@@ -1,7 +1,11 @@
-import type { ProductDetailsPage } from "../../commerce/types.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
-import { AppContext } from "../mod.ts";
-import { getSEOFromTag, parseSlug, toProduct } from "../utils/transform.ts";
+import type { ProductDetailsPage } from "apps/commerce/types.ts";
+import { AppContext } from "apps/vnda/mod.ts";
+import {
+  getSEOFromTag,
+  parseSlug,
+  toProduct,
+} from "apps/vnda/utils/transform.ts";
+import type { RequestURLParam } from "apps/website/functions/requestToParam.ts";
 
 export interface Props {
   slug: RequestURLParam;

@@ -2,9 +2,76 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$0 from "./loaders/legacy/productList.ts";
+import * as $$$1 from "./loaders/legacy/productDetailsPage.ts";
+import * as $$$2 from "./loaders/legacy/productListingPage.ts";
+import * as $$$3 from "./loaders/legacy/relatedProductsLoader.ts";
+import * as $$$4 from "./loaders/wishlist.ts";
+import * as $$$5 from "./loaders/navbar.ts";
+import * as $$$6 from "./loaders/intelligentSearch/productList.ts";
+import * as $$$7 from "./loaders/intelligentSearch/productDetailsPage.ts";
+import * as $$$8 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$9 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$10 from "./loaders/cart.ts";
+import * as $$$11 from "./loaders/user.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
+import * as $$$$$$$$$0 from "./actions/notifyme.ts";
+import * as $$$$$$$$$1 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$2 from "./actions/cart/updateAttachment.ts";
+import * as $$$$$$$$$3 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$4 from "./actions/cart/updateItemAttachment.ts";
+import * as $$$$$$$$$5 from "./actions/cart/updateUser.ts";
+import * as $$$$$$$$$6 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$7 from "./actions/cart/removeItems.ts";
+import * as $$$$$$$$$8 from "./actions/cart/getInstallment.ts";
+import * as $$$$$$$$$9 from "./actions/cart/updateItemPrice.ts";
+import * as $$$$$$$$$10 from "./actions/cart/updateProfile.ts";
+import * as $$$$$$$$$11 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$12 from "./actions/cart/removeItemAttachment.ts";
+import * as $$$$$$$$$13 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$14 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$15 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$16 from "./actions/analytics/sendEvent.ts";
 import { AppManifest } from "$live/types.ts";
 
-const manifest = {};
+const manifest = {
+  "loaders": {
+    "apps/vtex/loaders/cart.ts": $$$10,
+    "apps/vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$7,
+    "apps/vtex/loaders/intelligentSearch/productList.ts": $$$6,
+    "apps/vtex/loaders/intelligentSearch/productListingPage.ts": $$$8,
+    "apps/vtex/loaders/intelligentSearch/suggestions.ts": $$$9,
+    "apps/vtex/loaders/legacy/productDetailsPage.ts": $$$1,
+    "apps/vtex/loaders/legacy/productList.ts": $$$0,
+    "apps/vtex/loaders/legacy/productListingPage.ts": $$$2,
+    "apps/vtex/loaders/legacy/relatedProductsLoader.ts": $$$3,
+    "apps/vtex/loaders/navbar.ts": $$$5,
+    "apps/vtex/loaders/user.ts": $$$11,
+    "apps/vtex/loaders/wishlist.ts": $$$4,
+  },
+  "handlers": {
+    "apps/vtex/handlers/sitemap.ts": $$$$0,
+  },
+  "actions": {
+    "apps/vtex/actions/analytics/sendEvent.ts": $$$$$$$$$16,
+    "apps/vtex/actions/cart/addItems.ts": $$$$$$$$$6,
+    "apps/vtex/actions/cart/getInstallment.ts": $$$$$$$$$8,
+    "apps/vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$12,
+    "apps/vtex/actions/cart/removeItems.ts": $$$$$$$$$7,
+    "apps/vtex/actions/cart/simulation.ts": $$$$$$$$$11,
+    "apps/vtex/actions/cart/updateAttachment.ts": $$$$$$$$$2,
+    "apps/vtex/actions/cart/updateCoupons.ts": $$$$$$$$$1,
+    "apps/vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$4,
+    "apps/vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$9,
+    "apps/vtex/actions/cart/updateItems.ts": $$$$$$$$$3,
+    "apps/vtex/actions/cart/updateProfile.ts": $$$$$$$$$10,
+    "apps/vtex/actions/cart/updateUser.ts": $$$$$$$$$5,
+    "apps/vtex/actions/newsletter/subscribe.ts": $$$$$$$$$13,
+    "apps/vtex/actions/notifyme.ts": $$$$$$$$$0,
+    "apps/vtex/actions/wishlist/addItem.ts": $$$$$$$$$15,
+    "apps/vtex/actions/wishlist/removeItem.ts": $$$$$$$$$14,
+  },
+};
 
 export type Manifest = typeof manifest;
 

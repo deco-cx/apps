@@ -1,7 +1,7 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
-import { Runtime } from "../runtime.ts";
-import { Cart } from "../utils/client/types.ts";
+import { Runtime } from "apps/vnda/runtime.ts";
+import { Cart } from "apps/vnda/utils/client/types.ts";
 
 interface Context {
   cart: Cart;

@@ -1,6 +1,6 @@
 import { AnalyticsItem } from "apps/commerce/types.ts";
-import { Runtime } from "../runtime.ts";
-import { Cart, Item } from "../utils/client/types.ts";
+import { Runtime } from "apps/vnda/runtime.ts";
+import { Cart, Item } from "apps/vnda/utils/client/types.ts";
 import { state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;

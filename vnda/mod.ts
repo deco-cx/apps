@@ -4,6 +4,7 @@ import { createClient } from "./utils/client/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
+/** @title VNDA */
 export interface Props {
   /**
    * @title VNDA Account name
@@ -29,6 +30,11 @@ export interface Props {
    * @description Define if sandbox environment should be used
    */
   sandbox: boolean;
+
+  /**
+   * @description Use VNDA as backend platform
+   */
+  platform: "vnda";
 }
 
 export interface State extends Props {

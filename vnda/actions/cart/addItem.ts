@@ -1,6 +1,6 @@
 import { setCookie } from "std/http/mod.ts";
-import { AppContext } from "../../mod.ts";
-import type { Cart } from "../../utils/client/types.ts";
+import { AppContext } from "apps/vnda/mod.ts";
+import type { Cart } from "apps/vnda/utils/client/types.ts";
 
 export interface Props {
   itemId: string;

@@ -11,6 +11,7 @@ import { isFreshCtx } from "$live/handlers/fresh.ts";
 import { Flag, LiveState, RouterContext } from "$live/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
+import { FreshContext } from "$live/engine/fresh/manifest.ts";
 
 export interface SelectionConfig {
   audiences: Routes[];
@@ -77,8 +78,11 @@ export const router = (
       };
 
       const resolvedOrPromise =
-        isDeferred<Handler, { context: typeof ctx } & BaseContext>(handler)
-          ? handler({ context: ctx })
+        isDeferred<
+            Handler,
+            Omit<FreshContext, "context"> & { context: typeof ctx }
+          >(handler)
+          ? handler({ context: ctx, request: req })
           : resolver<Handler>(
             handler,
             configs,

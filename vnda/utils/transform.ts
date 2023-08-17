@@ -5,14 +5,14 @@ import {
   PropertyValue,
   Seo,
   UnitPriceSpecification,
-} from "../../commerce/types.ts";
+} from "apps/commerce/types.ts";
 import {
   Installment,
   ProductGroup,
   ProductSearchResult,
   ProductVariant,
   SEO,
-} from "./client/types.ts";
+} from "apps/vnda/utils/client/types.ts";
 
 interface ProductOptions {
   url: URL;

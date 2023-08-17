@@ -1,8 +1,6 @@
-import { getSetCookies } from "std/http/cookie.ts";
-import { FetchOptions, fetchSafe } from "../../../utils/fetch.ts";
-import { HttpError } from "../../../utils/HttpError.ts";
-import { Props } from "../../mod.ts";
-import { paramsToQueryString } from "../queryBuilder.ts";
+import { HttpError } from "apps/utils/HttpError.ts";
+import { FetchOptions, fetchSafe } from "apps/utils/fetch.ts";
+import { Props } from "apps/vnda/mod.ts";
 import {
   Banner,
   Coupon,
@@ -15,7 +13,9 @@ import {
   SEO,
   Shipping,
   TagsSearchParams,
-} from "./types.ts";
+} from "apps/vnda/utils/client/types.ts";
+import { paramsToQueryString } from "apps/vnda/utils/queryBuilder.ts";
+import { getSetCookies } from "std/http/cookie.ts";
 
 export const createClient = (state: Props) => {
   const { publicUrl, sandbox, authToken } = state;
