@@ -16,7 +16,7 @@ import type {
 } from "apps/vtex/utils/types.ts";
 import { withIsSimilarTo } from "apps/vtex/utils/similars.ts";
 
-export interface CollectionProps {
+export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
   /**
    * @description Collection ID or (Product Cluster id). For more info: https://developers.vtex.com/docs/api-reference/search-api#get-/api/catalog_system/pub/products/search .
@@ -31,7 +31,7 @@ export interface CollectionProps {
   count: number;
 }
 
-export interface TermProps {
+export interface TermProps extends CommonProps {
   /** @description term to use on search */
   term?: string;
   /**
@@ -42,7 +42,7 @@ export interface TermProps {
   count: number;
 }
 
-export interface FQProps {
+export interface FQProps extends CommonProps {
   /** @description fq's */
   fq: string[];
 
@@ -55,7 +55,7 @@ export interface FQProps {
   count: number;
 }
 
-export interface ProductIDProps {
+export interface ProductIDProps extends CommonProps {
   /**
    * @description SKU ids to retrieve
    */
@@ -69,12 +69,7 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props =
-  & CommonProps
-  & Partial<CollectionProps>
-  & Partial<TermProps>
-  & Partial<ProductIDProps>
-  & Partial<FQProps>;
+export type Props = CollectionProps | TermProps | ProductIDProps | FQProps;
 
 // deno-lint-ignore no-explicit-any
 const isCollectionProps = (p: any): p is CollectionProps =>
@@ -92,8 +87,6 @@ const fromProps = (
   props: Props,
   params = new URLSearchParams(),
 ): URLSearchParams => {
-  props.sort && params.set("O", props.sort);
-
   if (isProductIDProps(props)) {
     props.ids.forEach((skuId) => params.append("fq", `skuId:${skuId}`));
     params.set("_from", "0");
@@ -105,6 +98,7 @@ const fromProps = (
   const count = props.count ?? 12;
   params.set("_from", "0");
   params.set("_to", `${Math.max(count - 1, 0)}`);
+  props.sort && params.set("O", props.sort);
 
   if (isCollectionProps(props)) {
     params.set("fq", `productClusterIds:${props.collection}`);

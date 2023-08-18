@@ -65,11 +65,7 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-// TODO: Change & to |. Somehow RJS bugs when using |
-export type Props =
-  & Partial<CollectionProps>
-  & Partial<QueryProps>
-  & Partial<ProductIDProps>;
+export type Props = CollectionProps | QueryProps | ProductIDProps;
 
 // deno-lint-ignore no-explicit-any
 const isCollectionList = (p: any): p is CollectionProps =>
