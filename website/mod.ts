@@ -1,7 +1,7 @@
 import { Routes } from "$live/flags/audience.ts";
 import type { App, FnContext } from "$live/mod.ts";
 import { asResolved } from "$live/mod.ts";
-import manifest, { Manifest, name } from "./manifest.gen.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -19,7 +19,6 @@ export default function App(
   state: Props,
 ): App<Manifest, Props> {
   return {
-    name,
     state,
     manifest,
     resolvables: {

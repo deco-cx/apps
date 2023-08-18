@@ -6,11 +6,6 @@ import { Manifest } from "../manifest.gen.ts";
 export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
   "/live/invoke/apps/website/loaders/image.ts";
 
-/**
- * @format image-uri
- */
-export type ImageWidget = string;
-
 export type Props =
   & Omit<JSX.IntrinsicElements["img"], "width" | "height" | "preload">
   & {

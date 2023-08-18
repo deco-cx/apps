@@ -1,5 +1,5 @@
 import type { App, FnContext } from "$live/mod.ts";
-import manifest, { Manifest, name } from "./manifest.gen.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import { createClient } from "./utils/client/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
@@ -46,7 +46,6 @@ export interface State extends Props {
  */
 export default function App(props: Props): App<Manifest, State> {
   return {
-    name,
     state: {
       ...props,
       client: createClient(props),
