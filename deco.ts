@@ -4,6 +4,7 @@ const config = {
   apps: [
     app("apps/vtex"),
     app("apps/vnda"),
+    app("apps/shopify"),
     app("apps/website"),
     app("apps/workflows"),
   ],
