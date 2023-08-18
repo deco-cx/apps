@@ -5,7 +5,8 @@
 import * as $$$0 from "./loaders/productList.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
 import * as $$$2 from "./loaders/productListingPage.ts";
-import * as $$$3 from "./loaders/cart.ts";
+import * as $$$3 from "./loaders/proxy.ts";
+import * as $$$4 from "./loaders/cart.ts";
 import * as $$$$$$$$$0 from "./actions/cart/updateItem.ts";
 import * as $$$$$$$$$1 from "./actions/cart/setShippingAddress.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
@@ -14,10 +15,11 @@ import { AppManifest } from "$live/types.ts";
 
 const manifest = {
   "loaders": {
-    "apps/vnda/loaders/cart.ts": $$$3,
+    "apps/vnda/loaders/cart.ts": $$$4,
     "apps/vnda/loaders/productDetailsPage.ts": $$$1,
     "apps/vnda/loaders/productList.ts": $$$0,
     "apps/vnda/loaders/productListingPage.ts": $$$2,
+    "apps/vnda/loaders/proxy.ts": $$$3,
   },
   "actions": {
     "apps/vnda/actions/cart/addItem.ts": $$$$$$$$$2,

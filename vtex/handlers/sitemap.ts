@@ -1,10 +1,10 @@
-import { isFreshCtx } from "$live/handlers/fresh.ts";
 import Proxy from "$live/handlers/proxy.ts";
-
+import { AppContext } from "apps/vtex/mod.ts";
 import { ConnInfo } from "std/http/server.ts";
 
 const xmlHeader =
   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
 const includeSiteMaps = (
   currentXML: string,
   origin: string,
@@ -33,19 +33,16 @@ export interface Props {
 /**
  * @title Sitemap Proxy
  */
-export default function Sitemap({ include }: Props) {
+export default function Sitemap(
+  { include }: Props,
+  { publicUrl: url }: AppContext,
+) {
   return async (
     req: Request,
     ctx: ConnInfo,
   ) => {
-    if (!isFreshCtx(ctx)) {
-      throw new Error("Missing fresh context");
-    }
-
-    const url = ctx.state?.publicUrl;
-
     if (!url) {
-      throw new Error("Missing configVTEX.publicUrl");
+      throw new Error("Missing publicUrl");
     }
 
     const publicUrl =

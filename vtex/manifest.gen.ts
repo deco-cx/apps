@@ -8,12 +8,13 @@ import * as $$$2 from "./loaders/legacy/productListingPage.ts";
 import * as $$$3 from "./loaders/legacy/relatedProductsLoader.ts";
 import * as $$$4 from "./loaders/wishlist.ts";
 import * as $$$5 from "./loaders/navbar.ts";
-import * as $$$6 from "./loaders/intelligentSearch/productList.ts";
-import * as $$$7 from "./loaders/intelligentSearch/productDetailsPage.ts";
-import * as $$$8 from "./loaders/intelligentSearch/productListingPage.ts";
-import * as $$$9 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$10 from "./loaders/cart.ts";
-import * as $$$11 from "./loaders/user.ts";
+import * as $$$6 from "./loaders/proxy.ts";
+import * as $$$7 from "./loaders/intelligentSearch/productList.ts";
+import * as $$$8 from "./loaders/intelligentSearch/productDetailsPage.ts";
+import * as $$$9 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$10 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$11 from "./loaders/cart.ts";
+import * as $$$12 from "./loaders/user.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/notifyme.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateCoupons.ts";
@@ -36,17 +37,18 @@ import { AppManifest } from "$live/types.ts";
 
 const manifest = {
   "loaders": {
-    "apps/vtex/loaders/cart.ts": $$$10,
-    "apps/vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$7,
-    "apps/vtex/loaders/intelligentSearch/productList.ts": $$$6,
-    "apps/vtex/loaders/intelligentSearch/productListingPage.ts": $$$8,
-    "apps/vtex/loaders/intelligentSearch/suggestions.ts": $$$9,
+    "apps/vtex/loaders/cart.ts": $$$11,
+    "apps/vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$8,
+    "apps/vtex/loaders/intelligentSearch/productList.ts": $$$7,
+    "apps/vtex/loaders/intelligentSearch/productListingPage.ts": $$$9,
+    "apps/vtex/loaders/intelligentSearch/suggestions.ts": $$$10,
     "apps/vtex/loaders/legacy/productDetailsPage.ts": $$$1,
     "apps/vtex/loaders/legacy/productList.ts": $$$0,
     "apps/vtex/loaders/legacy/productListingPage.ts": $$$2,
     "apps/vtex/loaders/legacy/relatedProductsLoader.ts": $$$3,
     "apps/vtex/loaders/navbar.ts": $$$5,
-    "apps/vtex/loaders/user.ts": $$$11,
+    "apps/vtex/loaders/proxy.ts": $$$6,
+    "apps/vtex/loaders/user.ts": $$$12,
     "apps/vtex/loaders/wishlist.ts": $$$4,
   },
   "handlers": {

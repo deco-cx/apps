@@ -1,0 +1,89 @@
+import { Route } from "$live/flags/audience.ts";
+import { AppContext } from "apps/vnda/mod.ts";
+
+const PAGE_PATHS = [
+  "/admin",
+  "/admin/*",
+  "/carrinho",
+  "/carrinho/*",
+  "/cdn-cgi/*",
+  "/cep",
+  "/cep/*",
+  "/checkout/*",
+  "/common/*",
+  "/components/*",
+  "/conta",
+  "/conta/*",
+  "/cupom/ajax",
+  "/entrar",
+  "/images/*",
+  "/javascripts/*",
+  "/loja/configuracoes",
+  "/pedido/*",
+  "/recaptcha",
+  "/recuperar_senha",
+  "/sair",
+  "/sitemap.xml",
+  "/stylesheets/*",
+  "/v/s",
+  "/webform",
+];
+
+const API_PATHS = [
+  "/api/*",
+];
+
+const VNDA_HOST_HEADER = "X-Shop-Host";
+export interface Props {
+  /** @description ex: /p/fale-conosco */
+  pagesToProxy?: string[];
+}
+
+/**
+ * @title VNDA Proxy Routes
+ */
+function loader(
+  { pagesToProxy = [] }: Props,
+  _req: Request,
+  { publicUrl, account }: AppContext,
+): Route[] {
+  const internalDomain = `https://${account}.cdn.vnda.com.br/`;
+  const url = new URL(
+    publicUrl?.startsWith("http") ? publicUrl : `https://${publicUrl}`,
+  );
+
+  const customHeaders = [{ key: VNDA_HOST_HEADER, value: url.hostname }];
+
+  const internalDomainPaths = [
+    ...PAGE_PATHS,
+    ...pagesToProxy,
+  ].map((
+    pathTemplate,
+  ) => ({
+    pathTemplate,
+    handler: {
+      value: {
+        __resolveType: "apps/website/handlers/proxy.ts",
+        url: internalDomain,
+        host: url.hostname,
+        customHeaders,
+      },
+    },
+  }));
+
+  const apiDomainPaths = API_PATHS.map((pathTemplate) => ({
+    pathTemplate,
+    handler: {
+      value: {
+        __resolveType: "apps/website/handlers/proxy.ts",
+        url: `https://api.vnda.com.br/`,
+        host: url.hostname,
+        customHeaders,
+      },
+    },
+  }));
+
+  return [...internalDomainPaths, ...apiDomainPaths];
+}
+
+export default loader;

@@ -77,17 +77,16 @@ export const router = (
         pagePath: routePath,
       };
 
-      const resolvedOrPromise =
-        isDeferred<
-            Handler,
-            Omit<FreshContext, "context"> & { context: typeof ctx }
-          >(handler)
-          ? handler({ context: ctx, request: req })
-          : resolver<Handler>(
-            handler,
-            configs,
-            { context: ctx, request: req },
-          );
+      const resolvedOrPromise = isDeferred<
+          Handler,
+          Omit<FreshContext, "context"> & { context: typeof ctx }
+        >(handler)
+        ? handler({ context: ctx, request: req })
+        : resolver<Handler>(
+          handler,
+          configs,
+          { context: ctx, request: req },
+        );
 
       const end = configs?.monitoring?.t.start("load-data");
       const hand = isAwaitable(resolvedOrPromise)
