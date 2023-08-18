@@ -75,6 +75,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export const name = "apps/vtex";
-
 export default manifest satisfies AppManifest;

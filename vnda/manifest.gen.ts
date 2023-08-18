@@ -29,6 +29,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export const name = "apps/vnda";
-
 export default manifest satisfies AppManifest;

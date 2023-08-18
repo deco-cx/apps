@@ -27,6 +27,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export const name = "apps/workflows";
-
 export default manifest satisfies AppManifest;

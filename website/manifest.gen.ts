@@ -85,6 +85,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export const name = "apps/website";
-
 export default manifest satisfies AppManifest;
