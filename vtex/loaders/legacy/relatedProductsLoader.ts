@@ -35,7 +35,7 @@ export interface Props {
 }
 
 /**
- * @title VTEX Integration - Legacy Search
+ * @title VTEX Integration - Related Products
  * @description Related Products loader
  */
 async function loader(
