@@ -1,7 +1,7 @@
 import type {
-    BreadcrumbList,
-    ProductDetailsPage,
-    ProductListingPage,
+  BreadcrumbList,
+  ProductDetailsPage,
+  ProductListingPage,
 } from "../commerce/types.ts";
 import { Props } from "./types.ts";
 

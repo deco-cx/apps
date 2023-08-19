@@ -4,7 +4,7 @@ import { forwardRef } from "preact/compat";
 import { Manifest } from "../manifest.gen.ts";
 
 export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
-  "/live/invoke/apps/website/loaders/image.ts";
+  "/live/invoke/website/loaders/image.ts";
 
 export type Props =
   & Omit<JSX.IntrinsicElements["img"], "width" | "height" | "preload">

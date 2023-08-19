@@ -1,7 +1,7 @@
-import { ProductDetailsPage } from "apps/commerce/types.ts";
-import { AppContext } from "apps/shopify/mod.ts";
-import { toProductPage } from "apps/shopify/utils/transform.ts";
-import type { RequestURLParam } from "apps/website/functions/requestToParam.ts";
+import { ProductDetailsPage } from "../../commerce/types.ts";
+import { AppContext } from "../mod.ts";
+import { toProductPage } from "../utils/transform.ts";
+import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
 export interface Props {
   slug: RequestURLParam;

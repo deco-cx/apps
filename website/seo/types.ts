@@ -1,6 +1,5 @@
 import type { Image as LiveImage } from "../image/components/types.ts";
-import type { LoaderReturnType } from "$live/types.ts";
-
+import type { LoaderReturnType } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/types.ts";
 
 export type OGType = "website" | "article";
 

@@ -1,26 +1,26 @@
-import type { ProductDetailsPage } from "apps/commerce/types.ts";
-import type { RequestURLParam } from "apps/website/functions/requestToParam.ts";
-import { AppContext } from "apps/vtex/mod.ts";
+import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import { fetchAPI } from "../../../utils/fetch.ts";
+import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
+import { AppContext } from "../../mod.ts";
 import {
   toPath,
   withDefaultFacets,
   withDefaultParams,
-} from "apps/vtex/utils/intelligentSearch.ts";
-import { pageTypesToSeo } from "apps/vtex/utils/legacy.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
+} from "../../utils/intelligentSearch.ts";
+import { pageTypesToSeo } from "../../utils/legacy.ts";
+import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
   withSegmentCookie,
-} from "apps/vtex/utils/segment.ts";
-import { pickSku, toProductPage } from "apps/vtex/utils/transform.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
+} from "../../utils/segment.ts";
+import { withIsSimilarTo } from "../../utils/similars.ts";
+import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type {
   PageType,
   Product as VTEXProduct,
   ProductSearchResult,
 } from "../../utils/types.ts";
-import { withIsSimilarTo } from "apps/vtex/utils/similars.ts";
 
 export interface Props {
   slug: RequestURLParam;

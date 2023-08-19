@@ -1,5 +1,3 @@
-import type { FnContext } from "$live/types.ts";
-
 /** @description Equivalent to sku ID in VTEX platform */
 export type ProductID = string;
 

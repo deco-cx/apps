@@ -1,13 +1,24 @@
 // deno-lint-ignore-file no-explicit-any
-import { Workflow, WorkflowFn } from "$live/blocks/workflow.ts";
+import {
+  Workflow,
+  WorkflowFn,
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/workflow.ts";
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
-import { Arg, RuntimeParameters, WorkflowExecutionBase } from "$live/deps.ts";
-import { BlockFromKey, BlockFunc, BlockKeys } from "$live/engine/block.ts";
-import { Resolvable } from "$live/engine/core/resolver.ts";
-import { Manifest } from "$live/live.gen.ts";
-import { context } from "$live/live.ts";
-import { DecoManifest } from "$live/types.ts";
+import {
+  Arg,
+  RuntimeParameters,
+  WorkflowExecutionBase,
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/deps.ts";
+import {
+  BlockFromKey,
+  BlockFunc,
+  BlockKeys,
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/block.ts";
+import { Resolvable } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/resolver.ts";
+import { Manifest } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/live.gen.ts";
+import { context } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/live.ts";
+import { DecoManifest } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/types.ts";
 
 export interface CommonProps<
   TMetadata extends WorkflowMetadata = WorkflowMetadata,

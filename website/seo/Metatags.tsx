@@ -8,12 +8,11 @@ function Metatags(props: Props) {
   const { titleTemplate = "", context, type, themeColor, favicon } = props;
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
 
-  const tags =
-    context?.["@type"] === "ProductDetailsPage"
-      ? tagsFromProduct(context, titleTemplate)
-      : context?.["@type"] === "ProductListingPage"
-      ? tagsFromListing(context, titleTemplate)
-      : null;
+  const tags = context?.["@type"] === "ProductDetailsPage"
+    ? tagsFromProduct(context, titleTemplate)
+    : context?.["@type"] === "ProductListingPage"
+    ? tagsFromListing(context, titleTemplate)
+    : null;
 
   const { title, description, image, canonical } = handleSEO(props, tags);
 

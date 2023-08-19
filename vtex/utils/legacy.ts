@@ -1,9 +1,9 @@
-import type { Seo } from "apps/commerce/types.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
-import { slugify } from "apps/vtex/utils/slugify.ts";
-import type { PageType, Segment } from "apps/vtex/utils/types.ts";
+import type { Seo } from "../../commerce/types.ts";
+import { fetchAPI } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
+import { paths } from "../utils/paths.ts";
+import { slugify } from "../utils/slugify.ts";
+import type { PageType, Segment } from "../utils/types.ts";
 
 export const toSegmentParams = (segment: Partial<Segment>) => {
   const params = new URLSearchParams();

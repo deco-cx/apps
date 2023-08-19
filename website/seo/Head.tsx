@@ -1,1 +1,1 @@
-export { Preview, default } from "../seo/Metatags.tsx";
+export { default, Preview } from "../seo/Metatags.tsx";

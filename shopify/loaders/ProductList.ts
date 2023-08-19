@@ -1,6 +1,6 @@
-import type { Product } from "apps/commerce/types.ts";
+import type { Product } from "../../commerce/types.ts";
 import { toProduct } from "../utils/transform.ts";
-import { AppContext } from "apps/shopify/mod.ts";
+import { AppContext } from "../mod.ts";
 
 export interface Props {
   /** @description search term to use on search */

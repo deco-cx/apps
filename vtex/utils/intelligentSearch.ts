@@ -1,17 +1,17 @@
-import { AppContext } from "apps/vtex/mod.ts";
-import type { SelectedFacet, Sort } from "apps/vtex/utils/types.ts";
 import { getCookies, setCookie } from "std/http/mod.ts";
+import { AppContext } from "../mod.ts";
+import type { SelectedFacet, Sort } from "../utils/types.ts";
 
 export const SESSION_COOKIE = "vtex_is_session";
 export const ANONYMOUS_COOKIE = "vtex_is_anonymous";
 
 const POLICY_KEY = "trade-policy";
 const REGION_KEY = "region-id";
-const CHANNEL_KEYS = new Set([POLICY_KEY, REGION_KEY]);
+const _CHANNEL_KEYS = new Set([POLICY_KEY, REGION_KEY]);
 
 export const withDefaultFacets = (
   allFacets: readonly SelectedFacet[],
-  ctx: AppContext,
+  _ctx: AppContext,
 ) => {
   // const { defaultSalesChannel, defaultRegionId } = ctx!;
   // const facets = allFacets.filter(({ key }) => !CHANNEL_KEYS.has(key));
@@ -53,9 +53,8 @@ export const withDefaultParams = ({
   count = 12,
   sort = "",
   fuzzy = "auto",
-  locale,
   hideUnavailableItems,
-}: Partial<Params>, ctx: AppContext) =>
+}: Partial<Params>, _ctx: AppContext) =>
   new URLSearchParams({
     page: `${page + 1}`,
     count: `${count}`,

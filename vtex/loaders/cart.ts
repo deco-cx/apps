@@ -1,9 +1,9 @@
-import { fetchSafe } from "apps/utils/fetch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import { proxySetCookie } from "apps/vtex/utils/cookies.ts";
-import { parseCookie } from "apps/vtex/utils/orderForm.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
-import type { OrderForm } from "apps/vtex/utils/types.ts";
+import { fetchSafe } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
+import { proxySetCookie } from "../utils/cookies.ts";
+import { parseCookie } from "../utils/orderForm.ts";
+import { paths } from "../utils/paths.ts";
+import type { OrderForm } from "../utils/types.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm

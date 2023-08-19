@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import type { Flag, Site } from "$live/types.ts";
+import type { Flag, Site } from "../deps.ts";
 
 interface Page {
   id: string | number;

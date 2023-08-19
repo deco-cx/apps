@@ -1,4 +1,4 @@
-import { gql } from "apps/shopify/utils/gql.ts";
+import { gql } from "../../utils/gql.ts";
 
 export const productVariantFragment = gql`
 fragment ProductVariantFragment on ProductVariant {

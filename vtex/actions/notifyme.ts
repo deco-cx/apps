@@ -1,7 +1,7 @@
-import { paths } from "apps/vtex/utils/paths.ts";
-import { fetchSafe } from "apps/utils/fetch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import type { OrderForm } from "apps/vtex/utils/types.ts";
+import { fetchSafe } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
+import { paths } from "../utils/paths.ts";
+import type { OrderForm } from "../utils/types.ts";
 
 export interface Props {
   email: string;

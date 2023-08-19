@@ -1,16 +1,13 @@
-import { context } from "$live/live.ts";
 import Script from "partytown/Script.tsx";
 import Jitsu from "partytown/integrations/Jitsu.tsx";
-import { Flag } from "$live/types.ts";
+import { context, Flag } from "../deps.ts";
 
-const main = (
-  userData: {
-    page_id: string;
-    page_path: string;
-    site_id: string;
-    active_flags: string;
-  },
-) => {
+const main = (userData: {
+  page_id: string;
+  page_path: string;
+  site_id: string;
+  active_flags: string;
+}) => {
   // Required for Safari
   const onIdle = window.requestIdleCallback ||
     ((callback: IdleRequestCallback) => setTimeout(callback, 0));
@@ -36,14 +33,21 @@ const main = (
   };
 
   /* Send exception error to jitsu */
-  const onError = ({ message, url, lineNo, columnNo, error }: {
+  const onError = ({
+    message,
+    url,
+    lineNo,
+    columnNo,
+    error,
+  }: {
     message: string;
     url?: string;
     lineNo?: number;
     columnNo?: number;
     error: Error;
   }) =>
-    window.jitsu && window.jitsu("track", "error", {
+    window.jitsu &&
+    window.jitsu("track", "error", {
       error_1type: "Exception",
       message,
       url,
@@ -94,9 +98,7 @@ const main = (
   addEventListener("error", onError);
 };
 
-const innerHtml = (
-  { id, path, flags }: Props,
-) =>
+const innerHtml = ({ id, path, flags }: Props) =>
   `(${main.toString()})({page_id: "${id}", page_path: "${path}", site_id: "${context.siteId}", active_flags: "${
     flags?.map((f) => `${f.name}=${f.value ? 0 : 1}`).join(",") ?? ""
   }"});

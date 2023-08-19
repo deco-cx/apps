@@ -37,7 +37,8 @@ function TelegramSmallerImage(props: PreviewItens) {
 
   return (
     <div class="flex gap-[6px]">
-      <div class="flex-grow border-2 rounded-l-full border-divider-blue max-w-[2px]"></div>
+      <div class="flex-grow border-2 rounded-l-full border-divider-blue max-w-[2px]">
+      </div>
       <div class="flex flex-grow max-w-[480px] ">
         <div class="py-1 flex-grow bg-white font-semibold">
           <Image

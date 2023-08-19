@@ -1,6 +1,9 @@
-import { MultivariateFlag, Variant } from "$live/blocks/flag.ts";
-import { Section } from "$live/blocks/section.ts";
-import { asResolved } from "$live/engine/core/resolver.ts";
+import {
+  MultivariateFlag,
+  Variant,
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/flag.ts";
+import { Section } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/section.ts";
+import { asResolved } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/resolver.ts";
 
 /**
  * @title Multivariate

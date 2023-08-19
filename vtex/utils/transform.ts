@@ -9,8 +9,8 @@ import type {
   ProductGroup,
   PropertyValue,
   UnitPriceSpecification,
-} from "apps/commerce/types.ts";
-import { formatRange } from "apps/commerce/utils/filters.ts";
+} from "../../commerce/types.ts";
+import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
   Category,

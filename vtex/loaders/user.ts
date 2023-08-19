@@ -1,4 +1,4 @@
-import { AppContext } from "apps/vtex/mod.ts";
+import { AppContext } from "../mod.ts";
 import { parseCookie } from "../utils/vtexId.ts";
 
 export interface User {

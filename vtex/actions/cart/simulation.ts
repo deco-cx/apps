@@ -1,7 +1,7 @@
+import { fetchSafe } from "../../../utils/fetch.ts";
+import { AppContext } from "../../mod.ts";
 import { paths } from "../../utils/paths.ts";
-import { fetchSafe } from "apps/utils/fetch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import type { SimulationOrderForm } from "apps/vtex/utils/types.ts";
+import type { SimulationOrderForm } from "../../utils/types.ts";
 
 export interface Item {
   id: number;

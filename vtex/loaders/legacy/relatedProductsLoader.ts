@@ -1,14 +1,20 @@
-import { paths } from "apps/vtex/utils/paths.ts";
-import { pickSku, toProduct } from "apps/vtex/utils/transform.ts";
-import { RequestURLParam } from "apps/website/functions/requestToParam.ts";
-import { getSegment, setSegment } from "apps/vtex/utils/segment.ts";
-import { toSegmentParams } from "apps/vtex/utils/legacy.ts";
-import type { Product } from "apps/commerce/types.ts";
-import type { CrossSellingType } from "apps/vtex/utils/types.ts";
-import type { LegacyProduct, PageType } from "apps/vtex/utils/types.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import { withSegmentCookie } from "apps/vtex/utils/segment.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
+import type { Product } from "../../../commerce/types.ts";
+import { fetchAPI } from "../../../utils/fetch.ts";
+import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
+import { AppContext } from "../../mod.ts";
+import { toSegmentParams } from "../../utils/legacy.ts";
+import { paths } from "../../utils/paths.ts";
+import {
+  getSegment,
+  setSegment,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
+import { pickSku, toProduct } from "../../utils/transform.ts";
+import type {
+  CrossSellingType,
+  LegacyProduct,
+  PageType,
+} from "../../utils/types.ts";
 
 export interface Props {
   /**

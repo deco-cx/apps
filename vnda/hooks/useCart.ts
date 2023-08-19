@@ -1,6 +1,6 @@
-import { AnalyticsItem } from "apps/commerce/types.ts";
-import { Runtime } from "apps/vnda/runtime.ts";
-import { Cart, Item } from "apps/vnda/utils/client/types.ts";
+import { AnalyticsItem } from "../../commerce/types.ts";
+import { Runtime } from "../runtime.ts";
+import { Cart, Item } from "../utils/client/types.ts";
 import { state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
@@ -32,16 +32,16 @@ const state = {
   cart,
   loading,
   addItem: wrap(
-    Runtime.create("apps/vnda/actions/cart/addItem.ts"),
+    Runtime.create("vnda/actions/cart/addItem.ts"),
   ),
   updateItem: wrap(
-    Runtime.create("apps/vnda/actions/cart/updateItem.ts"),
+    Runtime.create("vnda/actions/cart/updateItem.ts"),
   ),
   setShippingAddress: wrap(
-    Runtime.create("apps/vnda/actions/cart/setShippingAddress.ts"),
+    Runtime.create("vnda/actions/cart/setShippingAddress.ts"),
   ),
   updateCoupon: wrap(
-    Runtime.create("apps/vnda/actions/cart/updateCoupon.ts"),
+    Runtime.create("vnda/actions/cart/updateCoupon.ts"),
   ),
 };
 

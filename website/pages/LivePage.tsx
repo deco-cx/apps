@@ -1,14 +1,20 @@
 import { Head } from "$fresh/runtime.ts";
-import { isSection, Section } from "$live/blocks/section.ts";
-import { ComponentMetadata, PreactComponent } from "$live/engine/block.ts";
-import { context } from "$live/live.ts";
+import {
+  isSection,
+  Section,
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/section.ts";
+import {
+  ComponentMetadata,
+  PreactComponent,
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/block.ts";
+import { context } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/live.ts";
 import {
   usePageContext,
   useRouterContext,
-} from "$live/routes/[...catchall].tsx";
-import { isLivePageProps } from "$live/sections/PageInclude.tsx";
-import { CONTENT_SLOT_NAME } from "$live/sections/Slot.tsx";
-import { Props as UseSlotProps } from "$live/sections/UseSlot.tsx";
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/routes/[...catchall].tsx";
+import { isLivePageProps } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/sections/PageInclude.tsx";
+import { CONTENT_SLOT_NAME } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/sections/Slot.tsx";
+import { Props as UseSlotProps } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/sections/UseSlot.tsx";
 import { createContext, JSX } from "preact";
 import { useContext } from "preact/hooks";
 import LiveAnalytics from "../components/_Analytics.tsx";
@@ -70,9 +76,7 @@ const USE_SLOT_SECTION_KEY = "$live/sections/UseSlot.tsx" as const;
  * @param sections the sections
  * @returns the implementation map.
  */
-function indexedBySlotName(
-  sections: Section[],
-) {
+function indexedBySlotName(sections: Section[]) {
   const indexed: Record<string, UseSlotSection> = {};
   const contentSections: Section[] = [];
 
@@ -102,21 +106,19 @@ function indexedBySlotName(
  * @param impls the implementation map
  * @returns the section or the slot implementation if available.
  */
-const useSlots = (
-  impls: Record<string, UseSlotSection>,
-) =>
-(sec: Section): Section[] => {
-  if (isSection(sec, "$live/sections/Slot.tsx")) {
-    const impl = impls[sec.props.name ?? CONTENT_SLOT_NAME];
-    if (impl && !impl.used) {
-      impl.used = true;
-      return Array.isArray(impl.useSection)
-        ? impl.useSection
-        : [impl.useSection]; // allow content sections to be rendered at current page level.
+const useSlots =
+  (impls: Record<string, UseSlotSection>) => (sec: Section): Section[] => {
+    if (isSection(sec, "$live/sections/Slot.tsx")) {
+      const impl = impls[sec.props.name ?? CONTENT_SLOT_NAME];
+      if (impl && !impl.used) {
+        impl.used = true;
+        return Array.isArray(impl.useSection)
+          ? impl.useSection
+          : [impl.useSection]; // allow content sections to be rendered at current page level.
+      }
     }
-  }
-  return [sec];
-};
+    return [sec];
+  };
 
 /**
  * Recursively builds a page based on its inheritance hierarchy.
@@ -139,11 +141,11 @@ const renderPage = (
   { sections: maybeSections }: Props,
   useSlotsFromChild: Record<string, UseSlotSection> = {},
   editMode: Mode = "default",
-  isPreview: boolean = false,
+  isPreview = false,
 ): JSX.Element => {
   const validSections = Array.isArray(maybeSections)
-    ? maybeSections?.filter((section) =>
-      typeof section?.Component === "function"
+    ? maybeSections?.filter(
+      (section) => typeof section?.Component === "function",
     ) ?? []
     : [];
   // TODO: Uncomment when bring bag layout props
@@ -155,9 +157,7 @@ const renderPage = (
   const _renderSection = renderSectionFor(editMode, isPreview);
 
   if (layoutProps && isLivePageProps(layoutProps)) {
-    const useSlots = indexedBySlotName(
-      sections,
-    );
+    const useSlots = indexedBySlotName(sections);
 
     const rendered = renderPage(layoutProps, useSlots, editMode);
     // unmatchedSlots are `UseSlot.tsx` that did not find a corresponding `Slot.tsx` with the same name, by default they are rendered at bottom
@@ -174,11 +174,7 @@ const renderPage = (
     );
   }
 
-  return (
-    <>
-      {sections.map(_renderSection)}
-    </>
-  );
+  return <>{sections.map(_renderSection)}</>;
 };
 
 interface LivePageContext {
@@ -192,9 +188,7 @@ export const useLivePageContext = () => useContext(LivePageContext);
 /**
  * @title Page
  */
-export default function LivePage(
-  props: Props,
-): JSX.Element {
+export default function LivePage(props: Props): JSX.Element {
   const metadata = usePageContext()?.metadata;
   const routerCtx = useRouterContext();
   const pageId = pageIdFromMetadata(metadata);
@@ -217,18 +211,15 @@ export default function LivePage(
 }
 
 const PAGE_NOT_FOUND = -1;
-export const pageIdFromMetadata = (
-  metadata: ComponentMetadata | undefined,
-) => {
+export const pageIdFromMetadata = (metadata: ComponentMetadata | undefined) => {
   if (!metadata) {
     return PAGE_NOT_FOUND;
   }
 
   const { resolveChain, component } = metadata;
-  const pageResolverIndex =
-    (resolveChain.findLastIndex((chain) =>
-      chain.type === "resolver" && chain.value === component
-    )) || PAGE_NOT_FOUND;
+  const pageResolverIndex = resolveChain.findLastIndex(
+    (chain) => chain.type === "resolver" && chain.value === component,
+  ) || PAGE_NOT_FOUND;
 
   const pageParent = pageResolverIndex > 0
     ? resolveChain[pageResolverIndex - 1]

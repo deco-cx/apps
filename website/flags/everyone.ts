@@ -1,7 +1,10 @@
-import { FlagObj } from "$live/blocks/flag.ts";
-import { asResolved } from "$live/engine/core/resolver.ts";
-import Audience, { Route, Routes } from "$live/flags/audience.ts";
-import MatchAlways from "$live/matchers/MatchAlways.ts";
+import { FlagObj } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/flag.ts";
+import { asResolved } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/resolver.ts";
+import Audience, {
+  Route,
+  Routes,
+} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/flags/audience.ts";
+import MatchAlways from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/matchers/MatchAlways.ts";
 
 export interface EveryoneConfig {
   routes?: Routes;

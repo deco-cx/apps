@@ -1,8 +1,8 @@
+import { fetchAPI } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
 import { paths } from "../utils/paths.ts";
+import type { WishlistItem } from "../utils/types.ts";
 import { parseCookie } from "../utils/vtexId.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
-import type { WishlistItem } from "apps/vtex/utils/types.ts";
-import { AppContext } from "apps/vtex/mod.ts";
 
 export interface Props {
   /**

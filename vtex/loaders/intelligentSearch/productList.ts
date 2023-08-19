@@ -1,23 +1,23 @@
-import type { Product } from "apps/commerce/types.ts";
-import { AppContext } from "apps/vtex/mod.ts";
+import type { Product } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import type {
   ProductID,
   ProductSearchResult,
   Sort,
-} from "apps/vtex/utils/types.ts";
+} from "../../utils/types.ts";
 import {
   toPath,
   withDefaultFacets,
   withDefaultParams,
-} from "apps/vtex/utils/intelligentSearch.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
+} from "../../utils/intelligentSearch.ts";
+import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
   withSegmentCookie,
-} from "apps/vtex/utils/segment.ts";
-import { toProduct } from "apps/vtex/utils/transform.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
+} from "../../utils/segment.ts";
+import { toProduct } from "../../utils/transform.ts";
+import { fetchAPI } from "../../../utils/fetch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 
 export interface CollectionProps extends CommonProps {

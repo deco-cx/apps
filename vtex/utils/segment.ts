@@ -1,5 +1,5 @@
 import { getCookies, setCookie } from "std/http/mod.ts";
-import type { Segment } from "apps/vtex/utils/types.ts";
+import type { Segment } from "../utils/types.ts";
 
 export const SEGMENT_COOKIE_NAME = "vtex_segment";
 

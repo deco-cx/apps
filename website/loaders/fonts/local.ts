@@ -3,7 +3,7 @@ export type Font = {
   styleSheet: string;
 };
 
-const loader = async (): Promise<Font> => {
+const loader = (): Promise<Font> => {
   throw new Error("Not implemented");
 };
 

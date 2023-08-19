@@ -1,4 +1,4 @@
-import { AppContext } from "apps/shopify/mod.ts";
+import { AppContext } from "../mod.ts";
 import { getCookies, getSetCookies, setCookie } from "std/http/mod.ts";
 import { SHOPIFY_COOKIE_NAME } from "../utils/constants.ts";
 import type { Cart } from "../utils/types.ts";
