@@ -1,4 +1,4 @@
-import type { App, FnContext } from "$live/mod.ts";
+import type { App, FnContext } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { createClient } from "./utils/client/client.ts";
 

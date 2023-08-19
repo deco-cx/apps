@@ -9,20 +9,22 @@ import * as $$$3 from "./loaders/cart.ts";
 import * as $$$$$$$$$0 from "./actions/cart/updateCoupons.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateItems.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
-import { AppManifest } from "$live/types.ts";
+import { AppManifest } from "./deps.ts";
 
 const manifest = {
   "loaders": {
-    "apps/shopify/loaders/cart.ts": $$$3,
-    "apps/shopify/loaders/ProductDetailsPage.ts": $$$1,
-    "apps/shopify/loaders/ProductList.ts": $$$0,
-    "apps/shopify/loaders/ProductListingPage.ts": $$$2,
+    "shopify/loaders/cart.ts": $$$3,
+    "shopify/loaders/ProductDetailsPage.ts": $$$1,
+    "shopify/loaders/ProductList.ts": $$$0,
+    "shopify/loaders/ProductListingPage.ts": $$$2,
   },
   "actions": {
-    "apps/shopify/actions/cart/addItems.ts": $$$$$$$$$2,
-    "apps/shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
-    "apps/shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
+    "shopify/actions/cart/addItems.ts": $$$$$$$$$2,
+    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
+    "shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
   },
+  "name": "shopify",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;

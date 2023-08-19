@@ -32,55 +32,57 @@ import * as $$$$$$$$1 from "./flags/multivariate.ts";
 import * as $$$$$$$$2 from "./flags/everyone.ts";
 import * as $$$$$$$$3 from "./flags/flag.ts";
 import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
-import { AppManifest } from "$live/types.ts";
+import { AppManifest } from "./deps.ts";
 
 const manifest = {
   "functions": {
-    "apps/website/functions/requestToParam.ts": $0,
+    "website/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "apps/website/loaders/asset.ts": $$$3,
-    "apps/website/loaders/fonts/googleFonts.ts": $$$5,
-    "apps/website/loaders/fonts/local.ts": $$$4,
-    "apps/website/loaders/image.ts": $$$0,
-    "apps/website/loaders/redirectsFromCsv.ts": $$$1,
-    "apps/website/loaders/secret.ts": $$$2,
+    "website/loaders/asset.ts": $$$3,
+    "website/loaders/fonts/googleFonts.ts": $$$5,
+    "website/loaders/fonts/local.ts": $$$4,
+    "website/loaders/image.ts": $$$0,
+    "website/loaders/redirectsFromCsv.ts": $$$1,
+    "website/loaders/secret.ts": $$$2,
   },
   "handlers": {
-    "apps/website/handlers/fresh.ts": $$$$3,
-    "apps/website/handlers/proxy.ts": $$$$2,
-    "apps/website/handlers/redirect.ts": $$$$4,
-    "apps/website/handlers/router.ts": $$$$0,
-    "apps/website/handlers/sitemap.ts": $$$$1,
+    "website/handlers/fresh.ts": $$$$3,
+    "website/handlers/proxy.ts": $$$$2,
+    "website/handlers/redirect.ts": $$$$4,
+    "website/handlers/router.ts": $$$$0,
+    "website/handlers/sitemap.ts": $$$$1,
   },
   "pages": {
-    "apps/website/pages/LivePage.tsx": $$$$$0,
+    "website/pages/LivePage.tsx": $$$$$0,
   },
   "sections": {
-    "apps/website/sections/Empty.tsx": $$$$$$0,
+    "website/sections/Empty.tsx": $$$$$$0,
   },
   "matchers": {
-    "apps/website/matchers/always.ts": $$$$$$$9,
-    "apps/website/matchers/cron.ts": $$$$$$$6,
-    "apps/website/matchers/date.ts": $$$$$$$0,
-    "apps/website/matchers/device.ts": $$$$$$$7,
-    "apps/website/matchers/environment.ts": $$$$$$$1,
-    "apps/website/matchers/host.ts": $$$$$$$8,
-    "apps/website/matchers/location.ts": $$$$$$$3,
-    "apps/website/matchers/multi.ts": $$$$$$$5,
-    "apps/website/matchers/random.ts": $$$$$$$4,
-    "apps/website/matchers/site.ts": $$$$$$$2,
-    "apps/website/matchers/userAgent.ts": $$$$$$$10,
+    "website/matchers/always.ts": $$$$$$$9,
+    "website/matchers/cron.ts": $$$$$$$6,
+    "website/matchers/date.ts": $$$$$$$0,
+    "website/matchers/device.ts": $$$$$$$7,
+    "website/matchers/environment.ts": $$$$$$$1,
+    "website/matchers/host.ts": $$$$$$$8,
+    "website/matchers/location.ts": $$$$$$$3,
+    "website/matchers/multi.ts": $$$$$$$5,
+    "website/matchers/random.ts": $$$$$$$4,
+    "website/matchers/site.ts": $$$$$$$2,
+    "website/matchers/userAgent.ts": $$$$$$$10,
   },
   "flags": {
-    "apps/website/flags/audience.ts": $$$$$$$$0,
-    "apps/website/flags/everyone.ts": $$$$$$$$2,
-    "apps/website/flags/flag.ts": $$$$$$$$3,
-    "apps/website/flags/multivariate.ts": $$$$$$$$1,
+    "website/flags/audience.ts": $$$$$$$$0,
+    "website/flags/everyone.ts": $$$$$$$$2,
+    "website/flags/flag.ts": $$$$$$$$3,
+    "website/flags/multivariate.ts": $$$$$$$$1,
   },
   "actions": {
-    "apps/website/actions/secrets/encrypt.ts": $$$$$$$$$0,
+    "website/actions/secrets/encrypt.ts": $$$$$$$$$0,
   },
+  "name": "website",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;

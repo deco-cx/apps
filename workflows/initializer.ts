@@ -1,13 +1,13 @@
-import { context } from "$live/live.ts";
+import { context } from "https://denopkg.com/deco-cx/live@1.27.6/live.ts";
 import {
-    Arg,
-    cancel as durableCancel,
-    get as durableGet,
-    history as durableHistory,
-    signal as durableSignal,
-    start as durableStart,
-    init,
-} from "./deps.ts";
+  Arg,
+  cancel as durableCancel,
+  get as durableGet,
+  history as durableHistory,
+  init,
+  signal as durableSignal,
+  start as durableStart,
+} from "./durable.ts";
 
 const initializeOnceWhen = <TArgs extends Arg = Arg, TResult = unknown>(
   f: (...args: [...TArgs]) => TResult,

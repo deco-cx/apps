@@ -8,21 +8,23 @@ import * as $$$$0 from "./handlers/workflowRunner.ts";
 import * as $$$$$$$$$0 from "./actions/start.ts";
 import * as $$$$$$$$$1 from "./actions/cancel.ts";
 import * as $$$$$$$$$2 from "./actions/signal.ts";
-import { AppManifest } from "$live/types.ts";
+import { AppManifest } from "./deps.ts";
 
 const manifest = {
   "loaders": {
-    "apps/workflows/loaders/events.ts": $$$1,
-    "apps/workflows/loaders/get.ts": $$$0,
+    "workflows/loaders/events.ts": $$$1,
+    "workflows/loaders/get.ts": $$$0,
   },
   "handlers": {
-    "apps/workflows/handlers/workflowRunner.ts": $$$$0,
+    "workflows/handlers/workflowRunner.ts": $$$$0,
   },
   "actions": {
-    "apps/workflows/actions/cancel.ts": $$$$$$$$$1,
-    "apps/workflows/actions/signal.ts": $$$$$$$$$2,
-    "apps/workflows/actions/start.ts": $$$$$$$$$0,
+    "workflows/actions/cancel.ts": $$$$$$$$$1,
+    "workflows/actions/signal.ts": $$$$$$$$$2,
+    "workflows/actions/start.ts": $$$$$$$$$0,
   },
+  "name": "workflows",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;
