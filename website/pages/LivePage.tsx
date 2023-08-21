@@ -1,12 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
-import {
-  isSection,
-  Section,
-} from "$live/blocks/section.ts";
-import {
-  ComponentMetadata,
-  PreactComponent,
-} from "$live/engine/block.ts";
+import { isSection, Section } from "$live/blocks/section.ts";
+import { ComponentMetadata, PreactComponent } from "$live/engine/block.ts";
 import { context } from "$live/live.ts";
 import {
   usePageContext,
@@ -224,7 +218,6 @@ export const pageIdFromMetadata = (metadata: ComponentMetadata | undefined) => {
       (chain) => chain.type === "resolver" && chain.value === component
     ) || PAGE_NOT_FOUND;
 
-  console.log(pageResolverIndex, component);
   const pageParent =
     pageResolverIndex > 0 ? resolveChain[pageResolverIndex - 1] : null;
 
