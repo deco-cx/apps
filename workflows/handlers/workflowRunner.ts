@@ -1,15 +1,15 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { Handler } from "https://denopkg.com/deco-cx/live@1.27.6/blocks/handler.ts";
+import { Handler } from "$live/blocks/handler.ts";
 import {
   Workflow,
   WorkflowContext,
-} from "https://denopkg.com/deco-cx/live@1.27.6/blocks/workflow.ts";
-import { workflowHTTPHandler } from "https://denopkg.com/deco-cx/live@1.27.6/deps.ts";
-import type { Manifest } from "https://denopkg.com/deco-cx/live@1.27.6/live.gen.ts";
+} from "$live/blocks/workflow.ts";
+import { workflowHTTPHandler } from "$live/deps.ts";
+import type { Manifest } from "$live/live.gen.ts";
 import {
   LiveConfig,
   LiveState,
-} from "https://denopkg.com/deco-cx/live@1.27.6/mod.ts";
+} from "$live/mod.ts";
 import { ConnInfo } from "std/http/server.ts";
 export interface Config {
   workflow: Workflow;

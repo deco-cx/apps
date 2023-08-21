@@ -1,6 +1,6 @@
-import type { Handler } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/handler.ts";
-import type { Resolvable } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/resolver.ts";
-import { isResolvable } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/resolver.ts";
+import type { Handler } from "$live/blocks/handler.ts";
+import type { Resolvable } from "$live/engine/core/resolver.ts";
+import { isResolvable } from "$live/engine/core/resolver.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { Route } from "../flags/audience.ts";
 

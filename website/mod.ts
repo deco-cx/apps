@@ -1,6 +1,6 @@
-import { Routes } from "https://denopkg.com/deco-cx/live@1.27.6/flags/audience.ts";
-import type { App, FnContext } from "./deps.ts";
-import { asResolved } from "./deps.ts";
+import { Routes } from "$live/flags/audience.ts";
+import type { App, FnContext } from "$live/mod.ts";
+import { asResolved } from "$live/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<Props, Manifest>;

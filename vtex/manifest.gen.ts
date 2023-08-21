@@ -33,7 +33,6 @@ import * as $$$$$$$$$13 from "./actions/newsletter/subscribe.ts";
 import * as $$$$$$$$$14 from "./actions/wishlist/removeItem.ts";
 import * as $$$$$$$$$15 from "./actions/wishlist/addItem.ts";
 import * as $$$$$$$$$16 from "./actions/analytics/sendEvent.ts";
-import { AppManifest } from "./deps.ts";
 
 const manifest = {
   "loaders": {
@@ -79,4 +78,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export default manifest satisfies AppManifest;
+export default manifest;

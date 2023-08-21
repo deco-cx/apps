@@ -1,8 +1,8 @@
 import type {
   HistoryEvent,
   Pagination,
-} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/deps.ts";
-import { StreamProps } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/utils/invoke.ts";
+} from "$live/deps.ts";
+import { StreamProps } from "$live/utils/invoke.ts";
 import { history } from "../initializer.ts"; // side-effect initialize
 
 export interface Props extends StreamProps {

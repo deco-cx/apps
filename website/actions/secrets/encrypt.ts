@@ -3,7 +3,7 @@ import {
   allowCorsFor,
   badRequest,
   context,
-} from "../../deps.ts";
+} from "$live/mod.ts";
 import { encryptToHex } from "../../utils/crypto.ts";
 
 export interface Props {

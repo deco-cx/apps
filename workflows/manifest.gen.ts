@@ -8,7 +8,6 @@ import * as $$$$0 from "./handlers/workflowRunner.ts";
 import * as $$$$$$$$$0 from "./actions/start.ts";
 import * as $$$$$$$$$1 from "./actions/cancel.ts";
 import * as $$$$$$$$$2 from "./actions/signal.ts";
-import { AppManifest } from "./deps.ts";
 
 const manifest = {
   "loaders": {
@@ -29,4 +28,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export default manifest satisfies AppManifest;
+export default manifest;

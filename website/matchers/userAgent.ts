@@ -1,4 +1,4 @@
-import { MatchContext } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/matcher.ts";
+import { MatchContext } from "$live/blocks/matcher.ts";
 
 /**
  * @title {{{includes}}} {{{match}}}

@@ -9,7 +9,6 @@ import * as $$$3 from "./loaders/cart.ts";
 import * as $$$$$$$$$0 from "./actions/cart/updateCoupons.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateItems.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
-import { AppManifest } from "./deps.ts";
 
 const manifest = {
   "loaders": {
@@ -29,4 +28,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export default manifest satisfies AppManifest;
+export default manifest;

@@ -1,9 +1,9 @@
-import { FlagObj } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/flag.ts";
-import { Handler } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/handler.ts";
-import { Matcher } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/blocks/matcher.ts";
-import JsonViewer from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/components/JsonViewer.tsx";
-import { Resolvable } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/resolver.ts";
-import { metabasePreview } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/utils/metabase.tsx";
+import { FlagObj } from "$live/blocks/flag.ts";
+import { Handler } from "$live/blocks/handler.ts";
+import { Matcher } from "$live/blocks/matcher.ts";
+import JsonViewer from "$live/components/JsonViewer.tsx";
+import { Resolvable } from "$live/engine/core/resolver.ts";
+import { metabasePreview } from "$live/utils/metabase.tsx";
 import Flag from "./flag.ts";
 export { onBeforeResolveProps } from "./everyone.ts";
 /**

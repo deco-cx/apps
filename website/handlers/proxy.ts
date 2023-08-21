@@ -1,5 +1,5 @@
 import { getSetCookies, Handler, setCookie } from "std/http/mod.ts";
-import { isFreshCtx } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/handlers/fresh.ts";
+import { isFreshCtx } from "$live/handlers/fresh.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",

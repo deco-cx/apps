@@ -1,4 +1,4 @@
-import { context } from "https://denopkg.com/deco-cx/live@1.27.6/live.ts";
+import { context } from "$live/live.ts";
 import {
   Arg,
   cancel as durableCancel,

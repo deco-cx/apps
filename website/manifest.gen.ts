@@ -32,7 +32,6 @@ import * as $$$$$$$$1 from "./flags/multivariate.ts";
 import * as $$$$$$$$2 from "./flags/everyone.ts";
 import * as $$$$$$$$3 from "./flags/flag.ts";
 import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
-import { AppManifest } from "./deps.ts";
 
 const manifest = {
   "functions": {
@@ -87,4 +86,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export default manifest satisfies AppManifest;
+export default manifest;

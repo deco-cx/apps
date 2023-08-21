@@ -1,6 +1,6 @@
-import Script from "partytown/Script.tsx";
+import { context, Flag } from "$live/mod.ts";
 import Jitsu from "partytown/integrations/Jitsu.tsx";
-import { context, Flag } from "../deps.ts";
+import Script from "partytown/Script.tsx";
 
 const main = (userData: {
   page_id: string;

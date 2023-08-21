@@ -1,23 +1,23 @@
-import { ResolveOptions } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/mod.ts";
+import { ResolveOptions } from "$live/engine/core/mod.ts";
 import {
   isDeferred,
   Resolvable,
   ResolveFunc,
-} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/resolver.ts";
-import { isAwaitable } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/core/utils.ts";
+} from "$live/engine/core/resolver.ts";
+import { isAwaitable } from "$live/engine/core/utils.ts";
 import {
   Route,
   Routes,
-} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/flags/audience.ts";
-import { isFreshCtx } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/handlers/fresh.ts";
+} from "$live/flags/audience.ts";
+import { isFreshCtx } from "$live/handlers/fresh.ts";
 import {
   Flag,
   LiveState,
   RouterContext,
-} from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/types.ts";
+} from "$live/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
-import { FreshContext } from "https://denopkg.com/deco-cx/deco@0fd9f2975afa29f9c1b7763ccea704157012912e/engine/fresh/manifest.ts";
+import { FreshContext } from "$live/engine/fresh/manifest.ts";
 
 export interface SelectionConfig {
   audiences: Routes[];

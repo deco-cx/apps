@@ -2,10 +2,10 @@
   "lock": false,
   "tasks": {
     "check": "deno fmt && deno lint",
-    "release": "deno eval 'import \"https://denopkg.com/deco-cx/deco@03cbc71a94028eba170d142a563374ef1ef3e29b/scripts/release.ts\"'",
-    "start": "deno eval 'import \"https://denopkg.com/deco-cx/deco@03cbc71a94028eba170d142a563374ef1ef3e29b/scripts/apps/bundle.ts\"'",
-    "link": "deno eval 'import \"https://denopkg.com/deco-cx/deco@03cbc71a94028eba170d142a563374ef1ef3e29b/scripts/apps/link.ts\"'",
-    "unlink": "deno eval 'import \"https://denopkg.com/deco-cx/deco@03cbc71a94028eba170d142a563374ef1ef3e29b/scripts/apps/unlink.ts\"'"
+    "release": "deno eval 'import \"$live/scripts/release.ts\"'",
+    "start": "deno eval 'import \"$live/scripts/apps/bundle.ts\"'",
+    "link": "deno eval 'import \"$live/scripts/apps/link.ts\"'",
+    "unlink": "deno eval 'import \"$live/scripts/apps/unlink.ts\"'"
   },
   "githooks": {
     "pre-commit": "check"
