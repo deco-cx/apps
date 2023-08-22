@@ -1,12 +1,12 @@
 import { context } from "$live/live.ts";
 import {
-    Arg,
-    cancel as durableCancel,
-    get as durableGet,
-    history as durableHistory,
-    signal as durableSignal,
-    start as durableStart,
-    init,
+  Arg,
+  cancel as durableCancel,
+  get as durableGet,
+  history as durableHistory,
+  init,
+  signal as durableSignal,
+  start as durableStart,
 } from "./deps.ts";
 
 const initializeOnceWhen = <TArgs extends Arg = Arg, TResult = unknown>(

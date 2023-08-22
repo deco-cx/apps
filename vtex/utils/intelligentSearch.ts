@@ -5,13 +5,13 @@ import { getCookies, setCookie } from "std/http/mod.ts";
 export const SESSION_COOKIE = "vtex_is_session";
 export const ANONYMOUS_COOKIE = "vtex_is_anonymous";
 
-const POLICY_KEY = "trade-policy";
-const REGION_KEY = "region-id";
-const CHANNEL_KEYS = new Set([POLICY_KEY, REGION_KEY]);
+// const POLICY_KEY = "trade-policy";
+// const REGION_KEY = "region-id";
+// const CHANNEL_KEYS = new Set([POLICY_KEY, REGION_KEY]);
 
 export const withDefaultFacets = (
   allFacets: readonly SelectedFacet[],
-  ctx: AppContext,
+  _ctx: AppContext,
 ) => {
   // const { defaultSalesChannel, defaultRegionId } = ctx!;
   // const facets = allFacets.filter(({ key }) => !CHANNEL_KEYS.has(key));
@@ -53,9 +53,9 @@ export const withDefaultParams = ({
   count = 12,
   sort = "",
   fuzzy = "auto",
-  locale,
+  // locale,
   hideUnavailableItems,
-}: Partial<Params>, ctx: AppContext) =>
+}: Partial<Params>, _ctx: AppContext) =>
   new URLSearchParams({
     page: `${page + 1}`,
     count: `${count}`,
