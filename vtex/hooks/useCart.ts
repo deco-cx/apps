@@ -1,7 +1,7 @@
-import type { AnalyticsItem } from "apps/commerce/types.ts";
-import { mapCategoriesToAnalyticsCategories } from "apps/commerce/utils/productToAnalyticsItem.ts";
-import { Runtime } from "apps/vtex/runtime.ts";
-import type { OrderForm, OrderFormItem } from "apps/vtex/utils/types.ts";
+import type { AnalyticsItem } from "../../commerce/types.ts";
+import { mapCategoriesToAnalyticsCategories } from "../../commerce/utils/productToAnalyticsItem.ts";
+import { Runtime } from "../runtime.ts";
+import type { OrderForm, OrderFormItem } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
@@ -68,39 +68,39 @@ const state = {
   cart,
   loading,
   updateItems: wrap(
-    Runtime.create("apps/vtex/actions/cart/updateItems.ts"),
+    Runtime.create("vtex/actions/cart/updateItems.ts"),
   ),
   removeAllItems: wrap(
-    Runtime.create("apps/vtex/actions/cart/removeItems.ts"),
+    Runtime.create("vtex/actions/cart/removeItems.ts"),
   ),
   addItems: wrap(
-    Runtime.create("apps/vtex/actions/cart/addItems.ts"),
+    Runtime.create("vtex/actions/cart/addItems.ts"),
   ),
   addCouponsToCart: wrap(
-    Runtime.create("apps/vtex/actions/cart/updateCoupons.ts"),
+    Runtime.create("vtex/actions/cart/updateCoupons.ts"),
   ),
   changePrice: wrap(
-    Runtime.create("apps/vtex/actions/cart/updateItemPrice.ts"),
+    Runtime.create("vtex/actions/cart/updateItemPrice.ts"),
   ),
   getCartInstallments: wrap(
-    Runtime.create("apps/vtex/actions/cart/getInstallment.ts"),
+    Runtime.create("vtex/actions/cart/getInstallment.ts"),
   ),
   ignoreProfileData: wrap(
-    Runtime.create("apps/vtex/actions/cart/updateProfile.ts"),
+    Runtime.create("vtex/actions/cart/updateProfile.ts"),
   ),
   removeAllPersonalData: wrap(
-    Runtime.create("apps/vtex/actions/cart/updateUser.ts"),
+    Runtime.create("vtex/actions/cart/updateUser.ts"),
   ),
   addItemAttachment: wrap(
-    Runtime.create("apps/vtex/actions/cart/updateItemAttachment.ts"),
+    Runtime.create("vtex/actions/cart/updateItemAttachment.ts"),
   ),
   removeItemAttachment: wrap(
-    Runtime.create("apps/vtex/actions/cart/removeItemAttachment.ts"),
+    Runtime.create("vtex/actions/cart/removeItemAttachment.ts"),
   ),
   sendAttachment: wrap(
-    Runtime.create("apps/vtex/actions/cart/updateAttachment.ts"),
+    Runtime.create("vtex/actions/cart/updateAttachment.ts"),
   ),
-  simulate: Runtime.create("apps/vtex/actions/cart/simulation.ts"),
+  simulate: Runtime.create("vtex/actions/cart/simulation.ts"),
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };
 

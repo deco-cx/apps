@@ -1,6 +1,6 @@
-import { AppContext } from "apps/shopify/mod.ts";
-import { SHOPIFY_COOKIE_NAME } from "apps/shopify/utils/constants.ts";
 import { getCookies } from "std/http/mod.ts";
+import { AppContext } from "../../mod.ts";
+import { SHOPIFY_COOKIE_NAME } from "../../utils/constants.ts";
 import type { Cart } from "../../utils/types.ts";
 
 export interface updateCartQueryProps {

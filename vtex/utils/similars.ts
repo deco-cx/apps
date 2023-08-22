@@ -1,6 +1,6 @@
-import type { Product } from "apps/commerce/types.ts";
-import { AppContext } from "apps/vtex/mod.ts";
+import type { Product } from "../../commerce/types.ts";
 import type { Props as OriginalProps } from "../loaders/legacy/relatedProductsLoader.ts";
+import { AppContext } from "../mod.ts";
 
 type Props = Pick<OriginalProps, "hideUnavailableItems">;
 
@@ -16,7 +16,7 @@ export const withIsSimilarTo = async (
   }
 
   const isSimilarTo = await ctx.invoke(
-    "apps/vtex/loaders/legacy/relatedProductsLoader.ts",
+    "vtex/loaders/legacy/relatedProductsLoader.ts",
     {
       ...props,
       crossSelling: "similars",

@@ -1,5 +1,5 @@
-import type { ProductListingPage } from "apps/commerce/types.ts";
-import { AppContext } from "apps/shopify/mod.ts";
+import type { ProductListingPage } from "../../commerce/types.ts";
+import { AppContext } from "../../shopify/mod.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {

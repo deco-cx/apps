@@ -1,9 +1,9 @@
-import { fetchAPI } from "apps/utils/fetch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import type { WishlistItem } from "apps/vtex/utils/types.ts";
-import wishlistLoader from "apps/vtex/loaders/wishlist.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
-import { parseCookie } from "apps/vtex/utils/vtexId.ts";
+import { fetchAPI } from "../../../utils/fetch.ts";
+import wishlistLoader from "../../loaders/wishlist.ts";
+import { AppContext } from "../../mod.ts";
+import { paths } from "../../utils/paths.ts";
+import type { WishlistItem } from "../../utils/types.ts";
+import { parseCookie } from "../../utils/vtexId.ts";
 
 export type Props = { id: string };
 

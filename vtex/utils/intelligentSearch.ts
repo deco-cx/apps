@@ -1,6 +1,6 @@
-import { AppContext } from "apps/vtex/mod.ts";
-import type { SelectedFacet, Sort } from "apps/vtex/utils/types.ts";
 import { getCookies, setCookie } from "std/http/mod.ts";
+import { AppContext } from "../mod.ts";
+import type { SelectedFacet, Sort } from "../utils/types.ts";
 
 export const SESSION_COOKIE = "vtex_is_session";
 export const ANONYMOUS_COOKIE = "vtex_is_anonymous";

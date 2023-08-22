@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
-import { ImageWidget } from "apps/admin/widgets.ts";
 import type { ComponentChildren, ComponentProps } from "preact";
 import { useMemo } from "preact/hooks";
+import { ImageWidget } from "../../../admin/widgets.ts";
 import type Seo from "../Seo.tsx";
 import { OGType } from "../Seo.tsx";
 import Discord from "./Discord.tsx";

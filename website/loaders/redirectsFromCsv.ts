@@ -54,7 +54,7 @@ const getRedirectFromFile = async (from: string) => {
     isHref: true,
     handler: {
       value: {
-        __resolveType: "apps/website//handlers/redirect.ts",
+        __resolveType: "website/handlers/redirect.ts",
         to,
         type,
       },
@@ -79,7 +79,7 @@ export default async function redirect(
     isHref: true,
     handler: {
       value: {
-        __resolveType: "apps/website//handlers/redirect.ts",
+        __resolveType: "website/handlers/redirect.ts",
         to,
         type,
       },

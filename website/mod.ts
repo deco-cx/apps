@@ -61,7 +61,7 @@ export default function App(
     },
     resolvables: {
       "./routes/[...catchall].tsx": {
-        __resolveType: "apps/website/handlers/router.ts",
+        __resolveType: "website/handlers/router.ts",
       },
     },
   };

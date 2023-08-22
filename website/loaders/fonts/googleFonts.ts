@@ -1,6 +1,6 @@
-import { fetchSafe } from "apps/utils/fetch.ts";
+import { fetchSafe } from "../../../utils/fetch.ts";
 import { Font } from "../../components/Theme.tsx";
-import type { Manifest } from "apps/website/manifest.gen.ts";
+import type { Manifest } from "../../manifest.gen.ts";
 
 interface Props {
   fonts: GoogleFont[];

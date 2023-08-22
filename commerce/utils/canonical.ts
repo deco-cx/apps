@@ -1,4 +1,4 @@
-import { BreadcrumbList } from "apps/commerce/types.ts";
+import { BreadcrumbList } from "../types.ts";
 
 export const canonicalFromBreadcrumblist = (
   { itemListElement }: BreadcrumbList,

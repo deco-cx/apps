@@ -1,4 +1,4 @@
-import { Runtime } from "apps/shopify/runtime.ts";
+import { Runtime } from "../runtime.ts";
 import { Cart } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
 
@@ -15,13 +15,13 @@ const state = {
   cart,
   loading,
   addItems: wrap(
-    Runtime.create("apps/shopify/actions/cart/addItems.ts"),
+    Runtime.create("shopify/actions/cart/addItems.ts"),
   ),
   updateItems: wrap(
-    Runtime.create("apps/shopify/actions/cart/updateItems.ts"),
+    Runtime.create("shopify/actions/cart/updateItems.ts"),
   ),
   addCouponsToCart: wrap(
-    Runtime.create("apps/shopify/actions/cart/updateCoupons.ts"),
+    Runtime.create("shopify/actions/cart/updateCoupons.ts"),
   ),
 };
 

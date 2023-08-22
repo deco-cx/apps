@@ -1,5 +1,5 @@
-import { AppContext } from "apps/vnda/mod.ts";
-import type { Cart } from "apps/vnda/utils/client/types.ts";
+import { AppContext } from "../../mod.ts";
+import type { Cart } from "../../utils/client/types.ts";
 
 export interface Props {
   itemId: number | string;
@@ -21,7 +21,7 @@ const action = async (
     await client.carrinho.remover(item_id, cookie);
   }
 
-  return ctx.invoke("apps/vnda/loaders/cart.ts");
+  return ctx.invoke("vnda/loaders/cart.ts");
 };
 
 export default action;

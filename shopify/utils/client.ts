@@ -1,9 +1,9 @@
-import { fetchAPI } from "apps/utils/fetch.ts";
-import { Props } from "apps/shopify/mod.ts";
-import { Cart, Product } from "apps/shopify/utils/types.ts";
-import { gql } from "apps/shopify/utils/gql.ts";
-import { productFragment } from "apps/shopify/utils/fragments/product.ts";
-import { cartFragment } from "apps/shopify/utils/fragments/cart.ts";
+import { fetchAPI } from "../../utils/fetch.ts";
+import { Props } from "../mod.ts";
+import { cartFragment } from "./fragments/cart.ts";
+import { productFragment } from "./fragments/product.ts";
+import { gql } from "./gql.ts";
+import { Cart, Product } from "./types.ts";
 
 export const createClient = (
   { storeName, storefrontAccessToken }: Props,

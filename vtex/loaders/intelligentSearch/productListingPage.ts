@@ -1,5 +1,31 @@
-import type { ProductListingPage } from "apps/commerce/types.ts";
-import { AppContext } from "apps/vtex/mod.ts";
+import type { ProductListingPage } from "../../../commerce/types.ts";
+import { parseRange } from "../../../commerce/utils/filters.ts";
+import { fetchAPI } from "../../../utils/fetch.ts";
+import { AppContext } from "../../mod.ts";
+import {
+  toPath,
+  withDefaultFacets,
+  withDefaultParams,
+} from "../../utils/intelligentSearch.ts";
+import {
+  pageTypesFromPathname,
+  pageTypesToBreadcrumbList,
+  pageTypesToSeo,
+} from "../../utils/legacy.ts";
+import { paths } from "../../utils/paths.ts";
+import {
+  getSegment,
+  setSegment,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
+import { withIsSimilarTo } from "../../utils/similars.ts";
+import { slugify } from "../../utils/slugify.ts";
+import {
+  filtersFromURL,
+  mergeFacets,
+  toFilter,
+  toProduct,
+} from "../../utils/transform.ts";
 import type {
   Facet,
   FacetSearchResult,
@@ -9,33 +35,7 @@ import type {
   RangeFacet,
   SelectedFacet,
   Sort,
-} from "apps/vtex/utils/types.ts";
-import {
-  toPath,
-  withDefaultFacets,
-  withDefaultParams,
-} from "apps/vtex/utils/intelligentSearch.ts";
-import {
-  pageTypesFromPathname,
-  pageTypesToBreadcrumbList,
-  pageTypesToSeo,
-} from "apps/vtex/utils/legacy.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "apps/vtex/utils/segment.ts";
-import { slugify } from "apps/vtex/utils/slugify.ts";
-import {
-  filtersFromURL,
-  mergeFacets,
-  toFilter,
-  toProduct,
-} from "apps/vtex/utils/transform.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
-import { parseRange } from "apps/commerce/utils/filters.ts";
-import { withIsSimilarTo } from "apps/vtex/utils/similars.ts";
+} from "../../utils/types.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -277,10 +277,10 @@ const loader = async (
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params.get("query");
   if (fullTextTerm) {
-    ctx.invoke("apps/vtex/actions/analytics/sendEvent.ts", {
+    ctx.invoke("vtex/actions/analytics/sendEvent.ts", {
       type: "session.ping",
     }).then(() =>
-      ctx.invoke("apps/vtex/actions/analytics/sendEvent.ts", {
+      ctx.invoke("vtex/actions/analytics/sendEvent.ts", {
         type: "search.query",
         text: fullTextTerm,
         misspelled: productsResult.correction?.misspelled ?? false,

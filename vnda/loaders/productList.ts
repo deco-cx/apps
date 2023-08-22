@@ -1,6 +1,6 @@
-import type { Product } from "apps/commerce/types.ts";
-import type { AppContext } from "apps/vnda/mod.ts";
-import { toProduct } from "apps/vnda/utils/transform.ts";
+import type { Product } from "../../commerce/types.ts";
+import type { AppContext } from "../mod.ts";
+import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
   /** @description total number of items to display */

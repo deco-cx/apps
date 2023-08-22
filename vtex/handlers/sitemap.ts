@@ -1,6 +1,6 @@
 import Proxy from "$live/handlers/proxy.ts";
-import { AppContext } from "apps/vtex/mod.ts";
 import { ConnInfo } from "std/http/server.ts";
+import { AppContext } from "../mod.ts";
 
 const xmlHeader =
   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';

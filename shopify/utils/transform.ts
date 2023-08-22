@@ -5,7 +5,7 @@ import type {
   ProductDetailsPage,
   PropertyValue,
   UnitPriceSpecification,
-} from "apps/commerce/types.ts";
+} from "../../commerce/types.ts";
 import {
   Product as ProductShopify,
   SelectedOption as SelectedOptionShopify,
