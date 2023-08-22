@@ -9,7 +9,6 @@ import * as $$$3 from "./loaders/cart.ts";
 import * as $$$$$$$$$0 from "./actions/cart/updateCoupons.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateItems.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
-import { AppManifest } from "$live/types.ts";
 
 const manifest = {
   "loaders": {
@@ -23,8 +22,10 @@ const manifest = {
     "apps/shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
     "apps/shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
   },
+  "name": "apps/shopify",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;
 
-export default manifest satisfies AppManifest;
+export default manifest;

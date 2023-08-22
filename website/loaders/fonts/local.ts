@@ -1,7 +1,4 @@
-export type Font = {
-  family: string;
-  styleSheet: string;
-};
+import { Font } from "../../components/Theme.tsx";
 
 const loader = async (): Promise<Font> => {
   throw new Error("Not implemented");

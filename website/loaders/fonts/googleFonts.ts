@@ -1,5 +1,5 @@
 import { fetchSafe } from "apps/utils/fetch.ts";
-import type { Font } from "./local.ts";
+import { Font } from "../../components/Theme.tsx";
 import type { Manifest } from "apps/website/manifest.gen.ts";
 
 interface Props {

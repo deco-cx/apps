@@ -1,8 +1,8 @@
 import Image from "../../components/Image.tsx";
-import { PreviewItens } from "../types.ts";
+import { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
-function FacebookBigOpenGraph(props: PreviewItens) {
+function FacebookBigOpenGraph(props: PreviewItem) {
   const { image, title, description, path, width, height } = props;
   const titleMaxLength = 120;
 
@@ -35,7 +35,7 @@ function FacebookBigOpenGraph(props: PreviewItens) {
   );
 }
 
-function FacebookMediumOpenGraph(props: PreviewItens) {
+function FacebookMediumOpenGraph(props: PreviewItem) {
   const { image, title, description, path, width, height } = props;
   const titleMaxLength = 90;
   const descriptionMaxLength = 110;
@@ -66,7 +66,7 @@ function FacebookMediumOpenGraph(props: PreviewItens) {
   );
 }
 
-function FacebookSmallOpenGraph(props: PreviewItens) {
+function FacebookSmallOpenGraph(props: PreviewItem) {
   const { image, title, description, path } = props;
   const titleMaxLength = 90;
   const descriptionMaxLength = 110;
@@ -98,7 +98,7 @@ function FacebookSmallOpenGraph(props: PreviewItens) {
   );
 }
 
-function Facebook(props: PreviewItens) {
+function Facebook(props: PreviewItem) {
   const { width, height } = props;
 
   if (height < 300 && height !== 0) {

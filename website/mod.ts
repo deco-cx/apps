@@ -1,15 +1,24 @@
+import { Section } from "$live/blocks/section.ts";
 import { Routes } from "$live/flags/audience.ts";
 import type { App, FnContext } from "$live/mod.ts";
 import { asResolved } from "$live/mod.ts";
+import type { Props as Seo } from "./components/Seo.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
 export interface Props {
+  /** @title Site Map */
+  routes?: Routes[];
+
+  /** @title Seo */
+  seo?: Omit<Seo, "jsonLDs">;
+
   /**
-   * @title Site Map
+   * @title Global Sections
+   * @description These sections will be included on all website/pages/Page.ts
    */
-  routes: Routes[];
+  global?: Section[];
 }
 
 /**
@@ -20,7 +29,36 @@ export default function App(
 ): App<Manifest, Props> {
   return {
     state,
-    manifest,
+    manifest: {
+      ...manifest,
+      sections: {
+        ...manifest.sections,
+        "apps/website/sections/Seo/Seo.tsx": {
+          ...manifest.sections["apps/website/sections/Seo/Seo.tsx"],
+          Preview: (props) =>
+            manifest.sections["apps/website/sections/Seo/Seo.tsx"].Preview({
+              ...state.seo,
+              ...props,
+            }),
+          default: (props) =>
+            manifest.sections["apps/website/sections/Seo/Seo.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
+        },
+      },
+      pages: {
+        ...manifest.pages,
+        "apps/website/pages/Page.tsx": {
+          ...manifest.pages["apps/website/pages/Page.tsx"],
+          default: (props) =>
+            manifest.pages["apps/website/pages/Page.tsx"].default({
+              ...props,
+              sections: [...state.global ?? [], ...props.sections],
+            }),
+        },
+      },
+    },
     resolvables: {
       "./routes/[...catchall].tsx": {
         __resolveType: "apps/website/handlers/router.ts",

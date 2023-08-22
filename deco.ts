@@ -6,6 +6,7 @@ const config = {
     app("apps/vnda"),
     app("apps/shopify"),
     app("apps/website"),
+    app("apps/commerce"),
     app("apps/workflows"),
   ],
 };

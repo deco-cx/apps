@@ -1,9 +1,9 @@
-import { PreviewItens } from "../types.ts";
+import { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
 const MAX_DESCRIPTION_LENGTH = 130;
 
-function Google({ title, description, path }: PreviewItens) {
+function Google({ title, description, path }: PreviewItem) {
   return (
     <div class="p-6 flex flex-col gap-1 bg-white border border-light-border rounded-lg">
       <p class="text-xs font-normal leading-5">

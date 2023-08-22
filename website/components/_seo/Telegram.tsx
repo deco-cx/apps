@@ -1,8 +1,8 @@
 import Image from "../../components/Image.tsx";
-import { PreviewItens } from "../types.ts";
+import { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
-function TelegramBiggerImage(props: PreviewItens) {
+function TelegramBiggerImage(props: PreviewItem) {
   const { image, title, description, width, height, path } = props;
 
   return (
@@ -32,12 +32,13 @@ function TelegramBiggerImage(props: PreviewItens) {
   );
 }
 
-function TelegramSmallerImage(props: PreviewItens) {
+function TelegramSmallerImage(props: PreviewItem) {
   const { image, title, description, path } = props;
 
   return (
     <div class="flex gap-[6px]">
-      <div class="flex-grow border-2 rounded-l-full border-divider-blue max-w-[2px]"></div>
+      <div class="flex-grow border-2 rounded-l-full border-divider-blue max-w-[2px]">
+      </div>
       <div class="flex flex-grow max-w-[480px] ">
         <div class="py-1 flex-grow bg-white font-semibold">
           <Image
@@ -62,7 +63,7 @@ function TelegramSmallerImage(props: PreviewItens) {
   );
 }
 
-function Telegram(props: PreviewItens) {
+function Telegram(props: PreviewItem) {
   const { width, height } = props;
 
   if (width === 0) {

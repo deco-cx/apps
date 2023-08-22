@@ -1,16 +1,31 @@
 import { Head } from "$fresh/runtime.ts";
+import { ImageWidget } from "apps/admin/widgets.ts";
+import type { ComponentChildren, ComponentProps } from "preact";
 import { useMemo } from "preact/hooks";
-import WhatsApp from "./WhatsApp.tsx";
-import PreviewItem from "./PreviewItem.tsx";
-import LinkedIn from "./LinkedIn.tsx";
+import type Seo from "../Seo.tsx";
+import { OGType } from "../Seo.tsx";
 import Discord from "./Discord.tsx";
 import Facebook from "./Facebook.tsx";
-import Telegram from "./Telegram.tsx";
 import Google from "./Google.tsx";
-import Twitter from "./Twitter.tsx";
+import LinkedIn from "./LinkedIn.tsx";
 import Slack from "./Slack.tsx";
+import Telegram from "./Telegram.tsx";
+import Twitter from "./Twitter.tsx";
+import WhatsApp from "./WhatsApp.tsx";
 import instructions from "./instructions.json" assert { type: "json" };
-import type { PreviewItens, Props } from "../types.ts";
+
+type SeoProps = ComponentProps<typeof Seo>;
+
+export interface PreviewItem {
+  title: string;
+  description: string;
+  image: ImageWidget;
+  type: OGType;
+  themeColor: string;
+  width: number;
+  height: number;
+  path: string;
+}
 
 const tailwind = {
   theme: {
@@ -40,7 +55,7 @@ const tailwind = {
   },
 };
 
-const defaultProps: PreviewItens = {
+const DEFAULT_ITEM: PreviewItem = {
   title: "",
   description: "",
   image: "",
@@ -51,7 +66,35 @@ const defaultProps: PreviewItens = {
   path: "website.com",
 };
 
-function PreviewHandler(props: Props) {
+function PreviewItem(
+  { title, children, instructions }: {
+    title: string;
+    children: ComponentChildren;
+    instructions: string[];
+  },
+) {
+  return (
+    <div class="w-[400px] flex flex-col h-full gap-[16px] sm:w-[522px]">
+      <div class="flex items-center">
+        <h2 class="uppercase text-[13px] text-primary  pr-4 leading-4 font-semibold">
+          {title}
+        </h2>
+        <div class="flex-grow h-px bg-divider"></div>
+      </div>
+      <div class="text-[14px] text-primary font-medium leading-[20px]">
+        <p>Instructions:</p>
+        <ul>
+          {instructions.map((instruction) => (
+            <li class="list-disc list-inside">{instruction}</li>
+          ))}
+        </ul>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Preview(props: SeoProps) {
   const path = useMemo(() => window.location?.host, []);
 
   return (
@@ -78,28 +121,28 @@ function PreviewHandler(props: Props) {
         <div class="flex flex-col max-w-6xl items-center">
           <div class="flex flex-col items-center gap-8 mb-5 lg:grid lg:grid-cols-2 lg:justify-center">
             <PreviewItem instructions={instructions.google} title="Google">
-              <Google {...defaultProps} {...props} path={path} />
+              <Google {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
             <PreviewItem instructions={instructions.linkedin} title="Linkedin">
-              <LinkedIn {...defaultProps} {...props} path={path} />
+              <LinkedIn {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
             <PreviewItem instructions={instructions.whatsapp} title="Whatsapp">
-              <WhatsApp {...defaultProps} {...props} path={path} />
+              <WhatsApp {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
             <PreviewItem instructions={instructions.telegram} title="Telegram">
-              <Telegram {...defaultProps} {...props} path={path} />
+              <Telegram {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
             <PreviewItem instructions={instructions.facebook} title="Facebook">
-              <Facebook {...defaultProps} {...props} path={path} />
+              <Facebook {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
             <PreviewItem instructions={instructions.twitter} title="Twitter">
-              <Twitter {...defaultProps} {...props} path={path} />
+              <Twitter {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
             <PreviewItem instructions={instructions.discord} title="Discord">
-              <Discord {...defaultProps} {...props} path={path} />
+              <Discord {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
             <PreviewItem instructions={instructions.slack} title="Slack">
-              <Slack {...defaultProps} {...props} path={path} />
+              <Slack {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
           </div>
         </div>
@@ -108,4 +151,4 @@ function PreviewHandler(props: Props) {
   );
 }
 
-export default PreviewHandler;
+export default Preview;

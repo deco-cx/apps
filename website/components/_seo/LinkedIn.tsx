@@ -1,7 +1,7 @@
 import Image from "../../components/Image.tsx";
-import { PreviewItens } from "../types.ts";
+import { PreviewItem } from "./Preview.tsx";
 
-export default function LinkedIn(props: PreviewItens) {
+export default function LinkedIn(props: PreviewItem) {
   const { image, title, path } = props;
 
   return (

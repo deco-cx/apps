@@ -1,8 +1,8 @@
 import Image from "../../components/Image.tsx";
-import { PreviewItens } from "../types.ts";
+import { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
-function TwitterArticle(props: PreviewItens) {
+function TwitterArticle(props: PreviewItem) {
   const { image, title, description, path } = props;
   const descriptionMaxLength = 150;
 
@@ -33,7 +33,7 @@ function TwitterArticle(props: PreviewItens) {
   );
 }
 
-function TwitterWebsite(props: PreviewItens) {
+function TwitterWebsite(props: PreviewItem) {
   const { image, title, description, path } = props;
   const descriptionMaxLength = 100;
   return (
@@ -63,7 +63,7 @@ function TwitterWebsite(props: PreviewItens) {
   );
 }
 
-function Twitter(props: PreviewItens) {
+function Twitter(props: PreviewItem) {
   const { type } = props;
   if (type === "article") {
     return <TwitterArticle {...props} />;

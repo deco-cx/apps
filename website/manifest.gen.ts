@@ -14,8 +14,8 @@ import * as $$$$1 from "./handlers/sitemap.ts";
 import * as $$$$2 from "./handlers/proxy.ts";
 import * as $$$$3 from "./handlers/fresh.ts";
 import * as $$$$4 from "./handlers/redirect.ts";
-import * as $$$$$0 from "./pages/LivePage.tsx";
-import * as $$$$$$0 from "./sections/Empty.tsx";
+import * as $$$$$0 from "./pages/Page.tsx";
+import * as $$$$$$0 from "./sections/Seo/Seo.tsx";
 import * as $$$$$$$0 from "./matchers/date.ts";
 import * as $$$$$$$1 from "./matchers/environment.ts";
 import * as $$$$$$$2 from "./matchers/site.ts";
@@ -32,7 +32,6 @@ import * as $$$$$$$$1 from "./flags/multivariate.ts";
 import * as $$$$$$$$2 from "./flags/everyone.ts";
 import * as $$$$$$$$3 from "./flags/flag.ts";
 import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
-import { AppManifest } from "$live/types.ts";
 
 const manifest = {
   "functions": {
@@ -54,10 +53,10 @@ const manifest = {
     "apps/website/handlers/sitemap.ts": $$$$1,
   },
   "pages": {
-    "apps/website/pages/LivePage.tsx": $$$$$0,
+    "apps/website/pages/Page.tsx": $$$$$0,
   },
   "sections": {
-    "apps/website/sections/Empty.tsx": $$$$$$0,
+    "apps/website/sections/Seo/Seo.tsx": $$$$$$0,
   },
   "matchers": {
     "apps/website/matchers/always.ts": $$$$$$$9,
@@ -81,8 +80,10 @@ const manifest = {
   "actions": {
     "apps/website/actions/secrets/encrypt.ts": $$$$$$$$$0,
   },
+  "name": "apps/website",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;
 
-export default manifest satisfies AppManifest;
+export default manifest;

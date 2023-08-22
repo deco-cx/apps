@@ -11,7 +11,6 @@ import * as $$$$$$$$$0 from "./actions/cart/updateItem.ts";
 import * as $$$$$$$$$1 from "./actions/cart/setShippingAddress.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateCoupon.ts";
-import { AppManifest } from "$live/types.ts";
 
 const manifest = {
   "loaders": {
@@ -27,8 +26,10 @@ const manifest = {
     "apps/vnda/actions/cart/updateCoupon.ts": $$$$$$$$$3,
     "apps/vnda/actions/cart/updateItem.ts": $$$$$$$$$0,
   },
+  "name": "apps/vnda",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;
 
-export default manifest satisfies AppManifest;
+export default manifest;

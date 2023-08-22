@@ -1,8 +1,8 @@
 import Image from "../../components/Image.tsx";
-import { PreviewItens } from "../types.ts";
+import { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
-function WhatsAppBiggerImages(props: PreviewItens) {
+function WhatsAppBiggerImages(props: PreviewItem) {
   const { image, title, description, path } = props;
   const titleMaxLength = 105;
 
@@ -29,7 +29,7 @@ function WhatsAppBiggerImages(props: PreviewItens) {
   );
 }
 
-function WhatsAppSmallerImages(props: PreviewItens) {
+function WhatsAppSmallerImages(props: PreviewItem) {
   const { image, title, description, path } = props;
   const titleMaxLength = 100;
 
@@ -55,7 +55,7 @@ function WhatsAppSmallerImages(props: PreviewItens) {
   );
 }
 
-function Whatsapp(props: PreviewItens) {
+function Whatsapp(props: PreviewItem) {
   const { width } = props;
 
   if (width === 0) {
