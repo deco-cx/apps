@@ -33,18 +33,18 @@ export default function Site(
       ...manifest,
       sections: {
         ...manifest.sections,
-        "apps/commerce/sections/Seo/SeoPDP.tsx": {
-          ...manifest.sections["apps/commerce/sections/Seo/SeoPDP.tsx"],
+        "commerce/sections/Seo/SeoPDP.tsx": {
+          ...manifest.sections["commerce/sections/Seo/SeoPDP.tsx"],
           default: (props) =>
-            manifest.sections["apps/commerce/sections/Seo/SeoPDP.tsx"].default({
+            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].default({
               ...state.seo,
               ...props,
             }),
         },
-        "apps/commerce/sections/Seo/SeoPLP.tsx": {
-          ...manifest.sections["apps/commerce/sections/Seo/SeoPLP.tsx"],
+        "commerce/sections/Seo/SeoPLP.tsx": {
+          ...manifest.sections["commerce/sections/Seo/SeoPLP.tsx"],
           default: (props) =>
-            manifest.sections["apps/commerce/sections/Seo/SeoPLP.tsx"].default({
+            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].default({
               ...state.seo,
               ...props,
             }),

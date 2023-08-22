@@ -11,18 +11,18 @@ import * as $$$$$$$$$2 from "./actions/signal.ts";
 
 const manifest = {
   "loaders": {
-    "apps/workflows/loaders/events.ts": $$$1,
-    "apps/workflows/loaders/get.ts": $$$0,
+    "workflows/loaders/events.ts": $$$1,
+    "workflows/loaders/get.ts": $$$0,
   },
   "handlers": {
-    "apps/workflows/handlers/workflowRunner.ts": $$$$0,
+    "workflows/handlers/workflowRunner.ts": $$$$0,
   },
   "actions": {
-    "apps/workflows/actions/cancel.ts": $$$$$$$$$1,
-    "apps/workflows/actions/signal.ts": $$$$$$$$$2,
-    "apps/workflows/actions/start.ts": $$$$$$$$$0,
+    "workflows/actions/cancel.ts": $$$$$$$$$1,
+    "workflows/actions/signal.ts": $$$$$$$$$2,
+    "workflows/actions/start.ts": $$$$$$$$$0,
   },
-  "name": "apps/workflows",
+  "name": "workflows",
   "baseUrl": import.meta.url,
 };
 

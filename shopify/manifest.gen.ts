@@ -12,17 +12,17 @@ import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
 
 const manifest = {
   "loaders": {
-    "apps/shopify/loaders/cart.ts": $$$3,
-    "apps/shopify/loaders/ProductDetailsPage.ts": $$$1,
-    "apps/shopify/loaders/ProductList.ts": $$$0,
-    "apps/shopify/loaders/ProductListingPage.ts": $$$2,
+    "shopify/loaders/cart.ts": $$$3,
+    "shopify/loaders/ProductDetailsPage.ts": $$$1,
+    "shopify/loaders/ProductList.ts": $$$0,
+    "shopify/loaders/ProductListingPage.ts": $$$2,
   },
   "actions": {
-    "apps/shopify/actions/cart/addItems.ts": $$$$$$$$$2,
-    "apps/shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
-    "apps/shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
+    "shopify/actions/cart/addItems.ts": $$$$$$$$$2,
+    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
+    "shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
   },
-  "name": "apps/shopify",
+  "name": "shopify",
   "baseUrl": import.meta.url,
 };
 

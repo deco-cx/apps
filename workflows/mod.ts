@@ -1,5 +1,5 @@
 import type { App, FnContext } from "$live/mod.ts";
-import manifest, { Manifest, name } from "./manifest.gen.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 
 /**
  * @title Site
@@ -7,11 +7,7 @@ import manifest, { Manifest, name } from "./manifest.gen.ts";
 export default function App(
   state: unknown,
 ): App<Manifest, unknown> {
-  return {
-    name,
-    manifest,
-    state,
-  };
+  return { manifest, state };
 }
 
 export type AppContext = FnContext<unknown, Manifest>;
