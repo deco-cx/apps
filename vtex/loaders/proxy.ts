@@ -1,5 +1,5 @@
 import { Route } from "$live/flags/audience.ts";
-import { AppContext } from "apps/vtex/mod.ts";
+import { AppContext } from "../mod.ts";
 
 const PATHS_TO_PROXY = [
   "/account",
@@ -51,7 +51,7 @@ const buildProxyRoutes = (
       pathTemplate,
       handler: {
         value: {
-          __resolveType: "apps/website/handlers/proxy.ts",
+          __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
         },
@@ -66,7 +66,7 @@ const buildProxyRoutes = (
         pathTemplate: decoSiteMapUrl,
         handler: {
           value: {
-            __resolveType: "apps/website/handlers/sitemap.ts",
+            __resolveType: "website/handlers/sitemap.ts",
           },
         },
       }]]
@@ -78,7 +78,7 @@ const buildProxyRoutes = (
         handler: {
           value: {
             include,
-            __resolveType: "apps/vtex/handlers/sitemap.ts",
+            __resolveType: "vtex/handlers/sitemap.ts",
           },
         },
       },
@@ -86,7 +86,7 @@ const buildProxyRoutes = (
         pathTemplate: "/sitemap/*",
         handler: {
           value: {
-            __resolveType: "apps/vtex/handlers/sitemap.ts",
+            __resolveType: "vtex/handlers/sitemap.ts",
           },
         },
       },

@@ -1,5 +1,5 @@
 import { Route } from "$live/flags/audience.ts";
-import { AppContext } from "apps/vnda/mod.ts";
+import { AppContext } from "../mod.ts";
 
 const PAGE_PATHS = [
   "/admin",
@@ -63,7 +63,7 @@ function loader(
     pathTemplate,
     handler: {
       value: {
-        __resolveType: "apps/website/handlers/proxy.ts",
+        __resolveType: "website/handlers/proxy.ts",
         url: internalDomain,
         host: url.hostname,
         customHeaders,
@@ -75,7 +75,7 @@ function loader(
     pathTemplate,
     handler: {
       value: {
-        __resolveType: "apps/website/handlers/proxy.ts",
+        __resolveType: "website/handlers/proxy.ts",
         url: `https://api.vnda.com.br/`,
         host: url.hostname,
         customHeaders,

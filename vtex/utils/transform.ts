@@ -9,21 +9,21 @@ import type {
   ProductGroup,
   PropertyValue,
   UnitPriceSpecification,
-} from "apps/commerce/types.ts";
-import { formatRange } from "apps/commerce/utils/filters.ts";
+} from "../../commerce/types.ts";
+import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
   Category,
   Facet as FacetVTEX,
   FacetValueBoolean,
   FacetValueRange,
-  Item as SkuVTEX,
   LegacyFacet,
-  LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
+  LegacyItem as LegacySkuVTEX,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
+  Item as SkuVTEX,
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";

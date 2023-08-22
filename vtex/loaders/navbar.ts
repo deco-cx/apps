@@ -1,9 +1,9 @@
-import { categoryTreeToNavbar } from "apps/vtex/utils/transform.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
-import type { Navbar } from "apps/commerce/types.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import type { Category } from "apps/vtex/utils/types.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
+import type { Navbar } from "../../commerce/types.ts";
+import { fetchAPI } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
+import { paths } from "../utils/paths.ts";
+import { categoryTreeToNavbar } from "../utils/transform.ts";
+import type { Category } from "../utils/types.ts";
 
 export interface Props {
   /**

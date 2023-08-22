@@ -1,23 +1,22 @@
-import type { Filter, ProductListingPage } from "apps/commerce/types.ts";
-import { fetchAPI, fetchSafe } from "apps/utils/fetch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
+import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
+import { fetchAPI, fetchSafe } from "../../../utils/fetch.ts";
+import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
   toSegmentParams,
-} from "apps/vtex/utils/legacy.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
+} from "../../utils/legacy.ts";
+import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
   withSegmentCookie,
-} from "apps/vtex/utils/segment.ts";
-import { withIsSimilarTo } from "apps/vtex/utils/similars.ts";
-import { legacyFacetToFilter, toProduct } from "apps/vtex/utils/transform.ts";
-import type { LegacySort } from "apps/vtex/utils/types.ts";
-import type { LegacyFacets, LegacyProduct } from "../../utils/types.ts";
+} from "../../utils/segment.ts";
+import { withIsSimilarTo } from "../../utils/similars.ts";
+import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
+import type { LegacyFacets, LegacyProduct, LegacySort } from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
 

@@ -33,15 +33,15 @@ export default function App(
       ...manifest,
       sections: {
         ...manifest.sections,
-        "apps/website/sections/Seo/Seo.tsx": {
-          ...manifest.sections["apps/website/sections/Seo/Seo.tsx"],
+        "website/sections/Seo/Seo.tsx": {
+          ...manifest.sections["website/sections/Seo/Seo.tsx"],
           Preview: (props) =>
-            manifest.sections["apps/website/sections/Seo/Seo.tsx"].Preview({
+            manifest.sections["website/sections/Seo/Seo.tsx"].Preview({
               ...state.seo,
               ...props,
             }),
           default: (props) =>
-            manifest.sections["apps/website/sections/Seo/Seo.tsx"].default({
+            manifest.sections["website/sections/Seo/Seo.tsx"].default({
               ...state.seo,
               ...props,
             }),
@@ -49,10 +49,10 @@ export default function App(
       },
       pages: {
         ...manifest.pages,
-        "apps/website/pages/Page.tsx": {
-          ...manifest.pages["apps/website/pages/Page.tsx"],
+        "website/pages/Page.tsx": {
+          ...manifest.pages["website/pages/Page.tsx"],
           default: (props) =>
-            manifest.pages["apps/website/pages/Page.tsx"].default({
+            manifest.pages["website/pages/Page.tsx"].default({
               ...props,
               sections: [...state.global ?? [], ...props.sections],
             }),
@@ -61,7 +61,7 @@ export default function App(
     },
     resolvables: {
       "./routes/[...catchall].tsx": {
-        __resolveType: "apps/website/handlers/router.ts",
+        __resolveType: "website/handlers/router.ts",
       },
     },
   };

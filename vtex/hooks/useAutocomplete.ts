@@ -1,13 +1,13 @@
 import { signal } from "@preact/signals";
 import { debounce } from "std/async/debounce.ts";
-import { Runtime } from "apps/vtex/runtime.ts";
-import type { Suggestion } from "apps/commerce/types.ts";
+import type { Suggestion } from "../../commerce/types.ts";
+import { Runtime } from "../runtime.ts";
 
 const payload = signal<Suggestion | null>(null);
 const loading = signal<boolean>(false);
 
 const suggestions = Runtime.create(
-  "apps/vtex/loaders/intelligentSearch/suggestions.ts",
+  "vtex/loaders/intelligentSearch/suggestions.ts",
 );
 
 const setSearch = debounce(async (search: string, count: number) => {

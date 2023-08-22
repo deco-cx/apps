@@ -5,7 +5,7 @@ import type {
   ProductDetailsPage,
   PropertyValue,
   UnitPriceSpecification,
-} from "apps/commerce/types.ts";
+} from "../../commerce/types.ts";
 import {
   Product as ProductShopify,
   SelectedOption as SelectedOptionShopify,
@@ -19,7 +19,9 @@ const DEFAULT_IMAGE = {
 };
 
 const getPath = ({ handle }: ProductShopify, sku?: SkuShopify) =>
-  sku ? `/products/${handle}-${getIdFromVariantId(sku.id)}` : `/products/${handle}`;
+  sku
+    ? `/products/${handle}-${getIdFromVariantId(sku.id)}`
+    : `/products/${handle}`;
 
 /**
  * @description Transforms shopify gid to a number

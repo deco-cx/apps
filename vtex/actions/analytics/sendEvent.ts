@@ -1,8 +1,8 @@
 // Intelligent Search analytics integration
-import { AppContext } from "apps/vtex/mod.ts";
-import { fetchSafe } from "apps/utils/fetch.ts";
-import { getOrSetISCookie } from "apps/vtex/utils/intelligentSearch.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
+import { fetchSafe } from "../../../utils/fetch.ts";
+import { AppContext } from "../../mod.ts";
+import { getOrSetISCookie } from "../../utils/intelligentSearch.ts";
+import { paths } from "../../utils/paths.ts";
 
 export type Props =
   | {

@@ -1,9 +1,9 @@
-import { signal } from "@preact/signals";
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { WishlistItem } from "apps/vtex/utils/types.ts";
-import { Runtime } from "apps/vtex/runtime.ts";
-import type { OrderForm } from "apps/vtex/utils/types.ts";
-import type { User } from "apps/vtex/loaders/user.ts";
+import { signal } from "@preact/signals";
+import type { User } from "../loaders/user.ts";
+import { Runtime } from "../runtime.ts";
+import type { OrderForm } from "../utils/types.ts";
+import { WishlistItem } from "../utils/types.ts";
 
 interface Context {
   cart: OrderForm | null;
@@ -56,15 +56,9 @@ const enqueue = (
 
 const load = (signal: AbortSignal) =>
   Runtime.invoke({
-    cart: {
-      key: "apps/vtex/loaders/cart.ts",
-    },
-    user: {
-      key: "apps/vtex/loaders/user.ts",
-    },
-    wishlist: {
-      key: "apps/vtex/loaders/wishlist.ts",
-    },
+    cart: { key: "vtex/loaders/cart.ts" },
+    user: { key: "vtex/loaders/user.ts" },
+    wishlist: { key: "vtex/loaders/wishlist.ts" },
   }, { signal });
 
 if (IS_BROWSER) {

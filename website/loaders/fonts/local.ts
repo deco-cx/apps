@@ -1,6 +1,6 @@
 import { Font } from "../../components/Theme.tsx";
 
-const loader = async (): Promise<Font> => {
+const loader = (): Promise<Font> => {
   throw new Error("Not implemented");
 };
 

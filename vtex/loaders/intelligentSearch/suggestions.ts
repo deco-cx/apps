@@ -1,20 +1,20 @@
-import { Suggestion } from "apps/commerce/types.ts";
-import { toProduct } from "apps/vtex/utils/transform.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "apps/vtex/utils/segment.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
+import { Suggestion } from "../../../commerce/types.ts";
+import { fetchAPI } from "../../../utils/fetch.ts";
+import { AppContext } from "../../mod.ts";
 import {
   toPath,
   withDefaultFacets,
   withDefaultParams,
-} from "apps/vtex/utils/intelligentSearch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import type { ProductSearchResult } from "apps/vtex/utils/types.ts";
+} from "../../utils/intelligentSearch.ts";
+import { paths } from "../../utils/paths.ts";
+import {
+  getSegment,
+  setSegment,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { toProduct } from "../../utils/transform.ts";
+import type { ProductSearchResult } from "../../utils/types.ts";
 
 export interface Props {
   query?: string;

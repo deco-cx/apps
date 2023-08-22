@@ -1,20 +1,20 @@
-import type { Product } from "apps/commerce/types.ts";
-import { fetchAPI } from "apps/utils/fetch.ts";
-import { AppContext } from "apps/vtex/mod.ts";
-import { toSegmentParams } from "apps/vtex/utils/legacy.ts";
-import { paths } from "apps/vtex/utils/paths.ts";
+import type { Product } from "../../../commerce/types.ts";
+import { fetchAPI } from "../../../utils/fetch.ts";
+import { AppContext } from "../../mod.ts";
+import { toSegmentParams } from "../../utils/legacy.ts";
+import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
   withSegmentCookie,
-} from "apps/vtex/utils/segment.ts";
-import { toProduct } from "apps/vtex/utils/transform.ts";
+} from "../../utils/segment.ts";
+import { withIsSimilarTo } from "../../utils/similars.ts";
+import { toProduct } from "../../utils/transform.ts";
 import type {
   LegacyProduct,
   LegacySort,
   ProductID,
-} from "apps/vtex/utils/types.ts";
-import { withIsSimilarTo } from "apps/vtex/utils/similars.ts";
+} from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF

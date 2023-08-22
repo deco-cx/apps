@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import type { ImageWidget } from "apps/admin/widgets.ts";
+import type { ImageWidget } from "../../admin/widgets.ts";
 import { stripHTML } from "../utils/html.ts";
 
 export type OGType = "website" | "article";

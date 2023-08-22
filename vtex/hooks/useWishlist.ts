@@ -1,6 +1,6 @@
+import { Runtime } from "../runtime.ts";
+import { WishlistItem } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
-import { Runtime } from "apps/vtex/runtime.ts";
-import { WishlistItem } from "apps/vtex/utils/types.ts";
 
 const { wishlist, loading } = storeState;
 
@@ -16,10 +16,10 @@ const wrap = <T>(
   }));
 
 const addItem = wrap(
-  Runtime.create("apps/vtex/actions/wishlist/addItem.ts"),
+  Runtime.create("vtex/actions/wishlist/addItem.ts"),
 );
 const removeItem = wrap(
-  Runtime.create("apps/vtex/actions/wishlist/removeItem.ts"),
+  Runtime.create("vtex/actions/wishlist/removeItem.ts"),
 );
 
 const getItem = (item: Partial<WishlistItem>) =>

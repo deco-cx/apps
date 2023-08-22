@@ -1,8 +1,8 @@
 import { App } from "$live/mod.ts";
-import shopify, { Props as ShopifyProps } from "apps/shopify/mod.ts";
-import vnda, { Props as VNDAProps } from "apps/vnda/mod.ts";
-import vtex, { Props as VTEXProps } from "apps/vtex/mod.ts";
-import website, { Props as WebsiteProps } from "apps/website/mod.ts";
+import shopify, { Props as ShopifyProps } from "../shopify/mod.ts";
+import vnda, { Props as VNDAProps } from "../vnda/mod.ts";
+import vtex, { Props as VTEXProps } from "../vtex/mod.ts";
+import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type Props = WebsiteProps & {
@@ -33,18 +33,18 @@ export default function Site(
       ...manifest,
       sections: {
         ...manifest.sections,
-        "apps/commerce/sections/Seo/SeoPDP.tsx": {
-          ...manifest.sections["apps/commerce/sections/Seo/SeoPDP.tsx"],
+        "commerce/sections/Seo/SeoPDP.tsx": {
+          ...manifest.sections["commerce/sections/Seo/SeoPDP.tsx"],
           default: (props) =>
-            manifest.sections["apps/commerce/sections/Seo/SeoPDP.tsx"].default({
+            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].default({
               ...state.seo,
               ...props,
             }),
         },
-        "apps/commerce/sections/Seo/SeoPLP.tsx": {
-          ...manifest.sections["apps/commerce/sections/Seo/SeoPLP.tsx"],
+        "commerce/sections/Seo/SeoPLP.tsx": {
+          ...manifest.sections["commerce/sections/Seo/SeoPLP.tsx"],
           default: (props) =>
-            manifest.sections["apps/commerce/sections/Seo/SeoPLP.tsx"].default({
+            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].default({
               ...state.seo,
               ...props,
             }),
@@ -55,4 +55,4 @@ export default function Site(
   };
 }
 
-export { onBeforeResolveProps } from "apps/website/mod.ts";
+export { onBeforeResolveProps } from "../website/mod.ts";

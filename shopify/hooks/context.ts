@@ -1,6 +1,6 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
-import { Runtime } from "apps/shopify/runtime.ts";
+import { Runtime } from "../runtime.ts";
 import { Cart } from "../utils/types.ts";
 
 interface Context {
@@ -48,7 +48,7 @@ const enqueue = (
 const load = async (signal: AbortSignal) => {
   const { cart } = await Runtime.invoke({
     cart: {
-      key: "apps/shopify/loaders/cart.ts",
+      key: "shopify/loaders/cart.ts",
     },
   }, { signal });
 

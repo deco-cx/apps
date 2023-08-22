@@ -1,14 +1,14 @@
-import { SortOption } from "apps/commerce/types.ts";
-import type { AppContext } from "apps/vnda/mod.ts";
-import { Sort } from "apps/vnda/utils/client/types.ts";
+import type { ProductListingPage } from "../../commerce/types.ts";
+import { SortOption } from "../../commerce/types.ts";
+import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import type { AppContext } from "../mod.ts";
+import { Sort } from "../utils/client/types.ts";
 import {
   getSEOFromTag,
   toFilters,
   toProduct,
   typeTagExtractor,
-} from "apps/vnda/utils/transform.ts";
-import type { ProductListingPage } from "../../commerce/types.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+} from "../utils/transform.ts";
 
 export const VNDA_SORT_OPTIONS: SortOption[] = [
   { value: "", label: "Relevância" },

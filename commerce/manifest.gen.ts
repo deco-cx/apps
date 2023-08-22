@@ -7,10 +7,10 @@ import * as $$$$$$1 from "./sections/Seo/SeoPDP.tsx";
 
 const manifest = {
   "sections": {
-    "apps/commerce/sections/Seo/SeoPDP.tsx": $$$$$$1,
-    "apps/commerce/sections/Seo/SeoPLP.tsx": $$$$$$0,
+    "commerce/sections/Seo/SeoPDP.tsx": $$$$$$1,
+    "commerce/sections/Seo/SeoPLP.tsx": $$$$$$0,
   },
-  "name": "apps/commerce",
+  "name": "commerce",
   "baseUrl": import.meta.url,
 };
 

@@ -1,17 +1,16 @@
 import { ResolveOptions } from "$live/engine/core/mod.ts";
 import {
-  BaseContext,
   isDeferred,
   Resolvable,
   ResolveFunc,
 } from "$live/engine/core/resolver.ts";
 import { isAwaitable } from "$live/engine/core/utils.ts";
+import { FreshContext } from "$live/engine/fresh/manifest.ts";
 import { Route, Routes } from "$live/flags/audience.ts";
 import { isFreshCtx } from "$live/handlers/fresh.ts";
 import { Flag, LiveState, RouterContext } from "$live/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
-import { FreshContext } from "$live/engine/fresh/manifest.ts";
 
 export interface SelectionConfig {
   audiences: Routes[];
