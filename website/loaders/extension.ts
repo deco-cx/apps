@@ -3,7 +3,7 @@ import { PromiseOrValue } from "$live/engine/core/utils.ts";
 /**
  * @title The type extension.
  */
-export type ExtensionOf<T> = (value: T) => PromiseOrValue<void>;
+export type ExtensionOf<T> = (value: T) => PromiseOrValue<T>;
 
 export interface Props<T> {
   /**
@@ -20,6 +20,9 @@ export interface Props<T> {
 export default async function Extended<T>(
   { data, extensions }: Props<T>,
 ): Promise<T> {
-  await Promise.all(extensions.map((ext) => ext(data)));
-  return data;
+  let result = data;
+  for (const extension of Array.isArray(extensions) ? extensions : []) {
+    result = await extension?.(result);
+  }
+  return result;
 }
