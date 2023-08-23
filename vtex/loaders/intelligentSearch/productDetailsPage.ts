@@ -18,8 +18,8 @@ import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type {
   PageType,
-  ProductSearchResult,
   Product as VTEXProduct,
+  ProductSearchResult,
 } from "../../utils/types.ts";
 
 export interface Props {
@@ -58,7 +58,7 @@ const loader = async (
 
   const pageTypePromise = fetchAPI<PageType>(
     vtex.api.catalog_system.pub.portal.pagetype.term(`${slug}/p`),
-    { withProxyCache: true },
+    { deco: { cache: "stale-while-revalidate" } },
   );
 
   const url = new URL(baseUrl);
@@ -87,7 +87,7 @@ const loader = async (
   const { products: [product] } = await fetchAPI<ProductSearchResult>(
     `${search.facets(toPath(facets))}?${params}`,
     {
-      withProxyCache: true,
+      deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
     },
   );
@@ -109,7 +109,7 @@ const loader = async (
     const result = await fetchAPI<ProductSearchResult>(
       `${search.facets(toPath(facets))}?${params}`,
       {
-        withProxyCache: true,
+        deco: { cache: "stale-while-revalidate" },
         headers: withSegmentCookie(segment),
       },
     );

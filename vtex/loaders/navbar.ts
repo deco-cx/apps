@@ -22,7 +22,7 @@ const loader = async (
 
   const tree = await fetchAPI<Category[]>(
     paths(ctx).api.catalog_system.pub.category.tree.level(levels),
-    { withProxyCache: true },
+    { deco: { cache: "stale-while-revalidate" } },
   );
 
   return categoryTreeToNavbar(tree);

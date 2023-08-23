@@ -1,6 +1,6 @@
 import { getSetCookies } from "std/http/cookie.ts";
-import { HttpError } from "../../../utils/HttpError.ts";
-import { FetchOptions, fetchSafe } from "../../../utils/fetch.ts";
+import { DecoRequestInit, fetchSafe } from "../../../utils/fetch.ts";
+import { HttpError } from "../../../utils/http.ts";
 import { Props } from "../../mod.ts";
 import {
   Banner,
@@ -24,7 +24,7 @@ export const createClient = (state: Props) => {
     ? "https://api.sandbox.vnda.com.br"
     : "https://api.vnda.com.br";
 
-  const fetcher = (path: string, init?: RequestInit & FetchOptions) =>
+  const fetcher = (path: string, init?: DecoRequestInit) =>
     fetchSafe(new URL(path, baseUrl), {
       ...init,
       headers: {
@@ -37,7 +37,9 @@ export const createClient = (state: Props) => {
     });
 
   const getProduct = (id: string | number): Promise<ProductGroup | null> =>
-    fetcher(`/api/v2/products/${id}`, { withProxyCache: true })
+    fetcher(`/api/v2/products/${id}`, {
+      deco: { cache: "stale-while-revalidate" },
+    })
       .then((res) => res.json())
       .catch(() => null);
 
@@ -53,7 +55,7 @@ export const createClient = (state: Props) => {
     });
 
     const response = await fetcher(`/api/v2/products/search?${qs}`, {
-      withProxyCache: true,
+      deco: { cache: "stale-while-revalidate" },
     });
 
     const data = await response.json();
@@ -74,7 +76,7 @@ export const createClient = (state: Props) => {
   const getDefaultBanner = (): Promise<Banner[]> =>
     fetcher(
       `/api/v2/banners?only_valid=true&tag=listagem-banner-principal`,
-      { withProxyCache: true },
+      { deco: { cache: "stale-while-revalidate" } },
     ).then((res) => res.json());
 
   const getSEO = (type: "Product" | "Page" | "Tag") =>
@@ -88,7 +90,7 @@ export const createClient = (state: Props) => {
     qs.set("type", "category");
 
     return fetcher(`/api/v2/seo_data?${qs.toString()}`, {
-      withProxyCache: true,
+      deco: { cache: "stale-while-revalidate" },
     }).then((res) => res.json());
   };
 
@@ -97,7 +99,9 @@ export const createClient = (state: Props) => {
   const getTagSEO = getSEO("Tag");
 
   const getTag = (name: string): Promise<RelatedItemTag> =>
-    fetcher(`/api/v2/tags/${name}`, { withProxyCache: true })
+    fetcher(`/api/v2/tags/${name}`, {
+      deco: { cache: "stale-while-revalidate" },
+    })
       .then((res) => res.json());
 
   const getTags = (params?: TagsSearchParams): Promise<RelatedItemTag[]> => {
@@ -106,7 +110,9 @@ export const createClient = (state: Props) => {
       qs.set(key, value);
     });
 
-    return fetcher(`/api/v2/tags?${qs.toString()}`, { withProxyCache: true })
+    return fetcher(`/api/v2/tags?${qs.toString()}`, {
+      deco: { cache: "stale-while-revalidate" },
+    })
       .then((res) => res.json());
   };
 

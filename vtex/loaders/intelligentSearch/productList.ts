@@ -133,7 +133,7 @@ const loader = async (
   const { products: vtexProducts } = await fetchAPI<ProductSearchResult>(
     `${search.facets(toPath(facets))}?${params}`,
     {
-      withProxyCache: true,
+      deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
     },
   );
