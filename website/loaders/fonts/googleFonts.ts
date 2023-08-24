@@ -52,7 +52,7 @@ const loader = async (props: Props, req: Request): Promise<Font> => {
 
   const styleSheet = await fetchSafe(url, {
     headers: req.headers,
-    //  deco: {cache: "stale-while-revalidate"}, TODO: bring it back
+    deco: { cache: "stale-while-revalidate" },
   }).then((res) => res.text());
 
   return {
