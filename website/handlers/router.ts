@@ -162,20 +162,27 @@ export const buildRoutes = (audiences: Routes[]): [
     );
 };
 
+export interface SelectionConfig {
+  audiences: Routes[];
+}
+
 /**
  * @title Router
  * @description Route requests based on audience
  */
 export default function RoutesSelection(
-  _props: unknown,
+  { audiences }: SelectionConfig,
   ctx: AppContext,
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
     const t = isFreshCtx<LiveState>(connInfo) ? connInfo.state.t : undefined;
 
+    const routesFromProps = Array.isArray(audiences) ? audiences : [];
     // everyone should come first in the list given that we override the everyone value with the upcoming flags.
     const [routes, hrefRoutes] = buildRoutes(
-      Array.isArray(ctx.routes) ? ctx.routes : [],
+      Array.isArray(ctx.routes)
+        ? [...ctx.routes, ...routesFromProps]
+        : routesFromProps,
     );
     // build the router from entries
     const builtRoutes = Object.entries(routes).sort((
