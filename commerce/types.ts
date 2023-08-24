@@ -399,6 +399,7 @@ export interface Seo {
 
 export interface Search {
   term: string;
+  href?: string;
 }
 
 export interface Suggestion {
