@@ -6,15 +6,16 @@ import * as $$$0 from "./loaders/legacy/productList.ts";
 import * as $$$1 from "./loaders/legacy/productDetailsPage.ts";
 import * as $$$2 from "./loaders/legacy/productListingPage.ts";
 import * as $$$3 from "./loaders/legacy/relatedProductsLoader.ts";
-import * as $$$4 from "./loaders/wishlist.ts";
-import * as $$$5 from "./loaders/navbar.ts";
-import * as $$$6 from "./loaders/proxy.ts";
-import * as $$$7 from "./loaders/intelligentSearch/productList.ts";
-import * as $$$8 from "./loaders/intelligentSearch/productDetailsPage.ts";
-import * as $$$9 from "./loaders/intelligentSearch/productListingPage.ts";
-import * as $$$10 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$11 from "./loaders/cart.ts";
-import * as $$$12 from "./loaders/user.ts";
+import * as $$$4 from "./loaders/legacy/suggestions.ts";
+import * as $$$5 from "./loaders/wishlist.ts";
+import * as $$$6 from "./loaders/navbar.ts";
+import * as $$$7 from "./loaders/proxy.ts";
+import * as $$$8 from "./loaders/intelligentSearch/productList.ts";
+import * as $$$9 from "./loaders/intelligentSearch/productDetailsPage.ts";
+import * as $$$10 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$11 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$12 from "./loaders/cart.ts";
+import * as $$$13 from "./loaders/user.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/notifyme.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateCoupons.ts";
@@ -36,19 +37,20 @@ import * as $$$$$$$$$16 from "./actions/analytics/sendEvent.ts";
 
 const manifest = {
   "loaders": {
-    "vtex/loaders/cart.ts": $$$11,
-    "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$8,
-    "vtex/loaders/intelligentSearch/productList.ts": $$$7,
-    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$9,
-    "vtex/loaders/intelligentSearch/suggestions.ts": $$$10,
+    "vtex/loaders/cart.ts": $$$12,
+    "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$9,
+    "vtex/loaders/intelligentSearch/productList.ts": $$$8,
+    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$10,
+    "vtex/loaders/intelligentSearch/suggestions.ts": $$$11,
     "vtex/loaders/legacy/productDetailsPage.ts": $$$1,
     "vtex/loaders/legacy/productList.ts": $$$0,
     "vtex/loaders/legacy/productListingPage.ts": $$$2,
     "vtex/loaders/legacy/relatedProductsLoader.ts": $$$3,
-    "vtex/loaders/navbar.ts": $$$5,
-    "vtex/loaders/proxy.ts": $$$6,
-    "vtex/loaders/user.ts": $$$12,
-    "vtex/loaders/wishlist.ts": $$$4,
+    "vtex/loaders/legacy/suggestions.ts": $$$4,
+    "vtex/loaders/navbar.ts": $$$6,
+    "vtex/loaders/proxy.ts": $$$7,
+    "vtex/loaders/user.ts": $$$13,
+    "vtex/loaders/wishlist.ts": $$$5,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
