@@ -84,7 +84,7 @@ const manifestMappings: ManifestMappings = {
   },
 };
 /**
- * @title Website
+ * @title $live
  */
 export default function App(
   state: Props,
@@ -93,7 +93,7 @@ export default function App(
   Props,
   [ReturnType<typeof webSite>, ReturnType<typeof workflows>]
 > {
-  const webSiteApp = webSite(state);
+  const { resolvables: _ignoreResolvables, ...webSiteApp } = webSite(state);
   const workflowsApp = workflows({});
   const webSiteManifest = webSiteApp.manifest;
   const workflowsManifest = workflowsApp.manifest;
