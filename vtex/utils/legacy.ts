@@ -49,7 +49,7 @@ export const pageTypesFromPathname = async (
         vtex.api.catalog_system.pub.portal.pagetype.term(
           segments.slice(0, index + 1).join("/"),
         ),
-        { withProxyCache: true },
+        { deco: { cache: "stale-while-revalidate" } },
       )
     ),
   );

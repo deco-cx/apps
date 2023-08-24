@@ -134,7 +134,7 @@ const loader = async (
   const vtexProducts = await fetchAPI<LegacyProduct[]>(
     `${paths(ctx).api.catalog_system.pub.products.search}?${params}`,
     {
-      withProxyCache: true,
+      deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
     },
   );

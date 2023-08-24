@@ -266,11 +266,17 @@ const loader = async (
   const [productsResult, facetsResult] = await Promise.all([
     fetchAPI<ProductSearchResult>(
       `${search.product_search.facets(toPath(selected))}?${params}`,
-      { withProxyCache: true, headers: withSegmentCookie(segment) },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
     ),
     fetchAPI<FacetSearchResult>(
       `${search.facets.facets(toPath(fselected))}?${params}`,
-      { withProxyCache: true, headers: withSegmentCookie(segment) },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
     ),
   ]);
 

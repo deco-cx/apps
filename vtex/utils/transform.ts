@@ -17,13 +17,13 @@ import type {
   Facet as FacetVTEX,
   FacetValueBoolean,
   FacetValueRange,
+  Item as SkuVTEX,
   LegacyFacet,
-  LegacyProduct as LegacyProductVTEX,
   LegacyItem as LegacySkuVTEX,
+  LegacyProduct as LegacyProductVTEX,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
-  Item as SkuVTEX,
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";

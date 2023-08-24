@@ -4,9 +4,17 @@ import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
 import { paths } from "../../utils/paths.ts";
-import { getSegment, setSegment, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegment,
+  setSegment,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { pickSku, toProduct } from "../../utils/transform.ts";
-import type { CrossSellingType, LegacyProduct, PageType } from "../../utils/types.ts";
+import type {
+  CrossSellingType,
+  LegacyProduct,
+  PageType,
+} from "../../utils/types.ts";
 
 export interface Props {
   /**
@@ -61,7 +69,7 @@ async function loader(
     if (slug) {
       const pageType = await fetchAPI<PageType>(
         api.portal.pagetype.term(`${slug}/p`),
-        { withProxyCache: true },
+        { deco: { cache: "stale-while-revalidate" } },
       );
 
       // Page type doesn't exists or this is not product page
@@ -85,7 +93,10 @@ async function loader(
     `${
       api.products.crossselling.type(crossSelling).productId(productId)
     }?${params}`,
-    { withProxyCache: true, headers: withSegmentCookie(segment) },
+    {
+      deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    },
   );
 
   const options = {

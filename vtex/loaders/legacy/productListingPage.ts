@@ -16,7 +16,11 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
-import type { LegacyFacets, LegacyProduct, LegacySort } from "../../utils/types.ts";
+import type {
+  LegacyFacets,
+  LegacyProduct,
+  LegacySort,
+} from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
 
@@ -152,11 +156,14 @@ const loader = async (
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
     fetchSafe(
       `${search.products.search.term(getTerm(term, map))}?${pParams}`,
-      { withProxyCache: true, headers: withSegmentCookie(segment) },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
     ),
     fetchAPI<LegacyFacets>(
       `${search.facets.search.term(getTerm(term, fmap))}?${fParams}`,
-      { withProxyCache: true },
+      { deco: { cache: "stale-while-revalidate" } },
     ),
   ]);
 

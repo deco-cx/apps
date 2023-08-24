@@ -42,7 +42,7 @@ async function loader(
   const [product] = await fetchAPI<LegacyProduct[]>(
     `${search.term(`${slug}/p`)}?${params}`,
     {
-      withProxyCache: true,
+      deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
     },
   );
@@ -62,7 +62,7 @@ async function loader(
 
     kitItems = await fetchAPI<LegacyProduct[]>(
       `${search}?${p}`,
-      { withProxyCache: true },
+      { deco: { cache: "stale-while-revalidate" } },
     );
   }
 

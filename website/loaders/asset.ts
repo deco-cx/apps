@@ -9,7 +9,7 @@ interface Props {
 
 const loader = async (props: Props) => {
   const original = await fetchSafe(props.src, {
-    withProxyCache: true,
+    deco: { cache: "stale-while-revalidate" },
   });
 
   const response = original.clone();

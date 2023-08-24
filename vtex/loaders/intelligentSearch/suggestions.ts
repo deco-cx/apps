@@ -50,7 +50,10 @@ const loaders = async (
 
     return fetchAPI<Suggestion>(
       `${search.search_suggestions}?${params}`,
-      { withProxyCache: true, headers: withSegmentCookie(segment) },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
     );
   };
 
@@ -59,7 +62,10 @@ const loaders = async (
 
     return fetchAPI<Suggestion>(
       `${search.top_searches}?${params}`,
-      { withProxyCache: true, headers: withSegmentCookie(segment) },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
     );
   };
 
@@ -69,7 +75,10 @@ const loaders = async (
 
     return fetchAPI<ProductSearchResult>(
       `${search.product_search.facets(toPath(facets))}?${params}`,
-      { withProxyCache: true, headers: withSegmentCookie(segment) },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
     );
   };
 
