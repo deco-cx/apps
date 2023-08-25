@@ -1071,3 +1071,24 @@ export interface WishlistItem {
   sku: string;
   title: string;
 }
+
+export interface PortalSuggestion {
+  itemsReturned: ItemsReturned[];
+}
+
+export interface ItemsReturned {
+  items:    Item[];
+  thumb:    string;
+  thumbUrl: null | string;
+  name:     string;
+  href:     string;
+  criteria: null | string;
+}
+
+export interface Item {
+  productId:    string;
+  itemId:       string;
+  name:         string;
+  nameComplete: string;
+  imageUrl:     string;
+}
