@@ -2,7 +2,12 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $0 from "./functions/requestToParam.ts";
+
 const manifest = {
+  "functions": {
+    "deco-sites/std/functions/requestToParam.ts": $0,
+  },
   "name": "deco-sites/std",
   "baseUrl": import.meta.url,
 };

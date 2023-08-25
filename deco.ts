@@ -1,10 +1,10 @@
 const app = (name: string) => ({ dir: name, name });
 
-const legacyApps = [{
-  dir: "./legacy/$live",
+const compatibilityApps = [{
+  dir: "./compat/$live",
   name: "$live",
 }, {
-  dir: "./legacy/std",
+  dir: "./compat/std",
   name: "deco-sites/std",
 }];
 
@@ -16,7 +16,7 @@ const config = {
     app("website"),
     app("commerce"),
     app("workflows"),
-    ...legacyApps,
+    ...compatibilityApps,
   ],
 };
 

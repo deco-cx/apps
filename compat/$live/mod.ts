@@ -5,7 +5,7 @@ import { buildSourceMap } from "$live/blocks/utils.tsx";
 import type { Manifest as LiveManifest } from "$live/live.gen.ts";
 
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
-import webSite, { Props } from "../../website/mod.ts";
+import webSite from "../../website/mod.ts";
 import type { Manifest as WorkflowsManifest } from "../../workflows/manifest.gen.ts";
 
 import { SourceMap } from "$live/blocks/app.ts";
@@ -83,6 +83,9 @@ const manifestMappings: ManifestMappings = {
     "$live/flags/multivariate.ts": "website/flags/multivariate.ts",
   },
 };
+// deno-lint-ignore no-empty-interface
+export interface Props {
+}
 /**
  * @title $live
  */
