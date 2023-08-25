@@ -3,17 +3,22 @@ export { onBeforeResolveProps } from "../../website/mod.ts";
 import { SourceMap } from "$live/blocks/app.ts";
 import { buildSourceMap } from "$live/blocks/utils.tsx";
 import type { App, AppManifest } from "$live/mod.ts";
-import type { Manifest as StdManifest } from "https://denopkg.com/deco-sites/std@1.20.11/live.gen.ts";
-import $live from "../$live/mod.ts";
-import shopify, { Props as ShopifyProps } from "../../shopify/mod.ts";
-import type { Manifest as ShopifyManifest } from "../../shopify/manifest.gen.ts";
-import vnda, { Props as VNDAProps } from "../../vnda/mod.ts";
-import type { Manifest as VNDAManifest } from "../../vnda/manifest.gen.ts";
-import vtex, { Props as VTEXProps } from "../../vtex/mod.ts";
-import type { Manifest as VTEXManifest } from "../../vtex/manifest.gen.ts";
-import type { Manifest as _Manifest } from "./manifest.gen.ts";
-import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
+import $live from "../$live/mod.ts";
+import type { Manifest as ShopifyManifest } from "../../shopify/manifest.gen.ts";
+import shopify, { Props as ShopifyProps } from "../../shopify/mod.ts";
+import type { Manifest as VNDAManifest } from "../../vnda/manifest.gen.ts";
+import vnda, { Props as VNDAProps } from "../../vnda/mod.ts";
+import type { Manifest as VTEXManifest } from "../../vtex/manifest.gen.ts";
+import vtex, { Props as VTEXProps } from "../../vtex/mod.ts";
+import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
+import type {
+  ShopifyAccount,
+  StdManifest,
+  VNDAAccount,
+  VTEXAccount,
+} from "./deps.ts";
+import type { Manifest as _Manifest } from "./manifest.gen.ts";
 
 import manifest from "./manifest.gen.ts";
 
@@ -134,7 +139,6 @@ const manifestMappings = {
   },
   sections: {
     // Global sections are now deprecated
-    "deco-sites/std/sections/Analytics.tsx": NOT_IMPLEMENTED, // where is this section?
     "deco-sites/std/sections/configButterCMS.global.tsx": NOT_IMPLEMENTED,
     "deco-sites/std/sections/configLinxImpulse.global.tsx": NOT_IMPLEMENTED,
     "deco-sites/std/sections/configNuvemShop.tsx": NOT_IMPLEMENTED,
@@ -220,14 +224,27 @@ export interface Props {
   vnda?: VNDAProps;
 }
 
+export interface State extends Props {
+  configVTEX?: VTEXAccount;
+  configShopify?: ShopifyAccount;
+  configVNDA?: VNDAAccount;
+}
+
 export default function Std(
   props: Props,
-): App<Manifest, Props, [ReturnType<typeof $live>]> {
+): App<Manifest, State, [ReturnType<typeof $live>]> {
   const targetApps: Record<
     string,
     { manifest: AppManifest; sourceMap: SourceMap }
   > = {};
+  const state: State = { ...props };
   if (props?.vtex) {
+    state.configVTEX = {
+      defaultLocale: "pt-BR",
+      defaultPriceCurrency: "BRL",
+      defaultSalesChannel: "1",
+      ...props.vtex,
+    };
     const { manifest } = vtex(props.vtex);
     targetApps["vtex"] = {
       sourceMap: buildSourceMap(manifest),
@@ -236,6 +253,7 @@ export default function Std(
   }
 
   if (props?.shopify) {
+    state.configShopify = props.shopify;
     const { manifest } = shopify(props.shopify);
     targetApps["shopify"] = {
       sourceMap: buildSourceMap(manifest),
@@ -244,6 +262,13 @@ export default function Std(
   }
 
   if (props?.vnda) {
+    state.configVNDA = {
+      domain: props.vnda.publicUrl,
+      internalDomain: `${props.vnda.account}.cdn.vnda.com.br`,
+      useSandbox: props.vnda.sandbox,
+      authToken: props.vnda.authToken,
+      defaultPriceCurrency: "BRL",
+    };
     const { manifest } = vnda(props.vnda);
     targetApps["vnda"] = {
       sourceMap: buildSourceMap(manifest),
