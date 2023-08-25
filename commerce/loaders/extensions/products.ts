@@ -2,13 +2,13 @@ import {
   default as extend,
   Props,
 } from "../../../website/loaders/extension.ts";
-import { ProductDetailsPage } from "../../types.ts";
+import { Product } from "../../types.ts";
 
 /**
  * @title Extend your products
  */
 export default function ProductsExt(
-  props: Props<ProductDetailsPage | null>,
-): Promise<ProductDetailsPage | null> {
+  props: Props<Product[] | null>,
+): Promise<Product[] | null> {
   return extend(props);
 }

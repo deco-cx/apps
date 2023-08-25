@@ -1,6 +1,6 @@
 {
   "imports": {
-    "$live/": "https://denopkg.com/deco-cx/deco@1.30.0/",
+    "$live/": "https://denopkg.com/deco-cx/deco@1.30.5/",
     "$fresh/": "https://denopkg.com/denoland/fresh@1.4.2/",
     "preact": "https://esm.sh/preact@10.15.1",
     "preact/": "https://esm.sh/preact@10.15.1/",

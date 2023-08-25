@@ -1,5 +1,13 @@
 const app = (name: string) => ({ dir: name, name });
 
+const compatibilityApps = [{
+  dir: "./compat/$live",
+  name: "$live",
+}, {
+  dir: "./compat/std",
+  name: "deco-sites/std",
+}];
+
 const config = {
   apps: [
     app("vtex"),
@@ -8,6 +16,7 @@ const config = {
     app("website"),
     app("commerce"),
     app("workflows"),
+    ...compatibilityApps,
   ],
 };
 
