@@ -1,6 +1,6 @@
 # **Apps**
 
-Welcome to the `deco-cx/apps` repository! This repository is home to a collection of powerful apps that can be seamlessly integrated into your deco sites. Here, we provide you with a brief overview of the deco framework and introduce the concept of apps. We'll also delve into the repository structure, how to contribute, and more. Read more about apps in the [docs](https://www.deco.cx/docs/en/concepts/app).
+Welcome to the `deco-cx/apps` repository! This repository is home to a collection of powerful apps that can be seamlessly integrated into your deco sites. Here, we provide you with a brief overview of the deco framework and introduce the concept of apps. We'll also delve into the repository structure, how to contribute, and more. Read more about apps in the [docs](https://www.deco.cx/docs/en/concepts/app), also if you want to see apps in action check our [storefront](https://github.com/deco-sites/storefront) repository.
 
 ## About the deco Framework
 
