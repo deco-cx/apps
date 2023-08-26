@@ -10,13 +10,13 @@ Deco, formerly known as `live`, is a modern and versatile framework that empower
 
 The `deco-cx/apps` repository is structured as a monorepo, housing a collection of individual apps, each stored in a dedicated subfolder. These apps can be installed separately, providing you with the flexibility to choose and integrate only the functionalities that suit your project's needs.
 
-The `deco.ts` file serves as a hub where you can specify which apps are included in your project. Additionally, this repository supports extensibility, allowing you to contribute new apps to the ecosystem. Whether you choose to create apps within this repository or within your own organization's repository, there are no limitations on where apps should be developed.
+The `deco.ts` file serves as a hub where you can specify the apps of this repository. However it is important to notice that whether you choose to create apps within this repository or within your own organization's repository, there are no limitations on where apps should be developed.
 
-## General Overview
+## Overview
 
 At the core of all websites within this repository is the `website` app, located in the `website` folder. This app lays the foundation for websites, offering a set of common features that are essential regardless of whether your site is an e-commerce platform or not. We've also structured the repository to accommodate specific platforms, such as e-commerce platforms like VTEX, Shopify, VNDA, and more. These platform-specific apps depend on the `website` app, leveraging its shared features while adding platform-specific functionality.
 
-## How to Contribute
+## Contributing
 
 Contributions to the `deco-cx/apps` repository are highly encouraged! We maintain an open and collaborative environment where community members are valued and respected. When contributing, please follow our contribution guidelines and treat others with kindness and professionalism. Our review process ensures high-quality contributions that align with the repository's goals.
 
