@@ -80,16 +80,10 @@ const handler = async (
   }
 };
 
-const cachePromise = typeof caches !== "undefined" ? caches.open(PATH) : null;
+const cache = typeof caches !== "undefined" ? await caches.open(PATH) : null;
 
 const loader: typeof handler = async (props, req) => {
-  const cache = await cachePromise;
-
-  if (cache === null) {
-    return handler(props, req);
-  }
-
-  const cached = await cache.match(req);
+  const cached = await cache?.match(req).catch(() => null);
 
   if (cached) return cached;
 
@@ -98,7 +92,7 @@ const loader: typeof handler = async (props, req) => {
   if (response.status === 200) {
     const cloned = response.clone();
     cloned.headers.set("x-cache", "HIT");
-    cache.put(req, cloned);
+    cache?.put(req, cloned);
   }
 
   return response;
