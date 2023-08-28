@@ -1077,18 +1077,18 @@ export interface PortalSuggestion {
 }
 
 export interface ItemsReturned {
-  items:    Item[];
-  thumb:    string;
+  items: Item[];
+  thumb: string;
   thumbUrl: null | string;
-  name:     string;
-  href:     string;
+  name: string;
+  href: string;
   criteria: null | string;
 }
 
 export interface Item {
-  productId:    string;
-  itemId:       string;
-  name:         string;
+  productId: string;
+  itemId: string;
+  name: string;
   nameComplete: string;
-  imageUrl:     string;
+  imageUrl: string;
 }

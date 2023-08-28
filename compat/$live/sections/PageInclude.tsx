@@ -11,7 +11,7 @@ export interface Props {
 }
 
 export const isLivePageProps = (
-  p: Page["props"] | LivePageProps
+  p: Page["props"] | LivePageProps,
 ): p is LivePageProps => {
   return (p as LivePageProps)?.sections !== undefined;
   // TODO: Uncomment when bring back layout

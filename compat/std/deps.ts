@@ -4,4 +4,3 @@ export type { Account as VNDAAccount } from "https://denopkg.com/deco-sites/std@
 export type { Account as VTEXAccount } from "https://denopkg.com/deco-sites/std@1.20.11/packs/vtex/accounts/vtex.ts";
 export { default as Analytics } from "https://denopkg.com/deco-sites/std@1.20.11/sections/Analytics.tsx";
 export { default as VTEXCompat } from "https://denopkg.com/deco-sites/std@1.20.11/sections/VTEXPortalDataLayerCompatibility.tsx";
-

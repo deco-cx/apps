@@ -25,7 +25,7 @@ export const paths = ({ account }: Props) => {
               term: (term: string) =>
                 href(`/api/catalog_system/pub/portal/pagetype/${term}`),
             },
-            buscaautocomplete: () => href('/buscaautocomplete')
+            buscaautocomplete: () => href("/buscaautocomplete"),
           },
           facets: {
             search: {
