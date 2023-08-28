@@ -5,7 +5,7 @@ import {
   ResolveFunc,
 } from "$live/engine/core/resolver.ts";
 import { isAwaitable } from "$live/engine/core/utils.ts";
-import { FreshContext } from "$live/engine/fresh/manifest.ts";
+import { FreshContext } from "$live/engine/manifest/manifest.ts";
 import { Route, Routes } from "$live/flags/audience.ts";
 import { isFreshCtx } from "$live/handlers/fresh.ts";
 import { Flag, LiveState, RouterContext } from "$live/types.ts";
