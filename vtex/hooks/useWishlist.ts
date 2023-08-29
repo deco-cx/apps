@@ -16,10 +16,10 @@ const wrap = <T>(
   }));
 
 const addItem = wrap(
-  Runtime.create("vtex/actions/wishlist/addItem.ts"),
+  Runtime.vtex.actions.wishlist.addItem,
 );
 const removeItem = wrap(
-  Runtime.create("vtex/actions/wishlist/removeItem.ts"),
+  Runtime.vtex.actions.wishlist.removeItem,
 );
 
 const getItem = (item: Partial<WishlistItem>) =>

@@ -1,4 +1,4 @@
-import { forApp } from "$live/clients/withManifest.ts";
-import app from "./mod.ts";
+import { proxy } from "$live/clients/withManifest.ts";
+import { Manifest } from "./manifest.gen.ts";
 
-export const Runtime = forApp<ReturnType<typeof app>>();
+export const Runtime = proxy<Manifest>();

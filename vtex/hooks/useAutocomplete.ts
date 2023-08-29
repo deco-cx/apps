@@ -6,9 +6,7 @@ import { Runtime } from "../runtime.ts";
 const payload = signal<Suggestion | null>(null);
 const loading = signal<boolean>(false);
 
-const suggestions = Runtime.create(
-  "vtex/loaders/intelligentSearch/suggestions.ts",
-);
+const suggestions = Runtime.vtex.loaders.intelligentSearch.suggestions;
 
 const setSearch = debounce(async (search: string, count: number) => {
   try {

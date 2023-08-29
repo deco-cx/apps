@@ -32,16 +32,16 @@ const state = {
   cart,
   loading,
   addItem: wrap(
-    Runtime.create("vnda/actions/cart/addItem.ts"),
+    Runtime.vnda.actions.cart.addItem,
   ),
   updateItem: wrap(
-    Runtime.create("vnda/actions/cart/updateItem.ts"),
+    Runtime.vnda.actions.cart.updateItem,
   ),
   setShippingAddress: wrap(
-    Runtime.create("vnda/actions/cart/setShippingAddress.ts"),
+    Runtime.vnda.actions.cart.setShippingAddress,
   ),
   updateCoupon: wrap(
-    Runtime.create("vnda/actions/cart/updateCoupon.ts"),
+    Runtime.vnda.actions.cart.updateCoupon,
   ),
 };
 

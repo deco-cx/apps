@@ -15,13 +15,13 @@ const state = {
   cart,
   loading,
   addItems: wrap(
-    Runtime.create("shopify/actions/cart/addItems.ts"),
+    Runtime.shopify.actions.cart.addItems,
   ),
   updateItems: wrap(
-    Runtime.create("shopify/actions/cart/updateItems.ts"),
+    Runtime.shopify.actions.cart.updateItems,
   ),
   addCouponsToCart: wrap(
-    Runtime.create("shopify/actions/cart/updateCoupons.ts"),
+    Runtime.shopify.actions.cart.updateCoupons,
   ),
 };
 
