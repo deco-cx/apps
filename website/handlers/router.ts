@@ -6,10 +6,10 @@ import {
 } from "$live/engine/core/resolver.ts";
 import { isAwaitable } from "$live/engine/core/utils.ts";
 import { FreshContext } from "$live/engine/manifest/manifest.ts";
-import { Route, Routes } from "$live/flags/audience.ts";
 import { isFreshCtx } from "$live/handlers/fresh.ts";
 import { Flag, LiveState, RouterContext } from "$live/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
+import { Route, Routes } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
 
 export interface SelectionConfig {
