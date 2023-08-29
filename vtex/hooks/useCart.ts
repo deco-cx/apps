@@ -68,39 +68,39 @@ const state = {
   cart,
   loading,
   updateItems: wrap(
-    Runtime.create("vtex/actions/cart/updateItems.ts"),
+    Runtime.vtex.actions.cart.updateItems,
   ),
   removeAllItems: wrap(
-    Runtime.create("vtex/actions/cart/removeItems.ts"),
+    Runtime.vtex.actions.cart.removeItems,
   ),
   addItems: wrap(
-    Runtime.create("vtex/actions/cart/addItems.ts"),
+    Runtime.vtex.actions.cart.addItems,
   ),
   addCouponsToCart: wrap(
-    Runtime.create("vtex/actions/cart/updateCoupons.ts"),
+    Runtime.vtex.actions.cart.updateCoupons,
   ),
   changePrice: wrap(
-    Runtime.create("vtex/actions/cart/updateItemPrice.ts"),
+    Runtime.vtex.actions.cart.updateItemPrice,
   ),
   getCartInstallments: wrap(
-    Runtime.create("vtex/actions/cart/getInstallment.ts"),
+    Runtime.vtex.actions.cart.getInstallment,
   ),
   ignoreProfileData: wrap(
-    Runtime.create("vtex/actions/cart/updateProfile.ts"),
+    Runtime.vtex.actions.cart.updateProfile,
   ),
   removeAllPersonalData: wrap(
-    Runtime.create("vtex/actions/cart/updateUser.ts"),
+    Runtime.vtex.actions.cart.updateUser,
   ),
   addItemAttachment: wrap(
-    Runtime.create("vtex/actions/cart/updateItemAttachment.ts"),
+    Runtime.vtex.actions.cart.updateItemAttachment,
   ),
   removeItemAttachment: wrap(
-    Runtime.create("vtex/actions/cart/removeItemAttachment.ts"),
+    Runtime.vtex.actions.cart.removeItemAttachment,
   ),
   sendAttachment: wrap(
-    Runtime.create("vtex/actions/cart/updateAttachment.ts"),
+    Runtime.vtex.actions.cart.updateAttachment,
   ),
-  simulate: Runtime.create("vtex/actions/cart/simulation.ts"),
+  simulate: Runtime.vtex.actions.cart.simulation,
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };
 
