@@ -8,7 +8,9 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 export type AppContext = FnContext<Props, Manifest>;
 
 export interface Props {
-  /** @title Site Map */
+  /**
+   * @title Site Map
+   */
   routes?: Routes[];
 
   /** @title Seo */
@@ -61,11 +63,6 @@ export default function App(
     },
     resolvables: {
       "./routes/[...catchall].tsx": {
-        audiences: [
-          {
-            __resolveType: "website/loaders/pages.ts",
-          },
-        ],
         __resolveType: "website/handlers/router.ts",
       },
     },

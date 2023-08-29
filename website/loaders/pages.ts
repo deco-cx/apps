@@ -1,9 +1,9 @@
 import defaults from "$live/engine/manifest/defaults.ts";
-import { Routes } from "../flags/audience.ts";
+import { Route } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import LivePage from "../pages/Page.tsx";
 
-async function getAllPages(ctx: AppContext): Promise<Routes> {
+async function getAllPages(ctx: AppContext): Promise<Route[]> {
   const allPages = await ctx.get<
     Record<string, Parameters<typeof LivePage>[0]>
   >({
@@ -11,7 +11,7 @@ async function getAllPages(ctx: AppContext): Promise<Routes> {
     __resolveType: defaults["blockSelector"].name,
   });
 
-  const routes: Routes = [];
+  const routes: Route[] = [];
 
   for (
     const [pageId, { path: pathTemplate }] of Object.entries(allPages ?? {})
@@ -34,13 +34,16 @@ async function getAllPages(ctx: AppContext): Promise<Routes> {
 
   return routes;
 }
+/**
+ * @title Pages
+ */
 export default async function Pages(
   _props: unknown,
   _req: Request,
   ctx: AppContext,
-): Promise<Routes> {
+): Promise<Route[]> {
   const allPages = await ctx.get<
-    Routes
+    Route[]
   >({
     func: () => getAllPages(ctx),
     __resolveType: defaults["once"].name,
