@@ -16,6 +16,7 @@ const config = {
     app("website"),
     app("commerce"),
     app("workflows"),
+    app("verified-reviews"),
     ...compatibilityApps,
   ],
 };
