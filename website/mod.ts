@@ -1,8 +1,8 @@
 import { Section } from "$live/blocks/section.ts";
-import { Routes } from "$live/flags/audience.ts";
 import type { App, FnContext } from "$live/mod.ts";
 import { asResolved } from "$live/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
+import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
@@ -61,6 +61,11 @@ export default function App(
     },
     resolvables: {
       "./routes/[...catchall].tsx": {
+        audiences: [
+          {
+            __resolveType: "website/loaders/pages.ts",
+          },
+        ],
         __resolveType: "website/handlers/router.ts",
       },
     },
