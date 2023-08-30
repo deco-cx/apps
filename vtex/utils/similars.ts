@@ -15,14 +15,12 @@ export const withIsSimilarTo = async (
     return product;
   }
 
-  const isSimilarTo = await ctx.invoke(
-    "vtex/loaders/legacy/relatedProductsLoader.ts",
-    {
+  const isSimilarTo = await ctx.invoke.vtex.loaders.legacy
+    .relatedProductsLoader({
       ...props,
       crossSelling: "similars",
       id: product.isVariantOf!.productGroupID,
-    },
-  );
+    });
 
   return {
     ...product,

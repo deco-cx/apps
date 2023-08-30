@@ -89,7 +89,7 @@ async function loader(
     return null;
   }
 
-  const vtexRelatedProducts = await fetchAPI<LegacyProduct[]>(
+  const relatedIds = await fetchAPI<LegacyProduct[]>(
     `${
       api.products.crossselling.type(crossSelling).productId(productId)
     }?${params}`,
@@ -97,22 +97,22 @@ async function loader(
       deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
     },
+  ).then((products = []) =>
+    products
+      .slice(0, count ?? Infinity)
+      .map((p) => pickSku(p).itemId)
   );
 
-  const options = {
-    baseUrl: url,
-    priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
-  };
-
-  const relatedProducts = vtexRelatedProducts
-    .slice(0, count ?? Infinity)
-    .map((p) => toProduct(p, pickSku(p), 0, options));
+  const relatedProducts = await ctx.invoke.vtex.loaders.legacy.productList({
+    similars: false,
+    ids: relatedIds,
+  });
 
   setSegment(segment, ctx.response.headers);
 
   // Search API does not offer a way to filter out in stock products
   // This is a scape hatch
-  if (hideUnavailableItems) {
+  if (hideUnavailableItems && relatedProducts) {
     const inStock = (p: Product) =>
       p.offers?.offers.find((o) =>
         o.availability === "https://schema.org/InStock"
