@@ -34,6 +34,20 @@ const action = async (
 ): Promise<null> => {
   const { anonymous, session } = getOrSetISCookie(req, ctx.response.headers);
 
+  console.log({
+    path: paths(ctx)["event-api"].v1.account.event,
+    method: "POST",
+    body: JSON.stringify({
+      ...props,
+      agent: "deco-sites/std",
+      anonymous,
+      session,
+    }),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+  
   await fetchSafe(
     paths(ctx)["event-api"].v1.account.event,
     {

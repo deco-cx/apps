@@ -284,6 +284,7 @@ const loader = async (
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params.get("query");
   if (fullTextTerm) {
+    console.log({ fullTextTerm });
     sendEvent({ type: "session.ping" }, req, ctx).then(() =>
       sendEvent(
         {
