@@ -3,7 +3,8 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $0 from "./functions/requestToParam.ts";
-import * as $$$0 from "./loaders/x/font.ts";
+import * as $$$0 from "./loaders/x/redirects.ts";
+import * as $$$1 from "./loaders/x/font.ts";
 import * as $$$$$$0 from "./sections/SEOPLP.tsx";
 import * as $$$$$$1 from "./sections/Analytics.tsx";
 import * as $$$$$$2 from "./sections/VTEXPortalDataLayerCompatibility.tsx";
@@ -14,7 +15,8 @@ const manifest = {
     "deco-sites/std/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "deco-sites/std/loaders/x/font.ts": $$$0,
+    "deco-sites/std/loaders/x/font.ts": $$$1,
+    "deco-sites/std/loaders/x/redirects.ts": $$$0,
   },
   "sections": {
     "deco-sites/std/sections/Analytics.tsx": $$$$$$1,
