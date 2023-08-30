@@ -1,5 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import type { Cart } from "../../utils/client/types.ts";
+import cart from "../../loaders/cart.ts";
 
 export interface Props {
   code: string;
@@ -15,7 +16,7 @@ const action = async (
   const cookie = req.headers.get("cookie") ?? "";
 
   const coupon = await client.coupon(code, cookie);
-  const updated = await ctx.invoke.vnda.loaders.cart();
+  const updated = await cart({}, req, ctx);
 
   return { coupon, ...updated };
 };

@@ -181,7 +181,7 @@ const loader = async (
         priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO: fix currency
       })
     ).map((product) =>
-      props.similars ? withIsSimilarTo(ctx, product) : product
+      props.similars ? withIsSimilarTo(req, ctx, product) : product
     ),
   );
   const filters = Object.entries({

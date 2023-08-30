@@ -9,12 +9,13 @@ import {
   setSegment,
   withSegmentCookie,
 } from "../../utils/segment.ts";
-import { pickSku, toProduct } from "../../utils/transform.ts";
+import { pickSku } from "../../utils/transform.ts";
 import type {
   CrossSellingType,
   LegacyProduct,
   PageType,
 } from "../../utils/types.ts";
+import productList from "./productList.ts";
 
 export interface Props {
   /**
@@ -49,7 +50,6 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> {
-  const { url } = req;
   const {
     hideUnavailableItems,
     crossSelling = "similars",
@@ -103,10 +103,14 @@ async function loader(
       .map((p) => pickSku(p).itemId)
   );
 
-  const relatedProducts = await ctx.invoke.vtex.loaders.legacy.productList({
-    similars: false,
-    ids: relatedIds,
-  });
+  const relatedProducts = await productList(
+    {
+      similars: false,
+      ids: relatedIds,
+    },
+    req,
+    ctx,
+  );
 
   setSegment(segment, ctx.response.headers);
 
