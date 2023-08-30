@@ -47,8 +47,8 @@ const action = async (
       "content-type": "application/json",
     },
   });
-  
-  await fetchSafe(
+
+  await fetch(
     paths(ctx)["event-api"].v1.account.event,
     {
       method: "POST",
