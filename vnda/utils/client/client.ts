@@ -37,7 +37,7 @@ export const createClient = (state: Props) => {
     });
 
   const getProduct = (id: string | number): Promise<ProductGroup | null> =>
-    fetcher(`/api/v2/products/${id}`, {
+    fetcher(`/api/v2/products/${id}?include_images=true`, {
       deco: { cache: "stale-while-revalidate" },
     })
       .then((res) => res.json())
