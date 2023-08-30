@@ -1,5 +1,5 @@
 import type { Product } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../../utils/fetch.ts";
+import { fetchAPI } from "../../utils/fetchVTEX.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
 import { paths } from "../../utils/paths.ts";

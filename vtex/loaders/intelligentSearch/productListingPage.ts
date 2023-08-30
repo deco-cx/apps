@@ -1,6 +1,6 @@
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
-import { fetchAPI } from "../../../utils/fetch.ts";
+import { fetchAPI } from "../../utils/fetchVTEX.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
@@ -284,7 +284,6 @@ const loader = async (
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params.get("query");
   if (fullTextTerm) {
-    console.log({ fullTextTerm });
     sendEvent({ type: "session.ping" }, req, ctx).then(() =>
       sendEvent(
         {

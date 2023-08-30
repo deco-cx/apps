@@ -1,5 +1,5 @@
 import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
-import { fetchAPI, fetchSafe } from "../../../utils/fetch.ts";
+import { fetchAPI, fetchSafe } from "../../utils/fetchVTEX.ts";
 import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
