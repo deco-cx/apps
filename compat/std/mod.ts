@@ -209,26 +209,25 @@ type Manifest = {
     }
     : ManifestWithStdCompat[key];
 };
-export interface Props {
-  /**
-   * @title VTEX Config
-   */
-  vtex?: VTEXProps;
-  /**
-   * @title ShopifyConfig
-   */
-  shopify?: ShopifyProps;
-  /**
-   * @title VNDA Config
-   */
-  vnda?: VNDAProps;
-}
 
-export interface State extends Props {
+export type Props = VTEXProps | ShopifyProps | VNDAProps;
+
+const isVTEXProps = (props: Props): props is VTEXProps => {
+  return (props as VTEXProps).platform === "vtex";
+};
+
+const isShopifyProps = (props: Props): props is ShopifyProps => {
+  return (props as ShopifyProps).platform === "shopify";
+};
+
+const isVNDAProps = (props: Props): props is VNDAProps => {
+  return (props as VNDAProps).platform === "vnda";
+};
+export type State = {
   configVTEX?: VTEXAccount;
   configShopify?: ShopifyAccount;
   configVNDA?: VNDAAccount;
-}
+} & Props;
 
 export default function Std(
   props: Props,
@@ -238,38 +237,38 @@ export default function Std(
     { manifest: AppManifest; sourceMap: SourceMap }
   > = {};
   const state: State = { ...props };
-  if (props?.vtex) {
+  if (isVTEXProps(props)) {
     state.configVTEX = {
       defaultLocale: "pt-BR",
       defaultPriceCurrency: "BRL",
       defaultSalesChannel: "1",
-      ...props.vtex,
+      ...props,
     };
-    const { manifest } = vtex(props.vtex);
+    const { manifest } = vtex(props);
     targetApps["vtex"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
     };
   }
 
-  if (props?.shopify) {
-    state.configShopify = props.shopify;
-    const { manifest } = shopify(props.shopify);
+  if (isShopifyProps(props)) {
+    state.configShopify = props;
+    const { manifest } = shopify(props);
     targetApps["shopify"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
     };
   }
 
-  if (props?.vnda) {
+  if (isVNDAProps(props)) {
     state.configVNDA = {
-      domain: props.vnda.publicUrl,
-      internalDomain: `${props.vnda.account}.cdn.vnda.com.br`,
-      useSandbox: props.vnda.sandbox,
-      authToken: props.vnda.authToken,
+      domain: props.publicUrl,
+      internalDomain: `${props.account}.cdn.vnda.com.br`,
+      useSandbox: props.sandbox,
+      authToken: props.authToken,
       defaultPriceCurrency: "BRL",
     };
-    const { manifest } = vnda(props.vnda);
+    const { manifest } = vnda(props);
     targetApps["vnda"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
