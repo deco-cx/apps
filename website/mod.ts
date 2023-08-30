@@ -53,6 +53,11 @@ export default function App(
         ...manifest.pages,
         "website/pages/Page.tsx": {
           ...manifest.pages["website/pages/Page.tsx"],
+          Preview: (props) =>
+            manifest.pages["website/pages/Page.tsx"].Preview({
+              ...props,
+              sections: [...state.global ?? [], ...props.sections],
+            }),
           default: (props) =>
             manifest.pages["website/pages/Page.tsx"].default({
               ...props,
