@@ -133,7 +133,6 @@ const manifestMappings = {
     "deco-sites/std/loaders/vtex/user.ts": "vtex/loaders/user.ts",
     "deco-sites/std/loaders/vtex/wishlist.ts": "vtex/loaders/wishlist.ts",
     "deco-sites/std/loaders/x/image.ts": "website/loaders/image.ts",
-    "deco-sites/std/loaders/x/redirects.ts": NOT_IMPLEMENTED, // not necessary
     "deco-sites/std/loaders/x/redirectsFromCsv.ts":
       "website/loaders/redirectsFromCsv.ts",
   },
