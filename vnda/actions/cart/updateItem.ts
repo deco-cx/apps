@@ -21,7 +21,7 @@ const action = async (
     await client.carrinho.remover(item_id, cookie);
   }
 
-  return ctx.invoke("vnda/loaders/cart.ts");
+  return ctx.invoke.vnda.loaders.cart();
 };
 
 export default action;

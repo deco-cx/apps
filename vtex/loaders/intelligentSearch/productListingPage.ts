@@ -283,10 +283,10 @@ const loader = async (
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params.get("query");
   if (fullTextTerm) {
-    ctx.invoke("vtex/actions/analytics/sendEvent.ts", {
+    ctx.invoke.vtex.actions.analytics.sendEvent({
       type: "session.ping",
     }).then(() =>
-      ctx.invoke("vtex/actions/analytics/sendEvent.ts", {
+      ctx.invoke.vtex.actions.analytics.sendEvent({
         type: "search.query",
         text: fullTextTerm,
         misspelled: productsResult.correction?.misspelled ?? false,

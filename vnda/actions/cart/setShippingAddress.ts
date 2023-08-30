@@ -16,7 +16,7 @@ const action = async (
   const cookie = req.headers.get("cookie") ?? "";
 
   const shipping = await client.cep(zip, cookie);
-  const updated = await ctx.invoke("vnda/loaders/cart.ts");
+  const updated = await ctx.invoke.vnda.loaders.cart();
 
   return { shipping, ...updated };
 };

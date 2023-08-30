@@ -15,7 +15,7 @@ const action = async (
   const cookie = req.headers.get("cookie") ?? "";
 
   const coupon = await client.coupon(code, cookie);
-  const updated = await ctx.invoke("vnda/loaders/cart.ts");
+  const updated = await ctx.invoke.vnda.loaders.cart();
 
   return { coupon, ...updated };
 };
