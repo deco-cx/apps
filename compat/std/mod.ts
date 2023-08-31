@@ -11,6 +11,8 @@ import type { Manifest as VNDAManifest } from "../../vnda/manifest.gen.ts";
 import vnda, { Props as VNDAProps } from "../../vnda/mod.ts";
 import type { Manifest as VTEXManifest } from "../../vtex/manifest.gen.ts";
 import vtex, { Props as VTEXProps } from "../../vtex/mod.ts";
+import commerce, { Props as CommerceProps } from "../../commerce/mod.ts";
+
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
 import type {
   ShopifyAccount,
@@ -229,52 +231,58 @@ export type State = {
 } & Props;
 
 export default function Std(
-  props: Props,
-): App<Manifest, State, [ReturnType<typeof $live>]> {
+  props: CommerceProps,
+): App<
+  Manifest,
+  State,
+  [ReturnType<typeof $live>, ReturnType<typeof commerce>]
+> {
   const targetApps: Record<
     string,
     { manifest: AppManifest; sourceMap: SourceMap }
   > = {};
-  const state: State = { ...props };
-  if (isVTEXProps(props)) {
+
+  const commerceApp = commerce(props);
+  const state: State = { ...props.commerce };
+  if (isVTEXProps(props.commerce)) {
     state.configVTEX = {
       defaultLocale: "pt-BR",
       defaultPriceCurrency: "BRL",
       defaultSalesChannel: "1",
-      ...props,
+      ...props.commerce,
     };
-    const { manifest } = vtex(props);
+    const { manifest } = vtex(props.commerce);
     targetApps["vtex"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
     };
   }
 
-  if (isShopifyProps(props)) {
-    state.configShopify = props;
-    const { manifest } = shopify(props);
+  if (isShopifyProps(props.commerce)) {
+    state.configShopify = props.commerce;
+    const { manifest } = shopify(props.commerce);
     targetApps["shopify"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
     };
   }
 
-  if (isVNDAProps(props)) {
+  if (isVNDAProps(props.commerce)) {
     state.configVNDA = {
-      domain: props.publicUrl,
-      internalDomain: `${props.account}.cdn.vnda.com.br`,
-      useSandbox: props.sandbox,
-      authToken: props.authToken,
+      domain: props.commerce.publicUrl,
+      internalDomain: `${props.commerce.account}.cdn.vnda.com.br`,
+      useSandbox: props.commerce.sandbox,
+      authToken: props.commerce.authToken,
       defaultPriceCurrency: "BRL",
     };
-    const { manifest } = vnda(props);
+    const { manifest } = vnda(props.commerce);
     targetApps["vnda"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
     };
   }
   const liveApp = $live(props);
-  const webSiteApp = liveApp.dependencies![0];
+  const webSiteApp = commerceApp.dependencies![0];
   const sourceMap: SourceMap = {
     ...buildSourceMap(manifest),
   };
@@ -306,9 +314,9 @@ export default function Std(
   }
 
   return {
-    state: props,
+    state,
     sourceMap,
     manifest: _manifest as Manifest,
-    dependencies: [liveApp],
+    dependencies: [liveApp, commerceApp],
   };
 }
