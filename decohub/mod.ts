@@ -4,7 +4,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 // deno-lint-ignore ban-types
 export type State = {};
 /**
- * @title Workflows
+ * @title Deco Hub
  */
 export default function App(
   state: State,
