@@ -1,5 +1,5 @@
 import { Suggestion } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../../utils/fetch.ts";
+import { fetchAPI } from "../../utils/fetchVTEX.ts";
 import { AppContext } from "../../mod.ts";
 import {
   toPath,
