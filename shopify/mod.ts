@@ -11,10 +11,10 @@ export interface Props {
    */
   storeName: string;
 
-   /**
+  /**
    * @description Store public URL.
    */
-   publicUrl: string;
+  publicUrl: string;
 
   /**
    * @ttile Access Token
