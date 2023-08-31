@@ -129,7 +129,7 @@ const loader = async (
   return {
     ...page,
     product: props.similars
-      ? await withIsSimilarTo(ctx, page.product)
+      ? await withIsSimilarTo(req, ctx, page.product)
       : page.product,
     seo: pageType.pageType === "Product"
       ? pageTypesToSeo([pageType], req)

@@ -1,14 +1,16 @@
 import { Section } from "$live/blocks/section.ts";
-import { Routes } from "$live/flags/audience.ts";
 import type { App, FnContext } from "$live/mod.ts";
 import { asResolved } from "$live/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
+import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
 export interface Props {
-  /** @title Site Map */
+  /**
+   * @title Site Map
+   */
   routes?: Routes[];
 
   /** @title Seo */
@@ -51,6 +53,11 @@ export default function App(
         ...manifest.pages,
         "website/pages/Page.tsx": {
           ...manifest.pages["website/pages/Page.tsx"],
+          Preview: (props) =>
+            manifest.pages["website/pages/Page.tsx"].Preview({
+              ...props,
+              sections: [...state.global ?? [], ...props.sections],
+            }),
           default: (props) =>
             manifest.pages["website/pages/Page.tsx"].default({
               ...props,

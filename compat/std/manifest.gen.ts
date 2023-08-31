@@ -4,6 +4,7 @@
 
 import * as $0 from "./functions/requestToParam.ts";
 import * as $$$0 from "./loaders/x/font.ts";
+import * as $$$1 from "./loaders/x/redirects.ts";
 import * as $$$$$$0 from "./sections/Analytics.tsx";
 import * as $$$$$$1 from "./sections/SEOPDP.tsx";
 import * as $$$$$$2 from "./sections/SEOPLP.tsx";
@@ -15,6 +16,7 @@ const manifest = {
   },
   "loaders": {
     "deco-sites/std/loaders/x/font.ts": $$$0,
+    "deco-sites/std/loaders/x/redirects.ts": $$$1,
   },
   "sections": {
     "deco-sites/std/sections/Analytics.tsx": $$$$$$0,

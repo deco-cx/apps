@@ -1,6 +1,7 @@
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { fetchAPI } from "../../../utils/fetch.ts";
+import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
   toPath,
@@ -283,17 +284,19 @@ const loader = async (
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params.get("query");
   if (fullTextTerm) {
-    ctx.invoke("vtex/actions/analytics/sendEvent.ts", {
-      type: "session.ping",
-    }).then(() =>
-      ctx.invoke("vtex/actions/analytics/sendEvent.ts", {
-        type: "search.query",
-        text: fullTextTerm,
-        misspelled: productsResult.correction?.misspelled ?? false,
-        match: productsResult.recordsFiltered,
-        operator: productsResult.operator,
-        locale: "pt-BR", // config?.defaultLocale, // TODO
-      })
+    sendEvent({ type: "session.ping" }, req, ctx).then(() =>
+      sendEvent(
+        {
+          type: "search.query",
+          text: fullTextTerm,
+          misspelled: productsResult.correction?.misspelled ?? false,
+          match: productsResult.recordsFiltered,
+          operator: productsResult.operator,
+          locale: "pt-BR", // config?.defaultLocale, // TODO
+        },
+        req,
+        ctx,
+      )
     ).catch(console.error);
   }
 
@@ -312,7 +315,7 @@ const loader = async (
       })
     ).map((product) =>
       props.similars
-        ? withIsSimilarTo(ctx, product, {
+        ? withIsSimilarTo(req, ctx, product, {
           hideUnavailableItems: props.hideUnavailableItems,
         })
         : product

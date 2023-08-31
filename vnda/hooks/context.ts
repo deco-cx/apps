@@ -46,8 +46,7 @@ const enqueue = (
   return queue;
 };
 
-const load = (signal: AbortSignal) =>
-  Runtime.invoke({ cart: { key: "vnda/loaders/cart.ts" } }, { signal });
+const load = (signal: AbortSignal) => Runtime.vnda.loaders.cart({}, { signal });
 
 if (IS_BROWSER) {
   enqueue(load);

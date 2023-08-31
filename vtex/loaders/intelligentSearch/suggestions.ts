@@ -101,7 +101,7 @@ const loaders = async (
     products: await Promise.all(
       products
         .map((p) => toProduct(p, p.items[0], 0, options)).map((p) =>
-          withIsSimilarTo(ctx, p)
+          withIsSimilarTo(req, ctx, p)
         ),
     ),
   };

@@ -1,6 +1,6 @@
 import { FlagObj } from "$live/blocks/flag.ts";
 import { asResolved } from "$live/engine/core/resolver.ts";
-import Audience, { Route, Routes } from "$live/flags/audience.ts";
+import Audience, { Route, Routes } from "./audience.ts";
 import MatchAlways from "$live/matchers/MatchAlways.ts";
 
 export interface EveryoneConfig {

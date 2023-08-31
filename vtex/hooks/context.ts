@@ -55,10 +55,10 @@ const enqueue = (
 };
 
 const load = (signal: AbortSignal) =>
-  Runtime.invoke({
-    cart: { key: "vtex/loaders/cart.ts" },
-    user: { key: "vtex/loaders/user.ts" },
-    wishlist: { key: "vtex/loaders/wishlist.ts" },
+  Runtime({
+    cart: Runtime.vtex.loaders.cart(),
+    user: Runtime.vtex.loaders.user(),
+    wishlist: Runtime.vtex.loaders.wishlist(),
   }, { signal });
 
 if (IS_BROWSER) {

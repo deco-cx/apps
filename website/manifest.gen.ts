@@ -8,8 +8,9 @@ import * as $$$1 from "./loaders/extension.ts";
 import * as $$$2 from "./loaders/fonts/googleFonts.ts";
 import * as $$$3 from "./loaders/fonts/local.ts";
 import * as $$$4 from "./loaders/image.ts";
-import * as $$$5 from "./loaders/redirectsFromCsv.ts";
-import * as $$$6 from "./loaders/secret.ts";
+import * as $$$5 from "./loaders/pages.ts";
+import * as $$$6 from "./loaders/redirectsFromCsv.ts";
+import * as $$$7 from "./loaders/secret.ts";
 import * as $$$$0 from "./handlers/fresh.ts";
 import * as $$$$1 from "./handlers/proxy.ts";
 import * as $$$$2 from "./handlers/redirect.ts";
@@ -44,8 +45,9 @@ const manifest = {
     "website/loaders/fonts/googleFonts.ts": $$$2,
     "website/loaders/fonts/local.ts": $$$3,
     "website/loaders/image.ts": $$$4,
-    "website/loaders/redirectsFromCsv.ts": $$$5,
-    "website/loaders/secret.ts": $$$6,
+    "website/loaders/pages.ts": $$$5,
+    "website/loaders/redirectsFromCsv.ts": $$$6,
+    "website/loaders/secret.ts": $$$7,
   },
   "handlers": {
     "website/handlers/fresh.ts": $$$$0,

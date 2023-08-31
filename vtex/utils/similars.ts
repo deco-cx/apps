@@ -1,10 +1,12 @@
 import type { Product } from "../../commerce/types.ts";
 import type { Props as OriginalProps } from "../loaders/legacy/relatedProductsLoader.ts";
+import relatedProductsLoader from "../loaders/legacy/relatedProductsLoader.ts";
 import { AppContext } from "../mod.ts";
 
 type Props = Pick<OriginalProps, "hideUnavailableItems">;
 
 export const withIsSimilarTo = async (
+  req: Request,
   ctx: AppContext,
   product: Product,
   props?: Props,
@@ -15,13 +17,14 @@ export const withIsSimilarTo = async (
     return product;
   }
 
-  const isSimilarTo = await ctx.invoke(
-    "vtex/loaders/legacy/relatedProductsLoader.ts",
+  const isSimilarTo = await relatedProductsLoader(
     {
       ...props,
       crossSelling: "similars",
       id: product.isVariantOf!.productGroupID,
     },
+    req,
+    ctx,
   );
 
   return {

@@ -1,4 +1,4 @@
-import { Route } from "$live/flags/audience.ts";
+import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 
 const PATHS_TO_PROXY = [
