@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("handlebars"),
     app("vtex"),
     app("vnda"),
     app("shopify"),
