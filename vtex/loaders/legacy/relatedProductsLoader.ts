@@ -1,20 +1,14 @@
 import type { Product } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../utils/fetchVTEX.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { pickSku } from "../../utils/transform.ts";
-import type {
-  CrossSellingType,
-  LegacyProduct,
-  PageType,
-} from "../../utils/types.ts";
+import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
 
 export interface Props {
@@ -50,12 +44,12 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> {
+  const { vcs } = ctx;
   const {
     hideUnavailableItems,
     crossSelling = "similars",
     count,
   } = props;
-  const api = paths(ctx).api.catalog_system.pub;
   const segment = getSegment(req);
   const params = toSegmentParams(segment);
 
@@ -67,10 +61,12 @@ async function loader(
     }
 
     if (slug) {
-      const pageType = await fetchAPI<PageType>(
-        api.portal.pagetype.term(`${slug}/p`),
-        { deco: { cache: "stale-while-revalidate" } },
-      );
+      const pageType = await vcs
+        ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
+          term: `${slug}/p`,
+        }, {
+          deco: { cache: "stale-while-revalidate" },
+        }).then((res) => res.json());
 
       // Page type doesn't exists or this is not product page
       if (pageType?.pageType === "Product") {
@@ -89,15 +85,16 @@ async function loader(
     return null;
   }
 
-  const products = await fetchAPI<LegacyProduct[]>(
-    `${
-      api.products.crossselling.type(crossSelling).productId(productId)
-    }?${params}`,
-    {
+  const products = await vcs
+    ["GET /api/catalog_system/pub/products/crossselling/:type/:productId"]({
+      type: crossSelling,
+      productId,
+      ...params,
+    }, {
       deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
-    },
-  );
+    }).then((res) => res.json());
+
   const relatedIds = products
     .slice(0, count)
     .map((p) => pickSku(p).itemId);

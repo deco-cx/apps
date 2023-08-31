@@ -1,6 +1,4 @@
-import { fetchAPI } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
-import { paths } from "../utils/paths.ts";
 import type { WishlistItem } from "../utils/types.ts";
 import { parseCookie } from "../utils/vtexId.ts";
 
@@ -18,6 +16,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<WishlistItem[]> => {
+  const { vcs } = ctx;
   const url = new URL(req.url);
   const page = Number(url.searchParams.get("page")) || 0;
   const count = props.count || Infinity;
@@ -29,27 +28,25 @@ const loader = async (
   }
 
   try {
-    const { data } = await fetchAPI<
-      { data?: { viewList: { name?: string; data: WishlistItem[] } } }
-    >(
-      `${paths(ctx).api.io._v.private.graphql.v1}`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          operationName: "GetWithlist",
-          variables: {
-            name: "Wishlist",
-            shopperId: user,
-          },
-          query:
-            `query GetWithlist($shopperId: String!, $name: String!, $from: Int, $to: Int) { viewList(shopperId: $shopperId, name: $name, from: $from, to: $to) @context(provider: "vtex.wish-list@1.x") { name data { id productId sku title } } }`,
-        }),
-        headers: {
-          "content-type": "application/json",
-          accept: "application/json",
-          cookie,
+    const { data } = await vcs["POST /api/io/_v/private/graphql/v1"]({}, {
+      body: {
+        operationName: "GetWithlist",
+        variables: {
+          name: "Wishlist",
+          shopperId: user,
         },
+        query:
+          `query GetWithlist($shopperId: String!, $name: String!, $from: Int, $to: Int) { viewList(shopperId: $shopperId, name: $name, from: $from, to: $to) @context(provider: "vtex.wish-list@1.x") { name data { id productId sku title } } }`,
       },
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json",
+        cookie,
+      },
+    }).then((res) =>
+      res.json() as {
+        data?: { viewList: { name?: string; data: WishlistItem[] } };
+      }
     );
 
     return data?.viewList.data?.slice(count * page, count * (page + 1)) ?? [];

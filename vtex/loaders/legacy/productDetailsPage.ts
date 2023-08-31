@@ -1,9 +1,7 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../utils/fetchVTEX.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
@@ -31,21 +29,22 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
+  const { vcs } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
   const url = new URL(baseUrl);
   const segment = getSegment(req);
   const params = toSegmentParams(segment);
-  const search = paths(ctx).api.catalog_system.pub.products.search;
   const skuId = url.searchParams.get("skuId");
 
-  const [product] = await fetchAPI<LegacyProduct[]>(
-    `${search.term(`${slug}/p`)}?${params}`,
-    {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    },
-  );
+  const [product] = await vcs
+    ["GET /api/catalog_system/pub/products/search/:slug/p"](
+      { ...params, slug },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
+    ).then((res) => res.json());
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -54,17 +53,12 @@ async function loader(
 
   const sku = pickSku(product, skuId?.toString());
 
-  let kitItems: LegacyProduct[] = [];
-  if (sku.isKit && sku.kitItems) {
-    const p = new URLSearchParams(params);
-
-    sku.kitItems.forEach(({ itemId }) => p.append("fq", `skuId:${itemId}`));
-
-    kitItems = await fetchAPI<LegacyProduct[]>(
-      `${search}?${p}`,
-      { deco: { cache: "stale-while-revalidate" } },
-    );
-  }
+  const kitItems: LegacyProduct[] = sku.isKit && sku.kitItems
+    ? await vcs["GET /api/catalog_system/pub/products/search/:term?"]({
+      ...params,
+      fq: sku.kitItems.map((item) => `skuId:${item}`),
+    }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json())
+    : [];
 
   setSegment(segment, ctx.response.headers);
 

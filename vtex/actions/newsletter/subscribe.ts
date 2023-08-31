@@ -1,7 +1,4 @@
-import { fetchSafe } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
-import { paths } from "../../utils/paths.ts";
-import type { OrderForm } from "../../utils/types.ts";
 
 export interface Props {
   email: string;
@@ -11,15 +8,12 @@ export interface Props {
   campaing?: string;
 }
 
-/**
- * @docs https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items
- */
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<OrderForm> => {
-  const url = new URL(`${paths(ctx)["no-cache"]["Newsletter.aspx"]}`);
+): Promise<void> => {
+  const { vcs } = ctx;
   const form = new FormData();
   const {
     email,
@@ -35,12 +29,9 @@ const action = async (
   form.append("newsInternalPart", part);
   form.append("newsInternalCampaign", campaing);
 
-  const response = await fetchSafe(url, {
-    method: "POST",
+  await vcs["POST /no-cache/Newsletter.aspx"]({}, {
     body: form,
   });
-
-  return response.json();
 };
 
 export default action;
