@@ -248,7 +248,7 @@ export default function Std(
   const { dependencies, ...commerceApp } = commerce(
     props,
   );
-  const state: State = { ...props.commerce };
+  let state: State = { ...props.commerce };
   if (isVTEXProps(props.commerce)) {
     state.configVTEX = {
       defaultLocale: "pt-BR",
@@ -256,7 +256,8 @@ export default function Std(
       defaultSalesChannel: "1",
       ...props.commerce,
     };
-    const { manifest } = vtex(props.commerce);
+    const { manifest, state: appState } = vtex(props.commerce);
+    state = { ...state, ...appState };
     targetApps["vtex"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
@@ -265,7 +266,9 @@ export default function Std(
 
   if (isShopifyProps(props.commerce)) {
     state.configShopify = props.commerce;
-    const { manifest } = shopify(props.commerce);
+    const { manifest, state: appState } = shopify(props.commerce);
+    state = { ...state, ...appState };
+
     targetApps["shopify"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
@@ -280,7 +283,9 @@ export default function Std(
       authToken: props.commerce.authToken,
       defaultPriceCurrency: "BRL",
     };
-    const { manifest } = vnda(props.commerce);
+    const { manifest, state: appState } = vnda(props.commerce);
+    state = { ...state, ...appState };
+
     targetApps["vnda"] = {
       sourceMap: buildSourceMap(manifest),
       manifest,
