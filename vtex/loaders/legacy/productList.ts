@@ -1,8 +1,6 @@
 import type { Product } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../utils/fetchVTEX.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
@@ -11,9 +9,8 @@ import {
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type {
-  LegacyProduct,
   LegacySort,
-  ProductID,
+  ProductID
 } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
@@ -85,34 +82,45 @@ const isFQProps = (p: any): p is FQProps =>
 
 const fromProps = (
   props: Props,
-  params = new URLSearchParams(),
-): URLSearchParams => {
+) => {
+  const params = { fq: [] } as {
+    _from?: number;
+    _to?: number;
+    fq: string[];
+    ft?: string;
+    O?: LegacySort;
+  };
+
   if (isProductIDProps(props)) {
-    props.ids.forEach((skuId) => params.append("fq", `skuId:${skuId}`));
-    params.set("_from", "0");
-    params.set("_to", `${Math.max(props.ids.length - 1, 0)}`);
+    props.ids.forEach((skuId) => params.fq.push(`skuId:${skuId}`));
+    params._from = 0;
+    params._to = Math.max(props.ids.length - 1, 0);
 
     return params;
   }
 
   const count = props.count ?? 12;
-  params.set("_from", "0");
-  params.set("_to", `${Math.max(count - 1, 0)}`);
-  props.sort && params.set("O", props.sort);
+  params._from = 0;
+  params._to = Math.max(count - 1, 0);
+  if (props.sort) {
+    params.O = props.sort;
+  }
 
   if (isCollectionProps(props)) {
-    params.set("fq", `productClusterIds:${props.collection}`);
+    params.fq.push(`productClusterIds:${props.collection}`);
 
     return params;
   }
 
   if (isFQProps(props)) {
-    props.fq.forEach((fq) => params.append("fq", fq));
+    params.fq = props.fq;
 
     return params;
   }
 
-  props.term && params.set("ft", encodeURIComponent(props.term));
+  if (props.term) {
+    params.ft = encodeURIComponent(props.term);
+  }
 
   return params;
 };
@@ -126,18 +134,20 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
+  const { vcs } = ctx;
   const { url: baseUrl } = req;
   const segment = getSegment(req);
   const segmentParams = toSegmentParams(segment);
-  const params = fromProps(props, segmentParams);
+  const params = fromProps(props);
 
-  const vtexProducts = await fetchAPI<LegacyProduct[]>(
-    `${paths(ctx).api.catalog_system.pub.products.search}?${params}`,
-    {
+  const vtexProducts = await vcs
+    ["GET /api/catalog_system/pub/products/search/:term?"]({
+      ...segmentParams,
+      ...params,
+    }, {
       deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
-    },
-  );
+    }).then((res) => res.json());
 
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add

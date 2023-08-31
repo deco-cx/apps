@@ -1,6 +1,6 @@
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import { mapCategoriesToAnalyticsCategories } from "../../commerce/utils/productToAnalyticsItem.ts";
-import { Runtime } from "../runtime.ts";
+import { invoke } from "../runtime.ts";
 import type { OrderForm, OrderFormItem } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
 
@@ -68,39 +68,39 @@ const state = {
   cart,
   loading,
   updateItems: wrap(
-    Runtime.vtex.actions.cart.updateItems,
+    invoke.vtex.actions.cart.updateItems,
   ),
   removeAllItems: wrap(
-    Runtime.vtex.actions.cart.removeItems,
+    invoke.vtex.actions.cart.removeItems,
   ),
   addItems: wrap(
-    Runtime.vtex.actions.cart.addItems,
+    invoke.vtex.actions.cart.addItems,
   ),
   addCouponsToCart: wrap(
-    Runtime.vtex.actions.cart.updateCoupons,
+    invoke.vtex.actions.cart.updateCoupons,
   ),
   changePrice: wrap(
-    Runtime.vtex.actions.cart.updateItemPrice,
+    invoke.vtex.actions.cart.updateItemPrice,
   ),
   getCartInstallments: wrap(
-    Runtime.vtex.actions.cart.getInstallment,
+    invoke.vtex.actions.cart.getInstallment,
   ),
   ignoreProfileData: wrap(
-    Runtime.vtex.actions.cart.updateProfile,
+    invoke.vtex.actions.cart.updateProfile,
   ),
   removeAllPersonalData: wrap(
-    Runtime.vtex.actions.cart.updateUser,
+    invoke.vtex.actions.cart.updateUser,
   ),
   addItemAttachment: wrap(
-    Runtime.vtex.actions.cart.updateItemAttachment,
+    invoke.vtex.actions.cart.updateItemAttachment,
   ),
   removeItemAttachment: wrap(
-    Runtime.vtex.actions.cart.removeItemAttachment,
+    invoke.vtex.actions.cart.removeItemAttachment,
   ),
   sendAttachment: wrap(
-    Runtime.vtex.actions.cart.updateAttachment,
+    invoke.vtex.actions.cart.updateAttachment,
   ),
-  simulate: Runtime.vtex.actions.cart.simulation,
+  simulate: invoke.vtex.actions.cart.simulation,
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };
 

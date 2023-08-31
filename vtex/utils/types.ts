@@ -1092,3 +1092,29 @@ export interface Item {
   nameComplete: string;
   imageUrl: string;
 }
+
+export interface SimulationItem {
+  id: number;
+  quantity: number;
+  seller: string;
+}
+
+export type SPEvent =
+  | {
+    type: "session.ping";
+  }
+  | {
+    type: "search.click";
+    position: number;
+    text: string;
+    productId: string;
+    url: string;
+  }
+  | {
+    type: "search.query";
+    text: string;
+    misspelled: boolean;
+    match: number;
+    operator: string;
+    locale: string;
+  };

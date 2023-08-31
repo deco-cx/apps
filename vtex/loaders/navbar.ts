@@ -1,9 +1,6 @@
 import type { Navbar } from "../../commerce/types.ts";
-import { fetchAPI } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
-import { paths } from "../utils/paths.ts";
 import { categoryTreeToNavbar } from "../utils/transform.ts";
-import type { Category } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -18,12 +15,17 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Navbar[] | null> => {
+  const { vcs } = ctx;
   const { levels = 2 } = props;
 
-  const tree = await fetchAPI<Category[]>(
-    paths(ctx).api.catalog_system.pub.category.tree.level(levels),
-    { deco: { cache: "stale-while-revalidate" } },
-  );
+  const response = await vcs
+    ["GET /api/catalog_system/pub/category/tree/:level"]({
+      level: levels,
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+    });
+
+  const tree = await response.json();
 
   return categoryTreeToNavbar(tree);
 };

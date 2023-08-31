@@ -1,4 +1,4 @@
-import { Runtime } from "../runtime.ts";
+import { invoke } from "../runtime.ts";
 import { WishlistItem } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
 
@@ -16,10 +16,10 @@ const wrap = <T>(
   }));
 
 const addItem = wrap(
-  Runtime.vtex.actions.wishlist.addItem,
+  invoke.vtex.actions.wishlist.addItem,
 );
 const removeItem = wrap(
-  Runtime.vtex.actions.wishlist.removeItem,
+  invoke.vtex.actions.wishlist.removeItem,
 );
 
 const getItem = (item: Partial<WishlistItem>) =>

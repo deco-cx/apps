@@ -1,7 +1,10 @@
 import type { App, FnContext } from "$live/mod.ts";
+import { fetchSafe } from "./utils/fetchVTEX.ts";
+import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { SP, VTEXCommerceStable } from "./utils/client.ts";
 
-export type AppContext = FnContext<Props, Manifest>;
+export type AppContext = FnContext<State, Manifest>;
 
 /** @title VTEX */
 export interface Props {
@@ -22,12 +25,26 @@ export interface Props {
   platform: "vtex";
 }
 
+interface State extends Props {
+  vcs: ReturnType<typeof createHttpClient<VTEXCommerceStable>>;
+  sp: ReturnType<typeof createHttpClient<SP>>;
+}
+
 /**
  * @title VTEX
  */
-export default function App(state: Props): App<Manifest, Props> {
+export default function App(state: Props): App<Manifest, State> {
+  const sp = createHttpClient<SP>({
+    base: `https://sp.vtex.com`,
+    fetcher: fetchSafe,
+  });
+  const vcs = createHttpClient<VTEXCommerceStable>({
+    base: `https://${state.account}.vtexcommercestable.com.br`,
+    fetcher: fetchSafe,
+  });
+
   return {
-    state,
+    state: { ...state, vcs, sp },
     manifest,
   };
 }

@@ -1,6 +1,5 @@
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
-import { fetchAPI } from "../../utils/fetchVTEX.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
@@ -13,7 +12,6 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
@@ -29,10 +27,8 @@ import {
 } from "../../utils/transform.ts";
 import type {
   Facet,
-  FacetSearchResult,
   Fuzzy,
   PageType,
-  ProductSearchResult,
   RangeFacet,
   SelectedFacet,
   Sort,
@@ -243,12 +239,11 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
+  const { vcs } = ctx;
   const { url: baseUrl } = req;
 
   const url = new URL(baseUrl);
-  const vtex = paths(ctx);
   const segment = getSegment(req);
-  const search = vtex.api.io._v.api["intelligent-search"];
   const currentPageoffset = props.pageOffset ?? 1;
   const {
     selectedFacets: baseSelectedFacets,
@@ -262,27 +257,27 @@ const loader = async (
 
   const selected = withDefaultFacets(selectedFacets, ctx);
   const fselected = selected.filter((f) => f.key !== "price");
-  const params = withDefaultParams({ ...args, page }, ctx);
+  const params = withDefaultParams({ ...args, page });
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
-    fetchAPI<ProductSearchResult>(
-      `${search.product_search.facets(toPath(selected))}?${params}`,
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
-    ),
-    fetchAPI<FacetSearchResult>(
-      `${search.facets.facets(toPath(fselected))}?${params}`,
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
-    ),
+    vcs["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ...params,
+      facets: toPath(selected),
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    }).then((res) => res.json()),
+    vcs["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
+      ...params,
+      facets: toPath(fselected),
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    }).then((res) => res.json()),
   ]);
 
   /** Intelligent search API analytics. Fire and forget 🔫 */
-  const fullTextTerm = params.get("query");
+  const fullTextTerm = params["query"];
   if (fullTextTerm) {
     sendEvent({ type: "session.ping" }, req, ctx).then(() =>
       sendEvent(
