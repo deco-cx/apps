@@ -1,10 +1,10 @@
 import type { App, AppContext as AC } from "$live/mod.ts";
-import HTMLRenderer from "deco-sites/std/components/HTMLRenderer.tsx";
 import { SourceMap } from "deco/blocks/app.ts";
 import { SectionModule } from "deco/blocks/section.ts";
 import { JSONSchema7 } from "deco/deps.ts";
 import { BlockModuleRef } from "deco/engine/block.ts";
 import Handlebars from "https://esm.sh/v131/handlebars@4.7.8";
+import { HTMLRenderer } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 const h = Handlebars as unknown as typeof Handlebars["export="];
