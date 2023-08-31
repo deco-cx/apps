@@ -232,7 +232,7 @@ export type State = {
   configVNDA?: VNDAAccount;
 } & AvailableCommerceProps;
 
-export type { CommerceProps as Props };
+export type Props = CommerceProps;
 export default function Std(
   props: CommerceProps,
 ): App<
