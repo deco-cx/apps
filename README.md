@@ -34,16 +34,17 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 
 ### Apps
 
-| App Name       | Description                                                                                            | Manifest                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
-| WebSite        | The base app of any website. Contains `Page.tsx` block and other common loaders like image and fonts.  | [manifest](/website/manifest.gen.ts)      |
-| VTEX           | The app for e-commerce that uses VTEX as a platform.                                                   | [manifest](/vtex/manifest.gen.ts)         |
-| Shopify        | The app for e-commerce that uses Shopify as a platform.                                                | [manifest](/shopify/manifest.gen.ts)      |
-| VNDA           | The app for e-commerce that uses VNDA as a platform.                                                   | [manifest](/vnda/manifest.gen.ts)         |
-| Workflows      | Provides a simple set of loaders and actions to manage workflows                                       | [manifest](/workflows/manifest.gen.ts)    |
-| Commerce       | A simple configurable start for any e-commerce platform, lets you switch between any of those          | [manifest](/commerce/manifest.gen.ts)     |
-| $live          | An app for compatibility with $live blocks                                                             | [manifest](/compat/$live/manifest.gen.ts) |
-| deco-sites/std | An app for compatibility with deco-sites/std app, contains various blocks merged from e-commerce apps. | [manifest](/compat/std/manifest.gen.ts)   |
+| App Name       | Description                                                                                                                          | Manifest                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| WebSite        | The base app of any website. Contains `Page.tsx` block and other common loaders like image and fonts.                                | [manifest](/website/manifest.gen.ts)      |
+| VTEX           | The app for e-commerce that uses VTEX as a platform.                                                                                 | [manifest](/vtex/manifest.gen.ts)         |
+| Shopify        | The app for e-commerce that uses Shopify as a platform.                                                                              | [manifest](/shopify/manifest.gen.ts)      |
+| VNDA           | The app for e-commerce that uses VNDA as a platform.                                                                                 | [manifest](/vnda/manifest.gen.ts)         |
+| Workflows      | Provides a simple set of loaders and actions to manage workflows                                                                     | [manifest](/workflows/manifest.gen.ts)    |
+| Commerce       | A simple configurable start for any e-commerce platform, lets you switch between any of those                                        | [manifest](/commerce/manifest.gen.ts)     |
+| $live          | An app for compatibility with $live blocks                                                                                           | [manifest](/compat/$live/manifest.gen.ts) |
+| deco-sites/std | An app for compatibility with deco-sites/std app, contains various blocks merged from e-commerce apps.                               | [manifest](/compat/std/manifest.gen.ts)   |
+| decohub        | The best place to find an app for your business case, here is where apps published by any developer in the deco ecosystem will live. | [manifest](/decohub/manifest.gen.ts)      |
 
 ## Thanks to all contributors
 
