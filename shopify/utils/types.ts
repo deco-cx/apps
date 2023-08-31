@@ -140,28 +140,30 @@ export interface Image {
   altText: string;
 }
 
+export interface Item{
+  id: string;
+  quantity: number;
+  merchandise: {
+    id: string;
+    title: string;
+    product: {
+      title: string;
+    };
+    image: Image;
+    price: Money;
+  };
+  cost: {
+    totalAmount: Money;
+    subtotalAmount: Money;
+    amountPerQuantity: Money;
+    compareAtAmountPerQuantity: Money;
+  };
+}
+
 export interface CartData {
   id: string;
   lines?: {
-    nodes: {
-      id: string;
-      quantity: number;
-      merchandise: {
-        id: string;
-        title: string;
-        product: {
-          title: string;
-        };
-        image: Image;
-        price: Money;
-      };
-      cost: {
-        totalAmount: Money;
-        subtotalAmount: Money;
-        amountPerQuantity: Money;
-        compareAtAmountPerQuantity: Money;
-      };
-    }[];
+    nodes: Item[];
   };
   checkoutUrl?: string;
   cost?: {

@@ -46,11 +46,7 @@ const enqueue = (
 };
 
 const load = async (signal: AbortSignal) => {
-  const { cart } = await Runtime.invoke({
-    cart: {
-      key: "shopify/loaders/cart.ts",
-    },
-  }, { signal });
+  const cart = await Runtime.shopify.loaders.cart({}, {signal})
 
   return {
     cart,

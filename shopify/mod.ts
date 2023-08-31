@@ -11,6 +11,11 @@ export interface Props {
    */
   storeName: string;
 
+   /**
+   * @description Store public URL.
+   */
+   publicUrl: string;
+
   /**
    * @ttile Access Token
    * @description Shopify storefront access token.
