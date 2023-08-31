@@ -245,7 +245,9 @@ export default function Std(
     { manifest: AppManifest; sourceMap: SourceMap }
   > = {};
 
-  const commerceApp = commerce(props);
+  const { dependencies, ...commerceApp } = commerce(
+    props,
+  );
   const state: State = { ...props.commerce };
   if (isVTEXProps(props.commerce)) {
     state.configVTEX = {
@@ -285,7 +287,7 @@ export default function Std(
     };
   }
   const liveApp = $live(props);
-  const webSiteApp = commerceApp.dependencies![0];
+  const { resolvables: _ignoreResolvables, ...webSiteApp } = dependencies![0];
   const sourceMap: SourceMap = {
     ...buildSourceMap(manifest),
   };
@@ -320,6 +322,9 @@ export default function Std(
     state,
     sourceMap,
     manifest: _manifest as Manifest,
-    dependencies: [liveApp, commerceApp],
+    dependencies: [liveApp, {
+      ...commerceApp,
+      dependencies: [webSiteApp, dependencies![1]],
+    }],
   };
 }
