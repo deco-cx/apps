@@ -211,25 +211,28 @@ type Manifest = {
     : ManifestWithStdCompat[key];
 };
 
-export type Props = VTEXProps | ShopifyProps | VNDAProps;
+type AvailableCommerceProps = CommerceProps["commerce"];
 
-const isVTEXProps = (props: Props): props is VTEXProps => {
-  return (props as VTEXProps).platform === "vtex";
+const isVTEXProps = (props: AvailableCommerceProps): props is VTEXProps => {
+  return (props as VTEXProps)?.platform === "vtex";
 };
 
-const isShopifyProps = (props: Props): props is ShopifyProps => {
-  return (props as ShopifyProps).platform === "shopify";
+const isShopifyProps = (
+  props: AvailableCommerceProps,
+): props is ShopifyProps => {
+  return (props as ShopifyProps)?.platform === "shopify";
 };
 
-const isVNDAProps = (props: Props): props is VNDAProps => {
-  return (props as VNDAProps).platform === "vnda";
+const isVNDAProps = (props: AvailableCommerceProps): props is VNDAProps => {
+  return (props as VNDAProps)?.platform === "vnda";
 };
 export type State = {
   configVTEX?: VTEXAccount;
   configShopify?: ShopifyAccount;
   configVNDA?: VNDAAccount;
-} & Props;
+} & AvailableCommerceProps;
 
+export type { CommerceProps as Props };
 export default function Std(
   props: CommerceProps,
 ): App<

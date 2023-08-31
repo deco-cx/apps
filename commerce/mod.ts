@@ -21,9 +21,9 @@ export default function Site(
   const { commerce } = state;
 
   const site = website(state);
-  const ecommerce = commerce.platform === "vnda"
+  const ecommerce = commerce?.platform === "vnda"
     ? vnda(commerce)
-    : commerce.platform === "vtex"
+    : commerce?.platform === "vtex"
     ? vtex(commerce)
     : shopify(commerce);
 
