@@ -89,7 +89,7 @@ async function loader(
     return null;
   }
 
-  const relatedIds = await fetchAPI<LegacyProduct[]>(
+  const products = await fetchAPI<LegacyProduct[]>(
     `${
       api.products.crossselling.type(crossSelling).productId(productId)
     }?${params}`,
@@ -97,20 +97,21 @@ async function loader(
       deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
     },
-  ).then((products = []) =>
-    products
-      .slice(0, count ?? Infinity)
-      .map((p) => pickSku(p).itemId)
   );
+  const relatedIds = products
+    .slice(0, count)
+    .map((p) => pickSku(p).itemId);
 
-  const relatedProducts = await productList(
-    {
-      similars: false,
-      ids: relatedIds,
-    },
-    req,
-    ctx,
-  );
+  const relatedProducts = relatedIds.length > 0
+    ? await productList(
+      {
+        similars: false,
+        ids: relatedIds,
+      },
+      req,
+      ctx,
+    )
+    : null;
 
   setSegment(segment, ctx.response.headers);
 

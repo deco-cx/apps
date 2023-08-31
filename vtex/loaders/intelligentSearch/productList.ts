@@ -153,11 +153,7 @@ const loader = async (
 
   return Promise.all(
     products.map((product) =>
-      props.similars
-        ? withIsSimilarTo(req, ctx, product, {
-          hideUnavailableItems: props.hideUnavailableItems,
-        })
-        : product
+      props.similars ? withIsSimilarTo(req, ctx, product) : product
     ),
   );
 };

@@ -314,11 +314,7 @@ const loader = async (
         priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
       })
     ).map((product) =>
-      props.similars
-        ? withIsSimilarTo(req, ctx, product, {
-          hideUnavailableItems: props.hideUnavailableItems,
-        })
-        : product
+      props.similars ? withIsSimilarTo(req, ctx, product) : product
     ),
   );
 

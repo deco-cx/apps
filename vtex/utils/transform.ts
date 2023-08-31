@@ -60,6 +60,7 @@ const nonEmptyArray = <T>(array: T[] | null | undefined) =>
   Array.isArray(array) && array.length > 0 ? array : null;
 
 const DEFAULT_IMAGE = {
+  imageLabel: null,
   imageText: "image",
   imageUrl:
     "https://storecomponents.vtexassets.com/assets/faststore/images/image___117a6d3e229a96ad0e0d0876352566e2.svg",
@@ -294,14 +295,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       name: brand,
       logo: brandImageUrl,
     },
+    inProductGroupWithID: productId,
     sku: skuId,
     gtin: ean,
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: images.map(({ imageUrl, imageText }) => ({
+    image: images.map(({ imageUrl, imageText, imageLabel }) => ({
       "@type": "ImageObject" as const,
-      alternateName: imageText ?? "",
+      alternateName: imageText ?? imageLabel ?? "",
       url: imageUrl,
     })),
     offers: offers.length > 0
