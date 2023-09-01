@@ -25,7 +25,7 @@ const getSanitizedInput = (
     return input;
   }
 
-  const QS_TO_REMOVE_PLUS = ["utm_campaign"];
+  const QS_TO_REMOVE_PLUS = ["utm_campaign", "map"];
 
   QS_TO_REMOVE_PLUS.forEach((qsToSanatize) => {
     if (url.searchParams.has(qsToSanatize)) {
@@ -41,7 +41,20 @@ const getSanitizedInput = (
       });
       searchParams.delete(qsToSanatize);
       updatedTestParamValues.forEach((updatedValue) =>
-        searchParams.append(qsToSanatize, updatedValue)
+        updatedValue && searchParams.append(qsToSanatize, updatedValue)
+      );
+    }
+  });
+
+  const QS_TO_REPLACE_PLUS = ["ft"];
+  QS_TO_REPLACE_PLUS.forEach((qsToSanatize) => {
+    if (url.searchParams.has(qsToSanatize)) {
+      const searchParams = url.searchParams;
+      const testParamValues = searchParams.getAll(qsToSanatize);
+      const updatedTestParamValues = testParamValues.map((paramValue) => encodeURIComponent(paramValue.trim()));
+      searchParams.delete(qsToSanatize);
+      updatedTestParamValues.forEach((updatedValue) =>
+          searchParams.append(qsToSanatize, updatedValue)
       );
     }
   });
