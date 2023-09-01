@@ -8,6 +8,9 @@ import { HTMLRenderer } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 const h = Handlebars as unknown as typeof Handlebars["export="];
+/**
+ * @title {{{name}}}.tsx
+ */
 export interface HandlebarSection {
   name: string;
   /**
@@ -30,6 +33,9 @@ const getHBVars = (content: string) => {
   return Object.keys(keys);
 };
 export interface State {
+  /**
+   * @title Sections
+   */
   sections: HandlebarSection[];
 }
 /**
