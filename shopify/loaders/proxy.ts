@@ -14,22 +14,17 @@ const PATHS_TO_PROXY = [
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = (
-  { publicUrl, extraPaths, includeSiteMap, generateDecoSiteMap }: {
-    publicUrl?: string;
+  { storeName, extraPaths, includeSiteMap, generateDecoSiteMap }: {
+    storeName?: string;
     extraPaths: string[];
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
   },
 ) => {
-
-  if (!publicUrl) {
-    return [];
-  }
+  const publicUrl = new URL(`https://${storeName}.myshopify.com`);
 
   try {
-    const hostname = (new URL(
-      publicUrl?.startsWith("http") ? publicUrl : `https://${publicUrl}`,
-    )).hostname;
+    const hostname = publicUrl.hostname;
 
     // Rejects TLD mystore.com, keep this if Shopify doesn't support
     if (!hostname || hostname.split(".").length <= 2) {
@@ -55,7 +50,7 @@ const buildProxyRoutes = (
       routeFromPath,
     );
 
-    const [include, routes] = generateDecoSiteMap
+    const [_include, routes] = generateDecoSiteMap
       ? [[...(includeSiteMap ?? []), decoSiteMapUrl], [{
         pathTemplate: decoSiteMapUrl,
         handler: {
@@ -65,7 +60,7 @@ const buildProxyRoutes = (
         },
       }]]
       : [includeSiteMap, []];
-      
+
     return [
       ...routes,
       ...routesFromPaths,
@@ -101,7 +96,7 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     includeSiteMap,
-    publicUrl: ctx.publicUrl,
+    storeName: ctx.storeName,
     extraPaths: extraPathsToProxy,
   });
 }
