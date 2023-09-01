@@ -55,6 +55,7 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 | $live          | An app for compatibility with $live blocks                                                                                           | [manifest](/compat/$live/manifest.gen.ts) |
 | deco-sites/std | An app for compatibility with deco-sites/std app, contains various blocks merged from e-commerce apps.                               | [manifest](/compat/std/manifest.gen.ts)   |
 | decohub        | The best place to find an app for your business case, here is where apps published by any developer in the deco ecosystem will live. | [manifest](/decohub/manifest.gen.ts)      |
+| handlebars        | An app that allows you to build your own sections using [handlebars](https://handlebarsjs.com/). | [manifest](/handlebars/manifest.gen.ts)      |
 
 #### Adding a new app to Deco Hub
 
