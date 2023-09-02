@@ -1,5 +1,4 @@
 import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
-import { fetchAPI, fetchSafe } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
@@ -8,7 +7,6 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
@@ -16,11 +14,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
-import type {
-  LegacyFacets,
-  LegacyProduct,
-  LegacySort,
-} from "../../utils/types.ts";
+import type { LegacyProduct, LegacySort } from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
 
@@ -110,11 +104,11 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
+  const { vcs } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
   const segment = getSegment(req);
   const params = toSegmentParams(segment);
-  const search = paths(ctx).api.catalog_system.pub;
   const currentPageoffset = props.pageOffset ?? 1;
 
   const filtersBehavior = props.filters || "dynamic";
@@ -130,9 +124,9 @@ const loader = async (
     sortOptions[0].value;
   const ft = props.ft || url.searchParams.get("ft") ||
     url.searchParams.get("q") || "";
-  const fq = props.fq || url.searchParams.get("fq") || "";
-  const _from = `${page * count}`;
-  const _to = `${(page + 1) * count - 1}`;
+  const fq = props.fq ? [props.fq] : url.searchParams.getAll("fq");
+  const _from = page * count;
+  const _to = (page + 1) * count - 1;
 
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
 
@@ -147,24 +141,23 @@ const loader = async (
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };
 
-  const pParams = new URLSearchParams(params);
-  Object.entries(args).map(([key, value]) => value && pParams.set(key, value));
-
-  const fParams = new URLSearchParams(pParams);
-  fmap && fParams.set("map", fmap);
-
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
-    fetchSafe(
-      `${search.products.search.term(getTerm(term, map))}?${pParams}`,
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
-    ),
-    fetchAPI<LegacyFacets>(
-      `${search.facets.search.term(getTerm(term, fmap))}?${fParams}`,
-      { deco: { cache: "stale-while-revalidate" } },
-    ),
+    vcs["GET /api/catalog_system/pub/products/search/:term?"]({
+      ...params,
+      ...args,
+      term: getTerm(term, map),
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    }),
+    vcs["GET /api/catalog_system/pub/facets/search/:term"]({
+      ...params,
+      ...args,
+      term: getTerm(term, fmap),
+      map: fmap,
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+    }).then((res) => res.json()),
   ]);
 
   const vtexProducts = await vtexProductsResponse.json() as LegacyProduct[];
@@ -195,7 +188,7 @@ const loader = async (
     .filter((x): x is Filter => Boolean(x));
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
 
-  const hasMoreResources = parseInt(_to, 10) < parseInt(_total, 10) - 1;
+  const hasMoreResources = _to < parseInt(_total, 10) - 1;
 
   const hasNextPage = Boolean(
     page < MAX_ALLOWED_PAGES && hasMoreResources,

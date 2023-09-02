@@ -1,6 +1,20 @@
+import type { AnalyticsItem } from "../../commerce/types.ts";
 import { Runtime } from "../runtime.ts";
-import { Cart } from "../utils/types.ts";
+import { Cart, Item } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
+
+export const itemToAnalyticsItem = (
+  item: Item & { quantity: number },
+  index: number,
+): AnalyticsItem => ({
+  item_id: item.id,
+  item_name: item.merchandise.product.title,
+  discount: item.cost.compareAtAmountPerQuantity ? item.cost.compareAtAmountPerQuantity.amount - item.cost.amountPerQuantity?.amount : 0,
+  item_variant: item.merchandise.title,
+  price: item.cost.amountPerQuantity.amount,
+  index,
+  quantity: item.quantity,
+});
 
 const { cart, loading } = storeState;
 

@@ -1,7 +1,4 @@
-import { fetchSafe } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
-import { paths } from "../utils/paths.ts";
-import type { OrderForm } from "../utils/types.ts";
 
 export interface Props {
   email: string;
@@ -16,8 +13,8 @@ const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<OrderForm> => {
-  const url = new URL(`${paths(ctx)["no-cache"]["AviseMe.aspx"]}`);
+): Promise<void> => {
+  const { vcs } = ctx;
   const form = new FormData();
   const { email, skuId, name = "" } = props;
 
@@ -25,12 +22,7 @@ const action = async (
   form.append("notifymeClientEmail", email);
   form.append("notifymeIdSku", skuId);
 
-  const response = await fetchSafe(url, {
-    method: "POST",
-    body: form,
-  });
-
-  return response.json();
+  await vcs["POST /no-cache/AviseMe.aspx"]({}, { body: form });
 };
 
 export default action;

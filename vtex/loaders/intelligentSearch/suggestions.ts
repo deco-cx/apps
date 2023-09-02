@@ -1,12 +1,10 @@
 import { Suggestion } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   toPath,
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
@@ -14,7 +12,6 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { ProductSearchResult } from "../../utils/types.ts";
 
 export interface Props {
   query?: string;
@@ -39,47 +36,41 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
+  const { vcs } = ctx;
   const { url } = req;
   const { count, query } = props;
   const locale = "pt-BR"; // config!.defaultLocale; // TODO
   const segment = getSegment(req);
-  const search = paths(ctx).api.io._v.api["intelligent-search"];
 
-  const suggestions = () => {
-    const params = new URLSearchParams({ query: query ?? "", locale });
+  const suggestions = () =>
+    vcs["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
+      locale,
+      query: query ?? "",
+    }, {
+      // Not adding suggestions to cache since queries are very spread out
+      // deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    }).then((res) => res.json());
 
-    return fetchAPI<Suggestion>(
-      `${search.search_suggestions}?${params}`,
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
-    );
-  };
-
-  const topSearches = () => {
-    const params = new URLSearchParams({ locale });
-
-    return fetchAPI<Suggestion>(
-      `${search.top_searches}?${params}`,
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
-    );
-  };
+  const topSearches = () =>
+    vcs["GET /api/io/_v/api/intelligent-search/top_searches"]({
+      locale,
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    }).then((res) => res.json());
 
   const productSearch = () => {
     const facets = withDefaultFacets([], ctx);
-    const params = withDefaultParams({ query, count: count ?? 4, locale }, ctx);
+    const params = withDefaultParams({ query, count: count ?? 4, locale });
 
-    return fetchAPI<ProductSearchResult>(
-      `${search.product_search.facets(toPath(facets))}?${params}`,
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
-    );
+    return vcs["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ...params,
+      facets: toPath(facets),
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    }).then((res) => res.json());
   };
 
   const [{ searches }, { products }] = await Promise.all([

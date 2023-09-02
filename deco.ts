@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("handlebars"),
     app("vtex"),
     app("vnda"),
     app("shopify"),
@@ -17,6 +18,7 @@ const config = {
     app("commerce"),
     app("workflows"),
     app("verified-reviews"),
+    app("decohub"),
     ...compatibilityApps,
   ],
 };

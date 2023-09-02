@@ -1,6 +1,4 @@
-import { fetchSafe } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
-import { paths } from "../../utils/paths.ts";
 import type { SimulationOrderForm } from "../../utils/types.ts";
 
 export interface Item {
@@ -23,16 +21,17 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<SimulationOrderForm> => {
+  const { vcs } = ctx;
   const {
     items,
     postalCode,
     country,
   } = props;
-  const response = await fetchSafe(
-    paths(ctx).api.checkout.pub.orderForms.simulation,
+
+  const response = await vcs["POST /api/checkout/pub/orderForms/simulation"](
+    {},
     {
-      method: "POST",
-      body: JSON.stringify({ items, postalCode, country }),
+      body: { items, postalCode, country },
       headers: {
         accept: "application/json",
         "content-type": "application/json",

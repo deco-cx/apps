@@ -1,25 +1,13 @@
 import type { Seo } from "../../commerce/types.ts";
-import { fetchAPI } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
-import { paths } from "../utils/paths.ts";
 import { slugify } from "../utils/slugify.ts";
 import type { PageType, Segment } from "../utils/types.ts";
 
-export const toSegmentParams = (segment: Partial<Segment>) => {
-  const params = new URLSearchParams();
-
-  if (segment?.utm_campaign) {
-    params.set("utm_campaign", segment.utm_campaign);
-  }
-  if (segment?.utm_source) {
-    params.set("utm_source", segment.utm_source);
-  }
-  if (segment?.utmi_campaign) {
-    params.set("utmi_campaign", segment.utmi_campaign);
-  }
-
-  return params;
-};
+export const toSegmentParams = (segment: Partial<Segment>) => (Object.fromEntries(Object.entries({
+  utmi_campaign: segment.utmi_campaign ?? undefined,
+  utm_campaign: segment.utm_campaign ?? undefined,
+  utm_source: segment.utm_source ?? undefined,
+}).filter(([_, v])=> v != undefined)));
 
 const PAGE_TYPE_TO_MAP_PARAM = {
   Brand: "b",
@@ -41,16 +29,15 @@ export const pageTypesFromPathname = async (
   ctx: AppContext,
 ) => {
   const segments = segmentsFromTerm(term);
-  const vtex = paths(ctx);
+  const { vcs } = ctx;
 
   const results = await Promise.all(
     segments.map((_, index) =>
-      fetchAPI<PageType>(
-        vtex.api.catalog_system.pub.portal.pagetype.term(
-          segments.slice(0, index + 1).join("/"),
-        ),
-        { deco: { cache: "stale-while-revalidate" } },
-      )
+      vcs["GET /api/catalog_system/pub/portal/pagetype/:term"]({
+        term: segments.slice(0, index + 1).join("/"),
+      }, {
+        deco: { cache: "stale-while-revalidate" },
+      }).then((res) => res.json())
     ),
   );
 

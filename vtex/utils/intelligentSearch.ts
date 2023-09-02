@@ -55,16 +55,15 @@ export const withDefaultParams = ({
   fuzzy = "auto",
   // locale,
   hideUnavailableItems,
-}: Partial<Params>, _ctx: AppContext) =>
-  new URLSearchParams({
-    page: `${page + 1}`,
-    count: `${count}`,
-    query,
-    sort,
-    fuzzy,
-    // locale: locale ?? ctx.configVTEX!.defaultLocale,
-    hideUnavailableItems: `${hideUnavailableItems ?? false}`,
-  });
+}: Partial<Params>) => ({
+  page: page + 1,
+  count,
+  query,
+  sort,
+  fuzzy,
+  // locale: locale ?? ctx.configVTEX!.defaultLocale,
+  hideUnavailableItems: hideUnavailableItems ?? false,
+});
 
 export const getOrSetISCookie = (req: Request, headers: Headers) => {
   const cookies = getCookies(req.headers);

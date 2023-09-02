@@ -1,5 +1,4 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import {
@@ -8,7 +7,6 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
@@ -16,11 +14,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
-import type {
-  PageType,
-  Product as VTEXProduct,
-  ProductSearchResult,
-} from "../../utils/types.ts";
+import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -51,15 +45,15 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> => {
+  const { vcs } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const vtex = paths(ctx);
   const segment = getSegment(req);
 
-  const pageTypePromise = fetchAPI<PageType>(
-    vtex.api.catalog_system.pub.portal.pagetype.term(`${slug}/p`),
-    { deco: { cache: "stale-while-revalidate" } },
-  );
+  const pageTypePromise = vcs
+    ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
+      term: `${slug}/p`,
+    }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
 
   const url = new URL(baseUrl);
   const skuId = url.searchParams.get("skuId");
@@ -80,17 +74,17 @@ const loader = async (
     return null;
   }
 
-  const search = vtex.api.io._v.api["intelligent-search"].product_search;
   const facets = withDefaultFacets([], ctx);
-  const params = withDefaultParams({ query, count: 1 }, ctx);
+  const params = withDefaultParams({ query, count: 1 });
 
-  const { products: [product] } = await fetchAPI<ProductSearchResult>(
-    `${search.facets(toPath(facets))}?${params}`,
-    {
+  const { products: [product] } = await vcs
+    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ...params,
+      facets: toPath(facets),
+    }, {
       deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
-    },
-  );
+    }).then((res) => res.json());
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -104,15 +98,16 @@ const loader = async (
     const params = withDefaultParams({
       query: `sku:${sku.kitItems.join(";")}`,
       count: sku.kitItems.length,
-    }, ctx);
+    });
 
-    const result = await fetchAPI<ProductSearchResult>(
-      `${search.facets(toPath(facets))}?${params}`,
-      {
+    const result = await vcs
+      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+        ...params,
+        facets: toPath(facets),
+      }, {
         deco: { cache: "stale-while-revalidate" },
         headers: withSegmentCookie(segment),
-      },
-    );
+      }).then((res) => res.json());
 
     kitItems = result.products;
   }

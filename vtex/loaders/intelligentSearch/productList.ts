@@ -1,12 +1,10 @@
 import type { Product } from "../../../commerce/types.ts";
-import { fetchAPI } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   toPath,
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { paths } from "../../utils/paths.ts";
 import {
   getSegment,
   setSegment,
@@ -14,11 +12,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type {
-  ProductID,
-  ProductSearchResult,
-  Sort,
-} from "../../utils/types.ts";
+import type { ProductID, Sort } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -120,23 +114,23 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
+  const { vcs } = ctx;
   const { url } = req;
-  const vtex = paths(ctx);
   const segment = getSegment(req);
 
   const { selectedFacets, ...args } = fromProps(props);
-  const params = withDefaultParams(args, ctx);
+  const params = withDefaultParams(args);
   const facets = withDefaultFacets(selectedFacets, ctx);
-  const search = vtex.api.io._v.api["intelligent-search"].product_search;
 
   // search products on VTEX. Feel free to change any of these parameters
-  const { products: vtexProducts } = await fetchAPI<ProductSearchResult>(
-    `${search.facets(toPath(facets))}?${params}`,
-    {
+  const { products: vtexProducts } = await vcs
+    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ...params,
+      facets: toPath(facets),
+    }, {
       deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
-    },
-  );
+    }).then((res) => res.json());
 
   const options = {
     baseUrl: url,
@@ -153,11 +147,7 @@ const loader = async (
 
   return Promise.all(
     products.map((product) =>
-      props.similars
-        ? withIsSimilarTo(req, ctx, product, {
-          hideUnavailableItems: props.hideUnavailableItems,
-        })
-        : product
+      props.similars ? withIsSimilarTo(req, ctx, product) : product
     ),
   );
 };
