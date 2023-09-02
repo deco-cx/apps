@@ -1,6 +1,6 @@
 {
   "imports": {
-    "$live/": "https://denopkg.com/deco-cx/deco@1.32.1/",
+    "$live/": "https://denopkg.com/deco-cx/deco@1.34.2/",
     "$fresh/": "https://denopkg.com/denoland/fresh@1.4.2/",
     "preact": "https://esm.sh/preact@10.15.1",
     "preact/": "https://esm.sh/preact@10.15.1/",
@@ -10,6 +10,6 @@
     "std/": "https://deno.land/std@0.190.0/",
     "partytown/": "https://deno.land/x/partytown@0.3.4/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.21.6/",
-    "deco/": "https://denopkg.com/deco-cx/deco@1.32.1/"
+    "deco/": "https://denopkg.com/deco-cx/deco@1.34.2/"
   }
 }

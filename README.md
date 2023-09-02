@@ -34,6 +34,12 @@ deno task new `APP_NAME` && deno task start
 
 The app folder and the `deco.ts` will be changed in order to support your newly created app.
 
+Then you can run the watcher in a site that you own,
+
+```sh
+deno task watcher $SITE_NAME
+```
+
 ## Transition from deco-sites/std to deco-cx/apps
 
 This repository isn't a deco site as it used to be in `deco-sites/std`. In the past, we used `deco-sites/std` as a central hub for various platform integrations. Now, we've modularized these integrations into smaller, installable, and composable apps. These apps now reside in the `deco-cx/apps` repository. Additionally, the `/compat` folder contains two apps, `$live` and `deco-sites/std`, which serve as drop-in replacements for the older apps that contained all blocks together. As users progressively adopt the new apps, they can take full advantage of app extensibility and enhance their websites' capabilities.
