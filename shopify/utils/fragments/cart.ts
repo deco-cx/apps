@@ -1,5 +1,5 @@
 import { gql } from "../../../utils/graphql.ts";
-import { Image, Money } from "../types.ts";
+import type { Image, Money } from "../types.ts";
 
 export interface Item {
   id: string;
