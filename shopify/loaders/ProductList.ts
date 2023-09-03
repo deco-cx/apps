@@ -1,5 +1,10 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
+import {
+  Data,
+  query as productsQuery,
+  Variables,
+} from "../utils/queries/products.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -18,15 +23,15 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  const { client } = ctx;
+  const { storefront } = ctx;
 
   const count = props.count ?? 12;
   const query = props.query || "";
 
   // search products on Shopify. Feel free to change any of these parameters
-  const data = await client.products({
-    first: count,
-    query,
+  const data = await storefront.query<Data, Variables>({
+    query: productsQuery,
+    variables: { first: count, query },
   });
 
   // Transform Shopify product format into schema.org's compatible format

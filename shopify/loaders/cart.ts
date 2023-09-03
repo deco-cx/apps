@@ -1,48 +1,41 @@
-import { getCookies, getSetCookies, setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
-import { SHOPIFY_COOKIE_NAME } from "../utils/constants.ts";
-import type { Cart } from "../utils/types.ts";
+import { getCartCookie, setCartCookie } from "../utils/cart.ts";
+import {
+  Data as CartData,
+  query as getCart,
+  Variables as CartVariables,
+} from "../utils/queries/cart.ts";
+import {
+  Data as CreateCartData,
+  query as createCart,
+  Variables as CreateVariablesData,
+} from "../utils/queries/createCart.ts";
 
 const loader = async (
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<Cart> => {
-  const { client } = ctx;
+): Promise<CartData["cart"]> => {
+  const { storefront } = ctx;
+  const maybeCartId = getCartCookie(req.headers);
 
-  try {
-    const r = await client.cart.create();
+  const cartId = maybeCartId ||
+    await storefront.query<CreateCartData, CreateVariablesData>({
+      query: createCart,
+    }).then((data) => data.payload.cart.id);
 
-    const reqCookies = getCookies(req.headers);
-    const cartIdCookie = reqCookies[SHOPIFY_COOKIE_NAME];
-    if (cartIdCookie) {
-      const queryResponse = await client.cart.get(cartIdCookie);
-      if (!queryResponse?.cart?.id) {
-        throw new Error("unable to create a cart");
-      }
-      return queryResponse;
-    }
-
-    if (!r?.payload?.cart.id) {
-      throw new Error("unable to create a cart");
-    }
-    const { cart } = r.payload;
-
-    const cookies = getSetCookies(ctx.response.headers);
-    cookies.push({ name: SHOPIFY_COOKIE_NAME, value: cart.id });
-
-    for (const cookie of cookies) {
-      setCookie(ctx.response.headers, {
-        ...cookie,
-        domain: new URL(req.url).hostname,
-      });
-    }
-
-    return { cart: { id: cart.id } };
-  } catch (error) {
-    console.error(error);
-    throw error;
+  if (!cartId) {
+    throw new Error("Missing cart id");
   }
+
+  const cart = await storefront.query<CartData, CartVariables>({
+    query: getCart,
+    variables: { id: cartId },
+  }).then((data) => data.cart);
+
+  setCartCookie(ctx.response.headers, cartId);
+
+  return cart;
 };
 
 export default loader;

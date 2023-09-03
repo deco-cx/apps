@@ -6,11 +6,9 @@ import type {
   PropertyValue,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
-import {
-  Product as ProductShopify,
-  SelectedOption as SelectedOptionShopify,
-  Variant as SkuShopify,
-} from "./types.ts";
+import { SelectedOption as SelectedOptionShopify } from "./types.ts";
+import { Fragment as ProductShopify } from "./fragments/product.ts";
+import { Fragment as SkuShopify } from "./fragments/productVariant.ts";
 
 const DEFAULT_IMAGE = {
   altText: "image",
