@@ -8,9 +8,8 @@ import * as $$$2 from "./loaders/productListingPage.ts";
 import * as $$$3 from "./loaders/proxy.ts";
 import * as $$$4 from "./loaders/cart.ts";
 import * as $$$$$$$$$0 from "./actions/cart/updateItem.ts";
-import * as $$$$$$$$$1 from "./actions/cart/setShippingAddress.ts";
+import * as $$$$$$$$$1 from "./actions/cart/updateCart.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$3 from "./actions/cart/updateCoupon.ts";
 
 const manifest = {
   "loaders": {
@@ -22,8 +21,7 @@ const manifest = {
   },
   "actions": {
     "vnda/actions/cart/addItem.ts": $$$$$$$$$2,
-    "vnda/actions/cart/setShippingAddress.ts": $$$$$$$$$1,
-    "vnda/actions/cart/updateCoupon.ts": $$$$$$$$$3,
+    "vnda/actions/cart/updateCart.ts": $$$$$$$$$1,
     "vnda/actions/cart/updateItem.ts": $$$$$$$$$0,
   },
   "name": "vnda",

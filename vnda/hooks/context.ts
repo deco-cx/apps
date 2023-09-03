@@ -1,6 +1,6 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
-import { Runtime } from "../runtime.ts";
+import { invoke } from "../runtime.ts";
 import { Cart } from "../utils/client/types.ts";
 
 interface Context {
@@ -46,7 +46,10 @@ const enqueue = (
   return queue;
 };
 
-const load = (signal: AbortSignal) => Runtime.vnda.loaders.cart({}, { signal });
+const load = (signal: AbortSignal) =>
+  invoke({
+    cart: invoke.vnda.loaders.cart(),
+  }, { signal });
 
 if (IS_BROWSER) {
   enqueue(load);

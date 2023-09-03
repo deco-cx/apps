@@ -92,7 +92,7 @@ export const createHttpClient = <T>({
 
       return (
         params: Record<string, string | number | string[] | number[]>,
-        init: RequestInit,
+        init?: RequestInit,
       ) => {
         const mapped = new Map(Object.entries(params));
 
@@ -125,7 +125,7 @@ export const createHttpClient = <T>({
           arrayed.forEach((item) => url.searchParams.append(key, `${item}`));
         });
 
-        const shouldStringifyBody = init.body != null &&
+        const isJSON = init?.body != null &&
           typeof init.body !== "string" &&
           !(init.body instanceof ReadableStream) &&
           !(init.body instanceof FormData) &&
@@ -133,12 +133,11 @@ export const createHttpClient = <T>({
           !(init.body instanceof Blob) &&
           !(init.body instanceof ArrayBuffer);
 
-        const headers = new Headers(init.headers);
+        const headers = new Headers(init?.headers);
         defaultHeaders?.forEach((value, key) => headers.set(key, value));
+        isJSON && headers.set("content-type", "application/json");
 
-        const body = shouldStringifyBody
-          ? JSON.stringify(init.body)
-          : undefined;
+        const body = isJSON ? JSON.stringify(init.body) : undefined;
 
         return fetcher(url, {
           ...init,

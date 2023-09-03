@@ -112,8 +112,6 @@ export interface Property {
 export interface Cart {
   orderForm?: OrderForm;
   relatedItems?: RelatedItem[];
-  shipping?: Shipping;
-  coupon?: Coupon;
 }
 
 export interface Installment {
@@ -154,7 +152,7 @@ export interface OrderForm {
   channel: string;
   client_id: null;
   code: string;
-  coupon_code: null;
+  coupon_code: string | null;
   discount: null;
   discount_price: number;
   extra: Record<string, string>;

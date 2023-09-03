@@ -5,9 +5,11 @@ import { getCartCookie } from "../../utils/cart.ts";
 import type { Cart } from "../../utils/client/types.ts";
 
 export interface Props {
-  itemId: string;
-  quantity: number;
-  attributes: Record<string, string>;
+  agent?: string;
+  zip?: string;
+  client_id?: number;
+  coupon_code?: string;
+  rebate_token?: string;
 }
 
 const action = async (
@@ -16,20 +18,13 @@ const action = async (
   ctx: AppContext,
 ): Promise<Cart> => {
   const { api } = ctx;
-  const { itemId, quantity, attributes } = props;
   const cartId = getCartCookie(req.headers);
 
   if (!cartId) {
     throw new HttpError(400, "Missing cart cookie");
   }
 
-  await api["POST /api/v2/carts/:cartId/items"]({ cartId }, {
-    body: {
-      sku: itemId,
-      quantity,
-      extra: attributes,
-    },
-  });
+  await api["PATCH /api/v2/carts/:cartId"]({ cartId }, { body: props });
 
   return cartLoader({}, req, ctx);
 };

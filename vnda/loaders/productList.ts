@@ -29,15 +29,15 @@ const productListLoader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const url = new URL(req.url);
-  const { client } = ctx;
+  const { api } = ctx;
 
-  const search = await client.product.search({
+  const search = await api["GET /api/v2/products/search"]({
     term: props?.term,
     wildcard: props?.wildcard,
     sort: props?.sort,
     per_page: props?.count,
-    tags: props?.tags,
-  });
+    "tags[]": props?.tags,
+  }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
 
   return search.results.map((product) =>
     toProduct(product, null, {
