@@ -18,7 +18,7 @@ async function loader(
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug } = props;
-  const { client } = ctx;
+  const { api } = ctx;
 
   if (!slug) return null;
 
@@ -26,8 +26,14 @@ async function loader(
   const { id } = parseSlug(slug);
 
   const [maybeProduct, seo] = await Promise.all([
-    client.product.get(id),
-    client.seo.product(id),
+    api["GET /api/v2/products/:id"]({ id, include_images: true }, {
+      deco: { cache: "stale-while-revalidate" },
+    }).then((r) => r.json()).catch(() => null),
+    api["GET /api/v2/seo_data"]({
+      resource_type: "Product",
+      resource_id: id,
+      type: "category",
+    }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json()),
   ]);
 
   // 404: product not found

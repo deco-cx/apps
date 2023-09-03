@@ -1,241 +1,114 @@
-import { getSetCookies } from "std/http/cookie.ts";
-import { DecoRequestInit, fetchSafe } from "../../../utils/fetch.ts";
-import { HttpError } from "../../../utils/http.ts";
-import { Props } from "../../mod.ts";
 import {
-  Banner,
-  Coupon,
+  Item,
   OrderForm,
   ProductGroup,
-  ProductSearchParams,
   ProductSearchResult,
-  RelatedItem,
   RelatedItemTag,
   SEO,
-  Shipping,
-  TagsSearchParams,
-} from "../../utils/client/types.ts";
-import { paramsToQueryString } from "../../utils/queryBuilder.ts";
+  Sort,
+  TagsSearchParams
+} from "./types.ts";
 
-export const createClient = (state: Props) => {
-  const { publicUrl, sandbox, authToken } = state;
-  const publicEndpoint = `https://${publicUrl}`; // TODO: Remove this and use only api endpoints
-  const baseUrl = sandbox
-    ? "https://api.sandbox.vnda.com.br"
-    : "https://api.vnda.com.br";
+export interface API {
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-products-id */
+  "GET /api/v2/products/:id": {
+    response: ProductGroup;
+    searchParams: { include_images: boolean };
+  };
 
-  const fetcher = (path: string, init?: DecoRequestInit) =>
-    fetchSafe(new URL(path, baseUrl), {
-      ...init,
-      headers: {
-        "User-Agent": "decocx/1.0",
-        "X-Shop-Host": publicUrl,
-        "accept": "application/json",
-        authorization: `Bearer ${authToken}`,
-        ...init?.headers,
-      },
-    });
-
-  const getProduct = (id: string | number): Promise<ProductGroup | null> =>
-    fetcher(`/api/v2/products/${id}?include_images=true`, {
-      deco: { cache: "stale-while-revalidate" },
-    })
-      .then((res) => res.json())
-      .catch(() => null);
-
-  const searchProduct = async (
-    params: ProductSearchParams,
-  ): Promise<ProductSearchResult> => {
-    const { type_tags, ...knownParams } = params;
-    const typeTagsEntries = type_tags?.map((tag) => [tag.key, tag.value]) ?? [];
-
-    const qs = paramsToQueryString({
-      ...knownParams,
-      ...Object.fromEntries(typeTagsEntries),
-    });
-
-    const response = await fetcher(`/api/v2/products/search?${qs}`, {
-      deco: { cache: "stale-while-revalidate" },
-    });
-
-    const data = await response.json();
-    const pagination = response.headers.get("x-pagination");
-
-    return {
-      ...data,
-      pagination: pagination ? JSON.parse(pagination) : {
-        total_pages: 0,
-        total_count: 0,
-        current_page: params.page,
-        prev_page: false,
-        next_page: false,
-      },
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-banners */
+  "GET /api/v2/banners": {
+    searchParams: {
+      only_valid: boolean;
+      tag: "listagem-banner-principal";
     };
   };
 
-  const getDefaultBanner = (): Promise<Banner[]> =>
-    fetcher(
-      `/api/v2/banners?only_valid=true&tag=listagem-banner-principal`,
-      { deco: { cache: "stale-while-revalidate" } },
-    ).then((res) => res.json());
-
-  const getSEO = (type: "Product" | "Page" | "Tag") =>
-  (
-    resourceId: string | number,
-  ): Promise<SEO[]> => {
-    const qs = new URLSearchParams();
-    qs.set("resource_type", type);
-    if (type !== "Tag") qs.set("resource_id", `${resourceId}`);
-    if (type === "Tag") qs.set(`code`, `${resourceId}`);
-    qs.set("type", "category");
-
-    return fetcher(`/api/v2/seo_data?${qs.toString()}`, {
-      deco: { cache: "stale-while-revalidate" },
-    }).then((res) => res.json());
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-tags-name */
+  "GET /api/v2/tags/:name": {
+    response: RelatedItemTag;
   };
 
-  const getProductSEO = getSEO("Product");
-  const getPageSEO = getSEO("Page");
-  const getTagSEO = getSEO("Tag");
-
-  const getTag = (name: string): Promise<RelatedItemTag> =>
-    fetcher(`/api/v2/tags/${name}`, {
-      deco: { cache: "stale-while-revalidate" },
-    })
-      .then((res) => res.json());
-
-  const getTags = (params?: TagsSearchParams): Promise<RelatedItemTag[]> => {
-    const qs = new URLSearchParams();
-    Object.entries(params ?? {}).forEach(([key, value]) => {
-      qs.set(key, value);
-    });
-
-    return fetcher(`/api/v2/tags?${qs.toString()}`, {
-      deco: { cache: "stale-while-revalidate" },
-    })
-      .then((res) => res.json());
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-tags */
+  "GET /api/v2/tags": {
+    response: RelatedItemTag[];
+    searchParams: TagsSearchParams;
   };
 
-  const getCarrinho = (cookie: string): Promise<OrderForm> =>
-    fetcher(new URL("/carrinho", publicEndpoint).href, {
-      headers: { cookie },
-    }).then((res) => res.json());
-
-  const relatedItems = (cookie: string): Promise<RelatedItem[]> =>
-    fetcher(
-      new URL(
-        "/carrinho/produtos-sugeridos/relacionados-carrinho",
-        publicEndpoint,
-      ).href,
-      { headers: { cookie } },
-    ).then((res) => res.json()).catch((error) => {
-      if (error instanceof HttpError && error.status === 404) {
-        return [];
-      }
-
-      throw error;
-    });
-
-  const adicionar = async ({
-    cookie,
-    sku,
-    quantity,
-    attributes,
-  }: {
-    cookie: string;
-    sku: string;
-    quantity: number;
-    attributes: Record<string, string>;
-  }) => {
-    const form = new FormData();
-    form.set("sku", sku);
-    form.set("quantity", `${quantity}`);
-
-    Object.entries(attributes).forEach(([name, value]) =>
-      form.set(`attribute-${name}`, value)
-    );
-
-    const response = await fetcher(
-      new URL("/carrinho/adicionar", publicEndpoint).href,
-      {
-        method: "POST",
-        body: form,
-        headers: { cookie },
-      },
-    );
-
-    return {
-      orderForm: await response.json() as OrderForm,
-      cookies: getSetCookies(response.headers),
+  "GET /api/v2/seo_data": {
+    response: SEO[];
+    searchParams: {
+      resource_type: "Product" | "Page";
+      resource_id: string | number;
+      type: "category";
+    } | {
+      resource_type: "Tag";
+      code: string;
+      type: "category";
     };
   };
 
-  const cep = (zip: string, cookie: string): Promise<Shipping> => {
-    const form = new FormData();
-    form.set("zip", zip);
-
-    return fetcher(new URL("/cep", publicEndpoint).href, {
-      method: "POST",
-      body: form,
-      headers: { cookie },
-    })
-      .then((res) => res.json());
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-products-search */
+  "GET /api/v2/products/search": {
+    response: Omit<ProductSearchResult, "pagination">;
+    searchParams: {
+      term?: string | undefined;
+      page?: number;
+      "tags[]"?: string[];
+      sort?: Sort;
+      per_page?: number;
+      wildcard?: boolean;
+    } & { [x: string]: unknown };
   };
 
-  const coupon = (code: string, cookie: string): Promise<Coupon> => {
-    const form = new FormData();
-    form.set("code", code);
-
-    return fetcher(new URL("/cupom/ajax", publicEndpoint).href, {
-      method: "POST",
-      body: form,
-      headers: { cookie },
-    }).then((res) => res.json());
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-carts-id */
+  "GET /api/v2/carts/:cartId": {
+    response: OrderForm;
   };
 
-  const atualizar = (
-    { item_id, quantity }: { item_id: string | number; quantity: number },
-    cookie: string,
-  ): Promise<OrderForm> =>
-    fetcher(new URL("/carrinho/quantidade/atualizar", publicEndpoint).href, {
-      method: "POST",
-      body: JSON.stringify({ item_id, quantity }),
-      headers: { cookie },
-    }).then((res) => res.json());
-
-  const remover = (
-    item_id: string | number,
-    cookie: string,
-  ): Promise<OrderForm> =>
-    fetcher(new URL("/carrinho/remover", publicEndpoint).href, {
-      method: "POST",
-      body: JSON.stringify({ item_id }),
-      headers: { cookie },
-    }).then((res) => res.json());
-
-  return {
-    product: {
-      search: searchProduct,
-      get: getProduct,
-    },
-    banners: {
-      default: getDefaultBanner,
-    },
-    seo: {
-      product: getProductSEO,
-      page: getPageSEO,
-      tag: getTagSEO,
-    },
-    tag: getTag,
-    tags: getTags,
-    carrinho: {
-      get: getCarrinho,
-      relatedItems,
-      adicionar,
-      atualizar,
-      remover,
-    },
-    cep,
-    coupon,
+  /** @docs https://developers.vnda.com.br/reference/post-api-v2-carts */
+  "POST /api/v2/carts": {
+    response: OrderForm;
   };
-};
+
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-carts-id */
+  "PATCH /api/v2/carts/:cartId": {
+    response: OrderForm;
+    body: {
+      agent?: string;
+      zip?: string;
+      client_id?: number;
+      coupon_code?: string;
+      rebate_token?: string;
+    };
+  };
+
+  /** @docs https://developers.vnda.com.br/reference/post-api-v2-carts-cart_id-items */
+  "POST /api/v2/carts/:cartId/items": {
+    response: Item;
+    body: {
+      sku: string;
+      quantity: number;
+      place_id?: number;
+      store_coupon_code?: string;
+      customizations?: Record<string, unknown>;
+      extra?: Record<string, unknown>;
+    };
+  };
+
+  /** @docs https://developers.vnda.com.br/reference/patch-api-v2-carts-cart_id-items-id */
+  "PATCH /api/v2/carts/:cartId/items/:itemId": {
+    response: Item;
+    body: {
+      sku?: string;
+      quantity: number;
+      place_id?: number;
+      store_coupon_code?: string;
+      customizations?: Record<string, unknown>;
+      extra?: Record<string, unknown>;
+    };
+  };
+
+  /** @docs https://developers.vnda.com.br/reference/delete-api-v2-carts-cart_id-items-id */
+  "DELETE /api/v2/carts/:cartId/items/:itemId": {};
+}
