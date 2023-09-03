@@ -65,17 +65,17 @@ type PropsOf<T> = T extends (props: infer P, r: any, ctx: any) => any ? P
   : never;
 
 type Actions =
-  | "vtex/actions/cart/updateItems"
-  | "vtex/actions/cart/removeItems"
-  | "vtex/actions/cart/addItems"
-  | "vtex/actions/cart/updateCoupons"
-  | "vtex/actions/cart/updateItemPrice"
-  | "vtex/actions/cart/getInstallment"
-  | "vtex/actions/cart/updateProfile"
-  | "vtex/actions/cart/updateUser"
-  | "vtex/actions/cart/updateItemAttachment"
-  | "vtex/actions/cart/removeItemAttachment"
-  | "vtex/actions/cart/updateAttachment";
+  | "vtex/actions/cart/updateItems.ts"
+  | "vtex/actions/cart/removeItems.ts"
+  | "vtex/actions/cart/addItems.ts"
+  | "vtex/actions/cart/updateCoupons.ts"
+  | "vtex/actions/cart/updateItemPrice.ts"
+  | "vtex/actions/cart/getInstallment.ts"
+  | "vtex/actions/cart/updateProfile.ts"
+  | "vtex/actions/cart/updateUser.ts"
+  | "vtex/actions/cart/updateItemAttachment.ts"
+  | "vtex/actions/cart/removeItemAttachment.ts"
+  | "vtex/actions/cart/updateAttachment.ts";
 
 const action =
   (key: Actions) => (props: PropsOf<InvocationFuncFor<Manifest, typeof key>>) =>
@@ -88,17 +88,17 @@ const action =
 const state = {
   cart,
   loading,
-  updateItems: action("vtex/actions/cart/updateItems"),
-  removeAllItems: action("vtex/actions/cart/removeItems"),
-  addItems: action("vtex/actions/cart/addItems"),
-  addCouponsToCart: action("vtex/actions/cart/updateCoupons"),
-  changePrice: action("vtex/actions/cart/updateItemPrice"),
-  getCartInstallments: action("vtex/actions/cart/getInstallment"),
-  ignoreProfileData: action("vtex/actions/cart/updateProfile"),
-  removeAllPersonalData: action("vtex/actions/cart/updateUser"),
-  addItemAttachment: action("vtex/actions/cart/updateItemAttachment"),
-  removeItemAttachment: action("vtex/actions/cart/removeItemAttachment"),
-  sendAttachment: action("vtex/actions/cart/updateAttachment"),
+  updateItems: action("vtex/actions/cart/updateItems.ts"),
+  removeAllItems: action("vtex/actions/cart/removeItems.ts"),
+  addItems: action("vtex/actions/cart/addItems.ts"),
+  addCouponsToCart: action("vtex/actions/cart/updateCoupons.ts"),
+  changePrice: action("vtex/actions/cart/updateItemPrice.ts"),
+  getCartInstallments: action("vtex/actions/cart/getInstallment.ts"),
+  ignoreProfileData: action("vtex/actions/cart/updateProfile.ts"),
+  removeAllPersonalData: action("vtex/actions/cart/updateUser.ts"),
+  addItemAttachment: action("vtex/actions/cart/updateItemAttachment.ts"),
+  removeItemAttachment: action("vtex/actions/cart/removeItemAttachment.ts"),
+  sendAttachment: action("vtex/actions/cart/updateAttachment.ts"),
   simulate: invoke.vtex.actions.cart.simulation,
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };
