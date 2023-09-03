@@ -1,4 +1,4 @@
-import type { App, FnContext } from "$live/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client/client.ts";

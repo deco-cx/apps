@@ -1,7 +1,7 @@
-import { FlagObj } from "$live/blocks/flag.ts";
-import { asResolved } from "$live/engine/core/resolver.ts";
+import { FlagObj } from "deco/blocks/flag.ts";
+import { asResolved } from "deco/engine/core/resolver.ts";
 import Audience, { Route, Routes } from "./audience.ts";
-import MatchAlways from "$live/matchers/MatchAlways.ts";
+import MatchAlways from "deco/matchers/MatchAlways.ts";
 
 export interface EveryoneConfig {
   routes?: Routes;

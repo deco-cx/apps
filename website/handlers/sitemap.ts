@@ -1,6 +1,6 @@
-import type { Handler } from "$live/blocks/handler.ts";
-import type { Resolvable } from "$live/engine/core/resolver.ts";
-import { isResolvable } from "$live/engine/core/resolver.ts";
+import type { Handler } from "deco/blocks/handler.ts";
+import type { Resolvable } from "deco/engine/core/resolver.ts";
+import { isResolvable } from "deco/engine/core/resolver.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { Route } from "../flags/audience.ts";
 

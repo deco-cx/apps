@@ -1,4 +1,4 @@
-import { RequestInit } from "$live/runtime/fetch/mod.ts";
+import { RequestInit } from "deco/runtime/fetch/mod.ts";
 import { fetchSafe } from "./fetch.ts";
 
 const HTTP_VERBS = new Set(

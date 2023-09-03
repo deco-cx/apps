@@ -1,7 +1,7 @@
-import { context } from "$live/live.ts";
+import { context } from "deco/live.ts";
 import Script from "partytown/Script.tsx";
 import Jitsu from "partytown/integrations/Jitsu.tsx";
-import { Flag } from "$live/types.ts";
+import { Flag } from "deco/types.ts";
 
 const main = (
   userData: {

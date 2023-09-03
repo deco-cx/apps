@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 export { onBeforeResolveProps } from "../../website/mod.ts";
-import { SourceMap } from "$live/blocks/app.ts";
-import { buildSourceMap } from "$live/blocks/utils.tsx";
-import type { App, AppManifest } from "$live/mod.ts";
+import { SourceMap } from "deco/blocks/app.ts";
+import { buildSourceMap } from "deco/blocks/utils.tsx";
+import type { App, AppManifest } from "deco/mod.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
 import $live from "../$live/mod.ts";
 import type { Manifest as ShopifyManifest } from "../../shopify/manifest.gen.ts";

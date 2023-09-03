@@ -1,4 +1,4 @@
-import type { App, FnContext } from "$live/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";

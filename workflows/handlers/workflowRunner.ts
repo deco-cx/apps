@@ -1,9 +1,9 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { Handler } from "$live/blocks/handler.ts";
-import { Workflow, WorkflowContext } from "$live/blocks/workflow.ts";
-import { workflowHTTPHandler } from "$live/deps.ts";
-import type { Manifest } from "$live/live.gen.ts";
-import { LiveConfig, LiveState } from "$live/mod.ts";
+import { Handler } from "deco/blocks/handler.ts";
+import { Workflow, WorkflowContext } from "deco/blocks/workflow.ts";
+import { workflowHTTPHandler } from "deco/deps.ts";
+import type { Manifest } from "deco/live.gen.ts";
+import { LiveConfig, LiveState } from "deco/mod.ts";
 import { ConnInfo } from "std/http/server.ts";
 export interface Config {
   workflow: Workflow;

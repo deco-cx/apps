@@ -1,5 +1,5 @@
-import { Section } from "$live/blocks/section.ts";
-import { notUndefined } from "$live/engine/core/utils.ts";
+import { Section } from "deco/blocks/section.ts";
+import { notUndefined } from "deco/engine/core/utils.ts";
 import { useLivePageContext } from "../../../website/pages/Page.tsx";
 import { WellKnownSlots } from "../sections/Slot.tsx";
 
