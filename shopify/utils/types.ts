@@ -140,80 +140,6 @@ export interface Image {
   altText: string;
 }
 
-export interface Item{
-  id: string;
-  quantity: number;
-  merchandise: {
-    id: string;
-    title: string;
-    product: {
-      title: string;
-    };
-    image: Image;
-    price: Money;
-  };
-  cost: {
-    totalAmount: Money;
-    subtotalAmount: Money;
-    amountPerQuantity: Money;
-    compareAtAmountPerQuantity: Money;
-  };
-}
-
-export interface CartData {
-  id: string;
-  lines?: {
-    nodes: Item[];
-  };
-  checkoutUrl?: string;
-  cost?: {
-    subtotalAmount: Money;
-    totalAmount: Money;
-    checkoutChargeAmount: Money;
-  };
-  discountCodes?: {
-    code: string;
-    applicable: boolean;
-  }[];
-  discountAllocations?: {
-    discountedAmount: Money;
-  };
-}
-
-export interface Cart {
-  cart: CartData;
-}
-
-export interface Product {
-  availableForSale: boolean;
-  createdAt: string;
-  description: string;
-  descriptionHtml: string;
-  featuredImage: Image;
-  handle: string;
-  id: string;
-  images: Images;
-  isGiftCard: boolean;
-  media: Media;
-  onlineStoreUrl: null;
-  options: Option[];
-  priceRange: PriceRange;
-  productType: string;
-  publishedAt: string;
-  requiresSellingPlan: boolean;
-  seo: SEO;
-  tags: string[];
-  title: string;
-  totalInventory: number;
-  updatedAt: string;
-  variants: Variants;
-  vendor: string;
-}
-
-export interface Images {
-  nodes: Image[];
-}
-
 export interface Media {
   nodes: Media[];
 }
@@ -242,29 +168,6 @@ export interface Price {
 export interface SEO {
   title: string;
   description: string;
-}
-
-export interface Variants {
-  nodes: Variant[];
-}
-
-export interface Variant {
-  availableForSale: boolean;
-  barcode: string;
-  compareAtPrice: Price | null;
-  currentlyNotInStock: boolean;
-  id: string;
-  image: Image;
-  price: Price;
-  quantityAvailable: number;
-  requiresShipping: boolean;
-  selectedOptions: SelectedOption[];
-  sku: string;
-  title: string;
-  unitPrice: null;
-  unitPriceMeasurement: UnitPriceMeasurement;
-  weight: number;
-  weightUnit: string;
 }
 
 export interface SelectedOption {

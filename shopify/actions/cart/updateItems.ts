@@ -1,35 +1,35 @@
-import { getCookies } from "std/http/mod.ts";
 import { AppContext } from "../../mod.ts";
-import { SHOPIFY_COOKIE_NAME } from "../../utils/constants.ts";
-import type { Cart } from "../../utils/types.ts";
-
-export interface updateCartQueryProps {
-  cartLinesUpdate: Cart;
-}
+import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
+import { Data as CartData } from "../../utils/queries/cart.ts";
+import { Data, query, Variables } from "../../utils/queries/updateCart.ts";
 
 type UpdateLineProps = {
-  lines: {
+  lines: Array<{
     id: string;
     quantity?: number;
-  };
+  }>;
 };
 
 const action = async (
-  props: UpdateLineProps,
+  { lines }: UpdateLineProps,
   req: Request,
   ctx: AppContext,
-): Promise<Cart> => {
-  const { client } = ctx;
+): Promise<CartData["cart"]> => {
+  const { storefront } = ctx;
+  const cartId = getCartCookie(req.headers);
 
-  const reqCookies = getCookies(req.headers);
-  const cartId = reqCookies[SHOPIFY_COOKIE_NAME];
-  const response: updateCartQueryProps | undefined = await client.cart
-    .updateItems({
-      cartId: cartId,
-      lines: [props.lines],
-    });
+  if (!cartId) {
+    throw new Error("Missing cart id");
+  }
 
-  return response?.cartLinesUpdate || { cart: { id: cartId } };
+  const { payload: { cart } } = await storefront.query<Data, Variables>({
+    variables: { cartId, lines },
+    query,
+  });
+
+  setCartCookie(ctx.response.headers, cartId);
+
+  return cart;
 };
 
 export default action;
