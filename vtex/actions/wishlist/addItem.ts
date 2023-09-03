@@ -13,7 +13,7 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<WishlistItem[]> => {
-  const { vcs } = ctx;
+  const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
   const user = payload?.sub;
 
@@ -21,23 +21,16 @@ const action = async (
     return [];
   }
 
-  await vcs["POST /api/io/_v/private/graphql/v1"]({}, {
-    body: {
-      operationName: "AddToWishlist",
-      variables: {
-        name: "Wishlist",
-        shopperId: user,
-        listItem: props,
-      },
-      query:
-        `mutation AddToWishlist($listItem: ListItemInputType!, $shopperId: String!, $name: String!, $public: Boolean) { addToList(listItem: $listItem, shopperId: $shopperId, name: $name, public: $public) @context(provider: "vtex.wish-list@1.x") }`,
+  await io.query({
+    operationName: "AddToWishlist",
+    variables: {
+      name: "Wishlist",
+      shopperId: user,
+      listItem: props,
     },
-    headers: {
-      "content-type": "application/json",
-      accept: "application/json",
-      cookie,
-    },
-  });
+    query:
+      `mutation AddToWishlist($listItem: ListItemInputType!, $shopperId: String!, $name: String!, $public: Boolean) { addToList(listItem: $listItem, shopperId: $shopperId, name: $name, public: $public) @context(provider: "vtex.wish-list@1.x") }`,
+  }, { headers: { cookie } });
 
   return wishlistLoader({ count: Infinity }, req, ctx);
 };

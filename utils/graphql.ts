@@ -15,6 +15,7 @@ type GraphQLAPI<D = unknown> = Record<string, {
   body: {
     query: string;
     variables?: Record<string, unknown>;
+    operationName?: string;
   };
 }>;
 
@@ -26,14 +27,29 @@ export const createGraphqlClient = (
 ) => {
   const url = new URL(endpoint);
   const key = `POST ${url.pathname}`;
-  const http = createHttpClient<GraphQLAPI>({ ...rest, base: url.origin });
+
+  const defaultHeaders = new Headers(rest.headers);
+  defaultHeaders.set("content-type", "application/json");
+  defaultHeaders.set("accept", "application/json");
+
+  const http = createHttpClient<GraphQLAPI>({
+    ...rest,
+    base: url.origin,
+    headers: defaultHeaders,
+  });
 
   return {
     query: async <D, V>(
-      { query = "", variables }: { query: string; variables?: V },
+      { query = "", variables, operationName }: {
+        query: string;
+        variables?: V;
+        operationName?: string;
+      },
+      init?: RequestInit,
     ): Promise<D> => {
       const { data, errors } = await http[key as any]({}, {
-        body: { query, variables: variables as any },
+        ...init,
+        body: { query, variables: variables as any, operationName },
       }).then((res) => res.json());
 
       if (Array.isArray(errors) && errors.length > 0) {

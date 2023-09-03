@@ -10,7 +10,7 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<WishlistItem[]> => {
-  const { vcs } = ctx;
+  const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
   const user = payload?.sub;
   const { id } = props;
@@ -19,23 +19,16 @@ const action = async (
     return [];
   }
 
-  await vcs["POST /api/io/_v/private/graphql/v1"]({}, {
-    body: {
-      operationName: "RemoveFromList",
-      variables: {
-        name: "Wishlist",
-        shopperId: user,
-        id,
-      },
-      query:
-        `mutation RemoveFromList($id: ID!, $shopperId: String!, $name: String) { removeFromList(id: $id, shopperId: $shopperId, name: $name) @context(provider: "vtex.wish-list@1.x") }`,
+  await io.query({
+    operationName: "RemoveFromList",
+    variables: {
+      name: "Wishlist",
+      shopperId: user,
+      id,
     },
-    headers: {
-      "content-type": "application/json",
-      accept: "application/json",
-      cookie,
-    },
-  });
+    query:
+      `mutation RemoveFromList($id: ID!, $shopperId: String!, $name: String) { removeFromList(id: $id, shopperId: $shopperId, name: $name) @context(provider: "vtex.wish-list@1.x") }`,
+  }, { headers: { cookie } });
 
   return wishlistLoader({ count: Infinity }, req, ctx);
 };

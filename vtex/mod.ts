@@ -3,6 +3,7 @@ import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { SP, VTEXCommerceStable } from "./utils/client.ts";
+import { createGraphqlClient } from "../utils/graphql.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -28,6 +29,7 @@ export interface Props {
 interface State extends Props {
   vcs: ReturnType<typeof createHttpClient<VTEXCommerceStable>>;
   sp: ReturnType<typeof createHttpClient<SP>>;
+  io: ReturnType<typeof createGraphqlClient>;
 }
 
 /**
@@ -42,9 +44,14 @@ export default function App(state: Props): App<Manifest, State> {
     base: `https://${state.account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
   });
+  const io = createGraphqlClient({
+    endpoint:
+      `https://${state.account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+    fetcher: fetchSafe,
+  });
 
   return {
-    state: { ...state, vcs, sp },
+    state: { ...state, vcs, sp, io },
     manifest,
   };
 }
