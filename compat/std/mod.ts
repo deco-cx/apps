@@ -31,32 +31,32 @@ export type ManifestWithStdCompat =
 export type ManifestMappings = Partial<
   {
     [
-    blockType in keyof Omit<
-      StdManifest,
-      "name" | "baseUrl" | "routes" | "islands"
-    >
+      blockType in keyof Omit<
+        StdManifest,
+        "name" | "baseUrl" | "routes" | "islands"
+      >
     ]: {
       [
-      blockKey in
-      & Exclude<
-        (keyof Omit<
-          StdManifest,
-          "name" | "baseUrl" | "routes" | "islands"
-        >[blockType]),
-        blockType extends keyof _Manifest ? keyof _Manifest[blockType] : ""
-      >
-      & `deco-sites/std/${string}`
+        blockKey in
+          & Exclude<
+            (keyof Omit<
+              StdManifest,
+              "name" | "baseUrl" | "routes" | "islands"
+            >[blockType]),
+            blockType extends keyof _Manifest ? keyof _Manifest[blockType] : ""
+          >
+          & `deco-sites/std/${string}`
       ]: blockType extends
-      keyof (ShopifyManifest & VNDAManifest & VTEXManifest & WebSiteManifest)
-      ?
-      | (keyof (
-        & ShopifyManifest
-        & VNDAManifest
-        & VTEXManifest
-        & WebSiteManifest
-      )[blockType])
-      | null
-      : string;
+        keyof (ShopifyManifest & VNDAManifest & VTEXManifest & WebSiteManifest)
+        ?
+          | (keyof (
+            & ShopifyManifest
+            & VNDAManifest
+            & VTEXManifest
+            & WebSiteManifest
+          )[blockType])
+          | null
+        : string;
     };
   }
 >;
@@ -106,7 +106,8 @@ const manifestMappings = {
     "deco-sites/std/loaders/nuvemShop/nuvemShopProductList.ts": NOT_IMPLEMENTED,
     "deco-sites/std/loaders/nuvemShop/nuvemShopProductListingPage.ts":
       NOT_IMPLEMENTED,
-    "deco-sites/std/loaders/vtex/legacy/suggestions.ts": "vtex/loaders/legacy/suggestions.ts",
+    "deco-sites/std/loaders/vtex/legacy/suggestions.ts":
+      "vtex/loaders/legacy/suggestions.ts",
     "deco-sites/std/loaders/vnda/cart.ts": "vnda/loaders/cart.ts",
     "deco-sites/std/loaders/vnda/productDetailsPage.ts":
       "vnda/loaders/productDetailsPage.ts",
@@ -154,10 +155,8 @@ const manifestMappings = {
   actions: {
     "deco-sites/std/actions/vnda/cart/addItem.ts":
       "vnda/actions/cart/addItem.ts",
-    "deco-sites/std/actions/vnda/cart/setShippingAddress.ts":
-      NOT_IMPLEMENTED,
-    "deco-sites/std/actions/vnda/cart/updateCoupon.ts":
-      NOT_IMPLEMENTED,
+    "deco-sites/std/actions/vnda/cart/setShippingAddress.ts": NOT_IMPLEMENTED,
+    "deco-sites/std/actions/vnda/cart/updateCoupon.ts": NOT_IMPLEMENTED,
     "deco-sites/std/actions/vnda/cart/updateItem.ts":
       "vnda/actions/cart/updateItem.ts",
     "deco-sites/std/actions/vtex/analytics/sendEvent.ts":
@@ -199,17 +198,17 @@ const manifestMappings = {
 type Mappings = typeof manifestMappings;
 type Manifest = {
   [key in keyof ManifestWithStdCompat]: key extends keyof Mappings ? {
-    [
-    blockKey in keyof Omit<
-      ManifestWithStdCompat[key],
-      keyof PickByValue<Mappings[key], null>
-    >
-    ]: Omit<
-      ManifestWithStdCompat[key],
-      keyof PickByValue<Mappings[key], null>
-    >[blockKey];
-  }
-  : ManifestWithStdCompat[key];
+      [
+        blockKey in keyof Omit<
+          ManifestWithStdCompat[key],
+          keyof PickByValue<Mappings[key], null>
+        >
+      ]: Omit<
+        ManifestWithStdCompat[key],
+        keyof PickByValue<Mappings[key], null>
+      >[blockKey];
+    }
+    : ManifestWithStdCompat[key];
 };
 
 type AvailableCommerceProps = CommerceProps["commerce"];
@@ -312,7 +311,7 @@ export default function Std(
       }
       for (
         const [target, { sourceMap: appSourceMap, manifest: appManifest }]
-        of Object.entries(targetApps)
+          of Object.entries(targetApps)
       ) {
         if (to?.startsWith(target)) {
           // @ts-ignore: blockkeys and from/to always exists for those types

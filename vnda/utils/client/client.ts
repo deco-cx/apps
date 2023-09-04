@@ -6,7 +6,7 @@ import {
   RelatedItemTag,
   SEO,
   Sort,
-  TagsSearchParams
+  TagsSearchParams,
 } from "./types.ts";
 
 export interface API {

@@ -3,7 +3,7 @@ import type {
   Product,
   ProductDetailsPage,
   PropertyValue,
-  UnitPriceSpecification
+  UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import { Fragment as ProductShopify } from "./fragments/product.ts";
 import { Fragment as SkuShopify } from "./fragments/productVariant.ts";

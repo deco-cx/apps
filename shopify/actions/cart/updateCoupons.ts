@@ -1,7 +1,7 @@
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
 import { Data as CartData } from "../../utils/queries/cart.ts";
-import { Data, Variables, query } from "../../utils/queries/updateCoupon.ts";
+import { Data, query, Variables } from "../../utils/queries/updateCoupon.ts";
 
 type AddCouponProps = {
   discountCodes: string[];
