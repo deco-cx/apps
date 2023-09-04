@@ -227,7 +227,11 @@ const getImageKey = (src = "") => {
     pathname: "/arquivos/ids/:skuId/:imageId",
   }).exec(src);
 
-  return match?.pathname.groups.imageId || src;
+  if (match == null) {
+    return src;
+  }
+
+  return `${match.pathname.groups.imageId}${match.search.input}`;
 };
 
 export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
