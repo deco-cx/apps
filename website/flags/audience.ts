@@ -1,9 +1,9 @@
-import { FlagObj } from "$live/blocks/flag.ts";
-import { Handler } from "$live/blocks/handler.ts";
-import { Matcher } from "$live/blocks/matcher.ts";
-import JsonViewer from "$live/components/JsonViewer.tsx";
-import { Resolvable } from "$live/engine/core/resolver.ts";
-import { metabasePreview } from "$live/utils/metabase.tsx";
+import { FlagObj } from "deco/blocks/flag.ts";
+import { Handler } from "deco/blocks/handler.ts";
+import { Matcher } from "deco/blocks/matcher.ts";
+import JsonViewer from "deco/components/JsonViewer.tsx";
+import { Resolvable } from "deco/engine/core/resolver.ts";
+import { metabasePreview } from "deco/utils/metabase.tsx";
 import Flag from "./flag.ts";
 export { onBeforeResolveProps } from "./everyone.ts";
 /**

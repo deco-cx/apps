@@ -1,14 +1,14 @@
 import { Head } from "$fresh/runtime.ts";
-import { isSection, Section } from "$live/blocks/section.ts";
-import { ComponentMetadata, PreactComponent } from "$live/engine/block.ts";
-import { context } from "$live/live.ts";
+import { isSection, Section } from "deco/blocks/section.ts";
+import { ComponentMetadata, PreactComponent } from "deco/engine/block.ts";
+import { context } from "deco/live.ts";
 import {
   usePageContext,
   useRouterContext,
-} from "$live/routes/[...catchall].tsx";
-import { isLivePageProps } from "$live/sections/PageInclude.tsx";
-import { CONTENT_SLOT_NAME } from "$live/sections/Slot.tsx";
-import { Props as UseSlotProps } from "$live/sections/UseSlot.tsx";
+} from "deco/routes/[...catchall].tsx";
+import { isLivePageProps } from "deco/sections/PageInclude.tsx";
+import { CONTENT_SLOT_NAME } from "deco/sections/Slot.tsx";
+import { Props as UseSlotProps } from "deco/sections/UseSlot.tsx";
 import { createContext, JSX } from "preact";
 import { useContext } from "preact/hooks";
 import LiveAnalytics from "../components/_Analytics.tsx";

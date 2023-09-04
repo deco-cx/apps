@@ -1,4 +1,4 @@
-import { MatchContext, Matcher } from "$live/blocks/matcher.ts";
+import { MatchContext, Matcher } from "deco/blocks/matcher.ts";
 
 /**
  * @title Combined options with {{{op}}}

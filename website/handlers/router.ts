@@ -1,13 +1,13 @@
-import { ResolveOptions } from "$live/engine/core/mod.ts";
+import { ResolveOptions } from "deco/engine/core/mod.ts";
 import {
   isDeferred,
   Resolvable,
   ResolveFunc,
-} from "$live/engine/core/resolver.ts";
-import { isAwaitable } from "$live/engine/core/utils.ts";
-import { FreshContext } from "$live/engine/manifest/manifest.ts";
-import { isFreshCtx } from "$live/handlers/fresh.ts";
-import { Flag, LiveState, RouterContext } from "$live/types.ts";
+} from "deco/engine/core/resolver.ts";
+import { isAwaitable } from "deco/engine/core/utils.ts";
+import { FreshContext } from "deco/engine/manifest/manifest.ts";
+import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { Flag, LiveState, RouterContext } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";

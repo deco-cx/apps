@@ -1,7 +1,7 @@
-import { badRequest } from "$live/engine/errors.ts";
-import { context } from "$live/live.ts";
-import { ActionContext } from "$live/types.ts";
-import { allowCorsFor } from "$live/utils/http.ts";
+import { badRequest } from "deco/engine/errors.ts";
+import { context } from "deco/live.ts";
+import { ActionContext } from "deco/types.ts";
+import { allowCorsFor } from "deco/utils/http.ts";
 import { encryptToHex } from "../../utils/crypto.ts";
 
 export interface Props {

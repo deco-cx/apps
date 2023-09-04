@@ -1,6 +1,6 @@
-import { Section } from "$live/blocks/section.ts";
-import type { App, FnContext } from "$live/mod.ts";
-import { asResolved } from "$live/mod.ts";
+import { Section } from "deco/blocks/section.ts";
+import type { App, FnContext } from "deco/mod.ts";
+import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";

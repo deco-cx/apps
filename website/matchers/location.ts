@@ -1,4 +1,4 @@
-import { MatchContext } from "$live/blocks/matcher.ts";
+import { MatchContext } from "deco/blocks/matcher.ts";
 
 /**
  * @title {{{city}}} {{{regionCode}}} {{{country}}}

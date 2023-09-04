@@ -1,6 +1,6 @@
-import { MultivariateFlag, Variant } from "$live/blocks/flag.ts";
-import { Section } from "$live/blocks/section.ts";
-import { asResolved } from "$live/engine/core/resolver.ts";
+import { MultivariateFlag, Variant } from "deco/blocks/flag.ts";
+import { Section } from "deco/blocks/section.ts";
+import { asResolved } from "deco/engine/core/resolver.ts";
 
 /**
  * @title Multivariate

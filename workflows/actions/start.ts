@@ -1,13 +1,13 @@
 // deno-lint-ignore-file no-explicit-any
-import { Workflow, WorkflowFn } from "$live/blocks/workflow.ts";
+import { Workflow, WorkflowFn } from "deco/blocks/workflow.ts";
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
-import { Arg, RuntimeParameters, WorkflowExecutionBase } from "$live/deps.ts";
-import { BlockFromKey, BlockFunc, BlockKeys } from "$live/engine/block.ts";
-import { Resolvable } from "$live/engine/core/resolver.ts";
-import { Manifest } from "$live/live.gen.ts";
-import { context } from "$live/live.ts";
-import { DecoManifest } from "$live/types.ts";
+import { Arg, RuntimeParameters, WorkflowExecutionBase } from "deco/deps.ts";
+import { BlockFromKey, BlockFunc, BlockKeys } from "deco/engine/block.ts";
+import { Resolvable } from "deco/engine/core/resolver.ts";
+import { Manifest } from "deco/live.gen.ts";
+import { context } from "deco/live.ts";
+import { DecoManifest } from "deco/types.ts";
 
 export interface CommonProps<
   TMetadata extends WorkflowMetadata = WorkflowMetadata,

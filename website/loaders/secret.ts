@@ -1,4 +1,4 @@
-import { context } from "$live/live.ts";
+import { context } from "deco/live.ts";
 import { decryptFromHex } from "../utils/crypto.ts";
 
 /**

@@ -1,4 +1,4 @@
-import type { App, FnContext } from "$live/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
 import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";

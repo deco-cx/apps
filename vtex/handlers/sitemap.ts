@@ -1,4 +1,4 @@
-import Proxy from "$live/handlers/proxy.ts";
+import Proxy from "deco/handlers/proxy.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
 
