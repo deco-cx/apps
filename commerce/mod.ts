@@ -1,4 +1,4 @@
-import { App } from "$live/mod.ts";
+import { App } from "deco/mod.ts";
 import shopify, { Props as ShopifyProps } from "../shopify/mod.ts";
 import vnda, { Props as VNDAProps } from "../vnda/mod.ts";
 import vtex, { Props as VTEXProps } from "../vtex/mod.ts";

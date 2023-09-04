@@ -9,7 +9,7 @@
     "std/": "https://deno.land/std@0.190.0/",
     "partytown/": "https://deno.land/x/partytown@0.3.4/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.21.7/",
-    "deco/": "https://deno.land/x/deco@1.34.5/",
-    "$live/": "https://deno.land/x/deco@1.34.5/"
+    "deco/": "https://deno.land/x/deco@1.34.6/",
+    "$live/": "https://deno.land/x/deco@1.34.6/"
   }
 }
