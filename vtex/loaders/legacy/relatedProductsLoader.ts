@@ -1,6 +1,7 @@
 import type { Product } from "../../../commerce/types.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
+import { batch } from "../../utils/batch.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
 import {
   getSegment,
@@ -95,20 +96,14 @@ async function loader(
       headers: withSegmentCookie(segment),
     }).then((res) => res.json());
 
-  const relatedIds = products
-    .slice(0, count)
-    .map((p) => pickSku(p).itemId);
+  const relatedIds = [...new Set(
+    products.slice(0, count).map((p) => pickSku(p).itemId),
+  ).keys()];
 
-  const relatedProducts = relatedIds.length > 0
-    ? await productList(
-      {
-        similars: false,
-        ids: relatedIds,
-      },
-      req,
-      ctx,
-    )
-    : null;
+  const batchedIds = batch(relatedIds, 50);
+  const relatedProducts = await Promise.all(
+    batchedIds.map((ids) => productList({ similars: false, ids }, req, ctx)),
+  ).then((p) => p.flat().filter((x): x is Product => Boolean(x)));
 
   setSegment(segment, ctx.response.headers);
 
