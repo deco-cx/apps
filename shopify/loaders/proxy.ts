@@ -51,7 +51,7 @@ const buildProxyRoutes = (
       routeFromPath,
     );
 
-    const [_include, routes] = generateDecoSiteMap
+    const [include, routes] = generateDecoSiteMap
       ? [[...(includeSiteMap ?? []), decoSiteMapUrl], [{
         pathTemplate: decoSiteMapUrl,
         handler: {
@@ -64,6 +64,23 @@ const buildProxyRoutes = (
 
     return [
       ...routes,
+      {
+        pathTemplate: "/sitemap.xml",
+        handler: {
+          value: {
+            include,
+            __resolveType: "shopify/handlers/sitemap.ts",
+          },
+        },
+      },
+      {
+        pathTemplate: "/sitemap*",
+        handler: {
+          value: {
+            __resolveType: "shopify/handlers/sitemap.ts",
+          },
+        },
+      },
       ...routesFromPaths,
     ];
   } catch (e) {
