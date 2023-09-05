@@ -10,6 +10,7 @@ const PATHS_TO_PROXY = [
   "/password/*",
   "/challenge",
   "/challenge/*",
+  "/account/login",
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 

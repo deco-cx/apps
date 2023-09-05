@@ -11,6 +11,7 @@ import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/cart/updateCoupons.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateItems.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$3 from "./actions/newsletter/subscribe.ts";
 
 const manifest = {
   "loaders": {
@@ -27,6 +28,7 @@ const manifest = {
     "shopify/actions/cart/addItems.ts": $$$$$$$$$2,
     "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
     "shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
+    "shopify/actions/newsletter/subscribe.ts": $$$$$$$$$3,
   },
   "name": "shopify",
   "baseUrl": import.meta.url,
