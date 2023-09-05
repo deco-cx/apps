@@ -1,16 +1,13 @@
 import type {
   BreadcrumbList,
-  ImageObject,
   Product,
   ProductDetailsPage,
   PropertyValue,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
-import {
-  Product as ProductShopify,
-  SelectedOption as SelectedOptionShopify,
-  Variant as SkuShopify,
-} from "./types.ts";
+import { Fragment as ProductShopify } from "./fragments/product.ts";
+import { Fragment as SkuShopify } from "./fragments/productVariant.ts";
+import { SelectedOption as SelectedOptionShopify } from "./types.ts";
 
 const DEFAULT_IMAGE = {
   altText: "image",
@@ -101,7 +98,7 @@ export const toProduct = (
   } = sku;
 
   const additionalProperty = selectedOptions.map(toPropertyValue);
-  const allImages = nonEmptyArray([image, ...images.nodes]) ?? [DEFAULT_IMAGE];
+  const skuImages = nonEmptyArray([image]) ?? [DEFAULT_IMAGE];
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));
   const priceSpec: UnitPriceSpecification[] = [{
@@ -136,8 +133,13 @@ export const toProduct = (
       url: `${url.host}${getPath(product)}`,
       name: product.title,
       additionalProperty: [],
+      image: nonEmptyArray(images.nodes)?.map((img) => ({
+        "@type": "ImageObject",
+        alternateName: img.altText ?? "",
+        url: img.url,
+      })),
     },
-    image: allImages.map((img): ImageObject => ({
+    image: skuImages.map((img) => ({
       "@type": "ImageObject",
       alternateName: img.altText ?? "",
       url: img.url,

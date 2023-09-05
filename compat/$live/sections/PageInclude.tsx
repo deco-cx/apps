@@ -1,5 +1,5 @@
-import { Page } from "$live/blocks/page.ts";
-import { notUndefined } from "$live/engine/core/utils.ts";
+import { Page } from "deco/blocks/page.ts";
+import { notUndefined } from "deco/engine/core/utils.ts";
 
 import {
   Props as LivePageProps,

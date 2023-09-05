@@ -1,5 +1,5 @@
-import { Handler } from "$live/blocks/handler.ts";
-import { FnContext } from "$live/types.ts";
+import { Handler } from "deco/blocks/handler.ts";
+import { FnContext } from "deco/types.ts";
 import { Routes } from "../../../website/flags/audience.ts";
 import { router } from "../../../website/handlers/router.ts";
 

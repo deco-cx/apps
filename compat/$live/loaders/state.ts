@@ -1,11 +1,11 @@
-import { Accounts } from "$live/blocks/account.ts";
-import { Flag } from "$live/blocks/flag.ts";
-import { Loader } from "$live/blocks/loader.ts";
-import { Page } from "$live/blocks/page.ts";
-import { Section } from "$live/blocks/section.ts";
-import { Resolvable } from "$live/engine/core/resolver.ts";
-import { Apps, LoaderContext } from "$live/mod.ts";
-import { MiddlewareConfig } from "$live/routes/_middleware.ts";
+import { Accounts } from "deco/blocks/account.ts";
+import { Flag } from "deco/blocks/flag.ts";
+import { Loader } from "deco/blocks/loader.ts";
+import { Page } from "deco/blocks/page.ts";
+import { Section } from "deco/blocks/section.ts";
+import { Resolvable } from "deco/engine/core/resolver.ts";
+import { Apps, LoaderContext } from "deco/mod.ts";
+import { MiddlewareConfig } from "deco/routes/_middleware.ts";
 
 /**
  * @titleBy key

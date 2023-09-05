@@ -1,4 +1,4 @@
-import type { App, AppContext as AC } from "$live/mod.ts";
+import type { App, AppContext as AC } from "deco/mod.ts";
 import { SourceMap } from "deco/blocks/app.ts";
 import { SectionModule } from "deco/blocks/section.ts";
 import { JSONSchema7 } from "deco/deps.ts";

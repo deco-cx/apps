@@ -56,7 +56,7 @@ async function loader(
   const kitItems: LegacyProduct[] = sku.isKit && sku.kitItems
     ? await vcs["GET /api/catalog_system/pub/products/search/:term?"]({
       ...params,
-      fq: sku.kitItems.map((item) => `skuId:${item}`),
+      fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
     }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json())
     : [];
 

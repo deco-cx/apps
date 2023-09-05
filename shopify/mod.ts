@@ -1,6 +1,7 @@
-import type { App, FnContext } from "$live/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
+import { fetchSafe } from "../utils/fetch.ts";
+import { createGraphqlClient } from "../utils/graphql.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { createClient } from "./utils/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -24,18 +25,22 @@ export interface Props {
 }
 
 export interface State extends Props {
-  client: ReturnType<typeof createClient>;
+  storefront: ReturnType<typeof createGraphqlClient>;
 }
 
 /**
  * @title Shopify
  */
 export default function App(props: Props): App<Manifest, State> {
-  return {
-    state: {
-      ...props,
-      client: createClient(props),
-    },
-    manifest,
-  };
+  const { storeName, storefrontAccessToken } = props;
+  const storefront = createGraphqlClient({
+    endpoint: `https://${storeName}.myshopify.com/api/2023-07/graphql.json`,
+    fetcher: fetchSafe,
+    headers: new Headers({
+      "Content-Type": "application/json",
+      "X-Shopify-Storefront-Access-Token": storefrontAccessToken,
+    }),
+  });
+
+  return { state: { ...props, storefront }, manifest };
 }

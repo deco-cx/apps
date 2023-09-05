@@ -1,6 +1,6 @@
-import { Page } from "$live/blocks/page.ts";
-import { context } from "$live/live.ts";
-import { adminUrlFor, isAdmin } from "$live/utils/admin.ts";
+import { Page } from "deco/blocks/page.ts";
+import { context } from "deco/live.ts";
+import { adminUrlFor, isAdmin } from "deco/utils/admin.ts";
 import { ConnInfo } from "std/http/server.ts";
 import Fresh from "../../../website/handlers/fresh.ts";
 import { pageIdFromMetadata } from "../../../website/pages/Page.tsx";

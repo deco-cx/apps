@@ -1,5 +1,5 @@
-import type { HistoryEvent, Pagination } from "$live/deps.ts";
-import { StreamProps } from "$live/utils/invoke.ts";
+import type { HistoryEvent, Pagination } from "deco/deps.ts";
+import { StreamProps } from "deco/utils/invoke.ts";
 import { history } from "../initializer.ts"; // side-effect initialize
 
 export interface Props extends StreamProps {

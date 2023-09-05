@@ -1,5 +1,7 @@
+import { InvocationFuncFor } from "deco/clients/withManifest.ts";
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import { mapCategoriesToAnalyticsCategories } from "../../commerce/utils/productToAnalyticsItem.ts";
+import { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
 import type { OrderForm, OrderFormItem } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
@@ -57,49 +59,46 @@ export const itemToAnalyticsItem = (
   ...(mapItemCategoriesToAnalyticsCategories(item)),
 });
 
-const wrap =
-  <T>(action: (p: T, init?: RequestInit | undefined) => Promise<OrderForm>) =>
-  (p: T) =>
-    storeState.enqueue(async (signal) => ({
-      cart: await action(p, { signal }),
-    }));
+type PropsOf<T> = T extends (props: infer P, r: any, ctx: any) => any ? P
+  : T extends (props: infer P, r: any) => any ? P
+  : T extends (props: infer P) => any ? P
+  : never;
+
+type Actions =
+  | "vtex/actions/cart/updateItems.ts"
+  | "vtex/actions/cart/removeItems.ts"
+  | "vtex/actions/cart/addItems.ts"
+  | "vtex/actions/cart/updateCoupons.ts"
+  | "vtex/actions/cart/updateItemPrice.ts"
+  | "vtex/actions/cart/getInstallment.ts"
+  | "vtex/actions/cart/updateProfile.ts"
+  | "vtex/actions/cart/updateUser.ts"
+  | "vtex/actions/cart/updateItemAttachment.ts"
+  | "vtex/actions/cart/removeItemAttachment.ts"
+  | "vtex/actions/cart/updateAttachment.ts";
+
+const action =
+  (key: Actions) => (props: PropsOf<InvocationFuncFor<Manifest, typeof key>>) =>
+    storeState.enqueue((signal) =>
+      invoke({ cart: { key, props } }, { signal }) satisfies Promise<
+        { cart: OrderForm }
+      >
+    );
 
 const state = {
   cart,
   loading,
-  updateItems: wrap(
-    invoke.vtex.actions.cart.updateItems,
-  ),
-  removeAllItems: wrap(
-    invoke.vtex.actions.cart.removeItems,
-  ),
-  addItems: wrap(
-    invoke.vtex.actions.cart.addItems,
-  ),
-  addCouponsToCart: wrap(
-    invoke.vtex.actions.cart.updateCoupons,
-  ),
-  changePrice: wrap(
-    invoke.vtex.actions.cart.updateItemPrice,
-  ),
-  getCartInstallments: wrap(
-    invoke.vtex.actions.cart.getInstallment,
-  ),
-  ignoreProfileData: wrap(
-    invoke.vtex.actions.cart.updateProfile,
-  ),
-  removeAllPersonalData: wrap(
-    invoke.vtex.actions.cart.updateUser,
-  ),
-  addItemAttachment: wrap(
-    invoke.vtex.actions.cart.updateItemAttachment,
-  ),
-  removeItemAttachment: wrap(
-    invoke.vtex.actions.cart.removeItemAttachment,
-  ),
-  sendAttachment: wrap(
-    invoke.vtex.actions.cart.updateAttachment,
-  ),
+  updateItems: action("vtex/actions/cart/updateItems.ts"),
+  removeAllItems: action("vtex/actions/cart/removeItems.ts"),
+  addItems: action("vtex/actions/cart/addItems.ts"),
+  addCouponsToCart: action("vtex/actions/cart/updateCoupons.ts"),
+  changePrice: action("vtex/actions/cart/updateItemPrice.ts"),
+  getCartInstallments: action("vtex/actions/cart/getInstallment.ts"),
+  ignoreProfileData: action("vtex/actions/cart/updateProfile.ts"),
+  removeAllPersonalData: action("vtex/actions/cart/updateUser.ts"),
+  addItemAttachment: action("vtex/actions/cart/updateItemAttachment.ts"),
+  removeItemAttachment: action("vtex/actions/cart/removeItemAttachment.ts"),
+  sendAttachment: action("vtex/actions/cart/updateAttachment.ts"),
   simulate: invoke.vtex.actions.cart.simulation,
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };

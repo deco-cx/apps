@@ -1,4 +1,4 @@
-import defaults from "$live/engine/manifest/defaults.ts";
+import defaults from "deco/engine/manifest/defaults.ts";
 import { Route } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import LivePage from "../pages/Page.tsx";

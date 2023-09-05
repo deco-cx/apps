@@ -8,10 +8,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type {
-  LegacySort,
-  ProductID
-} from "../../utils/types.ts";
+import type { LegacySort, ProductID } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF

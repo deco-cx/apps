@@ -1,7 +1,7 @@
-import { getCookies } from "std/http/mod.ts";
 import { AppContext } from "../../mod.ts";
-import { SHOPIFY_COOKIE_NAME } from "../../utils/constants.ts";
-import type { Cart } from "../../utils/types.ts";
+import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
+import { Data as CartData } from "../../utils/queries/cart.ts";
+import { Data, query, Variables } from "../../utils/queries/updateCoupon.ts";
 
 type AddCouponProps = {
   discountCodes: string[];
@@ -11,17 +11,22 @@ const action = async (
   props: AddCouponProps,
   req: Request,
   ctx: AppContext,
-): Promise<Cart> => {
-  const { client } = ctx;
+): Promise<CartData["cart"]> => {
+  const { storefront } = ctx;
+  const cartId = getCartCookie(req.headers);
 
-  const reqCookies = getCookies(req.headers);
-  const cartId = reqCookies[SHOPIFY_COOKIE_NAME];
-  const response = await client.cart.addCoupon({
-    cartId: cartId,
-    discountCodes: [...props.discountCodes],
+  if (!cartId) {
+    throw new Error("Missing cart id");
+  }
+
+  const { payload: { cart } } = await storefront.query<Data, Variables>({
+    variables: { cartId, discountCodes: props.discountCodes },
+    query,
   });
 
-  return response?.cartDiscountCodesUpdate || { cart: { id: cartId } };
+  setCartCookie(ctx.response.headers, cartId);
+
+  return cart;
 };
 
 export default action;

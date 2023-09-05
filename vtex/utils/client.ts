@@ -15,14 +15,6 @@ import {
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
-  "POST /api/io/_v/private/graphql/v1": {
-    response: { data: unknown; errors: unknown[] };
-    body: {
-      operationName: string;
-      variables: Record<string, unknown>;
-      query: string;
-    };
-  };
   "POST /no-cache/Newsletter.aspx": { body: FormData };
   "POST /no-cache/AviseMe.aspx": { body: FormData };
   "GET /api/catalog_system/pub/portal/pagetype/:term": { response: PageType };

@@ -3,11 +3,15 @@ import { AppContext } from "../mod.ts";
 import { slugify } from "../utils/slugify.ts";
 import type { PageType, Segment } from "../utils/types.ts";
 
-export const toSegmentParams = (segment: Partial<Segment>) => (Object.fromEntries(Object.entries({
-  utmi_campaign: segment.utmi_campaign ?? undefined,
-  utm_campaign: segment.utm_campaign ?? undefined,
-  utm_source: segment.utm_source ?? undefined,
-}).filter(([_, v])=> v != undefined)));
+export const toSegmentParams = (
+  segment: Partial<Segment>,
+) => (Object.fromEntries(
+  Object.entries({
+    utmi_campaign: segment.utmi_campaign ?? undefined,
+    utm_campaign: segment.utm_campaign ?? undefined,
+    utm_source: segment.utm_source ?? undefined,
+  }).filter(([_, v]) => v != undefined),
+));
 
 const PAGE_TYPE_TO_MAP_PARAM = {
   Brand: "b",

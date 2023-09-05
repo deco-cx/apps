@@ -1,7 +1,7 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
-import { Runtime } from "../runtime.ts";
-import { Cart } from "../utils/types.ts";
+import { invoke } from "../runtime.ts";
+import { Fragment as Cart } from "../utils/fragments/cart.ts";
 
 interface Context {
   cart: Cart;
@@ -45,13 +45,10 @@ const enqueue = (
   return queue;
 };
 
-const load = async (signal: AbortSignal) => {
-  const cart = await Runtime.shopify.loaders.cart({}, {signal})
-
-  return {
-    cart,
-  };
-};
+const load = (signal: AbortSignal) =>
+  invoke({
+    cart: invoke.shopify.loaders.cart(),
+  }, { signal });
 
 if (IS_BROWSER) {
   enqueue(load);

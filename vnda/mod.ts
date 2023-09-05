@@ -1,6 +1,7 @@
-import type { App, FnContext } from "$live/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
+import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { createClient } from "./utils/client/client.ts";
+import { API } from "./utils/client/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -38,18 +39,28 @@ export interface Props {
 }
 
 export interface State extends Props {
-  client: ReturnType<typeof createClient>;
+  api: ReturnType<typeof createHttpClient<API>>;
 }
 
 /**
  * @title VNDA
  */
 export default function App(props: Props): App<Manifest, State> {
+  const { authToken, publicUrl, sandbox } = props;
+  const api = createHttpClient<API>({
+    headers: new Headers({
+      "User-Agent": "decocx/1.0",
+      "X-Shop-Host": publicUrl,
+      "accept": "application/json",
+      authorization: `Bearer ${authToken}`,
+    }),
+    base: sandbox
+      ? "https://api.sandbox.vnda.com.br"
+      : "https://api.vnda.com.br",
+  });
+
   return {
-    state: {
-      ...props,
-      client: createClient(props),
-    },
+    state: { ...props, api },
     manifest,
   };
 }

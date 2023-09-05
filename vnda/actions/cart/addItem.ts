@@ -1,5 +1,7 @@
-import { setCookie } from "std/http/mod.ts";
+import { HttpError } from "../../../utils/http.ts";
+import cartLoader from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
+import { getCartCookie } from "../../utils/cart.ts";
 import type { Cart } from "../../utils/client/types.ts";
 
 export interface Props {
@@ -13,36 +15,23 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
-  const { client } = ctx;
+  const { api } = ctx;
   const { itemId, quantity, attributes } = props;
-  const reqCookies = req.headers.get("cookie") ?? "";
+  const cartId = getCartCookie(req.headers);
 
-  const { orderForm, cookies } = await client.carrinho.adicionar({
-    cookie: reqCookies,
-    sku: itemId,
-    quantity,
-    attributes,
-  });
-
-  // in case the cart was created, set the cookie to the browser
-  for (const cookie of cookies) {
-    setCookie(ctx.response.headers, {
-      ...cookie,
-      domain: new URL(req.url).hostname,
-    });
+  if (!cartId) {
+    throw new HttpError(400, "Missing cart cookie");
   }
 
-  const allCookies = [
-    reqCookies,
-    ...cookies.map(({ name, value }) => `${name}=${value}`),
-  ].join("; ");
+  await api["POST /api/v2/carts/:cartId/items"]({ cartId }, {
+    body: {
+      sku: itemId,
+      quantity,
+      extra: attributes,
+    },
+  });
 
-  const relatedItems = await client.carrinho.relatedItems(allCookies);
-
-  return {
-    orderForm,
-    relatedItems,
-  };
+  return cartLoader({}, req, ctx);
 };
 
 export default action;

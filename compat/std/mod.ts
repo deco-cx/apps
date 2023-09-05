@@ -1,17 +1,17 @@
 // deno-lint-ignore-file no-explicit-any
 export { onBeforeResolveProps } from "../../website/mod.ts";
-import { SourceMap } from "$live/blocks/app.ts";
-import { buildSourceMap } from "$live/blocks/utils.tsx";
-import type { App, AppManifest } from "$live/mod.ts";
+import { SourceMap } from "deco/blocks/app.ts";
+import { buildSourceMap } from "deco/blocks/utils.tsx";
+import type { App, AppManifest } from "deco/mod.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
 import $live from "../$live/mod.ts";
+import commerce, { Props as CommerceProps } from "../../commerce/mod.ts";
 import type { Manifest as ShopifyManifest } from "../../shopify/manifest.gen.ts";
 import shopify, { Props as ShopifyProps } from "../../shopify/mod.ts";
 import type { Manifest as VNDAManifest } from "../../vnda/manifest.gen.ts";
 import vnda, { Props as VNDAProps } from "../../vnda/mod.ts";
 import type { Manifest as VTEXManifest } from "../../vtex/manifest.gen.ts";
 import vtex, { Props as VTEXProps } from "../../vtex/mod.ts";
-import commerce, { Props as CommerceProps } from "../../commerce/mod.ts";
 
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
 import type {
@@ -106,6 +106,8 @@ const manifestMappings = {
     "deco-sites/std/loaders/nuvemShop/nuvemShopProductList.ts": NOT_IMPLEMENTED,
     "deco-sites/std/loaders/nuvemShop/nuvemShopProductListingPage.ts":
       NOT_IMPLEMENTED,
+    "deco-sites/std/loaders/vtex/legacy/suggestions.ts":
+      "vtex/loaders/legacy/suggestions.ts",
     "deco-sites/std/loaders/vnda/cart.ts": "vnda/loaders/cart.ts",
     "deco-sites/std/loaders/vnda/productDetailsPage.ts":
       "vnda/loaders/productDetailsPage.ts",
@@ -153,10 +155,8 @@ const manifestMappings = {
   actions: {
     "deco-sites/std/actions/vnda/cart/addItem.ts":
       "vnda/actions/cart/addItem.ts",
-    "deco-sites/std/actions/vnda/cart/setShippingAddress.ts":
-      "vnda/actions/cart/setShippingAddress.ts",
-    "deco-sites/std/actions/vnda/cart/updateCoupon.ts":
-      "vnda/actions/cart/updateCoupon.ts",
+    "deco-sites/std/actions/vnda/cart/setShippingAddress.ts": NOT_IMPLEMENTED,
+    "deco-sites/std/actions/vnda/cart/updateCoupon.ts": NOT_IMPLEMENTED,
     "deco-sites/std/actions/vnda/cart/updateItem.ts":
       "vnda/actions/cart/updateItem.ts",
     "deco-sites/std/actions/vtex/analytics/sendEvent.ts":

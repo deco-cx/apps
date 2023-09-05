@@ -51,10 +51,12 @@ const getSanitizedInput = (
     if (url.searchParams.has(qsToSanatize)) {
       const searchParams = url.searchParams;
       const testParamValues = searchParams.getAll(qsToSanatize);
-      const updatedTestParamValues = testParamValues.map((paramValue) => encodeURIComponent(paramValue.trim()));
+      const updatedTestParamValues = testParamValues.map((paramValue) =>
+        encodeURIComponent(paramValue.trim())
+      );
       searchParams.delete(qsToSanatize);
       updatedTestParamValues.forEach((updatedValue) =>
-          searchParams.append(qsToSanatize, updatedValue)
+        searchParams.append(qsToSanatize, updatedValue)
       );
     }
   });

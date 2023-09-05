@@ -2,7 +2,7 @@ import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
-import { Sort } from "../utils/client/types.ts";
+import { ProductSearchResult, Sort } from "../utils/client/types.ts";
 import {
   getSEOFromTag,
   toFilters,
@@ -50,7 +50,7 @@ const searchLoader = async (
 ): Promise<ProductListingPage | null> => {
   // get url from params
   const url = new URL(req.url);
-  const { client } = ctx;
+  const { api } = ctx;
 
   const count = props.count ?? 12;
   const { cleanUrl, typeTags } = typeTagExtractor(url);
@@ -62,25 +62,38 @@ const searchLoader = async (
   const term = props.term || props.slug || qQueryString ||
     undefined;
 
-  const search = await client.product.search({
+  const response = await api["GET /api/v2/products/search"]({
     term,
     sort,
     page,
     per_page: count,
-    tags: props.tags,
-    type_tags: typeTags,
+    "tags[]": props.tags,
     wildcard: true,
+    ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
+  }, {
+    deco: { cache: "stale-while-revalidate" },
   });
+  const pagination = JSON.parse(
+    response.headers.get("x-pagination") ?? "null",
+  ) as ProductSearchResult["pagination"] | null;
 
   const categoryTagName = props.term || url.pathname.split("/").pop() || "";
-  const [seo, categoryTag] = await Promise.all([
-    client.seo.tag(categoryTagName),
+  const [search, seo, categoryTag] = await Promise.all([
+    response.json(),
+    api["GET /api/v2/seo_data"]({
+      resource_type: "Tag",
+      code: categoryTagName,
+      type: "category",
+    }, {
+      deco: { cache: "stale-while-revalidate" },
+    }).then((res) => res.json()),
     isSearchPage
-      ? client.tag(categoryTagName).catch(() => undefined)
+      ? api["GET /api/v2/tags/:name"]({ name: categoryTagName })
+        .then((res) => res.json()).catch(() => undefined)
       : undefined,
   ]);
 
-  const { results: searchResults, pagination } = search;
+  const { results: searchResults } = search;
   const products = searchResults.map((product) =>
     toProduct(product, null, {
       url,
@@ -91,11 +104,11 @@ const searchLoader = async (
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);
 
-  if (pagination.next_page) {
+  if (pagination?.next_page) {
     nextPage.set("page", (page + 1).toString());
   }
 
-  if (pagination.prev_page) {
+  if (pagination?.prev_page) {
     previousPage.set("page", (page - 1).toString());
   }
 
@@ -115,10 +128,10 @@ const searchLoader = async (
     filters: toFilters(search.aggregations, typeTags, cleanUrl),
     products: products,
     pageInfo: {
-      nextPage: pagination.next_page ? `?${nextPage}` : undefined,
-      previousPage: pagination.prev_page ? `?${previousPage}` : undefined,
+      nextPage: pagination?.next_page ? `?${nextPage}` : undefined,
+      previousPage: pagination?.prev_page ? `?${previousPage}` : undefined,
       currentPage: page,
-      records: pagination.total_count,
+      records: pagination?.total_count,
       recordPerPage: count,
     },
     sortOptions: VNDA_SORT_OPTIONS,
