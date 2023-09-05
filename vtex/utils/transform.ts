@@ -223,15 +223,18 @@ const toAdditionalPropertyReferenceId = (
 };
 
 const getImageKey = (src = "") => {
-  const match = new URLPattern({
-    pathname: "/arquivos/ids/:skuId/:imageId",
-  }).exec(src);
+  return src;
 
-  if (match == null) {
-    return src;
-  }
+  // TODO: figure out how we can improve this
+  // const match = new URLPattern({
+  //   pathname: "/arquivos/ids/:skuId/:imageId",
+  // }).exec(src);
 
-  return `${match.pathname.groups.imageId}${match.search.input}`;
+  // if (match == null) {
+  //   return src;
+  // }
+
+  // return `${match.pathname.groups.imageId}${match.search.input}`;
 };
 
 export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
