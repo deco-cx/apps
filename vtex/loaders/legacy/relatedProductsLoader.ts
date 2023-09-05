@@ -96,10 +96,12 @@ async function loader(
       headers: withSegmentCookie(segment),
     }).then((res) => res.json());
 
+  // unique Ids
   const relatedIds = [...new Set(
     products.slice(0, count).map((p) => pickSku(p).itemId),
   ).keys()];
 
+  /** Batch fetches due to VTEX API limits */
   const batchedIds = batch(relatedIds, 50);
   const relatedProducts = await Promise.all(
     batchedIds.map((ids) => productList({ similars: false, ids }, req, ctx)),
