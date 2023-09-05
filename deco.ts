@@ -14,6 +14,7 @@ const config = {
     app("vtex"),
     app("vnda"),
     app("shopify"),
+    app("coteminas"),
     app("website"),
     app("commerce"),
     app("workflows"),
