@@ -7,6 +7,7 @@ import * as $$$1 from "./loaders/ProductDetailsPage.ts";
 import * as $$$2 from "./loaders/ProductListingPage.ts";
 import * as $$$3 from "./loaders/proxy.ts";
 import * as $$$4 from "./loaders/cart.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/cart/updateCoupons.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateItems.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
@@ -18,6 +19,9 @@ const manifest = {
     "shopify/loaders/ProductList.ts": $$$0,
     "shopify/loaders/ProductListingPage.ts": $$$2,
     "shopify/loaders/proxy.ts": $$$3,
+  },
+  "handlers": {
+    "shopify/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "shopify/actions/cart/addItems.ts": $$$$$$$$$2,
