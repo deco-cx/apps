@@ -2,6 +2,7 @@ import type { App, FnContext } from "deco/mod.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import type { SecretString } from "../website/loaders/secretString.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -22,7 +23,7 @@ export interface Props {
    * @ttile Access Token
    * @description Shopify admin access token.
    */
-  adminAccessToken: string;
+  adminAccessToken: SecretString;
 
   /**
    * @description Use Shopify as backend platform
@@ -55,7 +56,7 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
     headers: new Headers({
       "Content-Type": "application/json",
-      "X-Shopify-Access-Token": adminAccessToken,
+      "X-Shopify-Access-Token": adminAccessToken || "",
     }),
   });
 
