@@ -49,17 +49,16 @@ export default function Sitemap(
     const publicUrl =
       new URL(url?.startsWith("http") ? url : `https://${url}`).href;
 
-    console.log(publicUrl)
-    console.log(req)
-    console.log(ctx)
-
     const response = await Proxy({
       url: publicUrl,
     })(req, ctx);
 
+    if(!response.ok){
+      return response
+    } 
+
     const reqUrl = new URL(req.url);
     const text = await response.text();
-    console.log(text)
     return new Response(
       includeSiteMaps(
         text.replaceAll(publicUrl, `${reqUrl.origin}/`),
