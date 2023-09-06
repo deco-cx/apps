@@ -12,6 +12,8 @@ import * as $$$$$$$$$0 from "./actions/cart/updateCoupons.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateItems.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
 import * as $$$$$$$$$3 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$4 from "./actions/customer/updateCustomer.ts";
+import * as $$$$$$$$$5 from "./actions/customer/createCustomer.ts";
 
 const manifest = {
   "loaders": {
@@ -28,6 +30,8 @@ const manifest = {
     "shopify/actions/cart/addItems.ts": $$$$$$$$$2,
     "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
     "shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
+    "shopify/actions/customer/createCustomer.ts": $$$$$$$$$5,
+    "shopify/actions/customer/updateCustomer.ts": $$$$$$$$$4,
     "shopify/actions/newsletter/subscribe.ts": $$$$$$$$$3,
   },
   "name": "shopify",

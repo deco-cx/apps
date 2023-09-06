@@ -1,8 +1,8 @@
 import { gql } from "../../../utils/graphql.ts";
 
 export const query = gql`
-mutation customerCreate($input: CustomerInput!) {
-  payload: customerCreate(input: $input) {
+mutation customerUpdate($input: CustomerInput!) {
+  payload: customerUpdate(input: $input) {
     customer {
       id
     }
@@ -16,13 +16,8 @@ mutation customerCreate($input: CustomerInput!) {
 
 export interface Variables {
   input: {
-    email: string;
-    emailMarketingConsent: {
-      consentUpdatedAt?: string;
-      marketingOptInLevel?: string;
-      marketingState: string;
-    };
-    tags: string[];
+    id: string;
+    tags?: string[];
   };
 }
 

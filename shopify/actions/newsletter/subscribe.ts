@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import { Data, Variables, query } from "../../utils/queries/subscribe.ts";
+import createCustomerAction from "../customer/createCustomer.ts";
 
 type SubscribeCustomerProps = {
   input: {
@@ -13,29 +13,18 @@ type SubscribeCustomerProps = {
   };
 };
 
+
 const action = async (
   { input }: SubscribeCustomerProps,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<{id: string}> => {
-  const { admin } = ctx;
 
-  const { payload : {customer} }  = await admin.query<Data, Variables>({
-    variables: { 
-      input:{
-        email: input.email,
-        emailMarketingConsent: {
-          marketingState: input.emailMarketingConsent.marketingState,
-          consentUpdatedAt: input.emailMarketingConsent.consentUpdatedAt,
-          marketingOptInLevel: input.emailMarketingConsent.marketingOptInLevel
-        },
-        tags: input.tags
-      }
-    },
-    query,
-  });
+  const { id } = await createCustomerAction({ input }, req, ctx)
 
-  return customer;
+  return {
+    id
+  };
 };
 
 export default action;
