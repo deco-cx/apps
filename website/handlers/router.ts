@@ -94,7 +94,7 @@ export const router = (
     }
 
     for (const { pathTemplate: routePath, handler } of routes) {
-      const pattern = new URLPattern(routePath, req.url);
+      const pattern = new URLPattern({ pathname: routePath });
       const res = pattern.exec(req.url);
       const groups = res?.pathname.groups ?? {};
 
