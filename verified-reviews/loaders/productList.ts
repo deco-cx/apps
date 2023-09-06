@@ -2,20 +2,18 @@ import { AppContext } from "../mod.ts";
 import { AggregateRating, Product } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
 import { Ratings } from "../utils/types.ts";
-import { createClient } from "../utils/client.ts";
+import { createClient, getProductId } from "../utils/client.ts";
 // export type Props = ConfigVerifiedReviews;
 
-const getProductId = (product: Product) => product.isVariantOf!.productGroupID;
-
 /**
- * @title Opiniões verificadas
+ * @title Opiniões verificadas - Ratings for Products[]
  */
 export default function productList(
 	config: any,
-  req: Request,
-  ctx: AppContext,
+	req: Request,
+	ctx: AppContext
 ): ExtensionOf<Product[] | null> {
-	const client = createClient({...ctx});
+	const client = createClient({ ...ctx });
 
 	return async (products: Product[] | null) => {
 		if (!products) {
