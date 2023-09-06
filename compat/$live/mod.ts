@@ -83,6 +83,8 @@ const manifestMappings: ManifestMappings = {
     "$live/flags/multivariate.ts": "website/flags/multivariate.ts",
   },
 };
+
+export type { Props };
 /**
  * @title $live
  */
