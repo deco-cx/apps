@@ -21,13 +21,13 @@ export default function productList(
 		}
 		if (!client) return products;
 
-		// const productsIds = products.map(getProductId);
-		const productsIds = ["55766", "50015", "70411", "66268", "6563"] // MOCK PRODUCTS WITH RATINGS
+		const productsIds = products.map(getProductId);
+		// const productsIds = ["55766", "50015", "70411", "66268", "6563"] // MOCK PRODUCTS WITH RATINGS
 		const ratings = await client.ratings({ productsIds: productsIds });
 
-		return products.map((product, index) => {
-			// const productId = getProductId(product);
-			const productId = productsIds?.[index] ?? ""; // MOCK PRODUCT ID WITH RATING
+		return products.map((product) => {
+			const productId = getProductId(product);
+			// const productId = productsIds?.[index] ?? ""; // MOCK PRODUCT ID WITH RATING
 			product.aggregateRating = getRatingProduct({
 				ratings,
 				productId: productId,

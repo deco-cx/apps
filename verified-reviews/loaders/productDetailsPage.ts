@@ -24,16 +24,14 @@ export default function productDetailsPage(
 
 		if (!client) return null;
 
-		// const productId = getProductId(productDetailsPage.product);
-		const productId = "55766"; // MOCK PRODUCT WITH RATING AND REVIEWS
+		const productId = getProductId(productDetailsPage.product);
+		// const productId = "55766"; // MOCK PRODUCT WITH RATING AND REVIEWS
 		const fullReview = await client.fullReview({
 			productId,
 			count: config?.count,
 			offset: config?.offset,
 			order: config?.order,
 		});
-
-		console.log("💥 product fullReview", fullReview);
 
 		return {
 			...productDetailsPage,
