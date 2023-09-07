@@ -32,6 +32,8 @@ export default function productDetailsPage(
 			order: config?.order,
 		});
 
+		console.log("💥 product fullReview", fullReview);
+
 		return {
 			...productDetailsPage,
 			product: {
