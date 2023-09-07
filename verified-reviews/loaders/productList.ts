@@ -22,7 +22,7 @@ export default function productList(
 		if (!client) return products;
 
 		// const productsIds = products.map(getProductId);
-		const productsIds = ["50015", "55766", "73404", "64944"] // MOCK PRODUCTS WITH RATINGS
+		const productsIds = ["55766", "50015", "70411", "66268", "6563"] // MOCK PRODUCTS WITH RATINGS
 		const ratings = await client.ratings({ productsIds: productsIds });
 
 		return products.map((product, index) => {
