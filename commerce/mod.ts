@@ -2,18 +2,21 @@ import { App } from "deco/mod.ts";
 import shopify, { Props as ShopifyProps } from "../shopify/mod.ts";
 import vnda, { Props as VNDAProps } from "../vnda/mod.ts";
 import vtex, { Props as VTEXProps } from "../vtex/mod.ts";
+import coteminas, {Props as CoteminasProps} from "../coteminas/mod.ts"
 import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type Props = WebsiteProps & {
-  commerce: VNDAProps | VTEXProps | ShopifyProps;
+  commerce: VNDAProps | VTEXProps | ShopifyProps | CoteminasProps;
 };
 
 type WebsiteApp = ReturnType<typeof website>;
 type CommerceApp =
   | ReturnType<typeof vnda>
   | ReturnType<typeof vtex>
-  | ReturnType<typeof shopify>;
+  | ReturnType<typeof shopify>
+  | ReturnType<typeof coteminas>;
+
 
 export default function Site(
   state: Props,
@@ -21,11 +24,14 @@ export default function Site(
   const { commerce } = state;
 
   const site = website(state);
-  const ecommerce = commerce.platform === "vnda"
+  const ecommerce =
+  commerce.platform === "vnda"
     ? vnda(commerce)
     : commerce.platform === "vtex"
     ? vtex(commerce)
-    : shopify(commerce);
+    : commerce.platform === "shopify"
+    ? shopify(commerce)
+    : coteminas(commerce);
 
   return {
     state,
