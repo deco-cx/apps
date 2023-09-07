@@ -123,10 +123,13 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
               reviewCount: Number(currentRating.count),
             }
           : undefined,
-        reviews: responseReview
+        review: responseReview
           ? responseReview.reviews?.map((item) => ({
               "@type": "Review",
-              author: item.firstname,
+              author: [{
+								"@type": "Person",
+								name: `${item.firstname} ${item.lastname}`
+							}],
               datePublished: item.review_date,
               reviewBody: item.review,
               reviewRating: {
@@ -140,7 +143,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       console.warn("🔴⭐ Error on call Full Review of Verified Review - probably unidentified product");
       return {
         aggregateRating: undefined,
-        reviews: []
+        review: []
       }
     }
 	};

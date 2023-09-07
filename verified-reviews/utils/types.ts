@@ -42,7 +42,7 @@ export interface Reviews {
 
 export interface VerifiedReviewsFullReview {
   aggregateRating?: AggregateRating;
-  reviews: Review[];
+  review: Review[];
 }
 
 export interface ConfigVerifiedReviews {

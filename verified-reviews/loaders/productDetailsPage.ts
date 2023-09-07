@@ -1,10 +1,12 @@
 import { AppContext } from "../mod.ts";
-import { Product, ProductDetailsPage } from "../../commerce/types.ts";
+import { ProductDetailsPage } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
-import { createClient, PaginationOptions } from "../utils/client.ts";
+import {
+	createClient,
+	getProductId,
+	PaginationOptions,
+} from "../utils/client.ts";
 export type Props = PaginationOptions;
-
-const getProductId = (product: Product) => product.isVariantOf!.productGroupID;
 
 /**
  * @title Opiniões verificadas - Full Review for Product (Ratings and Reviews)
@@ -21,9 +23,9 @@ export default function productDetailsPage(
 
 		if (!client) return null;
 
-		const productId = getProductId(productDetailsPage.product);
+		// const productId = getProductId(productDetailsPage.product);
+		const productId = "55766"; // MOCK PRODUCT WITH RATING AND REVIEWS
 		const fullReview = await client.fullReview({
-			// productId: "55766",  // MOCK PRODUCT WITH RATING AND REVIEWS
 			productId,
 			count: config?.count,
 			offset: config?.offset,
