@@ -67,6 +67,12 @@ export interface AggregateRating {
   reviewCount?: number;
   /** The rating for the content. */
   ratingValue?: number;
+  /** The highest value allowed in this rating system. */
+  bestRating?: number;
+  /** The lowest value allowed in this rating system. */
+  worstRating?: number;
+  /** A short explanation (e.g. one to two sentences) providing background context and other information that led to the conclusion expressed in the rating. This is particularly applicable to ratings associated with "fact check" markup using ClaimReview. */
+  ratingExplanation?: string;
 }
 
 export declare type ItemAvailability =
@@ -242,18 +248,7 @@ export interface Review extends Omit<Thing, "@type"> {
   /** The actual body of the review. */
   reviewBody?: string;
   /** The rating given in this review. Note that reviews can themselves be rated. The `reviewRating` applies to rating given by the review. The {@link https://schema.org/aggregateRating aggregateRating} property applies to the review itself, as a creative work. */
-  reviewRating?: AggregateRating | Rating;
-}
-export interface Rating extends Omit<Thing, "@type"> {
-  "@type": "Rating";
-  /** The highest value allowed in this rating system. */
-  bestRating?: number;
-  /** The rating for the content. */
-  ratingValue?: number;
-  /** The lowest value allowed in this rating system. */
-  worstRating?: number;
-  /** A short explanation (e.g. one to two sentences) providing background context and other information that led to the conclusion expressed in the rating. This is particularly applicable to ratings associated with "fact check" markup using ClaimReview. */
-  ratingExplanation?: string;
+  reviewRating?: AggregateRating;
 }
 
 export interface Author extends Omit<Thing, "@type"> {
