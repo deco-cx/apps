@@ -222,21 +222,6 @@ const toAdditionalPropertyReferenceId = (
   }));
 };
 
-const getImageKey = (src = "") => {
-  return src;
-
-  // TODO: figure out how we can improve this
-  // const match = new URLPattern({
-  //   pathname: "/arquivos/ids/:skuId/:imageId",
-  // }).exec(src);
-
-  // if (match == null) {
-  //   return src;
-  // }
-
-  // return `${match.pathname.groups.imageId}${match.search.input}`;
-};
-
 export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   product: P,
   sku: P["items"][number],
@@ -255,12 +240,6 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     items,
   } = product;
   const { name, ean, itemId: skuId, referenceId = [] } = sku;
-  const imagesByKey = options.imagesByKey ?? items
-    .flatMap((i) => i.images)
-    .reduce((map, img) => {
-      map.set(getImageKey(img.imageUrl), img.imageUrl);
-      return map;
-    }, new Map<string, string>());
 
   const groupAdditionalProperty = isLegacyProduct(product)
     ? legacyToProductGroupAdditionalProperties(product)
@@ -282,9 +261,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     ? {
       "@type": "ProductGroup",
       productGroupID: productId,
-      hasVariant: items.map((sku) =>
-        toProduct(product, sku, 1, { ...options, imagesByKey })
-      ),
+      hasVariant: items.map((sku) => toProduct(product, sku, 1, options)),
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
       additionalProperty: groupAdditionalProperty,
@@ -325,12 +302,11 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: images.map(({ imageUrl, imageText, imageLabel }) => {
-      const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
-      const alternateName = imageText || imageLabel || "";
-
-      return { "@type": "ImageObject" as const, alternateName, url };
-    }),
+    image: images.map(({ imageUrl, imageText, imageLabel }) => ({
+      "@type": "ImageObject" as const,
+      alternateName: imageText || imageLabel || "",
+      url: imageUrl,
+    })),
     offers: offers.length > 0
       ? {
         "@type": "AggregateOffer",
