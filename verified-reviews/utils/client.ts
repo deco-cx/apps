@@ -65,7 +65,9 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
 
 			return Object.keys(data).length ? data : undefined;
 		} catch {
-			console.warn("🔴⭐ Error on call ratings of Verified Review - probably unidentified product");
+			console.warn(
+				"🔴⭐ Error on call ratings of Verified Review - probably unidentified product"
+			);
 			return undefined;
 		}
 	};
@@ -102,50 +104,53 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
 	}: PaginationOptions & {
 		productId: string;
 	}): Promise<VerifiedReviewsFullReview> => {
-    try {
-      const response = await Promise.all([
-        rating({ productId }),
-        reviews({ productId, count, offset }),
-      ]);
-  
-      const [responseRating, responseReview] = response.flat() as [
-        Ratings,
-        Reviews | null
-      ];
-  
-      const currentRating = responseRating[productId]?.[0] || undefined;
-  
-      return {
-        aggregateRating: currentRating
-          ? {
-              "@type": "AggregateRating",
-              ratingValue: Number(parseFloat(currentRating.rate).toFixed(1)),
-              reviewCount: Number(currentRating.count),
-            }
-          : undefined,
-        review: responseReview
-          ? responseReview.reviews?.map((item) => ({
-              "@type": "Review",
-              author: [{
-								"@type": "Person",
-								name: `${item.firstname} ${item.lastname}`
-							}],
-              datePublished: item.review_date,
-              reviewBody: item.review,
-              reviewRating: {
-                "@type": "AggregateRating",
-                ratingValue: Number(item.rate),
-              },
-            }))
-          : [],
-      };
-    } catch {
-      console.warn("🔴⭐ Error on call Full Review of Verified Review - probably unidentified product");
-      return {
-        aggregateRating: undefined,
-        review: []
-      }
-    }
+		try {
+			const response = await Promise.all([
+				rating({ productId }),
+				reviews({ productId, count, offset }),
+			]);
+
+			const [responseRating, responseReview] = response.flat() as [
+				Ratings,
+				Reviews | null
+			];
+
+			const currentRating = responseRating[productId]?.[0] || undefined;
+			return {
+				aggregateRating: currentRating
+					? {
+							"@type": "AggregateRating",
+							ratingValue: Number(parseFloat(currentRating.rate).toFixed(1)),
+							reviewCount: Number(currentRating.count),
+					  }
+					: undefined,
+				review: responseReview
+					? responseReview.reviews?.map((item) => ({
+							"@type": "Review",
+							author: [
+								{
+									"@type": "Person",
+									name: `${item.firstname} ${item.lastname}`,
+								},
+							],
+							datePublished: item.review_date,
+							reviewBody: item.review,
+							reviewRating: {
+								"@type": "AggregateRating",
+								ratingValue: Number(item.rate),
+							},
+					  }))
+					: [],
+			};
+		} catch {
+			console.warn(
+				"🔴⭐ Error on call Full Review of Verified Review - probably unidentified product"
+			);
+			return {
+				aggregateRating: undefined,
+				review: [],
+			};
+		}
 	};
 
 	return {
