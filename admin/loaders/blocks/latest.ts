@@ -12,7 +12,7 @@ export default async function Latest(
 ): Promise<BlockState | null> {
   const state = await ctx.storage.state();
   const block = state[blockId];
-  if (!blockId) {
+  if (!block) {
     return null;
   }
 
