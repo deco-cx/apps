@@ -10,6 +10,10 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    {
+      dir: "admin",
+      name: "deco-sites/admin",
+    },
     app("handlebars"),
     app("vtex"),
     app("vnda"),
