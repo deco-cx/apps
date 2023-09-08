@@ -1,20 +1,17 @@
 import { MatchContext, Matcher } from "deco/blocks/matcher.ts";
 
-/**
- * @title Combined options with {{{op}}}
- */
 export interface Props {
-  op: "or" | "and";
-  matchers: Matcher[];
+  /**
+   * @description Matcher to be negated.
+   */
+  matcher: Matcher;
 }
 
 /**
- * @title OR & AND Matcher
+ * @title Negates a matcher
  */
-const MatchMulti = ({ op, matchers }: Props) => (ctx: MatchContext) => {
-  return op === "or"
-    ? matchers.some((matcher) => matcher(ctx))
-    : matchers.every((matcher) => matcher(ctx));
-};
+const NegateMacher = ({ matcher }: Props) => (ctx: MatchContext) => {
+  return () => !matcher(ctx);
+}
 
-export default MatchMulti;
+export default NegateMacher;
