@@ -15,6 +15,8 @@ import * as $$$$$$$$$3 from "./actions/newsletter/subscribe.ts";
 import * as $$$$$$$$$4 from "./actions/customer/updateCustomer.ts";
 import * as $$$$$$$$$5 from "./actions/customer/createCustomer.ts";
 
+import * as $$$$$$$$$6 from "./actions/customer/createCustomer.ts";
+
 const manifest = {
   "loaders": {
     "shopify/loaders/cart.ts": $$$4,
@@ -27,12 +29,13 @@ const manifest = {
     "shopify/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
-    "shopify/actions/cart/addItems.ts": $$$$$$$$$2,
-    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
-    "shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
-    "shopify/actions/customer/createCustomer.ts": $$$$$$$$$5,
-    "shopify/actions/customer/updateCustomer.ts": $$$$$$$$$4,
-    "shopify/actions/newsletter/subscribe.ts": $$$$$$$$$3,
+    "shopify/actions/cart/addItems.ts": $$$$$$$$$3,
+    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$1,
+    "shopify/actions/cart/updateItems.ts": $$$$$$$$$2,
+    "shopify/actions/customer/createCustomer.ts": $$$$$$$$$6,
+    "shopify/actions/customer/updateCustomer.ts": $$$$$$$$$5,
+    "shopify/actions/newsletter/subscribe.ts": $$$$$$$$$4,
+    "shopify/actions/order/draftOrderCalculate.ts": $$$$$$$$$0,
   },
   "name": "shopify",
   "baseUrl": import.meta.url,

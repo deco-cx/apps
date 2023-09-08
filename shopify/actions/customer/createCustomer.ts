@@ -17,7 +17,7 @@ const action = async (
   { input }: CreateCustomerProps,
   _req: Request,
   ctx: AppContext,
-): Promise<{id: string}> => {
+): Promise<Data['payload']['customer']> => {
   const { admin } = ctx;
 
   const { payload : {customer} }  = await admin.query<Data, Variables>({
