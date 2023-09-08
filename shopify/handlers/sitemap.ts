@@ -37,7 +37,7 @@ export default function Sitemap(
   { include }: Props,
   { storeName }: AppContext,
 ) {
-  const url = `https://${storeName}.myshopify.com`
+  const url = `https://${storeName}.myshopify.com`;
   return async (
     req: Request,
     ctx: ConnInfo,
@@ -53,9 +53,9 @@ export default function Sitemap(
       url: publicUrl,
     })(req, ctx);
 
-    if(!response.ok){
-      return response
-    } 
+    if (!response.ok) {
+      return response;
+    }
 
     const reqUrl = new URL(req.url);
     const text = await response.text();
