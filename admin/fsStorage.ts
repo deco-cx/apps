@@ -1,9 +1,9 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { newFsProvider } from "deco/engine/releases/fs.ts";
 import {
-    OnChangeCallback,
-    ReadOptions,
-    Release,
+  OnChangeCallback,
+  ReadOptions,
+  Release,
 } from "deco/engine/releases/provider.ts";
 import { join } from "std/path/mod.ts";
 import { BlockStore } from "./mod.ts";

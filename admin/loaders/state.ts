@@ -1,4 +1,3 @@
-import { Resolvable } from "deco/engine/core/resolver.ts";
 import { AppContext } from "../mod.ts";
 
 export interface Props {
@@ -6,10 +5,12 @@ export interface Props {
   blockId: string;
 }
 
+export type State = Record<string, any>;
+
 export default async function Latest(
   _props: unknown,
   _req: Request,
   ctx: AppContext,
-): Promise<Record<string, Resolvable>> {
+): Promise<State> {
   return await ctx.storage.state();
 }

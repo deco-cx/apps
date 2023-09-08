@@ -16,7 +16,9 @@ export default async function ListRevisions(
   _req: Request,
   ctx: AppContext,
 ): Promise<Pagination<BlockState>> {
-  const block = await ctx.invoke["deco-sites/admin"].loaders.blocks.latest(props);
+  const block = await ctx.invoke["deco-sites/admin"].loaders.blocks.latest(
+    props,
+  );
   if (!block) {
     return {
       data: [],
