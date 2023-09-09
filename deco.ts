@@ -14,6 +14,7 @@ const config = {
       dir: "admin",
       name: "deco-sites/admin",
     },
+    app("linx"),
     app("handlebars"),
     app("vtex"),
     app("vnda"),
