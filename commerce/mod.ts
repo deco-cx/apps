@@ -3,19 +3,21 @@ import shopify, { Props as ShopifyProps } from "../shopify/mod.ts";
 import vnda, { Props as VNDAProps } from "../vnda/mod.ts";
 import vtex, { Props as VTEXProps } from "../vtex/mod.ts";
 import wake, { Props as WakeProps } from "../wake/mod.ts";
+import linx, { Props as LINXProps } from "../linx/mod.ts";
 import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type Props = WebsiteProps & {
-  commerce: VNDAProps | VTEXProps | ShopifyProps | WakeProps;
+  commerce: VNDAProps | VTEXProps | ShopifyProps | WakeProps | LINXProps;
 };
 
 type WebsiteApp = ReturnType<typeof website>;
 type CommerceApp =
   | ReturnType<typeof vnda>
   | ReturnType<typeof vtex>
+  | ReturnType<typeof shopify>
   | ReturnType<typeof wake>
-  | ReturnType<typeof shopify>;
+  | ReturnType<typeof linx>;
 
 export default function Site(
   state: Props,
@@ -29,6 +31,8 @@ export default function Site(
     ? vtex(commerce)
     : commerce.platform === "wake"
     ? wake(commerce)
+    : commerce.platform === "linx"
+    ? linx(commerce)
     : shopify(commerce);
 
   return {
