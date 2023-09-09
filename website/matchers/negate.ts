@@ -11,7 +11,7 @@ export interface Props {
  * @title Negates a matcher
  */
 const NegateMacher = ({ matcher }: Props) => (ctx: MatchContext) => {
-  return () => !matcher(ctx);
+  return !matcher(ctx);
 };
 
 export default NegateMacher;
