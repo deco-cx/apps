@@ -1,6 +1,11 @@
 import type { AppContext } from "../mod.ts";
 
-import { Product, UnitPriceSpecification } from "../../commerce/types.ts";
+import {
+  Offer,
+  Product,
+  ProductDetailsPage,
+  UnitPriceSpecification,
+} from "../../commerce/types.ts";
 
 import { ProductItemGrid } from "./client.ts";
 
@@ -11,7 +16,7 @@ interface ProductOptions {
 
 const toURL = (src: string) => src.startsWith("//") ? `https:${src}` : src;
 
-const toOffer = (product: ProductItemGrid) => {
+const toOffer = (product: ProductItemGrid): Offer => {
   const priceSpecification: UnitPriceSpecification[] = [
     {
       "@type": "UnitPriceSpecification",
@@ -99,8 +104,10 @@ export const toProduct = (
         },
       ],
     offers: {
-      "@type": "AggregateOffer",
+      "@type": "AggregateOffer" as const,
       priceCurrency: priceCurrency,
+      lowPrice: product.Price?.ListPrice,
+      highPrice: product.Price?.SalesPrice,
       offerCount: 1,
       offers: offers,
     },
@@ -108,8 +115,10 @@ export const toProduct = (
 };
 
 export const toProductDetails = (
+  ctx: AppContext,
   product: ProductItemGrid,
-): Product => {
+  options: ProductOptions,
+): ProductDetailsPage => {
   return {
     "@type": "ProductDetailsPage",
     breadcrumbList: {
@@ -117,6 +126,6 @@ export const toProductDetails = (
       itemListElement: [],
       numberOfItems: 0,
     },
-    product,
+    product: toProduct(ctx, product, options),
   };
 };

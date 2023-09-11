@@ -2,11 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/ProductList.ts";
+import * as $$$0 from "./loaders/productList.ts";
+import * as $$$1 from "./loaders/productDetailsPage.ts";
 
 const manifest = {
   "loaders": {
-    "linx/loaders/ProductList.ts": $$$0,
+    "linx/loaders/productDetailsPage.ts": $$$1,
+    "linx/loaders/productList.ts": $$$0,
   },
   "name": "linx",
   "baseUrl": import.meta.url,
