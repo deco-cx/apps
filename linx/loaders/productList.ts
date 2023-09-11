@@ -2,22 +2,94 @@ import type { Product } from "../../commerce/types.ts";
 import type { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 
-export interface Props {
+export interface CommonProps {
   /** @description total number of items to display */
-  count: number;
-
-  /** @description query to use on search */
-  dataSouceID: string;
-
-  /** @description search for term anywhere */
-  // wildcard?: boolean;
+  count?: number;
 
   /** @description search sort parameter */
-  // sort?: "newest" | "oldest" | "lowest_price" | "highest_price";
-
-  /** @description search for products that have certain tag */
-  // tags?: string[];
+  sort?:
+    | "mais-relevantes"
+    | "mais-acessados"
+    | "mais-caros"
+    | "mais-baratos"
+    | "nome-produto"
+    | "novidades"
+    | "mais-vendidos";
 }
+
+export interface DatasourceListProps extends CommonProps {
+  /** @description ID to use on Datasource list */
+  dataSouceID: string;
+  type: "datasource";
+}
+
+export interface SearchListProps extends CommonProps {
+  /** @description query to use on search */
+  term: string;
+  type: "search";
+}
+
+export interface CategoryListProps extends CommonProps {
+  /** @description ID to use on Category list */
+  categoryID: string;
+  type: "category";
+}
+
+export interface BrandListProps extends CommonProps {
+  /** @description ID to use on Brand list */
+  brandID: string;
+  type: "brand";
+}
+
+export type Props =
+  | DatasourceListProps
+  | SearchListProps
+  | CategoryListProps
+  | BrandListProps;
+
+const isDatasouceList = (p: any): p is DatasourceListProps =>
+  typeof p.dataSouceID === "string" && typeof p.apiSelect === "string";
+
+const isSearchList = (p: any): p is SearchListProps =>
+  typeof p.term === "string" && typeof p.apiSelect === "string";
+
+const isCategoryList = (p: any): p is CategoryListProps =>
+  typeof p.categoryID === "string" && typeof p.apiSelect === "string";
+
+const isBrandList = (p: any): p is BrandListProps =>
+  typeof p.brandID === "string" && typeof p.apiSelect === "string";
+
+const fromProps = (props: Props) => {
+  if (isDatasouceList(props)) {
+    return {
+      apiSelect: "Datasource",
+      id: props?.dataSouceID,
+    } as const;
+  }
+
+  if (isSearchList(props)) {
+    return {
+      apiSelect: "Search",
+      id: props?.term,
+    } as const;
+  }
+
+  if (isCategoryList(props)) {
+    return {
+      apiSelect: "Category",
+      id: props?.categoryID,
+    } as const;
+  }
+
+  if (isBrandList(props)) {
+    return {
+      apiSelect: "Brand",
+      id: props?.brandID,
+    } as const;
+  }
+
+  throw new Error(`Unknown props: ${JSON.stringify(props)}`);
+};
 
 /**
  * @title LINX Integration
@@ -30,13 +102,14 @@ const productListLoader = async (
 ): Promise<Product[] | null> => {
   const url = new URL(req.url);
   const { api } = ctx;
+  const { id, apiSelect } = fromProps(props);
 
-  const dasourceList = await api
-    ["GET /web-api/v1/Catalog/Products/Datasource/:id"]({
-      id: props?.dataSouceID,
+  const query = await api
+    [`GET /web-api/v1/Catalog/Products/${apiSelect}/:id/?catalogID=1`]({
+      id: id,
     }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
 
-  return dasourceList.Products.map((product) =>
+  return query.Products.map((product) =>
     toProduct(ctx, product, {
       url,
       priceCurrency: "BRL",

@@ -1,6 +1,15 @@
 export interface API {
-  "GET /web-api/v1/Catalog/Products/Datasource/:id": {
+  "GET /web-api/v1/Catalog/Products/Datasource/:id/?catalogID=1": {
     response: ProductListDataSource;
+  };
+  "GET /web-api/v1/Catalog/Products/Brand/:id/?catalogID=1": {
+    response: ProductListBrand;
+  };
+  "GET /web-api/v1/Catalog/Products/Category/:id/?catalogID=1": {
+    response: ProductListCategory;
+  };
+  "GET /web-api/v1/Catalog/Products/Search/:id/?catalogID=1": {
+    response: ProductListSearch;
   };
   "GET /web-api/v1/Catalog/Products/Get/:id": {
     response: productDetailPage;
@@ -14,6 +23,21 @@ export interface Attribute {
 }
 
 export interface ProductListDataSource {
+  Products: ProductItemGrid[];
+  SortOptions: SortOption[];
+}
+
+export interface ProductListBrand {
+  Products: ProductItemGrid[];
+  SortOptions: SortOption[];
+}
+
+export interface ProductListCategory {
+  Products: ProductItemGrid[];
+  SortOptions: SortOption[];
+}
+
+export interface ProductListSearch {
   Products: ProductItemGrid[];
   SortOptions: SortOption[];
 }
