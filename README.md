@@ -62,7 +62,7 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 | deco-sites/std | An app for compatibility with deco-sites/std app, contains various blocks merged from e-commerce apps.                               | [manifest](/compat/std/manifest.gen.ts)   |
 | decohub        | The best place to find an app for your business case, here is where apps published by any developer in the deco ecosystem will live. | [manifest](/decohub/manifest.gen.ts)      |
 | handlebars        | An app that allows you to build your own sections using [handlebars](https://handlebarsjs.com/). | [manifest](/handlebars/manifest.gen.ts)      |
-| Verified Reviews | An app that uses extension block to add Aggregate Rating to products by integrating with the "Opiniões Verificadas" provider. | [manifest](/verified-reviews/manifest.gen.ts)      |
+| Verified Reviews | An app that uses extension block to add Aggregate Rating to products by integrating with the "[Opiniões Verificadas](https://www.opinioes-verificadas.com.br/br/)" provider. | [manifest](/verified-reviews/manifest.gen.ts)      |
 
 #### Adding a new app to Deco Hub
 
