@@ -17,7 +17,7 @@ export interface PaginationOptions {
     | "helpfulrating_DESC";
 }
 
-const MessageError  = {
+const MessageError = {
   ratings:
     "🔴⭐ Error on call ratings of Verified Review - probably unidentified product",
   rating:
@@ -53,7 +53,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       if (context.isDeploy) {
         console.error(MessageError.rating, error);
       } else {
-        console.warn(MessageError.rating, error);
+        throw new Error(`${MessageError.rating} - ${error}`);
       }
       return undefined;
     }
@@ -78,9 +78,8 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       if (context.isDeploy) {
         console.error(MessageError.ratings, error);
       } else {
-        console.warn(MessageError.ratings, error);
+        throw new Error(`${MessageError.ratings} - ${error}`);
       }
-
       return undefined;
     }
   };
@@ -159,7 +158,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       if (context.isDeploy) {
         console.error(MessageError.ratings, error);
       } else {
-        console.warn(MessageError.ratings, error);
+        throw new Error(`${MessageError.fullReview} - ${error}`);
       }
       return {
         aggregateRating: undefined,
