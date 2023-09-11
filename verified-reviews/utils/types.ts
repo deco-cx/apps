@@ -44,9 +44,3 @@ export interface VerifiedReviewsFullReview {
   aggregateRating?: AggregateRating;
   review: Review[];
 }
-
-export interface ConfigVerifiedReviews {
-  idWebsite: string;
-  secretKey?: string;
-  plateforme?: string;
-}

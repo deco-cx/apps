@@ -22,10 +22,11 @@ export default function productDetailsPage(
 			return null;
 		}
 
-		if (!client) return null;
+		if (!client) {
+			return null;
+		};
 
 		const productId = getProductId(productDetailsPage.product);
-		// const productId = "55766"; // MOCK PRODUCT WITH RATING AND REVIEWS
 		const fullReview = await client.fullReview({
 			productId,
 			count: config?.count,
