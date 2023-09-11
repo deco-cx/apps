@@ -67,6 +67,12 @@ export interface AggregateRating {
   reviewCount?: number;
   /** The rating for the content. */
   ratingValue?: number;
+  /** The highest value allowed in this rating system. */
+  bestRating?: number;
+  /** The lowest value allowed in this rating system. */
+  worstRating?: number;
+  /** A short explanation (e.g. one to two sentences) providing background context and other information that led to the conclusion expressed in the rating. This is particularly applicable to ratings associated with "fact check" markup using ClaimReview. */
+  ratingExplanation?: string;
 }
 
 export declare type ItemAvailability =
@@ -227,6 +233,10 @@ export interface AggregateOffer {
 
 export interface Review extends Omit<Thing, "@type"> {
   "@type": "Review";
+  /** Author of the */
+  author?: Author[];
+  /** The date that the review was published, in ISO 8601 date format.*/
+  datePublished?: string;
   /** The item that is being reviewed/rated. */
   itemReviewed?: string;
   /** Indicates, in the context of a {@link https://schema.org/Review Review} (e.g. framed as 'pro' vs 'con' considerations), negative considerations - either as unstructured text, or a list. */
@@ -239,6 +249,14 @@ export interface Review extends Omit<Thing, "@type"> {
   reviewBody?: string;
   /** The rating given in this review. Note that reviews can themselves be rated. The `reviewRating` applies to rating given by the review. The {@link https://schema.org/aggregateRating aggregateRating} property applies to the review itself, as a creative work. */
   reviewRating?: AggregateRating;
+}
+
+export interface Author extends Omit<Thing, "@type"> {
+  "@type": "Person" | "Organization";
+  /** The name of the author. */
+  name?: string;
+  /** A link to a web page that uniquely identifies the author of the article. For example, the author's social media page, an about me page, or a bio page. */
+  url?: string;
 }
 
 // TODO: fix this hack and use Product directly where it appears
@@ -304,7 +322,7 @@ export interface Product extends Omit<Thing, "@type"> {
   /** The release date of a product or product model. This can be used to distinguish the exact variant of a product. */
   releaseDate?: string;
   /** A review of the item. */
-  review?: Review;
+  review?: Review[];
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */

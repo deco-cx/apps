@@ -3,26 +3,26 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $0 from "./functions/requestToParam.ts";
-import * as $$$0 from "./loaders/x/redirects.ts";
-import * as $$$1 from "./loaders/x/font.ts";
-import * as $$$$$$0 from "./sections/SEOPLP.tsx";
-import * as $$$$$$1 from "./sections/Analytics.tsx";
-import * as $$$$$$2 from "./sections/VTEXPortalDataLayerCompatibility.tsx";
-import * as $$$$$$3 from "./sections/SEOPDP.tsx";
+import * as $$$0 from "./loaders/x/font.ts";
+import * as $$$1 from "./loaders/x/redirects.ts";
+import * as $$$$$$0 from "./sections/Analytics.tsx";
+import * as $$$$$$1 from "./sections/SEOPDP.tsx";
+import * as $$$$$$2 from "./sections/SEOPLP.tsx";
+import * as $$$$$$3 from "./sections/VTEXPortalDataLayerCompatibility.tsx";
 
 const manifest = {
   "functions": {
     "deco-sites/std/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "deco-sites/std/loaders/x/font.ts": $$$1,
-    "deco-sites/std/loaders/x/redirects.ts": $$$0,
+    "deco-sites/std/loaders/x/font.ts": $$$0,
+    "deco-sites/std/loaders/x/redirects.ts": $$$1,
   },
   "sections": {
-    "deco-sites/std/sections/Analytics.tsx": $$$$$$1,
-    "deco-sites/std/sections/SEOPDP.tsx": $$$$$$3,
-    "deco-sites/std/sections/SEOPLP.tsx": $$$$$$0,
-    "deco-sites/std/sections/VTEXPortalDataLayerCompatibility.tsx": $$$$$$2,
+    "deco-sites/std/sections/Analytics.tsx": $$$$$$0,
+    "deco-sites/std/sections/SEOPDP.tsx": $$$$$$1,
+    "deco-sites/std/sections/SEOPLP.tsx": $$$$$$2,
+    "deco-sites/std/sections/VTEXPortalDataLayerCompatibility.tsx": $$$$$$3,
   },
   "name": "deco-sites/std",
   "baseUrl": import.meta.url,

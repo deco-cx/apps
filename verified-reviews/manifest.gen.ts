@@ -2,15 +2,15 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$$$0 from "./apps/handlebars.ts";
-import * as $$$$$$$$$$$1 from "./apps/workflows.ts";
+import * as $$$0 from "./loaders/productDetailsPage.ts";
+import * as $$$1 from "./loaders/productList.ts";
 
 const manifest = {
-  "apps": {
-    "decohub/apps/handlebars.ts": $$$$$$$$$$$0,
-    "decohub/apps/workflows.ts": $$$$$$$$$$$1,
+  "loaders": {
+    "verified-reviews/loaders/productDetailsPage.ts": $$$0,
+    "verified-reviews/loaders/productList.ts": $$$1,
   },
-  "name": "decohub",
+  "name": "verified-reviews",
   "baseUrl": import.meta.url,
 };
 
