@@ -5,7 +5,7 @@ import { AppContext } from "../mod.ts";
 import {
   GetProductQuery,
   GetProductQueryVariables,
-} from "../utils/graphql/graphql.gen.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseSlug, toBreadcrumbList, toProduct } from "../utils/transform.ts";
 import { fragment } from "../utils/graphql/fragments/singleProduct.ts";
 

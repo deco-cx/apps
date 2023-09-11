@@ -9,7 +9,7 @@ import {
   SearchQuery,
   SearchQueryVariables,
   SortDirection,
-} from "../utils/graphql/graphql.gen.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
 import { FILTER_PARAM, toFilters, toProduct } from "../utils/transform.ts";
 
 export const SORT_OPTIONS: SortOption[] = [

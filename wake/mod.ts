@@ -1,7 +1,7 @@
 import type { App, FnContext } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { API } from "./utils/openapi/openapi.gen.ts";
+import { API } from "./utils/openapi/wake.openapi.gen.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 

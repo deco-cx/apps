@@ -6,7 +6,7 @@ import {
   GetProductsQuery,
   GetProductsQueryVariables,
   ProductFragment,
-} from "../utils/graphql/graphql.gen.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
