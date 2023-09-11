@@ -7,6 +7,7 @@ import {
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
 import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { observe } from "deco/observability/observe.ts";
 import { Flag, LiveState, RouterContext } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
@@ -193,7 +194,7 @@ export default function RoutesSelection(
       hrefRoutes,
       ctx.get,
       {
-        monitoring: t ? { t } : undefined,
+        monitoring: t ? { t, observe } : undefined,
       },
     );
 
