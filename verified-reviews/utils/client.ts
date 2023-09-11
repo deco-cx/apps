@@ -1,11 +1,8 @@
 import { fetchAPI } from "../../utils/fetch.ts";
-import {
-	ConfigVerifiedReviews,
-	Ratings,
-	Reviews,
-	VerifiedReviewsFullReview,
-} from "./types.ts";
+import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
 import { Product } from "../../commerce/types.ts";
+import { ConfigVerifiedReviews } from "../mod.ts";
+import { context } from "deco/live.ts";
 
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
 
@@ -19,6 +16,15 @@ export interface PaginationOptions {
 		| "rate_ASC"
 		| "helpfulrating_DESC";
 }
+
+const messageError = {
+	ratings:
+		"🔴⭐ Error on call ratings of Verified Review - probably unidentified product",
+	rating:
+		"🔴⭐ Error on call single rating of Verified Review - probably unidentified product",
+	fullReview:
+		"🔴⭐ Error on call Full Review of Verified Review - probably unidentified product",
+};
 
 const baseUrl = "https://awsapis3.netreviews.eu/product";
 
@@ -44,7 +50,11 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
 
 			return Object.keys(data).length ? data : undefined;
 		} catch (error) {
-			console.warn("⚠ Error on call rating of Verified Review", error);
+			if (context.isDeploy) {
+				console.error(messageError.rating, error);
+			} else {
+				console.warn(messageError.rating, error);
+			}
 			return undefined;
 		}
 	};
@@ -64,10 +74,13 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
 			});
 
 			return Object.keys(data).length ? data : undefined;
-		} catch {
-			console.warn(
-				"🔴⭐ Error on call ratings of Verified Review - probably unidentified product"
-			);
+		} catch (error) {
+			if (context.isDeploy) {
+				console.error(messageError.ratings, error);
+			} else {
+				console.warn(messageError.ratings, error);
+			}
+
 			return undefined;
 		}
 	};
@@ -142,10 +155,12 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
 					  }))
 					: [],
 			};
-		} catch {
-			console.warn(
-				"🔴⭐ Error on call Full Review of Verified Review - probably unidentified product"
-			);
+		} catch (error) {
+			if (context.isDeploy) {
+				console.error(messageError.ratings, error);
+			} else {
+				console.warn(messageError.ratings, error);
+			}
 			return {
 				aggregateRating: undefined,
 				review: [],
