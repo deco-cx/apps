@@ -4,5 +4,5 @@ export const DEFAULT_IMAGE: ImageObject = {
   "@type": "ImageObject",
   alternateName: "Default Image Placeholder",
   url:
-    "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/2348/fc5f6ffd-cb58-4cb9-ae2d-06e28519eb4d",
+    "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1818/ff6bb37e-0eab-40e1-a454-86856efc278e",
 };
