@@ -26,9 +26,10 @@ import * as $$$$$$$4 from "./matchers/environment.ts";
 import * as $$$$$$$5 from "./matchers/host.ts";
 import * as $$$$$$$6 from "./matchers/location.ts";
 import * as $$$$$$$7 from "./matchers/multi.ts";
-import * as $$$$$$$8 from "./matchers/random.ts";
-import * as $$$$$$$9 from "./matchers/site.ts";
-import * as $$$$$$$10 from "./matchers/userAgent.ts";
+import * as $$$$$$$8 from "./matchers/negate.ts";
+import * as $$$$$$$9 from "./matchers/random.ts";
+import * as $$$$$$$10 from "./matchers/site.ts";
+import * as $$$$$$$11 from "./matchers/userAgent.ts";
 import * as $$$$$$$$0 from "./flags/audience.ts";
 import * as $$$$$$$$1 from "./flags/everyone.ts";
 import * as $$$$$$$$2 from "./flags/flag.ts";
@@ -71,9 +72,10 @@ const manifest = {
     "website/matchers/host.ts": $$$$$$$5,
     "website/matchers/location.ts": $$$$$$$6,
     "website/matchers/multi.ts": $$$$$$$7,
-    "website/matchers/random.ts": $$$$$$$8,
-    "website/matchers/site.ts": $$$$$$$9,
-    "website/matchers/userAgent.ts": $$$$$$$10,
+    "website/matchers/negate.ts": $$$$$$$8,
+    "website/matchers/random.ts": $$$$$$$9,
+    "website/matchers/site.ts": $$$$$$$10,
+    "website/matchers/userAgent.ts": $$$$$$$11,
   },
   "flags": {
     "website/flags/audience.ts": $$$$$$$$0,

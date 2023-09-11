@@ -4,7 +4,7 @@ import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
 import type { App, AppManifest } from "deco/mod.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
-import $live from "../$live/mod.ts";
+import $live, { Props as LiveProps } from "../$live/mod.ts";
 import commerce, { Props as CommerceProps } from "../../commerce/mod.ts";
 import type { Manifest as ShopifyManifest } from "../../shopify/manifest.gen.ts";
 import shopify, { Props as ShopifyProps } from "../../shopify/mod.ts";
@@ -233,6 +233,60 @@ export type State = {
 } & AvailableCommerceProps;
 
 export type Props = CommerceProps;
+
+export function WithoutCommerce(
+  props: LiveProps,
+): App<
+  Manifest,
+  LiveProps,
+  [ReturnType<typeof $live>]
+> {
+  const targetApps: Record<
+    string,
+    { manifest: AppManifest; sourceMap: SourceMap }
+  > = {};
+
+  const liveApp = $live(props);
+  const { resolvables: _ignoreResolvables, ...webSiteApp } =
+    liveApp.dependencies![0];
+  const sourceMap: SourceMap = {
+    ...buildSourceMap(manifest),
+  };
+  targetApps["website"] = {
+    sourceMap: buildSourceMap(webSiteApp.manifest),
+    manifest: webSiteApp.manifest,
+  };
+  const _manifest = { ...manifest };
+  for (const [_blockKey, blockMappings] of Object.entries(manifestMappings)) {
+    const blockKey = _blockKey as keyof _Manifest;
+    _manifest[blockKey] = { ...(manifest as any)[blockKey] ?? {} };
+    for (const [from, to] of Object.entries(blockMappings)) {
+      if (to === null) {
+        sourceMap[from] = null;
+        continue;
+      }
+      for (
+        const [target, { sourceMap: appSourceMap, manifest: appManifest }]
+          of Object.entries(targetApps)
+      ) {
+        if (to?.startsWith(target)) {
+          // @ts-ignore: blockkeys and from/to always exists for those types
+          _manifest[blockKey][from] = appManifest[blockKey][to];
+          sourceMap[from] = appSourceMap[to];
+          break;
+        }
+      }
+    }
+  }
+
+  return {
+    state: props,
+    sourceMap,
+    manifest: _manifest as Manifest,
+    dependencies: [liveApp],
+  };
+}
+
 export default function Std(
   props: CommerceProps,
 ): App<
@@ -245,7 +299,7 @@ export default function Std(
     { manifest: AppManifest; sourceMap: SourceMap }
   > = {};
 
-  const { dependencies, ...commerceApp } = commerce(
+  const commerceApp = commerce(
     props,
   );
   let state: State = { ...props.commerce };
@@ -292,7 +346,8 @@ export default function Std(
     };
   }
   const liveApp = $live(props);
-  const { resolvables: _ignoreResolvables, ...webSiteApp } = dependencies![0];
+  const { resolvables: _ignoreResolvables, ...webSiteApp } =
+    liveApp.dependencies![0];
   const sourceMap: SourceMap = {
     ...buildSourceMap(manifest),
   };
@@ -329,7 +384,7 @@ export default function Std(
     manifest: _manifest as Manifest,
     dependencies: [liveApp, {
       ...commerceApp,
-      dependencies: [webSiteApp, dependencies![1]],
+      dependencies: [webSiteApp, commerceApp.dependencies![1]],
     }],
   };
 }
