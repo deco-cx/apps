@@ -43,9 +43,15 @@ export default function Secret(
       if (!encrypted) {
         return Promise.resolve(null);
       }
-      return cache[encrypted] ??= decryptFromHex(encrypted).then((d) =>
-        d.decrypted
-      );
+      try{
+        return cache[encrypted] ??= decryptFromHex(encrypted).then((d) =>
+          d.decrypted
+        );
+      }catch(err){
+        console.error(err);
+        return Promise.resolve(null);
+      }
+      
     },
   };
 }
