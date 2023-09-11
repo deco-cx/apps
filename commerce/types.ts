@@ -254,7 +254,7 @@ export interface Review extends Omit<Thing, "@type"> {
 export interface Author extends Omit<Thing, "@type"> {
   "@type": "Person" | "Organization";
   /** The name of the author. */
-  name?: string
+  name?: string;
   /** A link to a web page that uniquely identifies the author of the article. For example, the author's social media page, an about me page, or a bio page. */
   url?: string;
 }

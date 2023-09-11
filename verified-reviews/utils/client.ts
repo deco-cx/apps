@@ -7,174 +7,174 @@ import { context } from "deco/live.ts";
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
 
 export interface PaginationOptions {
-	count?: number;
-	offset?: number;
-	order?:
-		| "date_desc"
-		| "date_ASC"
-		| "rate_DESC"
-		| "rate_ASC"
-		| "helpfulrating_DESC";
+  count?: number;
+  offset?: number;
+  order?:
+    | "date_desc"
+    | "date_ASC"
+    | "rate_DESC"
+    | "rate_ASC"
+    | "helpfulrating_DESC";
 }
 
-const messageError = {
-	ratings:
-		"🔴⭐ Error on call ratings of Verified Review - probably unidentified product",
-	rating:
-		"🔴⭐ Error on call single rating of Verified Review - probably unidentified product",
-	fullReview:
-		"🔴⭐ Error on call Full Review of Verified Review - probably unidentified product",
+const MessageError  = {
+  ratings:
+    "🔴⭐ Error on call ratings of Verified Review - probably unidentified product",
+  rating:
+    "🔴⭐ Error on call single rating of Verified Review - probably unidentified product",
+  fullReview:
+    "🔴⭐ Error on call Full Review of Verified Review - probably unidentified product",
 };
 
 const baseUrl = "https://awsapis3.netreviews.eu/product";
 
 export const createClient = (params: ConfigVerifiedReviews | undefined) => {
-	if (!params) return;
+  if (!params) return;
 
-	const { idWebsite } = params;
+  const { idWebsite } = params;
 
-	/** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#338f8f1b-4379-40a2-8893-080fe5234679 */
-	const rating = async ({ productId }: { productId: string }) => {
-		const payload = {
-			query: "average",
-			products: [productId],
-			idWebsite: idWebsite,
-			plateforme: "br",
-		};
+  /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#338f8f1b-4379-40a2-8893-080fe5234679 */
+  const rating = async ({ productId }: { productId: string }) => {
+    const payload = {
+      query: "average",
+      products: [productId],
+      idWebsite: idWebsite,
+      plateforme: "br",
+    };
 
-		try {
-			const data = await fetchAPI<Ratings>(`${baseUrl}`, {
-				method: "POST",
-				body: JSON.stringify(payload),
-			});
+    try {
+      const data = await fetchAPI<Ratings>(`${baseUrl}`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
-			return Object.keys(data).length ? data : undefined;
-		} catch (error) {
-			if (context.isDeploy) {
-				console.error(messageError.rating, error);
-			} else {
-				console.warn(messageError.rating, error);
-			}
-			return undefined;
-		}
-	};
+      return Object.keys(data).length ? data : undefined;
+    } catch (error) {
+      if (context.isDeploy) {
+        console.error(MessageError.rating, error);
+      } else {
+        console.warn(MessageError.rating, error);
+      }
+      return undefined;
+    }
+  };
 
-	/** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#6d8ab05a-28b6-48b3-9e8f-6bbbc046619a */
-	const ratings = async ({ productsIds }: { productsIds: string[] }) => {
-		const payload = {
-			query: "average",
-			products: productsIds,
-			idWebsite: idWebsite,
-			plateforme: "br",
-		};
-		try {
-			const data = await fetchAPI<Ratings>(`${baseUrl}`, {
-				method: "POST",
-				body: JSON.stringify(payload),
-			});
+  /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#6d8ab05a-28b6-48b3-9e8f-6bbbc046619a */
+  const ratings = async ({ productsIds }: { productsIds: string[] }) => {
+    const payload = {
+      query: "average",
+      products: productsIds,
+      idWebsite: idWebsite,
+      plateforme: "br",
+    };
+    try {
+      const data = await fetchAPI<Ratings>(`${baseUrl}`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
-			return Object.keys(data).length ? data : undefined;
-		} catch (error) {
-			if (context.isDeploy) {
-				console.error(messageError.ratings, error);
-			} else {
-				console.warn(messageError.ratings, error);
-			}
+      return Object.keys(data).length ? data : undefined;
+    } catch (error) {
+      if (context.isDeploy) {
+        console.error(MessageError.ratings, error);
+      } else {
+        console.warn(MessageError.ratings, error);
+      }
 
-			return undefined;
-		}
-	};
+      return undefined;
+    }
+  };
 
-	/** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
-	const reviews = ({
-		productId,
-		count = 5,
-		offset = 0,
-		order = "date_desc",
-	}: PaginationOptions & {
-		productId: string;
-	}) => {
-		const payload = {
-			query: "reviews",
-			product: productId,
-			idWebsite: idWebsite,
-			plateforme: "br",
-			offset: offset,
-			limit: count,
-			order: order,
-		};
+  /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
+  const reviews = ({
+    productId,
+    count = 5,
+    offset = 0,
+    order = "date_desc",
+  }: PaginationOptions & {
+    productId: string;
+  }) => {
+    const payload = {
+      query: "reviews",
+      product: productId,
+      idWebsite: idWebsite,
+      plateforme: "br",
+      offset: offset,
+      limit: count,
+      order: order,
+    };
 
-		return fetchAPI<Reviews>(`${baseUrl}`, {
-			method: "POST",
-			body: JSON.stringify(payload),
-		});
-	};
+    return fetchAPI<Reviews>(`${baseUrl}`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  };
 
-	const fullReview = async ({
-		productId,
-		count = 5,
-		offset = 0,
-	}: PaginationOptions & {
-		productId: string;
-	}): Promise<VerifiedReviewsFullReview> => {
-		try {
-			const response = await Promise.all([
-				rating({ productId }),
-				reviews({ productId, count, offset }),
-			]);
+  const fullReview = async ({
+    productId,
+    count = 5,
+    offset = 0,
+  }: PaginationOptions & {
+    productId: string;
+  }): Promise<VerifiedReviewsFullReview> => {
+    try {
+      const response = await Promise.all([
+        rating({ productId }),
+        reviews({ productId, count, offset }),
+      ]);
 
-			const [responseRating, responseReview] = response.flat() as [
-				Ratings,
-				Reviews | null
-			];
+      const [responseRating, responseReview] = response.flat() as [
+        Ratings,
+        Reviews | null,
+      ];
 
-			const currentRating = responseRating[productId]?.[0] || undefined;
-			return {
-				aggregateRating: currentRating
-					? {
-							"@type": "AggregateRating",
-							ratingValue: Number(parseFloat(currentRating.rate).toFixed(1)),
-							reviewCount: Number(currentRating.count),
-					  }
-					: undefined,
-				review: responseReview
-					? responseReview.reviews?.map((item) => ({
-							"@type": "Review",
-							author: [
-								{
-									"@type": "Person",
-									name: `${item.firstname} ${item.lastname}`,
-								},
-							],
-							datePublished: item.review_date,
-							reviewBody: item.review,
-							reviewRating: {
-								"@type": "AggregateRating",
-								ratingValue: Number(item.rate),
-							},
-					  }))
-					: [],
-			};
-		} catch (error) {
-			if (context.isDeploy) {
-				console.error(messageError.ratings, error);
-			} else {
-				console.warn(messageError.ratings, error);
-			}
-			return {
-				aggregateRating: undefined,
-				review: [],
-			};
-		}
-	};
+      const currentRating = responseRating[productId]?.[0] || undefined;
+      return {
+        aggregateRating: currentRating
+          ? {
+            "@type": "AggregateRating",
+            ratingValue: Number(parseFloat(currentRating.rate).toFixed(1)),
+            reviewCount: Number(currentRating.count),
+          }
+          : undefined,
+        review: responseReview
+          ? responseReview.reviews?.map((item) => ({
+            "@type": "Review",
+            author: [
+              {
+                "@type": "Person",
+                name: `${item.firstname} ${item.lastname}`,
+              },
+            ],
+            datePublished: item.review_date,
+            reviewBody: item.review,
+            reviewRating: {
+              "@type": "AggregateRating",
+              ratingValue: Number(item.rate),
+            },
+          }))
+          : [],
+      };
+    } catch (error) {
+      if (context.isDeploy) {
+        console.error(MessageError.ratings, error);
+      } else {
+        console.warn(MessageError.ratings, error);
+      }
+      return {
+        aggregateRating: undefined,
+        review: [],
+      };
+    }
+  };
 
-	return {
-		rating,
-		ratings,
-		reviews,
-		fullReview,
-	};
+  return {
+    rating,
+    ratings,
+    reviews,
+    fullReview,
+  };
 };
 
 export const getProductId = (product: Product) =>
-	product.isVariantOf!.productGroupID;
+  product.isVariantOf!.productGroupID;
