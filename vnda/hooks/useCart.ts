@@ -14,7 +14,7 @@ export const itemToAnalyticsItem = (
   item_id: `${item.id}_${item.variant_sku}`,
   item_name: item.product_name,
   discount: item.price - item.variant_price,
-  item_variant: item.variant_name.slice(item.product_name.length).trim(),
+  item_variant: item.variant_name?.slice(item.product_name.length).trim(),
   // TODO: check
   price: item.price,
   // TODO
