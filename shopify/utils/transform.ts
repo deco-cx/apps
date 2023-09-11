@@ -5,15 +5,10 @@ import type {
   PropertyValue,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
+import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { Fragment as ProductShopify } from "./fragments/product.ts";
 import { Fragment as SkuShopify } from "./fragments/productVariant.ts";
 import { SelectedOption as SelectedOptionShopify } from "./types.ts";
-
-const DEFAULT_IMAGE = {
-  altText: "image",
-  url:
-    "https://storecomponents.vtexassets.com/assets/faststore/images/image___117a6d3e229a96ad0e0d0876352566e2.svg",
-};
 
 const getPath = ({ handle }: ProductShopify, sku?: SkuShopify) =>
   sku
@@ -98,7 +93,7 @@ export const toProduct = (
   } = sku;
 
   const additionalProperty = selectedOptions.map(toPropertyValue);
-  const skuImages = nonEmptyArray([image]) ?? [DEFAULT_IMAGE];
+  const skuImages = nonEmptyArray([image]);
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));
   const priceSpec: UnitPriceSpecification[] = [{
@@ -139,11 +134,11 @@ export const toProduct = (
         url: img.url,
       })),
     },
-    image: skuImages.map((img) => ({
+    image: skuImages?.map((img) => ({
       "@type": "ImageObject",
       alternateName: img.altText ?? "",
       url: img.url,
-    })),
+    })) ?? [DEFAULT_IMAGE],
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: price.currencyCode,

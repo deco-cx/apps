@@ -1,0 +1,240 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/usuarios/{usuarioId}": {
+      "put": {
+        "summary": "Atualiza um usuário pelo id",
+        "description": "",
+        "operationId": "atualiza-um-usuario-pelo-id",
+        "parameters": [
+          {
+            "name": "usuarioId",
+            "in": "path",
+            "description": "Id do usuário",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tipoPessoa": {
+                    "type": "string",
+                    "description": "Tipo de pessoa",
+                    "enum": [
+                      "Fisica",
+                      "Juridica"
+                    ]
+                  },
+                  "origemContato": {
+                    "type": "string",
+                    "description": "Origem do contato",
+                    "enum": [
+                      "Google",
+                      "Bing",
+                      "Jornal",
+                      "PatrocinioEsportivo",
+                      "RecomendacaoAlguem",
+                      "Revista",
+                      "SiteInternet",
+                      "Televisao",
+                      "Outro",
+                      "UsuarioImportadoViaAdmin",
+                      "PayPalExpress"
+                    ]
+                  },
+                  "tipoSexo": {
+                    "type": "string",
+                    "description": "Tipo Sexo (optional)",
+                    "enum": [
+                      "Undefined",
+                      "Masculino",
+                      "Feminino"
+                    ]
+                  },
+                  "nome": {
+                    "type": "string",
+                    "description": "Nome do usuário (Max Length: 100)"
+                  },
+                  "cpf": {
+                    "type": "string",
+                    "description": "CPF do usuário caso seja pessoa física (Max Length: 50) (optional)"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "E-mail do usuário (Max Length: 100)"
+                  },
+                  "rg": {
+                    "type": "string",
+                    "description": "RG do usuário caso seja pessoa física (Max Length: 50) (optional)"
+                  },
+                  "telefoneResidencial": {
+                    "type": "string",
+                    "description": "Telefone residencial do usuário. Deve ser informado o DDD junto ao número(Max Length: 50)"
+                  },
+                  "telefoneCelular": {
+                    "type": "string",
+                    "description": "Telefone celular do usuário. Deve ser informado o DDD junto ao número (Max Length: 50) (optional)"
+                  },
+                  "telefoneComercial": {
+                    "type": "string",
+                    "description": "Telefone comercial do usuário. Deve ser informado o DDD junto ao número(Max Length: 50) (optional)"
+                  },
+                  "dataNascimento": {
+                    "type": "string",
+                    "description": "Data de nascimento (optional)",
+                    "format": "date"
+                  },
+                  "razaoSocial": {
+                    "type": "string",
+                    "description": "Razão social do usuário, caso seja uma pessoa jurídica(Max Length: 100) (optional)"
+                  },
+                  "cnpj": {
+                    "type": "string",
+                    "description": "CNPJ do usuário, caso seja uma pessoa jurídica(Max Length: 50) (optional)"
+                  },
+                  "inscricaoEstadual": {
+                    "type": "string",
+                    "description": "Inscrição estadual do usuário, caso seja uma pessoa jurídica(Max Length: 50) (optional)"
+                  },
+                  "responsavel": {
+                    "type": "string",
+                    "description": "Responsável(Max Length: 100) (optional)"
+                  },
+                  "dataCriacao": {
+                    "type": "string",
+                    "description": "Data de criação do cadastro (optional)",
+                    "format": "date"
+                  },
+                  "dataAtualizacao": {
+                    "type": "string",
+                    "description": "Data de atualização do cadastro (optional)",
+                    "format": "date"
+                  },
+                  "revendedor": {
+                    "type": "boolean",
+                    "description": "Se o usuário é revendedor (optional)"
+                  },
+                  "listaInformacaoCadastral": {
+                    "type": "array",
+                    "description": "Informação cadastral (optional)",
+                    "items": {
+                      "properties": {
+                        "chave": {
+                          "type": "string",
+                          "description": "Chave"
+                        },
+                        "valor": {
+                          "type": "string",
+                          "description": "Valor"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "description": "Avatar (Max Length: 50) (optional)"
+                  },
+                  "ip": {
+                    "type": "string",
+                    "description": "IP do usuário (Max Length: 20) (optional)"
+                  },
+                  "aprovado": {
+                    "type": "boolean",
+                    "description": "Seta ou retorna o valor de Aprovado (optional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62d99116940b47009ad96278"
+}

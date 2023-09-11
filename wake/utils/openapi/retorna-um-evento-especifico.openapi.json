@@ -1,0 +1,322 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/eventos/{eventoId}": {
+      "get": {
+        "summary": "Retorna um evento especifico",
+        "description": "Lista de produtos variantes vinculados aos tipo de evento",
+        "operationId": "retorna-um-evento-especifico",
+        "parameters": [
+          {
+            "name": "eventoId",
+            "in": "path",
+            "description": "Identificador do evento",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"eventoId\": 0,\n    \"tipoEventoId\": 0,\n    \"userId\": 0,\n    \"enderecoEntregaId\": 0,\n    \"data\": \"2022-06-17T11:14:38.758Z\",\n    \"dataCriacao\": \"2022-06-17T11:14:38.758Z\",\n    \"titulo\": \"string\",\n    \"url\": \"string\",\n    \"disponivel\": true,\n    \"diasDepoisEvento\": 0,\n    \"diasAntesEvento\": 0,\n    \"urlLogoEvento\": \"string\",\n    \"urlCapaEvento\": \"string\",\n    \"proprietarioEvento\": \"string\",\n    \"abaInfo01Habilitado\": true,\n    \"textoInfo01\": \"string\",\n    \"conteudoInfo01\": \"string\",\n    \"abaInfo02Habilitado\": true,\n    \"textoInfo02\": \"string\",\n    \"conteudoInfo02\": \"string\",\n    \"abaMensagemHabilitado\": true,\n    \"fotos\": \"string\",\n    \"enumTipoListaPresenteId\": \"Default\",\n    \"enumTipoEntregaId\": \"EntregaAgendada\",\n    \"eventoProdutoSelecionado\": [\n      {\n        \"eventoId\": 0,\n        \"produtoVarianteId\": 0,\n        \"recebidoForaLista\": true,\n        \"removido\": true\n      }\n    ],\n    \"enderecoEvento\": [\n      {\n        \"enderecoEventoId\": 0,\n        \"eventoId\": 0,\n        \"nome\": \"string\",\n        \"cep\": \"string\",\n        \"endereco\": \"string\",\n        \"numero\": \"string\",\n        \"bairro\": \"string\",\n        \"cidade\": \"string\",\n        \"estado\": \"string\"\n      }\n    ]\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "eventoId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "tipoEventoId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "userId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "enderecoEntregaId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "data": {
+                        "type": "string",
+                        "example": "2022-06-17T11:14:38.758Z"
+                      },
+                      "dataCriacao": {
+                        "type": "string",
+                        "example": "2022-06-17T11:14:38.758Z"
+                      },
+                      "titulo": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "url": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "disponivel": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "diasDepoisEvento": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "diasAntesEvento": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "urlLogoEvento": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "urlCapaEvento": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "proprietarioEvento": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "abaInfo01Habilitado": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "textoInfo01": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "conteudoInfo01": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "abaInfo02Habilitado": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "textoInfo02": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "conteudoInfo02": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "abaMensagemHabilitado": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "fotos": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "enumTipoListaPresenteId": {
+                        "type": "string",
+                        "example": "Default"
+                      },
+                      "enumTipoEntregaId": {
+                        "type": "string",
+                        "example": "EntregaAgendada"
+                      },
+                      "eventoProdutoSelecionado": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "eventoId": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "produtoVarianteId": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "recebidoForaLista": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "removido": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            }
+                          }
+                        }
+                      },
+                      "enderecoEvento": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "enderecoEventoId": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "eventoId": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "nome": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "cep": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "endereco": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "numero": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "bairro": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "cidade": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "estado": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62ac8191b902e4002d17e805"
+}

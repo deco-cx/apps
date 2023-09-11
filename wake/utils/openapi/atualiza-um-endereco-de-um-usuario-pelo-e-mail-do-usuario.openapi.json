@@ -1,0 +1,159 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/usuarios/{email}/enderecos/{enderecoId}": {
+      "put": {
+        "summary": "Atualiza um endereço de um usuário pelo e-mail do usuário",
+        "description": "",
+        "operationId": "atualiza-um-endereco-de-um-usuario-pelo-e-mail-do-usuario",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "E-mail do usuário",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "enderecoId",
+            "in": "path",
+            "description": "Id do endereço",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nomeEndereco": {
+                    "type": "string",
+                    "description": "Nome de identificação do endereço a ser cadastrado (Max Length: 100)"
+                  },
+                  "rua": {
+                    "type": "string",
+                    "description": "Nome da rua (Max Length: 500)"
+                  },
+                  "numero": {
+                    "type": "string",
+                    "description": "Número do local (Max Length: 50)"
+                  },
+                  "complemento": {
+                    "type": "string",
+                    "description": "Complemento (Max Length: 250) (optional)"
+                  },
+                  "referencia": {
+                    "type": "string",
+                    "description": "Referência para a localização do endereço (Max Length: 500) (optional)"
+                  },
+                  "bairro": {
+                    "type": "string",
+                    "description": "Bairro do endereço (Max Length: 100)"
+                  },
+                  "cidade": {
+                    "type": "string",
+                    "description": "Cidade em que se localiza o endereço (Max Length: 100)"
+                  },
+                  "estado": {
+                    "type": "string",
+                    "description": "O estado (Max Length: 100)"
+                  },
+                  "cep": {
+                    "type": "string",
+                    "description": "Código do cep (Max Length: 50)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62dad5c4affc630065c406fa"
+}

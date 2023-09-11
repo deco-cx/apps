@@ -1,0 +1,144 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/usuarios/camposcadastropersonalizado": {
+      "get": {
+        "summary": "Retorna os campos de cadastro personalizado existentes",
+        "description": "Campos de cadastro personalizado encontrados",
+        "operationId": "retorna-os-campos-de-cadastro-personalizado-existentes",
+        "responses": {
+          "201": {
+            "description": "201",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"grupoInformacaoCadastralId\": 0,\n    \"nome\": \"string\",\n    \"tipo\": \"TextoLivre\",\n    \"obrigatorio\": true,\n    \"ordem\": 0,\n    \"valorPreDefinido\": [\n      {\n        \"valoresDefinidosCampoGrupoInformacaoId\": 0,\n        \"valor\": \"string\",\n        \"ordem\": 0\n      }\n    ]\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "grupoInformacaoCadastralId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "nome": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "tipo": {
+                        "type": "string",
+                        "example": "TextoLivre"
+                      },
+                      "obrigatorio": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "ordem": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "valorPreDefinido": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "valoresDefinidosCampoGrupoInformacaoId": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "valor": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "ordem": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62dec853d52c65010d6da284"
+}

@@ -1,0 +1,195 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/produtos/precos/lote": {
+      "put": {
+        "summary": "Atualiza para o mesmo preço, todos os variantes de um produto encontrado com o SKU informado",
+        "description": "Atualiza para o mesmo preço, todos os variantes de um produto encontrado com o SKU informado. Limite de 50 produtos por requisição",
+        "operationId": "atualiza-para-o-mesmo-preco-todos-os-variantes-de-um-produto-encontrado-com-o-sku-informado",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "RAW_BODY"
+                ],
+                "properties": {
+                  "RAW_BODY": {
+                    "type": "array",
+                    "description": "Lista com os dados da atualização do preço por lote",
+                    "items": {
+                      "properties": {
+                        "sku": {
+                          "type": "string",
+                          "description": "Identificador do produto (SKU)"
+                        },
+                        "precoCusto": {
+                          "type": "number",
+                          "description": "Preço de custo do produto variante. Se passado 0 irá setar os valores para zero, se for NULO, não irá atualizar o preço de custo (optional)",
+                          "format": "double"
+                        },
+                        "precoDe": {
+                          "type": "number",
+                          "description": "\"PrecoDe\" do produto variante",
+                          "format": "double"
+                        },
+                        "precoPor": {
+                          "type": "number",
+                          "description": "\"PrecoPor\" do produto variante",
+                          "format": "double"
+                        },
+                        "fatorMultiplicadorPreco": {
+                          "type": "number",
+                          "description": "Fator multiplicador que gera o preço de exibição do produto. Ex.: produtos que exibem o preço em m² e cadastram o preço da caixa no \"PrecoPor\". (1 por padrão) (optional)",
+                          "format": "double"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "{\n  \"produtosNaoAtualizados\": [\n    {\n      \"produtoVarianteId\": 0,\n      \"sku\": \"string\",\n      \"resultado\": true,\n      \"detalhes\": \"string\"\n    }\n  ],\n  \"produtosAtualizados\": [\n    {\n      \"produtoVarianteId\": 0,\n      \"sku\": \"string\",\n      \"resultado\": true,\n      \"detalhes\": \"string\"\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "produtosNaoAtualizados": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "produtoVarianteId": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "sku": {
+                            "type": "string",
+                            "example": "string"
+                          },
+                          "resultado": {
+                            "type": "boolean",
+                            "example": true,
+                            "default": true
+                          },
+                          "detalhes": {
+                            "type": "string",
+                            "example": "string"
+                          }
+                        }
+                      }
+                    },
+                    "produtosAtualizados": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "produtoVarianteId": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "sku": {
+                            "type": "string",
+                            "example": "string"
+                          },
+                          "resultado": {
+                            "type": "boolean",
+                            "example": true,
+                            "default": true
+                          },
+                          "detalhes": {
+                            "type": "string",
+                            "example": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62c4368c2ddf2500137b6405"
+}

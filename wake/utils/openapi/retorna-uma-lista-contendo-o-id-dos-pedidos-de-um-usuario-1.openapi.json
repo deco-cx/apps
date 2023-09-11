@@ -1,0 +1,147 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/usuarios/documento/{documento}/pedidos": {
+      "get": {
+        "summary": "Retorna uma lista contendo o id dos pedidos de um usuário",
+        "description": "Retorna lista contendo os Id's dos pedidos do usuário",
+        "operationId": "retorna-uma-lista-contendo-o-id-dos-pedidos-de-um-usuario-1",
+        "parameters": [
+          {
+            "name": "documento",
+            "in": "path",
+            "description": "Documento (CPF ou CNPJ) do usuário cujos pedidos devem ser selecionados. Utilizar apenas números, sem caracteres especiais",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "tipoDocumento",
+            "in": "query",
+            "description": "Define se o documento informado é um CPF ou um CNPJ",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Cpf",
+                "Cnpj"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "[\n  {\n    \"pedidoId\": 0,\n    \"links\": [\n      {\n        \"href\": \"string\",\n        \"rel\": \"string\",\n        \"method\": \"string\"\n      }\n    ]\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pedidoId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "links": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "href": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "rel": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "method": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62de9fe86b05db02773d3a7b"
+}

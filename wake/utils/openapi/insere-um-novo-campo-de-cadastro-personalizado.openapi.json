@@ -1,0 +1,142 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/usuarios/CadastroPersonalizado": {
+      "post": {
+        "summary": "Insere um novo campo de cadastro personalizado",
+        "description": "",
+        "operationId": "insere-um-novo-campo-de-cadastro-personalizado",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "description": "Nome do campo"
+                  },
+                  "tipo": {
+                    "type": "string",
+                    "description": "Tipo do campo",
+                    "enum": [
+                      "TextoLivre",
+                      "ValoresPredefinidos",
+                      "RadioButton"
+                    ]
+                  },
+                  "obrigatorio": {
+                    "type": "boolean",
+                    "description": "Se o campo será obrigatório"
+                  },
+                  "ordem": {
+                    "type": "integer",
+                    "description": "Ordem",
+                    "format": "int32"
+                  },
+                  "valorPreDefinido": {
+                    "type": "array",
+                    "description": "Informação para os campos (optional)",
+                    "items": {
+                      "properties": {
+                        "valor": {
+                          "type": "string",
+                          "description": "Valor"
+                        },
+                        "ordem": {
+                          "type": "integer",
+                          "description": "Ordem",
+                          "format": "int32"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Id do campo de cadastro personalizado gerado": {
+                    "value": "Id do campo de cadastro personalizado gerado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62dec4fbe00703012ad1342f"
+}

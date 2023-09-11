@@ -1,0 +1,165 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/resellers": {
+      "put": {
+        "summary": "Atualiza um novo Seller no marketplace",
+        "description": "",
+        "operationId": "atualiza-um-novo-seller-no-marketplace",
+        "parameters": [
+          {
+            "name": "resellerId",
+            "in": "query",
+            "description": "Valor único utilizado para identificar o seller",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "razaoSocial": {
+                    "type": "string",
+                    "description": "Razão Social/Nome do Reseller"
+                  },
+                  "cnpj": {
+                    "type": "string",
+                    "description": "CNPJ do Seller"
+                  },
+                  "inscricaoEstadual": {
+                    "type": "string",
+                    "description": "Inscrição Estadual do Seller"
+                  },
+                  "isento": {
+                    "type": "boolean",
+                    "description": "Seller isento de inscrição estadual"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email de contato do Seller"
+                  },
+                  "telefone": {
+                    "type": "string",
+                    "description": "Telefone de contato do seller com ddd (xx) xxxx-xxxx"
+                  },
+                  "tipoAutonomia": {
+                    "type": "string",
+                    "description": "Tipo de autonomia do vendedor",
+                    "enum": [
+                      "ComAutonomia",
+                      "SemAutonomia"
+                    ]
+                  },
+                  "ativo": {
+                    "type": "boolean",
+                    "description": "Seller Ativo"
+                  },
+                  "split": {
+                    "type": "boolean",
+                    "description": "Se irá ter Split de frete boolean. Default:false"
+                  },
+                  "buyBox": {
+                    "type": "boolean",
+                    "description": "Se o produto deverá ser apresentado em BuyBox (apenas para Seller's e Marketplace's TrayCorp) boolean. Default:false,"
+                  },
+                  "ativacaoAutomaticaProdutos": {
+                    "type": "boolean",
+                    "description": "Se os produtos deverão sem ativados automaticamente no marketplace boolean. Default:false,"
+                  },
+                  "cep": {
+                    "type": "string",
+                    "description": "Cep do Seller (utilizado para o calculo de frete)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62d5435d9a9b65003e6c2c53"
+}
