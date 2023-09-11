@@ -56,8 +56,6 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  console.info(storefrontToken);
-
   return {
     state: { ...props, api, storefront },
     manifest,
