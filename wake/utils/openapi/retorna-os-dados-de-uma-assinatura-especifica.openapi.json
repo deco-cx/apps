@@ -1,0 +1,226 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/assinaturas/{assinaturaId}": {
+      "get": {
+        "summary": "Retorna os dados de uma assinatura específica",
+        "description": "Detalhes de uma assinatura",
+        "operationId": "retorna-os-dados-de-uma-assinatura-especifica",
+        "parameters": [
+          {
+            "name": "assinaturaId",
+            "in": "path",
+            "description": "Id da assinatura",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "{\n  \"assinaturaId\": 0,\n  \"usuarioId\": 0,\n  \"dataProximoPedido\": \"2022-06-13T11:13:55.154Z\",\n  \"periodoRecorrencia\": \"string\",\n  \"situacaoAssinatura\": \"Ativa\",\n  \"dataAssinatura\": \"2022-06-13T11:13:55.154Z\",\n  \"grupoAssinatura\": \"string\",\n  \"enderecoId\": 0,\n  \"usuarioCartaoCreditoId\": 0,\n  \"cupom\": \"string\",\n  \"produtos\": [\n    {\n      \"assinaturaProdutoId\": 0,\n      \"assinaturaId\": 0,\n      \"produtoId\": 0,\n      \"produtoVarianteId\": 0,\n      \"quantidade\": 0,\n      \"valor\": 0,\n      \"removido\": true\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "assinaturaId": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "usuarioId": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "dataProximoPedido": {
+                      "type": "string",
+                      "example": "2022-06-13T11:13:55.154Z"
+                    },
+                    "periodoRecorrencia": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "situacaoAssinatura": {
+                      "type": "string",
+                      "example": "Ativa"
+                    },
+                    "dataAssinatura": {
+                      "type": "string",
+                      "example": "2022-06-13T11:13:55.154Z"
+                    },
+                    "grupoAssinatura": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "enderecoId": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "usuarioCartaoCreditoId": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "cupom": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "produtos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "assinaturaProdutoId": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "assinaturaId": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "produtoId": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "produtoVarianteId": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "quantidade": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "valor": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "removido": {
+                            "type": "boolean",
+                            "example": true,
+                            "default": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62a71ec21c0501011e64c99b"
+}

@@ -1,0 +1,134 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/assinaturas/{assinaturaId}/pedido": {
+      "post": {
+        "summary": "Gera um novo pedido para a assinatura",
+        "description": "",
+        "operationId": "gera-um-novo-pedido-para-a-assinatura",
+        "parameters": [
+          {
+            "name": "assinaturaId",
+            "in": "path",
+            "description": "Identificador da assinatura",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "OK"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62a723a3b41b840051dffa8e"
+}

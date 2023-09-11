@@ -1,0 +1,230 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/midias/{identificador}": {
+      "get": {
+        "summary": "Retorna o xml com os dados de uma mídia específicas entre duas datas",
+        "description": "Xml com os dados de uma mídia específicas entre duas datas",
+        "operationId": "retorna-o-xml-com-os-dados-de-uma-midia-especificas-entre-duas-datas",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "description": "Data inicial (aaaa-mm-dd)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "description": "Data final (aaaa-mm-dd)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "identificador",
+            "in": "path",
+            "description": "Identificar da mídia (ex.: 7-CPA)",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "{\n  \"dias\": {\n    \"diaMidiaApiModel\": [\n      {\n        \"dia\": \"2022-06-30T11:24:34.731Z\",\n        \"investimento\": {\n          \"meta\": 0,\n          \"realizado\": 0\n        },\n        \"pedidos\": {\n          \"meta\": 0,\n          \"realizado\": 0\n        },\n        \"roi\": {\n          \"meta\": 0,\n          \"realizado\": 0\n        },\n        \"receita\": {\n          \"meta\": 0,\n          \"realizado\": 0\n        },\n        \"visitas\": {\n          \"meta\": 0,\n          \"realizado\": 0\n        }\n      }\n    ]\n  },\n  \"id\": 0,\n  \"nome\": \"string\",\n  \"tipo\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "dias": {
+                      "type": "object",
+                      "properties": {
+                        "diaMidiaApiModel": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "dia": {
+                                "type": "string",
+                                "example": "2022-06-30T11:24:34.731Z"
+                              },
+                              "investimento": {
+                                "type": "object",
+                                "properties": {
+                                  "meta": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  },
+                                  "realizado": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  }
+                                }
+                              },
+                              "pedidos": {
+                                "type": "object",
+                                "properties": {
+                                  "meta": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  },
+                                  "realizado": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  }
+                                }
+                              },
+                              "roi": {
+                                "type": "object",
+                                "properties": {
+                                  "meta": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  },
+                                  "realizado": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  }
+                                }
+                              },
+                              "receita": {
+                                "type": "object",
+                                "properties": {
+                                  "meta": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  },
+                                  "realizado": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  }
+                                }
+                              },
+                              "visitas": {
+                                "type": "object",
+                                "properties": {
+                                  "meta": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  },
+                                  "realizado": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "id": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "nome": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "tipo": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62bda3695cd2a0001a9004fc"
+}

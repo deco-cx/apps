@@ -1,0 +1,135 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/pedidos/naoIntegrados": {
+      "get": {
+        "summary": "Busca pedidos que ainda não foram setado o complete",
+        "description": "Lista de números de pedidos ainda não integrados",
+        "operationId": "busca-pedidos-que-ainda-nao-foram-setado-o-complete",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"pedidoId\": 0\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pedidoId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62bb3896237430004df21cf0"
+}

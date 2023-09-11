@@ -1,0 +1,159 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/pedidos/{pedidoId}/observacao": {
+      "get": {
+        "summary": "Retorna a observação de um pedido",
+        "description": "Lista de observações de um pedido",
+        "operationId": "inseri-uma-observacao-a-um-pedido",
+        "parameters": [
+          {
+            "name": "pedidoId",
+            "in": "path",
+            "description": "Número do pedido",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"observacao\": \"string\",\n    \"usuario\": \"string\",\n    \"publica\": true,\n    \"data\": \"2022-06-28T11:18:19.263Z\"\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "observacao": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "usuario": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "publica": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "data": {
+                        "type": "string",
+                        "example": "2022-06-28T11:18:19.263Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62bb3a3b0a861a04b9dd482b"
+}

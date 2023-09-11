@@ -1,0 +1,185 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/contascorrentes/{email}/extrato": {
+      "get": {
+        "summary": "Busca todas as movimentações de conta corrente de um usuário",
+        "description": "Extrato retornado com sucesso",
+        "operationId": "busca-todas-as-movimentacoes-de-conta-corrente-de-um-usuario",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "E-mail do usuário",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "description": "Data Inicial para verificar extrato",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "description": "Data Final para verificar extrato",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"data\": \"2022-06-15T13:26:37.748Z\",\n    \"historico\": \"string\",\n    \"valor\": 0,\n    \"tipoLancamento\": \"Credito\",\n    \"observacao\": \"string\",\n    \"visivelParaCliente\": true\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "string",
+                        "example": "2022-06-15T13:26:37.748Z"
+                      },
+                      "historico": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "valor": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "tipoLancamento": {
+                        "type": "string",
+                        "example": "Credito"
+                      },
+                      "observacao": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "visivelParaCliente": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62aa2dba0522f500488ccbd1"
+}

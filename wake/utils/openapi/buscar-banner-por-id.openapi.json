@@ -1,0 +1,337 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/banners/{bannerId}": {
+      "get": {
+        "summary": "Buscar banner por Id",
+        "description": "Objeto do banner",
+        "operationId": "buscar-banner-por-id",
+        "parameters": [
+          {
+            "name": "bannerId",
+            "in": "path",
+            "description": "Identificador do banner que deve ser buscado",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "{\n  \"id\": 0,\n  \"nome\": \"string\",\n  \"dataInicio\": \"2022-06-10T13:20:59.150Z\",\n  \"dataFim\": \"2022-06-10T13:20:59.150Z\",\n  \"ativo\": true,\n  \"detalhe\": {\n    \"posicionamentoId\": 0,\n    \"urlBanner\": \"string\",\n    \"imagemBanner\": {\n      \"nome\": \"string\",\n      \"base64\": \"string\",\n      \"formato\": \"PNG\"\n    },\n    \"ordemExibicao\": 0,\n    \"abrirBannerNovaAba\": true,\n    \"largura\": 0,\n    \"altura\": 0,\n    \"title\": \"string\",\n    \"urlClique\": \"string\",\n    \"urlBannerAlternativo\": \"string\",\n    \"titleAlternativo\": \"string\",\n    \"diasExibicao\": {\n      \"todosDias\": true,\n      \"domingo\": true,\n      \"segunda\": true,\n      \"terca\": true,\n      \"quarta\": true,\n      \"quinta\": true,\n      \"sexta\": true,\n      \"sabado\": true\n    },\n    \"textoAlternativo\": \"string\"\n  },\n  \"apresentacao\": {\n    \"exibirNoSite\": true,\n    \"exibirEmTodasBuscas\": true,\n    \"naoExibirEmBuscas\": true,\n    \"termosBusca\": \"string\",\n    \"listaHotsites\": {\n      \"exibirEmTodosHotSites\": true,\n      \"hotSites\": [\n        {\n          \"hotSiteId\": 0\n        }\n      ]\n    },\n    \"exibirEmTodasCategorias\": true,\n    \"listaParceiros\": {\n      \"exibirEmTodosParceiros\": true,\n      \"parceiros\": [\n        {\n          \"parceiroId\": 0\n        }\n      ]\n    }\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "nome": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "dataInicio": {
+                      "type": "string",
+                      "example": "2022-06-10T13:20:59.150Z"
+                    },
+                    "dataFim": {
+                      "type": "string",
+                      "example": "2022-06-10T13:20:59.150Z"
+                    },
+                    "ativo": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "detalhe": {
+                      "type": "object",
+                      "properties": {
+                        "posicionamentoId": {
+                          "type": "integer",
+                          "example": 0,
+                          "default": 0
+                        },
+                        "urlBanner": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "imagemBanner": {
+                          "type": "object",
+                          "properties": {
+                            "nome": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "base64": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "formato": {
+                              "type": "string",
+                              "example": "PNG"
+                            }
+                          }
+                        },
+                        "ordemExibicao": {
+                          "type": "integer",
+                          "example": 0,
+                          "default": 0
+                        },
+                        "abrirBannerNovaAba": {
+                          "type": "boolean",
+                          "example": true,
+                          "default": true
+                        },
+                        "largura": {
+                          "type": "integer",
+                          "example": 0,
+                          "default": 0
+                        },
+                        "altura": {
+                          "type": "integer",
+                          "example": 0,
+                          "default": 0
+                        },
+                        "title": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "urlClique": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "urlBannerAlternativo": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "titleAlternativo": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "diasExibicao": {
+                          "type": "object",
+                          "properties": {
+                            "todosDias": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "domingo": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "segunda": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "terca": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "quarta": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "quinta": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "sexta": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "sabado": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            }
+                          }
+                        },
+                        "textoAlternativo": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "apresentacao": {
+                      "type": "object",
+                      "properties": {
+                        "exibirNoSite": {
+                          "type": "boolean",
+                          "example": true,
+                          "default": true
+                        },
+                        "exibirEmTodasBuscas": {
+                          "type": "boolean",
+                          "example": true,
+                          "default": true
+                        },
+                        "naoExibirEmBuscas": {
+                          "type": "boolean",
+                          "example": true,
+                          "default": true
+                        },
+                        "termosBusca": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "listaHotsites": {
+                          "type": "object",
+                          "properties": {
+                            "exibirEmTodosHotSites": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "hotSites": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "hotSiteId": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "exibirEmTodasCategorias": {
+                          "type": "boolean",
+                          "example": true,
+                          "default": true
+                        },
+                        "listaParceiros": {
+                          "type": "object",
+                          "properties": {
+                            "exibirEmTodosParceiros": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "parceiros": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "parceiroId": {
+                                    "type": "integer",
+                                    "example": 0,
+                                    "default": 0
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62a35336a70b19004482f095"
+}

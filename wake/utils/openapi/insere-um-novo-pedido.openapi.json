@@ -1,0 +1,442 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/pedidos": {
+      "post": {
+        "summary": "Insere um novo pedido",
+        "description": "Caso a loja utilize as formas de pagamento do gateway o campo \"formaPagamentoId\" do objeto \"pagamento\" deverá conter o valor \"200\".",
+        "operationId": "insere-um-novo-pedido",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pedidoId": {
+                    "type": "integer",
+                    "description": "Id do pedido que está sendo inserido. Caso seja informado deve ser um Id disponível na loja. Caso não seja informado um Id será gerado (optional)",
+                    "format": "int32"
+                  },
+                  "carrinhoId": {
+                    "type": "string",
+                    "description": "Id do carrinho que foi utilizado no pedido (optional)"
+                  },
+                  "situacaoPedidoId": {
+                    "type": "integer",
+                    "description": "Define em qual situação está o pedido. A lista completa das possíveis situações se encontra no GET /situacoesPedido",
+                    "format": "int32"
+                  },
+                  "data": {
+                    "type": "string",
+                    "description": "Data em que o pedido foi realizado",
+                    "format": "date"
+                  },
+                  "valorTotal": {
+                    "type": "number",
+                    "description": "Valor total do pedido. Se informado deve ser igual a soma de todos os valores inclusos no pedido (preços dos produtos, ajustes, frete, etc) (optional)",
+                    "format": "double"
+                  },
+                  "valorJuros": {
+                    "type": "number",
+                    "description": "Informação do juros do pedido",
+                    "format": "double"
+                  },
+                  "valorDesconto": {
+                    "type": "number",
+                    "description": "Informação de desconto do pedido",
+                    "format": "double"
+                  },
+                  "usuarioId": {
+                    "type": "integer",
+                    "description": "Id do usuário que realizou a compra. É possível recuperar o Id de um usuário no GET /usuarios",
+                    "format": "int32"
+                  },
+                  "enderecoId": {
+                    "type": "integer",
+                    "description": "Id do endereço do usuário que deve ser utilizado como endereço de entrega. Para buscar os endereços de um usuário utilize o GET /usuarios/{usuarioId}/enderecos",
+                    "format": "int32"
+                  },
+                  "isMobile": {
+                    "type": "boolean",
+                    "description": "Define se o pedido foi feito através de um dispositivo móvel ou não"
+                  },
+                  "eventoId": {
+                    "type": "integer",
+                    "description": "Id do evento ao qual o pedido está vinculado (opcional)",
+                    "format": "int32"
+                  },
+                  "produtos": {
+                    "type": "array",
+                    "description": "Lista contendo os produtos do pedido",
+                    "items": {
+                      "properties": {
+                        "produtoVarianteId": {
+                          "type": "integer",
+                          "description": "Id do produto variante que está vinculado a esse pedido.",
+                          "format": "int32"
+                        },
+                        "quantidade": {
+                          "type": "object",
+                          "description": "Define a quantidade do produto, podendo ser dividida por diferentes centros de distribuição",
+                          "properties": {
+                            "quantidadeTotal": {
+                              "type": "integer",
+                              "description": "Quantidade por centro de distribuição",
+                              "format": "int32"
+                            },
+                            "quantidadePorCentroDeDistribuicao": {
+                              "type": "array",
+                              "description": "Quantidade (optional)",
+                              "items": {
+                                "properties": {
+                                  "centroDistribuicaoId": {
+                                    "type": "integer",
+                                    "description": "Id do centro de distribuição",
+                                    "format": "int32"
+                                  },
+                                  "quantidade": {
+                                    "type": "integer",
+                                    "description": "Quantidade",
+                                    "format": "int32"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            }
+                          }
+                        },
+                        "precoVenda": {
+                          "type": "number",
+                          "description": "Preço de venda do produto, sem adição ou subtração de valores.",
+                          "format": "double"
+                        },
+                        "isBrinde": {
+                          "type": "boolean",
+                          "description": "Define se esse produto é um brinde ou não"
+                        },
+                        "ajustes": {
+                          "type": "array",
+                          "description": "Lista contendo todos os ajustes de preço do produto",
+                          "items": {
+                            "properties": {
+                              "tipo": {
+                                "type": "string",
+                                "description": "Define o tipo do ajuste de valor de um produto contido em um pedido. = ['Frete', 'Pricing', 'Atacarejo', 'Personalizacao', 'Embalagem', 'Promocao', 'PromocaoFrete', 'ContaCorrente', 'FormaPagamento', 'PromocaoProduto', 'TipoFreteProduto', 'Formula']stringEnum:\"Frete\", \"Pricing\", \"Atacarejo\", \"Personalizacao\", \"Embalagem\", \"Promocao\", \"PromocaoFrete\", \"ContaCorrente\", \"FormaPagamento\", \"PromocaoProduto\", \"TipoFreteProduto\", \"Formula\""
+                              },
+                              "valor": {
+                                "type": "number",
+                                "description": "Define o valor do ajuste a ser aplicado no produto. O valor pode ser positivo ou negativo",
+                                "format": "double"
+                              },
+                              "observacao": {
+                                "type": "string",
+                                "description": "Observação (optional)"
+                              },
+                              "nome": {
+                                "type": "string",
+                                "description": "Nome (optional)"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "fretes": {
+                    "type": "array",
+                    "description": "Informações de frete do pedido",
+                    "items": {
+                      "properties": {
+                        "centroDistribuicaoId": {
+                          "type": "integer",
+                          "description": "Identificador do centro de distribuição de origem",
+                          "format": "int32"
+                        },
+                        "freteContratoId": {
+                          "type": "integer",
+                          "description": "Identificador do contrato de frete (optional)",
+                          "format": "int32"
+                        },
+                        "peso": {
+                          "type": "number",
+                          "description": "Peso em gramas (g) do frete calculado (optional)",
+                          "format": "double"
+                        },
+                        "pesoCobrado": {
+                          "type": "number",
+                          "description": "Peso em gramas cobrado do cliente (optional)",
+                          "format": "double"
+                        },
+                        "volume": {
+                          "type": "number",
+                          "description": "Volume em metro cúbico (m³) calculado (optional)",
+                          "format": "double"
+                        },
+                        "volumeCobrado": {
+                          "type": "number",
+                          "description": "Volume em metro cúbico (m³) cobrado do cliente (optional)",
+                          "format": "double"
+                        },
+                        "prazoEnvio": {
+                          "type": "integer",
+                          "description": "Prazo do envio do frete em dias úteis",
+                          "format": "int32"
+                        },
+                        "valorFreteEmpresa": {
+                          "type": "number",
+                          "description": "Valor do frete (optional)",
+                          "format": "double"
+                        },
+                        "valorFreteCliente": {
+                          "type": "number",
+                          "description": "Valor do frete cobrado do cliente",
+                          "format": "double"
+                        },
+                        "dataEntrega": {
+                          "type": "string",
+                          "description": "Data estimada da entrega do produto (optional)",
+                          "format": "date"
+                        },
+                        "informacoesAdicionais": {
+                          "type": "array",
+                          "description": "Informações adicionais do frete",
+                          "items": {
+                            "properties": {
+                              "chave": {
+                                "type": "string",
+                                "description": "Chave"
+                              },
+                              "valor": {
+                                "type": "string",
+                                "description": "Valor"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "pagamento": {
+                    "type": "object",
+                    "description": "Informações de pagamento do pedido",
+                    "properties": {
+                      "formaPagamentoId": {
+                        "type": "integer",
+                        "description": "Id da forma de pagamento",
+                        "format": "int32"
+                      },
+                      "numeroParcelas": {
+                        "type": "integer",
+                        "description": "Número parcelas",
+                        "format": "int32"
+                      },
+                      "valorParcela": {
+                        "type": "number",
+                        "description": "Valor da parcela",
+                        "format": "double"
+                      },
+                      "informacaoAdicional": {
+                        "type": "array",
+                        "description": "Informações adicionais de pagamento (optional)",
+                        "items": {
+                          "properties": {
+                            "chave": {
+                              "type": "string",
+                              "description": "Chave"
+                            },
+                            "valor": {
+                              "type": "string",
+                              "description": "Valor"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      }
+                    }
+                  },
+                  "canalId": {
+                    "type": "integer",
+                    "description": "ParceiroId vinculado ao pedido (optional)",
+                    "format": "int32"
+                  },
+                  "omniChannel": {
+                    "type": "object",
+                    "description": "Dados do pedido no marketplace (optional)",
+                    "properties": {
+                      "pedidoIdPublico": {
+                        "type": "string",
+                        "description": "Id do pedido que o cliente vê no momento que fecha a compra"
+                      },
+                      "pedidoIdPrivado": {
+                        "type": "string",
+                        "description": "Id interno do marketplace"
+                      },
+                      "integrador": {
+                        "type": "object",
+                        "description": "Dados do pedido no integrador",
+                        "properties": {
+                          "nome": {
+                            "type": "string",
+                            "description": "Nome do parceiro integrador"
+                          },
+                          "pedidoId": {
+                            "type": "string",
+                            "description": "Numero do pedido dentro do integrador"
+                          },
+                          "pedidoUrl": {
+                            "type": "string",
+                            "description": "Url do pedido dentro painel do integrador"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "transacaoId": {
+                    "type": "integer",
+                    "description": "Id da transação (optional)",
+                    "format": "int32"
+                  },
+                  "observacao": {
+                    "type": "string",
+                    "description": "Observação do pedido (optional)"
+                  },
+                  "valido": {
+                    "type": "boolean",
+                    "description": "Se um pedido é valido (optional)"
+                  },
+                  "cupomDesconto": {
+                    "type": "string",
+                    "description": "Cupom de desconto (optional)"
+                  },
+                  "ip": {
+                    "type": "string",
+                    "description": "IP da criação do pedido (optional)"
+                  },
+                  "usuarioMaster": {
+                    "type": "integer",
+                    "description": "ID do usuário master que realizou o pedido, se houver (optional)",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Id do pedido gerado": {
+                    "value": "Id do pedido gerado"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62bb0a7b8210890054b5b7a9"
+}

@@ -1,0 +1,185 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/produtos/{identificador}/informacoes": {
+      "post": {
+        "summary": "Adiciona uma nova informação",
+        "description": "",
+        "operationId": "adiciona-uma-nova-informacao",
+        "parameters": [
+          {
+            "name": "identificador",
+            "in": "path",
+            "description": "Valor único utilizado para identificar o produto",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "tipoIdentificador",
+            "in": "query",
+            "description": "Define se o identificador informado é um sku ou um id interno.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Sku",
+                "ProdutoVarianteId"
+              ]
+            }
+          },
+          {
+            "name": "tipoRetorno",
+            "in": "query",
+            "description": "Define o tipo de retorno a ser recebido. Id retorna o InformacaoProdutoId da informação inserida, Booleano retorna true ou false, de acordo com o resultado da operação. Valor padrão Booleano",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Id",
+                "Booleano"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "description": "Titulo da informação (optional)"
+                  },
+                  "texto": {
+                    "type": "string",
+                    "description": "Texto da informação (optional)"
+                  },
+                  "exibirSite": {
+                    "type": "boolean",
+                    "description": "Informação se o produto variante está visível no site."
+                  },
+                  "tipoInformacao": {
+                    "type": "string",
+                    "description": "Tipo de informação do produto (optional)",
+                    "enum": [
+                      "Informacoes",
+                      "Beneficios",
+                      "Especificacoes",
+                      "DadosTecnicos",
+                      "Composicao",
+                      "ModoDeUsar",
+                      "Cuidados",
+                      "ItensInclusos",
+                      "Dicas",
+                      "Video",
+                      "Descricao",
+                      "ValorReferente",
+                      "PopUpReferente",
+                      "Prescricao",
+                      "TabelaDeMedidas",
+                      "Spot",
+                      "Sinopse",
+                      "Carrinho"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Produto não encontrado": {
+                    "value": "Produto não encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62c44160fb4198002fd91e72"
+}

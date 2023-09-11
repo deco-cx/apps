@@ -1,0 +1,189 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/pedidos/{pedidoId}/rastreamento": {
+      "get": {
+        "summary": "Retorna os dados de rastreamento/nf de um pedido",
+        "description": "Lista de pedidos",
+        "operationId": "retorna-os-dados-de-rastreamentonf-de-um-pedido",
+        "parameters": [
+          {
+            "name": "pedidoId",
+            "in": "path",
+            "description": "Número do pedido que se deseja buscar",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "{\n  \"pedidoRastreamentoId\": 0,\n  \"dataAtualizacao\": \"2022-06-28T11:18:19.200Z\",\n  \"notaFiscal\": \"string\",\n  \"serieNF\": \"string\",\n  \"cfop\": 0,\n  \"dataEnviado\": \"2022-06-28T11:18:19.200Z\",\n  \"urlNFE\": \"string\",\n  \"chaveAcessoNFE\": \"string\",\n  \"rastreamento\": \"string\",\n  \"urlRastreamento\": \"string\",\n  \"transportadora\": \"string\",\n  \"dataEntrega\": \"2022-06-28T11:18:19.200Z\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pedidoRastreamentoId": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "dataAtualizacao": {
+                      "type": "string",
+                      "example": "2022-06-28T11:18:19.200Z"
+                    },
+                    "notaFiscal": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "serieNF": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "cfop": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "dataEnviado": {
+                      "type": "string",
+                      "example": "2022-06-28T11:18:19.200Z"
+                    },
+                    "urlNFE": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "chaveAcessoNFE": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "rastreamento": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "urlRastreamento": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "transportadora": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "dataEntrega": {
+                      "type": "string",
+                      "example": "2022-06-28T11:18:19.200Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62bb111fe2a40c0190687631"
+}

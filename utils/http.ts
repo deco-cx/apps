@@ -121,6 +121,8 @@ export const createHttpClient = <T>({
 
         const url = new URL(compiled, base);
         mapped.forEach((value, key) => {
+          if (value === undefined) return;
+
           const arrayed = Array.isArray(value) ? value : [value];
           arrayed.forEach((item) => url.searchParams.append(key, `${item}`));
         });

@@ -40,8 +40,9 @@ export const createGraphqlClient = (
 
   return {
     query: async <D, V>(
-      { query = "", variables, operationName }: {
+      { query = "", fragments = [], variables, operationName }: {
         query: string;
+        fragments?: string[];
         variables?: V;
         operationName?: string;
       },
@@ -49,7 +50,11 @@ export const createGraphqlClient = (
     ): Promise<D> => {
       const { data, errors } = await http[key as any]({}, {
         ...init,
-        body: { query, variables: variables as any, operationName },
+        body: {
+          query: [query, ...fragments].join("\n"),
+          variables: variables as any,
+          operationName,
+        },
       }).then((res) => res.json());
 
       if (Array.isArray(errors) && errors.length > 0) {

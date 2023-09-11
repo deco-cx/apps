@@ -10,6 +10,7 @@ import type {
   PropertyValue,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
+import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
@@ -58,13 +59,6 @@ const getProductURL = (
 
 const nonEmptyArray = <T>(array: T[] | null | undefined) =>
   Array.isArray(array) && array.length > 0 ? array : null;
-
-const DEFAULT_IMAGE = {
-  imageLabel: null,
-  imageText: "image",
-  imageUrl:
-    "https://storecomponents.vtexassets.com/assets/faststore/images/image___117a6d3e229a96ad0e0d0876352566e2.svg",
-};
 
 interface ProductOptions {
   baseUrl: string;
@@ -271,7 +265,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   const referenceIdAdditionalProperty = toAdditionalPropertyReferenceId(
     referenceId,
   );
-  const images = nonEmptyArray(sku.images) ?? [DEFAULT_IMAGE];
+  const images = nonEmptyArray(sku.images);
   const offers = (sku.sellers ?? []).map(
     isLegacyProduct(product) ? toOfferLegacy : toOffer,
   ).sort(bestOfferFirst);
@@ -325,12 +319,12 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: images.map(({ imageUrl, imageText, imageLabel }) => {
+    image: images?.map(({ imageUrl, imageText, imageLabel }) => {
       const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
       const alternateName = imageText || imageLabel || "";
 
       return { "@type": "ImageObject" as const, alternateName, url };
-    }),
+    }) ?? [DEFAULT_IMAGE],
     offers: offers.length > 0
       ? {
         "@type": "AggregateOffer",

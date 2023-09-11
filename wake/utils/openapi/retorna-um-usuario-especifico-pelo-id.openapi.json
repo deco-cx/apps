@@ -1,0 +1,236 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/usuarios/usuarioId/{usuarioId}": {
+      "get": {
+        "summary": "Retorna um usuário específico pelo id",
+        "description": "Usuário encontrado",
+        "operationId": "retorna-um-usuario-especifico-pelo-id",
+        "parameters": [
+          {
+            "name": "usuarioId",
+            "in": "path",
+            "description": "Id do usuário",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "{\n  \"usuarioId\": 0,\n  \"bloqueado\": true,\n  \"grupoInformacaoCadastral\": [\n    {\n      \"chave\": \"string\",\n      \"valor\": \"string\"\n    }\n  ],\n  \"tipoPessoa\": \"Fisica\",\n  \"origemContato\": \"Google\",\n  \"tipoSexo\": \"Undefined\",\n  \"nome\": \"string\",\n  \"cpf\": \"string\",\n  \"email\": \"string\",\n  \"rg\": \"string\",\n  \"telefoneResidencial\": \"string\",\n  \"telefoneCelular\": \"string\",\n  \"telefoneComercial\": \"string\",\n  \"dataNascimento\": \"2022-07-20T17:54:12.466Z\",\n  \"razaoSocial\": \"string\",\n  \"cnpj\": \"string\",\n  \"inscricaoEstadual\": \"string\",\n  \"responsavel\": \"string\",\n  \"dataCriacao\": \"2022-07-20T17:54:12.466Z\",\n  \"dataAtualizacao\": \"2022-07-20T17:54:12.466Z\",\n  \"revendedor\": true,\n  \"listaInformacaoCadastral\": [\n    {\n      \"chave\": \"string\",\n      \"valor\": \"string\"\n    }\n  ],\n  \"avatar\": \"string\",\n  \"ip\": \"string\",\n  \"aprovado\": true\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "usuarioId": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "bloqueado": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "grupoInformacaoCadastral": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "chave": {
+                            "type": "string",
+                            "example": "string"
+                          },
+                          "valor": {
+                            "type": "string",
+                            "example": "string"
+                          }
+                        }
+                      }
+                    },
+                    "tipoPessoa": {
+                      "type": "string",
+                      "example": "Fisica"
+                    },
+                    "origemContato": {
+                      "type": "string",
+                      "example": "Google"
+                    },
+                    "tipoSexo": {
+                      "type": "string",
+                      "example": "Undefined"
+                    },
+                    "nome": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "cpf": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "rg": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "telefoneResidencial": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "telefoneCelular": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "telefoneComercial": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "dataNascimento": {
+                      "type": "string",
+                      "example": "2022-07-20T17:54:12.466Z"
+                    },
+                    "razaoSocial": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "cnpj": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "inscricaoEstadual": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "responsavel": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "dataCriacao": {
+                      "type": "string",
+                      "example": "2022-07-20T17:54:12.466Z"
+                    },
+                    "dataAtualizacao": {
+                      "type": "string",
+                      "example": "2022-07-20T17:54:12.466Z"
+                    },
+                    "revendedor": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "listaInformacaoCadastral": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "chave": {
+                            "type": "string",
+                            "example": "string"
+                          },
+                          "valor": {
+                            "type": "string",
+                            "example": "string"
+                          }
+                        }
+                      }
+                    },
+                    "avatar": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "ip": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "aprovado": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62d99025f01e4d002f3a1731"
+}

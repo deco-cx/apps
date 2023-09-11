@@ -1,0 +1,182 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/produtos/{identificador}/imagens": {
+      "post": {
+        "summary": "Adiciona uma nova imagem vinculada a um produto",
+        "description": "",
+        "operationId": "adiciona-uma-nova-imagem-vinculada-a-um-produto",
+        "parameters": [
+          {
+            "name": "identificador",
+            "in": "path",
+            "description": "Valor único utilizado para identificar o produto",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "tipoIdentificador",
+            "in": "query",
+            "description": "Define se o identificador informado é um sku ou um id interno.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Sku",
+                "ProdutoVarianteId"
+              ]
+            }
+          },
+          {
+            "name": "tipoRetorno",
+            "in": "query",
+            "description": "Define o tipo de retorno a ser recebido. ListaIds retorna lista de Ids das imagens inseridas, Booleano retorna true ou false, de acordo com o resultado da operação. Valor padrão Booleano",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ListaIds",
+                "Booleano"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "RAW_BODY"
+                ],
+                "properties": {
+                  "RAW_BODY": {
+                    "type": "array",
+                    "description": "Lista com as imagens do produto no formato base 64 (optional)",
+                    "items": {
+                      "properties": {
+                        "base64": {
+                          "type": "string",
+                          "description": "Imagem do produto em base64"
+                        },
+                        "formato": {
+                          "type": "string",
+                          "description": "JPG ou PNG"
+                        },
+                        "exibirMiniatura": {
+                          "type": "boolean",
+                          "description": "Se a imagem será apresentada como miniatura"
+                        },
+                        "estampa": {
+                          "type": "boolean",
+                          "description": "Se a imagem será apresentada como estampa"
+                        },
+                        "ordem": {
+                          "type": "integer",
+                          "description": "Ordem para apresentação da imagem",
+                          "format": "int32"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Produto não encontrado": {
+                    "value": "Produto não encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62c469681f965e03abf18962"
+}

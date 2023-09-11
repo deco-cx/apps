@@ -1,0 +1,198 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/dashboard/ticketMedio": {
+      "get": {
+        "summary": "Retorna o relatório de ticket médio de um determinado período",
+        "description": "Relatório de ticket médio de um determinado período",
+        "operationId": "retorna-o-relatorio-de-ticket-medio-de-um-determinado-periodo",
+        "parameters": [
+          {
+            "name": "dataInicial",
+            "in": "query",
+            "description": "Data inicial dos pedidos que deverão retornar (aaaa-mm-dd)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "dataFinal",
+            "in": "query",
+            "description": "Data final dos pedidos que deverão retornar (aaaa-mm-dd)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "tipoAgrupamento",
+            "in": "query",
+            "description": "Tipo de agrupamento dos pedidos (hora, dia, semana, mês, ano)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Hora",
+                "Dia",
+                "Semana",
+                "Mes",
+                "Ano"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "{\n  \"tipoAgrupamento\": \"Hora\",\n  \"dados\": [\n    {\n      \"data\": \"2022-06-17T11:14:38.739Z\",\n      \"pedidosCaptados\": 0,\n      \"pedidosPagos\": 0,\n      \"pedidosEnviados\": 0,\n      \"pedidosCancelados\": 0\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tipoAgrupamento": {
+                      "type": "string",
+                      "example": "Hora"
+                    },
+                    "dados": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "string",
+                            "example": "2022-06-17T11:14:38.739Z"
+                          },
+                          "pedidosCaptados": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "pedidosPagos": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "pedidosEnviados": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          },
+                          "pedidosCancelados": {
+                            "type": "integer",
+                            "example": 0,
+                            "default": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62aa4238335a250013ebd023"
+}

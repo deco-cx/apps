@@ -1,0 +1,158 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/tabelaPrecos/{tabelaPrecoId}/produtos": {
+      "get": {
+        "summary": "Retorna os produtos de uma tabela de preços",
+        "description": "Lista de produtos de uma tabela de preços",
+        "operationId": "retorna-os-produtos-de-uma-tabela-de-precos",
+        "parameters": [
+          {
+            "name": "tabelaPrecoId",
+            "in": "path",
+            "description": "Id da tabela de preço",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "description": "Página da lista (padrão: 1)",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "quantidadeRegistros",
+            "in": "query",
+            "description": "Quantidade de registros que deverão retornar (max: 50)",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"tabelaPrecoProdutoVarianteId\": 0,\n    \"tabelaPrecoId\": 0,\n    \"sku\": \"string\",\n    \"produtoVarianteId\": 0,\n    \"precoDe\": 0,\n    \"precoPor\": 0\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "tabelaPrecoProdutoVarianteId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "tabelaPrecoId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "sku": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "produtoVarianteId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "precoDe": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "precoPor": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62d6a97ac5887702643ffec2"
+}

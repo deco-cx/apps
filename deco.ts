@@ -13,6 +13,7 @@ const config = {
     app("handlebars"),
     app("vtex"),
     app("vnda"),
+    app("wake"),
     app("shopify"),
     app("website"),
     app("commerce"),

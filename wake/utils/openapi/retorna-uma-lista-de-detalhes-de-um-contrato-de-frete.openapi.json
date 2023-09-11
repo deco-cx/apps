@@ -1,0 +1,195 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/fretes/{freteId}/detalhes": {
+      "get": {
+        "summary": "Retorna uma lista de detalhes de um contrato de frete",
+        "description": "Lista de detalhes de frete",
+        "operationId": "retorna-uma-lista-de-detalhes-de-um-contrato-de-frete",
+        "parameters": [
+          {
+            "name": "freteId",
+            "in": "path",
+            "description": "Id do contrato de frete",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"freteId\": 0,\n    \"cepInicial\": 0,\n    \"cepFinal\": 0,\n    \"variacoesFreteDetalhe\": [\n      {\n        \"pesoInicial\": 0,\n        \"pesoFinal\": 0,\n        \"valorFrete\": 0,\n        \"prazoEntrega\": 0,\n        \"valorPreco\": 0,\n        \"valorPeso\": 0\n      }\n    ]\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "freteId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "cepInicial": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "cepFinal": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "variacoesFreteDetalhe": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "pesoInicial": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "pesoFinal": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "valorFrete": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "prazoEntrega": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "valorPreco": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            },
+                            "valorPeso": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62b0d3c93b7a6b014fcbfeea"
+}

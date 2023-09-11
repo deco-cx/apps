@@ -1,0 +1,126 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/tabelaPrecos": {
+      "get": {
+        "summary": "Retorna todas as tabelas de preços",
+        "description": "Lista de tabelas de preços",
+        "operationId": "retorna-todas-as-tabelas-de-precos",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"tabelaPrecoId\": 0,\n    \"nome\": \"string\",\n    \"dataInicial\": \"2022-07-19T11:05:47.621Z\",\n    \"dataFinal\": \"2022-07-19T11:05:47.621Z\",\n    \"ativo\": true,\n    \"isSite\": true\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "tabelaPrecoId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "nome": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "dataInicial": {
+                        "type": "string",
+                        "example": "2022-07-19T11:05:47.621Z"
+                      },
+                      "dataFinal": {
+                        "type": "string",
+                        "example": "2022-07-19T11:05:47.621Z"
+                      },
+                      "ativo": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "isSite": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62d6a6f38e22dc00626f5b0f"
+}

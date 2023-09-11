@@ -3,7 +3,7 @@
   "tasks": {
     "check": "deno fmt && deno lint",
     "release": "deno eval 'import \"deco/scripts/release.ts\"'",
-    "start": "deno eval 'import \"deco/scripts/apps/bundle.ts\"'",
+    "start": "deno run -A ./scripts/start.ts",
     "link": "deno eval 'import \"deco/scripts/apps/link.ts\"'",
     "unlink": "deno eval 'import \"deco/scripts/apps/unlink.ts\"'",
     "serve": "deno eval 'import \"deco/scripts/apps/serve.ts\"'",

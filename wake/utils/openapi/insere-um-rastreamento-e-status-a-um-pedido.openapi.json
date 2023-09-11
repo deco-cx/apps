@@ -1,0 +1,188 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/pedidos/{pedidoId}/rastreamento": {
+      "post": {
+        "summary": "Insere um rastreamento e status a um pedido",
+        "description": "",
+        "operationId": "insere-um-rastreamento-e-status-a-um-pedido",
+        "parameters": [
+          {
+            "name": "pedidoId",
+            "in": "path",
+            "description": "Id do Pedido",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "situacaoPedidoId": {
+                    "type": "integer",
+                    "description": "Id da situação do pedido",
+                    "format": "int32"
+                  },
+                  "centroDistribuicaoId": {
+                    "type": "integer",
+                    "description": "Id do centro de distribuição",
+                    "format": "int32"
+                  },
+                  "rastreamento": {
+                    "type": "string",
+                    "description": "Rastreamento (optional)"
+                  },
+                  "dataEvento": {
+                    "type": "string",
+                    "description": "Data do pedido (optional)",
+                    "format": "date"
+                  },
+                  "numeroNotaFiscal": {
+                    "type": "string",
+                    "description": "Número da nota fiscal (optional)"
+                  },
+                  "chaveAcessoNFE": {
+                    "type": "string",
+                    "description": "Chave acesso NFE (optional)"
+                  },
+                  "urlNFE": {
+                    "type": "string",
+                    "description": "URL NFE (optional)"
+                  },
+                  "serieNFE": {
+                    "type": "string",
+                    "description": "Serie NFE (optional)"
+                  },
+                  "cfop": {
+                    "type": "string",
+                    "description": "CFOP (optional)"
+                  },
+                  "urlRastreamento": {
+                    "type": "string",
+                    "description": "URL Rastreamento (optional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62bb11b77b19e300fd2d9070"
+}

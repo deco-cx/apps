@@ -1,0 +1,203 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/tiposEvento/{tipoEventoId}": {
+      "put": {
+        "summary": "Atualiza o tipo evento",
+        "description": "",
+        "operationId": "atualiza-o-tipo-evento",
+        "parameters": [
+          {
+            "name": "tipoEventoId",
+            "in": "path",
+            "description": "Identificador do tipo de evento",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "description": "Nome do Tipo de Evento"
+                  },
+                  "tipoEntrega": {
+                    "type": "string",
+                    "description": "Tipo de entrega",
+                    "enum": [
+                      "EntregaAgendada",
+                      "EntregaConformeCompraRealizada",
+                      "Todos",
+                      "Nenhum"
+                    ]
+                  },
+                  "tipoDisponibilizacao": {
+                    "type": "string",
+                    "description": "Disponibilização do Tipo de Evento",
+                    "enum": [
+                      "DisponibilizacaoDeCreditos",
+                      "DisponibilizacaoDeProdutos",
+                      "Todos"
+                    ]
+                  },
+                  "permitirRemocaoAutomaticaProdutos": {
+                    "type": "boolean",
+                    "description": "Permissão para remoção automática de produtos"
+                  },
+                  "corHexTituloInformacoes": {
+                    "type": "string",
+                    "description": "Cor em hexadecimal para o titulo de informações"
+                  },
+                  "corHexCorpoInformacoes": {
+                    "type": "string",
+                    "description": "Cor em hexadecimal para o corpo de informações"
+                  },
+                  "numeroAbasInformacoes": {
+                    "type": "integer",
+                    "description": "Número de abas de informações, podendo ser de 1 a 2",
+                    "format": "int32"
+                  },
+                  "quantidadeDiasParaEventoExpirar": {
+                    "type": "integer",
+                    "description": "Quantidade de dias para que o evento expire",
+                    "format": "int32"
+                  },
+                  "numeroLocaisEvento": {
+                    "type": "integer",
+                    "description": "Quantidade de locais do evento",
+                    "format": "int32"
+                  },
+                  "ativo": {
+                    "type": "boolean",
+                    "description": "Informa se o evento está ativo ou inativo"
+                  },
+                  "disponivel": {
+                    "type": "boolean",
+                    "description": "Informa a disponibilidade do evento"
+                  },
+                  "tipoBeneficiarioFrete": {
+                    "type": "string",
+                    "description": "O beneficiário do frete",
+                    "enum": [
+                      "DonodaLista",
+                      "Convidado"
+                    ]
+                  },
+                  "imagemLogoEvento": {
+                    "type": "string",
+                    "description": "Imagem da logo do evento em base64"
+                  },
+                  "sugestaoProdutos": {
+                    "type": "array",
+                    "description": "Produtos Sugeridos para este evento (optional)",
+                    "items": {
+                      "properties": {
+                        "tipoEventoId": {
+                          "type": "integer",
+                          "description": "Id do tipo de evento",
+                          "format": "int32"
+                        },
+                        "produtoVarianteId": {
+                          "type": "integer",
+                          "description": "Identificador do produto variante",
+                          "format": "int32"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62ced1bfb6ef560e1f64f7df"
+}

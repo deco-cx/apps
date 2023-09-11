@@ -1,0 +1,189 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/categorias/{id}": {
+      "put": {
+        "summary": "Atualiza uma categoria",
+        "description": "",
+        "operationId": "atualiza-uma-categoria",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id da categoria",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "description": "Nome da categoria (optional)"
+                  },
+                  "categoriaPaiId": {
+                    "type": "integer",
+                    "description": "Id da categoria pai (optional)",
+                    "format": "int32"
+                  },
+                  "categoriaERPId": {
+                    "type": "string",
+                    "description": "Id da categoria ERP (optional)"
+                  },
+                  "ativo": {
+                    "type": "boolean",
+                    "description": "Categoria ativo/inativo (optional)"
+                  },
+                  "isReseller": {
+                    "type": "boolean",
+                    "description": "Categoria de reseller (optional)"
+                  },
+                  "exibirMatrizAtributos": {
+                    "type": "string",
+                    "description": "Exibir Matriz de Atributos (optional)",
+                    "enum": [
+                      "Sim",
+                      "Nao",
+                      "Neutro"
+                    ]
+                  },
+                  "quantidadeMaximaCompraUnidade": {
+                    "type": "integer",
+                    "description": "Informe a quantidade máxima permitida para compra por produtos desta categoria. Informe zero para assumir a configuração geral da loja (optional)",
+                    "format": "int32"
+                  },
+                  "valorMinimoCompra": {
+                    "type": "number",
+                    "description": "Informe o valor mínimo para compra em produtos desta categoria (optional)",
+                    "format": "double"
+                  },
+                  "exibeMenu": {
+                    "type": "boolean",
+                    "description": "Informe se será exibida no menu (optional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "True": {
+                    "value": "True"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62aa06a9f42f94009b1ccb1f"
+}

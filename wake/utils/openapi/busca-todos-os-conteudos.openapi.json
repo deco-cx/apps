@@ -1,0 +1,192 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Pública",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.fbits.net/"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "in": "header",
+        "x-default": "",
+        "name": "Authorization",
+        "x-bearer-format": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/conteudos": {
+      "get": {
+        "summary": "Busca todos os conteúdos",
+        "description": "Conteúdos encontrados",
+        "operationId": "busca-todos-os-conteudos",
+        "parameters": [
+          {
+            "name": "pagina",
+            "in": "query",
+            "description": "Página da lista (padrão: 1)",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "quantidadePorPagina",
+            "in": "query",
+            "description": "Quantidade de registros que deverão retornar (max: 50)",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "OK": {
+                    "value": "[\n  {\n    \"conteudoId\": 0,\n    \"titulo\": \"string\",\n    \"ativo\": true,\n    \"dataInicio\": \"2022-06-13T11:13:55.432Z\",\n    \"dataFim\": \"2022-06-13T11:13:55.432Z\",\n    \"posicionamento\": \"Topo\",\n    \"codigoFonte\": \"string\",\n    \"termoBusca\": \"string\",\n    \"exibeTodasBuscas\": true,\n    \"naoExibeBuscas\": true,\n    \"exibeTodosHotsites\": true,\n    \"hotsitesId\": [\n      0\n    ]\n  }\n]"
+                  }
+                },
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "conteudoId": {
+                        "type": "integer",
+                        "example": 0,
+                        "default": 0
+                      },
+                      "titulo": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "ativo": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "dataInicio": {
+                        "type": "string",
+                        "example": "2022-06-13T11:13:55.432Z"
+                      },
+                      "dataFim": {
+                        "type": "string",
+                        "example": "2022-06-13T11:13:55.432Z"
+                      },
+                      "posicionamento": {
+                        "type": "string",
+                        "example": "Topo"
+                      },
+                      "codigoFonte": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "termoBusca": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "exibeTodasBuscas": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "naoExibeBuscas": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "exibeTodosHotsites": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                      },
+                      "hotsitesId": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "example": 0,
+                          "default": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "422",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Erro no processamento da operação": {
+                    "value": "{\n  \"resultadoOperacao\": true,\n  \"codigo\": 0,\n  \"mensagem\": \"string\"\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "resultadoOperacao": {
+                      "type": "boolean",
+                      "example": true,
+                      "default": true
+                    },
+                    "codigo": {
+                      "type": "integer",
+                      "example": 0,
+                      "default": 0
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true,
+    "samples-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "629f940ff6822d00a2406e17:62a795f0a9696c00b6665d44"
+}
