@@ -1,4 +1,5 @@
 import type { Product } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
 import type { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 
@@ -37,14 +38,14 @@ const productListLoader = async (
     sort: props?.sort,
     per_page: props?.count,
     "tags[]": props?.tags,
-  }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
+  }, STALE).then((res) => res.json());
 
-  return search.results.map((product) =>
+  return search.results?.map((product) =>
     toProduct(product, null, {
       url,
       priceCurrency: "BRL",
     })
-  );
+  ) ?? null;
 };
 
 export default productListLoader;

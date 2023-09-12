@@ -24,6 +24,80 @@
     }
   ],
   "paths": {
+    "/api/v2/seo_data": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "resource_type": {
+                        "type": "string"
+                      },
+                      "resource_id": {
+                        "type": "integer"
+                      },
+                      "parent_id": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "resource_type",
+                      "resource_id",
+                      "parent_id"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "resource_type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "name": "resource_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "code",
+            "in": "query"
+          }
+        ]
+      }
+    },
     "/api/v2/users/authorize": {
       "post": {
         "summary": "User authorize",
@@ -7095,7 +7169,7 @@
               }
             },
             "in": "query",
-            "name": "tags",
+            "name": "tags[]",
             "description": "Filtra pelo nome das tags, independente do tipo"
           },
           {
@@ -12369,7 +12443,6 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
                 "$ref": "#/components/schemas/Product.v0"
               }
             }

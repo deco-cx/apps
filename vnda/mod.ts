@@ -1,7 +1,7 @@
 import type { App, FnContext } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { API } from "./utils/client/client.ts";
+import { OpenAPI } from "./utils/openapi/vnda.openapi.gen.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -39,7 +39,7 @@ export interface Props {
 }
 
 export interface State extends Props {
-  api: ReturnType<typeof createHttpClient<API>>;
+  api: ReturnType<typeof createHttpClient<OpenAPI>>;
 }
 
 /**
@@ -47,7 +47,7 @@ export interface State extends Props {
  */
 export default function App(props: Props): App<Manifest, State> {
   const { authToken, publicUrl, sandbox } = props;
-  const api = createHttpClient<API>({
+  const api = createHttpClient<OpenAPI>({
     headers: new Headers({
       "User-Agent": "decocx/1.0",
       "X-Shop-Host": publicUrl,

@@ -7,7 +7,7 @@ import {
   AddCouponMutation,
   AddCouponMutationVariables,
   CheckoutFragment,
-} from "../../utils/graphql/graphql.gen.ts";
+} from "../../utils/graphql/storefront.graphql.gen.ts";
 
 export interface Props {
   coupon: string;

@@ -7,7 +7,7 @@ import {
   CheckoutFragment,
   RemoveCouponMutation,
   RemoveCouponMutationVariables,
-} from "../../utils/graphql/graphql.gen.ts";
+} from "../../utils/graphql/storefront.graphql.gen.ts";
 
 const action = async (
   _props: unknown,

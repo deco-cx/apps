@@ -6,13 +6,18 @@ import {
   Seo,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
+import { ProductGroup, SEO } from "./client/types.ts";
 import {
-  Installment,
-  ProductGroup,
-  ProductSearchResult,
+  OpenAPI,
+  Product as OProduct,
+  ProductInstallment,
+  ProductSearch,
   ProductVariant,
-  SEO,
-} from "./client/types.ts";
+  VariantProductSearch,
+} from "./openapi/vnda.openapi.gen.ts";
+
+type VNDAProductGroup = ProductSearch | OProduct;
+type VNDAProduct = VariantProductSearch | ProductVariant;
 
 interface ProductOptions {
   url: URL;
@@ -46,12 +51,12 @@ export const parseSlug = (slug: string) => {
   };
 };
 
-const pickVariant = (product: ProductGroup, variantId: string | null) => {
+const pickVariant = (product: VNDAProductGroup, variantId: string | null) => {
   const variants = normalizeVariants(product.variants);
   const [head] = variants;
 
   let [target, main, available]: Array<
-    ProductVariant | null
+    VNDAProduct | null
   > = [null, head, null];
 
   for (const variant of variants) {
@@ -65,7 +70,9 @@ const pickVariant = (product: ProductGroup, variantId: string | null) => {
   return target || fallback || head;
 };
 
-const normalizeInstallments = (installments: Installment[] | number[] = []) => {
+const normalizeInstallments = (
+  installments: ProductInstallment[] | number[] = [],
+) => {
   if (typeof installments[0] === "number") {
     const total = (installments as number[]).reduce((acc, curr) => acc + curr);
 
@@ -76,7 +83,9 @@ const normalizeInstallments = (installments: Installment[] | number[] = []) => {
     }];
   }
 
-  return (installments as Installment[]).map(({ number, price, total }) => ({
+  return (installments as ProductInstallment[]).map((
+    { number, price, total },
+  ) => ({
     number,
     price,
     total,
@@ -91,7 +100,7 @@ const toOffer = ({
   available_quantity,
   available,
   installments = [],
-}: ProductVariant): Offer | null => {
+}: VNDAProduct): Offer | null => {
   if (!price || !sale_price) {
     return null;
   }
@@ -137,7 +146,7 @@ const toOffer = ({
   };
 };
 
-const toPropertyValue = (variant: ProductVariant): PropertyValue[] =>
+const toPropertyValue = (variant: VNDAProduct): PropertyValue[] =>
   Object.values(variant.properties ?? {})
     .filter(Boolean)
     .map(({ value, name }) =>
@@ -150,16 +159,18 @@ const toPropertyValue = (variant: ProductVariant): PropertyValue[] =>
     ).filter((x): x is PropertyValue => Boolean(x));
 
 // deno-lint-ignore no-explicit-any
-const isProductVariant = (p: any): p is ProductVariant =>
+const isProductVariant = (p: any): p is VariantProductSearch =>
   typeof p.id === "number";
 
 const normalizeVariants = (
-  variants: ProductGroup["variants"] = [],
-): ProductVariant[] =>
-  variants.flatMap((v) => isProductVariant(v) ? [v] : Object.values(v));
+  variants: VNDAProductGroup["variants"] = [],
+): VNDAProduct[] =>
+  variants.flatMap((v) =>
+    isProductVariant(v) ? [v] : Object.values(v) as VNDAProduct[]
+  );
 
 export const toProduct = (
-  product: ProductGroup,
+  product: VNDAProductGroup,
   variantId: string | null,
   options: ProductOptions,
   level = 0,
@@ -204,8 +215,8 @@ export const toProduct = (
     image: product.images?.length ?? 0 > 1
       ? product.images?.map((img) => ({
         "@type": "ImageObject" as const,
-        alternateName: img.id?.toString() ?? "",
-        url: toURL(img.url),
+        alternateName: `${img.url}`,
+        url: toURL(img.url!),
       }))
       : [
         {
@@ -250,22 +261,31 @@ const removeFilter = (
   );
 
 export const toFilters = (
-  aggregations: ProductSearchResult["aggregations"],
+  aggregations:
+    OpenAPI["GET /api/v2/products/search"]["response"]["aggregations"],
   typeTagsInUse: { key: string; value: string }[],
   cleanUrl: URL,
 ): Filter[] => {
+  if (!aggregations) {
+    return [];
+  }
+
   const priceRange = {
     "@type": "FilterRange" as const,
     label: "Valor",
     key: "price_range",
     values: {
-      min: aggregations.min_price,
-      max: aggregations.max_price,
+      min: aggregations.min_price!,
+      max: aggregations.max_price!,
     },
   };
 
-  const types = Object.keys(aggregations.types).map((typeKey) => {
-    const typeValues = aggregations.types[typeKey];
+  const types = Object.keys(aggregations.types ?? {}).map((typeKey) => {
+    const typeValues = (aggregations.types as any)[typeKey] as {
+      name: string;
+      title: string;
+      count: number;
+    }[];
 
     return {
       "@type": "FilterToggle" as const,
