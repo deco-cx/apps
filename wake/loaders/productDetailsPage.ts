@@ -1,13 +1,12 @@
 import type { ProductDetailsPage } from "../../commerce/types.ts";
-import { gql } from "../../utils/graphql.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
+import { GetProduct } from "../utils/graphql/queries.ts";
 import {
   GetProductQuery,
   GetProductQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseSlug, toBreadcrumbList, toProduct } from "../utils/transform.ts";
-import { fragment } from "../utils/graphql/fragments/singleProduct.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -39,10 +38,8 @@ async function loader(
     GetProductQuery,
     GetProductQueryVariables
   >({
-    fragments: [fragment],
-    query:
-      gql`query GetProduct($productId: Long!) { product(productId: $productId) { ...SingleProduct } }`,
     variables: { productId },
+    ...GetProduct,
   });
 
   if (!wakeProduct) {

@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import "npm:@graphql-codegen/typescript";
 import "npm:@graphql-codegen/typescript-operations";
+import "npm:@graphql-codegen/add";
 
 import { CodegenConfig, generate } from "npm:@graphql-codegen/cli";
 import { compile } from "npm:json-schema-to-typescript";
@@ -192,8 +193,7 @@ const generateOpenAPI = async () => {
 const generateGraphQL = async () => {
   for (const path of allGraphqlPaths) {
     const [folder, base] = [dirname(path), basename(path)];
-    const [appEntrypoint, ...tail] = folder.split("/");
-    const outfile = toOutfile(join(...tail, base));
+    const outfile = toOutfile(base);
 
     console.info(`Generating GraphQL types for specs at ${folder}`);
     const config: CodegenConfig = {
@@ -202,7 +202,13 @@ const generateGraphQL = async () => {
       documents: [`./**/*.ts`],
       generates: {
         [outfile]: {
+          // This order matters
           plugins: [
+            {
+              add: {
+                content: BANNER,
+              },
+            },
             "typescript",
             "typescript-operations",
           ],
@@ -214,13 +220,7 @@ const generateGraphQL = async () => {
       },
     };
 
-    await generate({ ...config, cwd: appEntrypoint }, true);
-
-    const o = join(appEntrypoint, outfile);
-    await Deno.writeTextFile(
-      o,
-      `${BANNER.trim()}\n${await Deno.readTextFile(o)}`,
-    );
+    await generate({ ...config, cwd: folder }, true);
   }
 };
 

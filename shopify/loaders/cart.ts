@@ -1,13 +1,12 @@
-import { gql } from "../../utils/graphql.ts";
 import { AppContext } from "../mod.ts";
 import { getCartCookie, setCartCookie } from "../utils/cart.ts";
-import { fragment } from "../utils/fragments/cart.ts";
+import { CreateCart, GetCart } from "../utils/storefront/queries.ts";
 import {
   CreateCartMutation,
   CreateCartMutationVariables,
   GetCartQuery,
   GetCartQueryVariables,
-} from "../utils/storefront.graphql.gen.ts";
+} from "../utils/storefront/storefront.graphql.gen.ts";
 
 const loader = async (
   _props: unknown,
@@ -18,13 +17,9 @@ const loader = async (
   const maybeCartId = getCartCookie(req.headers);
 
   const cartId = maybeCartId ||
-    await storefront.query<CreateCartMutation, CreateCartMutationVariables>({
-      query: gql`mutation CreateCart {
-        payload: cartCreate { 
-          cart { id } 
-        }
-      }`,
-    }).then((data) => data.payload?.cart?.id);
+    await storefront.query<CreateCartMutation, CreateCartMutationVariables>(
+      CreateCart,
+    ).then((data) => data.payload?.cart?.id);
 
   if (!cartId) {
     throw new Error("Missing cart id");
@@ -32,8 +27,7 @@ const loader = async (
 
   const cart = await storefront.query<GetCartQuery, GetCartQueryVariables>({
     variables: { id: cartId },
-    fragments: [fragment],
-    query: gql`query GetCart($id: ID!) { cart(id: $id) { ...Cart } }`,
+    ...GetCart,
   }).then((data) => data.cart);
 
   setCartCookie(ctx.response.headers, cartId);

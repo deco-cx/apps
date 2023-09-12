@@ -1,12 +1,10 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
-import { gql } from "../../utils/graphql.ts";
-import { fragment as productFragment } from "../utils/fragments/product.ts";
-import { fragment as variantFragment } from "../utils/fragments/productVariant.ts";
+import { SearchProducts } from "../utils/storefront/queries.ts";
 import {
   SearchProductsQuery,
   SearchProductsQueryVariables,
-} from "../utils/storefront.graphql.gen.ts";
+} from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -42,18 +40,7 @@ const loader = async (
     SearchProductsQueryVariables
   >({
     variables: { first: count, query: query },
-    fragments: [productFragment, variantFragment],
-    query:
-      gql`query SearchProducts($first: Int, $after: String, $query: String) {
-      products(first: $first, after: $after, query: $query) {
-        pageInfo {
-          hasNextPage
-        }
-        nodes {
-          ...Product
-        }
-      }
-    }`,
+    ...SearchProducts,
   });
 
   // Transform Shopify product format into schema.org's compatible format

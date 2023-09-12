@@ -1,8 +1,7 @@
-import { gql } from "../../../utils/graphql.ts";
 import { HttpError } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { fragment } from "../../utils/graphql/fragments/checkout.ts";
+import { RemoveCoupon } from "../../utils/graphql/queries.ts";
 import {
   CheckoutFragment,
   RemoveCouponMutation,
@@ -26,12 +25,7 @@ const action = async (
     RemoveCouponMutationVariables
   >({
     variables: { checkoutId: cartId },
-    fragments: [fragment],
-    query: gql`mutation RemoveCoupon($checkoutId: Uuid!) {
-      checkout: checkoutRemoveCoupon(checkoutId: $checkoutId) {
-        ...Checkout
-      }
-    }`,
+    ...RemoveCoupon,
   });
 
   const checkoutId = data.checkout?.checkoutId;

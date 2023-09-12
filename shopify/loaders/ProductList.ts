@@ -1,12 +1,10 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
-import { gql } from "../../utils/graphql.ts";
-import { fragment as productFragment } from "../utils/fragments/product.ts";
-import { fragment as variantFragment } from "../utils/fragments/productVariant.ts";
+import { ListProducts } from "../utils/storefront/queries.ts";
 import {
   ListProductsQuery,
   ListProductsQueryVariables,
-} from "../utils/storefront.graphql.gen.ts";
+} from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -35,14 +33,7 @@ const loader = async (
     ListProductsQueryVariables
   >({
     variables: { first: count, query },
-    fragments: [productFragment, variantFragment],
-    query: gql`query ListProducts($first: Int, $after: String, $query: String) {
-      products(first: $first, after: $after, query: $query) {
-        nodes {
-          ...Product
-        }
-      }
-    }`,
+    ...ListProducts,
   });
 
   // Transform Shopify product format into schema.org's compatible format

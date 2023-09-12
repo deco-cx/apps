@@ -2,7 +2,7 @@
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import type { CartFragment } from "../utils/storefront.graphql.gen.ts";
+import type { CartFragment } from "../utils/storefront/storefront.graphql.gen.ts";
 import { Context, state as storeState } from "./context.ts";
 
 export const itemToAnalyticsItem = (

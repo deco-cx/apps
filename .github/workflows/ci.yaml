@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: "Setup deno"
+    steps:
+      - uses: actions/checkout@v3
+      - name: cache deno installation and deno.land dependencies
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/*') }}
+          restore-keys: ${{ runner.os }}-deno-
+          path: |
+            /home/runner/.deno
+            /home/runner/.cache/deno/deps/https/deno.land
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: Build Deno Module
+        run: deno run -A --lock=deno.lock --lock-write --reload mod.ts
+      - name: fetch any uncached dependencies
+        run: |
+          deno cache --lock=deno.lock --lock-write --reload=file: ./mod.ts
+
+      ## Generate updated live.gen.ts
+      - run: |
+          deno run --unstable --lock=deno.lock --lock-write -A dev.ts
+
+      - name: Check if there are changes on ${{ matrix.os }}
+        id: changes
+        shell: bash
+        run: |
+          git status --porcelain
+          if [[ $(git status --porcelain | wc -c) -eq 0 ]]; then
+              echo "uncommitted changes detected"
+              exit 1
+          fi
+
+      - run: |
+          deno test --lock=deno.lock --lock-write -A .
+      - run: |
+          deno bench --lock=deno.lock --lock-write -A .
+      - name: check lint
+        continue-on-error: true
+        run: |
+          deno --unstable lint
+      - name: check formatting
+        continue-on-error: true
+        run: |
+          deno fmt --check

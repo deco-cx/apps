@@ -1,12 +1,11 @@
-import { gql } from "../../../utils/graphql.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { fragment } from "../../utils/fragments/cart.ts";
 import {
   AddCouponMutation,
   AddCouponMutationVariables,
   CartFragment,
-} from "../../utils/storefront.graphql.gen.ts";
+} from "../../utils/storefront/storefront.graphql.gen.ts";
+import { AddCoupon } from "../../utils/storefront/queries.ts";
 
 type AddCouponProps = {
   discountCodes: string[];
@@ -29,16 +28,7 @@ const action = async (
     AddCouponMutationVariables
   >({
     variables: { cartId, discountCodes: props.discountCodes },
-    fragments: [fragment],
-    query: gql`mutation AddCoupon($cartId: ID!, $discountCodes: [String!]!) {
-      payload: cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) {
-        cart { ...Cart }
-        userErrors {
-          field
-          message
-        }
-      }
-    }`,
+    ...AddCoupon,
   });
 
   setCartCookie(ctx.response.headers, cartId);

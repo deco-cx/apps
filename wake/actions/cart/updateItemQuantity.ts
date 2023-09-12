@@ -1,8 +1,10 @@
-import { gql } from "../../../utils/graphql.ts";
 import { HttpError } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { fragment } from "../../utils/graphql/fragments/checkout.ts";
+import {
+  AddItemToCart,
+  RemoveItemFromCart,
+} from "../../utils/graphql/queries.ts";
 import {
   AddItemToCartMutation,
   AddItemToCartMutationVariables,
@@ -30,9 +32,7 @@ const addToCart = (
     variables: {
       input: { id: cartId, products: [props] },
     },
-    fragments: [fragment],
-    query:
-      gql`mutation AddItemToCart($input: CheckoutProductInput!) { checkout: checkoutAddProduct(input: $input) { ...Checkout }}`,
+    ...AddItemToCart,
   });
 
 const removeFromCart = (
@@ -47,9 +47,7 @@ const removeFromCart = (
     variables: {
       input: { id: cartId, products: [{ ...props, quantity: 1e6 }] },
     },
-    fragments: [fragment],
-    query:
-      gql`mutation RemoveItemFromCart($input: CheckoutProductInput!) { checkout: checkoutRemoveProduct(input: $input) { ...Checkout }}`,
+    ...RemoveItemFromCart,
   });
 
 const action = async (

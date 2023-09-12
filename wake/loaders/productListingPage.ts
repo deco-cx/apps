@@ -1,8 +1,7 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
-import { gql } from "../../utils/graphql.ts";
 import type { AppContext } from "../mod.ts";
-import { fragment } from "../utils/graphql/fragments/product.ts";
+import { Search } from "../utils/graphql/queries.ts";
 import {
   ProductFragment,
   ProductSortKeys,
@@ -79,43 +78,7 @@ const searchLoader = async (
 
   const data = await storefront.query<SearchQuery, SearchQueryVariables>({
     variables: { query, operation, first, sortDirection, sortKey, filters },
-    fragments: [fragment],
-    query:
-      gql`query Search($operation: Operation!, $query: String, $first: Int!, $sortDirection: SortDirection, $sortKey: ProductSearchSortKeys, $filters: [ProductFilterInput]) { 
-        search(query: $query, operation: $operation) { 
-          aggregations {
-            filters {
-              field
-              origin
-              values {
-                quantity
-                name
-              }
-            }
-          }
-          breadcrumbs {
-            link
-            text
-          }
-          forbiddenTerm {
-            text
-            suggested
-          }
-          pageSize
-          redirectUrl
-          searchTime
-          products(first: $first, sortDirection: $sortDirection, sortKey: $sortKey, filters: $filters) {
-            nodes {
-              ...Product
-            }
-            pageInfo {
-              hasNextPage
-              hasPreviousPage
-            }
-            totalCount
-          }
-        } 
-      }`,
+    ...Search,
   });
 
   const products = data.search?.products?.nodes ?? [];

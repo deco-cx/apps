@@ -1,14 +1,12 @@
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
 import { toProductPage } from "../../shopify/utils/transform.ts";
-import { gql } from "../../utils/graphql.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
-import { fragment as productFragment } from "../utils/fragments/product.ts";
-import { fragment as variantFragment } from "../utils/fragments/productVariant.ts";
 import {
   GetProductQuery,
   GetProductQueryVariables,
-} from "../utils/storefront.graphql.gen.ts";
+} from "../utils/storefront/storefront.graphql.gen.ts";
+import { GetProduct } from "../utils/storefront/queries.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -36,10 +34,7 @@ const loader = async (
     GetProductQueryVariables
   >({
     variables: { handle },
-    fragments: [productFragment, variantFragment],
-    query: gql`query GetProduct($handle: String) {
-      product(handle: $handle) { ...Product }
-    }`,
+    ...GetProduct,
   });
 
   if (!data?.product) {

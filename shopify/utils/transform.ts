@@ -9,7 +9,7 @@ import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import {
   ProductFragment as ProductShopify,
   ProductVariantFragment as SkuShopify,
-} from "./storefront.graphql.gen.ts";
+} from "./storefront/storefront.graphql.gen.ts";
 import { SelectedOption as SelectedOptionShopify } from "./types.ts";
 
 const getPath = ({ handle }: ProductShopify, sku?: SkuShopify) =>

@@ -1,12 +1,11 @@
-import { gql } from "../../../utils/graphql.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { fragment } from "../../utils/fragments/cart.ts";
+import { AddItemToCart } from "../../utils/storefront/queries.ts";
 import {
   AddItemToCartMutation,
   AddItemToCartMutationVariables,
   CartFragment,
-} from "../../utils/storefront.graphql.gen.ts";
+} from "../../utils/storefront/storefront.graphql.gen.ts";
 
 type UpdateLineProps = {
   lines: {
@@ -34,12 +33,7 @@ const action = async (
     AddItemToCartMutationVariables
   >({
     variables: { cartId, lines },
-    fragments: [fragment],
-    query: gql`mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
-      payload: cartLinesAdd(cartId: $cartId, lines: $lines) {
-        cart { ...Cart }
-      }
-    }`,
+    ...AddItemToCart,
   });
 
   setCartCookie(ctx.response.headers, cartId);
