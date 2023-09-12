@@ -185,8 +185,10 @@ const generateOpenAPI = async () => {
     await Deno.writeTextFile(outfile, final);
 
     // Format using deno
-    const fmt = new Deno.Command(Deno.execPath(), { args: ["fmt", outfile] });
-    await fmt.output();
+    await new Deno.Command(Deno.execPath(), { args: ["fmt", outfile] })
+      .output();
+    await new Deno.Command(Deno.execPath(), { args: ["lint", outfile] })
+      .output();
   }
 };
 
@@ -221,6 +223,15 @@ const generateGraphQL = async () => {
     };
 
     await generate({ ...config, cwd: folder }, true);
+
+    await new Deno.Command(Deno.execPath(), {
+      args: ["fmt", join(folder, outfile)],
+    })
+      .output();
+    await new Deno.Command(Deno.execPath(), {
+      args: ["lint", join(folder, outfile)],
+    })
+      .output();
   }
 };
 
