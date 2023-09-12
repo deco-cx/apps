@@ -40,8 +40,6 @@ function processTypeInNestedObject(obj: any) {
   return obj;
 }
 
-
-
 for await (const entry of walk(".")) {
   if (entry.isFile) {
     if (entry.path.endsWith(OPENAPI_EXTENSION)) {
