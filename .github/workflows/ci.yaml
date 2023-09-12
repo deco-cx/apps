@@ -29,8 +29,11 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-      - name: Build Deno Module
+      - name: Bundle Apps
         run: deno run -A --lock=deno.lock --lock-write --reload scripts/start.ts
+
+      - name: Check
+        run: deno task check
 
       - name: Check if there are changes on ${{ matrix.os }}
         id: changes
@@ -43,14 +46,7 @@ jobs:
           fi
 
       - name: Test
-        continue-on-error: true
         run: deno test --lock=deno.lock --lock-write -A .
+        
       - name: Benchmark
-        continue-on-error: true
         run: deno bench --lock=deno.lock --lock-write -A .
-      - name: check lint
-        continue-on-error: true
-        run: deno --unstable lint
-      - name: check formatting
-        continue-on-error: true
-        run: deno fmt --check
