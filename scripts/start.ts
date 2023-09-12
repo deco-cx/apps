@@ -40,6 +40,13 @@ const BANNER = `
 //        
 `;
 
+const fmtAndLint = async (file: string) => {
+  const deno = Deno.execPath();
+
+  await new Deno.Command(deno, { args: ["fmt", file] }).output();
+  await new Deno.Command(deno, { args: ["lint", file] }).output();
+};
+
 const toOutfile = (path: string) => path.replace(".json", ".gen.ts");
 
 // transforms: /a/{b}/c => /a/:b/c
@@ -183,12 +190,7 @@ const generateOpenAPI = async () => {
     );
 
     await Deno.writeTextFile(outfile, final);
-
-    // Format using deno
-    await new Deno.Command(Deno.execPath(), { args: ["fmt", outfile] })
-      .output();
-    await new Deno.Command(Deno.execPath(), { args: ["lint", outfile] })
-      .output();
+    await fmtAndLint(outfile);
   }
 };
 
@@ -223,15 +225,7 @@ const generateGraphQL = async () => {
     };
 
     await generate({ ...config, cwd: folder }, true);
-
-    await new Deno.Command(Deno.execPath(), {
-      args: ["fmt", join(folder, outfile)],
-    })
-      .output();
-    await new Deno.Command(Deno.execPath(), {
-      args: ["lint", join(folder, outfile)],
-    })
-      .output();
+    await fmtAndLint(join(folder, outfile));
   }
 };
 
