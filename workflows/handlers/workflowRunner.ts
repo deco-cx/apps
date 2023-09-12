@@ -3,7 +3,7 @@ import { Handler } from "deco/blocks/handler.ts";
 import { Workflow, WorkflowContext } from "deco/blocks/workflow.ts";
 import { workflowHTTPHandler } from "deco/deps.ts";
 import type { Manifest } from "deco/live.gen.ts";
-import { LiveConfig, LiveState } from "deco/mod.ts";
+import { DecoSiteState, DecoState } from "deco/mod.ts";
 import { ConnInfo } from "std/http/server.ts";
 export interface Config {
   workflow: Workflow;
@@ -13,7 +13,7 @@ export default function WorkflowHandler({ workflow }: Config): Handler {
   return (req: Request, conn: ConnInfo) => {
     const ctx = conn as HandlerContext<
       unknown,
-      LiveConfig<unknown, LiveState, Manifest>
+      DecoState<unknown, DecoSiteState, Manifest>
     >;
     if (ctx?.state) {
       const handler = workflowHTTPHandler(
