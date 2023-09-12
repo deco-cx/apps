@@ -30,14 +30,7 @@ jobs:
         with:
           deno-version: v1.x
       - name: Build Deno Module
-        run: deno run -A --lock=deno.lock --lock-write --reload mod.ts
-      - name: fetch any uncached dependencies
-        run: |
-          deno cache --lock=deno.lock --lock-write --reload=file: ./mod.ts
-
-      ## Generate updated live.gen.ts
-      - run: |
-          deno run --unstable --lock=deno.lock --lock-write -A dev.ts
+        run: deno run -A --lock=deno.lock --lock-write --reload scripts/start.ts
 
       - name: Check if there are changes on ${{ matrix.os }}
         id: changes
@@ -49,15 +42,11 @@ jobs:
               exit 1
           fi
 
-      - run: |
-          deno test --lock=deno.lock --lock-write -A .
-      - run: |
-          deno bench --lock=deno.lock --lock-write -A .
+      - run: deno test --lock=deno.lock --lock-write -A .
+      - run: deno bench --lock=deno.lock --lock-write -A .
       - name: check lint
         continue-on-error: true
-        run: |
-          deno --unstable lint
+        run: deno --unstable lint
       - name: check formatting
         continue-on-error: true
-        run: |
-          deno fmt --check
+        run: deno fmt --check
