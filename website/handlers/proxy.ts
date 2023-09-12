@@ -24,11 +24,11 @@ const removeCFHeaders = (headers: Headers) => {
 };
 
 const proxyTo = (
-  { proxyUrl: rawProxyUrl, basePath, host: hostToUse, customHeaders = {} }: {
+  { proxyUrl: rawProxyUrl, basePath, host: hostToUse, customHeaders = [] }: {
     proxyUrl: string;
     basePath?: string;
     host?: string;
-    customHeaders?: Record<string, string>;
+    customHeaders?: Header[];
   },
 ): Handler =>
 async (req, _ctx) => {
@@ -58,7 +58,7 @@ async (req, _ctx) => {
   headers.set("host", hostToUse ?? to.host);
   headers.set("x-forwarded-host", url.host);
 
-  for (const [key, value] of Object.entries(customHeaders ?? {})) {
+  for (const { key, value } of customHeaders) {
     headers.set(key, value);
   }
 
@@ -134,6 +134,6 @@ export interface Props {
  * @title Proxy
  * @description Proxies request to the target url.
  */
-export default function Proxy({ url, basePath, host }: Props) {
-  return proxyTo({ proxyUrl: url, basePath, host });
+export default function Proxy({ url, basePath, host, customHeaders }: Props) {
+  return proxyTo({ proxyUrl: url, basePath, host, customHeaders });
 }

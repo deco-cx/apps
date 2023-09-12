@@ -13,10 +13,13 @@ export interface Props {
   storeName: string;
 
   /**
-   * @ttile Access Token
+   * @title Access Token
    * @description Shopify storefront access token.
    */
   storefrontAccessToken: string;
+
+  /** @description Disable password protection on the store */
+  storefrontDigestCookie?: string;
 
   /**
    * @description Use Shopify as backend platform
