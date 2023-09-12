@@ -1,6 +1,6 @@
-import { HttpError } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import type { ShippingMethod } from "../../utils/client/types.ts";
+import { badRequest } from "deco/mod.ts";
 
 export interface Props {
   skuId: string;
@@ -17,7 +17,9 @@ const action = async (
   const { skuId, quantity, zip } = props;
 
   if (!skuId || !quantity || !zip) {
-    throw new HttpError(400, "Missing cart cookie");
+    badRequest({
+      message: "could not find some props",
+    });
   }
   const cep = await api["GET /api/v2/variants/:sku/shipping_methods"]({
     sku: skuId,
