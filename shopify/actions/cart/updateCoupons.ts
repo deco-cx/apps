@@ -1,7 +1,11 @@
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { Data as CartData } from "../../utils/queries/cart.ts";
-import { Data, query, Variables } from "../../utils/queries/updateCoupon.ts";
+import {
+  AddCouponMutation,
+  AddCouponMutationVariables,
+  CartFragment,
+} from "../../utils/storefront/storefront.graphql.gen.ts";
+import { AddCoupon } from "../../utils/storefront/queries.ts";
 
 type AddCouponProps = {
   discountCodes: string[];
@@ -11,7 +15,7 @@ const action = async (
   props: AddCouponProps,
   req: Request,
   ctx: AppContext,
-): Promise<CartData["cart"]> => {
+): Promise<CartFragment | null> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
 
@@ -19,14 +23,17 @@ const action = async (
     throw new Error("Missing cart id");
   }
 
-  const { payload: { cart } } = await storefront.query<Data, Variables>({
+  const { payload } = await storefront.query<
+    AddCouponMutation,
+    AddCouponMutationVariables
+  >({
     variables: { cartId, discountCodes: props.discountCodes },
-    query,
+    ...AddCoupon,
   });
 
   setCartCookie(ctx.response.headers, cartId);
 
-  return cart;
+  return payload?.cart ?? null;
 };
 
 export default action;

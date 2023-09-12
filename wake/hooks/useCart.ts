@@ -1,7 +1,8 @@
+// deno-lint-ignore-file no-explicit-any
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import { CheckoutFragment } from "../utils/graphql/graphql.gen.ts";
+import { CheckoutFragment } from "../utils/graphql/storefront.graphql.gen.ts";
 import { Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;

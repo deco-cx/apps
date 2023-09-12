@@ -1,7 +1,11 @@
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { Data, query, Variables } from "../../utils/queries/addItem.ts";
-import { Data as CartData } from "../../utils/queries/cart.ts";
+import { AddItemToCart } from "../../utils/storefront/queries.ts";
+import {
+  AddItemToCartMutation,
+  AddItemToCartMutationVariables,
+  CartFragment,
+} from "../../utils/storefront/storefront.graphql.gen.ts";
 
 type UpdateLineProps = {
   lines: {
@@ -16,7 +20,7 @@ const action = async (
   { lines }: UpdateLineProps,
   req: Request,
   ctx: AppContext,
-): Promise<CartData["cart"]> => {
+): Promise<CartFragment | null> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
 
@@ -24,14 +28,17 @@ const action = async (
     throw new Error("Missing cart id");
   }
 
-  const { payload: { cart } } = await storefront.query<Data, Variables>({
+  const { payload } = await storefront.query<
+    AddItemToCartMutation,
+    AddItemToCartMutationVariables
+  >({
     variables: { cartId, lines },
-    query,
+    ...AddItemToCart,
   });
 
   setCartCookie(ctx.response.headers, cartId);
 
-  return cart;
+  return payload?.cart ?? null;
 };
 
 export default action;

@@ -1,5 +1,6 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
+import { withDigestCookie } from "../utils/password.ts";
 
 const PATHS_TO_PROXY = [
   "/checkouts/*",
@@ -13,12 +14,27 @@ const PATHS_TO_PROXY = [
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
+const PATHS_WITH_DIGEST = new Set([
+  "/account",
+  "/account/*",
+  "/password",
+  "/password/*",
+  "/challenge",
+  "/challenge/*",
+]);
+
 const buildProxyRoutes = (
-  { storeName, extraPaths, includeSiteMap, generateDecoSiteMap }: {
-    storeName?: string;
+  {
+    ctx,
+    ctx: { storeName },
+    extraPaths,
+    includeSiteMap,
+    generateDecoSiteMap,
+  }: {
     extraPaths: string[];
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
+    ctx: AppContext;
   },
 ) => {
   const publicUrl = new URL(`https://${storeName}.myshopify.com`);
@@ -43,6 +59,9 @@ const buildProxyRoutes = (
           __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
+          customHeaders: PATHS_WITH_DIGEST.has(pathTemplate)
+            ? withDigestCookie(ctx)
+            : [],
         },
       },
     });
@@ -113,8 +132,8 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     includeSiteMap,
-    storeName: ctx.storeName,
     extraPaths: extraPathsToProxy,
+    ctx,
   });
 }
 

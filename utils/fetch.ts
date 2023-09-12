@@ -60,3 +60,7 @@ export const fetchAPI = async <T>(
 
   return response.json();
 };
+
+export const STALE = {
+  deco: { cache: "stale-while-revalidate" },
+} as const;

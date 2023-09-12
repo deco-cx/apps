@@ -43,6 +43,7 @@ type URLPatternParams<URL extends string> = URL extends
   : URL extends `/*${infer param}`
     ? { [key in param]: URLPatternParam | URLPatternParam[] }
   : URL extends `/${string}/${infer rest}` ? URLPatternParams<`/${rest}`>
+  // deno-lint-ignore ban-types
   : {};
 
 type ClientOf<T> = {

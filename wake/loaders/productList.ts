@@ -1,12 +1,11 @@
 import type { Product } from "../../commerce/types.ts";
-import { gql } from "../../utils/graphql.ts";
 import type { AppContext } from "../mod.ts";
-import { fragment } from "../utils/graphql/fragments/product.ts";
+import { GetProducts } from "../utils/graphql/queries.ts";
 import {
   GetProductsQuery,
   GetProductsQueryVariables,
   ProductFragment,
-} from "../utils/graphql/graphql.gen.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -103,9 +102,7 @@ const productListLoader = async (
     GetProductsQueryVariables
   >({
     variables: props,
-    fragments: [fragment],
-    query:
-      gql`query GetProducts($filters: ProductExplicitFiltersInput!, $first: Int!, $sortDirection: SortDirection!, $sortKey: ProductSortKeys) { products(filters: $filters, first: $first, sortDirection: $sortDirection, sortKey: $sortKey) { nodes { ...Product } }}`,
+    ...GetProducts,
   });
 
   const products = data.products?.nodes;

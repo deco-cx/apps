@@ -1,5 +1,6 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
 import { ProductSearchResult, Sort } from "../utils/client/types.ts";
@@ -70,9 +71,7 @@ const searchLoader = async (
     "tags[]": props.tags,
     wildcard: true,
     ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
-  }, {
-    deco: { cache: "stale-while-revalidate" },
-  });
+  }, STALE);
   const pagination = JSON.parse(
     response.headers.get("x-pagination") ?? "null",
   ) as ProductSearchResult["pagination"] | null;
@@ -84,17 +83,15 @@ const searchLoader = async (
       resource_type: "Tag",
       code: categoryTagName,
       type: "category",
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-    }).then((res) => res.json()),
+    }, STALE).then((res) => res.json()),
     isSearchPage
-      ? api["GET /api/v2/tags/:name"]({ name: categoryTagName })
+      ? api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
         .then((res) => res.json()).catch(() => undefined)
       : undefined,
   ]);
 
   const { results: searchResults } = search;
-  const products = searchResults.map((product) =>
+  const products = searchResults?.map((product) =>
     toProduct(product, null, {
       url,
       priceCurrency: "BRL",
@@ -126,7 +123,7 @@ const searchLoader = async (
       numberOfItems: 0,
     },
     filters: toFilters(search.aggregations, typeTags, cleanUrl),
-    products: products,
+    products: products ?? [],
     pageInfo: {
       nextPage: pagination?.next_page ? `?${nextPage}` : undefined,
       previousPage: pagination?.prev_page ? `?${previousPage}` : undefined,

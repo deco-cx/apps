@@ -1,7 +1,7 @@
 import type { App, FnContext } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { API } from "./utils/openapi/openapi.gen.ts";
+import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 
@@ -35,7 +35,7 @@ export interface Props {
 }
 
 export interface State extends Props {
-  api: ReturnType<typeof createHttpClient<API>>;
+  api: ReturnType<typeof createHttpClient<OpenAPI>>;
   storefront: ReturnType<typeof createGraphqlClient>;
 }
 
@@ -44,7 +44,7 @@ export interface State extends Props {
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, storefrontToken } = props;
-  const api = createHttpClient<API>({
+  const api = createHttpClient<OpenAPI>({
     base: "https://api.fbits.net",
     headers: new Headers({ "Authorization": `Basic ${token}` }),
     fetcher: fetchSafe,

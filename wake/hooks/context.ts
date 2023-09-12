@@ -1,7 +1,7 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
-import type { CheckoutFragment } from "../utils/graphql/graphql.gen.ts";
+import type { CheckoutFragment } from "../utils/graphql/storefront.graphql.gen.ts";
 
 export interface Context {
   cart: Partial<CheckoutFragment>;

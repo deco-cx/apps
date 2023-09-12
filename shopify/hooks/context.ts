@@ -1,15 +1,15 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
-import { Fragment as Cart } from "../utils/fragments/cart.ts";
+import type { CartFragment } from "../utils/storefront/storefront.graphql.gen.ts";
 
-interface Context {
-  cart: Cart;
+export interface Context {
+  cart: CartFragment | null;
 }
 
 const loading = signal<boolean>(true);
 const context = {
-  cart: signal<Cart | null>(null),
+  cart: signal<CartFragment | null>(null),
 };
 
 let queue = Promise.resolve();

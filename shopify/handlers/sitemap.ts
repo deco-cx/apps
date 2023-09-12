@@ -1,6 +1,7 @@
-import Proxy from "deco/handlers/proxy.ts";
 import { ConnInfo } from "std/http/server.ts";
+import Proxy from "../../website/handlers/proxy.ts";
 import { AppContext } from "../mod.ts";
+import { withDigestCookie } from "../utils/password.ts";
 
 const xmlHeader =
   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
@@ -35,9 +36,9 @@ export interface Props {
  */
 export default function Sitemap(
   { include }: Props,
-  { storeName }: AppContext,
+  appCtx: AppContext,
 ) {
-  const url = `https://${storeName}.myshopify.com`;
+  const url = `https://${appCtx.storeName}.myshopify.com`;
   return async (
     req: Request,
     ctx: ConnInfo,
@@ -51,6 +52,7 @@ export default function Sitemap(
 
     const response = await Proxy({
       url: publicUrl,
+      customHeaders: withDigestCookie(appCtx),
     })(req, ctx);
 
     if (!response.ok) {

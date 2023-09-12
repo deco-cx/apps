@@ -1,14 +1,13 @@
-import { gql } from "../../utils/graphql.ts";
 import { AppContext } from "../mod.ts";
 import { getCartCookie, setCartCookie } from "../utils/cart.ts";
-import { fragment } from "../utils/graphql/fragments/checkout.ts";
+import { CreateCart, GetCart } from "../utils/graphql/queries.ts";
 import {
   CheckoutFragment,
   CreateCartMutation,
   CreateCartMutationVariables,
   GetCartQuery,
   GetCartQueryVariables,
-} from "../utils/graphql/graphql.gen.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
 
 /**
  * @title VNDA Integration
@@ -25,14 +24,10 @@ const loader = async (
   const data = cartId
     ? await storefront.query<GetCartQuery, GetCartQueryVariables>({
       variables: { checkoutId: cartId },
-      fragments: [fragment],
-      query:
-        gql`query GetCart($checkoutId: String!) { checkout(checkoutId: $checkoutId) { ...Checkout } }`,
+      ...GetCart,
     })
     : await storefront.query<CreateCartMutation, CreateCartMutationVariables>({
-      fragments: [fragment],
-      query:
-        gql`mutation CreateCart { checkout: createCheckout { ...Checkout } }`,
+      ...CreateCart,
     });
 
   const checkoutId = data.checkout?.checkoutId;

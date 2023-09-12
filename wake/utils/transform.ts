@@ -11,7 +11,7 @@ import {
   ProductFragment,
   SearchQuery,
   SingleProductFragment,
-} from "./graphql/graphql.gen.ts";
+} from "./graphql/storefront.graphql.gen.ts";
 
 export const stale = {
   deco: { cache: "stale-while-revalidate" },

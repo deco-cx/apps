@@ -1,10 +1,10 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
+import { ListProducts } from "../utils/storefront/queries.ts";
 import {
-  Data,
-  query as productsQuery,
-  Variables,
-} from "../utils/queries/products.ts";
+  ListProductsQuery,
+  ListProductsQueryVariables,
+} from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -28,10 +28,12 @@ const loader = async (
   const count = props.count ?? 12;
   const query = props.query || "";
 
-  // search products on Shopify. Feel free to change any of these parameters
-  const data = await storefront.query<Data, Variables>({
-    query: productsQuery,
+  const data = await storefront.query<
+    ListProductsQuery,
+    ListProductsQueryVariables
+  >({
     variables: { first: count, query },
+    ...ListProducts,
   });
 
   // Transform Shopify product format into schema.org's compatible format

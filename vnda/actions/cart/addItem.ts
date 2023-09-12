@@ -1,8 +1,7 @@
 import { HttpError } from "../../../utils/http.ts";
-import cartLoader from "../../loaders/cart.ts";
+import cartLoader, { Cart } from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
-import type { Cart } from "../../utils/client/types.ts";
 
 export interface Props {
   itemId: string;

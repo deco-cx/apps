@@ -1,9 +1,9 @@
-import type { InvocationFuncFor } from "deco/clients/withManifest.ts";
+// deno-lint-ignore-file no-explicit-any
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import type { Cart, Item } from "../utils/client/types.ts";
-import { state as storeState } from "./context.ts";
+import type { Item } from "../utils/client/types.ts";
+import { Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
 
@@ -23,30 +23,25 @@ export const itemToAnalyticsItem = (
   quantity: item.quantity,
 });
 
-type PropsOf<T> = T extends (props: infer P, r: any, ctx: any) => any ? P
-  : T extends (props: infer P, r: any) => any ? P
-  : T extends (props: infer P) => any ? P
-  : never;
+type EnqueuableActions<
+  K extends keyof Manifest["actions"],
+> = Manifest["actions"][K]["default"] extends
+  (...args: any[]) => Promise<Context["cart"]> ? K : never;
 
-type Actions =
-  | "vnda/actions/cart/addItem.ts"
-  | "vnda/actions/cart/updateCart.ts"
-  | "vnda/actions/cart/updateItem.ts";
-
-const action =
-  (key: Actions) => (props: PropsOf<InvocationFuncFor<Manifest, typeof key>>) =>
-    storeState.enqueue((signal) =>
-      invoke({ cart: { key, props } }, { signal }) satisfies Promise<
-        { cart: Cart }
-      >
-    );
+const enqueue = <
+  K extends keyof Manifest["actions"],
+>(key: EnqueuableActions<K>) =>
+(props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
+  storeState.enqueue((signal) =>
+    invoke({ cart: { key, props } } as any, { signal }) as any
+  );
 
 const state = {
   cart,
   loading,
-  update: action("vnda/actions/cart/updateCart.ts"),
-  addItem: action("vnda/actions/cart/addItem.ts"),
-  updateItem: action("vnda/actions/cart/updateItem.ts"),
+  update: enqueue("vnda/actions/cart/updateCart.ts"),
+  addItem: enqueue("vnda/actions/cart/addItem.ts"),
+  updateItem: enqueue("vnda/actions/cart/updateItem.ts"),
 };
 
 export const useCart = () => state;

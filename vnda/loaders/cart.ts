@@ -1,6 +1,11 @@
 import { AppContext } from "../mod.ts";
 import { getCartCookie, setCartCookie } from "../utils/cart.ts";
-import type { Cart } from "../utils/client/types.ts";
+import { OpenAPI } from "../utils/openapi/vnda.openapi.gen.ts";
+
+export type Cart = {
+  orderForm?: OpenAPI["POST /api/v2/carts"]["response"];
+  relatedItems?: [];
+};
 
 /**
  * @title VNDA Integration
@@ -17,7 +22,9 @@ const loader = async (
   const orderForm = cartId
     ? await api["GET /api/v2/carts/:cartId"]({ cartId })
       .then((res) => res.json())
-    : await api["POST /api/v2/carts"]({}).then((res) => res.json());
+    : await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
+      res.json()
+    );
 
   setCartCookie(ctx.response.headers, orderForm.id.toString());
 

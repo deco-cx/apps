@@ -13,7 +13,7 @@ export type Props = PaginationOptions;
  */
 export default function productDetailsPage(
   config: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): ExtensionOf<ProductDetailsPage | null> {
   const client = createClient({ ...ctx });
