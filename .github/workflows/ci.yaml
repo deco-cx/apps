@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    name: "Setup deno"
+    name: "Bundle & Check Apps"
     steps:
       - uses: actions/checkout@v3
       - name: cache deno installation and deno.land dependencies
