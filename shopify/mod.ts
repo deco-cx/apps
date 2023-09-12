@@ -34,8 +34,8 @@ export interface State extends Props {
 export default function App(props: Props): App<Manifest, State> {
   const { storeName, storefrontAccessToken } = props;
   const storefront = createGraphqlClient({
-    endpoint: `https://${storeName}.myshopify.com/api/2023-07/graphql.json`,
     fetcher: fetchSafe,
+    endpoint: `https://${storeName}.myshopify.com/api/2023-07/graphql.json`,
     headers: new Headers({
       "Content-Type": "application/json",
       "X-Shopify-Storefront-Access-Token": storefrontAccessToken,

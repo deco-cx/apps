@@ -1,7 +1,11 @@
+import { gql } from "../../../utils/graphql.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { Data as CartData } from "../../utils/queries/cart.ts";
-import { Data, query, Variables } from "../../utils/queries/updateCart.ts";
+import { fragment } from "../../utils/fragments/cart.ts";
+import {
+  UpdateItemsMutation,
+  UpdateItemsMutationVariables,
+} from "../../utils/storefront.graphql.gen.ts";
 
 type UpdateLineProps = {
   lines: Array<{
@@ -14,7 +18,7 @@ const action = async (
   { lines }: UpdateLineProps,
   req: Request,
   ctx: AppContext,
-): Promise<CartData["cart"]> => {
+): Promise<NonNullable<UpdateItemsMutation["payload"]>["cart"]> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
 
@@ -22,14 +26,23 @@ const action = async (
     throw new Error("Missing cart id");
   }
 
-  const { payload: { cart } } = await storefront.query<Data, Variables>({
+  const { payload } = await storefront.query<
+    UpdateItemsMutation,
+    UpdateItemsMutationVariables
+  >({
     variables: { cartId, lines },
-    query,
+    fragments: [fragment],
+    query:
+      gql`mutation UpdateItems($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      payload: cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart { ...Cart }
+      }
+    }`,
   });
 
   setCartCookie(ctx.response.headers, cartId);
 
-  return cart;
+  return payload?.cart;
 };
 
 export default action;

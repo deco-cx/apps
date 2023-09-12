@@ -1,31 +1,7 @@
 import { gql } from "../../../utils/graphql.ts";
-import {
-  Image,
-  Price,
-  SelectedOption,
-  UnitPriceMeasurement,
-} from "../types.ts";
 
-export interface Fragment {
-  availableForSale: boolean;
-  barcode: string;
-  compareAtPrice: Price | null;
-  currentlyNotInStock: boolean;
-  id: string;
-  image: Image;
-  price: Price;
-  quantityAvailable: number;
-  requiresShipping: boolean;
-  selectedOptions: SelectedOption[];
-  sku: string;
-  title: string;
-  unitPrice: null;
-  unitPriceMeasurement: UnitPriceMeasurement;
-  weight: number;
-  weightUnit: string;
-}
-
-export const fragment = gql`on ProductVariant {
+export const fragment = gql`
+fragment ProductVariant on ProductVariant {
   availableForSale
   barcode
   compareAtPrice {

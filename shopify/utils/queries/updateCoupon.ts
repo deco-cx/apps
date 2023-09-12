@@ -1,13 +1,12 @@
 import { gql } from "../../../utils/graphql.ts";
 import {
-  Fragment as CartFragment,
-  fragment as cartFragment,
+  Fragment as CartFragment
 } from "../fragments/cart.ts";
 
 export const query = gql`
 mutation addCoupon($cartId: ID!, $discountCodes: [String!]!) {
   payload: cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) {
-    cart { ...${cartFragment} }
+    cart { ...Cart }
     userErrors {
       field
       message

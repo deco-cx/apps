@@ -6,8 +6,10 @@ import type {
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
-import { Fragment as ProductShopify } from "./fragments/product.ts";
-import { Fragment as SkuShopify } from "./fragments/productVariant.ts";
+import {
+  ProductFragment as ProductShopify,
+  ProductVariantFragment as SkuShopify,
+} from "./storefront.graphql.gen.ts";
 import { SelectedOption as SelectedOptionShopify } from "./types.ts";
 
 const getPath = ({ handle }: ProductShopify, sku?: SkuShopify) =>
@@ -117,7 +119,7 @@ export const toProduct = (
     name: sku.title,
     description,
     sku: productID,
-    gtin: barcode,
+    gtin: barcode ?? undefined,
     brand: { "@type": "Brand", name: vendor },
     releaseDate: createdAt,
     additionalProperty,
@@ -136,8 +138,8 @@ export const toProduct = (
     },
     image: skuImages?.map((img) => ({
       "@type": "ImageObject",
-      alternateName: img.altText ?? "",
-      url: img.url,
+      alternateName: img?.altText ?? "",
+      url: img?.url,
     })) ?? [DEFAULT_IMAGE],
     offers: {
       "@type": "AggregateOffer",
@@ -153,7 +155,7 @@ export const toProduct = (
         availability: availableForSale
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
-        inventoryLevel: { value: quantityAvailable },
+        inventoryLevel: { value: quantityAvailable ?? 0 },
         priceSpecification: priceSpec,
       }],
     },

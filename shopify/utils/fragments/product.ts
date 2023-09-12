@@ -1,37 +1,7 @@
 import { gql } from "../../../utils/graphql.ts";
-import { Image, Media, Option, PriceRange, SEO } from "../types.ts";
-import {
-  Fragment as Variant,
-  fragment as ProductVariantFragment,
-} from "./productVariant.ts";
 
-export interface Fragment {
-  availableForSale: boolean;
-  createdAt: string;
-  description: string;
-  descriptionHtml: string;
-  featuredImage: Image;
-  handle: string;
-  id: string;
-  images: { nodes: Image[] };
-  isGiftCard: boolean;
-  media: Media;
-  onlineStoreUrl: null;
-  options: Option[];
-  priceRange: PriceRange;
-  productType: string;
-  publishedAt: string;
-  requiresSellingPlan: boolean;
-  seo: SEO;
-  tags: string[];
-  title: string;
-  totalInventory: number;
-  updatedAt: string;
-  variants: { nodes: Variant[] };
-  vendor: string;
-}
-
-export const fragment = gql`on Product {
+export const fragment = gql`
+fragment Product on Product {
   availableForSale
   createdAt
   description
@@ -87,7 +57,7 @@ export const fragment = gql`on Product {
   updatedAt
   variants(first: 10) {
     nodes {
-      ...${ProductVariantFragment}
+      ...ProductVariant
     }
   }
   vendor
