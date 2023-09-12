@@ -18,6 +18,12 @@ export interface Props {
    */
   storefrontAccessToken: string;
 
+  /**
+   * @ttile Access Token
+   * @description Shopify admin access token.
+   */
+  adminAccessToken: string;
+
   /** @description Disable password protection on the store */
   storefrontDigestCookie?: string;
 
@@ -29,13 +35,14 @@ export interface Props {
 
 export interface State extends Props {
   storefront: ReturnType<typeof createGraphqlClient>;
+  admin: ReturnType<typeof createGraphqlClient>;
 }
 
 /**
  * @title Shopify
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { storeName, storefrontAccessToken } = props;
+  const { storeName, storefrontAccessToken, adminAccessToken } = props;
   const storefront = createGraphqlClient({
     fetcher: fetchSafe,
     endpoint: `https://${storeName}.myshopify.com/api/2023-07/graphql.json`,
@@ -44,6 +51,15 @@ export default function App(props: Props): App<Manifest, State> {
       "X-Shopify-Storefront-Access-Token": storefrontAccessToken,
     }),
   });
+  const admin = createGraphqlClient({
+    fetcher: fetchSafe,
+    endpoint:
+      `https://${storeName}.myshopify.com/admin/api/2023-07/graphql.json`,
+    headers: new Headers({
+      "Content-Type": "application/json",
+      "X-Shopify-Access-Token": adminAccessToken || "",
+    }),
+  });
 
-  return { state: { ...props, storefront }, manifest };
+  return { state: { ...props, admin, storefront }, manifest };
 }
