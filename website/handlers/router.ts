@@ -8,7 +8,7 @@ import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
 import { isFreshCtx } from "deco/handlers/fresh.ts";
 import { observe } from "deco/observability/observe.ts";
-import { Flag, LiveState, RouterContext } from "deco/types.ts";
+import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
@@ -52,18 +52,11 @@ export const router = (
     ) => {
       const ctx = { ...connInfo, params: (groups ?? {}) } as ConnInfo & {
         params: Record<string, string>;
-        state: {
-          routes: Route[];
-          routerInfo: RouterContext;
-          flags: Flag[];
-        };
+        state: DecoState;
       };
 
       ctx.state.routes = routes;
-      ctx.state.routerInfo = {
-        flags: ctx.state.flags,
-        pagePath: routePath,
-      };
+      ctx.state.pathTemplate = routePath;
 
       const resolvedOrPromise = isDeferred<
           Handler,
@@ -166,7 +159,9 @@ export default function RoutesSelection(
   ctx: AppContext,
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
-    const t = isFreshCtx<LiveState>(connInfo) ? connInfo.state.t : undefined;
+    const t = isFreshCtx<DecoSiteState>(connInfo)
+      ? connInfo.state.t
+      : undefined;
 
     const routesFromProps = Array.isArray(audiences) ? audiences : [];
     // everyone should come first in the list given that we override the everyone value with the upcoming flags.
