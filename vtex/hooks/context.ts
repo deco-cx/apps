@@ -5,7 +5,7 @@ import { invoke } from "../runtime.ts";
 import type { OrderForm } from "../utils/types.ts";
 import { WishlistItem } from "../utils/types.ts";
 
-interface Context {
+export interface Context {
   cart: OrderForm | null;
   user: User | null;
   wishlist: WishlistItem[] | null;

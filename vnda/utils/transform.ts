@@ -281,6 +281,7 @@ export const toFilters = (
   };
 
   const types = Object.keys(aggregations.types ?? {}).map((typeKey) => {
+    // deno-lint-ignore no-explicit-any
     const typeValues = (aggregations.types as any)[typeKey] as {
       name: string;
       title: string;

@@ -8,8 +8,8 @@ import { createClient, getProductId } from "../utils/client.ts";
  * @title Opiniões verificadas - Ratings for Products[]
  */
 export default function productList(
-  config: unknown,
-  req: Request,
+  _config: unknown,
+  _req: Request,
   ctx: AppContext,
 ): ExtensionOf<Product[] | null> {
   const client = createClient({ ...ctx });

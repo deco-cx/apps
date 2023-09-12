@@ -3,6 +3,7 @@ import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
 import { fragment } from "../../utils/fragments/cart.ts";
 import {
+  CartFragment,
   UpdateItemsMutation,
   UpdateItemsMutationVariables,
 } from "../../utils/storefront.graphql.gen.ts";
@@ -18,7 +19,7 @@ const action = async (
   { lines }: UpdateLineProps,
   req: Request,
   ctx: AppContext,
-): Promise<NonNullable<UpdateItemsMutation["payload"]>["cart"]> => {
+): Promise<CartFragment | null> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
 
@@ -42,7 +43,7 @@ const action = async (
 
   setCartCookie(ctx.response.headers, cartId);
 
-  return payload?.cart;
+  return payload?.cart ?? null;
 };
 
 export default action;

@@ -1,10 +1,10 @@
-import { InvocationFuncFor } from "deco/clients/withManifest.ts";
+// deno-lint-ignore-file no-explicit-any
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import { mapCategoriesToAnalyticsCategories } from "../../commerce/utils/productToAnalyticsItem.ts";
 import { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
 import type { OrderForm, OrderFormItem } from "../utils/types.ts";
-import { state as storeState } from "./context.ts";
+import { Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
 
@@ -59,46 +59,33 @@ export const itemToAnalyticsItem = (
   ...(mapItemCategoriesToAnalyticsCategories(item)),
 });
 
-type PropsOf<T> = T extends (props: infer P, r: any, ctx: any) => any ? P
-  : T extends (props: infer P, r: any) => any ? P
-  : T extends (props: infer P) => any ? P
-  : never;
+type EnqueuableActions<
+  K extends keyof Manifest["actions"],
+> = Manifest["actions"][K]["default"] extends
+  (...args: any[]) => Promise<Context["cart"]> ? K : never;
 
-type Actions =
-  | "vtex/actions/cart/updateItems.ts"
-  | "vtex/actions/cart/removeItems.ts"
-  | "vtex/actions/cart/addItems.ts"
-  | "vtex/actions/cart/updateCoupons.ts"
-  | "vtex/actions/cart/updateItemPrice.ts"
-  | "vtex/actions/cart/getInstallment.ts"
-  | "vtex/actions/cart/updateProfile.ts"
-  | "vtex/actions/cart/updateUser.ts"
-  | "vtex/actions/cart/updateItemAttachment.ts"
-  | "vtex/actions/cart/removeItemAttachment.ts"
-  | "vtex/actions/cart/updateAttachment.ts";
-
-const action =
-  (key: Actions) => (props: PropsOf<InvocationFuncFor<Manifest, typeof key>>) =>
-    storeState.enqueue((signal) =>
-      invoke({ cart: { key, props } }, { signal }) satisfies Promise<
-        { cart: OrderForm }
-      >
-    );
+const enqueue = <
+  K extends keyof Manifest["actions"],
+>(key: EnqueuableActions<K>) =>
+(props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
+  storeState.enqueue((signal) =>
+    invoke({ cart: { key, props } } as any, { signal }) as any
+  );
 
 const state = {
   cart,
   loading,
-  updateItems: action("vtex/actions/cart/updateItems.ts"),
-  removeAllItems: action("vtex/actions/cart/removeItems.ts"),
-  addItems: action("vtex/actions/cart/addItems.ts"),
-  addCouponsToCart: action("vtex/actions/cart/updateCoupons.ts"),
-  changePrice: action("vtex/actions/cart/updateItemPrice.ts"),
-  getCartInstallments: action("vtex/actions/cart/getInstallment.ts"),
-  ignoreProfileData: action("vtex/actions/cart/updateProfile.ts"),
-  removeAllPersonalData: action("vtex/actions/cart/updateUser.ts"),
-  addItemAttachment: action("vtex/actions/cart/updateItemAttachment.ts"),
-  removeItemAttachment: action("vtex/actions/cart/removeItemAttachment.ts"),
-  sendAttachment: action("vtex/actions/cart/updateAttachment.ts"),
+  updateItems: enqueue("vtex/actions/cart/updateItems.ts"),
+  removeAllItems: enqueue("vtex/actions/cart/removeItems.ts"),
+  addItems: enqueue("vtex/actions/cart/addItems.ts"),
+  addCouponsToCart: enqueue("vtex/actions/cart/updateCoupons.ts"),
+  changePrice: enqueue("vtex/actions/cart/updateItemPrice.ts"),
+  getCartInstallments: enqueue("vtex/actions/cart/getInstallment.ts"),
+  ignoreProfileData: enqueue("vtex/actions/cart/updateProfile.ts"),
+  removeAllPersonalData: enqueue("vtex/actions/cart/updateUser.ts"),
+  addItemAttachment: enqueue("vtex/actions/cart/updateItemAttachment.ts"),
+  removeItemAttachment: enqueue("vtex/actions/cart/removeItemAttachment.ts"),
+  sendAttachment: enqueue("vtex/actions/cart/updateAttachment.ts"),
   simulate: invoke.vtex.actions.cart.simulation,
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };

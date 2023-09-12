@@ -43,7 +43,8 @@ const loader = async (
   >({
     variables: { first: count, query: query },
     fragments: [productFragment, variantFragment],
-    query: gql`query SearchProducts($first: Int, $after: String, $query: String) {
+    query:
+      gql`query SearchProducts($first: Int, $after: String, $query: String) {
       products(first: $first, after: $after, query: $query) {
         pageInfo {
           hasNextPage

@@ -1,12 +1,12 @@
-import { InvocationFuncFor } from "deco/clients/withManifest.ts";
+// deno-lint-ignore-file no-explicit-any
 import type { AnalyticsItem } from "../../commerce/types.ts";
-import { Manifest } from "../manifest.gen.ts";
+import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import { Fragment as Cart, Item } from "../utils/fragments/cart.ts";
-import { state as storeState } from "./context.ts";
+import type { CartFragment } from "../utils/storefront.graphql.gen.ts";
+import { Context, state as storeState } from "./context.ts";
 
 export const itemToAnalyticsItem = (
-  item: Item & { quantity: number },
+  item: CartFragment["lines"]["nodes"][number] & { quantity: number },
   index: number,
 ): AnalyticsItem => ({
   item_id: item.id,
@@ -23,30 +23,25 @@ export const itemToAnalyticsItem = (
 
 const { cart, loading } = storeState;
 
-type PropsOf<T> = T extends (props: infer P, r: any, ctx: any) => any ? P
-  : T extends (props: infer P, r: any) => any ? P
-  : T extends (props: infer P) => any ? P
-  : never;
+type EnqueuableActions<
+  K extends keyof Manifest["actions"],
+> = Manifest["actions"][K]["default"] extends
+  (...args: any[]) => Promise<Context["cart"]> ? K : never;
 
-type Actions =
-  | "shopify/actions/cart/addItems.ts"
-  | "shopify/actions/cart/updateItems.ts"
-  | "shopify/actions/cart/updateCoupons.ts";
-
-const action =
-  (key: Actions) => (props: PropsOf<InvocationFuncFor<Manifest, typeof key>>) =>
-    storeState.enqueue((signal) =>
-      invoke({ cart: { key, props } }, { signal }) satisfies Promise<
-        { cart: Cart }
-      >
-    );
+const enqueue = <
+  K extends keyof Manifest["actions"],
+>(key: EnqueuableActions<K>) =>
+(props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
+  storeState.enqueue((signal) =>
+    invoke({ cart: { key, props } } as any, { signal }) as any
+  );
 
 const state = {
   cart,
   loading,
-  addItems: action("shopify/actions/cart/addItems.ts"),
-  updateItems: action("shopify/actions/cart/updateItems.ts"),
-  addCouponsToCart: action("shopify/actions/cart/updateCoupons.ts"),
+  addItems: enqueue("shopify/actions/cart/addItems.ts"),
+  updateItems: enqueue("shopify/actions/cart/updateItems.ts"),
+  addCouponsToCart: enqueue("shopify/actions/cart/updateCoupons.ts"),
 };
 
 export const useCart = () => state;

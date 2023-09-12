@@ -5,6 +5,7 @@ import { fragment } from "../../utils/fragments/cart.ts";
 import {
   AddCouponMutation,
   AddCouponMutationVariables,
+  CartFragment,
 } from "../../utils/storefront.graphql.gen.ts";
 
 type AddCouponProps = {
@@ -15,7 +16,7 @@ const action = async (
   props: AddCouponProps,
   req: Request,
   ctx: AppContext,
-): Promise<NonNullable<AddCouponMutation["payload"]>["cart"]> => {
+): Promise<CartFragment | null> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
 
@@ -42,7 +43,7 @@ const action = async (
 
   setCartCookie(ctx.response.headers, cartId);
 
-  return payload?.cart;
+  return payload?.cart ?? null;
 };
 
 export default action;

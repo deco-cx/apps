@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
