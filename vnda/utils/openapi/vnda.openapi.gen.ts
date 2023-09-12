@@ -1067,7 +1067,7 @@ export interface OpenAPI {
       amount?: number;
       apply_to?: "product" | "tag" | "subtotal" | "total" | "shipping";
       min_quantity?: number;
-      type?: string;
+      type?: [{ "type": ["string"] }];
       channel?: string[];
     };
   };
@@ -1481,7 +1481,7 @@ export interface OpenAPI {
    * Calcula o frete para uma determinada variante
    */
   "GET /api/v2/variants/:sku/shipping_methods": {
-    body: {
+    searchParams: {
       quantity: number;
       zip: string;
     };
@@ -1491,11 +1491,11 @@ export interface OpenAPI {
       price: number;
       description: string;
       delivery_days: number;
-      value_needed_to_discount: number;
-      shipping_method_id: number;
-      notice: string;
-      fulfillment_company: string;
-      countries: {
+      value_needed_to_discount: null | number;
+      shipping_method_id: null | number;
+      notice: null | string;
+      fulfillment_company: null | string;
+      countries: null | {
         country?: string;
         price?: string;
       }[];
@@ -2288,7 +2288,7 @@ export interface OpenAPI {
   "GET /api/v2/carts/:cartId/samples": {
     response: {
       id: number;
-      image_url: string;
+      image_url: null | string;
       name: string;
       reference: string;
       updated_at: string;
@@ -2299,7 +2299,7 @@ export interface OpenAPI {
         sku: string;
         name: string;
         updated_at: string;
-        image_url: string;
+        image_url: null | string;
         product_id: number;
         norder: number;
       }[];

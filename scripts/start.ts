@@ -20,6 +20,26 @@ const GRAPHQL_EXTENSION = ".graphql.json";
 const allOpenAPIPaths: string[] = [];
 const allGraphqlPaths: string[] = [];
 
+function processObj(obj: any) {
+  if (typeof obj === "object" && obj !== null) {
+    if (obj.hasOwnProperty("nullable") && obj.nullable === true) {
+      if (Array.isArray(obj.type)) {
+        obj.type.unshift("null");
+      } else {
+        obj.type = ["null", obj.type];
+      }
+    } else if (obj.hasOwnProperty("type")) {
+      obj.type = [obj.type];
+    }
+
+    for (const key in obj) {
+      obj[key] = processObj(obj[key]);
+    }
+  }
+
+  return obj;
+}
+
 for await (const entry of walk(".")) {
   if (entry.isFile) {
     if (entry.path.endsWith(OPENAPI_EXTENSION)) {
@@ -106,7 +126,6 @@ const generateOpenAPI = async () => {
         if (!item) {
           continue;
         }
-
         const {
           parameters = [],
           requestBody,
@@ -128,7 +147,6 @@ const generateOpenAPI = async () => {
           .reduce((schema, item) => {
             if (item?.schema && item.in === "query") {
               hasParams = true;
-
               schema.properties[item.name] = {
                 description: item.description,
                 ...item.schema,
@@ -148,7 +166,7 @@ const generateOpenAPI = async () => {
 
         if (hasParams) {
           schema.required?.push("searchParams");
-          schema.properties!["searchParams"] = searchParams;
+          schema.properties!["searchParams"] = processObj(searchParams);
         }
 
         const body = resolve(requestBody)
@@ -156,7 +174,7 @@ const generateOpenAPI = async () => {
 
         if (body) {
           schema.required?.push("body");
-          schema.properties!["body"] = body;
+          schema.properties!["body"] = processObj(body);
         }
 
         const ok = responses?.["200"] ||
@@ -166,7 +184,7 @@ const generateOpenAPI = async () => {
 
         if (response) {
           schema.required?.push("response");
-          schema.properties!["response"] = response;
+          schema.properties!["response"] = processObj(response);
         }
 
         const type = `${verb.toUpperCase()} ${pathTemplate}`;

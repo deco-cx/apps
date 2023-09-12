@@ -14,14 +14,17 @@ const action = async (
   ctx: AppContext,
 ): Promise<ShippingMethod[]> => {
   const { api } = ctx;
-  const {skuId, quantity, zip} = props
-  
+  const { skuId, quantity, zip } = props;
+
   if (!skuId || !quantity || !zip) {
     throw new HttpError(400, "Missing cart cookie");
   }
-
-    const cep = await api["GET /api/v2/variants/:skuId/shipping_methods"]({ skuId, quantity, zip });
-    return cep.json()
+  const cep = await api["GET /api/v2/variants/:sku/shipping_methods"]({
+    sku: skuId,
+    quantity,
+    zip,
+  });
+  return cep.json();
 };
 
 export default action;

@@ -5,9 +5,9 @@ import {
   ProductSearchResult,
   RelatedItemTag,
   SEO,
+  ShippingMethod,
   Sort,
   TagsSearchParams,
-  ShippingMethod
 } from "./types.ts";
 
 export interface API {
@@ -114,8 +114,8 @@ export interface API {
   "DELETE /api/v2/carts/:cartId/items/:itemId": {};
 
   /** @docs https://developers.vnda.com.br/reference/get-api-v2-variants-variant_sku-shipping_methods */
-  "GET /api/v2/variants/:skuId/shipping_methods": {
+  "GET /api/v2/variants/:sku/shipping_methods": {
     response: ShippingMethod[];
-    searchParams: {quantity: number, zip: string}
-  }
+    searchParams: { quantity: number; zip: string };
+  };
 }
