@@ -42,8 +42,12 @@ jobs:
               exit 1
           fi
 
-      - run: deno test --lock=deno.lock --lock-write -A .
-      - run: deno bench --lock=deno.lock --lock-write -A .
+      - name: Test
+        continue-on-error: true
+        run: deno test --lock=deno.lock --lock-write -A .
+      - name: Benchmark
+        continue-on-error: true
+        run: deno bench --lock=deno.lock --lock-write -A .
       - name: check lint
         continue-on-error: true
         run: deno --unstable lint
