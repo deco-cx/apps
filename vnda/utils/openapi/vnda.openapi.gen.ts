@@ -859,11 +859,11 @@ export interface OpenAPI {
    */
   "POST /api/v2/audience_members": {
     body: {
-      first_name?: string;
-      last_name?: string;
+      first_name?: null | string;
+      last_name?: null | string;
       email: string;
-      phone_area?: string;
-      phone?: string;
+      phone_area?: null | string;
+      phone?: null | string;
       tags?: string[];
     };
     response: AudienceMember;
@@ -1067,7 +1067,7 @@ export interface OpenAPI {
       amount?: number;
       apply_to?: "product" | "tag" | "subtotal" | "total" | "shipping";
       min_quantity?: number;
-      type?: [{ "type": ["string"] }];
+      type?: string;
       channel?: string[];
     };
   };

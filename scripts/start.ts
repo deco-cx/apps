@@ -23,13 +23,13 @@ const allGraphqlPaths: string[] = [];
 function processTypeInNestedObject(obj: any) {
   if (typeof obj === "object" && obj !== null) {
     if (obj.hasOwnProperty("nullable") && obj.nullable === true) {
-      if (Array.isArray(obj.type)) {
-        obj.type.unshift("null");
-      } else {
-        obj.type = ["null", obj.type];
+      if (obj.hasOwnProperty("type")) {
+        if (Array.isArray(obj.type)) {
+          obj.type.unshift("null");
+        } else {
+          obj.type = ["null", obj.type];
+        }
       }
-    } else if (obj.hasOwnProperty("type")) {
-      obj.type = [obj.type];
     }
 
     for (const key in obj) {
@@ -39,6 +39,8 @@ function processTypeInNestedObject(obj: any) {
 
   return obj;
 }
+
+
 
 for await (const entry of walk(".")) {
   if (entry.isFile) {
