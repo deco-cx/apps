@@ -22,8 +22,8 @@ const allGraphqlPaths: string[] = [];
 
 function processTypeInNestedObject(obj: any) {
   if (typeof obj === "object" && obj !== null) {
-    if (obj.hasOwnProperty("nullable") && obj.nullable === true) {
-      if (obj.hasOwnProperty("type")) {
+    if ("nullable" in obj && obj.nullable === true) {
+      if ("type" in obj) {
         if (Array.isArray(obj.type)) {
           obj.type.unshift("null");
         } else {
