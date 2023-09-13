@@ -42,6 +42,7 @@ const state = {
   update: enqueue("vnda/actions/cart/updateCart.ts"),
   addItem: enqueue("vnda/actions/cart/addItem.ts"),
   updateItem: enqueue("vnda/actions/cart/updateItem.ts"),
+  simulate: invoke.vnda.actions.cart.simulation,
 };
 
 export const useCart = () => state;

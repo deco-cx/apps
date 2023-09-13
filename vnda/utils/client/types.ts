@@ -213,11 +213,15 @@ export interface ShippingMethod {
   description: string;
   name: string;
   price: number;
-  shipping_method_id: number;
+  shipping_method_id: number | null;
   value: string;
-  countries: string[] | null;
+  countries: {
+    country?: string;
+    price?: string;
+  }[] | null;
   fulfillment_company: string | null;
   value_needed_to_discount: number | null;
+  notice: string | null;
 }
 
 export interface Address {
