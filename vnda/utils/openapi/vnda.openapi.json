@@ -7439,33 +7439,28 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/sku"
+          }, {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "quantity",
+            "allowEmptyValue": false,
+            "required": true
+          }, {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "zip",
+            "allowEmptyValue": false,
+            "required": true
           }
         ],
         "summary": "Calcula frete",
         "tags": [
           "Variantes"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "quantity": {
-                    "type": "integer"
-                  },
-                  "zip": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "quantity",
-                  "zip"
-                ]
-              }
-            }
-          }
-        },
         "operationId": "get-api-v2-variants-variant_sku-shipping_methods",
         "responses": {
           "200": {
