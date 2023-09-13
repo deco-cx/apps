@@ -7439,7 +7439,8 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/sku"
-          }, {
+          },
+          {
             "schema": {
               "type": "integer"
             },
@@ -7447,7 +7448,8 @@
             "name": "quantity",
             "allowEmptyValue": false,
             "required": true
-          }, {
+          },
+          {
             "schema": {
               "type": "string"
             },
