@@ -111,7 +111,7 @@ export interface API {
   };
 
   /** @docs https://developers.vnda.com.br/reference/delete-api-v2-carts-cart_id-items-id */
-  "DELETE /api/v2/carts/:cartId/items/:itemId": {};
+  "DELETE /api/v2/carts/:cartId/items/:itemId": undefined;
 
   /** @docs https://developers.vnda.com.br/reference/get-api-v2-variants-variant_sku-shipping_methods */
   "GET /api/v2/variants/:sku/shipping_methods": {
