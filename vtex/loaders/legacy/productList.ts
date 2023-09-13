@@ -8,7 +8,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { LegacySort, ProductID } from "../../utils/types.ts";
+import type { LegacySort } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -49,11 +49,18 @@ export interface FQProps extends CommonProps {
   count: number;
 }
 
-export interface ProductIDProps extends CommonProps {
+export interface SkuIDProps extends CommonProps {
   /**
    * @description SKU ids to retrieve
    */
-  ids: ProductID[];
+  ids?: string[];
+}
+
+export interface ProductIDProps extends CommonProps {
+  /**
+   * @description Product ids to retrieve
+   */
+  productIds?: string[];
 }
 
 export interface CommonProps {
@@ -63,23 +70,31 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props = CollectionProps | TermProps | ProductIDProps | FQProps;
+export type Props =
+  | CollectionProps
+  | TermProps
+  | ProductIDProps
+  | SkuIDProps
+  | FQProps;
 
 // deno-lint-ignore no-explicit-any
 const isCollectionProps = (p: any): p is CollectionProps =>
   typeof p.collection === "string" && typeof p.count === "number";
 
 // deno-lint-ignore no-explicit-any
-const isProductIDProps = (p: any): p is ProductIDProps =>
-  Array.isArray(p.ids) && p.ids.length > 0;
+const isValidArrayProp = (prop: any) => Array.isArray(prop) && prop.length > 0;
 
 // deno-lint-ignore no-explicit-any
-const isFQProps = (p: any): p is FQProps =>
-  Array.isArray(p.fq) && p.fq.length > 0;
+const isSKUIDProps = (p: any): p is SkuIDProps => isValidArrayProp(p.ids);
 
-const fromProps = (
-  props: Props,
-) => {
+// deno-lint-ignore no-explicit-any
+const isProductIDProps = (p: any): p is ProductIDProps =>
+  isValidArrayProp(p.productIds);
+
+// deno-lint-ignore no-explicit-any
+const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
+
+const fromProps = (props: Props) => {
   const params = { fq: [] } as {
     _from?: number;
     _to?: number;
@@ -88,10 +103,22 @@ const fromProps = (
     O?: LegacySort;
   };
 
-  if (isProductIDProps(props)) {
-    props.ids.forEach((skuId) => params.fq.push(`skuId:${skuId}`));
+  if (isSKUIDProps(props)) {
+    const skuIds = props.ids || [];
+
+    skuIds.forEach((skuId) => params.fq.push(`skuId:${skuId}`));
     params._from = 0;
-    params._to = Math.max(props.ids.length - 1, 0);
+    params._to = Math.max(skuIds.length - 1, 0);
+
+    return params;
+  }
+
+  if (isProductIDProps(props)) {
+    const productIds = props.productIds || [];
+
+    productIds.forEach((productId) => params.fq.push(`productId:${productId}`));
+    params._from = 0;
+    params._to = Math.max(productIds.length - 1, 0);
 
     return params;
   }
