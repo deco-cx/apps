@@ -8,7 +8,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { LegacySort, ProductID } from "../../utils/types.ts";
+import type { LegacySort } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -53,12 +53,14 @@ export interface SkuIDProps extends CommonProps {
   /**
    * @description SKU ids to retrieve
    */
-  ids?: ProductID[];
-  skus?: ProductID[];
+  ids?: string[];
 }
 
 export interface ProductIDProps extends CommonProps {
-  productIds?: ProductID[];
+  /**
+   * @description Product ids to retrieve
+   */
+  productIds?: string[];
 }
 
 export interface CommonProps {
@@ -83,8 +85,7 @@ const isCollectionProps = (p: any): p is CollectionProps =>
 const isValidArrayProp = (prop: any) => Array.isArray(prop) && prop.length > 0;
 
 // deno-lint-ignore no-explicit-any
-const isSKUIDProps = (p: any): p is SkuIDProps =>
-  isValidArrayProp(p.ids) || isValidArrayProp(p.skus);
+const isSKUIDProps = (p: any): p is SkuIDProps => isValidArrayProp(p.ids);
 
 // deno-lint-ignore no-explicit-any
 const isProductIDProps = (p: any): p is ProductIDProps =>
@@ -103,13 +104,11 @@ const fromProps = (props: Props) => {
   };
 
   if (isSKUIDProps(props)) {
-    const ids = props.ids || [];
-    const skus = props.skus || [];
+    const skuIds = props.ids || [];
 
-    const skuIds = new Set([...ids, ...skus]);
-    Array.from(skuIds).forEach((skuId) => params.fq.push(`skuId:${skuId}`));
+    skuIds.forEach((skuId) => params.fq.push(`skuId:${skuId}`));
     params._from = 0;
-    params._to = Math.max(skuIds.size - 1, 0);
+    params._to = Math.max(skuIds.length - 1, 0);
 
     return params;
   }
