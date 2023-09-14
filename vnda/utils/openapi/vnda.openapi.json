@@ -15319,7 +15319,7 @@
             "description": "Código identificador `ID` do carrinho"
           },
           "items": {
-            "type": "string",
+            "type": "array",
             "description": "Itens do carrinho",
             "items": {
               "$ref": "#/components/schemas/Cart_item.v1"

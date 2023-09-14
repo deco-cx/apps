@@ -4,7 +4,7 @@ import { OpenAPI } from "../utils/openapi/vnda.openapi.gen.ts";
 
 export type Cart = {
   orderForm?: OpenAPI["POST /api/v2/carts"]["response"];
-  relatedItems?: [];
+  relatedItems?: OpenAPI["POST /api/v2/carts"]["response"]["items"];
 };
 
 /**
@@ -27,10 +27,9 @@ const loader = async (
     );
 
   setCartCookie(ctx.response.headers, orderForm.id.toString());
-
   return {
     orderForm,
-    relatedItems: [],
+    relatedItems: orderForm.items ?? [],
   };
 };
 
