@@ -32,7 +32,9 @@ async function loader(
       id,
     }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
 
-  return productDetail.Product.map((product) => toProductDetails(product));
+  return productDetail.Products.map((product) =>
+    toProductDetails(ctx, product, { url, priceCurrency: "BRL" })
+  )[0];
 }
 
 export default loader;

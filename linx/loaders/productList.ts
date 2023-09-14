@@ -20,32 +20,34 @@ export interface CommonProps {
 export interface DatasourceListProps extends CommonProps {
   /** @description ID to use on Datasource list */
   dataSouceID: string;
-  type: "datasource";
 }
 
 export interface SearchListProps extends CommonProps {
   /** @description query to use on search */
   term: string;
-  type: "search";
 }
 
 export interface CategoryListProps extends CommonProps {
   /** @description ID to use on Category list */
   categoryID: string;
-  type: "category";
 }
 
 export interface BrandListProps extends CommonProps {
   /** @description ID to use on Brand list */
   brandID: string;
-  type: "brand";
+}
+
+export interface FlagListProps extends CommonProps {
+  /** @description ID to use on Brand list */
+  flagID: string;
 }
 
 export type Props =
   | DatasourceListProps
   | SearchListProps
   | CategoryListProps
-  | BrandListProps;
+  | BrandListProps
+  | FlagListProps;
 
 const isDatasouceList = (p: any): p is DatasourceListProps =>
   typeof p.dataSouceID === "string" && typeof p.apiSelect === "string";
@@ -58,6 +60,9 @@ const isCategoryList = (p: any): p is CategoryListProps =>
 
 const isBrandList = (p: any): p is BrandListProps =>
   typeof p.brandID === "string" && typeof p.apiSelect === "string";
+
+const isFlagList = (p: any): p is BrandListProps =>
+  typeof p.flagID === "string" && typeof p.apiSelect === "string";
 
 const fromProps = (props: Props) => {
   if (isDatasouceList(props)) {
@@ -85,6 +90,13 @@ const fromProps = (props: Props) => {
     return {
       apiSelect: "Brand",
       id: props?.brandID,
+    } as const;
+  }
+
+  if (isFlagList(props)) {
+    return {
+      apiSelect: "Flag",
+      id: props?.flagID,
     } as const;
   }
 

@@ -4,11 +4,15 @@
 
 import * as $$$0 from "./loaders/productList.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
+import * as $$$2 from "./loaders/ProductListingPage.ts";
+import * as $$$3 from "./loaders/cart.ts";
 
 const manifest = {
   "loaders": {
+    "linx/loaders/cart.ts": $$$3,
     "linx/loaders/productDetailsPage.ts": $$$1,
     "linx/loaders/productList.ts": $$$0,
+    "linx/loaders/ProductListingPage.ts": $$$2,
   },
   "name": "linx",
   "baseUrl": import.meta.url,
