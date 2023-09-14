@@ -2,7 +2,17 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $0 from "./functions/requestToParam.ts";
+import * as $0 from "./functions/vtexProductListingPage.ts";
+import * as $1 from "./functions/vtexLegacyProductDetailsPage.ts";
+import * as $2 from "./functions/vtexSuggestions.ts";
+import * as $3 from "./functions/vtexNavbar.ts";
+import * as $4 from "./functions/vtexWishlist.ts";
+import * as $5 from "./functions/vtexProductList.ts";
+import * as $6 from "./functions/vtexLegacyProductListingPage.ts";
+import * as $7 from "./functions/vtexProductDetailsPage.ts";
+import * as $8 from "./functions/vtexLegacyProductList.ts";
+import * as $9 from "./functions/vtexLegacyRelatedProductsLoader.ts";
+import * as $10 from "./functions/requestToParam.ts";
 import * as $$$0 from "./loaders/x/redirects.ts";
 import * as $$$1 from "./loaders/x/font.ts";
 import * as $$$$$$0 from "./sections/SEOPLP.tsx";
@@ -12,7 +22,17 @@ import * as $$$$$$3 from "./sections/SEOPDP.tsx";
 
 const manifest = {
   "functions": {
-    "deco-sites/std/functions/requestToParam.ts": $0,
+    "deco-sites/std/functions/requestToParam.ts": $10,
+    "deco-sites/std/functions/vtexLegacyProductDetailsPage.ts": $1,
+    "deco-sites/std/functions/vtexLegacyProductList.ts": $8,
+    "deco-sites/std/functions/vtexLegacyProductListingPage.ts": $6,
+    "deco-sites/std/functions/vtexLegacyRelatedProductsLoader.ts": $9,
+    "deco-sites/std/functions/vtexNavbar.ts": $3,
+    "deco-sites/std/functions/vtexProductDetailsPage.ts": $7,
+    "deco-sites/std/functions/vtexProductList.ts": $5,
+    "deco-sites/std/functions/vtexProductListingPage.ts": $0,
+    "deco-sites/std/functions/vtexSuggestions.ts": $2,
+    "deco-sites/std/functions/vtexWishlist.ts": $4,
   },
   "loaders": {
     "deco-sites/std/loaders/x/font.ts": $$$1,
