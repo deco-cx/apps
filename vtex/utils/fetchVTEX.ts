@@ -25,7 +25,7 @@ const getSanitizedInput = (
     return input;
   }
 
-  const QS_TO_REMOVE_PLUS = ["utm_campaign", "map"];
+  const QS_TO_REMOVE_PLUS = ["utm_campaign", "utm_medium", "utm_source", "map"];
 
   QS_TO_REMOVE_PLUS.forEach((qsToSanatize) => {
     if (url.searchParams.has(qsToSanatize)) {
