@@ -3392,7 +3392,7 @@ export interface Cart1 {
   /**
    * Itens do carrinho
    */
-  items: string;
+  items: CartItem[];
   /**
    * Unidades do item no carrinho
    */
@@ -3490,169 +3490,6 @@ export interface Discount {
   email: string;
   cpf: string;
   tags: string;
-}
-/**
- * Modelo que representa as formas de entrega na API
- */
-export interface ShippingMethods {
-  package: string;
-  name: string;
-  label: string;
-  price: string;
-  delivery_days: string;
-  delivery_type: string;
-  description: string;
-  short_description: string;
-  fulfillment_company: string;
-}
-/**
- * Parcelas para pagamento parcelado
- */
-export interface CartInstallment {
-  /**
-   * Identifica se há (`true`) ou não (`false`) juros no parcelamento
-   */
-  interest: boolean;
-  /**
-   * Taxa de juros do parcelamento
-   */
-  interest_rate: number;
-  /**
-   * Número de parcelas
-   */
-  number: number;
-  /**
-   * Valor de cada parcela
-   */
-  price: number;
-  /**
-   * Valor total das parcelas
-   */
-  total: number;
-}
-/**
- * Modelo que representa uma parcela do total de um carrinho
- */
-export interface CartInstallment1 {
-  /**
-   * Identifica se há (`true`) ou não (`false`) juros no parcelamento
-   */
-  interest: boolean;
-  /**
-   * Taxa de juros do parcelamento
-   */
-  interest_rate: number;
-  /**
-   * Número de parcelas
-   */
-  number: number;
-  /**
-   * Valor de cada parcela
-   */
-  price: number;
-  /**
-   * Valor total das parcelas
-   */
-  total: number;
-}
-/**
- * Modelo que representa um local na API
- */
-export interface Place {
-  id?: number;
-  name: string;
-  address_line_1: string;
-  address_line_2?: string;
-  city: string;
-  neighborhood?: string;
-  zip?: string;
-  home_page?: string;
-  latitude?: number;
-  longitude?: number;
-  images?: string[];
-  description?: string;
-  email: string;
-  first_phone?: string;
-  second_phone?: string;
-  mobile_phone?: string;
-  only_cash?: boolean;
-  categories?: string[];
-  marker_url?: string;
-  state?: string;
-  created_at?: string;
-  updated_at?: string;
-  opening_hours?: string;
-  warehouse?: boolean;
-  legal_name?: string;
-  cnpj?: string;
-}
-/**
- * Modelo que representa uma nota fiscal na API
- */
-export interface Invoice {
-  /**
-   * Número da nota fiscal
-   */
-  number: number;
-  /**
-   * Número de série da nota fiscal
-   */
-  series?: number;
-  /**
-   * Data e horário da criação da nota fiscal
-   */
-  issued_at?: string;
-  /**
-   * Chave da nota fiscal
-   */
-  key?: string;
-  volumes?: number;
-}
-/**
- * Modelo que representa um recebedor na API
- */
-export interface PaymentRecipient {
-  id: number;
-  percentage: number;
-  active?: boolean;
-  charge_processing_fee?: boolean;
-  liable?: boolean;
-  code?: string;
-  name?: string;
-  tag_name?: string;
-  place_id?: number;
-  recipient_id: number;
-  tag_id?: number;
-  user_id?: number;
-  /**
-   * Indica se o frete deve ser incluído no split do pagamento
-   */
-  include_shipping?: boolean;
-}
-/**
- * Valores que o usuário possui a receber
- */
-export interface RecebiveisDoUsuario {
-  type?: string;
-  status?: string;
-  amount?: number;
-  fee?: number;
-  installment?: number;
-  credit_date?: string;
-  order_date?: string;
-  transaction_id?: number;
-}
-/**
- * Modelo que representa um membro do público
- */
-export interface AudienceMember {
-  id?: number;
-  first_name?: string;
-  last_name?: string;
-  email: string;
-  phone_area?: string;
-  phone?: string;
-  tags?: string[];
 }
 /**
  * Modelo que representa um item no carrinho na API
@@ -3876,6 +3713,169 @@ export interface Variant1 {
   norder?: number;
   required?: [];
   additionalProperties?: never;
+}
+/**
+ * Modelo que representa as formas de entrega na API
+ */
+export interface ShippingMethods {
+  package: string;
+  name: string;
+  label: string;
+  price: string;
+  delivery_days: string;
+  delivery_type: string;
+  description: string;
+  short_description: string;
+  fulfillment_company: string;
+}
+/**
+ * Parcelas para pagamento parcelado
+ */
+export interface CartInstallment {
+  /**
+   * Identifica se há (`true`) ou não (`false`) juros no parcelamento
+   */
+  interest: boolean;
+  /**
+   * Taxa de juros do parcelamento
+   */
+  interest_rate: number;
+  /**
+   * Número de parcelas
+   */
+  number: number;
+  /**
+   * Valor de cada parcela
+   */
+  price: number;
+  /**
+   * Valor total das parcelas
+   */
+  total: number;
+}
+/**
+ * Modelo que representa uma parcela do total de um carrinho
+ */
+export interface CartInstallment1 {
+  /**
+   * Identifica se há (`true`) ou não (`false`) juros no parcelamento
+   */
+  interest: boolean;
+  /**
+   * Taxa de juros do parcelamento
+   */
+  interest_rate: number;
+  /**
+   * Número de parcelas
+   */
+  number: number;
+  /**
+   * Valor de cada parcela
+   */
+  price: number;
+  /**
+   * Valor total das parcelas
+   */
+  total: number;
+}
+/**
+ * Modelo que representa um local na API
+ */
+export interface Place {
+  id?: number;
+  name: string;
+  address_line_1: string;
+  address_line_2?: string;
+  city: string;
+  neighborhood?: string;
+  zip?: string;
+  home_page?: string;
+  latitude?: number;
+  longitude?: number;
+  images?: string[];
+  description?: string;
+  email: string;
+  first_phone?: string;
+  second_phone?: string;
+  mobile_phone?: string;
+  only_cash?: boolean;
+  categories?: string[];
+  marker_url?: string;
+  state?: string;
+  created_at?: string;
+  updated_at?: string;
+  opening_hours?: string;
+  warehouse?: boolean;
+  legal_name?: string;
+  cnpj?: string;
+}
+/**
+ * Modelo que representa uma nota fiscal na API
+ */
+export interface Invoice {
+  /**
+   * Número da nota fiscal
+   */
+  number: number;
+  /**
+   * Número de série da nota fiscal
+   */
+  series?: number;
+  /**
+   * Data e horário da criação da nota fiscal
+   */
+  issued_at?: string;
+  /**
+   * Chave da nota fiscal
+   */
+  key?: string;
+  volumes?: number;
+}
+/**
+ * Modelo que representa um recebedor na API
+ */
+export interface PaymentRecipient {
+  id: number;
+  percentage: number;
+  active?: boolean;
+  charge_processing_fee?: boolean;
+  liable?: boolean;
+  code?: string;
+  name?: string;
+  tag_name?: string;
+  place_id?: number;
+  recipient_id: number;
+  tag_id?: number;
+  user_id?: number;
+  /**
+   * Indica se o frete deve ser incluído no split do pagamento
+   */
+  include_shipping?: boolean;
+}
+/**
+ * Valores que o usuário possui a receber
+ */
+export interface RecebiveisDoUsuario {
+  type?: string;
+  status?: string;
+  amount?: number;
+  fee?: number;
+  installment?: number;
+  credit_date?: string;
+  order_date?: string;
+  transaction_id?: number;
+}
+/**
+ * Modelo que representa um membro do público
+ */
+export interface AudienceMember {
+  id?: number;
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  phone_area?: string;
+  phone?: string;
+  tags?: string[];
 }
 /**
  * Modelo de carcaterística de produto para item no carrinho
