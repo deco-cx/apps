@@ -20,7 +20,7 @@ export interface Props {
   tags?: string[];
 
   /** @description search for products by id */
-  ids: number[]
+  ids: number[];
 }
 
 /**
@@ -41,7 +41,7 @@ const productListLoader = async (
     sort: props?.sort,
     per_page: props?.count,
     "tags[]": props?.tags,
-    "ids[]": props?.ids
+    "ids[]": props?.ids,
   }, STALE).then((res) => res.json());
 
   return search.results?.map((product) =>

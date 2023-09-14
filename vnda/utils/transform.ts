@@ -158,15 +158,15 @@ const toPropertyValue = (variant: VNDAProduct): PropertyValue[] =>
       } as PropertyValue)
     ).filter((x): x is PropertyValue => Boolean(x));
 
-    const toPropertyValueTags = (tags: ProductSearch["tags"]): PropertyValue[] =>
-    tags?.map((tag) =>
-      tag && ({
-        "@type": "PropertyValue",
-        name: tag.name,
-        value: JSON.stringify(tag),
-        valueReference: "TAGS",
-      } as PropertyValue)
-    )
+const toPropertyValueTags = (tags: ProductSearch["tags"]): PropertyValue[] =>
+  tags?.map((tag) =>
+    tag && ({
+      "@type": "PropertyValue",
+      name: tag.name,
+      value: JSON.stringify(tag),
+      valueReference: "TAGS",
+    } as PropertyValue)
+  );
 
 // deno-lint-ignore no-explicit-any
 const isProductVariant = (p: any): p is VariantProductSearch =>
@@ -201,7 +201,7 @@ export const toProduct = (
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
 
-  const myTags = "tags" in product ? product.tags : []
+  const myTags = "tags" in product ? product.tags : [];
 
   return {
     "@type": "Product",
@@ -210,7 +210,10 @@ export const toProduct = (
     url: variantUrl,
     name: product.name,
     description: product.description,
-    additionalProperty: [...toPropertyValue(variant), ...toPropertyValueTags(myTags) ],
+    additionalProperty: [
+      ...toPropertyValue(variant),
+      ...toPropertyValueTags(myTags),
+    ],
     inProductGroupWithID: productGroupID,
     gtin: product.reference,
     isVariantOf: {
