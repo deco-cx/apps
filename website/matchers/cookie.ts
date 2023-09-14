@@ -10,7 +10,7 @@ export interface Props {
 }
 
 /**
- * @title Cookie Matcher
+ * @title Cookie Matcher 
  */
 const MatchCookie = (
   { name, value }: Props,
