@@ -2,7 +2,7 @@
 export { onBeforeResolveProps } from "../../website/mod.ts";
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import type { App, AppManifest } from "deco/mod.ts";
+import type { App, AppContext as AC, AppManifest } from "deco/mod.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
 import $live, { Props as LiveProps } from "../$live/mod.ts";
 import commerce, { Props as CommerceProps } from "../../commerce/mod.ts";
@@ -79,17 +79,6 @@ const manifestMappings = {
     "deco-sites/std/functions/shopifyProductListingPage.ts": NOT_IMPLEMENTED,
     "deco-sites/std/functions/vndaProductList.ts": NOT_IMPLEMENTED,
     "deco-sites/std/functions/vndaProductListingPage.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexLegacyProductDetailsPage.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexLegacyProductList.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexLegacyProductListingPage.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexLegacyRelatedProductsLoader.ts":
-      NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexNavbar.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexProductDetailsPage.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexProductList.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexProductListingPage.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexSuggestions.ts": NOT_IMPLEMENTED,
-    "deco-sites/std/functions/vtexWishlist.ts": NOT_IMPLEMENTED,
   },
   loaders: {
     "deco-sites/std/loaders/linxImpulse/autocompletes/popular.ts":
@@ -287,6 +276,7 @@ export function WithoutCommerce(
   };
 }
 
+export type AppContext = AC<ReturnType<typeof Std>>;
 export default function Std(
   props: CommerceProps,
 ): App<
