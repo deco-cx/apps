@@ -63,7 +63,7 @@ const toOffer = (product: ProductItemGrid): Offer => {
     inventoryLevel: {
       value: 0,
     },
-    availability: product.Availability == "D"
+    availability: product.Availability != "D"
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
   };
@@ -84,25 +84,18 @@ export const toProduct = (
     sku: product.SKU,
     url: ctx.publicUrl + product.Url,
     name: product.Name,
-    description: product.ShortDescription,
+    description:
+      product.Descriptions?.filter((description) =>
+        description.Alias === "LongDescription"
+      )[0].Value,
     gtin: product.ProductID,
-    image: product.Medias?.length ?? 0 > 1
-      ? product.Medias?.map((img) => ({
-        "@type": "ImageObject" as const,
-        alternateName: product.Name,
-        url: toURL(
-          img.MediaSizeType === "Medium"
-            ? ctx.cdnUrl + img.MediaPath
-            : ctx.cdnUrl + product.MediaSmall,
-        ),
-      }))
-      : [
-        {
-          "@type": "ImageObject",
-          alternateName: product.Name ?? "",
-          url: toURL(ctx.cdnUrl + product.MediaSmall ?? ""),
-        },
-      ],
+    image: product.MediaGroups?.map((
+      img,
+    ) => ({
+      "@type": "ImageObject" as const,
+      alternateName: product.Name,
+      url: toURL(ctx.cdnUrl + img.Zoom?.MediaPath),
+    })),
     offers: {
       "@type": "AggregateOffer" as const,
       priceCurrency: priceCurrency,
