@@ -10,14 +10,14 @@ export interface Props {
 }
 
 /**
- * @title Cookie Matcher 
+ * @title Cookie Matcher
  */
 const MatchCookie = (
   { name, value }: Props,
   { request }: MatchContext,
 ) => {
   const cookies = getCookies(request.headers);
-  return cookies[name] == value;
+  return cookies[name] === value;
 };
 
 export default MatchCookie;
