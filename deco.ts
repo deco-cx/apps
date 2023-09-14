@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("algolia"),
     app("handlebars"),
     app("vtex"),
     app("vnda"),

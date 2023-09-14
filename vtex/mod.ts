@@ -1,11 +1,14 @@
-import type { App, FnContext } from "deco/mod.ts";
-import { fetchSafe } from "./utils/fetchVTEX.ts";
+import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
+import workflow from "../workflows/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { SP, VTEXCommerceStable } from "./utils/client.ts";
-import { createGraphqlClient } from "../utils/graphql.ts";
+import { fetchSafe } from "./utils/fetchVTEX.ts";
 
-export type AppContext = FnContext<State, Manifest>;
+export type AppContext = AC<ReturnType<typeof App>>;
+
+export type AppManifest = ManifestOf<ReturnType<typeof App>>;
 
 /** @title VTEX */
 export interface Props {
@@ -35,7 +38,9 @@ interface State extends Props {
 /**
  * @title VTEX
  */
-export default function App(state: Props): App<Manifest, State> {
+export default function App(
+  state: Props,
+): App<Manifest, State, [ReturnType<typeof workflow>]> {
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
     fetcher: fetchSafe,
@@ -51,7 +56,8 @@ export default function App(state: Props): App<Manifest, State> {
   });
 
   return {
-    state: { ...state, vcs, sp, io },
     manifest,
+    state: { ...state, vcs, sp, io },
+    dependencies: [workflow({})],
   };
 }
