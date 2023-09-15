@@ -1,7 +1,5 @@
 import type { Suggestion } from "../../../../../commerce/types.ts";
-import {
-  Props,
-} from "../../../../../vtex/loaders/legacy/suggestions.ts";
+import { Props } from "../../../../../vtex/loaders/legacy/suggestions.ts";
 import { VTEXContext } from "../../../mod.ts";
 
 /**

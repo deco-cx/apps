@@ -1,7 +1,5 @@
 import type { Product } from "../../../../../commerce/types.ts";
-import {
-  Props,
-} from "../../../../../vtex/loaders/legacy/productList.ts";
+import { Props } from "../../../../../vtex/loaders/legacy/productList.ts";
 import { VTEXContext } from "../../../mod.ts";
 
 /**

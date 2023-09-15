@@ -3,13 +3,15 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$$$0 from "./apps/workflows.ts";
-import * as $$$$$$$$$$$1 from "./apps/handlebars.ts";
-import * as $$$$$$$$$$$2 from "./apps/verified-reviews.ts";
+import * as $$$$$$$$$$$1 from "./apps/admin.ts";
+import * as $$$$$$$$$$$2 from "./apps/handlebars.ts";
+import * as $$$$$$$$$$$3 from "./apps/verified-reviews.ts";
 
 const manifest = {
   "apps": {
-    "decohub/apps/handlebars.ts": $$$$$$$$$$$1,
-    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$2,
+    "decohub/apps/admin.ts": $$$$$$$$$$$1,
+    "decohub/apps/handlebars.ts": $$$$$$$$$$$2,
+    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$3,
     "decohub/apps/workflows.ts": $$$$$$$$$$$0,
   },
   "name": "decohub",
