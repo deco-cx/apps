@@ -6,6 +6,9 @@ import * as $$$0 from "./loaders/productList.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
 import * as $$$2 from "./loaders/ProductListingPage.ts";
 import * as $$$3 from "./loaders/cart.ts";
+import * as $$$$$$$$$0 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$1 from "./actions/cart/updateCart.ts";
+import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
 
 const manifest = {
   "loaders": {
@@ -13,6 +16,11 @@ const manifest = {
     "linx/loaders/productDetailsPage.ts": $$$1,
     "linx/loaders/productList.ts": $$$0,
     "linx/loaders/ProductListingPage.ts": $$$2,
+  },
+  "actions": {
+    "linx/actions/cart/addItem.ts": $$$$$$$$$2,
+    "linx/actions/cart/updateCart.ts": $$$$$$$$$1,
+    "linx/actions/cart/updateItem.ts": $$$$$$$$$0,
   },
   "name": "linx",
   "baseUrl": import.meta.url,

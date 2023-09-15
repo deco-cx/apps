@@ -1,28 +1,35 @@
 export interface API {
-  "GET /web-api/v1/Catalog/Products/Datasource/:id/?catalogID=1": {
-    response: ProductListDataSource;
-  };
-  "GET /web-api/v1/Catalog/Products/Brand/:id/?catalogID=1": {
-    response: ProductListBrand;
-  };
-  "GET /web-api/v1/Catalog/Products/Category/:id/?catalogID=1": {
-    response: ProductListCategory;
-  };
-  "GET /web-api/v1/Catalog/Products/Search/:id/?catalogID=1": {
-    response: ProductListSearch;
-  };
-  "GET /web-api/v1/Catalog/Products/Flag/:id/?catalogID=1": {
-    response: ProductListFlag;
+  "GET /web-api/v1/Catalog/Products/:source/:id": {
+    response: ProductCatalogResponse;
+    searchParams: {
+      catalogID: number;
+    };
   };
   "GET /web-api/v1/Catalog/Products/Get/:id": {
     response: productDetailPage;
   };
   "GET /web-api/v1/Shopping/Basket/Get": {
-    response: OrderForm;
+    response: Cart;
   };
   "POST /web-api/v1/Shopping/Basket/AddProduct": {
-    response: OrderForm;
+    response: Cart;
+    body: {
+      WebSiteID: number;
+      FeatureID: number;
+      Products: Partial<ProductSkuItems>[];
+      ShopperTicketID: string;
+      BasketID: number;
+      BasketAuthorityToken: string;
+      CustomerID: number;
+      SessionID: string;
+    };
   };
+}
+
+export interface BasketItem {
+  ProductID: number;
+  SkuID: number;
+  Quantity: number;
 }
 
 export interface Attribute {
@@ -31,14 +38,10 @@ export interface Attribute {
   values: string[];
 }
 
-export interface OrderForm {
-  Shopper: ShopperCart;
-  IsValid: boolean;
-  Errors: ErrorsCart;
-}
-
 export interface Cart {
-  orderForm?: OrderForm;
+  Shopper?: ShopperCart;
+  IsValid?: boolean;
+  Errors?: ErrorsCart;
 }
 
 export interface ShopperCart {
@@ -156,35 +159,7 @@ export interface ShopperTicket {
   JsonWebToken: string;
 }
 
-export interface ProductListDataSource {
-  Products: ProductItemGrid[];
-  SortOptions: SortOption[];
-  PageInfo: PageInfo;
-  Facets: Facets[];
-}
-
-export interface ProductListBrand {
-  Products: ProductItemGrid[];
-  SortOptions: SortOption[];
-  PageInfo: PageInfo;
-  Facets: Facets[];
-}
-
-export interface ProductListCategory {
-  Products: ProductItemGrid[];
-  SortOptions: SortOption[];
-  PageInfo: PageInfo;
-  Facets: Facets[];
-}
-
-export interface ProductListSearch {
-  Products: ProductItemGrid[];
-  SortOptions: SortOption[];
-  PageInfo: PageInfo;
-  Facets: Facets[];
-}
-
-export interface ProductListFlag {
+export interface ProductCatalogResponse {
   Products: ProductItemGrid[];
   SortOptions: SortOption[];
   PageInfo: PageInfo;
