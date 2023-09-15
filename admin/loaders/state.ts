@@ -5,6 +5,7 @@ export interface Props {
   blockId: string;
 }
 
+// deno-lint-ignore no-explicit-any
 export type State = Record<string, any>;
 
 export default async function Latest(

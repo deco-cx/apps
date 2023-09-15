@@ -14,7 +14,9 @@ const loader = async (
   _req: Request,
   ctx: VTEXContext,
 ): Promise<ProductDetailsPage | null> => {
-  return await ctx.invoke.vtex.loaders.intelligentSearch.productDetailsPage(props);
+  return await ctx.invoke.vtex.loaders.intelligentSearch.productDetailsPage(
+    props,
+  );
 };
 
 export default loader;
