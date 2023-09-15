@@ -1,4 +1,5 @@
 import type { Product } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
 import type { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 
@@ -20,26 +21,36 @@ export interface CommonProps {
 export interface DatasourceListProps extends CommonProps {
   /** @description ID to use on Datasource list */
   dataSouceID: string;
+  /** @deprecated */
+  __apiSelect: "Datasource";
 }
 
 export interface SearchListProps extends CommonProps {
   /** @description query to use on search */
   term: string;
+  /** @deprecated */
+  __apiSelect: "Search";
 }
 
 export interface CategoryListProps extends CommonProps {
   /** @description ID to use on Category list */
   categoryID: string;
+  /** @deprecated */
+  __apiSelect: "Category";
 }
 
 export interface BrandListProps extends CommonProps {
   /** @description ID to use on Brand list */
   brandID: string;
+  /** @deprecated */
+  __apiSelect: "Brand";
 }
 
 export interface FlagListProps extends CommonProps {
   /** @description ID to use on Brand list */
   flagID: string;
+  /** @deprecated */
+  __apiSelect: "Flag";
 }
 
 export type Props =
@@ -49,53 +60,38 @@ export type Props =
   | BrandListProps
   | FlagListProps;
 
-const isDatasouceList = (p: any): p is DatasourceListProps =>
-  typeof p.dataSouceID === "string" && typeof p.apiSelect === "string";
-
-const isSearchList = (p: any): p is SearchListProps =>
-  typeof p.term === "string" && typeof p.apiSelect === "string";
-
-const isCategoryList = (p: any): p is CategoryListProps =>
-  typeof p.categoryID === "string" && typeof p.apiSelect === "string";
-
-const isBrandList = (p: any): p is BrandListProps =>
-  typeof p.brandID === "string" && typeof p.apiSelect === "string";
-
-const isFlagList = (p: any): p is BrandListProps =>
-  typeof p.flagID === "string" && typeof p.apiSelect === "string";
-
 const fromProps = (props: Props) => {
-  if (isDatasouceList(props)) {
+  if (props.__apiSelect === "Datasource") {
     return {
-      apiSelect: "Datasource",
+      apiSelect: props.__apiSelect,
       id: props?.dataSouceID,
     } as const;
   }
 
-  if (isSearchList(props)) {
+  if (props.__apiSelect === "Search") {
     return {
-      apiSelect: "Search",
+      apiSelect: props.__apiSelect,
       id: props?.term,
     } as const;
   }
 
-  if (isCategoryList(props)) {
+  if (props.__apiSelect === "Category") {
     return {
-      apiSelect: "Category",
+      apiSelect: props.__apiSelect,
       id: props?.categoryID,
     } as const;
   }
 
-  if (isBrandList(props)) {
+  if (props.__apiSelect === "Brand") {
     return {
-      apiSelect: "Brand",
+      apiSelect: props.__apiSelect,
       id: props?.brandID,
     } as const;
   }
 
-  if (isFlagList(props)) {
+  if (props.__apiSelect === "Flag") {
     return {
-      apiSelect: "Flag",
+      apiSelect: props.__apiSelect,
       id: props?.flagID,
     } as const;
   }
@@ -117,9 +113,11 @@ const productListLoader = async (
   const { id, apiSelect } = fromProps(props);
 
   const query = await api
-    [`GET /web-api/v1/Catalog/Products/${apiSelect}/:id/?catalogID=1`]({
+    [`GET /web-api/v1/Catalog/Products/:source/:id`]({
+      source: apiSelect,
+      catalogID: 1,
       id: id,
-    }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
+    }, STALE).then((res) => res.json());
 
   return query.Products.map((product) =>
     toProduct(ctx, product, {

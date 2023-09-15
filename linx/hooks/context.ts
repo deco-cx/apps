@@ -3,8 +3,8 @@ import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
 import { Cart } from "../utils/client.ts";
 
-interface Context {
-  cart: Cart;
+export interface Context {
+  cart: Cart | null;
 }
 
 const loading = signal<boolean>(true);

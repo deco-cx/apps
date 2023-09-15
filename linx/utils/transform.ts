@@ -84,10 +84,9 @@ export const toProduct = (
     sku: product.SKU,
     url: ctx.publicUrl + product.Url,
     name: product.Name,
-    description:
-      product.Descriptions?.filter((description) =>
-        description.Alias === "LongDescription"
-      )[0].Value,
+    description: product.Descriptions?.filter((description) =>
+      description.Alias === "LongDescription"
+    )[0].Value,
     gtin: product.ProductID,
     image: product.MediaGroups?.map((
       img,

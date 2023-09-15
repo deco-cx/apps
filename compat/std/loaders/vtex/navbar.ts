@@ -1,7 +1,5 @@
 import type { Navbar } from "../../../../commerce/types.ts";
-import {
-  Props,
-} from "../../../../vtex/loaders/navbar.ts";
+import { Props } from "../../../../vtex/loaders/navbar.ts";
 import { VTEXContext } from "../../mod.ts";
 
 /**

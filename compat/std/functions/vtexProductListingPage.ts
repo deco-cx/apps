@@ -5,7 +5,6 @@ import type {
 } from "../../../vtex/loaders/intelligentSearch/productListingPage.ts";
 import type { AppContext } from "../mod.ts";
 
-
 /**
  * @title VTEX Intelligent Search - Product Listing page (deprecated)
  * @description Useful for category, search, brand and collection pages.
@@ -20,9 +19,10 @@ const loaderV0: LoaderFunction<
   ctx,
   props,
 ) => {
-  const data = await ctx.state.invoke["deco-sites/std"].loaders.vtex.intelligentSearch.productListingPage(
-    props,
-  );
+  const data = await ctx.state.invoke["deco-sites/std"].loaders.vtex
+    .intelligentSearch.productListingPage(
+      props,
+    );
 
   return { data, status: data ? 200 : 404 };
 };

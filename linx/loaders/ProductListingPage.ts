@@ -42,7 +42,9 @@ const loader = async (
 
   // search products on Linx. Feel free to change any of these parameters
   const data = await api
-    [`GET /web-api/v1/Catalog/Products/${apiSelect}/:id/?catalogID=1`]({
+    [`GET /web-api/v1/Catalog/Products/:source/:id`]({
+      source: apiSelect,
+      catalogID: 1,
       id: term,
     }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
 
