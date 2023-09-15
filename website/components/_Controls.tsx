@@ -1,5 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import type { Flag, Site } from "deco/types.ts";
+import { context } from "deco/live.ts";
 
 interface Page {
   id: string | number;
@@ -12,6 +13,7 @@ declare global {
       page: Page;
       site: Site;
       flags?: Flag[];
+      play?: boolean;
     };
   }
 }
@@ -50,13 +52,11 @@ const main = () => {
       event.preventDefault();
       event.stopPropagation();
 
-      const pathname =
-        `/admin/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
+      const pathname = window.LIVE.play
+        ? `/play/blocks/${window.LIVE.page.id}?domain=${window.location.origin}`
+        : `/admin/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
 
-      const href = new URL(
-        pathname,
-        "https://deco.cx",
-      );
+      const href = new URL(pathname, "https://deco.cx");
 
       href.searchParams.set(
         "path",
@@ -105,7 +105,7 @@ function LiveControls({ site, page, flags }: Props) {
           type="application/json"
           id="__DECO_STATE"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({ page, site, flags }),
+            __html: JSON.stringify({ page, site, flags, play: context.play }),
           }}
         />
         <script
