@@ -13,8 +13,19 @@ import * as $7 from "./functions/vtexProductDetailsPage.ts";
 import * as $8 from "./functions/vtexLegacyProductList.ts";
 import * as $9 from "./functions/vtexLegacyRelatedProductsLoader.ts";
 import * as $10 from "./functions/requestToParam.ts";
-import * as $$$0 from "./loaders/x/redirects.ts";
-import * as $$$1 from "./loaders/x/font.ts";
+import * as $$$0 from "./loaders/vtex/legacy/productList.ts";
+import * as $$$1 from "./loaders/vtex/legacy/productDetailsPage.ts";
+import * as $$$2 from "./loaders/vtex/legacy/productListingPage.ts";
+import * as $$$3 from "./loaders/vtex/legacy/relatedProductsLoader.ts";
+import * as $$$4 from "./loaders/vtex/legacy/suggestions.ts";
+import * as $$$5 from "./loaders/vtex/navbar.ts";
+import * as $$$6 from "./loaders/vtex/proxy.ts";
+import * as $$$7 from "./loaders/vtex/intelligentSearch/productList.ts";
+import * as $$$8 from "./loaders/vtex/intelligentSearch/productDetailsPage.ts";
+import * as $$$9 from "./loaders/vtex/intelligentSearch/productListingPage.ts";
+import * as $$$10 from "./loaders/vtex/intelligentSearch/suggestions.ts";
+import * as $$$11 from "./loaders/x/redirects.ts";
+import * as $$$12 from "./loaders/x/font.ts";
 import * as $$$$$$0 from "./sections/SEOPLP.tsx";
 import * as $$$$$$1 from "./sections/Analytics.tsx";
 import * as $$$$$$2 from "./sections/VTEXPortalDataLayerCompatibility.tsx";
@@ -35,8 +46,19 @@ const manifest = {
     "deco-sites/std/functions/vtexWishlist.ts": $4,
   },
   "loaders": {
-    "deco-sites/std/loaders/x/font.ts": $$$1,
-    "deco-sites/std/loaders/x/redirects.ts": $$$0,
+    "deco-sites/std/loaders/vtex/intelligentSearch/productDetailsPage.ts": $$$8,
+    "deco-sites/std/loaders/vtex/intelligentSearch/productList.ts": $$$7,
+    "deco-sites/std/loaders/vtex/intelligentSearch/productListingPage.ts": $$$9,
+    "deco-sites/std/loaders/vtex/intelligentSearch/suggestions.ts": $$$10,
+    "deco-sites/std/loaders/vtex/legacy/productDetailsPage.ts": $$$1,
+    "deco-sites/std/loaders/vtex/legacy/productList.ts": $$$0,
+    "deco-sites/std/loaders/vtex/legacy/productListingPage.ts": $$$2,
+    "deco-sites/std/loaders/vtex/legacy/relatedProductsLoader.ts": $$$3,
+    "deco-sites/std/loaders/vtex/legacy/suggestions.ts": $$$4,
+    "deco-sites/std/loaders/vtex/navbar.ts": $$$5,
+    "deco-sites/std/loaders/vtex/proxy.ts": $$$6,
+    "deco-sites/std/loaders/x/font.ts": $$$12,
+    "deco-sites/std/loaders/x/redirects.ts": $$$11,
   },
   "sections": {
     "deco-sites/std/sections/Analytics.tsx": $$$$$$1,

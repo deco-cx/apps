@@ -95,8 +95,6 @@ const manifestMappings = {
     "deco-sites/std/loaders/nuvemShop/nuvemShopProductList.ts": NOT_IMPLEMENTED,
     "deco-sites/std/loaders/nuvemShop/nuvemShopProductListingPage.ts":
       NOT_IMPLEMENTED,
-    "deco-sites/std/loaders/vtex/legacy/suggestions.ts":
-      "vtex/loaders/legacy/suggestions.ts",
     "deco-sites/std/loaders/vnda/cart.ts": "vnda/loaders/cart.ts",
     "deco-sites/std/loaders/vnda/productDetailsPage.ts":
       "vnda/loaders/productDetailsPage.ts",
@@ -105,24 +103,6 @@ const manifestMappings = {
       "vnda/loaders/productListingPage.ts",
     "deco-sites/std/loaders/vnda/proxy.ts": "vnda/loaders/proxy.ts",
     "deco-sites/std/loaders/vtex/cart.ts": "vtex/loaders/cart.ts",
-    "deco-sites/std/loaders/vtex/intelligentSearch/productDetailsPage.ts":
-      "vtex/loaders/intelligentSearch/productDetailsPage.ts",
-    "deco-sites/std/loaders/vtex/intelligentSearch/productList.ts":
-      "vtex/loaders/intelligentSearch/productList.ts",
-    "deco-sites/std/loaders/vtex/intelligentSearch/productListingPage.ts":
-      "vtex/loaders/intelligentSearch/productListingPage.ts",
-    "deco-sites/std/loaders/vtex/intelligentSearch/suggestions.ts":
-      "vtex/loaders/intelligentSearch/suggestions.ts",
-    "deco-sites/std/loaders/vtex/legacy/productDetailsPage.ts":
-      "vtex/loaders/legacy/productDetailsPage.ts",
-    "deco-sites/std/loaders/vtex/legacy/productList.ts":
-      "vtex/loaders/legacy/productList.ts",
-    "deco-sites/std/loaders/vtex/legacy/productListingPage.ts":
-      "vtex/loaders/legacy/productListingPage.ts",
-    "deco-sites/std/loaders/vtex/legacy/relatedProductsLoader.ts":
-      "vtex/loaders/legacy/relatedProductsLoader.ts",
-    "deco-sites/std/loaders/vtex/navbar.ts": "vtex/loaders/navbar.ts",
-    "deco-sites/std/loaders/vtex/proxy.ts": "vtex/loaders/proxy.ts",
     "deco-sites/std/loaders/vtex/user.ts": "vtex/loaders/user.ts",
     "deco-sites/std/loaders/vtex/wishlist.ts": "vtex/loaders/wishlist.ts",
     "deco-sites/std/loaders/x/image.ts": "website/loaders/image.ts",
@@ -275,6 +255,14 @@ export function WithoutCommerce(
     dependencies: [liveApp],
   };
 }
+
+export type VTEXContext = AC<
+  App<
+    Manifest,
+    State,
+    [ReturnType<typeof $live>, ReturnType<typeof vtex>]
+  >
+>;
 
 export type AppContext = AC<ReturnType<typeof Std>>;
 export default function Std(
