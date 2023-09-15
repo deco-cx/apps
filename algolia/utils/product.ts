@@ -8,7 +8,7 @@ export const resolveProducts = async (
   index: SearchIndex,
 ) => {
   const hasVariantIds = products.flatMap((p) =>
-    p.isVariantOf?.hasVariant.map((x) => x.productID)
+    p.isVariantOf?.hasVariant?.map((x) => x.productID)
   );
   const isSimilarToIds = products.flatMap((p) =>
     p.isSimilarTo?.map((x) => x.productID)
@@ -33,8 +33,8 @@ export const resolveProducts = async (
     isVariantOf: p.isVariantOf && {
       ...p.isVariantOf,
       hasVariant: p.isVariantOf?.hasVariant
-        .map((p) => productsById.get(p.productID))
-        .filter((p): p is Product => Boolean(p)),
+        ?.map((p) => productsById.get(p.productID))
+        .filter((p): p is Product => Boolean(p)) ?? [],
     },
     isSimilarTo: p.isSimilarTo
       ?.map((p) => productsById.get(p.productID))
