@@ -14,7 +14,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
-import type { LegacyProduct, LegacySort } from "../../utils/types.ts";
+import type { LegacyProduct, LegacySort, LegacyFacet } from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
 
@@ -129,6 +129,7 @@ const loader = async (
   const _to = (page + 1) * count - 1;
 
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
+  const pageType = pageTypes.at(-1) || pageTypes[0];
 
   if (pageTypes.length === 0 && !ft && !fq) {
     return null;
@@ -177,8 +178,33 @@ const loader = async (
       props.similars ? withIsSimilarTo(req, ctx, product) : product
     ),
   );
+
+  // Get categories of the current department/category
+  const getCategoryFacets = (CategoriesTrees: LegacyFacet[]): LegacyFacet[] => {
+    const isDepartmentOrCategoryPage = !pageType;
+    if (isDepartmentOrCategoryPage) {
+      return [];
+    }
+
+    for (const category of CategoriesTrees) {
+      const isCurrentCategory = category.Id == Number(pageType.id);
+      if (isCurrentCategory) {
+        return category.Children || [];
+      } else if (category.Children.length) {
+        const childFacets = getCategoryFacets(category.Children);
+        const hasChildFacets = childFacets.length;
+        if (hasChildFacets) {
+          return childFacets;
+        }
+      }
+    }
+
+    return [];
+  };
+
   const filters = Object.entries({
     Departments: vtexFacets.Departments,
+    Categories: getCategoryFacets(vtexFacets.CategoriesTrees),
     Brands: vtexFacets.Brands,
     ...vtexFacets.SpecificationFilters,
   }).map(([name, facets]) =>

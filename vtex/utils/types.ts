@@ -659,6 +659,7 @@ export type LegacyProduct = IProduct & {
 
 export type LegacyFacets = {
   Departments: LegacyFacet[];
+  CategoriesTrees: LegacyFacet[];
   Brands: LegacyFacet[];
   SpecificationFilters: Record<string, LegacyFacet[]>;
 };
@@ -693,6 +694,7 @@ export interface Category {
 }
 
 export interface LegacyFacet {
+  Id: number;
   Quantity: number;
   Name: string;
   Link: string;
