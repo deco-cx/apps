@@ -21,7 +21,7 @@ export default function Index(_: unknown) {
       { product },
     );
 
-    if (typeof taskID === 'number') {
+    if (typeof taskID === "number") {
       yield ctx.invoke(
         "algolia/actions/index/wait.ts",
         { taskID },
