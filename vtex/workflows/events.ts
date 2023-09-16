@@ -1,6 +1,6 @@
 import type { Workflow } from "deco/blocks/workflow.ts";
 import type { WorkflowContext, WorkflowGen } from "deco/mod.ts";
-import type { ProductLeaf } from "../../commerce/types.ts";
+import type { Product, ProductLeaf } from "../../commerce/types.ts";
 import type { Notification } from "../actions/trigger.ts";
 import type { AppManifest } from "../mod.ts";
 
@@ -28,13 +28,21 @@ export default function Index(props: Props) {
       },
     );
 
-    const product = products?.[0].isVariantOf?.hasVariant?.find((
-      p: ProductLeaf,
-    ) => p.productID === idSKU);
+    const [head] = products as Product[];
+    const leaf: ProductLeaf | undefined = head?.isVariantOf
+      ?.hasVariant?.find((p: ProductLeaf) => p.productID === idSKU);
 
-    if (!product) {
+    if (!leaf) {
       throw new Error("No product returned by Product loader");
     }
+
+    const product: Product = {
+      ...leaf,
+      isVariantOf: head.isVariantOf && {
+        ...head.isVariantOf,
+        hasVariant: head.isVariantOf.hasVariant,
+      },
+    };
 
     /** Start each registered workflow */
     const workflows = props.product || [];

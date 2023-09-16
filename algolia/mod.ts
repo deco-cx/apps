@@ -29,10 +29,12 @@ export type Indices = "products" | "products_price_desc" | "products_price_asc";
 
 const setup = async (algolia: SearchClient) => {
   await algolia.initIndex("products" satisfies Indices).setSettings({
+    distinct: true,
+    attributeForDistinct: "inProductGroupWithID",
     searchableAttributes: [
       "name",
+      "brand",
       "description",
-      "brand.name",
       "isVariantOf.name",
       "isVariantOf.model",
       "offers.offers.availability",
@@ -40,8 +42,9 @@ const setup = async (algolia: SearchClient) => {
       "offers.offers.priceSpecification.priceComponentType",
     ],
     attributesForFaceting: [
-      "brand.name",
+      "brand",
       "category",
+      "additionalProperty",
     ],
     numericAttributesForFiltering: [
       "offers.highPrice",

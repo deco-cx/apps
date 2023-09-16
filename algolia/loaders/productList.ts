@@ -1,7 +1,7 @@
 import { Product } from "../../commerce/types.ts";
 
 import { AppContext } from "../mod.ts";
-import { resolveProducts } from "../utils/product.ts";
+import { IndexedProduct, resolveProducts } from "../utils/product.ts";
 
 interface Props {
   /**
@@ -31,7 +31,7 @@ const loader = async (
   const { algolia } = ctx;
   const index = await algolia("products");
 
-  const { hits: products } = await index.search<Product>(
+  const { hits: products } = await index.search<IndexedProduct>(
     props.term ?? "",
     {
       hitsPerPage: props.hitsPerPage ?? 12,

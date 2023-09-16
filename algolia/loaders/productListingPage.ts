@@ -1,6 +1,6 @@
-import { Filter, Product, ProductListingPage } from "../../commerce/types.ts";
+import { Filter, ProductListingPage } from "../../commerce/types.ts";
 import { AppContext, Indices } from "../mod.ts";
-import { resolveProducts } from "../utils/product.ts";
+import { IndexedProduct, resolveProducts } from "../utils/product.ts";
 
 interface Props {
   /**
@@ -58,7 +58,7 @@ const transformFacets = (
   return Object.entries(facets).map(([key, values]) => ({
     "@type": "FilterToggle",
     quantity: 0,
-    label: key,
+    label: key.replace("additionalProperty.", ""),
     key,
     values: Object.entries(values).map(([value, quantity]) => {
       const facet = `${key}:${value}`;
@@ -113,7 +113,7 @@ const loader = async (
   const facetFilters = JSON.parse(url.searchParams.get("facetFilters") ?? "[]");
 
   const { hits, page, nbPages, facets } = await index.search<
-    Product
+    IndexedProduct
   >(
     props.term ?? url.searchParams.get("query") ?? "",
     {

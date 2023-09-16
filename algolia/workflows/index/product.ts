@@ -21,10 +21,12 @@ export default function Index(_: unknown) {
       { product },
     );
 
-    yield ctx.invoke(
-      "algolia/actions/index/wait.ts",
-      { taskID },
-    );
+    if (typeof taskID === 'number') {
+      yield ctx.invoke(
+        "algolia/actions/index/wait.ts",
+        { taskID },
+      );
+    }
 
     yield ctx.log("Finished indexing Product:", productID);
   };
