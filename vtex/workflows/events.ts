@@ -25,6 +25,7 @@ export default function Index(props: Props) {
       "vtex/loaders/intelligentSearch/productList.ts",
       {
         ids: [idSKU],
+        similars: true,
       },
     );
 
