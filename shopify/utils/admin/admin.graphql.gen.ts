@@ -42433,3 +42433,18 @@ export type DeliveryProfileUpdatePayload = {
 export type NoopQueryVariables = Exact<{ [key: string]: never }>;
 
 export type NoopQuery = { app?: { description?: string | null } | null };
+
+export type DraftOrderCalculateMutationVariables = Exact<{
+  input: DraftOrderInput;
+}>;
+
+export type DraftOrderCalculateMutation = {
+  payload?: {
+    calculatedDraftOrder?: {
+      availableShippingRates: Array<
+        { title: string; handle: string; price: { amount: any } }
+      >;
+    } | null;
+    userErrors: Array<{ field?: Array<string> | null; message: string }>;
+  } | null;
+};
