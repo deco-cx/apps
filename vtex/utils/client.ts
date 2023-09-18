@@ -1,5 +1,6 @@
 import {
   Category,
+  CreateNewDocument,
   FacetSearchResult,
   LegacyFacets,
   LegacyProduct,
@@ -172,24 +173,26 @@ export interface VTEXCommerceStable {
     response: OrderForm;
     body: { price: number };
   };
-  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
-    {
-      response: OrderForm;
-      body: {
-        content: Record<string, string>;
-        noSplitItem: boolean;
-        expectedOrderFormSections: string[];
-      };
+  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment": {
+    response: OrderForm;
+    body: {
+      content: Record<string, string>;
+      noSplitItem: boolean;
+      expectedOrderFormSections: string[];
     };
-  "DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
-    {
-      response: OrderForm;
-      body: {
-        content: Record<string, string>;
-        noSplitItem: boolean;
-        expectedOrderFormSections: string[];
-      };
+  };
+  "DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment": {
+    response: OrderForm;
+    body: {
+      content: Record<string, string>;
+      noSplitItem: boolean;
+      expectedOrderFormSections: string[];
     };
+  };
+  "POST /api/dataentities/:acronym/documents": {
+    response: CreateNewDocument;
+    body: Record<string, unknown>;
+  };
 }
 
 export interface SP {
