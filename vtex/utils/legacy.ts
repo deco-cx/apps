@@ -97,12 +97,14 @@ export const pageTypesToSeo = (pages: PageType[], req: Request): Seo | null => {
   const current = pages.at(-1);
 
   const url = new URL(req.url);
-  const urlParams = new URLSearchParams(url.search);
+  const urlParams = url.searchParams;
+  const fullTextSearch = urlParams.get("q")
+  const isFullTextSearch = fullTextSearch
 
-  if (!current && urlParams.get("q")) {
+  if (!current && isFullTextSearch) {
     return {
-      title: urlParams.get("q") || "",
-      description: urlParams.get("q") || "",
+      title: fullTextSearch,
+      description: fullTextSearch,
       canonical: new URL(req.url).href,
     };
   }
