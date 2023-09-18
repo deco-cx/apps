@@ -1,7 +1,7 @@
-export { onBeforeResolveProps } from "./multivariate.ts";
+export { onBeforeResolveProps } from "../multivariate.ts";
 import { MultivariateFlag } from "deco/blocks/flag.ts";
 import { Section } from "deco/blocks/section.ts";
-import multivariate, { MultivariateProps } from "./multivariate.ts";
+import multivariate, { MultivariateProps } from "../multivariate.ts";
 
 /**
  * @title Page Variants
