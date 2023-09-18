@@ -1,4 +1,5 @@
 import type { Seo } from "../../commerce/types.ts";
+import { capitalize } from "../../utils/capitalize.ts";
 import { AppContext } from "../mod.ts";
 import { slugify } from "../utils/slugify.ts";
 import type { PageType, Segment } from "../utils/types.ts";
@@ -95,6 +96,18 @@ export const pageTypesToBreadcrumbList = (
 
 export const pageTypesToSeo = (pages: PageType[], req: Request): Seo | null => {
   const current = pages.at(-1);
+
+  const url = new URL(req.url);
+  const urlParams = url.searchParams;
+  const fullTextSearch = urlParams.get("q");
+
+  if (!current && fullTextSearch) {
+    return {
+      title: capitalize(fullTextSearch),
+      description: capitalize(fullTextSearch),
+      canonical: new URL(req.url).href,
+    };
+  }
 
   if (!current) {
     return null;
