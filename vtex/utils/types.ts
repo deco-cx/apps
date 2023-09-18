@@ -661,6 +661,7 @@ export type LegacyFacets = {
   Departments: LegacyFacet[];
   Brands: LegacyFacet[];
   SpecificationFilters: Record<string, LegacyFacet[]>;
+  PriceRanges: LegacyFacet[];
 };
 
 export interface PageType {
@@ -699,6 +700,7 @@ export interface LegacyFacet {
   LinkEncoded: string;
   Map: string;
   Value: string;
+  Slug?: string;
   Children: LegacyFacet[];
 }
 
