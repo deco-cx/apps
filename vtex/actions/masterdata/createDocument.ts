@@ -1,5 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import type { CreateNewDocument } from "../../utils/types.ts";
+import { parseCookie } from "../../utils/vtexId.ts";
 
 export interface Props {
   data: Record<string, unknown>;
@@ -11,11 +12,12 @@ export interface Props {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext
 ): Promise<CreateNewDocument> => {
   const { vcs } = ctx;
   const { data, acronym } = props;
+  const { cookie } = parseCookie(req.headers, ctx.account);
 
   const response = await vcs[`POST /api/dataentities/:acronym/documents`](
     { acronym },
@@ -24,11 +26,10 @@ const action = async (
       headers: {
         accept: "application/json",
         "content-type": "application/json",
+        cookie,
       },
     }
   );
-
-  console.log(response.json());
 
   return response.json();
 };
