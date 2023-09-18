@@ -99,9 +99,8 @@ export const pageTypesToSeo = (pages: PageType[], req: Request): Seo | null => {
   const url = new URL(req.url);
   const urlParams = url.searchParams;
   const fullTextSearch = urlParams.get("q");
-  const isFullTextSearch = fullTextSearch;
-
-  if (!current && isFullTextSearch) {
+  
+  if (!current && fullTextSearch) {
     return {
       title: fullTextSearch,
       description: fullTextSearch,
