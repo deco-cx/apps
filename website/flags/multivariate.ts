@@ -1,19 +1,18 @@
 import { MultivariateFlag, Variant } from "deco/blocks/flag.ts";
-import { Section } from "deco/blocks/section.ts";
 import { asResolved } from "deco/engine/core/resolver.ts";
 
 /**
  * @title Multivariate
  */
-export type MultivariateProps<T = Section[]> = MultivariateFlag<T>;
+export type MultivariateProps<T> = MultivariateFlag<T>;
 
 /**
  * @title Variant
  * @label hidden
  */
-export default function MultivariateFlag(
-  props: MultivariateProps<Section[]>,
-): MultivariateFlag<Section[]> {
+export default function MultivariateFlag<T>(
+  props: MultivariateProps<T>,
+): MultivariateFlag<T> {
   return props;
 }
 
