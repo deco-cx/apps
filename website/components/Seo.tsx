@@ -58,7 +58,10 @@ function Component({
   return (
     <Head>
       <title>{titleTemplate.replace("%s", title)}</title>
-      <meta name="description" content={descriptionTemplate.replace("%s", description)} />
+      <meta
+        name="description"
+        content={descriptionTemplate.replace("%s", description)}
+      />
       <meta name="theme-color" content={themeColor} />
       <link rel="icon" href={favicon} />
 
