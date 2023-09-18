@@ -8,11 +8,17 @@ export interface Props {
   title?: string;
   /**
    * @title Title template
-   * @description add a %s whenever you want it to be replaced with the category name or search term
+   * @description add a %s whenever you want it to be replaced with the product name, category name or search term
    * @default %s | Deco.cx
    */
   titleTemplate?: string;
   description?: string;
+  /**
+   * @title Description template
+   * @description add a %s whenever you want it to be replaced with the product name, category name or search term
+   * @default %s | Deco.cx
+   */
+  descriptionTemplate?: string;
   /** @default website */
   type?: OGType;
   /** @description Recommended: 1200 x 630 px (up to 5MB) */
@@ -36,6 +42,7 @@ function Component({
   title: t = "",
   titleTemplate = "%s",
   description: desc,
+  descriptionTemplate = "%s",
   type,
   image,
   favicon,
@@ -51,7 +58,10 @@ function Component({
   return (
     <Head>
       <title>{titleTemplate.replace("%s", title)}</title>
-      <meta name="description" content={description} />
+      <meta
+        name="description"
+        content={descriptionTemplate.replace("%s", description)}
+      />
       <meta name="theme-color" content={themeColor} />
       <link rel="icon" href={favicon} />
 
