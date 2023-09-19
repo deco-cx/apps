@@ -2,27 +2,27 @@ import { AppContext } from "../../mod.ts";
 
 import { draftOrderCalculate } from "../../utils/admin/queries.ts";
 
-import getStateFromZip from "../../../commerce/utils/stateByZip.ts"
+import getStateFromZip from "../../../commerce/utils/stateByZip.ts";
 
 import {
-    CalculatedDraftOrder,
-    MutationDraftOrderCalculateArgs,
-    DraftOrderCalculatePayload,
-Maybe,
-CountryCode
-  } from "../../utils/admin/admin.graphql.gen.ts";
+  CalculatedDraftOrder,
+  CountryCode,
+  DraftOrderCalculatePayload,
+  Maybe,
+  MutationDraftOrderCalculateArgs,
+} from "../../utils/admin/admin.graphql.gen.ts";
 
 type DraftOrderCalculateProps = {
   input: {
     lineItems: {
-        variantId: string;
-        quantity: number;
+      variantId: string;
+      quantity: number;
     }[];
-    shippingAddress:{
-        zip: string;
-        countryCode: CountryCode;
-        provinceCode: string;
-    }
+    shippingAddress: {
+      zip: string;
+      countryCode: CountryCode;
+      provinceCode: string;
+    };
   };
 };
 
@@ -33,25 +33,24 @@ const action = async (
 ): Promise<Maybe<CalculatedDraftOrder> | undefined> => {
   const { admin } = ctx;
 
-  const { shippingAddress : { zip, countryCode, provinceCode } } = input
+  const { shippingAddress: { zip, countryCode, provinceCode } } = input;
 
   const { calculatedDraftOrder } = await admin.query<
-  DraftOrderCalculatePayload,
-  MutationDraftOrderCalculateArgs
+    DraftOrderCalculatePayload,
+    MutationDraftOrderCalculateArgs
   >({
-    variables: { 
-        input:{
+    variables: {
+      input: {
         lineItems: [...input.lineItems],
         shippingAddress: {
-            zip: zip,
-            countryCode: countryCode,
-            provinceCode: provinceCode || getStateFromZip(zip),
+          zip: zip,
+          countryCode: countryCode,
+          provinceCode: provinceCode || getStateFromZip(zip),
         },
-      } 
+      },
     },
     ...draftOrderCalculate,
   });
-  
 
   return calculatedDraftOrder;
 };

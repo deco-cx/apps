@@ -12,9 +12,10 @@ const loaderV0: LoaderFunction<
   Suggestion | null,
   AppContext
 > = async (_req, ctx, props) => {
-  const data = await ctx.state.invoke["deco-sites/std"].loaders.vtex.intelligentSearch.suggestions(
-    props,
-  );
+  const data = await ctx.state.invoke["deco-sites/std"].loaders.vtex
+    .intelligentSearch.suggestions(
+      props,
+    );
 
   return { data, status: data ? 200 : 404 };
 };
