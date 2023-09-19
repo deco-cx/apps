@@ -3,7 +3,6 @@ import { asResolved } from "deco/engine/core/resolver.ts";
 
 /**
  * @title Multivariate
- * @multivariate true
  */
 export interface MultivariateProps<T> {
   /**

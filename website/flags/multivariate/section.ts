@@ -5,7 +5,6 @@ import multivariate, { MultivariateProps } from "../../utils/multivariate.ts";
 
 /**
  * @title Section Variants
- * @multivariate true
  */
 export default function SectionVariants(
   props: MultivariateProps<Section>,
