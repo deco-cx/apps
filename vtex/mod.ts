@@ -32,6 +32,8 @@ interface State extends Props {
   io: ReturnType<typeof createGraphqlClient>;
 }
 
+export const color = 0xF71963;
+
 /**
  * @title VTEX
  */

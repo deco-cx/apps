@@ -42,6 +42,8 @@ export interface State extends Props {
   api: ReturnType<typeof createHttpClient<OpenAPI>>;
 }
 
+export const color = 0x0C29D0;
+
 /**
  * @title VNDA
  */
