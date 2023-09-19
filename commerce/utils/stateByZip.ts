@@ -2,6 +2,7 @@ const getStateFromZip = (cep: string) => {
   // Remove non-numeric characters
   cep = cep.replace(/\D/g, "");
 
+  // zip range by: https://buscacepinter.correios.com.br/app/faixa_cep_uf_localidade/index.php
   const zipRange = [
     { state: "AC", startRange: 69900000, endRange: 69999999 },
     { state: "AL", startRange: 57000000, endRange: 57999999 },
@@ -43,7 +44,7 @@ const getStateFromZip = (cep: string) => {
     }
   }
 
-  return null;
+  return "";
 };
 
 export default getStateFromZip;
