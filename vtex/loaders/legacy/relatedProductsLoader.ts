@@ -104,7 +104,9 @@ async function loader(
   /** Batch fetches due to VTEX API limits */
   const batchedIds = batch(relatedIds, 50);
   const relatedProducts = await Promise.all(
-    batchedIds.map((ids) => productList({ similars: false, ids }, req, ctx)),
+    batchedIds.map((ids) =>
+      productList({ props: { similars: false, ids } }, req, ctx)
+    ),
   ).then((p) => p.flat().filter((x): x is Product => Boolean(x)));
 
   setSegment(segment, ctx.response.headers);

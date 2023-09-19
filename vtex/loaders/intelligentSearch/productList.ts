@@ -59,7 +59,7 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props = CollectionProps | QueryProps | ProductIDProps;
+export type Props = { props: CollectionProps | QueryProps | ProductIDProps };
 
 // deno-lint-ignore no-explicit-any
 const isCollectionList = (p: any): p is CollectionProps =>
@@ -71,7 +71,7 @@ const isQueryList = (p: any): p is QueryProps =>
 const isProductIDList = (p: any): p is ProductIDProps =>
   Array.isArray(p.ids) && p.ids.length > 0;
 
-const fromProps = (props: Props) => {
+const fromProps = ({ props }: Props) => {
   if (isProductIDList(props)) {
     return {
       query: `sku:${props.ids.join(";")}`,
@@ -110,7 +110,7 @@ const fromProps = (props: Props) => {
  * @description Product List loader
  */
 const loader = async (
-  props: Props,
+  { props }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
@@ -118,7 +118,7 @@ const loader = async (
   const { url } = req;
   const segment = getSegment(req);
 
-  const { selectedFacets, ...args } = fromProps(props);
+  const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);
   const facets = withDefaultFacets(selectedFacets, ctx);
 

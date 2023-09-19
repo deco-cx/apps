@@ -33,7 +33,7 @@ const loaderV0: LoaderFunction<
     : { collection: props.collection?.[0], count: props.count };
 
   const data = await ctx.state.invoke["deco-sites/std"].loaders.vtex.legacy
-    .productList(p);
+    .productList({ props: p });
 
   return { data, status: data ? 200 : 404 };
 };

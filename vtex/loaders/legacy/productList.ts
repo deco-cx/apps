@@ -70,12 +70,14 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props =
-  | CollectionProps
-  | TermProps
-  | ProductIDProps
-  | SkuIDProps
-  | FQProps;
+export type Props = {
+  props:
+    | CollectionProps
+    | TermProps
+    | ProductIDProps
+    | SkuIDProps
+    | FQProps;
+};
 
 // deno-lint-ignore no-explicit-any
 const isCollectionProps = (p: any): p is CollectionProps =>
@@ -94,7 +96,7 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 // deno-lint-ignore no-explicit-any
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
 
-const fromProps = (props: Props) => {
+const fromProps = ({ props }: Props) => {
   const params = { fq: [] } as {
     _from?: number;
     _to?: number;
@@ -154,7 +156,7 @@ const fromProps = (props: Props) => {
  * @description Product List loader
  */
 const loader = async (
-  props: Props,
+  { props }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
@@ -162,7 +164,7 @@ const loader = async (
   const { url: baseUrl } = req;
   const segment = getSegment(req);
   const segmentParams = toSegmentParams(segment);
-  const params = fromProps(props);
+  const params = fromProps({ props });
 
   const vtexProducts = await vcs
     ["GET /api/catalog_system/pub/products/search/:term?"]({
