@@ -42439,7 +42439,7 @@ export type DraftOrderCalculateMutationVariables = Exact<{
 }>;
 
 export type DraftOrderCalculateMutation = {
-  payload?: {
+  calculatedDraftOrder?: {
     calculatedDraftOrder?: {
       availableShippingRates: Array<
         { title: string; handle: string; price: { amount: any } }

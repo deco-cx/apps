@@ -2,6 +2,8 @@ import { AppContext } from "../../mod.ts";
 
 import { draftOrderCalculate } from "../../utils/admin/queries.ts";
 
+import getStateFromZip from "../../../commerce/utils/stateByZip.ts"
+
 import {
     CalculatedDraftOrder,
     MutationDraftOrderCalculateArgs,
@@ -31,7 +33,7 @@ const action = async (
 ): Promise<Maybe<CalculatedDraftOrder> | undefined> => {
   const { admin } = ctx;
 
-  console.log("entrou")
+  const { shippingAddress : { zip, countryCode, provinceCode } } = input
 
   const { calculatedDraftOrder } = await admin.query<
   DraftOrderCalculatePayload,
@@ -41,9 +43,9 @@ const action = async (
         input:{
         lineItems: [...input.lineItems],
         shippingAddress: {
-            zip: input.shippingAddress.zip,
-            countryCode: input.shippingAddress.countryCode,
-            provinceCode: input.shippingAddress.provinceCode,
+            zip: zip,
+            countryCode: countryCode,
+            provinceCode: provinceCode || getStateFromZip(zip),
         },
       } 
     },

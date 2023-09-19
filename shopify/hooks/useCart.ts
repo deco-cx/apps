@@ -42,6 +42,7 @@ const state = {
   addItems: enqueue("shopify/actions/cart/addItems.ts"),
   updateItems: enqueue("shopify/actions/cart/updateItems.ts"),
   addCouponsToCart: enqueue("shopify/actions/cart/updateCoupons.ts"),
+  simulate: invoke.shopify.actions.order.draftOrderCalculate
 };
 
 export const useCart = () => state;
