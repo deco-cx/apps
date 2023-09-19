@@ -1,5 +1,3 @@
-/** @format */
-
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
