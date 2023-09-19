@@ -46,7 +46,7 @@ export default function Secret(
       return cache[encrypted] ??= decryptFromHex(encrypted).then((d) =>
         d.decrypted
       ).catch((err) => {
-        console.error(err);
+        console.error("decrypt secret error", err);
         return null;
       });
     },
