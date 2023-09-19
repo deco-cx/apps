@@ -38,6 +38,8 @@ export interface State extends Props {
   admin: ReturnType<typeof createGraphqlClient>;
 }
 
+export const color = 0x96BF48;
+
 /**
  * @title Shopify
  */

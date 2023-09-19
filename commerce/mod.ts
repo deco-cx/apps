@@ -5,9 +5,11 @@ import vtex, { Props as VTEXProps } from "../vtex/mod.ts";
 import wake, { Props as WakeProps } from "../wake/mod.ts";
 import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { bgYellow } from "std/fmt/colors.ts";
 
 export type Props = WebsiteProps & {
-  commerce: VNDAProps | VTEXProps | ShopifyProps | WakeProps;
+  /** @deprecated Use selected commerce instead */
+  commerce?: VNDAProps | VTEXProps | ShopifyProps | WakeProps;
 };
 
 type WebsiteApp = ReturnType<typeof website>;
@@ -19,17 +21,27 @@ type CommerceApp =
 
 export default function Site(
   state: Props,
-): App<Manifest, Props, [WebsiteApp, CommerceApp]> {
+): App<Manifest, Props, [WebsiteApp] | [WebsiteApp, CommerceApp]> {
   const { commerce } = state;
 
   const site = website(state);
-  const ecommerce = commerce.platform === "vnda"
+
+  if (commerce) {
+    console.warn(
+      bgYellow("Deprecated"),
+      "Commerce prop is now deprecated. Delete this prop and install the commerce platform app instead. This will be removed in the future",
+    );
+  }
+
+  const ecommerce = commerce?.platform === "vnda"
     ? vnda(commerce)
-    : commerce.platform === "vtex"
+    : commerce?.platform === "vtex"
     ? vtex(commerce)
-    : commerce.platform === "wake"
+    : commerce?.platform === "wake"
     ? wake(commerce)
-    : shopify(commerce);
+    : commerce?.platform === "shopify"
+    ? shopify(commerce)
+    : null;
 
   return {
     state,
@@ -55,7 +67,7 @@ export default function Site(
         },
       },
     },
-    dependencies: [site, ecommerce],
+    dependencies: ecommerce ? [site, ecommerce] : [site],
   };
 }
 
