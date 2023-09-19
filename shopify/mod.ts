@@ -2,6 +2,8 @@ import type { App, FnContext } from "deco/mod.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import getStateFromZip from "../commerce/utils/stateByZip.ts";
+import { SecretString } from "../website/loaders/secretString.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -22,7 +24,7 @@ export interface Props {
    * @ttile Access Token
    * @description Shopify admin access token.
    */
-  adminAccessToken: string;
+  adminAccessToken: SecretString;
 
   /** @description Disable password protection on the store */
   storefrontDigestCookie?: string;
@@ -33,9 +35,18 @@ export interface Props {
   platform: "shopify";
 }
 
+export interface Address {
+  provinceCode: string;
+}
+
+export interface AddressLocator {
+  byZipCode(zip: string): Promise<Address | null>;
+}
+
 export interface State extends Props {
   storefront: ReturnType<typeof createGraphqlClient>;
   admin: ReturnType<typeof createGraphqlClient>;
+  address: AddressLocator;
 }
 
 export const color = 0x96BF48;
@@ -63,5 +74,14 @@ export default function App(props: Props): App<Manifest, State> {
     }),
   });
 
-  return { state: { ...props, admin, storefront }, manifest };
+  const byZipCode = (zip: string) => {
+    return Promise.resolve({
+      provinceCode: getStateFromZip(zip),
+    });
+  };
+
+  return {
+    state: { ...props, admin, storefront, address: { byZipCode } },
+    manifest,
+  };
 }

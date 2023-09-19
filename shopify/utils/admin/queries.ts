@@ -6,3 +6,24 @@ import { gql } from "../../../utils/graphql.ts";
 export const Noop = {
   query: gql`query Noop { app(id: "") { description } }`,
 };
+
+export const draftOrderCalculate = {
+  query: gql` mutation draftOrderCalculate($input: DraftOrderInput!) {
+    calculatedDraftOrder: draftOrderCalculate(input: $input) {
+      calculatedDraftOrder {
+          availableShippingRates {
+              title
+              handle
+              price {
+                amount
+              }
+          }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+  `,
+};
