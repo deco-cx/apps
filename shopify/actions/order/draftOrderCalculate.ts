@@ -21,7 +21,7 @@ type DraftOrderCalculateProps = {
     shippingAddress: {
       zip: string;
       countryCode: CountryCode;
-      provinceCode: string;
+      provinceCode?: string;
     };
   };
 };
