@@ -3,6 +3,7 @@ import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import getStateFromZip from "../commerce/utils/stateByZip.ts";
+import { SecretString } from "../website/loaders/secretString.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -23,7 +24,7 @@ export interface Props {
    * @ttile Access Token
    * @description Shopify admin access token.
    */
-  adminAccessToken: string;
+  adminAccessToken: SecretString;
 
   /** @description Disable password protection on the store */
   storefrontDigestCookie?: string;
