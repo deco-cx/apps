@@ -100,7 +100,7 @@ export interface Props {
   /**
    * @ignore
    */
-  currentPage?: number;
+  page?: number;
 }
 
 // TODO (mcandeia) investigating bugs related to returning the same set of products but different queries.
@@ -119,7 +119,7 @@ const searchArgsOf = (props: Props, url: URL) => {
   const query = props.query ?? url.searchParams.get("q") ?? "";
   const currentPageoffset = props.pageOffset ?? 1;
   const page =
-    props.currentPage ??
+    props.page??
     Math.min(
       url.searchParams.get("page") ? Number(url.searchParams.get("page")) - currentPageoffset : 0,
       VTEX_MAX_PAGES - currentPageoffset
