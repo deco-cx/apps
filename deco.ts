@@ -25,6 +25,7 @@ const config = {
     app("commerce"),
     app("workflows"),
     app("verified-reviews"),
+    app("power-reviews"),
     app("decohub"),
     ...compatibilityApps,
   ],
