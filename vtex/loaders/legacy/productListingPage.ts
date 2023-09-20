@@ -118,7 +118,7 @@ const loader = async (
   const page = url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
-  const O = url.searchParams.get("O") as LegacySort ??
+  const O = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
@@ -142,25 +142,31 @@ const loader = async (
   const args = { map, _from, _to, O, ft, fq };
 
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
-    vcs["GET /api/catalog_system/pub/products/search/:term?"]({
-      ...params,
-      ...args,
-      term: getTerm(term, map),
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }),
-    vcs["GET /api/catalog_system/pub/facets/search/:term"]({
-      ...params,
-      ...args,
-      term: getTerm(term, fmap),
-      map: fmap,
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-    }).then((res) => res.json()),
+    vcs["GET /api/catalog_system/pub/products/search/:term?"](
+      {
+        ...params,
+        ...args,
+        term: getTerm(term, map),
+      },
+      {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      },
+    ),
+    vcs["GET /api/catalog_system/pub/facets/search/:term"](
+      {
+        ...params,
+        ...args,
+        term: getTerm(term, fmap),
+        map: fmap,
+      },
+      {
+        deco: { cache: "stale-while-revalidate" },
+      },
+    ).then((res) => res.json()),
   ]);
 
-  const vtexProducts = await vtexProductsResponse.json() as LegacyProduct[];
+  const vtexProducts = (await vtexProductsResponse.json()) as LegacyProduct[];
   const resources = vtexProductsResponse.headers.get("resources") ?? "";
   const [, _total] = resources.split("/");
 
@@ -168,31 +174,33 @@ const loader = async (
   // If a property is missing from the final `products` array you can add
   // it in here
   const products = await Promise.all(
-    vtexProducts.map((p) =>
-      toProduct(p, p.items[0], 0, {
-        baseUrl,
-        priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO: fix currency
-      })
-    ).map((product) =>
-      props.similars ? withIsSimilarTo(req, ctx, product) : product
-    ),
+    vtexProducts
+      .map((p) =>
+        toProduct(p, p.items[0], 0, {
+          baseUrl,
+          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO: fix currency
+        })
+      )
+      .map((product) =>
+        props.similars ? withIsSimilarTo(req, ctx, product) : product
+      ),
   );
   const filters = Object.entries({
     Departments: vtexFacets.Departments,
     Brands: vtexFacets.Brands,
     ...vtexFacets.SpecificationFilters,
-  }).map(([name, facets]) =>
-    legacyFacetToFilter(name, facets, url, map, filtersBehavior)
-  )
+    PriceRanges: vtexFacets.PriceRanges,
+  })
+    .map(([name, facets]) =>
+      legacyFacetToFilter(name, facets, url, map, filtersBehavior)
+    )
     .flat()
     .filter((x): x is Filter => Boolean(x));
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
 
   const hasMoreResources = _to < parseInt(_total, 10) - 1;
 
-  const hasNextPage = Boolean(
-    page < MAX_ALLOWED_PAGES && hasMoreResources,
-  );
+  const hasNextPage = Boolean(page < MAX_ALLOWED_PAGES && hasMoreResources);
 
   const hasPreviousPage = page > 0;
 

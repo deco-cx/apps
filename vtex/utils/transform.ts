@@ -270,7 +270,6 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   const referenceIdAdditionalProperty =
     toAdditionalPropertyReferenceId(referenceId);
   const images = nonEmptyArray(sku.images);
-
   const offers = (sku.sellers ?? [])
     .map(isLegacyProduct(product) ? toOfferLegacy : toOffer)
     .sort(bestOfferFirst);
@@ -526,8 +525,10 @@ export const legacyFacetToFilter = (
     .replace(/^\//, "")
     .split("/")
     .slice(0, mapSegments.length);
+
   const mapSet = new Set(mapSegments);
   const pathSet = new Set(pathSegments);
+
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
     const newMap = selected
@@ -549,20 +550,23 @@ export const legacyFacetToFilter = (
 
     return `${link.pathname}${link.search}`;
   };
-
   return {
     "@type": "FilterToggle",
     quantity: facets.length,
     label: name,
     key: name,
     values: facets.map((facet) => {
-      const selected = mapSet.has(facet.Map) && pathSet.has(facet.Value);
+      const normalizedFacet =
+        name !== "PriceRanges" ? facet : normalizeFacet(facet);
+
+      const selected =
+        mapSet.has(normalizedFacet.Map) && pathSet.has(normalizedFacet.Value);
 
       return {
-        value: facet.Value,
-        quantity: facet.Quantity,
-        url: getLink(facet, selected),
-        label: facet.Name,
+        value: normalizedFacet.Value,
+        quantity: normalizedFacet.Quantity,
+        url: getLink(normalizedFacet, selected),
+        label: normalizedFacet.Name,
         selected,
       };
     }),
@@ -688,3 +692,11 @@ function nodeToNavbar(node: Category): Navbar {
 
 export const categoryTreeToNavbar = (tree: Category[]): Navbar[] =>
   tree.map(nodeToNavbar);
+
+export const normalizeFacet = (facet: LegacyFacet) => {
+  return {
+    ...facet,
+    Map: "priceFrom",
+    Value: facet.Slug!,
+  };
+};
