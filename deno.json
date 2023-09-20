@@ -17,7 +17,8 @@
   },
   "exclude": [
     "static",
-    "README.md"
+    "README.md",
+    "**/README.md"
   ],
   "importMap": "./import_map.json",
   "compilerOptions": {

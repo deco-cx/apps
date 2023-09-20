@@ -14,6 +14,8 @@ const config = {
       dir: "admin",
       name: "deco-sites/admin",
     },
+    app("typesense"),
+    app("algolia"),
     app("handlebars"),
     app("vtex"),
     app("vnda"),

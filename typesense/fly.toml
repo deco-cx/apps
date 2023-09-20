@@ -1,0 +1,27 @@
+# fly.toml app configuration file generated for dry-pond-5415 on 2023-09-17T08:49:14-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "dry-pond-5415"
+primary_region = "gig"
+
+[build]
+  image = "typesense/typesense:0.25.1"
+
+[env]
+  TYPESENSE_API_KEY = "90b213e1-5b08-4cab-9979-52ff92bc3302"
+  TYPESENSE_DATA_DIR = "/data"
+
+[mounts]
+  source = "index"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8108
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
