@@ -326,8 +326,9 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     image: images?.map(({ imageUrl, imageText, imageLabel }) => {
       const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
       const alternateName = imageText || imageLabel || "";
+      const name = imageLabel || "";
 
-      return { "@type": "ImageObject" as const, alternateName, url };
+      return { "@type": "ImageObject" as const, alternateName, url, name };
     }) ?? [DEFAULT_IMAGE],
     offers:
       offers.length > 0

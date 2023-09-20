@@ -5,12 +5,13 @@
 import * as $0 from "./functions/requestToParam.ts";
 import * as $$$0 from "./loaders/image.ts";
 import * as $$$1 from "./loaders/redirectsFromCsv.ts";
-import * as $$$2 from "./loaders/extension.ts";
-import * as $$$3 from "./loaders/secret.ts";
-import * as $$$4 from "./loaders/pages.ts";
-import * as $$$5 from "./loaders/asset.ts";
-import * as $$$6 from "./loaders/fonts/local.ts";
-import * as $$$7 from "./loaders/fonts/googleFonts.ts";
+import * as $$$2 from "./loaders/secretString.ts";
+import * as $$$3 from "./loaders/extension.ts";
+import * as $$$4 from "./loaders/secret.ts";
+import * as $$$5 from "./loaders/pages.ts";
+import * as $$$6 from "./loaders/asset.ts";
+import * as $$$7 from "./loaders/fonts/local.ts";
+import * as $$$8 from "./loaders/fonts/googleFonts.ts";
 import * as $$$$0 from "./handlers/router.ts";
 import * as $$$$1 from "./handlers/sitemap.ts";
 import * as $$$$2 from "./handlers/proxy.ts";
@@ -31,10 +32,12 @@ import * as $$$$$$$9 from "./matchers/device.ts";
 import * as $$$$$$$10 from "./matchers/host.ts";
 import * as $$$$$$$11 from "./matchers/always.ts";
 import * as $$$$$$$12 from "./matchers/userAgent.ts";
-import * as $$$$$$$$0 from "./flags/audience.ts";
-import * as $$$$$$$$1 from "./flags/multivariate.ts";
-import * as $$$$$$$$2 from "./flags/everyone.ts";
-import * as $$$$$$$$3 from "./flags/flag.ts";
+import * as $$$$$$$$0 from "./flags/multivariate/section.ts";
+import * as $$$$$$$$1 from "./flags/multivariate/page.ts";
+import * as $$$$$$$$2 from "./flags/audience.ts";
+import * as $$$$$$$$3 from "./flags/multivariate.ts";
+import * as $$$$$$$$4 from "./flags/everyone.ts";
+import * as $$$$$$$$5 from "./flags/flag.ts";
 import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
 
 const manifest = {
@@ -42,14 +45,15 @@ const manifest = {
     "website/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "website/loaders/asset.ts": $$$5,
-    "website/loaders/extension.ts": $$$2,
-    "website/loaders/fonts/googleFonts.ts": $$$7,
-    "website/loaders/fonts/local.ts": $$$6,
+    "website/loaders/asset.ts": $$$6,
+    "website/loaders/extension.ts": $$$3,
+    "website/loaders/fonts/googleFonts.ts": $$$8,
+    "website/loaders/fonts/local.ts": $$$7,
     "website/loaders/image.ts": $$$0,
-    "website/loaders/pages.ts": $$$4,
+    "website/loaders/pages.ts": $$$5,
     "website/loaders/redirectsFromCsv.ts": $$$1,
-    "website/loaders/secret.ts": $$$3,
+    "website/loaders/secret.ts": $$$4,
+    "website/loaders/secretString.ts": $$$2,
   },
   "handlers": {
     "website/handlers/fresh.ts": $$$$3,
@@ -80,10 +84,12 @@ const manifest = {
     "website/matchers/userAgent.ts": $$$$$$$12,
   },
   "flags": {
-    "website/flags/audience.ts": $$$$$$$$0,
-    "website/flags/everyone.ts": $$$$$$$$2,
-    "website/flags/flag.ts": $$$$$$$$3,
-    "website/flags/multivariate.ts": $$$$$$$$1,
+    "website/flags/audience.ts": $$$$$$$$2,
+    "website/flags/everyone.ts": $$$$$$$$4,
+    "website/flags/flag.ts": $$$$$$$$5,
+    "website/flags/multivariate.ts": $$$$$$$$3,
+    "website/flags/multivariate/page.ts": $$$$$$$$1,
+    "website/flags/multivariate/section.ts": $$$$$$$$0,
   },
   "actions": {
     "website/actions/secrets/encrypt.ts": $$$$$$$$$0,

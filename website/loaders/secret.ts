@@ -22,7 +22,7 @@ export interface Props {
   name?: string;
 }
 
-const cache: Record<string, Promise<string>> = {};
+const cache: Record<string, Promise<string | null>> = {};
 
 /**
  * @title Secret
@@ -45,7 +45,10 @@ export default function Secret(
       }
       return cache[encrypted] ??= decryptFromHex(encrypted).then((d) =>
         d.decrypted
-      );
+      ).catch((err) => {
+        console.error("decrypt secret error", err);
+        return null;
+      });
     },
   };
 }

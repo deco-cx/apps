@@ -277,6 +277,12 @@ export default function Std(
     { manifest: AppManifest; sourceMap: SourceMap }
   > = {};
 
+  if (!props.commerce) {
+    throw new Error(
+      "Missing commerce props. Please migrate to apps before removing commerce prop",
+    );
+  }
+
   const commerceApp = commerce(
     props,
   );
@@ -362,7 +368,7 @@ export default function Std(
     manifest: _manifest as Manifest,
     dependencies: [liveApp, {
       ...commerceApp,
-      dependencies: [webSiteApp, commerceApp.dependencies![1]],
+      dependencies: [webSiteApp, commerceApp.dependencies![1]!],
     }],
   };
 }
