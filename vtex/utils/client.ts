@@ -1,5 +1,6 @@
 import {
   Category,
+  CreateNewDocument,
   FacetSearchResult,
   LegacyFacets,
   LegacyProduct,
@@ -190,6 +191,10 @@ export interface VTEXCommerceStable {
         expectedOrderFormSections: string[];
       };
     };
+  "POST /api/dataentities/:acronym/documents": {
+    response: CreateNewDocument;
+    body: Record<string, unknown>;
+  };
 }
 
 export interface SP {

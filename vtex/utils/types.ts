@@ -1118,3 +1118,9 @@ export type SPEvent =
     operator: string;
     locale: string;
   };
+
+export interface CreateNewDocument {
+  Id: string;
+  Href: string;
+  DocumentId: string;
+}
