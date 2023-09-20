@@ -39,6 +39,8 @@ export interface State extends Props {
   storefront: ReturnType<typeof createGraphqlClient>;
 }
 
+export const color = 0xB600EE;
+
 /**
  * @title Wake
  */

@@ -8,9 +8,10 @@ import * as $$$2 from "./loaders/ProductList.ts";
 import * as $$$3 from "./loaders/ProductListingPage.ts";
 import * as $$$4 from "./loaders/ProductDetailsPage.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$$$$$$$0 from "./actions/cart/updateCoupons.ts";
-import * as $$$$$$$$$1 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$0 from "./actions/order/draftOrderCalculate.ts";
+import * as $$$$$$$$$1 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$2 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$3 from "./actions/cart/addItems.ts";
 
 const manifest = {
   "loaders": {
@@ -24,9 +25,10 @@ const manifest = {
     "shopify/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
-    "shopify/actions/cart/addItems.ts": $$$$$$$$$2,
-    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$0,
-    "shopify/actions/cart/updateItems.ts": $$$$$$$$$1,
+    "shopify/actions/cart/addItems.ts": $$$$$$$$$3,
+    "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$1,
+    "shopify/actions/cart/updateItems.ts": $$$$$$$$$2,
+    "shopify/actions/order/draftOrderCalculate.ts": $$$$$$$$$0,
   },
   "name": "shopify",
   "baseUrl": import.meta.url,
