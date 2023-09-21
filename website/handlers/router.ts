@@ -80,7 +80,7 @@ export const router = (
         ctx,
       );
     };
-  
+
     const handler = hrefRoutes[`${url.pathname}${url.search || ""}`] ??
       hrefRoutes[url.pathname];
     if (handler) {
