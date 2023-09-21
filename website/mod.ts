@@ -1,3 +1,5 @@
+import "./utils/unhandledRejection.ts";
+
 import { Section } from "deco/blocks/section.ts";
 import type { App, FnContext } from "deco/mod.ts";
 import { asResolved } from "deco/mod.ts";

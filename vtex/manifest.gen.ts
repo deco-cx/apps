@@ -2,79 +2,87 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/proxy.ts";
-import * as $$$1 from "./loaders/cart.ts";
-import * as $$$2 from "./loaders/navbar.ts";
-import * as $$$3 from "./loaders/user.ts";
-import * as $$$4 from "./loaders/legacy/productList.ts";
-import * as $$$5 from "./loaders/legacy/productDetailsPage.ts";
-import * as $$$6 from "./loaders/legacy/relatedProductsLoader.ts";
-import * as $$$7 from "./loaders/legacy/suggestions.ts";
-import * as $$$8 from "./loaders/legacy/productListingPage.ts";
+import * as $$$0 from "./loaders/product.ts";
+import * as $$$1 from "./loaders/legacy/productList.ts";
+import * as $$$2 from "./loaders/legacy/productDetailsPage.ts";
+import * as $$$3 from "./loaders/legacy/productListingPage.ts";
+import * as $$$4 from "./loaders/legacy/relatedProductsLoader.ts";
+import * as $$$5 from "./loaders/legacy/suggestions.ts";
+import * as $$$6 from "./loaders/wishlist.ts";
+import * as $$$7 from "./loaders/navbar.ts";
+import * as $$$8 from "./loaders/proxy.ts";
 import * as $$$9 from "./loaders/intelligentSearch/productList.ts";
 import * as $$$10 from "./loaders/intelligentSearch/productDetailsPage.ts";
-import * as $$$11 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$12 from "./loaders/intelligentSearch/productListingPage.ts";
-import * as $$$13 from "./loaders/wishlist.ts";
+import * as $$$11 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$12 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$13 from "./loaders/cart.ts";
+import * as $$$14 from "./loaders/user.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$$$$$$$0 from "./actions/masterdata/createDocument.ts";
-import * as $$$$$$$$$1 from "./actions/analytics/sendEvent.ts";
-import * as $$$$$$$$$2 from "./actions/notifyme.ts";
-import * as $$$$$$$$$3 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$4 from "./actions/wishlist/removeItem.ts";
-import * as $$$$$$$$$5 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$6 from "./actions/cart/removeItemAttachment.ts";
-import * as $$$$$$$$$7 from "./actions/cart/updateItemPrice.ts";
-import * as $$$$$$$$$8 from "./actions/cart/getInstallment.ts";
-import * as $$$$$$$$$9 from "./actions/cart/updateUser.ts";
-import * as $$$$$$$$$10 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$0 from "./actions/trigger.ts";
+import * as $$$$$$$$$1 from "./actions/notifyme.ts";
+import * as $$$$$$$$$2 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$3 from "./actions/cart/updateAttachment.ts";
+import * as $$$$$$$$$4 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$5 from "./actions/cart/updateItemAttachment.ts";
+import * as $$$$$$$$$6 from "./actions/cart/updateUser.ts";
+import * as $$$$$$$$$7 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$8 from "./actions/cart/removeItems.ts";
+import * as $$$$$$$$$9 from "./actions/cart/getInstallment.ts";
+import * as $$$$$$$$$10 from "./actions/cart/updateItemPrice.ts";
 import * as $$$$$$$$$11 from "./actions/cart/updateProfile.ts";
-import * as $$$$$$$$$12 from "./actions/cart/updateItemAttachment.ts";
-import * as $$$$$$$$$13 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$14 from "./actions/cart/updateAttachment.ts";
-import * as $$$$$$$$$15 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$16 from "./actions/cart/removeItems.ts";
-import * as $$$$$$$$$17 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$12 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$13 from "./actions/cart/removeItemAttachment.ts";
+import * as $$$$$$$$$14 from "./actions/masterdata/createDocument.ts";
+import * as $$$$$$$$$15 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$16 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$17 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$18 from "./actions/analytics/sendEvent.ts";
+import * as $$$$$$$$$$0 from "./workflows/events.ts";
 
 const manifest = {
   "loaders": {
-    "vtex/loaders/cart.ts": $$$1,
+    "vtex/loaders/cart.ts": $$$13,
     "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$10,
     "vtex/loaders/intelligentSearch/productList.ts": $$$9,
-    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$12,
-    "vtex/loaders/intelligentSearch/suggestions.ts": $$$11,
-    "vtex/loaders/legacy/productDetailsPage.ts": $$$5,
-    "vtex/loaders/legacy/productList.ts": $$$4,
-    "vtex/loaders/legacy/productListingPage.ts": $$$8,
-    "vtex/loaders/legacy/relatedProductsLoader.ts": $$$6,
-    "vtex/loaders/legacy/suggestions.ts": $$$7,
-    "vtex/loaders/navbar.ts": $$$2,
-    "vtex/loaders/proxy.ts": $$$0,
-    "vtex/loaders/user.ts": $$$3,
-    "vtex/loaders/wishlist.ts": $$$13,
+    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$11,
+    "vtex/loaders/intelligentSearch/suggestions.ts": $$$12,
+    "vtex/loaders/legacy/productDetailsPage.ts": $$$2,
+    "vtex/loaders/legacy/productList.ts": $$$1,
+    "vtex/loaders/legacy/productListingPage.ts": $$$3,
+    "vtex/loaders/legacy/relatedProductsLoader.ts": $$$4,
+    "vtex/loaders/legacy/suggestions.ts": $$$5,
+    "vtex/loaders/navbar.ts": $$$7,
+    "vtex/loaders/product.ts": $$$0,
+    "vtex/loaders/proxy.ts": $$$8,
+    "vtex/loaders/user.ts": $$$14,
+    "vtex/loaders/wishlist.ts": $$$6,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
-    "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$1,
-    "vtex/actions/cart/addItems.ts": $$$$$$$$$15,
-    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$8,
-    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$6,
-    "vtex/actions/cart/removeItems.ts": $$$$$$$$$16,
-    "vtex/actions/cart/simulation.ts": $$$$$$$$$17,
-    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$14,
-    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$10,
-    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$12,
-    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$7,
-    "vtex/actions/cart/updateItems.ts": $$$$$$$$$13,
+    "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$18,
+    "vtex/actions/cart/addItems.ts": $$$$$$$$$7,
+    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$9,
+    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$13,
+    "vtex/actions/cart/removeItems.ts": $$$$$$$$$8,
+    "vtex/actions/cart/simulation.ts": $$$$$$$$$12,
+    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$3,
+    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$2,
+    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$5,
+    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$10,
+    "vtex/actions/cart/updateItems.ts": $$$$$$$$$4,
     "vtex/actions/cart/updateProfile.ts": $$$$$$$$$11,
-    "vtex/actions/cart/updateUser.ts": $$$$$$$$$9,
-    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$0,
-    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$3,
-    "vtex/actions/notifyme.ts": $$$$$$$$$2,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$5,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$4,
+    "vtex/actions/cart/updateUser.ts": $$$$$$$$$6,
+    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$14,
+    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$15,
+    "vtex/actions/notifyme.ts": $$$$$$$$$1,
+    "vtex/actions/trigger.ts": $$$$$$$$$0,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$17,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$16,
+  },
+  "workflows": {
+    "vtex/workflows/events.ts": $$$$$$$$$$0,
   },
   "name": "vtex",
   "baseUrl": import.meta.url,

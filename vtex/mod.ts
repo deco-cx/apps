@@ -1,11 +1,15 @@
-import type { App, FnContext } from "deco/mod.ts";
-import { fetchSafe } from "./utils/fetchVTEX.ts";
+import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
+import workflow from "../workflows/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { SP, VTEXCommerceStable } from "./utils/client.ts";
-import { createGraphqlClient } from "../utils/graphql.ts";
+import { fetchSafe } from "./utils/fetchVTEX.ts";
+import { OpenAPI } from "./utils/vtex.openapi.gen.ts";
 
-export type AppContext = FnContext<State, Manifest>;
+export type AppContext = AC<ReturnType<typeof VTEX>>;
+
+export type AppManifest = ManifestOf<ReturnType<typeof VTEX>>;
 
 /** @title VTEX */
 export interface Props {
@@ -21,15 +25,22 @@ export interface Props {
   publicUrl: string;
 
   /**
+   * @title App Key
+   * @description Only required for extra features
+   */
+  appKey?: string;
+
+  /**
+   * @title App Token
+   * @description Only required for extra features
+   * @format password
+   */
+  appToken?: string;
+
+  /**
    * @description Use VTEX as backend platform
    */
   platform: "vtex";
-}
-
-interface State extends Props {
-  vcs: ReturnType<typeof createHttpClient<VTEXCommerceStable>>;
-  sp: ReturnType<typeof createHttpClient<SP>>;
-  io: ReturnType<typeof createGraphqlClient>;
 }
 
 export const color = 0xF71963;
@@ -37,23 +48,38 @@ export const color = 0xF71963;
 /**
  * @title VTEX
  */
-export default function App(state: Props): App<Manifest, State> {
+export default function VTEX(
+  { appKey, appToken, account, ...props }: Props,
+) {
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
     fetcher: fetchSafe,
   });
   const vcs = createHttpClient<VTEXCommerceStable>({
-    base: `https://${state.account}.vtexcommercestable.com.br`,
+    base: `https://${account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
   });
   const io = createGraphqlClient({
     endpoint:
-      `https://${state.account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+      `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
     fetcher: fetchSafe,
   });
+  const api = createHttpClient<OpenAPI>({
+    base: `https://${account}.vtexcommercestable.com.br`,
+    fetcher: fetchSafe,
+    headers: new Headers({
+      "X-VTEX-API-AppKey": appKey ?? "",
+      "X-VTEX-API-AppToken": appToken ?? "",
+    }),
+  });
 
-  return {
-    state: { ...state, vcs, sp, io },
+  const state = { ...props, account, vcs, sp, io, api };
+
+  const app: App<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
+    state,
     manifest,
+    dependencies: [workflow({})],
   };
+
+  return app;
 }

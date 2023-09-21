@@ -1,3 +1,5 @@
+import "../website/utils/unhandledRejection.ts";
+
 import {
   ExponentialBackoff,
   handleWhen,

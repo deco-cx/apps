@@ -182,7 +182,7 @@ const generateOpenAPI = async () => {
         const ok = responses?.["200"] ||
           responses?.["201"] ||
           responses?.["206"];
-        const response = resolve(ok)?.content?.[MEDIA_TYPE_JSON].schema;
+        const response = resolve(ok)?.content?.[MEDIA_TYPE_JSON]?.schema;
 
         if (response) {
           schema.required?.push("response");

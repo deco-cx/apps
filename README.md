@@ -63,6 +63,8 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 | decohub        | The best place to find an app for your business case, here is where apps published by any developer in the deco ecosystem will live. | [manifest](/decohub/manifest.gen.ts)      |
 | handlebars        | An app that allows you to build your own sections using [handlebars](https://handlebarsjs.com/). | [manifest](/handlebars/manifest.gen.ts)      |
 | Verified Reviews | An app that uses extension block to add Aggregate Rating to products by integrating with the "[Opiniões Verificadas](https://www.opinioes-verificadas.com.br/br/)" provider. | [manifest](/verified-reviews/manifest.gen.ts)      |
+| Algolia | Algolia search integration. Provides loaders and workflows for searching and indexing on Algolia | [manifest](/algolia/manifest.gen.ts)      |
+| Typesense | Typesense search integration. Provides loaders and workflows for searching and indexing on Typesense | [manifest](/algolia/manifest.gen.ts)      |
 
 #### Adding a new app to Deco Hub
 

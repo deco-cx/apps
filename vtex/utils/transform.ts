@@ -1,4 +1,5 @@
 import type {
+  AggregateOffer,
   BreadcrumbList,
   Filter,
   FilterToggleValue,
@@ -33,18 +34,18 @@ const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
   typeof (sku as LegacySkuVTEX).variations?.[0] === "string";
 
 const isLegacyProduct = (
-  product: ProductVTEX | LegacyProductVTEX
+  product: ProductVTEX | LegacyProductVTEX,
 ): product is LegacyProductVTEX => product.origin !== "intelligent-search";
 
 const getProductGroupURL = (
   origin: string,
-  { linkText }: { linkText: string }
+  { linkText }: { linkText: string },
 ) => new URL(`/${linkText}/p`, origin);
 
 const getProductURL = (
   origin: string,
   product: { linkText: string },
-  skuId?: string
+  skuId?: string,
 ) => {
   const canonicalUrl = getProductGroupURL(origin, product);
 
@@ -69,16 +70,15 @@ interface ProductOptions {
 const findFirstAvailable = (items: Array<LegacySkuVTEX | SkuVTEX>) =>
   items?.find((item) =>
     Boolean(
-      item?.sellers?.find((s) => s.commertialOffer?.AvailableQuantity > 0)
+      item?.sellers?.find((s) => s.commertialOffer?.AvailableQuantity > 0),
     )
   );
 
 export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
-  maybeSkuId?: string
+  maybeSkuId?: string,
 ): T["items"][number] => {
-  const skuId =
-    maybeSkuId ??
+  const skuId = maybeSkuId ??
     findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
 
@@ -94,7 +94,7 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
 const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
   sku: T["items"][number],
   kitItems: T[],
-  options: ProductOptions
+  options: ProductOptions,
 ) => {
   const productBySkuId = kitItems.reduce((map, product) => {
     product.items.forEach((item) => map.set(item.itemId, product));
@@ -107,7 +107,7 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
 
     if (!product) {
       throw new Error(
-        `Expected product for skuId ${itemId} but it was not returned by the search engine`
+        `Expected product for skuId ${itemId} but it was not returned by the search engine`,
       );
     }
 
@@ -121,14 +121,14 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
   sku: T["items"][number],
   kitItems: T[],
-  options: ProductOptions
+  options: ProductOptions,
 ): Omit<ProductDetailsPage, "seo"> => {
   const partialProduct = toProduct(product, sku, 0, options);
   // Get accessories in ProductPage only. I don't see where it's necessary outside this page for now
   const isAccessoryOrSparePartFor = toAccessoryOrSparePartFor(
     sku,
     kitItems,
-    options
+    options,
   );
 
   return {
@@ -164,27 +164,34 @@ const splitCategory = (firstCategory: string) =>
   firstCategory.split("/").filter(Boolean);
 
 const toAdditionalPropertyCategories = <
-  P extends LegacyProductVTEX | ProductVTEX
+  P extends LegacyProductVTEX | ProductVTEX,
 >(
-  product: P
+  product: P,
 ): Product["additionalProperty"] => {
   const categories = splitCategory(product.categories[0]);
   const categoryIds = splitCategory(product.categoriesIds[0]);
 
-  return [
-    ...categories.map((category, index) => ({
-      "@type": "PropertyValue" as const,
-      name: "category",
+  return categories.map((category, index) =>
+    toAdditionalPropertyCategory({
       propertyID: categoryIds[index],
-      value: category,
-    })),
-  ];
+      value: category || "",
+    })
+  );
 };
 
+export const toAdditionalPropertyCategory = (
+  { propertyID, value }: { propertyID: string; value: string },
+): PropertyValue => ({
+  "@type": "PropertyValue" as const,
+  name: "category",
+  propertyID,
+  value,
+});
+
 const toAdditionalPropertyClusters = <
-  P extends LegacyProductVTEX | ProductVTEX
+  P extends LegacyProductVTEX | ProductVTEX,
 >(
-  product: P
+  product: P,
 ): Product["additionalProperty"] => {
   const mapEntriesToIdName = ([id, name]: [string, unknown]) => ({
     id,
@@ -199,25 +206,41 @@ const toAdditionalPropertyClusters = <
     ? new Set(Object.keys(product.clusterHighlights))
     : new Set(product.clusterHighlights.map(({ id }) => id));
 
-  return allClusters.map(({ id, name }) => ({
-    "@type": "PropertyValue" as const,
-    name: "cluster",
-    value: name || "",
-    propertyID: id,
-    description: highlightsSet.has(id) ? "highlight" : undefined,
-  }));
+  return allClusters.map((cluster) =>
+    toAdditionalPropertyCluster(
+      { propertyID: cluster.id, value: cluster.name || "" },
+      highlightsSet,
+    )
+  );
 };
 
-const toAdditionalPropertyReferenceId = (
-  referenceId: Array<{ Key: string; Value: string }>
+export const toAdditionalPropertyCluster = (
+  { propertyID, value }: { propertyID: string; value: string },
+  highlights?: Set<string>,
+): PropertyValue => ({
+  "@type": "PropertyValue",
+  name: "cluster",
+  value,
+  propertyID,
+  description: highlights?.has(propertyID) ? "highlight" : undefined,
+});
+
+const toAdditionalPropertyReferenceIds = (
+  referenceId: Array<{ Key: string; Value: string }>,
 ): Product["additionalProperty"] => {
-  return referenceId.map(({ Key, Value }) => ({
-    "@type": "PropertyValue" as const,
-    name: Key,
-    value: Value,
-    valueReference: "ReferenceID",
-  }));
+  return referenceId.map(({ Key, Value }) =>
+    toAdditionalPropertyReferenceId({ name: Key, value: Value })
+  );
 };
+
+export const toAdditionalPropertyReferenceId = (
+  { name, value }: { name: string; value: string },
+): PropertyValue => ({
+  "@type": "PropertyValue",
+  name,
+  value,
+  valueReference: "ReferenceID",
+});
 
 const getImageKey = (src = "") => {
   return src;
@@ -234,11 +257,32 @@ const getImageKey = (src = "") => {
   // return `${match.pathname.groups.imageId}${match.search.input}`;
 };
 
+export const aggregateOffers = (
+  offers: Offer[],
+  priceCurrency?: string,
+): AggregateOffer | undefined => {
+  const sorted = offers.sort(bestOfferFirst);
+
+  if (sorted.length === 0) return;
+
+  const highPriceIndex = getHighPriceIndex(sorted);
+  const lowPriceIndex = 0;
+
+  return {
+    "@type": "AggregateOffer",
+    priceCurrency,
+    highPrice: sorted[highPriceIndex]?.price ?? null,
+    lowPrice: sorted[lowPriceIndex]?.price ?? null,
+    offerCount: sorted.length,
+    offers: sorted,
+  };
+};
+
 export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   product: P,
   sku: P["items"][number],
   level = 0, // prevent inifinte loop while self referencing the product
-  options: ProductOptions
+  options: ProductOptions,
 ): Product => {
   const { baseUrl, priceCurrency } = options;
   const {
@@ -252,8 +296,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     items,
   } = product;
   const { name, ean, itemId: skuId, referenceId = [] } = sku;
-  const imagesByKey =
-    options.imagesByKey ??
+  const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
       .reduce((map, img) => {
@@ -267,33 +310,30 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   const specificationsAdditionalProperty = isLegacySku(sku)
     ? toAdditionalPropertiesLegacy(sku)
     : toAdditionalProperties(sku);
-  const referenceIdAdditionalProperty =
-    toAdditionalPropertyReferenceId(referenceId);
+  const referenceIdAdditionalProperty = toAdditionalPropertyReferenceIds(
+    referenceId,
+  );
   const images = nonEmptyArray(sku.images);
   const offers = (sku.sellers ?? [])
-    .map(isLegacyProduct(product) ? toOfferLegacy : toOffer)
-    .sort(bestOfferFirst);
-  const highPriceIndex = getHighPriceIndex(offers);
-  const lowPriceIndex = 0;
+    .map(isLegacyProduct(product) ? toOfferLegacy : toOffer);
 
-  const isVariantOf =
-    level < 1
-      ? ({
-          "@type": "ProductGroup",
-          productGroupID: productId,
-          hasVariant: items.map((sku) =>
-            toProduct(product, sku, 1, { ...options, imagesByKey })
-          ),
-          url: getProductGroupURL(baseUrl, product).href,
-          name: product.productName,
-          additionalProperty: groupAdditionalProperty,
-          model: productReference,
-        } satisfies ProductGroup)
-      : undefined;
+  const isVariantOf = level < 1
+    ? ({
+      "@type": "ProductGroup",
+      productGroupID: productId,
+      hasVariant: items.map((sku) =>
+        toProduct(product, sku, 1, { ...options, imagesByKey })
+      ),
+      url: getProductGroupURL(baseUrl, product).href,
+      name: product.productName,
+      additionalProperty: groupAdditionalProperty,
+      model: productReference,
+    } satisfies ProductGroup)
+    : undefined;
 
   // From schema.org: A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy
   const categoriesString = splitCategory(product.categories[0]).join(
-    DEFAULT_CATEGORY_SEPARATOR
+    DEFAULT_CATEGORY_SEPARATOR,
   );
 
   const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
@@ -330,23 +370,13 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
 
       return { "@type": "ImageObject" as const, alternateName, url, name };
     }) ?? [DEFAULT_IMAGE],
-    offers:
-      offers.length > 0
-        ? {
-            "@type": "AggregateOffer",
-            priceCurrency,
-            highPrice: offers[highPriceIndex]?.price ?? null,
-            lowPrice: offers[lowPriceIndex]?.price ?? null,
-            offerCount: offers.length,
-            offers,
-          }
-        : undefined,
+    offers: aggregateOffers(offers, priceCurrency),
   };
 };
 
 const toBreadcrumbList = (
   product: ProductVTEX | LegacyProductVTEX,
-  { baseUrl }: ProductOptions
+  { baseUrl }: ProductOptions,
 ): BreadcrumbList => {
   const { categories, productName } = product;
   const names = categories[0]?.split("/").filter(Boolean);
@@ -381,68 +411,60 @@ const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
   product.allSpecifications?.flatMap((name) => {
     const values = (product as unknown as Record<string, string[]>)[name];
 
-    return values.map(
-      (value) =>
-        ({
-          "@type": "PropertyValue",
-          name,
-          value,
-          valueReference: "SPECIFICATION",
-        } as const)
+    return values.map((value) =>
+      toAdditionalPropertySpecification({ name, value })
     );
   }) ?? [];
 
 const toProductGroupAdditionalProperties = ({ properties = [] }: ProductVTEX) =>
   properties.flatMap(({ name, values }) =>
     values.map(
-      (value) =>
-        ({
-          "@type": "PropertyValue",
-          name,
-          value,
-          valueReference: "PROPERTY" as string,
-        } as const)
+      (value) => ({
+        "@type": "PropertyValue",
+        name,
+        value,
+        valueReference: "PROPERTY" as string,
+      } as const),
     )
   );
 
 const toAdditionalProperties = (sku: SkuVTEX): PropertyValue[] =>
   sku.variations?.flatMap(({ name, values }) =>
-    values.map(
-      (value) =>
-        ({
-          "@type": "PropertyValue",
-          name,
-          value,
-          valueReference: "SPECIFICATION",
-        } as const)
-    )
+    values.map((value) => toAdditionalPropertySpecification({ name, value }))
   ) ?? [];
+
+export const toAdditionalPropertySpecification = (
+  { name, value, propertyID }: {
+    name: string;
+    value: string;
+    propertyID?: string;
+  },
+): PropertyValue => ({
+  "@type": "PropertyValue",
+  name,
+  value,
+  propertyID,
+  valueReference: "SPECIFICATION",
+});
 
 const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   const { variations = [], attachments = [] } = sku;
 
   const specificationProperties = variations.flatMap((variation) =>
-    sku[variation].map(
-      (value) =>
-        ({
-          "@type": "PropertyValue",
-          name: variation,
-          value,
-          valueReference: "SPECIFICATION",
-        } as const)
+    sku[variation].map((value) =>
+      toAdditionalPropertySpecification({ name: variation, value })
     )
   );
 
   const attachmentProperties = attachments.map(
-    (attachment) =>
-      ({
-        "@type": "PropertyValue",
-        propertyID: `${attachment.id}`,
-        name: attachment.name,
-        value: attachment.domainValues,
-        required: attachment.required,
-        valueReference: "ATTACHMENT",
-      } as const)
+    (attachment) => ({
+      "@type": "PropertyValue",
+      propertyID: `${attachment.id}`,
+      name: attachment.name,
+      value: attachment.domainValues,
+      required: attachment.required,
+      valueReference: "ATTACHMENT",
+    } as const),
   );
 
   return [...specificationProperties, ...attachmentProperties];
@@ -476,13 +498,12 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
         billingDuration: installment.NumberOfInstallments,
         billingIncrement: installment.Value,
         price: installment.TotalValuePlusInterestRate,
-      })
+      }),
     ),
   ],
-  availability:
-    offer.AvailableQuantity > 0
-      ? "https://schema.org/InStock"
-      : "https://schema.org/OutOfStock",
+  availability: offer.AvailableQuantity > 0
+    ? "https://schema.org/InStock"
+    : "https://schema.org/OutOfStock",
 });
 
 const toOfferLegacy = (seller: SellerVTEX): Offer => ({
@@ -491,10 +512,9 @@ const toOfferLegacy = (seller: SellerVTEX): Offer => ({
     name: teaser["<Name>k__BackingField"],
     generalValues: teaser["<GeneralValues>k__BackingField"],
     conditions: {
-      minimumQuantity:
-        teaser["<Conditions>k__BackingField"][
-          "<MinimumQuantity>k__BackingField"
-        ],
+      minimumQuantity: teaser["<Conditions>k__BackingField"][
+        "<MinimumQuantity>k__BackingField"
+      ],
       parameters: teaser["<Conditions>k__BackingField"][
         "<Parameters>k__BackingField"
       ].map((parameter) => ({
@@ -518,7 +538,7 @@ export const legacyFacetToFilter = (
   facets: LegacyFacet[],
   url: URL,
   map: string,
-  behavior: "dynamic" | "static"
+  behavior: "dynamic" | "static",
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = url.pathname
@@ -556,11 +576,12 @@ export const legacyFacetToFilter = (
     label: name,
     key: name,
     values: facets.map((facet) => {
-      const normalizedFacet =
-        name !== "PriceRanges" ? facet : normalizeFacet(facet);
+      const normalizedFacet = name !== "PriceRanges"
+        ? facet
+        : normalizeFacet(facet);
 
-      const selected =
-        mapSet.has(normalizedFacet.Map) && pathSet.has(normalizedFacet.Value);
+      const selected = mapSet.has(normalizedFacet.Map) &&
+        pathSet.has(normalizedFacet.Value);
 
       return {
         value: normalizedFacet.Value,
@@ -575,7 +596,7 @@ export const legacyFacetToFilter = (
 
 export const filtersToSearchParams = (
   selectedFacets: SelectedFacet[],
-  paramsToPersist?: URLSearchParams
+  paramsToPersist?: URLSearchParams,
 ) => {
   const searchParams = new URLSearchParams(paramsToPersist);
 
@@ -619,7 +640,7 @@ export const filtersFromURL = (url: URL) => {
 
 export const mergeFacets = (
   f1: SelectedFacet[],
-  f2: SelectedFacet[]
+  f2: SelectedFacet[],
 ): SelectedFacet[] => {
   const facetKey = (facet: SelectedFacet) =>
     `key:${facet.key}-value:${facet.value}`;
@@ -636,39 +657,38 @@ export const mergeFacets = (
 };
 
 const isValueRange = (
-  facet: FacetValueRange | FacetValueBoolean
+  facet: FacetValueRange | FacetValueBoolean,
 ): facet is FacetValueRange =>
   // deno-lint-ignore no-explicit-any
   Boolean((facet as any).range);
 
-const facetToToggle =
-  (
-    selectedFacets: SelectedFacet[],
-    key: string,
-    paramsToPersist?: URLSearchParams
-  ) =>
-  (item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
-    const { quantity, selected } = item;
-    const isRange = isValueRange(item);
+const facetToToggle = (
+  selectedFacets: SelectedFacet[],
+  key: string,
+  paramsToPersist?: URLSearchParams,
+) =>
+(item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
+  const { quantity, selected } = item;
+  const isRange = isValueRange(item);
 
-    const value = isRange
-      ? formatRange(item.range.from, item.range.to)
-      : item.value;
-    const label = isRange ? value : item.name;
-    const facet = { key, value };
+  const value = isRange
+    ? formatRange(item.range.from, item.range.to)
+    : item.value;
+  const label = isRange ? value : item.name;
+  const facet = { key, value };
 
-    const filters = selected
-      ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
-      : [...selectedFacets, facet];
+  const filters = selected
+    ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
+    : [...selectedFacets, facet];
 
-    return {
-      value,
-      quantity,
-      selected,
-      url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
-      label,
-    };
+  return {
+    value,
+    quantity,
+    selected,
+    url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
+    label,
   };
+};
 
 export const toFilter =
   (selectedFacets: SelectedFacet[], paramsToPersist?: URLSearchParams) =>
