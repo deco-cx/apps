@@ -8,11 +8,12 @@ import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts"
 import webSite, { Props } from "../../website/mod.ts";
 import type { Manifest as WorkflowsManifest } from "../../workflows/manifest.gen.ts";
 
-import { SourceMap } from "deco/blocks/app.ts";
+import { AppContext as AC, SourceMap } from "deco/blocks/app.ts";
 import workflows from "../../workflows/mod.ts";
 import manifest, { Manifest as _Manifest } from "./manifest.gen.ts";
 
 export { onBeforeResolveProps } from "../../website/mod.ts";
+export type AppContext = AC<ReturnType<typeof App>>;
 export type Manifest = Omit<LiveManifest, "routes" | "islands"> & _Manifest;
 
 export type ManifestMappings = Partial<
