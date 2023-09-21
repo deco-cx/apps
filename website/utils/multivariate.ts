@@ -45,11 +45,12 @@ export const onBeforeResolveProps = (
   hints: HintNode<MultivariateProps<unknown>>,
 ) => {
   if (isMultivariateProps(props)) {
-    // TODO: Improve this type
     const newVariants = [];
-    props.variants.forEach((variant, index) => {
+
+    for (let idx = 0; idx < props.variants.length; idx++) {
+      const variant = props.variants[idx];
       if (isVariant(variant)) {
-        const variantHint = hints.variants?.[index];
+        const variantHint = hints.variants?.[idx];
         newVariants.push({
           ...variant,
           value: variantHint?.value === undefined
@@ -59,7 +60,7 @@ export const onBeforeResolveProps = (
       } else {
         newVariants.push(variant);
       }
-    });
+    }
 
     if (newVariants.length > 0) { // avoid shallow copy
       return {
