@@ -4,7 +4,7 @@ import { adminUrlFor, isAdmin } from "deco/utils/admin.ts";
 import { ConnInfo } from "std/http/server.ts";
 import Fresh from "../../../website/handlers/fresh.ts";
 import { pageIdFromMetadata } from "../../../website/pages/Page.tsx";
-
+import { AppContext } from "../mod.ts";
 export interface DevConfig {
   page: Page;
 }
@@ -13,8 +13,8 @@ export interface DevConfig {
  * @title Private Fresh Page
  * @description Useful for pages under development.
  */
-export default function DevPage(devConfig: DevConfig) {
-  const freshHandler = Fresh(devConfig);
+export default function DevPage(devConfig: DevConfig, ctx: AppContext) {
+  const freshHandler = Fresh(devConfig, ctx);
   return (req: Request, ctx: ConnInfo) => {
     const referer = req.headers.get("origin") ?? req.headers.get("referer");
     const isOnAdmin = referer && isAdmin(referer);
