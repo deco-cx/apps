@@ -13,7 +13,7 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<CreateNewDocument> => {
   const { vcs } = ctx;
   const { data, acronym } = props;
@@ -28,7 +28,7 @@ const action = async (
         "content-type": "application/json",
         cookie,
       },
-    }
+    },
   );
 
   return response.json();

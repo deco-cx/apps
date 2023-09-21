@@ -24,20 +24,6 @@ export interface State {
 
 export type Collections = ProductsCollectionName;
 
-const unhandledRejectionHandler = (event: PromiseRejectionEvent) => {
-  console.error(event.reason);
-
-  const isTypesenseUnhandledRejection =
-    typeof event.reason?.name === "string" &&
-    typeof event.reason.httpStatus === "number";
-
-  if (!isTypesenseUnhandledRejection) {
-    return;
-  }
-
-  event.preventDefault();
-};
-
 /**
  * @title TypeSense
  */
@@ -45,10 +31,6 @@ export default function App(
   props: State,
 ) {
   const { apiKey, apiUrls } = props;
-
-  globalThis.addEventListener("unhandledrejection", unhandledRejectionHandler, {
-    capture: true,
-  });
 
   const options = {
     nodes: apiUrls.map((href) => {

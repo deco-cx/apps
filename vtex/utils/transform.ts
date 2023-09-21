@@ -576,11 +576,12 @@ export const legacyFacetToFilter = (
     label: name,
     key: name,
     values: facets.map((facet) => {
-      const normalizedFacet =
-        name !== "PriceRanges" ? facet : normalizeFacet(facet);
+      const normalizedFacet = name !== "PriceRanges"
+        ? facet
+        : normalizeFacet(facet);
 
-      const selected =
-        mapSet.has(normalizedFacet.Map) && pathSet.has(normalizedFacet.Value);
+      const selected = mapSet.has(normalizedFacet.Map) &&
+        pathSet.has(normalizedFacet.Value);
 
       return {
         value: normalizedFacet.Value,
