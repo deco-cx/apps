@@ -34,10 +34,11 @@ import * as $$$$$$$11 from "./matchers/always.ts";
 import * as $$$$$$$12 from "./matchers/userAgent.ts";
 import * as $$$$$$$$0 from "./flags/multivariate/section.ts";
 import * as $$$$$$$$1 from "./flags/multivariate/page.ts";
-import * as $$$$$$$$2 from "./flags/audience.ts";
-import * as $$$$$$$$3 from "./flags/multivariate.ts";
-import * as $$$$$$$$4 from "./flags/everyone.ts";
-import * as $$$$$$$$5 from "./flags/flag.ts";
+import * as $$$$$$$$2 from "./flags/multivariate/message.ts";
+import * as $$$$$$$$3 from "./flags/audience.ts";
+import * as $$$$$$$$4 from "./flags/multivariate.ts";
+import * as $$$$$$$$5 from "./flags/everyone.ts";
+import * as $$$$$$$$6 from "./flags/flag.ts";
 import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
 
 const manifest = {
@@ -84,10 +85,11 @@ const manifest = {
     "website/matchers/userAgent.ts": $$$$$$$12,
   },
   "flags": {
-    "website/flags/audience.ts": $$$$$$$$2,
-    "website/flags/everyone.ts": $$$$$$$$4,
-    "website/flags/flag.ts": $$$$$$$$5,
-    "website/flags/multivariate.ts": $$$$$$$$3,
+    "website/flags/audience.ts": $$$$$$$$3,
+    "website/flags/everyone.ts": $$$$$$$$5,
+    "website/flags/flag.ts": $$$$$$$$6,
+    "website/flags/multivariate.ts": $$$$$$$$4,
+    "website/flags/multivariate/message.ts": $$$$$$$$2,
     "website/flags/multivariate/page.ts": $$$$$$$$1,
     "website/flags/multivariate/section.ts": $$$$$$$$0,
   },
