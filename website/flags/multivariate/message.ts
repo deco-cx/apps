@@ -10,6 +10,5 @@ export type Message = string;
 export default function Message(
   props: MultivariateProps<Message>,
 ): MultivariateFlag<Message> {
-  console.log("MSG", props);
   return multivariate(props);
 }
