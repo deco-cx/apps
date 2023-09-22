@@ -19,7 +19,7 @@ export interface Props {
   /**
    * @title Merchant Group
    */
-  merchantGroup: string;
+  merchantGroup?: string;
 }
 
 interface State extends Props {
