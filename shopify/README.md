@@ -1,7 +1,7 @@
 <h1>
   <p align="center">
     <a href="https://www.shopify.com/">
-      <img alt="Shopify" src="https://github.com/deco-cx/apps/assets/1753396/e1a11771-3e39-42ee-bff7-75565f10fb30" width="120" />
+      <img alt="Shopify" src="https://github.com/deco-cx/apps/assets/1753396/e1a11771-3e39-42ee-bff7-75565f10fb30" width="250" />
     </a>
   </p>
 </h1>
