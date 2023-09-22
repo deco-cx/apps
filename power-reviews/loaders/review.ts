@@ -61,17 +61,20 @@ export default async function getReviewProduct(
     });
 
   const fullReview = await fullReviewResponse.json();
+  console.log(fullReview.results[0].rollup);
   const rollup = fullReview.results[0].rollup;
   const reviews = fullReview.results[0].reviews;
 
-  const aggregateRating = toAggregateRating(rollup)
+  const aggregateRating = toAggregateRating(rollup);
+
+  console.log(aggregateRating);
 
   const review = reviews.length >= 1
     ? reviews?.map((item) => toReview(item))
     : undefined;
 
   return {
-    page: 1,
+    page: fullReview.paging.current_page_number,
     id: id,
     review,
     aggregateRating,

@@ -3,7 +3,6 @@ import {
   AggregateRating,
   Author,
   Product,
-  ProductDetailsPage,
   Review as ReviewSchema,
 } from "../../commerce/types.ts";
 
@@ -55,7 +54,7 @@ export const toReview = (review: Review) => {
 };
 
 export const toAggregateRating = (rollup: Rollup) => {
-  if(!rollup){
+  if (!rollup) {
     return undefined;
   }
   return {

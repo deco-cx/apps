@@ -26,8 +26,8 @@ export default function productListingPage(
   ctx: AppContext,
 ): ExtensionOf<ProductListingPage | null> {
   const { api, merchantId } = ctx;
-  const { propId, pageSize = 1 } = props;
-  const pageFrom = 0;
+  const { propId, pageSize = 0 } = props;
+  const pageFrom = 1;
 
   return async (productListingPage: ProductListingPage | null) => {
     if (!productListingPage) {

@@ -25,7 +25,7 @@ export interface Review {
   internal_review_id: number;
   details: Details;
   badges: Badges;
-  media: any[];
+  media: Media[];
   metrics: Metrics;
 }
 
@@ -39,7 +39,7 @@ export interface Details {
   comments: string;
   headline: string;
   nickname: string;
-  properties: any[];
+  properties: Property[];
   product_name: string;
   location: string;
   created_date: number;
@@ -48,6 +48,13 @@ export interface Details {
   brand_base_url: string;
   brand_logo_uri: string;
   brand_name: string;
+}
+
+export interface Property {
+  key: string;
+  label: string;
+  type: string;
+  value: string[];
 }
 
 export interface Metrics {
@@ -63,10 +70,24 @@ export interface Rollup {
   recommended_ratio: number;
   average_rating: number;
   review_count: number;
-  media: any[];
+  media: Media[];
   name: string;
   native_review_count: number;
   syndicated_review_count: number;
+}
+
+export interface Media {
+  id: string;
+  review_id: string;
+  uri: string;
+  headline: string;
+  rating: string;
+  helpful_votes: number;
+  not_helpful_votes: number;
+  type: "image" | "video";
+  caption: string;
+  nickname: string;
+  created_date: number;
 }
 
 export interface Property {

@@ -1,9 +1,11 @@
 import { AppContext } from "../mod.ts";
-import {
-  ProductDetailsPage,
-} from "../../commerce/types.ts";
+import { ProductDetailsPage } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
-import { toAggregateRating, toPowerReviewId, toReview } from "../utils/tranform.ts";
+import {
+  toAggregateRating,
+  toPowerReviewId,
+  toReview,
+} from "../utils/tranform.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
 export interface Props {
@@ -13,14 +15,13 @@ export interface Props {
    * @title Prop Id
    * @description Which prop in your product is your power review id?
    */
-  propId? : "id" | "sku" | "model";
-  
+  propId?: "id" | "sku" | "model";
+
   /**
    * @title Image Only
    * @description Filter only reviews with media
    */
   image_only?: boolean;
-
 }
 
 /**
@@ -42,7 +43,7 @@ export default function productDetailsPage(
 
     const id = slug || toPowerReviewId(propId, productDetailsPage.product);
 
-    if(!id){
+    if (!id) {
       return null;
     }
 
@@ -61,7 +62,7 @@ export default function productDetailsPage(
     const rollup = fullReview.results[0].rollup;
     const reviews = fullReview.results[0].reviews;
 
-    const aggregateRating = toAggregateRating(rollup)
+    const aggregateRating = toAggregateRating(rollup);
 
     const review = reviews.length >= 1
       ? reviews?.map((item) => toReview(item))
