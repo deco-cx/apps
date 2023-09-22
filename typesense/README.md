@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.algolia.com/">
-    <img alt="Typesense" src="https://github.com/deco-cx/apps/assets/1753396/a5ea3685-55ae-4877-aafd-6ba2464fc48f" width="60" />
+    <img alt="Typesense" src="https://github.com/deco-cx/apps/assets/1753396/616062d6-3b23-4af0-bda9-1480a90c1fa1" width="60" />
   </a>
 </p>
 <h1 align="center">
