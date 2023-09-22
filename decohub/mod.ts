@@ -15,6 +15,6 @@ export default function App(
 
 export type AppContext = FnContext<State, Manifest>;
 
-export const Preview = Markdown(
+export const Preview = await Markdown(
   new URL("./README.md", import.meta.url).href,
 );
