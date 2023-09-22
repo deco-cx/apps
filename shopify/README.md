@@ -1,26 +1,27 @@
 <p align="center">
-  <a href="https://vtex.com/">
+  <a href="https://www.shopify.com/">
     <img alt="VTEX" src="https://github.com/deco-cx/apps/assets/1753396/bede882a-0893-45f0-a777-d693dd9c105a" width="60" />
   </a>
 </p>
 <h1 align="center">
-  VTEX
+  Shopify
 </h1>
 
 <p align="center">
   <strong>
-    VTEX Commerce Platform for B2B & B2C Ecommerce Solution
+    Start and grow your e-commerce business
   </strong>
 </p>
 <p align="center">
-  Loaders, actions and workflows for adding VTEX Commerce Platform to your deco.cx website.
+  Loaders, actions and workflows for adding Shopify Commerce Platform to your deco.cx website.
 </p>
 
 <p align="center">
-VTEX is a cloud-based e-commerce platform and digital commerce company that provides a comprehensive set of tools and services for businesses looking to establish and manage their online retail operations.
+Shopify is a popular e-commerce platform that allows businesses to set up and run their online stores. It provides a wide range of tools and services to help entrepreneurs and retailers sell products and services on the internet.
 
-This app wrapps VTEX API into a comprehensive set of loaders/actions/workflows
-empowering non technical users to interact and act upon their headless commerce.
+This app wrapps Shopify API into a comprehensive set of
+loaders/actions/workflows empowering non technical users to interact and act
+upon their headless commerce.
 
 </p>
 
@@ -29,9 +30,9 @@ empowering non technical users to interact and act upon their headless commerce.
 1. Install via decohub
 2. Fill the necessary fields:
 
-1. Account name. More info on how to retrieve this param, take a look at this
+- Account name. More info on how to retrieve this param, take a look at this
   [article](https://help.vtex.com/en/tutorial/what-is-an-account-name--i0mIGLcg3QyEy8OCicEoC?&utm_source=autocomplete)
-2. Public URL: A public URL pointing to your VTEX installation. If your store is
+- Public URL: A public URL pointing to your VTEX installation. If your store is
   accessible via www.store.com, create a secure.store.com domain pointing to
   your VTEX account
 
