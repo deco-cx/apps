@@ -1,4 +1,4 @@
-import type { AppContext } from "../mod.tsx";
+import type { AppContext } from "../mod.ts";
 
 interface Props {
   query?: string;

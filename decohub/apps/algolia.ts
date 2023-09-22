@@ -1,1 +1,1 @@
-export { default, Preview } from "../../algolia/mod.tsx";
+export { default, Preview } from "../../algolia/mod.ts";

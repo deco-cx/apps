@@ -2,7 +2,7 @@ import { SearchIndex } from "npm:algoliasearch@4.20.0";
 import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
 import algolia from "npm:algoliasearch@4.20.0";
 import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
-import { State } from "../mod.tsx";
+import { State } from "../mod.ts";
 
 export type IndexedProduct = ReturnType<typeof toIndex>;
 export type Indices =

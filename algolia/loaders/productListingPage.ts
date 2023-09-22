@@ -1,5 +1,5 @@
 import { Filter, ProductListingPage } from "../../commerce/types.ts";
-import { AppContext } from "../mod.tsx";
+import { AppContext } from "../mod.ts";
 import { replaceHighlight } from "../utils/highlight.ts";
 import { IndexedProduct, Indices, resolveProducts } from "../utils/product.ts";
 

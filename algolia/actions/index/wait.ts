@@ -1,4 +1,4 @@
-import { AppContext } from "../../mod.tsx";
+import { AppContext } from "../../mod.ts";
 
 interface Props {
   taskID: number;
