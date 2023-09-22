@@ -110,10 +110,12 @@ const fromProps = ({ props }: Props) => {
  * @description Product List loader
  */
 const loader = async (
-  { props }: Props,
+  expandedProps: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
+  const props = expandedProps.props ??
+    (expandedProps as unknown as Props["props"]);
   const { vcs } = ctx;
   const { url } = req;
   const segment = getSegment(req);
