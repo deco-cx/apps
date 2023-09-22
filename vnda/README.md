@@ -1,10 +1,9 @@
-<p align="center">
-  <a href="https://www.vnda.com.br/">
-    <img alt="VNDA" src="https://github.com/deco-cx/apps/assets/1753396/445422c0-bf83-42a3-bd0b-4eb331fbe4c9" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  VNDA Commerce
+<h1>
+  <p align="center">
+    <a href="https://www.vnda.com.br/">
+      <img alt="VNDA" src="https://github.com/deco-cx/apps/assets/1753396/445422c0-bf83-42a3-bd0b-4eb331fbe4c9" width="180" />
+    </a>
+  </p>
 </h1>
 
 <p align="center">
@@ -19,8 +18,9 @@
 <p align="center">
 VNDA offers a range of features and services to facilitate e-commerce operations.
 
-This app wrapps VNDA Commerce API into a comprehensive set of loaders/actions/workflows
-empowering non technical users to interact and act upon their headless commerce.
+This app wrapps VNDA Commerce API into a comprehensive set of
+loaders/actions/workflows empowering non technical users to interact and act
+upon their headless commerce.
 
 </p>
 

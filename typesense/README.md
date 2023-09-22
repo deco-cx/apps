@@ -1,10 +1,9 @@
-<p align="center">
-  <a href="https://www.algolia.com/">
-    <img alt="Typesense" src="https://github.com/deco-cx/apps/assets/1753396/616062d6-3b23-4af0-bda9-1480a90c1fa1" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  Typesense
+<h1>
+  <p align="center">
+    <a href="https://typesense.org/">
+      <img alt="Typesense" src="https://github.com/deco-cx/apps/assets/1753396/616062d6-3b23-4af0-bda9-1480a90c1fa1" width="250" />
+    </a>
+  </p>
 </h1>
 
 <p align="center">

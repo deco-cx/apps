@@ -1,10 +1,9 @@
-<p align="center">
-  <a href="https://www.algolia.com/">
-    <img alt="Algolia" src="https://github.com/deco-cx/apps/assets/1753396/a5ea3685-55ae-4877-aafd-6ba2464fc48f" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  Algolia
+<h1>
+  <p align="center">
+    <a href="https://www.algolia.com/">
+      <img alt="Algolia" src="https://github.com/deco-cx/apps/assets/1753396/a5ea3685-55ae-4877-aafd-6ba2464fc48f" width="60" />
+    </a>
+  </p>
 </h1>
 
 <p align="center">

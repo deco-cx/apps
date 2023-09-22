@@ -1,10 +1,9 @@
-<p align="center">
-  <a href="https://www.shopify.com/">
-    <img alt="Shopify" src="https://github.com/deco-cx/apps/assets/1753396/86e171d5-984d-4380-90fa-9fa8aca2ffb5" width="120" />
-  </a>
-</p>
-<h1 align="center">
-  Shopify
+<h1>
+  <p align="center">
+    <a href="https://www.shopify.com/">
+      <img alt="Shopify" src="https://github.com/deco-cx/apps/assets/1753396/86e171d5-984d-4380-90fa-9fa8aca2ffb5" width="120" />
+    </a>
+  </p>
 </h1>
 
 <p align="center">
