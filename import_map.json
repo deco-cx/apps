@@ -9,6 +9,6 @@
     "std/": "https://deno.land/std@0.190.0/",
     "partytown/": "https://deno.land/x/partytown@0.3.4/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.22.9/",
-    "deco/": "https://denopkg.com/deco-cx/deco@22c3ab4c27849d5bdf332465bea2468f9af17d2c/"
+    "deco/": "https://denopkg.com/deco-cx/deco@785605322aa4b6887db23f0eb6ea9460a28fe730/"
   }
 }
