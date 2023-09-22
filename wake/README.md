@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://wake.tech/wake-commerce/">
-    <img alt="Wake" src="https://github.com/deco-cx/apps/assets/1753396/86e171d5-984d-4380-90fa-9fa8aca2ffb5" width="60" />
+    <img alt="Wake" src="https://github.com/deco-cx/apps/assets/1753396/ba7b7e17-74fd-461f-b1e8-daf77dad9eb8" width="60" />
   </a>
 </p>
 <h1 align="center">
