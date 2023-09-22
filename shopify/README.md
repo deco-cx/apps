@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.shopify.com/">
-    <img alt="VTEX" src="https://github.com/deco-cx/apps/assets/1753396/bede882a-0893-45f0-a777-d693dd9c105a" width="60" />
+    <img alt="VTEX" src="https://github.com/deco-cx/apps/assets/1753396/86e171d5-984d-4380-90fa-9fa8aca2ffb5" width="60" />
   </a>
 </p>
 <h1 align="center">
