@@ -1,12 +1,27 @@
-# Typesense search integration
-Loaders, actions and workflows for adding Typesense search to your deco.cx website
+<h1>
+  <p align="center">
+    <a href="https://typesense.org/">
+      <img alt="Typesense" src="https://github.com/deco-cx/apps/assets/1753396/616062d6-3b23-4af0-bda9-1480a90c1fa1" width="250" />
+    </a>
+  </p>
+</h1>
+
+<p align="center">
+  <strong>
+    Lightning-fast, Open Source Search. No PhD required.
+  </strong>
+</p>
+<p align="center">
+  Loaders, actions and workflows for adding Typesense search, a typo-tolerant open source search engine, to your deco.cx website.
+</p>
+
+<p align="center">
+Typesense is a general purpose indexer. This means you can save any Json document and later retrieve it using the Search API. Although being a simpler solution than competing alternatives like Elastic Search or Solar, setting up an index on Typesense still requires some software engineering, like setting up searchable fields, facet fields and sorting indices. Hopefully, deco.cx introduces canonical types, like Product, ProductGroup, etc. These schemas allow this app to built solutions for common use-cases, like indexing Products for a Product Listing Page. 
+</p>
 
 # Installation
 1. Install via decohub
 2. Copy & Paste your Typesense instance url and keys
-
-# Description
-Typesense is a general purpose indexer. This means you can save any Json document and later retrieve it using the Search API. Although being a simpler solution than competing alternatives like Elastic Search or Solar, setting up an index on Typesense still requires some software engineering, like setting up searchable fields, facet fields and sorting indices. Hopefully, deco.cx introduces canonical types, like Product, ProductGroup, etc. These schemas allow this app to built solutions for common use-cases, like indexing Products for a Product Listing Page. 
 
 ## Integrating to Typesense
 This App uses deco.cx canonical types in a push-based architecture. This means anyone interested in indexing any supported canonical type just need to invoke the right workflow passing the right input payload. Below you can see the schematics of how ecommerce platforms use the `workflows/index/product.ts` workflow for indexing products
