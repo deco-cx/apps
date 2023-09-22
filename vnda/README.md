@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.vnda.com.br/">
-    <img alt="VNDA" src="https://github.com/deco-cx/apps/assets/1753396/86e171d5-984d-4380-90fa-9fa8aca2ffb5" width="60" />
+    <img alt="VNDA" src="https://github.com/deco-cx/apps/assets/1753396/445422c0-bf83-42a3-bd0b-4eb331fbe4c9" width="60" />
   </a>
 </p>
 <h1 align="center">
