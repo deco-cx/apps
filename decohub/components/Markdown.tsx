@@ -6,7 +6,7 @@ import "https://esm.sh/prismjs@1.27.0/components/prism-tsx.js?no-check";
 import "https://esm.sh/prismjs@1.27.0/components/prism-diff.js?no-check";
 
 export const Markdown = (path: string) => () => {
-  const content = Deno.readTextFileSync(fromFileUrl(path));
+  const content = Deno.readTextFileSync(path);
 
   return (
     <>
