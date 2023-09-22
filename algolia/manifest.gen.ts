@@ -3,15 +3,17 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/productList.ts";
-import * as $$$1 from "./loaders/productListingPage.ts";
+import * as $$$1 from "./loaders/autocomplete.ts";
+import * as $$$2 from "./loaders/productListingPage.ts";
 import * as $$$$$$$$$0 from "./actions/index/product.ts";
 import * as $$$$$$$$$1 from "./actions/index/wait.ts";
 import * as $$$$$$$$$$0 from "./workflows/index/product.ts";
 
 const manifest = {
   "loaders": {
+    "algolia/loaders/autocomplete.ts": $$$1,
     "algolia/loaders/productList.ts": $$$0,
-    "algolia/loaders/productListingPage.ts": $$$1,
+    "algolia/loaders/productListingPage.ts": $$$2,
   },
   "actions": {
     "algolia/actions/index/product.ts": $$$$$$$$$0,

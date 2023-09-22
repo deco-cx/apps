@@ -1,6 +1,6 @@
 import { Product } from "../../commerce/types.ts";
 
-import { AppContext } from "../mod.ts";
+import { AppContext } from "../mod.tsx";
 import { IndexedProduct, resolveProducts } from "../utils/product.ts";
 
 interface Props {

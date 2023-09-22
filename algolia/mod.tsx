@@ -1,4 +1,5 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
+import { Markdown } from "../admin/components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Indices, setupProductsIndices } from "./utils/product.ts";
 
@@ -30,9 +31,13 @@ export default function App(
   const clientForIndex = (index: Indices) =>
     promise.then((client) => client.initIndex(index));
 
-  const state = { clientForIndex };
+  const getClient = () => promise;
+
+  const state = { clientForIndex, getClient };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 
   return app;
 }
+
+export const Preview = Markdown(new URL("./README.md", import.meta.url).href);

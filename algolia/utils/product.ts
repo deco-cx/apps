@@ -2,10 +2,14 @@ import { SearchIndex } from "npm:algoliasearch@4.20.0";
 import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
 import algolia from "npm:algoliasearch@4.20.0";
 import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
-import { State } from "../mod.ts";
+import { State } from "../mod.tsx";
 
 export type IndexedProduct = ReturnType<typeof toIndex>;
-export type Indices = "products" | "products_price_desc" | "products_price_asc";
+export type Indices =
+  | "products"
+  | "products_price_desc"
+  | "products_price_asc"
+  | "products_query_suggestions";
 
 const unique = (ids: string[]) => [...new Set(ids).keys()];
 
@@ -203,6 +207,60 @@ export const setupProductsIndices = async (
       "asc(offers.lowPrice)",
     ],
   });
+
+  /**
+   * Create query suggestions index with defaults.
+   *
+   * TODO: Use algolia client API once they provide their clients via npm
+   */
+  const options = {
+    indexName: "products_query_suggestions",
+    sourceIndices: [{
+      indexName: "products",
+      minHits: 3,
+      minLetters: 3,
+      facets: [
+        {
+          "attribute": "facets.category",
+          "amount": 1,
+        },
+        {
+          "attribute": "facets.brand",
+          "amount": 1,
+        },
+      ],
+    }],
+  };
+
+  // Update index
+  const response = await fetch(
+    `https://query-suggestions.us.algolia.com/1/configs/${options.indexName}`,
+    {
+      method: "PUT",
+      headers: {
+        "X-Algolia-Application-Id": applicationId,
+        "X-Algolia-API-Key": adminApiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(options),
+    },
+  );
+
+  // Index update was NOT successfull, maybe create a new one?
+  if (response.status !== 200) {
+    await fetch(
+      "https://query-suggestions.us.algolia.com/1/configs",
+      {
+        method: "POST",
+        headers: {
+          "X-Algolia-Application-Id": applicationId,
+          "X-Algolia-API-Key": adminApiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(options),
+      },
+    );
+  }
 
   return client;
 };

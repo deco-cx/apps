@@ -1,6 +1,6 @@
 import { ApiError } from "npm:@algolia/transporter@4.20.0";
 import { Product } from "../../../commerce/types.ts";
-import { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.tsx";
 import { toIndex } from "../../utils/product.ts";
 
 interface Props {
