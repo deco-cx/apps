@@ -35,34 +35,54 @@ export default function Fresh(
     if (req.method === "HEAD") {
       return new Response(null, { status: 200 });
     }
-    const endResolvePage = appContext?.monitoring?.t?.start?.("load-data");
-    const resolvePageSpan = appContext?.monitoring?.tracer?.startSpan?.(
+    const endResolvePage = appContext?.monitoring?.timings?.start?.(
       "load-data",
     );
-    const page =
-      isDeferred<Page, BaseContext & { context: ConnInfo }>(freshConfig.page)
-        ? await freshConfig.page({ context: ctx })
-        : freshConfig.page;
+
+    const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
+      "load-data",
+      async (span) => {
+        try {
+          return isDeferred<Page, BaseContext & { context: ConnInfo }>(
+              freshConfig.page,
+            )
+            ? await freshConfig.page({ context: ctx })
+            : freshConfig.page;
+        } catch (e) {
+          span.recordException(e);
+        } finally {
+          span.end();
+        }
+      },
+    );
+
     endResolvePage?.();
-    resolvePageSpan?.end?.();
     const url = new URL(req.url);
     if (url.searchParams.get("asJson") !== null) {
       return Response.json(page, { headers: allowCorsFor(req) });
     }
     if (isFreshCtx<DecoState>(ctx)) {
-      const renderToStringSpan = appContext?.monitoring?.tracer?.startSpan?.(
+      const end = appContext?.monitoring?.timings?.start?.("render-to-string");
+      const response = await appContext?.monitoring?.tracer?.startActiveSpan?.(
         "render-to-string",
-      );
-      const end = appContext?.monitoring?.t?.start?.("render-to-string");
-      const response = await ctx.render({
-        page,
-        routerInfo: {
-          flags: ctx.state.flags,
-          pagePath: ctx.state.pathTemplate,
+        async (span) => {
+          try {
+            return await ctx.render({
+              page,
+              routerInfo: {
+                flags: ctx.state.flags,
+                pagePath: ctx.state.pathTemplate,
+              },
+            });
+          } catch (err) {
+            span.recordException(err);
+          } finally {
+            span.end();
+          }
         },
-      });
+      );
       end?.();
-      renderToStringSpan?.end?.();
+
       return response;
     }
     return Response.json({ message: "Fresh is not being used" }, {
