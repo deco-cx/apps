@@ -29,6 +29,11 @@ export interface Props {
    * @description Quantity of reviews
    */
   pageSize?: number;
+
+    /**
+   * @title Sort
+   */
+  sort?: string;
 }
 
 /**
@@ -40,7 +45,7 @@ export default async function getReviewProduct(
   ctx: AppContext,
 ): Promise<ReviewPage | null> {
   const { api, merchantId } = ctx;
-  const { slug, pageId, pageFrom = 0, pageSize = 10, image_only = false } =
+  const { slug, pageId, pageFrom = 0, pageSize = 10, image_only = false, sort } =
     props;
 
   const id = slug || pageId;
@@ -58,16 +63,14 @@ export default async function getReviewProduct(
       image_only: image_only,
       "paging.from": pageFrom,
       "paging.size": pageSize,
+      sort: sort
     });
 
   const fullReview = await fullReviewResponse.json();
-  console.log(fullReview.results[0].rollup);
   const rollup = fullReview.results[0].rollup;
   const reviews = fullReview.results[0].reviews;
 
   const aggregateRating = toAggregateRating(rollup);
-
-  console.log(aggregateRating);
 
   const review = reviews.length >= 1
     ? reviews?.map((item) => toReview(item))

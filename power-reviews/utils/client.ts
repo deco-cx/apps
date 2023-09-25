@@ -11,6 +11,7 @@ export interface PowerReviews {
     searchParams: {
       _noconfig: string;
       image_only: boolean;
+      sort?: string;
       "paging.from": number;
       "paging.size": number;
     };
