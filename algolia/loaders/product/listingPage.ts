@@ -118,8 +118,6 @@ const transformFacets = (
 };
 
 const sortFacets = (filters: Filter[], order?: Facet[]) => {
-  console.info(filters, order);
-
   if (!order || order.length === 0) {
     return filters;
   }
