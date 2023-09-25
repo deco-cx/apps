@@ -50,8 +50,15 @@ export default async function getReviewProduct(
   ctx: AppContext,
 ): Promise<ReviewPage | null> {
   const { api, merchantId } = ctx;
-  const { slug, pageId, pageFrom = 0, pageSize = 10, image_only = false, sort, filters } =
-    props;
+  const {
+    slug,
+    pageId,
+    pageFrom = 0,
+    pageSize = 10,
+    image_only = false,
+    sort,
+    filters,
+  } = props;
 
   const id = slug || pageId;
 
@@ -69,7 +76,7 @@ export default async function getReviewProduct(
       "paging.from": pageFrom,
       "paging.size": pageSize,
       sort: sort,
-      filters: filters
+      filters: filters,
     });
 
   const fullReview = await fullReviewResponse.json();
@@ -88,7 +95,7 @@ export default async function getReviewProduct(
       nextPageUrl: fullReview.paging.next_page_url,
       pageSize: fullReview.paging.page_size,
       pagesTotal: fullReview.paging.pages_total,
-      totalResults: fullReview.paging.total_results
+      totalResults: fullReview.paging.total_results,
     },
     id: id,
     review,

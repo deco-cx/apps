@@ -231,7 +231,7 @@ export interface AggregateOffer {
   priceCurrency?: string;
 }
 
-export interface ReviewPageResults{
+export interface ReviewPageResults {
   currentPageNumber?: number;
   nextPageUrl?: string;
   pageSize?: number;
