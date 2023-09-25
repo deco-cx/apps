@@ -57,7 +57,7 @@ const loader = async (
     },
     {
       indexName: "products" satisfies Indices,
-      params: { hitsPerPage: count ?? 0 },
+      params: { hitsPerPage: count ?? 0, facets: [] },
       query,
     },
   ]);

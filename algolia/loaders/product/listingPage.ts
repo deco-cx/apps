@@ -182,6 +182,7 @@ const loader = async (
       query: props.term ?? url.searchParams.get("q") ??
         url.searchParams.get("query") ?? "",
       params: {
+        facetingAfterDistinct: true,
         facets: (props.facets?.length || 0) > 0
           ? props.facets?.map(facet.scope)
           : ["*"],
