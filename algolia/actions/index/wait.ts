@@ -1,14 +1,16 @@
 import { AppContext } from "../../mod.ts";
+import { Indices } from "../../utils/product.ts";
 
 interface Props {
   taskID: number;
 }
 
-const action = async (props: Props, _req: Request, ctx: AppContext) => {
-  const { clientForIndex } = ctx;
-  const index = await clientForIndex("products");
+const indexName: Indices = "products";
 
-  await index.waitTask(props.taskID);
+const action = async (props: Props, _req: Request, ctx: AppContext) => {
+  const client = await ctx.getClient();
+
+  await client.initIndex(indexName).waitTask(props.taskID);
 };
 
 export default action;

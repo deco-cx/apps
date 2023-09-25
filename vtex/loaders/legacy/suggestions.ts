@@ -21,7 +21,7 @@ export interface Props {
 }
 
 /**
- * @title Suggestions - VTEX Legacy
+ * @title VTEX Integration - Legacy
  */
 const loaders = async (
   props: Props,

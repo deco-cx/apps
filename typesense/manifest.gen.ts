@@ -2,15 +2,15 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/productList.ts";
-import * as $$$1 from "./loaders/productListingPage.ts";
+import * as $$$0 from "./loaders/product/listingPage.ts";
+import * as $$$1 from "./loaders/product/list.ts";
 import * as $$$$$$$$$0 from "./actions/index/product.ts";
 import * as $$$$$$$$$$0 from "./workflows/index/product.ts";
 
 const manifest = {
   "loaders": {
-    "typesense/loaders/productList.ts": $$$0,
-    "typesense/loaders/productListingPage.ts": $$$1,
+    "typesense/loaders/product/list.ts": $$$1,
+    "typesense/loaders/product/listingPage.ts": $$$0,
   },
   "actions": {
     "typesense/actions/index/product.ts": $$$$$$$$$0,

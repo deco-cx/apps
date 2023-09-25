@@ -3,7 +3,7 @@ import { Props } from "../../../../../vtex/loaders/legacy/suggestions.ts";
 import { VTEXContext } from "../../../mod.ts";
 
 /**
- * @title Suggestions - VTEX Legacy
+ * @title VTEX Integration - Legacy
  * @deprecated true
  */
 const loader = async (

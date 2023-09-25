@@ -1,17 +1,22 @@
-import { SearchIndex } from "npm:algoliasearch@4.20.0";
-import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
-import algolia from "npm:algoliasearch@4.20.0";
 import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
+import algolia, { SearchClient } from "npm:algoliasearch@4.20.0";
+import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
 import { State } from "../mod.ts";
 
 export type IndexedProduct = ReturnType<typeof toIndex>;
-export type Indices = "products" | "products_price_desc" | "products_price_asc";
+export type Indices =
+  | "products"
+  | "products_price_desc"
+  | "products_price_asc"
+  | "products_query_suggestions";
 
 const unique = (ids: string[]) => [...new Set(ids).keys()];
 
+const indexName: Indices = "products";
+
 export const resolveProducts = async (
   products: IndexedProduct[],
-  index: SearchIndex,
+  client: SearchClient,
   url: string | URL,
 ): Promise<Product[]> => {
   const hasVariantIds = products.flatMap((p) =>
@@ -26,9 +31,9 @@ export const resolveProducts = async (
     ...isSimilarToIds,
   ].filter((x): x is string => typeof x === "string");
 
-  const [{ results: similars }] = await Promise.all([
-    index.getObjects<IndexedProduct>(unique(ids)),
-  ]);
+  const { results: similars } = await client.multipleGetObjects<
+    IndexedProduct
+  >(unique(ids).map((objectID) => ({ objectID, indexName })));
 
   const productsById = new Map<string, Product>();
   for (const product of similars) {
@@ -72,6 +77,7 @@ const normalize = (additionalProperty: PropertyValue[] | undefined = []) => {
   return Object.fromEntries(map.entries());
 };
 
+// TODO: add ManufacturerCode
 export const toIndex = ({ isVariantOf, ...product }: Product) => {
   const facets = [
     ...product.additionalProperty ?? [],
@@ -165,6 +171,7 @@ export const setupProductsIndices = async (
     attributeForDistinct: "inProductGroupWithID",
     searchableAttributes: [
       "name",
+      "gtin",
       "brand.name",
       "description",
       "isVariantOf.name",
@@ -203,6 +210,66 @@ export const setupProductsIndices = async (
       "asc(offers.lowPrice)",
     ],
   });
+
+  /**
+   * Create query suggestions index with defaults.
+   *
+   * TODO: Use algolia client API once they provide their clients via npm
+   */
+  const options = {
+    indexName: "products_query_suggestions",
+    sourceIndices: [{
+      indexName: "products",
+      minHits: 3,
+      minLetters: 3,
+      facets: [
+        {
+          "attribute": "facets.category",
+          "amount": 1,
+        },
+        {
+          "attribute": "facets.brand",
+          "amount": 1,
+        },
+      ],
+    }],
+  };
+
+  // Update index
+  const response = await fetch(
+    `https://query-suggestions.us.algolia.com/1/configs/${options.indexName}`,
+    {
+      method: "PUT",
+      headers: {
+        "X-Algolia-Application-Id": applicationId,
+        "X-Algolia-API-Key": adminApiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(options),
+    },
+  );
+
+  // Index update was NOT successfull, maybe create a new one?
+  if (response.status !== 200) {
+    await fetch(
+      "https://query-suggestions.us.algolia.com/1/configs",
+      {
+        method: "POST",
+        headers: {
+          "X-Algolia-Application-Id": applicationId,
+          "X-Algolia-API-Key": adminApiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(options),
+      },
+    );
+  }
+
+  await client.initIndex("products_query_suggestions" satisfies Indices)
+    .setSettings({
+      highlightPreTag: "<mark>",
+      highlightPostTag: "</mark>",
+    });
 
   return client;
 };

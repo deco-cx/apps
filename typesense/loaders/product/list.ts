@@ -1,6 +1,6 @@
-import { Product } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
-import { search } from "../utils/product.ts";
+import { Product } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
+import { search } from "../../utils/product.ts";
 
 interface Props {
   /**
@@ -26,7 +26,7 @@ interface Props {
  * @title Typesense Integration
  */
 const loader = async (
-  props: Props & Props,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {

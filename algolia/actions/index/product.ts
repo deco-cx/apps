@@ -1,7 +1,7 @@
 import { ApiError } from "npm:@algolia/transporter@4.20.0";
 import { Product } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-import { toIndex } from "../../utils/product.ts";
+import { Indices, toIndex } from "../../utils/product.ts";
 
 interface Props {
   product: Product;
@@ -13,20 +13,20 @@ const isAPIError = (x: any): x is ApiError =>
   typeof x?.status === "number" &&
   x.name === "ApiError";
 
+const indexName: Indices = "products";
+
 const action = async (props: Props, _req: Request, ctx: AppContext) => {
-  const { clientForIndex } = ctx;
   const { product, action } = props;
+  const client = await ctx.getClient();
 
   try {
-    const index = await clientForIndex("products");
-
     const indexProduct = toIndex(product);
 
     const { taskID } = action === "UPSERT"
-      ? await index.saveObject(indexProduct, {
+      ? await client.initIndex(indexName).saveObject(indexProduct, {
         autoGenerateObjectIDIfNotExist: false,
       })
-      : await index.deleteObject(indexProduct.objectID);
+      : await client.initIndex(indexName).deleteObject(indexProduct.objectID);
 
     return taskID;
   } catch (error) {

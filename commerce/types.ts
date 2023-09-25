@@ -418,6 +418,8 @@ export interface Seo {
 export interface Search {
   term: string;
   href?: string;
+  hits?: number;
+  facets?: Array<{ key: string; values: string[] }>;
 }
 
 export interface Suggestion {
