@@ -75,16 +75,14 @@ const loader = async (
     req.url,
   );
 
-  const searches = suggestions
-    .map((s) => replaceHighlight(s, highlight ? s._highlightResult : undefined))
-    .map((s) => ({
-      term: s.query,
-      hits: s.products.exact_nb_hits,
-      facets: [
-        ...toFacets(s.products.facets.exact_matches),
-        ...toFacets(s.products.facets.analytics),
-      ].filter(Boolean),
-    }));
+  const searches = suggestions.map((s) => ({
+    term: s.query,
+    hits: s.products.exact_nb_hits,
+    facets: [
+      ...toFacets(s.products.facets.exact_matches),
+      ...toFacets(s.products.facets.analytics),
+    ].filter(Boolean),
+  }));
 
   return {
     searches: searches,
