@@ -12,6 +12,7 @@ export interface PowerReviews {
       _noconfig: string;
       image_only: boolean;
       sort?: string;
+      filters?: string;
       "paging.from": number;
       "paging.size": number;
     };

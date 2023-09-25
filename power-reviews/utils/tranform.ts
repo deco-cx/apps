@@ -16,6 +16,7 @@ export const toReview = (review: Review) => {
     ?.value;
   return {
     "@type": "Review" as ReviewSchema["@type"],
+    id: review.internal_review_id.toString(),
     author: [
       {
         "@type": "Person" as Author["@type"],

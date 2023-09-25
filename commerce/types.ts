@@ -231,8 +231,16 @@ export interface AggregateOffer {
   priceCurrency?: string;
 }
 
+export interface ReviewPageResults{
+  currentPageNumber?: number;
+  nextPageUrl?: string;
+  pageSize?: number;
+  pagesTotal?: number;
+  totalResults?: number;
+}
+
 export interface ReviewPage {
-  page: number;
+  page: ReviewPageResults;
   id: string;
   review?: Review[];
   aggregateRating?: AggregateRating;
@@ -240,6 +248,7 @@ export interface ReviewPage {
 
 export interface Review extends Omit<Thing, "@type"> {
   "@type": "Review";
+  id?: string;
   /** Author of the */
   author?: Author[];
   /** The date that the review was published, in ISO 8601 date format.*/
