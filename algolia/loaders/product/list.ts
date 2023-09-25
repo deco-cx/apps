@@ -1,7 +1,12 @@
-import { Product } from "../../commerce/types.ts";
+import { SearchResponse } from "npm:@algolia/client-search";
+import { Product } from "../../../commerce/types.ts";
 
-import { AppContext } from "../mod.ts";
-import { IndexedProduct, resolveProducts } from "../utils/product.ts";
+import { AppContext } from "../../mod.ts";
+import {
+  IndexedProduct,
+  Indices,
+  resolveProducts,
+} from "../../utils/product.ts";
 
 interface Props {
   /**
@@ -20,6 +25,8 @@ interface Props {
   term?: string;
 }
 
+const indexName: Indices = "products";
+
 /**
  * @title Algolia Integration
  */
@@ -28,18 +35,20 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  const { clientForIndex } = ctx;
-  const index = await clientForIndex("products");
+  const client = await ctx.getClient();
 
-  const { hits: products } = await index.search<IndexedProduct>(
-    props.term ?? "",
-    {
+  const { results } = await client.search([{
+    indexName,
+    query: props.term ?? "",
+    params: {
       hitsPerPage: props.hitsPerPage ?? 12,
       facetFilters: JSON.parse(props.facetFilters ?? "[]"),
     },
-  );
+  }]);
 
-  return resolveProducts(products, index, req.url);
+  const { hits: products } = results[0] as SearchResponse<IndexedProduct>;
+
+  return resolveProducts(products, client, req.url);
 };
 
 export default loader;

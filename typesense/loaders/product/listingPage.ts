@@ -1,6 +1,6 @@
-import { Filter, ProductListingPage } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
-import { search, Sort } from "../utils/product.ts";
+import { Filter, ProductListingPage } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
+import { search, Sort } from "../../utils/product.ts";
 
 interface Props {
   /**
