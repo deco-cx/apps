@@ -20,7 +20,7 @@ const loader = async (
   const { apiWrite, merchantId } = ctx;
   const url = new URL(req.url);
   const urlParams = url.searchParams;
-  const id = urlParams.get("page_id") || props.pageId;
+  const id = urlParams.get("pr_page_id") || props.pageId;
 
   if (!id) {
     return null;
