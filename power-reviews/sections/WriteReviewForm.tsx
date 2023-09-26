@@ -1,30 +1,27 @@
-
-
 export interface Props {
-    /**
-     * @title App Key
-     * @ignore
-     */
-    appKey?: string;
-    /**
-     * @title Locale
-     * @ignore
-     */
-    locale?: string;
-    /**
-     * @title Merchant Id
-     * @ignore
-     */
-    merchantId?: string;
-    /**
-     * @title Merchant Group
-     * @ignore
-     */
-    merchantGroup?: string;
-  }
+  /**
+   * @title App Key
+   * @ignore
+   */
+  appKey?: string;
+  /**
+   * @title Locale
+   * @ignore
+   */
+  locale?: string;
+  /**
+   * @title Merchant Id
+   * @ignore
+   */
+  merchantId?: string;
+  /**
+   * @title Merchant Group
+   * @ignore
+   */
+  merchantGroup?: string;
+}
 
 export default function WriteReviewForm(state: Props) {
-
   return (
     <div>
       <div id="pr-write" class="container max-w-[600px]"></div>

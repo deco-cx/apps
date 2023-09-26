@@ -57,16 +57,17 @@ export default function App(state: Props): App<Manifest, State> {
         "power-reviews/sections/WriteReviewForm.tsx": {
           ...manifest.sections["power-reviews/sections/WriteReviewForm.tsx"],
           default: () =>
-            manifest.sections["power-reviews/sections/WriteReviewForm.tsx"].default({
-              ...state,
-            }),
+            manifest.sections["power-reviews/sections/WriteReviewForm.tsx"]
+              .default({
+                ...state,
+              }),
         },
         "power-reviews/sections/Question.tsx": {
           ...manifest.sections["power-reviews/sections/Question.tsx"],
           default: (props) =>
             manifest.sections["power-reviews/sections/Question.tsx"].default({
               ...state,
-              ...props
+              ...props,
             }),
         },
       },
