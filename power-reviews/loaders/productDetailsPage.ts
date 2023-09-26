@@ -19,7 +19,7 @@ export interface Props {
 
   /**
    * @title Image Only
-   * @description Filter only reviews with media
+   * @description Filter only reviews with media 
    */
   image_only?: boolean;
 }
