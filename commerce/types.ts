@@ -231,8 +231,24 @@ export interface AggregateOffer {
   priceCurrency?: string;
 }
 
+export interface ReviewPageResults {
+  currentPageNumber?: number;
+  nextPageUrl?: string;
+  pageSize?: number;
+  pagesTotal?: number;
+  totalResults?: number;
+}
+
+export interface ReviewPage {
+  page: ReviewPageResults;
+  id: string;
+  review?: Review[];
+  aggregateRating?: AggregateRating;
+}
+
 export interface Review extends Omit<Thing, "@type"> {
   "@type": "Review";
+  id?: string;
   /** Author of the */
   author?: Author[];
   /** The date that the review was published, in ISO 8601 date format.*/
@@ -245,10 +261,42 @@ export interface Review extends Omit<Thing, "@type"> {
   positiveNotes?: string[];
   /** This Review or Rating is relevant to this part or facet of the itemReviewed. */
   reviewAspect?: string;
+  /** Emphasis part of the review */
+  reviewHeadline?: string;
   /** The actual body of the review. */
   reviewBody?: string;
   /** The rating given in this review. Note that reviews can themselves be rated. The `reviewRating` applies to rating given by the review. The {@link https://schema.org/aggregateRating aggregateRating} property applies to the review itself, as a creative work. */
   reviewRating?: AggregateRating;
+  /** Extra review informations */
+  tags?: ReviewTag[];
+  /** BrandReviewed */
+  brand?: ReviewBrand;
+  /** Medias */
+  media?: ReviewMedia[];
+}
+
+export interface ReviewMedia {
+  type: "image" | "video";
+  url?: string;
+  alt?: string;
+  likes?: number;
+  unlikes?: number;
+}
+
+export interface ReviewBrand {
+  /** Brand Name */
+  name: string;
+  /** Brand Logo */
+  logo: string;
+  /** Brand website url */
+  url: string;
+}
+
+export interface ReviewTag {
+  /** Label of specific topic */
+  label?: string;
+  /** Caracteristics about the topic */
+  value?: string[];
 }
 
 export interface Author extends Omit<Thing, "@type"> {
@@ -257,6 +305,10 @@ export interface Author extends Omit<Thing, "@type"> {
   name?: string;
   /** A link to a web page that uniquely identifies the author of the article. For example, the author's social media page, an about me page, or a bio page. */
   url?: string;
+  /** Indicates that the author is a real buyer */
+  verifiedBuyer?: boolean;
+  /** Author location */
+  location?: string;
 }
 
 // TODO: fix this hack and use Product directly where it appears

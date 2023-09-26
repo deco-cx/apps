@@ -12,12 +12,14 @@ import * as $$$$$$$$$$$6 from "./apps/vtex.ts";
 import * as $$$$$$$$$$$7 from "./apps/shopify.ts";
 import * as $$$$$$$$$$$8 from "./apps/handlebars.ts";
 import * as $$$$$$$$$$$9 from "./apps/verified-reviews.ts";
+import * as $$$$$$$$$$$10 from "./apps/power-reviews.ts";
 
 const manifest = {
   "apps": {
     "decohub/apps/admin.ts": $$$$$$$$$$$5,
     "decohub/apps/algolia.ts": $$$$$$$$$$$4,
     "decohub/apps/handlebars.ts": $$$$$$$$$$$8,
+    "decohub/apps/power-reviews.ts": $$$$$$$$$$$10,
     "decohub/apps/shopify.ts": $$$$$$$$$$$7,
     "decohub/apps/typesense.ts": $$$$$$$$$$$0,
     "decohub/apps/verified-reviews.ts": $$$$$$$$$$$9,
