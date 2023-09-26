@@ -56,7 +56,11 @@ export const toReview = (review: Review) => {
 
 export const toAggregateRating = (rollup: Rollup) => {
   if (!rollup) {
-    return undefined;
+    return {
+      "@type": "AggregateRating" as AggregateRating["@type"],
+      ratingValue: 0,
+      ratingCount: 0,
+    };
   }
   return {
     "@type": "AggregateRating" as AggregateRating["@type"],
