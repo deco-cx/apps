@@ -50,6 +50,7 @@ export default function Fresh(
             : freshConfig.page;
         } catch (e) {
           span.recordException(e);
+          throw e;
         } finally {
           span.end();
         }
@@ -63,7 +64,7 @@ export default function Fresh(
     }
     if (isFreshCtx<DecoState>(ctx)) {
       const end = appContext?.monitoring?.timings?.start?.("render-to-string");
-      const response = await appContext?.monitoring?.tracer?.startActiveSpan?.(
+      const response = await appContext.monitoring!.tracer.startActiveSpan(
         "render-to-string",
         async (span) => {
           try {
@@ -76,6 +77,7 @@ export default function Fresh(
             });
           } catch (err) {
             span.recordException(err);
+            throw err;
           } finally {
             span.end();
           }
