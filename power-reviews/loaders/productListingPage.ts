@@ -58,8 +58,6 @@ export default function productListingPage(
       fullReviewsResponse.map((review) => review.json()),
     );
 
-    console.log(fullReviewsResults)
-
     const productsExtendeds = fullReviewsResults.map((review, idx) => {
       return {
         ...products[idx],
