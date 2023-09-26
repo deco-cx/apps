@@ -7,7 +7,6 @@ import {
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
 import { isFreshCtx } from "deco/handlers/fresh.ts";
-import { observe } from "deco/observability/observe.ts";
 import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
@@ -36,6 +35,8 @@ const rankRoute = (pattern: string) =>
           : acc + 2,
       0,
     );
+
+const urlPatternCache: Record<string, URLPattern> = {};
 
 export const router = (
   routes: Route[],
@@ -69,7 +70,7 @@ export const router = (
           { context: ctx, request: req },
         );
 
-      const end = configs?.monitoring?.t.start("load-data");
+      const end = configs?.monitoring?.timings?.start?.("load-data");
       const hand = isAwaitable(resolvedOrPromise)
         ? await resolvedOrPromise
         : resolvedOrPromise;
@@ -91,7 +92,9 @@ export const router = (
     }
 
     for (const { pathTemplate: routePath, handler } of routes) {
-      const pattern = new URLPattern({ pathname: routePath });
+      const pattern = urlPatternCache[routePath] ??= new URLPattern({
+        pathname: routePath,
+      });
       const res = pattern.exec(req.url);
       const groups = res?.pathname.groups ?? {};
 
@@ -162,8 +165,8 @@ export default function RoutesSelection(
   ctx: AppContext,
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
-    const t = isFreshCtx<DecoSiteState>(connInfo)
-      ? connInfo.state.t
+    const monitoring = isFreshCtx<DecoSiteState>(connInfo)
+      ? connInfo.state.monitoring
       : undefined;
 
     const routesFromProps = Array.isArray(audiences) ? audiences : [];
@@ -192,7 +195,7 @@ export default function RoutesSelection(
       hrefRoutes,
       ctx.get,
       {
-        monitoring: t ? { t, observe } : undefined,
+        monitoring,
       },
     );
 
