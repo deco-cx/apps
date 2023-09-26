@@ -2,7 +2,6 @@ import { ReviewPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { toAggregateRating, toReview } from "../utils/tranform.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
-
 export interface Props {
   slug?: RequestURLParam;
 
