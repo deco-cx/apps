@@ -36,7 +36,7 @@ export default function App(state: Props): App<Manifest, State> {
     base: `https://readservices-b2c.powerreviews.com`,
     fetcher: fetchSafe,
     headers: new Headers({
-      Authorization: "6b533d2d-fa46-4c49-baac-34b69240ede7",
+      Authorization: state.appKey,
     }),
   });
 
@@ -44,7 +44,7 @@ export default function App(state: Props): App<Manifest, State> {
     base: `https://writeservices.powerreviews.com`,
     fetcher: fetchSafe,
     headers: new Headers({
-      Authorization: "6b533d2d-fa46-4c49-baac-34b69240ede7",
+      Authorization: state.appKey,
     }),
   });
 
