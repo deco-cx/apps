@@ -1,4 +1,4 @@
-import { fetchSafe } from "../../utils/fetch.ts";
+import { fetchSafe, STALE } from "../../utils/fetch.ts";
 
 interface Props {
   /**
@@ -8,11 +8,9 @@ interface Props {
 }
 
 const loader = async (props: Props) => {
-  const original = await fetchSafe(props.src, {
-    deco: { cache: "stale-while-revalidate" },
-  });
+  const original = await fetchSafe(props.src, STALE);
 
-  const response = original.clone();
+  const response = new Response(original.clone().body, original);
   response.headers.set(
     "cache-control",
     "public, s-maxage=15552000, max-age=15552000, immutable",

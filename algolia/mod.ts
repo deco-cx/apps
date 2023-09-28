@@ -1,5 +1,4 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
-import { Markdown } from "../decohub/components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { setupProductsIndices } from "./utils/product.ts";
 
@@ -27,14 +26,9 @@ export default function App(
   props: State,
 ) {
   const promise = setupProductsIndices(props);
-
-  const getClient = () => promise;
-
-  const state = { getClient };
+  const state = { getClient: () => promise };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 
   return app;
 }
-
-export const Preview = Markdown(new URL("./README.md", import.meta.url).href);
