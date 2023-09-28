@@ -7,9 +7,13 @@ import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { bgYellow } from "std/fmt/colors.ts";
 
+type CustomPlatform = {
+  platform: "other";
+};
+
 export type Props = WebsiteProps & {
   /** @deprecated Use selected commerce instead */
-  commerce?: VNDAProps | VTEXProps | ShopifyProps | WakeProps;
+  commerce?: VNDAProps | VTEXProps | ShopifyProps | WakeProps | CustomPlatform;
 };
 
 type WebsiteApp = ReturnType<typeof website>;
@@ -26,7 +30,7 @@ export default function Site(
 
   const site = website(state);
 
-  if (commerce) {
+  if (commerce && commerce.platform !== "other") {
     console.warn(
       bgYellow("Deprecated"),
       "Commerce prop is now deprecated. Delete this prop and install the commerce platform app instead. This will be removed in the future",

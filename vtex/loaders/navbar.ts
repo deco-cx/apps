@@ -1,4 +1,5 @@
-import type { Navbar } from "../../commerce/types.ts";
+import type { SiteNavigationElement } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
 import { categoryTreeToNavbar } from "../utils/transform.ts";
 
@@ -14,18 +15,14 @@ const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Navbar[] | null> => {
+): Promise<SiteNavigationElement[] | null> => {
   const { vcs } = ctx;
   const { levels = 2 } = props;
 
-  const response = await vcs
-    ["GET /api/catalog_system/pub/category/tree/:level"]({
-      level: levels,
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-    });
-
-  const tree = await response.json();
+  const tree = await vcs["GET /api/catalog_system/pub/category/tree/:level"](
+    { level: levels },
+    STALE,
+  ).then((res) => res.json());
 
   return categoryTreeToNavbar(tree);
 };

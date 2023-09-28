@@ -151,3 +151,12 @@ export const createHttpClient = <T>({
       };
     },
   });
+
+// deno-lint-ignore no-explicit-any
+export const nullOnNotFound = (error: any) => {
+  if (error.status === 404) {
+    return null;
+  }
+
+  throw error;
+};

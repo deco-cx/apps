@@ -20,6 +20,7 @@ const config = {
     app("vtex"),
     app("vnda"),
     app("wake"),
+    app("linx"),
     app("shopify"),
     app("website"),
     app("commerce"),
