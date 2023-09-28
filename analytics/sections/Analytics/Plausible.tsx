@@ -1,12 +1,10 @@
-import Plausible, { loader, Props } from "../../components/Plausible.tsx";
+import Plausible, { Props } from "../../components/Plausible.tsx";
 
 function Section(props: Props) {
-  return <Plausible domain={""} {...props} />;
+  return <Plausible {...props} />;
 }
 
 export default Section;
-
-export { loader };
 
 export const Preview = () => (
   <iframe
