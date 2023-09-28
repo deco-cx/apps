@@ -2,7 +2,7 @@ import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
 import { ProductDetailsPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 
-type Props = {
+export type Props = {
   jsonLD: ProductDetailsPage | null;
 } & Partial<Omit<SeoProps, "jsonLDs">>;
 

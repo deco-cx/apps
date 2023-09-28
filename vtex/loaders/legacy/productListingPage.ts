@@ -14,7 +14,11 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
-import type { LegacyProduct, LegacySort, LegacyFacet } from "../../utils/types.ts";
+import type {
+  LegacyFacet,
+  LegacyProduct,
+  LegacySort,
+} from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
 
