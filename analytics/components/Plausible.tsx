@@ -39,8 +39,8 @@ const sendEvent = (
 
   if (origEvent && ecommerce) {
     const flagsObject = {} as Record<string, boolean>;
-    if (window.LIVE.flags) {
-      for (const flag of window.LIVE.flags) {
+    if (window.LIVE?.flags) {
+      for (const flag of window.LIVE?.flags) {
         if (flag.name && flag.value) {
           flagsObject[flag.name] = flag.value;
         }
