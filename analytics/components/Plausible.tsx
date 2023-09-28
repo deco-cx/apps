@@ -18,6 +18,7 @@ export const loader = (
   ctx: AppContext,
 ): SectionProps | null => {
   const domain = new URL(req.url).hostname;
+  console.log(domain, req);
   return { ...props, domain };
 };
 
