@@ -11,7 +11,6 @@ import { CONTENT_SLOT_NAME } from "deco/sections/Slot.tsx";
 import { Props as UseSlotProps } from "deco/sections/UseSlot.tsx";
 import { createContext, JSX } from "preact";
 import { useContext } from "preact/hooks";
-import LiveAnalytics from "../components/_Analytics.tsx";
 import LiveControls from "../components/_Controls.tsx";
 
 /**
@@ -205,11 +204,6 @@ export default function LivePage(
         site={{ id: context.siteId, name: context.site }}
         page={{ id: pageId, pathTemplate: routerCtx?.pagePath }}
         flags={routerCtx?.flags}
-      />
-      <LiveAnalytics
-        id={pageId}
-        flags={routerCtx?.flags}
-        path={routerCtx?.pagePath}
       />
       {renderPage(props)}
     </>
