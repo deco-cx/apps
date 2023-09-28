@@ -1,7 +1,36 @@
 import { context } from "deco/live.ts";
-import Script from "partytown/Script.tsx";
-import GoogleTagScript from "partytown/integrations/GTAG.tsx";
 import GoogleTagManager from "partytown/integrations/GTM.tsx";
+import GoogleTagScript from "partytown/integrations/GTAG.tsx";
+import Script from "partytown/Script.tsx";
+
+declare global {
+  interface Window {
+    deco: {
+      analytics: Array<
+        // deno-lint-ignore no-explicit-any
+        (action: string, eventType: string, props?: any) => void
+      >;
+    };
+  }
+}
+
+/**
+ * This function handles all ecommerce analytics events.
+ * Add another ecommerce analytics modules here.
+ */
+const sendAnalyticsEvent = (
+  // deno-lint-ignore no-explicit-any
+  event: any,
+) => {
+  window.dataLayer && window.dataLayer.push({ ecommerce: null });
+  window.dataLayer && window.dataLayer.push({
+    event: event.name,
+    ecommerce: event.params,
+  });
+
+  window.deco?.analytics &&
+    window.deco?.analytics.map((f) => f("track", "analyticsType", event));
+};
 
 export interface Props {
   /**
@@ -22,12 +51,25 @@ export interface Props {
    * @description run GTM directly on the main thread, without Partytown. This is useful for debugging purposes. Default: false
    */
   dangerouslyRunOnMainThread?: boolean;
+
+  /**
+   * @description define the name of event type sent to datalayer and registered analytics. Default: ecommerce
+   */
+  analyticsType?: string;
 }
 
 export default function Analtyics(
-  { trackingIds, src, dangerouslyRunOnMainThread, googleAnalyticsIds }: Props,
+  {
+    trackingIds,
+    src,
+    dangerouslyRunOnMainThread,
+    googleAnalyticsIds,
+    analyticsType,
+  }: Props,
 ) {
   const isDeploy = !!context.isDeploy;
+  const eventType = analyticsType ?? "ecommerce";
+
   return (
     <>
       {/* TODO: Add debug from query string @author Igor Brasileiro */}
@@ -62,6 +104,15 @@ export default function Analtyics(
             `debugGlobals = () => { console.table([["datalayer", dataLayer]]); }`,
         }}
         forward={["debugGlobals"]}
+      />
+      <script
+        type="module"
+        id="analytics-script"
+        dangerouslySetInnerHTML={{
+          __html: `window.DECO_SITES_STD = { sendAnalyticsEvent: ${
+            sendAnalyticsEvent.toString().replace("analyticsType", eventType)
+          } }`,
+        }}
       />
     </>
   );
