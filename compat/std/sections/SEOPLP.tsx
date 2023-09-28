@@ -1,10 +1,10 @@
 import SEO, {
   Props as SEOPLPProps,
 } from "../../../commerce/sections/Seo/SeoPLP.tsx";
+import { ProductListingPage } from "../../../commerce/types.ts";
 
-export type JsonLD = SEOPLPProps["jsonLD"];
 export interface Props extends Omit<SEOPLPProps, "jsonLD"> {
-  page: SEOPLPProps["jsonLD"];
+  page: ProductListingPage | null;
 }
 
 /**

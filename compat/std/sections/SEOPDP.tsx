@@ -1,10 +1,10 @@
 import SEO, {
-    Props as SEOPDPProps,
+  Props as SEOPDPProps,
 } from "../../../commerce/sections/Seo/SeoPDP.tsx";
+import { ProductDetailsPage } from "../../../commerce/types.ts";
 
-export type JsonLD = SEOPDPProps["jsonLD"];
 export interface Props extends Omit<SEOPDPProps, "jsonLD"> {
-  page: SEOPDPProps["jsonLD"];
+  page: ProductDetailsPage | null;
 }
 
 /**
@@ -12,6 +12,9 @@ export interface Props extends Omit<SEOPDPProps, "jsonLD"> {
  */
 export default function SEOPDP(props: Props) {
   return (
-    <SEO {...props} jsonLD={props?.page ?? (props as unknown as SEOPDPProps)?.jsonLD} />
+    <SEO
+      {...props}
+      jsonLD={props?.page ?? (props as unknown as SEOPDPProps)?.jsonLD}
+    />
   );
 }
