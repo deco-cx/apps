@@ -1,7 +1,29 @@
-import { context } from "deco/live.ts";
+import { Head } from "$fresh/runtime.ts";
+import type { AppContext } from "../mod.ts";
 import Script from "partytown/Script.tsx";
 import Jitsu from "partytown/integrations/Jitsu.tsx";
-import { Flag } from "deco/types.ts";
+import { context } from "deco/live.ts";
+
+export interface Props {
+  async?: boolean;
+}
+
+interface SectionProps {
+  async?: boolean;
+  domain: string;
+  path: string;
+}
+
+export const loader = (
+  props: Omit<Props, "domain">,
+  req: Request,
+  ctx: AppContext,
+): SectionProps | null => {
+  const url = new URL(req.url);
+  const domain = url.hostname;
+  const path = url.pathname;
+  return { ...props, domain, path };
+};
 
 const main = (
   userData: {
@@ -95,16 +117,14 @@ const main = (
 };
 
 const innerHtml = (
-  { id, path, flags }: Props,
+  { domain, path }: SectionProps,
 ) =>
-  `(${main.toString()})({page_id: "${id}", page_path: "${path}", site_id: "${context.siteId}", active_flags: "${
-    flags?.map((f) => `${f.name}=${f.value ? 0 : 1}`).join(",") ?? ""
+  `(${main.toString()})({page_path: "${path}", site_id: "${domain}", active_flags: "${
+    [{ name: "x", value: 1 }].map((f) => `${f.name}=${f.value ? 0 : 1}`).join(
+      ",",
+    ) ?? ""
   }"});
 `;
-
-type Props = Partial<{ id: number | string; path: string }> & {
-  flags?: Flag[];
-};
 
 /**
  * We don't send Jitsu events on localhost by default, so
@@ -112,12 +132,12 @@ type Props = Partial<{ id: number | string; path: string }> & {
  */
 const IS_TESTING_JITSU = false;
 
-function LiveAnalytics({ id = -1, path = "defined_on_code", flags }: Props) {
+function Component({ path, domain }: SectionProps) {
   return (
     <>
       <Script
         type="module"
-        dangerouslySetInnerHTML={{ __html: innerHtml({ id, path, flags }) }}
+        dangerouslySetInnerHTML={{ __html: innerHtml({ path, domain }) }}
       />
 
       {(context.isDeploy || IS_TESTING_JITSU) && ( // Add analytcs in production only
@@ -130,4 +150,4 @@ function LiveAnalytics({ id = -1, path = "defined_on_code", flags }: Props) {
   );
 }
 
-export default LiveAnalytics;
+export default Component;
