@@ -2,13 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$0 from "./sections/Analytics/Jitsu.tsx";
-import * as $$$$$$1 from "./sections/Analytics/Plausible.tsx";
+import * as $$$$$$0 from "./sections/Analytics/Plausible.tsx";
 
 const manifest = {
   "sections": {
-    "analytics/sections/Analytics/Jitsu.tsx": $$$$$$0,
-    "analytics/sections/Analytics/Plausible.tsx": $$$$$$1,
+    "analytics/sections/Analytics/Plausible.tsx": $$$$$$0,
   },
   "name": "analytics",
   "baseUrl": import.meta.url,

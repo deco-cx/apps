@@ -14,8 +14,6 @@ interface SectionProps {
   path: string;
 }
 
-// TODO: WIP
-
 export const loader = (
   props: Omit<Props, "domain">,
   req: Request,

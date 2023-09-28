@@ -4,7 +4,10 @@ import Script from "partytown/Script.tsx";
 import { context } from "deco/live.ts";
 
 export interface Props {
-  async?: boolean;
+  /**
+   * @description paths to be excluded.
+   */
+  exclude?: string;
 }
 
 declare global {
@@ -25,6 +28,7 @@ const exclusionScript =
 
 const plausibleScript = exclusionScript;
 
+// This function should be self contained, because it is stringified!
 const sendEvent = (
   _action: string,
   _type: string,
@@ -55,7 +59,7 @@ const sendEvent = (
 };
 
 function Component({
-  async,
+  exclude,
 }: Props) {
   if (!context.isDeploy) {
     return <></>;
@@ -69,27 +73,13 @@ function Component({
           href="https://plausible.io/api/event"
           crossOrigin="anonymous"
         />
-        {async &&
-          (
-            <Script
-              type="module"
-              data-exclude="/proxy"
-              data-api="https://plausible.io/api/event"
-              dangerouslySetInnerHTML={{
-                __html: plausibleScript,
-              }}
-            />
-          )}
-        {!async && (
-          <script
-            defer
-            data-exclude="/proxy"
-            data-api="https://plausible.io/api/event"
-            dangerouslySetInnerHTML={{
-              __html: plausibleScript,
-            }}
-          />
-        )}
+        <script
+          data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
+          data-api="https://plausible.io/api/event"
+          dangerouslySetInnerHTML={{
+            __html: plausibleScript,
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.DECO_ANALYTICS = (window.DECO_ANALYTICS || {});
