@@ -33,6 +33,12 @@ function Component({
   return (
     <>
       <Head>
+        <link rel="dns-prefetch" href="https://plausible.io/api/event" />
+        <link
+          rel="preconnect"
+          href="https://plausible.io/api/event"
+          crossOrigin="anonymous"
+        />
         {async &&
           (
             <Script
