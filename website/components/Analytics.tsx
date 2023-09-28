@@ -29,7 +29,9 @@ const sendAnalyticsEvent = (
   });
 
   window.deco?.analytics &&
-    window.deco?.analytics.map((f) => f("track", "analyticsType", event));
+    Object.values(window.deco.analytics).map((f) =>
+      f("track", "analyticsType", event)
+    );
 };
 
 export interface Props {

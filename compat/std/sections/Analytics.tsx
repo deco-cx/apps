@@ -29,7 +29,9 @@ const sendAnalyticsEvent = <T extends AnalyticsEvent>(
   });
 
   window.deco?.analytics &&
-    window.deco?.analytics.map((f) => f("track", "ecommerce", event));
+    Object.values(window.deco.analytics).map((f) =>
+      f("track", "ecommerce", event)
+    );
 };
 
 export interface Props {
