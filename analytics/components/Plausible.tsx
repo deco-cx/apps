@@ -26,6 +26,8 @@ const exclusionScript =
 const plausibleScript = exclusionScript;
 
 const sendEvent = (
+  _action: string,
+  _type: string,
   event: { name?: string; params?: Record<string, string> },
 ) => {
   const origEvent = event?.name;
@@ -90,8 +92,8 @@ function Component({
         )}
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.deco = (window.deco || {"analytics": {}});
-               window.deco.analytics.plausible = window.deco.analytics.plausible || ${sendEvent.toString()}`,
+            __html: `window.DECO_ANALYTICS = (window.DECO_ANALYTICS || {});
+            window.DECO_ANALYTICS.plausible = window.DECO_ANALYTICS.plausible || (${sendEvent.toString()});`,
           }}
         />
       </Head>

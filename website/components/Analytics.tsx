@@ -5,12 +5,11 @@ import Script from "partytown/Script.tsx";
 
 declare global {
   interface Window {
-    deco: {
-      analytics: Array<
-        // deno-lint-ignore no-explicit-any
-        (action: string, eventType: string, props?: any) => void
-      >;
-    };
+    DECO_ANALYTICS: Record<
+      string,
+      // deno-lint-ignore no-explicit-any
+      (action: string, eventType: string, props?: any) => void
+    >;
   }
 }
 
@@ -28,8 +27,8 @@ const sendAnalyticsEvent = (
     ecommerce: event.params,
   });
 
-  window.deco?.analytics &&
-    Object.values(window.deco.analytics).map((f) =>
+  window.DECO_ANALYTICS &&
+    Object.values(window.DECO_ANALYTICS).map((f) =>
       f("track", "analyticsType", event)
     );
 };
