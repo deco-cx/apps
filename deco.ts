@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("random-product"),
     {
       dir: "admin",
       name: "deco-sites/admin",
