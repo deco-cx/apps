@@ -1,9 +1,10 @@
-import type { NavItem } from "../types.ts";
+import type { SiteNavigationElement } from "../types.ts";
 
 export interface Props {
-  items?: NavItem[];
+  items?: SiteNavigationElement[];
 }
 
-const loader = ({ items }: Props): NavItem[] | null => items ?? null;
+const loader = ({ items }: Props): SiteNavigationElement[] | null =>
+  items ?? null;
 
 export default loader;
