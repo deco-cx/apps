@@ -1,4 +1,5 @@
 import type { Product } from "../../commerce/types.ts";
+import { toProduct } from "../utils/transform.ts";
 import { AppContext } from "../mod.ts";
 
 export interface Props {
@@ -11,20 +12,18 @@ export interface Props {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const { randomApi } = ctx;
 
   const count = props.count ?? 12;
 
-  const beers = await randomApi["GET /api/v2/beers"]({ size: count }).then((r) =>
-    r.json()
-  );
+  const beers = await randomApi["GET /api/v2/beers"]({ size: count }).then((
+    r,
+  ) => r.json());
 
-  console.log({ beers })
-
-  const products = await Promise.resolve([]);
+  const products = beers.map((beer) => toProduct(beer, new URL(req.url)));
 
   return products ?? [];
 };
