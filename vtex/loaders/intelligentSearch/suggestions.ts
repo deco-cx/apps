@@ -5,11 +5,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 
@@ -40,7 +36,7 @@ const loaders = async (
   const { url } = req;
   const { count, query } = props;
   const locale = "pt-BR"; // config!.defaultLocale; // TODO
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
 
   const suggestions = () =>
     vcs["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
@@ -84,8 +80,6 @@ const loaders = async (
     baseUrl: url,
     priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
   };
-
-  setSegment(segment, ctx.response.headers);
 
   return {
     searches: count ? searches.slice(0, count) : searches,
