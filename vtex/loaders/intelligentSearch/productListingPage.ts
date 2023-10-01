@@ -12,11 +12,7 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -251,9 +247,8 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcs } = ctx;
   const { url: baseUrl } = req;
-
   const url = new URL(baseUrl);
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
   const currentPageoffset = props.pageOffset ?? 1;
   const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
     props,
@@ -353,8 +348,6 @@ const loader = async (
   if (hasPreviousPage) {
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
-
-  setSegment(segment, ctx.response.headers);
 
   return {
     "@type": "ProductListingPage",

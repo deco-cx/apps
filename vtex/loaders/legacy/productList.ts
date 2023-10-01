@@ -1,11 +1,7 @@
 import type { Product } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacySort } from "../../utils/types.ts";
@@ -164,7 +160,7 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
   const { vcs } = ctx;
   const { url: baseUrl } = req;
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
   const segmentParams = toSegmentParams(segment);
   const params = fromProps({ props });
 
@@ -186,8 +182,6 @@ const loader = async (
       priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO fix currency
     })
   );
-
-  setSegment(segment, ctx.response.headers);
 
   return Promise.all(
     products.map((product) =>

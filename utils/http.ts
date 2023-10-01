@@ -80,6 +80,10 @@ export const createHttpClient = <T>({
 }: HttpClientOptions): ClientOf<T> =>
   new Proxy({} as ClientOf<T>, {
     get: (_target, prop) => {
+      if (prop === Symbol.toStringTag || prop === Symbol.toPrimitive) {
+        return `HttpClient: ${base}`;
+      }
+
       if (typeof prop !== "string") {
         throw new TypeError(`HttpClient: Uknown path ${typeof prop}`);
       }

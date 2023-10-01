@@ -3,18 +3,14 @@ import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { pickSku } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
 
 export interface Props {
   /**
-   * @title Related Products
+   * @title Related Productss
    * @description VTEX Cross Selling API. This loader only works on routes of type /:slug/p
    */
   crossSelling: CrossSellingType;
@@ -51,7 +47,7 @@ async function loader(
     crossSelling = "similars",
     count,
   } = props;
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
   const params = toSegmentParams(segment);
 
   const getProductGroupID = async (props: { slug?: string; id?: string }) => {
@@ -108,8 +104,6 @@ async function loader(
       productList({ props: { similars: false, ids } }, req, ctx)
     ),
   ).then((p) => p.flat().filter((x): x is Product => Boolean(x)));
-
-  setSegment(segment, ctx.response.headers);
 
   // Search API does not offer a way to filter out in stock products
   // This is a scape hatch

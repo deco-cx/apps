@@ -1,15 +1,22 @@
-import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type {
+  App as A,
+  AppContext as AC,
+  AppMiddlewareContext as AMC,
+  ManifestOf,
+} from "deco/mod.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
 import workflow from "../workflows/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { middleware } from "./middleware.ts";
 import { SP, VTEXCommerceStable } from "./utils/client.ts";
 import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI } from "./utils/vtex.openapi.gen.ts";
 
-export type AppContext = AC<ReturnType<typeof VTEX>>;
-
-export type AppManifest = ManifestOf<ReturnType<typeof VTEX>>;
+export type App = ReturnType<typeof VTEX>;
+export type AppContext = AC<App>;
+export type AppManifest = ManifestOf<App>;
+export type AppMiddlewareContext = AMC<App>;
 
 /** @title VTEX */
 export interface Props {
@@ -75,9 +82,10 @@ export default function VTEX(
 
   const state = { ...props, account, vcs, sp, io, api };
 
-  const app: App<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
+  const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
     state,
     manifest,
+    middleware,
     dependencies: [workflow({})],
   };
 
