@@ -81,7 +81,7 @@ export const createHttpClient = <T>({
   new Proxy({} as ClientOf<T>, {
     get: (_target, prop) => {
       if (prop === Symbol.toStringTag || prop === Symbol.toPrimitive) {
-        return `HttpClient for: ${base}`;
+        return `HttpClient: ${base}`;
       }
 
       if (typeof prop !== "string") {
