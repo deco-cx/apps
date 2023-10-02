@@ -26,8 +26,11 @@ async function loader(
     "query getUserProfile { profile { id email firstName lastName profilePicture gender }}"
 
   try {
-    const user = await io.query({ query }, { headers: { cookie } })
-    return { ...user.profile } as User
+    const user: { profile: User } = await io.query(
+      { query },
+      { headers: { cookie } }
+    )
+    return { ...user.profile }
   } catch (_) {
     return null
   }
