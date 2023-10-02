@@ -59,6 +59,7 @@ export const router = (
       ctx.state.routes = routes;
       ctx.state.pathTemplate = routePath;
 
+      console.log({ url: req.url, routes });
       const resolvedOrPromise = isDeferred<
           Handler,
           Omit<FreshContext, "context"> & { context: typeof ctx }
