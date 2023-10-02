@@ -16,9 +16,9 @@
 </p>
 
 <p align="center">
-A Wake, marca da Locaweb Company, nasceu pensando em toda a jornada do cliente, de uma maneira muito mais fluida e com integrações consistentes. Nossa marca está dividida em três pilares de negócios: Wake Commerce (Plataforma Headless, Hub de marketplace e OMS), Wake Experience (Ferramenta de marketing Cloud focada no comportamento do consumidor) e Squid by Wake (Plataforma de influenciadores digitais). 
-
-Wake é o game changer em tecnologia para quem pensa grande e quer ir além, com foco incansável em alta performance a cada detalhe.
+Wake, a Locaweb Company brand, was born thinking about the entire customer journey, in a much more fluid way and with consistent integrations. Our brand is divided into three business pillars: Wake Commerce (Headless Platform, Marketplace Hub and OMS), Wake Experience (Cloud marketing tool focused on consumer behavior) and Squid by Wake (Digital influencer platform).
+  
+Wake is the game changer in technology for those who think big and want to go further, with a tireless focus on high performance in every detail.
 
 This app wrapps Wake Commerce API into a comprehensive set of loaders/actions/workflows
 empowering non technical users to interact and act upon their headless commerce.
