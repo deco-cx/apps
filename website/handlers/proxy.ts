@@ -1,6 +1,7 @@
 import { isFreshCtx } from "deco/handlers/fresh.ts";
 import { DecoSiteState } from "deco/mod.ts";
-import { getSetCookies, Handler, setCookie } from "std/http/mod.ts";
+import { Handler } from "std/http/mod.ts";
+import { proxySetCookie } from "../../utils/cookie.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -72,13 +73,10 @@ async (req, _ctx) => {
 
   // Change cookies domain
   const responseHeaders = new Headers(response.headers);
-  const cookies = getSetCookies(responseHeaders);
   responseHeaders.delete("set-cookie");
 
-  // Setting cookies on GET requests prevent cache from cdns, slowing down the app
-  for (const cookie of cookies) {
-    setCookie(responseHeaders, { ...cookie, domain: url.hostname });
-  }
+  proxySetCookie(response.headers, responseHeaders, url);
+
   if (response.status >= 300 && response.status < 400) { // redirect change location header
     const location = responseHeaders.get("location");
     if (location) {

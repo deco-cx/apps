@@ -12,11 +12,7 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -196,6 +192,20 @@ const pageTypeToMapParam = (type: PageType["pageType"], index: number) => {
   return PAGE_TYPE_TO_MAP_PARAM[type];
 };
 
+const queryFromPathname = (
+  isInSeachFormat: boolean,
+  pageTypes: PageType[],
+  path: string,
+) => {
+  const pathList = path.split("/").slice(1);
+
+  const isPage = Boolean(pageTypes.length);
+  const isValidPathSearch = pathList.length == 1;
+  if (!isPage && !isInSeachFormat && isValidPathSearch) {
+    return pathList[0];
+  }
+};
+
 const filtersFromPathname = (pages: PageType[]) =>
   pages
     .map((page, index) => {
@@ -251,9 +261,8 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcs } = ctx;
   const { url: baseUrl } = req;
-
   const url = new URL(baseUrl);
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
   const currentPageoffset = props.pageOffset ?? 1;
   const {
     selectedFacets: baseSelectedFacets,
@@ -261,34 +270,25 @@ const loader = async (
     ...args
   } = searchArgsOf(props, url);
   const pageTypesPromise = pageTypesFromPathname(url.pathname, ctx);
+  const pageTypes = await pageTypesPromise;
   const selectedFacets = baseSelectedFacets.length === 0
-    ? filtersFromPathname(await pageTypesPromise)
+    ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
 
   const selected = withDefaultFacets(selectedFacets, ctx);
   const fselected = selected.filter((f) => f.key !== "price");
-  const pageTypes = await pageTypesPromise;
 
-  const pathList = url.pathname.split("/").slice(1);
+  const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
 
-  /**
-   *  verify if when url its not a category/department/collection
-   *  and is not a default query format but is a valid search based in default IS behavior on native stores
-   */
-  if (
-    !pageTypes.length &&
-    !selected.length &&
-    !args.query &&
-    pathList.length == 1
-  ) {
-    args.query = pathList[0];
-  }
+  const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
 
-  if (!args.query && !selected.length) {
+  const searchArgs = { ...args, query: args.query || pathQuery };
+
+  if (!isInSeachFormat && !pathQuery) {
     return null;
   }
 
-  const params = withDefaultParams({ ...args, page });
+  const params = withDefaultParams({ ...searchArgs, page });
 
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
@@ -359,8 +359,8 @@ const loader = async (
   );
 
   const paramsToPersist = new URLSearchParams();
-  args.query && paramsToPersist.set("q", args.query);
-  args.sort && paramsToPersist.set("sort", args.sort);
+  searchArgs.query && paramsToPersist.set("q", searchArgs.query);
+  searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
   const filters = facets
     .filter((f) => !f.hidden)
     .map(toFilter(selectedFacets, paramsToPersist));
@@ -379,8 +379,6 @@ const loader = async (
   if (hasPreviousPage) {
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
-
-  setSegment(segment, ctx.response.headers);
 
   return {
     "@type": "ProductListingPage",

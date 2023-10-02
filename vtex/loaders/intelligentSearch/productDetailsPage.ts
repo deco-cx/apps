@@ -7,11 +7,7 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
@@ -48,7 +44,7 @@ const loader = async (
   const { vcs } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
 
   const pageTypePromise = vcs
     ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
@@ -113,8 +109,6 @@ const loader = async (
   }
 
   const pageType = await pageTypePromise;
-
-  setSegment(segment, ctx.response.headers);
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
