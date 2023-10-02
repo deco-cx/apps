@@ -2,11 +2,7 @@ import type { ProductDetailsPage } from "../../../commerce/types.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { LegacyProduct } from "../../utils/types.ts";
@@ -33,7 +29,7 @@ async function loader(
   const { url: baseUrl } = req;
   const { slug } = props;
   const url = new URL(baseUrl);
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
   const params = toSegmentParams(segment);
   const skuId = url.searchParams.get("skuId");
 
@@ -59,8 +55,6 @@ async function loader(
       fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
     }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json())
     : [];
-
-  setSegment(segment, ctx.response.headers);
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,

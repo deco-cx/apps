@@ -3,6 +3,8 @@ import type { Segment } from "./types.ts";
 
 export const SEGMENT_COOKIE_NAME = "vtex_segment";
 
+export const SEGMENT = Symbol("segment");
+
 /**
  * Stable serialization.
  *
