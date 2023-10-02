@@ -7,11 +7,7 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
@@ -111,7 +107,7 @@ const loader = async (
   const { vcs } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
   const params = toSegmentParams(segment);
   const currentPageoffset = props.pageOffset ?? 1;
 
@@ -244,8 +240,6 @@ const loader = async (
   if (hasPreviousPage) {
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
-
-  setSegment(segment, ctx.response.headers);
 
   return {
     "@type": "ProductListingPage",

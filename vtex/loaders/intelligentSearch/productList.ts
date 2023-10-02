@@ -5,11 +5,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import {
-  getSegment,
-  setSegment,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
@@ -118,7 +114,7 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
   const { vcs } = ctx;
   const { url } = req;
-  const segment = getSegment(req);
+  const segment = ctx.bag.get(SEGMENT);
 
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);
@@ -144,8 +140,6 @@ const loader = async (
   // it in here
   const products = vtexProducts
     .map((p) => toProduct(p, p.items[0], 0, options));
-
-  setSegment(segment, ctx.response.headers);
 
   return Promise.all(
     products.map((product) =>

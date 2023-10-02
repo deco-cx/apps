@@ -666,7 +666,7 @@ export interface SelectPromotionParams {
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#select_promotion */
-export interface SelectPromotionEvent extends IEvent<SelectItemEvent> {
+export interface SelectPromotionEvent extends IEvent<SelectPromotionParams> {
   name: "select_promotion";
 }
 
