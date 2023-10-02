@@ -16,7 +16,9 @@
 </p>
 
 <p align="center">
-Wake is a complete, headless, secure, flexible, and high-performance e-commerce platform that serves both retail and B2B with its composable architecture.
+A Wake, marca da Locaweb Company, nasceu pensando em toda a jornada do cliente, de uma maneira muito mais fluida e com integrações consistentes. Nossa marca está dividida em três pilares de negócios: Wake Commerce (Plataforma Headless, Hub de marketplace e OMS), Wake Experience (Ferramenta de marketing Cloud focada no comportamento do consumidor) e Squid by Wake (Plataforma de influenciadores digitais). 
+
+Wake é o game changer em tecnologia para quem pensa grande e quer ir além, com foco incansável em alta performance a cada detalhe.
 
 This app wrapps Wake Commerce API into a comprehensive set of loaders/actions/workflows
 empowering non technical users to interact and act upon their headless commerce.
