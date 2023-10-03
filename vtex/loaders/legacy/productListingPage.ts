@@ -15,6 +15,7 @@ import type {
   LegacyFacet,
   LegacyProduct,
   LegacySort,
+  PageType,
 } from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
@@ -97,6 +98,27 @@ const getTerm = (path: string, map: string) => {
 };
 
 /**
+ *  verify if when url its not a category/department/collection
+ *  and is not a default query format but is a valid search based in default lagacy behavior on native stores
+ */
+const getTermFallback = (url: URL, pageTypes: PageType[], fq: string[]) => {
+  const pathList = url.pathname.split("/").slice(1);
+
+  /**
+   * in lagacy mutiple terms path like /foo/bar is a valid search but any term after first will be ignored
+   * so this verify limit the term falback only if has one term
+   * if this is a problem feel free to remove the last verification
+   */
+  const isOneTermOnly = pathList.length == 1;
+
+  if (!pageTypes.length && !fq.length && isOneTermOnly) {
+    return pathList[0];
+  }
+
+  return "";
+};
+
+/**
  * @title VTEX Integration - Legacy Search
  * @description Product Listing Page loader
  */
@@ -116,6 +138,7 @@ const loader = async (
   const count = props.count ?? 12;
   const maybeMap = props.map || url.searchParams.get("map") || undefined;
   const maybeTerm = props.term || url.pathname || "";
+
   const page = url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
@@ -123,8 +146,6 @@ const loader = async (
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
-  const ft = props.ft || url.searchParams.get("ft") ||
-    url.searchParams.get("q") || "";
   const fq = props.fq ? [props.fq] : url.searchParams.getAll("fq");
   const _from = page * count;
   const _to = (page + 1) * count - 1;
@@ -132,7 +153,14 @@ const loader = async (
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
-  if (pageTypes.length === 0 && !ft && !fq) {
+  const ftFallback = getTermFallback(url, pageTypes, fq);
+
+  const ft = props.ft ||
+    url.searchParams.get("ft") ||
+    url.searchParams.get("q") ||
+    ftFallback;
+
+  if (pageTypes.length === 0 && !ft && !fq.length) {
     return null;
   }
 
@@ -140,6 +168,7 @@ const loader = async (
   const [map, term] = missingParams
     ? getMapAndTerm(pageTypes)
     : [maybeMap, maybeTerm];
+
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };
 

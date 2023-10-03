@@ -193,6 +193,20 @@ const pageTypeToMapParam = (type: PageType["pageType"], index: number) => {
   return PAGE_TYPE_TO_MAP_PARAM[type];
 };
 
+const queryFromPathname = (
+  isInSeachFormat: boolean,
+  pageTypes: PageType[],
+  path: string,
+) => {
+  const pathList = path.split("/").slice(1);
+
+  const isPage = Boolean(pageTypes.length);
+  const isValidPathSearch = pathList.length == 1;
+  if (!isPage && !isInSeachFormat && isValidPathSearch) {
+    return pathList[0];
+  }
+};
+
 const filtersFromPathname = (pages: PageType[]) =>
   pages
     .map((page, index) => {
@@ -251,18 +265,32 @@ const loader = async (
   const url = new URL(baseUrl);
   const segment = getSegment(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
-  const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
-    props,
-    url,
-  );
+  const {
+    selectedFacets: baseSelectedFacets,
+    page,
+    ...args
+  } = searchArgsOf(props, url);
   const pageTypesPromise = pageTypesFromPathname(url.pathname, ctx);
+  const pageTypes = await pageTypesPromise;
   const selectedFacets = baseSelectedFacets.length === 0
-    ? filtersFromPathname(await pageTypesPromise)
+    ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
 
   const selected = withDefaultFacets(selectedFacets, ctx);
   const fselected = selected.filter((f) => f.key !== "price");
-  const params = withDefaultParams({ ...args, page });
+
+  const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
+
+  const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
+
+  const searchArgs = { ...args, query: args.query || pathQuery };
+
+  if (!isInSeachFormat && !pathQuery) {
+    return null;
+  }
+
+  const params = withDefaultParams({ ...searchArgs, page });
+
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
@@ -303,8 +331,11 @@ const loader = async (
       .catch(console.error);
   }
 
-  const { products: vtexProducts, pagination, recordsFiltered } =
-    productsResult;
+  const {
+    products: vtexProducts,
+    pagination,
+    recordsFiltered,
+  } = productsResult;
   const facets = selectPriceFacet(facetsResult.facets, selectedFacets);
 
   // Transform VTEX product format into schema.org's compatible format
@@ -318,18 +349,18 @@ const loader = async (
           priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
         })
       )
-      .map((
-        product,
-      ) => (props.similars ? withIsSimilarTo(req, ctx, product) : product)),
+      .map((product) =>
+        props.similars ? withIsSimilarTo(req, ctx, product) : product
+      ),
   );
 
   const paramsToPersist = new URLSearchParams();
-  args.query && paramsToPersist.set("q", args.query);
-  args.sort && paramsToPersist.set("sort", args.sort);
-  const filters = facets.filter((f) => !f.hidden).map(
-    toFilter(selectedFacets, paramsToPersist),
-  );
-  const pageTypes = await pageTypesPromise;
+  searchArgs.query && paramsToPersist.set("q", searchArgs.query);
+  searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
+  const filters = facets
+    .filter((f) => !f.hidden)
+    .map(toFilter(selectedFacets, paramsToPersist));
+
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
 
   const hasNextPage = Boolean(pagination.next.proxyUrl);
