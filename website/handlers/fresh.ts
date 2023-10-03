@@ -6,7 +6,7 @@ import {
   isDeferred,
 } from "deco/engine/core/resolver.ts";
 import { DecoState } from "deco/types.ts";
-import { allowCorsFor } from "deco/utils/http.ts";
+//import { allowCorsFor } from "deco/utils/http.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
 
@@ -31,7 +31,7 @@ export default function Fresh(
   freshConfig: FreshConfig,
   appContext: Pick<AppContext, "monitoring">,
 ) {
-  return async (req: Request, ctx: ConnInfo) => {
+  return (req: Request, ctx: ConnInfo) => {
     if (req.method === "HEAD") {
       return new Response(null, { status: 200 });
     }
@@ -39,57 +39,79 @@ export default function Fresh(
       "load-data",
     );
 
-    const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
+    const stream = new TransformStream();
+
+    const response = new Response(stream.readable, {
+      status: 200,
+      headers: {
+        "content-type": "text/html",
+      },
+    });
+
+    appContext?.monitoring?.tracer?.startActiveSpan?.(
       "load-data",
-      async (span) => {
-        try {
-          return isDeferred<Page, BaseContext & { context: ConnInfo }>(
-              freshConfig.page,
-            )
-            ? await freshConfig.page({ context: ctx })
-            : freshConfig.page;
-        } catch (e) {
+      (span) => {
+        const streamPageContent = async (page: Page) => {
+          endResolvePage?.();
+          const url = new URL(req.url);
+          if (url.searchParams.get("asJson") !== null) {
+            stream.writable.close();
+            return;
+          }
+          if (isFreshCtx<DecoState>(ctx)) {
+            const end = appContext?.monitoring?.timings?.start?.(
+              "render-to-string",
+            );
+            const response = await appContext.monitoring!.tracer
+              .startActiveSpan(
+                "render-to-string",
+                async (span) => {
+                  try {
+                    return await ctx.render({
+                      page,
+                      routerInfo: {
+                        flags: ctx.state.flags,
+                        pagePath: ctx.state.pathTemplate,
+                      },
+                    });
+                  } catch (err) {
+                    span.recordException(err);
+                    throw err;
+                  } finally {
+                    span.end();
+                  }
+                },
+              );
+            end?.();
+
+            response.body?.pipeTo(stream.writable);
+
+            return response;
+          } else {
+            stream.writable.close();
+          }
+        };
+        let resolvePromise: null | Promise<Page> = null;
+        if (
+          isDeferred<Page, BaseContext & { context: ConnInfo }>(
+            freshConfig.page,
+          )
+        ) {
+          resolvePromise = Promise.resolve(freshConfig.page({ context: ctx }));
+        } else {
+          resolvePromise = Promise.resolve(freshConfig.page);
+        }
+
+        resolvePromise?.then(streamPageContent).catch((e) => {
           span.recordException(e);
           throw e;
-        } finally {
+        }).finally(() => {
           span.end();
-        }
+        });
       },
     );
 
-    endResolvePage?.();
-    const url = new URL(req.url);
-    if (url.searchParams.get("asJson") !== null) {
-      return Response.json(page, { headers: allowCorsFor(req) });
-    }
-    if (isFreshCtx<DecoState>(ctx)) {
-      const end = appContext?.monitoring?.timings?.start?.("render-to-string");
-      const response = await appContext.monitoring!.tracer.startActiveSpan(
-        "render-to-string",
-        async (span) => {
-          try {
-            return await ctx.render({
-              page,
-              routerInfo: {
-                flags: ctx.state.flags,
-                pagePath: ctx.state.pathTemplate,
-              },
-            });
-          } catch (err) {
-            span.recordException(err);
-            throw err;
-          } finally {
-            span.end();
-          }
-        },
-      );
-      end?.();
-
-      return response;
-    }
-    return Response.json({ message: "Fresh is not being used" }, {
-      status: 500,
-    });
+    return response;
   };
 }
 
