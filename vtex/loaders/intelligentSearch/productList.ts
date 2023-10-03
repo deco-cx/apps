@@ -1,4 +1,5 @@
 import type { Product } from "../../../commerce/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   toPath,
@@ -125,10 +126,8 @@ const loader = async (
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
       facets: toPath(facets),
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res) => res.json());
 
   const options = {
     baseUrl: url,

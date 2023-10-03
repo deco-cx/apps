@@ -1,4 +1,4 @@
-import { fetchSafe } from "../../../utils/fetch.ts";
+import { fetchSafe, STALE } from "../../../utils/fetch.ts";
 import { Font } from "../../components/Theme.tsx";
 import type { Manifest } from "../../manifest.gen.ts";
 
@@ -51,8 +51,8 @@ const loader = async (props: Props, req: Request): Promise<Font> => {
   }
 
   const styleSheet = await fetchSafe(url, {
+    ...STALE,
     headers: req.headers,
-    deco: { cache: "stale-while-revalidate" },
   }).then((res) => res.text());
 
   return {
