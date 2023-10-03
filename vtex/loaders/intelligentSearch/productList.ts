@@ -1,14 +1,17 @@
 import type { Product } from "../../../commerce/types.ts";
+import type { Product as VTEXProduct } from "../../utils/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   toPath,
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
+import { getProductsWithKitlook } from "../../utils/kitlook.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -49,6 +52,11 @@ export interface CommonProps {
    * @description Do not return out of stock items
    */
   hideUnavailableItems?: boolean;
+  /**
+   * @title Active Kit Items
+   * @description Send kit items product by product
+   */
+  isKit?: boolean;
   /**
    * @description Include similar products
    */
@@ -112,33 +120,39 @@ const loader = async (
 ): Promise<Product[] | null> => {
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url } = req;
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
 
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   // search products on VTEX. Feel free to change any of these parameters
-  const { products: vtexProducts } = await vcs
+  // intelligent search does not return true product information with kit look, if you need this information, use isKit
+  const { products: vtexProducts } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
       facets: toPath(facets),
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res: Response) => res.json()) as {
+      products: VTEXProduct[];
+    };
 
   const options = {
     baseUrl: url,
     priceCurrency: "BRL", // config!.defaultPriceCurrency, // TOO
   };
 
+  // if isKit is true, we need to fetch the kit items for each product
+  const currentProducts = props.isKit
+    ? await getProductsWithKitlook({ vtexProducts, ctx, params, options })
+    : vtexProducts;
+
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
-  const products = vtexProducts
+  const products = currentProducts
     .map((p) => toProduct(p, p.items[0], 0, options));
 
   return Promise.all(

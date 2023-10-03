@@ -16,13 +16,14 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<SiteNavigationElement[] | null> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { levels = 2 } = props;
 
-  const tree = await vcs["GET /api/catalog_system/pub/category/tree/:level"](
-    { level: levels },
-    STALE,
-  ).then((res) => res.json());
+  const tree = await vcsDeprecated
+    ["GET /api/catalog_system/pub/category/tree/:level"](
+      { level: levels },
+      STALE,
+    ).then((res) => res.json());
 
   return categoryTreeToNavbar(tree);
 };

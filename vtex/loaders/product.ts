@@ -26,25 +26,25 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Product | null> => {
-  const { api } = ctx;
+  const { vcs } = ctx;
   const sc = 1;
 
-  const sku = await api
+  const sku = await vcs
     ["GET /api/catalog_system/pvt/sku/stockkeepingunitbyid/:skuId"]({
       skuId: props.productID,
     }).then((res) => res.json());
 
   const [skus, salesChannels, ...simulations] = await Promise.all([
-    api
+    vcs
       ["GET /api/catalog_system/pvt/sku/stockkeepingunitByProductId/:productId"](
         {
           productId: sku.ProductId,
         },
       ).then((res) => res.json()),
-    api["GET /api/catalog_system/pvt/saleschannel/list"]({})
+    vcs["GET /api/catalog_system/pvt/saleschannel/list"]({})
       .then((res) => res.json()),
     ...sku.SkuSellers.map(({ SellerId }) =>
-      api["POST /api/checkout/pub/orderForms/simulation"]({
+      vcs["POST /api/checkout/pub/orderForms/simulation"]({
         RnbBehavior: 1,
         sc,
       }, {

@@ -11,10 +11,10 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<OrderForm> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { cookie } = parseCookie(req.headers);
 
-  const response = await vcs["POST /api/checkout/pub/orderForm"]({}, {
+  const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"]({}, {
     headers: { cookie },
   });
 

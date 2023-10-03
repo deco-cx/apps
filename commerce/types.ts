@@ -379,6 +379,7 @@ export interface Product extends Omit<Thing, "@type"> {
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
   isAccessoryOrSparePartFor?: ProductLeaf[];
+  kitItems?: Product[];
 }
 
 export interface ListItem<T = string> extends Omit<Thing, "@type"> {

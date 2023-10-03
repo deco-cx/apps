@@ -13,10 +13,6 @@ import {
   SingleProductFragment,
 } from "./graphql/storefront.graphql.gen.ts";
 
-export const stale = {
-  deco: { cache: "stale-while-revalidate" },
-};
-
 export const FILTER_PARAM = "filtro";
 
 export const camposAdicionais = [

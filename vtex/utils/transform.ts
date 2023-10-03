@@ -279,7 +279,7 @@ export const aggregateOffers = (
 };
 
 export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
-  product: P,
+  product: P & { kitItems?: Product[] },
   sku: P["items"][number],
   level = 0, // prevent inifinte loop while self referencing the product
   options: ProductOptions,
@@ -347,6 +347,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   return {
     "@type": "Product",
     category: categoriesString,
+    kitItems: product?.kitItems ?? [],
     productID: skuId,
     url: getProductURL(baseUrl, product, sku.itemId).href,
     name,

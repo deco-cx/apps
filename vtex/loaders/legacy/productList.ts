@@ -1,7 +1,8 @@
 import type { Product } from "../../../commerce/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacySort } from "../../utils/types.ts";
@@ -158,20 +159,18 @@ const loader = async (
 ): Promise<Product[] | null> => {
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
   const segmentParams = toSegmentParams(segment);
   const params = fromProps({ props });
 
-  const vtexProducts = await vcs
+  const vtexProducts = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:term?"]({
       ...segmentParams,
       ...params,
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res) => res.json());
 
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add

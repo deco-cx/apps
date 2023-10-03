@@ -1,9 +1,31 @@
 import { getCookies, setCookie } from "std/http/mod.ts";
 import type { Segment } from "./types.ts";
+import { AppContext } from "../mod.ts";
 
-export const SEGMENT_COOKIE_NAME = "vtex_segment";
+const SEGMENT_COOKIE_NAME = "vtex_segment";
+const SEGMENT = Symbol("segment");
 
-export const SEGMENT = Symbol("segment");
+export const isAnonymous = ({
+  campaigns,
+  utm_campaign,
+  utm_source,
+  utmi_campaign,
+  channel,
+  priceTables,
+  regionId,
+}: Partial<Segment>) =>
+  !campaigns &&
+  !utm_campaign &&
+  !utm_source &&
+  !utmi_campaign &&
+  !channel &&
+  !priceTables &&
+  !regionId;
+
+export const getSegment = (ctx: AppContext): Partial<Segment> =>
+  ctx.bag.get(SEGMENT);
+export const setSegment = (ctx: AppContext, segment: Partial<Segment>) =>
+  ctx.bag.set(SEGMENT, segment);
 
 /**
  * Stable serialization.
@@ -42,7 +64,7 @@ export const serialize = ({
 
 export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
-export const getSegment = (req: Request): Partial<Segment> => {
+export const getSegmentCookie = (req: Request): Partial<Segment> => {
   const url = new URL(req.url);
   const cookies = getCookies(req.headers);
   const cookie = cookies[SEGMENT_COOKIE_NAME];
@@ -56,7 +78,7 @@ export const getSegment = (req: Request): Partial<Segment> => {
   };
 };
 
-export const setSegment = (
+export const setSegmentCookie = (
   segment: Partial<Segment>,
   headers: Headers = new Headers(),
 ): Headers => {
