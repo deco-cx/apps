@@ -1,8 +1,9 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { LegacyProduct } from "../../utils/types.ts";
@@ -25,21 +26,18 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
   const url = new URL(baseUrl);
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
   const params = toSegmentParams(segment);
   const skuId = url.searchParams.get("skuId");
 
-  const [product] = await vcs
+  const [product] = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:slug/p"](
       { ...params, slug },
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
+      { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json());
 
   // Product not found, return the 404 status code
@@ -50,10 +48,13 @@ async function loader(
   const sku = pickSku(product, skuId?.toString());
 
   const kitItems: LegacyProduct[] = sku.isKit && sku.kitItems
-    ? await vcs["GET /api/catalog_system/pub/products/search/:term?"]({
-      ...params,
-      fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
-    }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json())
+    ? await vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
+      {
+        ...params,
+        fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
+      },
+      STALE,
+    ).then((res) => res.json())
     : [];
 
   const page = toProductPage(product, sku, kitItems, {
