@@ -49,6 +49,8 @@ export interface Props {
    * @description Use VTEX as backend platform
    */
   platform: "vtex";
+
+  usePortalSitemap?: boolean;
 }
 
 export const color = 0xF71963;
