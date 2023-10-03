@@ -1,5 +1,6 @@
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
@@ -270,20 +271,14 @@ const loader = async (
           ...params,
           facets: toPath(selected),
         },
-        {
-          deco: { cache: "stale-while-revalidate" },
-          headers: withSegmentCookie(segment),
-        },
+        { ...STALE, headers: withSegmentCookie(segment) },
       ).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"](
       {
         ...params,
         facets: toPath(fselected),
       },
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
+      { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json()),
   ]);
 

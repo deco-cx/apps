@@ -86,10 +86,8 @@ async function loader(
       type: crossSelling,
       productId,
       ...params,
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res) => res.json());
 
   // unique Ids
   const relatedIds = [...new Set(
