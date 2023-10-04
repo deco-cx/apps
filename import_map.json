@@ -1,6 +1,6 @@
 {
   "imports": {
-    "$fresh/": "https://denopkg.com/denoland/fresh@1.4.2/",
+    "$fresh/": "https://denopkg.com/denoland/fresh@9018024b7eb269a4aa37783b981009e9696eb28a/",
     "preact": "https://esm.sh/preact@10.15.1",
     "preact/": "https://esm.sh/preact@10.15.1/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.0",
