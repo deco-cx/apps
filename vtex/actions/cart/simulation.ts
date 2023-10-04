@@ -11,6 +11,7 @@ export interface Props {
   items: Item[];
   postalCode: string;
   country: string;
+  RnbBehavior?: 0 | 1;
 }
 
 /**
@@ -23,24 +24,23 @@ const action = async (
 ): Promise<SimulationOrderForm> => {
   const cookie = req.headers.get("cookie") ?? "";
   const { vcsDeprecated } = ctx;
-  const {
-    items,
-    postalCode,
-    country,
-  } = props;
+  const { items, postalCode, country, RnbBehavior = 1 } = props;
 
-  const response = await vcsDeprecated
-    ["POST /api/checkout/pub/orderForms/simulation"](
-      {},
-      {
-        body: { items, postalCode, country },
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          cookie,
-        },
+  const response = await vcsDeprecated[
+    "POST /api/checkout/pub/orderForms/simulation"
+  ](
+    {
+      RnbBehavior,
+    },
+    {
+      body: { items, country, postalCode },
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        cookie,
       },
-    );
+    },
+  );
 
   return response.json();
 };
