@@ -23,6 +23,15 @@ Algolia is a general purpose indexer. This means you can save any Json document 
 1. Install via decohub
 2. Open your Algolia dashboard and grab your keys at settings > API Keys
 3. Copy & Paste your Application ID and Admin API Key
+4. Save & Publish this block
+5. Click on the button below to setup the necessary indices on Algolia
+
+<div style="display: flex; justify-content: center; padding: 8px">
+  <form target="_blank" action="/live/invoke/algolia/actions/setup.ts" >
+    <button style="color: white; background-color: #003dff; border-radius: 4px; padding: 4px 8px">Create Indices</button>
+  </form>
+</div>
+
 
 > Use `Admin API Key` instead of `Search-Only API Key` since this app tweaks search params and create/deletes records
 

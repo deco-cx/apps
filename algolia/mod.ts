@@ -1,6 +1,7 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
+import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
+import algolia from "npm:algoliasearch@4.20.0";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { setupProductsIndices } from "./utils/product.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -25,10 +26,31 @@ export interface State {
 export default function App(
   props: State,
 ) {
-  const promise = setupProductsIndices(props);
-  const state = { getClient: () => promise };
+  const { applicationId, adminApiKey } = props;
+  const client = algolia.default(applicationId, adminApiKey, {
+    requester: createFetchRequester(), // Fetch makes it perform mutch better
+  });
 
-  const app: App<Manifest, typeof state> = { manifest, state };
+  const state = { client };
+
+  const app: App<Manifest, typeof state> = {
+    manifest: {
+      ...manifest,
+      actions: {
+        ...manifest.actions,
+        "algolia/actions/setup.ts": {
+          ...manifest.actions["algolia/actions/setup.ts"],
+          default: (p, req, ctx) =>
+            manifest.actions["algolia/actions/setup.ts"].default(
+              { ...props, ...p },
+              req,
+              ctx,
+            ),
+        },
+      },
+    },
+    state,
+  };
 
   return app;
 }

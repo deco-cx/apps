@@ -8,7 +8,7 @@ interface Props {
 const indexName: Indices = "products";
 
 const action = async (props: Props, _req: Request, ctx: AppContext) => {
-  const client = await ctx.getClient();
+  const { client } = ctx;
 
   await client.initIndex(indexName).waitTask(props.taskID);
 };

@@ -1,5 +1,4 @@
-import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
-import algolia, { SearchClient } from "npm:algoliasearch@4.20.0";
+import { SearchClient } from "npm:algoliasearch@4.20.0";
 import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
 import { State } from "../mod.ts";
 
@@ -161,11 +160,8 @@ export const fromIndex = (
 
 export const setupProductsIndices = async (
   { applicationId, adminApiKey }: State,
+  client: SearchClient,
 ) => {
-  const client = algolia.default(applicationId, adminApiKey, {
-    requester: createFetchRequester(), // Fetch makes it perform mutch better
-  });
-
   await client.initIndex("products" satisfies Indices).setSettings({
     distinct: true,
     attributeForDistinct: "inProductGroupWithID",
@@ -270,6 +266,4 @@ export const setupProductsIndices = async (
       highlightPreTag: "<mark>",
       highlightPostTag: "</mark>",
     });
-
-  return client;
 };
