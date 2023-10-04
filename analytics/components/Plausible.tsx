@@ -51,7 +51,7 @@ const sendEvent = (
       if (ecommerce[key] !== null && ecommerce[key] !== undefined) {
         values[key] = (typeof ecommerce[key] !== "object")
           ? ecommerce[key]
-          : JSON.stringify(ecommerce[key]);
+          : JSON.stringify(ecommerce[key]).slice(0, 990); // 2000 bytes limit
       }
     }
     window.plausible(origEvent, { props: { ...flagsObject, ...values } });
