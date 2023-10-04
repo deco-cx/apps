@@ -71,6 +71,7 @@ const buildProxyRoutes = (
         },
       }]]
       : [includeSiteMap, []];
+
     return [
       ...routes,
       {

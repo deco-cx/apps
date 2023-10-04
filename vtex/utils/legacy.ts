@@ -1,5 +1,6 @@
 import type { Seo } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
+import { STALE } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
 import { slugify } from "../utils/slugify.ts";
 import type { PageType, Segment } from "../utils/types.ts";
@@ -34,15 +35,13 @@ export const pageTypesFromPathname = async (
   ctx: AppContext,
 ) => {
   const segments = segmentsFromTerm(term);
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
 
   const results = await Promise.all(
     segments.map((_, index) =>
-      vcs["GET /api/catalog_system/pub/portal/pagetype/:term"]({
+      vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
         term: segments.slice(0, index + 1).join("/"),
-      }, {
-        deco: { cache: "stale-while-revalidate" },
-      }).then((res) => res.json())
+      }, STALE).then((res) => res.json())
     ),
   );
 

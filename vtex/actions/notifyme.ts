@@ -14,7 +14,7 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<void> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const form = new FormData();
   const { email, skuId, name = "" } = props;
 
@@ -22,7 +22,7 @@ const action = async (
   form.append("notifymeClientEmail", email);
   form.append("notifymeIdSku", skuId);
 
-  await vcs["POST /no-cache/AviseMe.aspx"]({}, { body: form });
+  await vcsDeprecated["POST /no-cache/AviseMe.aspx"]({}, { body: form });
 };
 
 export default action;

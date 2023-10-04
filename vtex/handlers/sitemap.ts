@@ -35,7 +35,7 @@ export interface Props {
  */
 export default function Sitemap(
   { include }: Props,
-  { publicUrl: url }: AppContext,
+  { publicUrl: url, usePortalSitemap, account }: AppContext,
 ) {
   return async (
     req: Request,
@@ -45,8 +45,15 @@ export default function Sitemap(
       throw new Error("Missing publicUrl");
     }
 
-    const publicUrl =
+    const urlFromPublicUrl =
       new URL(url?.startsWith("http") ? url : `https://${url}`).href;
+
+    /**
+     * Some stores were having problems with the IO sitemap (missing categories and brands)
+     */
+    const publicUrl = usePortalSitemap
+      ? `https://${account}.vtexcommercestable.com.br/`
+      : urlFromPublicUrl;
 
     const response = await Proxy({
       url: publicUrl,

@@ -1,4 +1,5 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import {
@@ -7,7 +8,7 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
@@ -41,12 +42,12 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
 
-  const pageTypePromise = vcs
+  const pageTypePromise = vcsDeprecated
     ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
       term: `${slug}/p`,
     }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
@@ -73,14 +74,12 @@ const loader = async (
   const facets = withDefaultFacets([], ctx);
   const params = withDefaultParams({ query, count: 1 });
 
-  const { products: [product] } = await vcs
+  const { products: [product] } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
       facets: toPath(facets),
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res) => res.json());
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -96,14 +95,12 @@ const loader = async (
       count: sku.kitItems.length,
     });
 
-    const result = await vcs
+    const result = await vcsDeprecated
       ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
         ...params,
         facets: toPath(facets),
-      }, {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      }).then((res) => res.json());
+      }, { ...STALE, headers: withSegmentCookie(segment) })
+      .then((res) => res.json());
 
     kitItems = result.products;
   }
