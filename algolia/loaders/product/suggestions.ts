@@ -47,7 +47,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const client = await ctx.getClient();
+  const { client } = ctx;
 
   const { results } = await client.search([
     {

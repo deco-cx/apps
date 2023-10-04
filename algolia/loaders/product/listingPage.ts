@@ -149,7 +149,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
-  const client = await ctx.getClient();
+  const { client } = ctx;
   const indexName = getIndex(url.searchParams.get("sort"));
 
   const facetFilters: [string, string[]][] = JSON.parse(
