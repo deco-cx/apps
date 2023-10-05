@@ -1,6 +1,9 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { Page } from "deco/blocks/page.ts";
 import {
+  ResolveOptions,
+} from "deco/engine/core/mod.ts";
+import {
   asResolved,
   BaseContext,
   isDeferred,
@@ -23,6 +26,15 @@ export const isFreshCtx = <TState>(
   return typeof (ctx as HandlerContext).render === "function";
 };
 
+const runOnlyMatchers: Required<Required<ResolveOptions>["hooks"]>["onResolveStart"] = (proceed, props, resolver) => {
+  if (resolver.type === "matchers") {
+    return proceed();
+  }
+  proceed().catch(_err => {
+    //ignore errors
+  }); // make the next resolver pass
+  return Promise.resolve(props);
+};
 /**
  * @title Fresh Page
  * @description Renders a fresh page.
@@ -32,13 +44,11 @@ export default function Fresh(
   appContext: Pick<AppContext, "monitoring">,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
-    if (req.method === "HEAD") {
-      return new Response(null, { status: 200 });
-    }
     const endResolvePage = appContext?.monitoring?.timings?.start?.(
       "load-data",
     );
 
+    const isHead = req.method === "HEAD";
     const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
       "load-data",
       async (span) => {
@@ -46,7 +56,16 @@ export default function Fresh(
           return isDeferred<Page, BaseContext & { context: ConnInfo }>(
               freshConfig.page,
             )
-            ? await freshConfig.page({ context: ctx })
+            ? await freshConfig.page(
+              { context: ctx },
+              isHead
+                ? {
+                  hooks: { onResolveStart: runOnlyMatchers },
+                  propagateOptions: true,
+                  propsAreResolved: true,
+                }
+                : undefined,
+            )
             : freshConfig.page;
         } catch (e) {
           span.recordException(e);
@@ -56,6 +75,9 @@ export default function Fresh(
         }
       },
     );
+    if (isHead) {
+      return new Response(null, { status: 200 });
+    }
 
     endResolvePage?.();
     const url = new URL(req.url);
