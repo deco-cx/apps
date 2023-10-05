@@ -26,6 +26,7 @@ const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
+
 export const getOptimizedMediaUrl = (
   { originalSrc, width, height, factor, fit = "cover" }: {
     originalSrc: string;
