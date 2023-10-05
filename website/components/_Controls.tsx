@@ -66,7 +66,7 @@ const main = () => {
       );
       href.searchParams.set(
         "pathTemplate",
-        encodeURIComponent(window.LIVE.page.pathTemplate ?? "/*"),
+        encodeURIComponent(window.LIVE.page.pathTemplate || "/*"),
       );
       window.location.href = `${href}`;
     }
