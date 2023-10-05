@@ -3,8 +3,8 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/product/listingPage.ts";
-import * as $$$1 from "./loaders/product/list.ts";
-import * as $$$2 from "./loaders/product/suggestions.ts";
+import * as $$$1 from "./loaders/product/suggestions.ts";
+import * as $$$2 from "./loaders/product/list.ts";
 import * as $$$$$$$$$0 from "./actions/setup.ts";
 import * as $$$$$$$$$1 from "./actions/index/product.ts";
 import * as $$$$$$$$$2 from "./actions/index/wait.ts";
