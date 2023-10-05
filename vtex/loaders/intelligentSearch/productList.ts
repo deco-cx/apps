@@ -5,7 +5,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
@@ -112,16 +112,16 @@ const loader = async (
 ): Promise<Product[] | null> => {
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url } = req;
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
 
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   // search products on VTEX. Feel free to change any of these parameters
-  const { products: vtexProducts } = await vcs
+  const { products: vtexProducts } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
       facets: toPath(facets),

@@ -1053,7 +1053,7 @@ export interface Segment {
   campaigns: unknown | null;
   /** @description 1,2,3 etc */
   channel: string;
-  priceTables: unknown | null;
+  priceTables: string | null;
   regionId: string | null;
   utm_campaign: string | null;
   utm_source: string | null;

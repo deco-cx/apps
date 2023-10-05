@@ -12,7 +12,7 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -245,10 +245,10 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
   const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
     props,
@@ -264,17 +264,18 @@ const loader = async (
   const params = withDefaultParams({ ...args, page });
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
-    vcs["GET /api/io/_v/api/intelligent-search/product_search/*facets"](
-      {
-        ...params,
-        facets: toPath(selected),
-      },
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
-    ).then((res) => res.json()),
-    vcs["GET /api/io/_v/api/intelligent-search/facets/*facets"](
+    vcsDeprecated
+      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"](
+        {
+          ...params,
+          facets: toPath(selected),
+        },
+        {
+          deco: { cache: "stale-while-revalidate" },
+          headers: withSegmentCookie(segment),
+        },
+      ).then((res) => res.json()),
+    vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"](
       {
         ...params,
         facets: toPath(fselected),

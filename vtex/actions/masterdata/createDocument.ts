@@ -15,21 +15,22 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<CreateNewDocument> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { data, acronym } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
-  const response = await vcs[`POST /api/dataentities/:acronym/documents`](
-    { acronym },
-    {
-      body: data,
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        cookie,
+  const response = await vcsDeprecated
+    [`POST /api/dataentities/:acronym/documents`](
+      { acronym },
+      {
+        body: data,
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          cookie,
+        },
       },
-    },
-  );
+    );
 
   return response.json();
 };

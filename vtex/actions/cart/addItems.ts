@@ -24,15 +24,16 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<OrderForm> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const {
     orderItems,
     allowedOutdatedData = ["paymentData"],
   } = props;
-  const { orderFormId, cookie } = parseCookie(req.headers);
+  const { orderFormId } = parseCookie(req.headers);
+  const cookie = req.headers.get("cookie") ?? "";
 
   try {
-    const response = await vcs
+    const response = await vcsDeprecated
       ["POST /api/checkout/pub/orderForm/:orderFormId/items"]({
         orderFormId,
         allowedOutdatedData,

@@ -13,7 +13,7 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<void> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const form = new FormData();
   const {
     email,
@@ -29,7 +29,7 @@ const action = async (
   form.append("newsInternalPart", part);
   form.append("newsInternalCampaign", campaing);
 
-  await vcs["POST /no-cache/Newsletter.aspx"]({}, {
+  await vcsDeprecated["POST /no-cache/Newsletter.aspx"]({}, {
     body: form,
   });
 };

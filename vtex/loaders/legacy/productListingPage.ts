@@ -1,4 +1,5 @@
 import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
@@ -7,7 +8,7 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
@@ -104,10 +105,10 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
   const params = toSegmentParams(segment);
   const currentPageoffset = props.pageOffset ?? 1;
 
@@ -143,27 +144,22 @@ const loader = async (
   const args = { map, _from, _to, O, ft, fq };
 
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
-    vcs["GET /api/catalog_system/pub/products/search/:term?"](
+    vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
       {
         ...params,
         ...args,
         term: getTerm(term, map),
       },
-      {
-        deco: { cache: "stale-while-revalidate" },
-        headers: withSegmentCookie(segment),
-      },
+      { ...STALE, headers: withSegmentCookie(segment) },
     ),
-    vcs["GET /api/catalog_system/pub/facets/search/:term"](
+    vcsDeprecated["GET /api/catalog_system/pub/facets/search/:term"](
       {
         ...params,
         ...args,
         term: getTerm(term, fmap),
         map: fmap,
       },
-      {
-        deco: { cache: "stale-while-revalidate" },
-      },
+      STALE,
     ).then((res) => res.json()),
   ]);
 

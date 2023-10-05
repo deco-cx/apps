@@ -5,7 +5,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 
@@ -32,14 +32,14 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url } = req;
   const { count, query } = props;
   const locale = "pt-BR"; // config!.defaultLocale; // TODO
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegment(ctx);
 
   const suggestions = () =>
-    vcs["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
+    vcsDeprecated["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
       locale,
       query: query ?? "",
     }, {
@@ -49,7 +49,7 @@ const loaders = async (
     }).then((res) => res.json());
 
   const topSearches = () =>
-    vcs["GET /api/io/_v/api/intelligent-search/top_searches"]({
+    vcsDeprecated["GET /api/io/_v/api/intelligent-search/top_searches"]({
       locale,
     }, {
       deco: { cache: "stale-while-revalidate" },
@@ -60,13 +60,14 @@ const loaders = async (
     const facets = withDefaultFacets([], ctx);
     const params = withDefaultParams({ query, count: count ?? 4, locale });
 
-    return vcs["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
-      ...params,
-      facets: toPath(facets),
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    return vcsDeprecated
+      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+        ...params,
+        facets: toPath(facets),
+      }, {
+        deco: { cache: "stale-while-revalidate" },
+        headers: withSegmentCookie(segment),
+      }).then((res) => res.json());
   };
 
   const [{ searches }, { products }] = await Promise.all([
