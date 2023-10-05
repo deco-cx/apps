@@ -39,7 +39,7 @@ export interface Props {
    */
   slug?: RequestURLParam;
 
-  filterByTags?: boolean
+  filterByTags?: boolean;
 }
 
 /**
@@ -65,19 +65,23 @@ const searchLoader = async (
   const term = props.term || props.slug || qQueryString ||
     undefined;
 
-    const categoryTagName = props.term || url.pathname.split("/").pop() || "";
+  const categoryTagName = props.term || url.pathname.split("/").pop() || "";
 
-    const categoryTag =   isSearchPage
+  const categoryTag = isSearchPage
     ? undefined
     : await api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
-      .then((res) => res.json()).catch(() => undefined)
+      .then((res) => res.json()).catch(() => undefined);
 
   const response = await api["GET /api/v2/products/search"]({
     term,
     sort,
     page,
     per_page: count,
-    "tags[]": props.tags && props.tags?.length > 0 ? props.tags : ( categoryTag?.name && props.filterByTags ?  [categoryTag?.name] : undefined),
+    "tags[]": props.tags && props.tags?.length > 0
+      ? props.tags
+      : (categoryTag?.name && props.filterByTags
+        ? [categoryTag?.name]
+        : undefined),
     wildcard: true,
     ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
   }, STALE);
