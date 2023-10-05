@@ -11,11 +11,13 @@ interface Deferred<T> extends Resolved<T> {
 
 export interface Props {
   sections: Deferred<Section>[];
+  /** @default 100px */
+  margin?: string;
 }
 
 const INCLUDE_PARAM = "fresh-partial";
 
-const script = (id: string) => {
+const script = (id: string, margin: string) => {
   const handler = () => {
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -24,7 +26,7 @@ const script = (id: string) => {
           entry.target.click();
         }
       }
-    }, { rootMargin: "100px" });
+    }, { rootMargin: margin });
 
     const element = document.getElementById(id);
     element && observer.observe(element);
@@ -40,7 +42,7 @@ const script = (id: string) => {
 type PromiseOf<T> = T extends Promise<infer K> ? K : T;
 
 const PartialSection = (
-  { sections, current, partial }: SectionProps<
+  { sections, current, partial, margin }: SectionProps<
     PromiseOf<ReturnType<typeof loader>>
   >,
 ) => {
@@ -55,7 +57,7 @@ const PartialSection = (
             <script
               type="module"
               dangerouslySetInnerHTML={{
-                __html: `(${script})("${INCLUDE_PARAM}");`,
+                __html: `(${script})("${INCLUDE_PARAM}", "${margin}");`,
               }}
             />
           </>
@@ -78,6 +80,7 @@ export const loader = async (props: Props, req: Request) => {
   partialURL.searchParams.set(INCLUDE_PARAM, "true");
 
   return {
+    margin: props.margin || "100px",
     current: `${currentURL.pathname}${currentURL.search}`,
     partial: `${partialURL.pathname}${partialURL.search}`,
     sections: include
