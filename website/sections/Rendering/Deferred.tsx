@@ -1,7 +1,7 @@
 import type { Section } from "deco/blocks/section.ts";
 import { usePartial } from "../../hooks/usePartial.ts";
 
-/** @title OnScroll */
+/** @titleBy type */
 type Scroll = {
   type: "scroll";
   /**
@@ -11,7 +11,7 @@ type Scroll = {
   payload: number;
 };
 
-/** @title OnView */
+/** @titleBy type */
 type Intersection = {
   type: "intersection";
   /**
