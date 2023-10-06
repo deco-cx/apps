@@ -88,7 +88,7 @@ export default function Fresh(
 
       appContext.response.headers.set(
         "cache-control",
-        `private=set-cookie;s-maxage=${Math.floor(maxAge + (Math.random() * jitter))}`,
+        `public, max-age=0, s-maxage=${Math.floor(maxAge + (Math.random() * jitter))}`,
       );
     }
 
