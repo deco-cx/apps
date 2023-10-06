@@ -3,8 +3,10 @@ import { useRouterContext } from "deco/routes/[...catchall].tsx";
 
 const sanitizeTagAttribute = (inputString: string): string => {
   const maxLength = 50;
-  let sanitizedString: string = inputString.replace(/[^\w-]/g, "");
-  sanitizedString = sanitizedString.replace(/^\d+/, "");
+  let sanitizedString: string = inputString.replace(" ", "-").replace(
+    /[^\w-]/g,
+    "",
+  ).replace(/^\d+/, "");
   sanitizedString = sanitizedString.slice(0, maxLength);
   return sanitizedString;
 };
@@ -35,8 +37,6 @@ const exclusionScript =
 const plausibleScript = exclusionScript;
 
 // This function should be self contained, because it is stringified!
-// We limit attr to 44 chars on event name, so we can add "event-" on
-// plausible script.
 const sendEvent = (
   _action: string,
   _type: string,
@@ -46,18 +46,6 @@ const sendEvent = (
   const ecommerce = event && event.params;
 
   if (origEvent && ecommerce) {
-    const flagsObject = {} as Record<string, boolean>;
-    if (window.LIVE && window.LIVE.flags) {
-      for (let i = 0; i < window.LIVE.flags.length; i++) {
-        const flag = window.LIVE.flags[i];
-        if (flag && flag.name && flag.value) {
-          let sanitizedString: string = flag.name.replace(/[^\w-]/g, "");
-          sanitizedString = sanitizedString.replace(/^\d+/, "");
-          sanitizedString = sanitizedString.slice(0, 44);
-          flagsObject[sanitizedString] = flag.value;
-        }
-      }
-    }
     const values = {} as Record<string, string>;
     for (const key in ecommerce) {
       if (ecommerce[key] !== null && ecommerce[key] !== undefined) {
@@ -67,7 +55,7 @@ const sendEvent = (
       }
     }
     window.plausible(origEvent, {
-      props: Object.assign({}, flagsObject, values),
+      props: values,
     });
   }
 };
@@ -76,12 +64,12 @@ function Component({
   exclude,
 }: Props) {
   const routerCtx = useRouterContext();
-  const flags: Record<string, boolean> | undefined = routerCtx?.flags.reduce(
+  const flags: Record<string, string> | undefined = routerCtx?.flags.reduce(
     (acc, flag) => {
-      acc[sanitizeTagAttribute(`event-${flag.name}`)] = flag.value;
+      acc[sanitizeTagAttribute(`event-${flag.name}`)] = flag.value.toString();
       return acc;
     },
-    {} as Record<string, boolean>,
+    {} as Record<string, string>,
   );
 
   return (
