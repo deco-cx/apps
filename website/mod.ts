@@ -11,6 +11,18 @@ export type AppContext = FnContext<Props, Manifest>;
 
 export type SectionProps<T> = T & { id: string };
 
+ */
+export interface CachingConfig {
+  /**
+   * @title Content Max Age in Seconds
+   */
+  maxAgeSeconds?: number;
+  /**
+   * @title Content Jitter in Seconds
+   */
+  jitterSeconds?: number;
+}
+
 export interface Props {
   /**
    * @title Site Map
@@ -25,6 +37,11 @@ export interface Props {
    * @description These sections will be included on all website/pages/Page.ts
    */
   global?: Section[];
+
+  /**
+   * @title Caching Config
+   */
+  caching?: CachingConfig
 }
 
 /**

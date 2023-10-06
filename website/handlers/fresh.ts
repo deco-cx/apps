@@ -1,8 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { Page } from "deco/blocks/page.ts";
-import {
-  ResolveOptions,
-} from "deco/engine/core/mod.ts";
+import { ResolveOptions } from "deco/engine/core/mod.ts";
 import {
   asResolved,
   BaseContext,
@@ -26,11 +24,13 @@ export const isFreshCtx = <TState>(
   return typeof (ctx as HandlerContext).render === "function";
 };
 
-const runOnlyMatchers: Required<Required<ResolveOptions>["hooks"]>["onResolveStart"] = (proceed, props, resolver) => {
+const runOnlyMatchers: Required<
+  Required<ResolveOptions>["hooks"]
+>["onResolveStart"] = (proceed, props, resolver) => {
   if (resolver.type === "matchers") {
     return proceed();
   }
-  proceed().catch(_err => {
+  proceed().catch((_err) => {
     //ignore errors
   }); // make the next resolver pass
   return Promise.resolve(props);
@@ -41,7 +41,7 @@ const runOnlyMatchers: Required<Required<ResolveOptions>["hooks"]>["onResolveSta
  */
 export default function Fresh(
   freshConfig: FreshConfig,
-  appContext: Pick<AppContext, "monitoring">,
+  appContext: AppContext,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
     const endResolvePage = appContext?.monitoring?.timings?.start?.(
@@ -77,6 +77,19 @@ export default function Fresh(
     );
     if (isHead) {
       return new Response(null, { status: 200 });
+    }
+
+    const caching = appContext.caching;
+
+    if (caching) {
+      const { maxAgeSeconds, jitterSeconds } = caching;
+      const jitter = jitterSeconds ?? 2;
+      const maxAge = maxAgeSeconds ?? 3;
+
+      appContext.response.headers.set(
+        "cache-control",
+        `max-age=${Math.floor(maxAge + (Math.random() * jitter))}`,
+      );
     }
 
     endResolvePage?.();
