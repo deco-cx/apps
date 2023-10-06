@@ -94,4 +94,3 @@ const Deferred = (p: Props) => {
 };
 
 export default Deferred;
-
