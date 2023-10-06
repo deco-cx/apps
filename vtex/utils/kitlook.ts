@@ -16,7 +16,7 @@ interface Params {
   hideUnavailableItems: boolean;
 }
 
-interface GETProductsWithKitlook {
+interface WithKitLookToProps {
   vtexProducts: VTEXProduct[];
   params: Params;
   options: {
@@ -48,8 +48,8 @@ async function getKitlookItem({ product, ctx, params }: GETProductKitLookItem) {
 }
 
 /** Retrieves VTEX products with Kitlook. */
-export async function getProductsWithKitlook(
-  { vtexProducts, params, options, ctx }: GETProductsWithKitlook,
+export async function withIsKitlookTo(
+  { vtexProducts, params, options, ctx }: WithKitLookToProps,
 ): Promise<Array<LegacyProduct & { kitItems: Product[] }>> {
   const { vcsDeprecated } = ctx;
   const segment = getSegment(ctx);

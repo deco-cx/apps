@@ -11,7 +11,7 @@ import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
-import { getProductsWithKitlook } from "../../utils/kitlook.ts";
+import { withIsKitlookTo } from "../../utils/kitlook.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -143,7 +143,7 @@ const loader = async (
 
   // if isKit is true, we need to fetch the kit items for each product
   const currentProducts = props.isKit
-    ? await getProductsWithKitlook({ vtexProducts, ctx, params, options })
+    ? await withIsKitlookTo({ vtexProducts, ctx, params, options })
     : vtexProducts;
 
   // Transform VTEX product format into schema.org's compatible format
