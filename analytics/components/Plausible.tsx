@@ -1,7 +1,13 @@
 import { Head } from "$fresh/runtime.ts";
-import type { AppContext } from "../mod.ts";
-import Script from "partytown/Script.tsx";
-import { context } from "deco/live.ts";
+import { useRouterContext } from "deco/routes/[...catchall].tsx";
+
+const sanitizeTagAttribute = (inputString: string): string => {
+  const maxLength = 50;
+  let sanitizedString: string = inputString.replace(/[^\w-]/g, "");
+  sanitizedString = sanitizedString.replace(/^\d+/, "");
+  sanitizedString = sanitizedString.slice(0, maxLength);
+  return sanitizedString;
+};
 
 export interface Props {
   /**
@@ -29,6 +35,8 @@ const exclusionScript =
 const plausibleScript = exclusionScript;
 
 // This function should be self contained, because it is stringified!
+// We limit attr to 44 chars on event name, so we can add "event-" on
+// plausible script.
 const sendEvent = (
   _action: string,
   _type: string,
@@ -43,7 +51,10 @@ const sendEvent = (
       for (let i = 0; i < window.LIVE.flags.length; i++) {
         const flag = window.LIVE.flags[i];
         if (flag && flag.name && flag.value) {
-          flagsObject[flag.name] = flag.value;
+          let sanitizedString: string = flag.name.replace(/[^\w-]/g, "");
+          sanitizedString = sanitizedString.replace(/^\d+/, "");
+          sanitizedString = sanitizedString.slice(0, 44);
+          flagsObject[sanitizedString] = flag.value;
         }
       }
     }
@@ -64,9 +75,15 @@ const sendEvent = (
 function Component({
   exclude,
 }: Props) {
-  if (!context.isDeploy) {
-    return <></>;
-  }
+  const routerCtx = useRouterContext();
+  const flags: Record<string, boolean> | undefined = routerCtx?.flags.reduce(
+    (acc, flag) => {
+      acc[sanitizeTagAttribute(`event-${flag.name}`)] = flag.value;
+      return acc;
+    },
+    {} as Record<string, boolean>,
+  );
+
   return (
     <>
       <Head>
@@ -79,6 +96,7 @@ function Component({
         <script
           data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
           data-api="https://plausible.io/api/event"
+          {...flags}
           dangerouslySetInnerHTML={{
             __html: plausibleScript,
           }}
