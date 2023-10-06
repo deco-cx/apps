@@ -2,7 +2,7 @@ import { Head } from "$fresh/runtime.ts";
 import { useRouterContext } from "deco/routes/[...catchall].tsx";
 
 const sanitizeTagAttribute = (inputString: string): string => {
-  const maxLength = 299;  // plausible limit
+  const maxLength = 299; // plausible limit
   let sanitizedString: string = inputString.replace(" ", "-").replace(".", "-")
     .replace(
       /[^\w-]/g,
