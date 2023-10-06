@@ -1,7 +1,16 @@
 import { Head } from "$fresh/runtime.ts";
-import type { AppContext } from "../mod.ts";
-import Script from "partytown/Script.tsx";
-import { context } from "deco/live.ts";
+import { useRouterContext } from "deco/routes/[...catchall].tsx";
+
+const sanitizeTagAttribute = (inputString: string): string => {
+  const maxLength = 299; // plausible limit
+  let sanitizedString: string = inputString.replace(" ", "-").replace(".", "-")
+    .replace(
+      /[^\w-]/g,
+      "",
+    ).replace(/^\d+/, "");
+  sanitizedString = sanitizedString.slice(0, maxLength);
+  return sanitizedString;
+};
 
 export interface Props {
   /**
@@ -38,15 +47,6 @@ const sendEvent = (
   const ecommerce = event && event.params;
 
   if (origEvent && ecommerce) {
-    const flagsObject = {} as Record<string, boolean>;
-    if (window.LIVE && window.LIVE.flags) {
-      for (let i = 0; i < window.LIVE.flags.length; i++) {
-        const flag = window.LIVE.flags[i];
-        if (flag && flag.name && flag.value) {
-          flagsObject[flag.name] = flag.value;
-        }
-      }
-    }
     const values = {} as Record<string, string>;
     for (const key in ecommerce) {
       if (ecommerce[key] !== null && ecommerce[key] !== undefined) {
@@ -56,7 +56,7 @@ const sendEvent = (
       }
     }
     window.plausible(origEvent, {
-      props: Object.assign({}, flagsObject, values),
+      props: values,
     });
   }
 };
@@ -64,9 +64,15 @@ const sendEvent = (
 function Component({
   exclude,
 }: Props) {
-  if (!context.isDeploy) {
-    return <></>;
-  }
+  const routerCtx = useRouterContext();
+  const flags: Record<string, string> | undefined = routerCtx?.flags.reduce(
+    (acc, flag) => {
+      acc[sanitizeTagAttribute(`event-${flag.name}`)] = flag.value.toString();
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
   return (
     <>
       <Head>
@@ -79,6 +85,7 @@ function Component({
         <script
           data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
           data-api="https://plausible.io/api/event"
+          {...flags}
           dangerouslySetInnerHTML={{
             __html: plausibleScript,
           }}
