@@ -13,7 +13,7 @@
     "new": "deno run -A ./scripts/new.ts"
   },
   "imports": {
-    "$fresh/": "https://denopkg.com/deco-cx/fresh@1.4.3/",
+    "$fresh/": "https://denopkg.com/deco-cx/fresh@1.4.4/",
     "preact": "https://esm.sh/preact@10.15.1",
     "preact/": "https://esm.sh/preact@10.15.1/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.0",
