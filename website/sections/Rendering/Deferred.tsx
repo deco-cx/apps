@@ -2,24 +2,24 @@ import type { Section } from "deco/blocks/section.ts";
 import { usePartial } from "../../hooks/usePartial.ts";
 
 /** @titleBy type */
-type Scroll = {
+interface Scroll {
   type: "scroll";
   /**
    * @title Delay MS
    * @description Delay (in milliseconds) to wait after the scroll event is fired
    */
   payload: number;
-};
+}
 
 /** @titleBy type */
-type Intersection = {
+interface Intersection {
   type: "intersection";
   /**
    * @title Root Margin
    * @description Margin (in pixels) to trigger deferred sections rendering
    */
   payload: string;
-};
+}
 
 export interface Props {
   sections: Section[];
