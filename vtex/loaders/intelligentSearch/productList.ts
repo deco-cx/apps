@@ -129,15 +129,12 @@ const loader = async (
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   // search products on VTEX. Feel free to change any of these parameters
-  // intelligent search does not return true product information with kit look, if you need this information, use isKit
   const { products: vtexProducts } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
       facets: toPath(facets),
     }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res: Response) => res.json()) as {
-      products: VTEXProduct[];
-    };
+    .then((res: Response) => res.json()) as { products: VTEXProduct[] };
 
   const options = {
     baseUrl: url,

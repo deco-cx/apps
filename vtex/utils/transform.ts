@@ -347,7 +347,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   return {
     "@type": "Product",
     category: categoriesString,
-    kitItems: product?.kitItems ?? [],
+    kitItems: product?.kitItems,
     productID: skuId,
     url: getProductURL(baseUrl, product, sku.itemId).href,
     name,
