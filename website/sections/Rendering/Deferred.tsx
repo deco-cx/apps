@@ -33,8 +33,6 @@ const script = (
   const handler = () => {
     const element = document.getElementById(id);
 
-    console.log(element);
-
     if (type === "scroll" && element) {
       addEventListener(
         "scroll",
