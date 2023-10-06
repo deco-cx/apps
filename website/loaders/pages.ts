@@ -1,11 +1,11 @@
 import defaults from "deco/engine/manifest/defaults.ts";
 import { Route } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
-import LivePage from "../pages/Page.tsx";
+import Page from "../pages/Page.tsx";
 
 async function getAllPages(ctx: AppContext): Promise<Route[]> {
   const allPages = await ctx.get<
-    Record<string, Parameters<typeof LivePage>[0]>
+    Record<string, Parameters<typeof Page>[0]>
   >({
     type: "pages",
     __resolveType: defaults["blockSelector"].name,
