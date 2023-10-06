@@ -1,4 +1,4 @@
-import { fetchSafe, STALE } from "../../../utils/fetch.ts";
+import { fetchSafe /* STALE */ } from "../../../utils/fetch.ts";
 import { Font } from "../../components/Theme.tsx";
 import type { Manifest } from "../../manifest.gen.ts";
 
@@ -22,6 +22,20 @@ const ASSET_LOADER_PATH =
     "loaders"
   ]}`;
 
+const getFontVariation = ({ italic, weight }: FontVariation) =>
+  `${italic ? "1" : "0"},${weight}`;
+
+const getFontVariations = (variations: FontVariation[]) => {
+  if (variations.length === 0) {
+    return "";
+  }
+
+  return `,wght@${
+    variations.map(getFontVariation)
+      .join(";")
+  }`;
+};
+
 const loader = async (props: Props, req: Request): Promise<Font> => {
   const { fonts = [] } = props;
   const url = new URL("https://fonts.googleapis.com/css2?display=swap");
@@ -42,22 +56,19 @@ const loader = async (props: Props, req: Request): Promise<Font> => {
   for (const font of Object.values(reduced)) {
     url.searchParams.append(
       "family",
-      `${font.family}:ital,wght@${
-        font.variations.map(({ italic, weight }) =>
-          `${italic ? "1" : "0"},${weight}`
-        ).join(";")
-      }`,
+      `${font.family}:ital${getFontVariations(font.variations)}`,
     );
   }
 
   const styleSheet = await fetchSafe(url, {
-    ...STALE,
+    // FIX ME (igorbrasileiro): fetch safe is not varying based on headers
+    // ...STALE,
     headers: req.headers,
   }).then((res) => res.text());
 
   return {
     family: Object.keys(reduced).join(", "),
-    styleSheet: styleSheet.replace(
+    styleSheet: styleSheet.replaceAll(
       "https://",
       `${ASSET_LOADER_PATH}?src=https://`,
     ),
