@@ -38,6 +38,8 @@ export interface Props {
    * Slug for category pages
    */
   slug?: RequestURLParam;
+
+  filterByTags?: boolean;
 }
 
 /**
@@ -63,12 +65,23 @@ const searchLoader = async (
   const term = props.term || props.slug || qQueryString ||
     undefined;
 
+  const categoryTagName = props.term || url.pathname.split("/").pop() || "";
+
+  const categoryTag = isSearchPage
+    ? undefined
+    : await api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
+      .then((res) => res.json()).catch(() => undefined);
+
   const response = await api["GET /api/v2/products/search"]({
     term,
     sort,
     page,
     per_page: count,
-    "tags[]": props.tags,
+    "tags[]": props.tags && props.tags?.length > 0
+      ? props.tags
+      : (categoryTag?.name && props.filterByTags
+        ? [categoryTag?.name]
+        : undefined),
     wildcard: true,
     ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
   }, STALE);
@@ -76,18 +89,8 @@ const searchLoader = async (
     response.headers.get("x-pagination") ?? "null",
   ) as ProductSearchResult["pagination"] | null;
 
-  const categoryTagName = props.term || url.pathname.split("/").pop() || "";
-  const [search, seo, categoryTag] = await Promise.all([
+  const [search] = await Promise.all([
     response.json(),
-    api["GET /api/v2/seo_data"]({
-      resource_type: "Tag",
-      code: categoryTagName,
-      type: "category",
-    }, STALE).then((res) => res.json()),
-    isSearchPage
-      ? api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
-        .then((res) => res.json()).catch(() => undefined)
-      : undefined,
   ]);
 
   const { results: searchResults } = search;
@@ -109,13 +112,11 @@ const searchLoader = async (
     previousPage.set("page", (page - 1).toString());
   }
 
-  const hasSEO = !isSearchPage && (seo?.[0] || categoryTag);
+  const hasSEO = !isSearchPage && categoryTag;
 
   return {
     "@type": "ProductListingPage",
-    seo: hasSEO
-      ? getSEOFromTag({ ...categoryTag, ...seo?.[0] }, req)
-      : undefined,
+    seo: hasSEO ? getSEOFromTag({ ...categoryTag }, req) : undefined,
     // TODO: Find out what's the right breadcrumb on vnda
     breadcrumb: {
       "@type": "BreadcrumbList",
