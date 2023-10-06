@@ -18,8 +18,9 @@ import * as $$$$2 from "./handlers/proxy.ts";
 import * as $$$$3 from "./handlers/fresh.ts";
 import * as $$$$4 from "./handlers/redirect.ts";
 import * as $$$$$0 from "./pages/Page.tsx";
-import * as $$$$$$0 from "./sections/Seo/Seo.tsx";
-import * as $$$$$$1 from "./sections/Analytics/Analytics.tsx";
+import * as $$$$$$0 from "./sections/Rendering/Deferred.tsx";
+import * as $$$$$$1 from "./sections/Seo/Seo.tsx";
+import * as $$$$$$2 from "./sections/Analytics/Analytics.tsx";
 import * as $$$$$$$0 from "./matchers/date.ts";
 import * as $$$$$$$1 from "./matchers/environment.ts";
 import * as $$$$$$$2 from "./matchers/site.ts";
@@ -69,8 +70,9 @@ const manifest = {
     "website/pages/Page.tsx": $$$$$0,
   },
   "sections": {
-    "website/sections/Analytics/Analytics.tsx": $$$$$$1,
-    "website/sections/Seo/Seo.tsx": $$$$$$0,
+    "website/sections/Analytics/Analytics.tsx": $$$$$$2,
+    "website/sections/Rendering/Deferred.tsx": $$$$$$0,
+    "website/sections/Seo/Seo.tsx": $$$$$$1,
   },
   "matchers": {
     "website/matchers/always.ts": $$$$$$$12,

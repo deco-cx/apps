@@ -3,7 +3,7 @@ import { notUndefined } from "deco/engine/core/utils.ts";
 
 import {
   Props as LivePageProps,
-  useLivePageContext,
+  usePageContext,
 } from "../../../website/pages/Page.tsx";
 
 export interface Props {
@@ -23,7 +23,7 @@ export default function PageInclude({ page }: Props) {
     return null;
   }
 
-  const { renderSection } = useLivePageContext();
+  const { renderSection } = usePageContext();
 
   return (
     <>{(page?.props?.sections ?? []).filter(notUndefined).map(renderSection)}</>

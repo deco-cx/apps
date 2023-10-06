@@ -9,6 +9,8 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
+export type SectionProps<T> = T & { id: string };
+
 export interface Props {
   /**
    * @title Site Map
