@@ -3,10 +3,11 @@ import { useRouterContext } from "deco/routes/[...catchall].tsx";
 
 const sanitizeTagAttribute = (inputString: string): string => {
   const maxLength = 50;
-  let sanitizedString: string = inputString.replace(" ", "-").replace(
-    /[^\w-]/g,
-    "",
-  ).replace(/^\d+/, "");
+  let sanitizedString: string = inputString.replace(" ", "-").replace(".", "-")
+    .replace(
+      /[^\w-]/g,
+      "",
+    ).replace(/^\d+/, "");
   sanitizedString = sanitizedString.slice(0, maxLength);
   return sanitizedString;
 };
