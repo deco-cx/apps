@@ -25,6 +25,7 @@ export interface Props {
   sections: Section[];
   display?: boolean;
   behavior?: Scroll | Intersection;
+  id?: string;
 }
 
 const script = (
@@ -64,11 +65,12 @@ const script = (
 const ID = "deferred";
 
 const Deferred = (p: Props) => {
-  const { sections, display, behavior } = p;
+  const { sections, display, behavior, id } = p;
   const partial = usePartial<typeof Deferred>({
-    ...p,
+    id,
     props: { display: true },
   });
+  const buttonId = `${ID}-${id}`;
 
   if (display) {
     return (
@@ -80,11 +82,11 @@ const Deferred = (p: Props) => {
 
   return (
     <>
-      <button id={ID} {...partial} />
+      <button id={buttonId} {...partial} />
       <script
         type="module"
         dangerouslySetInnerHTML={{
-          __html: `(${script})("${ID}", "${
+          __html: `(${script})("${buttonId}", "${
             behavior?.type || "intersection"
           }", "${behavior?.payload || ""}");`,
         }}
