@@ -82,7 +82,7 @@ const Deferred = (p: Props) => {
 
   return (
     <>
-      <button id={buttonId} {...partial} />
+      <button {...partial} id={buttonId} data-deferred />
       <script
         type="module"
         dangerouslySetInnerHTML={{
