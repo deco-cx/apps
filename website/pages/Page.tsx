@@ -57,10 +57,8 @@ function renderSectionFor(isPreview: boolean) {
   };
 }
 
-type PromiseOf<T> = T extends Promise<infer K> ? K : T;
-
 const renderSections = (
-  { sections }: SectionProps<PromiseOf<ReturnType<typeof loader>>>,
+  { sections }: SectionProps<typeof loader>,
   isPreview = false,
 ): JSX.Element => (
   <>
@@ -82,7 +80,7 @@ export const usePageContext = () => useContext(PageContext);
  * @title Page
  */
 function Page(
-  props: SectionProps<PromiseOf<ReturnType<typeof loader>>>,
+  props: SectionProps<typeof loader>,
 ): JSX.Element {
   const metadata = useDecoPageContext()?.metadata;
   const routerCtx = useRouterContext();
@@ -101,7 +99,7 @@ function Page(
 }
 
 export function Preview(
-  props: SectionProps<PromiseOf<ReturnType<typeof loader>>>,
+  props: SectionProps<typeof loader>,
 ) {
   return (
     <>
