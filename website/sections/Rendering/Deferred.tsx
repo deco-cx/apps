@@ -33,7 +33,6 @@ const script = (
   id: string,
   type: "scroll" | "intersection",
   payload: string,
-  partialAttr: string,
 ) => {
   const handler = () => {
     const element = document.getElementById(id);
@@ -95,7 +94,7 @@ const Deferred = (props: SectionProps<typeof loader>) => {
         dangerouslySetInnerHTML={{
           __html: `(${script})("${buttonId}", "${
             behavior?.type || "intersection"
-          }", "${behavior?.payload || ""}", "${PARTIAL_ATTR}");`,
+          }", "${behavior?.payload || ""}");`,
         }}
       />
     </>
