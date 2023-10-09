@@ -1,4 +1,4 @@
-import { fetchSafe /* STALE */ } from "../../../utils/fetch.ts";
+import { fetchSafe } from "../../../utils/fetch.ts";
 import { Font } from "../../components/Theme.tsx";
 import type { Manifest } from "../../manifest.gen.ts";
 
@@ -36,7 +36,16 @@ const getFontVariations = (variations: FontVariation[]) => {
   }`;
 };
 
-const loader = async (props: Props, req: Request): Promise<Font> => {
+const NEW_BROWSER_KEY = {
+  "User-Agent":
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+};
+
+const OLD_BROWSER_KEY = {
+  "User-Agent": "deco-cx/1.0",
+};
+
+const loader = async (props: Props, _req: Request): Promise<Font> => {
   const { fonts = [] } = props;
   const url = new URL("https://fonts.googleapis.com/css2?display=swap");
 
@@ -60,18 +69,18 @@ const loader = async (props: Props, req: Request): Promise<Font> => {
     );
   }
 
-  const styleSheet = await fetchSafe(url, {
-    // FIX ME (igorbrasileiro): fetch safe is not varying based on headers
-    // ...STALE,
-    headers: req.headers,
-  }).then((res) => res.text());
+  const sheets = await Promise.all([
+    fetchSafe(url, { headers: OLD_BROWSER_KEY }).then((res) => res.text()),
+    fetchSafe(url, { headers: NEW_BROWSER_KEY }).then((res) => res.text()),
+  ]);
 
+  const styleSheet = sheets.join("\n").replaceAll(
+    "https://",
+    `${ASSET_LOADER_PATH}?src=https://`,
+  );
   return {
     family: Object.keys(reduced).join(", "),
-    styleSheet: styleSheet.replaceAll(
-      "https://",
-      `${ASSET_LOADER_PATH}?src=https://`,
-    ),
+    styleSheet,
   };
 };
 
