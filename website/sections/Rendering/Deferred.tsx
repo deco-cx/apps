@@ -1,4 +1,5 @@
-import type { Section } from "deco/blocks/section.ts";
+import { PARTIAL_ATTR } from "$fresh/src/constants.ts";
+import type { Section, SectionProps } from "deco/blocks/section.ts";
 import { usePartial } from "../../hooks/usePartial.ts";
 
 /** @titleBy type */
@@ -32,18 +33,23 @@ const script = (
   id: string,
   type: "scroll" | "intersection",
   payload: string,
+  partialAttr: string,
 ) => {
   const handler = () => {
     const element = document.getElementById(id);
 
-    if (type === "scroll" && element) {
+    if (!element) {
+      return;
+    }
+
+    if (type === "scroll") {
       addEventListener(
         "scroll",
         () => setTimeout(() => element.click(), Number(payload) || 200),
       );
     }
 
-    if (type === "intersection" && element) {
+    if (type === "intersection") {
       new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
@@ -64,10 +70,11 @@ const script = (
 
 const ID = "deferred";
 
-const Deferred = (p: Props) => {
-  const { sections, display, behavior, id } = p;
+const Deferred = (props: SectionProps<typeof loader>) => {
+  const { sections, display, behavior, id, href } = props;
   const partial = usePartial<typeof Deferred>({
     id,
+    href,
     props: { display: true },
   });
   const buttonId = `${ID}-${id}`;
@@ -88,11 +95,18 @@ const Deferred = (p: Props) => {
         dangerouslySetInnerHTML={{
           __html: `(${script})("${buttonId}", "${
             behavior?.type || "intersection"
-          }", "${behavior?.payload || ""}");`,
+          }", "${behavior?.payload || ""}", "${PARTIAL_ATTR}");`,
         }}
       />
     </>
   );
+};
+
+export const loader = (props: Props, req: Request) => {
+  return {
+    ...props,
+    href: req.url,
+  };
 };
 
 export default Deferred;
