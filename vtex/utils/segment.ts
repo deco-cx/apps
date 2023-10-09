@@ -23,9 +23,9 @@ export const isAnonymous = ({
   !regionId;
 
 export const getSegment = (ctx: AppContext): Partial<Segment> =>
-  ctx.bag.get(SEGMENT);
+  ctx.bag?.get(SEGMENT);
 export const setSegment = (ctx: AppContext, segment: Partial<Segment>) =>
-  ctx.bag.set(SEGMENT, segment);
+  ctx.bag?.set(SEGMENT, segment);
 
 /**
  * Stable serialization.
