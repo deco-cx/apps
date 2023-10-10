@@ -286,7 +286,6 @@ const loader = async (
 
   const searchArgs = { ...args, query: args.query || pathQuery };
 
-  console.log("IS", pathQuery, searchArgs);
 
   if (!isInSeachFormat && !pathQuery) {
     return null;
