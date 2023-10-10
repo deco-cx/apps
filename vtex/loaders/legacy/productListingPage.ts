@@ -187,7 +187,6 @@ const loader = async (
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };
 
-  console.log(args, getTerm(term, map));
 
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
     vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
