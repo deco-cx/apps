@@ -143,7 +143,8 @@ const _singleFlightKey = (props: Props, { request }: { request: Request }) => {
 
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
-  const count = props.count ?? 12;
+  const countFromSearchParams = url.searchParams.get("PS");
+  const count = Number(countFromSearchParams ?? props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
   const currentPageoffset = props.pageOffset ?? 1;
   const page = props.page ??
@@ -203,7 +204,7 @@ const queryFromPathname = (
   const isPage = Boolean(pageTypes.length);
   const isValidPathSearch = pathList.length == 1;
   if (!isPage && !isInSeachFormat && isValidPathSearch) {
-    return pathList[0];
+    return decodeURI(pathList[0]);
   }
 };
 
@@ -285,6 +286,8 @@ const loader = async (
 
   const searchArgs = { ...args, query: args.query || pathQuery };
 
+  console.log("IS", pathQuery, searchArgs);
+
   if (!isInSeachFormat && !pathQuery) {
     return null;
   }
@@ -293,14 +296,15 @@ const loader = async (
 
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
-    vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"](
-        {
-          ...params,
-          facets: toPath(selected),
-        },
-        { ...STALE,  headers: segment ? withSegmentCookie(segment) : undefined },
-      ).then((res) => res.json()),
+    vcsDeprecated[
+      "GET /api/io/_v/api/intelligent-search/product_search/*facets"
+    ](
+      {
+        ...params,
+        facets: toPath(selected),
+      },
+      { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
+    ).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"](
       {
         ...params,
@@ -309,6 +313,8 @@ const loader = async (
       { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
     ).then((res) => res.json()),
   ]);
+
+  console.log("IS", selectedFacets);
 
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];

@@ -94,14 +94,27 @@ const getTerm = (path: string, map: string) => {
   const mapSegments = map.split(",");
   const pathSegments = removeForwardSlash(path).split("/");
 
-  return pathSegments.slice(0, mapSegments.length).join("/");
+  const term = pathSegments.slice(0, mapSegments.length).join("/");
+  console.log(mapSegments);
+  if (mapSegments.includes("priceFrom")) {
+    return term.replace(/de-\d+[,]?[\d]+-a-\d+[,]?[\d]+/, (match) => {
+      return match.replaceAll(",", ".");
+    });
+  }
+
+  return term;
 };
 
 /**
  *  verify if when url its not a category/department/collection
  *  and is not a default query format but is a valid search based in default lagacy behavior on native stores
  */
-const getTermFallback = (url: URL, pageTypes: PageType[], fq: string[]) => {
+const getTermFallback = (
+  url: URL,
+  pageTypes: PageType[],
+  fq: string[],
+  map: string,
+) => {
   const pathList = url.pathname.split("/").slice(1);
 
   /**
@@ -111,7 +124,7 @@ const getTermFallback = (url: URL, pageTypes: PageType[], fq: string[]) => {
    */
   const isOneTermOnly = pathList.length == 1;
 
-  if (!pageTypes.length && !fq.length && isOneTermOnly) {
+  if (!pageTypes.length && !map && !fq.length && isOneTermOnly) {
     return pathList[0];
   }
 
@@ -135,7 +148,10 @@ const loader = async (
   const currentPageoffset = props.pageOffset ?? 1;
 
   const filtersBehavior = props.filters || "dynamic";
-  const count = props.count ?? 12;
+
+  const countFromSearchParams = url.searchParams.get("PS");
+  const count = Number(countFromSearchParams ?? props.count ?? 12);
+
   const maybeMap = props.map || url.searchParams.get("map") || undefined;
   const maybeTerm = props.term || url.pathname || "";
 
@@ -153,24 +169,26 @@ const loader = async (
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
-  const ftFallback = getTermFallback(url, pageTypes, fq);
+  const missingParams = typeof maybeMap !== "string" || !maybeTerm;
+  const [map, term] = missingParams
+    ? getMapAndTerm(pageTypes)
+    : [maybeMap, maybeTerm];
+
+  const ftFallback = getTermFallback(url, pageTypes, fq, map);
 
   const ft = props.ft ||
     url.searchParams.get("ft") ||
     url.searchParams.get("q") ||
     ftFallback;
 
-  if (pageTypes.length === 0 && !ft && !fq.length) {
+  if (pageTypes.length === 0 && !ft && !fq.length && !map) {
     return null;
   }
 
-  const missingParams = typeof maybeMap !== "string" || !maybeTerm;
-  const [map, term] = missingParams
-    ? getMapAndTerm(pageTypes)
-    : [maybeMap, maybeTerm];
-
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };
+
+  console.log(args, getTerm(term, map));
 
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
     vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
