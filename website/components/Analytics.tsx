@@ -61,7 +61,7 @@ export interface Props {
   /**
    * @description prevent dataLayer being forward
    */
-  preventCollect?: boolean;
+  preventForward?: boolean;
 }
 
 export default function Analtyics(
@@ -71,7 +71,7 @@ export default function Analtyics(
     dangerouslyRunOnMainThread,
     googleAnalyticsIds,
     analyticsType,
-    preventCollect,
+    preventForward,
   }: Props,
 ) {
   const isDeploy = !!context.isDeploy;
@@ -86,7 +86,7 @@ export default function Analtyics(
           <GoogleTagManager
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-            preventCollect={preventCollect}
+            preventForward={preventForward}
           />
         ))
       )}
@@ -95,7 +95,7 @@ export default function Analtyics(
           <GoogleTagScript
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-            preventCollect={preventCollect}
+            preventForward={preventForward}
           />
         ))
       )}
@@ -103,7 +103,7 @@ export default function Analtyics(
         <GoogleTagManager
           src={src}
           dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-          preventCollect={preventCollect}
+          preventForward={preventForward}
         />
       )}
 
