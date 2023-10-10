@@ -93,7 +93,7 @@ async (req, _ctx) => {
         if (accHtml != undefined) {
           for (let i = 0; i < chunk.length; i++) {
             accHtml = accHtml.slice(-5) + decoder.decode(chunk.slice(i, i + 1));
-            
+
             if (accHtml == "<head>") {
               accHtml = "";
 
