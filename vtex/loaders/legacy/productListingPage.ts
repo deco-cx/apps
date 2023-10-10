@@ -167,7 +167,7 @@ const loader = async (
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
   const [map, term] = missingParams
     ? getMapAndTerm(pageTypes)
-    : [maybeMap, maybeTerm];
+    : [maybeMap, maybeMap === "productClusterIds,c" ? maybeTerm.split("/").map((value, index) => (index === 1 ? pageTypes[0].id : value)).join("/") : maybeTerm];
 
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };
