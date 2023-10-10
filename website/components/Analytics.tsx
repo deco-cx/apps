@@ -57,6 +57,11 @@ export interface Props {
    * @description define the name of event type sent to datalayer and registered analytics. Default: ecommerce
    */
   analyticsType?: string;
+
+  /**
+   * @description prevent dataLayer being forward
+   */
+  preventCollect?: boolean;
 }
 
 export default function Analtyics(
@@ -66,9 +71,10 @@ export default function Analtyics(
     dangerouslyRunOnMainThread,
     googleAnalyticsIds,
     analyticsType,
+    preventCollect,
   }: Props,
 ) {
-  const isDeploy = !!context.isDeploy;
+  const isDeploy = true;
   const eventType = analyticsType ?? "ecommerce";
 
   return (
@@ -80,6 +86,7 @@ export default function Analtyics(
           <GoogleTagManager
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
+            preventCollect={preventCollect}
           />
         ))
       )}
@@ -88,6 +95,7 @@ export default function Analtyics(
           <GoogleTagScript
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
+            preventCollect={preventCollect}
           />
         ))
       )}
@@ -95,6 +103,7 @@ export default function Analtyics(
         <GoogleTagManager
           src={src}
           dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
+          preventCollect={preventCollect}
         />
       )}
 
