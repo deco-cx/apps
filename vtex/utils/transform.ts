@@ -556,7 +556,15 @@ export const legacyFacetToFilter = (
     const index = pathSegments.findIndex((s) => s === facet.Value);
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
-      : [facet.Map, ...mapSegments];
+      : [facet.Map, ...mapSegments].sort((a, b) => {
+        if (a === "c" && b !== "c") {
+          return -1;
+        } else if (a !== "c" && b === "c") {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     const newPath = selected
       ? [...pathSegments.filter((_, i) => i !== index)]
       : [...pathSegments, facet.Value];
