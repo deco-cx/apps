@@ -23,6 +23,7 @@ import type {
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
+  PageType,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
@@ -539,6 +540,7 @@ export const legacyFacetToFilter = (
   url: URL,
   map: string,
   behavior: "dynamic" | "static",
+  pageType: PageType[],
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = url.pathname
@@ -548,17 +550,23 @@ export const legacyFacetToFilter = (
 
   const mapSet = new Set(mapSegments);
   const pathSet = new Set(pathSegments);
+  const isCollection = pageType[0]?.pageType === "Collection";
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
-      : [...mapSegments, facet.Map];
+      : [facet.Map, ...mapSegments];
     const newPath = selected
       ? [...pathSegments.filter((_, i) => i !== index)]
       : [...pathSegments, facet.Value];
+    const collectionPath = newPath.slice(1);
+    collectionPath.push(pageType[0]?.id || "");
 
-    const link = new URL(`/${newPath.join("/")}`, url);
+    const link = new URL(
+      `/${(isCollection ? collectionPath : newPath).join("/")}`,
+      url,
+    );
     link.searchParams.set("map", newMap.join(","));
     if (behavior === "static") {
       link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
