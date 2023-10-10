@@ -624,6 +624,9 @@ const fromLegacyMap: Record<string, string> = {
 };
 
 export const legacyFacetsNormalize = (map: string, path: string) => {
+  // Replace legacy price path param to IS price facet format
+  // exemple: de-34,90-a-56,90 turns to 34.90:56.90
+  // may this regex have to be adjusted for international stores
   const value = path.replace(
     /de-(?<from>\d+[,]?[\d]+)-a-(?<to>\d+[,]?[\d]+)/,
     (_match, from, to) => {

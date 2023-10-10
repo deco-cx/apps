@@ -15,7 +15,6 @@ import type {
   LegacyFacet,
   LegacyProduct,
   LegacySort,
-  PageType,
 } from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
@@ -87,6 +86,13 @@ const IS_TO_LEGACY: Record<string, LegacySort> = {
   "relevance:desc": "OrderByScoreDESC",
 };
 
+// in path vtex can use comma as price separator but only reconize dot separator in API
+const formatPriceFromPathToFacet = (term: string) => {
+  return term.replace(/de-\d+[,]?[\d]+-a-\d+[,]?[\d]+/, (match) => {
+    return match.replaceAll(",", ".");
+  });
+};
+
 export const removeForwardSlash = (str: string) =>
   str.slice(str.startsWith("/") ? 1 : 0);
 
@@ -95,10 +101,9 @@ const getTerm = (path: string, map: string) => {
   const pathSegments = removeForwardSlash(path).split("/");
 
   const term = pathSegments.slice(0, mapSegments.length).join("/");
+
   if (mapSegments.includes("priceFrom")) {
-    return term.replace(/de-\d+[,]?[\d]+-a-\d+[,]?[\d]+/, (match) => {
-      return match.replaceAll(",", ".");
-    });
+    return formatPriceFromPathToFacet(term);
   }
 
   return term;
@@ -108,12 +113,7 @@ const getTerm = (path: string, map: string) => {
  *  verify if when url its not a category/department/collection
  *  and is not a default query format but is a valid search based in default lagacy behavior on native stores
  */
-const getTermFallback = (
-  url: URL,
-  pageTypes: PageType[],
-  fq: string[],
-  map: string,
-) => {
+const getTermFallback = (url: URL, isPage: boolean, hasFilters: boolean) => {
   const pathList = url.pathname.split("/").slice(1);
 
   /**
@@ -123,7 +123,7 @@ const getTermFallback = (
    */
   const isOneTermOnly = pathList.length == 1;
 
-  if (!pageTypes.length && !map && !fq.length && isOneTermOnly) {
+  if (!isPage && !hasFilters && isOneTermOnly) {
     return pathList[0];
   }
 
@@ -137,7 +137,7 @@ const getTermFallback = (
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
@@ -157,7 +157,8 @@ const loader = async (
   const page = url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
-  const O = (url.searchParams.get("O") as LegacySort) ??
+  const O =
+    (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
@@ -173,20 +174,26 @@ const loader = async (
     ? getMapAndTerm(pageTypes)
     : [maybeMap, maybeTerm];
 
-  const ftFallback = getTermFallback(url, pageTypes, fq, map);
+  const isPage = pageTypes.length > 0;
 
-  const ft = props.ft ||
+  const hasFilters = fq.length > 0 || !map;
+
+  const ftFallback = getTermFallback(url, isPage, hasFilters);
+
+  const ft =
+    props.ft ||
     url.searchParams.get("ft") ||
     url.searchParams.get("q") ||
     ftFallback;
 
-  if (pageTypes.length === 0 && !ft && !fq.length && !map) {
+  const isInSeachFormat = ft;
+
+  if (!isPage && !hasFilters && !isInSeachFormat) {
     return null;
   }
 
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };
-
 
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
     vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
@@ -195,7 +202,7 @@ const loader = async (
         ...args,
         term: getTerm(term, map),
       },
-      { ...STALE, headers: withSegmentCookie(segment) },
+      { ...STALE, headers: withSegmentCookie(segment) }
     ),
     vcsDeprecated["GET /api/catalog_system/pub/facets/search/:term"](
       {
@@ -204,7 +211,7 @@ const loader = async (
         term: getTerm(term, fmap),
         map: fmap,
       },
-      STALE,
+      STALE
     ).then((res) => res.json()),
   ]);
 
@@ -225,7 +232,7 @@ const loader = async (
       )
       .map((product) =>
         props.similars ? withIsSimilarTo(req, ctx, product) : product
-      ),
+      )
   );
 
   // Get categories of the current department/category

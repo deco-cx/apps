@@ -203,7 +203,9 @@ const queryFromPathname = (
 
   const isPage = Boolean(pageTypes.length);
   const isValidPathSearch = pathList.length == 1;
+
   if (!isPage && !isInSeachFormat && isValidPathSearch) {
+    // decode uri parse uri enconde symbols like '%20' to ' '
     return decodeURI(pathList[0]);
   }
 };
@@ -286,7 +288,6 @@ const loader = async (
 
   const searchArgs = { ...args, query: args.query || pathQuery };
 
-
   if (!isInSeachFormat && !pathQuery) {
     return null;
   }
@@ -312,8 +313,6 @@ const loader = async (
       { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
     ).then((res) => res.json()),
   ]);
-
-  console.log("IS", selectedFacets);
 
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];
