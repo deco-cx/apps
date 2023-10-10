@@ -74,7 +74,7 @@ export default function Analtyics(
     preventCollect,
   }: Props,
 ) {
-  const isDeploy = true;
+  const isDeploy = !!context.isDeploy;
   const eventType = analyticsType ?? "ecommerce";
 
   return (
