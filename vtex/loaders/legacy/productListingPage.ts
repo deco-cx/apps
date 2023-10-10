@@ -95,7 +95,6 @@ const getTerm = (path: string, map: string) => {
   const pathSegments = removeForwardSlash(path).split("/");
 
   const term = pathSegments.slice(0, mapSegments.length).join("/");
-  console.log(mapSegments);
   if (mapSegments.includes("priceFrom")) {
     return term.replace(/de-\d+[,]?[\d]+-a-\d+[,]?[\d]+/, (match) => {
       return match.replaceAll(",", ".");
