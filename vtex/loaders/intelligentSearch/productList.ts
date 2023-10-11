@@ -6,6 +6,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
+import { withKitItems } from "../../utils/kitItems.ts";
 import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
@@ -50,6 +51,10 @@ export interface CommonProps {
    * @description Do not return out of stock items
    */
   hideUnavailableItems?: boolean;
+  /**
+   * @title Include kit items
+   */
+  kit?: boolean;
   /**
    * @description Include similar products
    */
@@ -122,12 +127,15 @@ const loader = async (
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   // search products on VTEX. Feel free to change any of these parameters
-  const { products: vtexProducts } = await vcsDeprecated
-    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+  const { products: vtexProducts } = await vcsDeprecated[
+    "GET /api/io/_v/api/intelligent-search/product_search/*facets"
+  ](
+    {
       ...params,
       facets: toPath(facets),
-    }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res) => res.json());
+    },
+    { ...STALE, headers: withSegmentCookie(segment) },
+  ).then((res) => res.json());
 
   const options = {
     baseUrl: url,
@@ -137,11 +145,21 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
-  const products = vtexProducts
-    .map((p) => toProduct(p, p.items[0], 0, options));
+  const products = vtexProducts.map((p) =>
+    toProduct(p, p.items[0], 0, options)
+  );
+
+  const parsedProducts = props.kit
+    ? await withKitItems({
+      products,
+      params,
+      req,
+      ctx,
+    })
+    : products;
 
   return Promise.all(
-    products.map((product) =>
+    parsedProducts.map((product) =>
       props.similars ? withIsSimilarTo(req, ctx, product) : product
     ),
   );
