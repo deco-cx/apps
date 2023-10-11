@@ -80,7 +80,8 @@ async (req, _ctx) => {
   let newBodyStream = null;
 
   if (
-    contentType?.includes("text/html") && includeScriptsToHead?.includePlausible
+    contentType?.includes("text/html") &&
+    (includeScriptsToHead?.includes ?? []).length > 0
   ) {
     let accHtml: string | undefined = "";
     const insertPlausible = new TransformStream({
@@ -94,7 +95,7 @@ async (req, _ctx) => {
               accHtml = "";
 
               accHtml += decoder.decode(chunk.slice(0, i + 1));
-              for (const script of includeScriptsToHead.includes) {
+              for (const script of includeScriptsToHead!.includes) {
                 accHtml += script;
               }
               accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
