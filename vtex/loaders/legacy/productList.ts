@@ -2,7 +2,7 @@ import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacySort } from "../../utils/types.ts";
@@ -161,7 +161,7 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
   const segmentParams = toSegmentParams(segment);
   const params = fromProps({ props });
 

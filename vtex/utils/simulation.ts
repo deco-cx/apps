@@ -2,7 +2,7 @@ import { Product, ProductLeaf } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { batch } from "./batch.ts";
 import { OpenAPI } from "./openapi/vcs.openapi.gen.ts";
-import { getSegment, isAnonymous } from "./segment.ts";
+import { getSegmentFromBag, isAnonymous } from "./segment.ts";
 import { aggregateOffers } from "./transform.ts";
 
 type Item = NonNullable<
@@ -22,7 +22,7 @@ const simulate = (items: {
     campaigns,
     channel,
     regionId,
-  } = getSegment(ctx);
+  } = getSegmentFromBag(ctx);
 
   const md = new Map<string, unknown>();
   utm_campaign && md.set("utmCampaign", utm_campaign);
@@ -55,7 +55,7 @@ export const simulationOffer = async (
   _req: Request,
   ctx: AppContext,
 ) => {
-  if (isAnonymous(getSegment(ctx))) {
+  if (isAnonymous(getSegmentFromBag(ctx))) {
     return products;
   }
 

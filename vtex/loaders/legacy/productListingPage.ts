@@ -8,7 +8,7 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
@@ -108,7 +108,7 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
   const currentPageoffset = props.pageOffset ?? 1;
 
