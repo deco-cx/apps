@@ -17,6 +17,7 @@ export interface Props {
   slug: RequestURLParam;
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }

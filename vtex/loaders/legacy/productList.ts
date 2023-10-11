@@ -63,6 +63,7 @@ export interface ProductIDProps extends CommonProps {
 export interface CommonProps {
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }

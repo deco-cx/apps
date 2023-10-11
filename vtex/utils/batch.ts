@@ -1,9 +1,21 @@
-export const batch = <T>(array: T[], size: number): T[][] => {
-  const batched: T[][] = [];
+export const batch = <T>(
+  iterable: IterableIterator<T> | T[],
+  size: number,
+): T[][] => {
+  const batches: T[][] = [];
 
-  for (let it = 0; it * size < array.length; it++) {
-    batched.push(array.slice(it * size, (it + 1) * size));
+  let current = 0;
+  for (const item of iterable) {
+    if (batches[current]?.length === size) {
+      current++;
+    }
+
+    if (!batches[current]) {
+      batches[current] = [];
+    }
+
+    batches[current].push(item);
   }
 
-  return batched;
+  return batches;
 };

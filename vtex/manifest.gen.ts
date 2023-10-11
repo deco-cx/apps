@@ -8,9 +8,9 @@ import * as $$$2 from "./loaders/legacy/productDetailsPage.ts";
 import * as $$$3 from "./loaders/legacy/productListingPage.ts";
 import * as $$$4 from "./loaders/legacy/relatedProductsLoader.ts";
 import * as $$$5 from "./loaders/legacy/suggestions.ts";
-import * as $$$6 from "./loaders/product/extensions/simulation/listingPage.ts";
-import * as $$$7 from "./loaders/product/extensions/simulation/detailsPage.ts";
-import * as $$$8 from "./loaders/product/extensions/simulation/list.ts";
+import * as $$$6 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$7 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$8 from "./loaders/product/extensions/list.ts";
 import * as $$$9 from "./loaders/wishlist.ts";
 import * as $$$10 from "./loaders/navbar.ts";
 import * as $$$11 from "./loaders/proxy.ts";
@@ -56,9 +56,9 @@ const manifest = {
     "vtex/loaders/legacy/suggestions.ts": $$$5,
     "vtex/loaders/navbar.ts": $$$10,
     "vtex/loaders/product.ts": $$$0,
-    "vtex/loaders/product/extensions/simulation/detailsPage.ts": $$$7,
-    "vtex/loaders/product/extensions/simulation/list.ts": $$$8,
-    "vtex/loaders/product/extensions/simulation/listingPage.ts": $$$6,
+    "vtex/loaders/product/extensions/detailsPage.ts": $$$7,
+    "vtex/loaders/product/extensions/list.ts": $$$8,
+    "vtex/loaders/product/extensions/listingPage.ts": $$$6,
     "vtex/loaders/proxy.ts": $$$11,
     "vtex/loaders/user.ts": $$$17,
     "vtex/loaders/wishlist.ts": $$$9,
