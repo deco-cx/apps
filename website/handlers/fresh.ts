@@ -6,11 +6,12 @@ import {
   BaseContext,
   isDeferred,
 } from "deco/engine/core/resolver.ts";
+import { caches as redisCache, redis } from "deco/runtime/caches/redis.ts";
 import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
+import { segmentFor } from "deco/utils/segment.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
-import { segmentFor } from "deco/utils/segment.ts";
 
 /**
  * @title Fresh Config
@@ -37,8 +38,9 @@ const runOnlyMatchers: Required<
   return Promise.resolve(props);
 };
 
-const DEFAULT_JITTER_SECONDS = 2;
-const DEFAULT_MAX_AGE_SECONDS = 5;
+const caches: Cache | null = redis === null
+  ? null
+  : await redisCache.open("pages");
 
 /**
  * @title Fresh Page
@@ -54,7 +56,7 @@ export default function Fresh(
     );
 
     const isHead = req.method === "HEAD";
-    const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
+    const pagePromise = appContext?.monitoring?.tracer?.startActiveSpan?.(
       "load-data",
       async (span) => {
         try {
@@ -81,9 +83,6 @@ export default function Fresh(
       },
     );
 
-    const start = performance.now();
-    const segment = await segmentFor(appContext, req.url);
-    console.log({ segment }, performance.now() - start);
     if (isHead) {
       return new Response(null, { status: 200 });
     }
@@ -100,21 +99,58 @@ export default function Fresh(
     endResolvePage?.();
     const url = new URL(req.url);
     if (url.searchParams.get("asJson") !== null) {
-      return Response.json(page, { headers: allowCorsFor(req) });
+      return Response.json(await pagePromise, { headers: allowCorsFor(req) });
     }
     if (isFreshCtx<DecoState>(ctx)) {
-      const end = appContext?.monitoring?.timings?.start?.("render-to-string");
       const response = await appContext.monitoring!.tracer.startActiveSpan(
-        "render-to-string",
+        "render-to-string-or-cached",
         async (span) => {
           try {
-            return await ctx.render({
-              page,
-              routerInfo: {
-                flags: ctx.state.flags,
-                pagePath: ctx.state.pathTemplate,
-              },
-            });
+            const url = new URL(req.url);
+            const etag = await segmentFor(appContext, req.url);
+            url.searchParams.set("__deco_etag", etag);
+            const reqKey = new Request(url, req);
+            const response = await caches?.match(reqKey)?.then((response) => {
+              console.log("HIT");
+              response?.headers?.set?.("x-cache", "HIT");
+              response && span.addEvent("hit", { etag });
+              return response;
+            }) ??
+              (async () => {
+                const end = appContext?.monitoring?.timings?.start?.(
+                  "render-to-string",
+                );
+                const renderToString = appContext.monitoring!.tracer?.startSpan(
+                  "render-to-string",
+                );
+                return Promise.resolve(ctx.render({
+                  page: await pagePromise,
+                  routerInfo: {
+                    flags: ctx.state.flags,
+                    pagePath: ctx.state.pathTemplate,
+                  },
+                })).then((response) => {
+                  span.addEvent("miss", { etag });
+                  response.headers.set("etag", etag);
+                  if (caches) {
+                    const cloned = new Response(
+                      response.clone().body,
+                      response,
+                    );
+                    cloned.headers.set(
+                      "expires",
+                      new Date(Date.now() + (180 * 1e3)).toUTCString(),
+                    );
+                    caches?.put(reqKey, cloned);
+                  }
+                  response.headers.set("x-cache", "MISS");
+                  return response;
+                }).finally(() => {
+                  end?.();
+                  renderToString?.end?.();
+                });
+              })();
+            return await response;
           } catch (err) {
             span.recordException(err);
             throw err;
@@ -123,7 +159,6 @@ export default function Fresh(
           }
         },
       );
-      end?.();
 
       return response;
     }
