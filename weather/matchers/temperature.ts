@@ -29,6 +29,6 @@ export default function MatchWeather(
     return false;
   }
   return temperatureRanges.some(({ from, to }) =>
-    (!from || from <= temperature.celsius) && (!to || to <= temperature.celsius)
+    (!from || from <= temperature.celsius) && (!to || to >= temperature.celsius)
   );
 }
