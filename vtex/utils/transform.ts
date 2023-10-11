@@ -19,14 +19,13 @@ import type {
   Facet as FacetVTEX,
   FacetValueBoolean,
   FacetValueRange,
-  Item as SkuVTEX,
   LegacyFacet,
-  LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
-  PageType,
+  LegacyItem as LegacySkuVTEX,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
+  Item as SkuVTEX
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";
@@ -539,43 +538,40 @@ export const legacyFacetToFilter = (
   facets: LegacyFacet[],
   url: URL,
   map: string,
+  term: string,
   behavior: "dynamic" | "static",
-  pageType: PageType[],
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = url.pathname
+  const pathSegments = term
     .replace(/^\//, "")
     .split("/")
     .slice(0, mapSegments.length);
 
   const mapSet = new Set(mapSegments);
   const pathSet = new Set(pathSegments);
-  const isCollection = pageType[0]?.pageType === "Collection";
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
-      : [facet.Map, ...mapSegments].sort((a, b) => {
-        if (a === "c" && b !== "c") {
-          return -1;
-        } else if (a !== "c" && b === "c") {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+      : [...mapSegments, facet.Map];
     const newPath = selected
       ? [...pathSegments.filter((_, i) => i !== index)]
       : [...pathSegments, facet.Value];
-    const collectionPath = newPath.slice(1);
-    collectionPath.push(pageType[0]?.id || "");
 
-    const link = new URL(
-      `/${(isCollection ? collectionPath : newPath).join("/")}`,
-      url,
-    );
-    link.searchParams.set("map", newMap.join(","));
+    // Insertion-sort like algorithm. Uses the c-continuum theorem
+    const zipped: [string, string][] = [];
+    for (let it = 0; it < newMap.length; it++) {
+      let i = 0;
+      while (
+        i < zipped.length && (zipped[i][0] === "c" || zipped[i][0] === "C")
+      ) i++;
+
+      zipped.splice(i, 0, [newMap[it], newPath[it]]);
+    }
+
+    const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
+    link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
       link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
     }

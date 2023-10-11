@@ -23,7 +23,7 @@ const PAGE_TYPE_TO_MAP_PARAM = {
   Collection: "productClusterIds",
   Cluster: "productClusterIds",
   Search: "ft",
-  FullText: null,
+  FullText: "ft",
   Product: "p",
   NotFound: null,
 };

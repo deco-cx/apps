@@ -15,7 +15,6 @@ import type {
   LegacyFacet,
   LegacyProduct,
   LegacySort,
-  PageType,
 } from "../../utils/types.ts";
 
 const MAX_ALLOWED_PAGES = 500;
@@ -98,27 +97,6 @@ const getTerm = (path: string, map: string) => {
 };
 
 /**
- *  verify if when url its not a category/department/collection
- *  and is not a default query format but is a valid search based in default lagacy behavior on native stores
- */
-const getTermFallback = (url: URL, pageTypes: PageType[], fq: string[]) => {
-  const pathList = url.pathname.split("/").slice(1);
-
-  /**
-   * in lagacy mutiple terms path like /foo/bar is a valid search but any term after first will be ignored
-   * so this verify limit the term falback only if has one term
-   * if this is a problem feel free to remove the last verification
-   */
-  const isOneTermOnly = pathList.length == 1;
-
-  if (!pageTypes.length && !fq.length && isOneTermOnly) {
-    return pathList[0];
-  }
-
-  return "";
-};
-
-/**
  * @title VTEX Integration - Legacy Search
  * @description Product Listing Page loader
  */
@@ -153,12 +131,10 @@ const loader = async (
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
-  const ftFallback = getTermFallback(url, pageTypes, fq);
-
   const ft = props.ft ||
     url.searchParams.get("ft") ||
     url.searchParams.get("q") ||
-    ftFallback;
+    "";
 
   if (pageTypes.length === 0 && !ft && !fq.length) {
     return null;
@@ -243,7 +219,7 @@ const loader = async (
     PriceRanges: vtexFacets.PriceRanges,
   })
     .map(([name, facets]) =>
-      legacyFacetToFilter(name, facets, url, map, filtersBehavior, pageTypes)
+      legacyFacetToFilter(name, facets, url, map, term, filtersBehavior)
     )
     .flat()
     .filter((x): x is Filter => Boolean(x));
