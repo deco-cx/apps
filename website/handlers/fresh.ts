@@ -10,6 +10,7 @@ import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
+import { segmentFor } from "deco/utils/segment.ts";
 
 /**
  * @title Fresh Config
@@ -35,13 +36,17 @@ const runOnlyMatchers: Required<
   }); // make the next resolver pass
   return Promise.resolve(props);
 };
+
+const DEFAULT_JITTER_SECONDS = 2;
+const DEFAULT_MAX_AGE_SECONDS = 5;
+
 /**
  * @title Fresh Page
  * @description Renders a fresh page.
  */
 export default function Fresh(
   freshConfig: FreshConfig,
-  appContext: AppContext,
+  appContext: Pick<AppContext, "response" | "monitoring">,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
     const endResolvePage = appContext?.monitoring?.timings?.start?.(
@@ -75,22 +80,22 @@ export default function Fresh(
         }
       },
     );
+
+    const start = performance.now();
+    const segment = await segmentFor(appContext, req.url);
+    console.log({ segment }, performance.now() - start);
     if (isHead) {
       return new Response(null, { status: 200 });
     }
 
-    const caching = appContext.caching;
-
-    if (caching) {
-      const { maxAgeSeconds, jitterSeconds } = caching;
-      const jitter = jitterSeconds ?? 2;
-      const maxAge = maxAgeSeconds ?? 3;
-
-      appContext.response.headers.set(
-        "cache-control",
-        `public, max-age=0, s-maxage=${Math.floor(maxAge + (Math.random() * jitter))}`,
-      );
-    }
+    // appContext.response.headers.set(
+    //   "cache-control",
+    //   `public, max-age=0, s-maxage=${
+    //     Math.floor(
+    //       DEFAULT_MAX_AGE_SECONDS + (Math.random() * DEFAULT_JITTER_SECONDS),
+    //     )
+    //   }`,
+    // );
 
     endResolvePage?.();
     const url = new URL(req.url);
