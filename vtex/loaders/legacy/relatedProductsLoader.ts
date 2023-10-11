@@ -4,7 +4,7 @@ import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { pickSku } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
@@ -48,7 +48,7 @@ async function loader(
     crossSelling = "similars",
     count,
   } = props;
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
 
   const getProductGroupID = async (props: { slug?: string; id?: string }) => {

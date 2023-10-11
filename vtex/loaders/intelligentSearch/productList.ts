@@ -6,7 +6,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
@@ -115,7 +115,7 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
   const { url } = req;
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
 
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);

@@ -22,7 +22,7 @@ export const isAnonymous = ({
   !priceTables &&
   !regionId;
 
-export const getSegment = (ctx: AppContext): Partial<Segment> =>
+export const getSegmentFromBag = (ctx: AppContext): Partial<Segment> =>
   ctx.bag?.get(SEGMENT);
 export const setSegmentInBag = (ctx: AppContext, segment: Partial<Segment>) =>
   ctx.bag?.set(SEGMENT, segment);

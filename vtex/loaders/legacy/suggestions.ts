@@ -1,6 +1,6 @@
 import { Product, Suggestion } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 
 export interface Props {
   query?: string;
@@ -26,7 +26,7 @@ const loaders = async (
 ): Promise<Suggestion | null> => {
   const { vcsDeprecated } = ctx;
   const { count = 4, query } = props;
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated["GET /buscaautocomplete"]({
     maxRows: count,
