@@ -20,7 +20,13 @@ const PATHS_TO_PROXY = [
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = (
-  { publicUrl, extraPaths, includeSiteMap, generateDecoSiteMap, includeScriptsToHead }: {
+  {
+    publicUrl,
+    extraPaths,
+    includeSiteMap,
+    generateDecoSiteMap,
+    includeScriptsToHead,
+  }: {
     publicUrl?: string;
     extraPaths: string[];
     includeSiteMap?: string[];
@@ -138,8 +144,12 @@ export interface Props {
  * @title VTEX Proxy Routes
  */
 function loader(
-  { extraPathsToProxy = [], includeSiteMap = [], generateDecoSiteMap = true, includeScriptsToHead = { includes: [], includePlausible: false} }:
-    Props,
+  {
+    extraPathsToProxy = [],
+    includeSiteMap = [],
+    generateDecoSiteMap = true,
+    includeScriptsToHead = { includes: [], includePlausible: false },
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ): Route[] {

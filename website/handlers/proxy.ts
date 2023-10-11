@@ -26,8 +26,13 @@ const removeCFHeaders = (headers: Headers) => {
 };
 
 const proxyTo = (
-  { url: rawProxyUrl, basePath, host: hostToUse, customHeaders = [], includeScriptsToHead }:
-   Props
+  {
+    url: rawProxyUrl,
+    basePath,
+    host: hostToUse,
+    customHeaders = [],
+    includeScriptsToHead,
+  }: Props,
 ): Handler =>
 async (req, _ctx) => {
   const url = new URL(req.url);
@@ -74,7 +79,9 @@ async (req, _ctx) => {
 
   let newBodyStream = null;
 
-  if (contentType?.includes("text/html") && includeScriptsToHead?.includePlausible) {
+  if (
+    contentType?.includes("text/html") && includeScriptsToHead?.includePlausible
+  ) {
     let accHtml: string | undefined = "";
     const insertPlausible = new TransformStream({
       async transform(chunk, controller) {
@@ -87,7 +94,9 @@ async (req, _ctx) => {
               accHtml = "";
 
               accHtml += decoder.decode(chunk.slice(0, i + 1));
-              for (const script of includeScriptsToHead.includes) accHtml += script;
+              for (const script of includeScriptsToHead.includes) {
+                accHtml += script;
+              }
               accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
 
               newChunk = encoder.encode(accHtml);
@@ -171,6 +180,8 @@ export interface Props {
  * @title Proxy
  * @description Proxies request to the target url.
  */
-export default function Proxy({ url, basePath, host, customHeaders, includeScriptsToHead }: Props) {
+export default function Proxy(
+  { url, basePath, host, customHeaders, includeScriptsToHead }: Props,
+) {
   return proxyTo({ url, basePath, host, customHeaders, includeScriptsToHead });
 }
