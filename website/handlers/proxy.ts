@@ -81,13 +81,14 @@ async (req, _ctx) => {
 
   if (
     contentType?.includes("text/html") &&
-    (includeScriptsToHead?.includes ?? []).length > 0
+    includeScriptsToHead?.includes &&
+    includeScriptsToHead.includes.length > 0
   ) {
     let accHtml: string | undefined = "";
     const insertPlausible = new TransformStream({
       async transform(chunk, controller) {
         let newChunk = await chunk;
-        if (accHtml !== undefined) {
+        if (accHtml !== undefined && includeScriptsToHead.includes) {
           for (let i = 0; i < chunk.length; i++) {
             accHtml = accHtml.slice(-5) + decoder.decode(chunk.slice(i, i + 1));
 
@@ -95,7 +96,7 @@ async (req, _ctx) => {
               accHtml = "";
 
               accHtml += decoder.decode(chunk.slice(0, i + 1));
-              for (const script of includeScriptsToHead!.includes) {
+              for (const script of includeScriptsToHead.includes) {
                 accHtml += script;
               }
               accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
@@ -172,7 +173,7 @@ export interface Props {
    * @description Scripts to be included in the head of the html
    */
   includeScriptsToHead?: {
-    includes: string[];
+    includes?: string[];
     includePlausible: boolean;
   };
 }
