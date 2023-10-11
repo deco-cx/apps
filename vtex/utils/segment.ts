@@ -24,7 +24,7 @@ export const isAnonymous = ({
 
 export const getSegment = (ctx: AppContext): Partial<Segment> =>
   ctx.bag?.get(SEGMENT);
-export const setSegment = (ctx: AppContext, segment: Partial<Segment>) =>
+export const setSegmentInBag = (ctx: AppContext, segment: Partial<Segment>) =>
   ctx.bag?.set(SEGMENT, segment);
 
 /**
