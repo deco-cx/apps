@@ -295,7 +295,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [] } = sku;
+  const { name, ean, itemId: skuId, referenceId = [], kitItems } = sku;
   const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
@@ -357,6 +357,11 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       name: brand,
       logo: brandImageUrl,
     },
+    isAccessoryOrSparePartFor: kitItems?.map(({ itemId }) => ({
+      "@type": "Product",
+      productID: itemId,
+      sku: itemId,
+    })),
     inProductGroupWithID: productId,
     sku: skuId,
     gtin: ean,

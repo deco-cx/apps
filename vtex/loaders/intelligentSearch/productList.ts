@@ -52,6 +52,7 @@ export interface CommonProps {
   hideUnavailableItems?: boolean;
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }
@@ -121,7 +122,6 @@ const loader = async (
   const params = withDefaultParams(args);
   const facets = withDefaultFacets(selectedFacets, ctx);
 
-  // search products on VTEX. Feel free to change any of these parameters
   const { products: vtexProducts } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
