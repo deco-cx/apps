@@ -6,7 +6,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 
@@ -20,6 +20,7 @@ export interface Props {
 
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }
@@ -37,7 +38,7 @@ const loaders = async (
   const { url } = req;
   const { count, query } = props;
   const locale = "pt-BR"; // config!.defaultLocale; // TODO
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
 
   const suggestions = () =>
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/search_suggestions"]({

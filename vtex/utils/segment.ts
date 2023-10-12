@@ -22,9 +22,9 @@ export const isAnonymous = ({
   !priceTables &&
   !regionId;
 
-export const getSegment = (ctx: AppContext): Partial<Segment> =>
+export const getSegmentFromBag = (ctx: AppContext): Partial<Segment> =>
   ctx.bag?.get(SEGMENT);
-export const setSegment = (ctx: AppContext, segment: Partial<Segment>) =>
+export const setSegmentInBag = (ctx: AppContext, segment: Partial<Segment>) =>
   ctx.bag?.set(SEGMENT, segment);
 
 /**
@@ -72,9 +72,12 @@ export const getSegmentCookie = (req: Request): Partial<Segment> => {
 
   return {
     ...partial,
-    utmi_campaign: url.searchParams.get("utmi_campaign") ?? null,
-    utm_campaign: url.searchParams.get("utm_campaign") ?? null,
-    utm_source: url.searchParams.get("utm_source") ?? null,
+    utmi_campaign: url.searchParams.get("utmi_campaign") ??
+      partial?.utmi_campaign ?? null,
+    utm_campaign: url.searchParams.get("utm_campaign") ??
+      partial?.utm_campaign ?? null,
+    utm_source: url.searchParams.get("utm_source") ??
+      partial?.utm_source ?? null,
   };
 };
 

@@ -303,7 +303,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [] } = sku;
+  const { name, ean, itemId: skuId, referenceId = [], kitItems } = sku;
   const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
@@ -366,6 +366,11 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       name: brand,
       logo: brandImageUrl,
     },
+    isAccessoryOrSparePartFor: kitItems?.map(({ itemId }) => ({
+      "@type": "Product",
+      productID: itemId,
+      sku: itemId,
+    })),
     inProductGroupWithID: productId,
     sku: skuId,
     gtin: ean,
@@ -549,10 +554,11 @@ export const legacyFacetToFilter = (
   facets: LegacyFacet[],
   url: URL,
   map: string,
+  term: string,
   behavior: "dynamic" | "static",
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = url.pathname
+  const pathSegments = term
     .replace(/^\//, "")
     .split("/")
     .slice(0, mapSegments.length);
@@ -569,8 +575,19 @@ export const legacyFacetToFilter = (
       ? [...pathSegments.filter((_, i) => i !== index)]
       : [...pathSegments, facet.Value];
 
-    const link = new URL(`/${newPath.join("/")}`, url);
-    link.searchParams.set("map", newMap.join(","));
+    // Insertion-sort like algorithm. Uses the c-continuum theorem
+    const zipped: [string, string][] = [];
+    for (let it = 0; it < newMap.length; it++) {
+      let i = 0;
+      while (
+        i < zipped.length && (zipped[i][0] === "c" || zipped[i][0] === "C")
+      ) i++;
+
+      zipped.splice(i, 0, [newMap[it], newPath[it]]);
+    }
+
+    const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
+    link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
       link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
     }

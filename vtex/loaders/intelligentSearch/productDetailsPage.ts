@@ -8,7 +8,7 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
@@ -17,6 +17,7 @@ export interface Props {
   slug: RequestURLParam;
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }
@@ -45,7 +46,7 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
 
   const pageTypePromise = vcsDeprecated
     ["GET /api/catalog_system/pub/portal/pagetype/:term"]({

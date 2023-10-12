@@ -3,7 +3,7 @@ import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { LegacyProduct } from "../../utils/types.ts";
@@ -13,6 +13,7 @@ export interface Props {
 
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }
@@ -30,7 +31,7 @@ async function loader(
   const { url: baseUrl } = req;
   const { slug } = props;
   const url = new URL(baseUrl);
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
   const skuId = url.searchParams.get("skuId");
 

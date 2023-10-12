@@ -1,15 +1,15 @@
-import { Product, ProductLeaf } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
-import { batch } from "./batch.ts";
-import { OpenAPI } from "./openapi/vcs.openapi.gen.ts";
-import { getSegment, isAnonymous } from "./segment.ts";
-import { aggregateOffers } from "./transform.ts";
+import { Product, ProductLeaf } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
+import { batch } from "../batch.ts";
+import { OpenAPI } from "../openapi/vcs.openapi.gen.ts";
+import { getSegmentFromBag, isAnonymous } from "../segment.ts";
+import { aggregateOffers } from "../transform.ts";
 
 type Item = NonNullable<
   OpenAPI["POST /api/checkout/pub/orderForms/simulation"]["response"]["items"]
 >[number];
 
-const simulate = (items: {
+const doSimulate = (items: {
   id: string;
   quantity: number;
   seller: string | undefined;
@@ -22,7 +22,7 @@ const simulate = (items: {
     campaigns,
     channel,
     regionId,
-  } = getSegment(ctx);
+  } = getSegmentFromBag(ctx);
 
   const md = new Map<string, unknown>();
   utm_campaign && md.set("utmCampaign", utm_campaign);
@@ -50,12 +50,12 @@ const simulate = (items: {
     .then((res) => res.json());
 };
 
-export const simulationOffer = async (
+export const extension = async (
   products: Product[],
   _req: Request,
   ctx: AppContext,
 ) => {
-  if (isAnonymous(getSegment(ctx))) {
+  if (isAnonymous(getSegmentFromBag(ctx))) {
     return products;
   }
 
@@ -74,7 +74,7 @@ export const simulationOffer = async (
   const batched = batch(items, 300);
 
   const responses = await Promise.all(
-    batched.map((batch) => simulate(batch, ctx)),
+    batched.map((batch) => doSimulate(batch, ctx)),
   );
 
   const mapped = new Map<string, Map<string, Item>>();

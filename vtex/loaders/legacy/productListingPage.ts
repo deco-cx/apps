@@ -8,7 +8,7 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
@@ -61,6 +61,7 @@ export interface Props {
 
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }
@@ -137,12 +138,12 @@ const getTermFallback = (url: URL, isPage: boolean, hasFilters: boolean) => {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
   const currentPageoffset = props.pageOffset ?? 1;
 
@@ -157,8 +158,7 @@ const loader = async (
   const page = url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
-  const O =
-    (url.searchParams.get("O") as LegacySort) ??
+  const O = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
@@ -180,8 +180,7 @@ const loader = async (
 
   const ftFallback = getTermFallback(url, isPage, hasFilters);
 
-  const ft =
-    props.ft ||
+  const ft = props.ft ||
     url.searchParams.get("ft") ||
     url.searchParams.get("q") ||
     ftFallback;
@@ -202,7 +201,7 @@ const loader = async (
         ...args,
         term: getTerm(term, map),
       },
-      { ...STALE, headers: withSegmentCookie(segment) }
+      { ...STALE, headers: withSegmentCookie(segment) },
     ),
     vcsDeprecated["GET /api/catalog_system/pub/facets/search/:term"](
       {
@@ -211,7 +210,7 @@ const loader = async (
         term: getTerm(term, fmap),
         map: fmap,
       },
-      STALE
+      STALE,
     ).then((res) => res.json()),
   ]);
 
@@ -232,7 +231,7 @@ const loader = async (
       )
       .map((product) =>
         props.similars ? withIsSimilarTo(req, ctx, product) : product
-      )
+      ),
   );
 
   // Get categories of the current department/category
@@ -266,7 +265,7 @@ const loader = async (
     PriceRanges: vtexFacets.PriceRanges,
   })
     .map(([name, facets]) =>
-      legacyFacetToFilter(name, facets, url, map, filtersBehavior)
+      legacyFacetToFilter(name, facets, url, map, term, filtersBehavior)
     )
     .flat()
     .filter((x): x is Filter => Boolean(x));

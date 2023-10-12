@@ -13,7 +13,7 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -117,6 +117,7 @@ export interface Props {
 
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 
@@ -266,7 +267,7 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
   const {
     selectedFacets: baseSelectedFacets,

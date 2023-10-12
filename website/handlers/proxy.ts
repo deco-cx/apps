@@ -26,12 +26,13 @@ const removeCFHeaders = (headers: Headers) => {
 };
 
 const proxyTo = (
-  { proxyUrl: rawProxyUrl, basePath, host: hostToUse, customHeaders = [] }: {
-    proxyUrl: string;
-    basePath?: string;
-    host?: string;
-    customHeaders?: Header[];
-  },
+  {
+    url: rawProxyUrl,
+    basePath,
+    host: hostToUse,
+    customHeaders = [],
+    includeScriptsToHead,
+  }: Props,
 ): Handler =>
 async (req, _ctx) => {
   const url = new URL(req.url);
@@ -71,6 +72,48 @@ async (req, _ctx) => {
     body: req.body,
   });
 
+  const contentType = response.headers.get("Content-Type");
+
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+
+  let newBodyStream = null;
+
+  if (
+    contentType?.includes("text/html") &&
+    includeScriptsToHead?.includes &&
+    includeScriptsToHead.includes.length > 0
+  ) {
+    let accHtml: string | undefined = "";
+    const insertPlausible = new TransformStream({
+      async transform(chunk, controller) {
+        let newChunk = await chunk;
+        if (accHtml !== undefined && includeScriptsToHead.includes) {
+          for (let i = 0; i < chunk.length; i++) {
+            accHtml = accHtml.slice(-5) + decoder.decode(chunk.slice(i, i + 1));
+
+            if (accHtml === "<head>") {
+              accHtml = "";
+
+              accHtml += decoder.decode(chunk.slice(0, i + 1));
+              for (const script of includeScriptsToHead.includes) {
+                accHtml += script;
+              }
+              accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
+
+              newChunk = encoder.encode(accHtml);
+              accHtml = undefined;
+              break;
+            }
+          }
+        }
+        controller.enqueue(newChunk);
+      },
+    });
+    await response.body!.pipeThrough(insertPlausible);
+    newBodyStream = insertPlausible.readable;
+  }
+
   // Change cookies domain
   const responseHeaders = new Headers(response.headers);
   responseHeaders.delete("set-cookie");
@@ -86,8 +129,7 @@ async (req, _ctx) => {
       );
     }
   }
-
-  return new Response(response.body, {
+  return new Response(newBodyStream === null ? response.body : newBodyStream, {
     status: response.status,
     headers: responseHeaders,
   });
@@ -127,12 +169,21 @@ export interface Props {
    * @description custom headers
    */
   customHeaders?: Header[];
+  /**
+   * @description Scripts to be included in the head of the html
+   */
+  includeScriptsToHead?: {
+    includes?: string[];
+    includePlausible: boolean;
+  };
 }
 
 /**
  * @title Proxy
  * @description Proxies request to the target url.
  */
-export default function Proxy({ url, basePath, host, customHeaders }: Props) {
-  return proxyTo({ proxyUrl: url, basePath, host, customHeaders });
+export default function Proxy(
+  { url, basePath, host, customHeaders, includeScriptsToHead }: Props,
+) {
+  return proxyTo({ url, basePath, host, customHeaders, includeScriptsToHead });
 }

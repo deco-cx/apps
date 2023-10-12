@@ -6,7 +6,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { getSegment, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
@@ -52,6 +52,7 @@ export interface CommonProps {
   hideUnavailableItems?: boolean;
   /**
    * @description Include similar products
+   * @deprecated Use product extensions instead
    */
   similars?: boolean;
 }
@@ -115,13 +116,12 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
   const { url } = req;
-  const segment = getSegment(ctx);
+  const segment = getSegmentFromBag(ctx);
 
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);
   const facets = withDefaultFacets(selectedFacets, ctx);
 
-  // search products on VTEX. Feel free to change any of these parameters
   const { products: vtexProducts } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,

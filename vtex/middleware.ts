@@ -1,8 +1,8 @@
 import { AppMiddlewareContext } from "./mod.ts";
 import {
   getSegmentCookie,
-  setSegment,
   setSegmentCookie,
+  setSegmentInBag,
 } from "./utils/segment.ts";
 
 const ONCE = Symbol("once");
@@ -16,7 +16,7 @@ export const middleware = (
     ctx.bag.set(ONCE, true);
 
     const segment = getSegmentCookie(req);
-    setSegment(ctx, segment);
+    setSegmentInBag(ctx, segment);
     setSegmentCookie(segment, ctx.response.headers);
   }
 
