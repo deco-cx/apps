@@ -74,14 +74,22 @@ export const getSegmentFromCookie = (
   return segment;
 };
 
+const SEGMENT_QUERY_PARAMS = [
+  "utmi_campaign" as const,
+  "utm_campaign" as const,
+  "utm_source" as const,
+];
 export const buildSegmentCookie = (req: Request): Partial<Segment> => {
   const url = new URL(req.url);
+  const partialSegment: Partial<Segment> = {};
+  for (const qs of SEGMENT_QUERY_PARAMS) {
+    const param = url.searchParams.get(qs);
+    if (param) {
+      partialSegment[qs] = param;
+    }
+  }
 
-  return {
-    utmi_campaign: url.searchParams.get("utmi_campaign"),
-    utm_campaign: url.searchParams.get("utm_campaign"),
-    utm_source: url.searchParams.get("utm_source"),
-  };
+  return partialSegment;
 };
 
 export const setSegmentCookie = (
