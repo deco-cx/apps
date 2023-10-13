@@ -1,8 +1,8 @@
 import {
   default as extend,
   Props,
-} from "../../../website/loaders/extension.ts";
-import { Product } from "../../types.ts";
+} from "../../../../website/loaders/extension.ts";
+import { Product } from "../../../types.ts";
 
 /**
  * @title Extend your products
