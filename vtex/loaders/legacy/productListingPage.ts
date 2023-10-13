@@ -87,6 +87,13 @@ const IS_TO_LEGACY: Record<string, LegacySort> = {
   "relevance:desc": "OrderByScoreDESC",
 };
 
+// in path vtex can use comma as price separator but only reconize dot separator in API
+const formatPriceFromPathToFacet = (term: string) => {
+  return term.replace(/de-\d+[,]?[\d]+-a-\d+[,]?[\d]+/, (match) => {
+    return match.replaceAll(",", ".");
+  });
+};
+
 export const removeForwardSlash = (str: string) =>
   str.slice(str.startsWith("/") ? 1 : 0);
 
@@ -94,7 +101,34 @@ const getTerm = (path: string, map: string) => {
   const mapSegments = map.split(",");
   const pathSegments = removeForwardSlash(path).split("/");
 
-  return pathSegments.slice(0, mapSegments.length).join("/");
+  const term = pathSegments.slice(0, mapSegments.length).join("/");
+
+  if (mapSegments.includes("priceFrom")) {
+    return formatPriceFromPathToFacet(term);
+  }
+
+  return term;
+};
+
+/**
+ *  verify if when url its not a category/department/collection
+ *  and is not a default query format but is a valid search based in default lagacy behavior on native stores
+ */
+const getTermFallback = (url: URL, isPage: boolean, hasFilters: boolean) => {
+  const pathList = url.pathname.split("/").slice(1);
+
+  /**
+   * in lagacy mutiple terms path like /foo/bar is a valid search but any term after first will be ignored
+   * so this verify limit the term falback only if has one term
+   * if this is a problem feel free to remove the last verification
+   */
+  const isOneTermOnly = pathList.length == 1;
+
+  if (!isPage && !hasFilters && isOneTermOnly) {
+    return pathList[0];
+  }
+
+  return "";
 };
 
 /**
@@ -114,7 +148,10 @@ const loader = async (
   const currentPageoffset = props.pageOffset ?? 1;
 
   const filtersBehavior = props.filters || "dynamic";
-  const count = props.count ?? 12;
+
+  const countFromSearchParams = url.searchParams.get("PS");
+  const count = Number(countFromSearchParams ?? props.count ?? 12);
+
   const maybeMap = props.map || url.searchParams.get("map") || undefined;
   const maybeTerm = props.term || url.pathname || "";
 
@@ -132,19 +169,27 @@ const loader = async (
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
-  const ft = props.ft ||
-    url.searchParams.get("ft") ||
-    url.searchParams.get("q") ||
-    "";
-
-  if (pageTypes.length === 0 && !ft && !fq.length) {
-    return null;
-  }
-
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
   const [map, term] = missingParams
     ? getMapAndTerm(pageTypes)
     : [maybeMap, maybeTerm];
+
+  const isPage = pageTypes.length > 0;
+
+  const hasFilters = fq.length > 0 || !map;
+
+  const ftFallback = getTermFallback(url, isPage, hasFilters);
+
+  const ft = props.ft ||
+    url.searchParams.get("ft") ||
+    url.searchParams.get("q") ||
+    ftFallback;
+
+  const isInSeachFormat = ft;
+
+  if (!isPage && !hasFilters && !isInSeachFormat) {
+    return null;
+  }
 
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };

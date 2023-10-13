@@ -144,7 +144,8 @@ const _singleFlightKey = (props: Props, { request }: { request: Request }) => {
 
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
-  const count = props.count ?? 12;
+  const countFromSearchParams = url.searchParams.get("PS");
+  const count = Number(countFromSearchParams ?? props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
   const currentPageoffset = props.pageOffset ?? 1;
   const page = props.page ??
@@ -203,8 +204,10 @@ const queryFromPathname = (
 
   const isPage = Boolean(pageTypes.length);
   const isValidPathSearch = pathList.length == 1;
+
   if (!isPage && !isInSeachFormat && isValidPathSearch) {
-    return pathList[0];
+    // decode uri parse uri enconde symbols like '%20' to ' '
+    return decodeURI(pathList[0]);
   }
 };
 
@@ -294,14 +297,15 @@ const loader = async (
 
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
-    vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"](
-        {
-          ...params,
-          facets: toPath(selected),
-        },
-        { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
-      ).then((res) => res.json()),
+    vcsDeprecated[
+      "GET /api/io/_v/api/intelligent-search/product_search/*facets"
+    ](
+      {
+        ...params,
+        facets: toPath(selected),
+      },
+      { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
+    ).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"](
       {
         ...params,
