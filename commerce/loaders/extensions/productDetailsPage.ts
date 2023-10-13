@@ -1,6 +1,6 @@
-import loader from "./product/list.ts";
+import loader from "./product/detailsPage.ts";
 
-/** @deprecated use product/list instead */
+/** @deprecated use product/detailsPage instead */
 const deprecated = (...args: Parameters<typeof loader>) => loader(...args);
 
 export default deprecated;
