@@ -79,6 +79,7 @@ const SEGMENT_QUERY_PARAMS = [
   "utm_campaign" as const,
   "utm_source" as const,
 ];
+
 export const buildSegmentCookie = (req: Request): Partial<Segment> => {
   const url = new URL(req.url);
   const partialSegment: Partial<Segment> = {};
