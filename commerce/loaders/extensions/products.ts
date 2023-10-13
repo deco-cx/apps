@@ -1,14 +1,6 @@
-import {
-  default as extend,
-  Props,
-} from "../../../website/loaders/extension.ts";
-import { Product } from "../../types.ts";
+import loader from "../product/extensions/list.ts";
 
-/**
- * @title Extend your products
- */
-export default function ProductsExt(
-  props: Props<Product[] | null>,
-): Promise<Product[] | null> {
-  return extend(props);
-}
+/** @deprecated use product/list instead */
+const deprecated = (...args: Parameters<typeof loader>) => loader(...args);
+
+export default deprecated;
