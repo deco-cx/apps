@@ -1,6 +1,6 @@
 import { getCookies, setCookie } from "std/http/mod.ts";
-import type { Segment } from "./types.ts";
 import { AppContext } from "../mod.ts";
+import type { Segment } from "./types.ts";
 
 const SEGMENT_COOKIE_NAME = "vtex_segment";
 const SEGMENT = Symbol("segment");
@@ -64,20 +64,23 @@ export const serialize = ({
 
 export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
-export const getSegmentCookie = (req: Request): Partial<Segment> => {
-  const url = new URL(req.url);
+export const getSegmentFromCookie = (
+  req: Request,
+): Partial<Segment> | undefined => {
   const cookies = getCookies(req.headers);
   const cookie = cookies[SEGMENT_COOKIE_NAME];
-  const partial = cookie && parse(cookie);
+  const segment = cookie && parse(cookie);
+
+  return segment;
+};
+
+export const buildSegmentCookie = (req: Request): Partial<Segment> => {
+  const url = new URL(req.url);
 
   return {
-    ...partial,
-    utmi_campaign: url.searchParams.get("utmi_campaign") ??
-      partial?.utmi_campaign ?? null,
-    utm_campaign: url.searchParams.get("utm_campaign") ??
-      partial?.utm_campaign ?? null,
-    utm_source: url.searchParams.get("utm_source") ??
-      partial?.utm_source ?? null,
+    utmi_campaign: url.searchParams.get("utmi_campaign"),
+    utm_campaign: url.searchParams.get("utm_campaign"),
+    utm_source: url.searchParams.get("utm_source"),
   };
 };
 
