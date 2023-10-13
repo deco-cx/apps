@@ -17,6 +17,7 @@ const DEFAULT_SEGMENT: Partial<Segment> = {
   utm_source: null,
 };
 
+// Symbols are the default keys for WeakMaps https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
 const SEGMENT_ONCE_KEY = Symbol("Set segment on context");
 
 export const middleware = (
@@ -29,7 +30,11 @@ export const middleware = (
 
     const segmentFromCookie = getSegmentFromCookie(req);
     const segmentFromRequest = buildSegmentCookie(req);
-    const segment = { ...DEFAULT_SEGMENT, ...segmentFromCookie, ...segmentFromRequest };
+    const segment = {
+      ...DEFAULT_SEGMENT,
+      ...segmentFromCookie,
+      ...segmentFromRequest,
+    };
     setSegmentInBag(ctx, segment);
     if (!equal(segmentFromCookie, segment)) {
       setSegmentCookie(segment, ctx.response.headers);
