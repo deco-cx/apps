@@ -199,7 +199,7 @@ const loader = async (
       {
         ...params,
         ...args,
-        term: getTerm(term, map),
+        term: getTerm(isInSeachFormat ? isInSeachFormat : term, map),
       },
       { ...STALE, headers: withSegmentCookie(segment) },
     ),
@@ -207,7 +207,7 @@ const loader = async (
       {
         ...params,
         ...args,
-        term: getTerm(term, fmap),
+        term: getTerm(isInSeachFormat ? isInSeachFormat : term, fmap),
         map: fmap,
       },
       STALE,
