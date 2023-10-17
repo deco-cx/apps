@@ -5,11 +5,11 @@ import {
   asResolved,
   BaseContext,
   isDeferred,
+  Resolvable,
 } from "deco/engine/core/resolver.ts";
-import { caches as redisCache, redis } from "deco/runtime/caches/redis.ts";
+import { redis, caches as redisCache } from "deco/runtime/caches/redis.ts";
 import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
-import { segmentFor } from "deco/utils/segment.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
 
@@ -26,16 +26,13 @@ export const isFreshCtx = <TState>(
   return typeof (ctx as HandlerContext).render === "function";
 };
 
-const runOnlyMatchers: Required<
+const runFlags: Required<
   Required<ResolveOptions>["hooks"]
->["onResolveStart"] = (proceed, props, resolver) => {
-  if (resolver.type === "matchers") {
+>["onResolveStart"] = (proceed, props, resolver, __resolveType) => {
+  if (resolver.type === "flags" || resolver.type === undefined) {
     return proceed();
   }
-  proceed().catch((_err) => {
-    //ignore errors
-  }); // make the next resolver pass
-  return Promise.resolve(props);
+  return Promise.resolve({ ...props, __resolveType });
 };
 
 const caches: Cache | null = redis === null
@@ -48,7 +45,7 @@ const caches: Cache | null = redis === null
  */
 export default function Fresh(
   freshConfig: FreshConfig,
-  appContext: Pick<AppContext, "response" | "monitoring">,
+  appContext: Pick<AppContext, "response" | "monitoring" | "segment" | "get">,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
     const endResolvePage = appContext?.monitoring?.timings?.start?.(
@@ -56,32 +53,33 @@ export default function Fresh(
     );
 
     const isHead = req.method === "HEAD";
-    const pagePromise = appContext?.monitoring?.tracer?.startActiveSpan?.(
-      "load-data",
-      async (span) => {
-        try {
-          return isDeferred<Page, BaseContext & { context: ConnInfo }>(
-              freshConfig.page,
-            )
-            ? await freshConfig.page(
-              { context: ctx },
-              isHead
-                ? {
-                  hooks: { onResolveStart: runOnlyMatchers },
+    const pageAfterFlags = await appContext?.monitoring?.tracer
+      ?.startActiveSpan?.(
+        "load-data",
+        async (span) => {
+          try {
+            return isDeferred<Resolvable, BaseContext & { context: ConnInfo }>(
+                freshConfig.page,
+              )
+              ? await freshConfig.page(
+                { context: ctx },
+                {
+                  hooks: { onResolveStart: runFlags },
                   propagateOptions: true,
                   propsAreResolved: true,
-                }
-                : undefined,
-            )
-            : freshConfig.page;
-        } catch (e) {
-          span.recordException(e);
-          throw e;
-        } finally {
-          span.end();
-        }
-      },
-    );
+                },
+              )
+              : freshConfig.page;
+          } catch (e) {
+            span.recordException(e);
+            throw e;
+          } finally {
+            span.end();
+          }
+        },
+      );
+
+    const loadPage = () => appContext.get<Page>(pageAfterFlags);
 
     if (isHead) {
       return new Response(null, { status: 200 });
@@ -99,7 +97,7 @@ export default function Fresh(
     endResolvePage?.();
     const url = new URL(req.url);
     if (url.searchParams.get("asJson") !== null) {
-      return Response.json(await pagePromise, { headers: allowCorsFor(req) });
+      return Response.json(await loadPage(), { headers: allowCorsFor(req) });
     }
     if (isFreshCtx<DecoState>(ctx)) {
       const response = await appContext.monitoring!.tracer.startActiveSpan(
@@ -107,11 +105,10 @@ export default function Fresh(
         async (span) => {
           try {
             const url = new URL(req.url);
-            const etag = await segmentFor(appContext, req.url);
+            const etag = appContext.segment.build();
             url.searchParams.set("__deco_etag", etag);
             const reqKey = new Request(url, req);
             const response = await caches?.match(reqKey)?.then((response) => {
-              console.log("HIT");
               response?.headers?.set?.("x-cache", "HIT");
               response && span.addEvent("hit", { etag });
               return response;
@@ -123,8 +120,10 @@ export default function Fresh(
                 const renderToString = appContext.monitoring!.tracer?.startSpan(
                   "render-to-string",
                 );
+                const page = await loadPage();
+                console.log({ page });
                 return Promise.resolve(ctx.render({
-                  page: await pagePromise,
+                  page,
                   routerInfo: {
                     flags: ctx.state.flags,
                     pagePath: ctx.state.pathTemplate,

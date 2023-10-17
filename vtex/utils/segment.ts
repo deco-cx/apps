@@ -94,18 +94,19 @@ export const buildSegmentCookie = (req: Request): Partial<Segment> => {
 };
 
 export const setSegmentCookie = (
-  segment: Partial<Segment>,
+  segment: string | Partial<Segment>,
   headers: Headers = new Headers(),
-): Headers => {
+): [Headers, string] => {
+  const value = typeof segment === "string" ? segment : serialize(segment);
   setCookie(headers, {
-    value: serialize(segment),
+    value,
     name: SEGMENT_COOKIE_NAME,
     path: "/",
     secure: true,
     httpOnly: true,
   });
 
-  return headers;
+  return [headers, value];
 };
 
 export const withSegmentCookie = (

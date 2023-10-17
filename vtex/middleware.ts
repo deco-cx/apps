@@ -3,6 +3,7 @@ import { AppMiddlewareContext } from "./mod.ts";
 import {
   buildSegmentCookie,
   getSegmentFromCookie,
+  serialize,
   setSegmentCookie,
   setSegmentInBag,
 } from "./utils/segment.ts";
@@ -36,8 +37,10 @@ export const middleware = (
       ...segmentFromRequest,
     };
     setSegmentInBag(ctx, segment);
+    const serializedSegment = serialize(segment);
+    ctx.segment.varyWith("segment", serializedSegment);
     if (!equal(segmentFromCookie, segment)) {
-      setSegmentCookie(segment, ctx.response.headers);
+      setSegmentCookie(serializedSegment, ctx.response.headers);
     }
   }
 

@@ -123,6 +123,7 @@ export const onBeforeResolveProps = (props: Props) => ({
 });
 
 export const loader = async (props: Props, req: Request) => {
+  console.log("LOADER PROPS", props)
   const url = new URL(req.url);
   const partialId = url.searchParams.get(SECTION_LINK_ID_SEARCH_PARAM);
   const partialProps = url.searchParams.get(SECTION_LINK_PROPS_SEARCH_PARAM);
