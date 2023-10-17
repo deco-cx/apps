@@ -2,8 +2,8 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$1 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$0 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$1 from "./loaders/product/extensions/listingPage.ts";
 import * as $$$2 from "./loaders/product/extensions/list.ts";
 import * as $$$3 from "./loaders/product/productListingPage.ts";
 import * as $$$4 from "./loaders/product/products.ts";
@@ -20,9 +20,9 @@ const manifest = {
     "commerce/loaders/extensions/productListingPage.ts": $$$6,
     "commerce/loaders/extensions/products.ts": $$$7,
     "commerce/loaders/navbar.ts": $$$8,
-    "commerce/loaders/product/extensions/detailsPage.ts": $$$1,
+    "commerce/loaders/product/extensions/detailsPage.ts": $$$0,
     "commerce/loaders/product/extensions/list.ts": $$$2,
-    "commerce/loaders/product/extensions/listingPage.ts": $$$0,
+    "commerce/loaders/product/extensions/listingPage.ts": $$$1,
     "commerce/loaders/product/productListingPage.ts": $$$3,
     "commerce/loaders/product/products.ts": $$$4,
   },
