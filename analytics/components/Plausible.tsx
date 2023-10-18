@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import { useRouterContext } from "deco/routes/[...catchall].tsx";
-import { exclusionScript } from "../../utils/plausible_scripts.ts";
+import { exclusionAndHashScript } from "../../utils/plausible_scripts.ts";
 
 const sanitizeTagAttribute = (inputString: string): string => {
   const maxLength = 299; // plausible limit
@@ -29,7 +29,7 @@ declare global {
   }
 }
 
-const plausibleScript = exclusionScript;
+const plausibleScript = exclusionAndHashScript;
 
 // This function should be self contained, because it is stringified!
 const sendEvent = (
