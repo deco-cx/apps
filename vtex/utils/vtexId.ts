@@ -22,7 +22,7 @@ export const parseCookie = (headers: Headers, account: string) => {
 
   return {
     cookie: stringify({
-      [NAME]: cookies[NAME],
+      [cookies[NAME] ? NAME : ""]: cookies[NAME],
       [`${NAME}_${account}`]: cookies[`${NAME}_${account}`],
     }),
     payload,
