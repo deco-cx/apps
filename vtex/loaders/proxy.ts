@@ -1,6 +1,6 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
-import { exclusionScript } from "../../utils/plausible_scripts.ts";
+import { exclusionAndHashScript } from "../../utils/plausible_scripts.ts";
 
 const PATHS_TO_PROXY = [
   "/account",
@@ -63,7 +63,7 @@ const buildProxyRoutes = (
     const link2 =
       '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
     const plausibleScript =
-      `<script defer data-exclude="/proxy" data-api="https://plausible.io/api/event">${exclusionScript}</script>`;
+      `<script defer data-exclude="/proxy" data-api="https://plausible.io/api/event">${exclusionAndHashScript}</script>`;
 
     if (includeScriptsToHead?.includePlausible) {
       includeScriptsToHead.includes = [
