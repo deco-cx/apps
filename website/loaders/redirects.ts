@@ -7,7 +7,7 @@ async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
   const allRedirects = await ctx.get<
     RedirectProps[]
   >({
-    type: "website/loaders/redirect.ts",
+    resolveType: "website/loaders/redirect.ts",
     __resolveType: defaults["resolveTypeSelector"].name,
   });
 
@@ -36,6 +36,7 @@ export default async function Redirects(
   const allRedirects = await ctx.get<
     Route[]
   >({
+    key: "getAllRedirects",
     func: () => getAllRedirects(ctx),
     __resolveType: defaults["once"].name,
   });
