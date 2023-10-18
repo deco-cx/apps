@@ -73,6 +73,12 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
       return event.name === "view_item" || event.name === "view_item_list";
     }
 
+    type WithID<T> = T & { item_id: string };
+
+    const hasItemId = <T,>(item: T): item is WithID<T> =>
+      // deno-lint-ignore no-explicit-any
+      (item as any).item_id === "string";
+
     window.DECO.events.subscribe((event) => {
       if (!event) return;
 
@@ -82,9 +88,8 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         const [item] = event.params.items;
 
         if (
-          !item ||
+          !item || !hasItemId(item) ||
           typeof item.index !== "number" ||
-          typeof item.item_variant !== "string" ||
           typeof item.item_url !== "string"
         ) {
           return console.warn(
@@ -100,13 +105,13 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
             eventName,
             index: attr.indexName,
             queryID: attr.queryID,
-            objectIDs: [item.item_variant],
+            objectIDs: [item.item_id],
             positions: [item.index + 1],
           });
         } else {
           window.aa("clickedObjectIDs", {
             eventName,
-            objectIDs: [item.item_variant],
+            objectIDs: [item.item_id],
             index: "unknown",
           });
         }
@@ -118,8 +123,8 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         const attr = attributesFromURL(window.location.href) ||
           attributesFromURL(item.item_url || "");
         const objectIDs = event.params.items
-          .map((i) => i.item_variant)
-          .filter((i): i is string => Boolean(i));
+          .filter(hasItemId)
+          .map((i) => i.item_id);
 
         if (attr) {
           window.aa("convertedObjectIDsAfterSearch", {
@@ -142,8 +147,8 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           index: "unknown",
           eventName,
           objectIDs: event.params.items
-            .map((i) => i.item_variant)
-            .filter((i): i is string => Boolean(i)),
+            .filter(hasItemId)
+            .map((i) => i.item_id),
         });
       }
     });
