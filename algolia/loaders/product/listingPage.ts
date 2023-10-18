@@ -40,7 +40,13 @@ interface Props {
   highlight?: boolean;
 }
 
-const getPageInfo = (page: number, nbPages: number, url: URL) => {
+const getPageInfo = (
+  page: number,
+  nbPages: number,
+  nbHits: number,
+  hitsPerPage: number,
+  url: URL,
+) => {
   const next = page + 1;
   const prev = page - 1;
   const hasNextPage = next < nbPages;
@@ -59,6 +65,8 @@ const getPageInfo = (page: number, nbPages: number, url: URL) => {
   return {
     nextPage: hasNextPage ? `?${nextPage}` : undefined,
     previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
+    records: nbHits,
+    recordPerPage: hitsPerPage,
     currentPage: page,
   };
 };
@@ -175,6 +183,7 @@ const loader = async (
         facets: [],
         hitsPerPage: props.hitsPerPage ?? 12,
         page: Number(url.searchParams.get("page")) || 0,
+        clickAnalytics: true,
       },
     },
     {
@@ -192,18 +201,19 @@ const loader = async (
     },
   ]);
 
-  const [{ hits, page, nbPages }, { facets }] = results as SearchResponse<
-    IndexedProduct
-  >[];
+  const [
+    { hits, page, nbPages, queryID, nbHits, hitsPerPage },
+    { facets },
+  ] = results as SearchResponse<IndexedProduct>[];
 
   const products = await resolveProducts(
     hits.map(({ _highlightResult, ...p }) =>
       replaceHighlight(p, props.highlight ? _highlightResult : {})
     ),
     client,
-    url,
+    { url, queryID, indexName },
   );
-  const pageInfo = getPageInfo(page, nbPages, url);
+  const pageInfo = getPageInfo(page, nbPages, nbHits, hitsPerPage, url);
   const filters = transformFacets(facets, { facetFilters, url });
 
   return {
@@ -215,7 +225,7 @@ const loader = async (
       numberOfItems: 0,
     },
     filters: sortFacets(filters, props.facets),
-    products: products,
+    products,
     pageInfo,
     sortOptions: [
       {

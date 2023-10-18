@@ -1,6 +1,5 @@
 import { SearchClient } from "npm:algoliasearch@4.20.0";
 import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
-import { State } from "../mod.ts";
 
 export type IndexedProduct = ReturnType<typeof toIndex>;
 export type Indices =
@@ -13,10 +12,16 @@ const unique = (ids: string[]) => [...new Set(ids).keys()];
 
 const indexName: Indices = "products";
 
+interface Options {
+  url: string | URL;
+  queryID?: string;
+  indexName?: string;
+}
+
 export const resolveProducts = async (
   products: IndexedProduct[],
   client: SearchClient,
-  url: string | URL,
+  opts: Options,
 ): Promise<Product[]> => {
   const hasVariantIds = products.flatMap((p) =>
     p.isVariantOf?.hasVariant?.map((x) => x.productID)
@@ -36,17 +41,15 @@ export const resolveProducts = async (
 
   const productsById = new Map<string, Product>();
   for (const product of similars) {
-    product && productsById.set(product.productID, fromIndex(product));
+    product && productsById.set(product.productID, fromIndex(product, opts));
   }
 
   return products
-    .map(fromIndex)
+    .map((p) => fromIndex(p, opts))
     .map((p) => ({
       ...p,
-      url: p.url && new URL(p.url, url).href,
       isVariantOf: p.isVariantOf && {
         ...p.isVariantOf,
-        url: p.isVariantOf.url && new URL(p.isVariantOf.url, url).href,
         hasVariant: p.isVariantOf?.hasVariant
           ?.map((p) => productsById.get(p.productID))
           .filter((p): p is ProductLeaf => Boolean(p)) ?? [],
@@ -55,6 +58,20 @@ export const resolveProducts = async (
         ?.map((p) => productsById.get(p.productID))
         .filter((p): p is ProductLeaf => Boolean(p)),
     }));
+};
+
+const withAnalyticsInfo = (
+  maybeUrl: string | undefined,
+  { queryID, indexName, url: origin }: Options,
+) => {
+  if (!maybeUrl) return undefined;
+
+  const url = new URL(maybeUrl, origin);
+
+  queryID && url.searchParams.set("algoliaQueryID", queryID);
+  indexName && url.searchParams.set("algoliaIndex", indexName);
+
+  return url.href;
 };
 
 const removeType = <T>(object: T & { "@type": string }): T => ({
@@ -122,10 +139,13 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
 };
 
 export const fromIndex = (
-  { facets: _f, groupFacets: _fg, objectID: _oid, ...product }: IndexedProduct,
+  { url, facets: _f, groupFacets: _fg, objectID: _oid, ...product }:
+    IndexedProduct,
+  opts: Options,
 ): Product => ({
   ...product,
   "@type": "Product",
+  url: withAnalyticsInfo(url, opts),
   offers: product.offers && {
     ...product.offers,
     "@type": "AggregateOffer",
@@ -140,6 +160,7 @@ export const fromIndex = (
   },
   isVariantOf: product.isVariantOf && {
     ...product.isVariantOf,
+    url: withAnalyticsInfo(product.isVariantOf.url, opts),
     hasVariant: product.isVariantOf.hasVariant.map((p) => ({
       "@type": "Product",
       productID: p.productID,
@@ -159,7 +180,8 @@ export const fromIndex = (
 });
 
 export const setupProductsIndices = async (
-  { applicationId, adminApiKey }: State,
+  applicationId: string,
+  adminApiKey: string,
   client: SearchClient,
 ) => {
   await client.initIndex("products" satisfies Indices).setSettings({
