@@ -1,7 +1,10 @@
-import { AppContext, State } from "../mod.ts";
+import { AppContext } from "../mod.ts";
 import { setupProductsIndices } from "../utils/product.ts";
 
-type Props = Partial<State>;
+type Props = Partial<{
+  adminApiKey: string;
+  applicationId: string;
+}>;
 
 const action = async (props: Props, _req: Request, ctx: AppContext) => {
   const { adminApiKey, applicationId } = props;
@@ -10,7 +13,7 @@ const action = async (props: Props, _req: Request, ctx: AppContext) => {
   }
 
   try {
-    await setupProductsIndices({ adminApiKey, applicationId }, ctx.client);
+    await setupProductsIndices(applicationId, adminApiKey, ctx.client);
     return "Setup finished successfuly";
   } catch (error) {
     return `Setup finished with error: ${error}`;

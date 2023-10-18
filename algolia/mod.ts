@@ -18,6 +18,13 @@ export interface State {
    * @format password
    */
   adminApiKey: string;
+
+  /**
+   * @title Search API Key
+   * @description https://dashboard.algolia.com/account/api-keys/all
+   * @format password
+   */
+  searchApiKey: string;
 }
 
 /**
@@ -26,12 +33,12 @@ export interface State {
 export default function App(
   props: State,
 ) {
-  const { applicationId, adminApiKey } = props;
+  const { applicationId, adminApiKey, searchApiKey } = props;
   const client = algolia.default(applicationId, adminApiKey, {
     requester: createFetchRequester(), // Fetch makes it perform mutch better
   });
 
-  const state = { client };
+  const state = { client, applicationId, searchApiKey };
 
   const app: App<Manifest, typeof state> = {
     manifest: {
