@@ -1,7 +1,7 @@
 // We got these scripts from plausible. Here is the docs for every possible extension:
 // https://plausible.io/docs/script-extensions
 
-// The scripts currently have extensions .local, .hash and .exclusions.
+// The scripts currently have extensions '.local', '.hash' and '.exclusions'.
 
 // It is necessary to change how we get data-domain:
 //
