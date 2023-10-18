@@ -77,7 +77,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
 
     const hasItemId = <T,>(item: T): item is WithID<T> =>
       // deno-lint-ignore no-explicit-any
-      (item as any).item_id === "string";
+      typeof (item as any).item_id === "string";
 
     window.DECO.events.subscribe((event) => {
       if (!event) return;
@@ -112,7 +112,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           window.aa("clickedObjectIDs", {
             eventName,
             objectIDs: [item.item_id],
-            index: "unknown",
+            index: "not-from-algolia",
           });
         }
       }
@@ -137,14 +137,14 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           window.aa("convertedObjectIDs", {
             eventName,
             objectIDs,
-            index: "unknown",
+            index: "not-from-algolia",
           });
         }
       }
 
       if (isViewItem(event)) {
         window.aa("viewedObjectIDs", {
-          index: "unknown",
+          index: "not-from-algolia",
           eventName,
           objectIDs: event.params.items
             .filter(hasItemId)
