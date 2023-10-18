@@ -79,6 +79,9 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
       // deno-lint-ignore no-explicit-any
       typeof (item as any).item_id === "string";
 
+    const UNKNOWN = "not-from-algolia";
+    const MAX_BATCH_SIZE = 20;
+
     window.DECO.events.subscribe((event) => {
       if (!event) return;
 
@@ -112,7 +115,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           window.aa("clickedObjectIDs", {
             eventName,
             objectIDs: [item.item_id],
-            index: "not-from-algolia",
+            index: UNKNOWN,
           });
         }
       }
@@ -137,19 +140,23 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           window.aa("convertedObjectIDs", {
             eventName,
             objectIDs,
-            index: "not-from-algolia",
+            index: UNKNOWN,
           });
         }
       }
 
       if (isViewItem(event)) {
-        window.aa("viewedObjectIDs", {
-          index: "not-from-algolia",
-          eventName,
-          objectIDs: event.params.items
-            .filter(hasItemId)
-            .map((i) => i.item_id),
-        });
+        const objectIDs = event.params.items
+          .filter(hasItemId)
+          .map((i) => i.item_id);
+
+        for (let it = 0; it < objectIDs.length; it += MAX_BATCH_SIZE) {
+          window.aa("viewedObjectIDs", {
+            eventName,
+            index: UNKNOWN,
+            objectIDs: objectIDs.slice(it, (it + 1) * MAX_BATCH_SIZE),
+          });
+        }
       }
     });
   }
