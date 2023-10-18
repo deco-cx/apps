@@ -1,5 +1,4 @@
 import { Head, Partial } from "$fresh/runtime.ts";
-import { PARTIAL_SEARCH_PARAM } from "$fresh/src/constants.ts";
 import { Section } from "deco/blocks/section.ts";
 import { ComponentMetadata } from "deco/engine/block.ts";
 import { context } from "deco/live.ts";
@@ -10,11 +9,12 @@ import {
 } from "deco/routes/[...catchall].tsx";
 import { createContext, JSX } from "preact";
 import { useContext } from "preact/hooks";
+import Events from "../components/Events.tsx";
+import LiveControls from "../components/_Controls.tsx";
 import {
   SECTION_LINK_ID_SEARCH_PARAM,
   SECTION_LINK_PROPS_SEARCH_PARAM,
 } from "../hooks/usePartial.ts";
-import LiveControls from "../components/_Controls.tsx";
 
 /**
  * @title Sections
@@ -60,8 +60,9 @@ function renderSectionFor(isPreview: boolean) {
 const renderSections = (
   { sections }: SectionProps<typeof loader>,
   isPreview = false,
-): JSX.Element => (
+) => (
   <>
+    <Events />
     {sections.map(renderSectionFor(isPreview))}
   </>
 );

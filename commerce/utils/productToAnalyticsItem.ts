@@ -1,4 +1,4 @@
-import { AnalyticsItem, BreadcrumbList, Product } from "../types.ts";
+import type { AnalyticsItem, BreadcrumbList, Product } from "../types.ts";
 
 export const mapCategoriesToAnalyticsCategories = (
   categories: string[],
@@ -15,7 +15,7 @@ export const mapCategoriesToAnalyticsCategories = (
 export const mapProductCategoryToAnalyticsCategories = (category: string) => {
   return category.split(">").reduce(
     (result, category, index) => {
-      result[`item_category${index === 0 ? "" : index + 1}`] = category;
+      result[`item_category${index === 0 ? "" : index + 1}`] = category.trim();
       return result;
     },
     {} as Record<`item_category${number | ""}`, string>,
@@ -23,20 +23,15 @@ export const mapProductCategoryToAnalyticsCategories = (category: string) => {
 };
 
 export const mapProductToAnalyticsItem = (
-  { product, breadcrumbList, price, listPrice }: {
+  { product, breadcrumbList, price, listPrice, index = 0 }: {
     product: Product;
     breadcrumbList?: BreadcrumbList;
     price?: number;
     listPrice?: number;
+    index?: number;
   },
 ): AnalyticsItem => {
-  const { name, productID, isVariantOf } = product;
-  const index = Math.max(
-    product.isVariantOf?.hasVariant.findIndex((v) => v.url === product.url) ||
-      0,
-    0,
-  );
-
+  const { name, productID, isVariantOf, url } = product;
   const categories = breadcrumbList?.itemListElement
     ? mapCategoriesToAnalyticsCategories(
       breadcrumbList?.itemListElement.map(({ name: _name }) => _name ?? "")
@@ -55,6 +50,7 @@ export const mapProductToAnalyticsItem = (
     item_name: isVariantOf?.name ?? name ?? "",
     item_variant: name,
     item_brand: product.brand?.name ?? "",
+    item_url: url,
     ...categories,
   };
 };
