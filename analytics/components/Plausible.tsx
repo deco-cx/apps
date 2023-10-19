@@ -22,6 +22,19 @@ const snippet = () => {
   // Flags and additional dimentions
   const props: Record<string, string> = {};
 
+  const trackPageview = () => window.plausible("pageview", { props });
+
+  // Attach pushState and popState listeners
+  const originalPushState = history.pushState;
+  if (originalPushState) {
+    history.pushState = function () {
+      // @ts-ignore monkey patch
+      originalPushState.apply(this, arguments);
+      trackPageview();
+    };
+    addEventListener("popstate", trackPageview);
+  }
+
   // setup plausible script and unsubscribe
   window.DECO.events.subscribe((event) => {
     if (!event || event.name !== "deco-flags") return;
@@ -32,7 +45,7 @@ const snippet = () => {
       }
     }
 
-    window.plausible("pageview", { props });
+    trackPageview();
   })();
 
   window.DECO.events.subscribe((event) => {
