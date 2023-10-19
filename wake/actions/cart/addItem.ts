@@ -22,7 +22,7 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Partial<CheckoutFragment>> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);

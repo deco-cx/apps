@@ -141,7 +141,7 @@ const filtersFromParams = (searchParams: URLSearchParams) => {
 const searchLoader = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   // get url from params
   const url = new URL(req.url);
@@ -149,8 +149,7 @@ const searchLoader = async (
 
   const first = props.first ?? 12;
   const filters = filtersFromParams(url.searchParams) ?? props.filters;
-  const sort =
-    (url.searchParams.get("sort") as SortValue | null) ??
+  const sort = (url.searchParams.get("sort") as SortValue | null) ??
     props.sort ??
     "DESC:SALES";
   const page = props.page ?? (Number(url.searchParams.get("page")) || 0);
@@ -158,7 +157,7 @@ const searchLoader = async (
   const operation = props.operation ?? "AND";
   const [sortDirection, sortKey] = sort.split(":") as [
     SortDirection,
-    ProductSortKeys
+    ProductSortKeys,
   ];
 
   const data = await storefront.query<SearchQuery, SearchQueryVariables>({

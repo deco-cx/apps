@@ -12,7 +12,7 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Partial<CheckoutFragment>> => {
   return AddItems({ products: props }, req, ctx);
 };
