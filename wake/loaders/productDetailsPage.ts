@@ -19,7 +19,7 @@ export interface Props {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug } = props;
@@ -45,6 +45,8 @@ async function loader(
   if (!wakeProduct) {
     return null;
   }
+
+  console.log(wakeProduct);
 
   const product = toProduct(wakeProduct, { base: url });
 

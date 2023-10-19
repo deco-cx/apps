@@ -8,17 +8,21 @@ import {
   CheckoutFragment,
 } from "../../utils/graphql/storefront.graphql.gen.ts";
 
-export interface Props {
+export interface CartItem {
   productVariantId: number;
   quantity: number;
   customization: { customizationId: number; value: string }[];
   subscription: { subscriptionGroupId: number; recurringTypeId: number };
 }
 
+export interface Props {
+  products: CartItem[];
+}
+
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Partial<CheckoutFragment>> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
@@ -31,7 +35,7 @@ const action = async (
     AddItemToCartMutation,
     AddItemToCartMutationVariables
   >({
-    variables: { input: { id: cartId, products: [props] } },
+    variables: { input: { id: cartId, products: props.products } },
     ...AddItemToCart,
   });
 
