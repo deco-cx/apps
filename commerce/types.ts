@@ -1,3 +1,5 @@
+import { type Flag } from "deco/types.ts";
+
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export declare type WithContext<T extends Things> = T & {
   "@context": "https://schema.org";
@@ -717,6 +719,10 @@ export interface ViewPromotionEvent extends IEvent<ViewPromotionParams> {
   name: "view_promotion";
 }
 
+export interface DecoFlagsEvent extends IEvent<Flag[]> {
+  name: "deco-flags";
+}
+
 export type AnalyticsEvent =
   | AddShippingInfoEvent
   | AddToCartEvent
@@ -730,4 +736,5 @@ export type AnalyticsEvent =
   | ViewCartEvent
   | ViewItemEvent
   | ViewItemListEvent
-  | ViewPromotionEvent;
+  | ViewPromotionEvent
+  | DecoFlagsEvent;

@@ -1,5 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
-import { AnalyticsEvent } from "../../commerce/types.ts";
+import { type Flag } from "deco/types.ts";
+import { type AnalyticsEvent } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 type EventHandler = (event?: AnalyticsEvent) => void | Promise<void>;
@@ -28,7 +29,31 @@ declare global {
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const snippet = () => {
+const snippet = (flags: Flag[]) => {
+  const appendSessionFlags = () => {
+    const knownFlags = new Set(flags.map((f) => f.name));
+    const cookies = document.cookie.split(";");
+
+    for (let i = 0; i < cookies.length; i++) {
+      const ck = cookies[i].trim();
+
+      if (ck.startsWith("deco_matcher_")) {
+        const name = atob(ck.slice(ck.indexOf("=") + 1, ck.indexOf("@")));
+        const value = ck.at(-1) === "1" ? true : false;
+
+        if (knownFlags.has(name)) continue;
+
+        flags.push({ name, value });
+      }
+    }
+  };
+
+  try {
+    appendSessionFlags();
+  } catch (error) {
+    console.error(error);
+  }
+
   const target = new EventTarget();
 
   const dispatch: EventsAPI["dispatch"] = (event: unknown) => {
@@ -38,6 +63,8 @@ const snippet = () => {
   const subscribe: EventsAPI["subscribe"] = (handler, opts) => {
     // deno-lint-ignore no-explicit-any
     const cb = ({ detail }: any) => handler(detail);
+
+    handler({ name: "deco-flags", params: flags });
 
     target.addEventListener("analytics", cb, opts);
 
@@ -53,10 +80,10 @@ const snippet = () => {
   };
 };
 
-function Events() {
+function Events({ flags }: { flags: Flag[] }) {
   return (
     <Head>
-      <script defer id="deco-events" src={scriptAsDataURI(snippet)} />
+      <script defer id="deco-events" src={scriptAsDataURI(snippet, flags)} />
     </Head>
   );
 }
