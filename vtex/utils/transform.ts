@@ -595,8 +595,7 @@ export const legacyFacetToFilter = (
     if (currentQuery) {
       link.searchParams.set("q", currentQuery);
     }
-
-    return `${link.pathname}${link.search}`;
+    return `${link.pathname}${link.search.replace(/%2[^&]*/g, "")}`;
   };
   return {
     "@type": "FilterToggle",
