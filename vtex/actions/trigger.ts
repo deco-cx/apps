@@ -30,8 +30,6 @@ const action = async (
 ): Promise<{ id: string }> => {
   const { IdSku } = props;
 
-  console.log({ props });
-
   if (!IdSku) {
     throw new Error("Missing idSKU");
   }
