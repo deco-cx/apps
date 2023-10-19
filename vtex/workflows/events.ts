@@ -1,6 +1,6 @@
 import type { Workflow } from "deco/blocks/workflow.ts";
 import type { WorkflowContext, WorkflowGen } from "deco/mod.ts";
-import type { Notification } from "../actions/trigger.ts";
+import type { VTEXNotificationPayload } from "../actions/trigger.ts";
 import type { AppManifest } from "../mod.ts";
 
 interface Props {
@@ -10,28 +10,28 @@ interface Props {
 export default function Index(props: Props) {
   return function* (
     ctx: WorkflowContext<AppManifest>,
-    notification?: Notification,
+    notification?: VTEXNotificationPayload,
   ): WorkflowGen<void> {
-    if (!notification?.idSKU) {
+    if (!notification?.IdSku) {
       throw new Error(`Missing idSKU from notification`);
     }
 
     const {
-      idSKU,
+      IdSku,
       HasStockKeepingUnitRemovedFromAffiliate,
-      isActive,
+      IsActive,
     } = notification;
 
-    const action = HasStockKeepingUnitRemovedFromAffiliate || !isActive
+    const action = HasStockKeepingUnitRemovedFromAffiliate || !IsActive
       ? "DELETE"
       : "UPSERT";
 
     const product = yield ctx.invoke("vtex/loaders/product.ts", {
-      productID: idSKU,
+      productID: IdSku,
     });
 
     if (!product) {
-      throw new Error(`No product returned by Product loader ${idSKU}`);
+      throw new Error(`No product returned by Product loader ${IdSku}`);
     }
 
     /** Start each registered workflow */
