@@ -147,7 +147,7 @@ export const createHttpClient = <T>({
         defaultHeaders?.forEach((value, key) => headers.set(key, value));
         isJSON && headers.set("content-type", "application/json");
 
-        const body = isJSON ? JSON.stringify(init.body) : undefined;
+        const body = isJSON ? JSON.stringify(init.body) : init?.body;
 
         return fetcher(url, {
           ...init,
