@@ -22,7 +22,7 @@
     "std/": "https://deno.land/std@0.190.0/",
     "partytown/": "https://deno.land/x/partytown@0.4.8/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.22.11/",
-    "deco/": "https://denopkg.com/deco-cx/deco@1.39.0/"
+    "deco/": "https://denopkg.com/deco-cx/deco@1.41.11/"
   },
   "githooks": {
     "pre-commit": "check"
