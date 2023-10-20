@@ -34,6 +34,7 @@ const buildProxyRoutes = (
     generateDecoSiteMap?: boolean;
     includeScriptsToHead?: {
       includes?: string[];
+      includePlausible: boolean;
     };
   },
 ) => {
@@ -64,17 +65,14 @@ const buildProxyRoutes = (
     const plausibleScript =
       `<script defer data-exclude="/proxy" data-api="https://plausible.io/api/event">${exclusionAndHashScript}</script>`;
 
-    if (typeof includeScriptsToHead === "undefined") {
-      includeScriptsToHead = { includes: [] };
+    if (includeScriptsToHead?.includePlausible) {
+      includeScriptsToHead.includes = [
+        link1,
+        link2,
+        plausibleScript,
+        ...(includeScriptsToHead?.includes ?? []),
+      ];
     }
-
-    includeScriptsToHead.includes = [
-      link1,
-      link2,
-      plausibleScript,
-      ...(includeScriptsToHead?.includes ?? []),
-    ];
-
     const routeFromPath = (pathTemplate: string): Route => ({
       pathTemplate,
       handler: {
@@ -144,6 +142,7 @@ export interface Props {
    */
   includeScriptsToHead?: {
     includes?: string[];
+    includePlausible: boolean;
   };
 }
 
@@ -155,7 +154,7 @@ function loader(
     extraPathsToProxy = [],
     includeSiteMap = [],
     generateDecoSiteMap = true,
-    includeScriptsToHead = { includes: [] },
+    includeScriptsToHead = { includePlausible: false },
   }: Props,
   _req: Request,
   ctx: AppContext,
