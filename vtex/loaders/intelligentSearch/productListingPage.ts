@@ -1,4 +1,4 @@
-import type { ProductListingPage } from "../../../commerce/types.ts";
+import type { ProductListingPage, Product } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
@@ -8,6 +8,7 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
+import { getKitItems } from "../../utils/kitItems.ts";
 import {
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
@@ -29,6 +30,8 @@ import type {
   RangeFacet,
   SelectedFacet,
   Sort,
+  Item,
+  Product as VTEXProduct
 } from "../../utils/types.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
@@ -134,12 +137,11 @@ const _singleFlightKey = (props: Props, { request }: { request: Request }) => {
     props,
     url,
   );
-  return `${query}${count}${sort}${page}${fuzzy}${
-    selectedFacets
-      .map((f) => `${f.key}${f.value}`)
-      .sort()
-      .join("")
-  }`;
+  return `${query}${count}${sort}${page}${fuzzy}${selectedFacets
+    .map((f) => `${f.key}${f.value}`)
+    .sort()
+    .join("")
+    }`;
 };
 
 const searchArgsOf = (props: Props, url: URL) => {
@@ -346,17 +348,21 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
+  const options = {
+    baseUrl: baseUrl,
+    priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
+  }
+
   const products = await Promise.all(
-    vtexProducts
-      .map((p) =>
-        toProduct(p, p.items[0], 0, {
-          baseUrl: baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
-        })
-      )
-      .map((product) =>
-        props.similars ? withIsSimilarTo(req, ctx, product) : product
-      ),
+    (vtexProducts as VTEXProduct[]).map(async (p) => {
+      const vtexKitItems: Array<{ sku: Item }> = await getKitItems(p.items[0].itemId, ctx);
+      const kitItems: Product[] = vtexKitItems.map((item) => toProduct(p, item.sku, 0, options))
+
+      return {
+        ...toProduct(p, p.items[0], 0, options),
+        isAccessoryOrSparePartFor: kitItems ?? []
+      };
+    })
   );
 
   const paramsToPersist = new URLSearchParams();

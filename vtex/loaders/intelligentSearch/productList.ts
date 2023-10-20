@@ -6,10 +6,11 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
+import { getKitItems } from "../../utils/kitItems.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { ProductID, Sort } from "../../utils/types.ts";
+import type { Item, ProductID, Sort, Product as VTEXProduct } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -123,11 +124,11 @@ const loader = async (
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   const { products: vtexProducts } = await vcsDeprecated
-    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
-      ...params,
-      facets: toPath(facets),
-    }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res) => res.json());
+  ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+    ...params,
+    facets: toPath(facets),
+  }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res: Response) => res.json()) as { products: VTEXProduct[] }
 
   const options = {
     baseUrl: url,
@@ -137,8 +138,17 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
-  const products = vtexProducts
-    .map((p) => toProduct(p, p.items[0], 0, options));
+  const products = await Promise.all(
+    vtexProducts.map(async (p) => {
+      const vtexKitItems: Array<{ sku: Item }> = await getKitItems(p.items[0].itemId, ctx);
+      const kitItems: Product[] = vtexKitItems.map((item) => toProduct(p, item.sku, 0, options))
+
+      return {
+        ...toProduct(p, p.items[0], 0, options),
+        isAccessoryOrSparePartFor: kitItems ?? []
+      };
+    })
+  );
 
   return Promise.all(
     products.map((product) =>
