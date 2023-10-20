@@ -9,7 +9,7 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Partial<CheckoutFragment>> => {
-  return await AddItems({ products: [props] }, req, ctx);
+  return await ctx.invoke.wake.actions.cart.addItem({ products: [props] });
 };
 
 export default action;
