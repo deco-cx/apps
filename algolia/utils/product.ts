@@ -98,7 +98,7 @@ const normalize = (additionalProperty: PropertyValue[] | undefined = []) => {
   return Object.fromEntries(map.entries());
 };
 
-const AvalabilityRank = Object.fromEntries([
+const availabilityByRank: ItemAvailability[] = [
   "https://schema.org/Discontinued",
   "https://schema.org/BackOrder",
   "https://schema.org/OutOfStock",
@@ -109,7 +109,11 @@ const AvalabilityRank = Object.fromEntries([
   "https://schema.org/OnlineOnly",
   "https://schema.org/LimitedAvailability",
   "https://schema.org/InStock",
-].map((item, index) => [item, index])) as Record<ItemAvailability, number>;
+];
+
+const rankByAvailability = Object.fromEntries(
+  availabilityByRank.map((item, rank) => [item, rank]),
+) as Record<ItemAvailability, number>;
 
 // TODO: add ManufacturerCode
 export const toIndex = ({ isVariantOf, ...product }: Product) => {
@@ -131,7 +135,7 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
     },
   ].filter((f) => !facetKeys.has(f.name));
   const availability = product.offers?.offers.reduce(
-    (acc, o) => Math.max(acc, AvalabilityRank[o.availability] ?? 0),
+    (acc, o) => Math.max(acc, rankByAvailability[o.availability] ?? 0),
     0,
   ) ?? 0;
 
@@ -157,7 +161,7 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
     objectID: product.productID,
     groupFacets: normalize(groupFacets),
     facets: normalize(facets),
-    ranks: { availability },
+    available: availability > 3,
   });
 };
 
@@ -167,7 +171,7 @@ export const fromIndex = (
     facets: _f,
     groupFacets: _gf,
     objectID: _oid,
-    ranks: _r,
+    available: _a,
     ...product
   }: IndexedProduct,
   opts: Options,
@@ -217,7 +221,7 @@ export const setupProductsIndices = async (
     distinct: true,
     attributeForDistinct: "inProductGroupWithID",
     customRanking: [
-      "desc(ranks.availability)"
+      "desc(available)",
     ],
     searchableAttributes: [
       "name",
@@ -233,7 +237,7 @@ export const setupProductsIndices = async (
     attributesForFaceting: [
       "facets",
       "groupFacets",
-      "ranks.availability"
+      "available",
     ],
     numericAttributesForFiltering: [
       "offers.highPrice",

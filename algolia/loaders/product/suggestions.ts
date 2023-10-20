@@ -16,6 +16,9 @@ interface Props {
 
   /** @description Enable to highlight matched terms */
   highlight?: boolean;
+
+  /** @description Hide Unavailable Items */
+  hideUnavailable?: boolean;
 }
 
 interface IndexedSuggestion {
@@ -45,7 +48,7 @@ const productsIndex = "products" satisfies Indices;
  * @title Algolia Integration
  */
 const loader = async (
-  { query, count, highlight }: Props,
+  { query, count, highlight, hideUnavailable }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
@@ -59,7 +62,12 @@ const loader = async (
     },
     {
       indexName: productsIndex,
-      params: { hitsPerPage: count ?? 0, facets: [], clickAnalytics: true },
+      params: {
+        hitsPerPage: count ?? 0,
+        filters: hideUnavailable ? `available:true` : "",
+        facets: [],
+        clickAnalytics: true,
+      },
       query,
     },
   ]);

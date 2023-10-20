@@ -38,6 +38,9 @@ interface Props {
 
   /** @description Enable to highlight matched terms */
   highlight?: boolean;
+
+  /** @description Hide Unavailable Items */
+  hideUnavailable?: boolean;
 }
 
 const getPageInfo = (
@@ -163,6 +166,10 @@ const loader = async (
   const facetFilters: [string, string[]][] = JSON.parse(
     url.searchParams.get("facetFilters") ?? "[]",
   );
+
+  if (props.hideUnavailable) {
+    facetFilters.push(["available", ["true"]]);
+  }
 
   // Creates a canonical facet representation format
   // Facets on the same category are grouped by OR and facets on
