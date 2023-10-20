@@ -15,7 +15,6 @@ import {
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
-import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
   filtersFromURL,
