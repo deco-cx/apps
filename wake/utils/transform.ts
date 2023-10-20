@@ -167,6 +167,25 @@ export const toProduct = (
     });
   }
 
+  if (variant.prices?.installmentPlans) {
+    variant.prices.installmentPlans.forEach((installmentPlan) => {
+      if (installmentPlan) {
+        installmentPlan.installments?.forEach((installment) => {
+          priceSpecification.push({
+            "@type": "UnitPriceSpecification",
+            priceType: "https://schema.org/SalePrice",
+            priceComponentType: "https://schema.org/Installment",
+            name: installmentPlan.displayName ?? undefined,
+            description: installmentPlan.name ?? undefined,
+            billingDuration: installment?.number,
+            billingIncrement: installment?.value,
+            price: installment?.value,
+          });
+        });
+      }
+    });
+  }
+
   return {
     "@type": "Product",
     url: getVariantUrl(variant, base).href,
