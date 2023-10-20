@@ -153,7 +153,7 @@ const searchLoader = async (
     props.sort ??
     "DESC:SALES";
   const page = props.page ?? (Number(url.searchParams.get("page")) || 0);
-  const query = props.query ?? url.searchParams.get("s");
+  const query = props.query ?? url.searchParams.get("busca");
   const operation = props.operation ?? "AND";
   const [sortDirection, sortKey] = sort.split(":") as [
     SortDirection,

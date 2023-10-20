@@ -46,8 +46,6 @@ async function loader(
     return null;
   }
 
-  console.log(wakeProduct);
-
   const product = toProduct(wakeProduct, { base: url });
 
   return {
