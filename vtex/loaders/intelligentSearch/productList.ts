@@ -10,7 +10,11 @@ import { getKitItems } from "../../utils/kitItems.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { Item, ProductID, Sort, Product as VTEXProduct } from "../../utils/types.ts";
+import type {
+  Product as VTEXProduct,
+  ProductID,
+  Sort,
+} from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -124,11 +128,11 @@ const loader = async (
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   const { products: vtexProducts } = await vcsDeprecated
-  ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
-    ...params,
-    facets: toPath(facets),
-  }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res: Response) => res.json()) as { products: VTEXProduct[] }
+    ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+      ...params,
+      facets: toPath(facets),
+    }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res: Response) => res.json()) as { products: VTEXProduct[] };
 
   const options = {
     baseUrl: url,
@@ -140,14 +144,16 @@ const loader = async (
   // it in here
   const products = await Promise.all(
     vtexProducts.map(async (p) => {
-      const vtexKitItems: Array<{ sku: Item }> = await getKitItems(p.items[0].itemId, ctx);
-      const kitItems: Product[] = vtexKitItems.map((item) => toProduct(p, item.sku, 0, options))
+      const vtexKitItems = await getKitItems(p.items[0].itemId, ctx);
+      const kitItems = vtexKitItems?.map((item) =>
+        toProduct(p, item.sku, 0, options)
+      );
 
       return {
         ...toProduct(p, p.items[0], 0, options),
-        isAccessoryOrSparePartFor: kitItems ?? []
+        isAccessoryOrSparePartFor: kitItems ?? [],
       };
-    })
+    }),
   );
 
   return Promise.all(
