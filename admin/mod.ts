@@ -25,6 +25,21 @@ export interface BlockState<TBlock = unknown> {
   revision: string;
 }
 
+export interface BlockMetadata {
+  id: string;
+  revision?: string;
+  archived: boolean;
+  type: string; // e.g: "account" | "matcher" | "page" | "section" | "loader";
+  module: string; // e.g: VTEXAccount.ts, LivePage.ts, Header.tsx
+  usedBy: Array<Pick<BlockMetadata, "id">>;
+  lastUpdated: {
+    at: number;
+    byEmail: string;
+    byUserId: string;
+  };
+  data: Resolvable;
+}
+
 export interface Props {
   resolvables: Resolvables;
 }
