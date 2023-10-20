@@ -3,20 +3,22 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $0 from "./functions/requestToParam.ts";
-import * as $$$0 from "./loaders/pages.ts";
-import * as $$$1 from "./loaders/extension.ts";
-import * as $$$2 from "./loaders/image.ts";
-import * as $$$3 from "./loaders/redirectsFromCsv.ts";
-import * as $$$4 from "./loaders/fonts/local.ts";
-import * as $$$5 from "./loaders/fonts/googleFonts.ts";
-import * as $$$6 from "./loaders/secretString.ts";
-import * as $$$7 from "./loaders/asset.ts";
-import * as $$$8 from "./loaders/secret.ts";
-import * as $$$$0 from "./handlers/redirect.ts";
-import * as $$$$1 from "./handlers/router.ts";
-import * as $$$$2 from "./handlers/fresh.ts";
-import * as $$$$3 from "./handlers/proxy.ts";
-import * as $$$$4 from "./handlers/sitemap.ts";
+import * as $$$0 from "./loaders/image.ts";
+import * as $$$1 from "./loaders/redirectsFromCsv.ts";
+import * as $$$2 from "./loaders/secretString.ts";
+import * as $$$3 from "./loaders/extension.ts";
+import * as $$$4 from "./loaders/secret.ts";
+import * as $$$5 from "./loaders/redirects.ts";
+import * as $$$6 from "./loaders/pages.ts";
+import * as $$$7 from "./loaders/redirect.ts";
+import * as $$$8 from "./loaders/asset.ts";
+import * as $$$9 from "./loaders/fonts/local.ts";
+import * as $$$10 from "./loaders/fonts/googleFonts.ts";
+import * as $$$$0 from "./handlers/router.ts";
+import * as $$$$1 from "./handlers/sitemap.ts";
+import * as $$$$2 from "./handlers/proxy.ts";
+import * as $$$$3 from "./handlers/fresh.ts";
+import * as $$$$4 from "./handlers/redirect.ts";
 import * as $$$$$0 from "./pages/Page.tsx";
 import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
 import * as $$$$$$1 from "./sections/Seo/Seo.tsx";
@@ -49,15 +51,17 @@ const manifest = {
     "website/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "website/loaders/asset.ts": $$$7,
-    "website/loaders/extension.ts": $$$1,
-    "website/loaders/fonts/googleFonts.ts": $$$5,
-    "website/loaders/fonts/local.ts": $$$4,
-    "website/loaders/image.ts": $$$2,
-    "website/loaders/pages.ts": $$$0,
-    "website/loaders/redirectsFromCsv.ts": $$$3,
-    "website/loaders/secret.ts": $$$8,
-    "website/loaders/secretString.ts": $$$6,
+    "website/loaders/asset.ts": $$$8,
+    "website/loaders/extension.ts": $$$3,
+    "website/loaders/fonts/googleFonts.ts": $$$10,
+    "website/loaders/fonts/local.ts": $$$9,
+    "website/loaders/image.ts": $$$0,
+    "website/loaders/pages.ts": $$$6,
+    "website/loaders/redirect.ts": $$$7,
+    "website/loaders/redirects.ts": $$$5,
+    "website/loaders/redirectsFromCsv.ts": $$$1,
+    "website/loaders/secret.ts": $$$4,
+    "website/loaders/secretString.ts": $$$2,
   },
   "handlers": {
     "website/handlers/fresh.ts": $$$$2,

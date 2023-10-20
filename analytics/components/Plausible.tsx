@@ -1,18 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { useRouterContext } from "deco/routes/[...catchall].tsx";
-import { exclusionAndHashScript } from "../../utils/plausible_scripts.ts";
-import { dataURI, scriptAsDataURI } from "../../utils/dataURI.ts";
-
-const sanitizeTagAttribute = (inputString: string): string => {
-  const maxLength = 299; // plausible limit
-  let sanitizedString: string = inputString.replace(" ", "-").replace(".", "-")
-    .replace(
-      /[^\w-]/g,
-      "",
-    ).replace(/^\d+/, "");
-  sanitizedString = sanitizedString.slice(0, maxLength);
-  return sanitizedString;
-};
+import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 export interface Props {
   /**
@@ -30,18 +17,45 @@ declare global {
   }
 }
 
-const plausibleScript = exclusionAndHashScript;
-
 // This function should be self contained, because it is stringified!
 const snippet = () => {
+  // Flags and additional dimentions
+  const props: Record<string, string> = {};
+
+  const trackPageview = () => window.plausible("pageview", { props });
+
+  // Attach pushState and popState listeners
+  const originalPushState = history.pushState;
+  if (originalPushState) {
+    history.pushState = function () {
+      // @ts-ignore monkey patch
+      originalPushState.apply(this, arguments);
+      trackPageview();
+    };
+    addEventListener("popstate", trackPageview);
+  }
+
+  // setup plausible script and unsubscribe
+  window.DECO.events.subscribe((event) => {
+    if (!event || event.name !== "deco-flags") return;
+
+    if (Array.isArray(event.params)) {
+      for (const flag of event.params) {
+        props[flag.name] = flag.value.toString();
+      }
+    }
+
+    trackPageview();
+  })();
+
   window.DECO.events.subscribe((event) => {
     if (!event) return;
 
     const { name, params } = event;
 
-    if (!name || !params) return;
+    if (!name || !params || name === "deco-flags") return;
 
-    const values = {} as Record<string, string>;
+    const values = { ...props };
     for (const key in params) {
       // @ts-expect-error somehow typescript bugs
       const value = params[key];
@@ -58,15 +72,6 @@ const snippet = () => {
 };
 
 function Component({ exclude }: Props) {
-  const routerCtx = useRouterContext();
-  const flags: Record<string, string> | undefined = routerCtx?.flags.reduce(
-    (acc, flag) => {
-      acc[sanitizeTagAttribute(`event-${flag.name}`)] = flag.value.toString();
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
-
   return (
     <Head>
       <link rel="dns-prefetch" href="https://plausible.io/api/event" />
@@ -79,8 +84,7 @@ function Component({ exclude }: Props) {
         defer
         data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
         data-api="https://plausible.io/api/event"
-        {...flags}
-        src={dataURI("text/javascript", true, plausibleScript)}
+        src="https://plausible.io/js/script.manual.js"
       />
       <script defer src={scriptAsDataURI(snippet)} />
     </Head>

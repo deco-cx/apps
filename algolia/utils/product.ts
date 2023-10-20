@@ -1,5 +1,10 @@
 import { SearchClient } from "npm:algoliasearch@4.20.0";
-import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
+import {
+  ItemAvailability,
+  Product,
+  ProductLeaf,
+  PropertyValue,
+} from "../../commerce/types.ts";
 
 export type IndexedProduct = ReturnType<typeof toIndex>;
 export type Indices =
@@ -93,6 +98,23 @@ const normalize = (additionalProperty: PropertyValue[] | undefined = []) => {
   return Object.fromEntries(map.entries());
 };
 
+const availabilityByRank: ItemAvailability[] = [
+  "https://schema.org/Discontinued",
+  "https://schema.org/BackOrder",
+  "https://schema.org/OutOfStock",
+  "https://schema.org/SoldOut",
+  "https://schema.org/PreSale",
+  "https://schema.org/PreOrder",
+  "https://schema.org/InStoreOnly",
+  "https://schema.org/OnlineOnly",
+  "https://schema.org/LimitedAvailability",
+  "https://schema.org/InStock",
+];
+
+const rankByAvailability = Object.fromEntries(
+  availabilityByRank.map((item, rank) => [item, rank]),
+) as Record<ItemAvailability, number>;
+
 // TODO: add ManufacturerCode
 export const toIndex = ({ isVariantOf, ...product }: Product) => {
   const facets = [
@@ -112,6 +134,10 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
       value: isVariantOf?.model,
     },
   ].filter((f) => !facetKeys.has(f.name));
+  const availability = product.offers?.offers.reduce(
+    (acc, o) => Math.max(acc, rankByAvailability[o.availability] ?? 0),
+    0,
+  ) ?? 0;
 
   return removeType({
     ...product,
@@ -135,12 +161,19 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
     objectID: product.productID,
     groupFacets: normalize(groupFacets),
     facets: normalize(facets),
+    available: availability > 3,
   });
 };
 
 export const fromIndex = (
-  { url, facets: _f, groupFacets: _fg, objectID: _oid, ...product }:
-    IndexedProduct,
+  {
+    url,
+    facets: _f,
+    groupFacets: _gf,
+    objectID: _oid,
+    available: _a,
+    ...product
+  }: IndexedProduct,
   opts: Options,
 ): Product => ({
   ...product,
@@ -187,6 +220,9 @@ export const setupProductsIndices = async (
   await client.initIndex("products" satisfies Indices).setSettings({
     distinct: true,
     attributeForDistinct: "inProductGroupWithID",
+    customRanking: [
+      "desc(available)",
+    ],
     searchableAttributes: [
       "name",
       "gtin",
@@ -195,13 +231,13 @@ export const setupProductsIndices = async (
       "isVariantOf.name",
       "isVariantOf.model",
       "isVariantOf.description",
-      "offers.offers.availability",
       "offers.offers.priceSpecification.priceType",
       "offers.offers.priceSpecification.priceComponentType",
     ],
     attributesForFaceting: [
       "facets",
       "groupFacets",
+      "available",
     ],
     numericAttributesForFiltering: [
       "offers.highPrice",

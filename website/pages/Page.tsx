@@ -62,7 +62,6 @@ const renderSections = (
   isPreview = false,
 ) => (
   <>
-    <Events />
     {sections.map(renderSectionFor(isPreview))}
   </>
 );
@@ -94,6 +93,7 @@ function Page(
         page={{ id: pageId, pathTemplate: routerCtx?.pagePath }}
         flags={routerCtx?.flags}
       />
+      <Events flags={routerCtx?.flags ?? []} />
       {renderSections(props, false)}
     </>
   );
@@ -107,6 +107,7 @@ export function Preview(
       <Head>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
+      <Events flags={[]} />
       {renderSections(props, true)}
     </>
   );
