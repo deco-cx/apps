@@ -1,4 +1,4 @@
-import type { ProductListingPage } from "../../../commerce/types.ts";
+import type { Product, ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
@@ -8,14 +8,15 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
+import { getKitItems } from "../../utils/kitItems.ts";
 import {
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
-import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
+import { withIsSimilarTo } from "../../utils/similars.ts";
 import {
   filtersFromURL,
   mergeFacets,
@@ -26,6 +27,7 @@ import type {
   Facet,
   Fuzzy,
   PageType,
+  Product as VTEXProduct,
   RangeFacet,
   SelectedFacet,
   Sort,
@@ -346,17 +348,27 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
+  const options = {
+    baseUrl: baseUrl,
+    priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
+  };
+
   const products = await Promise.all(
-    vtexProducts
-      .map((p) =>
-        toProduct(p, p.items[0], 0, {
-          baseUrl: baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
-        })
-      )
-      .map((product) =>
-        props.similars ? withIsSimilarTo(req, ctx, product) : product
-      ),
+    (vtexProducts as VTEXProduct[]).map(async (p) => {
+      const vtexKitItems = await getKitItems(p.items[0].itemId, ctx);
+      const kitItems: Product[] = vtexKitItems.map((item) =>
+        toProduct(p, item.sku, 0, options)
+      );
+
+      const product = {
+        ...toProduct(p, p.items[0], 0, options),
+        isAccessoryOrSparePartFor: kitItems ?? [],
+      };
+
+      return props.similars
+        ? await withIsSimilarTo(req, ctx, product)
+        : product;
+    }),
   );
 
   const paramsToPersist = new URLSearchParams();

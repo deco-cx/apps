@@ -728,6 +728,11 @@ export type LegacyItem = Omit<Item, "variations"> & {
   variations: string[];
 } & Record<string, string[]>;
 
+export interface KitItem {
+  itemId: string;
+  amount: number;
+}
+
 export interface Item {
   itemId: string;
   name: string;
@@ -752,10 +757,7 @@ export interface Item {
     domainValues: string;
   }>;
   isKit: boolean;
-  kitItems?: Array<{
-    itemId: string;
-    amount: number;
-  }>;
+  kitItems?: KitItem[];
 }
 
 export interface TeasersParametersLegacy {
