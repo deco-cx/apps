@@ -56,7 +56,6 @@ const searchLoader = async (
   const { api } = ctx;
 
   const count = props.count ?? 12;
-  const { cleanUrl, typeTags } = typeTagExtractor(url);
   const sort = url.searchParams.get("sort") as Sort;
   const page = Number(url.searchParams.get("page")) || 1;
 
@@ -67,10 +66,35 @@ const searchLoader = async (
 
   const categoryTagName = props.term || url.pathname.split("/").pop() || "";
 
+  const categoryTagNames = Object.values(
+    Object.fromEntries(new URL(req.url).searchParams.entries()),
+  );
+
   const categoryTag = isSearchPage
     ? undefined
     : await api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
       .then((res) => res.json()).catch(() => undefined);
+
+  const promises = categoryTagNames.map((categoryTagName) => {
+    return api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
+      .then((res) => res.json())
+      .catch(() => undefined);
+  });
+
+  const tags = await Promise.all(promises);
+
+  const resolvedTagNames = tags
+  .filter((tag): tag is { name: string } => tag !== undefined)
+  .map(({ name }) => name);
+  
+  // deno-lint-ignore no-explicit-any
+  const filterTagNames: any[] = tags
+    .filter((tag) => tag !== undefined);
+
+  const { cleanUrl, typeTags } = typeTagExtractor(
+    new URL(req.url),
+    filterTagNames,
+  );
 
   const response = await api["GET /api/v2/products/search"]({
     term,
@@ -80,20 +104,20 @@ const searchLoader = async (
     "tags[]": props.tags && props.tags?.length > 0
       ? props.tags
       : (categoryTag?.name && props.filterByTags
-        ? [categoryTag?.name]
-        : undefined),
+        ? [categoryTag?.name, ...resolvedTagNames]
+        : [...resolvedTagNames]),
     wildcard: true,
     ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
   }, STALE);
+
   const pagination = JSON.parse(
     response.headers.get("x-pagination") ?? "null",
   ) as ProductSearchResult["pagination"] | null;
 
-  const [search] = await Promise.all([
-    response.json(),
-  ]);
+  const search = await response.json();
 
   const { results: searchResults } = search;
+
   const products = searchResults?.map((product) =>
     toProduct(product, null, {
       url,

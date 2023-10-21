@@ -295,13 +295,37 @@ export const toFilters = (
     },
   };
 
-  const types = Object.keys(aggregations.types ?? {}).map((typeKey) => {
-    // deno-lint-ignore no-explicit-any
-    const typeValues = (aggregations.types as any)[typeKey] as {
+  const combinedFiltersKeys = Object.keys(aggregations.types ?? {}).concat(
+    ...Object.keys(aggregations.properties ?? {}),
+  );
+
+  const types = combinedFiltersKeys.map((typeKey) => {
+    const isProperty = typeKey.includes("property");
+
+    interface AggregationType {
       name: string;
       title: string;
       count: number;
-    }[];
+      value: string;
+    }
+    const typeValues: AggregationType[] = isProperty
+      // deno-lint-ignore no-explicit-any
+      ? ((aggregations.properties as any)[
+        typeKey as string
+      ] as AggregationType[])
+      // deno-lint-ignore no-explicit-any
+      : ((aggregations.types as any)[
+        typeKey as string
+      ] as AggregationType[]);
+
+    if (isProperty) {
+      typeValues.forEach((obj) => {
+        if (obj.value) {
+          obj.title = obj.value;
+          obj.name = obj.value;
+        }
+      });
+    }
 
     return {
       "@type": "FilterToggle" as const,
@@ -338,22 +362,24 @@ export const toFilters = (
   ];
 };
 
-export const typeTagExtractor = (url: URL) => {
+export const typeTagExtractor = (url: URL, tags: { subtitle: string }[]) => {
   const keysToDestroy: string[] = [];
   const typeTags: { key: string; value: string }[] = [];
-  const typeTagRegex = /\btype_tags\[(\S+)\]\[\]/;
+  const typeTagRegex = /\btype_tags\[(.*?)\]\[\]/;
 
   url.searchParams.forEach((value, key) => {
     const match = typeTagRegex.exec(key);
 
     if (match) {
-      keysToDestroy.push(key);
-      typeTags.push({ key, value });
+      const tagValue = match[1];
+      if (tags.some((tag) => tag.subtitle === tagValue)) {
+        keysToDestroy.push(key);
+        typeTags.push({ key, value });
+      }
     }
   });
 
-  // it can't be done inside the forEach instruction above
-  typeTags.forEach((tag) => url.searchParams.delete(tag.key));
+  keysToDestroy.forEach((key) => url.searchParams.delete(key));
 
   return {
     typeTags,
