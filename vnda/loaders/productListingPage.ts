@@ -84,9 +84,9 @@ const searchLoader = async (
   const tags = await Promise.all(promises);
 
   const resolvedTagNames = tags
-  .filter((tag): tag is { name: string } => tag !== undefined)
-  .map(({ name }) => name);
-  
+    .filter((tag): tag is { name: string } => tag !== undefined)
+    .map(({ name }) => name);
+
   // deno-lint-ignore no-explicit-any
   const filterTagNames: any[] = tags
     .filter((tag) => tag !== undefined);
