@@ -362,7 +362,7 @@ export const toFilters = (
   ];
 };
 
-export const typeTagExtractor = (url: URL, tags: { subtitle: string }[]) => {
+export const typeTagExtractor = (url: URL, tags: { type: string }[]) => {
   const keysToDestroy: string[] = [];
   const typeTags: { key: string; value: string }[] = [];
   const typeTagRegex = /\btype_tags\[(.*?)\]\[\]/;
@@ -372,7 +372,7 @@ export const typeTagExtractor = (url: URL, tags: { subtitle: string }[]) => {
 
     if (match) {
       const tagValue = match[1];
-      if (tags.some((tag) => tag.subtitle === tagValue)) {
+      if (tags.some((tag) => tag.type === tagValue)) {
         keysToDestroy.push(key);
         typeTags.push({ key, value });
       }
