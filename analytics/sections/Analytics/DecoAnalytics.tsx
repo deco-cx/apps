@@ -1,4 +1,4 @@
-import Plausible, { type Props } from "../../components/Plausible.tsx";
+import Plausible, { type Props } from "../../components/DecoAnalytics.tsx";
 
 function Section(props: Props) {
   return <Plausible {...props} />;

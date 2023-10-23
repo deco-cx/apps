@@ -56,7 +56,6 @@ async (req, _ctx) => {
   removeCFHeaders(headers); // cf-headers are not ASCII-compliant
   if (isFreshCtx<DecoSiteState>(_ctx)) {
     _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
-    console.log("_ctx.state", _ctx?.state);
   }
 
   headers.set("origin", req.headers.get("origin") ?? url.origin);
@@ -99,7 +98,11 @@ async (req, _ctx) => {
 
               accHtml += decoder.decode(chunk.slice(0, i + 1));
               for (const script of includeScriptsToHead.includes) {
-                accHtml += script.src;
+                if ((typeof script.src === "string")) {
+                  accHtml += script.src;
+                } else {
+                  accHtml += script.src(req);
+                }
               }
               accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
 

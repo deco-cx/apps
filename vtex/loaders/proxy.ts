@@ -64,7 +64,7 @@ const buildProxyRoutes = (
           __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
-          includeScriptsToHead: includeScriptsToHead,
+          includeScriptsToHead,
         },
       },
     });

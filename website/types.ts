@@ -1,1 +1,1 @@
-export type Script = { src: string };
+export type Script = { src: string | ((req: Request) => string) };
