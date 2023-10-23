@@ -97,8 +97,8 @@ const formatPriceFromPathToFacet = (term: string) => {
 export const removeForwardSlash = (str: string) =>
   str.slice(str.startsWith("/") ? 1 : 0);
 
-const getTerm = (path: string, map: string) => {
-  const mapSegments = map.split(",");
+const getTerm = (path: string, map: string | undefined) => {
+  const mapSegments = map?.split(",") ?? [];
   const pathSegments = removeForwardSlash(path).split("/");
 
   const term = pathSegments.slice(0, mapSegments.length).join("/");
@@ -167,10 +167,10 @@ const loader = async (
   const _to = (page + 1) * count - 1;
 
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
-  const pageType = pageTypes.at(-1) || pageTypes[0];
+  const pageType = pageTypes.at(-1);
 
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
-  const [map, term] = missingParams
+  const [map, term] = missingParams && fq.length === 0
     ? getMapAndTerm(pageTypes)
     : [maybeMap, maybeTerm];
 
@@ -193,6 +193,12 @@ const loader = async (
 
   const fmap = url.searchParams.get("fmap") ?? map;
   const args = { map, _from, _to, O, ft, fq };
+
+  console.log({
+    ...params,
+    ...args,
+    term: getTerm(term, map),
+  });
 
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
     vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
@@ -265,7 +271,7 @@ const loader = async (
     PriceRanges: vtexFacets.PriceRanges,
   })
     .map(([name, facets]) =>
-      legacyFacetToFilter(name, facets, url, map, term, filtersBehavior)
+      legacyFacetToFilter(name, facets, url, map ?? '', term, filtersBehavior)
     )
     .flat()
     .filter((x): x is Filter => Boolean(x));
