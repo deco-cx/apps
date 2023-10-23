@@ -2,6 +2,7 @@ import { isFreshCtx } from "deco/handlers/fresh.ts";
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
+import { Script } from "../types.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -55,6 +56,7 @@ async (req, _ctx) => {
   removeCFHeaders(headers); // cf-headers are not ASCII-compliant
   if (isFreshCtx<DecoSiteState>(_ctx)) {
     _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
+    console.log("_ctx.state", _ctx?.state);
   }
 
   headers.set("origin", req.headers.get("origin") ?? url.origin);
@@ -97,7 +99,7 @@ async (req, _ctx) => {
 
               accHtml += decoder.decode(chunk.slice(0, i + 1));
               for (const script of includeScriptsToHead.includes) {
-                accHtml += script;
+                accHtml += script.src;
               }
               accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
 
@@ -173,8 +175,7 @@ export interface Props {
    * @description Scripts to be included in the head of the html
    */
   includeScriptsToHead?: {
-    includes?: string[];
-    includePlausible: boolean;
+    includes?: Script[];
   };
 }
 

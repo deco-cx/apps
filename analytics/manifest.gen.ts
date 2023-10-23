@@ -3,6 +3,7 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$0 from "./sections/Analytics/Plausible.tsx";
+import * as $$$$$$1 from "./loaders/PlausibleScript.ts";
 
 const manifest = {
   "sections": {
@@ -10,6 +11,7 @@ const manifest = {
   },
   "name": "analytics",
   "baseUrl": import.meta.url,
+  "loaders": { "analytics/loaders/PlausibleScript.ts": $$$$$$1 },
 };
 
 export type Manifest = typeof manifest;
