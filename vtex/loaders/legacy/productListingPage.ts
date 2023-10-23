@@ -271,7 +271,7 @@ const loader = async (
     PriceRanges: vtexFacets.PriceRanges,
   })
     .map(([name, facets]) =>
-      legacyFacetToFilter(name, facets, url, map ?? '', term, filtersBehavior)
+      legacyFacetToFilter(name, facets, url, map ?? "", term, filtersBehavior)
     )
     .flat()
     .filter((x): x is Filter => Boolean(x));
