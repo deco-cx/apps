@@ -105,7 +105,7 @@ const searchLoader = async (
       ? props.tags
       : (categoryTag?.name && props.filterByTags
         ? [categoryTag?.name, ...resolvedTagNames]
-        : [...resolvedTagNames]),
+        : undefined),
     wildcard: true,
     ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
   }, STALE);
