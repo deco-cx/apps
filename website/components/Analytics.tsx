@@ -46,9 +46,14 @@ export interface Props {
   analyticsType?: string;
 
   /**
-   * @description prevent dataLayer being forward
+   * @description prevent dataLayer being forward into partytown worker
    */
   preventForward?: boolean;
+
+  /**
+   * @description Disable forwarding events into dataLayer
+   */
+  disableAutomaticEventPush?: boolean;
 }
 
 export default function Analytics(
@@ -58,6 +63,7 @@ export default function Analytics(
     dangerouslyRunOnMainThread,
     googleAnalyticsIds,
     preventForward,
+    disableAutomaticEventPush,
   }: Props,
 ) {
   const isDeploy = !!context.isDeploy;
@@ -100,11 +106,13 @@ export default function Analytics(
         }}
         forward={["debugGlobals"]}
       />
-      <script
-        defer
-        id="analytics-script"
-        src={scriptAsDataURI(snippet)}
-      />
+      {disableAutomaticEventPush !== true && (
+        <script
+          defer
+          id="analytics-script"
+          src={scriptAsDataURI(snippet)}
+        />
+      )}
     </>
   );
 }

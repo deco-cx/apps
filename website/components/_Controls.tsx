@@ -54,9 +54,9 @@ const main = () => {
 
       const pathname = window.LIVE.play
         ? `/play/blocks/${window.LIVE.page.id}?domain=${window.location.origin}`
-        : `/admin/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
+        : `/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
 
-      const href = new URL(pathname, "https://deco.cx");
+      const href = new URL(pathname, "https://admin.deco.cx");
 
       href.searchParams.set(
         "path",
