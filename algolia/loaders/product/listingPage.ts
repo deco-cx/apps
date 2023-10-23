@@ -81,15 +81,38 @@ const facet = {
     facet.replace("groupFacets.", "").replace("facets.", ""),
 };
 
+const filterFacets = (
+  facets: SearchResponse<IndexedProduct>["facets"] = {},
+  renderingContent: SearchResponse<IndexedProduct>["renderingContent"],
+) => {
+  const entries = Object.entries(facets);
+  const order = renderingContent?.facetOrdering?.facets?.order;
+
+  if (!order?.length) {
+    return entries;
+  }
+
+  // O(n) sort
+  return order.reduce((acc, name) => {
+    const item = facets[name];
+
+    if (item) {
+      acc.push([name, item]);
+    }
+
+    return acc;
+  }, [] as [string, Record<string, number>][]);
+};
+
 const transformFacets = (
-  facets: Record<string, Record<string, number>> = {},
+  facets: [string, Record<string, number>][],
   options: { facetFilters: [string, string[]][]; url: URL },
 ): Filter[] => {
   const { facetFilters, url } = options;
   const params = new URLSearchParams(url.searchParams);
   const filters = Object.fromEntries(facetFilters);
 
-  return Object.entries(facets).map(([key, values]) => {
+  return facets.map(([key, values]) => {
     const filter = filters[key] ?? [];
 
     return {
@@ -210,7 +233,7 @@ const loader = async (
 
   const [
     { hits, page, nbPages, queryID, nbHits, hitsPerPage },
-    { facets },
+    { facets, renderingContent },
   ] = results as SearchResponse<IndexedProduct>[];
 
   const products = await resolveProducts(
@@ -221,7 +244,10 @@ const loader = async (
     { url, queryID, indexName },
   );
   const pageInfo = getPageInfo(page, nbPages, nbHits, hitsPerPage, url);
-  const filters = transformFacets(facets, { facetFilters, url });
+  const filters = transformFacets(filterFacets(facets, renderingContent), {
+    facetFilters,
+    url,
+  });
 
   return {
     "@type": "ProductListingPage",
