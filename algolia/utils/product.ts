@@ -162,6 +162,9 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
     groupFacets: normalize(groupFacets),
     facets: normalize(facets),
     available: availability > 3,
+    releaseDate: product.releaseDate
+      ? new Date(product.releaseDate).getTime()
+      : undefined,
   });
 };
 
@@ -172,6 +175,7 @@ export const fromIndex = (
     groupFacets: _gf,
     objectID: _oid,
     available: _a,
+    releaseDate,
     ...product
   }: IndexedProduct,
   opts: Options,
@@ -210,6 +214,7 @@ export const fromIndex = (
     "@type": "Product",
     sku: similar.productID,
   })),
+  releaseDate: releaseDate ? new Date(releaseDate).toUTCString() : undefined,
 });
 
 export const setupProductsIndices = async (
@@ -220,19 +225,29 @@ export const setupProductsIndices = async (
   await client.initIndex("products" satisfies Indices).setSettings({
     distinct: true,
     attributeForDistinct: "inProductGroupWithID",
-    customRanking: [
+    ranking: [
       "desc(available)",
+      "typo",
+      "geo",
+      "words",
+      "filters",
+      "proximity",
+      "attribute",
+      "exact",
+      "custom",
+    ],
+    customRanking: [
+      "desc(releaseDate)",
     ],
     searchableAttributes: [
       "name",
       "gtin",
+      "productID",
       "brand.name",
       "description",
       "isVariantOf.name",
       "isVariantOf.model",
       "isVariantOf.description",
-      "offers.offers.priceSpecification.priceType",
-      "offers.offers.priceSpecification.priceComponentType",
     ],
     attributesForFaceting: [
       "facets",
