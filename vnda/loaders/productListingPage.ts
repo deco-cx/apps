@@ -64,24 +64,24 @@ const searchLoader = async (
   const term = props.term || props.slug || qQueryString ||
     undefined;
 
-  const categoryTagName = props.term || url.pathname.split("/").pop() || "";
+  const categoryTagName = props.term || url.pathname.split("/").slice(1) || "";
 
   const categoryTagNames = Object.values(
     Object.fromEntries(new URL(req.url).searchParams.entries()),
   );
 
-  const categoryTag = isSearchPage
-    ? undefined
-    : await api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
-      .then((res) => res.json()).catch(() => undefined);
 
-  const promises = categoryTagNames.map((categoryTagName) => {
+  const promises = categoryTagNames.concat([...categoryTagName].filter((isUndefined) => isUndefined !== undefined) as string[]).map((categoryTagName) => {
     return api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
       .then((res) => res.json())
       .catch(() => undefined);
   });
 
   const tags = await Promise.all(promises);
+
+  const seoCategories = tags.slice(-[...categoryTagName].length).filter((tag): tag is { name: string, title: string, subtitle: string } => tag !== undefined)
+
+  const categories = seoCategories.map(({ name }) => name)
 
   const resolvedTagNames = tags
     .filter((tag): tag is { name: string } => tag !== undefined)
@@ -103,8 +103,8 @@ const searchLoader = async (
     per_page: count,
     "tags[]": props.tags && props.tags?.length > 0
       ? props.tags
-      : (categoryTag?.name && props.filterByTags
-        ? [categoryTag?.name, ...resolvedTagNames]
+      : (categories.length > 0 && props.filterByTags
+        ? [...categories, ...resolvedTagNames]
         : undefined),
     wildcard: true,
     ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
@@ -136,11 +136,11 @@ const searchLoader = async (
     previousPage.set("page", (page - 1).toString());
   }
 
-  const hasSEO = !isSearchPage && categoryTag;
+  const hasSEO = !isSearchPage && categories.length > 0;
 
   return {
     "@type": "ProductListingPage",
-    seo: hasSEO ? getSEOFromTag({ ...categoryTag }, req) : undefined,
+    seo: hasSEO ? getSEOFromTag({ ...seoCategories[seoCategories.length - 1] }, req) : undefined,
     // TODO: Find out what's the right breadcrumb on vnda
     breadcrumb: {
       "@type": "BreadcrumbList",
