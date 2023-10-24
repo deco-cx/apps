@@ -1,16 +1,17 @@
 import { getCookies, getSetCookies, setCookie } from "std/http/cookie.ts";
+import { DECO_MATCHER_PREFIX } from "deco/blocks/matcher.ts";
 
 export const getFlagsFromCookies = (req: Request) => {
   const flags = [];
   const cookies = getCookies(req.headers);
 
   for (const [key, value] of Object.entries(cookies)) {
-    if (key.startsWith("deco_matcher_")) {
+    if (key.startsWith(DECO_MATCHER_PREFIX)) {
       const flagName = atob(
         value.slice(value.indexOf("=") + 1, value.indexOf("@")),
       );
-      const flagValue = value.at(-1) === "1" ? true : false;
-      flags.push({ flagName, flagValue });
+      const flagActive = value.at(-1) === "1";
+      flags.push({ flagName, flagActive });
     }
   }
   return flags;
