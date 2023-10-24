@@ -1,5 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import type { SimulationOrderForm } from "../../utils/types.ts";
+import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Item {
   id: number;
@@ -25,12 +26,14 @@ const action = async (
   const cookie = req.headers.get("cookie") ?? "";
   const { vcsDeprecated } = ctx;
   const { items, postalCode, country, RnbBehavior = 1 } = props;
+  const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated[
     "POST /api/checkout/pub/orderForms/simulation"
   ](
     {
       RnbBehavior,
+      sc: segment.channel,
     },
     {
       body: { items, country, postalCode },

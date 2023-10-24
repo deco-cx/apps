@@ -2,6 +2,7 @@ import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
+import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   paymentSystem: number;
@@ -19,10 +20,11 @@ const action = async (
   const { paymentSystem } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
+  const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated
     ["GET /api/checkout/pub/orderForm/:orderFormId/installments"](
-      { orderFormId, paymentSystem },
+      { orderFormId, paymentSystem, sc: segment.channel },
       { headers: { accept: "application/json", cookie } },
     );
 
