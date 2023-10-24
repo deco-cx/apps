@@ -23,7 +23,10 @@ const action = async (
   const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated
-    ["POST /api/checkout/pub/orderForm/:orderFormId/coupons"]({ orderFormId, sc: segment.channel, }, {
+    ["POST /api/checkout/pub/orderForm/:orderFormId/coupons"]({
+      orderFormId,
+      sc: segment.channel,
+    }, {
       body: { text },
       headers: {
         accept: "application/json",
