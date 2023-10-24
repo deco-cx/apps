@@ -20,8 +20,6 @@ const loader = (
 
     const flags = getFlagsFromCookies(req);
 
-    console.log("flags", flags, req.headers);
-
     const plausibleScript = `<script ${
       props.defer ? "defer" : ""
     } data-exclude="/proxy" ${
