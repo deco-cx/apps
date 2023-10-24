@@ -1,10 +1,11 @@
-import { Page } from "deco/blocks/page.ts";
+import { Page } from "deco/blocks/page.tsx";
 import { context } from "deco/live.ts";
 import { adminUrlFor, isAdmin } from "deco/utils/admin.ts";
 import { ConnInfo } from "std/http/server.ts";
 import Fresh from "../../../website/handlers/fresh.ts";
 import { pageIdFromMetadata } from "../../../website/pages/Page.tsx";
 import { AppContext } from "../mod.ts";
+
 export interface DevConfig {
   page: Page;
 }
