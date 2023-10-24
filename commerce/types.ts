@@ -301,8 +301,23 @@ export interface ReviewTag {
   value?: string[];
 }
 
+/** https://schema.org/Person */
+export interface Person extends Omit<Thing, "@type"> {
+  /** Email address. */
+  email?: string;
+  /** Given name. In the U.S., the first name of a Person. */
+  givenName?: string;
+  /** Family name. In the U.S., the last name of a Person. */
+  familyName?: string;
+  /** Gender of something, typically a Person, but possibly also fictional characters, animals, etc */
+  gender?: "https://schema.org/Male" | "https://schema.org/Female";
+  /** An image of the item. This can be a URL or a fully described ImageObject. **/
+  image?: ImageObject[];
+}
+
+// NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {
-  "@type": "Person" | "Organization";
+  "@type": "Author";
   /** The name of the author. */
   name?: string;
   /** A link to a web page that uniquely identifies the author of the article. For example, the author's social media page, an about me page, or a bio page. */

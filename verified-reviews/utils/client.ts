@@ -141,7 +141,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
             "@type": "Review",
             author: [
               {
-                "@type": "Person",
+                "@type": "Author",
                 name: `${item.firstname} ${item.lastname}`,
               },
             ],

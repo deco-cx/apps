@@ -1,6 +1,7 @@
-import { PARTIAL_ATTR } from "$fresh/src/constants.ts";
 import type { Section, SectionProps } from "deco/blocks/section.ts";
-import { usePartial } from "../../hooks/usePartial.ts";
+import { usePartialSection } from "deco/hooks/usePartialSection.ts";
+import { useId } from "preact/hooks";
+import { scriptAsDataURI } from "../../../utils/dataURI.ts";
 
 /** @titleBy type */
 interface Scroll {
@@ -26,7 +27,6 @@ export interface Props {
   sections: Section[];
   display?: boolean;
   behavior?: Scroll | Intersection;
-  id?: string;
 }
 
 const script = (
@@ -34,49 +34,37 @@ const script = (
   type: "scroll" | "intersection",
   payload: string,
 ) => {
-  const handler = () => {
-    const element = document.getElementById(id);
+  const element = document.getElementById(id);
 
-    if (!element) {
-      return;
-    }
+  if (!element) {
+    return;
+  }
 
-    if (type === "scroll") {
-      addEventListener(
-        "scroll",
-        () => setTimeout(() => element.click(), Number(payload) || 200),
-      );
-    }
+  if (type === "scroll") {
+    addEventListener(
+      "scroll",
+      () => setTimeout(() => element.click(), Number(payload) || 200),
+    );
+  }
 
-    if (type === "intersection") {
-      new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            // @ts-expect-error trustme, I'm an engineer
-            entry.target.click();
-          }
+  if (type === "intersection") {
+    new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          // @ts-expect-error trustme, I'm an engineer
+          entry.target.click();
         }
-      }, { rootMargin: payload || "200px" }).observe(element);
-    }
-  };
-
-  if (document.readyState === "complete") {
-    handler();
-  } else {
-    addEventListener("load", handler);
+      }
+    }, { rootMargin: payload || "200px" }).observe(element);
   }
 };
 
-const ID = "deferred";
-
-const Deferred = (props: SectionProps<typeof loader>) => {
-  const { sections, display, behavior, id, href } = props;
-  const partial = usePartial<typeof Deferred>({
-    id,
-    href,
+const Deferred = (props: Props) => {
+  const { sections, display, behavior } = props;
+  const buttonId = `deffered-${useId()}`;
+  const partial = usePartialSection<typeof Deferred>({
     props: { display: true },
   });
-  const buttonId = `${ID}-${id}`;
 
   if (display) {
     return (
@@ -90,22 +78,16 @@ const Deferred = (props: SectionProps<typeof loader>) => {
     <>
       <button {...partial} id={buttonId} data-deferred />
       <script
-        type="module"
-        dangerouslySetInnerHTML={{
-          __html: `(${script})("${buttonId}", "${
-            behavior?.type || "intersection"
-          }", "${behavior?.payload || ""}");`,
-        }}
+        defer
+        src={scriptAsDataURI(
+          script,
+          buttonId,
+          behavior?.type || "intersection",
+          behavior?.payload.toString() || "",
+        )}
       />
     </>
   );
-};
-
-export const loader = (props: Props, req: Request) => {
-  return {
-    ...props,
-    href: req.url,
-  };
 };
 
 export default Deferred;

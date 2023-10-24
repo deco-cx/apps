@@ -1,10 +1,5 @@
+import { Product } from "../../commerce/types.ts";
 import { Review, Rollup } from "./types.ts";
-import {
-  AggregateRating,
-  Author,
-  Product,
-  Review as ReviewSchema,
-} from "../../commerce/types.ts";
 
 export const toReview = (review: Review) => {
   const date = new Date(review.details.created_date);
@@ -15,11 +10,11 @@ export const toReview = (review: Review) => {
   const cons = review.details.properties.find((prop) => prop.key == "cons")
     ?.value;
   return {
-    "@type": "Review" as ReviewSchema["@type"],
+    "@type": "Review" as const,
     id: review.internal_review_id.toString(),
     author: [
       {
-        "@type": "Person" as Author["@type"],
+        "@type": "Author" as const,
         name: `${review.details.nickname}`,
         verifiedBuyer: review.badges.is_verified_buyer,
         location: review.details.location,
@@ -32,7 +27,7 @@ export const toReview = (review: Review) => {
     reviewHeadline: review.details.headline,
     reviewBody: review.details.comments,
     reviewRating: {
-      "@type": "AggregateRating" as AggregateRating["@type"],
+      "@type": "AggregateRating" as const,
       ratingValue: review.metrics.rating,
     },
     tags: review.details.properties.map((props) => ({
@@ -57,13 +52,13 @@ export const toReview = (review: Review) => {
 export const toAggregateRating = (rollup: Rollup) => {
   if (!rollup) {
     return {
-      "@type": "AggregateRating" as AggregateRating["@type"],
+      "@type": "AggregateRating" as const,
       ratingValue: 0,
       ratingCount: 0,
     };
   }
   return {
-    "@type": "AggregateRating" as AggregateRating["@type"],
+    "@type": "AggregateRating" as const,
     ratingValue: rollup?.average_rating || 0,
     ratingCount: rollup?.review_count || 0,
   };
