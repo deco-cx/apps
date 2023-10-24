@@ -1,20 +1,20 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
-import type { User } from "../loaders/user.ts";
+import { Person } from "../../commerce/types.ts";
 import { invoke } from "../runtime.ts";
 import type { OrderForm } from "../utils/types.ts";
 import { WishlistItem } from "../utils/types.ts";
 
 export interface Context {
   cart: OrderForm | null;
-  user: User | null;
+  user: Person | null;
   wishlist: WishlistItem[] | null;
 }
 
 const loading = signal<boolean>(true);
 const context = {
   cart: signal<OrderForm | null>(null),
-  user: signal<User | null>(null),
+  user: signal<Person | null>(null),
   wishlist: signal<WishlistItem[] | null>(null),
 };
 
