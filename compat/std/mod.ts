@@ -362,13 +362,15 @@ export default function Std(
     }
   }
 
+  const [, ecomPlatform] = commerceApp.dependencies ?? [];
+
   return {
     state,
     sourceMap,
     manifest: _manifest as Manifest,
     dependencies: [liveApp, {
       ...commerceApp,
-      dependencies: [webSiteApp, commerceApp.dependencies![1]!],
+      dependencies: ecomPlatform ? [webSiteApp, ecomPlatform] : [webSiteApp],
     }],
   };
 }

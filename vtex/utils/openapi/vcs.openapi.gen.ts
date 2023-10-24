@@ -8589,6 +8589,10 @@ export interface OpenAPI {
          */
         seller?: string;
       }[];
+      marketingData?: {
+        [k: string]: any;
+      };
+      priceTables?: string[];
       /**
        * Three letter ISO code of the country of the shipping address. This value must be sent along with the `postalCode` or `geoCoordinates` values.
        */

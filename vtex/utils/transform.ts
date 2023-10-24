@@ -179,9 +179,13 @@ const toAdditionalPropertyCategories = <
   );
 };
 
-export const toAdditionalPropertyCategory = (
-  { propertyID, value }: { propertyID: string; value: string },
-): PropertyValue => ({
+export const toAdditionalPropertyCategory = ({
+  propertyID,
+  value,
+}: {
+  propertyID: string;
+  value: string;
+}): PropertyValue => ({
   "@type": "PropertyValue" as const,
   name: "category",
   propertyID,
@@ -233,9 +237,13 @@ const toAdditionalPropertyReferenceIds = (
   );
 };
 
-export const toAdditionalPropertyReferenceId = (
-  { name, value }: { name: string; value: string },
-): PropertyValue => ({
+export const toAdditionalPropertyReferenceId = ({
+  name,
+  value,
+}: {
+  name: string;
+  value: string;
+}): PropertyValue => ({
   "@type": "PropertyValue",
   name,
   value,
@@ -295,7 +303,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [] } = sku;
+  const { name, ean, itemId: skuId, referenceId = [], kitItems } = sku;
   const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
@@ -314,8 +322,9 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     referenceId,
   );
   const images = nonEmptyArray(sku.images);
-  const offers = (sku.sellers ?? [])
-    .map(isLegacyProduct(product) ? toOfferLegacy : toOffer);
+  const offers = (sku.sellers ?? []).map(
+    isLegacyProduct(product) ? toOfferLegacy : toOffer,
+  );
 
   const isVariantOf = level < 1
     ? ({
@@ -357,6 +366,11 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       name: brand,
       logo: brandImageUrl,
     },
+    isAccessoryOrSparePartFor: kitItems?.map(({ itemId }) => ({
+      "@type": "Product",
+      productID: itemId,
+      sku: itemId,
+    })),
     inProductGroupWithID: productId,
     sku: skuId,
     gtin: ean,
@@ -433,13 +447,15 @@ const toAdditionalProperties = (sku: SkuVTEX): PropertyValue[] =>
     values.map((value) => toAdditionalPropertySpecification({ name, value }))
   ) ?? [];
 
-export const toAdditionalPropertySpecification = (
-  { name, value, propertyID }: {
-    name: string;
-    value: string;
-    propertyID?: string;
-  },
-): PropertyValue => ({
+export const toAdditionalPropertySpecification = ({
+  name,
+  value,
+  propertyID,
+}: {
+  name: string;
+  value: string;
+  propertyID?: string;
+}): PropertyValue => ({
   "@type": "PropertyValue",
   name,
   value,
@@ -538,10 +554,11 @@ export const legacyFacetToFilter = (
   facets: LegacyFacet[],
   url: URL,
   map: string,
+  term: string,
   behavior: "dynamic" | "static",
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = url.pathname
+  const pathSegments = term
     .replace(/^\//, "")
     .split("/")
     .slice(0, mapSegments.length);
@@ -558,8 +575,19 @@ export const legacyFacetToFilter = (
       ? [...pathSegments.filter((_, i) => i !== index)]
       : [...pathSegments, facet.Value];
 
-    const link = new URL(`/${newPath.join("/")}`, url);
-    link.searchParams.set("map", newMap.join(","));
+    // Insertion-sort like algorithm. Uses the c-continuum theorem
+    const zipped: [string, string][] = [];
+    for (let it = 0; it < newMap.length; it++) {
+      let i = 0;
+      while (
+        i < zipped.length && (zipped[i][0] === "c" || zipped[i][0] === "C")
+      ) i++;
+
+      zipped.splice(i, 0, [newMap[it], newPath[it]]);
+    }
+
+    const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
+    link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
       link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
     }
@@ -607,6 +635,27 @@ export const filtersToSearchParams = (
   return searchParams;
 };
 
+const fromLegacyMap: Record<string, string> = {
+  priceFrom: "price",
+  productClusterSearchableIds: "productClusterIds",
+};
+
+export const legacyFacetsNormalize = (map: string, path: string) => {
+  // Replace legacy price path param to IS price facet format
+  // exemple: de-34,90-a-56,90 turns to 34.90:56.90
+  // may this regex have to be adjusted for international stores
+  const value = path.replace(
+    /de-(?<from>\d+[,]?[\d]+)-a-(?<to>\d+[,]?[\d]+)/,
+    (_match, from, to) => {
+      return `${from.replace(",", ".")}:${to.replace(",", ".")}`;
+    },
+  );
+
+  const key = fromLegacyMap[map] || map;
+
+  return { key, value };
+};
+
 /**
  * Transform ?map urls into selected facets. This happens when a store is migrating
  * to Deco and also migrating from VTEX Legacy to VTEX Intelligent Search.
@@ -618,7 +667,9 @@ export const legacyFacetsFromURL = (url: URL) => {
 
   const selectedFacets: SelectedFacet[] = [];
   for (let it = 0; it < length; it++) {
-    selectedFacets.push({ key: mapSegments[it], value: pathSegments[it] });
+    const facet = legacyFacetsNormalize(mapSegments[it], pathSegments[it]);
+
+    selectedFacets.push(facet);
   }
 
   return selectedFacets;

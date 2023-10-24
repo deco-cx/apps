@@ -24,7 +24,10 @@ const loader = async (
   const { path } = props;
   const splat = path?.[0] === "/" ? path.slice(1) : path;
 
-  const params = { splat, fc: "false" };
+  const params = {
+    splat: splat.endsWith(".json") ? splat : `${splat}.json`,
+    fc: "false",
+  };
 
   const response = await api["GET /*splat"](params, STALE)
     .then((res) => res.json())

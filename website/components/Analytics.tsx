@@ -1,36 +1,23 @@
 import { context } from "deco/live.ts";
-import GoogleTagManager from "partytown/integrations/GTM.tsx";
-import GoogleTagScript from "partytown/integrations/GTAG.tsx";
 import Script from "partytown/Script.tsx";
-
-declare global {
-  interface Window {
-    DECO_ANALYTICS: Record<
-      string,
-      // deno-lint-ignore no-explicit-any
-      (action: string, eventType: string, props?: any) => void
-    >;
-  }
-}
+import GoogleTagScript from "partytown/integrations/GTAG.tsx";
+import GoogleTagManager from "partytown/integrations/GTM.tsx";
+import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const sendAnalyticsEvent = (
-  // deno-lint-ignore no-explicit-any
-  event: any,
-) => {
-  window.dataLayer && window.dataLayer.push({ ecommerce: null });
-  window.dataLayer && window.dataLayer.push({
-    event: event.name,
-    ecommerce: event.params,
-  });
+const snippet = () => {
+  window.DECO.events.subscribe((event) => {
+    if (
+      !event || !window.dataLayer ||
+      typeof window.dataLayer.push !== "function"
+    ) return;
 
-  window.DECO_ANALYTICS &&
-    Object.values(window.DECO_ANALYTICS).map((f) =>
-      f("track", "analyticsType", event)
-    );
+    window.dataLayer.push({ ecommerce: null });
+    window.dataLayer.push({ event: event.name, ecommerce: event.params });
+  });
 };
 
 export interface Props {
@@ -57,19 +44,29 @@ export interface Props {
    * @description define the name of event type sent to datalayer and registered analytics. Default: ecommerce
    */
   analyticsType?: string;
+
+  /**
+   * @description prevent dataLayer being forward into partytown worker
+   */
+  preventForward?: boolean;
+
+  /**
+   * @description Disable forwarding events into dataLayer
+   */
+  disableAutomaticEventPush?: boolean;
 }
 
-export default function Analtyics(
+export default function Analytics(
   {
     trackingIds,
     src,
     dangerouslyRunOnMainThread,
     googleAnalyticsIds,
-    analyticsType,
+    preventForward,
+    disableAutomaticEventPush,
   }: Props,
 ) {
   const isDeploy = !!context.isDeploy;
-  const eventType = analyticsType ?? "ecommerce";
 
   return (
     <>
@@ -80,6 +77,7 @@ export default function Analtyics(
           <GoogleTagManager
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
+            preventForward={preventForward}
           />
         ))
       )}
@@ -88,6 +86,7 @@ export default function Analtyics(
           <GoogleTagScript
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
+            preventForward={preventForward}
           />
         ))
       )}
@@ -95,6 +94,7 @@ export default function Analtyics(
         <GoogleTagManager
           src={src}
           dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
+          preventForward={preventForward}
         />
       )}
 
@@ -106,15 +106,13 @@ export default function Analtyics(
         }}
         forward={["debugGlobals"]}
       />
-      <script
-        type="module"
-        id="analytics-script"
-        dangerouslySetInnerHTML={{
-          __html: `window.DECO_SITES_STD = { sendAnalyticsEvent: ${
-            sendAnalyticsEvent.toString().replace("analyticsType", eventType)
-          } }`,
-        }}
-      />
+      {disableAutomaticEventPush !== true && (
+        <script
+          defer
+          id="analytics-script"
+          src={scriptAsDataURI(snippet)}
+        />
+      )}
     </>
   );
 }

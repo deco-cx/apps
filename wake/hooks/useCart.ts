@@ -42,6 +42,7 @@ const state = {
   cart,
   loading,
   addItem: enqueue("wake/actions/cart/addItem.ts"),
+  addItems: enqueue("wake/actions/cart/addItems.ts"),
   updateItem: enqueue("wake/actions/cart/updateItemQuantity.ts"),
   addCoupon: enqueue("wake/actions/cart/addCoupon.ts"),
   removeCoupon: enqueue("wake/actions/cart/removeCoupon.ts"),

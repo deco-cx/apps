@@ -1,36 +1,36 @@
 import { AppContext } from "../mod.ts";
 
-export interface Notification {
+export interface VTEXNotificationPayload {
   /** @description SKU ID in VTEX **/
-  idSKU: string;
-  /** @description Product ID in VTEX **/
-  productId: string;
+  IdSku: string;
   /** @description Seller’s account name in VTEX, shown in the store’s VTEX Admin url. **/
-  an: string;
+  An: string;
   /** @description Affiliate ID generated automatically in the configuration. **/
-  idAffiliate: string;
+  IdAffiliate: string;
+  /** @description Product ID in VTEX **/
+  ProductId: number;
   /** @description Date when the item was updated **/
   DateModified: string;
   /** @description Identifies whether the product is active or not. In case it is “false”, it means the product was deactivated in VTEX and should be blocked in the marketplace. We recommend that the inventory level is zeroed in the marketplace, and the product is blocked. In case the marketplace doesn’t allow it to be deactivated, the product should be excluded, along with any existing correspondences in the connector. **/
-  isActive: string;
+  IsActive: boolean;
   /** @description Identifies that the inventory level has been altered. Connectors should send an Fulfillment Simulation request to collect updated information. **/
-  StockModified: string;
+  StockModified: boolean;
   /** @description Identifies that the price has been altered. Connectors should send an Fulfillment Simulation request to collect updated information. **/
-  PriceModified: string;
+  PriceModified: boolean;
   /** @description Identifies that the product/SKU registration data has changed, like name, description, weight, etc **/
-  HasStockKeepingUnitModified: string;
+  HasStockKeepingUnitModified: boolean;
   /** @description Identifies that the product is no longer associated with the trade policy. In case the marketplace doesn’t allow it to be deactivated, the product should be excluded, along with any existing correspondences in the connector. **/
-  HasStockKeepingUnitRemovedFromAffiliate: string;
+  HasStockKeepingUnitRemovedFromAffiliate: boolean;
 }
 
 const action = async (
-  props: Notification,
+  props: VTEXNotificationPayload,
   _req: Request,
   ctx: AppContext,
 ): Promise<{ id: string }> => {
-  const { idSKU } = props;
+  const { IdSku } = props;
 
-  if (!idSKU) {
+  if (!IdSku) {
     throw new Error("Missing idSKU");
   }
 

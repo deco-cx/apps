@@ -18,34 +18,44 @@ export type Props =
     preload?: boolean;
     /** @description Improves Web Vitals (LCP). Use high for LCP image. Auto for other images */
     fetchPriority?: "high" | "low" | "auto";
+    /** @description Object-fit */
+    fit?: FitOptions;
   };
 
 const FACTORS = [1, 2];
 
+type FitOptions = "contain" | "cover";
+
 export const getOptimizedMediaUrl = (
-  { originalSrc, width, height, factor }: {
+  { originalSrc, width, height, factor, fit = "cover" }: {
     originalSrc: string;
     width: number;
     height?: number;
     factor: number;
+    fit?: FitOptions;
   },
 ) => {
   const params = new URLSearchParams();
 
   params.set("src", originalSrc);
-  params.set("fit", "cover");
+  params.set("fit", fit);
   params.set("width", `${Math.trunc(factor * width)}`);
   height && params.set("height", `${Math.trunc(factor * height)}`);
 
   return `${PATH}?${params}`;
 };
 
-export const getSrcSet = (src: string, width: number, height?: number) =>
+export const getSrcSet = (
+  src: string,
+  width: number,
+  height?: number,
+  fit?: FitOptions,
+) =>
   FACTORS
     .map((factor) =>
-      `${getOptimizedMediaUrl({ originalSrc: src, width, height, factor })} ${
-        Math.trunc(factor * width)
-      }w`
+      `${
+        getOptimizedMediaUrl({ originalSrc: src, width, height, factor, fit })
+      } ${Math.trunc(factor * width)}w`
     )
     .join(", ");
 
@@ -58,7 +68,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
     );
   }
 
-  const srcSet = getSrcSet(props.src, props.width, props.height);
+  const srcSet = getSrcSet(props.src, props.width, props.height, props.fit);
   const linkProps = {
     imagesrcset: srcSet,
     imagesizes: props.sizes,

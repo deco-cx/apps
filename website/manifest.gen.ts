@@ -8,18 +8,21 @@ import * as $$$1 from "./loaders/redirectsFromCsv.ts";
 import * as $$$2 from "./loaders/secretString.ts";
 import * as $$$3 from "./loaders/extension.ts";
 import * as $$$4 from "./loaders/secret.ts";
-import * as $$$5 from "./loaders/pages.ts";
-import * as $$$6 from "./loaders/asset.ts";
-import * as $$$7 from "./loaders/fonts/local.ts";
-import * as $$$8 from "./loaders/fonts/googleFonts.ts";
+import * as $$$5 from "./loaders/redirects.ts";
+import * as $$$6 from "./loaders/pages.ts";
+import * as $$$7 from "./loaders/redirect.ts";
+import * as $$$8 from "./loaders/asset.ts";
+import * as $$$9 from "./loaders/fonts/local.ts";
+import * as $$$10 from "./loaders/fonts/googleFonts.ts";
 import * as $$$$0 from "./handlers/router.ts";
 import * as $$$$1 from "./handlers/sitemap.ts";
 import * as $$$$2 from "./handlers/proxy.ts";
 import * as $$$$3 from "./handlers/fresh.ts";
 import * as $$$$4 from "./handlers/redirect.ts";
 import * as $$$$$0 from "./pages/Page.tsx";
-import * as $$$$$$0 from "./sections/Seo/Seo.tsx";
-import * as $$$$$$1 from "./sections/Analytics/Analytics.tsx";
+import * as $$$$$$0 from "./sections/Rendering/Deferred.tsx";
+import * as $$$$$$1 from "./sections/Seo/Seo.tsx";
+import * as $$$$$$2 from "./sections/Analytics/Analytics.tsx";
 import * as $$$$$$$0 from "./matchers/date.ts";
 import * as $$$$$$$1 from "./matchers/environment.ts";
 import * as $$$$$$$2 from "./matchers/site.ts";
@@ -48,12 +51,14 @@ const manifest = {
     "website/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "website/loaders/asset.ts": $$$6,
+    "website/loaders/asset.ts": $$$8,
     "website/loaders/extension.ts": $$$3,
-    "website/loaders/fonts/googleFonts.ts": $$$8,
-    "website/loaders/fonts/local.ts": $$$7,
+    "website/loaders/fonts/googleFonts.ts": $$$10,
+    "website/loaders/fonts/local.ts": $$$9,
     "website/loaders/image.ts": $$$0,
-    "website/loaders/pages.ts": $$$5,
+    "website/loaders/pages.ts": $$$6,
+    "website/loaders/redirect.ts": $$$7,
+    "website/loaders/redirects.ts": $$$5,
     "website/loaders/redirectsFromCsv.ts": $$$1,
     "website/loaders/secret.ts": $$$4,
     "website/loaders/secretString.ts": $$$2,
@@ -69,8 +74,9 @@ const manifest = {
     "website/pages/Page.tsx": $$$$$0,
   },
   "sections": {
-    "website/sections/Analytics/Analytics.tsx": $$$$$$1,
-    "website/sections/Seo/Seo.tsx": $$$$$$0,
+    "website/sections/Analytics/Analytics.tsx": $$$$$$2,
+    "website/sections/Rendering/Deferred.tsx": $$$$$$0,
+    "website/sections/Seo/Seo.tsx": $$$$$$1,
   },
   "matchers": {
     "website/matchers/always.ts": $$$$$$$12,

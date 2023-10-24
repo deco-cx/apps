@@ -11,10 +11,11 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<OrderForm> => {
-  const { vcs } = ctx;
-  const { orderFormId, cookie } = parseCookie(req.headers);
+  const { vcsDeprecated } = ctx;
+  const { orderFormId } = parseCookie(req.headers);
+  const cookie = req.headers.get("cookie") ?? "";
 
-  const response = await vcs
+  const response = await vcsDeprecated
     ["GET /api/checkout/changeToAnonymousUser/:orderFormId"]({
       orderFormId,
     }, {

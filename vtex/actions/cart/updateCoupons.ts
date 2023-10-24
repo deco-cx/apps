@@ -15,11 +15,12 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<OrderForm> => {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { text } = props;
-  const { orderFormId, cookie } = parseCookie(req.headers);
+  const cookie = req.headers.get("cookie") ?? "";
+  const { orderFormId } = parseCookie(req.headers);
 
-  const response = await vcs
+  const response = await vcsDeprecated
     ["POST /api/checkout/pub/orderForm/:orderFormId/coupons"]({ orderFormId }, {
       body: { text },
       headers: {

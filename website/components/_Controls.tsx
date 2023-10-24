@@ -54,9 +54,9 @@ const main = () => {
 
       const pathname = window.LIVE.play
         ? `/play/blocks/${window.LIVE.page.id}?domain=${window.location.origin}`
-        : `/admin/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
+        : `/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
 
-      const href = new URL(pathname, "https://deco.cx");
+      const href = new URL(pathname, "https://admin.deco.cx");
 
       href.searchParams.set(
         "path",
@@ -66,7 +66,7 @@ const main = () => {
       );
       href.searchParams.set(
         "pathTemplate",
-        encodeURIComponent(window.LIVE.page.pathTemplate ?? "/*"),
+        encodeURIComponent(window.LIVE.page.pathTemplate || "/*"),
       );
       window.location.href = `${href}`;
     }
@@ -85,7 +85,7 @@ const main = () => {
   /** Setup global variables */
   window.LIVE = {
     ...window.LIVE,
-    ...JSON.parse(document.getElementById("__DECO_STATE")!.innerText),
+    ...JSON.parse(document.getElementById("__DECO_STATE")!.textContent || ""),
   };
 
   /** Setup listeners */

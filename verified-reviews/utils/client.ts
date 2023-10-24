@@ -127,7 +127,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
         Reviews | null,
       ];
 
-      const currentRating = responseRating[productId]?.[0] || undefined;
+      const currentRating = responseRating?.[productId]?.[0];
       return {
         aggregateRating: currentRating
           ? {

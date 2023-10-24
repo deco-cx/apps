@@ -13,6 +13,7 @@ function Section({ jsonLD, ...props }: Props) {
   const canonical = jsonLD?.breadcrumbList
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumbList)
     : null;
+  const noIndexing = !jsonLD;
 
   return (
     <Seo
@@ -22,6 +23,7 @@ function Section({ jsonLD, ...props }: Props) {
       image={image || props.image}
       canonical={canonical || props.canonical}
       jsonLDs={[jsonLD]}
+      noIndexing={noIndexing}
     />
   );
 }

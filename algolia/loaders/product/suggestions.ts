@@ -16,6 +16,9 @@ interface Props {
 
   /** @description Enable to highlight matched terms */
   highlight?: boolean;
+
+  /** @description Hide Unavailable Items */
+  hideUnavailable?: boolean;
 }
 
 interface IndexedSuggestion {
@@ -39,15 +42,17 @@ const toFacets = (
     key,
   }));
 
+const productsIndex = "products" satisfies Indices;
+
 /**
  * @title Algolia Integration
  */
 const loader = async (
-  { query, count, highlight }: Props,
+  { query, count, highlight, hideUnavailable }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const client = await ctx.getClient();
+  const { client } = ctx;
 
   const { results } = await client.search([
     {
@@ -56,13 +61,21 @@ const loader = async (
       query,
     },
     {
-      indexName: "products" satisfies Indices,
-      params: { hitsPerPage: count ?? 0, facets: [] },
+      indexName: productsIndex,
+      params: {
+        hitsPerPage: count ?? 0,
+        filters: hideUnavailable ? `available:true` : "",
+        facets: [],
+        clickAnalytics: true,
+      },
       query,
     },
   ]);
 
-  const [{ hits: suggestions }, { hits: indexedProducts }] = results as [
+  const [
+    { hits: suggestions },
+    { hits: indexedProducts, queryID },
+  ] = results as [
     SearchResponse<IndexedSuggestion>,
     SearchResponse<IndexedProduct>,
   ];
@@ -72,7 +85,7 @@ const loader = async (
       replaceHighlight(p, highlight ? _highlightResult : {})
     ),
     client,
-    req.url,
+    { url: req.url, queryID, indexName: productsIndex },
   );
 
   const searches = suggestions.map((s) => ({
@@ -86,7 +99,7 @@ const loader = async (
 
   return {
     searches: searches,
-    products: products,
+    products,
   };
 };
 

@@ -13,10 +13,6 @@ import {
   SingleProductFragment,
 } from "./graphql/storefront.graphql.gen.ts";
 
-export const stale = {
-  deco: { cache: "stale-while-revalidate" },
-};
-
 export const FILTER_PARAM = "filtro";
 
 export const camposAdicionais = [
@@ -168,6 +164,25 @@ export const toProduct = (
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
       price: variant.prices.price,
+    });
+  }
+
+  if (variant.prices?.installmentPlans) {
+    variant.prices.installmentPlans.forEach((installmentPlan) => {
+      if (installmentPlan) {
+        installmentPlan.installments?.forEach((installment) => {
+          priceSpecification.push({
+            "@type": "UnitPriceSpecification",
+            priceType: "https://schema.org/SalePrice",
+            priceComponentType: "https://schema.org/Installment",
+            name: installmentPlan.displayName ?? undefined,
+            description: installmentPlan.name ?? undefined,
+            billingDuration: installment?.number,
+            billingIncrement: installment?.value,
+            price: installment?.value,
+          });
+        });
+      }
     });
   }
 

@@ -11,7 +11,8 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import { middleware } from "./middleware.ts";
 import { SP, VTEXCommerceStable } from "./utils/client.ts";
 import { fetchSafe } from "./utils/fetchVTEX.ts";
-import { OpenAPI } from "./utils/vtex.openapi.gen.ts";
+import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
+import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
@@ -48,6 +49,8 @@ export interface Props {
    * @description Use VTEX as backend platform
    */
   platform: "vtex";
+
+  usePortalSitemap?: boolean;
 }
 
 export const color = 0xF71963;
@@ -58,11 +61,16 @@ export const color = 0xF71963;
 export default function VTEX(
   { appKey, appToken, account, ...props }: Props,
 ) {
+  const headers = new Headers();
+
+  appKey && headers.set("X-VTEX-API-AppKey", appKey);
+  appToken && headers.set("X-VTEX-API-AppToken", appToken);
+
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
     fetcher: fetchSafe,
   });
-  const vcs = createHttpClient<VTEXCommerceStable>({
+  const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
     base: `https://${account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
   });
@@ -71,16 +79,26 @@ export default function VTEX(
       `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
     fetcher: fetchSafe,
   });
-  const api = createHttpClient<OpenAPI>({
+  const vcs = createHttpClient<VCS>({
     base: `https://${account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
-    headers: new Headers({
-      "X-VTEX-API-AppKey": appKey ?? "",
-      "X-VTEX-API-AppToken": appToken ?? "",
-    }),
+    headers: headers,
+  });
+  const api = createHttpClient<API>({
+    base: `https://api.vtex.com/${account}`,
+    fetcher: fetchSafe,
+    headers: headers,
   });
 
-  const state = { ...props, account, vcs, sp, io, api };
+  const state = {
+    ...props,
+    account,
+    vcsDeprecated,
+    sp,
+    io,
+    vcs,
+    api,
+  };
 
   const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
     state,

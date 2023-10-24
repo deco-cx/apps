@@ -38,9 +38,18 @@ interface Props {
 
   /** @description Enable to highlight matched terms */
   highlight?: boolean;
+
+  /** @description Hide Unavailable Items */
+  hideUnavailable?: boolean;
 }
 
-const getPageInfo = (page: number, nbPages: number, url: URL) => {
+const getPageInfo = (
+  page: number,
+  nbPages: number,
+  nbHits: number,
+  hitsPerPage: number,
+  url: URL,
+) => {
   const next = page + 1;
   const prev = page - 1;
   const hasNextPage = next < nbPages;
@@ -59,6 +68,8 @@ const getPageInfo = (page: number, nbPages: number, url: URL) => {
   return {
     nextPage: hasNextPage ? `?${nextPage}` : undefined,
     previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
+    records: nbHits,
+    recordPerPage: hitsPerPage,
     currentPage: page,
   };
 };
@@ -70,15 +81,38 @@ const facet = {
     facet.replace("groupFacets.", "").replace("facets.", ""),
 };
 
+const filterFacets = (
+  facets: SearchResponse<IndexedProduct>["facets"] = {},
+  renderingContent: SearchResponse<IndexedProduct>["renderingContent"],
+) => {
+  const entries = Object.entries(facets);
+  const order = renderingContent?.facetOrdering?.facets?.order;
+
+  if (!order?.length) {
+    return entries;
+  }
+
+  // O(n) sort
+  return order.reduce((acc, name) => {
+    const item = facets[name];
+
+    if (item) {
+      acc.push([name, item]);
+    }
+
+    return acc;
+  }, [] as [string, Record<string, number>][]);
+};
+
 const transformFacets = (
-  facets: Record<string, Record<string, number>> = {},
+  facets: [string, Record<string, number>][],
   options: { facetFilters: [string, string[]][]; url: URL },
 ): Filter[] => {
   const { facetFilters, url } = options;
   const params = new URLSearchParams(url.searchParams);
   const filters = Object.fromEntries(facetFilters);
 
-  return Object.entries(facets).map(([key, values]) => {
+  return facets.map(([key, values]) => {
     const filter = filters[key] ?? [];
 
     return {
@@ -149,12 +183,16 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
-  const client = await ctx.getClient();
+  const { client } = ctx;
   const indexName = getIndex(url.searchParams.get("sort"));
 
   const facetFilters: [string, string[]][] = JSON.parse(
     url.searchParams.get("facetFilters") ?? "[]",
   );
+
+  if (props.hideUnavailable) {
+    facetFilters.push(["available", ["true"]]);
+  }
 
   // Creates a canonical facet representation format
   // Facets on the same category are grouped by OR and facets on
@@ -175,6 +213,7 @@ const loader = async (
         facets: [],
         hitsPerPage: props.hitsPerPage ?? 12,
         page: Number(url.searchParams.get("page")) || 0,
+        clickAnalytics: true,
       },
     },
     {
@@ -192,19 +231,23 @@ const loader = async (
     },
   ]);
 
-  const [{ hits, page, nbPages }, { facets }] = results as SearchResponse<
-    IndexedProduct
-  >[];
+  const [
+    { hits, page, nbPages, queryID, nbHits, hitsPerPage },
+    { facets, renderingContent },
+  ] = results as SearchResponse<IndexedProduct>[];
 
   const products = await resolveProducts(
     hits.map(({ _highlightResult, ...p }) =>
       replaceHighlight(p, props.highlight ? _highlightResult : {})
     ),
     client,
-    url,
+    { url, queryID, indexName },
   );
-  const pageInfo = getPageInfo(page, nbPages, url);
-  const filters = transformFacets(facets, { facetFilters, url });
+  const pageInfo = getPageInfo(page, nbPages, nbHits, hitsPerPage, url);
+  const filters = transformFacets(filterFacets(facets, renderingContent), {
+    facetFilters,
+    url,
+  });
 
   return {
     "@type": "ProductListingPage",
@@ -215,7 +258,7 @@ const loader = async (
       numberOfItems: 0,
     },
     filters: sortFacets(filters, props.facets),
-    products: products,
+    products,
     pageInfo,
     sortOptions: [
       {

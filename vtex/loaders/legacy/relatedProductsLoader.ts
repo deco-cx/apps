@@ -1,9 +1,10 @@
 import type { Product } from "../../../commerce/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { SEGMENT, withSegmentCookie } from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { pickSku } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
@@ -41,13 +42,13 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> {
-  const { vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const {
     hideUnavailableItems,
     crossSelling = "similars",
     count,
   } = props;
-  const segment = ctx.bag.get(SEGMENT);
+  const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
 
   const getProductGroupID = async (props: { slug?: string; id?: string }) => {
@@ -58,12 +59,10 @@ async function loader(
     }
 
     if (slug) {
-      const pageType = await vcs
+      const pageType = await vcsDeprecated
         ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
           term: `${slug}/p`,
-        }, {
-          deco: { cache: "stale-while-revalidate" },
-        }).then((res) => res.json());
+        }, STALE).then((res) => res.json());
 
       // Page type doesn't exists or this is not product page
       if (pageType?.pageType === "Product") {
@@ -82,15 +81,13 @@ async function loader(
     return null;
   }
 
-  const products = await vcs
+  const products = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/crossselling/:type/:productId"]({
       type: crossSelling,
       productId,
       ...params,
-    }, {
-      deco: { cache: "stale-while-revalidate" },
-      headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    }, { ...STALE, headers: withSegmentCookie(segment) })
+    .then((res) => res.json());
 
   // unique Ids
   const relatedIds = [...new Set(

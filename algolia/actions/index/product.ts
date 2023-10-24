@@ -17,7 +17,7 @@ const indexName: Indices = "products";
 
 const action = async (props: Props, _req: Request, ctx: AppContext) => {
   const { product, action } = props;
-  const client = await ctx.getClient();
+  const { client } = ctx;
 
   try {
     const indexProduct = toIndex(product);

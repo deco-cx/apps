@@ -19,6 +19,7 @@ const PAGE_PATHS = [
   "/images/*",
   "/javascripts/*",
   "/loja/configuracoes",
+  "/pagamento/*",
   "/pedido/*",
   "/recaptcha",
   "/recuperar_senha",

@@ -1,5 +1,6 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
+import { exclusionAndHashScript } from "../../utils/plausible_scripts.ts";
 
 const PATHS_TO_PROXY = [
   "/account",
@@ -20,11 +21,20 @@ const PATHS_TO_PROXY = [
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = (
-  { publicUrl, extraPaths, includeSiteMap, generateDecoSiteMap }: {
+  {
+    publicUrl,
+    extraPaths,
+    includeSiteMap,
+    generateDecoSiteMap,
+    includeScriptsToHead,
+  }: {
     publicUrl?: string;
     extraPaths: string[];
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
+    includeScriptsToHead?: {
+      includes?: string[];
+    };
   },
 ) => {
   if (!publicUrl) {
@@ -47,6 +57,24 @@ const buildProxyRoutes = (
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
 
+    const link1 =
+      '<link rel="dns-prefetch" href="https://plausible.io/api/event" />';
+    const link2 =
+      '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
+    const plausibleScript =
+      `<script defer data-exclude="/proxy" data-api="https://plausible.io/api/event">${exclusionAndHashScript}</script>`;
+
+    if (typeof includeScriptsToHead === "undefined") {
+      includeScriptsToHead = { includes: [] };
+    }
+
+    includeScriptsToHead.includes = [
+      link1,
+      link2,
+      plausibleScript,
+      ...(includeScriptsToHead?.includes ?? []),
+    ];
+
     const routeFromPath = (pathTemplate: string): Route => ({
       pathTemplate,
       handler: {
@@ -54,6 +82,7 @@ const buildProxyRoutes = (
           __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
+          includeScriptsToHead: includeScriptsToHead,
         },
       },
     });
@@ -71,6 +100,7 @@ const buildProxyRoutes = (
         },
       }]]
       : [includeSiteMap, []];
+
     return [
       ...routes,
       {
@@ -109,14 +139,24 @@ export interface Props {
    * @title If deco site map should be exposed at /deco-sitemap.xml
    */
   generateDecoSiteMap?: boolean;
+  /**
+   * @title Scripts to include on Html head
+   */
+  includeScriptsToHead?: {
+    includes?: string[];
+  };
 }
 
 /**
  * @title VTEX Proxy Routes
  */
 function loader(
-  { extraPathsToProxy = [], includeSiteMap = [], generateDecoSiteMap = true }:
-    Props,
+  {
+    extraPathsToProxy = [],
+    includeSiteMap = [],
+    generateDecoSiteMap = true,
+    includeScriptsToHead = { includes: [] },
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ): Route[] {
@@ -125,6 +165,7 @@ function loader(
     includeSiteMap,
     publicUrl: ctx.publicUrl,
     extraPaths: extraPathsToProxy,
+    includeScriptsToHead,
   });
 }
 

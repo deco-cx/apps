@@ -74,11 +74,14 @@ export interface HttpClientOptions {
 }
 
 export const createHttpClient = <T>({
-  base,
+  base: maybeBase,
   headers: defaultHeaders,
   fetcher = fetchSafe,
-}: HttpClientOptions): ClientOf<T> =>
-  new Proxy({} as ClientOf<T>, {
+}: HttpClientOptions): ClientOf<T> => {
+  // Base should always endwith / so when concatenating with path we get the right URL
+  const base = maybeBase.at(-1) === "/" ? maybeBase : `${maybeBase}/`;
+
+  return new Proxy({} as ClientOf<T>, {
     get: (_target, prop) => {
       if (prop === Symbol.toStringTag || prop === Symbol.toPrimitive) {
         return `HttpClient: ${base}`;
@@ -121,7 +124,7 @@ export const createHttpClient = <T>({
 
             return param;
           })
-          .filter((s) => s !== undefined)
+          .filter(Boolean)
           .join("/");
 
         const url = new URL(compiled, base);
@@ -144,7 +147,7 @@ export const createHttpClient = <T>({
         defaultHeaders?.forEach((value, key) => headers.set(key, value));
         isJSON && headers.set("content-type", "application/json");
 
-        const body = isJSON ? JSON.stringify(init.body) : undefined;
+        const body = isJSON ? JSON.stringify(init.body) : init?.body;
 
         return fetcher(url, {
           ...init,
@@ -155,6 +158,7 @@ export const createHttpClient = <T>({
       };
     },
   });
+};
 
 // deno-lint-ignore no-explicit-any
 export const nullOnNotFound = (error: any) => {

@@ -112,7 +112,7 @@ export interface VTEXCommerceStable {
     response: SimulationOrderForm;
     body: {
       items: SimulationItem[];
-      postalCode: string;
+      postalCode?: string;
       country: string;
     };
   };

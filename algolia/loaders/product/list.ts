@@ -35,7 +35,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  const client = await ctx.getClient();
+  const { client } = ctx;
 
   const { results } = await client.search([{
     indexName,
@@ -48,7 +48,11 @@ const loader = async (
 
   const { hits: products } = results[0] as SearchResponse<IndexedProduct>;
 
-  return resolveProducts(products, client, req.url);
+  return resolveProducts(products, client, {
+    url: req.url,
+    queryID: undefined,
+    indexName,
+  });
 };
 
 export default loader;

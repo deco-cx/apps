@@ -1,9 +1,31 @@
 import { getCookies, setCookie } from "std/http/mod.ts";
+import { AppContext } from "../mod.ts";
 import type { Segment } from "./types.ts";
 
-export const SEGMENT_COOKIE_NAME = "vtex_segment";
+const SEGMENT_COOKIE_NAME = "vtex_segment";
+const SEGMENT = Symbol("segment");
 
-export const SEGMENT = Symbol("segment");
+export const isAnonymous = ({
+  campaigns,
+  utm_campaign,
+  utm_source,
+  utmi_campaign,
+  channel,
+  priceTables,
+  regionId,
+}: Partial<Segment>) =>
+  !campaigns &&
+  !utm_campaign &&
+  !utm_source &&
+  !utmi_campaign &&
+  !channel &&
+  !priceTables &&
+  !regionId;
+
+export const getSegmentFromBag = (ctx: AppContext): Partial<Segment> =>
+  ctx.bag?.get(SEGMENT);
+export const setSegmentInBag = (ctx: AppContext, segment: Partial<Segment>) =>
+  ctx.bag?.set(SEGMENT, segment);
 
 /**
  * Stable serialization.
@@ -42,21 +64,36 @@ export const serialize = ({
 
 export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
-export const getSegment = (req: Request): Partial<Segment> => {
-  const url = new URL(req.url);
+export const getSegmentFromCookie = (
+  req: Request,
+): Partial<Segment> | undefined => {
   const cookies = getCookies(req.headers);
   const cookie = cookies[SEGMENT_COOKIE_NAME];
-  const partial = cookie && parse(cookie);
+  const segment = cookie && parse(cookie);
 
-  return {
-    ...partial,
-    utmi_campaign: url.searchParams.get("utmi_campaign") ?? null,
-    utm_campaign: url.searchParams.get("utm_campaign") ?? null,
-    utm_source: url.searchParams.get("utm_source") ?? null,
-  };
+  return segment;
 };
 
-export const setSegment = (
+const SEGMENT_QUERY_PARAMS = [
+  "utmi_campaign" as const,
+  "utm_campaign" as const,
+  "utm_source" as const,
+];
+
+export const buildSegmentCookie = (req: Request): Partial<Segment> => {
+  const url = new URL(req.url);
+  const partialSegment: Partial<Segment> = {};
+  for (const qs of SEGMENT_QUERY_PARAMS) {
+    const param = url.searchParams.get(qs);
+    if (param) {
+      partialSegment[qs] = param;
+    }
+  }
+
+  return partialSegment;
+};
+
+export const setSegmentCookie = (
   segment: Partial<Segment>,
   headers: Headers = new Headers(),
 ): Headers => {

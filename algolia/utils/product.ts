@@ -1,7 +1,10 @@
-import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
-import algolia, { SearchClient } from "npm:algoliasearch@4.20.0";
-import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
-import { State } from "../mod.ts";
+import { SearchClient } from "npm:algoliasearch@4.20.0";
+import {
+  ItemAvailability,
+  Product,
+  ProductLeaf,
+  PropertyValue,
+} from "../../commerce/types.ts";
 
 export type IndexedProduct = ReturnType<typeof toIndex>;
 export type Indices =
@@ -14,10 +17,16 @@ const unique = (ids: string[]) => [...new Set(ids).keys()];
 
 const indexName: Indices = "products";
 
+interface Options {
+  url: string | URL;
+  queryID?: string;
+  indexName?: string;
+}
+
 export const resolveProducts = async (
   products: IndexedProduct[],
   client: SearchClient,
-  url: string | URL,
+  opts: Options,
 ): Promise<Product[]> => {
   const hasVariantIds = products.flatMap((p) =>
     p.isVariantOf?.hasVariant?.map((x) => x.productID)
@@ -37,17 +46,15 @@ export const resolveProducts = async (
 
   const productsById = new Map<string, Product>();
   for (const product of similars) {
-    product && productsById.set(product.productID, fromIndex(product));
+    product && productsById.set(product.productID, fromIndex(product, opts));
   }
 
   return products
-    .map(fromIndex)
+    .map((p) => fromIndex(p, opts))
     .map((p) => ({
       ...p,
-      url: p.url && new URL(p.url, url).href,
       isVariantOf: p.isVariantOf && {
         ...p.isVariantOf,
-        url: p.isVariantOf.url && new URL(p.isVariantOf.url, url).href,
         hasVariant: p.isVariantOf?.hasVariant
           ?.map((p) => productsById.get(p.productID))
           .filter((p): p is ProductLeaf => Boolean(p)) ?? [],
@@ -56,6 +63,20 @@ export const resolveProducts = async (
         ?.map((p) => productsById.get(p.productID))
         .filter((p): p is ProductLeaf => Boolean(p)),
     }));
+};
+
+const withAnalyticsInfo = (
+  maybeUrl: string | undefined,
+  { queryID, indexName, url: origin }: Options,
+) => {
+  if (!maybeUrl) return undefined;
+
+  const url = new URL(maybeUrl, origin);
+
+  queryID && url.searchParams.set("algoliaQueryID", queryID);
+  indexName && url.searchParams.set("algoliaIndex", indexName);
+
+  return url.href;
 };
 
 const removeType = <T>(object: T & { "@type": string }): T => ({
@@ -77,6 +98,23 @@ const normalize = (additionalProperty: PropertyValue[] | undefined = []) => {
   return Object.fromEntries(map.entries());
 };
 
+const availabilityByRank: ItemAvailability[] = [
+  "https://schema.org/Discontinued",
+  "https://schema.org/BackOrder",
+  "https://schema.org/OutOfStock",
+  "https://schema.org/SoldOut",
+  "https://schema.org/PreSale",
+  "https://schema.org/PreOrder",
+  "https://schema.org/InStoreOnly",
+  "https://schema.org/OnlineOnly",
+  "https://schema.org/LimitedAvailability",
+  "https://schema.org/InStock",
+];
+
+const rankByAvailability = Object.fromEntries(
+  availabilityByRank.map((item, rank) => [item, rank]),
+) as Record<ItemAvailability, number>;
+
 // TODO: add ManufacturerCode
 export const toIndex = ({ isVariantOf, ...product }: Product) => {
   const facets = [
@@ -96,6 +134,10 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
       value: isVariantOf?.model,
     },
   ].filter((f) => !facetKeys.has(f.name));
+  const availability = product.offers?.offers.reduce(
+    (acc, o) => Math.max(acc, rankByAvailability[o.availability] ?? 0),
+    0,
+  ) ?? 0;
 
   return removeType({
     ...product,
@@ -119,14 +161,28 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
     objectID: product.productID,
     groupFacets: normalize(groupFacets),
     facets: normalize(facets),
+    available: availability > 3,
+    releaseDate: product.releaseDate
+      ? new Date(product.releaseDate).getTime()
+      : undefined,
   });
 };
 
 export const fromIndex = (
-  { facets: _f, groupFacets: _fg, objectID: _oid, ...product }: IndexedProduct,
+  {
+    url,
+    facets: _f,
+    groupFacets: _gf,
+    objectID: _oid,
+    available: _a,
+    releaseDate,
+    ...product
+  }: IndexedProduct,
+  opts: Options,
 ): Product => ({
   ...product,
   "@type": "Product",
+  url: withAnalyticsInfo(url, opts),
   offers: product.offers && {
     ...product.offers,
     "@type": "AggregateOffer",
@@ -141,6 +197,7 @@ export const fromIndex = (
   },
   isVariantOf: product.isVariantOf && {
     ...product.isVariantOf,
+    url: withAnalyticsInfo(product.isVariantOf.url, opts),
     hasVariant: product.isVariantOf.hasVariant.map((p) => ({
       "@type": "Product",
       productID: p.productID,
@@ -157,33 +214,45 @@ export const fromIndex = (
     "@type": "Product",
     sku: similar.productID,
   })),
+  releaseDate: releaseDate ? new Date(releaseDate).toUTCString() : undefined,
 });
 
 export const setupProductsIndices = async (
-  { applicationId, adminApiKey }: State,
+  applicationId: string,
+  adminApiKey: string,
+  client: SearchClient,
 ) => {
-  const client = algolia.default(applicationId, adminApiKey, {
-    requester: createFetchRequester(), // Fetch makes it perform mutch better
-  });
-
   await client.initIndex("products" satisfies Indices).setSettings({
     distinct: true,
     attributeForDistinct: "inProductGroupWithID",
+    ranking: [
+      "desc(available)",
+      "typo",
+      "geo",
+      "words",
+      "filters",
+      "proximity",
+      "attribute",
+      "exact",
+      "custom",
+    ],
+    customRanking: [
+      "desc(releaseDate)",
+    ],
     searchableAttributes: [
       "name",
       "gtin",
+      "productID",
       "brand.name",
       "description",
       "isVariantOf.name",
       "isVariantOf.model",
       "isVariantOf.description",
-      "offers.offers.availability",
-      "offers.offers.priceSpecification.priceType",
-      "offers.offers.priceSpecification.priceComponentType",
     ],
     attributesForFaceting: [
       "facets",
       "groupFacets",
+      "available",
     ],
     numericAttributesForFiltering: [
       "offers.highPrice",
@@ -270,6 +339,4 @@ export const setupProductsIndices = async (
       highlightPreTag: "<mark>",
       highlightPostTag: "</mark>",
     });
-
-  return client;
 };
