@@ -146,14 +146,19 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
       }
 
       if (isViewItem(event)) {
+        const [head] = event.params.items;
+        const item_url = head && head.item_url;
         const objectIDs = event.params.items
           .filter(hasItemId)
           .map((i) => i.item_id);
 
+        const attr = attributesFromURL(window.location.href) ||
+          attributesFromURL(item_url || "");
+
         for (let it = 0; it < objectIDs.length; it += MAX_BATCH_SIZE) {
           window.aa("viewedObjectIDs", {
             eventName,
-            index: UNKNOWN,
+            index: attr ? attr.indexName : UNKNOWN,
             objectIDs: objectIDs.slice(it, (it + 1) * MAX_BATCH_SIZE),
           });
         }
