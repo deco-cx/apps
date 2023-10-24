@@ -70,8 +70,11 @@ const searchLoader = async (
     Object.fromEntries(new URL(req.url).searchParams.entries()),
   );
 
-
-  const promises = categoryTagNames.concat([...categoryTagName].filter((isUndefined) => isUndefined !== undefined) as string[]).map((categoryTagName) => {
+  const promises = categoryTagNames.concat(
+    [...categoryTagName].filter((isUndefined) =>
+      isUndefined !== undefined
+    ) as string[],
+  ).map((categoryTagName) => {
     return api["GET /api/v2/tags/:name"]({ name: categoryTagName }, STALE)
       .then((res) => res.json())
       .catch(() => undefined);
@@ -79,9 +82,13 @@ const searchLoader = async (
 
   const tags = await Promise.all(promises);
 
-  const seoCategories = tags.slice(-[...categoryTagName].length).filter((tag): tag is { name: string, title: string, subtitle: string } => tag !== undefined)
+  const seoCategories = tags.slice(-[...categoryTagName].length).filter((
+    tag,
+  ): tag is { name: string; title: string; subtitle: string } =>
+    tag !== undefined
+  );
 
-  const categories = seoCategories.map(({ name }) => name)
+  const categories = seoCategories.map(({ name }) => name);
 
   const resolvedTagNames = tags
     .filter((tag): tag is { name: string } => tag !== undefined)
@@ -140,7 +147,9 @@ const searchLoader = async (
 
   return {
     "@type": "ProductListingPage",
-    seo: hasSEO ? getSEOFromTag({ ...seoCategories[seoCategories.length - 1] }, req) : undefined,
+    seo: hasSEO
+      ? getSEOFromTag({ ...seoCategories[seoCategories.length - 1] }, req)
+      : undefined,
     // TODO: Find out what's the right breadcrumb on vnda
     breadcrumb: {
       "@type": "BreadcrumbList",
