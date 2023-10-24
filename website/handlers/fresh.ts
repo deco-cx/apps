@@ -1,5 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { Page } from "deco/blocks/page.ts";
+import { Page } from "deco/blocks/page.tsx";
 import {
   asResolved,
   BaseContext,
