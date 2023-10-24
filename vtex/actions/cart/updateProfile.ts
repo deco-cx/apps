@@ -2,6 +2,7 @@ import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
+import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   ignoreProfileData: boolean;
@@ -19,10 +20,12 @@ const action = async (
   const { ignoreProfileData } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
+  const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated
     ["PATCH /api/checkout/pub/orderForm/:orderFormId/profile"]({
       orderFormId,
+      sc: segment.channel,
     }, {
       body: { ignoreProfileData },
       headers: {

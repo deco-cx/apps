@@ -46,11 +46,18 @@ export interface Props {
   appToken?: string;
 
   /**
+   * @title Default Sales Channel
+   * @description Default sales channel to use
+   * @default 1
+   */
+  salesChannel?: "1" | "2" | "3" | "4" | "5";
+
+  usePortalSitemap?: boolean;
+
+  /**
    * @description Use VTEX as backend platform
    */
   platform: "vtex";
-
-  usePortalSitemap?: boolean;
 }
 
 export const color = 0xF71963;
@@ -59,7 +66,7 @@ export const color = 0xF71963;
  * @title VTEX
  */
 export default function VTEX(
-  { appKey, appToken, account, ...props }: Props,
+  { appKey, appToken, account, salesChannel, ...props }: Props,
 ) {
   const headers = new Headers();
 
@@ -92,6 +99,7 @@ export default function VTEX(
 
   const state = {
     ...props,
+    salesChannel: salesChannel ?? "1",
     account,
     vcsDeprecated,
     sp,

@@ -3,6 +3,7 @@ import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "./updateItemAttachment.ts";
+import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
   attachment: string;
@@ -24,11 +25,13 @@ const action = async (
   } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
+  const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated
     ["POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"]({
       orderFormId,
       attachment,
+      sc: segment.channel,
     }, {
       body: { expectedOrderFormSections, ...body },
       headers: {

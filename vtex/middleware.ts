@@ -25,19 +25,22 @@ export const middleware = (
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
-  if (!ctx.bag.has(SEGMENT_ONCE_KEY)) {
-    ctx.bag.set(SEGMENT_ONCE_KEY, true);
+  const { bag, salesChannel, response } = ctx;
+
+  if (!bag.has(SEGMENT_ONCE_KEY)) {
+    bag.set(SEGMENT_ONCE_KEY, true);
 
     const segmentFromCookie = getSegmentFromCookie(req);
     const segmentFromRequest = buildSegmentCookie(req);
     const segment = {
+      channel: salesChannel,
       ...DEFAULT_SEGMENT,
       ...segmentFromCookie,
       ...segmentFromRequest,
     };
     setSegmentInBag(ctx, segment);
     if (!equal(segmentFromCookie, segment)) {
-      setSegmentCookie(segment, ctx.response.headers);
+      setSegmentCookie(segment, response.headers);
     }
   }
 
