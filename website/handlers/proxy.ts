@@ -2,6 +2,7 @@ import { isFreshCtx } from "deco/handlers/fresh.ts";
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
+import { Script } from "../types.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -97,7 +98,11 @@ async (req, _ctx) => {
 
               accHtml += decoder.decode(chunk.slice(0, i + 1));
               for (const script of includeScriptsToHead.includes) {
-                accHtml += script;
+                if ((typeof script.src === "string")) {
+                  accHtml += script.src;
+                } else {
+                  accHtml += script.src(req);
+                }
               }
               accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
 
@@ -173,8 +178,7 @@ export interface Props {
    * @description Scripts to be included in the head of the html
    */
   includeScriptsToHead?: {
-    includes?: string[];
-    includePlausible: boolean;
+    includes?: Script[];
   };
 }
 
