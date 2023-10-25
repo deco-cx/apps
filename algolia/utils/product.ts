@@ -263,7 +263,8 @@ export const setupProductsIndices = async (
       "virtual(products_price_asc)",
     ],
     disableTypoToleranceOnAttributes: [
-      "gtin", "productID",
+      "gtin",
+      "productID",
     ],
     highlightPreTag: "<mark>",
     highlightPostTag: "</mark>",
