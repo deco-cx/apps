@@ -139,8 +139,6 @@ const transformFacets = (
     };
   }
 
-  console.log(Deno.inspect({ transformed, order }, { colors: true, depth: 2 }));
-
   return transformed.filter(Boolean);
 };
 
