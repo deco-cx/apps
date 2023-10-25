@@ -240,12 +240,10 @@ export const setupProductsIndices = async (
       "desc(releaseDate)",
     ],
     searchableAttributes: [
-      "isVariantOf.name",
-      "isVariantOf.description",
-      "name",
-      "description",
-      "brand.name",
-      "isVariantOf.model",
+      "unordered(isVariantOf.name)",
+      "unordered(name)",
+      "unordered(brand.name)",
+      "unordered(isVariantOf.model)",
       "gtin",
       "productID",
     ],
@@ -263,6 +261,9 @@ export const setupProductsIndices = async (
     replicas: [
       "virtual(products_price_desc)",
       "virtual(products_price_asc)",
+    ],
+    disableTypoToleranceOnAttributes: [
+      "gtin", "productID",
     ],
     highlightPreTag: "<mark>",
     highlightPostTag: "</mark>",
