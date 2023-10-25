@@ -10,7 +10,9 @@ import {
 
 /** @titleBy label */
 interface Facet {
-  /** @description Facet name */
+  /**
+   * @title Facet Name
+   * @description These are the facet names available at Algolia dashboard > search > index */
   name: string;
 
   /** @description Facet label to be rendered on the site UI */
