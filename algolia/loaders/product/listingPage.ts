@@ -8,13 +8,13 @@ import {
   resolveProducts,
 } from "../../utils/product.ts";
 
-/** @titleBy name */
+/** @titleBy label */
 interface Facet {
   /** @description Facet name */
   name: string;
 
-  /** @description Facet label to be rendered on the site UI. Fallback to name if not set */
-  label?: string;
+  /** @description Facet label to be rendered on the site UI */
+  label: string;
 }
 
 interface Props {
@@ -85,10 +85,7 @@ const transformFacets = (
   const params = new URLSearchParams(url.searchParams);
   const filters = Object.fromEntries(facetFilters);
   const orderByKey = new Map(
-    order.map((
-      { name, label },
-      index,
-    ) => [name, { label: label ?? name, index }]),
+    order.map(({ name, label }, index) => [name, { label, index }]),
   );
   const entries = Object.entries(facets);
 
