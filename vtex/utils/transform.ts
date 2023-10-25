@@ -492,6 +492,7 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
   seller: sellerId,
   priceValidUntil: offer.PriceValidUntil,
   inventoryLevel: { value: offer.AvailableQuantity },
+  giftSkuIds: offer.GiftSkuIds ?? [],
   teasers: offer.teasers ?? [],
   priceSpecification: [
     {

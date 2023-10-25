@@ -199,6 +199,8 @@ export interface Offer extends Omit<Thing, "@type"> {
   seller?: string;
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku?: string;
+  /** Used by some ecommerce sites to retrieve the sku of products that are part of the BuyAndWin promotion */
+  giftSkuIds?: string[];
   /** Used by some ecommerce providers (e.g: VTEX) to describe special promotions that depend on some conditions */
   teasers?: Teasers[];
 }
