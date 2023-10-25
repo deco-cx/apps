@@ -2,6 +2,7 @@ import { equal } from "std/testing/asserts.ts";
 import { AppMiddlewareContext } from "./mod.ts";
 import {
   buildSegmentCookie,
+  getSegmentFromBag,
   getSegmentFromCookie,
   setSegmentCookie,
   setSegmentInBag,
@@ -17,21 +18,18 @@ const DEFAULT_SEGMENT: Partial<Segment> = {
   utm_source: null,
 };
 
-// Symbols are the default keys for WeakMaps https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
-const SEGMENT_ONCE_KEY = Symbol("Set segment on context");
-
 export const middleware = (
   _props: unknown,
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
-  const { bag, salesChannel, response } = ctx;
+  const { salesChannel, response } = ctx;
+  const segment = getSegmentFromBag(ctx);
 
-  if (!bag.has(SEGMENT_ONCE_KEY)) {
-    bag.set(SEGMENT_ONCE_KEY, true);
-
+  if (!segment) {
     const segmentFromCookie = getSegmentFromCookie(req);
     const segmentFromRequest = buildSegmentCookie(req);
+
     const segment = {
       channel: salesChannel,
       ...DEFAULT_SEGMENT,
@@ -39,6 +37,8 @@ export const middleware = (
       ...segmentFromRequest,
     };
     setSegmentInBag(ctx, segment);
+
+    // Avoid setting cookie when segment from request matches the one generated
     if (!equal(segmentFromCookie, segment)) {
       setSegmentCookie(segment, response.headers);
     }

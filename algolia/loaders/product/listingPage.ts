@@ -10,9 +10,11 @@ import {
 
 /** @titleBy name */
 interface Facet {
+  /** @description Facet name */
   name: string;
-  /** @description Select if the facet is a ProductGroup facet */
-  groupFacet?: boolean;
+
+  /** @description Facet label to be rendered on the site UI. Fallback to name if not set */
+  label?: string;
 }
 
 interface Props {
@@ -74,51 +76,41 @@ const getPageInfo = (
   };
 };
 
-const facet = {
-  scope: ({ name, groupFacet }: Facet) =>
-    `${groupFacet ? "groupFacets." : "facets."}${name}`,
-  unscope: (facet: string) =>
-    facet.replace("groupFacets.", "").replace("facets.", ""),
-};
-
-const filterFacets = (
-  facets: SearchResponse<IndexedProduct>["facets"] = {},
-  renderingContent: SearchResponse<IndexedProduct>["renderingContent"],
-) => {
-  const entries = Object.entries(facets);
-  const order = renderingContent?.facetOrdering?.facets?.order;
-
-  if (!order?.length) {
-    return entries;
-  }
-
-  // O(n) sort
-  return order.reduce((acc, name) => {
-    const item = facets[name];
-
-    if (item) {
-      acc.push([name, item]);
-    }
-
-    return acc;
-  }, [] as [string, Record<string, number>][]);
-};
-
+// Transforms facets and re-orders so they match what's configured on deco admin
 const transformFacets = (
-  facets: [string, Record<string, number>][],
-  options: { facetFilters: [string, string[]][]; url: URL },
+  facets: Record<string, Record<string, number>>,
+  options: { order: Facet[]; facetFilters: [string, string[]][]; url: URL },
 ): Filter[] => {
-  const { facetFilters, url } = options;
+  const { facetFilters, url, order } = options;
   const params = new URLSearchParams(url.searchParams);
   const filters = Object.fromEntries(facetFilters);
+  const orderByKey = new Map(
+    order.map((
+      { name, label },
+      index,
+    ) => [name, { label: label ?? name, index }]),
+  );
+  const entries = Object.entries(facets);
 
-  return facets.map(([key, values]) => {
+  const transformed: Filter[] = new Array(entries.length);
+  for (let it = 0; it < entries.length; it++) {
+    const [key, values] = entries[it];
     const filter = filters[key] ?? [];
+    let index: number | undefined = it;
+    let label: string | undefined = key;
 
-    return {
+    // Apply sort only when user set facets on deco admin
+    if (orderByKey.size > 0) {
+      index = orderByKey.get(key)?.index;
+      label = orderByKey.get(key)?.label;
+    }
+
+    if (index === undefined || label === undefined) continue;
+
+    transformed[index] = {
       "@type": "FilterToggle",
       quantity: 0,
-      label: facet.unscope(key),
+      label,
       key,
       values: Object.entries(values).map(([value, quantity]) => {
         const index = filter.findIndex((f) => f === value);
@@ -148,17 +140,11 @@ const transformFacets = (
         };
       }),
     };
-  });
-};
-
-const sortFacets = (filters: Filter[], order?: Facet[]) => {
-  if (!order || order.length === 0) {
-    return filters;
   }
 
-  return order
-    .map((o) => filters.find((f) => f.key === facet.scope(o)))
-    .filter((f): f is Filter => Boolean(f));
+  console.log(Deno.inspect({ transformed, order }, { colors: true, depth: 2 }));
+
+  return transformed.filter(Boolean);
 };
 
 const getIndex = (options: string | null): Indices => {
@@ -223,7 +209,7 @@ const loader = async (
       params: {
         facetingAfterDistinct: true,
         facets: (props.facets?.length || 0) > 0
-          ? props.facets?.map(facet.scope)
+          ? props.facets?.map((f) => f.name)
           : ["*"],
         hitsPerPage: 0,
         sortFacetValuesBy: props.sortFacetValuesBy,
@@ -233,7 +219,7 @@ const loader = async (
 
   const [
     { hits, page, nbPages, queryID, nbHits, hitsPerPage },
-    { facets, renderingContent },
+    { facets },
   ] = results as SearchResponse<IndexedProduct>[];
 
   const products = await resolveProducts(
@@ -244,7 +230,8 @@ const loader = async (
     { url, queryID, indexName },
   );
   const pageInfo = getPageInfo(page, nbPages, nbHits, hitsPerPage, url);
-  const filters = transformFacets(filterFacets(facets, renderingContent), {
+  const filters = transformFacets(facets ?? {}, {
+    order: props.facets ?? [],
     facetFilters,
     url,
   });
@@ -257,7 +244,7 @@ const loader = async (
       itemListElement: [],
       numberOfItems: 0,
     },
-    filters: sortFacets(filters, props.facets),
+    filters,
     products,
     pageInfo,
     sortOptions: [

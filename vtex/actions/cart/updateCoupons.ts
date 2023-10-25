@@ -25,7 +25,7 @@ const action = async (
   const response = await vcsDeprecated
     ["POST /api/checkout/pub/orderForm/:orderFormId/coupons"]({
       orderFormId,
-      sc: segment.channel,
+      sc: segment?.channel,
     }, {
       body: { text },
       headers: {

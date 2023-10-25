@@ -24,7 +24,7 @@ const action = async (
 
   const response = await vcsDeprecated
     ["GET /api/checkout/pub/orderForm/:orderFormId/installments"](
-      { orderFormId, paymentSystem, sc: segment.channel },
+      { orderFormId, paymentSystem, sc: segment?.channel },
       { headers: { accept: "application/json", cookie } },
     );
 
