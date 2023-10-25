@@ -33,7 +33,7 @@ const action = async (
   ](
     {
       RnbBehavior,
-      sc: segment.channel,
+      sc: segment?.channel,
     },
     {
       body: { items, country, postalCode },

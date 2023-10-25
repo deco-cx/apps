@@ -20,7 +20,7 @@ const action = async (
   const response = await vcsDeprecated
     ["GET /api/checkout/changeToAnonymousUser/:orderFormId"]({
       orderFormId,
-      sc: segment.channel,
+      sc: segment?.channel,
     }, {
       headers: {
         accept: "application/json",
