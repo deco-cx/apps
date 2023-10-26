@@ -21,7 +21,7 @@ export default function Index(_: unknown) {
     }
 
     yield ctx.log(
-      "Started indexing Product:",
+      "[Typesense] Started indexing Product:",
       { productID, name, groupName, action },
     );
 
@@ -31,7 +31,7 @@ export default function Index(_: unknown) {
     );
 
     yield ctx.log(
-      "Finished indexing Product:",
+      "[Typesense] Finished indexing Product:",
       { productID, name, groupName, action },
     );
   };

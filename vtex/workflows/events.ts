@@ -1,8 +1,9 @@
 import type { Workflow } from "deco/blocks/workflow.ts";
 import type { WorkflowContext, WorkflowGen } from "deco/mod.ts";
+import type { Product } from "../../commerce/types.ts";
+import { waitForWorkflowCompletion } from "../../workflows/utils/awaiters.ts";
 import type { VTEXNotificationPayload } from "../actions/trigger.ts";
 import type { AppManifest } from "../mod.ts";
-import type { Product } from "../../commerce/types.ts";
 
 interface Props {
   product: Workflow[];
@@ -44,12 +45,16 @@ export default function Index(props: Props) {
         p.productID,
       );
 
-      yield ctx.invoke("workflows/actions/start.ts", {
+      const exec = yield ctx.invoke("workflows/actions/start.ts", {
         // @ts-expect-error type is not resolving keys somehow
         key: workflow.key,
         props: workflow.props,
         args: [p, action],
       });
+
+      if (exec.id && exec.status === "running") {
+        yield waitForWorkflowCompletion(ctx, exec.id);
+      }
     }
   };
 }
