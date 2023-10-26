@@ -2,6 +2,7 @@ import type { Workflow } from "deco/blocks/workflow.ts";
 import type { WorkflowContext, WorkflowGen } from "deco/mod.ts";
 import type { VTEXNotificationPayload } from "../actions/trigger.ts";
 import type { AppManifest } from "../mod.ts";
+import type { Product } from "../../commerce/types.ts";
 
 interface Props {
   product: Workflow[];
@@ -16,40 +17,38 @@ export default function Index(props: Props) {
       throw new Error(`Missing idSKU from notification`);
     }
 
-    const {
-      IdSku,
-      HasStockKeepingUnitRemovedFromAffiliate,
-      IsActive,
-    } = notification;
+    const { IdSku, HasStockKeepingUnitRemovedFromAffiliate } = notification;
 
-    const action = HasStockKeepingUnitRemovedFromAffiliate || !IsActive
-      ? "DELETE"
-      : "UPSERT";
-
-    const product = yield ctx.invoke("vtex/loaders/product.ts", {
+    const product = yield ctx.invoke("vtex/loaders/workflow/product.ts", {
       productID: IdSku,
     });
 
-    if (!product) {
-      throw new Error(`No product returned by Product loader ${IdSku}`);
-    }
+    const action = HasStockKeepingUnitRemovedFromAffiliate || !product
+      ? "DELETE"
+      : "UPSERT";
 
     /** Start each registered workflow */
     const workflows = props.product || [];
 
     for (const workflow of workflows) {
+      const p: Product = product || {
+        "@type": "Product",
+        sku: IdSku,
+        productID: IdSku,
+      };
+
       yield ctx.log(
         "Starting worflow for",
         workflow.key,
         "with productID",
-        product.productID,
+        p.productID,
       );
 
       yield ctx.invoke("workflows/actions/start.ts", {
         // @ts-expect-error type is not resolving keys somehow
         key: workflow.key,
         props: workflow.props,
-        args: [product, action],
+        args: [p, action],
       });
     }
   };
