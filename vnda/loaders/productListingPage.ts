@@ -109,16 +109,18 @@ const searchLoader = async (
     filterTagNames,
   );
 
+  const initialTags = props.tags && props.tags?.length > 0 ? props.tags : undefined;
+  
+  const categoryTagsToFilter =  (categories.length > 0 && props.filterByTags
+  ? [...categories, ...resolvedTagNames]
+  : undefined)
+
   const response = await api["GET /api/v2/products/search"]({
     term,
     sort,
     page,
     per_page: count,
-    "tags[]": props.tags && props.tags?.length > 0
-      ? props.tags
-      : (categories.length > 0 && props.filterByTags
-        ? [...categories, ...resolvedTagNames]
-        : undefined),
+    "tags[]": initialTags ?? categoryTagsToFilter,
     wildcard: true,
     "property1_values[]": properties1,
     "property2_values[]": properties2,
