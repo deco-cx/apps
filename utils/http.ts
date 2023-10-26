@@ -124,7 +124,7 @@ export const createHttpClient = <T>({
 
             return param;
           })
-          .filter(Boolean)
+          .filter((x) => typeof x === "string" || typeof x === "number")
           .join("/");
 
         const url = new URL(compiled, base);
