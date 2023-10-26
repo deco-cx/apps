@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("implementation"),
     app("weather"),
     {
       dir: "admin",
