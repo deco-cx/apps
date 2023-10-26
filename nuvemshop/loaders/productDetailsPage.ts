@@ -3,7 +3,7 @@ import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 
-import { toProduct, getBreadCrumbs } from "../utils/transform.ts";
+import { getBreadCrumbs, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -28,7 +28,7 @@ async function loader(
     handle: slug,
   });
 
-  const nuvemProduct = await nuvemProductResponse.json()
+  const nuvemProduct = await nuvemProductResponse.json();
 
   // Product not found, return the 404 status code
   if (!nuvemProduct) {

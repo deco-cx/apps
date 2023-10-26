@@ -1,5 +1,8 @@
-
-import type { Product, ProductDetailsPage, ProductListingPage } from "../../commerce/types.ts";
+import type {
+  Product,
+  ProductDetailsPage,
+  ProductListingPage,
+} from "../../commerce/types.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
@@ -56,7 +59,7 @@ async function loader(
       page,
       per_page,
       price_max: maxPrice,
-      price_min: minPrice
+      price_min: minPrice,
     });
     result = await response.json();
   } catch {

@@ -3,19 +3,19 @@ import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 
-import { toProduct, getBreadCrumbs } from "../utils/transform.ts";
+import { getBreadCrumbs, toProduct } from "../utils/transform.ts";
 import { NuvemShopSort, ProductBaseNuvemShop } from "../utils/types.ts";
 
 export interface Props {
-    /** @description query to use on search. if used will break sort */
-    term?: string;
-  
-    /** @description total number of items to display */
-    limit: number;
-  
-    /** @description search sort parameter */
-    sort?: NuvemShopSort;
-  }
+  /** @description query to use on search. if used will break sort */
+  term?: string;
+
+  /** @description total number of items to display */
+  limit: number;
+
+  /** @description search sort parameter */
+  sort?: NuvemShopSort;
+}
 
 /**
  * @title NuvemShop Integration - Search products
@@ -29,7 +29,7 @@ async function loader(
   const { url: baseUrl } = req;
 
   let result: ProductBaseNuvemShop[] | undefined;
-    
+
   try {
     const response = await api["GET /products/"]({
       q: props.term || "",
@@ -37,7 +37,6 @@ async function loader(
       per_page: props.limit || 10,
     });
     result = await response.json();
-
   } catch {
     result = [];
   }
@@ -45,7 +44,6 @@ async function loader(
   const products = result?.map((product) => {
     return [...toProduct(product, new URL(req.url), null)];
   }).flat();
-
 
   return products || [];
 }
