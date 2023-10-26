@@ -21,7 +21,7 @@ export class FsBlockStorage implements BlockStore {
   }
 
   async patch(
-    resolvables: Record<string, Resolvable>
+    resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>> {
     const state = await this.state();
     const merged = { ...state, ...resolvables };
@@ -38,12 +38,12 @@ export class FsBlockStorage implements BlockStore {
   }
 
   state(
-    options?: ReadOptions | undefined
+    options?: ReadOptions | undefined,
   ): Promise<Record<string, Resolvable>> {
     return this.readOnly.state(options);
   }
   archived(
-    options?: ReadOptions | undefined
+    options?: ReadOptions | undefined,
   ): Promise<Record<string, Resolvable>> {
     return this.readOnly.archived(options);
   }

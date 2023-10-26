@@ -8,7 +8,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 export const ANONYMOUS = "Anonymous";
 export interface BlockStore extends Release {
   patch(
-    resolvables: Record<string, Resolvable>
+    resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>>;
   update(resolvables: Record<string, Resolvable>): Promise<void>;
   delete(id: string): Promise<void>;

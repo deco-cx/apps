@@ -21,7 +21,7 @@ export default function Index(_: unknown) {
     }
 
     yield ctx.log(
-      "Started indexing Product:",
+      "[Algolia] Started indexing Product:",
       { productID, name, groupName, action },
     );
 
@@ -38,7 +38,7 @@ export default function Index(_: unknown) {
     }
 
     yield ctx.log(
-      "Finished indexing Product:",
+      "[Algolia] Finished indexing Product:",
       { productID, name, groupName, action },
     );
   };
