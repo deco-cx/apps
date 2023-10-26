@@ -1,18 +1,37 @@
-import { AppContext } from "../../mod.ts";
+import { AppContext, BlockMetadata } from "../../mod.ts";
+import { Pagination } from "../../types.ts";
 
 export interface Props {
   site: string;
 }
 
-export default function ListBlocks(
+export default async function ListBlocks(
   _props: Props,
   _req: Request,
-  _ctx: AppContext,
-) {
+  ctx: AppContext,
+): Promise<Pagination<BlockMetadata> | null> {
+  const state = await ctx.storage.state();
+
+  if (!state) {
+    return {
+      data: [],
+      page: 0,
+      pageSize: 0,
+      total: 0,
+    };
+  }
+
+  const data = Object.entries(state).map(([id, blockState]) => ({
+    id,
+    ...(blockState as Omit<BlockMetadata, "id">),
+    module: blockState.__resolveType,
+    __resolveType: undefined,
+  }));
+
   return {
-    data: [],
+    data: data,
     page: 0,
-    pageSize: 0,
-    total: 0,
+    pageSize: data.length,
+    total: data.length,
   };
 }

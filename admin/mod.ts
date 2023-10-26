@@ -7,9 +7,11 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
 export interface BlockStore extends Release {
-  update(
-    resolvables: Record<string, Resolvable>,
+  patch(
+    resolvables: Record<string, Resolvable>
   ): Promise<Record<string, Resolvable>>;
+  update(resolvables: Record<string, Resolvable>): Promise<void>;
+  delete(id: string): Promise<void>;
 }
 export interface State {
   storage: BlockStore;
@@ -25,6 +27,21 @@ export interface BlockState<TBlock = unknown> {
   revision: string;
 }
 
+export interface BlockMetadata {
+  id: string;
+  revision?: string;
+  archived: boolean;
+  type: string; // e.g: "account" | "matcher" | "page" | "section" | "loader";
+  module: string; // e.g: VTEXAccount.ts, LivePage.ts, Header.tsx
+  usedBy: Array<Pick<BlockMetadata, "id">>;
+  lastUpdated: {
+    at: number;
+    byEmail: string;
+    byUserId: string;
+  };
+  data: Resolvable;
+}
+
 export interface Props {
   resolvables: Resolvables;
 }
@@ -32,9 +49,7 @@ export interface Props {
 /**
  * @title Admin
  */
-export default function App(
-  { resolvables }: Props,
-): App<Manifest, State> {
+export default function App({ resolvables }: Props): App<Manifest, State> {
   return { manifest, state: { storage: new FsBlockStorage() }, resolvables };
 }
 

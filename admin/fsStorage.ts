@@ -15,21 +15,35 @@ export class FsBlockStorage implements BlockStore {
     this.readOnly = newFsProvider(path);
     this.path = join(Deno.cwd(), path);
   }
-  async update(
-    resolvables: Record<string, Resolvable>,
+
+  async update(resolvables: Record<string, Resolvable>): Promise<void> {
+    await Deno.writeTextFile(this.path, JSON.stringify(resolvables));
+  }
+
+  async patch(
+    resolvables: Record<string, Resolvable>
   ): Promise<Record<string, Resolvable>> {
     const state = await this.state();
     const merged = { ...state, ...resolvables };
-    await Deno.writeTextFile(this.path, JSON.stringify(merged));
+    await this.update(merged);
     return merged;
   }
+
+  async delete(id: string): Promise<void> {
+    const state = await this.state();
+    if (state[id]) {
+      delete state[id];
+      await this.update(state);
+    }
+  }
+
   state(
-    options?: ReadOptions | undefined,
+    options?: ReadOptions | undefined
   ): Promise<Record<string, Resolvable>> {
     return this.readOnly.state(options);
   }
   archived(
-    options?: ReadOptions | undefined,
+    options?: ReadOptions | undefined
   ): Promise<Record<string, Resolvable>> {
     return this.readOnly.archived(options);
   }
