@@ -57,7 +57,7 @@ If you wish to index VTEX's product data into deco, click in the button below. B
 <div style="display: flex; justify-content: center; padding: 8px">
   <form target="_blank" action="/live/invoke/workflows/actions/start.ts">
     <input style="display: none" name="props" value="eyJrZXkiOiJ2dGV4L3dvcmtmbG93cy9wcm9kdWN0L2luZGV4LnRzIn0"/> 
-    <button style="color: white; background-color: #F71963; border-radius: 4px; padding: 4px 8px">Re-index Base</button>
+    <button style="color: white; background-color: #F71963; border-radius: 4px; padding: 4px 8px">Start indexing workflow</button>
   </form>
 </div>
 
