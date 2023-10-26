@@ -10,6 +10,7 @@ export interface BlockStore extends Release {
   update(
     resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>>;
+  delete(id: string): Promise<void>;
 }
 export interface State {
   storage: BlockStore;

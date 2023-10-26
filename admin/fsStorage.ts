@@ -23,6 +23,15 @@ export class FsBlockStorage implements BlockStore {
     await Deno.writeTextFile(this.path, JSON.stringify(merged));
     return merged;
   }
+
+  async delete(id: string): Promise<void> {
+    const state = await this.state();
+    if (state[id]) {
+      delete state[id];
+      await Deno.writeTextFile(this.path, JSON.stringify(state));
+    }
+  }
+
   state(
     options?: ReadOptions | undefined,
   ): Promise<Record<string, Resolvable>> {

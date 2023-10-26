@@ -24,6 +24,8 @@ export default async function ListBlocks(
   const data = Object.entries(state).map(([id, blockState]) => ({
     id,
     ...(blockState as Omit<BlockMetadata, "id">),
+    module: blockState.__resolveType,
+    __resolveType: undefined,
   }));
 
   return {
