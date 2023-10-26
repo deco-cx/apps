@@ -16,16 +16,16 @@ export class FsBlockStorage implements BlockStore {
     this.path = join(Deno.cwd(), path);
   }
 
-  async patch(resolvables: Record<string, Resolvable>): Promise<void> {
+  async update(resolvables: Record<string, Resolvable>): Promise<void> {
     await Deno.writeTextFile(this.path, JSON.stringify(resolvables));
   }
 
-  async update(
-    resolvables: Record<string, Resolvable>,
+  async patch(
+    resolvables: Record<string, Resolvable>
   ): Promise<Record<string, Resolvable>> {
     const state = await this.state();
     const merged = { ...state, ...resolvables };
-    await this.patch(merged);
+    await this.update(merged);
     return merged;
   }
 
@@ -33,17 +33,17 @@ export class FsBlockStorage implements BlockStore {
     const state = await this.state();
     if (state[id]) {
       delete state[id];
-      await this.patch(state);
+      await this.update(state);
     }
   }
 
   state(
-    options?: ReadOptions | undefined,
+    options?: ReadOptions | undefined
   ): Promise<Record<string, Resolvable>> {
     return this.readOnly.state(options);
   }
   archived(
-    options?: ReadOptions | undefined,
+    options?: ReadOptions | undefined
   ): Promise<Record<string, Resolvable>> {
     return this.readOnly.archived(options);
   }

@@ -7,9 +7,10 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
 export interface BlockStore extends Release {
-  update(
-    resolvables: Record<string, Resolvable>,
+  patch(
+    resolvables: Record<string, Resolvable>
   ): Promise<Record<string, Resolvable>>;
+  update(resolvables: Record<string, Resolvable>): Promise<void>;
   delete(id: string): Promise<void>;
 }
 export interface State {
@@ -48,9 +49,7 @@ export interface Props {
 /**
  * @title Admin
  */
-export default function App(
-  { resolvables }: Props,
-): App<Manifest, State> {
+export default function App({ resolvables }: Props): App<Manifest, State> {
   return { manifest, state: { storage: new FsBlockStorage() }, resolvables };
 }
 
