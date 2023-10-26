@@ -364,7 +364,7 @@ export const toFilters = (
 
 export const typeTagExtractor = (url: URL, tags: { type: string }[]) => {
   const keysToDestroy: string[] = [];
-  const typeTags: { key: string; value: string, isProperty: boolean }[] = [];
+  const typeTags: { key: string; value: string; isProperty: boolean }[] = [];
   const typeTagRegex = /\btype_tags\[(.*?)\]\[\]/;
 
   url.searchParams.forEach((value, key) => {

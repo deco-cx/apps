@@ -76,7 +76,6 @@ const searchLoader = async (
     Object.fromEntries(newUrl.searchParams.entries()),
   );
 
-
   const promises = categoryTagNames.concat(
     [...categoryTagName].filter((isUndefined) =>
       isUndefined !== undefined
@@ -124,7 +123,11 @@ const searchLoader = async (
     "property1_values[]": properties1,
     "property2_values[]": properties2,
     "property3_values[]": properties3,
-    ...Object.fromEntries(typeTags.filter(({isProperty}) => !isProperty ).map(({ key, value }) => [key, value])),
+    ...Object.fromEntries(
+      typeTags.filter(({ isProperty }) => !isProperty).map((
+        { key, value },
+      ) => [key, value]),
+    ),
   }, STALE);
 
   const pagination = JSON.parse(
