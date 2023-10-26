@@ -66,9 +66,16 @@ const searchLoader = async (
 
   const categoryTagName = props.term || url.pathname.split("/").slice(1) || "";
 
+  const newUrl = new URL(req.url);
+
+  const properties1 = newUrl.searchParams.getAll("type_tags[property1][]");
+  const properties2 = newUrl.searchParams.getAll("type_tags[property2][]");
+  const properties3 = newUrl.searchParams.getAll("type_tags[property3][]");
+
   const categoryTagNames = Object.values(
-    Object.fromEntries(new URL(req.url).searchParams.entries()),
+    Object.fromEntries(newUrl.searchParams.entries()),
   );
+
 
   const promises = categoryTagNames.concat(
     [...categoryTagName].filter((isUndefined) =>
@@ -114,7 +121,10 @@ const searchLoader = async (
         ? [...categories, ...resolvedTagNames]
         : undefined),
     wildcard: true,
-    ...Object.fromEntries(typeTags.map(({ key, value }) => [key, value])),
+    "property1_values[]": properties1,
+    "property2_values[]": properties2,
+    "property3_values[]": properties3,
+    ...Object.fromEntries(typeTags.filter(({isProperty}) => !isProperty ).map(({ key, value }) => [key, value])),
   }, STALE);
 
   const pagination = JSON.parse(

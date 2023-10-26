@@ -364,7 +364,7 @@ export const toFilters = (
 
 export const typeTagExtractor = (url: URL, tags: { type: string }[]) => {
   const keysToDestroy: string[] = [];
-  const typeTags: { key: string; value: string }[] = [];
+  const typeTags: { key: string; value: string, isProperty: boolean }[] = [];
   const typeTagRegex = /\btype_tags\[(.*?)\]\[\]/;
 
   url.searchParams.forEach((value, key) => {
@@ -372,9 +372,10 @@ export const typeTagExtractor = (url: URL, tags: { type: string }[]) => {
 
     if (match) {
       const tagValue = match[1];
-      if (tags.some((tag) => tag.type === tagValue)) {
+      const isProperty = tagValue.includes("property");
+      if (tags.some((tag) => tag.type === tagValue) || isProperty) {
         keysToDestroy.push(key);
-        typeTags.push({ key, value });
+        typeTags.push({ key, value, isProperty });
       }
     }
   });
