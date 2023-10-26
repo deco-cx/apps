@@ -1,21 +1,18 @@
 import { Head } from "$fresh/runtime.ts";
 import type { Flag, Site } from "deco/types.ts";
 import { context } from "deco/live.ts";
+import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 interface Page {
   id: string | number;
   pathTemplate?: string;
 }
 
-declare global {
-  interface Window {
-    LIVE: {
-      page: Page;
-      site: Site;
-      flags?: Flag[];
-      play?: boolean;
-    };
-  }
+interface Live {
+  page?: Page;
+  site: Site;
+  flags: Flag[];
+  play: boolean;
 }
 
 interface Props {
@@ -29,7 +26,7 @@ type EditorEvent = {
   args: { script: string };
 };
 
-const main = () => {
+const snippet = (live: Live) => {
   const onKeydown = (event: KeyboardEvent) => {
     // in case loaded in iframe, avoid redirecting to editor while in editor
     if (window !== window.parent) {
@@ -83,10 +80,7 @@ const main = () => {
   };
 
   /** Setup global variables */
-  window.LIVE = {
-    ...window.LIVE,
-    ...JSON.parse(document.getElementById("__DECO_STATE")!.textContent || ""),
-  };
+  window.LIVE = { ...window.LIVE, ...live };
 
   /** Setup listeners */
 
@@ -97,23 +91,19 @@ const main = () => {
   addEventListener("message", onMessage);
 };
 
-function LiveControls({ site, page, flags }: Props) {
+function LiveControls({ site, page, flags = [] }: Props) {
   return (
-    <>
-      <Head>
-        <script
-          type="application/json"
-          id="__DECO_STATE"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({ page, site, flags, play: context.play }),
-          }}
-        />
-        <script
-          type="module"
-          dangerouslySetInnerHTML={{ __html: `(${main})()` }}
-        />
-      </Head>
-    </>
+    <Head>
+      <script
+        defer
+        src={scriptAsDataURI(snippet, {
+          page,
+          site,
+          flags,
+          play: !!context.play,
+        })}
+      />
+    </Head>
   );
 }
 
