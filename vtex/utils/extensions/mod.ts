@@ -2,7 +2,7 @@ import { Product, ProductLeaf } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { withIsSimilarTo } from "../similars.ts";
 import { extension as simulateExt } from "./simulation.ts";
-import listLoader from "../../loaders/intelligentSearch/productList.ts";
+import listLoader from "../../loaders/legacy/productList.ts";
 import { batch } from "../batch.ts";
 
 export interface Options {
