@@ -29,7 +29,7 @@ const loaders = async (
   const { count = 4, query } = props;
   const segment = getSegmentFromBag(ctx);
 
-  const response = await vcsDeprecated["GET /buscaautocomplete"]({
+  const suggestions = await vcsDeprecated["GET /buscaautocomplete"]({
     maxRows: count,
     productNameContains: query,
     suggestionsStack: "",
@@ -37,50 +37,23 @@ const loaders = async (
     // Not adding suggestions to cache since queries are very spread out
     // deco: { cache: "stale-while-revalidate" },
     headers: withSegmentCookie(segment),
-  });
+  }).then((res) => res.json());
 
-  const suggestions = await response.json();
+  const searches: Suggestion["searches"] = suggestions.itemsReturned.filter((
+    { items },
+  ) => !items?.length).map(({ name, href }) => ({ term: name, href }));
 
-  if (!suggestions?.itemsReturned) return null;
-
-  const suggestedTerms = suggestions.itemsReturned.filter(({ items }) =>
-    !items?.length
-  ).map(({ name, href }) => ({ term: name, href }));
-
-  const products = suggestions.itemsReturned.filter(({ items }) =>
-    !!items.length
-  ).map(({ items, href, thumbUrl }) => {
-    const { nameComplete, name, productId, itemId } = items[0];
-    const thumbUrlWithoutResize = thumbUrl?.replace("-25-25", "");
-    // This is being used only in autocomplete. Unfortunately there's no more info.
-    const partialProduct: Product = {
+  const products: Suggestion["products"] = suggestions.itemsReturned
+    .filter(({ items }) => !!items.length)
+    .map(({ items: [{ productId, itemId }] }): Product => ({
       "@type": "Product",
-      productID: productId,
+      productID: itemId,
       sku: itemId,
-      isVariantOf: {
-        "@type": "ProductGroup",
-        name: nameComplete,
-        url: (new URL(href)).pathname,
-        hasVariant: [],
-        additionalProperty: [],
-        productGroupID: productId,
-      },
-      name,
-      image: thumbUrl
-        ? [{
-          "@type": "ImageObject",
-          url: thumbUrlWithoutResize,
-          alternateName: nameComplete,
-        }]
-        : [],
-      url: `${(new URL(href)).pathname}?skuId=${itemId}`,
-    };
-
-    return partialProduct;
-  });
+      inProductGroupWithID: productId,
+    }));
 
   return {
-    searches: suggestedTerms,
+    searches,
     products,
   };
 };
