@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("salesforce"),
     app("implementation"),
     app("weather"),
     {
