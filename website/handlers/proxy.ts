@@ -73,6 +73,14 @@ async (req, _ctx) => {
     body: req.body,
   });
 
+  if (response.status > 499) {
+    console.error(
+      Deno.inspect({ request: req, response }),
+      "request cookies",
+      req.headers.get("cookie"),
+    );
+  }
+
   const contentType = response.headers.get("Content-Type");
 
   const decoder = new TextDecoder();
