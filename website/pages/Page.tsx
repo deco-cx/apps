@@ -9,6 +9,8 @@ import {
 import { JSX } from "preact";
 import Events from "../components/Events.tsx";
 import LiveControls from "../components/_Controls.tsx";
+import { AppContext } from "../mod.ts";
+// import { Page } from "deco/blocks/page.tsx";
 
 /**
  * @title Sections
@@ -50,7 +52,7 @@ const useDeco = () => {
 /**
  * @title Page
  */
-function Page({ sections }: Props): JSX.Element {
+function Page({ sections }: Props & { errorPage: string }): JSX.Element {
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 
@@ -62,6 +64,14 @@ function Page({ sections }: Props): JSX.Element {
     </>
   );
 }
+
+export const loader = (
+  { sections }: Props,
+  _req: Request,
+  _ctx: AppContext,
+) => {
+  return { sections, errorPage: _ctx.errorPage };
+};
 
 export function Preview({ sections }: Props) {
   const deco = useDeco();
