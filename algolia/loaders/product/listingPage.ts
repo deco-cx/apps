@@ -235,7 +235,14 @@ const loader = async (
     client,
     { url, queryID, indexName },
   );
-  const pageInfo = getPageInfo(page, nbPages, nbHits, hitsPerPage, url, startingPage);
+  const pageInfo = getPageInfo(
+    page,
+    nbPages,
+    nbHits,
+    hitsPerPage,
+    url,
+    startingPage,
+  );
   const filters = transformFacets(facets ?? {}, {
     order: props.facets ?? [],
     facetFilters,
