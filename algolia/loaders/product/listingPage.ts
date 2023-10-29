@@ -45,6 +45,12 @@ interface Props {
 
   /** @description Hide Unavailable Items */
   hideUnavailable?: boolean;
+
+  /**
+   * @description ?page search params for the first page
+   * @default 0
+   */
+  startingPage?: 0 | 1;
 }
 
 const getPageInfo = (
@@ -53,6 +59,7 @@ const getPageInfo = (
   nbHits: number,
   hitsPerPage: number,
   url: URL,
+  startingPage: number,
 ) => {
   const next = page + 1;
   const prev = page - 1;
@@ -62,11 +69,11 @@ const getPageInfo = (
   const previousPage = new URLSearchParams(url.searchParams);
 
   if (hasNextPage) {
-    nextPage.set("page", `${next}`);
+    nextPage.set("page", `${next + startingPage}`);
   }
 
   if (hasPreviousPage) {
-    previousPage.set("page", `${prev}`);
+    previousPage.set("page", `${prev + startingPage}`);
   }
 
   return {
@@ -74,7 +81,7 @@ const getPageInfo = (
     previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
     records: nbHits,
     recordPerPage: hitsPerPage,
-    currentPage: page,
+    currentPage: page + startingPage,
   };
 };
 
@@ -168,6 +175,8 @@ const loader = async (
   const url = new URL(req.url);
   const { client } = ctx;
   const indexName = getIndex(url.searchParams.get("sort"));
+  const startingPage = props.startingPage ?? 0;
+  const pageIndex = Number(url.searchParams.get("page")) || startingPage;
 
   const facetFilters: [string, string[]][] = JSON.parse(
     url.searchParams.get("facetFilters") ?? "[]",
@@ -195,7 +204,7 @@ const loader = async (
         filters: fFilters,
         facets: [],
         hitsPerPage: props.hitsPerPage ?? 12,
-        page: Number(url.searchParams.get("page")) || 0,
+        page: pageIndex - startingPage,
         clickAnalytics: true,
       },
     },
@@ -226,7 +235,14 @@ const loader = async (
     client,
     { url, queryID, indexName },
   );
-  const pageInfo = getPageInfo(page, nbPages, nbHits, hitsPerPage, url);
+  const pageInfo = getPageInfo(
+    page,
+    nbPages,
+    nbHits,
+    hitsPerPage,
+    url,
+    startingPage,
+  );
   const filters = transformFacets(facets ?? {}, {
     order: props.facets ?? [],
     facetFilters,

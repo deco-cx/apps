@@ -170,7 +170,9 @@ const loader = async (
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
-  const [map, term] = missingParams
+  const [map, term] = missingParams && fq.length > 0
+    ? ["", ""]
+    : missingParams
     ? getMapAndTerm(pageTypes)
     : [maybeMap, maybeTerm];
 
