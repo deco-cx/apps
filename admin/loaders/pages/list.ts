@@ -1,7 +1,7 @@
 import { AppContext, BlockMetadata } from "../../mod.ts";
 import { Pagination } from "../../types.ts";
 
-const PAGE_RESOLVE_TYPE = "website/pages/Page.tsx";
+export const PAGE_RESOLVE_TYPE = "website/pages/Page.tsx";
 
 export default async function ListPages(
   _props: unknown,
