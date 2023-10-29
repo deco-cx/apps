@@ -7,10 +7,10 @@ import { engine as passThrough } from "../utils/image/engines/passThrough/engine
 import { engine as wasm } from "../utils/image/engines/wasm/engine.ts";
 
 const ENGINES = [
+  passThrough,
   wasm,
   cloudflare,
   deco,
-  passThrough,
 ];
 
 function assert(expr: unknown, msg = ""): asserts expr {
