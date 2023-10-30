@@ -48,15 +48,17 @@ async function loader(
 
   const sku = pickSku(product, skuId?.toString());
 
-  const kitItems: LegacyProduct[] = sku.isKit && sku.kitItems
-    ? await vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
-      {
-        ...params,
-        fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
-      },
-      STALE,
-    ).then((res) => res.json())
-    : [];
+  const kitItems: LegacyProduct[] =
+    Array.isArray(sku.kitItems) && sku.kitItems.length > 0
+      ? await vcsDeprecated
+        ["GET /api/catalog_system/pub/products/search/:term?"](
+          {
+            ...params,
+            fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
+          },
+          STALE,
+        ).then((res) => res.json())
+      : [];
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
