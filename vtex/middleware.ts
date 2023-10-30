@@ -16,6 +16,11 @@ const DEFAULT_SEGMENT: Partial<Segment> = {
   utmi_campaign: null,
   utm_campaign: null,
   utm_source: null,
+  channel: "1",
+  cultureInfo: "pt-BR",
+  currencyCode: "BRL",
+  currencySymbol: "R$",
+  countryCode: "BRA",
 };
 
 export const middleware = (
