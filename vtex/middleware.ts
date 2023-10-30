@@ -33,6 +33,7 @@ export const middleware = (
     const segment = {
       channel: salesChannel,
       ...DEFAULT_SEGMENT,
+      ...ctx.defaultSegment,
       ...segmentFromCookie,
       ...segmentFromRequest,
     };
