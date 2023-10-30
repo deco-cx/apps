@@ -20,7 +20,6 @@ const indexName: Indices = "products";
 interface Options {
   url: string | URL;
   queryID?: string;
-  indexName?: string;
 }
 
 export const resolveProducts = async (
@@ -67,14 +66,13 @@ export const resolveProducts = async (
 
 const withAnalyticsInfo = (
   maybeUrl: string | undefined,
-  { queryID, indexName, url: origin }: Options,
+  { queryID, url: origin }: Options,
 ) => {
   if (!maybeUrl) return undefined;
 
   const url = new URL(maybeUrl, origin);
 
   queryID && url.searchParams.set("algoliaQueryID", queryID);
-  indexName && url.searchParams.set("algoliaIndex", indexName);
 
   return url.href;
 };
