@@ -28,7 +28,11 @@ const removeCFHeaders = (headers: Headers) => {
 
 const trace = (request: Request, response: Response) => {
   try {
-    const headers = Object.fromEntries(request.headers.entries());
+    const headers = Object.fromEntries(
+      [...request.headers.entries()].filter(([key]) =>
+        key === "cookie" || key.toLowerCase() === "user-agent"
+      ),
+    );
     console.error(
       response.status,
       `fetch("${request.url}", {headers: ${
@@ -87,7 +91,7 @@ async (req, _ctx) => {
     body: req.body,
   });
 
-  if (response.status > 199) trace(req, response);
+  if (response.status > 499) trace(req, response);
 
   const contentType = response.headers.get("Content-Type");
 
