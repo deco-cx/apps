@@ -1329,7 +1329,7 @@ export interface OpenAPI {
       /**
        * Filtra pelo valor da propriedade 1
        */
-      property1_values?: string[];
+      "property1_values[]"?: string[];
       /**
        * Operador lógico para o filtro de valor da propriedade 1
        */
@@ -1337,7 +1337,7 @@ export interface OpenAPI {
       /**
        * Filtra pelo valor da propriedade 2
        */
-      property2_values?: string[];
+      "property2_values[]"?: string[];
       /**
        * Operador lógico para o filtro de valor da propriedade 2
        */
@@ -1345,7 +1345,7 @@ export interface OpenAPI {
       /**
        * Filtra pelo valor da propriedade 3
        */
-      property3_values?: string[];
+      "property3_values[]"?: string[];
       /**
        * Operador lógico para o filtro de valor da propriedade 3
        */
