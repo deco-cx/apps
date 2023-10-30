@@ -26,6 +26,24 @@ const removeCFHeaders = (headers: Headers) => {
   });
 };
 
+const trace = async (request: Request, response: Response) => {
+  console.error(JSON.stringify(
+    {
+      req: {
+        url: request.url,
+        cookies: request.headers.get("cookie"),
+        Headers: Deno.inspect(request.headers),
+      },
+      res: {
+        status: response.status,
+        body: await response.clone().text(),
+      },
+    },
+    null,
+    2,
+  ));
+};
+
 const proxyTo = (
   {
     url: rawProxyUrl,
@@ -73,13 +91,7 @@ async (req, _ctx) => {
     body: req.body,
   });
 
-  if (response.status > 499) {
-    console.error(
-      Deno.inspect({ request: req, response }),
-      "request cookies",
-      req.headers.get("cookie"),
-    );
-  }
+  if (response.status > 499) trace(req, response).catch(console.error);
 
   const contentType = response.headers.get("Content-Type");
 
