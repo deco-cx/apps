@@ -26,22 +26,18 @@ const removeCFHeaders = (headers: Headers) => {
   });
 };
 
-const trace = async (request: Request, response: Response) => {
-  console.error(JSON.stringify(
-    {
-      req: {
-        url: request.url,
-        cookies: request.headers.get("cookie"),
-        Headers: Deno.inspect(request.headers),
-      },
-      res: {
-        status: response.status,
-        body: await response.clone().text(),
-      },
-    },
-    null,
-    2,
-  ));
+const trace = (request: Request, response: Response) => {
+  try {
+    const headers = Object.fromEntries(request.headers.entries());
+    console.error(
+      response.status,
+      `fetch("${request.url}", {headers: ${
+        JSON.stringify(headers, null, 2)
+      }, method: "${request.method}", redirect: "manual" })`,
+    );
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const proxyTo = (
@@ -91,7 +87,7 @@ async (req, _ctx) => {
     body: req.body,
   });
 
-  if (response.status > 499) trace(req, response).catch(console.error);
+  if (response.status > 199) trace(req, response);
 
   const contentType = response.headers.get("Content-Type");
 
