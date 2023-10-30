@@ -233,7 +233,7 @@ const loader = async (
       replaceHighlight(p, props.highlight ? _highlightResult : {})
     ),
     client,
-    { url, queryID, indexName },
+    { url, queryID },
   );
   const pageInfo = getPageInfo(
     page,
