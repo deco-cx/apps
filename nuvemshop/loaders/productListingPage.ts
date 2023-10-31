@@ -54,7 +54,7 @@ async function loader(
   let result: ProductBaseNuvemShop[] | undefined;
 
   try {
-    const response = await api["GET /products/"]({
+    const response = await api["GET /products"]({
       q: q,
       page,
       per_page,

@@ -26,16 +26,24 @@ async function loader(
   ctx: AppContext,
 ): Promise<Product[] | null> {
   const { api } = ctx;
-  const { url: baseUrl } = req;
-
+  const { url } = req;
+  console.log(
+    "api",
+    api["GET /products"]({
+      q: props.term || "",
+      sort_by: props.sort || "user",
+      per_page: props.limit || 10,
+    }),
+  );
   let result: ProductBaseNuvemShop[] | undefined;
 
   try {
-    const response = await api["GET /products/"]({
+    const response = await api["GET /products"]({
       q: props.term || "",
       sort_by: props.sort || "user",
       per_page: props.limit || 10,
     });
+    console.log(response);
     result = await response.json();
   } catch {
     result = [];

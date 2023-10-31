@@ -10,7 +10,7 @@ import { NuvemShopAPI } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
-export type App = ReturnType<typeof VTEX>;
+export type App = ReturnType<typeof Nuvemshop>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
 export type AppMiddlewareContext = AMC<App>;
@@ -35,7 +35,13 @@ export interface Props {
   userAgent: string;
 
   /**
-   * @description Use VTEX as backend platform
+   * @title Public URL
+   */
+
+  publicUrl: string;
+
+  /**
+   * @description Use Nuvemshop as backend platform
    */
   platform: "nuvemshop";
 }
@@ -45,23 +51,24 @@ export const color = 0xF71963;
 /**
  * @title NuvemShop
  */
-export default function VTEX(
-  { storeId, accessToken, userAgent }: Props,
+export default function Nuvemshop(
+  { storeId, accessToken, publicUrl, userAgent }: Props,
 ) {
   const headers = new Headers();
   headers.set("accept", "application/json");
   headers.set("Authentication", `bearer ${accessToken}`);
   headers.set("user-agent", userAgent);
   headers.set("content-type", "application/json");
-
+  console.log(storeId);
   const api = createHttpClient<NuvemShopAPI>({
-    base: `${BASE_URL}/${storeId}/`,
+    base: `${BASE_URL}/${storeId}`,
     fetcher: fetchSafe,
     headers: headers,
   });
 
   const state = {
     api,
+    publicUrl: publicUrl,
   };
 
   const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {

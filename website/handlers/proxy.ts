@@ -65,6 +65,9 @@ async (req, _ctx) => {
   for (const { key, value } of customHeaders) {
     headers.set(key, value);
   }
+  console.log("to", to);
+  to.protocol = "https:";
+  console.log("to", to);
 
   const response = await fetch(to, {
     headers,

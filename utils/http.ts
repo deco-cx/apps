@@ -127,7 +127,11 @@ export const createHttpClient = <T>({
           .filter((x) => typeof x === "string" || typeof x === "number")
           .join("/");
 
-        const url = new URL(compiled, base);
+        let path2: any = compiled;
+        if (path2.startsWith("/")) {
+          path2 = path2.substring(1);
+        }
+        const url = new URL(path2, base);
         mapped.forEach((value, key) => {
           if (value === undefined) return;
 

@@ -11,6 +11,7 @@ export interface Props {
 
 /**
  * @title NuvemShop Integration - Product Details Page
+ * @description Product Details Page loader
  */
 async function loader(
   props: Props,
@@ -24,7 +25,7 @@ async function loader(
 
   const sku = url.searchParams.get("sku");
 
-  const nuvemProductResponse = await api["GET /products/"]({
+  const nuvemProductResponse = await api["GET /products"]({
     handle: slug,
   });
 
