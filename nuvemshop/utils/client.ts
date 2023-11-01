@@ -1,4 +1,4 @@
-import { ProductBaseNuvemShop } from "./types.ts";
+import { Cart, ProductBaseNuvemShop } from "./types.ts";
 
 export interface NuvemShopAPI {
   "GET /products": {
@@ -14,6 +14,6 @@ export interface NuvemShopAPI {
     };
   };
   "GET /carts/:id": {
-    response: any;
+    response: Cart;
   };
 }

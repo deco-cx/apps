@@ -1,5 +1,4 @@
 import type { ProductDetailsPage } from "../../commerce/types.ts";
-import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 

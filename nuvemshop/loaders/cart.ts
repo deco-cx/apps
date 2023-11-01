@@ -1,11 +1,12 @@
 import { AppContext } from "../mod.ts";
-import { getCartCookie, setCartCookie } from "../utils/cart.ts";
+import { getCartCookie } from "../utils/cart.ts";
+import { Cart } from "../utils/types.ts";
 
 const loader = async (
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<GetCartQuery["cart"]> => {
+): Promise<Cart | undefined> => {
   const { api } = ctx;
   const maybeCartId = getCartCookie(req.headers);
 
@@ -17,9 +18,7 @@ const loader = async (
     id: maybeCartId,
   }).then((response) => response.json());
 
-  console.log("cart", cart);
-
-  return { cart };
+  return cart;
 };
 
 export default loader;

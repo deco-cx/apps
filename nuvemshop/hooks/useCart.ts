@@ -2,20 +2,21 @@
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
+import { ProductElement } from "../utils/types.ts";
 import { Context, state as storeState } from "./context.ts";
 
 export const itemToAnalyticsItem = (
-  item: CartFragment["lines"]["nodes"][number] & { quantity: number },
+  item: ProductElement,
   index: number,
 ): AnalyticsItem => ({
-  item_id: item.id,
+  item_id: item.id.toString(),
   item_name: item.name,
   discount: item.compare_at_price
-    ? item.price -
-      item.compare_at_price
+    ? Number(item.price) -
+      Number(item.compare_at_price)
     : 0,
-  item_variant: item.variant_id,
-  price: item.price,
+  item_variant: item.variant_id.toString(),
+  price: Number(item.price),
   index,
   quantity: item.quantity,
 });

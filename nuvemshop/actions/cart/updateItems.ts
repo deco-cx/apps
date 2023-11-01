@@ -1,27 +1,23 @@
 import { AppContext } from "../../mod.ts";
-import {
-  getCartCookie,
-  setCartCookie,
-  setStoreSessionCookie,
-  setStoreSessionPayloadCookie,
-} from "../../utils/cart.ts";
-import { getCookies, setCookie } from "std/http/cookie.ts";
+import { setCartCookie } from "../../utils/cart.ts";
+import { UpdateCartResponse } from "../../utils/types.ts";
+
+export interface UpdateProps {
+  quantity: number;
+  itemId: number;
+}
 
 const action = async (
-  { quantity, itemId }: UpdateLineProps,
+  { quantity, itemId }: UpdateProps,
   req: Request,
   ctx: AppContext,
-): Promise<CartFragment | null> => {
-  console.log("add Item");
-  try{
-
+): Promise<UpdateCartResponse | null> => {
   const { publicUrl } = ctx;
 
-  var myHeaders = new Headers();
+  const myHeaders = new Headers();
 
   const requestCookies = req.headers.get("Cookie");
 
-  // Adiciona cookies ao myHeaders, se existirem
   if (requestCookies) {
     myHeaders.append("Cookie", requestCookies);
   }
@@ -34,14 +30,13 @@ const action = async (
   myHeaders.append("X-Requested-With", "XMLHttpRequest");
   myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-  var urlencoded = new URLSearchParams();
+  const urlencoded = new URLSearchParams();
   urlencoded.append(`quantity[${itemId}]`, quantity.toString());
-    
-  var requestOptions = {
+
+  const requestOptions = {
     method: "POST",
     headers: myHeaders,
     body: urlencoded,
-    redirect: "follow",
   };
 
   const response = await fetch(
@@ -49,10 +44,7 @@ const action = async (
     requestOptions,
   );
 
-  console.log(response);
-
   const result = await response.json();
-  console.log(result.cart.id);
   setCartCookie(ctx.response.headers, result?.cart?.id);
 
   const setCookiesArray = response.headers.get("set-cookie")?.split(",") || [];
@@ -60,7 +52,8 @@ const action = async (
     "store_session_payload_2734114",
     "store_login_session",
   ];
-  let cookiesToSet = [];
+
+  const cookiesToSet = [];
 
   for (const cookieStr of setCookiesArray) {
     for (const desiredCookie of desiredCookies) {
@@ -72,16 +65,11 @@ const action = async (
     }
   }
 
-  console.log("toset", cookiesToSet);
-
   for (const cookie of cookiesToSet) {
     ctx.response.headers.append("Set-Cookie", cookie); // Use append para adicionar múltiplos Set-Cookie headers
   }
 
-  return result;
-}catch(err){
-  throw err
-}
+  return result.cart;
 };
 
 export default action;

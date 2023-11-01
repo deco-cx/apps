@@ -166,7 +166,7 @@ export interface Cart {
   billing_country: null;
   shipping_cost_owner: null;
   shipping_cost_customer: null;
-  coupon: any[];
+  coupon: unknown[];
   promotional_discount: PromotionalDiscount;
   subtotal: string;
   discount: string;
@@ -191,8 +191,8 @@ export interface Cart {
   shipping_store_branch_name: null;
   shipping_store_branch_extra: null;
   shipping_pickup_type: null;
-  shipping_suboption: any[];
-  extra: Extra;
+  shipping_suboption: unknown[];
+  extra: unknown;
   storefront: string;
   note: null;
   created_at: string;
@@ -200,7 +200,7 @@ export interface Cart {
   completed_at: null;
   next_action: string;
   payment_details: PaymentDetails;
-  attributes: any[];
+  attributes: unknown[];
   customer: null;
   contact_accepts_marketing: boolean;
   contact_accepts_marketing_updated_at: string;
@@ -217,12 +217,9 @@ export interface Cart {
   total_long: string;
 }
 
-export interface Extra {
-}
-
 export interface PaymentDetails {
   method: null;
-  credit_card_company: null;
+  credit_card_compunknown: null;
   installments: number;
 }
 
@@ -240,8 +237,8 @@ export interface ProductElement {
   weight: string;
   width: string;
   variant_id: number;
-  variant_values: any[];
-  properties: any[];
+  variant_values: unknown[];
+  properties: unknown[];
   sku: string;
   barcode: null;
   url: string;
@@ -256,7 +253,7 @@ export interface PurpleImage {
   product_id: number;
   src: string;
   position: number;
-  alt: any[];
+  alt: unknown[];
   created_at: string;
   updated_at: string;
 }
@@ -267,8 +264,8 @@ export interface PromotionalDiscount {
   order_id: number;
   created_at: string;
   total_discount_amount: string;
-  contents: any[];
-  promotions_applied: any[];
+  contents: unknown[];
+  promotions_applied: unknown[];
 }
 
 export interface Item {
@@ -336,7 +333,7 @@ export interface ItemProduct {
   max_installments: MaxInstallments;
   seo_title: string;
   handle: string;
-  metafields: any[];
+  metafields: unknown[];
   promotional_offer: null;
   selected_variant: null;
   barcode: null;
@@ -381,7 +378,7 @@ export interface SelectedOrFirstAvailableVariant {
   option1: null;
   option2: null;
   option3: null;
-  options: any[];
+  options: unknown[];
   price: number;
   compare_at_price: number;
   display_price: boolean;
@@ -395,7 +392,7 @@ export interface SelectedOrFirstAvailableVariant {
   available: boolean;
   canonical_url: string;
   image: FeaturedImageClass;
-  metafields: any[];
+  metafields: unknown[];
   selected: boolean;
   height: string;
   width: string;

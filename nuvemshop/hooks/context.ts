@@ -1,14 +1,15 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
+import { Cart } from "../utils/types.ts";
 
 export interface Context {
-  cart: any | null;
+  cart: Cart | null;
 }
 
 const loading = signal<boolean>(true);
 const context = {
-  cart: signal<any | null>(null),
+  cart: signal<Cart | null>(null),
 };
 
 let queue = Promise.resolve();

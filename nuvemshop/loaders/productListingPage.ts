@@ -1,14 +1,5 @@
-import type {
-  Product,
-  ProductDetailsPage,
-  ProductListingPage,
-} from "../../commerce/types.ts";
-import { STALE } from "../../utils/fetch.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import type { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-
-import { getBreadCrumbs, toProduct } from "../utils/transform.ts";
-import { NuvemShopSort, ProductBaseNuvemShop } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -37,7 +28,7 @@ async function loader(
   const url = new URL(baseUrl);
 
   const per_page = props.limit ?? 10;
-  const page = Number(url.searchParams.get("page")) || 0;
+  const page = Number(url.searchParams.get("page")) || 1;
 
   const minPrice = url.searchParams.get("min_price");
   const maxPrice = url.searchParams.get("max_price");
@@ -48,7 +39,6 @@ async function loader(
   let q = props.term || url.searchParams.get("q") ||
     decodeURIComponent(url.pathname) ||
     undefined;
-
   q = q?.replace("/", "");
 
   let result: ProductBaseNuvemShop[] | undefined;
@@ -60,7 +50,9 @@ async function loader(
       per_page,
       price_max: maxPrice,
       price_min: minPrice,
+      sort_by: "price-ascending",
     });
+    console.log(response);
     result = await response.json();
   } catch {
     result = [];

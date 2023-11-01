@@ -1,9 +1,7 @@
-import type { Product, ProductDetailsPage } from "../../commerce/types.ts";
-import { STALE } from "../../utils/fetch.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 
-import { getBreadCrumbs, toProduct } from "../utils/transform.ts";
+import { toProduct } from "../utils/transform.ts";
 import { NuvemShopSort, ProductBaseNuvemShop } from "../utils/types.ts";
 
 export interface Props {
@@ -27,14 +25,7 @@ async function loader(
 ): Promise<Product[] | null> {
   const { api } = ctx;
   const { url } = req;
-  console.log(
-    "api",
-    api["GET /products"]({
-      q: props.term || "",
-      sort_by: props.sort || "user",
-      per_page: props.limit || 10,
-    }),
-  );
+
   let result: ProductBaseNuvemShop[] | undefined;
 
   try {
@@ -50,7 +41,7 @@ async function loader(
   }
 
   const products = result?.map((product) => {
-    return [...toProduct(product, new URL(req.url), null)];
+    return [...toProduct(product, new URL(url), null)];
   }).flat();
 
   return products || [];
