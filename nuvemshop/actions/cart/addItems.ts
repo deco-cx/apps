@@ -32,8 +32,8 @@ const action = async (
   myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
   const urlencoded = new URLSearchParams();
-  urlencoded.append("add_to_cart", `${itemId}`);
-  urlencoded.append("quantity", `${quantity}`);
+  urlencoded.append("add_to_cart", itemId.toString());
+  urlencoded.append("quantity", quantity.toString());
   urlencoded.append("add_to_cart_enhanced", add_to_cart_enhanced);
 
   const requestOptions = {
@@ -42,15 +42,16 @@ const action = async (
     body: urlencoded,
   };
 
+  const buyUrl = newURL("/comprar/", publicUrl);
+
   const response = await fetch(
-    `${publicUrl}/comprar/`,
+    buyUrl.href,
     requestOptions,
   );
 
   const result = await response.json();
 
   setCartCookie(ctx.response.headers, result?.cart?.id);
-
   ctx.response.headers.append("Set-Cookie", response.headers.get("set-cookie"));
 
   return result.cart;

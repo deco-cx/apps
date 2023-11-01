@@ -39,14 +39,16 @@ const action = async (
     body: urlencoded,
   };
 
+  const updateUrl = new URL("/cart/update/", publicUrl);
+
   const response = await fetch(
-    `${publicUrl}cart/update/`,
+    updateUrl.href,
     requestOptions,
   );
 
   const result = await response.json();
-  setCartCookie(ctx.response.headers, result?.cart?.id);
 
+  setCartCookie(ctx.response.headers, result?.cart?.id);
   ctx.response.headers.append("Set-Cookie", response.headers.get("set-cookie"));
 
   return result.cart;

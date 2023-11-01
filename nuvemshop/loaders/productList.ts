@@ -1,6 +1,4 @@
 import type { Product } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
-
 import { toProduct } from "../utils/transform.ts";
 import { NuvemShopSort, ProductBaseNuvemShop } from "../utils/types.ts";
 
@@ -34,7 +32,6 @@ async function loader(
       sort_by: props.sort || "user",
       per_page: props.limit || 10,
     });
-    console.log(response);
     result = await response.json();
   } catch {
     result = [];

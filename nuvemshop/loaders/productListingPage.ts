@@ -1,5 +1,7 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
+import { ProductBaseNuvemShop } from "../utils/types.ts";
+import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
   /**
@@ -52,7 +54,6 @@ async function loader(
       price_min: minPrice,
       sort_by: "price-ascending",
     });
-    console.log(response);
     result = await response.json();
   } catch {
     result = [];
