@@ -47,27 +47,7 @@ const action = async (
   const result = await response.json();
   setCartCookie(ctx.response.headers, result?.cart?.id);
 
-  const setCookiesArray = response.headers.get("set-cookie")?.split(",") || [];
-  const desiredCookies = [
-    "store_session_payload_2734114",
-    "store_login_session",
-  ];
-
-  const cookiesToSet = [];
-
-  for (const cookieStr of setCookiesArray) {
-    for (const desiredCookie of desiredCookies) {
-      console.log("quebra: ", cookieStr.trim());
-      if (cookieStr.trim().startsWith(desiredCookie)) {
-        cookiesToSet.push(cookieStr.trim());
-        break; // exit inner loop when found
-      }
-    }
-  }
-
-  for (const cookie of cookiesToSet) {
-    ctx.response.headers.append("Set-Cookie", cookie); // Use append para adicionar múltiplos Set-Cookie headers
-  }
+  ctx.response.headers.append("Set-Cookie", response.headers.get("set-cookie"));
 
   return result.cart;
 };

@@ -32,8 +32,8 @@ const action = async (
   myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
   const urlencoded = new URLSearchParams();
-  urlencoded.append("add_to_cart", itemId);
-  urlencoded.append("quantity", quantity);
+  urlencoded.append("add_to_cart", `${itemId}`);
+  urlencoded.append("quantity", `${quantity}`);
   urlencoded.append("add_to_cart_enhanced", add_to_cart_enhanced);
 
   const requestOptions = {
@@ -51,25 +51,7 @@ const action = async (
 
   setCartCookie(ctx.response.headers, result?.cart?.id);
 
-  const setCookiesArray = response.headers.get("set-cookie")?.split(",") || [];
-  const desiredCookies = [
-    "store_session_payload_2734114",
-    "store_login_session",
-  ];
-  const cookiesToSet = [];
-
-  for (const cookieStr of setCookiesArray) {
-    for (const desiredCookie of desiredCookies) {
-      if (cookieStr.trim().startsWith(desiredCookie)) {
-        cookiesToSet.push(cookieStr.trim());
-        break;
-      }
-    }
-  }
-
-  for (const cookie of cookiesToSet) {
-    ctx.response.headers.append("Set-Cookie", cookie);
-  }
+  ctx.response.headers.append("Set-Cookie", response.headers.get("set-cookie"));
 
   return result.cart;
 };
