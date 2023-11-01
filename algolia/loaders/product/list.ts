@@ -51,7 +51,11 @@ const loader = async (
     IndexedProduct
   >;
 
-  return resolveProducts(products, client, { url: req.url, queryID });
+  return resolveProducts(products, client, {
+    url: req.url,
+    queryID,
+    indexName,
+  });
 };
 
 export default loader;

@@ -85,7 +85,7 @@ const loader = async (
       replaceHighlight(p, highlight ? _highlightResult : {})
     ),
     client,
-    { url: req.url, queryID },
+    { url: req.url, queryID, indexName: productsIndex },
   );
 
   const searches = suggestions.map((s) => ({
