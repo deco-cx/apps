@@ -49,7 +49,10 @@ const action = async (
   const result = await response.json();
 
   setCartCookie(ctx.response.headers, result?.cart?.id);
-  ctx.response.headers.append("Set-Cookie", response.headers.get("set-cookie"));
+  ctx.response.headers.append(
+    "Set-Cookie",
+    response.headers.get("set-cookie") || "",
+  );
 
   return result.cart;
 };

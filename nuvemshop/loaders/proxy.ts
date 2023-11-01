@@ -51,11 +51,8 @@ const buildProxyRoutes = (
       throw new Error(`Invalid hostname from '${publicUrl}'`);
     }
 
-    // TODO @lucis: Fix the proxy, MITM
-
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
-    console.log(hostname);
     const routeFromPath = (pathTemplate: string): Route => ({
       pathTemplate,
       handler: {
@@ -84,6 +81,23 @@ const buildProxyRoutes = (
 
     return [
       ...routes,
+      {
+        pathTemplate: "/sitemap.xml",
+        handler: {
+          value: {
+            include,
+            __resolveType: "nuvemshop/handlers/sitemap.ts",
+          },
+        },
+      },
+      {
+        pathTemplate: "/sitemap*",
+        handler: {
+          value: {
+            __resolveType: "nuvemshop/handlers/sitemap.ts",
+          },
+        },
+      },
       ...routesFromPaths,
     ];
   } catch (e) {
