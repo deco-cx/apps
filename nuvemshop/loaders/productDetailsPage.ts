@@ -17,14 +17,15 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
-  const { api } = ctx;
+  const { api, storeId } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
   const url = new URL(baseUrl);
 
   const sku = url.searchParams.get("sku");
 
-  const nuvemProductResponse = await api["GET /products"]({
+  const nuvemProductResponse = await api["GET /v1/:storeId/products"]({
+    storeId: storeId,
     handle: slug,
   });
 

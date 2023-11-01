@@ -1,7 +1,7 @@
 import { Cart, ProductBaseNuvemShop } from "./types.ts";
 
 export interface NuvemShopAPI {
-  "GET /products": {
+  "GET /v1/:storeId/products": {
     response: ProductBaseNuvemShop[];
     searchParams: {
       handle?: string;
@@ -13,7 +13,7 @@ export interface NuvemShopAPI {
       price_min?: string | null;
     };
   };
-  "GET /carts/:id": {
+  "GET /v1/:storeId/carts/:id": {
     response: Cart;
   };
 }

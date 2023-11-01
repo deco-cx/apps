@@ -25,7 +25,7 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> {
-  const { api } = ctx;
+  const { api, storeId } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
 
@@ -46,7 +46,8 @@ async function loader(
   let result: ProductBaseNuvemShop[] | undefined;
 
   try {
-    const response = await api["GET /products"]({
+    const response = await api["GET /v1/:storeId/products"]({
+      storeId: storeId,
       q: q,
       page,
       per_page,

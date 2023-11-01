@@ -127,11 +127,8 @@ export const createHttpClient = <T>({
           .filter((x) => typeof x === "string" || typeof x === "number")
           .join("/");
 
-        let path2: any = compiled;
-        if (path2.startsWith("/")) {
-          path2 = path2.substring(1);
-        }
-        const url = new URL(path2, base);
+        const url = new URL(compiled, base);
+
         mapped.forEach((value, key) => {
           if (value === undefined) return;
 
@@ -153,7 +150,7 @@ export const createHttpClient = <T>({
 
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
 
-        return fetcher(url, {
+        return fetcher(url.href, {
           ...init,
           headers,
           method,

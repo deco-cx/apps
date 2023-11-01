@@ -1,6 +1,7 @@
 import type { Product } from "../../commerce/types.ts";
 import { toProduct } from "../utils/transform.ts";
 import { NuvemShopSort, ProductBaseNuvemShop } from "../utils/types.ts";
+import { AppContext } from "../mod.ts";
 
 export interface Props {
   /** @description query to use on search. if used will break sort */
@@ -21,13 +22,14 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> {
-  const { api } = ctx;
+  const { api, storeId } = ctx;
   const { url } = req;
 
   let result: ProductBaseNuvemShop[] | undefined;
 
   try {
-    const response = await api["GET /products"]({
+    const response = await api["GET /v1/:storeId/products"]({
+      storeId: storeId,
       q: props.term || "",
       sort_by: props.sort || "user",
       per_page: props.limit || 10,

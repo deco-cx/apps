@@ -15,9 +15,9 @@ export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
 export type AppMiddlewareContext = AMC<App>;
 
-const BASE_URL = "https://api.nuvemshop.com.br/v1";
+const BASE_URL = "https://api.nuvemshop.com.br/";
 
-/** @title VTEX */
+/** @title Nuvemshop */
 export interface Props {
   /**
    * @description STORE ID
@@ -59,9 +59,9 @@ export default function Nuvemshop(
   headers.set("Authentication", `bearer ${accessToken}`);
   headers.set("user-agent", userAgent);
   headers.set("content-type", "application/json");
-  console.log(storeId);
+
   const api = createHttpClient<NuvemShopAPI>({
-    base: `${BASE_URL}/${storeId}`,
+    base: `${BASE_URL}`,
     fetcher: fetchSafe,
     headers: headers,
   });
@@ -69,6 +69,7 @@ export default function Nuvemshop(
   const state = {
     api,
     publicUrl: publicUrl,
+    storeId: storeId,
   };
 
   const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {

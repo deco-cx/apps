@@ -19,7 +19,7 @@ const includeSiteMaps = (
     <lastmod>${new Date().toISOString().substring(0, 10)}</lastmod>
   </sitemap>`);
   }
-  console.log(siteMapIncludeTags);
+
   return siteMapIncludeTags.length > 0
     ? currentXML.replace(
       xmlHeader,
