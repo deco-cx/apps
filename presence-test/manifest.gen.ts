@@ -5,11 +5,11 @@
 import * as $$$$$$0 from "./sections/Presence/PresenceCounter.tsx";
 
 const manifest = {
-  "sections": {
+  sections: {
     "presence-test/sections/Presence/PresenceCounter.tsx": $$$$$$0,
   },
-  "name": "presence-test",
-  "baseUrl": import.meta.url,
+  name: "presence-test",
+  baseUrl: import.meta.url,
 };
 
 export type Manifest = typeof manifest;
