@@ -1,15 +1,19 @@
 const app = (name: string) => ({ dir: name, name });
 
-const compatibilityApps = [{
-  dir: "./compat/$live",
-  name: "$live",
-}, {
-  dir: "./compat/std",
-  name: "deco-sites/std",
-}];
+const compatibilityApps = [
+  {
+    dir: "./compat/$live",
+    name: "$live",
+  },
+  {
+    dir: "./compat/std",
+    name: "deco-sites/std",
+  },
+];
 
 const config = {
   apps: [
+    app("presence-test"),
     app("implementation"),
     app("weather"),
     {
