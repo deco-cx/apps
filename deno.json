@@ -12,7 +12,7 @@
     "deco/": "https://denopkg.com/deco-cx/deco@1.45.5/"
   },
   "lock": false,
-  "tasks": {   
+  "tasks": {
     "check": "deno fmt && deno lint && deno check **/mod.ts",
     "release": "deno eval 'import \"deco/scripts/release.ts\"'",
     "start": "deno run -A ./scripts/start.ts",
