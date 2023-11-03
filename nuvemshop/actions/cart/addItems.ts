@@ -52,7 +52,7 @@ const action = async (
   const result = await response.json();
 
   setCartCookie(ctx.response.headers, result?.cart?.id);
-  
+
   const setCookiesArray = response.headers.get("set-cookie")?.split(",") || [];
 
   const cookiesToSet = [];

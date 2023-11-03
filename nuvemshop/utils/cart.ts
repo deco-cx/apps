@@ -4,7 +4,7 @@ const CART_COOKIE = "nuvemshop_cart_id";
 export const DESIRED_COOKIES = [
   "store_session_payload_2734114",
   "store_login_session",
-]
+];
 
 const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
