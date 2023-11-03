@@ -1,6 +1,6 @@
 <h1>
   <p align="center">
-    <img alt="Presence" src="https://raw.githubusercontent.com/viktormarinho/deco-apps/main/presence/Presence.png" width="250" height="120"/>
+    <img alt="Presence" src="https://raw.githubusercontent.com/viktormarinho/deco-apps/main/presence/logo.png" width="250" height="120"/>
   </p>
 </h1>
 
