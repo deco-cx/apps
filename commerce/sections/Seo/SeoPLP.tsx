@@ -9,7 +9,9 @@ export type Props = {
 function Section({ jsonLD, ...props }: Props) {
   const title = jsonLD?.seo?.title;
   const description = jsonLD?.seo?.description;
-  const canonical = jsonLD?.breadcrumb
+  const canonical = jsonLD?.seo?.canonical
+    ? jsonLD.seo.canonical
+    : jsonLD?.breadcrumb
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
     : null;
 

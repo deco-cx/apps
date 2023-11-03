@@ -1,17 +1,18 @@
 // deno-lint-ignore-file no-explicit-any
 import { Workflow, WorkflowFn } from "deco/blocks/workflow.ts";
-import { start } from "../initializer.ts"; // side-effect initialize
-import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 import { Arg, RuntimeParameters, WorkflowExecutionBase } from "deco/deps.ts";
 import { BlockFromKey, BlockFunc, BlockKeys } from "deco/engine/block.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Manifest } from "deco/live.gen.ts";
 import { context } from "deco/live.ts";
 import { DecoManifest } from "deco/types.ts";
+import { start } from "../initializer.ts"; // side-effect initialize
+import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 
 export interface CommonProps<
   TMetadata extends WorkflowMetadata = WorkflowMetadata,
 > {
+  restart?: boolean;
   id?: string;
   metadata?: TMetadata;
   runtimeParameters?: RuntimeParameters;
@@ -113,5 +114,6 @@ export default async function startWorkflow<
       ...(props?.metadata ?? {}),
     },
   };
-  return await start<Arg, unknown, WorkflowMetadata>(payload).then(toExecution);
+  return await start<Arg, unknown, WorkflowMetadata>(payload, props?.restart)
+    .then(toExecution);
 }

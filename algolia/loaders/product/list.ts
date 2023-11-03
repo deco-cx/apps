@@ -43,14 +43,17 @@ const loader = async (
     params: {
       hitsPerPage: props.hitsPerPage ?? 12,
       facetFilters: JSON.parse(props.facetFilters ?? "[]"),
+      clickAnalytics: true,
     },
   }]);
 
-  const { hits: products } = results[0] as SearchResponse<IndexedProduct>;
+  const { hits: products, queryID } = results[0] as SearchResponse<
+    IndexedProduct
+  >;
 
   return resolveProducts(products, client, {
     url: req.url,
-    queryID: undefined,
+    queryID,
     indexName,
   });
 };

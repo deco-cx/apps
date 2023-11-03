@@ -15,7 +15,7 @@ export type Indices =
 
 const unique = (ids: string[]) => [...new Set(ids).keys()];
 
-const indexName: Indices = "products";
+const DEFAULT_INDEX_NAME: Indices = "products";
 
 interface Options {
   url: string | URL;
@@ -42,7 +42,12 @@ export const resolveProducts = async (
 
   const { results: similars } = await client.multipleGetObjects<
     IndexedProduct
-  >(unique(ids).map((objectID) => ({ objectID, indexName })));
+  >(
+    unique(ids).map((objectID) => ({
+      objectID,
+      indexName: opts.indexName || DEFAULT_INDEX_NAME,
+    })),
+  );
 
   const productsById = new Map<string, Product>();
   for (const product of similars) {

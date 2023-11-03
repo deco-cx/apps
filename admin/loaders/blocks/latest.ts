@@ -10,7 +10,10 @@ export default async function Latest(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlockState | null> {
-  const state = await ctx.storage.state();
+  const state = await ctx.storage.state({
+    forceFresh: true,
+  });
+
   const block = state[blockId];
   if (!block) {
     return null;

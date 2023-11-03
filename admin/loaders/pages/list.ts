@@ -1,15 +1,13 @@
 import { AppContext, BlockMetadata } from "../../mod.ts";
 import { Pagination } from "../../types.ts";
 
-export interface Props {
-  site: string;
-}
+export const PAGE_RESOLVE_TYPE = "website/pages/Page.tsx";
 
-export default async function ListBlocks(
-  _props: Props,
+export default async function ListPages(
+  _props: unknown,
   _req: Request,
   ctx: AppContext,
-): Promise<Pagination<Partial<BlockMetadata>> | null> {
+): Promise<Pagination<BlockMetadata> | null> {
   const state = await ctx.storage.state();
 
   if (!state) {
@@ -21,16 +19,13 @@ export default async function ListBlocks(
     };
   }
 
-  const data = Object.entries(state).map(
-    ([id, { __resolveType, ...blockState }]) => ({
+  const data = Object.entries(state)
+    .map(([id, { __resolveType, ...blockState }]) => ({
       id,
-      data: {
-        ...blockState,
-        __resolveType,
-      },
+      ...(blockState as Omit<BlockMetadata, "id">),
       module: __resolveType,
-    }),
-  );
+    }))
+    .filter((block) => block.module === PAGE_RESOLVE_TYPE);
 
   return {
     data: data,

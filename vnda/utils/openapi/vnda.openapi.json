@@ -7084,7 +7084,7 @@
               }
             },
             "in": "query",
-            "name": "property1_values",
+            "name": "property1_values[]",
             "description": "Filtra pelo valor da propriedade 1"
           },
           {
@@ -7107,7 +7107,7 @@
               }
             },
             "in": "query",
-            "name": "property2_values",
+            "name": "property2_values[]",
             "description": "Filtra pelo valor da propriedade 2"
           },
           {
@@ -7130,7 +7130,7 @@
               }
             },
             "in": "query",
-            "name": "property3_values",
+            "name": "property3_values[]",
             "description": "Filtra pelo valor da propriedade 3"
           },
           {
