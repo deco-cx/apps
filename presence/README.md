@@ -41,7 +41,7 @@ Here is an example of how you would do that:
 ```
 
 ```ts
-import { createPresenceHandler } from "apps/presence/handlers/presenceRoom.ts"
+import { createPresenceHandler } from "apps/presence/infra/presenceRoom.ts"
 
 export const handler = createPresenceHandler({});
 ```
