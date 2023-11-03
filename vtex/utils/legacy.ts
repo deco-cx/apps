@@ -98,7 +98,11 @@ export const pageTypesToBreadcrumbList = (
   });
 };
 
-export const pageTypesToSeo = (pages: PageType[], req: Request): Seo | null => {
+export const pageTypesToSeo = (
+  pages: PageType[],
+  req: Request,
+  pgNumberIndexing?: boolean,
+): Seo | null => {
   const current = pages.at(-1);
 
   const url = new URL(req.url);
@@ -117,11 +121,20 @@ export const pageTypesToSeo = (pages: PageType[], req: Request): Seo | null => {
     return null;
   }
 
-  const [_, pathname] = current.url?.split(".vtexcommercestable.com.br") ?? [];
-
   return {
     title: current.title!,
     description: current.metaTagDescription!,
-    canonical: new URL(pathname, req.url).href,
+    canonical: buildCanonicalURL(pgNumberIndexing, req.url),
   };
 };
+
+function buildCanonicalURL(pgNumberIndexing = false, urlStr: string) {
+  const url = new URL(urlStr);
+  const { origin, pathname, searchParams } = url;
+
+  if (!pgNumberIndexing) return `${origin}${pathname}`;
+
+  const pgNumber = searchParams.get("page") ?? "1";
+
+  return `${origin}${pathname}?page=${pgNumber}`;
+}

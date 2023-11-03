@@ -104,6 +104,12 @@ export interface Props {
   selectedFacets?: SelectedFacet[];
 
   /**
+   * @title Page number indexing
+   * @description Page number will be taken into account on indexing
+   */
+  pgNumberIndexing?: boolean;
+
+  /**
    * @title Hide Unavailable Items
    * @description Do not return out of stock items
    */
@@ -398,7 +404,7 @@ const loader = async (
       recordPerPage: pagination.perPage,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req),
+    seo: pageTypesToSeo(pageTypes, req, props.pgNumberIndexing),
   };
 };
 
