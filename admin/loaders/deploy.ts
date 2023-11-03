@@ -16,7 +16,7 @@ export default async function code(_props: unknown): Promise<Bundle | null> {
   for await (
     const entry of walk(Deno.cwd(), {
       includeDirs: false,
-      skip: [/.git/, /.release.json/, /node_modules/, /_fresh/],
+      skip: [/.git$/, /.release.json/, /node_modules/, /_fresh/],
     })
   ) {
     codeEntries.push(
