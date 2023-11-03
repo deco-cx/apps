@@ -12,29 +12,29 @@ import * as $$$$$$$$$$$6 from "./apps/weather.ts";
 import * as $$$$$$$$$$$7 from "./apps/typesense.ts";
 import * as $$$$$$$$$$$8 from "./apps/workflows.ts";
 import * as $$$$$$$$$$$9 from "./apps/analytics.ts";
-import * as $$$$$$$$$$$10 from "./apps/wake.ts";
-import * as $$$$$$$$$$$11 from "./apps/handlebars.ts";
-import * as $$$$$$$$$$$12 from "./apps/vtex.ts";
-import * as $$$$$$$$$$$13 from "./apps/implementation.ts";
-import * as $$$$$$$$$$$14 from "./apps/shopify.ts";
-import * as $$$$$$$$$$$15 from "./apps/presence-test.ts";
+import * as $$$$$$$$$$$10 from "./apps/presence.ts";
+import * as $$$$$$$$$$$11 from "./apps/wake.ts";
+import * as $$$$$$$$$$$12 from "./apps/handlebars.ts";
+import * as $$$$$$$$$$$13 from "./apps/vtex.ts";
+import * as $$$$$$$$$$$14 from "./apps/implementation.ts";
+import * as $$$$$$$$$$$15 from "./apps/shopify.ts";
 
 const manifest = {
   "apps": {
     "decohub/apps/admin.ts": $$$$$$$$$$$2,
     "decohub/apps/algolia.ts": $$$$$$$$$$$5,
     "decohub/apps/analytics.ts": $$$$$$$$$$$9,
-    "decohub/apps/handlebars.ts": $$$$$$$$$$$11,
-    "decohub/apps/implementation.ts": $$$$$$$$$$$13,
+    "decohub/apps/handlebars.ts": $$$$$$$$$$$12,
+    "decohub/apps/implementation.ts": $$$$$$$$$$$14,
     "decohub/apps/linx.ts": $$$$$$$$$$$4,
     "decohub/apps/power-reviews.ts": $$$$$$$$$$$0,
-    "decohub/apps/presence-test.ts": $$$$$$$$$$$15,
-    "decohub/apps/shopify.ts": $$$$$$$$$$$14,
+    "decohub/apps/presence.ts": $$$$$$$$$$$10,
+    "decohub/apps/shopify.ts": $$$$$$$$$$$15,
     "decohub/apps/typesense.ts": $$$$$$$$$$$7,
     "decohub/apps/verified-reviews.ts": $$$$$$$$$$$1,
     "decohub/apps/vnda.ts": $$$$$$$$$$$3,
-    "decohub/apps/vtex.ts": $$$$$$$$$$$12,
-    "decohub/apps/wake.ts": $$$$$$$$$$$10,
+    "decohub/apps/vtex.ts": $$$$$$$$$$$13,
+    "decohub/apps/wake.ts": $$$$$$$$$$$11,
     "decohub/apps/weather.ts": $$$$$$$$$$$6,
     "decohub/apps/workflows.ts": $$$$$$$$$$$8,
   },

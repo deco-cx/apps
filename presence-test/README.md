@@ -1,7 +1,0 @@
-
-
-# Presence
-
----
-
-Testando readme

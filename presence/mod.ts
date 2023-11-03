@@ -1,12 +1,8 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
-export interface ConfigPresence {
-  /**
-   * @description Presence provider
-   */
-  provider: "Default Presence" | "Supabase" | "LiveBlocks";
-}
+// deno-lint-ignore no-empty-interface
+export interface ConfigPresence {}
 
 /**
  * @title Realtime Presence rooms App

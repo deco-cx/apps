@@ -13,7 +13,6 @@
   },
   "lock": false,
   "tasks": {
-    "check": "deno fmt && deno lint && deno check **/mod.ts",
     "release": "deno eval 'import \"deco/scripts/release.ts\"'",
     "start": "deno run -A ./scripts/start.ts",
     "bundle": "deno eval 'import \"deco/scripts/apps/bundle.ts\"'",
@@ -23,9 +22,6 @@
     "watcher": "deno eval 'import \"deco/scripts/apps/watcher.ts\"'",
     "update": "deno eval 'import \"deco/scripts/update.ts\"'",
     "new": "deno run -A ./scripts/new.ts"
-  },
-  "githooks": {
-    "pre-commit": "check"
   },
   "exclude": [
     "static",

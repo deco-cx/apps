@@ -13,7 +13,7 @@ const compatibilityApps = [
 
 const config = {
   apps: [
-    app("presence-test"),
+    app("presence"),
     app("implementation"),
     app("weather"),
     {
