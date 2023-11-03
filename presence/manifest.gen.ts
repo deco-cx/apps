@@ -2,13 +2,9 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$0 from "./handlers/presenceRoom.ts";
 import * as $$$$$$0 from "./sections/Presence/PresenceCounter.tsx";
 
 const manifest = {
-  "handlers": {
-    "presence/handlers/presenceRoom.ts": $$$$0,
-  },
   "sections": {
     "presence/sections/Presence/PresenceCounter.tsx": $$$$$$0,
   },
