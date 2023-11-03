@@ -24,6 +24,7 @@ export interface Props {
 const defaults = {
   labelTemplate: "%count% Pessoas nesta página",
   margin: "2rem",
+  position: "Bottom Right",
 };
 
 function PingDot() {
@@ -68,7 +69,7 @@ export default function PresenceCounter(props: Props) {
   return (
     <span
       style={calcPositionStyles(
-        props.position ?? "Bottom Right",
+        props.position ?? defaults.position,
         props.margin ? `${props.margin}px` : defaults.margin,
       )}
       class={`
