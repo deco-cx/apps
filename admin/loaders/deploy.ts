@@ -30,9 +30,11 @@ export default async function code(_props: unknown): Promise<Bundle | null> {
   const release = { ...await context.release!.state() };
   delete release["admin-app"]; // remove admin-app as default installed
 
+  const { manifest } = await context.runtime!;
+  const name = manifest.name.replace("deco-sites/", "");
   return {
     code,
     release,
-    name: Deno.env.get("DECO_SITE_NAME")!,
+    name,
   };
 }
