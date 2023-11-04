@@ -575,6 +575,7 @@ interface AnalyticsItemWithoutIdentifier {
   coupon?: string;
   discount?: number;
   index?: number;
+  item_group_id?: string;
   item_url?: string;
   item_brand?: string;
   item_category?: string;
