@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { Head } from "$fresh/runtime.ts";
 import { scriptAsDataURI } from "../../../utils/dataURI.ts";
 
@@ -22,6 +23,20 @@ const snippet = () => {
     event: "gtm.js",
   });
 
+  const fixId = ({ item_id, item_group_id, item_url, ...rest }: any) =>
+    item_group_id
+      ? ({ item_id: `${item_group_id}_${item_id}`, ...rest })
+      : ({ item_id, ...rest });
+
+  const fixPrice = (
+    { price, discount = 0, quantity = 1, ...rest }: any,
+  ) => ({
+    ...rest,
+    discount,
+    quantity,
+    price: price + discount,
+  });
+
   window.DECO.events.subscribe((event) => {
     if (!event) return;
 
@@ -30,18 +45,12 @@ const snippet = () => {
       return;
     }
 
-    // deno-lint-ignore no-explicit-any
     const ecommerce: any = { ...event.params };
 
     if (ecommerce && Array.isArray(ecommerce.items)) {
-      ecommerce.items = ecommerce.items.map((
-        // deno-lint-ignore no-explicit-any
-        { item_id, item_group_id, item_url, ...rest }: any,
-      ) =>
-        item_group_id
-          ? ({ item_id: `${item_id}_${item_group_id}`, ...rest })
-          : ({ item_id, ...rest })
-      );
+      ecommerce.items = ecommerce.items
+        .map(fixId)
+        .map(fixPrice);
     }
 
     window.dataLayer.push({ ecommerce: null });
