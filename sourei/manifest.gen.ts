@@ -2,11 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$0 from "./sections/Analytics/SouRei.tsx";
+import * as $$$$$$0 from "./sections/Analytics/Sourei.tsx";
 
 const manifest = {
   "sections": {
-    "sourei/sections/Analytics/SouRei.tsx": $$$$$$0,
+    "sourei/sections/Analytics/Sourei.tsx": $$$$$$0,
   },
   "name": "sourei",
   "baseUrl": import.meta.url,

@@ -2,14 +2,21 @@ import { Head } from "$fresh/runtime.ts";
 import { scriptAsDataURI } from "../../../utils/dataURI.ts";
 
 interface Props {
-  src: string;
+  /**
+   * @title Hostname
+   * @description e.g: https://ss.sourei.com
+   * @default https://www.googletagmanager.com
+   */
+  hostname: string;
+  /**
+   * @title GTM ID
+   * @description e.g: GTM-XXXXXXXX
+   */
+  gtmId: string;
 }
 
 const snippet = () => {
   window.dataLayer = window.dataLayer || [];
-
-  // It is safe to .push in datalayer in here because partytown have already
-  // run and made dataLayer.push available in window
   window.dataLayer.push({
     "gtm.start": new Date().getTime(),
     event: "gtm.js",
@@ -42,16 +49,25 @@ const snippet = () => {
   });
 };
 
-function Analytics({ src }: Props) {
+function Section({
+  gtmId,
+  hostname = "https://www.googletagmanager.com",
+}: Props) {
+  const src = new URL(`/gtm.js?id=${gtmId}`, hostname);
+  const iframeSrc = new URL(`/ns.html?id=${gtmId}`, hostname);
+
   return (
     <>
+      {/* Head */}
       <Head>
-        <script src={src} defer />
+        <script src={src.href} defer />
         <script src={scriptAsDataURI(snippet)} defer />
       </Head>
+
+      {/* Body */}
       <noscript>
         <iframe
-          src={src}
+          src={iframeSrc.href}
           height="0"
           width="0"
           style="display:none;visibility:hidden"
@@ -61,4 +77,4 @@ function Analytics({ src }: Props) {
   );
 }
 
-export default Analytics;
+export default Section;
