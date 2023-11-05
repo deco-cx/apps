@@ -14,6 +14,12 @@ interface Props {
    * @description e.g: GTM-XXXXXXXX
    */
   gtmId: string;
+
+  /**
+   * @description Adds the defer attribute to script tag. Set eager for including the script asap
+   * @default defer
+   */
+  loading?: "module" | "defer" | "async" | "eager";
 }
 
 const snippet = () => {
@@ -61,6 +67,7 @@ const snippet = () => {
 function Section({
   gtmId,
   hostname = "https://www.googletagmanager.com",
+  loading = "defer",
 }: Props) {
   const src = new URL(`/gtm.js?id=${gtmId}`, hostname);
   const iframeSrc = new URL(`/ns.html?id=${gtmId}`, hostname);
@@ -69,8 +76,17 @@ function Section({
     <>
       {/* Head */}
       <Head>
-        <script src={src.href} defer />
-        <script src={scriptAsDataURI(snippet)} defer />
+        <script
+          src={src.href}
+          defer={loading === "defer"}
+          async={loading === "async"}
+          type={loading === "module" ? "module" : "text/javascript"}
+        />
+        <script
+          src={scriptAsDataURI(snippet)}
+          defer={loading === "defer"}
+          type="text/javascript"
+        />
       </Head>
 
       {/* Body */}
