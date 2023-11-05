@@ -2,11 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$0 from "./sections/Presence/PresenceCounter.tsx";
+import * as $$$$$$0 from "./sections/Presence/LiveChat.tsx";
 
 const manifest = {
   "sections": {
-    "presence/sections/Presence/PresenceCounter.tsx": $$$$$$0,
+    "presence/sections/Presence/LiveChat.tsx": $$$$$$0,
   },
   "name": "presence",
   "baseUrl": import.meta.url,

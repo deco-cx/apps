@@ -4,7 +4,7 @@ import {
   Messages,
   Reaction,
   SetName,
-} from "../../infra/protocol.ts";
+} from "../../infra/protocol.js";
 
 type Position = "Bottom Right" | "Bottom Left" | "Top Right" | "Top Left";
 
@@ -205,12 +205,14 @@ function ChatWindow({
   chatOpen,
 }: ChatProps) {
   const [text, setText] = useState("");
+  const [error, setError] = useState("");
 
   if (!nameWasSet) {
     return (
       <div class="flex flex-col h-full gap-2 items-center justify-center">
+        <p class="font-semibold p-2 text-center">{error.length ? error : "Olá!"}</p>
         <input
-          class="w-48 rounded-lg border p-1 text-sm"
+          class="w-52 rounded-lg border p-1 text-sm"
           placeholder="Digite seu nome"
           type="text"
           value={name}
@@ -218,12 +220,27 @@ function ChatWindow({
             nameInputChange((e.target as unknown as { value: string }).value);
           }}
         />
-        <button
-          class="rounded-lg p-1 bg-gray-100 text-sm hover:bg-gray-200 border text-gray-700 w-1/2"
-          onClick={updateName}
-        >
-          Pronto!
-        </button>
+        <div class="flex gap-1 items-center w-52">
+          <button
+            class="rounded-lg p-1 bg-gray-100 text-sm hover:bg-gray-200 border text-gray-700 w-1/2"
+            onClick={() => {
+              nameInputChange("Anônimo");
+            }}
+          >
+            Anônimo
+          </button>
+          <button
+            class="rounded-lg p-1 bg-green-200 hover:bg-green-300 text-sm hover:bg-gray-200 border text-gray-700 w-1/2"
+            onClick={() => {
+              if (name.length < 3) {
+                return setError("Por favor, digite um nome de pelo menos três caracteres");
+              }
+              updateName();
+            }}
+          >
+            Pronto!
+          </button>
+        </div>
       </div>
     );
   }
@@ -279,7 +296,7 @@ function ChatWindow({
   );
 }
 
-export default function PresenceCounter(props: Props) {
+export default function LiveChat(props: Props) {
   const {
     label,
     toggleChat,
