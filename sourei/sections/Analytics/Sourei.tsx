@@ -29,6 +29,8 @@ const snippet = () => {
     event: "gtm.js",
   });
 
+  const rounded = (n: number) => Number(n.toFixed(2));
+
   const fixId = ({ item_id, item_group_id, item_url, ...rest }: any) =>
     item_group_id
       ? ({ item_id: `${item_group_id}_${item_id}`, ...rest })
@@ -38,10 +40,12 @@ const snippet = () => {
     { price, discount = 0, quantity = 1, ...rest }: any,
   ) => ({
     ...rest,
-    discount,
     quantity,
-    price: price + discount,
+    discount: rounded(discount),
+    price: rounded(price + discount),
   });
+
+  const fixIndex = ({ index, ...rest }: any) => ({ ...rest, index: index + 1 });
 
   window.DECO.events.subscribe((event) => {
     if (!event) return;
@@ -56,7 +60,8 @@ const snippet = () => {
     if (ecommerce && Array.isArray(ecommerce.items)) {
       ecommerce.items = ecommerce.items
         .map(fixId)
-        .map(fixPrice);
+        .map(fixPrice)
+        .map(fixIndex);
     }
 
     window.dataLayer.push({ ecommerce: null });
