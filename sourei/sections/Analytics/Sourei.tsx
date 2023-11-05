@@ -84,7 +84,7 @@ function Section({
         />
         <script
           src={scriptAsDataURI(snippet)}
-          defer={loading === "defer"}
+          defer
           type="text/javascript"
         />
       </Head>
