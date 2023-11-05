@@ -1,30 +1,13 @@
 import { HandlerContext } from "$fresh/server.ts";
-
-/**
- *  Room
- *
- *  A room contains a unique Id and a pool of connections.
- *  Represents a Realtime Presence Group of people.
- */
-type Room = {
-  connections: WebSocket[];
-  id: string;
-};
+import { Messages } from "./protocol.ts";
+import { Broadcast, NamedSocket, Room } from "./rooms.ts";
 
 /**
  * Global store that tracks all of our rooms and connections
  */
 const rooms: Room[] = [];
 
-/**
- *  Receives a Presence Room and broadcast its current State (Number of connections)
- */
-function broadcastRoomState(room: Room) {
-  const count = room.connections.length.toString();
-  for (const socket of room.connections) {
-    socket.send(count);
-  }
-}
+const getRoom = (id: string) => rooms.find((room) => room.id == id);
 
 type CreatePresenceHandlerConfig = {
   onError?: (this: WebSocket, ev: Event) => void;
@@ -44,15 +27,10 @@ export function createPresenceHandler({
   onRoomStateChange,
   roomIdParam,
 }: CreatePresenceHandlerConfig) {
-  const broadcast = (room: Room) => {
-    broadcastRoomState(room);
-    if (onRoomStateChange) {
-      onRoomStateChange(room);
-    }
-  };
+  const after = onRoomStateChange ?? function (_room: Room) {};
 
   const onOpen = (socket: WebSocket, roomId: string) => {
-    let currentRoom = rooms.find((room) => room.id == roomId);
+    let currentRoom = getRoom(roomId);
     if (!currentRoom) {
       currentRoom = {
         connections: [socket],
@@ -65,7 +43,7 @@ export function createPresenceHandler({
 
     // Wait until Socket is fully connected.
     while (socket.readyState !== socket.OPEN);
-    broadcast(currentRoom);
+    Broadcast.count(currentRoom, after);
   };
 
   const onClose = (socket: WebSocket) => {
@@ -79,9 +57,28 @@ export function createPresenceHandler({
         }
       });
       if (foundConnection) {
-        broadcast(room);
+        Broadcast.count(room, after);
         break;
       }
+    }
+  };
+
+  const onMessage = (socket: NamedSocket, roomId: string, data: string) => {
+    const message = Messages.deserialize(data);
+    const room = getRoom(roomId);
+
+    if (!room) return;
+
+    if (message.type === "chat_update") {
+      Broadcast.chatMessage(room, message.newMessage, socket.name, after);
+    }
+
+    if (message.type === "set_name") {
+      socket.name = message.newName;
+    }
+
+    if (message.type === "reaction") {
+      Broadcast.reaction(room, message.emoji, after);
     }
   };
 
@@ -99,6 +96,9 @@ export function createPresenceHandler({
 
     socket.onopen = () => {
       onOpen(socket, roomId);
+    };
+    socket.onmessage = (e) => {
+      onMessage(socket, roomId, e.data);
     };
     socket.onclose = () => {
       onClose(socket);
