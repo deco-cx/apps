@@ -2,10 +2,11 @@
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import type { Item } from "../utils/client/types.ts";
 import { Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
+
+type Item = NonNullable<Context["cart"]["orderForm"]>["items"][number];
 
 export const itemToAnalyticsItem = (
   item: Item & { quantity: number },

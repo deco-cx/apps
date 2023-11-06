@@ -456,7 +456,7 @@ export interface Seller {
   HasSeller: boolean;
   PurchaseLimit: PurchaseLimit;
   SellerID: null;
-  SellerName: null;
+  SellerName: string | null;
 }
 
 export interface PurchaseLimit {

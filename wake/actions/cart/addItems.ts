@@ -11,8 +11,8 @@ import {
 export interface CartItem {
   productVariantId: number;
   quantity: number;
-  customization: { customizationId: number; value: string }[];
-  subscription: { subscriptionGroupId: number; recurringTypeId: number };
+  customization?: { customizationId: number; value: string }[];
+  subscription?: { subscriptionGroupId: number; recurringTypeId: number };
 }
 
 export interface Props {

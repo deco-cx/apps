@@ -67,6 +67,11 @@ export const getMapAndTerm = (
     .filter(Boolean)
     .join(",");
 
+  // We are in a search page
+  if (map === "ft" && term === "s") {
+    return ["", ""];
+  }
+
   return [map, term];
 };
 

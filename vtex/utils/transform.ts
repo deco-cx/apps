@@ -105,16 +105,13 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
   return sku.kitItems?.map(({ itemId }) => {
     const product = productBySkuId.get(itemId);
 
-    if (!product) {
-      throw new Error(
-        `Expected product for skuId ${itemId} but it was not returned by the search engine`,
-      );
-    }
+    /** Sometimes VTEX does not return what I've asked for */
+    if (!product) return;
 
     const sku = pickSku(product, itemId);
 
     return toProduct(product, sku, 0, options);
-  });
+  }).filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -124,7 +121,7 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   options: ProductOptions,
 ): Omit<ProductDetailsPage, "seo"> => {
   const partialProduct = toProduct(product, sku, 0, options);
-  // Get accessories in ProductPage only. I don't see where it's necessary outside this page for now
+  // This is deprecated. Compose this loader at loaders > product > extension > detailsPage.ts
   const isAccessoryOrSparePartFor = toAccessoryOrSparePartFor(
     sku,
     kitItems,

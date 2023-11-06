@@ -57,13 +57,14 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
     function attributesFromURL(href: string) {
       const url = new URL(href);
       const queryID = url.searchParams.get("algoliaQueryID");
+      const indexName = url.searchParams.get("algoliaIndex");
 
       // Not comming from an algolia search page
-      if (!queryID) {
+      if (!queryID || !indexName) {
         return null;
       }
 
-      return { queryID };
+      return { queryID, indexName };
     }
 
     // deno-lint-ignore no-explicit-any
@@ -116,7 +117,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         if (attr) {
           window.aa("clickedObjectIDsAfterSearch", {
             eventName,
-            index: PRODUCTS,
+            index: attr.indexName,
             queryID: attr.queryID,
             objectIDs: [item.item_id],
             positions: [item.index + 1],
@@ -142,8 +143,8 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         if (attr) {
           window.aa("convertedObjectIDsAfterSearch", {
             eventName,
-            index: PRODUCTS,
             objectIDs,
+            index: attr.indexName,
             queryID: attr.queryID,
           });
         } else {

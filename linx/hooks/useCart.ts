@@ -6,10 +6,10 @@ import { Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
 
+type Item = NonNullable<NonNullable<Context["cart"]>["Basket"]>;
+
 export const itemToAnalyticsItem = (
-  item: NonNullable<
-    NonNullable<Context["cart"]>["Shopper"]
-  >["Basket"]["Items"][number],
+  item: NonNullable<Item>["Items"][number],
   coupon: string | undefined,
   index: number,
 ): AnalyticsItem => {
@@ -23,7 +23,7 @@ export const itemToAnalyticsItem = (
     item_variant: item.SkuName,
     price: item.RetailPrice,
     quantity: item.Quantity,
-    affiliation: item.Seller?.[0]?.SellerName,
+    affiliation: item.Seller.SellerName ?? undefined,
   });
 };
 

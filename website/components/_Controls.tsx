@@ -2,11 +2,7 @@ import { Head } from "$fresh/runtime.ts";
 import type { Flag, Site } from "deco/types.ts";
 import { context } from "deco/live.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
-
-interface Page {
-  id: string | number;
-  pathTemplate?: string;
-}
+import { Page } from "../../commerce/types.ts";
 
 interface Live {
   page?: Page;
