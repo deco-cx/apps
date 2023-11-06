@@ -1,5 +1,7 @@
 import { Product } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import Script from "partytown/Script.tsx";
+import { ComponentProps } from "preact";
 
 declare global {
   interface Window {
@@ -9,6 +11,8 @@ declare global {
     skuJson: ProductSKUJsonProps;
   }
 }
+
+type ScriptProps = ComponentProps<typeof Script>;
 
 function addVTEXPortalDataSnippet(accountName: string) {
   performance.mark("start-vtex-dl");
@@ -107,12 +111,15 @@ function addVTEXPortalDataSnippet(accountName: string) {
   performance.measure("vtex-dl-compat", "start-vtex-dl", "end-vtex-dl");
 }
 
-interface AddVTEXPortalData {
+interface AddVTEXPortalData extends ScriptProps {
   accountName: string;
 }
-export function AddVTEXPortalData({ accountName }: AddVTEXPortalData) {
+export function AddVTEXPortalData(
+  { accountName, ...props }: AddVTEXPortalData,
+) {
   return (
     <script
+      {...props}
       id="datalayer-portal-compat"
       defer
       src={scriptAsDataURI(addVTEXPortalDataSnippet, accountName)}
@@ -120,12 +127,12 @@ export function AddVTEXPortalData({ accountName }: AddVTEXPortalData) {
   );
 }
 
-interface ProductDetailsTemplateProps {
+interface ProductDetailsTemplateProps extends ScriptProps {
   product: Product;
 }
 
 export function ProductDetailsTemplate(
-  { product }: ProductDetailsTemplateProps,
+  { product, ...props }: ProductDetailsTemplateProps,
 ) {
   const departament = product.additionalProperty?.find((p) =>
     p.name === "category"
@@ -165,6 +172,7 @@ export function ProductDetailsTemplate(
 
   return (
     <script
+      {...props}
       defer
       src={scriptAsDataURI((t) => {
         window.datalayer_product = t;
@@ -173,16 +181,17 @@ export function ProductDetailsTemplate(
   );
 }
 
-interface ProductInfoProps {
+interface ProductInfoProps extends ScriptProps {
   product: Product;
 }
 
 export function ProductInfo(
-  { product }: ProductInfoProps,
+  { product, ...props }: ProductInfoProps,
 ) {
   if (!product.isVariantOf?.productGroupID) return null;
   return (
     <script
+      {...props}
       defer
       data-product-info
       src={scriptAsDataURI((t) => {
@@ -193,12 +202,13 @@ export function ProductInfo(
   );
 }
 
-export interface ProductSKUJsonProps {
+export interface ProductSKUJsonProps extends ScriptProps {
   product: unknown;
 }
-export function ProductSKUJson({ product }: ProductSKUJsonProps) {
+export function ProductSKUJson({ product, ...props }: ProductSKUJsonProps) {
   return (
     <script
+      {...props}
       defer
       src={scriptAsDataURI((p) => {
         window.skuJson = p;
