@@ -18,6 +18,7 @@ const config = {
       name: "deco-sites/admin",
     },
     app("analytics"),
+    app("sourei"),
     app("typesense"),
     app("algolia"),
     app("handlebars"),

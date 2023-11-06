@@ -1,6 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { type Flag } from "deco/types.ts";
-import { type AnalyticsEvent } from "../../commerce/types.ts";
+import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 type EventHandler = (event?: AnalyticsEvent) => void | Promise<void>;
@@ -29,7 +28,7 @@ declare global {
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const snippet = (flags: Flag[]) => {
+const snippet = ({ flags, page }: Deco) => {
   const appendSessionFlags = () => {
     const knownFlags = new Set(flags.map((f) => f.name));
     const cookies = document.cookie.split(";");
@@ -64,7 +63,7 @@ const snippet = (flags: Flag[]) => {
     // deno-lint-ignore no-explicit-any
     const cb = ({ detail }: any) => handler(detail);
 
-    handler({ name: "deco-flags", params: flags });
+    handler({ name: "deco", params: { flags, page } });
 
     target.addEventListener("analytics", cb, opts);
 
@@ -80,10 +79,14 @@ const snippet = (flags: Flag[]) => {
   };
 };
 
-function Events({ flags }: { flags: Flag[] }) {
+function Events({ deco }: { deco: Deco }) {
   return (
     <Head>
-      <script defer id="deco-events" src={scriptAsDataURI(snippet, flags)} />
+      <script
+        defer
+        id="deco-events"
+        src={scriptAsDataURI(snippet, deco)}
+      />
     </Head>
   );
 }
