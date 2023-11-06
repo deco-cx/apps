@@ -202,8 +202,13 @@ const queryFromPathname = (
 ) => {
   const pathList = path.split("/").slice(1);
 
-  const isPage = Boolean(pageTypes.length);
-  const isValidPathSearch = pathList.length == 1;
+  const isUniquePath = pageTypes.length == 1;
+
+  const isPage = pageTypes.length > 1 ||
+    (isUniquePath &&
+      !NotAllowedPageTypeAsUniquePath.includes(pageTypes[0].pageType));
+
+  const isValidPathSearch = isUniquePath;
 
   if (!isPage && !isInSeachFormat && isValidPathSearch) {
     // decode uri parse uri enconde symbols like '%20' to ' '
@@ -211,8 +216,17 @@ const queryFromPathname = (
   }
 };
 
-const filtersFromPathname = (pages: PageType[]) =>
-  pages
+const NotAllowedPageTypeAsUniquePath = ["Category", "SubCategory", "FullText"];
+
+const filtersFromPathname = (pages: PageType[]) => {
+  if (
+    pages.length === 1 &&
+    NotAllowedPageTypeAsUniquePath.includes(pages[0].pageType)
+  ) {
+    return [];
+  }
+
+  return pages
     .map((page, index) => {
       const key = pageTypeToMapParam(page.pageType, index);
 
@@ -229,7 +243,7 @@ const filtersFromPathname = (pages: PageType[]) =>
       );
     })
     .filter((facet): facet is { key: string; value: string } => Boolean(facet));
-
+};
 // Search API does not return the selected price filter, so there is no way for the
 // user to remove this price filter after it is set. This function selects the facet
 // so users can clear the price filters
@@ -289,7 +303,7 @@ const loader = async (
 
   const searchArgs = { ...args, query: args.query || pathQuery };
 
-  if (!isInSeachFormat && !pathQuery) {
+  if (!isInSeachFormat && !pathQuery && !pageTypes.length) {
     return null;
   }
 
