@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("my-sections"),
     app("implementation"),
     app("weather"),
     {
