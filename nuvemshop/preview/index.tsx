@@ -25,18 +25,14 @@ export default function Preview() {
         >
           <div class="flex flex-col gap-4">
             <label>
-              <strong class="mb-2">Public URL</strong>
+              <strong class="mb-2">Public url</strong>
               <p>
-                It is your Nuvemshop url, example:
+                Your Nuvemshop url, example:
                 https://yourstore.lojavirtualnuvem.com.br/
               </p>
             </label>
             <label>
-              <strong class="mb-2">Store id</strong>
-              <p>You can get your store id accessing this URL.</p>
-            </label>
-            <label>
-              <strong class="mb-2">Access Token</strong>
+              <strong class="mb-2">Store id + Access Token</strong>
               {publicUrl
                 ? (
                   <a
@@ -50,7 +46,7 @@ export default function Preview() {
                     }}
                     target="_blank"
                   >
-                    Get your token
+                    Get your id and token
                   </a>
                 )
                 : <p>Fill your publicUrl first</p>}
