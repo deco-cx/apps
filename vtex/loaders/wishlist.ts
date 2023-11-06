@@ -8,7 +8,10 @@ export interface Props {
    * @description Number of products per page to display
    * @default 12
    */
-  count: number;
+  count?: number;
+
+  /** @description disable pagination and return all records */
+  allRecords?: boolean;
 }
 
 const loader = async (
@@ -46,6 +49,10 @@ const loader = async (
         cookie,
       },
     });
+
+    if (props.allRecords) {
+      return viewList.data ?? [];
+    }
 
     return viewList.data?.slice(count * page, count * (page + 1)) ?? [];
   } catch {
