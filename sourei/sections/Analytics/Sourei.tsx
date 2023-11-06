@@ -36,7 +36,7 @@ const snippet = () => {
       ? ({ item_id: `${item_group_id}_${item_id}`, ...rest })
       : ({ item_id, ...rest });
 
-  const fixPrice = (
+  const fixPrices = (
     { price, discount = 0, quantity = 1, ...rest }: any,
   ) => ({
     ...rest,
@@ -50,7 +50,7 @@ const snippet = () => {
   window.DECO.events.subscribe((event) => {
     if (!event) return;
 
-    if (event.name === "deco-flags") {
+    if (event.name === "deco") {
       window.dataLayer.push(event);
       return;
     }
@@ -60,8 +60,12 @@ const snippet = () => {
     if (ecommerce && Array.isArray(ecommerce.items)) {
       ecommerce.items = ecommerce.items
         .map(fixId)
-        .map(fixPrice)
+        .map(fixPrices)
         .map(fixIndex);
+    }
+
+    if (typeof ecommerce.value === "number") {
+      ecommerce.value = rounded(ecommerce.value);
     }
 
     window.dataLayer.push({ ecommerce: null });

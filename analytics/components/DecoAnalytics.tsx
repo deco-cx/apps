@@ -35,14 +35,21 @@ const snippet = () => {
     addEventListener("popstate", trackPageview);
   }
 
+  // 2000 bytes limit
+  const truncate = (str: string) => `${str}`.slice(0, 990);
+
   // setup plausible script and unsubscribe
   window.DECO.events.subscribe((event) => {
-    if (!event || event.name !== "deco-flags") return;
+    if (!event || event.name !== "deco") return;
 
-    if (Array.isArray(event.params)) {
-      for (const flag of event.params) {
-        props[flag.name] = flag.value.toString();
+    if (event.params) {
+      const { flags, page } = event.params;
+      if (Array.isArray(flags)) {
+        for (const flag of flags) {
+          props[flag.name] = truncate(flag.value.toString());
+        }
       }
+      props["pageId"] = truncate(`${page.id}`);
     }
 
     trackPageview();
@@ -53,7 +60,7 @@ const snippet = () => {
 
     const { name, params } = event;
 
-    if (!name || !params || name === "deco-flags") return;
+    if (!name || !params || name === "deco") return;
 
     const values = { ...props };
     for (const key in params) {
@@ -61,9 +68,9 @@ const snippet = () => {
       const value = params[key];
 
       if (value !== null && value !== undefined) {
-        values[key] = (typeof value !== "object")
-          ? value
-          : JSON.stringify(value).slice(0, 990); // 2000 bytes limit
+        values[key] = truncate(
+          (typeof value !== "object") ? value : JSON.stringify(value),
+        );
       }
     }
 
