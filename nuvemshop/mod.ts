@@ -32,6 +32,7 @@ export let state: null | State = null;
 export interface Props {
   /**
    * @title Public URL
+   * @description Your Nuvemshop url, example: https://yourstore.lojavirtualnuvem.com.br/
    */
 
   publicUrl: string;
