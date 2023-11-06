@@ -737,8 +737,18 @@ export interface ViewPromotionEvent extends IEvent<ViewPromotionParams> {
   name: "view_promotion";
 }
 
-export interface DecoFlagsEvent extends IEvent<Flag[]> {
-  name: "deco-flags";
+export interface Page {
+  id: string | number;
+  pathTemplate?: string;
+}
+
+export interface Deco {
+  flags: Flag[];
+  page: Page;
+}
+
+export interface DecoEvent extends IEvent<Deco> {
+  name: "deco";
 }
 
 export type AnalyticsEvent =
@@ -755,4 +765,4 @@ export type AnalyticsEvent =
   | ViewItemEvent
   | ViewItemListEvent
   | ViewPromotionEvent
-  | DecoFlagsEvent;
+  | DecoEvent;
