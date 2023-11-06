@@ -28,11 +28,6 @@ export interface Props {
    * @title Access Token
    */
   accessToken: string;
-  /**
-   * @title User Agent
-   */
-
-  userAgent: string;
 
   /**
    * @title Public URL
@@ -52,12 +47,11 @@ export const color = 0xF71963;
  * @title NuvemShop
  */
 export default function Nuvemshop(
-  { storeId, accessToken, publicUrl, userAgent }: Props,
+  { storeId, accessToken, publicUrl }: Props,
 ) {
   const headers = new Headers();
   headers.set("accept", "application/json");
   headers.set("Authentication", `bearer ${accessToken}`);
-  headers.set("user-agent", userAgent);
   headers.set("content-type", "application/json");
 
   const api = createHttpClient<NuvemShopAPI>({
