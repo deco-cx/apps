@@ -596,7 +596,7 @@ export type AnalyticsItem = AnalyticsItemWithoutIdentifier & ItemIdentifier;
 export interface AddShippingInfoParams {
   currency?: Currency;
   value?: Value;
-  coupun?: string;
+  coupon?: string;
   shipping_tier?: string;
   items: AnalyticsItem[];
 }
@@ -683,7 +683,7 @@ export interface SelectPromotionParams {
   creative_slot?: string;
   promotion_id?: string;
   promotion_name?: string;
-  items: AnalyticsItem[];
+  items?: AnalyticsItem[];
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#select_promotion */
