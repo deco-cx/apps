@@ -46,7 +46,7 @@ type URLPatternParams<URL extends string> = URL extends
   // deno-lint-ignore ban-types
   : {};
 
-type ClientOf<T> = {
+export type ClientOf<T> = {
   [key in (keyof T) & `${HttpVerb} /${string}`]: key extends
     `${HttpVerb} /${infer path}` ? T[key] extends {
       response?: infer ResBody;

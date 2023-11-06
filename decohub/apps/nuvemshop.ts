@@ -1,7 +1,5 @@
-import { Markdown } from "../components/Markdown.tsx";
+import PreviewNuvemshop from "../../nuvemshop/preview/index.tsx";
 
 export { default } from "../../nuvemshop/mod.ts";
 
-export const Preview = await Markdown(
-  new URL("../../nuvemShop/README.md", import.meta.url).href,
-);
+export const Preview = PreviewNuvemshop;

@@ -9,6 +9,9 @@ import workflow from "../workflows/mod.ts";
 import { NuvemShopAPI } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { SecretString } from "../website/loaders/secretString.ts";
+
+import { ClientOf } from "../utils/http.ts";
 
 export type App = ReturnType<typeof Nuvemshop>;
 export type AppContext = AC<App>;
@@ -17,8 +20,22 @@ export type AppMiddlewareContext = AMC<App>;
 
 const BASE_URL = "https://api.nuvemshop.com.br/";
 
+interface State {
+  api: ClientOf<NuvemShopAPI>;
+  publicUrl: string;
+  storeId: string;
+}
+
+export let state: null | State = null;
+
 /** @title Nuvemshop */
 export interface Props {
+  /**
+   * @title Public URL
+   */
+
+  publicUrl: string;
+
   /**
    * @description STORE ID
    */
@@ -27,13 +44,7 @@ export interface Props {
   /**
    * @title Access Token
    */
-  accessToken: string;
-
-  /**
-   * @title Public URL
-   */
-
-  publicUrl: string;
+  accessToken: SecretString;
 
   /**
    * @description Use Nuvemshop as backend platform
@@ -41,7 +52,7 @@ export interface Props {
   platform: "nuvemshop";
 }
 
-export const color = 0xF71963;
+export const color = 0x272D4B;
 
 /**
  * @title NuvemShop
@@ -60,13 +71,13 @@ export default function Nuvemshop(
     headers: headers,
   });
 
-  const state = {
+  state = {
     api,
     publicUrl: publicUrl,
     storeId: storeId,
   };
 
-  const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
+  const app: A<Manifest, State, [ReturnType<typeof workflow>]> = {
     state,
     manifest,
     dependencies: [workflow({})],
