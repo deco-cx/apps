@@ -33,34 +33,45 @@ export function renderSection(section: Props["sections"][number]) {
   return <Component {...props} />;
 }
 
-/**
- * @title Page
- */
-function Page({ sections }: Props): JSX.Element {
+const useDeco = () => {
   const metadata = useDecoPageContext()?.metadata;
   const routerCtx = useRouterContext();
   const pageId = pageIdFromMetadata(metadata);
 
+  return {
+    flags: routerCtx?.flags ?? [],
+    page: {
+      id: pageId,
+      pathTemplate: routerCtx?.pagePath,
+    },
+  };
+};
+
+/**
+ * @title Page
+ */
+function Page({ sections }: Props): JSX.Element {
+  const site = { id: context.siteId, name: context.site };
+  const deco = useDeco();
+
   return (
     <>
-      <LiveControls
-        site={{ id: context.siteId, name: context.site }}
-        page={{ id: pageId, pathTemplate: routerCtx?.pagePath }}
-        flags={routerCtx?.flags}
-      />
-      <Events flags={routerCtx?.flags ?? []} />
+      <LiveControls site={site} {...deco} />
+      <Events deco={deco} />
       {sections.map(renderSection)}
     </>
   );
 }
 
 export function Preview({ sections }: Props) {
+  const deco = useDeco();
+
   return (
     <>
       <Head>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      <Events flags={[]} />
+      <Events deco={deco} />
       {sections.map(renderSection)}
     </>
   );

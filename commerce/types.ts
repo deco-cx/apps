@@ -575,6 +575,7 @@ interface AnalyticsItemWithoutIdentifier {
   coupon?: string;
   discount?: number;
   index?: number;
+  item_group_id?: string;
   item_url?: string;
   item_brand?: string;
   item_category?: string;
@@ -595,7 +596,7 @@ export type AnalyticsItem = AnalyticsItemWithoutIdentifier & ItemIdentifier;
 export interface AddShippingInfoParams {
   currency?: Currency;
   value?: Value;
-  coupun?: string;
+  coupon?: string;
   shipping_tier?: string;
   items: AnalyticsItem[];
 }
@@ -682,7 +683,7 @@ export interface SelectPromotionParams {
   creative_slot?: string;
   promotion_id?: string;
   promotion_name?: string;
-  items: AnalyticsItem[];
+  items?: AnalyticsItem[];
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#select_promotion */
@@ -736,8 +737,18 @@ export interface ViewPromotionEvent extends IEvent<ViewPromotionParams> {
   name: "view_promotion";
 }
 
-export interface DecoFlagsEvent extends IEvent<Flag[]> {
-  name: "deco-flags";
+export interface Page {
+  id: string | number;
+  pathTemplate?: string;
+}
+
+export interface Deco {
+  flags: Flag[];
+  page: Page;
+}
+
+export interface DecoEvent extends IEvent<Deco> {
+  name: "deco";
 }
 
 export type AnalyticsEvent =
@@ -754,4 +765,4 @@ export type AnalyticsEvent =
   | ViewItemEvent
   | ViewItemListEvent
   | ViewPromotionEvent
-  | DecoFlagsEvent;
+  | DecoEvent;
