@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import { DESIRED_COOKIES, setCartCookie } from "../../utils/cart.ts";
+import { setCartContextCookies, setCartCookie } from "../../utils/cart.ts";
 import { UpdateCartResponse } from "../../utils/types.ts";
 
 export interface UpdateProps {
@@ -52,20 +52,7 @@ const action = async (
 
   const setCookiesArray = response.headers.get("set-cookie")?.split(",") || [];
 
-  const cookiesToSet = [];
-
-  for (const cookieStr of setCookiesArray) {
-    for (const desiredCookie of DESIRED_COOKIES) {
-      if (cookieStr.trim().startsWith(desiredCookie)) {
-        cookiesToSet.push(cookieStr.trim());
-        break;
-      }
-    }
-  }
-
-  for (const cookie of cookiesToSet) {
-    ctx.response.headers.append("Set-Cookie", cookie);
-  }
+  setCartContextCookies(ctx.response.headers, setCookiesArray);
 
   return result.cart;
 };

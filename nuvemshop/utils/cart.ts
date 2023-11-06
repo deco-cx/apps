@@ -24,3 +24,23 @@ export const setCartCookie = (headers: Headers, cartId: string) =>
     secure: true,
     sameSite: "Lax",
   });
+
+export const setCartContextCookies = (
+  headers: Headers,
+  cookiesArray: string[],
+) => {
+  const cookiesToSet = [];
+
+  for (const cookieStr of cookiesArray) {
+    for (const desiredCookie of DESIRED_COOKIES) {
+      if (cookieStr.trim().startsWith(desiredCookie)) {
+        cookiesToSet.push(cookieStr.trim());
+        break;
+      }
+    }
+  }
+
+  for (const cookie of cookiesToSet) {
+    headers.append("Set-Cookie", cookie);
+  }
+};
