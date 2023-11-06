@@ -6,7 +6,7 @@ import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-// import { Page } from "deco/blocks/page.tsx";
+import { Page } from "deco/blocks/page.tsx";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -31,7 +31,7 @@ export interface Props {
    * @title Error Page
    * @description This page will be used when a route is not found
    */
-  errorPage?: string;
+  errorPage?: Page;
 }
 
 /**
