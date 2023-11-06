@@ -3,20 +3,11 @@ import { AppContext } from "../mod.ts";
 import { Script } from "../../website/types.ts";
 
 const PATHS_TO_PROXY = [
-  "/account",
   "/checkout",
   "/checkout/*",
-  "/files/*",
-  "/assets/*",
-  "/arquivos/*",
+  "/account",
+  "/account/",
   "/account/*",
-  "/login",
-  "/no-cache/*",
-  "/api/*",
-  "/logout",
-  "/_secure/account",
-  "/XMLData/*",
-  "/_v/*",
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
