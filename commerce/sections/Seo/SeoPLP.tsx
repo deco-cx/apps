@@ -13,7 +13,7 @@ function Section({ jsonLD, ...props }: Props) {
     ? jsonLD.seo.canonical
     : jsonLD?.breadcrumb
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
-    : null;
+    : props.canonical;
 
   const noIndexing = !jsonLD || !jsonLD.products.length;
 
@@ -22,7 +22,7 @@ function Section({ jsonLD, ...props }: Props) {
       {...props}
       title={title || props.title}
       description={description || props.description}
-      canonical={canonical || props.canonical}
+      canonical={canonical}
       jsonLDs={[jsonLD]}
       noIndexing={noIndexing}
     />

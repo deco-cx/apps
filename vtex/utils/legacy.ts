@@ -98,18 +98,21 @@ export const pageTypesToBreadcrumbList = (
   });
 };
 
-export const pageTypesToSeo = (pages: PageType[], req: Request): Seo | null => {
+export const pageTypesToSeo = (
+  pages: PageType[],
+  req: Request,
+  currentPage?: number,
+): Seo | null => {
   const current = pages.at(-1);
 
   const url = new URL(req.url);
-  const urlParams = url.searchParams;
-  const fullTextSearch = urlParams.get("q");
+  const fullTextSearch = url.searchParams.get("q");
 
   if (!current && fullTextSearch) {
     return {
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
-      canonical: new URL(req.url).href,
+      canonical: req.url,
     };
   }
 
@@ -117,11 +120,26 @@ export const pageTypesToSeo = (pages: PageType[], req: Request): Seo | null => {
     return null;
   }
 
-  const [_, pathname] = current.url?.split(".vtexcommercestable.com.br") ?? [];
-
   return {
     title: current.title!,
     description: current.metaTagDescription!,
-    canonical: new URL(pathname, req.url).href,
+    canonical: toCanonical(
+      new URL(
+        current.url
+          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
+          : url,
+        url,
+      ),
+      currentPage,
+    ),
   };
 };
+
+// Warning! this modifies the parameter. Use it consciously
+function toCanonical(url: URL, page?: number) {
+  if (typeof page === "number") {
+    url.searchParams.set("page", `${page}`);
+  }
+
+  return url.href;
+}
