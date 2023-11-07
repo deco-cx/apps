@@ -56,7 +56,6 @@ const snippet = ({ flags, page }: Deco) => {
   const target = new EventTarget();
 
   const dispatch: EventsAPI["dispatch"] = (event: unknown) => {
-    console.log("sending", event);
     target.dispatchEvent(new CustomEvent("analytics", { detail: event }));
   };
 
