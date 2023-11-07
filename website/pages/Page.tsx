@@ -15,6 +15,7 @@ import { Component } from "preact";
 import { ComponentFunc } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
+import { notUndefined } from "deco/engine/core/utils.ts";
 
 /**
  * @title Sections
@@ -34,17 +35,17 @@ export interface Props {
 }
 
 export function renderSection(section: Props["sections"][number]) {
-  if (section == null) return <div></div>;
   const { Component, props } = section;
 
   return <Component {...props} />;
 }
 
 class ErrorBoundary
-  extends Component<{ fallback: ComponentFunc<HTMLDivElement> }> {
+  extends Component<{ fallback: ComponentFunc<HTMLElement> }> {
   state = { error: null };
 
-  static getDerivedStateFromError(error: HttpError | Error) {
+  // deno-lint-ignore no-explicit-any
+  static getDerivedStateFromError(error: any) {
     return { error };
   }
 
@@ -85,10 +86,11 @@ const useDeco = () => {
 /**
  * @title Page
  */
-function Page({ sections, errorPage }: Props & { errorPage: Page }): JSX.Element {
+function Page(
+  { sections, errorPage }: Props & { errorPage?: Page },
+): JSX.Element {
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
-  if (errorPage !== undefined) delete errorPage.props.errorPage;
 
   return (
     <ErrorBoundary
@@ -96,7 +98,7 @@ function Page({ sections, errorPage }: Props & { errorPage: Page }): JSX.Element
         error instanceof HttpError
           ? (
             <div>
-              {errorPage === undefined ? <div></div> : renderSection(errorPage)}
+              {errorPage === undefined ? <div></div> : <>{(errorPage?.props?.sections ?? []).filter(notUndefined).map(renderSection)}</>}
             </div>
           )
           : (
