@@ -24,13 +24,14 @@ export function toProduct(
   const nuvemUrl = new URL(canonical_url);
   const localUrl = new URL(nuvemUrl.pathname, baseUrl.origin);
 
-  return getVariants(product, localUrl.href, sku);
+  return getVariants(product, localUrl, sku);
 }
 
 function getVariants(
   product: ProductBaseNuvemShop,
-  url: string,
+  url: URL,
   sku: string | null,
+  level = 0,
 ) {
   const products = product
     .variants.filter((variant) => !sku || variant.sku === sku)
@@ -44,7 +45,7 @@ function getVariants(
         );
         const variantWithName = { ...variant, name: name.trim() };
 
-        return productVariantToProduct(variantWithName, product, url);
+        return productVariantToProduct(variantWithName, product, url, level);
       },
     );
   return products;
@@ -53,14 +54,18 @@ function getVariants(
 function productVariantToProduct(
   variant: ProductVariant,
   product: ProductBaseNuvemShop,
-  url: string,
+  url: URL,
+  level = 0,
 ): Product {
   const { product_id, sku, promotional_price, price } = variant;
   const { name, description, images, categories, brand, attributes } = product;
+  const variantUrl = new URL(url);
+
+  variantUrl.searchParams.set("sku", sku);
 
   const schemaProduct: Product = {
     "@type": "Product",
-    productID: product_id?.toString() || "",
+    productID: sku,
     sku: sku,
     name: getPreferredLanguage(name) + " " + variant.name,
     // NuvemShop description is returned as HTML and special characters and not working properly
@@ -73,7 +78,7 @@ function productVariantToProduct(
       url: image.src,
     })),
     category: getPreferredLanguage(categories[0]?.name || ""), // Assuming there's only one category
-    brand: { "@type": "Brand", name: brand },
+    brand: { "@type": "Brand", name: brand ?? undefined },
     offers: {
       "@type": "AggregateOffer" as const,
       priceCurrency: "BRL",
@@ -82,35 +87,22 @@ function productVariantToProduct(
       offerCount: 1,
       offers: [getOffer(variant)],
     },
-    isVariantOf: {
-      "@type": "ProductGroup",
-      productGroupID: product_id?.toString() || "",
-      hasVariant: [
-        {
-          additionalProperty: getProperties(
-            [variant],
-            attributes,
-          ),
-          url: `${url}?sku=${sku}`,
-        } as Product,
-        ...getVariants(
-          {
-            ...product,
-            variants: product.variants.filter((variant) => variant.sku !== sku),
-          },
-          url,
-          null,
-        ),
-      ],
-      name: getPreferredLanguage(name),
-      url: ``,
-      additionalProperty: [],
-    },
+    inProductGroupWithID: product_id?.toString() || "",
+    isVariantOf: level === 0
+      ? {
+        "@type": "ProductGroup",
+        url: url.href,
+        productGroupID: product_id?.toString() || "",
+        hasVariant: getVariants(product, url, null, 1),
+        name: getPreferredLanguage(name),
+        additionalProperty: [],
+      }
+      : undefined,
     additionalProperty: getProperties(
-      product.variants,
+      variant,
       attributes,
     ),
-    url: `${url}?sku=${sku}`,
+    url: variantUrl.href,
   };
 
   return schemaProduct;
@@ -167,31 +159,14 @@ function getPreferredLanguage(
 }
 
 function getProperties(
-  productVariants: ProductVariant[],
+  { values }: ProductVariant,
   attributes: LanguageTypes[],
 ): PropertyValue[] {
-  const data = productVariants.map(({ values }) => {
-    return values.map((value, index) =>
-      ({
-        "@type": "PropertyValue",
-        name: getPreferredLanguage(attributes[index]),
-        value: getPreferredLanguage(value),
-        valueReference: "SPECIFICATION",
-      }) as const
-    );
-  });
-
-  return data.flat().reduce((accumulator, current) => {
-    const isDuplicate = accumulator.some(
-      (item) => item.name === current.name && item.value === current.value,
-    );
-
-    if (!isDuplicate) {
-      accumulator.push(current);
-    }
-
-    return accumulator;
-  }, [] as PropertyValue[]);
+  return values.map((value, index) => ({
+    "@type": "PropertyValue" as const,
+    name: getPreferredLanguage(attributes[index]),
+    value: getPreferredLanguage(value),
+  }));
 }
 
 function getFilterPriceIntervals(
