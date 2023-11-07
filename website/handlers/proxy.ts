@@ -26,6 +26,24 @@ const removeCFHeaders = (headers: Headers) => {
   });
 };
 
+const trace = (request: Request, response: Response) => {
+  try {
+    const headers = Object.fromEntries(
+      [...request.headers.entries()].filter(([key]) =>
+        key === "cookie" || key.toLowerCase() === "user-agent"
+      ),
+    );
+    console.error(
+      response.status,
+      `fetch("${request.url}", {headers: ${
+        JSON.stringify(headers, null, 2)
+      }, method: "${request.method}", redirect: "manual" })`,
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const proxyTo = (
   {
     url: rawProxyUrl,
@@ -72,6 +90,8 @@ async (req, _ctx) => {
     method: req.method,
     body: req.body,
   });
+
+  if (response.status > 499) trace(req, response);
 
   const contentType = response.headers.get("Content-Type");
 
