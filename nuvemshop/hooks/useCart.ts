@@ -9,16 +9,17 @@ export const itemToAnalyticsItem = (
   item: ProductElement,
   index: number,
 ): AnalyticsItem => ({
-  item_id: item.id.toString(),
-  item_name: item.name,
-  discount: item.compare_at_price
-    ? Number(item.price) -
-      Number(item.compare_at_price)
-    : 0,
-  item_variant: item.variant_id.toString(),
-  price: Number(item.price),
-  index,
+  item_id: item.sku,
+  item_group_id: item.product_id.toString(),
   quantity: item.quantity,
+  price: Number(item.price),
+  discount: item.compare_at_price
+    ? Number(item.compare_at_price) -
+      Number(item.price)
+    : 0,
+  item_name: item.name,
+  item_variant: item.name,
+  index,
 });
 
 const { cart, loading } = storeState;
