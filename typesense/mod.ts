@@ -1,5 +1,6 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import Typesense from "npm:typesense@1.7.1";
+import { SecretString } from "../website/loaders/secretString.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import {
   ProductsCollectionName,
@@ -19,7 +20,7 @@ export interface State {
    * @title API Key
    * @description https://dashboard.algolia.com/account/api-keys/all
    */
-  apiKey: string;
+  apiKey: SecretString;
 }
 
 export type Collections = ProductsCollectionName;
@@ -31,6 +32,10 @@ export default function App(
   props: State,
 ) {
   const { apiKey, apiUrls } = props;
+
+  if (!apiKey) {
+    throw new Error("Missing API key");
+  }
 
   const options = {
     nodes: apiUrls.map((href) => {
