@@ -6,10 +6,11 @@ export interface AddItemProps {
   quantity: number;
   itemId: number;
   add_to_cart_enhanced: string;
+  attributes: Record<string, string>;
 }
 
 const action = async (
-  { quantity, itemId, add_to_cart_enhanced = "1" }: AddItemProps,
+  { quantity, itemId, add_to_cart_enhanced = "1", attributes }: AddItemProps,
   req: Request,
   ctx: AppContext,
 ): Promise<UpdateCartResponse | null> => {
@@ -35,6 +36,9 @@ const action = async (
   urlencoded.append("add_to_cart", itemId.toString());
   urlencoded.append("quantity", quantity.toString());
   urlencoded.append("add_to_cart_enhanced", add_to_cart_enhanced);
+  Object.values(attributes)?.map((value, idx) => {
+    urlencoded.append(`variation[${idx}]`, value);
+  });
 
   const requestOptions = {
     method: "POST",
