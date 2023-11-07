@@ -101,19 +101,18 @@ export const pageTypesToBreadcrumbList = (
 export const pageTypesToSeo = (
   pages: PageType[],
   req: Request,
-  pgNumberIndexing?: boolean,
+  currentPage?: number,
 ): Seo | null => {
   const current = pages.at(-1);
 
   const url = new URL(req.url);
-  const urlParams = url.searchParams;
-  const fullTextSearch = urlParams.get("q");
+  const fullTextSearch = url.searchParams.get("q");
 
   if (!current && fullTextSearch) {
     return {
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
-      canonical: new URL(req.url).href,
+      canonical: req.url,
     };
   }
 
@@ -124,17 +123,23 @@ export const pageTypesToSeo = (
   return {
     title: current.title!,
     description: current.metaTagDescription!,
-    canonical: buildCanonicalURL(pgNumberIndexing, req.url),
+    canonical: toCanonical(
+      new URL(
+        current.url
+          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
+          : url,
+        url,
+      ),
+      currentPage,
+    ),
   };
 };
 
-function buildCanonicalURL(pgNumberIndexing = false, urlStr: string) {
-  const url = new URL(urlStr);
-  const { origin, pathname, searchParams } = url;
+// Warning! this modifies the parameter. Use it consciously
+function toCanonical(url: URL, page?: number) {
+  if (typeof page === "number") {
+    url.searchParams.set("page", `${page}`);
+  }
 
-  if (!pgNumberIndexing) return `${origin}${pathname}`;
-
-  const pgNumber = searchParams.get("page") ?? "1";
-
-  return `${origin}${pathname}?page=${pgNumber}`;
+  return url.href;
 }

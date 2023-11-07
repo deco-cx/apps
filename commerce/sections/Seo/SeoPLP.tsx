@@ -1,5 +1,6 @@
 import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
 import { ProductListingPage } from "../../types.ts";
+import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 
 export type Props = {
   jsonLD: ProductListingPage | null;
@@ -12,7 +13,7 @@ function Section({ jsonLD, ...props }: Props) {
     ? jsonLD.seo.canonical
     : jsonLD?.breadcrumb
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
-    : null;
+    : props.canonical;
 
   const noIndexing = !jsonLD || !jsonLD.products.length;
 
@@ -21,7 +22,7 @@ function Section({ jsonLD, ...props }: Props) {
       {...props}
       title={title || props.title}
       description={description || props.description}
-      canonical={props.canonical || canonical}
+      canonical={canonical}
       jsonLDs={[jsonLD]}
       noIndexing={noIndexing}
     />

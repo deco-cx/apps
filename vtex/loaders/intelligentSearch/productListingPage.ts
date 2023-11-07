@@ -104,12 +104,6 @@ export interface Props {
   selectedFacets?: SelectedFacet[];
 
   /**
-   * @title Page number indexing
-   * @description Page number will be taken into account on indexing
-   */
-  pgNumberIndexing?: boolean;
-
-  /**
    * @title Hide Unavailable Items
    * @description Do not return out of stock items
    */
@@ -387,6 +381,8 @@ const loader = async (
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
 
+  const currentPage = page + currentPageoffset;
+
   return {
     "@type": "ProductListingPage",
     breadcrumb: {
@@ -399,12 +395,16 @@ const loader = async (
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
-      currentPage: page + currentPageoffset,
+      currentPage,
       records: recordsFiltered,
       recordPerPage: pagination.perPage,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req, props.pgNumberIndexing),
+    seo: pageTypesToSeo(
+      pageTypes,
+      req,
+      hasPreviousPage ? currentPage : undefined,
+    ),
   };
 };
 
