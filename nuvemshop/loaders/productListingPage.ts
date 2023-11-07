@@ -49,7 +49,7 @@ async function loader(
     const response = await api["GET /v1/:storeId/products"]({
       q,
       storeId,
-      page: page,
+      page,
       per_page,
       price_max: maxPrice,
       price_min: minPrice,
