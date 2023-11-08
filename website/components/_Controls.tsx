@@ -32,8 +32,8 @@ const DomInspectorActivators = {
   CmdE: {
     label: "Cmd+E or Ctrl+E",
     matchEvent: (event) =>
-      (event.ctrlKey && event.key === "x") ||
-      (event.metaKey && event.key === "x"),
+      (event.ctrlKey && event.key === "e") ||
+      (event.metaKey && event.key === "e"),
   },
   Backquote: {
     label: "\` (backtick)",
@@ -103,7 +103,7 @@ const snippet = (live: Live) => {
       outline: "1px dashed #2fd080",
       backgroundColor: "rgba(47, 208, 128, 0.33)",
       backgroundBlendMode: "multiply",
-      activator: DomInspectorActivators.CmdE,
+      activator: DomInspectorActivators.Backquote,
       path: "/live/inspect",
     });
 
