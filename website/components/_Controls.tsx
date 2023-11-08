@@ -35,10 +35,6 @@ const DomInspectorActivators = {
       (event.ctrlKey && event.key === "e") ||
       (event.metaKey && event.key === "e"),
   },
-  Backquote: {
-    label: "\` (backtick)",
-    matchEvent: (event) => event.code === "Backquote",
-  },
 };
 ${DomInspector.toString()}`
   : "";
