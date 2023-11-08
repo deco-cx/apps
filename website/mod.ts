@@ -103,12 +103,17 @@ const deferPropsResolve = (
   return routes;
 };
 
-export const onBeforeResolveProps = <T extends { routes?: Routes[] }>(
+export const onBeforeResolveProps = <
+  T extends { routes?: Routes[]; errorPage?: Page },
+>(
   props: T,
 ): T => {
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
+      errorPage: props.errorPage
+        ? asResolved(props.errorPage, true)
+        : undefined,
       routes: props.routes.map(deferPropsResolve),
     };
     return newRoutes;

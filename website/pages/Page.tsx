@@ -15,7 +15,7 @@ import { Component } from "preact";
 import { ComponentFunc } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
-import { notUndefined } from "deco/engine/core/utils.ts";
+import { isDeferred } from "deco/mod.ts";
 
 /**
  * @title Sections
@@ -35,6 +35,7 @@ export interface Props {
 }
 
 export function renderSection(section: Props["sections"][number]) {
+  if (section === undefined || section === null) return <></>;
   const { Component, props } = section;
 
   return <Component {...props} />;
@@ -87,7 +88,9 @@ const useDeco = () => {
  * @title Page
  */
 function Page(
-  { sections, errorPage }: Props & { errorPage?: Page },
+  { sections, errorPage, devMode }:
+    & Props
+    & { errorPage?: Page; devMode: boolean },
 ): JSX.Element {
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
@@ -95,15 +98,16 @@ function Page(
   return (
     <ErrorBoundary
       fallback={(error) => (
-        error instanceof HttpError
-          ? (
-            <div>
-              {errorPage === undefined ? <div></div> : <>{(errorPage?.props?.sections ?? []).filter(notUndefined).map(renderSection)}</>}
-            </div>
-          )
+        error instanceof HttpError && errorPage !== undefined &&
+          errorPage !== null && !devMode
+          ? <errorPage.Component {...errorPage.props}></errorPage.Component>
           : (
             <div>
-              {error instanceof Error ? error.message : ""}
+              {error instanceof (Error || HttpError)
+                ? devMode
+                  ? error.stack
+                  : `Aconteceu um erro inesperado :(\n${error.message}`
+                : ""}
             </div>
           )
       )}
@@ -115,12 +119,20 @@ function Page(
   );
 }
 
-export const loader = (
+export const loader = async (
   { sections }: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ) => {
-  return { sections, errorPage: ctx.errorPage };
+  const url = new URL(req.url);
+  const devMode = url.searchParams.has("__d");
+  return {
+    sections,
+    errorPage: isDeferred<Page>(ctx.errorPage)
+      ? await ctx.errorPage()
+      : undefined,
+    devMode,
+  };
 };
 
 export function Preview({ sections }: Props) {
