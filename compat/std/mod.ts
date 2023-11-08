@@ -318,7 +318,7 @@ export default function Std(
       domain: props.commerce.publicUrl,
       internalDomain: `${props.commerce.account}.cdn.vnda.com.br`,
       useSandbox: props.commerce.sandbox,
-      authToken: props.commerce.authToken,
+      authToken: props.commerce.authToken!,
       defaultPriceCurrency: "BRL",
     };
     const { manifest, state: appState } = vnda(props.commerce);
