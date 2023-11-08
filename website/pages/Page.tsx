@@ -16,6 +16,7 @@ import { ComponentFunc } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
+import { defaultErrorPage } from './defaultErrorPage.ts'
 
 /**
  * @title Sections
@@ -106,8 +107,8 @@ function Page(
               {error instanceof (Error || HttpError)
                 ? devMode
                   ? error.stack
-                  : `Aconteceu um erro inesperado :( ${error.message}`
-                : ""}
+                  : <div dangerouslySetInnerHTML={{ __html: defaultErrorPage }} />
+                : `Aconteceu um erro inesperado :(`}
             </div>
           )
       )}
