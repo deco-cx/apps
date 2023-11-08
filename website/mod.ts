@@ -29,7 +29,7 @@ export interface Props {
 
   /**
    * @title Error Page
-   * @description This page will be used when a route is not found
+   * @description This page will be used when something goes wrong rendering a page
    */
   errorPage?: Page;
 }
