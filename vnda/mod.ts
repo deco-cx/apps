@@ -2,6 +2,7 @@ import type { App, FnContext } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/vnda.openapi.gen.ts";
+import { SecretString } from "../website/loaders/secretString.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -24,7 +25,7 @@ export interface Props {
   /**
    * @description The token generated from admin panel. Read here: https://developers.vnda.com.br/docs/chave-de-acesso-e-requisicoes. Do not add any other permissions than catalog.
    */
-  authToken: string;
+  authToken: SecretString;
 
   /**
    * @title Use Sandbox

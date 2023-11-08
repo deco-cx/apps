@@ -1,9 +1,10 @@
 import type { App, FnContext } from "deco/mod.ts";
-import { createHttpClient } from "../utils/http.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
+import { createHttpClient } from "../utils/http.ts";
+import { SecretString } from "../website/loaders/secretString.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -19,14 +20,14 @@ export interface Props {
    * @title Wake Storefront Token
    * @description https://wakecommerce.readme.io/docs/storefront-api-criacao-e-autenticacao-do-token
    */
-  storefrontToken: string;
+  storefrontToken: SecretString;
 
   /**
    * @title Wake API token
    * @description The token for accessing wake commerce
    * @default deco
    */
-  token?: string;
+  token?: SecretString;
 
   /**
    * @description Use Wake as backend platform
@@ -46,6 +47,11 @@ export const color = 0xB600EE;
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, storefrontToken } = props;
+
+  if (!token || !storefrontToken) {
+    throw new Error("Missing tokens");
+  }
+
   const api = createHttpClient<OpenAPI>({
     base: "https://api.fbits.net",
     headers: new Headers({ "Authorization": `Basic ${token}` }),
