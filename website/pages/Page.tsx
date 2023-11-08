@@ -107,7 +107,7 @@ function Page(
               {error instanceof (Error || HttpError)
                 ? devMode ? error.stack : (
                   <div
-                    dangerouslySetInnerHTML={{ __html: defaultErrorPage }}
+                    // dangerouslySetInnerHTML={{ __html: defaultErrorPage }}
                   />
                 )
                 : `Aconteceu um erro inesperado :(`}
