@@ -106,7 +106,7 @@ function Page(
               {error instanceof (Error || HttpError)
                 ? devMode
                   ? error.stack
-                  : `Aconteceu um erro inesperado :(\n${error.message}`
+                  : `Aconteceu um erro inesperado :( ${error.message}`
                 : ""}
             </div>
           )
