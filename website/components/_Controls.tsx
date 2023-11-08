@@ -29,11 +29,9 @@ type EditorEvent = {
 const domInspectorModule = IS_LOCALHOST
   ? `
 const DomInspectorActivators = {
-  CmdE: {
-    label: "Cmd+E or Ctrl+E",
-    matchEvent: (event) =>
-      (event.ctrlKey && event.key === "e") ||
-      (event.metaKey && event.key === "e"),
+  Backquote: {
+    label: "\` (backtick)",
+    matchEvent: (event) => event.code === "Backquote",
   },
 };
 ${DomInspector.toString()}`
