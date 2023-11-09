@@ -128,7 +128,7 @@ const deferPropsResolve = (
     }
     return newRoutes;
   }
-  return routes;
+  return asResolved(routes, true);
 };
 
 export const onBeforeResolveProps = <
