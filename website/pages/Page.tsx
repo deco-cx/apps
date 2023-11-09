@@ -16,7 +16,7 @@ import { ComponentFunc } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
-import { defaultErrorPage } from "./defaultErrorPage.ts";
+import { defaultErrorPage } from "./defaultErrorPage.tsx";
 
 /**
  * @title Sections
