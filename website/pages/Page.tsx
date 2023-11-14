@@ -99,14 +99,16 @@ function Page(
   return (
     <ErrorBoundary
       fallback={(error) => (
-        error instanceof HttpError
-          ? <ErrorPageComponent></ErrorPageComponent>
-          : <>{"nao era pra ta aqui"}</>
-        // error instanceof HttpError && errorPage !== undefined &&
-        //   errorPage !== null && !devMode
-        //   ? <errorPage.Component {...errorPage.props}></errorPage.Component>
-        //   :
-        //   <ErrorPageComponent>{(devMode && error instanceof (Error || HttpError) ? error.stack : '') || ''}</ErrorPageComponent>
+        error instanceof HttpError && errorPage !== undefined &&
+          errorPage !== null && !devMode
+          ? <errorPage.Component {...errorPage.props}></errorPage.Component>
+          : (
+            <ErrorPageComponent
+              error={(devMode && error instanceof (Error || HttpError)
+                ? error.stack
+                : "") || ""}
+            />
+          )
       )}
     >
       <LiveControls site={site} {...deco} />

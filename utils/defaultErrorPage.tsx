@@ -1,29 +1,30 @@
 import { ComponentChildren } from "preact";
 import { Head } from "$fresh/runtime.ts";
-// import { Icon } from "deco/blocks/icon.tsx";
+import { asset } from "$fresh/runtime.ts";
 
 type Props = {
   error?: string;
 };
 
-export const Squares = () => (
+const Squares = () => (
   <>
     <Head>
-      <style>
-        {`
-              @keyframes animate {
-                0%{
-                    transform: translateY(0) rotate(0deg);
-                    opacity: 1;
-                    border-radius: 0;
-                }
-          
-                100%{
-                    transform: translateY(-1000px) rotate(720deg);
-                    opacity: 0;
-                    border-radius: 50%;
-                }
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          @keyframes animate {
+            0%{
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 0;
             }
+      
+            100%{
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 50%;
+            }
+          }
 
           .circles{
               position: absolute;
@@ -118,8 +119,9 @@ export const Squares = () => (
               height: 150px;
               animation-delay: 0s;
               animation-duration: 11s;
-          }`}
-      </style>
+          }`,
+        }}
+      />
     </Head>
     <div class="area">
       <ul class="circles">
@@ -136,112 +138,32 @@ export const Squares = () => (
 );
 
 export default function ErrorPageComponent({ error }: Props) {
+  console.log("error", error);
+  console.log("asset", asset(`/sprites.svg#alert-circle`));
   return (
     <>
       <Head>
-        <style>
-          {`
-            @media (min-width: 768px) {
-                .md\:flex {
-                    display: flex;
-                }
-            }
-            @media (min-width: 768px) {
-              .md\:justify-center {
-                  justify-content: center;
-              }
-            }
-            .px-8 {
-              padding-left: 32px/* 32px */;
-              padding-right: 32px/* 32px */;
-            }
-            @media (min-width: 768px) {
-              .md\:w-full {
-                  width: 100%;
-              }
-            }
-            .pt-20 {
-                padding-top: 5rem/* 80px */;
-            }
-            .bg-white {
-              --tw-bg-opacity: 1;
-              background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-            }
-            @media (min-width: 768px) {
-              .md\:flex-col {
-                  flex-direction: column;
-              }
-            }
-            .flex {
-              display: flex;
-            }
-            .justify-center {
-              justify-content: center;
-            }
-            .pt-36 {
-                padding-top: 9rem/* 144px */;
-            }
-            .pt-4 {
-              padding-top: 1rem/* 16px */;
-            }
-            .pb-\[15px\] {
-              padding-bottom: 15px;
-            }
-            .text-center {
-              text-align: center;
-            }
-            .text-5xl {
-              font-size: 3rem/* 48px */;
-              line-height: 1;
-            }
-            .font-semibold {
-                font-weight: 600;
-            }
-            .mt-4 {
-              margin-top: 1rem/* 16px */;
-            }
-            .text-xl {
-              font-size: 1.25rem/* 20px */;
-              line-height: 1.75rem/* 28px */;
-            }
-            .relative {
-              position: relative;
-            }
-            .z-50 {
-              z-index: 50;
-            }
-            .mt-10 {
-              margin-top: 2.5rem/* 40px */;
-            }
-            .text-sm {
-              font-size: 0.875rem/* 14px */;
-              line-height: 1.25rem/* 20px */;
-            }
-            .text-left {
-              text-align: left;
-            }
-            .px-60 {
-              padding-left: 15rem/* 240px */;
-              padding-right: 15rem/* 240px */;
-            }
-            `}
-        </style>
+        <script src="https://cdn.tailwindcss.com"></script>
       </Head>
       <div class="media:flex media:justify-center px-8 media:px-auto media:w-full pt-20 bg-white">
         <Squares />
         <div class="media:flex media:flex-col pt-20">
           <div class={`flex justify-center ${error ? "" : "pt-36"}`}>
-            <svg width="120" height="60" stroke-width="2" class="relative">
-              <use href="/sprites.svg?__frsh_c=dd8b2a03bab5cb4ae95b26682717f5c539df7d61#alert-circle">
-              </use>
+            <svg
+              width={120}
+              height={60}
+              strokeWidth={2}
+              class="relative"
+            >
+              <use href={asset(`/sprites.svg#alert-circle`)} />
             </svg>
           </div>
           <div class="pt-4 pb-[15px] text-center">
-            <p class={`text-5xl font-semibold text-base-900`}>
+            <p class={`text-5xl font-bold text-base-900`}>
               {"Oops, something went wrong."}
             </p>
           </div>
-          <div class="mt-4 text-xl text-center relative z-50 text-base-900">
+          <div class="mt-4 text-lg text-center relative z-50 text-base-900">
             {"We are sorry, but we are unable to display this webpage."}
           </div>
           <div class="mt-10 text-sm text-left relative z-50 text-base-900 px-60">
