@@ -102,16 +102,18 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
     return map;
   }, new Map<string, T>());
 
-  return sku.kitItems?.map(({ itemId }) => {
-    const product = productBySkuId.get(itemId);
+  return sku.kitItems
+    ?.map(({ itemId }) => {
+      const product = productBySkuId.get(itemId);
 
-    /** Sometimes VTEX does not return what I've asked for */
-    if (!product) return;
+      /** Sometimes VTEX does not return what I've asked for */
+      if (!product) return;
 
-    const sku = pickSku(product, itemId);
+      const sku = pickSku(product, itemId);
 
-    return toProduct(product, sku, 0, options);
-  }).filter((p): p is Product => typeof p !== "undefined");
+      return toProduct(product, sku, 0, options);
+    })
+    .filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -338,9 +340,19 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     : undefined;
 
   // From schema.org: A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy
-  const categoriesString = splitCategory(product.categories[0]).join(
-    DEFAULT_CATEGORY_SEPARATOR,
-  );
+
+  // Split all categories, remove empty strings, and join all categories into a single string
+  const categories = product.categories
+    .map((category) =>
+      category
+        .split("/")
+        .filter((part) => part.trim() !== "")
+        .join(DEFAULT_CATEGORY_SEPARATOR)
+    )
+    .join(">");
+
+  // Split the single string into individual categories, remove duplicates, and join them again
+  const categoriesString = [...new Set(categories.split(">"))].join(">");
 
   const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
   const clusterAdditionalProperties = toAdditionalPropertyClusters(product);
@@ -578,8 +590,11 @@ export const legacyFacetToFilter = (
     for (let it = 0; it < newMap.length; it++) {
       let i = 0;
       while (
-        i < zipped.length && (zipped[i][0] === "c" || zipped[i][0] === "C")
-      ) i++;
+        i < zipped.length &&
+        (zipped[i][0] === "c" || zipped[i][0] === "C")
+      ) {
+        i++;
+      }
 
       zipped.splice(i, 0, [newMap[it], newPath[it]]);
     }
