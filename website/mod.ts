@@ -29,7 +29,7 @@ export interface Props {
 
   /**
    * @title Error Page
-   * @description This page will be used when something goes wrong rendering a page
+   * @description This page will be used when something goes wrong beyond section error-boundaries when rendering a page
    */
   errorPage?: Page;
 }
