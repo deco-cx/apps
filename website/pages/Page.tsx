@@ -16,7 +16,7 @@ import { ComponentFunc } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
-import { defaultErrorPage } from "../../utils/defaultErrorPage.ts";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 
 /**
  * @title Sections
@@ -99,25 +99,20 @@ function Page(
   return (
     <ErrorBoundary
       fallback={(error) => (
-        error instanceof HttpError && errorPage !== undefined &&
-          errorPage !== null && !devMode
-          ? <errorPage.Component {...errorPage.props}></errorPage.Component>
-          : (
-            <div>
-              {error instanceof (Error || HttpError)
-                ? devMode ? error.stack : (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: defaultErrorPage }}
-                  />
-                )
-                : `Aconteceu um erro inesperado :(`}
-            </div>
-          )
+        error instanceof HttpError
+        ? <ErrorPageComponent></ErrorPageComponent>
+        :
+        <>{"nao era pra ta aqui"}</>
+        // error instanceof HttpError && errorPage !== undefined &&
+        //   errorPage !== null && !devMode
+        //   ? <errorPage.Component {...errorPage.props}></errorPage.Component>
+        //   :
+        //   <ErrorPageComponent>{(devMode && error instanceof (Error || HttpError) ? error.stack : '') || ''}</ErrorPageComponent>
       )}
-    >
-      <LiveControls site={site} {...deco} />
-      <Events deco={deco} />
-      {sections.map(renderSection)}
+            >
+              <LiveControls site={site} {...deco} />
+              <Events deco={deco} />
+              {sections.map(renderSection)}
     </ErrorBoundary>
   );
 }
