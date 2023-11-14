@@ -8,10 +8,9 @@ type Props = {
 
 export const Squares = () => (
   <>
-      <Head>
-        <style>
-          {
-            `
+    <Head>
+      <style>
+        {`
               @keyframes animate {
                 0%{
                     transform: translateY(0) rotate(0deg);
@@ -119,8 +118,7 @@ export const Squares = () => (
               height: 150px;
               animation-delay: 0s;
               animation-duration: 11s;
-          }`
-          }
+          }`}
       </style>
     </Head>
     <div class="area">
@@ -142,8 +140,7 @@ export default function ErrorPageComponent({ error }: Props) {
     <>
       <Head>
         <style>
-          {
-            `
+          {`
             @media (min-width: 768px) {
                 .md\:flex {
                     display: flex;
@@ -227,15 +224,17 @@ export default function ErrorPageComponent({ error }: Props) {
               padding-left: 15rem/* 240px */;
               padding-right: 15rem/* 240px */;
             }
-            `
-          }
+            `}
         </style>
       </Head>
       <div class="media:flex media:justify-center px-8 media:px-auto media:w-full pt-20 bg-white">
         <Squares />
         <div class="media:flex media:flex-col pt-20">
           <div class={`flex justify-center ${error ? "" : "pt-36"}`}>
-            <svg width="120" height="60" stroke-width="2" class="relative"><use href="/sprites.svg?__frsh_c=dd8b2a03bab5cb4ae95b26682717f5c539df7d61#alert-circle"></use></svg>
+            <svg width="120" height="60" stroke-width="2" class="relative">
+              <use href="/sprites.svg?__frsh_c=dd8b2a03bab5cb4ae95b26682717f5c539df7d61#alert-circle">
+              </use>
+            </svg>
           </div>
           <div class="pt-4 pb-[15px] text-center">
             <p class={`text-5xl font-semibold text-base-900`}>
@@ -247,11 +246,9 @@ export default function ErrorPageComponent({ error }: Props) {
           </div>
           <div class="mt-10 text-sm text-left relative z-50 text-base-900 px-60">
             {
-              (
-                <p class="text-mt1 text-base-900">
-                  { error ? error : ""}
-                </p>
-              )
+              <p class="text-mt1 text-base-900">
+                {error ? error : ""}
+              </p>
             }
           </div>
         </div>
@@ -259,5 +256,3 @@ export default function ErrorPageComponent({ error }: Props) {
     </>
   );
 }
-
-
