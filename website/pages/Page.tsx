@@ -68,10 +68,6 @@ class ErrorBoundary
   }
 }
 
-/**
- * @title Page
- */
-
 const useDeco = () => {
   const metadata = useDecoPageContext()?.metadata;
   const routerCtx = useRouterContext();
