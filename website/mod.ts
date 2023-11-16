@@ -6,6 +6,7 @@ import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { Page } from "deco/blocks/page.tsx";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -25,6 +26,12 @@ export interface Props {
    * @description These sections will be included on all website/pages/Page.ts
    */
   global?: Section[];
+
+  /**
+   * @title Error Page
+   * @description This page will be used when something goes wrong beyond section error-boundaries when rendering a page
+   */
+  errorPage?: Page;
 }
 
 /**
@@ -96,12 +103,17 @@ const deferPropsResolve = (
   return routes;
 };
 
-export const onBeforeResolveProps = <T extends { routes?: Routes[] }>(
+export const onBeforeResolveProps = <
+  T extends { routes?: Routes[]; errorPage?: Page },
+>(
   props: T,
 ): T => {
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
+      errorPage: props.errorPage
+        ? asResolved(props.errorPage, true)
+        : undefined,
       routes: props.routes.map(deferPropsResolve),
     };
     return newRoutes;
