@@ -343,6 +343,8 @@ const loader = async (
   } = productsResult;
   const facets = selectPriceFacet(facetsResult.facets, selectedFacets);
 
+  const start = performance.now();
+
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
@@ -358,6 +360,8 @@ const loader = async (
         props.similars ? withIsSimilarTo(req, ctx, product) : product
       ),
   );
+
+  console.log("withIsSimilarTo-all", performance.now() - start, "ms");
 
   const paramsToPersist = new URLSearchParams();
   searchArgs.query && paramsToPersist.set("q", searchArgs.query);
