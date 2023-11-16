@@ -178,6 +178,43 @@ const toAdditionalPropertyCategories = <
   );
 };
 
+function processCategories(categories: string[]): string[] {
+  return categories
+    .map((category) =>
+      category
+        .split("/")
+        .filter((part) => part.trim() !== "")
+        .join(DEFAULT_CATEGORY_SEPARATOR)
+    )
+    .join(">")
+    .split(">");
+}
+
+const toAdditionalPropertyAllCategories = <
+  P extends LegacyProductVTEX | ProductVTEX,
+>(
+  product: P,
+): Product["additionalProperty"] => {
+  const categories = processCategories(product.categories);
+  const allCategories = [...new Set(categories)];
+
+  const categoriesIds = processCategories(product.categoriesIds);
+  const allCategoriesIds = [...new Set(categoriesIds)];
+
+  return [
+    {
+      "@type": "PropertyValue" as const,
+      name: "Additional Categories",
+      value: allCategories.map((category, index) => ({
+        "@type": "PropertyValue" as const,
+        name: "category",
+        propertyID: allCategoriesIds[index],
+        value: category,
+      })),
+    },
+  ];
+};
+
 export const toAdditionalPropertyCategory = ({
   propertyID,
   value,
@@ -340,27 +377,21 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     : undefined;
 
   // From schema.org: A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy
+  const categoriesString = splitCategory(product.categories[0]).join(
+    DEFAULT_CATEGORY_SEPARATOR,
+  );
 
-  // Split all categories, remove empty strings, and join all categories into a single string
-  const categories = product.categories
-    .map((category) =>
-      category
-        .split("/")
-        .filter((part) => part.trim() !== "")
-        .join(DEFAULT_CATEGORY_SEPARATOR)
-    )
-    .join(">");
-
-  // Split the single string into individual categories, remove duplicates, and join them again
-  const categoriesString = [...new Set(categories.split(">"))].join(">");
-
+  const allCategoriesAdditionalProperties = toAdditionalPropertyAllCategories(
+    product,
+  );
   const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
   const clusterAdditionalProperties = toAdditionalPropertyClusters(product);
 
   const additionalProperty = specificationsAdditionalProperty
     .concat(categoryAdditionalProperties ?? [])
     .concat(clusterAdditionalProperties ?? [])
-    .concat(referenceIdAdditionalProperty ?? []);
+    .concat(referenceIdAdditionalProperty ?? [])
+    .concat(allCategoriesAdditionalProperties ?? []);
 
   return {
     "@type": "Product",

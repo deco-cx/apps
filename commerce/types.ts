@@ -56,7 +56,7 @@ export interface PropertyValue extends Omit<Thing, "@type"> {
    * - Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.
    * - Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.
    */
-  value?: string;
+  value?: string | PropertyValue[];
   /** A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement. */
   valueReference?: string;
 }
