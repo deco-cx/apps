@@ -502,6 +502,11 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
       priceType: "https://schema.org/SalePrice",
       price: offer.Price,
     },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SRP",
+      price: offer.PriceWithoutDiscount,
+    },
     ...offer.Installments.map(
       (installment): UnitPriceSpecification => ({
         "@type": "UnitPriceSpecification",
