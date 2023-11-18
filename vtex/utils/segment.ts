@@ -47,20 +47,26 @@ export const serialize = ({
   cultureInfo,
   channelPrivacy,
 }: Partial<Segment>) =>
-  btoa(JSON.stringify({
-    campaigns,
-    channel,
-    priceTables,
-    regionId,
-    utm_campaign,
-    utm_source,
-    utmi_campaign,
-    currencyCode,
-    currencySymbol,
-    countryCode,
-    cultureInfo,
-    channelPrivacy,
-  }));
+  btoa(
+    unescape(
+      encodeURIComponent(
+        JSON.stringify({
+          campaigns,
+          channel,
+          priceTables,
+          regionId,
+          utm_campaign,
+          utm_source,
+          utmi_campaign,
+          currencyCode,
+          currencySymbol,
+          countryCode,
+          cultureInfo,
+          channelPrivacy,
+        }),
+      ),
+    ),
+  );
 
 export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
