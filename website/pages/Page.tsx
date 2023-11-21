@@ -9,6 +9,14 @@ import {
 import { JSX } from "preact";
 import Events from "../components/Events.tsx";
 import LiveControls from "../components/_Controls.tsx";
+import { AppContext } from "../mod.ts";
+import { Page } from "deco/blocks/page.tsx";
+import { Component } from "preact";
+import { ComponentFunc } from "deco/engine/block.ts";
+import { HttpError } from "deco/engine/errors.ts";
+import { logger } from "deco/observability/otel/config.ts";
+import { isDeferred } from "deco/mod.ts";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 
 /**
  * @title Sections
@@ -28,16 +36,42 @@ export interface Props {
 }
 
 export function renderSection(section: Props["sections"][number]) {
+  if (section === undefined || section === null) return <></>;
   const { Component, props } = section;
 
   return <Component {...props} />;
+}
+
+class ErrorBoundary
+  extends Component<{ fallback: ComponentFunc<HTMLElement> }> {
+  state = { error: null };
+
+  // deno-lint-ignore no-explicit-any
+  static getDerivedStateFromError(error: any) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      const err = this?.state?.error as Error;
+      const msg = `rendering: ${this.props} ${err?.stack}`;
+      logger.error(
+        msg,
+      );
+      console.error(
+        msg,
+      );
+    }
+    return this.state.error
+      ? this.props.fallback(this.state.error)
+      : this.props.children;
+  }
 }
 
 const useDeco = () => {
   const metadata = useDecoPageContext()?.metadata;
   const routerCtx = useRouterContext();
   const pageId = pageIdFromMetadata(metadata);
-
   return {
     flags: routerCtx?.flags ?? [],
     page: {
@@ -50,18 +84,51 @@ const useDeco = () => {
 /**
  * @title Page
  */
-function Page({ sections }: Props): JSX.Element {
+function Page(
+  { sections, errorPage, devMode }:
+    & Props
+    & { errorPage?: Page; devMode: boolean },
+): JSX.Element {
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 
   return (
-    <>
+    <ErrorBoundary
+      fallback={(error) => (
+        error instanceof HttpError && errorPage !== undefined &&
+          errorPage !== null && !devMode
+          ? <errorPage.Component {...errorPage.props}></errorPage.Component>
+          : (
+            <ErrorPageComponent
+              error={(devMode && error instanceof (Error || HttpError)
+                ? error.stack
+                : "") || ""}
+            />
+          )
+      )}
+    >
       <LiveControls site={site} {...deco} />
       <Events deco={deco} />
       {sections.map(renderSection)}
-    </>
+    </ErrorBoundary>
   );
 }
+
+export const loader = async (
+  { sections }: Props,
+  req: Request,
+  ctx: AppContext,
+) => {
+  const url = new URL(req.url);
+  const devMode = url.searchParams.has("__d");
+  return {
+    sections,
+    errorPage: isDeferred<Page>(ctx.errorPage)
+      ? await ctx.errorPage()
+      : undefined,
+    devMode,
+  };
+};
 
 export function Preview({ sections }: Props) {
   const deco = useDeco();

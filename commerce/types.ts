@@ -729,7 +729,7 @@ export interface ViewPromotionParams {
   creative_slot?: string;
   promotion_id?: string;
   promotion_name?: string;
-  items: AnalyticsItem[];
+  items?: AnalyticsItem[];
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#view_promotion */

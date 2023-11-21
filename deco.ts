@@ -27,6 +27,7 @@ const config = {
     app("wake"),
     app("linx"),
     app("shopify"),
+    app("nuvemshop"),
     app("website"),
     app("commerce"),
     app("workflows"),

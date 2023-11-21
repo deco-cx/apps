@@ -2,27 +2,24 @@
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import type { CartFragment } from "../utils/storefront/storefront.graphql.gen.ts";
+import { ProductElement } from "../utils/types.ts";
 import { Context, state as storeState } from "./context.ts";
 
 export const itemToAnalyticsItem = (
-  {
-    id,
-    quantity,
-    cost: { amountPerQuantity, compareAtAmountPerQuantity },
-    merchandise,
-  }: CartFragment["lines"]["nodes"][number] & { quantity: number },
+  item: ProductElement,
   index: number,
 ): AnalyticsItem => ({
-  item_id: id,
-  quantity: quantity,
-  price: amountPerQuantity.amount,
-  index,
-  discount: compareAtAmountPerQuantity
-    ? compareAtAmountPerQuantity.amount - amountPerQuantity.amount
+  item_id: item.sku,
+  item_group_id: item.product_id.toString(),
+  quantity: item.quantity,
+  price: Number(item.price),
+  discount: item.compare_at_price
+    ? Number(item.compare_at_price) -
+      Number(item.price)
     : 0,
-  item_name: merchandise.product.title,
-  item_variant: merchandise.title,
+  item_name: item.name,
+  item_variant: item.name,
+  index,
 });
 
 const { cart, loading } = storeState;
@@ -43,10 +40,8 @@ const enqueue = <
 const state = {
   cart,
   loading,
-  addItems: enqueue("shopify/actions/cart/addItems.ts"),
-  updateItems: enqueue("shopify/actions/cart/updateItems.ts"),
-  addCouponsToCart: enqueue("shopify/actions/cart/updateCoupons.ts"),
-  simulate: invoke.shopify.actions.order.draftOrderCalculate,
+  addItems: enqueue("nuvemshop/actions/cart/addItems.ts"),
+  updateItems: enqueue("nuvemshop/actions/cart/updateItems.ts"),
 };
 
 export const useCart = () => state;

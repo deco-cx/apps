@@ -290,6 +290,8 @@ const loader = async (
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
 
+  const currentPage = page + currentPageoffset;
+
   return {
     "@type": "ProductListingPage",
     breadcrumb: {
@@ -302,12 +304,12 @@ const loader = async (
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage.toString()}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage.toString()}` : undefined,
-      currentPage: page + currentPageoffset,
+      currentPage,
       records: parseInt(_total, 10),
       recordPerPage: count,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req),
+    seo: pageTypesToSeo(pageTypes, req, previousPage ? currentPage : undefined),
   };
 };
 

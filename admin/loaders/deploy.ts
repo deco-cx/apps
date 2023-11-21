@@ -1,6 +1,7 @@
 import { context } from "deco/live.ts";
 import { walk } from "std/fs/mod.ts";
 import { SEP } from "std/path/separator.ts";
+import { encode } from "std/encoding/base64.ts";
 
 export interface Bundle {
   release: Record<string, unknown>;
@@ -20,9 +21,12 @@ export default async function code(_props: unknown): Promise<Bundle | null> {
     })
   ) {
     codeEntries.push(
-      Deno.readTextFile(entry.path).then((
+      Deno.readFile(entry.path).then((
         content,
-      ) => [entry.path.replace(`${Deno.cwd()}${SEP}`, ""), content]),
+      ) => [
+        entry.path.replace(`${Deno.cwd()}${SEP}`, ""),
+        encode(content),
+      ]),
     );
   }
 

@@ -14,6 +14,7 @@ import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
+import { SecretString } from "../website/loaders/secretString.ts";
 
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
@@ -46,14 +47,14 @@ export interface Props {
    * @title App Key
    * @description Only required for extra features
    */
-  appKey?: string;
+  appKey?: SecretString;
 
   /**
    * @title App Token
    * @description Only required for extra features
    * @format password
    */
-  appToken?: string;
+  appToken?: SecretString;
 
   /**
    * @title Default Sales Channel
