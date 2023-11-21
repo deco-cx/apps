@@ -1,6 +1,7 @@
 import { getCookies, setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
 import type { Segment } from "./types.ts";
+import { removeNonLatin1Chars } from "../../utils/normalize.ts";
 
 const SEGMENT_COOKIE_NAME = "vtex_segment";
 const SEGMENT = Symbol("segment");
@@ -46,21 +47,23 @@ export const serialize = ({
   countryCode,
   cultureInfo,
   channelPrivacy,
-}: Partial<Segment>) =>
-  btoa(JSON.stringify({
+}: Partial<Segment>) => {
+  const seg = {
     campaigns,
     channel,
     priceTables,
     regionId,
-    utm_campaign,
-    utm_source,
-    utmi_campaign,
+    utm_campaign: utm_campaign && removeNonLatin1Chars(utm_campaign),
+    utm_source: utm_source && removeNonLatin1Chars(utm_source),
+    utmi_campaign: utmi_campaign && removeNonLatin1Chars(utmi_campaign),
     currencyCode,
     currencySymbol,
     countryCode,
     cultureInfo,
     channelPrivacy,
-  }));
+  };
+  return btoa(JSON.stringify(seg));
+};
 
 export const parse = (cookie: string) => JSON.parse(atob(cookie));
 
