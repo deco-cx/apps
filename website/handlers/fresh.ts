@@ -7,6 +7,7 @@ import {
 } from "deco/engine/core/resolver.ts";
 import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
+import { getSetCookies } from "std/http/cookie.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
 
@@ -29,7 +30,7 @@ export const isFreshCtx = <TState>(
  */
 export default function Fresh(
   freshConfig: FreshConfig,
-  appContext: Pick<AppContext, "monitoring">,
+  appContext: Pick<AppContext, "monitoring" | "response">,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
     if (req.method === "HEAD") {
@@ -68,13 +69,26 @@ export default function Fresh(
         "render-to-string",
         async (span) => {
           try {
-            return await ctx.render({
+            const response = await ctx.render({
               page,
               routerInfo: {
                 flags: ctx.state.flags,
                 pagePath: ctx.state.pathTemplate,
               },
             });
+            const setCookies = getSetCookies(appContext.response.headers);
+            const cacheControlEnabled = Deno.env.has("CACHE_CONTROL_ENABLED");
+            const cacheControlMaxAge = Deno.env.get("CACHE_CONTROL_MAX_AGE");
+            const cacheControlStaleWhileRevalidate = Deno.env.get(
+              "CACHE_CONTROL_STALE_WHILE_REVALIDATE",
+            );
+            if (cacheControlEnabled && setCookies.length === 0) {
+              appContext.response.headers.set(
+                "Cache-Control",
+                `max-age=${cacheControlMaxAge}, stale-while-revalidate=${cacheControlStaleWhileRevalidate}`,
+              );
+            }
+            return response;
           } catch (err) {
             span.recordException(err);
             throw err;
