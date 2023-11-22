@@ -1,11 +1,13 @@
 import type { ProductDetailsPage } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
+import { MAXIMUM_REQUEST_QUANTITY } from "../utils/getVariations.ts";
 import { GetProduct } from "../utils/graphql/queries.ts";
 import {
   GetProductQuery,
   GetProductQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
+import { parseHeaders } from "../utils/parseHeaders.ts";
 import { parseSlug, toBreadcrumbList, toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -25,9 +27,11 @@ async function loader(
   const { slug } = props;
   const { storefront } = ctx;
 
+  const headers = parseHeaders(req.headers);
+
   if (!slug) return null;
 
-  // const variantId = Number(url.searchParams.get("skuId")) || null;
+  const variantId = Number(url.searchParams.get("skuId")) || null;
   const { id: productId } = parseSlug(slug);
 
   if (!productId) {
@@ -40,17 +44,31 @@ async function loader(
   >({
     variables: { productId },
     ...GetProduct,
+  }, {
+    headers,
   });
 
   if (!wakeProduct) {
     return null;
   }
 
-  const product = toProduct(wakeProduct, { base: url });
+  const variantsItems = await ctx.invoke.wake.loaders.productList({
+    first: MAXIMUM_REQUEST_QUANTITY,
+    sortDirection: "ASC",
+    sortKey: "RANDOM",
+    filters: { productId: [productId] },
+  }) ?? [];
+
+  const product = toProduct(
+    wakeProduct,
+    { base: url },
+    variantsItems,
+    variantId,
+  );
 
   return {
     "@type": "ProductDetailsPage",
-    breadcrumbList: toBreadcrumbList(product, wakeProduct.productCategories, {
+    breadcrumbList: toBreadcrumbList(product, wakeProduct.breadcrumbs, {
       base: url,
     }),
     product,

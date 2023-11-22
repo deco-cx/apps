@@ -379,7 +379,7 @@ export interface Product extends Omit<Thing, "@type"> {
   inProductGroupWithID?: string;
   // TODO: Make json schema generator support self-referencing types
   // /** A pointer to another, somehow related product (or multiple products). */
-  // isRelatedTo?: Product[];
+  isRelatedTo?: Product[];
   /** A pointer to another, functionally similar product (or multiple products). */
   isSimilarTo?: Product[];
   /** Indicates the kind of product that this is a variant of. In the case of {@link https://schema.org/ProductModel ProductModel}, this is a pointer (from a ProductModel) to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive. In the case of a {@link https://schema.org/ProductGroup ProductGroup}, the group description also serves as a template, representing a set of Products that vary on explicitly defined, specific dimensions only (so it defines both a set of variants, as well as which values distinguish amongst those variants). When used with {@link https://schema.org/ProductGroup ProductGroup}, this property can apply to any {@link https://schema.org/Product Product} included in the group. */

@@ -1,17 +1,20 @@
 import type { Product } from "../../commerce/types.ts";
 import type { AppContext } from "../mod.ts";
+import { getVariations } from "../utils/getVariations.ts";
 import { GetProducts } from "../utils/graphql/queries.ts";
 import {
   GetProductsQuery,
   GetProductsQueryVariables,
   ProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
+import { parseHeaders } from "../utils/parseHeaders.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
   /**
    * @title Count
    * @description Number of products to return
+   * @maximum 50
    */
   first: number;
   sortDirection: "ASC" | "DESC";
@@ -23,6 +26,7 @@ export interface Props {
     | "RELEASE_DATE"
     | "SALES"
     | "STOCK";
+
   filters: {
     /** @description The set of attributes to filter. */
     attributes?: {
@@ -83,6 +87,9 @@ export interface Props {
     /** @description Retrieve products which the last update date is less than or equal to the given date. */
     updatedAt_lte?: string;
   };
+
+  /** @description Retrieve variantions for each product. */
+  getVariations?: boolean;
 }
 
 /**
@@ -97,12 +104,16 @@ const productListLoader = async (
   const url = new URL(req.url);
   const { storefront } = ctx;
 
+  const headers = parseHeaders(req.headers);
+
   const data = await storefront.query<
     GetProductsQuery,
     GetProductsQueryVariables
   >({
     variables: props,
     ...GetProducts,
+  }, {
+    headers,
   });
 
   const products = data.products?.nodes;
@@ -111,9 +122,19 @@ const productListLoader = async (
     return null;
   }
 
+  const productIDs = products.map((i) => i?.productId);
+
+  const variations = await getVariations(storefront, productIDs, headers, url);
+
   return products
     .filter((node): node is ProductFragment => Boolean(node))
-    .map((node) => toProduct(node, { base: url }));
+    .map((node) => {
+      const productVariations = variations?.filter((v) =>
+        v.inProductGroupWithID === node.productId
+      );
+
+      return toProduct(node, { base: url }, productVariations);
+    });
 };
 
 export default productListLoader;

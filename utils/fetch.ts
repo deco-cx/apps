@@ -46,7 +46,10 @@ export const fetchSafe = async (
     return response;
   }
 
+  const error = await response.json();
+
   console.error(`${input}\n`, response, `\n`);
+  console.error(`${input}\n`, error, `\n`);
   throw new HttpError(response.status, `${input}`);
 };
 

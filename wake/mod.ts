@@ -5,8 +5,11 @@ import { createHttpClient } from "../utils/http.ts";
 import { SecretString } from "../website/loaders/secretString.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
+import { CheckoutApi } from "./utils/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
+
+export let state: null | State = null;
 
 /** @title Wake */
 export interface Props {
@@ -15,6 +18,12 @@ export interface Props {
    * @description erploja2 etc
    */
   account: string;
+
+  /**
+   * @title Checkout Url
+   * @description https://checkout.erploja2.com.br
+   */
+  checkoutUrl: string;
 
   /**
    * @title Wake Storefront Token
@@ -37,6 +46,7 @@ export interface Props {
 
 export interface State extends Props {
   api: ReturnType<typeof createHttpClient<OpenAPI>>;
+  checkoutApi: ReturnType<typeof createHttpClient<CheckoutApi>>;
   storefront: ReturnType<typeof createGraphqlClient>;
 }
 
@@ -46,17 +56,11 @@ export const color = 0xB600EE;
  * @title Wake
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { token, storefrontToken } = props;
+  const { token, storefrontToken, account, checkoutUrl } = props;
 
   if (!token || !storefrontToken) {
     throw new Error("Missing tokens");
   }
-
-  const api = createHttpClient<OpenAPI>({
-    base: "https://api.fbits.net",
-    headers: new Headers({ "Authorization": `Basic ${token}` }),
-    fetcher: fetchSafe,
-  });
 
   const storefront = createGraphqlClient({
     endpoint: "https://storefront-api.fbits.net/graphql",
@@ -64,8 +68,21 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
+  const api = createHttpClient<OpenAPI>({
+    base: "https://api.fbits.net",
+    headers: new Headers({ "Authorization": `Basic ${token}` }),
+    fetcher: fetchSafe,
+  });
+
+  const checkoutApi = createHttpClient<CheckoutApi>({
+    base: checkoutUrl ?? `https://${account}.checkout.fbits.store`,
+    fetcher: fetchSafe,
+  });
+
+  state = { ...props, api, storefront, checkoutApi };
+
   return {
-    state: { ...props, api, storefront },
+    state,
     manifest,
   };
 }
