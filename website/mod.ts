@@ -12,6 +12,28 @@ export type AppContext = FnContext<Props, Manifest>;
 
 export type SectionProps<T> = T & { id: string };
 
+export interface CacheDirectiveBase {
+  name: string;
+  value: number;
+}
+
+export interface StaleWhileRevalidate extends CacheDirectiveBase {
+  name: "stale-while-revalidate";
+  value: number;
+}
+
+export interface MaxAge extends CacheDirectiveBase {
+  name: "max-age";
+  value: number;
+}
+
+export type CacheDirective = StaleWhileRevalidate | MaxAge;
+
+export interface Caching {
+  enabled?: boolean;
+  directives?: CacheDirective[];
+}
+
 export interface Props {
   /**
    * @title Site Map
@@ -32,6 +54,12 @@ export interface Props {
    * @description This page will be used when something goes wrong beyond section error-boundaries when rendering a page
    */
   errorPage?: Page;
+
+  /**
+   * @title Caching configuration of pages
+   * @description the caching configuration
+   */
+  caching?: Caching
 }
 
 /**
