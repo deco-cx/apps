@@ -23,7 +23,7 @@ function Section({ jsonLD, ...props }: Props) {
       title={title || props.title}
       description={description || props.description}
       image={image || props.image}
-      canonical={canonical || props.canonical}
+      canonical={(props.canonical || canonical) ?? undefined}
       jsonLDs={[jsonLD]}
       noIndexing={noIndexing}
     />
