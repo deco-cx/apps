@@ -59,7 +59,7 @@ export interface Props {
    * @title Caching configuration of pages
    * @description the caching configuration
    */
-  caching?: Caching
+  caching?: Caching;
 }
 
 /**

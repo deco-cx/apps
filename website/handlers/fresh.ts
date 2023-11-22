@@ -80,7 +80,9 @@ export default function Fresh(
             if (appContext?.caching?.enabled && setCookies.length === 0) {
               appContext.response.headers.set(
                 "Cache-Control",
-                (appContext?.caching?.directives??[]).map(({name, value}) => `${name}=${value}`).join(","),
+                (appContext?.caching?.directives ?? []).map(({ name, value }) =>
+                  `${name}=${value}`
+                ).join(","),
               );
             }
             return response;
