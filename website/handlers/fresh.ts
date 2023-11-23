@@ -30,7 +30,7 @@ export const isFreshCtx = <TState>(
  */
 export default function Fresh(
   freshConfig: FreshConfig,
-  appContext: Pick<AppContext, "monitoring" | "response">,
+  appContext: Pick<AppContext, "monitoring" | "response" | "caching">,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
     if (req.method === "HEAD") {
@@ -77,15 +77,12 @@ export default function Fresh(
               },
             });
             const setCookies = getSetCookies(appContext.response.headers);
-            const cacheControlEnabled = Deno.env.has("CACHE_CONTROL_ENABLED");
-            const cacheControlMaxAge = Deno.env.get("CACHE_CONTROL_MAX_AGE");
-            const cacheControlStaleWhileRevalidate = Deno.env.get(
-              "CACHE_CONTROL_STALE_WHILE_REVALIDATE",
-            );
-            if (cacheControlEnabled && setCookies.length === 0) {
+            if (appContext?.caching?.enabled && setCookies.length === 0) {
               appContext.response.headers.set(
                 "Cache-Control",
-                `max-age=${cacheControlMaxAge}, stale-while-revalidate=${cacheControlStaleWhileRevalidate}`,
+                (appContext?.caching?.directives ?? []).map(({ name, value }) =>
+                  `${name}=${value}`
+                ).join(","),
               );
             }
             return response;
