@@ -32,7 +32,7 @@ export type Sections = Section[];
 export interface Props {
   name: string;
   /**
-   * @format path-uri
+   * @format unused-path
    */
   path?: string;
   sections: Sections;
