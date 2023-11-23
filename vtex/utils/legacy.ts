@@ -12,6 +12,7 @@ export const toSegmentParams = (
     utmi_campaign: segment.utmi_campaign ?? undefined,
     utm_campaign: segment.utm_campaign ?? undefined,
     utm_source: segment.utm_source ?? undefined,
+    sc: segment.channel ?? '1',
   }).filter(([_, v]) => v != undefined),
 ));
 
