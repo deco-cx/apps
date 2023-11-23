@@ -2,6 +2,7 @@ import {
   Category,
   CreateNewDocument,
   FacetSearchResult,
+  InstallmentOption,
   LegacyFacets,
   LegacyProduct,
   LegacySort,
@@ -122,7 +123,7 @@ export interface VTEXCommerceStable {
     response: OrderForm;
   };
   "GET /api/checkout/pub/orderForm/:orderFormId/installments": {
-    response: OrderForm;
+    response: InstallmentOption;
     searchParams: { paymentSystem: number; sc?: string };
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/profile": {
