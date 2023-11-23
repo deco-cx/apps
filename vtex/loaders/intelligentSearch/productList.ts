@@ -131,7 +131,7 @@ const loader = async (
 
   const options = {
     baseUrl: url,
-    priceCurrency: "BRL", // config!.defaultPriceCurrency, // TOO
+    priceCurrency: segment.currencyCode ?? "BRL",
   };
 
   // Transform VTEX product format into schema.org's compatible format

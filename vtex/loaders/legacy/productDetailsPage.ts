@@ -68,7 +68,7 @@ async function loader(
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: "BRL", //  config!.defaultPriceCurrency, // TODO: fix currency
+    priceCurrency: segment.currencyCode ?? "BRL",
   });
 
   return {

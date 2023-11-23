@@ -183,7 +183,7 @@ const loader = async (
   const products = vtexProducts.map((p) =>
     toProduct(p, p.items[0], 0, {
       baseUrl: baseUrl,
-      priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO fix currency
+      priceCurrency: segment.currencyCode ?? "BRL",
     })
   );
 
