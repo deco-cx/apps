@@ -21,13 +21,18 @@ export interface Redirects {
 let redirectsFromFile: Promise<Route[]> | null = null;
 const getRedirectFromFile = async (from: string) => {
   let redirectsRaw: string | null = null;
-  if (from.startsWith("http")) {
-    redirectsRaw = await fetch(from).then((resp) => resp.text());
-  } else {
-    redirectsRaw = await Deno.readTextFile(
-      join(Deno.cwd(), join(...from.split("/"))),
-    );
+  try {
+    if (from.startsWith("http")) {
+      redirectsRaw = await fetch(from).then((resp) => resp.text());
+    } else {
+      redirectsRaw = await Deno.readTextFile(
+        join(Deno.cwd(), join(...from.split("/"))),
+      );
+    }
+  } catch (e) {
+    console.error(e);
   }
+
   if (!redirectsRaw) {
     return [];
   }
