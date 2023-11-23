@@ -21,7 +21,7 @@ export interface Redirects {
 let redirectsFromFile: Promise<Route[]> | null = null;
 const getRedirectFromFile = async (from: string) => {
   let redirectsRaw: string | null = null;
-  try{
+  try {
     if (from.startsWith("http")) {
       redirectsRaw = await fetch(from).then((resp) => resp.text());
     } else {
@@ -29,10 +29,10 @@ const getRedirectFromFile = async (from: string) => {
         join(Deno.cwd(), join(...from.split("/"))),
       );
     }
-  }catch(e){
+  } catch (e) {
     console.error(e);
   }
-  
+
   if (!redirectsRaw) {
     return [];
   }
