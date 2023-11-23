@@ -19,18 +19,17 @@ export default function CreateSection(props: Props) {
 
   return (
     <div>
-        <script src="https://cdn.tailwindcss.com" />
-        {HTMLRenderer({ html: compiled(JSON.parse(props.schema)?.formData) })}
+      <script src="https://cdn.tailwindcss.com" />
+      {HTMLRenderer({ html: compiled(JSON.parse(props.schema)?.formData) })}
     </div>
-    
-    );
+  );
 }
 
-export const Preview  = (props: Props) => {
-    return (
-        <div>
-            <CreateSection {...props} />
-            <script src="https://cdn.tailwindcss.com" />
-        </div>
-    );
-}
+export const Preview = (props: Props) => {
+  return (
+    <div>
+      <CreateSection {...props} />
+      <script src="https://cdn.tailwindcss.com" />
+    </div>
+  );
+};
