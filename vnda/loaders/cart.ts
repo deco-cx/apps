@@ -18,13 +18,14 @@ const loader = async (
 ): Promise<Cart> => {
   const { api } = ctx;
   const cartId = getCartCookie(req.headers);
+  const url = new URL(req.headers.get("referer") ?? "");
+  const agent = url.searchParams.get("agent");
 
   const orderForm = cartId
     ? await api["GET /api/v2/carts/:cartId"]({ cartId })
       .then((res) => res.json())
-    : await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
-      res.json()
-    );
+    : await api["POST /api/v2/carts"]({}, { body: agent ? { agent } : {} })
+      .then((res) => res.json());
 
   setCartCookie(ctx.response.headers, orderForm.id.toString());
   return {
