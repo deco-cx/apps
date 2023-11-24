@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { getCartCookie, setCartCookie } from "../utils/cart.ts";
+import { getCartCookie, setCartCookie, getAgentCookie } from "../utils/cart.ts";
 import { OpenAPI } from "../utils/openapi/vnda.openapi.gen.ts";
 
 export type Cart = {
@@ -18,8 +18,7 @@ const loader = async (
 ): Promise<Cart> => {
   const { api } = ctx;
   const cartId = getCartCookie(req.headers);
-  const url = new URL(req.headers.get("referer") ?? "");
-  const agent = url.searchParams.get("agent");
+  const agent = getAgentCookie(req.headers)
 
   const orderForm = cartId
     ? await api["GET /api/v2/carts/:cartId"]({ cartId })
