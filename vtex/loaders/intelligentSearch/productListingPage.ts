@@ -327,7 +327,7 @@ const loader = async (
             misspelled: productsResult.correction?.misspelled ?? false,
             match: productsResult.recordsFiltered,
             operator: productsResult.operator,
-            locale: "pt-BR", // config?.defaultLocale, // TODO
+            locale: segment.cultureInfo ?? "pt-BR", 
           },
           req,
           ctx,
@@ -351,7 +351,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl: baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
+          priceCurrency: segment.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
