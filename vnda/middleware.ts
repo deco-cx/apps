@@ -17,7 +17,10 @@ export const middleware = (
   if (!segment) {
     const segmentFromRequest = buildSegmentCookie(req);
     const segmentFromCookie = getSegmentFromCookie(req);
-    if (segmentFromRequest !== null && !equal(segmentFromRequest, segmentFromCookie)) {
+    if (
+      segmentFromRequest !== null &&
+      !equal(segmentFromRequest, segmentFromCookie)
+    ) {
       setSegmentInBag(ctx, segmentFromRequest);
       setSegmentCookie(segmentFromRequest, ctx.response.headers);
     }

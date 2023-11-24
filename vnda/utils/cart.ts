@@ -1,10 +1,9 @@
 import { getCookies, setCookie } from "std/http/cookie.ts";
-import { SEGMENT_COOKIE_NAME } from "./segment.ts"
+import { SEGMENT_COOKIE_NAME } from "./segment.ts";
 
 const CART_COOKIE = "vnda_cart_id";
 
 const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
-
 
 export const getCartCookie = (headers: Headers): string | undefined => {
   const cookies = getCookies(headers);
@@ -13,10 +12,10 @@ export const getCartCookie = (headers: Headers): string | undefined => {
 };
 
 export const getAgentCookie = (headers: Headers): string | undefined => {
-  const cookies = getCookies(headers)
+  const cookies = getCookies(headers);
 
-  return cookies[SEGMENT_COOKIE_NAME]
-}
+  return cookies[SEGMENT_COOKIE_NAME];
+};
 
 export const setCartCookie = (headers: Headers, cartId: string) =>
   setCookie(headers, {

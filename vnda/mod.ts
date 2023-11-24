@@ -1,11 +1,9 @@
-import type { App, FnContext  } from "deco/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/vnda.openapi.gen.ts";
 import { SecretString } from "../website/loaders/secretString.ts";
-import type {
-  AppMiddlewareContext as AMC,
-} from "deco/mod.ts";
+import type { AppMiddlewareContext as AMC } from "deco/mod.ts";
 import { middleware } from "./middleware.ts";
 
 export type AppMiddlewareContext = AMC<ReturnType<typeof VNDA>>;
@@ -71,6 +69,6 @@ export default function VNDA(props: Props): App<Manifest, State> {
   return {
     state: { ...props, api },
     manifest,
-    middleware
+    middleware,
   };
 }
