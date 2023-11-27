@@ -82,7 +82,7 @@ const state = {
   addItems: enqueue("vtex/actions/cart/addItems.ts"),
   addCouponsToCart: enqueue("vtex/actions/cart/updateCoupons.ts"),
   changePrice: enqueue("vtex/actions/cart/updateItemPrice.ts"),
-  getCartInstallments: enqueue("vtex/actions/cart/getInstallment.ts"),
+  getCartInstallments: invoke.vtex.actions.cart.getInstallment,
   ignoreProfileData: enqueue("vtex/actions/cart/updateProfile.ts"),
   removeAllPersonalData: enqueue("vtex/actions/cart/updateUser.ts"),
   addItemAttachment: enqueue("vtex/actions/cart/updateItemAttachment.ts"),

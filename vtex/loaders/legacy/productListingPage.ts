@@ -173,8 +173,8 @@ const loader = async (
   const [map, term] = missingParams && fq.length > 0
     ? ["", ""]
     : missingParams
-    ? getMapAndTerm(pageTypes)
-    : [maybeMap, maybeTerm];
+      ? getMapAndTerm(pageTypes)
+      : [maybeMap, maybeTerm];
 
   const isPage = pageTypes.length > 0;
 
@@ -220,6 +220,10 @@ const loader = async (
   const resources = vtexProductsResponse.headers.get("resources") ?? "";
   const [, _total] = resources.split("/");
 
+  if (vtexProducts && !Array.isArray(vtexProducts)) {
+    throw new Error(`Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`)
+  }
+
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
@@ -228,7 +232,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO: fix currency
+          priceCurrency: segment.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
