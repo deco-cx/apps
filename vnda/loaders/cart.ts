@@ -26,6 +26,12 @@ const loader = async (
     : await api["POST /api/v2/carts"]({}, { body: agent ? { agent } : {} })
       .then((res) => res.json());
 
+  const hasAgent = orderForm.agent === agent
+
+  if (!hasAgent && agent && cartId) {
+    await api["PATCH /api/v2/carts/:cartId"]({ cartId }, { body: { agent } })
+  }
+
   setCartCookie(ctx.response.headers, orderForm.id.toString());
   return {
     orderForm,
