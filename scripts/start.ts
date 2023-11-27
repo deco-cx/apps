@@ -214,7 +214,7 @@ const generateOpenAPI = async () => {
   }
 };
 
-const _generateGraphQL = async () => {
+const generateGraphQL = async () => {
   for (const path of allGraphqlPaths) {
     const [folder, base] = [dirname(path), basename(path)];
     const outfile = toOutfile(base);
@@ -252,5 +252,5 @@ const _generateGraphQL = async () => {
 const generateDeco = () => import("deco/scripts/apps/bundle.ts");
 
 await generateOpenAPI();
-//await generateGraphQL();
+await generateGraphQL();
 await generateDeco();

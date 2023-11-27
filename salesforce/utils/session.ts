@@ -1,4 +1,4 @@
-import { getCookies } from "std/http/mod.ts";
+import { getCookies, setCookie } from "std/http/mod.ts";
 import type { Session, TokenBaseSalesforce } from "./types.ts";
 import { AppContext } from "../mod.ts";
 import { convertSecondsToDate } from "./utils.ts";
@@ -65,27 +65,32 @@ export const setSessionCookie = (
     id_token,
   } = token;
 
-  const expireTokenDate = convertSecondsToDate(expires_in).toUTCString();
+  const expireTokenDate = convertSecondsToDate(expires_in).getTime();
   const expireRefTokenDate = convertSecondsToDate(refresh_token_expires_in)
-    .toUTCString();
-  headers.set(
-    "Set-Cookie",
-    `salesforce_session=${
-      serialize(session)
-    }; Expires=${expireTokenDate}; Secure=true; HttpOnly:true`,
-  );
+    .getTime();
 
-  headers.append(
-    "Set-Cookie",
-    `${
-      id_token ? "cc-nx" : "cc-nx-g"
-    }_=${refresh_token}; Expires=${expireRefTokenDate}; Secure=true; HttpOnly:true`,
-  );
+  setCookie(headers, {
+    value: serialize(session),
+    name: "salesforce_session",
+    secure: true,
+    httpOnly: true,
+    maxAge: expireTokenDate,
+  });
 
-  headers.append(
-    "Set-Cookie",
-    `usid_${SESSION_COOKIE_NAME}=${usid}; Secure=true; HttpOnly:true`,
-  );
+  setCookie(headers, {
+    value: refresh_token,
+    name: id_token ? "cc-nx" : "cc-nx-g",
+    secure: true,
+    httpOnly: true,
+    maxAge: expireRefTokenDate,
+  });
+
+  setCookie(headers, {
+    value: usid,
+    name: `usid_${SESSION_COOKIE_NAME}`,
+    secure: true,
+    httpOnly: true,
+  });
 
   return headers;
 };
