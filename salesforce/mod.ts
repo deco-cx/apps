@@ -8,8 +8,8 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import type { Account } from "./utils/types.ts";
 import { SalesforceClient } from "./utils/client.ts";
 import { createHttpClient } from "../utils/http.ts";
-import { fetchSafe } from "./utils/fetchSalesforce.ts";
 import { middleware } from "./middleware.ts";
+import { fetchSafe } from "../utils/fetch.ts";
 
 export type App = ReturnType<typeof Salesforce>;
 export type AppContext = AC<App>;
