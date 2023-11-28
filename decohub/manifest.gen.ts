@@ -19,6 +19,7 @@ import * as $$$$$$$$$$$13 from "./apps/admin.ts";
 import * as $$$$$$$$$$$14 from "./apps/sourei.ts";
 import * as $$$$$$$$$$$15 from "./apps/handlebars.ts";
 import * as $$$$$$$$$$$16 from "./apps/power-reviews.ts";
+import * as $$$$$$$$$$$17 from "./apps/power-reviews.ts";
 
 const manifest = {
   "apps": {

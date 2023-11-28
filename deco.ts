@@ -10,6 +10,8 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("openai"),
+    app("brand-assistant"),
     app("implementation"),
     app("weather"),
     {
