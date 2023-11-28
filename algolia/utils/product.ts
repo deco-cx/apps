@@ -1,5 +1,10 @@
 import { SearchClient } from "npm:algoliasearch@4.20.0";
-import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
+import {
+  ItemAvailability,
+  Product,
+  ProductLeaf,
+  PropertyValue,
+} from "../../commerce/types.ts";
 
 export type IndexedProduct = ReturnType<typeof toIndex>;
 export type Indices =
@@ -10,7 +15,7 @@ export type Indices =
 
 const unique = (ids: string[]) => [...new Set(ids).keys()];
 
-const indexName: Indices = "products";
+const DEFAULT_INDEX_NAME: Indices = "products";
 
 interface Options {
   url: string | URL;
@@ -37,7 +42,12 @@ export const resolveProducts = async (
 
   const { results: similars } = await client.multipleGetObjects<
     IndexedProduct
-  >(unique(ids).map((objectID) => ({ objectID, indexName })));
+  >(
+    unique(ids).map((objectID) => ({
+      objectID,
+      indexName: opts.indexName || DEFAULT_INDEX_NAME,
+    })),
+  );
 
   const productsById = new Map<string, Product>();
   for (const product of similars) {
@@ -93,6 +103,23 @@ const normalize = (additionalProperty: PropertyValue[] | undefined = []) => {
   return Object.fromEntries(map.entries());
 };
 
+const availabilityByRank: ItemAvailability[] = [
+  "https://schema.org/Discontinued",
+  "https://schema.org/BackOrder",
+  "https://schema.org/OutOfStock",
+  "https://schema.org/SoldOut",
+  "https://schema.org/PreSale",
+  "https://schema.org/PreOrder",
+  "https://schema.org/InStoreOnly",
+  "https://schema.org/OnlineOnly",
+  "https://schema.org/LimitedAvailability",
+  "https://schema.org/InStock",
+];
+
+const rankByAvailability = Object.fromEntries(
+  availabilityByRank.map((item, rank) => [item, rank]),
+) as Record<ItemAvailability, number>;
+
 // TODO: add ManufacturerCode
 export const toIndex = ({ isVariantOf, ...product }: Product) => {
   const facets = [
@@ -112,6 +139,10 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
       value: isVariantOf?.model,
     },
   ].filter((f) => !facetKeys.has(f.name));
+  const availability = product.offers?.offers.reduce(
+    (acc, o) => Math.max(acc, rankByAvailability[o.availability] ?? 0),
+    0,
+  ) ?? 0;
 
   return removeType({
     ...product,
@@ -135,12 +166,23 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
     objectID: product.productID,
     groupFacets: normalize(groupFacets),
     facets: normalize(facets),
+    available: availability > 3,
+    releaseDate: product.releaseDate
+      ? new Date(product.releaseDate).getTime()
+      : undefined,
   });
 };
 
 export const fromIndex = (
-  { url, facets: _f, groupFacets: _fg, objectID: _oid, ...product }:
-    IndexedProduct,
+  {
+    url,
+    facets: _f,
+    groupFacets: _gf,
+    objectID: _oid,
+    available: _a,
+    releaseDate,
+    ...product
+  }: IndexedProduct,
   opts: Options,
 ): Product => ({
   ...product,
@@ -177,6 +219,7 @@ export const fromIndex = (
     "@type": "Product",
     sku: similar.productID,
   })),
+  releaseDate: releaseDate ? new Date(releaseDate).toUTCString() : undefined,
 });
 
 export const setupProductsIndices = async (
@@ -187,21 +230,32 @@ export const setupProductsIndices = async (
   await client.initIndex("products" satisfies Indices).setSettings({
     distinct: true,
     attributeForDistinct: "inProductGroupWithID",
+    ranking: [
+      "desc(available)",
+      "typo",
+      "geo",
+      "words",
+      "filters",
+      "proximity",
+      "attribute",
+      "exact",
+      "custom",
+    ],
+    customRanking: [
+      "desc(releaseDate)",
+    ],
     searchableAttributes: [
-      "name",
+      "unordered(isVariantOf.name)",
+      "unordered(name)",
+      "unordered(brand.name)",
+      "unordered(isVariantOf.model)",
       "gtin",
-      "brand.name",
-      "description",
-      "isVariantOf.name",
-      "isVariantOf.model",
-      "isVariantOf.description",
-      "offers.offers.availability",
-      "offers.offers.priceSpecification.priceType",
-      "offers.offers.priceSpecification.priceComponentType",
+      "productID",
     ],
     attributesForFaceting: [
       "facets",
       "groupFacets",
+      "available",
     ],
     numericAttributesForFiltering: [
       "offers.highPrice",
@@ -212,6 +266,10 @@ export const setupProductsIndices = async (
     replicas: [
       "virtual(products_price_desc)",
       "virtual(products_price_asc)",
+    ],
+    disableTypoToleranceOnAttributes: [
+      "gtin",
+      "productID",
     ],
     highlightPreTag: "<mark>",
     highlightPostTag: "</mark>",

@@ -28,14 +28,31 @@ interface ProductOptions {
 export const getProductCategoryTag = ({ tags }: ProductGroup) =>
   tags?.filter(({ type }) => type === "categoria")[0];
 
+export const canonicalFromTags = (
+  tags: Pick<SEO, "name" | "title" | "description">[],
+  url: URL,
+) => {
+  const pathname = tags.map((t) => t.name).join("/");
+  return new URL(`/${pathname}`, url);
+};
+
 export const getSEOFromTag = (
-  tag: Pick<SEO, "title" | "description">,
-  req: Request,
-): Seo => ({
-  title: tag.title || "",
-  description: tag.description || "",
-  canonical: req.url,
-});
+  tags: Pick<SEO, "name" | "title" | "description">[],
+  url: URL,
+): Seo => {
+  const tag = tags.at(-1);
+  const canonical = canonicalFromTags(tags, url);
+
+  if (url.searchParams.has("page")) {
+    canonical.searchParams.set("page", url.searchParams.get("page")!);
+  }
+
+  return {
+    title: tag?.title || "",
+    description: tag?.description || "",
+    canonical: canonical.href,
+  };
+};
 
 export const parseSlug = (slug: string) => {
   const segments = slug.split("-");
@@ -295,13 +312,37 @@ export const toFilters = (
     },
   };
 
-  const types = Object.keys(aggregations.types ?? {}).map((typeKey) => {
-    // deno-lint-ignore no-explicit-any
-    const typeValues = (aggregations.types as any)[typeKey] as {
+  const combinedFiltersKeys = Object.keys(aggregations.types ?? {}).concat(
+    ...Object.keys(aggregations.properties ?? {}),
+  );
+
+  const types = combinedFiltersKeys.map((typeKey) => {
+    const isProperty = typeKey.includes("property");
+
+    interface AggregationType {
       name: string;
       title: string;
       count: number;
-    }[];
+      value: string;
+    }
+    const typeValues: AggregationType[] = isProperty
+      // deno-lint-ignore no-explicit-any
+      ? ((aggregations.properties as any)[
+        typeKey as string
+      ] as AggregationType[])
+      // deno-lint-ignore no-explicit-any
+      : ((aggregations.types as any)[
+        typeKey as string
+      ] as AggregationType[]);
+
+    if (isProperty) {
+      typeValues.forEach((obj) => {
+        if (obj.value) {
+          obj.title = obj.value;
+          obj.name = obj.value;
+        }
+      });
+    }
 
     return {
       "@type": "FilterToggle" as const,
@@ -338,25 +379,29 @@ export const toFilters = (
   ];
 };
 
-export const typeTagExtractor = (url: URL) => {
+export const typeTagExtractor = (url: URL, tags: { type?: string }[]) => {
+  const cleanUrl = new URL(url);
   const keysToDestroy: string[] = [];
-  const typeTags: { key: string; value: string }[] = [];
-  const typeTagRegex = /\btype_tags\[(\S+)\]\[\]/;
+  const typeTags: { key: string; value: string; isProperty: boolean }[] = [];
+  const typeTagRegex = /\btype_tags\[(.*?)\]\[\]/;
 
-  url.searchParams.forEach((value, key) => {
+  cleanUrl.searchParams.forEach((value, key) => {
     const match = typeTagRegex.exec(key);
 
     if (match) {
-      keysToDestroy.push(key);
-      typeTags.push({ key, value });
+      const tagValue = match[1];
+      const isProperty = tagValue.includes("property");
+      if (tags.some((tag) => tag.type === tagValue) || isProperty) {
+        keysToDestroy.push(key);
+        typeTags.push({ key, value, isProperty });
+      }
     }
   });
 
-  // it can't be done inside the forEach instruction above
-  typeTags.forEach((tag) => url.searchParams.delete(tag.key));
+  keysToDestroy.forEach((key) => cleanUrl.searchParams.delete(key));
 
   return {
     typeTags,
-    cleanUrl: url,
+    cleanUrl,
   };
 };

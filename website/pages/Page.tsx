@@ -1,20 +1,22 @@
-import { Head, Partial } from "$fresh/runtime.ts";
+import { Head } from "$fresh/runtime.ts";
 import { Section } from "deco/blocks/section.ts";
 import { ComponentMetadata } from "deco/engine/block.ts";
 import { context } from "deco/live.ts";
-import { isDeferred, SectionProps } from "deco/mod.ts";
 import {
   usePageContext as useDecoPageContext,
   useRouterContext,
 } from "deco/routes/[...catchall].tsx";
-import { createContext, JSX } from "preact";
-import { useContext } from "preact/hooks";
+import { JSX } from "preact";
 import Events from "../components/Events.tsx";
 import LiveControls from "../components/_Controls.tsx";
-import {
-  SECTION_LINK_ID_SEARCH_PARAM,
-  SECTION_LINK_PROPS_SEARCH_PARAM,
-} from "../hooks/usePartial.ts";
+import { AppContext } from "../mod.ts";
+import { Page } from "deco/blocks/page.tsx";
+import { Component } from "preact";
+import { ComponentFunc } from "deco/engine/block.ts";
+import { HttpError } from "deco/engine/errors.ts";
+import { logger } from "deco/observability/otel/config.ts";
+import { isDeferred } from "deco/mod.ts";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 
 /**
  * @title Sections
@@ -29,131 +31,121 @@ export type Sections = Section[];
  */
 export interface Props {
   name: string;
+  /**
+   * @format unused-path
+   */
   path?: string;
   sections: Sections;
 }
 
-function renderSectionFor(isPreview: boolean) {
-  return function _renderSection(section: Props["sections"][number] | null) {
-    if (!section) {
-      return null;
+export function renderSection(section: Props["sections"][number]) {
+  if (section === undefined || section === null) return <></>;
+  const { Component, props } = section;
+
+  return <Component {...props} />;
+}
+
+class ErrorBoundary
+  extends Component<{ fallback: ComponentFunc<HTMLElement> }> {
+  state = { error: null };
+
+  // deno-lint-ignore no-explicit-any
+  static getDerivedStateFromError(error: any) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      const err = this?.state?.error as Error;
+      const msg = `rendering: ${this.props} ${err?.stack}`;
+      logger.error(
+        msg,
+      );
+      console.error(
+        msg,
+      );
     }
+    return this.state.error
+      ? this.props.fallback(this.state.error)
+      : this.props.children;
+  }
+}
 
-    const { Component, props, props: { id }, metadata } = section;
-
-    return (
-      <Partial name={id}>
-        <section
-          id={id}
-          data-manifest-key={metadata?.component}
-          data-resolve-chain={isPreview === true
-            ? JSON.stringify(metadata?.resolveChain)
-            : undefined}
-        >
-          <Component {...props} />
-        </section>
-      </Partial>
-    );
+const useDeco = () => {
+  const metadata = useDecoPageContext()?.metadata;
+  const routerCtx = useRouterContext();
+  const pageId = pageIdFromMetadata(metadata);
+  return {
+    flags: routerCtx?.flags ?? [],
+    page: {
+      id: pageId,
+      pathTemplate: routerCtx?.pagePath,
+    },
   };
-}
-
-const renderSections = (
-  { sections }: SectionProps<typeof loader>,
-  isPreview = false,
-) => (
-  <>
-    <Events />
-    {sections.map(renderSectionFor(isPreview))}
-  </>
-);
-
-interface LivePageContext {
-  renderSection: ReturnType<typeof renderSectionFor>;
-}
-
-const PageContext = createContext<LivePageContext>({
-  renderSection: renderSectionFor(false),
-});
-
-export const usePageContext = () => useContext(PageContext);
+};
 
 /**
  * @title Page
  */
 function Page(
-  props: SectionProps<typeof loader>,
+  { sections, errorPage, devMode }:
+    & Props
+    & { errorPage?: Page; devMode: boolean },
 ): JSX.Element {
-  const metadata = useDecoPageContext()?.metadata;
-  const routerCtx = useRouterContext();
-  const pageId = pageIdFromMetadata(metadata);
+  const site = { id: context.siteId, name: context.site };
+  const deco = useDeco();
 
   return (
-    <>
-      <LiveControls
-        site={{ id: context.siteId, name: context.site }}
-        page={{ id: pageId, pathTemplate: routerCtx?.pagePath }}
-        flags={routerCtx?.flags}
-      />
-      {renderSections(props, false)}
-    </>
+    <ErrorBoundary
+      fallback={(error) => (
+        error instanceof HttpError && errorPage !== undefined &&
+          errorPage !== null && !devMode
+          ? <errorPage.Component {...errorPage.props}></errorPage.Component>
+          : (
+            <ErrorPageComponent
+              error={(devMode && error instanceof (Error || HttpError)
+                ? error.stack
+                : "") || ""}
+            />
+          )
+      )}
+    >
+      <LiveControls site={site} {...deco} />
+      <Events deco={deco} />
+      {sections.map(renderSection)}
+    </ErrorBoundary>
   );
 }
 
-export function Preview(
-  props: SectionProps<typeof loader>,
-) {
+export const loader = async (
+  { sections }: Props,
+  req: Request,
+  ctx: AppContext,
+) => {
+  const url = new URL(req.url);
+  const devMode = url.searchParams.has("__d");
+  return {
+    sections,
+    errorPage: isDeferred<Page>(ctx.errorPage)
+      ? await ctx.errorPage()
+      : undefined,
+    devMode,
+  };
+};
+
+export function Preview({ sections }: Props) {
+  const deco = useDeco();
+
   return (
     <>
       <Head>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      {renderSections(props, true)}
+      <Events deco={deco} />
+      {sections.map(renderSection)}
     </>
   );
 }
-
-export const onBeforeResolveProps = (props: Props) => ({
-  ...props,
-  sections: Array.isArray(props.sections)
-    ? props.sections.map((section) => ({
-      data: section,
-      deferred: true,
-      __resolveType: "resolved",
-    }))
-    : props.sections,
-});
-
-export const loader = async (props: Props, req: Request) => {
-  const url = new URL(req.url);
-  const partialId = url.searchParams.get(SECTION_LINK_ID_SEARCH_PARAM);
-  const partialProps = url.searchParams.get(SECTION_LINK_PROPS_SEARCH_PARAM);
-  const paramProps = partialProps && JSON.parse(atob(partialProps));
-
-  const sections = await Promise.all(
-    props.sections.map(async (section, index) => {
-      const id = `section-${index}`;
-
-      if (partialId && partialId !== id) {
-        return null;
-      }
-
-      const resolved = isDeferred<Section>(section) ? await section() : section;
-
-      const props = {
-        ...resolved.props,
-        ...paramProps,
-        id,
-      };
-
-      return { ...resolved, props };
-    }),
-  ) as Sections;
-
-  return ({
-    ...props,
-    sections,
-  });
-};
 
 const PAGE_NOT_FOUND = -1;
 export const pageIdFromMetadata = (

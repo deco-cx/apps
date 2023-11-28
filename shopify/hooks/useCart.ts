@@ -6,19 +6,23 @@ import type { CartFragment } from "../utils/storefront/storefront.graphql.gen.ts
 import { Context, state as storeState } from "./context.ts";
 
 export const itemToAnalyticsItem = (
-  item: CartFragment["lines"]["nodes"][number] & { quantity: number },
+  {
+    id,
+    quantity,
+    cost: { amountPerQuantity, compareAtAmountPerQuantity },
+    merchandise,
+  }: CartFragment["lines"]["nodes"][number] & { quantity: number },
   index: number,
 ): AnalyticsItem => ({
-  item_id: item.id,
-  item_name: item.merchandise.product.title,
-  discount: item.cost.compareAtAmountPerQuantity
-    ? item.cost.compareAtAmountPerQuantity.amount -
-      item.cost.amountPerQuantity?.amount
-    : 0,
-  item_variant: item.merchandise.title,
-  price: item.cost.amountPerQuantity.amount,
+  item_id: id,
+  quantity: quantity,
+  price: amountPerQuantity.amount,
   index,
-  quantity: item.quantity,
+  discount: compareAtAmountPerQuantity
+    ? compareAtAmountPerQuantity.amount - amountPerQuantity.amount
+    : 0,
+  item_name: merchandise.product.title,
+  item_variant: merchandise.title,
 });
 
 const { cart, loading } = storeState;

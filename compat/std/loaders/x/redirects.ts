@@ -2,7 +2,14 @@ import { Route } from "../../../../website/flags/audience.ts";
 
 /** @titleBy from */
 export interface Redirect {
+  /**
+   * @description Path is url pattern. https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
+   * @format unused-path
+   */
   from: string;
+  /**
+   * @description Path is url pattern. https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
+   */
   to: string;
   type?: "temporary" | "permanent";
 }

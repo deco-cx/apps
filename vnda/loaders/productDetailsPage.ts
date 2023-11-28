@@ -2,7 +2,7 @@ import type { ProductDetailsPage } from "../../commerce/types.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
-import { getSEOFromTag, parseSlug, toProduct } from "../utils/transform.ts";
+import { parseSlug, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -26,15 +26,11 @@ async function loader(
   const variantId = url.searchParams.get("skuId") || null;
   const { id } = parseSlug(slug);
 
-  const [maybeProduct, seo] = await Promise.all([
-    api["GET /api/v2/products/:id"]({ id, include_images: "true" }, STALE)
-      .then((r) => r.json()).catch(() => null),
-    api["GET /api/v2/seo_data"]({
-      resource_type: "Product",
-      resource_id: id,
-      type: "category",
-    }, STALE).then((res) => res.json()),
-  ]);
+  const maybeProduct = await api["GET /api/v2/products/:id"]({
+    id,
+    include_images: "true",
+  }, STALE)
+    .then((r) => r.json()).catch(() => null);
 
   // 404: product not found
   if (!maybeProduct) {
@@ -46,20 +42,27 @@ async function loader(
     priceCurrency: "BRL",
   });
 
+  const segments = url.pathname.slice(1).split("/");
+
   return {
     "@type": "ProductDetailsPage",
     // TODO: Find out what's the right breadcrumb on vnda
     breadcrumbList: {
       "@type": "BreadcrumbList",
-      itemListElement: [],
-      numberOfItems: 0,
+      itemListElement: segments.map((s, i) => ({
+        "@type": "ListItem",
+        name: s,
+        position: i + 1,
+        item: new URL(`/${segments.slice(0, i + 1).join("/")}`, url).href,
+      })),
+      numberOfItems: segments.length,
     },
     product,
-    seo: getSEOFromTag({
-      title: product.name,
-      description: product.description || "",
-      ...seo?.[0],
-    }, req),
+    seo: {
+      title: product.name ?? "",
+      description: product.description ?? "",
+      canonical: new URL(`/${segments.join("/")}`, url).href,
+    },
   };
 }
 

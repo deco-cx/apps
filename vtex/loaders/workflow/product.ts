@@ -3,23 +3,23 @@ import type {
   Product,
   PropertyValue,
   UnitPriceSpecification,
-} from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
+} from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import {
   aggregateOffers,
   toAdditionalPropertyCategory,
   toAdditionalPropertyCluster,
   toAdditionalPropertyReferenceId,
   toAdditionalPropertySpecification,
-} from "../utils/transform.ts";
+} from "../../utils/transform.ts";
 
 export type Props = {
   productID: string;
 };
 
 /**
- * @title VTEX Integration
- * @description Product Loader
+ * @title VTEX Integration - Product Loader
+ * @description DO NOT USE this on the storefront
  */
 const loader = async (
   props: Props,
@@ -33,6 +33,8 @@ const loader = async (
     ["GET /api/catalog_system/pvt/sku/stockkeepingunitbyid/:skuId"]({
       skuId: props.productID,
     }).then((res) => res.json());
+
+  if (!sku.IsActive) return null;
 
   const [skus, salesChannels, ...simulations] = await Promise.all([
     vcs

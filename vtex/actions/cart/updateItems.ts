@@ -1,6 +1,7 @@
 import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
+import { getSegmentFromBag } from "../../utils/segment.ts";
 import type { OrderForm } from "../../utils/types.ts";
 
 export interface Item {
@@ -28,11 +29,13 @@ const action = async (
   } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
+  const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated
     ["POST /api/checkout/pub/orderForm/:orderFormId/items/update"]({
       orderFormId,
       allowedOutdatedData,
+      sc: segment?.channel,
     }, {
       body: { orderItems },
       headers: {

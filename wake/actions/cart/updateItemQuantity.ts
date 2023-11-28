@@ -16,8 +16,8 @@ import {
 export interface Props {
   productVariantId: number;
   quantity: number;
-  customization: { customizationId: number; value: string }[];
-  subscription: { subscriptionGroupId: number; recurringTypeId: number };
+  customization?: { customizationId: number; value: string }[];
+  subscription?: { subscriptionGroupId: number; recurringTypeId: number };
 }
 
 const addToCart = (

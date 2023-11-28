@@ -70,11 +70,11 @@ export interface CommonProps {
 
 export type Props = {
   props:
-    | CollectionProps
-    | TermProps
-    | ProductIDProps
-    | SkuIDProps
-    | FQProps;
+  | CollectionProps
+  | TermProps
+  | ProductIDProps
+  | SkuIDProps
+  | FQProps;
 };
 
 // deno-lint-ignore no-explicit-any
@@ -167,11 +167,15 @@ const loader = async (
   const params = fromProps({ props });
 
   const vtexProducts = await vcsDeprecated
-    ["GET /api/catalog_system/pub/products/search/:term?"]({
-      ...segmentParams,
-      ...params,
-    }, { ...STALE, headers: withSegmentCookie(segment) })
+  ["GET /api/catalog_system/pub/products/search/:term?"]({
+    ...segmentParams,
+    ...params,
+  }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
+
+  if (vtexProducts && !Array.isArray(vtexProducts)) {
+    throw new Error(`Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`)
+  }
 
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
@@ -179,7 +183,7 @@ const loader = async (
   const products = vtexProducts.map((p) =>
     toProduct(p, p.items[0], 0, {
       baseUrl: baseUrl,
-      priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO fix currency
+      priceCurrency: segment.currencyCode ?? "BRL",
     })
   );
 

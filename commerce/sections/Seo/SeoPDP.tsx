@@ -10,9 +10,11 @@ function Section({ jsonLD, ...props }: Props) {
   const title = jsonLD?.seo?.title;
   const description = jsonLD?.seo?.description;
   const image = jsonLD?.product.image?.[0]?.url;
-  const canonical = jsonLD?.breadcrumbList
+  const canonical = jsonLD?.seo?.canonical
+    ? jsonLD.seo.canonical
+    : jsonLD?.breadcrumbList
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumbList)
-    : null;
+    : undefined;
   const noIndexing = !jsonLD;
 
   return (
@@ -21,7 +23,7 @@ function Section({ jsonLD, ...props }: Props) {
       title={title || props.title}
       description={description || props.description}
       image={image || props.image}
-      canonical={canonical || props.canonical}
+      canonical={props.canonical || canonical}
       jsonLDs={[jsonLD]}
       noIndexing={noIndexing}
     />

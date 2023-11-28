@@ -1,21 +1,18 @@
 import { Head } from "$fresh/runtime.ts";
 import type { Flag, Site } from "deco/types.ts";
 import { context } from "deco/live.ts";
+import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { Page } from "../../commerce/types.ts";
+import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
+import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
 
-interface Page {
-  id: string | number;
-  pathTemplate?: string;
-}
+const IS_LOCALHOST = context.deploymentId === undefined;
 
-declare global {
-  interface Window {
-    LIVE: {
-      page: Page;
-      site: Site;
-      flags?: Flag[];
-      play?: boolean;
-    };
-  }
+interface Live {
+  page?: Page;
+  site: Site;
+  flags: Flag[];
+  play: boolean;
 }
 
 interface Props {
@@ -29,7 +26,18 @@ type EditorEvent = {
   args: { script: string };
 };
 
-const main = () => {
+const domInspectorModule = IS_LOCALHOST
+  ? `
+const DomInspectorActivators = {
+  Backquote: {
+    label: "\` (backtick) or Ctrl + X",
+    matchEvent: (event) => event.code === "Backquote" || (event.ctrlKey && event.key === "x"),
+  },
+};
+${DomInspector.toString()}`
+  : "";
+
+const snippet = (live: Live) => {
   const onKeydown = (event: KeyboardEvent) => {
     // in case loaded in iframe, avoid redirecting to editor while in editor
     if (window !== window.parent) {
@@ -54,9 +62,9 @@ const main = () => {
 
       const pathname = window.LIVE.play
         ? `/play/blocks/${window.LIVE.page.id}?domain=${window.location.origin}`
-        : `/admin/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
+        : `/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
 
-      const href = new URL(pathname, "https://deco.cx");
+      const href = new URL(pathname, "https://admin.deco.cx");
 
       href.searchParams.set(
         "path",
@@ -82,11 +90,19 @@ const main = () => {
     }
   };
 
+  //@ts-ignore: "DomInspector not available"
+  const inspector = typeof DomInspector !== "undefined" &&
+    //@ts-ignore: "DomInspector not available"
+    new DomInspector(document.body, {
+      outline: "1px dashed #2fd080",
+      backgroundColor: "rgba(47, 208, 128, 0.33)",
+      backgroundBlendMode: "multiply",
+      activator: DomInspectorActivators.Backquote,
+      path: "/live/inspect",
+    });
+
   /** Setup global variables */
-  window.LIVE = {
-    ...window.LIVE,
-    ...JSON.parse(document.getElementById("__DECO_STATE")!.innerText),
-  };
+  window.LIVE = { ...window.LIVE, ...live };
 
   /** Setup listeners */
 
@@ -97,23 +113,24 @@ const main = () => {
   addEventListener("message", onMessage);
 };
 
-function LiveControls({ site, page, flags }: Props) {
+function LiveControls({ site, page, flags = [] }: Props) {
   return (
-    <>
-      <Head>
-        <script
-          type="application/json"
-          id="__DECO_STATE"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({ page, site, flags, play: context.play }),
-          }}
-        />
-        <script
-          type="module"
-          dangerouslySetInnerHTML={{ __html: `(${main})()` }}
-        />
-      </Head>
-    </>
+    <Head>
+      <script
+        defer
+        src={scriptAsDataURI(snippet, {
+          page,
+          site,
+          flags,
+          play: !!context.play,
+        })}
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: domInspectorModule,
+        }}
+      />
+    </Head>
   );
 }
 

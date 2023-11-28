@@ -1,3 +1,5 @@
+import { type Flag } from "deco/types.ts";
+
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export declare type WithContext<T extends Things> = T & {
   "@context": "https://schema.org";
@@ -197,6 +199,8 @@ export interface Offer extends Omit<Thing, "@type"> {
   seller?: string;
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku?: string;
+  /** Used by some ecommerce sites to retrieve the sku of products that are part of the BuyAndWin promotion */
+  giftSkuIds?: string[];
   /** Used by some ecommerce providers (e.g: VTEX) to describe special promotions that depend on some conditions */
   teasers?: Teasers[];
 }
@@ -299,8 +303,23 @@ export interface ReviewTag {
   value?: string[];
 }
 
+/** https://schema.org/Person */
+export interface Person extends Omit<Thing, "@type"> {
+  /** Email address. */
+  email?: string;
+  /** Given name. In the U.S., the first name of a Person. */
+  givenName?: string;
+  /** Family name. In the U.S., the last name of a Person. */
+  familyName?: string;
+  /** Gender of something, typically a Person, but possibly also fictional characters, animals, etc */
+  gender?: "https://schema.org/Male" | "https://schema.org/Female";
+  /** An image of the item. This can be a URL or a fully described ImageObject. **/
+  image?: ImageObject[];
+}
+
+// NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {
-  "@type": "Person" | "Organization";
+  "@type": "Author";
   /** The name of the author. */
   name?: string;
   /** A link to a web page that uniquely identifies the author of the article. For example, the author's social media page, an about me page, or a bio page. */
@@ -556,6 +575,7 @@ interface AnalyticsItemWithoutIdentifier {
   coupon?: string;
   discount?: number;
   index?: number;
+  item_group_id?: string;
   item_url?: string;
   item_brand?: string;
   item_category?: string;
@@ -576,7 +596,7 @@ export type AnalyticsItem = AnalyticsItemWithoutIdentifier & ItemIdentifier;
 export interface AddShippingInfoParams {
   currency?: Currency;
   value?: Value;
-  coupun?: string;
+  coupon?: string;
   shipping_tier?: string;
   items: AnalyticsItem[];
 }
@@ -663,7 +683,7 @@ export interface SelectPromotionParams {
   creative_slot?: string;
   promotion_id?: string;
   promotion_name?: string;
-  items: AnalyticsItem[];
+  items?: AnalyticsItem[];
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#select_promotion */
@@ -709,12 +729,26 @@ export interface ViewPromotionParams {
   creative_slot?: string;
   promotion_id?: string;
   promotion_name?: string;
-  items: AnalyticsItem[];
+  items?: AnalyticsItem[];
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#view_promotion */
 export interface ViewPromotionEvent extends IEvent<ViewPromotionParams> {
   name: "view_promotion";
+}
+
+export interface Page {
+  id: string | number;
+  pathTemplate?: string;
+}
+
+export interface Deco {
+  flags: Flag[];
+  page: Page;
+}
+
+export interface DecoEvent extends IEvent<Deco> {
+  name: "deco";
 }
 
 export type AnalyticsEvent =
@@ -730,4 +764,5 @@ export type AnalyticsEvent =
   | ViewCartEvent
   | ViewItemEvent
   | ViewItemListEvent
-  | ViewPromotionEvent;
+  | ViewPromotionEvent
+  | DecoEvent;

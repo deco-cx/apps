@@ -2,6 +2,7 @@ import {
   Category,
   CreateNewDocument,
   FacetSearchResult,
+  InstallmentOption,
   LegacyFacets,
   LegacyProduct,
   LegacySort,
@@ -107,6 +108,7 @@ export interface VTEXCommerceStable {
 
   "GET /api/checkout/changeToAnonymousUser/:orderFormId": {
     response: OrderForm;
+    searchParams: { sc?: string };
   };
   "POST /api/checkout/pub/orderForms/simulation": {
     response: SimulationOrderForm;
@@ -116,23 +118,30 @@ export interface VTEXCommerceStable {
       country: string;
     };
   };
-  "POST /api/checkout/pub/orderForm": { response: OrderForm };
-  "GET /api/checkout/pub/orderForm/:orderFormId/installments": {
+  "POST /api/checkout/pub/orderForm": {
+    searchParams: { sc?: string };
     response: OrderForm;
-    searchParams: { paymentSystem: number };
+  };
+  "GET /api/checkout/pub/orderForm/:orderFormId/installments": {
+    response: InstallmentOption;
+    searchParams: { paymentSystem: number; sc?: string };
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/profile": {
     response: OrderForm;
+    searchParams: { sc?: string };
   };
   "PATCH /api/checkout/pub/orderForm/:orderFormId/profile": {
     response: OrderForm;
     body: { ignoreProfileData: boolean };
+    searchParams: { sc?: string };
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/coupons": {
     response: OrderForm;
     body: { text: string };
+    searchParams: { sc?: string };
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment": {
+    searchParams: { sc?: string };
     response: OrderForm;
     body: {
       expectedOrderFormSections: string[];
@@ -142,6 +151,7 @@ export interface VTEXCommerceStable {
   "POST /api/checkout/pub/orderForm/:orderFormId/items": {
     response: OrderForm;
     searchParams: {
+      sc?: string;
       allowedOutdatedData: "paymentData"[];
     };
     body: {
@@ -163,18 +173,22 @@ export interface VTEXCommerceStable {
       }>;
     };
     searchParams: {
+      sc?: string;
       allowedOutdatedData: "paymentData"[];
     };
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/items/removeAll": {
     response: OrderForm;
+    searchParams: { sc?: string };
   };
   "PUT /api/checkout/pub/orderForm/:orderFormId/items/:index/price": {
+    searchParams: { sc?: string };
     response: OrderForm;
     body: { price: number };
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
     {
+      searchParams: { sc?: string };
       response: OrderForm;
       body: {
         content: Record<string, string>;
@@ -184,6 +198,7 @@ export interface VTEXCommerceStable {
     };
   "DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
     {
+      searchParams: { sc?: string };
       response: OrderForm;
       body: {
         content: Record<string, string>;

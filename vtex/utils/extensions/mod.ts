@@ -2,13 +2,14 @@ import { Product, ProductLeaf } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { withIsSimilarTo } from "../similars.ts";
 import { extension as simulateExt } from "./simulation.ts";
-import listLoader from "../../loaders/intelligentSearch/productList.ts";
+import listLoader from "../../loaders/legacy/productList.ts";
 import { batch } from "../batch.ts";
 
 export interface Options {
-  simulate: boolean;
-  similars: boolean;
-  kitItems: boolean;
+  simulate?: boolean;
+  similars?: boolean;
+  kitItems?: boolean;
+  variants?: boolean;
 }
 
 const similarsExt = (
@@ -53,13 +54,48 @@ const kitItemsExt = async (
   }));
 };
 
+const variantsExt = async (
+  products: Product[],
+  req: Request,
+  ctx: AppContext,
+): Promise<Product[]> => {
+  const productIDs = new Set<string>();
+
+  for (const product of products) {
+    productIDs.add(product.productID);
+  }
+
+  const batched = await Promise.all(
+    batch(productIDs.values(), 15).map((batch) =>
+      listLoader({ props: { ids: batch } }, req, ctx)
+    ),
+  );
+
+  const productsById = new Map<string, Product>();
+  for (const batch of batched) {
+    for (const product of batch || []) {
+      productsById.set(product.productID, product);
+    }
+  }
+
+  return products.map((p) => ({
+    ...productsById.get(p.productID),
+    ...p,
+    isVariantOf: productsById.get(p.productID)?.isVariantOf,
+  }));
+};
+
 export const extend = async (
   products: Product[],
-  { simulate, similars, kitItems }: Options,
+  { simulate, similars, kitItems, variants }: Options,
   req: Request,
   ctx: AppContext,
 ) => {
   let p = products;
+
+  if (variants) {
+    p = await variantsExt(p, req, ctx);
+  }
 
   if (kitItems) {
     p = await kitItemsExt(p, req, ctx);

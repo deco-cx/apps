@@ -327,7 +327,7 @@ const loader = async (
             misspelled: productsResult.correction?.misspelled ?? false,
             match: productsResult.recordsFiltered,
             operator: productsResult.operator,
-            locale: "pt-BR", // config?.defaultLocale, // TODO
+            locale: segment.cultureInfo ?? "pt-BR", 
           },
           req,
           ctx,
@@ -351,7 +351,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl: baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
+          priceCurrency: segment.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
@@ -381,6 +381,8 @@ const loader = async (
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
 
+  const currentPage = page + currentPageoffset;
+
   return {
     "@type": "ProductListingPage",
     breadcrumb: {
@@ -393,12 +395,16 @@ const loader = async (
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
-      currentPage: page + currentPageoffset,
+      currentPage,
       records: recordsFiltered,
       recordPerPage: pagination.perPage,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req),
+    seo: pageTypesToSeo(
+      pageTypes,
+      req,
+      hasPreviousPage ? currentPage : undefined,
+    ),
   };
 };
 

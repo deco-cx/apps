@@ -1,1 +1,1 @@
-export { VTEXCompat as default } from "../deps.ts";
+export { ProductSKUJson as default } from "../../../vtex/components/VTEXPortalDataLayerCompatibility.tsx";

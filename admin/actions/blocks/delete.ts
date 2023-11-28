@@ -9,5 +9,5 @@ export default async function NewRevision(
   _req: Request,
   ctx: AppContext,
 ): Promise<void> {
-  await ctx.storage.update({ [blockId]: null });
+  await ctx.storage.delete(blockId);
 }

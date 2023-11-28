@@ -170,9 +170,11 @@ const loader = async (
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
-  const [map, term] = missingParams
-    ? getMapAndTerm(pageTypes)
-    : [maybeMap, maybeTerm];
+  const [map, term] = missingParams && fq.length > 0
+    ? ["", ""]
+    : missingParams
+      ? getMapAndTerm(pageTypes)
+      : [maybeMap, maybeTerm];
 
   const isPage = pageTypes.length > 0;
 
@@ -218,6 +220,10 @@ const loader = async (
   const resources = vtexProductsResponse.headers.get("resources") ?? "";
   const [, _total] = resources.split("/");
 
+  if (vtexProducts && !Array.isArray(vtexProducts)) {
+    throw new Error(`Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`)
+  }
+
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
@@ -226,7 +232,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO: fix currency
+          priceCurrency: segment.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
@@ -288,6 +294,8 @@ const loader = async (
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
 
+  const currentPage = page + currentPageoffset;
+
   return {
     "@type": "ProductListingPage",
     breadcrumb: {
@@ -300,12 +308,12 @@ const loader = async (
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage.toString()}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage.toString()}` : undefined,
-      currentPage: page + currentPageoffset,
+      currentPage,
       records: parseInt(_total, 10),
       recordPerPage: count,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req),
+    seo: pageTypesToSeo(pageTypes, req, previousPage ? currentPage : undefined),
   };
 };
 

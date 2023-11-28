@@ -378,6 +378,7 @@ export interface Banner {
 
 export interface SEO {
   id: number;
+  name?: string;
   title?: string;
   description?: string | null;
   resource_type: string;

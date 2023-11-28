@@ -49,9 +49,10 @@ const loader = async (
   const segment = getSegmentFromBag(ctx);
 
   const pageTypePromise = vcsDeprecated
-    ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
-      term: `${slug}/p`,
-    }, { deco: { cache: "stale-while-revalidate" } }).then((res) => res.json());
+    ["GET /api/catalog_system/pub/portal/pagetype/:term"](
+      { term: `${slug}/p` },
+      STALE,
+    ).then((res) => res.json());
 
   const url = new URL(baseUrl);
   const skuId = url.searchParams.get("skuId");
@@ -110,7 +111,7 @@ const loader = async (
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: "BRL", // config!.defaultPriceCurrency, TODO: fix currency
+    priceCurrency: segment.currencyCode ?? "BRL",
   });
 
   return {

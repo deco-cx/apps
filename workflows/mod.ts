@@ -13,3 +13,4 @@ export default function App(
 }
 
 export type AppContext = FnContext<State, Manifest>;
+export type AppManifest = Manifest;

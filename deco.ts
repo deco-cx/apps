@@ -10,12 +10,14 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("implementation"),
     app("weather"),
     {
       dir: "admin",
       name: "deco-sites/admin",
     },
     app("analytics"),
+    app("sourei"),
     app("typesense"),
     app("algolia"),
     app("handlebars"),
@@ -24,6 +26,7 @@ const config = {
     app("wake"),
     app("linx"),
     app("shopify"),
+    app("nuvemshop"),
     app("website"),
     app("commerce"),
     app("workflows"),

@@ -12,18 +12,20 @@ export const itemToAnalyticsItem = (
     coupon?: string;
   },
   index: number,
-): AnalyticsItem => ({
-  item_id: `${item.productId}_${item.productVariantId}`,
-  item_name: item.name!,
-  discount: item.price - item.ajustedPrice,
-  item_variant: item.productVariantId,
-  // TODO: check
-  price: item.price,
-  coupon: item.coupon,
-  item_brand: item.brand!,
-  index,
-  quantity: item.quantity,
-});
+): AnalyticsItem => {
+  return {
+    item_id: item.productVariantId,
+    item_group_id: item.productId,
+    quantity: item.quantity,
+    coupon: item.coupon,
+    price: item.price,
+    index,
+    discount: item.price - item.ajustedPrice,
+    item_name: item.name!,
+    item_variant: item.productVariantId,
+    item_brand: item.brand ?? "",
+  };
+};
 
 type EnqueuableActions<
   K extends keyof Manifest["actions"],
@@ -42,6 +44,7 @@ const state = {
   cart,
   loading,
   addItem: enqueue("wake/actions/cart/addItem.ts"),
+  addItems: enqueue("wake/actions/cart/addItems.ts"),
   updateItem: enqueue("wake/actions/cart/updateItemQuantity.ts"),
   addCoupon: enqueue("wake/actions/cart/addCoupon.ts"),
   removeCoupon: enqueue("wake/actions/cart/removeCoupon.ts"),

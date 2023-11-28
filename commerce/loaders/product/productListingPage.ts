@@ -6,6 +6,7 @@ import { ProductListingPage } from "../../types.ts";
 
 /**
  * @title Extend your product
+ * @deprecated
  */
 export default function ProductDetailsExt(
   props: Props<ProductListingPage | null>,

@@ -12,7 +12,7 @@ export default async function NewRevision(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlockState | null> {
-  await ctx.storage.update({ [blockId]: block });
+  await ctx.storage.patch({ [blockId]: block });
 
   return {
     site,

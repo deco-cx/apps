@@ -105,16 +105,13 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
   return sku.kitItems?.map(({ itemId }) => {
     const product = productBySkuId.get(itemId);
 
-    if (!product) {
-      throw new Error(
-        `Expected product for skuId ${itemId} but it was not returned by the search engine`,
-      );
-    }
+    /** Sometimes VTEX does not return what I've asked for */
+    if (!product) return;
 
     const sku = pickSku(product, itemId);
 
     return toProduct(product, sku, 0, options);
-  });
+  }).filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -124,7 +121,7 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   options: ProductOptions,
 ): Omit<ProductDetailsPage, "seo"> => {
   const partialProduct = toProduct(product, sku, 0, options);
-  // Get accessories in ProductPage only. I don't see where it's necessary outside this page for now
+  // This is deprecated. Compose this loader at loaders > product > extension > detailsPage.ts
   const isAccessoryOrSparePartFor = toAccessoryOrSparePartFor(
     sku,
     kitItems,
@@ -492,6 +489,7 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
   seller: sellerId,
   priceValidUntil: offer.PriceValidUntil,
   inventoryLevel: { value: offer.AvailableQuantity },
+  giftSkuIds: offer.GiftSkuIds ?? [],
   teasers: offer.teasers ?? [],
   priceSpecification: [
     {
@@ -503,6 +501,11 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
       price: offer.Price,
+    },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SRP",
+      price: offer.PriceWithoutDiscount,
     },
     ...offer.Installments.map(
       (installment): UnitPriceSpecification => ({

@@ -1,6 +1,6 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
-import { exclusionScript } from "../../utils/plausible_scripts.ts";
+import { Script } from "../../website/types.ts";
 
 const PATHS_TO_PROXY = [
   "/account",
@@ -33,8 +33,7 @@ const buildProxyRoutes = (
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
     includeScriptsToHead?: {
-      includes?: string[];
-      includePlausible: boolean;
+      includes?: Script[];
     };
   },
 ) => {
@@ -58,21 +57,6 @@ const buildProxyRoutes = (
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
 
-    const link1 =
-      '<link rel="dns-prefetch" href="https://plausible.io/api/event" />';
-    const link2 =
-      '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
-    const plausibleScript =
-      `<script defer data-exclude="/proxy" data-api="https://plausible.io/api/event">${exclusionScript}</script>`;
-
-    if (includeScriptsToHead?.includePlausible) {
-      includeScriptsToHead.includes = [
-        link1,
-        link2,
-        plausibleScript,
-        ...(includeScriptsToHead?.includes ?? []),
-      ];
-    }
     const routeFromPath = (pathTemplate: string): Route => ({
       pathTemplate,
       handler: {
@@ -80,7 +64,7 @@ const buildProxyRoutes = (
           __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
-          includeScriptsToHead: includeScriptsToHead,
+          includeScriptsToHead,
         },
       },
     });
@@ -141,8 +125,7 @@ export interface Props {
    * @title Scripts to include on Html head
    */
   includeScriptsToHead?: {
-    includes?: string[];
-    includePlausible: boolean;
+    includes?: Script[];
   };
 }
 
@@ -154,7 +137,7 @@ function loader(
     extraPathsToProxy = [],
     includeSiteMap = [],
     generateDecoSiteMap = true,
-    includeScriptsToHead = { includePlausible: false },
+    includeScriptsToHead = { includes: [] },
   }: Props,
   _req: Request,
   ctx: AppContext,

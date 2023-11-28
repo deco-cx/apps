@@ -1,16 +1,11 @@
 import { AppContext, BlockState } from "../../mod.ts";
+import { Pagination } from "../../types.ts";
 
 export interface Props {
   site: string;
   blockId: string;
 }
 
-export interface Pagination<T> {
-  data: T[];
-  page: number;
-  pageSize: number;
-  total: number;
-}
 export default async function ListRevisions(
   props: Props,
   _req: Request,

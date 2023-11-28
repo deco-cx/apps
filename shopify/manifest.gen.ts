@@ -2,33 +2,33 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/ProductList.ts";
+import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/ProductDetailsPage.ts";
-import * as $$$2 from "./loaders/ProductListingPage.ts";
-import * as $$$3 from "./loaders/proxy.ts";
-import * as $$$4 from "./loaders/cart.ts";
+import * as $$$2 from "./loaders/ProductList.ts";
+import * as $$$3 from "./loaders/ProductListingPage.ts";
+import * as $$$4 from "./loaders/proxy.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$$$$$$$0 from "./actions/order/draftOrderCalculate.ts";
+import * as $$$$$$$$$0 from "./actions/cart/addItems.ts";
 import * as $$$$$$$$$1 from "./actions/cart/updateCoupons.ts";
 import * as $$$$$$$$$2 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$3 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$3 from "./actions/order/draftOrderCalculate.ts";
 
 const manifest = {
   "loaders": {
-    "shopify/loaders/cart.ts": $$$4,
+    "shopify/loaders/cart.ts": $$$0,
     "shopify/loaders/ProductDetailsPage.ts": $$$1,
-    "shopify/loaders/ProductList.ts": $$$0,
-    "shopify/loaders/ProductListingPage.ts": $$$2,
-    "shopify/loaders/proxy.ts": $$$3,
+    "shopify/loaders/ProductList.ts": $$$2,
+    "shopify/loaders/ProductListingPage.ts": $$$3,
+    "shopify/loaders/proxy.ts": $$$4,
   },
   "handlers": {
     "shopify/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
-    "shopify/actions/cart/addItems.ts": $$$$$$$$$3,
+    "shopify/actions/cart/addItems.ts": $$$$$$$$$0,
     "shopify/actions/cart/updateCoupons.ts": $$$$$$$$$1,
     "shopify/actions/cart/updateItems.ts": $$$$$$$$$2,
-    "shopify/actions/order/draftOrderCalculate.ts": $$$$$$$$$0,
+    "shopify/actions/order/draftOrderCalculate.ts": $$$$$$$$$3,
   },
   "name": "shopify",
   "baseUrl": import.meta.url,
