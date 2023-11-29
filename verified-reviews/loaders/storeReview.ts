@@ -1,14 +1,16 @@
 import { AppContext } from "../mod.ts";
 import { Review } from "../../commerce/types.ts";
-import { ExtensionOf } from "../../website/loaders/extension.ts";
-import {
-  createClient,
-  PaginationOptions,
-} from "../utils/client.ts";
-export type Props = PaginationOptions;
+import { createClient } from "../utils/client.ts";
+
+export type Props = {
+  /**
+   * @title Number of reviews 
+   */
+  limit: number;
+};
 
 /**
- * @title Opiniões verificadas - Full Review for Product (Ratings and Reviews)
+ * @title Opiniões verificadas - Full Review for Store (Ratings and Reviews)
  */
 export default async function storeReview(
   _config: Props,
@@ -23,10 +25,11 @@ export default async function storeReview(
 
   const reviews = await client.storeReview();
 
-  if(!reviews){
+  if (!reviews) {
     return null;
   }
 
-  return reviews;
+  const limitedReviews = reviews.slice(0, _config.limit);
 
+  return limitedReviews;
 }
