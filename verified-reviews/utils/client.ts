@@ -1,6 +1,6 @@
 import { fetchAPI } from "../../utils/fetch.ts";
 import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
-import { Product } from "../../commerce/types.ts";
+import { Product, Review } from "../../commerce/types.ts";
 import { ConfigVerifiedReviews } from "../mod.ts";
 import { context } from "deco/live.ts";
 
@@ -167,7 +167,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     }
   };
 
-  const storeReview = async () => {
+  const storeReview = async () : Promise<Review[] | null> => {
     try {
       const response = await fetchAPI<Reviews['reviews']>(`https://cl.avis-verifies.com/br/cache/8/6/a/${idWebsite}/AWS/WEBSITE_API/reviews.json`, {
         method: "GET",
@@ -201,7 +201,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       } else {
         throw new Error(`${MessageError.ratings} - ${error}`);
       }
-      return undefined;
+      return null;
     }
   }
 

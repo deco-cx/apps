@@ -10,25 +10,23 @@ export type Props = PaginationOptions;
 /**
  * @title Opiniões verificadas - Full Review for Product (Ratings and Reviews)
  */
-export default function storeReview(
+export default async function storeReview(
   _config: Props,
   _req: Request,
   ctx: AppContext,
-): ExtensionOf<Review | null> {
+): Promise<Review[] | null> {
   const client = createClient({ ...ctx });
-  return async (storeReview: Review | null) => {
-    if (!storeReview) {
-      return null;
-    }
 
-    if (!client) {
-      return null;
-    }
+  if (!client) {
+    return null;
+  }
 
-    const reviews = await client.storeReview();
+  const reviews = await client.storeReview();
 
-    return {
-        ...reviews,
-    };
-  };
+  if(!reviews){
+    return null;
+  }
+
+  return reviews;
+
 }
