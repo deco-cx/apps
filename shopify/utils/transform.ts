@@ -1,5 +1,6 @@
 import type {
   BreadcrumbList,
+  Filter,
   Product,
   ProductDetailsPage,
   PropertyValue,
@@ -7,6 +8,8 @@ import type {
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import {
+  Filter as FilterShopify,
+  FilterValue,
   ProductFragment as ProductShopify,
   ProductVariantFragment as SkuShopify,
 } from "./storefront/storefront.graphql.gen.ts";
@@ -166,3 +169,60 @@ const toPropertyValue = (option: SelectedOptionShopify): PropertyValue => ({
   "@type": "PropertyValue",
   ...option,
 });
+
+const isSelectedFilter = (filterValue: FilterValue, url: URL) => {
+  let isSelected = false;
+  url.searchParams.forEach((value, key) => {
+    if (!key.startsWith("filter")) return;
+    if (value === filterValue.label) isSelected = true;
+  });
+  return isSelected;
+};
+
+export const toFilter = (filter: FilterShopify, url: URL): Filter => {
+  if (!filter.type.includes("RANGE")) {
+    return {
+      "@type": "FilterToggle",
+      label: filter.label,
+      key: filter.id,
+      values: filter.values.map((value) => {
+        return {
+          quantity: value.count,
+          label: value.label,
+          value: value.label,
+          selected: isSelectedFilter(value, url),
+          url: filtersURL(filter, value, url),
+        };
+      }),
+      quantity: filter.values.length,
+    };
+  } else {
+    const min = JSON.parse(filter.values[0].input).min;
+    const max = JSON.parse(filter.values[0].input).max;
+    return {
+      "@type": "FilterRange",
+      label: filter.label,
+      key: filter.id,
+      values: {
+        min,
+        max,
+      },
+    };
+  }
+};
+
+const filtersURL = (filter: FilterShopify, value: FilterValue, _url: URL) => {
+  const url = new URL(_url.href);
+  const params = new URLSearchParams(url.search);
+  params.delete("page");
+  params.delete("startCursor");
+  params.delete("endCursor");
+  if (params.has(filter.id, value.label)) {
+    params.delete(filter.id, value.label);
+  } else {
+    params.append(filter.id, value.label);
+  }
+
+  url.search = params.toString();
+  return url.toString();
+};
