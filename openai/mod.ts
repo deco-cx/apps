@@ -1,5 +1,5 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
-import OpenAI from "https://deno.land/x/openai@v4.19.1/mod.ts";
+import type { AppContext as AC, App } from "deco/mod.ts";
+import { OpenAI } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export interface Props {
@@ -20,7 +20,7 @@ export default function App(
     manifest,
     state: {
       openAI: new OpenAI({
-        apiKey: "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",
+        apiKey: "PLACE_HOLDER",
         ...state,
       }),
     },
