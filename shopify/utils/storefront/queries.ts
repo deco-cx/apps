@@ -105,6 +105,20 @@ fragment Product on Product {
 }
 `;
 
+const Filter = gql`
+fragment Filter on Filter{
+  id
+  label
+  type
+  values {
+    count
+    id
+    input
+    label
+  }
+}
+`;
+
 const Cart = gql`
 fragment Cart on Cart {
   id
@@ -209,14 +223,79 @@ export const ListProducts = {
 };
 
 export const SearchProducts = {
-  fragments: [Product, ProductVariant],
-  query: gql`query SearchProducts($first: Int, $after: String, $query: String) {
-    products(first: $first, after: $after, query: $query) {
+  fragments: [Product, ProductVariant, Filter],
+  query: gql`query searchWithFilters(
+      $first: Int, 
+      $last: Int, 
+      $after: String, 
+      $before: String,  
+      $query: String!, 
+      $productFilters: [ProductFilter!]
+      $sortKey: SearchSortKeys, 
+      $reverse: Boolean
+     ){
+    search(
+      first: $first, 
+      last: $last, 
+      after: $after, 
+      before: $before, 
+      query: $query, 
+      productFilters: $productFilters, 
+      types: PRODUCT, 
+      sortKey: $sortKey,
+      reverse: $reverse
+    ){
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        endCursor
+        startCursor
+      }
+      productFilters {
+        ...Filter
       }
       nodes {
         ...Product
+      }
+    }
+  }`,
+};
+
+export const ProductsByCollection = {
+  fragments: [Product, ProductVariant, Filter],
+  query: gql`query AllProducts(
+      $first: Int, 
+      $last: Int, 
+      $after: String, 
+      $before: String, 
+      $handle: String,
+      $sortKey: ProductCollectionSortKeys, 
+      $reverse: Boolean, 
+      $filters: [ProductFilter!]
+    ){
+    collection(handle: $handle) {
+      handle
+      products(
+        first: $first, 
+        last: $last, 
+        after: $after, 
+        before: $before, 
+        sortKey: $sortKey, 
+        reverse: $reverse, 
+        filters: $filters
+      ){
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            endCursor
+            startCursor
+          }
+          filters {
+            ...Filter
+          }
+          nodes {
+            ...Product
+          }
       }
     }
   }`,
