@@ -120,7 +120,6 @@ const loader = async (
         },
         ...SearchProducts,
       });
-      console.log(data);
       shopifyProducts = data.search;
     } else {
       const data = await storefront.query<

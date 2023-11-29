@@ -89,6 +89,8 @@ const loader = async (
         data?.search?.pageInfo.hasPreviousPage ?? false,
       );
     } else {
+      // TODO: understand how accept more than one path
+      // example: /collections/first-collection/second-collection
       const pathname = url.pathname.split("/")[1];
 
       const data = await storefront.query<
@@ -150,11 +152,16 @@ const loader = async (
 
   return {
     "@type": "ProductListingPage",
-    // TODO: Find out what's the right breadcrumb on shopify
+    // TODO: Update breadcrumb when accept more than one path
     breadcrumb: {
       "@type": "BreadcrumbList",
-      itemListElement: [],
-      numberOfItems: 0,
+      itemListElement: [{
+        "@type": "ListItem" as const,
+        name: isSearch ? query : url.pathname.split("/")[1],
+        item: isSearch ? url.href : url.pathname,
+        position: 2,
+      }],
+      numberOfItems: 1,
     },
     filters: filters ?? [],
     products: products ?? [],
