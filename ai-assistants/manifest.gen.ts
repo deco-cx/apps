@@ -6,9 +6,9 @@ import * as $$$$$$$$$0 from "./actions/chat.ts";
 
 const manifest = {
   "actions": {
-    "assistant/actions/chat.ts": $$$$$$$$$0,
+    "ai-assistants/actions/chat.ts": $$$$$$$$$0,
   },
-  "name": "assistant",
+  "name": "ai-assistants",
   "baseUrl": import.meta.url,
 };
 
