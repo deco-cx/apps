@@ -1,4 +1,4 @@
-import type { AppContext as AC, App } from "deco/mod.ts";
+import type { App, AppContext as AC } from "deco/mod.ts";
 import { OpenAI } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 

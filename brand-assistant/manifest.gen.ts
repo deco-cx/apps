@@ -2,11 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/chat.ts";
+import * as $$$0 from "./loaders/assistant.ts";
 
 const manifest = {
-  "actions": {
-    "brand-assistant/actions/chat.ts": $$$$$$$$$0,
+  "loaders": {
+    "brand-assistant/loaders/assistant.ts": $$$0,
   },
   "name": "brand-assistant",
   "baseUrl": import.meta.url,

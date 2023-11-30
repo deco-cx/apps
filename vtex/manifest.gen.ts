@@ -24,6 +24,7 @@ import * as $$$18 from "./loaders/intelligentSearch/productList.ts";
 import * as $$$19 from "./loaders/intelligentSearch/suggestions.ts";
 import * as $$$20 from "./loaders/intelligentSearch/productListingPage.ts";
 import * as $$$21 from "./loaders/user.ts";
+import * as $$$22 from "./loaders/user.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/trigger.ts";
 import * as $$$$$$$$$1 from "./actions/notifyme.ts";

@@ -1,0 +1,145 @@
+import { AssistantCreateParams, MessageContentText } from "../deps.ts";
+
+import { JSONSchema7 } from "deco/deps.ts";
+import { genSchemas } from "deco/engine/schema/reader.ts";
+import { context } from "deco/live.ts";
+import { ChatMessage } from "../actions/chat.ts";
+import { AIAssistant, AppContext } from "../mod.ts";
+import { dereferenceJsonSchema } from "../schema.ts";
+
+const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
+let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
+  null;
+const appTools = (): Promise<
+  AssistantCreateParams.AssistantToolsFunction[]
+> => {
+  return tools ??= context.runtime!.then(async (runtime) => {
+    const schemas = await genSchemas(runtime.manifest, runtime.sourceMap);
+    return Object.keys({
+      ...runtime.manifest.loaders,
+      ...runtime.manifest.actions,
+    }).map(
+      (functionKey) => {
+        const functionDefinition = btoa(functionKey);
+        const schema = schemas.definitions[functionDefinition];
+        if ((schema as { ignoreAI?: boolean })?.ignoreAI) {
+          return undefined;
+        }
+        const propsRef = (schema.allOf?.[0] as JSONSchema7)?.$ref;
+        if (!propsRef) {
+          return undefined;
+        }
+        const dereferenced = dereferenceJsonSchema({
+          $ref: propsRef,
+          ...schemas,
+        });
+        if (functionKey === "deco-sites/storefront/loaders/List/Sections.tsx") {
+          console.log(JSON.stringify({ dereferenced }));
+        }
+        if (
+          dereferenced.type !== "object" ||
+          (dereferenced.oneOf || dereferenced.anyOf ||
+            dereferenced?.allOf || dereferenced?.enum || dereferenced?.not)
+        ) {
+          return undefined;
+        }
+        return {
+          type: "function" as const,
+          function: {
+            name: functionKey,
+            description: schema?.description,
+            parameters: {
+              ...dereferenced,
+              definitions: undefined,
+              root: undefined,
+            },
+          },
+        };
+      },
+    ).filter(notUndefined);
+  });
+};
+
+export interface ProcessorOpts {
+  assistantId: string;
+  instructions: string;
+}
+
+const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
+
+export const messageProcessorFor = async (
+  assistant: AIAssistant,
+  ctx: AppContext,
+) => {
+  const openAI = ctx.openAI;
+  const threads = openAI.beta.threads;
+  const thread = await threads.create();
+  const instructions = `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. Below are arbitrary prompt that gives you information about the current context, it can be empty. \n${
+    (assistant.prompts ?? []).map((prompt) =>
+      `this is the ${prompt.context}: ${prompt.content}`
+    )
+  }. Last, but not least, DO NOT CHANGE THE FUNCTIONS NAMES THAT I'LL GIVE TO YOU.`;
+  return async ({ text: content, reply }: ChatMessage) => {
+    // send message
+    await threads.messages.create(thread.id, {
+      content,
+      role: "user",
+    });
+    // create run
+    const run = await threads.runs.create(thread.id, {
+      assistant_id: await ctx.assistant.then((assistant) => assistant.id),
+      instructions,
+      tools: await appTools(),
+    });
+    // Wait for the assistant answer
+    let runStatus;
+    do {
+      runStatus = await threads.runs.retrieve(
+        thread.id,
+        run.id,
+      );
+      console.log("status is", runStatus.status);
+      if (runStatus.status === "requires_action") {
+        const actions = runStatus.required_action!;
+        const outputs = actions.submit_tool_outputs;
+        const tool_outputs = await Promise.all(
+          outputs.tool_calls.map(async (call) => {
+            const invokeResponse = await ctx.invoke(
+              // deno-lint-ignore no-explicit-any
+              call.function.name as any,
+              JSON.parse(call.function.arguments),
+            );
+            return {
+              tool_call_id: call.id,
+              output: JSON.stringify(invokeResponse),
+            };
+          }),
+        );
+        await threads.runs.submitToolOutputs(
+          thread.id,
+          run.id,
+          {
+            tool_outputs,
+          },
+        );
+        runStatus = await threads.runs.retrieve(
+          thread.id,
+          run.id,
+        );
+      }
+      await sleep(500);
+    } while (["in_progress", "queued"].includes(runStatus.status));
+
+    const messages = await threads.messages.list(thread.id);
+    const lastMessageForRun = messages.data
+      .findLast((message) =>
+        message.run_id == run.id && message.role === "assistant"
+      );
+
+    if (!lastMessageForRun) {
+      console.log("No message to reply");
+      return;
+    }
+    reply((lastMessageForRun.content[0] as MessageContentText).text.value);
+  };
+};
