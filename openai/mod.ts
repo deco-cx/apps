@@ -20,7 +20,7 @@ export default function App(
     manifest,
     state: {
       openAI: new OpenAI({
-        apiKey: "PLACE_HOLDER",
+        apiKey: Deno.env.get("OPENAI_TOKEN"),
         ...state,
       }),
     },
