@@ -4,11 +4,6 @@ import { notFound } from "deco/mod.ts";
 import { messageProcessorFor } from "../chat/messages.ts";
 import { Notify, Queue } from "../deps.ts";
 
-export interface AIAssistant {
-  instructions: string;
-  name: string;
-}
-
 export interface Props {
   thread?: string;
   assistant: string;
@@ -20,7 +15,10 @@ const process = async (
   processor: (c: ChatMessage) => Promise<void>,
 ) => {
   while (true) {
-    const message = await Promise.race([abort.notified(), q.pop()]);
+    const message = await Promise.race([
+      abort.notified(),
+      q.pop({ signal: AbortSignal.timeout(10000000) }),
+    ]);
     if (typeof message !== "object") {
       break;
     }
@@ -29,10 +27,23 @@ const process = async (
     ]);
   }
 };
+export interface ReplyMessage {
+  type: "message";
+  content: string;
+}
+
+export interface ReplyJson<T> {
+  type: "json";
+  content: T;
+}
+
+export type Reply<T> = ReplyMessage | ReplyJson<T>;
+
 export interface ChatMessage {
   text: string;
-  reply: (txt: string) => void;
+  reply: <T = unknown>(reply: Reply<T>) => void;
 }
+
 export default function openChat(
   props: Props,
   req: Request,
@@ -65,12 +76,18 @@ export default function openChat(
         throw err;
       }),
     );
+    assistant.then((aiAssistant) => {
+      socket.send(aiAssistant.welcomeMessage ?? "Welcome to the chat!");
+    });
   };
   socket.onclose = () => {
     abort.notifyAll();
   };
   socket.onmessage = (event) => {
-    messagesQ.push({ text: event.data, reply: socket.send.bind(socket) });
+    messagesQ.push({
+      text: event.data,
+      reply: (replyMsg) => socket.send(JSON.stringify(replyMsg)),
+    });
   };
   return response;
 }

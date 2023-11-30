@@ -10,15 +10,16 @@ import { dereferenceJsonSchema } from "../schema.ts";
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
   null;
-const appTools = (): Promise<
+const appTools = (assistant: AIAssistant): Promise<
   AssistantCreateParams.AssistantToolsFunction[]
 > => {
   return tools ??= context.runtime!.then(async (runtime) => {
     const schemas = await genSchemas(runtime.manifest, runtime.sourceMap);
-    return Object.keys({
+    const functionKeys = assistant.availableFunctions ?? Object.keys({
       ...runtime.manifest.loaders,
       ...runtime.manifest.actions,
-    }).map(
+    });
+    return functionKeys.map(
       (functionKey) => {
         const functionDefinition = btoa(functionKey);
         const schema = schemas.definitions[functionDefinition];
@@ -71,45 +72,58 @@ export const messageProcessorFor = async (
   const openAI = ctx.openAI;
   const threads = openAI.beta.threads;
   const thread = await threads.create();
-  const instructions = `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. Below are arbitrary prompt that gives you information about the current context, it can be empty. \n${
-    (assistant.prompts ?? []).map((prompt) =>
-      `this is the ${prompt.context}: ${prompt.content}`
-    )
-  }. Last, but not least, DO NOT CHANGE THE FUNCTIONS NAMES THAT I'LL GIVE TO YOU.`;
+  const instructions =
+    `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. Below are arbitrary prompt that gives you information about the current context, it can be empty. \n${
+      (assistant.prompts ?? []).map((prompt) =>
+        `this is the ${prompt.context}: ${prompt.content}`
+      )
+    }. Last, but not least, DO NOT CHANGE THE FUNCTIONS NAMES THAT I'LL GIVE TO YOU, do not remove .ts at the end of function name nor /. If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an @ symbol at the end of the phrase. Otherwise, add a # symbol.
+    For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. #".
+    `;
   return async ({ text: content, reply }: ChatMessage) => {
     // send message
     await threads.messages.create(thread.id, {
       content,
       role: "user",
     });
+    const aiAssistant = await ctx.assistant.then((assistant) => assistant.id);
+    const tools = await appTools(assistant);
     // create run
     const run = await threads.runs.create(thread.id, {
-      assistant_id: await ctx.assistant.then((assistant) => assistant.id),
+      assistant_id: aiAssistant,
       instructions,
-      tools: await appTools(),
+      tools,
     });
     // Wait for the assistant answer
+    const jsonReplies: unknown[] = [];
     let runStatus;
     do {
       runStatus = await threads.runs.retrieve(
         thread.id,
         run.id,
       );
-      console.log("status is", runStatus.status);
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
         const tool_outputs = await Promise.all(
           outputs.tool_calls.map(async (call) => {
-            const invokeResponse = await ctx.invoke(
-              // deno-lint-ignore no-explicit-any
-              call.function.name as any,
-              JSON.parse(call.function.arguments),
-            );
-            return {
-              tool_call_id: call.id,
-              output: JSON.stringify(invokeResponse),
-            };
+            try {
+              console.log("invoking", call);
+              const props = JSON.parse(call.function.arguments);
+              const invokeResponse = await ctx.invoke(
+                // deno-lint-ignore no-explicit-any
+                call.function.name as any,
+                assistant?.useProps?.(props) ?? props,
+              );
+              jsonReplies.push(invokeResponse);
+              return {
+                tool_call_id: call.id,
+                output: JSON.stringify(invokeResponse),
+              };
+            } catch (err) {
+              console.log("invoke error", await err?.resp?.text());
+              throw err;
+            }
           }),
         );
         await threads.runs.submitToolOutputs(
@@ -137,6 +151,18 @@ export const messageProcessorFor = async (
       console.log("No message to reply");
       return;
     }
-    reply((lastMessageForRun.content[0] as MessageContentText).text.value);
+    const strContent =
+      (lastMessageForRun.content[0] as MessageContentText).text.value;
+
+    reply({
+      type: "message",
+      content: strContent.endsWith("@") || strContent.endsWith("#")
+        ? strContent.slice(0, strContent.length - 2)
+        : strContent,
+    });
+
+    if (strContent.endsWith("@")) {
+      reply({ type: "json", content: jsonReplies });
+    }
   };
 };

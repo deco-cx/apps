@@ -1,12 +1,15 @@
 import type { AIAssistant } from "../../ai-assistants/mod.ts";
 import type { Category, Product, Suggestion } from "../../commerce/types.ts";
 import type { Prompt } from "../../ai-assistants/mod.ts";
-
+import type vtex from "../../vtex/mod.ts";
+import type { ManifestOf } from "deco/mod.ts";
 export interface Props {
   name: string;
   productsSample?: Product[] | null;
   topSearches?: Suggestion;
   categories?: Category | Category[];
+  instructions?: string;
+  welcomeMessage?: string;
 }
 const withContext = <T>(context: string, v: T | undefined): Prompt[] => {
   if (!v) {
@@ -14,12 +17,30 @@ const withContext = <T>(context: string, v: T | undefined): Prompt[] => {
   }
   return [{ context, content: JSON.stringify(v) }];
 };
+type VTEXManifest = ManifestOf<ReturnType<typeof vtex>>;
 const BASE_INSTRUCTIONS =
   "You are a shopping assistant designed to help customers navigate our online store. Your primary role is to assist users in finding products, providing information about them, and answering any related queries. Always prioritize clear, concise, and helpful responses. Encourage users to ask questions about product specifications, availability, price comparisons, and general store policies. Be responsive to diverse customer needs and maintain a friendly, professional tone in all interactions. You are equipped to handle a wide range of inquiries, but if a question falls outside your scope, guide the customer to the appropriate customer service channel. Remember, your goal is to enhance the shopping experience by making it more efficient, informative, and user-friendly.";
 export default function brandAssistant(props: Props): AIAssistant {
-  return {
+  const assistant: AIAssistant<VTEXManifest> = {
+    useProps: (props: unknown) => {
+      if (!props) {
+        return props;
+      }
+      if (typeof props !== "object") {
+        return props;
+      }
+      if (!("props" in props)) {
+        return props;
+      }
+      return { props: { count: 10, query: "", ...props.props } };
+    },
     name: props.name,
-    instructions: BASE_INSTRUCTIONS,
+    availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
+    welcomeMessage: props?.welcomeMessage ??
+      `👋 Welcome to our Online Store Assistant! How can I assist you today? Whether you're looking for product information, pricing details, or help with navigating our store, feel free to ask. I'm here to make your shopping experience smooth and enjoyable! Just type your question, and let's get started. 🛍️`,
+    instructions: `${BASE_INSTRUCTIONS}. ${
+      props.instructions ?? ""
+    }. You should ALWAYS fulfill the query parameter even with an empty string when calling the vtex/loaders/intelligentSearch/productList.ts function, also, make sure you have information enough to make the search, otherwise ask for more information.`,
     prompts: [
       ...withContext(
         "This is the category tree of the store",
@@ -39,4 +60,5 @@ export default function brandAssistant(props: Props): AIAssistant {
       ),
     ],
   };
+  return assistant as AIAssistant;
 }
