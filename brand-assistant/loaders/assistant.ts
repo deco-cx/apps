@@ -32,7 +32,13 @@ export default function brandAssistant(props: Props): AIAssistant {
       if (!("props" in props)) {
         return props;
       }
-      return { props: { count: 10, query: "", ...props.props } };
+      return {
+        props: {
+          count: 10,
+          query: "",
+          ...typeof props.props === "object" ? props.props : {},
+        },
+      };
     },
     name: props.name,
     availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
