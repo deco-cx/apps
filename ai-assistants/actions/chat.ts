@@ -26,7 +26,6 @@ const process = async (
     }
     await Promise.race([
       processor(message),
-      abort.notified({ signal: AbortSignal.timeout(60_000) }),
     ]);
   }
 };
