@@ -33,9 +33,6 @@ const appTools = (): Promise<
           $ref: propsRef,
           ...schemas,
         });
-        if (functionKey === "deco-sites/storefront/loaders/List/Sections.tsx") {
-          console.log(JSON.stringify({ dereferenced }));
-        }
         if (
           dereferenced.type !== "object" ||
           (dereferenced.oneOf || dereferenced.anyOf ||
