@@ -38,9 +38,9 @@ export interface Props {
     /** @description Choose if you want to retrieve only the available products in stock. */
     available?: boolean;
     /** @description The set of brand IDs which the result item brand ID must be included in. */
-    brandId?: string[];
+    brandId?: number[];
     /** @description The set of category IDs which the result item category ID must be included in. */
-    categoryId?: string[];
+    categoryId?: number[];
     /** @description The set of EANs which the result item EAN must be included. */
     ean?: string[];
     /** @description Retrieve the product variant only if it contains images. */
@@ -68,23 +68,41 @@ export interface Props {
     sameParentAs?: number[];
     /** @description The set of SKUs which the result item SKU must be included. */
     sku?: string[];
-    /** @description Show products with a quantity of available products in stock greater than or equal to the given number. */
+    /**
+     *  @title Stock greater than or equal
+     *  @description Show products with a quantity of available products in stock greater than or equal to the given number. */
     stock_gte?: number;
-    /** @description Show products with a quantity of available products in stock less than or equal to the given number. */
+    /**
+     * @title Stock less than or equal
+     * @description Show products with a quantity of available products in stock less than or equal to the given number. */
     stock_lte?: number;
     /** @description The set of stocks to filter. */
     stocks?: {
       dcId?: number[];
       /** @description The distribution center names to match. */
       dcName?: string[];
-      /** @description The product stock must be greater than or equal to. */
+      /**
+       * @title Stock greater than or equal
+       * @description The product stock must be greater than or equal to.
+       */
       stock_gte?: number;
-      /** @description The product stock must be lesser than or equal to. */
+      /**
+       * @title Stock less than or equal
+       * @description The product stock must be lesser than or equal to.
+       */
       stock_lte?: number;
     };
-    /** @description Retrieve products which the last update date is greater than or equal to the given date. */
+    /**
+     * @title Upated after
+     * @format date
+     * @description Retrieve products which the last update date is greater than or equal to the given date.
+     */
     updatedAt_gte?: string;
-    /** @description Retrieve products which the last update date is less than or equal to the given date. */
+    /**
+     * @title Upated before
+     * @format date
+     * @description Retrieve products which the last update date is less than or equal to the given date.
+     */
     updatedAt_lte?: string;
   };
 
