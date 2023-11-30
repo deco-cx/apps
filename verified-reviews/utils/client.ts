@@ -1,6 +1,6 @@
 import { fetchAPI } from "../../utils/fetch.ts";
 import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
-import { Product, Review } from "../../commerce/types.ts";
+import { Product } from "../../commerce/types.ts";
 import { ConfigVerifiedReviews } from "../mod.ts";
 import { context } from "deco/live.ts";
 
@@ -167,7 +167,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     }
   };
 
-  const storeReview = async () : Promise<Review[] | null> => {
+  const storeReview = async () : Promise<Reviews['reviews'] | null> => {
     try {
       const response = await fetchAPI<Reviews['reviews']>(`https://cl.avis-verifies.com/br/cache/8/6/a/${idWebsite}/AWS/WEBSITE_API/reviews.json`, {
         method: "GET",
@@ -176,21 +176,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return(
         response 
         ?
-        response.map((item) => ({
-          "@type": "Review",
-          author: [
-            {
-              "@type": "Author",
-              name: `${item.firstname} ${item.lastname}`,
-            },
-          ],
-          datePublished: item.review_date,
-          reviewBody: item.review,
-          reviewRating: {
-            "@type": "AggregateRating",
-            ratingValue: Number(item.rate),
-          },
-        }))
+        response
         :
         []
         );

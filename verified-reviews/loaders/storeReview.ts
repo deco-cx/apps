@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 import { AppContext } from "../mod.ts";
 import { Review } from "../../commerce/types.ts";
 import { createClient } from "../utils/client.ts";
@@ -29,7 +30,25 @@ export default async function storeReview(
     return null;
   }
 
-  const limitedReviews = reviews.slice(0, _config.limit);
+  let formatReviews: Review[];
+  
+  formatReviews = reviews.map((item) => ({
+    "@type": "Review",
+    author: [
+      {
+        "@type": "Author",
+        name: `${item.firstname} ${item.lastname}`,
+      },
+    ],
+    datePublished: item.review_date,
+    reviewBody: item.review,
+    reviewRating: {
+      "@type": "AggregateRating",
+      ratingValue: Number(item.rate),
+    },
+  }))
+
+  const limitedReviews = formatReviews.slice(0, _config.limit);
 
   return limitedReviews;
 }
