@@ -21,6 +21,7 @@ const config = {
     app("typesense"),
     app("algolia"),
     app("handlebars"),
+    app("section-lab"),
     app("vtex"),
     app("vnda"),
     app("wake"),
