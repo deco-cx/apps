@@ -72,9 +72,7 @@ const pickVariant = (product: VNDAProductGroup, variantId: string | null) => {
   const variants = normalizeVariants(product.variants);
   const [head] = variants;
 
-  let [target, main, available]: Array<
-    VNDAProduct | null
-  > = [null, head, null];
+  let [target, main, available]: Array<VNDAProduct | null> = [null, head, null];
 
   for (const variant of variants) {
     if (variant.sku === variantId) target = variant;
@@ -93,23 +91,25 @@ const normalizeInstallments = (
   if (typeof installments[0] === "number") {
     const total = (installments as number[]).reduce((acc, curr) => acc + curr);
 
-    return [{
-      number: installments.length,
-      price: installments[0],
-      total,
-    }];
+    return [
+      {
+        number: installments.length,
+        price: installments[0],
+        total,
+      },
+    ];
   }
 
-  return (installments as ProductInstallment[]).map((
-    { number, price, total },
-  ) => ({
-    number,
-    price,
-    total,
-  }));
+  return (installments as ProductInstallment[]).map(
+    ({ number, price, total }) => ({
+      number,
+      price,
+      total,
+    }),
+  );
 };
 
-const toURL = (src: string) => src.startsWith("//") ? `https:${src}` : src;
+const toURL = (src: string) => (src.startsWith("//") ? `https:${src}` : src);
 
 const toOffer = ({
   price,
@@ -122,11 +122,13 @@ const toOffer = ({
     return null;
   }
 
-  const priceSpecification: UnitPriceSpecification[] = [{
-    "@type": "UnitPriceSpecification",
-    priceType: "https://schema.org/SalePrice",
-    price: sale_price,
-  }];
+  const priceSpecification: UnitPriceSpecification[] = [
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SalePrice",
+      price: sale_price,
+    },
+  ];
 
   if (price > sale_price) {
     priceSpecification.push({
@@ -166,23 +168,28 @@ const toOffer = ({
 const toPropertyValue = (variant: VNDAProduct): PropertyValue[] =>
   Object.values(variant.properties ?? {})
     .filter(Boolean)
-    .map(({ value, name }) =>
-      value && ({
-        "@type": "PropertyValue",
-        name,
-        value,
-        valueReference: "SPECIFICATION",
-      } as PropertyValue)
-    ).filter((x): x is PropertyValue => Boolean(x));
+    .map(
+      ({ value, name }) =>
+        value &&
+        ({
+          "@type": "PropertyValue",
+          name,
+          value,
+          valueReference: "SPECIFICATION",
+        } as PropertyValue),
+    )
+    .filter((x): x is PropertyValue => Boolean(x));
 
 const toPropertyValueTags = (tags: ProductSearch["tags"]): PropertyValue[] =>
-  tags?.map((tag) =>
-    tag && ({
-      "@type": "PropertyValue",
-      name: tag.name,
-      value: JSON.stringify(tag),
-      valueReference: "TAGS",
-    } as PropertyValue)
+  tags?.map(
+    (tag) =>
+      tag &&
+      ({
+        "@type": "PropertyValue",
+        name: tag.name,
+        value: JSON.stringify(tag),
+        valueReference: "TAGS",
+      } as PropertyValue),
   );
 
 // deno-lint-ignore no-explicit-any
@@ -193,7 +200,7 @@ const normalizeVariants = (
   variants: VNDAProductGroup["variants"] = [],
 ): VNDAProduct[] =>
   variants.flatMap((v) =>
-    isProductVariant(v) ? [v] : Object.values(v) as VNDAProduct[]
+    isProductVariant(v) ? [v] : (Object.values(v) as VNDAProduct[])
   );
 
 export const toProduct = (
@@ -273,10 +280,11 @@ const isFilterSelected = (
   typeTagsInUse: { key: string; value: string }[],
   filter: { key: string; value: string },
 ) =>
-  Boolean(typeTagsInUse.find((inUse) =>
-    inUse.key === filter.key &&
-    inUse.value === filter.value
-  ));
+  Boolean(
+    typeTagsInUse.find(
+      (inUse) => inUse.key === filter.key && inUse.value === filter.value,
+    ),
+  );
 
 const addFilter = (
   typeTagsInUse: { key: string; value: string }[],
@@ -287,9 +295,8 @@ const removeFilter = (
   typeTagsInUse: { key: string; value: string }[],
   filter: { key: string; value: string },
 ) =>
-  typeTagsInUse.filter((inUse) =>
-    inUse.key !== filter.key &&
-    inUse.value !== filter.value
+  typeTagsInUse.filter(
+    (inUse) => inUse.key !== filter.key && inUse.value !== filter.value,
   );
 
 export const toFilters = (
@@ -331,9 +338,7 @@ export const toFilters = (
         typeKey as string
       ] as AggregationType[])
       // deno-lint-ignore no-explicit-any
-      : ((aggregations.types as any)[
-        typeKey as string
-      ] as AggregationType[]);
+      : ((aggregations.types as any)[typeKey as string] as AggregationType[]);
 
     if (isProperty) {
       typeValues.forEach((obj) => {
@@ -373,10 +378,7 @@ export const toFilters = (
     };
   });
 
-  return [
-    priceRange,
-    ...types,
-  ];
+  return [priceRange, ...types];
 };
 
 export const typeTagExtractor = (url: URL, tags: { type?: string }[]) => {
