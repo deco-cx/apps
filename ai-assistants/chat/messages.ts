@@ -198,6 +198,11 @@ export const messageProcessorFor = async (
 
     if (!lastMessageForRun) {
       console.log("No message to reply");
+      reply({
+        messageId,
+        type: "message",
+        content: "Desculpe, estamos enfrentando problemas.",
+      });
       return;
     }
     const strContent =
