@@ -69,7 +69,7 @@ export const parseSlug = (slug: string) => {
 };
 
 const pickVariant = (product: VNDAProductGroup, variantId: string | null) => {
-  const variants = normalizeVariants(product.variants);
+  const variants = normalizeVariants(product);
   const [head] = variants;
 
   let [target, main, available]: Array<VNDAProduct | null> = [null, head, null];
@@ -196,12 +196,65 @@ const toPropertyValueTags = (tags: ProductSearch["tags"]): PropertyValue[] =>
 const isProductVariant = (p: any): p is VariantProductSearch =>
   typeof p.id === "number";
 
-const normalizeVariants = (
-  variants: VNDAProductGroup["variants"] = [],
-): VNDAProduct[] =>
-  variants.flatMap((v) =>
+// Converts a VNDAProductGroup with no variants into a VNDAProduct
+// *** If VNDAProductGroup has no variants, it is not available ***
+const buildNoVariantsProduct = (productGroup: VNDAProductGroup) => {
+  const {
+    id,
+    image_url = "",
+    installments = [],
+    name = "",
+    price = 0,
+    sale_price = price,
+    slug = "",
+  } = productGroup;
+
+  return {
+    available: false,
+    available_quantity: 0,
+    barcode: "",
+    custom_attributes: {},
+    full_name: name,
+    handling_days: 0,
+    height: 0,
+    image_url,
+    installments,
+    intl_price: 0,
+    length: 0,
+    main: true,
+    min_quantity: 1,
+    name,
+    norder: 0,
+    price,
+    product_id: id!,
+    properties: {},
+    quantity: 0,
+    sale_price,
+    sku: "01",
+    sku_lowercase: "01",
+    slug,
+    stock: 0,
+    updated_at: "",
+    weight: 0,
+    width: 0,
+    additionalProperties: undefined,
+    id,
+    inventories: undefined,
+    quantity_sold: undefined,
+    required: undefined,
+  } as VNDAProduct;
+};
+
+// variants: VNDAProductGroup["variants"] = []
+const normalizeVariants = (productGroup: VNDAProductGroup): VNDAProduct[] => {
+  const { variants = [] } = productGroup;
+
+  if (variants.length === 0) return [buildNoVariantsProduct(productGroup)];
+
+  return variants.flatMap((v) =>
     isProductVariant(v) ? [v] : (Object.values(v) as VNDAProduct[])
   );
+};
 
 export const toProduct = (
   product: VNDAProductGroup,
@@ -211,7 +264,7 @@ export const toProduct = (
 ): Product => {
   const { url, priceCurrency } = options;
   const variant = pickVariant(product, variantId);
-  const variants = normalizeVariants(product.variants);
+  const variants = normalizeVariants(product);
   const variantUrl = new URL(
     `/produto/${product.slug}-${product.id}?skuId=${variant.sku}`,
     url.origin,
