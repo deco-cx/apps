@@ -45,7 +45,7 @@ const appTools = (assistant: AIAssistant): Promise<
           type: "function" as const,
           function: {
             name: functionKey,
-            description: schema?.description,
+            description: `Usage for: ${schema?.description}. Example: ${schema?.examples}`,
             parameters: {
               ...dereferenced,
               definitions: undefined,
@@ -102,6 +102,7 @@ export const messageProcessorFor = async (
         thread.id,
         run.id,
       );
+      console.log("status is", runStatus.status);
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
@@ -161,7 +162,7 @@ export const messageProcessorFor = async (
         : strContent,
     });
 
-    if (strContent.endsWith("@")) {
+    if (!strContent.endsWith("#") && jsonReplies.length > 0) {
       reply({ type: "json", content: jsonReplies });
     }
   };
