@@ -20,20 +20,29 @@ const loader = async (
   const cartId = getCartCookie(req.headers);
   const agent = getAgentCookie(req.headers);
 
-  const orderForm = cartId
-    ? await api["GET /api/v2/carts/:cartId"]({ cartId }).then((res) =>
-      res.json()
-    )
-    : await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
-      res.json()
-    );
+  let orderForm;
+
+  try {
+    orderForm = cartId
+      ? await api["GET /api/v2/carts/:cartId"]({ cartId }).then((res) =>
+        res.json())
+      : await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
+        res.json());
+  } catch (error) {
+    console.log(error)
+  }
+
+  if (!orderForm) {
+    orderForm = await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
+      res.json());
+  }
 
   const hasAgent = orderForm.agent === agent;
 
-  if (!hasAgent && agent && cartId) {
+  if (!hasAgent && agent) {
     const [{ id }] = await api["GET /api/v2/users"]({ external_code: agent })
       .then((res) => res.json());
-    await api["PATCH /api/v2/carts/:cartId"]({ cartId }, {
+    await api["PATCH /api/v2/carts/:cartId"]({ cartId: orderForm.id }, {
       body: { agent, user_id: id },
     });
   }
