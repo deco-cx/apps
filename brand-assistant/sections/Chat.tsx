@@ -11,7 +11,7 @@ function Chat() {
 
   useEffect(() => {
     const host = window.location.host;
-    const websocket = window.location.protocol === 'https:' ? 'wss' : 'ws'; 
+    const websocket = window.location.protocol === "https:" ? "wss" : "ws";
     ws.value = new WebSocket(
       `${websocket}://${host}/live/invoke/ai-assistants/actions/chat.ts?assistant=brand`,
     );

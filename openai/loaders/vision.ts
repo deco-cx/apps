@@ -20,14 +20,30 @@ const candeiaImages = Promise.resolve([
   "https://scontent-gig4-2.cdninstagram.com/v/t51.12442-15/67119982_1288585001306214_1117853752773459583_n.jpg?stp=c0.506.1080.1080a_dst-jpg_e35_s150x150&_nc_ht=scontent-gig4-2.cdninstagram.com&_nc_cat=106&_nc_ohc=bbOh09P2xWAAX-S9crF&edm=AGW0Xe4BAAAA&ccb=7-5&oh=00_AfCc8qboKpMy0h6UvoFEPxPgb8vRW9cWogcR_yF2eKJSgw&oe=656BA287&_nc_sid=94fea1",
   "https://scontent-gig4-2.cdninstagram.com/v/t51.12442-15/69879820_155250535663850_4765593734197833371_n.jpg?stp=c0.506.1080.1080a_dst-jpg_e35_s150x150&_nc_ht=scontent-gig4-2.cdninstagram.com&_nc_cat=102&_nc_ohc=-qcPvOPn4z0AX8BX-uQ&edm=AGW0Xe4BAAAA&ccb=7-5&oh=00_AfCcvrETdSmPHS7spNmdoJuNeC5Oa9AToH7Lzinkby6mNQ&oe=656B7727&_nc_sid=94fea1",
 ]);
-const cache: Record<string, Promise<string[]>> = {
+const imagesCache: Record<string, Promise<string[]>> = {
   ["https://www.instagram.com/marcoscandeia"]: candeiaImages,
   ["https://www.instagram.com/marcoscandeia/"]: candeiaImages,
+};
+
+const descriptionsCache: Record<string, string[]> = {
+  ["https://www.instagram.com/marcoscandeia"]: [
+    "Homem de blusa preta",
+    "camisa azul",
+    "shorts jeans",
+  ],
+  ["https://www.instagram.com/anitta"]: [
+    "mulher atraente",
+    "calcinhas e blusas do brasil",
+    "representação do funk",
+    "shorts curtos",
+    "maquiagens",
+    "viagens e mar",
+  ],
 };
 const getImagesFrom = async (url: string): Promise<string[]> => {
   const browser = await puppeteer.launch({
     args: ["--no-sandbox"],
-    headless: false,
+    headless: true,
   });
   const page = await browser.newPage();
   await page.setUserAgent(
@@ -56,8 +72,11 @@ export default async function (
   _req: Request,
   ctx: AppContext,
 ): Promise<Description[]> {
-  cache[url] ??= getImagesFrom(url);
-  const images = await cache[url];
+  if (url && descriptionsCache[url]) {
+    return descriptionsCache[url];
+  }
+  imagesCache[url] ??= getImagesFrom(url);
+  const images = await imagesCache[url];
   if (images.length === 0) {
     return [];
   }
@@ -69,7 +88,7 @@ export default async function (
         role: "user",
         content: [
           { type: "text", text: request ?? "What’s in this image?" },
-          ...images.slice(0, 2).map((image) => {
+          ...images.slice(0, 5).map((image) => {
             return {
               type: "image_url" as const,
               image_url: {

@@ -27,23 +27,37 @@ const process = async (
     ]);
   }
 };
+
 export interface ReplyMessage {
+  messageId: string;
   type: "message";
   content: string;
 }
 
-export interface FunctionCallReply<T> {
-  name: string
-  props: unknown
-  response:T
+export interface FunctionCall {
+  name: string;
+  props: unknown;
 }
 
+export interface FunctionCallReply<T> extends FunctionCall {
+  response: T;
+}
+
+export interface ReplyStartFunctionCall {
+  messageId: string;
+  type: "start_function_call";
+  content: FunctionCall;
+}
 export interface ReplyFunctionCalls<T> {
+  messageId: string;
   type: "function_calls";
   content: FunctionCallReply<T>[];
 }
 
-export type Reply<T> = ReplyMessage | ReplyFunctionCalls<T>;
+export type Reply<T> =
+  | ReplyMessage
+  | ReplyFunctionCalls<T>
+  | ReplyStartFunctionCall;
 
 export interface ChatMessage {
   text: string;

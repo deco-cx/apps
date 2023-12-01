@@ -6,15 +6,40 @@ import { context } from "deco/live.ts";
 import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
+import { mschema } from "deco/routes/live/_meta.ts";
+import { AppManifest } from "deco/mod.ts";
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
   null;
+const pickFunctions = (
+  funcs: string[],
+  { name, baseUrl, ...blocks }: AppManifest,
+): AppManifest => {
+  const newManifest: AppManifest = { name, baseUrl };
+  for (const [blockType, blockValues] of Object.entries(blocks)) {
+    for (const blockKey of Object.keys(blockValues)) {
+      if (funcs.includes(blockKey)) {
+        newManifest[
+          blockType as keyof Omit<AppManifest, "name" | "baseUrl">
+        ] ??= {};
+        newManifest[blockType as keyof Omit<AppManifest, "name" | "baseUrl">]![
+          blockKey
+        ] = blockValues[blockKey];
+      }
+    }
+  }
+  return newManifest;
+};
 const appTools = (assistant: AIAssistant): Promise<
   AssistantCreateParams.AssistantToolsFunction[]
 > => {
   return tools ??= context.runtime!.then(async (runtime) => {
-    const schemas = await genSchemas(runtime.manifest, runtime.sourceMap);
+    const manifest = assistant.availableFunctions
+      ? pickFunctions(assistant.availableFunctions, runtime.manifest)
+      : runtime.manifest;
+    const schemas = mschema ??
+      await genSchemas(manifest, runtime.sourceMap);
     const functionKeys = assistant.availableFunctions ?? Object.keys({
       ...runtime.manifest.loaders,
       ...runtime.manifest.actions,
@@ -66,6 +91,7 @@ export interface ProcessorOpts {
 
 const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
 
+const cache: Record<string, unknown> = {};
 export const messageProcessorFor = async (
   assistant: AIAssistant,
   ctx: AppContext,
@@ -96,6 +122,7 @@ export const messageProcessorFor = async (
       instructions,
       tools,
     });
+    const messageId = run.id;
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
     let runStatus;
@@ -113,11 +140,24 @@ export const messageProcessorFor = async (
             try {
               console.log("invoking", call);
               const props = JSON.parse(call.function.arguments);
-              const invokeResponse = await ctx.invoke(
+
+              const cacheKey =
+                `${call.function.arguments}${call.function.name}`;
+
+              cache[cacheKey] ??= ctx.invoke(
                 // deno-lint-ignore no-explicit-any
                 call.function.name as any,
                 assistant?.useProps?.(props) ?? props,
               );
+              reply({
+                messageId,
+                type: "start_function_call",
+                content: {
+                  name: call.function.name,
+                  props,
+                },
+              });
+              const invokeResponse = await cache[cacheKey];
               functionCallReplies.push({
                 name: call.function.name,
                 props,
@@ -165,6 +205,7 @@ export const messageProcessorFor = async (
 
     latestMsg = lastMessageForRun.id;
     reply({
+      messageId,
       type: "message",
       content: strContent.endsWith("@") || strContent.endsWith("#")
         ? strContent.slice(0, strContent.length - 2)
@@ -172,7 +213,11 @@ export const messageProcessorFor = async (
     });
 
     if (!strContent.endsWith("#") && functionCallReplies.length > 0) {
-      reply({ type: "function_calls" as const, content: functionCallReplies });
+      reply({
+        messageId,
+        type: "function_calls" as const,
+        content: functionCallReplies,
+      });
     }
   };
 };

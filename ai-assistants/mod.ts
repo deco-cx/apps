@@ -1,7 +1,10 @@
 import { asResolved, isDeferred } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
-import type { AppContext as AC, App } from "deco/mod.ts";
-import { AvailableActions, AvailableLoaders } from "deco/routes/live/invoke/index.ts";
+import type { App, AppContext as AC } from "deco/mod.ts";
+import {
+  AvailableActions,
+  AvailableLoaders,
+} from "deco/routes/live/invoke/index.ts";
 import { AppManifest } from "deco/types.ts";
 import { deferred } from "std/async/deferred.ts";
 import openai, {
@@ -16,7 +19,9 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
   instructions?: string;
   prompts?: Prompt[];
   welcomeMessage?: string;
-  availableFunctions?: Array<AvailableActions<TManifest> | AvailableLoaders<TManifest>>;
+  availableFunctions?: Array<
+    AvailableActions<TManifest> | AvailableLoaders<TManifest>
+  >;
   useProps?: (props: unknown) => unknown;
 }
 
