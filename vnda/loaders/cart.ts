@@ -25,16 +25,19 @@ const loader = async (
   try {
     orderForm = cartId
       ? await api["GET /api/v2/carts/:cartId"]({ cartId }).then((res) =>
-        res.json())
+        res.json()
+      )
       : await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
-        res.json());
+        res.json()
+      );
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 
   if (!orderForm) {
     orderForm = await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
-      res.json());
+      res.json()
+    );
   }
 
   const hasAgent = orderForm.agent === agent;
