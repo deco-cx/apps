@@ -169,7 +169,10 @@ export const messageProcessorFor = async (
               };
             } catch (err) {
               console.log("invoke error", await err?.resp?.text());
-              throw err;
+              return {
+                tool_call_id: call.id,
+                output: "[]",
+              }
             }
           }),
         );
