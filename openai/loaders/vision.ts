@@ -72,15 +72,14 @@ export default async function (
   _req: Request,
   ctx: AppContext,
 ): Promise<Description[]> {
-  if (url && descriptionsCache[url]) {
-    return descriptionsCache[url];
+  if (url && (descriptionsCache[url] ?? ctx.visionFineTunning[url])) {
+    return (descriptionsCache[url] ?? ctx.visionFineTunning[url]);
   }
   imagesCache[url] ??= getImagesFrom(url);
   const images = await imagesCache[url];
   if (images.length === 0) {
     return [];
   }
-  console.log(JSON.stringify({ images }));
   const response = await ctx.openAI.chat.completions.create({
     model: "gpt-4-vision-preview",
     messages: [
