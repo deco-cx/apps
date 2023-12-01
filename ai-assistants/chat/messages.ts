@@ -3,11 +3,11 @@ import { AssistantCreateParams, MessageContentText } from "../deps.ts";
 import { JSONSchema7 } from "deco/deps.ts";
 import { genSchemas } from "deco/engine/schema/reader.ts";
 import { context } from "deco/live.ts";
+import { AppManifest } from "deco/mod.ts";
+import { mschema } from "deco/routes/live/_meta.ts";
 import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
-import { mschema } from "deco/routes/live/_meta.ts";
-import { AppManifest } from "deco/mod.ts";
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
@@ -131,14 +131,12 @@ export const messageProcessorFor = async (
         thread.id,
         run.id,
       );
-      console.log("status is", runStatus.status);
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
         const tool_outputs = await Promise.all(
           outputs.tool_calls.map(async (call) => {
             try {
-              console.log("invoking", call);
               const props = JSON.parse(call.function.arguments || "{}");
 
               const cacheKey =
@@ -168,11 +166,11 @@ export const messageProcessorFor = async (
                 output: JSON.stringify(invokeResponse),
               };
             } catch (err) {
-              console.log("invoke error", await err?.resp?.text());
+              console.error("invoke error", err);
               return {
                 tool_call_id: call.id,
                 output: "[]",
-              }
+              };
             }
           }),
         );
@@ -200,7 +198,6 @@ export const messageProcessorFor = async (
       );
 
     if (!lastMessageForRun) {
-      console.log("No message to reply");
       reply({
         messageId,
         type: "message",

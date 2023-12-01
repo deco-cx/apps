@@ -37,8 +37,8 @@ export interface QueryProps extends CommonProps {
    * @examples "price:asc"
    */
   sort?: Sort;
-  /** @description total number of items to display. Required for query */
   /**
+   * @description total number of items to display. Required for query
    * @examples 1\n2
    */
   count: number;

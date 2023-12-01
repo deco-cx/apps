@@ -17,7 +17,7 @@ const process = async (
   while (true) {
     const message = await Promise.race([
       abort.notified(),
-      q.pop({ signal: AbortSignal.timeout(10000000) }),
+      q.pop(),
     ]);
     if (typeof message !== "object") {
       break;
