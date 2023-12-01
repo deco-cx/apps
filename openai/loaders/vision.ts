@@ -35,8 +35,9 @@ const getImagesFrom = async (url: string): Promise<string[]> => {
   );
   const images: string[] = [];
   page.on("response", (response) => {
-    const matches = /.*\.(jepg)$/.exec(response.url());
-    if (matches && (matches.length === 2)) {
+    const headers = response.headers();
+    const contentType = headers["Content-Type"] ?? headers["content-type"];
+    if (contentType?.includes("jpeg")) {
       images.push(response.url());
     }
   });
@@ -60,6 +61,7 @@ export default async function (
   if (images.length === 0) {
     return [];
   }
+  console.log(JSON.stringify({ images }));
   const response = await ctx.openAI.chat.completions.create({
     model: "gpt-4-vision-preview",
     messages: [
@@ -67,7 +69,7 @@ export default async function (
         role: "user",
         content: [
           { type: "text", text: request ?? "What’s in this image?" },
-          ...images.slice(0, 4).map((image) => {
+          ...images.slice(0, 2).map((image) => {
             return {
               type: "image_url" as const,
               image_url: {

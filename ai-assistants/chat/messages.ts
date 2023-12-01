@@ -3,7 +3,7 @@ import { AssistantCreateParams, MessageContentText } from "../deps.ts";
 import { JSONSchema7 } from "deco/deps.ts";
 import { genSchemas } from "deco/engine/schema/reader.ts";
 import { context } from "deco/live.ts";
-import { ChatMessage } from "../actions/chat.ts";
+import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
 
@@ -97,7 +97,7 @@ export const messageProcessorFor = async (
       tools,
     });
     // Wait for the assistant answer
-    const jsonReplies: unknown[] = [];
+    const functionCallReplies: FunctionCallReply<unknown>[] = [];
     let runStatus;
     do {
       runStatus = await threads.runs.retrieve(
@@ -118,7 +118,11 @@ export const messageProcessorFor = async (
                 call.function.name as any,
                 assistant?.useProps?.(props) ?? props,
               );
-              jsonReplies.push(invokeResponse);
+              functionCallReplies.push({
+                name: call.function.name,
+                props,
+                response: invokeResponse,
+              });
               return {
                 tool_call_id: call.id,
                 output: JSON.stringify(invokeResponse),
@@ -167,8 +171,8 @@ export const messageProcessorFor = async (
         : strContent,
     });
 
-    if (!strContent.endsWith("#") && jsonReplies.length > 0) {
-      reply({ type: "json", content: jsonReplies });
+    if (!strContent.endsWith("#") && functionCallReplies.length > 0) {
+      reply({ type: "function_calls" as const, content: functionCallReplies });
     }
   };
 };

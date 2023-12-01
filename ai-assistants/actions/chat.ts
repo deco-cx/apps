@@ -32,12 +32,18 @@ export interface ReplyMessage {
   content: string;
 }
 
-export interface ReplyJson<T> {
-  type: "json";
-  content: T;
+export interface FunctionCallReply<T> {
+  name: string
+  props: unknown
+  response:T
 }
 
-export type Reply<T> = ReplyMessage | ReplyJson<T>;
+export interface ReplyFunctionCalls<T> {
+  type: "function_calls";
+  content: FunctionCallReply<T>[];
+}
+
+export type Reply<T> = ReplyMessage | ReplyFunctionCalls<T>;
 
 export interface ChatMessage {
   text: string;
