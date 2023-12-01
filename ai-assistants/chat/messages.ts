@@ -139,7 +139,7 @@ export const messageProcessorFor = async (
           outputs.tool_calls.map(async (call) => {
             try {
               console.log("invoking", call);
-              const props = JSON.parse(call.function.arguments);
+              const props = JSON.parse(call.function.arguments || "{}");
 
               const cacheKey =
                 `${call.function.arguments}${call.function.name}`;
