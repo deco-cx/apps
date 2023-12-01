@@ -45,7 +45,8 @@ const appTools = (assistant: AIAssistant): Promise<
           type: "function" as const,
           function: {
             name: functionKey,
-            description: `Usage for: ${schema?.description}. Example: ${schema?.examples}`,
+            description:
+              `Usage for: ${schema?.description}. Example: ${schema?.examples}`,
             parameters: {
               ...dereferenced,
               definitions: undefined,
@@ -80,6 +81,7 @@ export const messageProcessorFor = async (
     }. Last, but not least, DO NOT CHANGE THE FUNCTIONS NAMES THAT I'LL GIVE TO YOU, do not remove .ts at the end of function name nor /. If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an @ symbol at the end of the phrase. Otherwise, add a # symbol.
     For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. #".
     `;
+  let latestMsg: undefined | string = undefined;
   return async ({ text: content, reply }: ChatMessage) => {
     // send message
     await threads.messages.create(thread.id, {
@@ -142,7 +144,9 @@ export const messageProcessorFor = async (
       await sleep(500);
     } while (["in_progress", "queued"].includes(runStatus.status));
 
-    const messages = await threads.messages.list(thread.id);
+    const messages = await threads.messages.list(thread.id, {
+      after: latestMsg,
+    });
     const lastMessageForRun = messages.data
       .findLast((message) =>
         message.run_id == run.id && message.role === "assistant"
@@ -155,6 +159,7 @@ export const messageProcessorFor = async (
     const strContent =
       (lastMessageForRun.content[0] as MessageContentText).text.value;
 
+    latestMsg = lastMessageForRun.id;
     reply({
       type: "message",
       content: strContent.endsWith("@") || strContent.endsWith("#")
