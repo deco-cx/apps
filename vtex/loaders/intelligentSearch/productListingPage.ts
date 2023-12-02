@@ -327,7 +327,7 @@ const loader = async (
             misspelled: productsResult.correction?.misspelled ?? false,
             match: productsResult.recordsFiltered,
             operator: productsResult.operator,
-            locale: segment.cultureInfo ?? "pt-BR", 
+            locale: segment.cultureInfo ?? "pt-BR",
           },
           req,
           ctx,
