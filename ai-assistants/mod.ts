@@ -14,16 +14,48 @@ import openai, {
 import { Assistant } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
+/**
+ * Represents an AI Assistant with specific capabilities and configurations.
+ * @template TManifest - The type of the AppManifest associated with the AI Assistant.
+ */
 export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
+  /**
+   * The name of the AI Assistant.
+   */
   name: string;
+
+  /**
+   * Optional instructions or guidelines for the AI Assistant.
+   */
   instructions?: string;
+
+  /**
+   * Optional array of prompts to provide context for the AI Assistant.
+   */
   prompts?: Prompt[];
+
+  /**
+   * Optional welcome message to be displayed when the chat session starts.
+   */
   welcomeMessage?: string;
+
+  /**
+   * Optional list of available functions (actions or loaders) that the AI Assistant can perform.
+   * @type {Array<AvailableActions<TManifest> | AvailableLoaders<TManifest>>}
+   */
   availableFunctions?: Array<
     AvailableActions<TManifest> | AvailableLoaders<TManifest>
   >;
+
+  /**
+   * Optional function to customize the handling of properties (props) passed to the AI Assistant.
+   * It takes a set of properties and returns a modified set of properties.
+   * @param {unknown} props - The properties passed to the AI Assistant.
+   * @returns {unknown} - The modified properties.
+   */
   useProps?: (props: unknown) => unknown;
 }
+
 
 export interface Prompt {
   content: string;

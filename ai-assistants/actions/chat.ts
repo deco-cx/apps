@@ -9,6 +9,13 @@ export interface Props {
   assistant: string;
 }
 
+/**
+ * Processes messages from the message queue.
+ * @param {Queue<ChatMessage>} q - The message queue.
+ * @param {Notify} abort - The notification object for aborting the message processing.
+ * @param {(c: ChatMessage) => Promise<void>} processor - The function for processing each message.
+ * @returns {Promise<void>} - A promise representing the completion of the message processing.
+ */
 const process = async (
   q: Queue<ChatMessage>,
   abort: Notify,
@@ -64,6 +71,13 @@ export interface ChatMessage {
   reply: <T = unknown>(reply: Reply<T>) => void;
 }
 
+/**
+ * Initializes a WebSocket chat connection and processes incoming messages.
+ * @param {Props} props - The properties for the chat session.
+ * @param {Request} req - The HTTP request object containing the WebSocket connection.
+ * @param {AppContext} ctx - The application context.
+ * @returns {Response} - The HTTP response object.
+ */
 export default function openChat(
   props: Props,
   req: Request,
@@ -84,6 +98,9 @@ export default function openChat(
   );
   const messagesQ = new Queue<ChatMessage>();
 
+  /**
+   * Handles the WebSocket connection on open event.
+   */
   socket.onopen = async () => {
     process(
       messagesQ,
@@ -92,6 +109,7 @@ export default function openChat(
         socket.send(
           `An error was suddently ocurred when message processor was created. ${err}`,
         );
+        socket.close();
         abort.notifyAll();
         throw err;
       }),
@@ -100,9 +118,17 @@ export default function openChat(
       socket.send(aiAssistant.welcomeMessage ?? "Welcome to the chat!");
     });
   };
+  /**
+   * Handles the WebSocket connection on close event.
+   */
   socket.onclose = () => {
     abort.notifyAll();
   };
+
+   /**
+   * Handles the WebSocket connection on message event.
+   * @param {MessageEvent} event - The WebSocket message event.
+   */
   socket.onmessage = (event) => {
     messagesQ.push({
       text: event.data,

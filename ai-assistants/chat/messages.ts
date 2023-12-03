@@ -12,6 +12,10 @@ import { dereferenceJsonSchema } from "../schema.ts";
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
   null;
+
+/**
+ * Select functions from manifest based on the available functions or pickall loaders and actions.
+ */
 const pickFunctions = (
   funcs: string[],
   { name, baseUrl, ...blocks }: AppManifest,
@@ -31,6 +35,11 @@ const pickFunctions = (
   }
   return newManifest;
 };
+/**
+ * Builds assistant tools that can be used by OpenAI assistant to execute actions based on users requests.
+ * @param assistant the assistant that will handle the request
+ * @returns an array of available functions that can be used.
+ */
 const appTools = (assistant: AIAssistant): Promise<
   AssistantCreateParams.AssistantToolsFunction[]
 > => {
@@ -92,6 +101,13 @@ export interface ProcessorOpts {
 const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
 
 const cache: Record<string, unknown> = {};
+
+/**
+ * Creates a message processor function for the given AI assistant and context.
+ * @param {AIAssistant} assistant - The AI assistant for processing messages.
+ * @param {AppContext} ctx - The application context.
+ * @returns {Promise<(message: ChatMessage) => void>} - A function that processes incoming chat messages.
+ */
 export const messageProcessorFor = async (
   assistant: AIAssistant,
   ctx: AppContext,
@@ -108,14 +124,20 @@ export const messageProcessorFor = async (
     For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. #".
     `;
   let latestMsg: undefined | string = undefined;
+  const aiAssistant = await ctx.assistant.then((assistant) => assistant.id);
+  const tools = await appTools(assistant);
+
+  /**
+   * Processes an incoming chat message.
+   * @param {ChatMessage} message - The incoming chat message.
+   * @returns {Promise<void>} - A promise representing the completion of message processing.
+   */
   return async ({ text: content, reply }: ChatMessage) => {
     // send message
     await threads.messages.create(thread.id, {
       content,
       role: "user",
     });
-    const aiAssistant = await ctx.assistant.then((assistant) => assistant.id);
-    const tools = await appTools(assistant);
     // create run
     const run = await threads.runs.create(thread.id, {
       assistant_id: aiAssistant,
