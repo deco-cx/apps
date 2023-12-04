@@ -2,9 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$0 from "./loaders/messages.ts";
 import * as $$$$$$$$$0 from "./actions/chat.ts";
 
 const manifest = {
+  "loaders": {
+    "ai-assistants/loaders/messages.ts": $$$0,
+  },
   "actions": {
     "ai-assistants/actions/chat.ts": $$$$$$$$$0,
   },

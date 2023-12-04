@@ -35,10 +35,21 @@ const process = async (
   }
 };
 
+export interface MessageContentText {
+  type: "text";
+  value: string;
+}
+
+export interface MessageContentFile {
+  type: "file";
+  fileId: string;
+}
+
 export interface ReplyMessage {
   messageId: string;
   type: "message";
-  content: string;
+  content: Array<MessageContentText | MessageContentFile>;
+  role: "user" | "assistant";
 }
 
 export interface FunctionCall {
@@ -125,7 +136,7 @@ export default function openChat(
     abort.notifyAll();
   };
 
-   /**
+  /**
    * Handles the WebSocket connection on message event.
    * @param {MessageEvent} event - The WebSocket message event.
    */

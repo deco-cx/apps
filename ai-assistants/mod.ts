@@ -56,7 +56,6 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
   useProps?: (props: unknown) => unknown;
 }
 
-
 export interface Prompt {
   content: string;
   context: string;

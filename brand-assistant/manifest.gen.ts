@@ -3,14 +3,10 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/assistant.ts";
-import * as $$$$$$0 from "./sections/Chat.tsx";
 
 const manifest = {
   "loaders": {
     "brand-assistant/loaders/assistant.ts": $$$0,
-  },
-  "sections": {
-    "brand-assistant/sections/Chat.tsx": $$$$$$0,
   },
   "name": "brand-assistant",
   "baseUrl": import.meta.url,

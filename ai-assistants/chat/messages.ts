@@ -222,8 +222,9 @@ export const messageProcessorFor = async (
     if (!lastMessageForRun) {
       reply({
         messageId,
+        role: "assistant",
         type: "message",
-        content: "Desculpe, estamos enfrentando problemas.",
+        content: [{ type: "text", value: "Something went wrong." }],
       });
       return;
     }
@@ -233,10 +234,14 @@ export const messageProcessorFor = async (
     latestMsg = lastMessageForRun.id;
     reply({
       messageId,
+      role: "assistant",
       type: "message",
-      content: strContent.endsWith("@") || strContent.endsWith("#")
-        ? strContent.slice(0, strContent.length - 2)
-        : strContent,
+      content: [{
+        type: "text",
+        value: strContent.endsWith("@") || strContent.endsWith("#")
+          ? strContent.slice(0, strContent.length - 2)
+          : strContent,
+      }],
     });
 
     if (!strContent.endsWith("#") && functionCallReplies.length > 0) {
