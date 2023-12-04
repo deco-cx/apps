@@ -34,7 +34,7 @@ function getVariants(
   level = 0,
 ) {
   const products = product
-    .variants.filter((variant) => !sku || variant.sku === sku)
+    .variants.filter((variant) => !sku || variant.sku === sku || variant.id.toString() === sku)
     .map(
       (variant) => {
         const { values } = variant;
@@ -57,11 +57,12 @@ function productVariantToProduct(
   url: URL,
   level = 0,
 ): Product {
-  const { product_id, sku, promotional_price, price } = variant;
+
+  const { id, product_id, sku, promotional_price, price } = variant;
   const { name, description, images, categories, brand, attributes } = product;
   const variantUrl = new URL(url);
 
-  variantUrl.searchParams.set("sku", sku);
+  variantUrl.searchParams.set("sku", sku || id.toString());
 
   const schemaProduct: Product = {
     "@type": "Product",
@@ -115,7 +116,7 @@ function getOffer(variant: ProductVariant): Offer {
     inventoryLevel: {
       value: getStockVariant(variant.stock),
     } as QuantitativeValue,
-    price: variant.promotional_price || 0,
+    price: Number(variant.promotional_price) || Number(variant.price) || 0,
     availability: getStockVariant(variant.stock) > 0
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
@@ -123,12 +124,12 @@ function getOffer(variant: ProductVariant): Offer {
       {
         "@type": "UnitPriceSpecification",
         priceType: "https://schema.org/ListPrice",
-        price: variant.price || 0,
+        price: Number(variant.price) || 0,
       },
       {
         "@type": "UnitPriceSpecification",
         priceType: "https://schema.org/SalePrice",
-        price: variant.promotional_price || 0,
+        price: Number(variant.promotional_price) || 0,
       },
     ],
   };
