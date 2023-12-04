@@ -34,7 +34,9 @@ function getVariants(
   level = 0,
 ) {
   const products = product
-    .variants.filter((variant) => !sku || variant.sku === sku || variant.id.toString() === sku)
+    .variants.filter((variant) =>
+      !sku || variant.sku === sku || variant.id.toString() === sku
+    )
     .map(
       (variant) => {
         const { values } = variant;
@@ -57,7 +59,6 @@ function productVariantToProduct(
   url: URL,
   level = 0,
 ): Product {
-
   const { id, product_id, sku, promotional_price, price } = variant;
   const { name, description, images, categories, brand, attributes } = product;
   const variantUrl = new URL(url);
