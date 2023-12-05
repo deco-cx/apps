@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "std/http/mod.ts";
+import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
 import type { SelectedFacet, Sort } from "../utils/types.ts";
 
@@ -65,16 +65,34 @@ export const withDefaultParams = ({
   hideUnavailableItems: hideUnavailableItems ?? false,
 });
 
-export const getOrSetISCookie = (req: Request, headers: Headers) => {
-  const cookies = getCookies(req.headers);
+const IS_ANONYMOUS = Symbol("segment");
+const IS_SESSION = Symbol("segment");
 
+export const getISCookiesFromBag = (ctx: AppContext) => {
+  const anonymous = ctx.bag.get(IS_ANONYMOUS);
+  const session = ctx.bag.get(IS_SESSION);
+
+  if (anonymous && session) {
+    return {
+      anonymous,
+      session,
+    };
+  }
+
+  return null;
+};
+
+export const setISCookiesBag = (
+  cookies: Record<string, string>,
+  ctx: AppContext,
+) => {
   let anonymous = cookies[ANONYMOUS_COOKIE];
   let session = cookies[SESSION_COOKIE];
 
   if (!anonymous) {
     anonymous = crypto.randomUUID();
 
-    setCookie(headers, {
+    setCookie(ctx.response.headers, {
       value: anonymous,
       name: ANONYMOUS_COOKIE,
       path: "/",
@@ -87,7 +105,7 @@ export const getOrSetISCookie = (req: Request, headers: Headers) => {
   if (!session) {
     session = crypto.randomUUID();
 
-    setCookie(headers, {
+    setCookie(ctx.response.headers, {
       value: session,
       name: SESSION_COOKIE,
       path: "/",
@@ -96,6 +114,9 @@ export const getOrSetISCookie = (req: Request, headers: Headers) => {
       maxAge: 30 * 60,
     });
   }
+
+  ctx.bag.set(IS_ANONYMOUS, anonymous);
+  ctx.bag.set(IS_SESSION, session);
 
   return {
     anonymous,

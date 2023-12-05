@@ -55,7 +55,7 @@ const action = async (
         orderFormId,
         attachment,
         index,
-        sc: segment?.channel,
+        sc: segment?.payload.channel,
       },
       {
         body: { content, noSplitItem, expectedOrderFormSections },

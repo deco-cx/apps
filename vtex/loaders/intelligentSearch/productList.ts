@@ -131,7 +131,7 @@ const loader = async (
 
   const options = {
     baseUrl: url,
-    priceCurrency: segment.currencyCode ?? "BRL",
+    priceCurrency: segment.payload.currencyCode ?? "BRL",
   };
 
   // Transform VTEX product format into schema.org's compatible format
@@ -146,5 +146,7 @@ const loader = async (
     ),
   );
 };
+
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
 
 export default loader;

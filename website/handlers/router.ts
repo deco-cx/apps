@@ -70,16 +70,11 @@ export const router = (
           { context: ctx, request: req },
         );
 
-      const end = configs?.monitoring?.timings?.start?.("load-data");
       const hand = isAwaitable(resolvedOrPromise)
         ? await resolvedOrPromise
         : resolvedOrPromise;
-      end?.();
 
-      return await hand(
-        req,
-        ctx,
-      );
+      return await hand(req, ctx);
     };
 
     const handler = hrefRoutes[`${url.pathname}${url.search || ""}`] ??
@@ -165,9 +160,13 @@ export default function RoutesSelection(
   ctx: AppContext,
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
+    // TODO: (@tlgimenes) Remove routing from request cycle
+
     const monitoring = isFreshCtx<DecoSiteState>(connInfo)
       ? connInfo.state.monitoring
       : undefined;
+
+    const timing = monitoring?.timings.start("router");
 
     const routesFromProps = Array.isArray(audiences) ? audiences : [];
     // everyone should come first in the list given that we override the everyone value with the upcoming flags.
@@ -194,10 +193,10 @@ export default function RoutesSelection(
       })),
       hrefRoutes,
       ctx.get,
-      {
-        monitoring,
-      },
+      { monitoring },
     );
+
+    timing?.end();
 
     return await server(req, connInfo);
   };
