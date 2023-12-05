@@ -173,8 +173,8 @@ const loader = async (
   const [map, term] = missingParams && fq.length > 0
     ? ["", ""]
     : missingParams
-      ? getMapAndTerm(pageTypes)
-      : [maybeMap, maybeTerm];
+    ? getMapAndTerm(pageTypes)
+    : [maybeMap, maybeTerm];
 
   const isPage = pageTypes.length > 0;
 
@@ -221,7 +221,9 @@ const loader = async (
   const [, _total] = resources.split("/");
 
   if (vtexProducts && !Array.isArray(vtexProducts)) {
-    throw new Error(`Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`)
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`,
+    );
   }
 
   // Transform VTEX product format into schema.org's compatible format
@@ -232,7 +234,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl,
-          priceCurrency: segment.currencyCode ?? "BRL",
+          priceCurrency: segment.payload.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
@@ -313,8 +315,24 @@ const loader = async (
       recordPerPage: count,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req, previousPage ? currentPage : undefined),
+    seo: pageTypesToSeo(
+      pageTypes,
+      baseUrl,
+      previousPage ? currentPage : undefined,
+    ),
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+
+  url.searchParams.sort();
+  url.searchParams.set("segment", token);
+
+  return url.href;
 };
 
 export default loader;

@@ -60,9 +60,9 @@ async function loader(
 
     if (slug) {
       const pageType = await vcsDeprecated
-      ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
-        term: `${slug}/p`,
-      }, STALE).then((res) => res.json());
+        ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
+          term: `${slug}/p`,
+        }, STALE).then((res) => res.json());
 
       // Page type doesn't exists or this is not product page
       if (pageType?.pageType === "Product") {
@@ -82,15 +82,17 @@ async function loader(
   }
 
   const products = await vcsDeprecated
-  ["GET /api/catalog_system/pub/products/crossselling/:type/:productId"]({
-    type: crossSelling,
-    productId,
-    ...params,
-  }, { ...STALE, headers: withSegmentCookie(segment) })
+    ["GET /api/catalog_system/pub/products/crossselling/:type/:productId"]({
+      type: crossSelling,
+      productId,
+      ...params,
+    }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
 
   if (products && !Array.isArray(products)) {
-    throw new Error(`Error while fetching VTEX data ${JSON.stringify(products)}`)
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(products)}`,
+    );
   }
 
   // unique Ids
@@ -119,5 +121,7 @@ async function loader(
 
   return relatedProducts;
 }
+
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
 
 export default loader;
