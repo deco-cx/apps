@@ -2,7 +2,6 @@ import { Product, ProductLeaf } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
-import { getSegmentFromBag } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import listLoader from "../legacy/productList.ts";
 
@@ -120,7 +119,4 @@ export default async (
   return p;
 };
 
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (_req: Request, ctx: AppContext) =>
-  getSegmentFromBag(ctx).token;
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";

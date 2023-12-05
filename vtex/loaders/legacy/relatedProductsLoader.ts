@@ -122,9 +122,6 @@ async function loader(
   return relatedProducts;
 }
 
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (_req: Request, ctx: AppContext) =>
-  getSegmentFromBag(ctx).token;
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
 
 export default loader;
