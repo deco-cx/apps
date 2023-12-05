@@ -120,9 +120,24 @@ const loader = async (
       ? await withIsSimilarTo(req, ctx, page.product)
       : page.product,
     seo: pageType.pageType === "Product"
-      ? pageTypesToSeo([pageType], req)
+      ? pageTypesToSeo([pageType], baseUrl)
       : null,
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+
+  const params = new URLSearchParams();
+  params.set("skuId", url.searchParams.get("skuId") ?? "");
+  params.set("segment", token);
+
+  url.search = params.toString();
+
+  return url.href;
 };
 
 export default loader;

@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "std/http/mod.ts";
+import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
 import type { Segment } from "./types.ts";
 import { removeNonLatin1Chars } from "../../utils/normalize.ts";
@@ -6,15 +6,36 @@ import { removeNonLatin1Chars } from "../../utils/normalize.ts";
 const SEGMENT_COOKIE_NAME = "vtex_segment";
 const SEGMENT = Symbol("segment");
 
+export interface WrappedSegment {
+  payload: Partial<Segment>;
+  token: string;
+}
+
+/**
+ * by default segment starts with null values
+ */
+const DEFAULT_SEGMENT: Partial<Segment> = {
+  utmi_campaign: null,
+  utm_campaign: null,
+  utm_source: null,
+  channel: "1",
+  cultureInfo: "pt-BR",
+  currencyCode: "BRL",
+  currencySymbol: "R$",
+  countryCode: "BRA",
+};
+
 export const isAnonymous = ({
-  campaigns,
-  utm_campaign,
-  utm_source,
-  utmi_campaign,
-  channel,
-  priceTables,
-  regionId,
-}: Partial<Segment>) =>
+  payload: {
+    campaigns,
+    utm_campaign,
+    utm_source,
+    utmi_campaign,
+    channel,
+    priceTables,
+    regionId,
+  },
+}: WrappedSegment) =>
   !campaigns &&
   !utm_campaign &&
   !utm_source &&
@@ -23,10 +44,12 @@ export const isAnonymous = ({
   !priceTables &&
   !regionId;
 
-export const getSegmentFromBag = (ctx: AppContext): Partial<Segment> =>
-  ctx.bag?.get(SEGMENT);
-export const setSegmentInBag = (ctx: AppContext, segment: Partial<Segment>) =>
-  ctx.bag?.set(SEGMENT, segment);
+const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
+  ctx.bag?.set(SEGMENT, data);
+
+export const getSegmentFromBag = (
+  ctx: AppContext,
+): WrappedSegment => ctx.bag?.get(SEGMENT);
 
 /**
  * Stable serialization.
@@ -34,7 +57,7 @@ export const setSegmentInBag = (ctx: AppContext, segment: Partial<Segment>) =>
  * This means that even if the attributes are in a different order, the final segment
  * value will be the same. This improves cache hits
  */
-export const serialize = ({
+const serialize = ({
   campaigns,
   channel,
   priceTables,
@@ -65,17 +88,7 @@ export const serialize = ({
   return btoa(JSON.stringify(seg));
 };
 
-export const parse = (cookie: string) => JSON.parse(atob(cookie));
-
-export const getSegmentFromCookie = (
-  req: Request,
-): Partial<Segment> | undefined => {
-  const cookies = getCookies(req.headers);
-  const cookie = cookies[SEGMENT_COOKIE_NAME];
-  const segment = cookie && parse(cookie);
-
-  return segment;
-};
+const parse = (cookie: string) => JSON.parse(atob(cookie));
 
 const SEGMENT_QUERY_PARAMS = [
   "utmi_campaign" as const,
@@ -96,28 +109,44 @@ export const buildSegmentCookie = (req: Request): Partial<Segment> => {
   return partialSegment;
 };
 
-export const setSegmentCookie = (
-  segment: Partial<Segment>,
-  headers: Headers = new Headers(),
-): Headers => {
-  setCookie(headers, {
-    value: serialize(segment),
-    name: SEGMENT_COOKIE_NAME,
-    path: "/",
-    secure: true,
-    httpOnly: true,
-  });
-
-  return headers;
-};
-
 export const withSegmentCookie = (
-  segment: Partial<Segment>,
+  { token }: WrappedSegment,
   headers?: Headers,
 ) => {
   const h = new Headers(headers);
 
-  h.set("cookie", `${SEGMENT_COOKIE_NAME}=${serialize(segment)}`);
+  h.set("cookie", `${SEGMENT_COOKIE_NAME}=${token}`);
 
   return h;
+};
+
+export const setSegmentBag = (
+  cookies: Record<string, string>,
+  req: Request,
+  ctx: AppContext,
+) => {
+  const vtex_segment = cookies[SEGMENT_COOKIE_NAME];
+  const segmentFromCookie = vtex_segment && parse(vtex_segment);
+  const segmentFromRequest = buildSegmentCookie(req);
+
+  const segment = {
+    channel: ctx.salesChannel,
+    ...DEFAULT_SEGMENT,
+    ...ctx.defaultSegment,
+    ...segmentFromCookie,
+    ...segmentFromRequest,
+  };
+  const token = serialize(segment);
+  setSegmentInBag(ctx, { payload: segment, token });
+
+  // Avoid setting cookie when segment from request matches the one generated
+  if (vtex_segment !== token) {
+    setCookie(ctx.response.headers, {
+      value: token,
+      name: SEGMENT_COOKIE_NAME,
+      path: "/",
+      secure: true,
+      httpOnly: true,
+    });
+  }
 };

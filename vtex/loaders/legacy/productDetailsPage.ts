@@ -84,4 +84,6 @@ async function loader(
   };
 }
 
+export { cache, cacheKey } from "../intelligentSearch/productDetailsPage.ts";
+
 export default loader;

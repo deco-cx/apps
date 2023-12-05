@@ -313,8 +313,24 @@ const loader = async (
       recordPerPage: count,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req, previousPage ? currentPage : undefined),
+    seo: pageTypesToSeo(
+      pageTypes,
+      baseUrl,
+      previousPage ? currentPage : undefined,
+    ),
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+
+  url.searchParams.sort();
+  url.searchParams.set("segment", token);
+
+  return url.href;
 };
 
 export default loader;

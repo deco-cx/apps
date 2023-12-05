@@ -76,6 +76,16 @@ const mapLabelledFuzzyToFuzzy = (
   }
 };
 
+const ALLOWED_PARAMS = new Set([
+  "ps",
+  "sort",
+  "page",
+  "o",
+  "q",
+  "fuzzy",
+  "map",
+]);
+
 export interface Props {
   /**
    * @description overides the query term
@@ -126,21 +136,6 @@ export interface Props {
    */
   page?: number;
 }
-
-// TODO (mcandeia) investigating bugs related to returning the same set of products but different queries.
-const _singleFlightKey = (props: Props, { request }: { request: Request }) => {
-  const url = new URL(request.url);
-  const { query, count, sort, page, selectedFacets, fuzzy } = searchArgsOf(
-    props,
-    url,
-  );
-  return `${query}${count}${sort}${page}${fuzzy}${
-    selectedFacets
-      .map((f) => `${f.key}${f.value}`)
-      .sort()
-      .join("")
-  }`;
-};
 
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
@@ -402,10 +397,34 @@ const loader = async (
     sortOptions,
     seo: pageTypesToSeo(
       pageTypes,
-      req,
+      baseUrl,
       hasPreviousPage ? currentPage : undefined,
     ),
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+
+  const params = new URLSearchParams();
+
+  url.searchParams.forEach((value, key) => {
+    if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !key.startsWith("filter.")) {
+      return;
+    }
+
+    params.append(key, value);
+  });
+
+  params.sort();
+  params.set("segment", token);
+
+  url.search = params.toString();
+
+  return url.href;
 };
 
 export default loader;
