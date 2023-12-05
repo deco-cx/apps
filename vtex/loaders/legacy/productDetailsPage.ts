@@ -36,16 +36,18 @@ async function loader(
   const skuId = url.searchParams.get("skuId");
 
   const response = await vcsDeprecated
-  ["GET /api/catalog_system/pub/products/search/:slug/p"](
-    { ...params, slug },
-    { ...STALE, headers: withSegmentCookie(segment) },
-  ).then((res) => res.json());
+    ["GET /api/catalog_system/pub/products/search/:slug/p"](
+      { ...params, slug },
+      { ...STALE, headers: withSegmentCookie(segment) },
+    ).then((res) => res.json());
 
   if (response && !Array.isArray(response)) {
-    throw new Error(`Error while fetching VTEX data ${JSON.stringify(response)}`)
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(response)}`,
+    );
   }
 
-  const [product] = response
+  const [product] = response;
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -57,18 +59,18 @@ async function loader(
   const kitItems: LegacyProduct[] =
     Array.isArray(sku.kitItems) && sku.kitItems.length > 0
       ? await vcsDeprecated
-      ["GET /api/catalog_system/pub/products/search/:term?"](
-        {
-          ...params,
-          fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
-        },
-        STALE,
-      ).then((res) => res.json())
+        ["GET /api/catalog_system/pub/products/search/:term?"](
+          {
+            ...params,
+            fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
+          },
+          STALE,
+        ).then((res) => res.json())
       : [];
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: segment.currencyCode ?? "BRL",
+    priceCurrency: segment.payload.currencyCode ?? "BRL",
   });
 
   return {
