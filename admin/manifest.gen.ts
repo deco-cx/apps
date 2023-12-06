@@ -15,9 +15,10 @@ import * as $$$$$$$$$1 from "./actions/blocks/restore.ts";
 import * as $$$$$$$$$2 from "./actions/blocks/safeDelete.ts";
 import * as $$$$$$$$$3 from "./actions/blocks/newRevision.ts";
 import * as $$$$$$$$$4 from "./actions/blocks/delete.ts";
-import * as $$$$$$$$$5 from "./actions/pages/publish.ts";
-import * as $$$$$$$$$6 from "./actions/pages/new.ts";
-import * as $$$$$$$$$7 from "./actions/pages/delete.ts";
+import * as $$$$$$$$$5 from "./actions/workspaces/connect.ts";
+import * as $$$$$$$$$6 from "./actions/pages/publish.ts";
+import * as $$$$$$$$$7 from "./actions/pages/new.ts";
+import * as $$$$$$$$$8 from "./actions/pages/delete.ts";
 
 const manifest = {
   "loaders": {
@@ -36,9 +37,10 @@ const manifest = {
     "deco-sites/admin/actions/blocks/publish.ts": $$$$$$$$$0,
     "deco-sites/admin/actions/blocks/restore.ts": $$$$$$$$$1,
     "deco-sites/admin/actions/blocks/safeDelete.ts": $$$$$$$$$2,
-    "deco-sites/admin/actions/pages/delete.ts": $$$$$$$$$7,
-    "deco-sites/admin/actions/pages/new.ts": $$$$$$$$$6,
-    "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$5,
+    "deco-sites/admin/actions/pages/delete.ts": $$$$$$$$$8,
+    "deco-sites/admin/actions/pages/new.ts": $$$$$$$$$7,
+    "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$6,
+    "deco-sites/admin/actions/workspaces/connect.ts": $$$$$$$$$5,
   },
   "name": "deco-sites/admin",
   "baseUrl": import.meta.url,

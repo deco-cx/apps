@@ -55,3 +55,5 @@ export class FsBlockStorage implements BlockStore {
     return this.readOnly.onChange(callback);
   }
 }
+
+export const storage = new FsBlockStorage();

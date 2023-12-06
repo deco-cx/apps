@@ -1,7 +1,7 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC } from "deco/mod.ts";
-import { FsBlockStorage } from "./fsStorage.ts";
+import { storage } from "./fsStorage.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -50,7 +50,7 @@ export interface Props {
  * @title Admin
  */
 export default function App({ resolvables }: Props): App<Manifest, State> {
-  return { manifest, state: { storage: new FsBlockStorage() }, resolvables };
+  return { manifest, state: { storage }, resolvables };
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;

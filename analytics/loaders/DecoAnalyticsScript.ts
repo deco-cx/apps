@@ -1,7 +1,7 @@
-import { AppContext } from "../mod.ts";
-import { Script } from "../../website/types.ts";
-import { exclusionPropsAndHashScript } from "../scripts/plausible_scripts.ts";
 import { getFlagsFromCookies } from "../../utils/cookie.ts";
+import { Script } from "../../website/types.ts";
+import { AppContext } from "../mod.ts";
+import { exclusionPropsAndHashScript } from "../scripts/plausible_scripts.ts";
 
 export type Props = {
   defer?: boolean;
