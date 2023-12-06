@@ -21,10 +21,11 @@ import * as $$$15 from "./loaders/cart.ts";
 import * as $$$16 from "./loaders/proxy.ts";
 import * as $$$17 from "./loaders/intelligentSearch/productDetailsPage.ts";
 import * as $$$18 from "./loaders/intelligentSearch/productList.ts";
-import * as $$$19 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$19 from "./loaders/intelligentSearch/productListingPage.ts";
 import * as $$$20 from "./loaders/intelligentSearch/productListingPage.ts";
-import * as $$$21 from "./loaders/user.ts";
-import * as $$$22 from "./loaders/user.ts";
+import * as $$$21 from "./loaders/cart.ts";
+import * as $$$22 from "./loaders/categories/tree.ts";
+import * as $$$23 from "./loaders/user.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/trigger.ts";
 import * as $$$$$$$$$1 from "./actions/notifyme.ts";
@@ -51,10 +52,11 @@ import * as $$$$$$$$$$1 from "./workflows/events.ts";
 const manifest = {
   "loaders": {
     "vtex/loaders/cart.ts": $$$15,
+    "vtex/loaders/categories/tree.ts": $$$22,
     "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$17,
     "vtex/loaders/intelligentSearch/productList.ts": $$$18,
     "vtex/loaders/intelligentSearch/productListingPage.ts": $$$20,
-    "vtex/loaders/intelligentSearch/suggestions.ts": $$$19,
+    "vtex/loaders/intelligentSearch/suggestions.ts": $$$20,
     "vtex/loaders/legacy/productDetailsPage.ts": $$$7,
     "vtex/loaders/legacy/productList.ts": $$$8,
     "vtex/loaders/legacy/productListingPage.ts": $$$10,
@@ -68,7 +70,7 @@ const manifest = {
     "vtex/loaders/product/extensions/suggestions.ts": $$$2,
     "vtex/loaders/product/wishlist.ts": $$$5,
     "vtex/loaders/proxy.ts": $$$16,
-    "vtex/loaders/user.ts": $$$21,
+    "vtex/loaders/user.ts": $$$23,
     "vtex/loaders/wishlist.ts": $$$14,
     "vtex/loaders/workflow/product.ts": $$$12,
     "vtex/loaders/workflow/products.ts": $$$13,
