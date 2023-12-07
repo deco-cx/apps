@@ -21,15 +21,14 @@ const loader = async (
   const agent = getAgentCookie(req.headers);
 
   const orderForm = cartId
-    ? await api["GET /api/v2/carts/:cartId"]({ cartId })
-      .then((res) => res.json())
-    : await api["POST /api/v2/carts"]({}, { body: agent ? { agent } : {} })
-      .then((res) => res.json());
+    ? await api["GET /api/v2/carts/:cartId"]({ cartId }).then((res) => res.json())
+    : await api["POST /api/v2/carts"]({}, { body: {} }).then((res) => res.json());
 
   const hasAgent = orderForm.agent === agent;
 
   if (!hasAgent && agent && cartId) {
-    await api["PATCH /api/v2/carts/:cartId"]({ cartId }, { body: { agent } });
+    const [{ id }] = await api["GET /api/v2/users"]({ external_code: agent }).then((res) => res.json())
+    await api["PATCH /api/v2/carts/:cartId"]({ cartId }, { body: { agent, user_id: id } });
   }
 
   setCartCookie(ctx.response.headers, orderForm.id.toString());

@@ -17946,6 +17946,10 @@
           "rebate_token": {
             "type": "string",
             "description": "Token do desconto"
+          },
+          "user_id": {
+            "type": "number",
+            "description": "Id do agente"
           }
         }
       },
