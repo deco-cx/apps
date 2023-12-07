@@ -124,7 +124,12 @@ export const PreviewVtex = (app: AppRuntime<BaseContext, App["state"]>) => {
             </ul>
             <p>
               Para adicionar domínios na VTEX, entre{" "}
-              <a href={`https://${account}.myvtex.com/admin/account/stores/`} target="_blank">nessa página</a>.
+              <a
+                href={`https://${account}.myvtex.com/admin/account/stores/`}
+                target="_blank"
+              >
+                nessa página
+              </a>.
             </p>
           </details>
 
