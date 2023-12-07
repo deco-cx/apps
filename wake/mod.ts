@@ -49,7 +49,9 @@ export default function App(props: Props): App<Manifest, State> {
   const { token, storefrontToken } = props;
 
   if (!token || !storefrontToken) {
-    throw new Error("Missing tokens");
+    console.warn(
+      "Missing tokens for wake app. Add it into the wake app config in deco.cx admin. Some functionalities may not work",
+    );
   }
 
   const api = createHttpClient<OpenAPI>({
@@ -60,7 +62,7 @@ export default function App(props: Props): App<Manifest, State> {
 
   const storefront = createGraphqlClient({
     endpoint: "https://storefront-api.fbits.net/graphql",
-    headers: new Headers({ "TCS-Access-Token": storefrontToken }),
+    headers: new Headers({ "TCS-Access-Token": `${storefrontToken}` }),
     fetcher: fetchSafe,
   });
 
