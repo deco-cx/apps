@@ -1,4 +1,7 @@
-import { AssistantCreateParams } from "../deps.ts";
+import {
+  AssistantCreateParams,
+  RequiredActionFunctionToolCall,
+} from "../deps.ts";
 import { threadMessageToReply } from "../loaders/messages.ts";
 
 import { JSONSchema7 } from "deco/deps.ts";
@@ -103,6 +106,47 @@ const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
 
 const cache: Record<string, unknown> = {};
 
+const invokeFor = (
+  ctx: AppContext,
+  assistant: AIAssistant,
+  onFunctionCallStart: (
+    tool: RequiredActionFunctionToolCall,
+    props: unknown,
+  ) => void,
+  onFunctionCallEnd: (
+    tool: RequiredActionFunctionToolCall,
+    props: unknown,
+    response: unknown,
+  ) => void,
+) => {
+  return async (call: RequiredActionFunctionToolCall) => {
+    try {
+      const props = JSON.parse(call.function.arguments || "{}");
+
+      const cacheKey = `${call.function.arguments}${call.function.name}`;
+
+      const assistantProps = assistant?.useProps?.(props) ?? props;
+      cache[cacheKey] ??= ctx.invoke(
+        // deno-lint-ignore no-explicit-any
+        call.function.name as any,
+        assistantProps,
+      );
+      onFunctionCallStart(call, assistantProps);
+      const invokeResponse = await cache[cacheKey];
+      onFunctionCallEnd(call, assistantProps, invokeResponse);
+      return {
+        tool_call_id: call.id,
+        output: JSON.stringify(invokeResponse),
+      };
+    } catch (err) {
+      console.error("invoke error", err);
+      return {
+        tool_call_id: call.id,
+        output: "[]",
+      };
+    }
+  };
+};
 /**
  * Creates a message processor function for the given AI assistant and context.
  * @param {AIAssistant} assistant - The AI assistant for processing messages.
@@ -148,6 +192,24 @@ export const messageProcessorFor = async (
     const messageId = run.id;
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
+
+    const invoke = invokeFor(ctx, assistant, (call, props) => {
+      reply({
+        messageId,
+        type: "start_function_call",
+        content: {
+          name: call.function.name,
+          props,
+        },
+      });
+    }, (call, props, response) => {
+      functionCallReplies.push({
+        name: call.function.name,
+        props,
+        response,
+      });
+    });
+
     let runStatus;
     do {
       runStatus = await threads.runs.retrieve(
@@ -158,44 +220,7 @@ export const messageProcessorFor = async (
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
         const tool_outputs = await Promise.all(
-          outputs.tool_calls.map(async (call) => {
-            try {
-              const props = JSON.parse(call.function.arguments || "{}");
-
-              const cacheKey =
-                `${call.function.arguments}${call.function.name}`;
-
-              cache[cacheKey] ??= ctx.invoke(
-                // deno-lint-ignore no-explicit-any
-                call.function.name as any,
-                assistant?.useProps?.(props) ?? props,
-              );
-              reply({
-                messageId,
-                type: "start_function_call",
-                content: {
-                  name: call.function.name,
-                  props,
-                },
-              });
-              const invokeResponse = await cache[cacheKey];
-              functionCallReplies.push({
-                name: call.function.name,
-                props,
-                response: invokeResponse,
-              });
-              return {
-                tool_call_id: call.id,
-                output: JSON.stringify(invokeResponse),
-              };
-            } catch (err) {
-              console.error("invoke error", err);
-              return {
-                tool_call_id: call.id,
-                output: "[]",
-              };
-            }
-          }),
+          outputs.tool_calls.map(invoke),
         );
         await threads.runs.submitToolOutputs(
           thread.id,
