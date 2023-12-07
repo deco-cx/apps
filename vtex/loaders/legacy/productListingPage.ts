@@ -173,8 +173,8 @@ const loader = async (
   const [map, term] = missingParams && fq.length > 0
     ? ["", ""]
     : missingParams
-      ? getMapAndTerm(pageTypes)
-      : [maybeMap, maybeTerm];
+    ? getMapAndTerm(pageTypes)
+    : [maybeMap, maybeTerm];
 
   const isPage = pageTypes.length > 0;
 
@@ -224,7 +224,7 @@ const loader = async (
     throw new Error(
       `Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`,
     );
- }
+  }
 
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
