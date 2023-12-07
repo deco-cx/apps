@@ -30,14 +30,11 @@ const loader = async (
       : await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
         res.json()
       );
-  } catch (error) {
-    console.log(error);
-  }
-
-  if (!orderForm) {
+  } catch (_error) {
+    // Failed to get current cardId, creating a new orderForm
     orderForm = await api["POST /api/v2/carts"]({}, { body: {} }).then((res) =>
-      res.json()
-    );
+    res.json()
+  );
   }
 
   const hasAgent = orderForm.agent === agent;
