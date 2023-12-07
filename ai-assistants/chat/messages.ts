@@ -1,4 +1,5 @@
-import { AssistantCreateParams, MessageContentText } from "../deps.ts";
+import { AssistantCreateParams } from "../deps.ts";
+import { threadMessageToReply } from "../loaders/messages.ts";
 
 import { JSONSchema7 } from "deco/deps.ts";
 import { genSchemas } from "deco/engine/schema/reader.ts";
@@ -214,37 +215,21 @@ export const messageProcessorFor = async (
     const messages = await threads.messages.list(thread.id, {
       after: latestMsg,
     });
-    const lastMessageForRun = messages.data
+    const threadMessages = messages.data;
+    const lastMsg = threadMessages
       .findLast((message) =>
         message.run_id == run.id && message.role === "assistant"
       );
 
-    if (!lastMessageForRun) {
-      reply({
-        messageId,
-        role: "assistant",
-        type: "message",
-        content: [{ type: "text", value: "Something went wrong." }],
-      });
+    if (!lastMsg) {
+      // TODO(@mcandeia) in some cases the bot didn't respond anything.
       return;
     }
-    const strContent =
-      (lastMessageForRun.content[0] as MessageContentText).text.value;
 
-    latestMsg = lastMessageForRun.id;
-    reply({
-      messageId,
-      role: "assistant",
-      type: "message",
-      content: [{
-        type: "text",
-        value: strContent.endsWith("@") || strContent.endsWith("#")
-          ? strContent.slice(0, strContent.length - 2)
-          : strContent,
-      }],
-    });
+    latestMsg = lastMsg.id;
+    reply(threadMessageToReply(lastMsg));
 
-    if (!strContent.endsWith("#") && functionCallReplies.length > 0) {
+    if (functionCallReplies.length > 0) {
       reply({
         messageId,
         type: "function_calls" as const,

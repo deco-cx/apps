@@ -6,6 +6,7 @@ export type {
 export type {
   MessageContentImageFile,
   MessageContentText,
+  ThreadMessage,
 } from "https://deno.land/x/openai@v4.19.1/resources/beta/threads/messages/messages.ts";
 export { Notify } from "https://deno.land/x/async@v2.0.2/notify.ts";
 export { Queue } from "https://deno.land/x/async@v2.0.2/queue.ts";
