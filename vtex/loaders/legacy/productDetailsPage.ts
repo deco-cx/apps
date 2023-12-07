@@ -59,13 +59,13 @@ async function loader(
   const kitItems: LegacyProduct[] =
     Array.isArray(sku.kitItems) && sku.kitItems.length > 0
       ? await vcsDeprecated
-        ["GET /api/catalog_system/pub/products/search/:term?"](
-          {
-            ...params,
-            fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
-          },
-          STALE,
-        ).then((res) => res.json())
+      ["GET /api/catalog_system/pub/products/search/:term?"](
+        {
+          ...params,
+          fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
+        },
+        STALE,
+      ).then((res) => res.json())
       : [];
 
   const page = toProductPage(product, sku, kitItems, {
