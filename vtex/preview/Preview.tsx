@@ -14,6 +14,7 @@ export const PreviewVtex = (app: AppRuntime<BaseContext, App["state"]>) => {
   console.log("ctx", context.site);
   const decoSite = context.site;
   const publicUrl = app.state?.publicUrl || "";
+  const account = app.state?.account || "";
 
   const withoutSubDomain = publicUrl.split(".").slice(1).join(".");
   const siteName = publicUrl.split(".")[1];
@@ -122,7 +123,8 @@ export const PreviewVtex = (app: AppRuntime<BaseContext, App["state"]>) => {
               <li class="ml-2">- secure.{withoutSubDomain}</li>
             </ul>
             <p>
-              Para adicionar domínios na VTEX, entre <a href="">nessa página</a>.
+              Para adicionar domínios na VTEX, entre{" "}
+              <a href={`https://${account}.myvtex.com/admin/account/stores/`} target="_blank">nessa página</a>.
             </p>
           </details>
 
