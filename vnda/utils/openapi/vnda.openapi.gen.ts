@@ -3346,6 +3346,10 @@ export interface ParametrosDeCarrinhoResumido {
    * Token do desconto
    */
   rebate_token?: string;
+  /**
+   * Id do agente
+   */
+  user_id?: number;
 }
 /**
  * Modelo que representa um carrinho na API

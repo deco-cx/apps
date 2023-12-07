@@ -3,6 +3,10 @@ import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/vnda.openapi.gen.ts";
 import { SecretString } from "../website/loaders/secretString.ts";
+import type { AppMiddlewareContext as AMC } from "deco/mod.ts";
+import { middleware } from "./middleware.ts";
+
+export type AppMiddlewareContext = AMC<ReturnType<typeof VNDA>>;
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -48,7 +52,7 @@ export const color = 0x0C29D0;
 /**
  * @title VNDA
  */
-export default function App(props: Props): App<Manifest, State> {
+export default function VNDA(props: Props): App<Manifest, State> {
   const { authToken, publicUrl, sandbox } = props;
   const api = createHttpClient<OpenAPI>({
     headers: new Headers({
@@ -65,5 +69,6 @@ export default function App(props: Props): App<Manifest, State> {
   return {
     state: { ...props, api },
     manifest,
+    middleware,
   };
 }
