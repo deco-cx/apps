@@ -48,6 +48,12 @@ export const color = 0xB600EE;
 export default function App(props: Props): App<Manifest, State> {
   const { token, storefrontToken } = props;
 
+  if (!token || !storefrontToken) {
+    console.warn(
+      "Missing tokens for wake app. Add it into the wake app config in deco.cx admin. Some functionalities may not work",
+    );
+  }
+
   const api = createHttpClient<OpenAPI>({
     base: "https://api.fbits.net",
     headers: new Headers({ "Authorization": `Basic ${token}` }),
