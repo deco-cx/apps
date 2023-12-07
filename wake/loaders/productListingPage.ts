@@ -116,7 +116,11 @@ const searchLoader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   // get url from params
-  const url = new URL(req.url);
+  console.log(req.headers.get("referer"));
+  const url = new URL(req.url).pathname === "/live/invoke"
+    ? new URL(req.headers.get("referer") ?? req.url)
+    : new URL(req.url);
+
   const { storefront } = ctx;
 
   const headers = parseHeaders(req.headers);
@@ -144,7 +148,7 @@ const searchLoader = async (
       ?.split(":")[1]?.split(";").map(Number) ??
       url.searchParams.get("precoPor")?.split(";").map(Number) ?? [];
 
-  const offset = page <= 1 ? 0 : page * limit;
+  const offset = page <= 1 ? 0 : (page - 1) * limit;
 
   const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>({
     variables: {
@@ -191,6 +195,17 @@ const searchLoader = async (
 
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);
+
+  console.log(
+    "aaa",
+    {
+      ...comoonParams,
+      url: url.pathname,
+    },
+    products.length,
+    isHotsite,
+    query,
+  );
 
   const hasNextPage = Boolean(
     (data?.result?.productsByOffset?.totalCount ?? 0) %
