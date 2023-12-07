@@ -48,10 +48,6 @@ export const color = 0xB600EE;
 export default function App(props: Props): App<Manifest, State> {
   const { token, storefrontToken } = props;
 
-  if (!token || !storefrontToken) {
-    throw new Error("Missing tokens");
-  }
-
   const api = createHttpClient<OpenAPI>({
     base: "https://api.fbits.net",
     headers: new Headers({ "Authorization": `Basic ${token}` }),
@@ -60,7 +56,7 @@ export default function App(props: Props): App<Manifest, State> {
 
   const storefront = createGraphqlClient({
     endpoint: "https://storefront-api.fbits.net/graphql",
-    headers: new Headers({ "TCS-Access-Token": storefrontToken }),
+    headers: new Headers({ "TCS-Access-Token": `${storefrontToken}` }),
     fetcher: fetchSafe,
   });
 
