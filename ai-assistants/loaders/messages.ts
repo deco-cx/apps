@@ -1,5 +1,9 @@
 import { ReplyMessage } from "../actions/chat.ts";
-import { MessageContentImageFile, MessageContentText, ThreadMessage } from "../deps.ts";
+import {
+  MessageContentImageFile,
+  MessageContentText,
+  ThreadMessage,
+} from "../deps.ts";
 import { AppContext } from "../mod.ts";
 export interface Props {
   thread: string;
@@ -9,9 +13,9 @@ export interface Props {
 
 const normalize = (strContent: string) => {
   return strContent.endsWith("@") || strContent.endsWith("#")
-  ? strContent.slice(0, strContent.length - 2)
-  : strContent
-}
+    ? strContent.slice(0, strContent.length - 2)
+    : strContent;
+};
 
 export const threadMessageToReply = (message: ThreadMessage): ReplyMessage => {
   return {
@@ -23,8 +27,8 @@ export const threadMessageToReply = (message: ThreadMessage): ReplyMessage => {
         : { type: "text", value: normalize(cnt.text!.value) }
     ),
     role: message.role,
-  }
-}
+  };
+};
 
 const isFileContent = (
   v: MessageContentImageFile | MessageContentText,

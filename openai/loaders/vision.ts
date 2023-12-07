@@ -12,6 +12,12 @@ export interface Props {
    * @examples you can ask for something like "What’s in this image?"\n or "Is there a car?"
    */
   request?: string;
+  /**
+   * @description
+   * @examples 5
+   * @default 5
+   */
+  imageCount?: number;
 }
 
 const getImagesFrom = async (url: string): Promise<string[]> => {
@@ -42,9 +48,11 @@ const getImagesFrom = async (url: string): Promise<string[]> => {
  */
 export type Description = string;
 
+// by default consider the 5-first images.
+const DEFAULT_IMAGE_COUNT = 5;
 const imagesCache: Record<string, Promise<string[]>> = {};
 export default async function (
-  { url, request }: Props,
+  { url, request, imageCount }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Description[]> {
@@ -63,7 +71,7 @@ export default async function (
         role: "user",
         content: [
           { type: "text", text: request ?? "What’s in this image?" },
-          ...images.slice(0, 5).map((image) => {
+          ...images.slice(0, imageCount ?? DEFAULT_IMAGE_COUNT).map((image) => {
             return {
               type: "image_url" as const,
               image_url: {
