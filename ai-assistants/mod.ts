@@ -51,7 +51,6 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
 
   /**
    * Optional list of available functions (actions or loaders) that the AI Assistant can perform.
-   * @type {Array<AvailableActions<TManifest> | AvailableLoaders<TManifest>>}
    */
   availableFunctions?: Array<
     AvailableActions<TManifest> | AvailableLoaders<TManifest>
