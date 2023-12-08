@@ -88,6 +88,7 @@ const state = {
   addItemAttachment: enqueue("vtex/actions/cart/updateItemAttachment.ts"),
   removeItemAttachment: enqueue("vtex/actions/cart/removeItemAttachment.ts"),
   sendAttachment: enqueue("vtex/actions/cart/updateAttachment.ts"),
+  updateGifts: enqueue("vtex/actions/cart/updateGifts.ts"),
   simulate: invoke.vtex.actions.cart.simulation,
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };
