@@ -14,6 +14,16 @@ import openai, {
 import { Assistant } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
+export type GPTModel =
+  | "gpt-4-0613"
+  | "gpt-4-0314"
+  | "gpt-4-1106-preview"
+  | "gpt-4"
+  | "gpt-3.5-turbo-1106"
+  | "gpt-3.5-turbo-16k"
+  | "gpt-3.5-turbo-16k-0613"
+  | "gpt-3.5-turbo"
+  | "gpt-3.5-turbo-0613";
 /**
  * Represents an AI Assistant with specific capabilities and configurations.
  * @template TManifest - The type of the AppManifest associated with the AI Assistant.
@@ -54,6 +64,11 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
    * @returns {unknown} - The modified properties.
    */
   useProps?: (props: unknown) => unknown;
+
+  /**
+   * The GPT model that will be used, if not specified the assistant model will be used.
+   */
+  model?: GPTModel | { custom: string };
 }
 
 export interface Prompt {

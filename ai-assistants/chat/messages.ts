@@ -191,6 +191,9 @@ export const messageProcessorFor = async (
     });
     // create run
     const run = await threads.runs.create(thread.id, {
+      model: typeof assistant.model === "object"
+        ? assistant.model.custom
+        : assistant.model,
       assistant_id: aiAssistant,
       instructions,
       tools,
