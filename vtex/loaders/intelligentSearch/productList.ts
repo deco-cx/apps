@@ -27,13 +27,20 @@ export interface CollectionProps extends CommonProps {
 }
 
 export interface QueryProps extends CommonProps {
-  /** @description query to use on search */
+  /**
+   * @description query to use on search
+   * @examples "shoes"\n"blue shoes"
+   */
   query: string;
   /**
    * @description search sort parameter
+   * @examples "price:asc"
    */
   sort?: Sort;
-  /** @description total number of items to display. Required for query */
+  /**
+   * @description total number of items to display. Required for query
+   * @examples 1\n2
+   */
   count: number;
 }
 
@@ -106,6 +113,7 @@ const fromProps = ({ props }: Props) => {
 /**
  * @title VTEX Integration - Intelligent Search
  * @description Product List loader
+ * @examples { "props": { "collection": "139", "count": 12 } }\n{ "props": { "query": "shoes", "count": 12 } }\n{ "props": { "ids": ["2000001", "2000002"], "count": 12 } }
  */
 const loader = async (
   expandedProps: Props,

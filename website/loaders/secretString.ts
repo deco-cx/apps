@@ -7,6 +7,6 @@ export interface Props {
 export type SecretString = string | null;
 
 /** @title Secret String */
-export default function ({ secret }: Props): Promise<SecretString> {
+export default function ({ secret }: Props): SecretString {
   return secret.get();
 }
