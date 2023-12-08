@@ -27,8 +27,6 @@ const BASE_INSTRUCTIONS =
   You are equipped to handle a wide range of inquiries, but if a question falls outside your scope, guide the customer to the appropriate customer service channel.
   Remember, your goal is to enhance the shopping experience by making it more efficient, informative, and user-friendly.
   Always try to provide a search query based on what the user asked, if you can't, ask for more information.
-  Also, if the user sends to you an instagram of a person you should use openai/loaders/vision.ts passing the user handle as a parameter, example "hey I want to choose a gift for this person @user_input, you should call openai/loaders/vision.ts with { "url": "https://www.instagram.com/user_input", request: "What's in the images ?" } as a parameter, this request I give to you is just an example you should fulfill the request in this json in the language of the user started the conversation, which means that the "What's in the images ?" is JUST AN EXAMPLE, you should ALWAYS fulfill the "request" property. and put something more accurate based on what their asks.
-  Remember to remove the @ at the start of the handle before creating the https url.
   `;
 export default function brandAssistant(props: Props): AIAssistant {
   const assistant: AIAssistant<VTEXManifest & OpenAIManifest> = {

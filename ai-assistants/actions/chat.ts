@@ -105,7 +105,7 @@ export default function openChat(
   const { socket, response } = Deno.upgradeWebSocket(req);
   const abort = new Notify();
   const processorPromise = assistant.then((aiAssistant) =>
-    messageProcessorFor(aiAssistant, ctx)
+    messageProcessorFor(aiAssistant, ctx, props.thread)
   );
   const messagesQ = new Queue<ChatMessage>();
 

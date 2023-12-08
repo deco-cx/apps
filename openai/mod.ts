@@ -1,21 +1,14 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
+import { Secret } from "../website/loaders/secret.ts";
 import { OpenAI } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { Secret } from "../website/loaders/secret.ts";
-
-export interface VisionFineTunning {
-  url: string;
-  descriptions: string[];
-}
 
 export interface Props {
   apiKey?: Secret;
-  visionFineTunning?: VisionFineTunning[];
 }
 
 export interface State {
   openAI: OpenAI;
-  visionFineTunning: Record<string, string[]>;
 }
 
 /**
@@ -28,10 +21,6 @@ export default function App(
     manifest,
     state: {
       openAI: new OpenAI({ apiKey: state.apiKey?.get() ?? undefined }),
-      visionFineTunning: (state.visionFineTunning ?? []).reduce(
-        (acc, vision) => ({ [vision.url]: vision.descriptions, ...acc }),
-        {},
-      ),
     },
   };
 }

@@ -11,8 +11,13 @@ export interface Props {
   before?: string;
 }
 
+export const Tokens = {
+  POSITIVE: "@",
+  NEGATIVE: "#",
+};
 const normalize = (strContent: string) => {
-  return strContent.endsWith("@") || strContent.endsWith("#")
+  return strContent.endsWith(Tokens.POSITIVE) ||
+      strContent.endsWith(Tokens.NEGATIVE)
     ? strContent.slice(0, strContent.length - 2)
     : strContent;
 };

@@ -62,7 +62,10 @@ export interface Prompt {
 }
 
 export interface Props extends OpenAIProps {
-  assistantId?: string;
+  /**
+   * @description the assistant Id
+   */
+  assistantId: string;
   /**
    * @description Instructions
    */
@@ -76,7 +79,7 @@ export interface State extends OpenAIState {
   assistants: Record<string, Promise<AIAssistant>>;
 }
 /**
- * @title Brand Assistant
+ * @title AI Assistants Hub
  */
 export default function App(
   state: Props,
@@ -108,7 +111,7 @@ export default function App(
       ),
       instructions: `${state.instructions ?? ""}`,
       assistant: assistantsAPI.retrieve(
-        state.assistantId ?? "asst_vwWNeBUSmBlKe88mXq7qlU7f",
+        state.assistantId,
       ),
     },
     dependencies: [openAIApp],

@@ -2,7 +2,7 @@ import {
   AssistantCreateParams,
   RequiredActionFunctionToolCall,
 } from "../deps.ts";
-import { threadMessageToReply } from "../loaders/messages.ts";
+import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
 import { JSONSchema7 } from "deco/deps.ts";
 import { genSchemas } from "deco/engine/schema/reader.ts";
@@ -156,17 +156,23 @@ const invokeFor = (
 export const messageProcessorFor = async (
   assistant: AIAssistant,
   ctx: AppContext,
+  threadId?: string,
 ) => {
   const openAI = ctx.openAI;
   const threads = openAI.beta.threads;
-  const thread = await threads.create();
+  const thread =
+    await (threadId ? threads.retrieve(threadId) : threads.create());
   const instructions =
-    `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. Below are arbitrary prompt that gives you information about the current context, it can be empty. \n${
+    `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. ${
+      assistant.prompts
+        ? "Below are arbitrary prompt that gives you information about the current context, it can be empty."
+        : ""
+    }\n${
       (assistant.prompts ?? []).map((prompt) =>
         `this is the ${prompt.context}: ${prompt.content}`
       )
-    }. Last, but not least, DO NOT CHANGE THE FUNCTIONS NAMES THAT I'LL GIVE TO YOU, do not remove .ts at the end of function name nor /. If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an @ symbol at the end of the phrase. Otherwise, add a # symbol.
-    For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. #".
+    }. DO NOT CHANGE FUNCTIONS NAMES, do not remove .ts at the end of function name. do not remove / at the end of function name. If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an ${Tokens.POSITIVE} symbol at the end of the phrase. Otherwise, add a ${Tokens.NEGATIVE} symbol.
+    For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. ${Tokens.NEGATIVE}".
     `;
   let latestMsg: undefined | string = undefined;
   const aiAssistant = await ctx.assistant.then((assistant) => assistant.id);
