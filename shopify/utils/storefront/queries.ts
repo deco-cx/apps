@@ -96,7 +96,7 @@ fragment Product on Product {
   title
   totalInventory
   updatedAt
-  variants(first: 10) {
+  variants(first: 250) {
     nodes {
       ...ProductVariant
     }

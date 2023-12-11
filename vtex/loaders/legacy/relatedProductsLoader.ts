@@ -122,4 +122,6 @@ async function loader(
   return relatedProducts;
 }
 
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
+
 export default loader;

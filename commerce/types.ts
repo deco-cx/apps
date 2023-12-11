@@ -5,6 +5,21 @@ export declare type WithContext<T extends Things> = T & {
   "@context": "https://schema.org";
 };
 
+/**
+ * An store category
+ */
+export interface Category {
+  /**
+   * @title The Category Name
+   */
+  name: string;
+  /**
+   * @title Sub categories
+   * @description Store's sub categories
+   */
+  children?: Category[];
+}
+
 export declare type Things = Thing | Product | BreadcrumbList;
 
 export interface Thing {

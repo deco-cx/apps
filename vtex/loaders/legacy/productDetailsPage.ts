@@ -70,7 +70,7 @@ async function loader(
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: segment.currencyCode ?? "BRL",
+    priceCurrency: segment.payload.currencyCode ?? "BRL",
   });
 
   return {
@@ -85,5 +85,7 @@ async function loader(
     },
   };
 }
+
+export { cache, cacheKey } from "../intelligentSearch/productDetailsPage.ts";
 
 export default loader;

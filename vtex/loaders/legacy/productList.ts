@@ -185,7 +185,7 @@ const loader = async (
   const products = vtexProducts.map((p) =>
     toProduct(p, p.items[0], 0, {
       baseUrl: baseUrl,
-      priceCurrency: segment.currencyCode ?? "BRL",
+      priceCurrency: segment.payload.currencyCode ?? "BRL",
     })
   );
 
@@ -195,5 +195,7 @@ const loader = async (
     ),
   );
 };
+
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
 
 export default loader;

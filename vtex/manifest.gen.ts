@@ -2,27 +2,30 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/proxy.ts";
-import * as $$$1 from "./loaders/cart.ts";
-import * as $$$2 from "./loaders/navbar.ts";
-import * as $$$3 from "./loaders/user.ts";
-import * as $$$4 from "./loaders/legacy/productList.ts";
-import * as $$$5 from "./loaders/legacy/productDetailsPage.ts";
-import * as $$$6 from "./loaders/legacy/relatedProductsLoader.ts";
-import * as $$$7 from "./loaders/legacy/suggestions.ts";
-import * as $$$8 from "./loaders/legacy/productListingPage.ts";
-import * as $$$9 from "./loaders/intelligentSearch/productList.ts";
-import * as $$$10 from "./loaders/intelligentSearch/productDetailsPage.ts";
-import * as $$$11 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$12 from "./loaders/intelligentSearch/productListingPage.ts";
-import * as $$$13 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$14 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$15 from "./loaders/product/extensions/list.ts";
-import * as $$$16 from "./loaders/product/extensions/suggestions.ts";
-import * as $$$17 from "./loaders/product/wishlist.ts";
-import * as $$$18 from "./loaders/wishlist.ts";
-import * as $$$19 from "./loaders/workflow/products.ts";
-import * as $$$20 from "./loaders/workflow/product.ts";
+import * as $$$0 from "./loaders/categories/tree.ts";
+import * as $$$1 from "./loaders/proxy.ts";
+import * as $$$2 from "./loaders/cart.ts";
+import * as $$$3 from "./loaders/navbar.ts";
+import * as $$$4 from "./loaders/user.ts";
+import * as $$$5 from "./loaders/legacy/productList.ts";
+import * as $$$6 from "./loaders/legacy/productDetailsPage.ts";
+import * as $$$7 from "./loaders/legacy/relatedProductsLoader.ts";
+import * as $$$8 from "./loaders/legacy/suggestions.ts";
+import * as $$$9 from "./loaders/legacy/productListingPage.ts";
+import * as $$$10 from "./loaders/intelligentSearch/productList.ts";
+import * as $$$11 from "./loaders/intelligentSearch/topsearches.ts";
+import * as $$$12 from "./loaders/intelligentSearch/productDetailsPage.ts";
+import * as $$$13 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$14 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$15 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$16 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$17 from "./loaders/product/extensions/list.ts";
+import * as $$$18 from "./loaders/product/extensions/suggestions.ts";
+import * as $$$19 from "./loaders/product/extend.ts";
+import * as $$$20 from "./loaders/product/wishlist.ts";
+import * as $$$21 from "./loaders/wishlist.ts";
+import * as $$$22 from "./loaders/workflow/products.ts";
+import * as $$$23 from "./loaders/workflow/product.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/masterdata/createDocument.ts";
 import * as $$$$$$$$$1 from "./actions/trigger.ts";
@@ -48,27 +51,30 @@ import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
 
 const manifest = {
   "loaders": {
-    "vtex/loaders/cart.ts": $$$1,
-    "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$10,
-    "vtex/loaders/intelligentSearch/productList.ts": $$$9,
-    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$12,
-    "vtex/loaders/intelligentSearch/suggestions.ts": $$$11,
-    "vtex/loaders/legacy/productDetailsPage.ts": $$$5,
-    "vtex/loaders/legacy/productList.ts": $$$4,
-    "vtex/loaders/legacy/productListingPage.ts": $$$8,
-    "vtex/loaders/legacy/relatedProductsLoader.ts": $$$6,
-    "vtex/loaders/legacy/suggestions.ts": $$$7,
-    "vtex/loaders/navbar.ts": $$$2,
-    "vtex/loaders/product/extensions/detailsPage.ts": $$$14,
-    "vtex/loaders/product/extensions/list.ts": $$$15,
-    "vtex/loaders/product/extensions/listingPage.ts": $$$13,
-    "vtex/loaders/product/extensions/suggestions.ts": $$$16,
-    "vtex/loaders/product/wishlist.ts": $$$17,
-    "vtex/loaders/proxy.ts": $$$0,
-    "vtex/loaders/user.ts": $$$3,
-    "vtex/loaders/wishlist.ts": $$$18,
-    "vtex/loaders/workflow/product.ts": $$$20,
-    "vtex/loaders/workflow/products.ts": $$$19,
+    "vtex/loaders/cart.ts": $$$2,
+    "vtex/loaders/categories/tree.ts": $$$0,
+    "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$12,
+    "vtex/loaders/intelligentSearch/productList.ts": $$$10,
+    "vtex/loaders/intelligentSearch/productListingPage.ts": $$$14,
+    "vtex/loaders/intelligentSearch/suggestions.ts": $$$13,
+    "vtex/loaders/intelligentSearch/topsearches.ts": $$$11,
+    "vtex/loaders/legacy/productDetailsPage.ts": $$$6,
+    "vtex/loaders/legacy/productList.ts": $$$5,
+    "vtex/loaders/legacy/productListingPage.ts": $$$9,
+    "vtex/loaders/legacy/relatedProductsLoader.ts": $$$7,
+    "vtex/loaders/legacy/suggestions.ts": $$$8,
+    "vtex/loaders/navbar.ts": $$$3,
+    "vtex/loaders/product/extend.ts": $$$19,
+    "vtex/loaders/product/extensions/detailsPage.ts": $$$16,
+    "vtex/loaders/product/extensions/list.ts": $$$17,
+    "vtex/loaders/product/extensions/listingPage.ts": $$$15,
+    "vtex/loaders/product/extensions/suggestions.ts": $$$18,
+    "vtex/loaders/product/wishlist.ts": $$$20,
+    "vtex/loaders/proxy.ts": $$$1,
+    "vtex/loaders/user.ts": $$$4,
+    "vtex/loaders/wishlist.ts": $$$21,
+    "vtex/loaders/workflow/product.ts": $$$23,
+    "vtex/loaders/workflow/products.ts": $$$22,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
