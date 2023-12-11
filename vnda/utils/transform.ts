@@ -23,6 +23,7 @@ interface ProductOptions {
   url: URL;
   /** Price coded currency, e.g.: USD, BRL */
   priceCurrency: string;
+  useVariantImages?: boolean;
 }
 
 export const getProductCategoryTag = ({ tags }: ProductGroup) =>
@@ -196,13 +197,46 @@ const normalizeVariants = (
     isProductVariant(v) ? [v] : Object.values(v) as VNDAProduct[]
   );
 
+const getVariantImages = (
+  product: VNDAProductGroup,
+  variantId: string | null,
+) => {
+  const FALLBACK_IMAGE = ""; // TODO Insert a default image URL
+  const variant = pickVariant(product, variantId);
+
+  const { images: nonTypedImages = [] } = product;
+  const images = nonTypedImages as NonNullable<OProduct["images"]>;
+
+  // Filters properly variant images
+  const variantImages = images.filter(({ variant_ids = [] }) => {
+    return variant_ids.some((variantID) => variantID === variant.id);
+  });
+
+  // Creates a "default" variant image
+  if (variantImages.length === 0) {
+    return [{
+      "@type": "ImageObject" as const,
+      alternateName: variant.name ?? toURL(variant.image_url ?? ""),
+      url: toURL(variant.image_url ?? FALLBACK_IMAGE),
+    }];
+  }
+
+  return variantImages.map((image) => {
+    return {
+      "@type": "ImageObject" as const,
+      alternateName: variant.name ?? toURL(image.url ?? ""),
+      url: toURL(image.url ?? FALLBACK_IMAGE),
+    };
+  });
+};
+
 export const toProduct = (
   product: VNDAProductGroup,
   variantId: string | null,
   options: ProductOptions,
   level = 0,
 ): Product => {
-  const { url, priceCurrency } = options;
+  const { url, priceCurrency, useVariantImages = false } = options;
   const variant = pickVariant(product, variantId);
   const variants = normalizeVariants(product.variants);
   const variantUrl = new URL(
@@ -244,7 +278,9 @@ export const toProduct = (
         ? variants.map((v) => toProduct(product, v.sku!, options, 1))
         : [],
     },
-    image: product.images?.length ?? 0 > 1
+    image: useVariantImages
+      ? getVariantImages(product, variantId)
+      : product.images?.length ?? 0 > 1
       ? product.images?.map((img) => ({
         "@type": "ImageObject" as const,
         alternateName: `${img.url}`,
@@ -257,7 +293,6 @@ export const toProduct = (
           url: toURL(product.image_url ?? ""),
         },
       ],
-    // images:
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: priceCurrency,

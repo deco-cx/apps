@@ -6,6 +6,7 @@ import { parseSlug, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
+  useVariantImages?: boolean;
 }
 
 /**
@@ -18,7 +19,7 @@ async function loader(
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
-  const { slug } = props;
+  const { slug, useVariantImages } = props;
   const { api } = ctx;
 
   if (!slug) return null;
@@ -40,6 +41,7 @@ async function loader(
   const product = toProduct(maybeProduct, variantId, {
     url,
     priceCurrency: "BRL",
+    useVariantImages,
   });
 
   const segments = url.pathname.slice(1).split("/");
