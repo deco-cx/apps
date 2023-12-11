@@ -2,6 +2,7 @@ import { decryptFromHex } from "../utils/crypto.ts";
 
 /**
  * @title Plain Text Secret (use Secret instead)
+ * @deprecated true
  */
 export interface Secret {
   get: () => string | null;

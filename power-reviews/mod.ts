@@ -2,7 +2,7 @@ import type { App, FnContext } from "deco/mod.ts";
 
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
-import { SecretString } from "../website/loaders/secretString.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PowerReviews } from "./utils/client.ts";
 
@@ -12,7 +12,7 @@ export interface Props {
   /**
    * @title App Key
    */
-  appKey: SecretString;
+  appKey: Secret;
   /**
    * @title Locale
    */
@@ -34,14 +34,18 @@ interface State extends Props {
 
 export default function App(
   { appKey, locale, merchantId, merchantGroup }: Props,
-): App<Manifest, State> {
+) {
   if (!appKey) throw new Error("Missing appKey");
+
+  const stringAppKey = typeof appKey === "string"
+    ? appKey
+    : appKey?.get?.() ?? "";
 
   const api = createHttpClient<PowerReviews>({
     base: `https://readservices-b2c.powerreviews.com`,
     fetcher: fetchSafe,
     headers: new Headers({
-      Authorization: appKey,
+      Authorization: stringAppKey,
     }),
   });
 
@@ -49,12 +53,12 @@ export default function App(
     base: `https://writeservices.powerreviews.com`,
     fetcher: fetchSafe,
     headers: new Headers({
-      Authorization: appKey,
+      Authorization: stringAppKey,
     }),
   });
 
   const state = {
-    appKey,
+    appKey: stringAppKey,
     locale,
     merchantId,
     merchantGroup,
@@ -62,7 +66,7 @@ export default function App(
     apiWrite,
   };
 
-  return {
+  const app: App<Manifest, typeof state> = {
     state,
     manifest: {
       ...manifest,
@@ -85,4 +89,6 @@ export default function App(
       },
     },
   };
+
+  return app;
 }
