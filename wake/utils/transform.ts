@@ -348,15 +348,6 @@ export const toProduct = (
     toProduct(p!, { base })
   );
 
-  const isRelatedTo = (variant as SingleProductFragment).buyTogether?.map(
-    (buyItem) => {
-      return {
-        ...toProduct(buyItem!, { base }),
-        additionalType: "BuyTogether",
-      };
-    },
-  );
-
   const variantSelected = variants.find((v) => {
     return Number(v.productID) === Number(variantId);
   }) ?? {};
@@ -390,8 +381,6 @@ export const toProduct = (
       reviewCount: (variant as SingleProductFragment).reviews?.length,
       worstRating: 0,
     },
-    isRelatedTo,
-    isSimilarTo,
     additionalProperty,
     review,
     offers: {
@@ -412,6 +401,7 @@ export const toProduct = (
       }],
     },
     ...variantSelected,
+    isSimilarTo,
     isVariantOf: {
       "@type": "ProductGroup",
       url: getProductUrl(variant, base).href,

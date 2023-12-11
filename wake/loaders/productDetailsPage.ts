@@ -12,6 +12,7 @@ import { parseSlug, toBreadcrumbList, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
+  buyTogether?: boolean;
 }
 
 /**
@@ -24,7 +25,7 @@ async function loader(
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
-  const { slug } = props;
+  const { slug, buyTogether } = props;
   const { storefront } = ctx;
 
   const headers = parseHeaders(req.headers);
@@ -59,6 +60,21 @@ async function loader(
     filters: { productId: [productId] },
   }) ?? [];
 
+  const buyTogetherItens = buyTogether && wakeProduct.buyTogether
+    ? await ctx.invoke.wake.loaders.productList({
+      first: MAXIMUM_REQUEST_QUANTITY,
+      sortDirection: "ASC",
+      sortKey: "RANDOM",
+      filters: {
+        productId: wakeProduct.buyTogether.map((bt) => bt!.productId),
+        mainVariant: true,
+      },
+      getVariations: true,
+    }) ?? []
+    : [];
+
+  console.log(wakeProduct?.buyTogether?.length);
+
   const product = toProduct(
     wakeProduct,
     { base: url },
@@ -71,7 +87,17 @@ async function loader(
     breadcrumbList: toBreadcrumbList(product, wakeProduct.breadcrumbs, {
       base: url,
     }),
-    product,
+    product: {
+      ...product,
+      isRelatedTo: buyTogetherItens?.map(
+        (buyItem) => {
+          return {
+            ...buyItem,
+            additionalType: "BuyTogether",
+          };
+        },
+      ) ?? [],
+    },
     seo: {
       canonical: product.isVariantOf?.url ?? "",
       title: wakeProduct.productName ?? "",
