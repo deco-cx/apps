@@ -393,7 +393,7 @@ const SingleProduct = gql`
 fragment SingleProduct on SingleProduct {
   ...SingleProductPart,
   buyTogether {
-    ...SingleProductPart
+    productId
   } 
 }
 
@@ -469,9 +469,7 @@ export const GetProduct = {
   query: gql`query GetProduct($productId: Long!) { 
     product(productId: $productId) { 
       ...SingleProduct 
-      buyTogether {
-        ...SingleProduct
-      } 
+     
     } 
   }`,
 };

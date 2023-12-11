@@ -116,7 +116,6 @@ const searchLoader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   // get url from params
-  console.log(req.headers.get("referer"));
   const url = new URL(req.url).pathname === "/live/invoke"
     ? new URL(req.headers.get("referer") ?? req.url)
     : new URL(req.url);
@@ -195,17 +194,6 @@ const searchLoader = async (
 
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);
-
-  console.log(
-    "aaa",
-    {
-      ...comoonParams,
-      url: url.pathname,
-    },
-    products.length,
-    isHotsite,
-    query,
-  );
 
   const hasNextPage = Boolean(
     (data?.result?.productsByOffset?.totalCount ?? 0) %

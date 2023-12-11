@@ -60,7 +60,7 @@ async function loader(
     filters: { productId: [productId] },
   }) ?? [];
 
-  const buyTogetherItens = buyTogether && wakeProduct.buyTogether
+  const buyTogetherItens = buyTogether && !!wakeProduct.buyTogether?.length
     ? await ctx.invoke.wake.loaders.productList({
       first: MAXIMUM_REQUEST_QUANTITY,
       sortDirection: "ASC",
@@ -72,8 +72,6 @@ async function loader(
       getVariations: true,
     }) ?? []
     : [];
-
-  console.log(wakeProduct?.buyTogether?.length);
 
   const product = toProduct(
     wakeProduct,
