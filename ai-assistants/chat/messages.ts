@@ -1,6 +1,7 @@
 import {
   AssistantCreateParams,
   RequiredActionFunctionToolCall,
+  Thread
 } from "../deps.ts";
 import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
@@ -64,7 +65,7 @@ const appTools = (assistant: AIAssistant): Promise<
         if ((schema as { ignoreAI?: boolean })?.ignoreAI) {
           return undefined;
         }
-        const propsRef = (schema.allOf?.[0] as JSONSchema7)?.$ref;
+        const propsRef = (schema?.allOf?.[0] as JSONSchema7)?.$ref;
         if (!propsRef) {
           return undefined;
         }
@@ -156,12 +157,10 @@ const invokeFor = (
 export const messageProcessorFor = async (
   assistant: AIAssistant,
   ctx: AppContext,
-  threadId?: string,
+  thread: Thread,
 ) => {
   const openAI = ctx.openAI;
   const threads = openAI.beta.threads;
-  const thread =
-    await (threadId ? threads.retrieve(threadId) : threads.create());
   const instructions =
     `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. ${
       assistant.prompts
@@ -247,7 +246,7 @@ export const messageProcessorFor = async (
     } while (["in_progress", "queued"].includes(runStatus.status));
 
     const messages = await threads.messages.list(thread.id, {
-      after: latestMsg,
+      before: latestMsg,
     });
     const threadMessages = messages.data;
     const lastMsg = threadMessages

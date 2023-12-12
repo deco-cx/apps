@@ -86,6 +86,7 @@ export default function VTEX({
   appKey,
   appToken,
   account,
+  publicUrl,
   salesChannel,
   ...props
 }: Props) {
@@ -130,6 +131,7 @@ export default function VTEX({
     ...props,
     salesChannel: salesChannel ?? "1",
     account,
+    publicUrl,
     vcsDeprecated,
     sp,
     io,
