@@ -64,7 +64,14 @@ const getOrGenerateKey = (): Promise<AESKey> => {
     return key;
   }
   if (!kv) {
-    throw new Error("could not generate keys, kv is not available.");
+    return key ??= generateKey().then(async (generatedKey) => {
+      const rawKey = new Uint8Array(
+        await crypto.subtle.exportKey("raw", generatedKey),
+      );
+      const iv = crypto.getRandomValues(new Uint8Array(16));
+
+      return fromSavedAESKey({ key: rawKey, iv });
+    });
   }
 
   return key ??= kv.get<SavedAESKey>(cryptoKey).then(
