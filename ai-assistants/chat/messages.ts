@@ -1,6 +1,7 @@
 import {
   AssistantCreateParams,
   RequiredActionFunctionToolCall,
+  Thread
 } from "../deps.ts";
 import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
@@ -156,12 +157,10 @@ const invokeFor = (
 export const messageProcessorFor = async (
   assistant: AIAssistant,
   ctx: AppContext,
-  threadId?: string,
+  thread: Thread,
 ) => {
   const openAI = ctx.openAI;
   const threads = openAI.beta.threads;
-  const thread =
-    await (threadId ? threads.retrieve(threadId) : threads.create());
   const instructions =
     `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. ${
       assistant.prompts
