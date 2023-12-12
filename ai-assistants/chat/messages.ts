@@ -64,7 +64,7 @@ const appTools = (assistant: AIAssistant): Promise<
         if ((schema as { ignoreAI?: boolean })?.ignoreAI) {
           return undefined;
         }
-        const propsRef = (schema.allOf?.[0] as JSONSchema7)?.$ref;
+        const propsRef = (schema?.allOf?.[0] as JSONSchema7)?.$ref;
         if (!propsRef) {
           return undefined;
         }
@@ -247,7 +247,7 @@ export const messageProcessorFor = async (
     } while (["in_progress", "queued"].includes(runStatus.status));
 
     const messages = await threads.messages.list(thread.id, {
-      after: latestMsg,
+      before: latestMsg,
     });
     const threadMessages = messages.data;
     const lastMsg = threadMessages
