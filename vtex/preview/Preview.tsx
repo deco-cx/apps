@@ -17,7 +17,6 @@ export const PreviewVtex = (
   const publicUrl = app.state?.publicUrl || "";
   const account = app.state?.account || "";
   const withoutSubDomain = publicUrl.split(".").slice(1).join(".");
-  console.log(app.markdownContent);
   return (
     <div style={{ height: "100%", padding: "0px 16px" }}>
       <style
@@ -102,7 +101,6 @@ export const PreviewVtex = (
         document.querySelectorAll('#tab>summary').forEach((summary)=>{
           summary.onclick = (e)=>{
             const details = summary.parentElement
-            console.log(details)
             const open = details.open
             document.querySelectorAll('#tab').forEach((d)=>{ d.open = false });
           }
