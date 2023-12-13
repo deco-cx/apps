@@ -3,6 +3,7 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/state.ts";
+import * as $$$1 from "./loaders/secret.ts";
 import * as $$$$0 from "./handlers/devPage.ts";
 import * as $$$$1 from "./handlers/router.ts";
 import * as $$$$$$0 from "./sections/Slot.tsx";
@@ -11,6 +12,7 @@ import * as $$$$$$2 from "./sections/PageInclude.tsx";
 
 const manifest = {
   "loaders": {
+    "$live/loaders/secret.ts": $$$1,
     "$live/loaders/state.ts": $$$0,
   },
   "handlers": {

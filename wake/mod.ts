@@ -34,7 +34,6 @@ export interface Props {
   /**
    * @title Wake API token
    * @description The token for accessing wake commerce
-   * @default deco
    */
   token?: Secret;
 
@@ -64,8 +63,8 @@ export default function App(props: Props): App<Manifest, State> {
     );
   }
 
-<<<<<<< HEAD
-=======
+  // HEAD
+  //
   const stringToken = typeof token === "string" ? token : token?.get?.() ?? "";
   const stringStorefrontToken = typeof storefrontToken === "string"
     ? storefrontToken
@@ -77,7 +76,7 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
->>>>>>> 22e714b360b7ef187fe4bdb93385dd0a85686e2a
+  //22e714b360b7ef187fe4bdb93385dd0a85686e2a
   const storefront = createGraphqlClient({
     endpoint: "https://storefront-api.fbits.net/graphql",
     headers: new Headers({ "TCS-Access-Token": `${stringStorefrontToken}` }),

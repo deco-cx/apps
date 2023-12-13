@@ -46,6 +46,7 @@ import * as $$$$$$$$$15 from "./actions/cart/updateAttachment.ts";
 import * as $$$$$$$$$16 from "./actions/cart/addItems.ts";
 import * as $$$$$$$$$17 from "./actions/cart/removeItems.ts";
 import * as $$$$$$$$$18 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$19 from "./actions/cart/updateGifts.ts";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
 
@@ -88,6 +89,7 @@ const manifest = {
     "vtex/actions/cart/simulation.ts": $$$$$$$$$18,
     "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$15,
     "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$11,
+    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$19,
     "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$13,
     "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$8,
     "vtex/actions/cart/updateItems.ts": $$$$$$$$$14,
