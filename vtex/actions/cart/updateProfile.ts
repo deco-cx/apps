@@ -25,7 +25,7 @@ const action = async (
   const response = await vcsDeprecated
     ["PATCH /api/checkout/pub/orderForm/:orderFormId/profile"]({
       orderFormId,
-      sc: segment?.channel,
+      sc: segment?.payload.channel,
     }, {
       body: { ignoreProfileData },
       headers: {

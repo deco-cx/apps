@@ -35,11 +35,19 @@ async function loader(
   const params = toSegmentParams(segment);
   const skuId = url.searchParams.get("skuId");
 
-  const [product] = await vcsDeprecated
+  const response = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:slug/p"](
       { ...params, slug },
       { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json());
+
+  if (response && !Array.isArray(response)) {
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(response)}`,
+    );
+  }
+
+  const [product] = response;
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -62,7 +70,7 @@ async function loader(
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: "BRL", //  config!.defaultPriceCurrency, // TODO: fix currency
+    priceCurrency: segment.payload.currencyCode ?? "BRL",
   });
 
   return {
@@ -77,5 +85,7 @@ async function loader(
     },
   };
 }
+
+export { cache, cacheKey } from "../intelligentSearch/productDetailsPage.ts";
 
 export default loader;

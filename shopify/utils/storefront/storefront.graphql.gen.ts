@@ -7492,6 +7492,13 @@ export type ProductFragment = {
   };
 };
 
+export type FilterFragment = {
+  id: string;
+  label: string;
+  type: FilterType;
+  values: Array<{ count: number; id: string; input: any; label: string }>;
+};
+
 export type CartFragment = {
   id: string;
   checkoutUrl: any;
@@ -7794,15 +7801,33 @@ export type ListProductsQuery = {
   };
 };
 
-export type SearchProductsQueryVariables = Exact<{
+export type SearchWithFiltersQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
-  query?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  query: Scalars["String"]["input"];
+  productFilters?: InputMaybe<Array<ProductFilter> | ProductFilter>;
+  sortKey?: InputMaybe<SearchSortKeys>;
+  reverse?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
-export type SearchProductsQuery = {
-  products: {
-    pageInfo: { hasNextPage: boolean };
+export type SearchWithFiltersQuery = {
+  search: {
+    pageInfo: {
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      endCursor?: string | null;
+      startCursor?: string | null;
+    };
+    productFilters: Array<
+      {
+        id: string;
+        label: string;
+        type: FilterType;
+        values: Array<{ count: number; id: string; input: any; label: string }>;
+      }
+    >;
     nodes: Array<
       {
         availableForSale: boolean;
@@ -7879,9 +7904,122 @@ export type SearchProductsQuery = {
             }
           >;
         };
-      }
+      } | {}
     >;
   };
+};
+
+export type AllProductsQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  handle?: InputMaybe<Scalars["String"]["input"]>;
+  sortKey?: InputMaybe<ProductCollectionSortKeys>;
+  reverse?: InputMaybe<Scalars["Boolean"]["input"]>;
+  filters?: InputMaybe<Array<ProductFilter> | ProductFilter>;
+}>;
+
+export type AllProductsQuery = {
+  collection?: {
+    handle: string;
+    products: {
+      pageInfo: {
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+        endCursor?: string | null;
+        startCursor?: string | null;
+      };
+      filters: Array<
+        {
+          id: string;
+          label: string;
+          type: FilterType;
+          values: Array<
+            { count: number; id: string; input: any; label: string }
+          >;
+        }
+      >;
+      nodes: Array<
+        {
+          availableForSale: boolean;
+          createdAt: any;
+          description: string;
+          descriptionHtml: any;
+          handle: string;
+          id: string;
+          isGiftCard: boolean;
+          onlineStoreUrl?: any | null;
+          productType: string;
+          publishedAt: any;
+          requiresSellingPlan: boolean;
+          tags: Array<string>;
+          title: string;
+          totalInventory?: number | null;
+          updatedAt: any;
+          vendor: string;
+          featuredImage?: { altText?: string | null; url: any } | null;
+          images: { nodes: Array<{ altText?: string | null; url: any }> };
+          media: {
+            nodes: Array<
+              {
+                alt?: string | null;
+                mediaContentType: MediaContentType;
+                previewImage?: { altText?: string | null; url: any } | null;
+              } | {
+                alt?: string | null;
+                mediaContentType: MediaContentType;
+                previewImage?: { altText?: string | null; url: any } | null;
+              } | {
+                alt?: string | null;
+                mediaContentType: MediaContentType;
+                previewImage?: { altText?: string | null; url: any } | null;
+              } | {
+                alt?: string | null;
+                mediaContentType: MediaContentType;
+                previewImage?: { altText?: string | null; url: any } | null;
+              }
+            >;
+          };
+          options: Array<{ name: string; values: Array<string> }>;
+          priceRange: {
+            minVariantPrice: { amount: any; currencyCode: CurrencyCode };
+            maxVariantPrice: { amount: any; currencyCode: CurrencyCode };
+          };
+          seo: { title?: string | null; description?: string | null };
+          variants: {
+            nodes: Array<
+              {
+                availableForSale: boolean;
+                barcode?: string | null;
+                currentlyNotInStock: boolean;
+                id: string;
+                quantityAvailable?: number | null;
+                requiresShipping: boolean;
+                sku?: string | null;
+                title: string;
+                weight?: number | null;
+                weightUnit: WeightUnit;
+                compareAtPrice?:
+                  | { amount: any; currencyCode: CurrencyCode }
+                  | null;
+                image?: { altText?: string | null; url: any } | null;
+                price: { amount: any; currencyCode: CurrencyCode };
+                selectedOptions: Array<{ name: string; value: string }>;
+                unitPrice?: { amount: any; currencyCode: CurrencyCode } | null;
+                unitPriceMeasurement?: {
+                  measuredType?: UnitPriceMeasurementMeasuredType | null;
+                  quantityValue: number;
+                  referenceUnit?: UnitPriceMeasurementMeasuredUnit | null;
+                  quantityUnit?: UnitPriceMeasurementMeasuredUnit | null;
+                } | null;
+              }
+            >;
+          };
+        }
+      >;
+    };
+  } | null;
 };
 
 export type AddItemToCartMutationVariables = Exact<{

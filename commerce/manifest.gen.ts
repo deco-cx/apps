@@ -2,31 +2,31 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/extensions/productDetailsPage.ts";
-import * as $$$1 from "./loaders/extensions/productListingPage.ts";
-import * as $$$2 from "./loaders/extensions/products.ts";
-import * as $$$3 from "./loaders/navbar.ts";
-import * as $$$4 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$5 from "./loaders/product/extensions/list.ts";
-import * as $$$6 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$7 from "./loaders/product/extensions/suggestions.ts";
-import * as $$$8 from "./loaders/product/productListingPage.ts";
-import * as $$$9 from "./loaders/product/products.ts";
+import * as $$$0 from "./loaders/product/products.ts";
+import * as $$$1 from "./loaders/product/productListingPage.ts";
+import * as $$$2 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$3 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$4 from "./loaders/product/extensions/list.ts";
+import * as $$$5 from "./loaders/product/extensions/suggestions.ts";
+import * as $$$6 from "./loaders/extensions/productDetailsPage.ts";
+import * as $$$7 from "./loaders/extensions/products.ts";
+import * as $$$8 from "./loaders/extensions/productListingPage.ts";
+import * as $$$9 from "./loaders/navbar.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoPDP.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoPLP.tsx";
 
 const manifest = {
   "loaders": {
-    "commerce/loaders/extensions/productDetailsPage.ts": $$$0,
-    "commerce/loaders/extensions/productListingPage.ts": $$$1,
-    "commerce/loaders/extensions/products.ts": $$$2,
-    "commerce/loaders/navbar.ts": $$$3,
-    "commerce/loaders/product/extensions/detailsPage.ts": $$$4,
-    "commerce/loaders/product/extensions/list.ts": $$$5,
-    "commerce/loaders/product/extensions/listingPage.ts": $$$6,
-    "commerce/loaders/product/extensions/suggestions.ts": $$$7,
-    "commerce/loaders/product/productListingPage.ts": $$$8,
-    "commerce/loaders/product/products.ts": $$$9,
+    "commerce/loaders/extensions/productDetailsPage.ts": $$$6,
+    "commerce/loaders/extensions/productListingPage.ts": $$$8,
+    "commerce/loaders/extensions/products.ts": $$$7,
+    "commerce/loaders/navbar.ts": $$$9,
+    "commerce/loaders/product/extensions/detailsPage.ts": $$$3,
+    "commerce/loaders/product/extensions/list.ts": $$$4,
+    "commerce/loaders/product/extensions/listingPage.ts": $$$2,
+    "commerce/loaders/product/extensions/suggestions.ts": $$$5,
+    "commerce/loaders/product/productListingPage.ts": $$$1,
+    "commerce/loaders/product/products.ts": $$$0,
   },
   "sections": {
     "commerce/sections/Seo/SeoPDP.tsx": $$$$$$0,

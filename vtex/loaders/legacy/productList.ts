@@ -173,13 +173,19 @@ const loader = async (
     }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
 
+  if (vtexProducts && !Array.isArray(vtexProducts)) {
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`,
+    );
+  }
+
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
   const products = vtexProducts.map((p) =>
     toProduct(p, p.items[0], 0, {
       baseUrl: baseUrl,
-      priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO fix currency
+      priceCurrency: segment.payload.currencyCode ?? "BRL",
     })
   );
 
@@ -189,5 +195,7 @@ const loader = async (
     ),
   );
 };
+
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
 
 export default loader;

@@ -1,15 +1,17 @@
 import { Product, ProductLeaf } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-import { withIsSimilarTo } from "../similars.ts";
-import { extension as simulateExt } from "./simulation.ts";
-import listLoader from "../../loaders/legacy/productList.ts";
-import { batch } from "../batch.ts";
+import { batch } from "../../utils/batch.ts";
+import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
+import { withIsSimilarTo } from "../../utils/similars.ts";
+import listLoader from "../legacy/productList.ts";
 
-export interface Options {
+export interface Props {
   simulate?: boolean;
   similars?: boolean;
   kitItems?: boolean;
   variants?: boolean;
+
+  products: Product[];
 }
 
 const similarsExt = (
@@ -85,12 +87,17 @@ const variantsExt = async (
   }));
 };
 
-export const extend = async (
-  products: Product[],
-  { simulate, similars, kitItems, variants }: Options,
+export default async (
+  {
+    products,
+    variants,
+    kitItems,
+    similars,
+    simulate,
+  }: Props,
   req: Request,
   ctx: AppContext,
-) => {
+): Promise<Product[]> => {
   let p = products;
 
   if (variants) {
@@ -106,8 +113,10 @@ export const extend = async (
   }
 
   if (simulate) {
-    p = await simulateExt(p, req, ctx);
+    p = await simulateExt(p, ctx);
   }
 
   return p;
 };
+
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";

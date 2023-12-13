@@ -51,7 +51,7 @@ const action = async (
 
   const response = await vcsDeprecated
     ["DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment"](
-      { orderFormId, attachment, index, sc: segment?.channel },
+      { orderFormId, attachment, index, sc: segment?.payload.channel },
       {
         body: { content, noSplitItem, expectedOrderFormSections },
         headers: {
