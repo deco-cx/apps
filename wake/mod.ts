@@ -2,7 +2,7 @@ import type { App, FnContext } from "deco/mod.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
-import { SecretString } from "../website/loaders/secretString.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
 
@@ -20,14 +20,13 @@ export interface Props {
    * @title Wake Storefront Token
    * @description https://wakecommerce.readme.io/docs/storefront-api-criacao-e-autenticacao-do-token
    */
-  storefrontToken: SecretString;
+  storefrontToken: Secret;
 
   /**
    * @title Wake API token
    * @description The token for accessing wake commerce
-   * @default deco
    */
-  token?: SecretString;
+  token?: Secret;
 
   /**
    * @description Use Wake as backend platform
@@ -54,15 +53,20 @@ export default function App(props: Props): App<Manifest, State> {
     );
   }
 
+  const stringToken = typeof token === "string" ? token : token?.get?.() ?? "";
+  const stringStorefrontToken = typeof storefrontToken === "string"
+    ? storefrontToken
+    : storefrontToken?.get?.() ?? "";
+
   const api = createHttpClient<OpenAPI>({
     base: "https://api.fbits.net",
-    headers: new Headers({ "Authorization": `Basic ${token}` }),
+    headers: new Headers({ "Authorization": `Basic ${stringToken}` }),
     fetcher: fetchSafe,
   });
 
   const storefront = createGraphqlClient({
     endpoint: "https://storefront-api.fbits.net/graphql",
-    headers: new Headers({ "TCS-Access-Token": `${storefrontToken}` }),
+    headers: new Headers({ "TCS-Access-Token": `${stringStorefrontToken}` }),
     fetcher: fetchSafe,
   });
 
