@@ -18,7 +18,7 @@ const loader = async (
   const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"](
-    { sc: segment?.payload.channel },
+    { sc: segment?.payload?.channel },
     { headers: { cookie } },
   );
 

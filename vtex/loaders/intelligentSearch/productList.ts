@@ -120,6 +120,8 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
+  console.log("productList running");
+
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
@@ -137,6 +139,8 @@ const loader = async (
     }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
 
+  console.log({ vtexProducts });
+
   const options = {
     baseUrl: url,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
@@ -145,8 +149,9 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
-  const products = vtexProducts
-    .map((p) => toProduct(p, p.items[0], 0, options));
+  const products = vtexProducts?.map((p) =>
+    toProduct(p, p.items[0], 0, options)
+  );
 
   return Promise.all(
     products.map((product) =>

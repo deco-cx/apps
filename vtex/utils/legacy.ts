@@ -10,9 +10,9 @@ export const toSegmentParams = (
   { payload: segment }: WrappedSegment,
 ) => (Object.fromEntries(
   Object.entries({
-    utmi_campaign: segment.utmi_campaign ?? undefined,
-    utm_campaign: segment.utm_campaign ?? undefined,
-    utm_source: segment.utm_source ?? undefined,
+    utmi_campaign: segment?.utmi_campaign ?? undefined,
+    utm_campaign: segment?.utm_campaign ?? undefined,
+    utm_source: segment?.utm_source ?? undefined,
   }).filter(([_, v]) => v != undefined),
 ));
 
