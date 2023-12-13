@@ -47,6 +47,7 @@ const pickFunctions = (
 const appTools = (assistant: AIAssistant): Promise<
   AssistantCreateParams.AssistantToolsFunction[]
 > => {
+  console.log({ assistant });
   return tools ??= context.runtime!.then(async (runtime) => {
     const manifest = assistant.availableFunctions
       ? pickFunctions(assistant.availableFunctions, runtime.manifest)
@@ -64,7 +65,7 @@ const appTools = (assistant: AIAssistant): Promise<
         if ((schema as { ignoreAI?: boolean })?.ignoreAI) {
           return undefined;
         }
-        const propsRef = (schema.allOf?.[0] as JSONSchema7)?.$ref;
+        const propsRef = (schema?.allOf?.[0] as JSONSchema7)?.$ref;
         if (!propsRef) {
           return undefined;
         }
@@ -162,6 +163,7 @@ export const messageProcessorFor = async (
   const threads = openAI.beta.threads;
   const thread =
     await (threadId ? threads.retrieve(threadId) : threads.create());
+  // console.log(assistant.prompts[0].content);
   const instructions =
     `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. ${
       assistant.prompts
@@ -174,7 +176,6 @@ export const messageProcessorFor = async (
     }. DO NOT CHANGE FUNCTIONS NAMES, do not remove .ts at the end of function name. do not remove / at the end of function name. If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an ${Tokens.POSITIVE} symbol at the end of the phrase. Otherwise, add a ${Tokens.NEGATIVE} symbol.
     For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. ${Tokens.NEGATIVE}".
     `;
-  let latestMsg: undefined | string = undefined;
   const aiAssistant = await ctx.assistant.then((assistant) => assistant.id);
   const tools = await appTools(assistant);
 
@@ -195,9 +196,10 @@ export const messageProcessorFor = async (
         ? assistant.model.custom
         : assistant.model,
       assistant_id: aiAssistant,
-      instructions,
+      instructions: instructions.slice(0, 25000),
       tools,
     });
+    console.log({ tools });
     const messageId = run.id;
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
@@ -225,6 +227,8 @@ export const messageProcessorFor = async (
         thread.id,
         run.id,
       );
+      console.log({ runStatus });
+      console.log("status", runStatus.status);
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
@@ -246,9 +250,7 @@ export const messageProcessorFor = async (
       await sleep(500);
     } while (["in_progress", "queued"].includes(runStatus.status));
 
-    const messages = await threads.messages.list(thread.id, {
-      after: latestMsg,
-    });
+    const messages = await threads.messages.list(thread.id);
     const threadMessages = messages.data;
     const lastMsg = threadMessages
       .findLast((message) =>
@@ -260,7 +262,7 @@ export const messageProcessorFor = async (
       return;
     }
 
-    latestMsg = lastMsg.id;
+    const _latestMsg = lastMsg.id;
     reply(threadMessageToReply(lastMsg));
 
     if (functionCallReplies.length > 0) {

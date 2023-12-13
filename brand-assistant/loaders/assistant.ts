@@ -48,6 +48,7 @@ export default function brandAssistant(props: Props): AIAssistant {
         },
       };
     },
+    availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
     name: props.name,
     welcomeMessage: props?.welcomeMessage ??
       `👋 Welcome to our Online Store Assistant! How can I assist you today? Whether you're looking for product information, pricing details, or help with navigating our store, feel free to ask. I'm here to make your shopping experience smooth and enjoyable! Just type your question, and let's get started. 🛍️`,
@@ -69,7 +70,7 @@ export default function brandAssistant(props: Props): AIAssistant {
             offers: _ignoreOffers,
             ...rest
           },
-        ) => rest),
+        ) => rest).slice(0, 1),
       ),
     ],
   };

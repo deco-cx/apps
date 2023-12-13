@@ -162,8 +162,8 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const segment = getSegmentFromBag(ctx);
-  const segmentParams = toSegmentParams(segment);
+  const segment = getSegmentFromBag(ctx) ?? {};
+  const segmentParams = toSegmentParams(segment ?? {});
   const params = fromProps({ props });
 
   const vtexProducts = await vcsDeprecated
@@ -185,7 +185,7 @@ const loader = async (
   const products = vtexProducts.map((p) =>
     toProduct(p, p.items[0], 0, {
       baseUrl: baseUrl,
-      priceCurrency: segment.payload.currencyCode ?? "BRL",
+      priceCurrency: segment.payload?.currencyCode ?? "BRL",
     })
   );
 
