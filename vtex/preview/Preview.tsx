@@ -18,19 +18,20 @@ export const PreviewVtex = (
   const account = app.state?.account || "";
   const withoutSubDomain = publicUrl.split(".").slice(1).join(".");
   return (
-    <div style={{ height: "100%", padding: "0px 16px" }}>
+    <div class="h-full px-4">
+      <script defer src="https://unpkg.com/windicss-runtime-dom"></script>
       <style
         dangerouslySetInnerHTML={{
           __html: `
             a{
-                color: #111827;
-                font-weight: 600;
-                text-decoration: underline;
+              color: #111827;
+              font-weight: 600;
+              text-decoration: underline;
             }
             #tab[open]>summary{
               font-weight: 700;
             }
-            `,
+          `,
         }}
       >
       </style>
@@ -40,51 +41,27 @@ export const PreviewVtex = (
         </a>
       </div>
       <div class="flex justify-center relative gap-8">
-        <details open id="tab">
-          <summary
-            class="text-left text-2xl cursor-pointer py-4"
-            style={{
-              width: "auto",
-            }}
-          >
+        <details open id="tab" class="group text-black">
+          <summary class="w-auto text-left text-2xl cursor-pointer py-4 group-open:font-semibold">
             General Information
           </summary>
           <div
-            class="px-4"
+            class="absolute w-[90%] top-[70px] left-[5%] bg-white rounded-lg p-4"
             style={{
-              position: "absolute",
-              width: "90%",
-              top: "70px",
-              left: "5%",
-              background: "white",
               boxShadow: "0px 0px 5px 3px rgba(0,0,0,0.20)",
-              padding: "16px",
-              borderRadius: "16px",
             }}
           >
             {app.markdownContent && <app.markdownContent />}
           </div>
         </details>
-        <details id="tab">
-          <summary
-            class="text-lef text-2xl cursor-pointer py-4"
-            style={{
-              width: "auto",
-            }}
-          >
+        <details id="tab" class="group text-black">
+          <summary class="w-auto text-lef text-2xl cursor-pointer py-4 group-open:font-semibold">
             Go Live (pt-BR)
           </summary>
           <ul
-            class="px-4"
+            class="absolute w-[90%] top-[70px] left-[5%] bg-white rounded-lg p-4"
             style={{
-              position: "absolute",
-              width: "90%",
-              top: "70px",
-              left: "5%",
-              background: "white",
               boxShadow: "0px 0px 5px 3px rgba(0,0,0,0.20)",
-              padding: "32px",
-              borderRadius: "16px",
             }}
           >
             <GoLivePtBr
@@ -97,15 +74,15 @@ export const PreviewVtex = (
         <script
           dangerouslySetInnerHTML={{
             __html: `
-        // script to close all details when click on one
-        document.querySelectorAll('#tab>summary').forEach((summary)=>{
-          summary.onclick = (e)=>{
-            const details = summary.parentElement
-            const open = details.open
-            document.querySelectorAll('#tab').forEach((d)=>{ d.open = false });
-          }
-        })
-        `,
+            // script to close all details when click on one
+            document.querySelectorAll('#tab>summary').forEach((summary)=>{
+              summary.onclick = (e)=>{
+                const details = summary.parentElement
+                const open = details.open
+                document.querySelectorAll('#tab').forEach((d)=>{ d.open = false });
+              }
+            })
+          `,
           }}
         >
         </script>
