@@ -83,12 +83,6 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  const api = createHttpClient<OpenAPI>({
-    base: "https://api.fbits.net",
-    headers: new Headers({ "Authorization": `Basic ${token}` }),
-    fetcher: fetchSafe,
-  });
-
   const checkoutApi = createHttpClient<CheckoutApi>({
     base: checkoutUrl ?? `https://${account}.checkout.fbits.store`,
     fetcher: fetchSafe,
