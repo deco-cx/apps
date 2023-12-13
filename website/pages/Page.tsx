@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import { Section } from "deco/blocks/section.ts";
 import { ComponentMetadata } from "deco/engine/block.ts";

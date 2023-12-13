@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
 
 type Props = Omit<SeoProps, "jsonLDs">;

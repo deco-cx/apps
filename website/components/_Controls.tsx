@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import type { Flag, Site } from "deco/types.ts";
 import { context } from "deco/live.ts";

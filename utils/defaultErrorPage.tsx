@@ -1,4 +1,6 @@
-import { ComponentChildren } from "preact";
+
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import { asset } from "$fresh/runtime.ts";
 

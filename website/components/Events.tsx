@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
