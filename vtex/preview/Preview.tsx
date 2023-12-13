@@ -42,9 +42,7 @@ export const PreviewVtex = (
       </div>
       <div class="flex justify-center relative gap-8">
         <details open id="tab" class="group text-black">
-          <summary
-            class="w-auto text-left text-2xl cursor-pointer py-4 group-open:font-semibold"
-          >
+          <summary class="w-auto text-left text-2xl cursor-pointer py-4 group-open:font-semibold">
             General Information
           </summary>
           <div
@@ -57,9 +55,7 @@ export const PreviewVtex = (
           </div>
         </details>
         <details id="tab" class="group text-black">
-          <summary
-            class="w-auto text-lef text-2xl cursor-pointer py-4 group-open:font-semibold"
-          >
+          <summary class="w-auto text-lef text-2xl cursor-pointer py-4 group-open:font-semibold">
             Go Live (pt-BR)
           </summary>
           <ul
