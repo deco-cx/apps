@@ -14,9 +14,16 @@ import {
   SimulationOrderForm,
   SPEvent,
   Suggestion,
+  SelectableGifts,
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
+  "POST /api/checkout/pub/orderForm/:orderFormId/selectable-gifts/:giftId": {
+    body: SelectableGifts & {
+      expectedOrderFormSections: string[];
+    };
+    response: OrderForm;
+  };
   "POST /no-cache/Newsletter.aspx": { body: FormData };
   "POST /no-cache/AviseMe.aspx": { body: FormData };
   "GET /api/catalog_system/pub/portal/pagetype/:term": { response: PageType };
@@ -186,26 +193,24 @@ export interface VTEXCommerceStable {
     response: OrderForm;
     body: { price: number };
   };
-  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
-    {
-      searchParams: { sc?: string };
-      response: OrderForm;
-      body: {
-        content: Record<string, string>;
-        noSplitItem: boolean;
-        expectedOrderFormSections: string[];
-      };
+  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment": {
+    searchParams: { sc?: string };
+    response: OrderForm;
+    body: {
+      content: Record<string, string>;
+      noSplitItem: boolean;
+      expectedOrderFormSections: string[];
     };
-  "DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
-    {
-      searchParams: { sc?: string };
-      response: OrderForm;
-      body: {
-        content: Record<string, string>;
-        noSplitItem: boolean;
-        expectedOrderFormSections: string[];
-      };
+  };
+  "DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment": {
+    searchParams: { sc?: string };
+    response: OrderForm;
+    body: {
+      content: Record<string, string>;
+      noSplitItem: boolean;
+      expectedOrderFormSections: string[];
     };
+  };
   "POST /api/dataentities/:acronym/documents": {
     response: CreateNewDocument;
     body: Record<string, unknown>;
