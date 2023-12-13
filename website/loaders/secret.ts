@@ -5,6 +5,9 @@ import { decryptFromHex } from "../utils/crypto.ts";
  * @deprecated true
  */
 export interface Secret {
+  /**
+   * @ignore
+   */
   get: () => string | null;
 }
 
