@@ -17,10 +17,15 @@ export interface State {
 export default function App(
   state: Props,
 ): App<Manifest, State> {
+  const getToken = state?.apiKey?.get;
   return {
     manifest,
     state: {
-      openAI: new OpenAI({ apiKey: state.apiKey?.get() ?? undefined }),
+      openAI: new OpenAI({
+        apiKey: typeof getToken === "function"
+          ? getToken() ?? undefined
+          : undefined,
+      }),
     },
   };
 }

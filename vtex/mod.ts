@@ -14,7 +14,7 @@ import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
-import { SecretString } from "../website/loaders/secretString.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
@@ -47,14 +47,14 @@ export interface Props {
    * @title App Key
    * @description Only required for extra features
    */
-  appKey?: SecretString;
+  appKey?: Secret;
 
   /**
    * @title App Token
    * @description Only required for extra features
    * @format password
    */
-  appToken?: SecretString;
+  appToken?: Secret;
 
   /**
    * @title Default Sales Channel
@@ -86,13 +86,22 @@ export default function VTEX({
   appKey,
   appToken,
   account,
+  publicUrl,
   salesChannel,
   ...props
 }: Props) {
   const headers = new Headers();
 
-  appKey && headers.set("X-VTEX-API-AppKey", appKey);
-  appToken && headers.set("X-VTEX-API-AppToken", appToken);
+  appKey &&
+    headers.set(
+      "X-VTEX-API-AppKey",
+      typeof appKey === "string" ? appKey : appKey?.get?.() ?? "",
+    );
+  appToken &&
+    headers.set(
+      "X-VTEX-API-AppToken",
+      typeof appToken === "string" ? appToken : appToken?.get?.() ?? "",
+    );
 
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
@@ -122,6 +131,7 @@ export default function VTEX({
     ...props,
     salesChannel: salesChannel ?? "1",
     account,
+    publicUrl,
     vcsDeprecated,
     sp,
     io,

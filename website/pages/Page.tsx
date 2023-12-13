@@ -45,9 +45,9 @@ export function renderSection(section: Props["sections"][number]) {
   return <Component {...props} />;
 }
 
-class ErrorBoundary
-  extends Component<{ fallback: ComponentFunc<HTMLElement> }> {
-  state = { error: null };
+class ErrorBoundary extends // deno-lint-ignore no-explicit-any
+Component<{ fallback: ComponentFunc<any> }> {
+  state = { error: null as Error | null };
 
   // deno-lint-ignore no-explicit-any
   static getDerivedStateFromError(error: any) {
@@ -56,7 +56,7 @@ class ErrorBoundary
 
   render() {
     if (this.state.error) {
-      const err = this?.state?.error as Error;
+      const err = this?.state?.error;
       const msg = `rendering: ${this.props} ${err?.stack}`;
       logger.error(
         msg,
@@ -65,9 +65,11 @@ class ErrorBoundary
         msg,
       );
     }
-    return this.state.error
-      ? this.props.fallback(this.state.error)
-      : this.props.children;
+    return !this.state.error ||
+        (this.state.error instanceof HttpError &&
+          (this.state.error as HttpError).status < 400)
+      ? this.props.children
+      : this.props.fallback(this.state.error);
   }
 }
 

@@ -1,12 +1,13 @@
 import { AppContext } from "../mod.ts";
 
-import { notFound } from "deco/mod.ts";
+import { badRequest, notFound } from "deco/mod.ts";
 import { messageProcessorFor } from "../chat/messages.ts";
 import { Notify, Queue } from "../deps.ts";
 
 export interface Props {
   thread?: string;
   assistant: string;
+  message?: string;
 }
 
 /**
@@ -89,7 +90,7 @@ export interface ChatMessage {
  * @param {AppContext} ctx - The application context.
  * @returns {Response} - The HTTP response object.
  */
-export default function openChat(
+export default async function openChat(
   props: Props,
   req: Request,
   ctx: AppContext,
@@ -102,12 +103,37 @@ export default function openChat(
     notFound();
   }
 
+  const threads = ctx.openAI.beta.threads;
+  const threadId = props.thread;
+  const threadPromise = threadId
+    ? threads.retrieve(threadId)
+    : threads.create();
+
+  const processorPromise = assistant.then(async (aiAssistant) =>
+    messageProcessorFor(aiAssistant, ctx, await threadPromise)
+  );
+  if (req.headers.get("upgrade") !== "websocket") {
+    if (!props.message) {
+      badRequest({ message: "message is required when websocket is not used" });
+    }
+    const processor = await processorPromise;
+    const replies: Reply<unknown>[] = [];
+    await processor({
+      text: props.message!,
+      reply: (reply) => replies.push(reply),
+    });
+    return { replies, thread: (await threadPromise).id };
+  }
+
   const { socket, response } = Deno.upgradeWebSocket(req);
   const abort = new Notify();
-  const processorPromise = assistant.then((aiAssistant) =>
-    messageProcessorFor(aiAssistant, ctx, props.thread)
-  );
   const messagesQ = new Queue<ChatMessage>();
+  if (props.message) {
+    messagesQ.push({
+      text: props.message,
+      reply: (replyMsg) => socket.send(JSON.stringify(replyMsg)),
+    });
+  }
 
   /**
    * Handles the WebSocket connection on open event.
