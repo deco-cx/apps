@@ -50,21 +50,32 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 
 ### Apps
 
-| App Name       | Description                                                                                                                          | Manifest                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
-| WebSite        | The base app of any website. Contains `Page.tsx` block and other common loaders like image and fonts.                                | [manifest](/website/manifest.gen.ts)      |
-| VTEX           | The app for e-commerce that uses VTEX as a platform.                                                                                 | [manifest](/vtex/manifest.gen.ts)         |
-| Shopify        | The app for e-commerce that uses Shopify as a platform.                                                                              | [manifest](/shopify/manifest.gen.ts)      |
-| VNDA           | The app for e-commerce that uses VNDA as a platform.                                                                                 | [manifest](/vnda/manifest.gen.ts)         |
-| Workflows      | Provides a simple set of loaders and actions to manage workflows                                                                     | [manifest](/workflows/manifest.gen.ts)    |
-| Commerce       | A simple configurable start for any e-commerce platform, lets you switch between any of those                                        | [manifest](/commerce/manifest.gen.ts)     |
-| $live          | An app for compatibility with $live blocks                                                                                           | [manifest](/compat/$live/manifest.gen.ts) |
-| deco-sites/std | An app for compatibility with deco-sites/std app, contains various blocks merged from e-commerce apps.                               | [manifest](/compat/std/manifest.gen.ts)   |
-| decohub        | The best place to find an app for your business case, here is where apps published by any developer in the deco ecosystem will live. | [manifest](/decohub/manifest.gen.ts)      |
-| handlebars        | An app that allows you to build your own sections using [handlebars](https://handlebarsjs.com/). | [manifest](/handlebars/manifest.gen.ts)      |
-| Verified Reviews | An app that uses extension block to add Aggregate Rating to products by integrating with the "[Opiniões Verificadas](https://www.opinioes-verificadas.com.br/br/)" provider. | [manifest](/verified-reviews/manifest.gen.ts)      |
-| Algolia | Algolia search integration. Provides loaders and workflows for searching and indexing on Algolia | [manifest](/algolia/manifest.gen.ts)      |
-| Typesense | Typesense search integration. Provides loaders and workflows for searching and indexing on Typesense | [manifest](/algolia/manifest.gen.ts)      |
+| App Name          | Description                                                                                                                          | Manifest                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| Algolia           | Algolia search integration. Provides loaders and workflows for searching and indexing on Algolia                                     | [manifest](/algolia/manifest.gen.ts)      |
+| ai-assistant      | AI Assistant is a hub for artificial intelligence (AI) assistants, allowing you to register your own AI assistants and invoke them through automated actions.                                                                                                    				                                                                                 | [manifest](/ai-assistant/manifest.gen.ts) |
+| analytics         | Analytics is a powerful data analysis tool, providing valuable insights into the performance and behavior of users on your application or platform.                                                                                                   				                                                                                           | [manifest](/analytics/manifest.gen.ts)    |
+| brand-assistant   | Brand Assistant is a brand assistance tool.                                                                                           | [manifest](/brand-assistant/manifest.gen.ts) |
+| commerce          | A simple configurable start for any e-commerce platform, lets you switch between any of those                                        | [manifest](/commerce/manifest.gen.ts)     |
+| $live             | An app for compatibility with $live blocks.                                                                                           | [manifest](/compat/$live/manifest.gen.ts) |
+| deco-sites/std    | An app for compatibility with deco-sites/std app, contains various blocks merged from e-commerce apps.                               | [manifest](/compat/std/manifest.gen.ts)    |
+| decohub           | The best place to find an app for your business case, here is where apps published by any developer in the deco ecosystem will live. | [manifest](/decohub/manifest.gen.ts)       |
+| handlebars        | An app that allows you to build your own sections using [handlebars](https://handlebarsjs.com/).                                     | [manifest](/handlebars/manifest.gen.ts)     |
+| implementation    | App for project implementation details.                                                                                              | [manifest](/implementation/manifest.gen.ts) |
+| Linx              | The app for e-commerce that uses Linx as a platform.                                                                 	               | [manifest](/linx/manifest.gen.ts)        |
+| nuvemshop         | The app for e-commerce that uses Nuvemshop as a platform.                                            		                      		   | [manifest](/nuvemshop/manifest.gen.ts)   |
+| openai            | Connects to OpenAI services to generate AI-powered content.                                                                          | [manifest](/openai/manifest.gen.ts)      |
+| power-reviews     | Power Reviews is an integration to show reviews and ratings of your products. It allow your customers to give a rating, write texts, emphasis pros/cons and upload images and videos.                                                                                                                                                                    | [manifest](/power-reviews/manifest.gen.ts) |
+| Shopify           | The app for e-commerce that uses Shopify as a platform.                                          				                             | [manifest](/shopify/manifest.gen.ts)      |
+| sourei            | Digitalize your business with Sourei. Offering a wide range of digital solutions, from domain registration to advanced project infrastructure.                                                                                                     				                                                                                               | [manifest](/sourei/manifest.gen.ts)      |
+| typesense         | Typesense search integration. Provides loaders and workflows for searching and indexing on Typesense.  				                       | [manifest](/typesense/manifest.gen.ts)   |
+| Verified Reviews  | An app that uses extension block to add Aggregate Rating to products by integrating with the "[Opiniões Verificadas](https://www.opinioes-verificadas.com.br/br/)" provider.                                                                                                                                           			                             | [manifest](/verified-reviews/manifest.gen.ts) |
+| VNDA              | The app for e-commerce that uses VNDA as a platform.                                                 				                         | [manifest](/vnda/manifest.gen.ts)         |
+| VTEX              | The app for e-commerce that uses VTEX as a platform.                                                 			                      	   | [manifest](/vtex/manifest.gen.ts)         |
+| Wake              | The app for e-commerce that uses Wake as a platform.                                                 				                         | [manifest](/wake/manifest.gen.ts)         |
+| Weather           | Weather is an application that provides accurate and up-to-date weather information.                                                 | [manifest](/weather/manifest.gen.ts)      |
+| Website           | The base app of any website. Contains `Page.tsx` block and other common loaders like image and fonts.                                | [manifest](/website/manifest.gen.ts)      |
+| Workflows         | App for managing workflows.                                                                                                        | [manifest](/workflows/manifest.gen.ts)    |
 
 ## E-commerce Integrations - Status
 
