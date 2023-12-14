@@ -61,7 +61,7 @@ const enqueue = (
 };
 
 const enqueue2 = (
-  cb: (signal: AbortSignal) => Promise<any> | any,
+  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>,
 ) => {
   abort2();
 

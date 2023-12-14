@@ -17,7 +17,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<RestockAlertNode> => {
+): Promise<RestockAlertNode | null> => {
   const { storefront } = ctx;
 
   const headers = parseHeaders(req.headers);
@@ -32,7 +32,7 @@ const action = async (
     headers,
   });
 
-  return data.productRestockAlert ?? {};
+  return data.productRestockAlert ?? null;
 };
 
 export default action;
