@@ -1,30 +1,35 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 
+const PATHS_TO_PROXY = [
+  ["/checkout", "/checkout"],
+  ["/Fechamento"],
+  ["/Fechamento/*"],
+  ["/Login"],
+  ["/login/*"],
+  ["/Login/Authenticate"],
+  ["/Carrinho/*"],
+  ["/api/*"],
+];
+
 /**
  * @title Wake Proxy Routes
  */
 function loader(
   _props: unknown,
   _req: Request,
-  { account }: AppContext,
+  { checkoutUrl }: AppContext,
 ): Route[] {
-  const checkout = [
-    ["/checkout", "/checkout"],
-    ["/Fechamento"],
-    ["/Login"],
-    ["/login/*"],
-    ["/api/*"],
-  ].map(([pathTemplate, basePath]) => ({
+  const checkout = PATHS_TO_PROXY.map(([pathTemplate, basePath]) => ({
     pathTemplate,
     handler: {
       value: {
         __resolveType: "website/handlers/proxy.ts",
-        url: `https://${account}.checkout.fbits.store`,
+        url: checkoutUrl,
         basePath,
-        customHeaders: {
-          Host: "erploja2.checkout.fbits.store",
-        },
+        customHeaders: [{
+          Host: checkoutUrl,
+        }],
       },
     },
   }));

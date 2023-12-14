@@ -104,7 +104,7 @@ export const toProduct = (
   };
   const additionalProperty: PropertyValue[] = selectedOptions.map(
     toPropertyValue,
-  ).concat(descriptionHtml);  
+  ).concat(descriptionHtml);
   const skuImages = nonEmptyArray([image]);
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));

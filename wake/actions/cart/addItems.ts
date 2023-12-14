@@ -7,6 +7,7 @@ import {
   AddItemToCartMutationVariables,
   CheckoutFragment,
 } from "../../utils/graphql/storefront.graphql.gen.ts";
+import { parseHeaders } from "../../utils/parseHeaders.ts";
 
 export interface CartItem {
   productVariantId: number;
@@ -26,6 +27,7 @@ const action = async (
 ): Promise<Partial<CheckoutFragment>> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
+  const headers = parseHeaders(req.headers);
 
   if (!cartId) {
     throw new HttpError(400, "Missing cart cookie");
@@ -37,10 +39,13 @@ const action = async (
   >({
     variables: { input: { id: cartId, products: props.products } },
     ...AddItemToCart,
-  });
+  }, { headers });
 
   const checkoutId = data.checkout?.checkoutId;
-  setCartCookie(ctx.response.headers, checkoutId);
+
+  if (cartId !== checkoutId) {
+    setCartCookie(ctx.response.headers, checkoutId);
+  }
 
   return data.checkout ?? {};
 };

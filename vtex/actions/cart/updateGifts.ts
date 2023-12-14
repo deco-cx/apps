@@ -11,7 +11,7 @@ export interface Props extends SelectableGifts {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<OrderForm> => {
   const { vcsDeprecated } = ctx;
   const {
@@ -29,7 +29,7 @@ const action = async (
     {
       headers: { accept: "application/json", cookie },
       body: { expectedOrderFormSections, selectedGifts, id },
-    }
+    },
   );
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
