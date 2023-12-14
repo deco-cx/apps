@@ -32,8 +32,10 @@ async function loader(
   }, STALE)
     .then((r) => r.json()).catch(() => null);
 
+  const variantsLength = maybeProduct?.variants?.length ?? 0;
+
   // 404: product not found
-  if (!maybeProduct) {
+  if (!maybeProduct || variantsLength === 0) {
     return null;
   }
 
