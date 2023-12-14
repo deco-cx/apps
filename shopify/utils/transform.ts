@@ -97,7 +97,14 @@ export const toProduct = (
     compareAtPrice,
   } = sku;
 
-  const additionalProperty = selectedOptions.map(toPropertyValue);
+  const descriptionHtml: PropertyValue = {
+    "@type": "PropertyValue",
+    "name": "descriptionHtml",
+    "value": product.descriptionHtml,
+  };
+  const additionalProperty: PropertyValue[] = selectedOptions.map(
+    toPropertyValue,
+  ).concat(descriptionHtml);
   const skuImages = nonEmptyArray([image]);
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));

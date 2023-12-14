@@ -1128,3 +1128,12 @@ export interface CreateNewDocument {
   Href: string;
   DocumentId: string;
 }
+
+export interface SelectableGifts {
+  id: string;
+  selectedGifts: {
+    id: string;
+    seller: string;
+    index: number;
+  }[];
+}

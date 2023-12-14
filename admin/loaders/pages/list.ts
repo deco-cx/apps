@@ -1,7 +1,10 @@
 import { AppContext, BlockMetadata } from "../../mod.ts";
 import { Pagination } from "../../types.ts";
 
-export const PAGE_RESOLVE_TYPE = "website/pages/Page.tsx";
+export const PAGE_RESOLVE_TYPES = [
+  "website/pages/Page.tsx",
+  "$live/pages/LivePage.tsx",
+];
 
 export default async function ListPages(
   _props: unknown,
@@ -25,7 +28,7 @@ export default async function ListPages(
       ...(blockState as Omit<BlockMetadata, "id">),
       module: __resolveType,
     }))
-    .filter((block) => block.module === PAGE_RESOLVE_TYPE);
+    .filter((block) => PAGE_RESOLVE_TYPES.includes(block.module));
 
   return {
     data: data,
