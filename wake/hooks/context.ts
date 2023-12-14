@@ -7,6 +7,7 @@ import type {
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { Person } from "../../commerce/types.ts";
 import { setClientCookie } from "../utils/cart.ts";
+import { ShopQuery } from "../utils/graphql/storefront.graphql.gen.ts";
 
 export interface Context {
   cart: Partial<CheckoutFragment>;
@@ -19,6 +20,7 @@ const context = {
   cart: signal<Partial<CheckoutFragment>>({}),
   user: signal<Person | null>(null),
   wishlist: signal<WishlistReducedProductFragment[] | null>(null),
+  shop: signal<ShopQuery["shop"] | null>(null),
 };
 
 let queue2 = Promise.resolve();

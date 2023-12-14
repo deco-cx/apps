@@ -14,7 +14,7 @@ const shopInfos = async (
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<ShopQuery | undefined> => {
+): Promise<ShopQuery["shop"] | undefined> => {
   const { storefront } = ctx;
 
   const headers = parseHeaders(req.headers);

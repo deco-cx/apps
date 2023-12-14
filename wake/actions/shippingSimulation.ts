@@ -1,7 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { ShippingQuotes } from "../utils/graphql/queries.ts";
 import {
-  ShippingQuote,
   ShippingQuotesQuery,
   ShippingQuotesQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
@@ -54,7 +53,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<ShippingQuote[]> => {
+): Promise<ShippingQuotesQuery["shippingQuotes"]> => {
   const { storefront } = ctx;
 
   const headers = parseHeaders(req.headers);
