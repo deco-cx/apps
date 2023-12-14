@@ -1105,26 +1105,35 @@ export interface SimulationItem {
 
 export type SPEvent =
   | {
-    type: "session.ping";
-  }
+      type: "session.ping";
+    }
   | {
-    type: "search.click";
-    position: number;
-    text: string;
-    productId: string;
-    url: string;
-  }
+      type: "search.click";
+      position: number;
+      text: string;
+      productId: string;
+      url: string;
+    }
   | {
-    type: "search.query";
-    text: string;
-    misspelled: boolean;
-    match: number;
-    operator: string;
-    locale: string;
-  };
+      type: "search.query";
+      text: string;
+      misspelled: boolean;
+      match: number;
+      operator: string;
+      locale: string;
+    };
 
 export interface CreateNewDocument {
   Id: string;
   Href: string;
   DocumentId: string;
+}
+
+export interface SelectableGifts {
+  id: string;
+  selectedGifts: {
+    id: string;
+    seller: string;
+    index: number;
+  }[];
 }

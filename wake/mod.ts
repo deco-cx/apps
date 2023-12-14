@@ -25,7 +25,6 @@ export interface Props {
   /**
    * @title Wake API token
    * @description The token for accessing wake commerce
-   * @default deco
    */
   token?: Secret;
 

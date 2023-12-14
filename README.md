@@ -77,6 +77,26 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 | Website           | The base app of any website. Contains `Page.tsx` block and other common loaders like image and fonts.                                | [manifest](/website/manifest.gen.ts)      |
 | Workflows         | App for managing workflows.                                                                                                        | [manifest](/workflows/manifest.gen.ts)    |
 
+## E-commerce Integrations - Status
+
+| Integrations                                                                                    | Home   | PLP   | PDP   | Cart   | Checkout proxy   | Order placed proxy   | My account proxy   |
+|:------------------------------------------------------------------------------------------------|:-------|:------|:------|:-------|:-----------------|:---------------------|:-------------------|
+| [VTEX](https://github.com/deco-cx/apps/blob/main/vtex/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
+| [VNDA](https://github.com/deco-cx/apps/blob/main/vnda/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
+| [Shopify](https://github.com/deco-cx/apps/blob/b072c1fdfab8d5f1647ed42f9dbaae618f28f05f/shopify/README.md) | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ⚠️                 |
+| [Linx](https://github.com/deco-cx/apps/blob/main/linx/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
+| Linx impulse                                                                                    | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
+| [Nuvemshop](https://github.com/deco-cx/apps/blob/main/nuvemshop/README.MD)                                   | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ⚠️                 |
+| [Wake](https://github.com/deco-cx/apps/blob/main/wake/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
+
+## Review Integrations - Status
+
+| Integrations                                                                                    | Extension PDP   | Extension ProductList   | Extension Listing Page   | Submit Review   |
+|:------------------------------------------------------------------------------------------------|:-------|:------|:------|:-------|
+| [Power Reviews](https://github.com/deco-cx/apps/blob/main/power-reviews/README.md)                                        | ✅     | ✅    | ✅    | ✅     |
+| [Verified Reviews](https://github.com/deco-cx/apps/blob/main/verified-reviews/README.md)                                        | ✅     | ✅    | 🔴    | 🔴     |
+
+
 #### Adding a new app to Deco Hub
 
 In order to make your app available to be installable in any deco site, just import/export your app inside decohub/apps folder.

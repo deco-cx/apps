@@ -1,7 +1,7 @@
 import {
   AssistantCreateParams,
   RequiredActionFunctionToolCall,
-  Thread
+  Thread,
 } from "../deps.ts";
 import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
