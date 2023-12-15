@@ -301,6 +301,15 @@ export const ProductsByCollection = {
   }`,
 };
 
+export const ProductRecommendations = {
+  fragments: [Product, ProductVariant],
+  query: gql`query productRecommendations($productId: ID!) {
+    productRecommendations(productId: $productId) {
+      ...Product
+    }
+  }`
+}
+
 export const AddItemToCart = {
   fragments: [Cart],
   query: gql`mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
