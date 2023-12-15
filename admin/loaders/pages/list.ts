@@ -3,8 +3,8 @@ import { Pagination } from "../../types.ts";
 
 export const PAGE_RESOLVE_TYPES = [
   "website/pages/Page.tsx",
-  "$live/pages/LivePage.tsx"
-]
+  "$live/pages/LivePage.tsx",
+];
 
 export default async function ListPages(
   _props: unknown,
@@ -14,7 +14,7 @@ export default async function ListPages(
   const state = await ctx.storage.state();
 
   if (!state) {
-    return {  
+    return {
       data: [],
       page: 0,
       pageSize: 0,

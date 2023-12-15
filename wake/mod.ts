@@ -5,8 +5,11 @@ import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
+import { CheckoutApi } from "./utils/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
+
+export let state: null | State = null;
 
 /** @title Wake */
 export interface Props {
@@ -15,6 +18,12 @@ export interface Props {
    * @description erploja2 etc
    */
   account: string;
+
+  /**
+   * @title Checkout Url
+   * @description https://checkout.erploja2.com.br
+   */
+  checkoutUrl: string;
 
   /**
    * @title Wake Storefront Token
@@ -36,6 +45,7 @@ export interface Props {
 
 export interface State extends Props {
   api: ReturnType<typeof createHttpClient<OpenAPI>>;
+  checkoutApi: ReturnType<typeof createHttpClient<CheckoutApi>>;
   storefront: ReturnType<typeof createGraphqlClient>;
 }
 
@@ -45,7 +55,7 @@ export const color = 0xB600EE;
  * @title Wake
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { token, storefrontToken } = props;
+  const { token, storefrontToken, account, checkoutUrl } = props;
 
   if (!token || !storefrontToken) {
     console.warn(
@@ -53,6 +63,8 @@ export default function App(props: Props): App<Manifest, State> {
     );
   }
 
+  // HEAD
+  //
   const stringToken = typeof token === "string" ? token : token?.get?.() ?? "";
   const stringStorefrontToken = typeof storefrontToken === "string"
     ? storefrontToken
@@ -64,14 +76,22 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
+  //22e714b360b7ef187fe4bdb93385dd0a85686e2a
   const storefront = createGraphqlClient({
     endpoint: "https://storefront-api.fbits.net/graphql",
     headers: new Headers({ "TCS-Access-Token": `${stringStorefrontToken}` }),
     fetcher: fetchSafe,
   });
 
+  const checkoutApi = createHttpClient<CheckoutApi>({
+    base: checkoutUrl ?? `https://${account}.checkout.fbits.store`,
+    fetcher: fetchSafe,
+  });
+
+  state = { ...props, api, storefront, checkoutApi };
+
   return {
-    state: { ...props, api, storefront },
+    state,
     manifest,
   };
 }

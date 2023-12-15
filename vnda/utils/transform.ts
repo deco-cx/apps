@@ -185,6 +185,22 @@ const toPropertyValueTags = (tags: ProductSearch["tags"]): PropertyValue[] =>
     } as PropertyValue)
   );
 
+const toPropertyValueCategoryTags = (
+  categoryTags: OProduct["category_tags"],
+) => {
+  if (!categoryTags) return [];
+
+  return categoryTags.map((tag) => {
+    return {
+      "@type": "PropertyValue",
+      name: tag.tag_type,
+      value: tag.name,
+      description: tag.title,
+      valueReference: "TAGS",
+    } as PropertyValue;
+  });
+};
+
 // deno-lint-ignore no-explicit-any
 const isProductVariant = (p: any): p is VariantProductSearch =>
   typeof p.id === "number";
@@ -219,6 +235,9 @@ export const toProduct = (
   const offers = offer ? [offer] : [];
 
   const myTags = "tags" in product ? product.tags : [];
+  const myCategoryTags = "category_tags" in product
+    ? product.category_tags
+    : [];
 
   return {
     "@type": "Product",
@@ -230,6 +249,7 @@ export const toProduct = (
     additionalProperty: [
       ...toPropertyValue(variant),
       ...toPropertyValueTags(myTags),
+      ...toPropertyValueCategoryTags(myCategoryTags),
     ],
     inProductGroupWithID: productGroupID,
     gtin: product.reference,

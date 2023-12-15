@@ -10,11 +10,11 @@ import {
   PageType,
   PortalSuggestion,
   ProductSearchResult,
+  SelectableGifts,
   SimulationItem,
   SimulationOrderForm,
   SPEvent,
   Suggestion,
-  SelectableGifts,
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
@@ -193,24 +193,26 @@ export interface VTEXCommerceStable {
     response: OrderForm;
     body: { price: number };
   };
-  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment": {
-    searchParams: { sc?: string };
-    response: OrderForm;
-    body: {
-      content: Record<string, string>;
-      noSplitItem: boolean;
-      expectedOrderFormSections: string[];
+  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
+    {
+      searchParams: { sc?: string };
+      response: OrderForm;
+      body: {
+        content: Record<string, string>;
+        noSplitItem: boolean;
+        expectedOrderFormSections: string[];
+      };
     };
-  };
-  "DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment": {
-    searchParams: { sc?: string };
-    response: OrderForm;
-    body: {
-      content: Record<string, string>;
-      noSplitItem: boolean;
-      expectedOrderFormSections: string[];
+  "DELETE /api/checkout/pub/orderForm/:orderFormId/items/:index/attachments/:attachment":
+    {
+      searchParams: { sc?: string };
+      response: OrderForm;
+      body: {
+        content: Record<string, string>;
+        noSplitItem: boolean;
+        expectedOrderFormSections: string[];
+      };
     };
-  };
   "POST /api/dataentities/:acronym/documents": {
     response: CreateNewDocument;
     body: Record<string, unknown>;

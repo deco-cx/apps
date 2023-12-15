@@ -7,8 +7,8 @@ import * as $$$1 from "./loaders/product/list.ts";
 import * as $$$2 from "./loaders/product/suggestions.ts";
 import * as $$$$$$0 from "./sections/Analytics/Algolia.tsx";
 import * as $$$$$$$$$0 from "./actions/setup.ts";
-import * as $$$$$$$$$1 from "./actions/index/wait.ts";
-import * as $$$$$$$$$2 from "./actions/index/product.ts";
+import * as $$$$$$$$$1 from "./actions/index/product.ts";
+import * as $$$$$$$$$2 from "./actions/index/wait.ts";
 import * as $$$$$$$$$$0 from "./workflows/index/product.ts";
 
 const manifest = {
@@ -21,8 +21,8 @@ const manifest = {
     "algolia/sections/Analytics/Algolia.tsx": $$$$$$0,
   },
   "actions": {
-    "algolia/actions/index/product.ts": $$$$$$$$$2,
-    "algolia/actions/index/wait.ts": $$$$$$$$$1,
+    "algolia/actions/index/product.ts": $$$$$$$$$1,
+    "algolia/actions/index/wait.ts": $$$$$$$$$2,
     "algolia/actions/setup.ts": $$$$$$$$$0,
   },
   "workflows": {
