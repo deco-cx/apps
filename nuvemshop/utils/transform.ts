@@ -302,8 +302,8 @@ export const getBreadCrumbs = (
 
       return {
         "@type": "ListItem" as const,
-        name: getPreferredLanguage(category.name),
-        item: `/${getPreferredLanguage(category.name)}`,
+        name: getPreferredLanguage(category.name).toLowerCase(),
+        item: `/${getPreferredLanguage(category.name).toLowerCase()}`,
         position,
       };
     }),
