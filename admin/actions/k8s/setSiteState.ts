@@ -7,7 +7,7 @@ export interface Props {
   site: string;
   state: SiteState;
 }
-export default async function setLatestRelease(
+export default async function setSiteState(
   { site, state }: Props,
   _req: Request,
   ctx: AppContext,
