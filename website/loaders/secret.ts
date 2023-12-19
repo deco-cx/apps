@@ -1,7 +1,7 @@
 import { decryptFromHex } from "../utils/crypto.ts";
 
 /**
- * @title Plain Text Secret (use Secret instead)
+ * @title Secret
  * @hideOption true
  */
 export interface Secret {
