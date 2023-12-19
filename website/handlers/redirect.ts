@@ -24,7 +24,7 @@ export default function Redirect({ to, type = "temporary" }: RedirectConfig) {
     const params = isFreshCtx(conn) ? conn.params ?? {} : {};
     /**
      * This allows redirects to have dynamic parameters.
-     * 
+     *
      * e.g: from /admin/:site to /new-admin/:site
      */
     const location = Object.keys(params).length > 0
@@ -36,7 +36,7 @@ export default function Redirect({ to, type = "temporary" }: RedirectConfig) {
 
     /**
      * This makes sure that incoming query strings are kept
-     * 
+     *
      * (Useful for tracking parameters e.g Google's gclid, utm_source...)
      */
     const finalLocation = location.includes("?")

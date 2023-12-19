@@ -307,8 +307,8 @@ export const ProductRecommendations = {
     productRecommendations(productId: $productId) {
       ...Product
     }
-  }`
-}
+  }`,
+};
 
 export const AddItemToCart = {
   fragments: [Cart],
