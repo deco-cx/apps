@@ -1,7 +1,11 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC } from "deco/mod.ts";
+import type { Secret } from "../website/loaders/secret.ts";
+import { EventPayloadMap, k8s, Octokit, WebhookEventName } from "./deps.ts";
 import { FsBlockStorage } from "./fsStorage.ts";
+import { prEventHandler } from "./github/pr.ts";
+import { pushEventHandler } from "./github/push.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -13,8 +17,25 @@ export interface BlockStore extends Release {
   update(resolvables: Record<string, Resolvable>): Promise<void>;
   delete(id: string): Promise<void>;
 }
+
+export interface GithubEventListener<
+  TEvents extends WebhookEventName = WebhookEventName,
+> {
+  events?: TEvents[];
+  handle: (
+    event: EventPayloadMap[TEvents],
+    ctx: AppContext,
+  ) => Promise<void>;
+}
+
 export interface State {
   storage: BlockStore;
+  octokit: Octokit;
+  githubWebhookSecret?: string;
+  githubEventListeners: GithubEventListener[];
+  workloadNamespace: string;
+  kc: k8s.KubeConfig;
+  scaling: Required<Scaling>;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -42,15 +63,53 @@ export interface BlockMetadata {
   data: Resolvable;
 }
 
+export interface GithubProps {
+  webhookSecret?: Secret;
+  octokitAPIToken?: Secret;
+  eventListeners?: GithubEventListener[];
+}
+export interface Scaling {
+  initialProductionScale?: number;
+  initialScale?: number;
+}
 export interface Props {
   resolvables: Resolvables;
+  github?: GithubProps;
+  workloadNamespace?: string;
+  scaling?: Scaling;
 }
 
 /**
  * @title Admin
  */
-export default function App({ resolvables }: Props): App<Manifest, State> {
-  return { manifest, state: { storage: new FsBlockStorage() }, resolvables };
+export default function App(
+  { resolvables, github, workloadNamespace, scaling }: Props,
+): App<Manifest, State> {
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  return {
+    manifest,
+    state: {
+      kc,
+      scaling: {
+        initialProductionScale: scaling?.initialProductionScale ?? 3,
+        initialScale: scaling?.initialScale ?? 0,
+      },
+      workloadNamespace: workloadNamespace ?? "deco-sites",
+      githubEventListeners: [
+        ...github?.eventListeners ?? [],
+        pushEventHandler as GithubEventListener,
+        prEventHandler as GithubEventListener,
+      ],
+      storage: new FsBlockStorage(),
+      octokit: new Octokit({
+        auth: github?.octokitAPIToken?.get?.() ?? Deno.env.get("OCTOKIT_TOKEN"),
+      }),
+      githubWebhookSecret: github?.webhookSecret?.get?.() ??
+        Deno.env.get("GITHUB_WEBHOOK_SECRET"),
+    },
+    resolvables,
+  };
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
