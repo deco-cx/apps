@@ -92,8 +92,9 @@ const knativeServiceOf = (
             "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
             "autoscaling.knative.dev/max-scale": `${maxScale ?? 0}`,
             "autoscaling.knative.dev/min-scale": `${minScale ?? 0}`,
-            "autoscaling.knative.dev/scale-to-zero-pod-retention-period":
-              `${retentionPeriod ?? "0s"}`,
+            "autoscaling.knative.dev/scale-to-zero-pod-retention-period": `${
+              retentionPeriod ?? "0s"
+            }`,
           },
         },
         spec: {
