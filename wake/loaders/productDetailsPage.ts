@@ -82,9 +82,9 @@ async function loader(
 
   return {
     "@type": "ProductDetailsPage",
-    breadcrumbList: toBreadcrumbList(product, wakeProduct.breadcrumbs, {
+    breadcrumbList: toBreadcrumbList(wakeProduct.breadcrumbs, {
       base: url,
-    }),
+    }, product),
     product: {
       ...product,
       isRelatedTo: buyTogetherItens?.map(

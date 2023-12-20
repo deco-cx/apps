@@ -196,24 +196,27 @@ export const toFilters = (
 };
 
 export const toBreadcrumbList = (
-  product: Product,
   breadcrumbs: SingleProductFragment["breadcrumbs"] = [],
-  { base: _base }: { base: URL },
+  { base: base }: { base: URL },
+  product?: Product,
 ): BreadcrumbList => {
   const itemListElement = [
     ...(breadcrumbs ?? []).map((item, i): ListItem<string> => ({
       "@type": "ListItem",
       name: item!.text!,
       position: i + 1,
-      item: item!.link!,
+      item: new URL(item!.link!, base).href,
     })),
-    {
+  ];
+
+  if (product) {
+    itemListElement.push({
       "@type": "ListItem",
       name: product.isVariantOf?.name,
-      item: product.isVariantOf?.url,
+      item: product.isVariantOf?.url!,
       position: (breadcrumbs ?? []).length + 1,
-    } as ListItem<string>,
-  ];
+    });
+  }
 
   return {
     "@type": "BreadcrumbList",

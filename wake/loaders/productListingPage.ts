@@ -18,7 +18,12 @@ import {
   SortDirection,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
-import { FILTER_PARAM, toFilters, toProduct } from "../utils/transform.ts";
+import {
+  FILTER_PARAM,
+  toBreadcrumbList,
+  toFilters,
+  toProduct,
+} from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
 
 export type Sort =
@@ -216,13 +221,9 @@ const searchLoader = async (
     ? await getVariations(storefront, productIDs, headers, url)
     : [];
 
-  const itemListElement: ProductListingPage["breadcrumb"]["itemListElement"] =
-    data?.result?.breadcrumbs?.map((b, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      item: b!.link!,
-      name: b!.text!,
-    })) ?? [];
+  const breadcrumb = toBreadcrumbList(data?.result?.breadcrumbs, {
+    base: url,
+  });
 
   const { title, description } =
     (data as HotsiteQuery)?.result?.seo?.reduce((acc, i) => {
@@ -246,11 +247,7 @@ const searchLoader = async (
       recordPerPage: limit,
     },
     sortOptions: SORT_OPTIONS,
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement,
-      numberOfItems: itemListElement.length,
-    },
+    breadcrumb,
     seo: {
       description: description,
       title: title,
