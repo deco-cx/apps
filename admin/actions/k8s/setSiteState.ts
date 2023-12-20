@@ -9,6 +9,9 @@ export interface Props {
   create?: boolean;
 }
 
+/**
+ * Set the site state saving the new state to the secret.
+ */
 export default async function setSiteState(
   { site, state, create }: Props,
   _req: Request,

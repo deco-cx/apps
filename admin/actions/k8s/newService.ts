@@ -173,6 +173,10 @@ const routeOf = ({ namespace, routeName: name, revisionName }: RouteOpts) => {
     },
   };
 };
+
+/**
+ * Creates a new Knative Service and the routes for it depending wether in production or not.
+ */
 export default async function newService(
   { production, site, deploymentId, runnerImage, siteState }: Props,
   _req: Request,

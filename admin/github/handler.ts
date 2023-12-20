@@ -1,6 +1,9 @@
 import { AppContext } from "../mod.ts";
 import { controllerFor, controllerGroup, noop } from "./statusController.ts";
 
+/**
+ * Handles events from the given owner/repo/commit
+ */
 export const handleChange = async (
   owner: string,
   repo: string,

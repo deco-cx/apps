@@ -63,6 +63,9 @@ export interface SiteState {
   scaling?: Scaling;
 }
 
+/**
+ * Returns the current site state.
+ */
 export default async function getSiteState(
   { site }: Props,
   _req: Request,

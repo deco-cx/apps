@@ -5,7 +5,11 @@ export interface RunnerConfig {
   image: string;
 }
 const BUILDER_CONFIG_NAME = "runner-config";
-export default async function getBuilderConfig(
+
+/**
+ * Returns the default runner config.
+ */
+export default async function getRunnerConfig(
   _props: unknown,
   _req: Request,
   ctx: AppContext,

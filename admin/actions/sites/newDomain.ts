@@ -6,6 +6,9 @@ export interface Props {
   domain: string;
 }
 
+/**
+ * Creates a new domain for the given site.
+ */
 export default async function newDomain(
   { site, domain }: Props,
   _req: Request,

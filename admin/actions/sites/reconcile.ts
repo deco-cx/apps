@@ -22,6 +22,9 @@ export interface Deployment {
 export interface ReconciliationResult {
   deployment: Deployment;
 }
+/**
+ * Reconciles the site state based on the desired state.
+ */
 export default async function reconcile(
   { site, currentState, desiredState: ds, production: prod }: Props,
   _req: Request,

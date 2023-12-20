@@ -10,6 +10,9 @@ export interface Props {
   state: "pending" | "failure" | "success";
 }
 
+/**
+ * Set the status of the given github commit, providing a context and a targetUrl that can be clicked.
+ */
 export default async function setStatus(
   { commit, repo, owner, description, targetUrl, context, state }: Props,
   _req: Request,

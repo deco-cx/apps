@@ -244,6 +244,10 @@ export interface BuildResult {
   getBuildStatus: () => Promise<BuildStatus>;
   waitUntil: (status: BuildStatus, timeoutMs?: number) => Promise<void>;
 }
+
+/**
+ * Builds a specific commit repo and owner using the given builder image or getting from builder image default.
+ */
 export default async function build(
   { commitSha, repo, owner, site, builderImage }: Props,
   _req: Request,

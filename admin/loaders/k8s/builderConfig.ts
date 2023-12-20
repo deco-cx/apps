@@ -5,6 +5,10 @@ export interface BuilderConfig {
   image: string;
 }
 const BUILDER_CONFIG_NAME = "builder-config";
+
+/**
+ * Returns the default builder config
+ */
 export default async function getBuilderConfig(
   _props: unknown,
   _req: Request,

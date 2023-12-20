@@ -10,6 +10,11 @@ const canHandle = (
   return !Array.isArray(listener.events) || listener.events.includes(event);
 };
 
+/**
+ * Used as an entrypoint for any webhook event from github
+ * It skips signature verify when running locally
+ * use /live/invoke/deco-sites/admin/actions/github/webhooks/broker.ts and pass the payload
+ */
 export default async function onEventReceived(
   event: WebhookEvent,
   req: Request,
