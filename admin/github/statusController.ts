@@ -6,42 +6,67 @@ export interface ControllerOpts {
   commitSha: string;
   context: string;
 }
+export const controllerGroup = (
+  ...controllers: ReturnType<typeof controllerFor>[]
+) => {
+  return {
+    pending: () => {
+      controllers.forEach((c) => c.pending());
+    },
+    suceeed: (...targetUrl: string[]) => {
+      controllers.forEach((c, i) => c.suceeed(targetUrl[i]));
+    },
+    failure: (reason?: string) => {
+      controllers.forEach((c) => c.failure(reason));
+    },
+  };
+};
 export const controllerFor = (
-  { owner, repo, commitSha: commit, context }: ControllerOpts,
+  opts: ControllerOpts,
   ctx: AppContext,
 ) => {
+  const { owner, repo, commitSha: commit, context } = opts;
   const { actions } = ctx.invoke["deco-sites/admin"];
+  const catchIgnore = (err: unknown) => {
+    console.error("failed to set github status", opts, err);
+  };
   return {
-    async pending() {
-      await actions.github.setStatus({
-        commit,
-        repo,
-        owner,
-        description: "Starting deco build...",
-        context,
-        state: "pending",
-      });
+    pending() {
+      (async () => {
+        await actions.github.setStatus({
+          commit,
+          repo,
+          owner,
+          description: "Starting deco build...",
+          context,
+          state: "pending",
+        });
+      })().catch(catchIgnore);
     },
-    async suceeed(targetUrl: string) {
-      await actions.github.setStatus({
-        commit,
-        repo,
-        owner,
-        description: "Build successful",
-        targetUrl,
-        context,
-        state: "success",
-      });
+    suceeed(targetUrl: string) {
+      (async () => {
+        await actions.github.setStatus({
+          commit,
+          repo,
+          owner,
+          description: "Build successful",
+          targetUrl,
+          context,
+          state: "success",
+        });
+      })().catch(catchIgnore);
     },
-    async failure(_reason?: string) {
-      await actions.github.setStatus({
-        commit,
-        repo,
-        owner,
-        description: "Build failure",
-        context,
-        state: "failure",
-      });
+    failure(_reason?: string) {
+      (async () => {
+        await actions.github.setStatus({
+          commit,
+          repo,
+          owner,
+          description: "Build failed",
+          context,
+          state: "failure",
+        });
+      })().catch(catchIgnore);
     },
   };
 };

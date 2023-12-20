@@ -7,6 +7,14 @@ export interface Props {
 }
 
 export const State = {
+  shouldBuild: (
+    { owner, repo, commitSha }: SiteState,
+    { owner: toOwner, repo: toRepo, commitSha: toCommitSha }: SiteState,
+  ) => owner !== toOwner || repo !== toRepo || commitSha !== toCommitSha,
+  shouldRelease: (
+    { release }: SiteState,
+    { release: toRelease }: SiteState,
+  ) => release !== toRelease,
   forSite: (site: string) => `${site}-state`,
   fromSecret: (secret: k8s.V1Secret): SiteState | undefined => {
     const siteB64Str = secret.data?.["state"];
@@ -31,12 +39,19 @@ export const State = {
   },
 };
 
+export interface Scaling {
+  initialProductionScale?: number;
+  initialScale?: number;
+}
 export interface SiteState {
   release?: string;
   owner: string;
   repo: string;
   commitSha: string;
+  runnerImage?: string;
   envVars?: EnvVar[];
+  useServiceAccount?: boolean;
+  scaling?: Scaling;
 }
 
 export default async function getSiteState(

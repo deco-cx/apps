@@ -2,21 +2,36 @@ import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
 import { upsertObject } from "../../k8s/objects.ts";
+import { SiteState } from "../../loaders/k8s/siteState.ts";
 import { AppContext } from "../../mod.ts";
-import { SourceBinder } from "../k8s/build.ts";
+import { SourceBinder, SrcBinder } from "../k8s/build.ts";
 
 export const DeploymentId = {
-  build: (commitSha: string, release?: string) =>
-    hashString(`${commitSha}-${release}`),
+  build: (
+    {
+      commitSha,
+      release,
+      owner,
+      repo,
+      runnerImage,
+      envVars,
+      scaling,
+      useServiceAccount,
+    }: SiteState,
+  ) =>
+    hashString(
+      `${commitSha}-${release}-${owner}-${repo}-${runnerImage}-${
+        (envVars ?? []).map((e) => `${e.name}:${e.value}`).join(",")
+      }-${scaling?.initialProductionScale}-${scaling?.initialScale}-${useServiceAccount}`,
+    ),
 };
 
 export interface Props {
   site: string;
   production: boolean;
   deploymentId: string;
-  sourceBinder: SourceBinder;
   runnerImage?: string;
-  envVars?: EnvVar[];
+  siteState: SiteState;
 }
 
 export interface EnvVar {
@@ -34,6 +49,7 @@ interface KnativeSerivceOpts {
   runnerImage: string;
   sourceBinder: SourceBinder;
   envVars?: EnvVar[];
+  serviceAccountName?: string;
 }
 const knativeServiceOf = (
   {
@@ -46,6 +62,7 @@ const knativeServiceOf = (
     revisionName,
     sourceBinder,
     envVars,
+    serviceAccountName,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -70,6 +87,7 @@ const knativeServiceOf = (
           },
         },
         spec: {
+          serviceAccountName,
           volumes: [
             {
               name: "assets",
@@ -144,29 +162,34 @@ const routeOf = ({ namespace, routeName: name, revisionName }: RouteOpts) => {
   };
 };
 export default async function newService(
-  { production, site, deploymentId, runnerImage, sourceBinder, envVars }: Props,
+  { production, site, deploymentId, runnerImage, siteState }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
   const { loaders } = ctx.invoke["deco-sites/admin"];
 
-  const runnerImg = runnerImage ??
+  const runnerImg = siteState?.runnerImage ?? runnerImage ??
     (await loaders.k8s.runnerConfig().then((b) => b.image));
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
   const revisionName = `${site}-site-${deploymentId}`;
 
   const service = knativeServiceOf({
-    envVars,
-    sourceBinder,
+    envVars: siteState.envVars,
+    sourceBinder: SrcBinder.fromRepo(
+      siteState.owner,
+      siteState.repo,
+      siteState.commitSha,
+    ),
     site,
     namespace: ctx.workloadNamespace,
     deploymentId,
     production,
-    initialScale: production
-      ? ctx.scaling.initialProductionScale
-      : ctx.scaling.initialScale,
+    initialScale: (production
+      ? siteState?.scaling?.initialProductionScale
+      : siteState?.scaling?.initialScale) ?? 0,
     runnerImage: runnerImg!,
     revisionName,
+    serviceAccountName: siteState?.useServiceAccount ? `${site}-sa` : undefined,
   });
   const createdKnativeService = await upsertObject(
     ctx.kc,

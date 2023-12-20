@@ -13,6 +13,7 @@ import {
 import { FsBlockStorage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
+import { SiteState } from "./loaders/k8s/siteState.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -42,7 +43,7 @@ export interface State {
   githubEventListeners: GithubEventListener[];
   workloadNamespace: string;
   kc: k8s.KubeConfig;
-  scaling: Required<Scaling>;
+  defaultSiteState: Partial<SiteState>;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -75,22 +76,19 @@ export interface GithubProps {
   octokitAPIToken?: Secret;
   eventListeners?: GithubEventListener[];
 }
-export interface Scaling {
-  initialProductionScale?: number;
-  initialScale?: number;
-}
+
 export interface Props {
   resolvables: Resolvables;
   github?: GithubProps;
   workloadNamespace?: string;
-  scaling?: Scaling;
+  defaultSiteState?: Partial<SiteState>;
 }
 
 /**
  * @title Admin
  */
 export default function App(
-  { resolvables, github, workloadNamespace, scaling }: Props,
+  { resolvables, github, workloadNamespace, defaultSiteState }: Props,
 ): App<Manifest, State> {
   const kc = new k8s.KubeConfig();
   context.isDeploy ? kc.loadFromCluster() : kc.loadFromDefault();
@@ -100,9 +98,11 @@ export default function App(
     manifest,
     state: {
       kc,
-      scaling: {
-        initialProductionScale: scaling?.initialProductionScale ?? 3,
-        initialScale: scaling?.initialScale ?? 0,
+      defaultSiteState: defaultSiteState ?? {
+        scaling: {
+          initialProductionScale: 3,
+          initialScale: 0,
+        },
       },
       workloadNamespace: workloadNamespace ?? "deco-sites",
       githubEventListeners: [

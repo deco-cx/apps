@@ -279,7 +279,7 @@ export default async function build(
     throw err;
   });
   if (buildJob?.response?.statusCode && buildJob.response.statusCode >= 400) {
-    badRequest({ message: "could not create knative service" });
+    badRequest({ message: "could not build" });
   }
   const statusFn = getBuildStatus(performance.now());
   const getBuildStatusFn = () =>
