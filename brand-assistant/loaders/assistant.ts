@@ -62,15 +62,16 @@ export default function brandAssistant(props: Props): AIAssistant {
       ),
       ...withContext("This is the store topsearches", props?.topSearches),
       ...withContext(
-        "this is a sample of the store's products",
+        "This is a sample of the store's products",
         props.productsSample?.map((
           {
-            isVariantOf: _ignoreIsVariantOf,
+            "@type": _ignoreType,
             additionalProperty: _ignoreAdditionalProperty,
-            offers: _ignoreOffers,
+            isVariantOf: _ignoreIsVariantOf,
+            image: _ignoreImage,
             ...rest
           },
-        ) => rest).slice(0, 1),
+        ) => rest),
       ),
     ],
   };
