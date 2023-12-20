@@ -224,6 +224,17 @@ const searchLoader = async (
       name: b!.text!,
     })) ?? [];
 
+  const { title, description } =
+    (data as HotsiteQuery)?.result?.seo?.reduce((acc, i) => {
+      if (i?.name === "description") {
+        return { ...acc, description: i.content! };
+      }
+      if (i?.type === "TITLE") {
+        return { ...acc, title: i.content! };
+      }
+      return acc;
+    }, {} as Record<string, string>) ?? {};
+
   return {
     "@type": "ProductListingPage",
     filters: toFilters(data?.result?.aggregations, { base: url }),
@@ -239,6 +250,11 @@ const searchLoader = async (
       "@type": "BreadcrumbList",
       itemListElement,
       numberOfItems: itemListElement.length,
+    },
+    seo: {
+      description: description,
+      title: title,
+      canonical: isHotsite ? (data as HotsiteQuery).result?.url! : "",
     },
     products: products
       ?.filter((p): p is ProductFragment => Boolean(p))
