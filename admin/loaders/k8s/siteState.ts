@@ -43,6 +43,7 @@ export interface ServiceScaling {
   initialScale?: number;
   minScale?: number;
   maxScale?: number;
+  retentionPeriod?: string;
 }
 
 export interface Scaling {

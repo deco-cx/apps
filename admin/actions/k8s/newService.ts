@@ -63,7 +63,7 @@ const knativeServiceOf = (
     namespace,
     deploymentId,
     production,
-    scaling: { initialScale, maxScale, minScale },
+    scaling: { initialScale, maxScale, minScale, retentionPeriod },
     runnerImage,
     revisionName,
     sourceBinder,
@@ -92,6 +92,8 @@ const knativeServiceOf = (
             "autoscaling.knative.dev/initial-scale": `${initialScale}`,
             "autoscaling.knative.dev/max-scale": `${maxScale}`,
             "autoscaling.knative.dev/min-scale": `${minScale}`,
+            "autoscaling.knative.dev/scale-to-zero-pod-retention-period":
+              `${retentionPeriod}`,
           },
         },
         spec: {
