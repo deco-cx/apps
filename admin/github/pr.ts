@@ -30,6 +30,7 @@ export const prEventHandler: GithubEventListener<"pull_request"> = {
       await statusController.suceeed(domains[0].url);
     } catch (_err) {
       await statusController.failure();
+      throw _err;
     }
   },
 };

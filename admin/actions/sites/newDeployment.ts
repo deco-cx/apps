@@ -39,7 +39,7 @@ export default async function deploy(
       loaders.k8s.siteState({ site }),
     ]);
   const ghOrg = owner ?? "deco-sites";
-  const [sourceBinder, deploymentId] = await Promise.all([
+  const [{ sourceBinder, waitUntil }, deploymentId] = await Promise.all([
     actions.k8s.build({
       commitSha,
       repo,
@@ -50,6 +50,12 @@ export default async function deploy(
     DeploymentId.build(commitSha, siteState?.release),
   ]);
 
+  if (production) {
+    await waitUntil("succeed", 60_000);
+  } else {
+    await waitUntil("probably_will_succeed", 6_000);
+  }
+
   await actions.k8s.newService({
     production,
     site,
@@ -59,6 +65,7 @@ export default async function deploy(
   });
   await actions.k8s.setSiteState({
     site,
+    create: siteState === undefined,
     state: {
       ...siteState ?? {},
       owner: ghOrg,

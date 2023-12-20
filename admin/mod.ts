@@ -2,7 +2,13 @@ import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC } from "deco/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
-import { EventPayloadMap, k8s, Octokit, WebhookEventName } from "./deps.ts";
+import {
+  EventPayloadMap,
+  k8s,
+  Octokit,
+  WebhookEventName,
+  Webhooks,
+} from "./deps.ts";
 import { FsBlockStorage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
@@ -31,7 +37,7 @@ export interface GithubEventListener<
 export interface State {
   storage: BlockStore;
   octokit: Octokit;
-  githubWebhookSecret?: string;
+  webhooks: Webhooks;
   githubEventListeners: GithubEventListener[];
   workloadNamespace: string;
   kc: k8s.KubeConfig;
@@ -87,6 +93,8 @@ export default function App(
 ): App<Manifest, State> {
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
+  const githubAPIToken = github?.octokitAPIToken?.get?.() ??
+    Deno.env.get("OCTOKIT_TOKEN");
   return {
     manifest,
     state: {
@@ -103,10 +111,12 @@ export default function App(
       ],
       storage: new FsBlockStorage(),
       octokit: new Octokit({
-        auth: github?.octokitAPIToken?.get?.() ?? Deno.env.get("OCTOKIT_TOKEN"),
+        auth: githubAPIToken,
       }),
-      githubWebhookSecret: github?.webhookSecret?.get?.() ??
-        Deno.env.get("GITHUB_WEBHOOK_SECRET"),
+      webhooks: new Webhooks({
+        secret: github?.webhookSecret?.get?.() ??
+          Deno.env.get("GITHUB_WEBHOOK_SECRET")!,
+      }),
     },
     resolvables,
   };

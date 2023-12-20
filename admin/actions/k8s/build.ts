@@ -1,6 +1,6 @@
 import { badRequest } from "deco/mod.ts";
+import { delay } from "std/async/mod.ts";
 import { k8s } from "../../deps.ts";
-import { watchJobStatus } from "../../k8s/jobs.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
@@ -19,7 +19,6 @@ interface BuildJobOpts {
   namespace: string;
   site: string;
   builderImage: string;
-  githubToken?: string;
   sourceBinder: SourceBinder;
 }
 
@@ -48,7 +47,6 @@ const buildJobOf = (
     namespace,
     site,
     builderImage,
-    githubToken,
     sourceBinder,
   }: BuildJobOpts,
 ): k8s.V1Job => {
@@ -60,7 +58,7 @@ const buildJobOf = (
     apiVersion: "batch/v1",
     kind: "Job",
     metadata: {
-      name: `${commitSha}-${owner}-${repo}`,
+      name: `build-${commitSha}-${owner}-${repo}`,
       namespace,
     },
     spec: {
@@ -83,7 +81,7 @@ const buildJobOf = (
           }],
           containers: [
             {
-              command: ["sh", "/bootstrap.sh"],
+              command: ["sh", "/build.sh"],
               name: "builder",
               image: builderImage, // Use any image you want
               env: [
@@ -129,7 +127,12 @@ const buildJobOf = (
                 },
                 {
                   name: "GITHUB_TOKEN",
-                  value: githubToken,
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: "github-token",
+                      key: "token",
+                    },
+                  },
                 },
               ],
               volumeMounts: [
@@ -159,11 +162,84 @@ const buildJobOf = (
   };
 };
 
+/**
+ * this function is an heuristic that says that in 99% of the cases when the build will fail it will happen in the first five seconds.
+ */
+const getBuildStatus = (buildStartTimeMs: number) =>
+async (
+  api: k8s.BatchV1Api,
+  namespace: string,
+  jobName: string,
+): Promise<BuildStatus> => {
+  const job = await api.readNamespacedJob(jobName, namespace);
+  const jobStatus = job.body.status;
+  if (!jobStatus) {
+    return "running" as const;
+  }
+
+  const condition = (jobStatus.conditions ?? []).find((
+    cond: k8s.V1JobCondition,
+  ) => cond.status === "True");
+  if (!condition) {
+    if (performance.now() - buildStartTimeMs > 5_000) {
+      return "probably_will_succeed";
+    }
+    return "running" as const;
+  }
+
+  return condition.type === "Complete" ? "succeed" : "failed";
+};
+
+const finalStatus: BuildStatus[] = ["succeed", "failed"];
+const waitWithPooling =
+  (getStatusFunc: () => Promise<BuildStatus>, pollingDelayMs: number) =>
+  async (status: BuildStatus, timeoutMs?: number) => {
+    let timedOut = false;
+    const timeout = timeoutMs && setTimeout(() => {
+      timedOut = true;
+    }, timeoutMs);
+    const isProbablySucceed = status === "probably_will_succeed";
+    try {
+      const waitUntil = async () => {
+        const currentStatus = await getStatusFunc();
+        if (
+          currentStatus === status ||
+          (isProbablySucceed && currentStatus === "succeed")
+        ) {
+          return;
+        }
+
+        // unexpected final status
+        if (finalStatus.includes(currentStatus)) {
+          throw new Error(`unexpected final job status ${currentStatus}`);
+        }
+        if (timedOut) {
+          throw new Error("timeout");
+        }
+        await delay(pollingDelayMs);
+        await waitUntil();
+      };
+      return await waitUntil();
+    } finally {
+      timeout && clearTimeout(timeout);
+    }
+  };
+export type BuildStatus =
+  | "succeed"
+  | "failed"
+  | "probably_will_succeed"
+  | "running";
+
+export interface BuildResult {
+  sourceBinder: SourceBinder;
+  getBuildStatus: () => Promise<BuildStatus>;
+  waitUntil: (status: BuildStatus, timeoutMs?: number) => Promise<void>;
+}
 export default async function build(
   { commitSha, repo, owner, site, builderImage }: Props,
   _req: Request,
   ctx: AppContext,
-) {
+): Promise<BuildResult> {
   const { loaders } = ctx.invoke["deco-sites/admin"];
   const builderImg = builderImage ??
     (await loaders.k8s.builderConfig().then((b) => b.image));
@@ -177,16 +253,29 @@ export default async function build(
     namespace: ctx.workloadNamespace,
     site,
     builderImage: builderImg!,
-    githubToken: ctx.githubWebhookSecret,
     sourceBinder: binder,
   });
   const buildJob = await batchAPI.createNamespacedJob(
     ctx.workloadNamespace,
     job,
-  );
-  if (buildJob.response.statusCode && buildJob.response.statusCode >= 400) {
+  ).catch((err) => {
+    if (
+      (err as k8s.HttpError)?.statusCode === 409 &&
+      (err as k8s.HttpError)?.body?.reason === "AlreadyExists"
+    ) {
+      return undefined;
+    }
+    throw err;
+  });
+  if (buildJob?.response?.statusCode && buildJob.response.statusCode >= 400) {
     badRequest({ message: "could not create knative service" });
   }
-  await watchJobStatus(ctx.kc, ctx.workloadNamespace, job.metadata?.name!);
-  return binder;
+  const statusFn = getBuildStatus(performance.now());
+  const getBuildStatusFn = () =>
+    statusFn(batchAPI, ctx.workloadNamespace, job.metadata!.name!);
+  return {
+    sourceBinder: binder,
+    waitUntil: waitWithPooling(getBuildStatusFn, 5_000),
+    getBuildStatus: getBuildStatusFn,
+  };
 }

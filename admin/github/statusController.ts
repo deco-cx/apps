@@ -30,7 +30,7 @@ export const controllerFor = (
         description: "Build successful",
         targetUrl,
         context,
-        state: "pending",
+        state: "success",
       });
     },
     async failure(_reason?: string) {

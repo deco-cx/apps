@@ -45,6 +45,7 @@ export const pushEventHandler: GithubEventListener<"push"> = {
         prodStatusController.failure(),
         commitStatusController.failure(),
       ]);
+      throw _err;
     }
   },
 };

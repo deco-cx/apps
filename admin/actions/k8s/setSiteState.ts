@@ -6,19 +6,25 @@ import { AppContext } from "../../mod.ts";
 export interface Props {
   site: string;
   state: SiteState;
+  create?: boolean;
 }
 export default async function setSiteState(
-  { site, state }: Props,
+  { site, state, create }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<void> {
   const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
   const releaseName = State.forSite(site);
-  const secret = await k8sApi.replaceNamespacedSecret(
-    releaseName,
-    ctx.workloadNamespace,
-    State.toSecret(site, ctx.workloadNamespace, state),
-  );
+  const secret = await (create
+    ? k8sApi.createNamespacedSecret(
+      ctx.workloadNamespace,
+      State.toSecret(site, ctx.workloadNamespace, state),
+    )
+    : k8sApi.replaceNamespacedSecret(
+      releaseName,
+      ctx.workloadNamespace,
+      State.toSecret(site, ctx.workloadNamespace, state),
+    ));
   if (
     secret.response.statusCode &&
     secret.response.statusCode >= 400

@@ -1,6 +1,7 @@
 import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
+import { upsertObject } from "../../k8s/objects.ts";
 import { AppContext } from "../../mod.ts";
 import { SourceBinder } from "../k8s/build.ts";
 
@@ -49,7 +50,6 @@ const knativeServiceOf = (
         "networking.knative.dev/wildcardDomain": "*.decocdn.com",
       },
       labels: {
-        version: deploymentId,
         prod: production ? "true" : "false",
       },
     },
@@ -151,24 +151,26 @@ export default async function newService(
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
   const revisionName = `${site}-site-${deploymentId}`;
 
-  const createdKnativeService = await k8sApi.createNamespacedCustomObject(
+  const service = knativeServiceOf({
+    sourceBinder,
+    site,
+    namespace: ctx.workloadNamespace,
+    deploymentId,
+    production,
+    initialScale: production
+      ? ctx.scaling.initialProductionScale
+      : ctx.scaling.initialScale,
+    runnerImage: runnerImg!,
+    revisionName,
+  });
+  const createdKnativeService = await upsertObject(
+    ctx.kc,
+    service,
     "serving.knative.dev",
     "v1",
-    ctx.workloadNamespace,
     "services",
-    knativeServiceOf({
-      sourceBinder,
-      site,
-      namespace: ctx.workloadNamespace,
-      deploymentId,
-      production,
-      initialScale: production
-        ? ctx.scaling.initialProductionScale
-        : ctx.scaling.initialScale,
-      runnerImage: runnerImg!,
-      revisionName,
-    }),
   );
+
   if (
     createdKnativeService.response.statusCode &&
     createdKnativeService.response.statusCode >= 400
@@ -176,33 +178,39 @@ export default async function newService(
     badRequest({ message: "could not create knative service" });
   }
 
-  const commitRouteName = `sites-${site}-${deploymentId}`;
-  const routes = [
-    routeOf({
-      routeName: commitRouteName,
-      revisionName,
-      namespace: ctx.workloadNamespace,
-    }),
+  const deploymentRoute = `sites-${site}-${deploymentId}`;
+  const routes: Promise<{ response: { statusCode?: number } }>[] = [
+    k8sApi.createNamespacedCustomObject(
+      "serving.knative.dev",
+      "v1",
+      ctx.workloadNamespace,
+      "routes",
+      routeOf({
+        routeName: deploymentRoute,
+        revisionName,
+        namespace: ctx.workloadNamespace,
+      }),
+    ),
   ];
 
   if (production) {
-    routes.push(routeOf({
-      routeName: `sites-${site}`,
-      revisionName,
-      namespace: ctx.workloadNamespace,
-    }));
+    routes.push(
+      upsertObject(
+        ctx.kc,
+        routeOf({
+          routeName: `sites-${site}`,
+          revisionName,
+          namespace: ctx.workloadNamespace,
+        }),
+        "serving.knative.dev",
+        "v1",
+        "routes",
+      ),
+    );
   }
 
   const routeResponses = await Promise.all(
-    routes.map((route) =>
-      k8sApi.createNamespacedCustomObject(
-        "serving.knative.dev",
-        "v1",
-        ctx.workloadNamespace,
-        "routes",
-        route,
-      )
-    ),
+    routes,
   );
 
   if (

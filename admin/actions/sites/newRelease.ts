@@ -39,8 +39,4 @@ export default async function newRelease(
       release,
     },
   });
-  // read current service
-  // generate deploymentId
-  // set release
-  // change route
 }

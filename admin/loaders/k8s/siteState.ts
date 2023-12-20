@@ -46,6 +46,11 @@ export default async function getSiteState(
   const secret = await k8sApi.readNamespacedSecret(
     State.forSite(site),
     ctx.workloadNamespace,
-  );
-  return State.fromSecret(secret.body);
+  ).catch((err) => {
+    if ((err as k8s.HttpError)?.statusCode === 404) {
+      return undefined;
+    }
+    throw err;
+  });
+  return secret ? State.fromSecret(secret.body) : undefined;
 }
