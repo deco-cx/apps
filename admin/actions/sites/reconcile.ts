@@ -44,12 +44,13 @@ export default async function reconcile(
     const [status, timeout]: [BuildStatus, number] = production
       ? ["succeed" as const, currentState === undefined ? 200_000 : 60_000]
       : ["probably_will_succeed" as const, 6_000];
-    (await actions.k8s.build({
+    const buildResult = await actions.k8s.build({
       commitSha: desiredState.commitSha,
       repo: desiredState.repo,
       owner: desiredState.owner,
       site,
-    })).waitUntil(status, timeout);
+    });
+    await buildResult.waitUntil(status, timeout);
   }
 
   // a new service should be created regardless
