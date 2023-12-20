@@ -236,6 +236,8 @@ const searchLoader = async (
       return acc;
     }, {} as Record<string, string>) ?? {};
 
+  const hotsiteUrl = (data as HotsiteQuery).result?.url;
+
   return {
     "@type": "ProductListingPage",
     filters: toFilters(data?.result?.aggregations, { base: url }),
@@ -251,7 +253,7 @@ const searchLoader = async (
     seo: {
       description: description,
       title: title,
-      canonical: isHotsite ? (data as HotsiteQuery).result?.url! : "",
+      canonical: new URL(hotsiteUrl ? `/${hotsiteUrl}` : url, url).href,
     },
     products: products
       ?.filter((p): p is ProductFragment => Boolean(p))
