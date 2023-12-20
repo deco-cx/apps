@@ -70,6 +70,7 @@ const buildJobOf = (
       },
     },
     spec: {
+      ttlSecondsAfterFinished: 60 * 60 * 8, // 8 hours
       template: {
         spec: {
           volumes: [{
