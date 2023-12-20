@@ -1,13 +1,14 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
-import type { App, AppContext as AC } from "deco/mod.ts";
+import { context } from "deco/live.ts";
+import type { AppContext as AC, App } from "deco/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import {
   EventPayloadMap,
-  k8s,
   Octokit,
   WebhookEventName,
   Webhooks,
+  k8s,
 } from "./deps.ts";
 import { FsBlockStorage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
@@ -92,7 +93,7 @@ export default function App(
   { resolvables, github, workloadNamespace, scaling }: Props,
 ): App<Manifest, State> {
   const kc = new k8s.KubeConfig();
-  kc.loadFromDefault();
+  context.isDeploy ? kc.loadFromCluster() : kc.loadFromDefault();
   const githubAPIToken = github?.octokitAPIToken?.get?.() ??
     Deno.env.get("OCTOKIT_TOKEN");
   return {
