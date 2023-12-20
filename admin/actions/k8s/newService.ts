@@ -200,6 +200,7 @@ export default async function newService(
     runnerImage: runnerImg!,
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `${site}-sa` : undefined,
+    runArgs: siteState?.runArgs,
   });
   const createdKnativeService = await upsertObject(
     ctx.kc,
