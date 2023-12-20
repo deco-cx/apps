@@ -1,5 +1,6 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
+import { capitalize } from "../../utils/capitalize.ts";
 import type { AppContext } from "../mod.ts";
 import {
   getVariations,
@@ -225,18 +226,9 @@ const searchLoader = async (
     base: url,
   });
 
-  const { title, description } =
-    (data as HotsiteQuery)?.result?.seo?.reduce((acc, i) => {
-      if (i?.name === "description") {
-        return { ...acc, description: i.content! };
-      }
-      if (i?.type === "TITLE") {
-        return { ...acc, title: i.content! };
-      }
-      return acc;
-    }, {} as Record<string, string>) ?? {};
-
-  const hotsiteUrl = (data as HotsiteQuery).result?.url;
+  const title = isHotsite ? (data as HotsiteQuery)?.result?.seo?.find((i) => i?.type === "TITLE")?.content : capitalize(query || "");
+  const description = isHotsite ? (data as HotsiteQuery)?.result?.seo?.find((i) => i?.name === "description")?.content : capitalize(query || "");
+  const canonical = new URL(isHotsite ? `/${(data as HotsiteQuery)?.result?.url}` : url, url).href
 
   return {
     "@type": "ProductListingPage",
@@ -251,9 +243,9 @@ const searchLoader = async (
     sortOptions: SORT_OPTIONS,
     breadcrumb,
     seo: {
-      description: description,
-      title: title,
-      canonical: new URL(hotsiteUrl ? `/${hotsiteUrl}` : url, url).href,
+      description: description || "",
+      title: title || "",
+      canonical
     },
     products: products
       ?.filter((p): p is ProductFragment => Boolean(p))
