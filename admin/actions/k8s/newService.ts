@@ -89,11 +89,11 @@ const knativeServiceOf = (
         metadata: {
           name: revisionName,
           annotations: {
-            "autoscaling.knative.dev/initial-scale": `${initialScale}`,
-            "autoscaling.knative.dev/max-scale": `${maxScale}`,
-            "autoscaling.knative.dev/min-scale": `${minScale}`,
+            "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
+            "autoscaling.knative.dev/max-scale": `${maxScale ?? 0}`,
+            "autoscaling.knative.dev/min-scale": `${minScale ?? 0}`,
             "autoscaling.knative.dev/scale-to-zero-pod-retention-period":
-              `${retentionPeriod}`,
+              `${retentionPeriod ?? "0s"}`,
           },
         },
         spec: {
