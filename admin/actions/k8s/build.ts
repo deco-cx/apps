@@ -1,6 +1,7 @@
 import { badRequest } from "deco/mod.ts";
 import { delay } from "std/async/mod.ts";
 import { k8s } from "../../deps.ts";
+import { hashString } from "../../hash/shortHash.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
@@ -13,6 +14,7 @@ export interface Props {
 
 const DECO_SITES_PVC = "deco-sites-sources";
 interface BuildJobOpts {
+  name: string;
   commitSha: string;
   repo: string;
   owner: string;
@@ -41,6 +43,7 @@ export const SrcBinder = {
 export type SourceBinder = VolumeBinder;
 const buildJobOf = (
   {
+    name,
     commitSha,
     repo,
     owner,
@@ -58,8 +61,13 @@ const buildJobOf = (
     apiVersion: "batch/v1",
     kind: "Job",
     metadata: {
-      name: `build-${commitSha}-${owner}-${repo}`,
+      name,
       namespace,
+      labels: {
+        site,
+        repo,
+        owner,
+      },
     },
     spec: {
       template: {
@@ -247,6 +255,9 @@ export default async function build(
   const binder = SrcBinder.fromRepo(owner, repo, commitSha);
   // Define the Job specification
   const job = buildJobOf({
+    name: `build-${await hashString(
+      `build-${commitSha}-${owner}-${repo}`,
+    )}`,
     commitSha,
     owner,
     repo,

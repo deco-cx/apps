@@ -1,5 +1,5 @@
 import { badRequest } from "deco/mod.ts";
-import { WebhookEvent, WebhookEventName } from "../../../deps.ts";
+import { k8s, WebhookEvent, WebhookEventName } from "../../../deps.ts";
 import { AppContext, GithubEventListener } from "../../../mod.ts";
 
 const canHandle = (
@@ -30,5 +30,10 @@ export default async function onEventReceived(
       return listener.handle(event, ctx);
     }
     return Promise.resolve();
-  }));
+  })).catch((err) => {
+    if ((err as k8s.HttpError).body) {
+      console.error("k8s error", JSON.stringify((err as k8s.HttpError).body));
+    }
+    throw err;
+  });
 }

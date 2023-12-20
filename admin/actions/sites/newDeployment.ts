@@ -62,6 +62,7 @@ export default async function deploy(
     deploymentId,
     runnerImage,
     sourceBinder,
+    envVars: siteState?.envVars,
   });
   await actions.k8s.setSiteState({
     site,

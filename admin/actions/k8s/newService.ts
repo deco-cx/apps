@@ -16,6 +16,12 @@ export interface Props {
   deploymentId: string;
   sourceBinder: SourceBinder;
   runnerImage?: string;
+  envVars?: EnvVar[];
+}
+
+export interface EnvVar {
+  name: string;
+  value: string;
 }
 
 interface KnativeSerivceOpts {
@@ -27,6 +33,7 @@ interface KnativeSerivceOpts {
   initialScale: number;
   runnerImage: string;
   sourceBinder: SourceBinder;
+  envVars?: EnvVar[];
 }
 const knativeServiceOf = (
   {
@@ -38,6 +45,7 @@ const knativeServiceOf = (
     runnerImage,
     revisionName,
     sourceBinder,
+    envVars,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -83,11 +91,6 @@ const knativeServiceOf = (
                     name: "workload-default-env",
                   },
                 },
-                {
-                  secretRef: {
-                    name: site,
-                  },
-                },
               ],
               env: [
                 { name: "DECO_SITE_NAME", value: site },
@@ -100,6 +103,7 @@ const knativeServiceOf = (
                   value: sourceBinder.sourcePath,
                 },
                 { name: "APP_PORT", value: "8000" },
+                ...envVars ?? [],
                 // Add other environment variables as needed
               ],
               image: runnerImage,
@@ -140,7 +144,7 @@ const routeOf = ({ namespace, routeName: name, revisionName }: RouteOpts) => {
   };
 };
 export default async function newService(
-  { production, site, deploymentId, runnerImage, sourceBinder }: Props,
+  { production, site, deploymentId, runnerImage, sourceBinder, envVars }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
@@ -152,6 +156,7 @@ export default async function newService(
   const revisionName = `${site}-site-${deploymentId}`;
 
   const service = knativeServiceOf({
+    envVars,
     sourceBinder,
     site,
     namespace: ctx.workloadNamespace,

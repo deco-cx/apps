@@ -1,3 +1,4 @@
+import { EnvVar } from "../../actions/k8s/newService.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 
@@ -35,6 +36,7 @@ export interface SiteState {
   owner: string;
   repo: string;
   commitSha: string;
+  envVars?: EnvVar[];
 }
 
 export default async function getSiteState(

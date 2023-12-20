@@ -8,6 +8,7 @@ export interface Props {
   state: SiteState;
   create?: boolean;
 }
+
 export default async function setSiteState(
   { site, state, create }: Props,
   _req: Request,
@@ -15,20 +16,21 @@ export default async function setSiteState(
 ): Promise<void> {
   const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
   const releaseName = State.forSite(site);
+  const siteSecret = State.toSecret(site, ctx.workloadNamespace, state);
   const secret = await (create
     ? k8sApi.createNamespacedSecret(
       ctx.workloadNamespace,
-      State.toSecret(site, ctx.workloadNamespace, state),
+      siteSecret,
     )
     : k8sApi.replaceNamespacedSecret(
       releaseName,
       ctx.workloadNamespace,
-      State.toSecret(site, ctx.workloadNamespace, state),
+      siteSecret,
     ));
   if (
     secret.response.statusCode &&
     secret.response.statusCode >= 400
   ) {
-    badRequest({ message: "could not set latest release" });
+    badRequest({ message: "could not set site state" });
   }
 }
