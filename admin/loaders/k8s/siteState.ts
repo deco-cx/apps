@@ -39,10 +39,17 @@ export const State = {
   },
 };
 
-export interface Scaling {
-  initialProductionScale?: number;
+export interface ServiceScaling {
   initialScale?: number;
+  minScale?: number;
+  maxScale?: number;
 }
+
+export interface Scaling {
+  production?: ServiceScaling;
+  preview?: ServiceScaling;
+}
+
 export interface SiteState {
   release?: string;
   owner: string;

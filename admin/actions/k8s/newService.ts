@@ -2,10 +2,12 @@ import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
 import { upsertObject } from "../../k8s/objects.ts";
-import { SiteState } from "../../loaders/k8s/siteState.ts";
+import { ServiceScaling, SiteState } from "../../loaders/k8s/siteState.ts";
 import { AppContext } from "../../mod.ts";
 import { SourceBinder, SrcBinder } from "../k8s/build.ts";
 
+const hashScaling = (svcScaling?: ServiceScaling) =>
+  `${svcScaling?.initialScale}-${svcScaling?.maxScale}-${svcScaling?.minScale}`;
 export const DeploymentId = {
   build: (
     {
@@ -22,7 +24,9 @@ export const DeploymentId = {
     hashString(
       `${commitSha}-${release}-${owner}-${repo}-${runnerImage}-${
         (envVars ?? []).map((e) => `${e.name}:${e.value}`).join(",")
-      }-${scaling?.initialProductionScale}-${scaling?.initialScale}-${useServiceAccount}`,
+      }-${hashScaling(scaling?.preview)}-${
+        hashScaling(scaling?.production)
+      }-${useServiceAccount}`,
     ),
 };
 
@@ -45,7 +49,7 @@ interface KnativeSerivceOpts {
   namespace: string;
   deploymentId: string;
   production: boolean;
-  initialScale: number;
+  scaling: ServiceScaling;
   runnerImage: string;
   sourceBinder: SourceBinder;
   envVars?: EnvVar[];
@@ -57,7 +61,7 @@ const knativeServiceOf = (
     namespace,
     deploymentId,
     production,
-    initialScale,
+    scaling: { initialScale, maxScale, minScale },
     runnerImage,
     revisionName,
     sourceBinder,
@@ -84,6 +88,8 @@ const knativeServiceOf = (
           name: revisionName,
           annotations: {
             "autoscaling.knative.dev/initial-scale": `${initialScale}`,
+            "autoscaling.knative.dev/max-scale": `${maxScale}`,
+            "autoscaling.knative.dev/min-scale": `${minScale}`,
           },
         },
         spec: {
@@ -184,9 +190,10 @@ export default async function newService(
     namespace: ctx.workloadNamespace,
     deploymentId,
     production,
-    initialScale: (production
-      ? siteState?.scaling?.initialProductionScale
-      : siteState?.scaling?.initialScale) ?? 0,
+    scaling: (production
+      ? siteState?.scaling?.production
+      : siteState?.scaling?.preview) ??
+      { initialScale: 0, maxScale: 3, minScale: 0 },
     runnerImage: runnerImg!,
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `${site}-sa` : undefined,

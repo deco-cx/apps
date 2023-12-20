@@ -1,14 +1,14 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import { context } from "deco/live.ts";
-import type { AppContext as AC, App } from "deco/mod.ts";
+import type { App, AppContext as AC } from "deco/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import {
   EventPayloadMap,
+  k8s,
   Octokit,
   WebhookEventName,
   Webhooks,
-  k8s,
 } from "./deps.ts";
 import { FsBlockStorage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
@@ -100,8 +100,16 @@ export default function App(
       kc,
       defaultSiteState: defaultSiteState ?? {
         scaling: {
-          initialProductionScale: 3,
-          initialScale: 0,
+          preview: {
+            maxScale: 3,
+            initialScale: 0,
+            minScale: 0,
+          },
+          production: {
+            maxScale: 100,
+            initialScale: 3,
+            minScale: 0,
+          },
         },
       },
       workloadNamespace: workloadNamespace ?? "deco-sites",
