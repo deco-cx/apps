@@ -85,9 +85,10 @@ export default async function startWorkflow<
 ): Promise<WorkflowExecution> {
   const { id, args, runtimeParameters } = props;
   const workflow = fromWorkflowProps(props);
-  const service = context.isDeploy
-    ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
-    : "ws://localhost:8000";
+  const service = Deno.env.get("MY_DURABLE_URL") ??
+    (context.isDeploy
+      ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
+      : "ws://localhost:8000");
 
   const url = new URL(
     `${service}/live/workflows/run?${WorkflowQS.buildFromProps(workflow)}`,
