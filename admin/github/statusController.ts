@@ -13,13 +13,18 @@ export const controllerGroup = (
     pending: () => {
       controllers.forEach((c) => c.pending());
     },
-    suceeed: (...targetUrl: string[]) => {
-      controllers.forEach((c, i) => c.suceeed(targetUrl[i]));
+    succeed: (...targetUrl: string[]) => {
+      controllers.forEach((c, i) => c.succeed(targetUrl[i]));
     },
     failure: (reason?: string) => {
       controllers.forEach((c) => c.failure(reason));
     },
   };
+};
+export const noop = {
+  pending: () => {},
+  succeed: () => {},
+  failure: () => {},
 };
 export const controllerFor = (
   opts: ControllerOpts,
@@ -43,7 +48,7 @@ export const controllerFor = (
         });
       })().catch(catchIgnore);
     },
-    suceeed(targetUrl: string) {
+    succeed(targetUrl: string) {
       (async () => {
         await actions.github.setStatus({
           commit,
