@@ -38,13 +38,14 @@ const VNDA_HOST_HEADER = "X-Shop-Host";
 export interface Props {
   /** @description ex: /p/fale-conosco */
   pagesToProxy?: string[];
+  siteMap?: string;
 }
 
 /**
  * @title VNDA Proxy Routes
  */
 function loader(
-  { pagesToProxy = [] }: Props,
+  { pagesToProxy = [], siteMap }: Props,
   _req: Request,
   { publicUrl, account }: AppContext,
 ): Route[] {
@@ -65,7 +66,7 @@ function loader(
     handler: {
       value: {
         __resolveType: "website/handlers/proxy.ts",
-        url: internalDomain,
+        url: pathTemplate === "sitemap.xml" ? (siteMap ? siteMap : internalDomain) : internalDomain,
         host: url.hostname,
         customHeaders,
       },
