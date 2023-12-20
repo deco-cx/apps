@@ -104,11 +104,13 @@ export default function App(
             maxScale: 3,
             initialScale: 0,
             minScale: 0,
+            retentionPeriod: "0s",
           },
           production: {
             maxScale: 100,
             initialScale: 3,
             minScale: 0,
+            retentionPeriod: "5m",
           },
         },
       },
