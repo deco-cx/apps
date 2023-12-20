@@ -66,7 +66,9 @@ function loader(
     handler: {
       value: {
         __resolveType: "website/handlers/proxy.ts",
-        url: pathTemplate === "sitemap.xml" ? (siteMap ? siteMap : internalDomain) : internalDomain,
+        url: pathTemplate === "sitemap.xml"
+          ? (siteMap ? siteMap : internalDomain)
+          : internalDomain,
         host: url.hostname,
         customHeaders,
       },
