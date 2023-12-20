@@ -196,24 +196,27 @@ export const toFilters = (
 };
 
 export const toBreadcrumbList = (
-  product: Product,
   breadcrumbs: SingleProductFragment["breadcrumbs"] = [],
-  { base: _base }: { base: URL },
+  { base: base }: { base: URL },
+  product?: Product,
 ): BreadcrumbList => {
   const itemListElement = [
     ...(breadcrumbs ?? []).map((item, i): ListItem<string> => ({
       "@type": "ListItem",
       name: item!.text!,
       position: i + 1,
-      item: item!.link!,
+      item: new URL(item!.link!, base).href,
     })),
-    {
+  ];
+
+  if (product) {
+    itemListElement.push({
       "@type": "ListItem",
       name: product.isVariantOf?.name,
-      item: product.isVariantOf?.url,
+      item: product.isVariantOf?.url!,
       position: (breadcrumbs ?? []).length + 1,
-    } as ListItem<string>,
-  ];
+    });
+  }
 
   return {
     "@type": "BreadcrumbList",
@@ -352,6 +355,18 @@ export const toProduct = (
     return Number(v.productID) === Number(variantId);
   }) ?? {};
 
+  const aggregateRating = (variant.numberOfVotes ||
+      (variant as SingleProductFragment).reviews?.length)
+    ? {
+      "@type": "AggregateRating" as const,
+      bestRating: 5,
+      ratingCount: variant.numberOfVotes || undefined,
+      ratingValue: variant.averageRating ?? undefined,
+      reviewCount: (variant as SingleProductFragment).reviews?.length,
+      worstRating: 1,
+    }
+    : undefined;
+
   return {
     "@type": "Product",
     url: getVariantUrl(variant, base).href,
@@ -373,20 +388,14 @@ export const toProduct = (
       logo: variant.productBrand?.fullUrlLogo ??
         undefined,
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      bestRating: 5,
-      ratingCount: variant.numberOfVotes ?? undefined,
-      ratingValue: variant.averageRating ?? undefined,
-      reviewCount: (variant as SingleProductFragment).reviews?.length,
-      worstRating: 0,
-    },
+    aggregateRating,
     additionalProperty,
     review,
     offers: {
       "@type": "AggregateOffer",
       highPrice: variant.prices?.price,
       lowPrice: variant.prices?.price,
+      priceCurrency: "BRL",
       offerCount: 1,
       offers: [{
         "@type": "Offer",
