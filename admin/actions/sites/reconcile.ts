@@ -30,7 +30,7 @@ export default async function reconcile(
   const { actions } = ctx.invoke["deco-sites/admin"];
   const desiredState = { ...ctx.defaultSiteState, ...ds };
   const hasReleaseChange = !currentState ||
-    State.shouldRelease(currentState, desiredState);
+    State.shouldReleaseNewVersion(currentState, desiredState);
   const production = prod ?? hasReleaseChange;
   const deploymentId = await DeploymentId.build(desiredState);
 

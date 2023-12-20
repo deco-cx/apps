@@ -11,7 +11,7 @@ export const State = {
     { owner, repo, commitSha }: SiteState,
     { owner: toOwner, repo: toRepo, commitSha: toCommitSha }: SiteState,
   ) => owner !== toOwner || repo !== toRepo || commitSha !== toCommitSha,
-  shouldRelease: (
+  shouldReleaseNewVersion: (
     { release }: SiteState,
     { release: toRelease }: SiteState,
   ) => release !== toRelease,
