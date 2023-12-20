@@ -1,3 +1,4 @@
+import { context } from "deco/live.ts";
 import { badRequest } from "deco/mod.ts";
 import { k8s, WebhookEvent, WebhookEventName } from "../../../deps.ts";
 import { AppContext, GithubEventListener } from "../../../mod.ts";
@@ -14,7 +15,7 @@ export default async function onEventReceived(
   req: Request,
   ctx: AppContext,
 ) {
-  const valid = await ctx.webhooks.verify(
+  const valid = !context.isDeploy || await ctx.webhooks.verify(
     JSON.stringify(event),
     req.headers.get("x-hub-signature-256")!,
   );
