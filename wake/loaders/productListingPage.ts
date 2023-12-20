@@ -226,9 +226,18 @@ const searchLoader = async (
     base: url,
   });
 
-  const title = isHotsite ? (data as HotsiteQuery)?.result?.seo?.find((i) => i?.type === "TITLE")?.content : capitalize(query || "");
-  const description = isHotsite ? (data as HotsiteQuery)?.result?.seo?.find((i) => i?.name === "description")?.content : capitalize(query || "");
-  const canonical = new URL(isHotsite ? `/${(data as HotsiteQuery)?.result?.url}` : url, url).href
+  const title = isHotsite
+    ? (data as HotsiteQuery)?.result?.seo?.find((i) => i?.type === "TITLE")
+      ?.content
+    : capitalize(query || "");
+  const description = isHotsite
+    ? (data as HotsiteQuery)?.result?.seo?.find((i) =>
+      i?.name === "description"
+    )?.content
+    : capitalize(query || "");
+  const canonical =
+    new URL(isHotsite ? `/${(data as HotsiteQuery)?.result?.url}` : url, url)
+      .href;
 
   return {
     "@type": "ProductListingPage",
@@ -245,7 +254,7 @@ const searchLoader = async (
     seo: {
       description: description || "",
       title: title || "",
-      canonical
+      canonical,
     },
     products: products
       ?.filter((p): p is ProductFragment => Boolean(p))
