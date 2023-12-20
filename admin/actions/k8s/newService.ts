@@ -54,9 +54,11 @@ interface KnativeSerivceOpts {
   sourceBinder: SourceBinder;
   envVars?: EnvVar[];
   serviceAccountName?: string;
+  runArgs?: string;
 }
 const knativeServiceOf = (
   {
+    runArgs,
     site,
     namespace,
     deploymentId,
@@ -117,6 +119,7 @@ const knativeServiceOf = (
                 },
               ],
               env: [
+                { name: "EXTRA_RUN_ARGS", value: runArgs },
                 { name: "DECO_SITE_NAME", value: site },
                 {
                   name: "DENO_DEPLOYMENT_ID",

@@ -55,6 +55,7 @@ export interface SiteState {
   owner: string;
   repo: string;
   commitSha: string;
+  runArgs?: string;
   runnerImage?: string;
   envVars?: EnvVar[];
   useServiceAccount?: boolean;
