@@ -65,7 +65,7 @@ function loader(
     handler: {
       value: {
         __resolveType: "website/handlers/proxy.ts",
-        url: pathTemplate === "sitemap.xml"
+        url: pathTemplate === "/sitemap.xml"
           ? `https://sitemap.vnda.com.br/preview/${publicUrl}`
           : internalDomain,
         host: url.hostname,
