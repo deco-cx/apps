@@ -2,7 +2,7 @@ import {
   AssistantCreateParams,
   RequiredActionFunctionToolCall,
 } from "../deps.ts";
-import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
+import { getToken, threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
 import { JSONSchema7 } from "deco/deps.ts";
 import { genSchemas } from "deco/engine/schema/reader.ts";
@@ -290,12 +290,13 @@ export const messageProcessorFor = async (
       return;
     }
 
+    const token = getToken(lastMsg);
     const replyMessage = threadMessageToReply(lastMsg);
 
     const _latestMsg = lastMsg.id;
     reply(replyMessage);
 
-    if (functionCallReplies.length > 0) {
+    if (functionCallReplies.length > 0 && token === Tokens.POSITIVE) {
       reply({
         messageId,
         type: "function_calls" as const,
