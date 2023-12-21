@@ -122,7 +122,6 @@ const knativeServiceOf = (
       namespace,
       annotations: {
         "networking.knative.dev/wildcardDomain": "*.decocdn.com",
-        ...metricToAnnotations(metric),
       },
       labels: {
         prod: production ? "true" : "false",
@@ -133,6 +132,7 @@ const knativeServiceOf = (
         metadata: {
           name: revisionName,
           annotations: {
+            ...metricToAnnotations(metric),
             "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
             "autoscaling.knative.dev/max-scale": `${maxScale ?? 0}`,
             "autoscaling.knative.dev/min-scale": `${minScale ?? 0}`,
