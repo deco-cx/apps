@@ -234,7 +234,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl,
-          priceCurrency: segment.payload.currencyCode ?? "BRL",
+          priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
