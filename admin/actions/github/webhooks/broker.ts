@@ -40,6 +40,7 @@ export default async function onEventReceived(
     if ((err as k8s.HttpError).body) {
       console.error("k8s error", JSON.stringify((err as k8s.HttpError).body));
     }
+    console.error(err);
     throw err;
   });
 }
