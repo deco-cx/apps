@@ -110,12 +110,12 @@ export const buildSegmentCookie = (req: Request): Partial<Segment> => {
 };
 
 export const withSegmentCookie = (
-  { token }: WrappedSegment,
+  segment: WrappedSegment,
   headers?: Headers,
 ) => {
   const h = new Headers(headers);
 
-  h.set("cookie", `${SEGMENT_COOKIE_NAME}=${token}`);
+  h.set("cookie", `${SEGMENT_COOKIE_NAME}=${segment?.token}`);
 
   return h;
 };
