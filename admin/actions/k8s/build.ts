@@ -71,7 +71,7 @@ const buildJobOf = (
     },
     spec: {
       backoffLimit: 0,
-      ttlSecondsAfterFinished: 60 * 60 * 8, // 8 hours
+      ttlSecondsAfterFinished: 60 * 60 * 2, // 2 hours
       template: {
         spec: {
           volumes: [{
