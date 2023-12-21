@@ -2,8 +2,9 @@ import SEO, {
   Props as SEOPDPProps,
 } from "../../../commerce/sections/Seo/SeoPDP.tsx";
 import { ProductDetailsPage } from "../../../commerce/types.ts";
+import { Props as SeoProps } from "../../../website/components/Seo.tsx";
 
-export interface Props extends Omit<SEOPDPProps, "jsonLD"> {
+export interface Props extends Partial<Omit<SeoProps, "jsonLDs">> {
   page: ProductDetailsPage | null;
 }
 
