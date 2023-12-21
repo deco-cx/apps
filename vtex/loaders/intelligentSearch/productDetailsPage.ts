@@ -46,11 +46,12 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
+  const lowercaseSlug = slug?.toLowerCase()
   const segment = getSegmentFromBag(ctx);
 
   const pageTypePromise = vcsDeprecated
     ["GET /api/catalog_system/pub/portal/pagetype/:term"](
-      { term: `${slug}/p` },
+      { term: `${lowercaseSlug}/p` },
       STALE,
     ).then((res) => res.json());
 

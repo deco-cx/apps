@@ -30,6 +30,7 @@ async function loader(
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
+  const lowercaseSlug = slug?.toLowerCase();
   const url = new URL(baseUrl);
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
@@ -37,7 +38,7 @@ async function loader(
 
   const response = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:slug/p"](
-      { ...params, slug },
+      { ...params, slug: lowercaseSlug },
       { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json());
 
