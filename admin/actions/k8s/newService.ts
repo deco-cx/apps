@@ -174,6 +174,7 @@ const routeOf = ({ namespace, routeName: name, revisionName }: RouteOpts) => {
   };
 };
 
+const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
 /**
  * Creates a new Knative Service and the routes for it depending wether in production or not.
  */
@@ -215,6 +216,25 @@ export default async function newService(
     "serving.knative.dev",
     "v1",
     "services",
+    (current) => {
+      return {
+        ...service,
+        metadata: {
+          ...current.metadata,
+          ...service.metadata,
+          annotations: {
+            ...current.metadata.annotations,
+            ...service.metadata.annotations,
+            ...IMMUTABLE_ANNOTATIONS.reduce((acc, key) => {
+              if (current.metadata.annotations?.[key]) {
+                acc[key] = current.metadata.annotations[key];
+              }
+              return acc;
+            }, {} as Record<string, string>),
+          },
+        },
+      };
+    },
   );
 
   if (

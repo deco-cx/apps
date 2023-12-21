@@ -4,6 +4,7 @@ export interface K8sObject {
   metadata: {
     name: string;
     namespace: string;
+    annotations?: Record<string, string>
     resourceVersion?: string;
   };
 }
@@ -14,6 +15,7 @@ export const upsertObject = async (
   group: string,
   version: string,
   plural: string,
+  beforeReplace?: (current: K8sObject) => K8sObject,
 ): Promise<{ response: { statusCode?: number } }> => {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
@@ -47,7 +49,7 @@ export const upsertObject = async (
       obj.metadata.namespace,
       plural,
       obj.metadata.name,
-      {
+      beforeReplace?.(currentObjVersion.body as K8sObject) ?? {
         ...obj,
         metadata: {
           ...(currentObjVersion.body as K8sObject).metadata,
