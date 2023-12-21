@@ -7,6 +7,7 @@ export interface K8sObject {
     resourceVersion?: string;
   };
 }
+
 export const upsertObject = async (
   kc: k8s.KubeConfig,
   obj: K8sObject,
@@ -49,8 +50,8 @@ export const upsertObject = async (
       {
         ...obj,
         metadata: {
-          ...obj.metadata,
           ...(currentObjVersion.body as K8sObject).metadata,
+          ...obj.metadata,
         },
       },
     );
