@@ -1,5 +1,5 @@
-import { AppContext } from "../mod.ts";
-import { controllerFor, controllerGroup, noop } from "./statusController.ts";
+import type { WorkflowProps } from "../../workflows/actions/start.ts";
+import { AppContext, Manifest } from "../mod.ts";
 
 /**
  * Handles events from the given owner/repo/commit
@@ -11,38 +11,24 @@ export const handleChange = async (
   production: boolean,
   ctx: AppContext,
 ) => {
-  const { actions, loaders } = ctx.invoke["deco-sites/admin"];
-  const site = repo; // TODO(mcandeia) it should have a way to deploy more sites to the same repo
-
-  const statusControllerGroup = controllerGroup(
-    controllerFor({
+  const reconcile = ctx.invoke.workflows.actions.start;
+  const props: WorkflowProps<
+    "deco-sites/admin/workflows/reconcile.ts",
+    Manifest
+  > = {
+    key: "deco-sites/admin/workflows/reconcile.ts",
+    props: {},
+    args: [{
       owner,
       repo,
       commitSha,
-      context: `(beta) Deco / sites-${site} / ${commitSha}`,
-    }, ctx),
-    production
-      ? controllerFor({
-        owner,
-        repo,
-        commitSha,
-        context: `(beta) Deco / sites-${site} / prod`,
-      }, ctx)
-      : noop,
-  );
-  try {
-    statusControllerGroup.pending();
-    const currentState = await loaders.k8s.siteState({ site });
-    const desiredState = { ...currentState, owner, repo, commitSha };
-    const { deployment: { domains } } = await actions.sites.reconcile({
-      site,
-      currentState,
-      desiredState,
       production,
-    });
-    statusControllerGroup.succeed(domains?.[0]?.url, domains?.[1]?.url);
-  } catch (_err) {
-    statusControllerGroup.failure();
-    throw _err;
+    }],
+  };
+  try {
+    await reconcile(props);
+  } catch (err) {
+    console.error("workflow err", err);
+    throw err;
   }
 };

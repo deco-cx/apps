@@ -1,22 +1,22 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import { context } from "deco/live.ts";
-import type { AppContext as AC, App } from "deco/mod.ts";
+import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import workflows from "../workflows/mod.ts";
 import {
   EventPayloadMap,
+  k8s,
   Octokit,
   WebhookEventName,
   Webhooks,
-  k8s,
 } from "./deps.ts";
 import { FsBlockStorage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
 import { SiteState } from "./loaders/k8s/siteState.ts";
 import { State as Resolvables } from "./loaders/state.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
+import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
 export interface BlockStore extends Release {
@@ -90,7 +90,7 @@ export interface Props {
  */
 export default function App(
   { resolvables, github, workloadNamespace, defaultSiteState }: Props,
-): App<Manifest, State, [ReturnType<typeof workflows>]> {
+): App<AppManifest, State, [ReturnType<typeof workflows>]> {
   const kc = new k8s.KubeConfig();
   const workflowsApp = workflows({});
   context.isDeploy ? kc.loadFromCluster() : kc.loadFromDefault();
@@ -137,3 +137,5 @@ export default function App(
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
+
+export type Manifest = ManifestOf<ReturnType<typeof App>>;

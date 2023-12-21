@@ -28,6 +28,7 @@ import * as $$$$$$$$$11 from "./actions/github/webhooks/broker.ts";
 import * as $$$$$$$$$12 from "./actions/pages/publish.ts";
 import * as $$$$$$$$$13 from "./actions/pages/new.ts";
 import * as $$$$$$$$$14 from "./actions/pages/delete.ts";
+import * as $$$$$$$$$$0 from "./workflows/reconcile.ts";
 
 const manifest = {
   "loaders": {
@@ -59,6 +60,9 @@ const manifest = {
     "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$12,
     "deco-sites/admin/actions/sites/newDomain.ts": $$$$$$$$$9,
     "deco-sites/admin/actions/sites/reconcile.ts": $$$$$$$$$8,
+  },
+  "workflows": {
+    "deco-sites/admin/workflows/reconcile.ts": $$$$$$$$$$0,
   },
   "name": "deco-sites/admin",
   "baseUrl": import.meta.url,
