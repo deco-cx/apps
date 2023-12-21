@@ -40,7 +40,7 @@ export const handleChange = async (
       desiredState,
       production,
     });
-    statusControllerGroup.succeed(domains[0].url, domains[1].url);
+    statusControllerGroup.succeed(domains?.[0]?.url, domains?.[1]?.url);
   } catch (_err) {
     statusControllerGroup.failure();
     throw _err;
