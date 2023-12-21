@@ -46,7 +46,7 @@ export default async function reconcile(
   if (!currentState || State.shouldBuild(currentState, desiredState)) {
     const [status, timeout]: [BuildStatus, number] = production
       ? ["succeed" as const, currentState === undefined ? 200_000 : 60_000]
-      : ["probably_will_succeed" as const, 6_000];
+      : ["will_probably_succeed" as const, 6_000];
     const buildResult = await actions.k8s.build({
       commitSha: desiredState.commitSha,
       repo: desiredState.repo,

@@ -191,7 +191,7 @@ async (
   ) => cond.status === "True");
   if (!condition) {
     if (performance.now() - buildStartTimeMs > 5_000) {
-      return "probably_will_succeed";
+      return "will_probably_succeed";
     }
     return "running" as const;
   }
@@ -207,7 +207,7 @@ const waitWithPooling =
     const timeout = timeoutMs && setTimeout(() => {
       timedOut = true;
     }, timeoutMs);
-    const isProbablySucceed = status === "probably_will_succeed";
+    const isProbablySucceed = status === "will_probably_succeed";
     try {
       const waitUntil = async () => {
         const currentStatus = await getStatusFunc();
@@ -236,7 +236,7 @@ const waitWithPooling =
 export type BuildStatus =
   | "succeed"
   | "failed"
-  | "probably_will_succeed"
+  | "will_probably_succeed"
   | "running";
 
 export interface BuildResult {
