@@ -13,6 +13,7 @@ import { mschema } from "deco/runtime/fresh/routes/_meta.ts";
 import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
+import type { Product } from "../../commerce/types.ts";
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
@@ -107,6 +108,28 @@ const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
 
 const cache: Record<string, unknown> = {};
 
+// const matchProductCategory = (products: any, queryCategory: string) => {
+//   console.log("matchProductCategory", products[0]);
+//   return products.every((product: any) =>
+//     product.category.includes(queryCategory)
+//   );
+// };
+
+const checkAndHandleResults = (products: Product[], queryCategory: string) => {
+  if (products.length === 0) {
+    return "I couldn't find any products matching your search. Could you specify what you're looking for a bit more?";
+  }
+
+  const isCategoryMatch = products.some((product: Product) =>
+    product.category?.includes(queryCategory)
+  );
+  if (!isCategoryMatch) {
+    return "It seems the products found don't exactly match your search. Could you specify what you're looking for a bit more?";
+  }
+
+  return null; // No issues with the results
+};
+
 const invokeFor = (
   ctx: AppContext,
   assistant: AIAssistant,
@@ -135,9 +158,13 @@ const invokeFor = (
       onFunctionCallStart(call, assistantProps);
       const invokeResponse = await cache[cacheKey];
       onFunctionCallEnd(call, assistantProps, invokeResponse);
+      const response = checkAndHandleResults(
+        invokeResponse as Product[],
+        assistantProps.query,
+      );
       return {
         tool_call_id: call.id,
-        output: JSON.stringify(invokeResponse),
+        output: JSON.stringify(response),
       };
     } catch (err) {
       console.error("invoke error", err);
@@ -196,7 +223,7 @@ export const messageProcessorFor = async (
       instructions: instructions.slice(0, 25000),
       tools,
     });
-    console.log({ tools });
+
     const messageId = run.id;
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
@@ -224,7 +251,7 @@ export const messageProcessorFor = async (
         thread.id,
         run.id,
       );
-      console.log({ runStatus });
+
       console.log("status", runStatus.status);
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
@@ -256,11 +283,14 @@ export const messageProcessorFor = async (
 
     if (!lastMsg) {
       // TODO(@mcandeia) in some cases the bot didn't respond anything.
+
       return;
     }
 
+    const replyMessage = threadMessageToReply(lastMsg);
+
     const _latestMsg = lastMsg.id;
-    reply(threadMessageToReply(lastMsg));
+    reply(replyMessage);
 
     if (functionCallReplies.length > 0) {
       reply({
