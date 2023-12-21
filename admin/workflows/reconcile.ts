@@ -50,7 +50,7 @@ export default function reconcile(
       const { deployment: { domains } } = yield ctx.callLocalActivity(
         async () => {
           const currentState = await siteState({ site });
-          const desiredState = { owner, repo, commitSha };
+          const desiredState = { ...currentState, owner, repo, commitSha };
           return await reconcile({
             site,
             currentState,
