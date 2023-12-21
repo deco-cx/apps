@@ -267,12 +267,14 @@ export const toProduct = (
     image: product.images?.length ?? 0 > 1
       ? product.images?.map((img) => ({
         "@type": "ImageObject" as const,
+        encodingFormat: "image",
         alternateName: `${img.url}`,
         url: toURL(img.url!),
       }))
       : [
         {
           "@type": "ImageObject",
+          encodingFormat: "image",
           alternateName: product.name ?? "",
           url: toURL(product.image_url ?? ""),
         },
