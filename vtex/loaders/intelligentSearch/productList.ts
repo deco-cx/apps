@@ -139,7 +139,7 @@ const loader = async (
 
   const options = {
     baseUrl: url,
-    priceCurrency: segment.payload.currencyCode ?? "BRL",
+    priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   };
 
   // Transform VTEX product format into schema.org's compatible format

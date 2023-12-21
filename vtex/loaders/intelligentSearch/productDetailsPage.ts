@@ -111,7 +111,7 @@ const loader = async (
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: segment.payload.currencyCode ?? "BRL",
+    priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   });
 
   return {

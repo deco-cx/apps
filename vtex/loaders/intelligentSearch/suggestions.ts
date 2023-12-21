@@ -77,7 +77,7 @@ const loaders = async (
 
   const options = {
     baseUrl: url,
-    priceCurrency: segment.payload.currencyCode ?? "BRL",
+    priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   };
 
   return {
