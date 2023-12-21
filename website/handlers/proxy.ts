@@ -126,9 +126,6 @@ export default function Proxy({
 
     const contentType = response.headers.get("Content-Type");
 
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-
     let newBodyStream = null;
 
     if (
@@ -136,39 +133,40 @@ export default function Proxy({
       includeScriptsToHead?.includes &&
       includeScriptsToHead.includes.length > 0
     ) {
-      let accHtml: string | undefined = "";
-      const insertPlausible = new TransformStream({
+      // Use a more efficient approach to insert scripts
+      const insertScriptsStream = new TransformStream({
         async transform(chunk, controller) {
-          let newChunk = await chunk;
-          if (accHtml !== undefined && includeScriptsToHead.includes) {
-            for (let i = 0; i < chunk.length; i++) {
-              accHtml = accHtml.slice(-5) +
-                decoder.decode(chunk.slice(i, i + 1));
+          const chunkStr = new TextDecoder().decode(await chunk);
 
-              if (accHtml === "<head>") {
-                accHtml = "";
+          // Find the position of <head> tag
+          const headEndPos = chunkStr.indexOf("</head>");
+          if (headEndPos !== -1) {
+            // Split the chunk at </head> position
+            const beforeHeadEnd = chunkStr.substring(0, headEndPos);
+            const afterHeadEnd = chunkStr.substring(headEndPos);
 
-                accHtml += decoder.decode(chunk.slice(0, i + 1));
-                for (const script of includeScriptsToHead.includes) {
-                  if ((typeof script.src === "string")) {
-                    accHtml += script.src;
-                  } else {
-                    accHtml += script.src(req);
-                  }
-                }
-                accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
-
-                newChunk = encoder.encode(accHtml);
-                accHtml = undefined;
-                break;
-              }
+            // Prepare scripts to insert
+            let scriptsInsert = "";
+            for (const script of (includeScriptsToHead?.includes ?? [])) {
+              scriptsInsert += typeof script.src === "string"
+                ? script.src
+                : script.src(req);
             }
+
+            // Combine and encode the new chunk
+            const newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
+            controller.enqueue(new TextEncoder().encode(newChunkStr));
+          } else {
+            // If </head> not found, pass the chunk unchanged
+            controller.enqueue(chunk);
           }
-          controller.enqueue(newChunk);
         },
       });
-      await response.body!.pipeThrough(insertPlausible);
-      newBodyStream = insertPlausible.readable;
+
+      // Modify the response body by piping through the transform stream
+      if (response.body) {
+        newBodyStream = response.body.pipeThrough(insertScriptsStream);
+      }
     }
 
     // Change cookies domain
