@@ -56,6 +56,49 @@ interface KnativeSerivceOpts {
   serviceAccountName?: string;
   runArgs?: string;
 }
+
+const typeToAttributes: Record<
+  Required<ServiceScaling>["metric"]["type"],
+  (metric: Required<ServiceScaling>["metric"]) => Record<string, string>
+> = {
+  concurrency: (metric) => {
+    return {
+      "autoscaling.knative.dev/metric": "concurrency",
+      "autoscaling.knative.dev/target-utilization-percentage":
+        `${metric.target}`,
+    };
+  },
+  cpu: (metric) => {
+    return {
+      "autoscaling.knative.dev/class": "hpa.autoscaling.knative.dev",
+      "autoscaling.knative.dev/metric": "cpu",
+      "autoscaling.knative.dev/target": `${metric.target}`,
+    };
+  },
+  memory: (metric) => {
+    return {
+      "autoscaling.knative.dev/class": "hpa.autoscaling.knative.dev",
+      "autoscaling.knative.dev/metric": "concurrency",
+      "autoscaling.knative.dev/target": `${metric.target}`,
+    };
+  },
+  rps: (metric) => {
+    return {
+      "autoscaling.knative.dev/metric": "rps",
+      "autoscaling.knative.dev/target": `${metric.target}`,
+    };
+  },
+};
+
+const metricToAnnotations = (
+  metric: ServiceScaling["metric"],
+): Record<string, string> => {
+  if (!metric) {
+    return {};
+  }
+  return typeToAttributes[metric.type](metric);
+};
+
 const knativeServiceOf = (
   {
     runArgs,
@@ -63,7 +106,7 @@ const knativeServiceOf = (
     namespace,
     deploymentId,
     production,
-    scaling: { initialScale, maxScale, minScale, retentionPeriod },
+    scaling: { initialScale, maxScale, minScale, retentionPeriod, metric },
     runnerImage,
     revisionName,
     sourceBinder,
@@ -79,6 +122,7 @@ const knativeServiceOf = (
       namespace,
       annotations: {
         "networking.knative.dev/wildcardDomain": "*.decocdn.com",
+        ...metricToAnnotations(metric),
       },
       labels: {
         prod: production ? "true" : "false",

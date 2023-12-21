@@ -39,11 +39,34 @@ export const State = {
   },
 };
 
+export interface Concurrency {
+  type: "concurrency";
+  target: number;
+}
+
+export interface RPS {
+  type: "rps";
+  target: number;
+}
+
+export interface CPU {
+  type: "cpu";
+  target: number;
+}
+
+export interface Memory {
+  type: "memory";
+  target: number;
+}
+
+export type ScaleMetric = Concurrency | CPU | Memory | RPS;
+
 export interface ServiceScaling {
   initialScale?: number;
   minScale?: number;
   maxScale?: number;
   retentionPeriod?: string;
+  metric?: ScaleMetric;
 }
 
 export interface Scaling {
