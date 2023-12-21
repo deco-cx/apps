@@ -4,6 +4,10 @@ import { handleChange } from "./handler.ts";
 export const pushEventHandler: GithubEventListener<"push"> = {
   events: ["push"],
   handle: async (event, ctx) => {
+    const isMain = event.ref === "refs/heads/main";
+    if (!isMain) {
+      return;
+    }
     const owner = event.repository.owner.login;
     const repo = event.repository.name;
     const commitSha = event.after;
@@ -11,7 +15,7 @@ export const pushEventHandler: GithubEventListener<"push"> = {
       owner,
       repo,
       commitSha,
-      event.ref === "refs/heads/main",
+      true,
       ctx,
     );
   },
