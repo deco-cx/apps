@@ -22,6 +22,14 @@ const normalize = (strContent: string) => {
     : strContent;
 };
 
+export const getToken = (message: ThreadMessage): string => {
+  const text = (message.content[0] as MessageContentText).text?.value;
+  if (!text) {
+    return Tokens.NEGATIVE;
+  }
+  return text.endsWith(Tokens.POSITIVE) ? Tokens.POSITIVE : Tokens.NEGATIVE;
+};
+
 export const threadMessageToReply = (message: ThreadMessage): ReplyMessage => {
   return {
     messageId: message.run_id!,
