@@ -97,7 +97,7 @@ const normalize = (additionalProperty: PropertyValue[] | undefined = []) => {
 
     if (!name || !value) continue;
 
-    map.set(name, map.get(name) ?? []).get(name)!.push(value);
+    map.set(name, map.get(name) ?? []).get(name)!.push(value as string);
   }
 
   return Object.fromEntries(map.entries());

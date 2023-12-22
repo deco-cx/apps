@@ -102,16 +102,18 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
     return map;
   }, new Map<string, T>());
 
-  return sku.kitItems?.map(({ itemId }) => {
-    const product = productBySkuId.get(itemId);
+  return sku.kitItems
+    ?.map(({ itemId }) => {
+      const product = productBySkuId.get(itemId);
 
-    /** Sometimes VTEX does not return what I've asked for */
-    if (!product) return;
+      /** Sometimes VTEX does not return what I've asked for */
+      if (!product) return;
 
-    const sku = pickSku(product, itemId);
+      const sku = pickSku(product, itemId);
 
-    return toProduct(product, sku, 0, options);
-  }).filter((p): p is Product => typeof p !== "undefined");
+      return toProduct(product, sku, 0, options);
+    })
+    .filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -174,6 +176,43 @@ const toAdditionalPropertyCategories = <
       value: category || "",
     })
   );
+};
+
+function processCategories(categories: string[]): string[] {
+  return categories
+    .map((category) =>
+      category
+        .split("/")
+        .filter((part) => part.trim() !== "")
+        .join(DEFAULT_CATEGORY_SEPARATOR)
+    )
+    .join(">")
+    .split(">");
+}
+
+const toAdditionalPropertyAllCategories = <
+  P extends LegacyProductVTEX | ProductVTEX,
+>(
+  product: P,
+): Product["additionalProperty"] => {
+  const categories = processCategories(product.categories);
+  const allCategories = [...new Set(categories)];
+
+  const categoriesIds = processCategories(product.categoriesIds);
+  const allCategoriesIds = [...new Set(categoriesIds)];
+
+  return [
+    {
+      "@type": "PropertyValue" as const,
+      name: "Additional Categories",
+      value: allCategories.map((category, index) => ({
+        "@type": "PropertyValue" as const,
+        name: "category",
+        propertyID: allCategoriesIds[index],
+        value: category,
+      })),
+    },
+  ];
 };
 
 export const toAdditionalPropertyCategory = ({
@@ -342,13 +381,17 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     DEFAULT_CATEGORY_SEPARATOR,
   );
 
+  const allCategoriesAdditionalProperties = toAdditionalPropertyAllCategories(
+    product,
+  );
   const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
   const clusterAdditionalProperties = toAdditionalPropertyClusters(product);
 
   const additionalProperty = specificationsAdditionalProperty
     .concat(categoryAdditionalProperties ?? [])
     .concat(clusterAdditionalProperties ?? [])
-    .concat(referenceIdAdditionalProperty ?? []);
+    .concat(referenceIdAdditionalProperty ?? [])
+    .concat(allCategoriesAdditionalProperties ?? []);
 
   return {
     "@type": "Product",
@@ -583,8 +626,11 @@ export const legacyFacetToFilter = (
     for (let it = 0; it < newMap.length; it++) {
       let i = 0;
       while (
-        i < zipped.length && (zipped[i][0] === "c" || zipped[i][0] === "C")
-      ) i++;
+        i < zipped.length &&
+        (zipped[i][0] === "c" || zipped[i][0] === "C")
+      ) {
+        i++;
+      }
 
       zipped.splice(i, 0, [newMap[it], newPath[it]]);
     }
