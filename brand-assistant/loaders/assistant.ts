@@ -72,9 +72,7 @@ export default function brandAssistant(props: Props): AIAssistant {
       `👋 Welcome to our Online Store Assistant! 
       How can I assist you today? Whether you're looking for product information, pricing details, or help with navigating our store, feel free to ask.
        I'm here to make your shopping experience smooth and enjoyable! Just type your question, and let's get started. 🛍️`,
-    instructions: `${BASE_INSTRUCTIONS}. ${
-      props.instructions ?? ""
-    }.
+    instructions: `${BASE_INSTRUCTIONS}. ${props.instructions ?? ""}.
      You should ALWAYS fulfill the query parameter even with an empty string when calling the productList.ts function. 
      Also, make sure you have information enough to make the search, otherwise ask for more information.`,
     prompts: [

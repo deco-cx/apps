@@ -233,7 +233,7 @@ export const messageProcessorFor = async (
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
 
     const invoke = invokeFor(ctx, assistant, (call, props) => {
-      console.log({props})
+      console.log({ props });
       reply({
         messageId,
         type: "start_function_call",
@@ -293,7 +293,7 @@ export const messageProcessorFor = async (
     }
 
     const token = getToken(lastMsg);
-    console.log({token})
+    console.log({ token });
     const replyMessage = threadMessageToReply(lastMsg);
 
     const _latestMsg = lastMsg.id;
