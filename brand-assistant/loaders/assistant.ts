@@ -4,6 +4,7 @@ import type { Category, Product, Suggestion } from "../../commerce/types.ts";
 import type { Manifest as OpenAIManifest } from "../../openai/manifest.gen.ts";
 import type vtex from "../../vtex/mod.ts";
 import { Tokens } from "../../ai-assistants/loaders/messages.ts";
+import type { AssistantPersonalization } from "../../ai-assistants/types.ts";
 export interface Props {
   name: string;
   productsSample?: Product[] | null;
@@ -11,6 +12,7 @@ export interface Props {
   categories?: Category | Category[];
   instructions?: string;
   welcomeMessage?: string;
+  personalization?: AssistantPersonalization;
 }
 const withContext = <T>(context: string, v: T | undefined): Prompt[] => {
   if (!v) {
@@ -71,10 +73,18 @@ export default function brandAssistant(props: Props): AIAssistant {
     availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
     name: props.name,
     welcomeMessage: props?.welcomeMessage ??
-      `👋 Welcome to our Online Store Assistant! 
+      `👋 Welcome to our Online Store! I am ${
+        props.personalization?.nickname ?? props.name
+      }, your shopping assistant. 
       How can I assist you today? Whether you're looking for product information, pricing details, or help with navigating our store, feel free to ask.
        I'm here to make your shopping experience smooth and enjoyable! Just type your question, and let's get started. 🛍️`,
-    instructions: `${BASE_INSTRUCTIONS}. ${props.instructions ?? ""}.
+    instructions: `${BASE_INSTRUCTIONS}. 
+    \n\n** Your mood/personality is ${
+      props.personalization?.mood ?? "Enthusiastic"
+    }. 
+    You should take that into account when formulating your dialogue. Your answers should reflect this mood/personality at all times.
+    **\n\n
+    ${props.instructions ?? ""}.
      You should ALWAYS fulfill the query parameter even with an empty string when calling the productList.ts function. 
      Also, make sure you have information enough to make the search, otherwise ask for more information.`,
     prompts: [
