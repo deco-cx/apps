@@ -191,7 +191,8 @@ export const messageProcessorFor = async (
   const thread =
     await (threadId ? threads.retrieve(threadId) : threads.create());
   const instructions =
-    `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. ${
+    `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. The files uploaded to the assistant should 
+    give you a good context of how the products you are dealing with are formatted. ${
       assistant.prompts
         ? "Below are arbitrary prompt that gives you information about the current context, it can be empty."
         : ""
@@ -199,7 +200,8 @@ export const messageProcessorFor = async (
       (assistant.prompts ?? []).map((prompt) =>
         `this is the ${prompt.context}: ${prompt.content}`
       )
-    }. DO NOT CHANGE FUNCTIONS NAMES, do not remove .ts at the end of function name. do not remove / at the end of function name. If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an ${Tokens.POSITIVE} symbol at the end of the phrase. Otherwise, add a ${Tokens.NEGATIVE} symbol.
+    }. DO NOT CHANGE FUNCTIONS NAMES, do not remove .ts at the end of function name. do not remove / at the end of function name. 
+    If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an ${Tokens.POSITIVE} symbol at the end of the phrase. Otherwise, add a ${Tokens.NEGATIVE} symbol.
     For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. ${Tokens.NEGATIVE}".
     `;
   const aiAssistant = await ctx.assistant.then((assistant) => assistant.id);
