@@ -45,6 +45,7 @@ export interface EnvVar {
 }
 
 interface KnativeSerivceOpts {
+  cachePath: string;
   revisionName: string;
   site: string;
   namespace: string;
@@ -102,6 +103,7 @@ const metricToAnnotations = (
 
 const knativeServiceOf = (
   {
+    cachePath,
     runArgs,
     site,
     namespace,
@@ -174,6 +176,10 @@ const knativeServiceOf = (
                   value: deploymentId,
                 },
                 {
+                  name: "CACHE_PATH",
+                  value: cachePath,
+                },
+                {
                   name: "SOURCE_ASSET_PATH",
                   value: sourceBinder.sourcePath,
                 },
@@ -235,13 +241,16 @@ export default async function newService(
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
   const revisionName = `${site}-site-${deploymentId}`;
 
+  const sourceBinder = SrcBinder.fromRepo(
+    siteState.owner,
+    siteState.repo,
+    siteState.commitSha,
+  );
   const service = knativeServiceOf({
+    cachePath:
+      `${sourceBinder.mountPath}/${siteState.owner}/${siteState.repo}/cache.tar`,
     envVars: siteState.envVars,
-    sourceBinder: SrcBinder.fromRepo(
-      siteState.owner,
-      siteState.repo,
-      siteState.commitSha,
-    ),
+    sourceBinder,
     site,
     namespace: ctx.workloadNamespace,
     deploymentId,
