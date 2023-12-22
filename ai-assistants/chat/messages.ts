@@ -190,7 +190,6 @@ export const messageProcessorFor = async (
   const threads = openAI.beta.threads;
   const thread =
     await (threadId ? threads.retrieve(threadId) : threads.create());
-  // console.log(assistant.prompts[0].content);
   const instructions =
     `${ctx.instructions}. Introduce yourself as ${assistant.name}. ${assistant.instructions}. ${
       assistant.prompts
@@ -232,6 +231,7 @@ export const messageProcessorFor = async (
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
 
     const invoke = invokeFor(ctx, assistant, (call, props) => {
+      console.log({props})
       reply({
         messageId,
         type: "start_function_call",
@@ -291,12 +291,13 @@ export const messageProcessorFor = async (
     }
 
     const token = getToken(lastMsg);
+    console.log({token})
     const replyMessage = threadMessageToReply(lastMsg);
 
     const _latestMsg = lastMsg.id;
     reply(replyMessage);
 
-    if (functionCallReplies.length > 0 && token === Tokens.POSITIVE) {
+    if (functionCallReplies.length > 0) {
       reply({
         messageId,
         type: "function_calls" as const,
