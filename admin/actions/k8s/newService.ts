@@ -1,4 +1,5 @@
 import { badRequest } from "deco/mod.ts";
+import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
 import { upsertObject } from "../../k8s/objects.ts";
 import { ServiceScaling, SiteState } from "../../loaders/k8s/siteState.ts";
@@ -7,7 +8,6 @@ import { SourceBinder, SrcBinder } from "../k8s/build.ts";
 
 const hashScaling = (svcScaling?: ServiceScaling) =>
   `${svcScaling?.initialScale}-${svcScaling?.maxScale}-${svcScaling?.minScale}-${svcScaling?.retentionPeriod}-${svcScaling?.metric?.target}-${svcScaling?.metric?.type}`;
-
 export const DeploymentId = {
   build: (
     {
@@ -45,6 +45,7 @@ export interface EnvVar {
 }
 
 interface KnativeSerivceOpts {
+  revisionName: string;
   site: string;
   namespace: string;
   deploymentId: string;
@@ -108,17 +109,17 @@ const knativeServiceOf = (
     production,
     scaling: { initialScale, maxScale, minScale, retentionPeriod, metric },
     runnerImage,
+    revisionName,
     sourceBinder,
     envVars,
     serviceAccountName,
   }: KnativeSerivceOpts,
 ) => {
-  const serviceName = `sites-${site}`;
   return {
     apiVersion: "serving.knative.dev/v1",
     kind: "Service",
     metadata: {
-      name: serviceName,
+      name: `${site}-site`,
       namespace,
       annotations: {
         "networking.knative.dev/wildcardDomain": "*.decocdn.com",
@@ -130,7 +131,7 @@ const knativeServiceOf = (
     spec: {
       template: {
         metadata: {
-          name: `${serviceName}-${deploymentId}`,
+          name: revisionName,
           annotations: {
             ...metricToAnnotations(metric),
             "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
@@ -231,7 +232,8 @@ export default async function newService(
 
   const runnerImg = siteState?.runnerImage ?? runnerImage ??
     (await loaders.k8s.runnerConfig().then((b) => b.image));
-  const revisionName = `sites-${site}-${deploymentId}`;
+  const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
+  const revisionName = `${site}-site-${deploymentId}`;
 
   const service = knativeServiceOf({
     envVars: siteState.envVars,
@@ -249,6 +251,7 @@ export default async function newService(
       : siteState?.scaling?.preview) ??
       { initialScale: 0, maxScale: 3, minScale: 0 },
     runnerImage: runnerImg!,
+    revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `${site}-sa` : undefined,
     runArgs: siteState?.runArgs,
   });
@@ -286,17 +289,46 @@ export default async function newService(
     badRequest({ message: "could not create knative service" });
   }
 
-  if (production) {
-    await upsertObject(
-      ctx.kc,
+  const deploymentRoute = `sites-${site}-${deploymentId}`;
+  const routes: Promise<{ response: { statusCode?: number } }>[] = [
+    k8sApi.createNamespacedCustomObject(
+      "serving.knative.dev",
+      "v1",
+      ctx.workloadNamespace,
+      "routes",
       routeOf({
-        routeName: `sites-${site}`,
+        routeName: deploymentRoute,
         revisionName,
         namespace: ctx.workloadNamespace,
       }),
-      "serving.knative.dev",
-      "v1",
-      "routes",
+    ),
+  ];
+
+  if (production) {
+    routes.push(
+      upsertObject(
+        ctx.kc,
+        routeOf({
+          routeName: `sites-${site}`,
+          revisionName,
+          namespace: ctx.workloadNamespace,
+        }),
+        "serving.knative.dev",
+        "v1",
+        "routes",
+      ),
     );
+  }
+
+  const routeResponses = await Promise.all(
+    routes,
+  );
+
+  if (
+    routeResponses.some((routeResp) =>
+      routeResp.response.statusCode && routeResp.response.statusCode >= 400
+    )
+  ) {
+    badRequest({ message: "error when trying to create routes" });
   }
 }

@@ -27,7 +27,9 @@ const textEncoder = new TextEncoder();
 const textEncode = (str: string) => textEncoder.encode(str);
 const textDecode = (bytes: Uint8Array) => textDecoder.decode(bytes);
 
-const fromSavedAESKey = async ({ key, iv }: SavedAESKey): Promise<AESKey> => {
+export const fromSavedAESKey = async (
+  { key, iv }: SavedAESKey,
+): Promise<AESKey> => {
   const importedKey = await crypto.subtle.importKey(
     "raw",
     key.buffer,
@@ -49,7 +51,16 @@ try {
   console.warn("please run with `--unstable` to enable deno kv support");
 }
 const cryptoKey = ["deco", "secret_cryptokey"];
+const CRYPTO_KEY_ENV_VAR = "DECO_CRYPTO_KEY";
 
+export const generateAESKey = async (): Promise<SavedAESKey> => {
+  const generatedKey = await generateKey();
+  const rawKey = new Uint8Array(
+    await crypto.subtle.exportKey("raw", generatedKey),
+  );
+  const iv = crypto.getRandomValues(new Uint8Array(16));
+  return { key: rawKey, iv };
+};
 /**
  * The overall behavior here is to generate the key in the first use and then use it for the entire environment life (across deployments).
  * Essentially we try to retrieve the key from the memory and then fallback to KV using the following order.
@@ -62,6 +73,9 @@ const cryptoKey = ["deco", "secret_cryptokey"];
 const getOrGenerateKey = (): Promise<AESKey> => {
   if (key) {
     return key;
+  }
+  if (Deno.env.has(CRYPTO_KEY_ENV_VAR)) {
+    return fromSavedAESKey(JSON.parse(atob(Deno.env.get(CRYPTO_KEY_ENV_VAR)!)));
   }
   if (!kv) {
     throw new Error("could not generate keys, kv is not available.");
