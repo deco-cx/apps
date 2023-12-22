@@ -69,10 +69,14 @@ export default function brandAssistant(props: Props): AIAssistant {
     availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
     name: props.name,
     welcomeMessage: props?.welcomeMessage ??
-      `👋 Welcome to our Online Store Assistant! How can I assist you today? Whether you're looking for product information, pricing details, or help with navigating our store, feel free to ask. I'm here to make your shopping experience smooth and enjoyable! Just type your question, and let's get started. 🛍️`,
+      `👋 Welcome to our Online Store Assistant! 
+      How can I assist you today? Whether you're looking for product information, pricing details, or help with navigating our store, feel free to ask.
+       I'm here to make your shopping experience smooth and enjoyable! Just type your question, and let's get started. 🛍️`,
     instructions: `${BASE_INSTRUCTIONS}. ${
       props.instructions ?? ""
-    }. You should ALWAYS fulfill the query parameter even with an empty string when calling the productList.ts function, also, make sure you have information enough to make the search, otherwise ask for more information.`,
+    }.
+     You should ALWAYS fulfill the query parameter even with an empty string when calling the productList.ts function. 
+     Also, make sure you have information enough to make the search, otherwise ask for more information.`,
     prompts: [
       ...withContext(
         "This is the category tree of the store",
@@ -80,12 +84,13 @@ export default function brandAssistant(props: Props): AIAssistant {
       ),
       ...withContext("This is the store topsearches", props?.topSearches),
       ...withContext(
-        "this is a sample of the store's products",
+        "This is a sample of the store's products",
         props.productsSample?.map((
           {
-            isVariantOf: _ignoreIsVariantOf,
+            "@type": _ignoreType,
             additionalProperty: _ignoreAdditionalProperty,
-            offers: _ignoreOffers,
+            isVariantOf: _ignoreIsVariantOf,
+            image: _ignoreImage,
             ...rest
           },
         ) => rest).slice(0, 1),
