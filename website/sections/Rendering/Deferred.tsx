@@ -61,7 +61,8 @@ const script = (
 
 const Deferred = (props: Props) => {
   const { sections, display, behavior } = props;
-  const buttonId = `deffered-${useId()}`;
+  const sectionID = useId();
+  const buttonId = `deffered-${sectionID}`;
   const partial = usePartialSection<typeof Deferred>({
     props: { display: true },
   });
@@ -76,7 +77,12 @@ const Deferred = (props: Props) => {
 
   return (
     <>
-      <button {...partial} id={buttonId} data-deferred />
+      <button
+        {...partial}
+        id={buttonId}
+        data-deferred
+        aria-label={`Deferred Section - ${sectionID}`}
+      />
       <script
         defer
         src={scriptAsDataURI(
