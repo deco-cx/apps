@@ -142,12 +142,14 @@ export const toProduct = (
       additionalProperty: [],
       image: nonEmptyArray(images.nodes)?.map((img) => ({
         "@type": "ImageObject",
+        encodingFormat: "image",
         alternateName: img.altText ?? "",
         url: img.url,
       })),
     },
     image: skuImages?.map((img) => ({
       "@type": "ImageObject",
+      encodingFormat: "image",
       alternateName: img?.altText ?? "",
       url: img?.url,
     })) ?? [DEFAULT_IMAGE],

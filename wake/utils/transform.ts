@@ -233,6 +233,7 @@ export const toProduct = (
 ): Product => {
   const images = variant.images?.map((image) => ({
     "@type": "ImageObject" as const,
+    encodingFormat: "image",
     url: image?.url ?? "",
     alternateName: image?.fileName ?? "",
   }));
@@ -275,6 +276,7 @@ export const toProduct = (
         image: promotion!.fullStampUrl
           ? [{
             "@type": "ImageObject",
+            encodingFormat: "image",
             url: promotion!.fullStampUrl,
           }]
           : undefined,

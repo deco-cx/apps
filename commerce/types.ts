@@ -48,7 +48,22 @@ export interface Thing {
   url?: string;
 }
 
-export interface ImageObject extends Omit<Thing, "@type"> {
+export interface MediaObject {
+  /** Media type typically expressed using a MIME format (see IANA site and MDN reference) */
+  encodingFormat: string;
+  /** A URL pointing to a player for a specific video. */
+  embedUrl?: string;
+  /** Actual bytes of the media object, for example the image file or video file. */
+  contentUrl?: string;
+}
+
+export interface CreativeWork {
+  /** A thumbnail image relevant to the Thing */
+  thumbnailUrl?: string;
+}
+
+export interface ImageObject
+  extends MediaObject, CreativeWork, Omit<Thing, "@type"> {
   "@type": "ImageObject";
 }
 
