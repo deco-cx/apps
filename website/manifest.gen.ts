@@ -45,6 +45,7 @@ import * as $$$$$$$$4 from "./flags/multivariate.ts";
 import * as $$$$$$$$5 from "./flags/everyone.ts";
 import * as $$$$$$$$6 from "./flags/flag.ts";
 import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
+import * as $$$$$$$$$1 from "./actions/interceptor.ts";
 
 const manifest = {
   "functions": {
@@ -104,6 +105,7 @@ const manifest = {
     "website/flags/multivariate/section.ts": $$$$$$$$0,
   },
   "actions": {
+    "website/actions/interceptor.ts": $$$$$$$$$1,
     "website/actions/secrets/encrypt.ts": $$$$$$$$$0,
   },
   "name": "website",
