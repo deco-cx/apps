@@ -164,6 +164,7 @@ const loader = async (
     gtin: sku.AlternateIds.Ean,
     image: sku.Images.map((img) => ({
       "@type": "ImageObject",
+      encodingFormat: "image",
       alternateName: img.ImageName ?? img.FileId,
       url: img.ImageUrl,
     })),

@@ -378,8 +378,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
       const alternateName = imageText || imageLabel || "";
       const name = imageLabel || "";
+      const encodingFormat = "image";
 
-      return { "@type": "ImageObject" as const, alternateName, url, name };
+      return {
+        "@type": "ImageObject" as const,
+        alternateName,
+        url,
+        name,
+        encodingFormat,
+      };
     }) ?? [DEFAULT_IMAGE],
     offers: aggregateOffers(offers, priceCurrency),
   };
