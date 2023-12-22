@@ -46,7 +46,7 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const lowercaseSlug = slug?.toLowerCase()
+  const lowercaseSlug = slug?.toLowerCase();
   const segment = getSegmentFromBag(ctx);
 
   const pageTypePromise = vcsDeprecated
