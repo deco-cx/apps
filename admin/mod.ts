@@ -33,6 +33,7 @@ export interface GithubEventListener<
   events?: TEvents[];
   handle: (
     event: EventPayloadMap[TEvents],
+    req: Request,
     ctx: AppContext,
   ) => Promise<void>;
 }
@@ -40,11 +41,13 @@ export interface GithubEventListener<
 export interface State {
   storage: BlockStore;
   octokit: Octokit;
-  webhooks: Webhooks;
+  webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
   workloadNamespace: string;
   kc: k8s.KubeConfig;
   defaultSiteState: Partial<SiteState>;
+  controlPlaneDomain: string;
+  githubWebhookSecret?: string;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -83,23 +86,40 @@ export interface Props {
   github?: GithubProps;
   workloadNamespace?: string;
   defaultSiteState?: Partial<SiteState>;
+  controlPlaneDomain?: string;
 }
 
 /**
  * @title Admin
  */
 export default function App(
-  { resolvables, github, workloadNamespace, defaultSiteState }: Props,
+  {
+    resolvables,
+    github,
+    workloadNamespace = "deco-sites",
+    defaultSiteState,
+    controlPlaneDomain = "decocdn.com",
+  }: Props,
 ): App<AppManifest, State, [ReturnType<typeof workflows>]> {
   const kc = new k8s.KubeConfig();
   const workflowsApp = workflows({});
-  context.isDeploy ? kc.loadFromCluster() : kc.loadFromDefault();
+  if (!context.play) {
+    try {
+      context.isDeploy ? kc.loadFromCluster() : kc.loadFromDefault();
+    } catch (err) {
+      console.error("couldn't not load from kuberentes state", err);
+    }
+  }
   const githubAPIToken = github?.octokitAPIToken?.get?.() ??
     Deno.env.get("OCTOKIT_TOKEN");
+  const githubWebhookSecret = github?.webhookSecret?.get?.() ??
+    Deno.env.get("GITHUB_WEBHOOK_SECRET");
   return {
     manifest,
     state: {
       kc,
+      githubWebhookSecret,
+      controlPlaneDomain,
       defaultSiteState: defaultSiteState ?? {
         scaling: {
           preview: {
@@ -116,7 +136,7 @@ export default function App(
           },
         },
       },
-      workloadNamespace: workloadNamespace ?? "deco-sites",
+      workloadNamespace,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
@@ -126,10 +146,11 @@ export default function App(
       octokit: new Octokit({
         auth: githubAPIToken,
       }),
-      webhooks: new Webhooks({
-        secret: github?.webhookSecret?.get?.() ??
-          Deno.env.get("GITHUB_WEBHOOK_SECRET")!,
-      }),
+      webhooks: githubWebhookSecret
+        ? new Webhooks({
+          secret: githubWebhookSecret,
+        })
+        : undefined,
     },
     resolvables,
     dependencies: [workflowsApp],

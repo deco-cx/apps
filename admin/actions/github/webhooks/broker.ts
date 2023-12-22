@@ -20,10 +20,10 @@ export default async function onEventReceived(
   req: Request,
   ctx: AppContext,
 ) {
-  const valid = !context.isDeploy || await ctx.webhooks.verify(
+  const valid = !context.isDeploy || (await ctx.webhooks?.verify(
     JSON.stringify(event),
     req.headers.get("x-hub-signature-256")!,
-  );
+  ) ?? true);
   if (!valid) {
     badRequest({ message: "signature is invalid" });
     return;
@@ -33,7 +33,7 @@ export default async function onEventReceived(
 
   await Promise.all(ctx.githubEventListeners.map((listener) => {
     if (canHandle(eventName, listener)) {
-      return listener.handle(event, ctx);
+      return listener.handle(event, req, ctx);
     }
     return Promise.resolve();
   })).catch((err) => {

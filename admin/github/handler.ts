@@ -9,11 +9,12 @@ export const handleChange = async (
   repo: string,
   commitSha: string,
   production: boolean,
+  req: Request,
   ctx: AppContext,
 ) => {
   const { actions, loaders } = ctx.invoke["deco-sites/admin"];
-  const site = repo; // TODO(mcandeia) it should have a way to deploy more sites to the same repo
-
+  const reqUrl = new URL(req.url);
+  const site = reqUrl.searchParams.get("site") ?? repo;
   const statusControllerGroup = controllerGroup(
     controllerFor({
       owner,

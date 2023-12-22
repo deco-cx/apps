@@ -45,6 +45,7 @@ export interface EnvVar {
 }
 
 interface KnativeSerivceOpts {
+  controlPlaneDomain: string;
   cachePath: string;
   revisionName: string;
   site: string;
@@ -115,6 +116,7 @@ const knativeServiceOf = (
     sourceBinder,
     envVars,
     serviceAccountName,
+    controlPlaneDomain,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -124,7 +126,7 @@ const knativeServiceOf = (
       name: `${site}-site`,
       namespace,
       annotations: {
-        "networking.knative.dev/wildcardDomain": "*.decocdn.com",
+        "networking.knative.dev/wildcardDomain": `*.${controlPlaneDomain}`,
       },
       labels: {
         prod: production ? "true" : "false",
@@ -169,6 +171,10 @@ const knativeServiceOf = (
                 },
               ],
               env: [
+                {
+                  name: "ASSETS_MOUNT_PATH",
+                  value: sourceBinder.mountPath,
+                },
                 { name: "EXTRA_RUN_ARGS", value: runArgs },
                 { name: "DECO_SITE_NAME", value: site },
                 {
@@ -247,6 +253,7 @@ export default async function newService(
     siteState.commitSha,
   );
   const service = knativeServiceOf({
+    controlPlaneDomain: ctx.controlPlaneDomain,
     cachePath:
       `${sourceBinder.mountPath}/${siteState.owner}/${siteState.repo}/cache.tar`,
     envVars: siteState.envVars,

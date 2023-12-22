@@ -65,12 +65,12 @@ export default async function reconcile(
   });
 
   const domains = [{
-    url: `https://sites-${site}-${deploymentId}.decocdn.com`,
+    url: `https://sites-${site}-${deploymentId}.${ctx.controlPlaneDomain}`,
     production: false,
   }];
   if (production) {
     domains.push({
-      url: `https://sites-${site}.decocdn.com`,
+      url: `https://sites-${site}.${ctx.controlPlaneDomain}`,
       production: true,
     });
     await actions.k8s.setSiteState({
