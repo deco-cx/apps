@@ -16,7 +16,6 @@ export default async function linkRepo(
   ctx: AppContext,
 ) {
   await ctx.octokit.rest.repos.createWebhook({
-    name: `${site}-webhook`,
     owner,
     repo,
     config: {
