@@ -171,6 +171,7 @@ const knativeServiceOf = (
                 },
               ],
               env: [
+                { name: "FRESH_ESBUILD_LOADER", value: "portable"}, //avoid needing deno.run access
                 {
                   name: "ASSETS_MOUNT_PATH",
                   value: sourceBinder.mountPath,
