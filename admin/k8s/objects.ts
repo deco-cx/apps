@@ -4,10 +4,20 @@ export interface K8sObject {
   metadata: {
     name: string;
     namespace: string;
-    annotations?: Record<string, string>
+    annotations?: Record<string, string>;
     resourceVersion?: string;
   };
 }
+
+export const ignoreIfExists = (err: unknown) => {
+  if (
+    (err as k8s.HttpError)?.statusCode === 409 &&
+    (err as k8s.HttpError)?.body?.reason === "AlreadyExists"
+  ) {
+    return undefined;
+  }
+  throw err;
+};
 
 export const upsertObject = async (
   kc: k8s.KubeConfig,

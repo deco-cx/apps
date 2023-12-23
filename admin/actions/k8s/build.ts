@@ -2,6 +2,7 @@ import { badRequest } from "deco/mod.ts";
 import { delay } from "std/async/mod.ts";
 import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
+import { ignoreIfExists } from "../../k8s/objects.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
@@ -275,15 +276,8 @@ export default async function build(
   const buildJob = await batchAPI.createNamespacedJob(
     ctx.workloadNamespace,
     job,
-  ).catch((err) => {
-    if (
-      (err as k8s.HttpError)?.statusCode === 409 &&
-      (err as k8s.HttpError)?.body?.reason === "AlreadyExists"
-    ) {
-      return undefined;
-    }
-    throw err;
-  });
+  ).catch(ignoreIfExists);
+
   if (buildJob?.response?.statusCode && buildJob.response.statusCode >= 400) {
     badRequest({ message: "could not build" });
   }

@@ -1,7 +1,7 @@
 import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
-import { upsertObject } from "../../k8s/objects.ts";
+import { ignoreIfExists, upsertObject } from "../../k8s/objects.ts";
 import { ServiceScaling, SiteState } from "../../loaders/k8s/siteState.ts";
 import { AppContext } from "../../mod.ts";
 import { SourceBinder, SrcBinder } from "../k8s/build.ts";
@@ -306,7 +306,7 @@ export default async function newService(
   }
 
   const deploymentRoute = `sites-${site}-${deploymentId}`;
-  const routes: Promise<{ response: { statusCode?: number } }>[] = [
+  const routes: Promise<unknown>[] = [
     k8sApi.createNamespacedCustomObject(
       "serving.knative.dev",
       "v1",
@@ -317,7 +317,7 @@ export default async function newService(
         revisionName,
         namespace: ctx.workloadNamespace,
       }),
-    ),
+    ).catch(ignoreIfExists),
   ];
 
   if (production) {
@@ -336,15 +336,7 @@ export default async function newService(
     );
   }
 
-  const routeResponses = await Promise.all(
+  await Promise.all(
     routes,
   );
-
-  if (
-    routeResponses.some((routeResp) =>
-      routeResp.response.statusCode && routeResp.response.statusCode >= 400
-    )
-  ) {
-    badRequest({ message: "error when trying to create routes" });
-  }
 }
