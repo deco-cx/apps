@@ -35,7 +35,12 @@ export default async function reconcile(
   const hasReleaseChange = !currentState ||
     State.shouldReleaseNewVersion(currentState, desiredState);
   const production = prod ?? hasReleaseChange;
-  const deploymentId = await DeploymentId.build(desiredState);
+  const [currentDeploymentId, deploymentId] = await Promise.all([
+    currentState
+      ? DeploymentId.build(currentState)
+      : Promise.resolve(undefined),
+    DeploymentId.build(desiredState),
+  ]);
 
   // TODO (mcandeia)
   // This should treat as a workflow that only one is running at the same time in a given site. This should take its time and can run as longer as its necessary
@@ -56,13 +61,17 @@ export default async function reconcile(
     await buildResult.waitUntil(status, timeout);
   }
 
-  // a new service should be created regardless
-  await actions.k8s.newService({
-    production,
-    site,
-    deploymentId,
-    siteState: desiredState,
-  });
+  if (
+    deploymentId !== currentDeploymentId
+  ) {
+    // a new service should be created regardless
+    await actions.k8s.newService({
+      production,
+      site,
+      deploymentId,
+      siteState: desiredState,
+    });
+  }
 
   const domains = [{
     url: `https://sites-${site}-${deploymentId}.${ctx.controlPlaneDomain}`,
