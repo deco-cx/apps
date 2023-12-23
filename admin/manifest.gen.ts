@@ -24,11 +24,12 @@ import * as $$$$$$$$$7 from "./actions/k8s/build.ts";
 import * as $$$$$$$$$8 from "./actions/sites/reconcile.ts";
 import * as $$$$$$$$$9 from "./actions/sites/linkRepo.ts";
 import * as $$$$$$$$$10 from "./actions/sites/newDomain.ts";
-import * as $$$$$$$$$11 from "./actions/github/setStatus.ts";
-import * as $$$$$$$$$12 from "./actions/github/webhooks/broker.ts";
-import * as $$$$$$$$$13 from "./actions/pages/publish.ts";
-import * as $$$$$$$$$14 from "./actions/pages/new.ts";
-import * as $$$$$$$$$15 from "./actions/pages/delete.ts";
+import * as $$$$$$$$$11 from "./actions/sites/unlinkRepo.ts";
+import * as $$$$$$$$$12 from "./actions/github/setStatus.ts";
+import * as $$$$$$$$$13 from "./actions/github/webhooks/broker.ts";
+import * as $$$$$$$$$14 from "./actions/pages/publish.ts";
+import * as $$$$$$$$$15 from "./actions/pages/new.ts";
+import * as $$$$$$$$$16 from "./actions/pages/delete.ts";
 import * as $$$$$$$$$$0 from "./workflows/reconcile.ts";
 
 const manifest = {
@@ -51,17 +52,18 @@ const manifest = {
     "deco-sites/admin/actions/blocks/publish.ts": $$$$$$$$$0,
     "deco-sites/admin/actions/blocks/restore.ts": $$$$$$$$$1,
     "deco-sites/admin/actions/blocks/safeDelete.ts": $$$$$$$$$2,
-    "deco-sites/admin/actions/github/setStatus.ts": $$$$$$$$$11,
-    "deco-sites/admin/actions/github/webhooks/broker.ts": $$$$$$$$$12,
+    "deco-sites/admin/actions/github/setStatus.ts": $$$$$$$$$12,
+    "deco-sites/admin/actions/github/webhooks/broker.ts": $$$$$$$$$13,
     "deco-sites/admin/actions/k8s/build.ts": $$$$$$$$$7,
     "deco-sites/admin/actions/k8s/newService.ts": $$$$$$$$$6,
     "deco-sites/admin/actions/k8s/setSiteState.ts": $$$$$$$$$5,
-    "deco-sites/admin/actions/pages/delete.ts": $$$$$$$$$15,
-    "deco-sites/admin/actions/pages/new.ts": $$$$$$$$$14,
-    "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$13,
+    "deco-sites/admin/actions/pages/delete.ts": $$$$$$$$$16,
+    "deco-sites/admin/actions/pages/new.ts": $$$$$$$$$15,
+    "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$14,
     "deco-sites/admin/actions/sites/linkRepo.ts": $$$$$$$$$9,
     "deco-sites/admin/actions/sites/newDomain.ts": $$$$$$$$$10,
     "deco-sites/admin/actions/sites/reconcile.ts": $$$$$$$$$8,
+    "deco-sites/admin/actions/sites/unlinkRepo.ts": $$$$$$$$$11,
   },
   "workflows": {
     "deco-sites/admin/workflows/reconcile.ts": $$$$$$$$$$0,
