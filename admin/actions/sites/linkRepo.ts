@@ -1,28 +1,45 @@
-import { context } from "deco/mod.ts";
+import { badRequest, context } from "deco/mod.ts";
 import manifest from "../../manifest.gen.ts";
 import { AppContext } from "../../mod.ts";
+
 export interface Props {
   site: string;
   owner: string;
   repo: string;
 }
 
+export const webhookUrl = (site: string, ctx: AppContext) =>
+  `https://sites-${context.site}.${ctx.controlPlaneDomain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`;
+
 /**
- * Creates a new domain for the given site.
+ * @title Link Repository
  */
 export default async function linkRepo(
   { owner, repo, site }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
+  const url = webhookUrl(site, ctx);
+  const webhooks = await ctx.octokit.rest.repos.listWebhooks({
+    owner,
+    repo,
+  });
+  const webhook = webhooks.data.find((webhook) => webhook.config.url === url);
+  if (webhook) {
+    badRequest({
+      message: "repo already linked with the target site, unlink it first",
+    });
+    return;
+  }
+
   await ctx.octokit.rest.repos.createWebhook({
+    name: "web",
     owner,
     repo,
     config: {
       content_type: "application/json",
       secret: ctx.githubWebhookSecret,
-      url:
-        `https://sites-${context.site}.${ctx.controlPlaneDomain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`,
+      url,
     },
     events: ["push", "pull_request"],
   });
