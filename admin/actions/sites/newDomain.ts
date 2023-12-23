@@ -6,6 +6,29 @@ export interface Props {
   domain: string;
 }
 
+const CLOUDFLARE_API_HOST = "https://api.cloudflare.com/client/v4";
+const CLOUDFLARE_TOKEN = Deno.env.get("CLOUDFLARE_TOKEN");
+const CLOUDFLARE_API_EMAIL = Deno.env.get("CLOUDFLARE_API_EMAIL");
+const CLOUDFLARE_API_KEY = Deno.env.get("CLOUDFLARE_API_KEY");
+
+const CUSTOM_HOSTNAME_POST_BODY = {
+  "ssl": {
+    "bundle_method": "ubiquitous",
+    "method": "http",
+    "type": "dv",
+    "settings": {
+      "ciphers": [
+        "ECDHE-RSA-AES128-GCM-SHA256",
+        "AES128-SHA",
+      ],
+      "early_hints": "on",
+      "http2": "on",
+      "min_tls_version": "1.2",
+      "tls_1_3": "on",
+    },
+    "wildcard": false,
+  },
+};
 /**
  * Creates a new domain for the given site.
  */
@@ -59,6 +82,7 @@ export default async function newDomain(
   };
 
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
+  const path = `${CLOUDFLARE_API_HOST}/zones/${ctx.cfZoneId}/custom_hostnames`;
 
   const [certificate, domainMapping] = await Promise.all([
     k8sApi.createNamespacedCustomObject(
@@ -75,6 +99,19 @@ export default async function newDomain(
       "domainmappings",
       domainMappingManifest,
     ),
+    fetch(encodeURI(path), {
+      method: "POST",
+      body: JSON.stringify({
+        "hostname": domain,
+        ...CUSTOM_HOSTNAME_POST_BODY,
+      }),
+      headers: {
+        "Authorization": `Bearer ${CLOUDFLARE_TOKEN}`,
+        "Content-Type": "application/json",
+        "X-Auth-Email": `${CLOUDFLARE_API_EMAIL}`,
+        "X-Auth-Key": `${CLOUDFLARE_API_KEY}`,
+      },
+    }),
   ]);
   if (
     certificate.response.statusCode &&

@@ -48,6 +48,7 @@ export interface State {
   defaultSiteState: Partial<SiteState>;
   controlPlaneDomain: string;
   githubWebhookSecret?: string;
+  cfZoneId: string;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -87,6 +88,7 @@ export interface Props {
   workloadNamespace?: string;
   defaultSiteState?: Partial<SiteState>;
   controlPlaneDomain?: string;
+  cfZoneId?: string;
 }
 
 /**
@@ -99,6 +101,7 @@ export default function App(
     workloadNamespace = "deco-sites",
     defaultSiteState,
     controlPlaneDomain = "decocdn.com",
+    cfZoneId = "eba5bf129d0b006fd616fd32f0c71492",
   }: Props,
 ): App<AppManifest, State, [ReturnType<typeof workflows>]> {
   const kc = new k8s.KubeConfig();
@@ -118,6 +121,7 @@ export default function App(
     manifest,
     state: {
       kc,
+      cfZoneId,
       githubWebhookSecret,
       controlPlaneDomain,
       defaultSiteState: defaultSiteState ?? {
