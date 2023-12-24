@@ -2,6 +2,7 @@ import { badRequest } from "deco/mod.ts";
 import { delay } from "std/async/mod.ts";
 import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
+import buildScript from "../../k8s/cmds/build.ts";
 import { ignoreIfExists } from "../../k8s/objects.ts";
 import { AppContext } from "../../mod.ts";
 
@@ -92,7 +93,8 @@ const buildJobOf = (
           }],
           containers: [
             {
-              command: ["sh", "/build.sh"],
+              command: ["/bin/sh", "-c"],
+              args: [buildScript],
               name: "builder",
               image: builderImage, // Use any image you want
               env: [

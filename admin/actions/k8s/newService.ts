@@ -1,6 +1,7 @@
 import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { hashString } from "../../hash/shortHash.ts";
+import runScript from "../../k8s/cmds/run.ts";
 import { ignoreIfExists, upsertObject } from "../../k8s/objects.ts";
 import { ServiceScaling, SiteState } from "../../loaders/k8s/siteState.ts";
 import { AppContext } from "../../mod.ts";
@@ -163,6 +164,8 @@ const knativeServiceOf = (
           containers: [
             {
               name: "app",
+              command: ["/bin/sh", "-c"],
+              args: [runScript],
               envFrom: [
                 {
                   configMapRef: {

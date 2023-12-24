@@ -1,5 +1,5 @@
-import { k8s } from "../deps.ts";
 import { deferred, delay } from "std/async/mod.ts";
+import { k8s } from "../deps.ts";
 
 // TODO(mcandeia) watch uses the request lib that uses internal node querystring package that is not fully supported by deno.
 async function _watchJobStatus(
