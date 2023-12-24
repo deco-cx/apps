@@ -1,6 +1,5 @@
 import { SiteState, State } from "../../loaders/k8s/siteState.ts";
 import { AppContext } from "../../mod.ts";
-import { BuildStatus } from "../k8s/build.ts";
 import { DeploymentId } from "../k8s/newService.ts";
 
 export interface Props {
@@ -49,16 +48,13 @@ export default async function reconcile(
 
   // when code has changed so we need to build it.
   if (!currentState || State.shouldBuild(currentState, desiredState)) {
-    const [status, timeout]: [BuildStatus, number] = production
-      ? ["succeed" as const, currentState === undefined ? 200_000 : 60_000]
-      : ["will_probably_succeed" as const, 6_000];
     const buildResult = await actions.k8s.build({
       commitSha: desiredState.commitSha,
       repo: desiredState.repo,
       owner: desiredState.owner,
       site,
     });
-    await buildResult.waitUntil(status, timeout);
+    await buildResult.waitUntil("succeed", 300_000);
   }
 
   if (

@@ -181,7 +181,6 @@ deno run -A - << 'EOF'
 ${build};
 await build();
 EOF
-deno run -A /main2.ts
 
 echo "exporting the code result to a tar file..."
 
