@@ -1,5 +1,6 @@
 import { context } from "deco/live.ts";
-import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type { AppContext as AC, App, ManifestOf } from "deco/mod.ts";
+import { Secret } from "../../website/loaders/secret.ts";
 import { k8s } from "./deps.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
@@ -14,10 +15,12 @@ export interface State {
   kc: k8s.KubeConfig;
   defaultSiteState: SiteState;
   controlPlaneDomain: string;
+  githubToken?: string;
 }
 
 export interface Props {
   defaultSiteState?: SiteState;
+  githubToken?: Secret;
 }
 
 /**
@@ -26,6 +29,7 @@ export interface Props {
 export default function App(
   {
     defaultSiteState,
+    githubToken
   }: Props,
 ): App<AppManifest, State> {
   const kc = new k8s.KubeConfig();
@@ -40,6 +44,7 @@ export default function App(
     manifest,
     state: {
       kc,
+      githubToken: githubToken?.get?.() ?? Deno.env.get("OCTOKIT_TOKEN"),
       controlPlaneDomain: CONTROL_PLANE_DOMAIN,
       defaultSiteState: defaultSiteState ?? {
         runnerImage: DEFAULT_RUNNER_IMAGE,

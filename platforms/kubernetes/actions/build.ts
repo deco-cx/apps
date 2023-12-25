@@ -16,6 +16,7 @@ export interface Props {
 
 export const DECO_SITES_PVC = "deco-sites-sources";
 interface BuildJobOpts {
+  githubToken?: string;
   name: string;
   commitSha: string;
   repo: string;
@@ -44,6 +45,7 @@ export const SrcBinder = {
 export type SourceBinder = VolumeBinder;
 const buildJobOf = (
   {
+    githubToken,
     name,
     commitSha,
     repo,
@@ -134,10 +136,12 @@ const buildJobOf = (
                 },
                 {
                   name: "GITHUB_TOKEN",
-                  valueFrom: {
-                    secretKeyRef: {
-                      name: "github-token",
-                      key: "token",
+                  ...githubToken ? { value: githubToken } : {
+                    valueFrom: {
+                      secretKeyRef: {
+                        name: "github-token",
+                        key: "token",
+                      },
                     },
                   },
                 },
@@ -262,6 +266,7 @@ export default async function build(
     name: `build-${await hashString(
       `build-${commitSha}-${owner}-${repo}`,
     )}`,
+    githubToken: ctx.githubToken,
     commitSha,
     owner,
     repo,
