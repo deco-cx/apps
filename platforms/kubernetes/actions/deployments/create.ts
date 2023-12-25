@@ -8,7 +8,7 @@ import { ServiceScaling, SiteState } from "../../loaders/siteState/get.ts";
 import { AppContext } from "../../mod.ts";
 import { SourceBinder, SrcBinder } from "../build.ts";
 
-const uid = new ShortUniqueId({ length: 10 });
+const uid = new ShortUniqueId({ length: 10, dictionary: "alpha_lower" });
 export const DeploymentId = {
   new: () => uid.randomUUID(),
 };
