@@ -9,7 +9,7 @@ export interface Props {
 }
 
 export const webhookUrl = (site: string, domain: string) =>
-  `https://sites-${context.site}.${domain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`;
+  `https://site-${context.site}.${domain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`;
 
 /**
  * @title Link Repository

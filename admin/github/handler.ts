@@ -20,14 +20,14 @@ export const handleChange = async (
       owner,
       repo,
       commitSha,
-      context: `(beta) Deco / sites-${site} / ${commitSha}`,
+      context: `(beta) Deco / site-${site} / preview`,
     }, ctx),
     production
       ? controllerFor({
         owner,
         repo,
         commitSha,
-        context: `(beta) Deco / sites-${site} / prod`,
+        context: `(beta) Deco / site-${site} / prod`,
       }, ctx)
       : noop,
   );

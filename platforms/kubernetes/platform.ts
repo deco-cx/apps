@@ -45,7 +45,7 @@ async function buildAndDeploy(
   });
 
   const domains = [{
-    url: `https://sites-${site}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
+    url: `https://site-${site}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
     production: false,
   }];
   return { id: deploymentId, domains };
@@ -96,7 +96,7 @@ export default function kubernetes(
           return {
             ...deployment,
             domains: [...deployment.domains, {
-              url: `https://sites-${site}.${CONTROL_PLANE_DOMAIN}`,
+              url: `https://site-${site}.${CONTROL_PLANE_DOMAIN}`,
               production: true,
             }],
           };
@@ -130,7 +130,7 @@ export default function kubernetes(
         return {
           ...deployment,
           domains: [...deployment.domains, {
-            url: `https://sites-${site}.${CONTROL_PLANE_DOMAIN}`,
+            url: `https://site-${site}.${CONTROL_PLANE_DOMAIN}`,
             production: true,
           }],
         };
