@@ -94,7 +94,7 @@ export default function App(
   State,
   [ReturnType<typeof k8s>]
 > {
-  const k8sApp = k8s(kubernetes);
+  const k8sApp = k8s(kubernetes ?? {});
   const githubAPIToken = github?.octokitAPIToken?.get?.() ??
     Deno.env.get("OCTOKIT_TOKEN");
   const githubWebhookSecret = github?.webhookSecret?.get?.() ??
