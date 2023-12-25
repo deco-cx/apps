@@ -1,5 +1,5 @@
 import { badRequest } from "deco/mod.ts";
-import ShortUniqueId from "https://esm.sh/short-unique-id@v4.4.2";
+import ShortUniqueId from "https://esm.sh/v135/short-unique-id@v4.4.2";
 import runScript from "../../common/cmds/run.ts";
 import { routeOf } from "../../common/knative/route.ts";
 import { ignoreIfExists, upsertObject } from "../../common/objects.ts";
