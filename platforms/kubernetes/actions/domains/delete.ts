@@ -1,0 +1,65 @@
+import { badRequest } from "deco/mod.ts";
+import { k8s } from "../../deps.ts";
+import { AppContext } from "../../mod.ts";
+
+export interface Props {
+  site: string;
+  domain: string;
+}
+
+/**
+ * Creates a new domain for the given site.
+ */
+export default async function deleteDomain(
+  { site, domain }: Props,
+  _req: Request,
+  ctx: AppContext,
+) {
+  const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
+
+  const [certificate, domainMapping, currentSiteState] = await Promise.all([
+    k8sApi.deleteNamespacedCustomObject(
+      "cert-manager.io",
+      "v1",
+      site,
+      "certificates",
+      domain,
+    ),
+    k8sApi.deleteNamespacedCustomObject(
+      "serving.knative.dev",
+      "v1beta1",
+      site,
+      "domainmappings",
+      domain,
+    ),
+    ctx.invoke.kubernetes.loaders.siteState.get({ site }),
+  ]);
+  if (
+    certificate.response.statusCode &&
+    certificate.response.statusCode >= 400
+  ) {
+    badRequest({ message: "could not delete certificate" });
+  }
+  if (
+    domainMapping.response.statusCode &&
+    domainMapping.response.statusCode >= 400
+  ) {
+    badRequest({ message: "could not delete domainMapping" });
+  }
+
+  if (!currentSiteState) {
+    badRequest({ message: "site not found" });
+    return;
+  }
+
+  await ctx.invoke.kubernetes.actions.siteState.upsert({
+    site,
+    state: {
+      ...currentSiteState,
+      domains: [...currentSiteState.domains ?? [], {
+        url: domain,
+        production: true,
+      }],
+    },
+  });
+}

@@ -1,4 +1,5 @@
-import { EnvVar } from "../../actions/k8s/newService.ts";
+import { Domain } from "../../../../admin/platform.ts";
+import { EnvVar } from "../../actions/deployments/create.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 
@@ -7,21 +8,12 @@ export interface Props {
 }
 
 export const State = {
-  shouldBuild: (
-    { owner, repo, commitSha }: SiteState,
-    { owner: toOwner, repo: toRepo, commitSha: toCommitSha }: SiteState,
-  ) => owner !== toOwner || repo !== toRepo || commitSha !== toCommitSha,
-  shouldReleaseNewVersion: (
-    { release }: SiteState,
-    { release: toRelease }: SiteState,
-  ) => release !== toRelease,
-  forSite: (site: string) => `${site}-state`,
+  secretName: "state",
   fromSecret: (secret: k8s.V1Secret): SiteState | undefined => {
     const siteB64Str = secret.data?.["state"];
     return siteB64Str ? JSON.parse(atob(siteB64Str)) : undefined;
   },
   toSecret: (
-    site: string,
     namespace: string,
     state: SiteState,
   ): k8s.V1Secret => {
@@ -29,7 +21,7 @@ export const State = {
       apiVersion: "v1",
       kind: "Secret",
       metadata: {
-        name: State.forSite(site),
+        name: State.secretName,
         namespace,
       },
       stringData: {
@@ -69,21 +61,23 @@ export interface ServiceScaling {
   metric?: ScaleMetric;
 }
 
-export interface Scaling {
-  production?: ServiceScaling;
-  preview?: ServiceScaling;
-}
-
-export interface SiteState {
-  release?: string;
-  owner: string;
+export interface Github {
+  type: "github";
   repo: string;
+  owner: string;
   commitSha: string;
+}
+export type Source = Github;
+export interface SiteState {
+  entrypoint?: string; // defaults to main.ts
+  source: Source;
   runArgs?: string;
   runnerImage?: string;
+  builderImage?: string;
   envVars?: EnvVar[];
   useServiceAccount?: boolean;
-  scaling?: Scaling;
+  scaling?: ServiceScaling;
+  domains?: Domain[];
 }
 
 /**
@@ -96,13 +90,15 @@ export default async function getSiteState(
 ): Promise<SiteState | undefined> {
   const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
   const secret = await k8sApi.readNamespacedSecret(
-    State.forSite(site),
-    ctx.workloadNamespace,
+    State.secretName,
+    site,
   ).catch((err) => {
     if ((err as k8s.HttpError)?.statusCode === 404) {
       return undefined;
     }
     throw err;
   });
-  return secret ? State.fromSecret(secret.body) : undefined;
+  return secret
+    ? { ...ctx.defaultSiteState, ...State.fromSecret(secret.body)! }
+    : undefined;
 }

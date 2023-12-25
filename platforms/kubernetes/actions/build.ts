@@ -1,10 +1,10 @@
 import { badRequest } from "deco/mod.ts";
 import { delay } from "std/async/mod.ts";
-import { k8s } from "../../deps.ts";
-import { hashString } from "../../hash/shortHash.ts";
-import buildScript from "../../k8s/cmds/build.ts";
-import { ignoreIfExists } from "../../k8s/objects.ts";
-import { AppContext } from "../../mod.ts";
+import buildScript from "../common/cmds/build.ts";
+import { ignoreIfExists } from "../common/objects.ts";
+import { k8s } from "../deps.ts";
+import { hashString } from "../hash/shortHash.ts";
+import { AppContext } from "../mod.ts";
 
 export interface Props {
   site: string;
@@ -14,13 +14,12 @@ export interface Props {
   builderImage?: string;
 }
 
-const DECO_SITES_PVC = "deco-sites-sources";
+export const DECO_SITES_PVC = "deco-sites-sources";
 interface BuildJobOpts {
   name: string;
   commitSha: string;
   repo: string;
   owner: string;
-  namespace: string;
   site: string;
   builderImage: string;
   sourceBinder: SourceBinder;
@@ -49,7 +48,6 @@ const buildJobOf = (
     commitSha,
     repo,
     owner,
-    namespace,
     site,
     builderImage,
     sourceBinder,
@@ -64,7 +62,7 @@ const buildJobOf = (
     kind: "Job",
     metadata: {
       name,
-      namespace,
+      namespace: site,
       labels: {
         site,
         repo,
@@ -133,10 +131,6 @@ const buildJobOf = (
                 {
                   name: "XDG_CACHE_HOME",
                   value: esbuildCacheMountPath,
-                },
-                {
-                  name: "NAMESPACE",
-                  value: namespace,
                 },
                 {
                   name: "GITHUB_TOKEN",
@@ -257,9 +251,10 @@ export default async function build(
   _req: Request,
   ctx: AppContext,
 ): Promise<BuildResult> {
-  const { loaders } = ctx.invoke["deco-sites/admin"];
-  const builderImg = builderImage ??
-    (await loaders.k8s.builderConfig().then((b) => b.image));
+  const builderImg = builderImage;
+  if (!builderImg) {
+    badRequest({ message: "builder image is required" });
+  }
   const batchAPI = ctx.kc.makeApiClient(k8s.BatchV1Api);
   const binder = SrcBinder.fromRepo(owner, repo, commitSha);
   // Define the Job specification
@@ -270,13 +265,12 @@ export default async function build(
     commitSha,
     owner,
     repo,
-    namespace: ctx.workloadNamespace,
     site,
     builderImage: builderImg!,
     sourceBinder: binder,
   });
   const buildJob = await batchAPI.createNamespacedJob(
-    ctx.workloadNamespace,
+    site,
     job,
   ).catch(ignoreIfExists);
 
@@ -284,8 +278,7 @@ export default async function build(
     badRequest({ message: "could not build" });
   }
   const statusFn = getBuildStatus(performance.now());
-  const getBuildStatusFn = () =>
-    statusFn(batchAPI, ctx.workloadNamespace, job.metadata!.name!);
+  const getBuildStatusFn = () => statusFn(batchAPI, site, job.metadata!.name!);
   return {
     sourceBinder: binder,
     waitUntil: waitWithPooling(getBuildStatusFn, 5_000),

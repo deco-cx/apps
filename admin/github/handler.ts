@@ -12,7 +12,7 @@ export const handleChange = async (
   req: Request,
   ctx: AppContext,
 ) => {
-  const { actions, loaders } = ctx.invoke["deco-sites/admin"];
+  const { loaders } = ctx.invoke["deco-sites/admin"];
   const reqUrl = new URL(req.url);
   const site = reqUrl.searchParams.get("site") ?? repo;
   const statusControllerGroup = controllerGroup(
@@ -33,12 +33,12 @@ export const handleChange = async (
   );
   try {
     statusControllerGroup.pending();
-    const currentState = await loaders.k8s.siteState({ site });
-    const desiredState = { ...currentState, owner, repo, commitSha };
-    const { deployment: { domains } } = await actions.sites.reconcile({
+    const platform = await loaders.platforms.forSite({ site });
+    const { domains } = await platform.deployments.create({
+      commitSha,
+      owner,
+      repo,
       site,
-      currentState,
-      desiredState,
       production,
     });
     statusControllerGroup.succeed(domains?.[0]?.url, domains?.[1]?.url);

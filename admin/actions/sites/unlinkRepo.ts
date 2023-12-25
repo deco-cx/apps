@@ -14,7 +14,9 @@ export default async function unlink(
   _req: Request,
   ctx: AppContext,
 ) {
-  const url = webhookUrl(site, ctx);
+  const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms
+    .forSite({ site });
+  const url = webhookUrl(site, platform.domain);
   const webhooks = await ctx.octokit.rest.repos.listWebhooks({
     owner,
     repo,

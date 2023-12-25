@@ -1,6 +1,6 @@
 import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
-import { SiteState, State } from "../../loaders/k8s/siteState.ts";
+import { SiteState, State } from "../../loaders/siteState/get.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
@@ -18,16 +18,16 @@ export default async function setSiteState(
   ctx: AppContext,
 ): Promise<void> {
   const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
-  const releaseName = State.forSite(site);
-  const siteSecret = State.toSecret(site, ctx.workloadNamespace, state);
+  const releaseName = State.secretName;
+  const siteSecret = State.toSecret(site, state);
   const secret = await (create
     ? k8sApi.createNamespacedSecret(
-      ctx.workloadNamespace,
+      site,
       siteSecret,
     )
     : k8sApi.replaceNamespacedSecret(
       releaseName,
-      ctx.workloadNamespace,
+      site,
       siteSecret,
     ));
   if (

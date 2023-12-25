@@ -1,6 +1,7 @@
 import { context } from "deco/live.ts";
 import { badRequest } from "deco/mod.ts";
-import { k8s, WebhookEvent, WebhookEventName } from "../../../deps.ts";
+import { k8s } from "../../../../platforms/kubernetes/deps.ts";
+import { WebhookEvent, WebhookEventName } from "../../../deps.ts";
 import { AppContext, GithubEventListener } from "../../../mod.ts";
 
 const canHandle = (

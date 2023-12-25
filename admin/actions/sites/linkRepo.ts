@@ -8,8 +8,8 @@ export interface Props {
   repo: string;
 }
 
-export const webhookUrl = (site: string, ctx: AppContext) =>
-  `https://sites-${context.site}.${ctx.controlPlaneDomain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`;
+export const webhookUrl = (site: string, domain: string) =>
+  `https://sites-${context.site}.${domain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`;
 
 /**
  * @title Link Repository
@@ -19,7 +19,9 @@ export default async function linkRepo(
   _req: Request,
   ctx: AppContext,
 ) {
-  const url = webhookUrl(site, ctx);
+  const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms
+    .forSite({ site });
+  const url = webhookUrl(site, platform.domain);
   const webhooks = await ctx.octokit.rest.repos.listWebhooks({
     owner,
     repo,

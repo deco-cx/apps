@@ -1,12 +1,10 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
-import { context } from "deco/live.ts";
 import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import k8s, { Props as K8sProps } from "../platforms/kubernetes/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
-import workflows from "../workflows/mod.ts";
 import {
   EventPayloadMap,
-  k8s,
   Octokit,
   WebhookEventName,
   Webhooks,
@@ -14,7 +12,6 @@ import {
 import { FsBlockStorage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
-import { SiteState } from "./loaders/k8s/siteState.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
@@ -43,12 +40,7 @@ export interface State {
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
-  workloadNamespace: string;
-  kc: k8s.KubeConfig;
-  defaultSiteState: Partial<SiteState>;
-  controlPlaneDomain: string;
   githubWebhookSecret?: string;
-  cfZoneId: string;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -85,10 +77,7 @@ export interface GithubProps {
 export interface Props {
   resolvables: Resolvables;
   github?: GithubProps;
-  workloadNamespace?: string;
-  defaultSiteState?: Partial<SiteState>;
-  controlPlaneDomain?: string;
-  cfZoneId?: string;
+  kubernetes: K8sProps;
 }
 
 /**
@@ -98,21 +87,14 @@ export default function App(
   {
     resolvables,
     github,
-    workloadNamespace = "deco-sites",
-    defaultSiteState,
-    controlPlaneDomain = "decocdn.com",
-    cfZoneId = "eba5bf129d0b006fd616fd32f0c71492",
+    kubernetes,
   }: Props,
-): App<AppManifest, State, [ReturnType<typeof workflows>]> {
-  const kc = new k8s.KubeConfig();
-  const workflowsApp = workflows({});
-  if (!context.play) {
-    try {
-      context.isDeploy ? kc.loadFromCluster() : kc.loadFromDefault();
-    } catch (err) {
-      console.error("couldn't not load from kuberentes state", err);
-    }
-  }
+): App<
+  AppManifest,
+  State,
+  [ReturnType<typeof k8s>]
+> {
+  const k8sApp = k8s(kubernetes);
   const githubAPIToken = github?.octokitAPIToken?.get?.() ??
     Deno.env.get("OCTOKIT_TOKEN");
   const githubWebhookSecret = github?.webhookSecret?.get?.() ??
@@ -120,27 +102,7 @@ export default function App(
   return {
     manifest,
     state: {
-      kc,
-      cfZoneId,
       githubWebhookSecret,
-      controlPlaneDomain,
-      defaultSiteState: defaultSiteState ?? {
-        scaling: {
-          preview: {
-            maxScale: 3,
-            initialScale: 0,
-            minScale: 0,
-            retentionPeriod: "0s",
-          },
-          production: {
-            maxScale: 100,
-            initialScale: 3,
-            minScale: 0,
-            retentionPeriod: "5m",
-          },
-        },
-      },
-      workloadNamespace,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
@@ -157,7 +119,7 @@ export default function App(
         : undefined,
     },
     resolvables,
-    dependencies: [workflowsApp],
+    dependencies: [k8sApp],
   };
 }
 
