@@ -106,7 +106,7 @@ const knativeServiceOf = (
     apiVersion: "serving.knative.dev/v1",
     kind: "Service",
     metadata: {
-      name: `sites`,
+      name: `site`,
       namespace,
       annotations: {
         "networking.knative.dev/wildcardDomain": `*.${controlPlaneDomain}`,
@@ -221,7 +221,7 @@ export default async function newDeployment(
     return;
   }
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
-  const revisionName = `sites-${deploymentId}`;
+  const revisionName = `site-${deploymentId}`;
 
   const sourceBinder = SrcBinder.fromRepo(
     owner,
