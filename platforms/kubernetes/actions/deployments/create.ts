@@ -106,7 +106,7 @@ const knativeServiceOf = (
     apiVersion: "serving.knative.dev/v1",
     kind: "Service",
     metadata: {
-      name: `${site}-site`,
+      name: `site`,
       namespace,
       annotations: {
         "networking.knative.dev/wildcardDomain": `*.${controlPlaneDomain}`,
