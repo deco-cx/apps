@@ -204,12 +204,17 @@ export default async function newDeployment(
     labels,
     runnerImage,
     siteState,
-    siteState: { source: { owner, repo, commitSha } },
+    siteState: { source },
     scaling = { initialScale: 0, maxScale: 3, minScale: 0 },
   }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
+  if (!source) {
+    badRequest({ message: "source is required" });
+    return;
+  }
+  const { owner, repo, commitSha } = source;
   const runnerImg = runnerImage ?? siteState?.runnerImage;
   if (!runnerImg) {
     badRequest({ message: "runner image is required" });

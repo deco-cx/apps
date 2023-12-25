@@ -70,7 +70,7 @@ export interface Github {
 export type Source = Github;
 export interface SiteState {
   entrypoint?: string; // defaults to main.ts
-  source: Source;
+  source?: Source;
   runArgs?: string;
   runnerImage?: string;
   builderImage?: string;
@@ -99,7 +99,5 @@ export default async function getSiteState(
     }
     throw err;
   });
-  return secret
-    ? { ...ctx.defaultSiteState, ...State.fromSecret(secret.body)! }
-    : undefined;
+  return secret ? State.fromSecret(secret.body) : ctx.defaultSiteState;
 }

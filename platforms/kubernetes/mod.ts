@@ -12,12 +12,12 @@ export const CONTROL_PLANE_DOMAIN = "decocdn.com";
 
 export interface State {
   kc: k8s.KubeConfig;
-  defaultSiteState: Partial<SiteState>;
+  defaultSiteState: SiteState;
   controlPlaneDomain: string;
 }
 
 export interface Props {
-  defaultSiteState?: Partial<SiteState>;
+  defaultSiteState?: SiteState;
 }
 
 /**

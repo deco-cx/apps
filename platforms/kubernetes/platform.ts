@@ -1,3 +1,4 @@
+import { badRequest } from "deco/mod.ts";
 import { Deployment, Platform } from "../../admin/platform.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
@@ -18,11 +19,15 @@ async function buildAndDeploy(
   { site, state: desiredState, deploymentId }: Props,
   { actions }: Kubernetes,
 ): Promise<Deployment> {
+  const source = desiredState.source;
+  if (!source) {
+    badRequest({ message: "there's no source to deploy" });
+  }
   // when code has changed so we need to build it.
   const buildResult = await actions.build({
-    commitSha: desiredState.source.commitSha,
-    repo: desiredState.source.repo,
-    owner: desiredState.source.owner,
+    commitSha: source!.commitSha,
+    repo: source!.repo,
+    owner: source!.owner,
     builderImage: desiredState.builderImage,
     site,
   });
