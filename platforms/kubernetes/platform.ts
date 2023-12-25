@@ -23,6 +23,7 @@ async function buildAndDeploy(
     commitSha: desiredState.source.commitSha,
     repo: desiredState.source.repo,
     owner: desiredState.source.owner,
+    builderImage: desiredState.builderImage,
     site,
   });
   await buildResult.waitUntil("succeed", 300_000);
