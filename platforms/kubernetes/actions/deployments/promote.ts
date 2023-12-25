@@ -9,7 +9,8 @@ export interface Props {
 }
 
 /**
- * Creates a new Knative Service and the routes for it depending wether in production or not.
+ * Promotes the given deployment to production.
+ * @title Deployment Promotion
  */
 export default async function promote(
   { site, state, create, deploymentId }: Props,

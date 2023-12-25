@@ -11,6 +11,7 @@ export interface Props {
 
 /**
  * Set the site state saving the new state to the secret.
+ * @title Set Site State
  */
 export default async function setSiteState(
   { site, state, create }: Props,

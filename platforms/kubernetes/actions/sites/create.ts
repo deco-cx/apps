@@ -10,6 +10,7 @@ export interface Props {
 const EFS_SC = "efs-sc";
 /**
  * Provision namespace of the new site and required resources.
+ * @title Create Site
  */
 export default async function newSite(
   { site }: Props,

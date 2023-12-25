@@ -192,8 +192,10 @@ const knativeServiceOf = (
 };
 
 const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
+
 /**
- * Creates a new Knative Service and the routes for it depending wether in production or not.
+ * Creates a new Knative Service and the route that points to it.
+ * @title Create k8s Deployment
  */
 export default async function newDeployment(
   {

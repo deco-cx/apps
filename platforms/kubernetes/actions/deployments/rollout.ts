@@ -8,7 +8,8 @@ export interface Props {
 }
 
 /**
- * Creates a new Knative Service and the routes for it depending wether in production or not.
+ * Rollout an specific deployment to production without promotion(next pushes will take changes back in prod).
+ * @title Deployment Rollout
  */
 export default async function rollout(
   { site, deploymentId }: Props,

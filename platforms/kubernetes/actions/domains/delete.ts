@@ -8,7 +8,8 @@ export interface Props {
 }
 
 /**
- * Creates a new domain for the given site.
+ * Deletes a domain for the given site.
+ * @title Domain Delete
  */
 export default async function deleteDomain(
   { site, domain }: Props,

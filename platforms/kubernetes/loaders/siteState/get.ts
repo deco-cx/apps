@@ -82,6 +82,7 @@ export interface SiteState {
 
 /**
  * Returns the current site state.
+ * @title Site State
  */
 export default async function getSiteState(
   { site }: Props,

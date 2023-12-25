@@ -9,6 +9,7 @@ export interface Props {
 
 /**
  * Creates a new domain for the given site.
+ * @title Create Domain
  */
 export default async function newDomain(
   { site, domain }: Props,
