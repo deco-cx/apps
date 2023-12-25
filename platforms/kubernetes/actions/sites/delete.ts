@@ -7,6 +7,7 @@ export interface Props {
 
 /**
  * Provision namespace of the new site and required resources.
+ * @title Delete Site
  */
 export default async function deleteSite(
   { site }: Props,

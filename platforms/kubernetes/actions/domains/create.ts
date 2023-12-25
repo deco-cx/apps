@@ -50,7 +50,7 @@ export default async function newDomain(
     },
     spec: {
       ref: {
-        name: `site`,
+        name: `sites`,
         kind: "Service",
         apiVersion: "serving.knative.dev/v1",
       },
