@@ -91,6 +91,7 @@ export default function kubernetes(
           await actions.deployments.promote({
             site,
             state: desiredState,
+            deploymentId,
           });
           return {
             ...deployment,
@@ -117,14 +118,16 @@ export default function kubernetes(
             value: release,
           }],
         };
+        const deploymentId = DeploymentId.new();
         const deployment = await buildAndDeploy({
           site,
           state: desiredState,
-          deploymentId: DeploymentId.new(),
+          deploymentId,
         }, k8s);
         await actions.deployments.promote({
           site,
           state: desiredState,
+          deploymentId,
         });
         return {
           ...deployment,
