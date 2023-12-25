@@ -22,12 +22,19 @@ export default async function newSite(
   await corev1Api.createNamespace({
     metadata: { name: site },
   }).catch(ignoreIfExists);
-  await corev1Api.createNamespacedPersistentVolumeClaim(site, {
-    metadata: { name: DECO_SITES_PVC, namespace: site },
-    spec: {
-      accessModes: ["ReadWriteMany"],
-      storageClassName: EFS_SC,
-      resources: { requests: { storage: "5Gi" } }, // since this should be EFS the size doesn't matter.
-    },
-  }).catch(ignoreIfExists);
+  await Promise.all([
+    corev1Api.createNamespacedPersistentVolumeClaim(site, {
+      metadata: { name: DECO_SITES_PVC, namespace: site },
+      spec: {
+        accessModes: ["ReadWriteMany"],
+        storageClassName: EFS_SC,
+        resources: { requests: { storage: "5Gi" } }, // since this should be EFS the size doesn't matter.
+      },
+    }).catch(ignoreIfExists),
+    ctx.invoke.kubernetes.actions.siteState.upsert({
+      site,
+      state: ctx.defaultSiteState,
+      create: true,
+    }),
+  ]);
 }

@@ -1,4 +1,4 @@
-import { badRequest } from "deco/mod.ts";
+import { ignoreIfExists } from "../../common/objects.ts";
 import { k8s } from "../../deps.ts";
 import { SiteState, State } from "../../loaders/siteState/get.ts";
 import { AppContext } from "../../mod.ts";
@@ -21,20 +21,14 @@ export default async function setSiteState(
   const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
   const releaseName = State.secretName;
   const siteSecret = State.toSecret(site, state);
-  const secret = await (create
+  await (create
     ? k8sApi.createNamespacedSecret(
       site,
       siteSecret,
-    )
+    ).catch(ignoreIfExists)
     : k8sApi.replaceNamespacedSecret(
       releaseName,
       site,
       siteSecret,
     ));
-  if (
-    secret.response.statusCode &&
-    secret.response.statusCode >= 400
-  ) {
-    badRequest({ message: "could not set site state" });
-  }
 }

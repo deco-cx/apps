@@ -91,7 +91,6 @@ export default function kubernetes(
           await actions.deployments.promote({
             site,
             state: desiredState,
-            create: currentState === undefined,
           });
           return {
             ...deployment,

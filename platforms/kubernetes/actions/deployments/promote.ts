@@ -5,7 +5,6 @@ export interface Props {
   site: string;
   state: SiteState;
   deploymentId: string;
-  create?: boolean;
 }
 
 /**
@@ -13,7 +12,7 @@ export interface Props {
  * @title Deployment Promotion
  */
 export default async function promote(
-  { site, state, create, deploymentId }: Props,
+  { site, state, deploymentId }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
@@ -24,6 +23,5 @@ export default async function promote(
   await ctx.invoke.kubernetes.actions.siteState.upsert({
     site,
     state,
-    create,
   });
 }
