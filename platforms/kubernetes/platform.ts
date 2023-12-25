@@ -45,7 +45,7 @@ async function buildAndDeploy(
   });
 
   const domains = [{
-    url: `https://sites-${deploymentId}-${site}.${CONTROL_PLANE_DOMAIN}`,
+    url: `https://${deploymentId}-sites-${site}.${CONTROL_PLANE_DOMAIN}`,
     production: false,
   }];
   return { id: deploymentId, domains };
