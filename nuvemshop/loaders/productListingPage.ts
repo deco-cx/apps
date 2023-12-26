@@ -61,7 +61,7 @@ async function loader(
   }
 
   const products = result?.map((product) => {
-    return [...toProduct(product, new URL(req.url), null)];
+    return toProduct(product.variants[0], product, new URL(url), 0);
   }).flat();
 
   const nextPage = new URLSearchParams(url.searchParams);
