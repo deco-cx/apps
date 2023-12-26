@@ -1,7 +1,6 @@
 import { badRequest } from "deco/mod.ts";
 import { Deployment, Platform } from "../../admin/platform.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
-import { k8s } from "./deps.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
 
@@ -75,14 +74,7 @@ export default function kubernetes(
         { site, commitSha, owner, repo, production = false },
       ) => {
         const deploymentId = DeploymentId.new();
-        const currentState = await loaders.siteState.get({ site }).then((s) =>
-          s
-        ).catch(async (err) => {
-          if ((err as k8s.HttpError)?.statusCode === 404) {
-            return await actions.sites.create({ site });
-          }
-          throw err;
-        });
+        const currentState = await loaders.siteState.get({ site });
         const desiredState = {
           ...currentState ?? {},
           source: {

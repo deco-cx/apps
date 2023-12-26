@@ -93,8 +93,9 @@ export default async function getSiteState(
   const secret = await k8sApi.readNamespacedSecret(
     State.secretName,
     site,
-  ).catch((err) => {
+  ).catch(async (err) => {
     if ((err as k8s.HttpError)?.statusCode === 404) {
+      await ctx.invoke.kubernetes.actions.sites.create({ site }); // create site on 404
       return undefined;
     }
     throw err;
