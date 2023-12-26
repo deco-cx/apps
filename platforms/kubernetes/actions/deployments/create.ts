@@ -106,7 +106,7 @@ const knativeServiceOf = (
     apiVersion: "serving.knative.dev/v1",
     kind: "Service",
     metadata: {
-      name: `sites`,
+      name: `sites-${site}`,
       namespace,
       annotations: {
         "networking.knative.dev/wildcardDomain": `*.${controlPlaneDomain}`,
@@ -221,7 +221,7 @@ export default async function newDeployment(
     return;
   }
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
-  const revisionName = `sites-${deploymentId}`;
+  const revisionName = `${site}-site-${deploymentId}`;
 
   const sourceBinder = SrcBinder.fromRepo(
     owner,
@@ -277,7 +277,7 @@ export default async function newDeployment(
     badRequest({ message: "could not create knative service" });
   }
 
-  const deploymentRoute = `${deploymentId}-sites`;
+  const deploymentRoute = `sites-${site}-${deploymentId}`;
   await k8sApi.createNamespacedCustomObject(
     "serving.knative.dev",
     "v1",

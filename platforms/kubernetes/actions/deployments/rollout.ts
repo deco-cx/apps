@@ -16,11 +16,11 @@ export default async function rollout(
   _req: Request,
   ctx: AppContext,
 ) {
-  const revisionName = `sites-${deploymentId}`;
+  const revisionName = `${site}-site-${deploymentId}`;
   await upsertObject(
     ctx.kc,
     routeOf({
-      routeName: `sites`,
+      routeName: `sites-${site}`,
       revisionName,
       namespace: site,
     }),
