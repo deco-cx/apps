@@ -19,6 +19,15 @@ export const ignoreIfExists = (err: unknown) => {
   throw err;
 };
 
+export const undefinedIfNotExists = (err: unknown) => {
+  if (
+    (err as k8s.HttpError)?.statusCode === 404
+  ) {
+    return undefined;
+  }
+  throw err;
+};
+
 export const upsertObject = async (
   kc: k8s.KubeConfig,
   obj: K8sObject,

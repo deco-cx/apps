@@ -37,4 +37,5 @@ export default async function newSite(
       create: true,
     }),
   ]);
+  return ctx.defaultSiteState;
 }
