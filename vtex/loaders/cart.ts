@@ -1,8 +1,9 @@
 import { AppContext } from "../mod.ts";
 import { proxySetCookie } from "../utils/cookies.ts";
-import { parseCookie } from "../utils/orderForm.ts";
+import { hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
 import { getSegmentFromBag } from "../utils/segment.ts";
-import type { OrderForm } from "../utils/types.ts";
+import type { MarketingData, OrderForm } from "../utils/types.ts";
+import addMarketingData from "../actions/cart/addMarketingData.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
@@ -16,14 +17,49 @@ const loader = async (
   const { cookie } = parseCookie(req.headers);
   const segment = getSegmentFromBag(ctx);
 
+  const {
+    payload: {
+      utm_campaign,
+      utm_source,
+      utm_medium,
+      utmi_campaign,
+      utmi_part,
+      utmi_page,
+    },
+  } = getSegmentFromBag(ctx);
+
   const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"](
     { sc: segment?.payload.channel },
     { headers: { cookie } },
   );
 
+  const result = response.json()
+
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
-  return response.json();
+  const cart = await result
+  const hasUtm = utm_campaign || utm_source || utm_medium || utmi_campaign || utmi_page || utmi_part
+  
+  if(hasUtm){
+    const marketingData : MarketingData = {
+      utmCampaign: utm_campaign || cart.marketingData?.utmCampaign,
+      utmSource: utm_source || cart.marketingData?.utmSource,
+      utmMedium: utm_medium || cart.marketingData?.utmMedium,
+      utmiCampaign: utmi_campaign || cart.marketingData?.utmiCampaign,
+      utmiPage: utmi_page || cart.marketingData?.utmiPage,
+      utmiPart: utmi_part || cart.marketingData?.utmiPart,
+      marketingTags: cart.marketingData?.marketingTags,
+      coupon: cart.marketingData?.coupon,
+    };
+
+    if(!cart.marketingData || hasDifferentMarketingData(cart.marketingData, marketingData)){
+      const result = await addMarketingData({ marketingData }, req, ctx)
+      return result
+    }
+    
+  }
+
+  return result;
 };
 
 export default loader;
