@@ -1,3 +1,4 @@
+import { shortcircuit } from "deco/engine/errors.ts";
 import { badRequest, context } from "deco/mod.ts";
 import manifest from "../../manifest.gen.ts";
 import { AppContext } from "../../mod.ts";
@@ -35,15 +36,24 @@ export default async function linkRepo(
     return;
   }
 
-  await ctx.octokit.rest.repos.createWebhook({
-    name: "web",
-    owner,
-    repo,
-    config: {
-      content_type: "application/json",
-      secret: ctx.githubWebhookSecret,
-      url,
-    },
-    events: ["push", "pull_request"],
-  });
+  try {
+    await ctx.octokit.rest.repos.createWebhook({
+      name: "web",
+      owner,
+      repo,
+      config: {
+        content_type: "application/json",
+        secret: ctx.githubWebhookSecret,
+        url,
+      },
+      events: ["push", "pull_request"],
+    });
+  } catch (err) {
+    console.error("linking site error", err);
+    shortcircuit(
+      new Response(JSON.stringify({ message: "could not link repository" }), {
+        status: 500,
+      }),
+    );
+  }
 }

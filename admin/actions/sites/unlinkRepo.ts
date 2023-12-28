@@ -1,5 +1,7 @@
 import { AppContext } from "../../mod.ts";
 import { webhookUrl } from "./linkRepo.ts";
+import { shortcircuit } from "deco/engine/errors.ts";
+
 export interface Props {
   site: string;
   owner: string;
@@ -26,9 +28,18 @@ export default async function unlink(
     return;
   }
 
-  await ctx.octokit.rest.repos.deleteWebhook({
-    owner,
-    repo,
-    hook_id: webhook.id,
-  });
+  try {
+    await ctx.octokit.rest.repos.deleteWebhook({
+      owner,
+      repo,
+      hook_id: webhook.id,
+    });
+  } catch (err) {
+    console.error("unlinking site error", err);
+    shortcircuit(
+      new Response(JSON.stringify({ message: "could not unlink repository" }), {
+        status: 500,
+      }),
+    );
+  }
 }

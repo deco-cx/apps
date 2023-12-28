@@ -57,10 +57,9 @@ export default async function deleteDomain(
     site,
     state: {
       ...currentSiteState,
-      domains: [...currentSiteState.domains ?? [], {
-        url: domain,
-        production: true,
-      }],
+      domains: (currentSiteState.domains ?? []).filter(({ url }) =>
+        url !== domain
+      ),
     },
   });
 }

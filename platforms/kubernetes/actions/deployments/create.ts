@@ -1,3 +1,4 @@
+import { shortcircuit } from "deco/engine/errors.ts";
 import { badRequest } from "deco/mod.ts";
 import ShortUniqueId from "https://esm.sh/v135/short-unique-id@v4.4.2";
 import runScript from "../../common/cmds/run.ts";
@@ -288,5 +289,13 @@ export default async function newDeployment(
       revisionName,
       namespace: site,
     }),
-  ).catch(ignoreIfExists);
+  ).catch(ignoreIfExists).catch((err) => {
+    console.error("creating site route error", err);
+    shortcircuit(
+      new Response(
+        JSON.stringify({ message: "could not create deployment route" }),
+        { status: 500 },
+      ),
+    );
+  });
 }
