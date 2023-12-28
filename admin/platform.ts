@@ -31,7 +31,7 @@ export interface Deployment {
   domains: Domain[];
 }
 
-export interface ReleaseOpts {
+export interface UpdateDeploymentOpts {
   site: string;
   release: string;
 }
@@ -39,7 +39,7 @@ export interface ReleaseOpts {
 export interface CreateSiteOpts {
   site: string;
   repo: Omit<RepoOpts, "site">;
-  release?: Omit<ReleaseOpts, "site">;
+  release?: string;
 }
 
 export interface DeleteSiteOpts {
@@ -54,7 +54,7 @@ export interface Domains {
 export interface Deployments {
   promote: (opts: PromoteOpts) => Promise<void>;
   create: (opts: DeploymentOpts) => Promise<Deployment>;
-  withRelease: (opts: ReleaseOpts) => Promise<Deployment>;
+  update: (opts: UpdateDeploymentOpts) => Promise<Deployment>;
 }
 
 export interface Sites {

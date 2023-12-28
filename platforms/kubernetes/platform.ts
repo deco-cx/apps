@@ -105,7 +105,7 @@ export default function kubernetes(
         }
         return deployment;
       },
-      withRelease: async ({ site, release }) => {
+      update: async ({ site, release }) => {
         const currentState = await loaders.siteState.get({ site });
         if (!currentState) {
           throw new Error(`site ${site} not found`);
