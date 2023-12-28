@@ -12,6 +12,7 @@ export const webhookUrl = (site: string, domain: string) =>
   `https://sites-${context.site}.${domain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`;
 
 /**
+ * Subscribe to github push and pull_requests events via webhook.
  * @title Link Repository
  */
 export default async function linkRepo(
