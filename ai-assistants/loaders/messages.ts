@@ -75,6 +75,7 @@ const isFileContent = (
 ): v is MessageContentImageFile => {
   return (v as MessageContentImageFile)?.image_file?.file_id !== undefined;
 };
+
 export default async function messages(
   { thread, after, before }: Props,
   _req: Request,
