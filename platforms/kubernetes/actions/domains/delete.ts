@@ -18,7 +18,7 @@ export default async function deleteDomain(
 ) {
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
 
-  const [certificate, domainMapping, currentSiteState] = await Promise.all([
+  const [_certificate, _domainMapping, currentSiteState] = await Promise.all([
     k8sApi.deleteNamespacedCustomObject(
       "cert-manager.io",
       "v1",
@@ -35,18 +35,6 @@ export default async function deleteDomain(
     ),
     ctx.invoke.kubernetes.loaders.siteState.get({ site }),
   ]);
-  if (
-    certificate.response.statusCode &&
-    certificate.response.statusCode >= 400
-  ) {
-    badRequest({ message: "could not delete certificate" });
-  }
-  if (
-    domainMapping.response.statusCode &&
-    domainMapping.response.statusCode >= 400
-  ) {
-    badRequest({ message: "could not delete domainMapping" });
-  }
 
   if (!currentSiteState) {
     badRequest({ message: "site not found" });

@@ -274,14 +274,12 @@ export default async function build(
     builderImage: builderImg!,
     sourceBinder: binder,
   });
-  const buildJob = await batchAPI.createNamespacedJob(
+
+  await batchAPI.createNamespacedJob(
     site,
     job,
   ).catch(ignoreIfExists);
 
-  if (buildJob?.response?.statusCode && buildJob.response.statusCode >= 400) {
-    badRequest({ message: "could not build" });
-  }
   const statusFn = getBuildStatus(performance.now());
   const getBuildStatusFn = () => statusFn(batchAPI, site, job.metadata!.name!);
   return {

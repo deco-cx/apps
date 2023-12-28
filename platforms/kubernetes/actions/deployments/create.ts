@@ -244,7 +244,7 @@ export default async function newDeployment(
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
     runArgs: siteState?.runArgs,
   });
-  const createdKnativeService = await upsertObject(
+  await upsertObject(
     ctx.kc,
     service,
     "serving.knative.dev",
@@ -270,13 +270,6 @@ export default async function newDeployment(
       };
     },
   );
-
-  if (
-    createdKnativeService.response.statusCode &&
-    createdKnativeService.response.statusCode >= 400
-  ) {
-    badRequest({ message: "could not create knative service" });
-  }
 
   const deploymentRoute = `sites-${site}-${deploymentId}`;
   await k8sApi.createNamespacedCustomObject(

@@ -62,7 +62,7 @@ export default async function newDomain(
 
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
 
-  const [certificate, domainMapping, currentSiteState] = await Promise.all([
+  const [_certificate, _domainMapping, currentSiteState] = await Promise.all([
     k8sApi.createNamespacedCustomObject(
       "cert-manager.io",
       "v1",
@@ -79,18 +79,6 @@ export default async function newDomain(
     ),
     ctx.invoke.kubernetes.loaders.siteState.get({ site }),
   ]);
-  if (
-    certificate.response.statusCode &&
-    certificate.response.statusCode >= 400
-  ) {
-    badRequest({ message: "could not create certificate" });
-  }
-  if (
-    domainMapping.response.statusCode &&
-    domainMapping.response.statusCode >= 400
-  ) {
-    badRequest({ message: "could not create domainMapping" });
-  }
 
   if (!currentSiteState) {
     badRequest({ message: "site not found" });
