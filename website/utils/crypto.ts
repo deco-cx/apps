@@ -51,7 +51,14 @@ try {
   console.warn("please run with `--unstable` to enable deno kv support");
 }
 const cryptoKey = ["deco", "secret_cryptokey"];
-const CRYPTO_KEY_ENV_VAR = "DECO_CRYPTO_KEY";
+
+export const getSavedAES = (kv: Deno.Kv) => {
+  return kv.get<SavedAESKey>(cryptoKey).then(({ value }) => {
+    return value;
+  });
+};
+
+export const CRYPTO_KEY_ENV_VAR = "DECO_CRYPTO_KEY";
 
 export const generateAESKey = async (): Promise<SavedAESKey> => {
   const generatedKey = await generateKey();
