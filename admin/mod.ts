@@ -41,7 +41,6 @@ export interface State {
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
   githubWebhookSecret?: string;
-  sitePlatform: Record<string, string>; // site name => platform name
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -75,16 +74,10 @@ export interface GithubProps {
   eventListeners?: GithubEventListener[];
 }
 
-export interface SitePlatformBind {
-  site: string;
-  platform: string;
-}
-
 export interface Props {
   resolvables?: Resolvables;
   github?: GithubProps;
   kubernetes: K8sProps;
-  platformBind: SitePlatformBind[];
 }
 
 /**
@@ -95,7 +88,6 @@ export default function App(
     resolvables,
     github,
     kubernetes,
-    platformBind,
   }: Props,
 ): App<
   AppManifest,
@@ -110,12 +102,6 @@ export default function App(
   return {
     manifest,
     state: {
-      sitePlatform: (platformBind ?? []).reduce((acc, val) => {
-        return {
-          ...acc,
-          [val.site]: val.platform,
-        };
-      }, {} as Record<string, string>),
       githubWebhookSecret,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
