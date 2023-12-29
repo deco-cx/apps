@@ -172,7 +172,12 @@ export default function RoutesSelection(
     // everyone should come first in the list given that we override the everyone value with the upcoming flags.
     const [routes, hrefRoutes] = buildRoutes(
       Array.isArray(ctx.routes)
-        ? [...ctx.routes, ...routesFromProps]
+        ? [...await Promise.all(ctx.routes.map(async route => {
+          if (isDeferred<Routes, FreshContext>(route)) {
+            return await route({ request: req })
+          }
+          return route;
+        })), ...routesFromProps]
         : routesFromProps,
     );
     // build the router from entries
