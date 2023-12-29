@@ -41,7 +41,7 @@ export default function Sitemap(
   const url = ctx.publicUrl;
   return async (
     req: Request,
-    ctx: ConnInfo,
+    connInfoctx: ConnInfo,
   ) => {
     if (!url) {
       throw new Error("Missing publicUrl");
@@ -52,7 +52,7 @@ export default function Sitemap(
 
     const response = await Proxy({
       url: publicUrl,
-    })(req, ctx);
+    }, ctx)(req, connInfoctx);
 
     if (!response.ok) {
       return response;

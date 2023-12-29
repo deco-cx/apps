@@ -3,6 +3,7 @@ import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
+import { AppContext } from "../mod.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -78,14 +79,17 @@ export interface Props {
  * @title Proxy
  * @description Proxies request to the target url.
  */
-export default function Proxy({
-  url: rawProxyUrl,
-  basePath,
-  host: hostToUse,
-  customHeaders = [],
-  includeScriptsToHead,
-  redirect = "manual",
-}: Props): Handler {
+export default function Proxy(
+  {
+    url: rawProxyUrl,
+    basePath,
+    host: hostToUse,
+    customHeaders = [],
+    includeScriptsToHead,
+    redirect = "manual",
+  }: Props,
+  appContext: Pick<AppContext, "monitoring" | "response" | "caching">,
+): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
@@ -117,14 +121,31 @@ export default function Proxy({
       headers.set(key, value);
     }
 
-    const response = await fetch(to, {
-      headers,
-      redirect,
-      method: req.method,
-      body: req.body,
-    });
+    const timing = appContext?.monitoring?.timings?.start?.(
+      "proxy",
+    );
 
-    const contentType = response.headers.get("Content-Type");
+    const response = await appContext?.monitoring?.tracer?.startActiveSpan?.(
+      "proxy",
+      async (span) => {
+        try {
+          return await fetch(to, {
+            headers,
+            redirect,
+            method: req.method,
+            body: req.body,
+          });
+        } catch (err) {
+          span.recordException(err);
+          throw err;
+        } finally {
+          span.end();
+          timing?.end();
+        }
+      },
+    );
+
+    const contentType = response!.headers.get("Content-Type");
 
     let newBodyStream = null;
 
@@ -164,18 +185,18 @@ export default function Proxy({
       });
 
       // Modify the response body by piping through the transform stream
-      if (response.body) {
-        newBodyStream = response.body.pipeThrough(insertScriptsStream);
+      if (response!.body) {
+        newBodyStream = response!.body.pipeThrough(insertScriptsStream);
       }
     }
 
     // Change cookies domain
-    const responseHeaders = new Headers(response.headers);
+    const responseHeaders = new Headers(response!.headers);
     responseHeaders.delete("set-cookie");
 
-    proxySetCookie(response.headers, responseHeaders, url);
+    proxySetCookie(response!.headers, responseHeaders, url);
 
-    if (response.status >= 300 && response.status < 400) { // redirect change location header
+    if (response!.status >= 300 && response!.status < 400) { // redirect change location header
       const location = responseHeaders.get("location");
       if (location) {
         responseHeaders.set(
@@ -185,9 +206,9 @@ export default function Proxy({
       }
     }
     return new Response(
-      newBodyStream === null ? response.body : newBodyStream,
+      newBodyStream === null ? response!.body : newBodyStream,
       {
-        status: response.status,
+        status: response!.status,
         headers: responseHeaders,
       },
     );
