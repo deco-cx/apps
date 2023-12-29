@@ -6,6 +6,7 @@ export interface Props {
    * @description paths to be excluded.
    */
   exclude?: string;
+  domain?: string;
 }
 
 declare global {
@@ -78,7 +79,7 @@ const snippet = () => {
   });
 };
 
-function Component({ exclude }: Props) {
+function Component({ exclude, domain }: Props) {
   return (
     <Head>
       <link rel="dns-prefetch" href="https://plausible.io/api/event" />
@@ -89,6 +90,7 @@ function Component({ exclude }: Props) {
       />
       <script
         defer
+        data-domain={domain}
         data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
         data-api="https://plausible.io/api/event"
         src="https://plausible.io/js/script.manual.js"
