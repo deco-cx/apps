@@ -113,7 +113,7 @@ const loader = async (
 
       shopifyProducts = data.collection?.products;
       shopifyFilters = data.collection?.products?.filters;
-      console.log(data.collection)
+      console.log(data.collection);
       hasNextPage = Boolean(
         data?.collection?.products.pageInfo.hasNextPage ?? false,
       );
@@ -172,7 +172,7 @@ const loader = async (
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage: page,
-      records
+      records,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
   };
