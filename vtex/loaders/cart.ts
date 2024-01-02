@@ -17,6 +17,19 @@ const loader = async (
   const { cookie } = parseCookie(req.headers);
   const segment = getSegmentFromBag(ctx);
 
+  const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"](
+    { sc: segment?.payload.channel },
+    { headers: { cookie } },
+  );
+
+  const result = response.json();
+
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+
+  if (!segment?.payload) {
+    return result;
+  }
+
   const {
     payload: {
       utm_campaign,
@@ -26,22 +39,14 @@ const loader = async (
       utmi_part,
       utmi_page,
     },
-  } = getSegmentFromBag(ctx);
+  } = segment;
 
-  const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"](
-    { sc: segment?.payload.channel },
-    { headers: { cookie } },
-  );
+  const cart = await result;
+  const hasUtm = utm_campaign || utm_source || utm_medium || utmi_campaign ||
+    utmi_page || utmi_part;
 
-  const result = response.json()
-
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
-
-  const cart = await result
-  const hasUtm = utm_campaign || utm_source || utm_medium || utmi_campaign || utmi_page || utmi_part
-  
-  if(hasUtm){
-    const marketingData : MarketingData = {
+  if (hasUtm) {
+    const marketingData: MarketingData = {
       utmCampaign: utm_campaign || cart.marketingData?.utmCampaign,
       utmSource: utm_source || cart.marketingData?.utmSource,
       utmMedium: utm_medium || cart.marketingData?.utmMedium,
@@ -52,11 +57,13 @@ const loader = async (
       coupon: cart.marketingData?.coupon,
     };
 
-    if(!cart.marketingData || hasDifferentMarketingData(cart.marketingData, marketingData)){
-      const result = await addMarketingData({ marketingData }, req, ctx)
-      return result
+    if (
+      !cart.marketingData ||
+      hasDifferentMarketingData(cart.marketingData, marketingData)
+    ) {
+      const result = await addMarketingData({ marketingData }, req, ctx);
+      return result;
     }
-    
   }
 
   return result;

@@ -54,8 +54,12 @@ export const formatCookie = (orderFormId: string): Cookie => ({
   sameSite: "Lax",
 });
 
-export const hasDifferentMarketingData = (md1: MarketingData, md2: MarketingData) => {
-  const someDifferent = Object.keys(md1).some((key) => md1[key as keyof MarketingData] !== md2[key as keyof MarketingData]);
-  console.log("someDifferent", someDifferent)
+export const hasDifferentMarketingData = (
+  md1: MarketingData,
+  md2: MarketingData,
+) => {
+  const someDifferent = Object.keys(md1).some((key) =>
+    md1[key as keyof MarketingData] !== md2[key as keyof MarketingData]
+  );
   return someDifferent;
-}
+};
