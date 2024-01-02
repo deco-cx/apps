@@ -18,7 +18,7 @@ echo "extraction time: $(($end-$start)) seconds"
 
 cd $CODE_DIR
 SOURCE_MOUNT_PATH="\${ASSETS_MOUNT_PATH:-/deco-sites-sources}"
-deno run $EXTRA_RUN_ARGS --node-modules-dir=false --allow-env --allow-net --allow-sys --allow-hrtime --allow-read --deny-read=$SOURCE_MOUNT_PATH --allow-run --allow-write=$HOME/.cache --unstable main.ts
+deno run $EXTRA_RUN_ARGS --node-modules-dir=false --allow-env --allow-net --allow-sys --allow-hrtime --allow-read --deny-read=$SOURCE_MOUNT_PATH --allow-write=$HOME/.cache --unstable main.ts
 `;
 
 export default script;
