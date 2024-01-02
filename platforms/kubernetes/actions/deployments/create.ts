@@ -175,7 +175,6 @@ const knativeServiceOf = (
                   value: sourceBinder.sourcePath,
                 },
                 { name: "APP_PORT", value: "8000" },
-                { name: "FRESH_ESBUILD_LOADER", value: "portable" },
                 ...envVars ?? [],
                 // Add other environment variables as needed
               ],
