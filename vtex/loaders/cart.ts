@@ -3,7 +3,7 @@ import { proxySetCookie } from "../utils/cookies.ts";
 import { hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
 import { getSegmentFromBag } from "../utils/segment.ts";
 import type { MarketingData, OrderForm } from "../utils/types.ts";
-import addMarketingData from "../actions/cart/addMarketingData.ts";
+import updateAttachment from "../actions/cart/updateAttachment.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
@@ -61,7 +61,11 @@ const loader = async (
       !cart.marketingData ||
       hasDifferentMarketingData(cart.marketingData, marketingData)
     ) {
-      const result = await addMarketingData({ marketingData }, req, ctx);
+      const result = await updateAttachment(
+        { attachment: "marketingData", body: { ...marketingData } },
+        req,
+        ctx,
+      );
       return result;
     }
   }
