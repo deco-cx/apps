@@ -15,11 +15,15 @@ export interface Redirects {
    * @title The file url or path
    */
   from?: string;
+  forcePermanentRedirects?: boolean;
   redirects: Redirect[];
 }
 
 let redirectsFromFile: Promise<Route[]> | null = null;
-const getRedirectFromFile = async (from: string) => {
+const getRedirectFromFile = async (
+  from: string,
+  forcePermanentRedirects?: boolean,
+) => {
   let redirectsRaw: string | null = null;
   try {
     if (from.startsWith("http")) {
@@ -48,7 +52,10 @@ const getRedirectFromFile = async (from: string) => {
         REDIRECT_TYPE_ENUM.includes(part)
       );
 
-      const type = (parts[typeRowIndex] as Redirect["type"]) ?? "temporary";
+      const type =
+        (parts[typeRowIndex] as Redirect["type"]) ?? forcePermanentRedirects
+          ? "permanent"
+          : "temporary";
 
       if (typeRowIndex !== -1) {
         parts.splice(typeRowIndex, 1);
@@ -89,8 +96,11 @@ export const removeTrailingSlash = (path: string) =>
 export default async function redirect({
   redirects,
   from,
+  forcePermanentRedirects,
 }: Redirects): Promise<Route[]> {
-  redirectsFromFile ??= from ? getRedirectFromFile(from) : Promise.resolve([]);
+  redirectsFromFile ??= from
+    ? getRedirectFromFile(from, forcePermanentRedirects)
+    : Promise.resolve([]);
 
   const redirectsFromFiles: Route[] = await redirectsFromFile;
 

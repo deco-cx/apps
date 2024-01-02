@@ -1,5 +1,5 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
-import { newFsProvider } from "deco/engine/releases/fs.ts";
+import { DECO_FILE_NAME, newFsProvider } from "deco/engine/releases/fs.ts";
 import {
   OnChangeCallback,
   ReadOptions,
@@ -7,14 +7,16 @@ import {
 } from "deco/engine/releases/provider.ts";
 import { join } from "std/path/mod.ts";
 import { BlockStore } from "./mod.ts";
-import { DECO_FILE_NAME } from "deco/engine/releases/fs.ts";
 
 export class FsBlockStorage implements BlockStore {
-  protected readOnly: Release;
+  protected _readOnly: Release | undefined;
   protected path: string;
-  constructor(path = DECO_FILE_NAME) {
-    this.readOnly = newFsProvider(path);
-    this.path = join(Deno.cwd(), path);
+  constructor(protected fileName = DECO_FILE_NAME) {
+    this.path = join(Deno.cwd(), fileName);
+  }
+
+  get readOnly() {
+    return this._readOnly ??= newFsProvider(this.fileName);
   }
 
   async update(resolvables: Record<string, Resolvable>): Promise<void> {

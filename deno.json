@@ -9,10 +9,7 @@
     "std/": "https://deno.land/std@0.204.0/",
     "partytown/": "https://deno.land/x/partytown@0.4.8/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.22.11/",
-    "deco/": "https://denopkg.com/deco-cx/deco@1.48.7/",
-    "@rjsf/core": "https://esm.sh/*@rjsf/core@5.15.0?target=es2022",
-    "@rjsf/utils": "https://esm.sh/*@rjsf/utils@5.15.0?target=es2022",
-    "@rjsf/validator-ajv8": "https://esm.sh/*@rjsf/validator-ajv8@5.15.0?target=es2022"
+    "deco/": "https://denopkg.com/deco-cx/deco@1.50.0/"
   },
   "lock": false,
   "tasks": {
