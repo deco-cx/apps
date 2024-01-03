@@ -12,7 +12,6 @@ import { mschema } from "deco/routes/live/_meta.ts";
 import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
-import type { Product } from "../../commerce/types.ts";
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
@@ -48,7 +47,6 @@ const pickFunctions = (
 const appTools = (assistant: AIAssistant): Promise<
   AssistantCreateParams.AssistantToolsFunction[]
 > => {
-  console.log("appTools");
   return tools ??= context.runtime!.then(async (runtime) => {
     const manifest = assistant.availableFunctions
       ? pickFunctions(assistant.availableFunctions, runtime.manifest)
@@ -108,28 +106,6 @@ const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
 
 const cache: Record<string, unknown> = {};
 
-// const matchProductCategory = (products: any, queryCategory: string) => {
-//   console.log("matchProductCategory", products[0]);
-//   return products.every((product: any) =>
-//     product.category.includes(queryCategory)
-//   );
-// };
-
-const checkAndHandleResults = (products: Product[], queryCategory: string) => {
-  if (products.length === 0) {
-    return "I couldn't find any products matching your search. Could you specify what you're looking for a bit more?";
-  }
-
-  const isCategoryMatch = products.some((product: Product) =>
-    product.category?.includes(queryCategory)
-  );
-  if (!isCategoryMatch) {
-    return "It seems the products found don't exactly match your search. Could you specify what you're looking for a bit more?";
-  }
-
-  return null; // No issues with the results
-};
-
 const invokeFor = (
   ctx: AppContext,
   assistant: AIAssistant,
@@ -150,6 +126,11 @@ const invokeFor = (
       const cacheKey = `${call.function.arguments}${call.function.name}`;
 
       const assistantProps = assistant?.useProps?.(props) ?? props;
+      console.log("assistantPropss", assistant?.useProps?.(props));
+      if (!assistantProps.props) {
+        assistantProps.props = assistantProps.tool_uses[0].parameters.props;
+      }
+      console.log("2", { assistantProps });
       cache[cacheKey] ??= ctx.invoke(
         // deno-lint-ignore no-explicit-any
         call.function.name as any,
@@ -158,13 +139,9 @@ const invokeFor = (
       onFunctionCallStart(call, assistantProps);
       const invokeResponse = await cache[cacheKey];
       onFunctionCallEnd(call, assistantProps, invokeResponse);
-      const response = checkAndHandleResults(
-        invokeResponse as Product[],
-        assistantProps.query,
-      );
       return {
         tool_call_id: call.id,
-        output: JSON.stringify(response),
+        output: JSON.stringify(invokeResponse),
       };
     } catch (err) {
       console.error("invoke error", err);
@@ -233,7 +210,6 @@ export const messageProcessorFor = async (
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
 
     const invoke = invokeFor(ctx, assistant, (call, props) => {
-      console.log({ props });
       reply({
         messageId,
         type: "start_function_call",
@@ -278,6 +254,8 @@ export const messageProcessorFor = async (
       }
       await sleep(500);
     } while (["in_progress", "queued"].includes(runStatus.status));
+
+    // TODO: Deal with status "failed" or "expired"
 
     const messages = await threads.messages.list(thread.id);
     const threadMessages = messages.data;

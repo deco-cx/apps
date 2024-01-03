@@ -51,26 +51,27 @@ const BASE_INSTRUCTIONS =
   Your goal is to enhance user experience by providing informative yet brief responses that encourage further interaction and exploration within our store.
   `;
 export default function brandAssistant(props: Props): AIAssistant {
+  interface Props {
+    props?: {
+      count?: number;
+      fq?: string[];
+    };
+  }
+  // deno-lint-ignore no-explicit-any
+  function isProps(object: any): object is Props {
+    return "props" in object && typeof object.props === "object";
+  }
+
   const assistant: AIAssistant<VTEXManifest & OpenAIManifest> = {
     useProps: (props: unknown) => {
-      if (!props) {
-        return props;
+      console.log("useProps", props);
+      if (isProps(props)) {
+        props.props = props.props ?? {};
+        props.props.count = 24;
       }
-      if (typeof props !== "object") {
-        return props;
-      }
-      if (!("props" in props)) {
-        return props;
-      }
-      return {
-        props: {
-          count: 10,
-          query: "",
-          ...typeof props.props === "object" ? props.props : {},
-        },
-      };
+      return props;
     },
-    availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
+    availableFunctions: ["vtex/loaders/legacy/productList.ts"],
     name: props.name,
     welcomeMessage: props?.welcomeMessage ??
       `👋 Welcome to our Online Store! I am ${
@@ -85,8 +86,21 @@ export default function brandAssistant(props: Props): AIAssistant {
     You should take that into account when formulating your dialogue. Your answers should reflect this mood/personality at all times.
     **\n\n
     ${props.instructions ?? ""}.
-     You should ALWAYS fulfill the query parameter even with an empty string when calling the productList.ts function. 
-     Also, make sure you have information enough to make the search, otherwise ask for more information.`,
+    - Understand User Request: Identify the product type the user is inquiring about.
+    - Access Category Tree Data: Use the categories prop to access the store's category tree data.
+    - When receiving a product request, identify not only exact keywords but also related terms. For example, if a user asks for "bikinis," associate this request with related categories such as "Swimwear".
+    - Match Product with Category ID: Locate the matching Category ID(s) in the category tree for the requested product. For instance, if the user asks for "jackets," find the Category ID corresponding to "jackets" in the tree.
+    - Format fq Correctly: Ensure the fq field is formatted as an array. When assigning a Category ID to fq, it should always be in the format of an array, even if it's a single element. For example, "C:/100/2038/" should be formatted as ["C:/100/2038/"].
+    - Populate props Object: When constructing the props object for the API call, ensure the structure adheres to the expected format:
+      Correct: props: { fq: ["C:/100/2038/"] }
+      Incorrect: props: { props: { fq: "C:/100/2038/" } }
+    - Example: if a user asks for bikinis. Bikinis are under the category Swimwear. Sou you should call productList.ts with the following props: { fq: ["C:/100/2048/2427", "C:/100/2048/2428"] }, because this is the categories for bikini tops and bottoms. 
+    - Avoid Nested arrays on "fq" prop: Be cautious to not nest the fq array within itself. The structure of the props object should be flat, without additional levels of props.
+    - Avoid Nested props: Be cautious to not nest the props object within itself. The structure of the props object should be flat, without additional levels of props.
+    - Validate Before API Call: Before making the API call, validate the structure of the props object. Ensure that fq is a flat array and that there are no nested props objects.
+    - Call productList.ts Function: With the fq prop correctly set, call the productList.ts function to retrieve the list of products that match the user's request.
+    - Display Product Suggestions: Present the user with suggestions or options based on the search results obtained from the productList.ts function. Use a friendly and engaging tone, in line with your assistant's mood/personality.
+    - Make sure you have information enough to make the search, otherwise ask for more information.`,
     prompts: [
       ...withContext(
         "This is the category tree of the store",

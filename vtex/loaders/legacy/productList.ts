@@ -160,11 +160,17 @@ const loader = async (
 ): Promise<Product[] | null> => {
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
+  console.log("props do productList", props);
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const segment = getSegmentFromBag(ctx) ?? {};
   const segmentParams = toSegmentParams(segment ?? {});
   const params = fromProps({ props });
+
+  console.log("url", "GET /api/catalog_system/pub/products/search/:term?", {
+    ...segmentParams,
+    ...params,
+  });
 
   const vtexProducts = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:term?"]({
@@ -173,6 +179,7 @@ const loader = async (
     }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
 
+  // console.log({vtexProducts});
   if (vtexProducts && !Array.isArray(vtexProducts)) {
     throw new Error(
       `Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`,
