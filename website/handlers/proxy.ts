@@ -78,16 +78,14 @@ export interface Props {
  * @title Proxy
  * @description Proxies request to the target url.
  */
-export default function Proxy(
-  {
-    url: rawProxyUrl,
-    basePath,
-    host: hostToUse,
-    customHeaders = [],
-    includeScriptsToHead,
-    redirect = "manual",
-  }: Props,
-): Handler {
+export default function Proxy({
+  url: rawProxyUrl,
+  basePath,
+  host: hostToUse,
+  customHeaders = [],
+  includeScriptsToHead,
+  redirect = "manual",
+}: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
@@ -140,7 +138,7 @@ export default function Proxy(
 
     const response = await fecthFunction();
 
-    const contentType = response!.headers.get("Content-Type");
+    const contentType = response.headers.get("Content-Type");
 
     let newBodyStream = null;
 
@@ -180,18 +178,18 @@ export default function Proxy(
       });
 
       // Modify the response body by piping through the transform stream
-      if (response!.body) {
-        newBodyStream = response!.body.pipeThrough(insertScriptsStream);
+      if (response.body) {
+        newBodyStream = response.body.pipeThrough(insertScriptsStream);
       }
     }
 
     // Change cookies domain
-    const responseHeaders = new Headers(response!.headers);
+    const responseHeaders = new Headers(response.headers);
     responseHeaders.delete("set-cookie");
 
-    proxySetCookie(response!.headers, responseHeaders, url);
+    proxySetCookie(response.headers, responseHeaders, url);
 
-    if (response!.status >= 300 && response!.status < 400) { // redirect change location header
+    if (response!.status >= 300 && response.status < 400) { // redirect change location header
       const location = responseHeaders.get("location");
       if (location) {
         responseHeaders.set(
@@ -201,9 +199,9 @@ export default function Proxy(
       }
     }
     return new Response(
-      newBodyStream === null ? response!.body : newBodyStream,
+      newBodyStream === null ? response.body : newBodyStream,
       {
-        status: response!.status,
+        status: response.status,
         headers: responseHeaders,
       },
     );
