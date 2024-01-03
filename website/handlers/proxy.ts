@@ -137,6 +137,7 @@ export default function Proxy(
           });
         } catch (err) {
           span.recordException(err);
+          appContext?.monitoring?.logger?.error?.(err);
           throw err;
         } finally {
           span.end();
