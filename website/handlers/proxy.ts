@@ -3,7 +3,6 @@ import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
-import { AppContext } from "../mod.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -88,7 +87,6 @@ export default function Proxy(
     includeScriptsToHead,
     redirect = "manual",
   }: Props,
-  appContext: Pick<AppContext, "monitoring" | "response" | "caching">,
 ): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -121,30 +119,26 @@ export default function Proxy(
       headers.set(key, value);
     }
 
-    const timing = appContext?.monitoring?.timings?.start?.(
-      "proxy",
-    );
+    const monitoring = isFreshCtx<DecoSiteState>(_ctx)
+      ? _ctx?.state?.monitoring
+      : undefined;
 
-    const response = await appContext?.monitoring?.tracer?.startActiveSpan?.(
-      "proxy",
-      async (span) => {
-        try {
-          return await fetch(to, {
-            headers,
-            redirect,
-            method: req.method,
-            body: req.body,
-          });
-        } catch (err) {
-          span.recordException(err);
-          appContext?.monitoring?.logger?.error?.(err);
-          throw err;
-        } finally {
-          span.end();
-          timing?.end();
-        }
-      },
-    );
+    const fecthFunction = async () => {
+      try {
+        return await fetch(to, {
+          headers,
+          redirect,
+          method: req.method,
+          body: req.body,
+        });
+      } catch (err) {
+        monitoring?.logger?.error?.(err);
+
+        throw err;
+      }
+    };
+
+    const response = await fecthFunction();
 
     const contentType = response!.headers.get("Content-Type");
 

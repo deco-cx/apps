@@ -53,7 +53,7 @@ export default function Sitemap(
     const response = await Proxy({
       url: publicUrl,
       customHeaders: withDigestCookie(appCtx),
-    }, appCtx)(req, ctx);
+    })(req, ctx);
 
     if (!response.ok) {
       return response;

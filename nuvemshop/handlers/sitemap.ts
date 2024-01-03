@@ -52,7 +52,7 @@ export default function Sitemap(
 
     const response = await Proxy({
       url: publicUrl,
-    }, ctx)(req, connInfoctx);
+    })(req, connInfoctx);
 
     if (!response.ok) {
       return response;

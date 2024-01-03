@@ -35,9 +35,8 @@ export interface Props {
  */
 export default function Sitemap(
   { include }: Props,
-  appCtx: AppContext,
+  { publicUrl: url, usePortalSitemap, account }: AppContext,
 ) {
-  const { publicUrl: url, usePortalSitemap, account } = appCtx;
   return async (
     req: Request,
     ctx: ConnInfo,
@@ -58,7 +57,7 @@ export default function Sitemap(
 
     const response = await Proxy({
       url: publicUrl,
-    }, appCtx)(req, ctx);
+    })(req, ctx);
 
     const reqUrl = new URL(req.url);
     const text = await response.text();
