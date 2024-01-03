@@ -189,7 +189,7 @@ export default function Proxy({
 
     proxySetCookie(response.headers, responseHeaders, url);
 
-    if (response!.status >= 300 && response.status < 400) { // redirect change location header
+    if (response.status >= 300 && response.status < 400) { // redirect change location header
       const location = responseHeaders.get("location");
       if (location) {
         responseHeaders.set(
