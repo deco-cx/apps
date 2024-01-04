@@ -16,8 +16,11 @@ export interface WrappedSegment {
  */
 const DEFAULT_SEGMENT: Partial<Segment> = {
   utmi_campaign: null,
+  utmi_page: null,
+  utmi_part: null,
   utm_campaign: null,
   utm_source: null,
+  utm_medium: null,
   channel: "1",
   cultureInfo: "pt-BR",
   currencyCode: "BRL",
@@ -72,7 +75,10 @@ const serialize = ({
   regionId,
   utm_campaign,
   utm_source,
+  utm_medium,
   utmi_campaign,
+  utmi_page,
+  utmi_part,
   currencyCode,
   currencySymbol,
   countryCode,
@@ -86,7 +92,10 @@ const serialize = ({
     regionId,
     utm_campaign: utm_campaign && removeNonLatin1Chars(utm_campaign),
     utm_source: utm_source && removeNonLatin1Chars(utm_source),
+    utm_medium: utm_medium && removeNonLatin1Chars(utm_medium),
     utmi_campaign: utmi_campaign && removeNonLatin1Chars(utmi_campaign),
+    utmi_page: utmi_page && removeNonLatin1Chars(utmi_page),
+    utmi_part: utmi_part && removeNonLatin1Chars(utmi_part),
     currencyCode,
     currencySymbol,
     countryCode,
@@ -100,8 +109,11 @@ const parse = (cookie: string) => JSON.parse(atob(cookie));
 
 const SEGMENT_QUERY_PARAMS = [
   "utmi_campaign" as const,
+  "utmi_page" as const,
+  "utmi_part" as const,
   "utm_campaign" as const,
   "utm_source" as const,
+  "utm_medium" as const,
 ];
 
 export const buildSegmentCookie = (req: Request): Partial<Segment> => {
