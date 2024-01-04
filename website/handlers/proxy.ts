@@ -27,15 +27,20 @@ const removeCFHeaders = (headers: Headers) => {
   });
 };
 
-async function logClonedResponseBody(response: Response, monitoring: Monitoring | undefined): Promise<void> {
+async function logClonedResponseBody(
+  response: Response,
+  monitoring: Monitoring | undefined,
+): Promise<void> {
   if (!response.body) {
-    return ;
+    return;
   }
 
   const clonedResponse = response.clone();
-  const text = await clonedResponse.text()
+  const text = await clonedResponse.text();
 
-  monitoring?.logger?.error?.(`Proxy error = ${response.statusText}, body = ${text}`);
+  monitoring?.logger?.error?.(
+    `Proxy error = ${response.statusText}, body = ${text}`,
+  );
 }
 
 /**
@@ -143,14 +148,14 @@ export default function Proxy({
         });
       } catch (err) {
         monitoring?.logger?.error?.(err);
-        
+
         throw err;
       }
     };
-    
+
     const response = await fecthFunction();
 
-    if(response.status >= 299 || response.status < 200) {
+    if (response.status >= 299 || response.status < 200) {
       await logClonedResponseBody(response, monitoring);
     }
 
