@@ -28,8 +28,16 @@ const DEFAULT_SEGMENT: Partial<Segment> = {
   countryCode: "BRA",
 };
 
-export const isAnonymous = ({
-  payload: {
+const isDefautSalesChannel = (ctx: AppContext, channel?: string) => {
+  return channel ===
+    (ctx.salesChannel || DEFAULT_SEGMENT.channel ||
+      ctx.defaultSegment?.channel);
+};
+
+export const isAnonymous = (
+  ctx: AppContext,
+) => {
+  const {
     campaigns,
     utm_campaign,
     utm_source,
@@ -37,15 +45,15 @@ export const isAnonymous = ({
     channel,
     priceTables,
     regionId,
-  },
-}: WrappedSegment) =>
-  !campaigns &&
-  !utm_campaign &&
-  !utm_source &&
-  !utmi_campaign &&
-  !channel &&
-  !priceTables &&
-  !regionId;
+  } = getSegmentFromBag(ctx).payload;
+  return !campaigns &&
+    !utm_campaign &&
+    !utm_source &&
+    !utmi_campaign &&
+    (!channel || isDefautSalesChannel(ctx, channel)) &&
+    !priceTables &&
+    !regionId;
+};
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
   ctx.bag?.set(SEGMENT, data);
