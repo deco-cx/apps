@@ -2,29 +2,29 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/productList.ts";
+import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
-import * as $$$2 from "./loaders/productListingPage.ts";
-import * as $$$3 from "./loaders/proxy.ts";
-import * as $$$4 from "./loaders/cart.ts";
-import * as $$$$$$$$$0 from "./actions/cart/updateItem.ts";
-import * as $$$$$$$$$1 from "./actions/cart/updateCart.ts";
-import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$3 from "./actions/cart/simulation.ts";
+import * as $$$2 from "./loaders/productList.ts";
+import * as $$$3 from "./loaders/productListingPage.ts";
+import * as $$$4 from "./loaders/proxy.ts";
+import * as $$$$$$$$$0 from "./actions/cart/addItem.ts";
+import * as $$$$$$$$$1 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$2 from "./actions/cart/updateCart.ts";
+import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
 
 const manifest = {
   "loaders": {
-    "vnda/loaders/cart.ts": $$$4,
+    "vnda/loaders/cart.ts": $$$0,
     "vnda/loaders/productDetailsPage.ts": $$$1,
-    "vnda/loaders/productList.ts": $$$0,
-    "vnda/loaders/productListingPage.ts": $$$2,
-    "vnda/loaders/proxy.ts": $$$3,
+    "vnda/loaders/productList.ts": $$$2,
+    "vnda/loaders/productListingPage.ts": $$$3,
+    "vnda/loaders/proxy.ts": $$$4,
   },
   "actions": {
-    "vnda/actions/cart/addItem.ts": $$$$$$$$$2,
-    "vnda/actions/cart/simulation.ts": $$$$$$$$$3,
-    "vnda/actions/cart/updateCart.ts": $$$$$$$$$1,
-    "vnda/actions/cart/updateItem.ts": $$$$$$$$$0,
+    "vnda/actions/cart/addItem.ts": $$$$$$$$$0,
+    "vnda/actions/cart/simulation.ts": $$$$$$$$$1,
+    "vnda/actions/cart/updateCart.ts": $$$$$$$$$2,
+    "vnda/actions/cart/updateItem.ts": $$$$$$$$$3,
   },
   "name": "vnda",
   "baseUrl": import.meta.url,
