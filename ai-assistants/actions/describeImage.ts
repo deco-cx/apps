@@ -39,6 +39,6 @@ export default async function describeImage(
       },
     ],
   });
-  console.log('describe image response: ', response);
+  console.log("describe image response: ", response);
   return response;
 }
