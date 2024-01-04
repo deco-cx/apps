@@ -76,7 +76,7 @@ export default async function awsUploadImage(
   const blobData = base64ToBlob(awsUploadImageProps.file); // {size, type}
   const uploadURL = await getSignedUrl(blobData.type);
   const uploadResponse = await uploadFileToS3(uploadURL, blobData);
-  
+
   if (!uploadResponse.ok) {
     throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
   }
