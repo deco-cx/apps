@@ -327,7 +327,6 @@ export const toProduct = (
       }
     });
   }
-
   const review = (variant as SingleProductFragment).reviews?.map((review) => ({
     "@type": "Review" as const,
     author: [
@@ -388,9 +387,7 @@ export const toProduct = (
       logo: variant.productBrand?.fullUrlLogo ??
         undefined,
     },
-    aggregateRating,
     additionalProperty,
-    review,
     offers: {
       "@type": "AggregateOffer",
       highPrice: variant.prices?.price,
@@ -411,6 +408,8 @@ export const toProduct = (
     },
     ...variantSelected,
     isSimilarTo,
+    review,
+    aggregateRating,
     isVariantOf: {
       "@type": "ProductGroup",
       url: getProductUrl(variant, base).href,
