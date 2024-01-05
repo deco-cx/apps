@@ -25,6 +25,10 @@ import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
  */
 export type Sections = Section[];
 
+export interface DefaultPathProps {
+  possiblePaths: string[];
+}
+
 /**
  * @titleBy name
  * @label rootHidden

@@ -10,7 +10,7 @@ export interface Props {
    */
   categoryLevels?: number;
 }
-export default async function (
+export default async function loader(
   { categoryLevels }: Props,
   _req: Request,
   ctx: AppContext,
