@@ -343,6 +343,7 @@ export const toProduct = (
       bestRating: 5,
       worstRating: 0,
       ratingValue: review?.rating ?? undefined,
+      ratingCount: 1,
     },
   })) ?? [];
 
