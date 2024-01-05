@@ -7,6 +7,7 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { LegacyProduct } from "../../utils/types.ts";
+import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -30,7 +31,14 @@ async function loader(
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const lowercaseSlug = slug?.toLowerCase();
+  const haveToUseSlug = slug && !slug.startsWith(":");
+  let defaultPaths;
+  if (!haveToUseSlug) {
+    defaultPaths = await PDPDefaultPath({ count: 1 }, req, ctx);
+  }
+  const lowercaseSlug = haveToUseSlug
+    ? slug?.toLowerCase()
+    : defaultPaths?.possiblePaths[0] || "/";
   const url = new URL(baseUrl);
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
