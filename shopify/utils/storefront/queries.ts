@@ -243,8 +243,9 @@ export const SearchProducts = {
       productFilters: $productFilters, 
       types: PRODUCT, 
       sortKey: $sortKey,
-      reverse: $reverse
+      reverse: $reverse,
     ){
+      totalCount
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -284,18 +285,18 @@ export const ProductsByCollection = {
         reverse: $reverse, 
         filters: $filters
       ){
-          pageInfo {
-            hasNextPage
-            hasPreviousPage
-            endCursor
-            startCursor
-          }
-          filters {
-            ...Filter
-          }
-          nodes {
-            ...Product
-          }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          endCursor
+          startCursor
+        }
+        filters {
+          ...Filter
+        }
+        nodes {
+          ...Product
+        }
       }
     }
   }`,

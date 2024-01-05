@@ -8,7 +8,11 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
@@ -46,11 +50,12 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
+  const lowercaseSlug = slug?.toLowerCase();
   const segment = getSegmentFromBag(ctx);
 
   const pageTypePromise = vcsDeprecated
     ["GET /api/catalog_system/pub/portal/pagetype/:term"](
-      { term: `${slug}/p` },
+      { term: `${lowercaseSlug}/p` },
       STALE,
     ).then((res) => res.json());
 
@@ -111,7 +116,7 @@ const loader = async (
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: segment.payload.currencyCode ?? "BRL",
+    priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   });
 
   return {
@@ -128,6 +133,9 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (req: Request, ctx: AppContext) => {
+  if (!isAnonymous(ctx)) {
+    return null;
+  }
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
