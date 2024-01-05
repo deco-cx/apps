@@ -8,7 +8,11 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
@@ -129,6 +133,9 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (req: Request, ctx: AppContext) => {
+  if (!isAnonymous(ctx)) {
+    return null;
+  }
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 

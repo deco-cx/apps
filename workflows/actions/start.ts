@@ -5,7 +5,7 @@ import { BlockFromKey, BlockFunc, BlockKeys } from "deco/engine/block.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Manifest } from "deco/live.gen.ts";
 import { context } from "deco/live.ts";
-import { DecoManifest } from "deco/types.ts";
+import { AppManifest } from "deco/mod.ts";
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 
@@ -27,7 +27,7 @@ export interface AnyWorkflow extends CommonProps {
 
 export type WorkflowProps<
   key extends string = string,
-  TManifest extends DecoManifest = Manifest,
+  TManifest extends AppManifest = Manifest,
   block extends BlockFromKey<key, TManifest> = BlockFromKey<key, TManifest>,
 > = key extends BlockKeys<TManifest> & `${string}/workflows/${string}`
   ? BlockFunc<key, TManifest, block> extends
@@ -39,7 +39,7 @@ export type WorkflowProps<
 
 const fromWorkflowProps = <
   key extends string = string,
-  TManifest extends DecoManifest = Manifest,
+  TManifest extends AppManifest = Manifest,
   block extends BlockFromKey<key, TManifest> = BlockFromKey<key, TManifest>,
 >(
   props: WorkflowProps<key, TManifest, block> | AnyWorkflow,
@@ -78,16 +78,17 @@ export const WorkflowQS = {
  */
 export default async function startWorkflow<
   key extends string = string,
-  TManifest extends DecoManifest = Manifest,
+  TManifest extends AppManifest = Manifest,
   block extends BlockFromKey<key, TManifest> = BlockFromKey<key, TManifest>,
 >(
   props: WorkflowProps<key, TManifest, block> | AnyWorkflow,
 ): Promise<WorkflowExecution> {
   const { id, args, runtimeParameters } = props;
   const workflow = fromWorkflowProps(props);
-  const service = context.isDeploy
-    ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
-    : "ws://localhost:8000";
+  const service = Deno.env.get("MY_DURABLE_URL") ??
+    (context.isDeploy
+      ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
+      : "ws://localhost:8000");
 
   const url = new URL(
     `${service}/live/workflows/run?${WorkflowQS.buildFromProps(workflow)}`,

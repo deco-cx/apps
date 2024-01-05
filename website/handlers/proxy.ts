@@ -3,6 +3,7 @@ import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
+import { Monitoring } from "deco/engine/core/resolver.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -25,6 +26,22 @@ const removeCFHeaders = (headers: Headers) => {
     }
   });
 };
+
+async function logClonedResponseBody(
+  response: Response,
+  monitoring: Monitoring | undefined,
+): Promise<void> {
+  if (!response.body) {
+    return;
+  }
+
+  const clonedResponse = response.clone();
+  const text = await clonedResponse.text();
+
+  monitoring?.logger?.error?.(
+    `Proxy error = ${response.statusText}, body = ${text}`,
+  );
+}
 
 /**
  * @title {{{key}}} - {{{value}}}
@@ -117,12 +134,30 @@ export default function Proxy({
       headers.set(key, value);
     }
 
-    const response = await fetch(to, {
-      headers,
-      redirect,
-      method: req.method,
-      body: req.body,
-    });
+    const monitoring = isFreshCtx<DecoSiteState>(_ctx)
+      ? _ctx?.state?.monitoring
+      : undefined;
+
+    const fecthFunction = async () => {
+      try {
+        return await fetch(to, {
+          headers,
+          redirect,
+          method: req.method,
+          body: req.body,
+        });
+      } catch (err) {
+        monitoring?.logger?.error?.(err);
+
+        throw err;
+      }
+    };
+
+    const response = await fecthFunction();
+
+    if (response.status >= 299 || response.status < 200) {
+      await logClonedResponseBody(response, monitoring);
+    }
 
     const contentType = response.headers.get("Content-Type");
 

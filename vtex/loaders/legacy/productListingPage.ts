@@ -8,7 +8,11 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
@@ -328,6 +332,10 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
+
+  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+    return null;
+  }
 
   url.searchParams.sort();
   url.searchParams.set("segment", token);

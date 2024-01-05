@@ -13,7 +13,11 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -408,6 +412,9 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
+  if (url.searchParams.has("q") || !isAnonymous(ctx)) {
+    return "";
+  }
 
   const params = new URLSearchParams();
 
