@@ -19,9 +19,9 @@ export async function watchJobStatus(
   const req = await watcher.watch(
     `/apis/batch/v1/namespaces/${namespace}/jobs`,
     { fieldSelector },
-    (type, obj) => {
+    (_type, obj) => {
       lastSeenJob = obj;
-      if (type === "MODIFIED" && obj.status && obj.status.conditions) {
+      if (obj.status && obj.status.conditions) {
         const conditions = obj.status.conditions;
         const condition: k8s.V1JobCondition = (conditions ?? []).find((
           cond: k8s.V1JobCondition,
