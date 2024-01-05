@@ -1,5 +1,5 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
-import { MetaInfo, genMetaInfo } from "deco/routes/live/_meta.ts";
+import { genMetaInfo, MetaInfo } from "deco/routes/live/_meta.ts";
 import { debounce } from "std/async/debounce.ts";
 import { storage } from "../../fsStorage.ts";
 import { AppContext } from "../../mod.ts";
