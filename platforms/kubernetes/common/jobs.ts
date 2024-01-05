@@ -1,39 +1,42 @@
-import { deferred, delay } from "std/async/mod.ts";
+import { delay } from "std/async/mod.ts";
 import { k8s } from "../deps.ts";
 
-// TODO(mcandeia) watch uses the request lib that uses internal node querystring package that is not fully supported by deno.
-async function _watchJobStatus(
+export async function watchJobStatus(
   kc: k8s.KubeConfig,
   namespace: string,
   jobName: string,
   timeoutMs?: number,
-): Promise<void> {
+): Promise<k8s.V1Job | null> {
   const fieldSelector = `metadata.name=${jobName}`;
   const watcher = new k8s.Watch(kc);
 
-  const result = deferred<void>();
+  const { resolve, reject, promise } = Promise.withResolvers<
+    k8s.V1Job | null
+  >();
+  let lastSeenJob: k8s.V1Job | null = null;
 
   // Watch for changes to the Job status
   const req = await watcher.watch(
     `/apis/batch/v1/namespaces/${namespace}/jobs`,
     { fieldSelector },
     (type, obj) => {
+      lastSeenJob = obj;
       if (type === "MODIFIED" && obj.status && obj.status.conditions) {
         const conditions = obj.status.conditions;
-        const jobComplete = conditions.some((cond: k8s.V1JobCondition) =>
-          cond.type === "Complete" && cond.status === "True"
-        );
+        const condition: k8s.V1JobCondition = (conditions ?? []).find((
+          cond: k8s.V1JobCondition,
+        ) => cond.status === "True");
 
-        if (jobComplete) {
-          result.resolve();
+        if (condition !== undefined) {
+          resolve(lastSeenJob);
         }
       }
     },
     (err) => {
       if (err) {
-        result.reject(err);
+        reject(err);
       } else {
-        result.resolve();
+        resolve(lastSeenJob);
       }
     },
   );
@@ -41,9 +44,9 @@ async function _watchJobStatus(
   if (timeoutMs) {
     delay(timeoutMs).then(() => {
       req.abort();
-      result.reject({ message: "timed out" });
+      reject({ message: "watch timed out" });
     });
   }
 
-  return result;
+  return promise;
 }
