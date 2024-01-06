@@ -9,7 +9,7 @@ async function build() {
   } = await import("https://deno.land/x/zipjs@v2.7.30/index.js");
 
   const cacheLocalDir = Deno.env.get("CACHE_LOCAL_DIR");
-  const soureLocalDir = Deno.env.get("SOURCE_LOCAL_DIR");
+  const sourceLocalDir = Deno.env.get("SOURCE_LOCAL_DIR");
   const gitRepository = Deno.env.get("GIT_REPO");
   const commitSha = Deno.env.get("COMMIT_SHA") ?? "main";
   const ghToken = Deno.env.get("GITHUB_TOKEN");
@@ -33,16 +33,53 @@ async function build() {
 
   const DOCKER_DEPS_FILE_NAME = `_docker_deps.ts`;
   const dockerDepsPromise = Deno.writeTextFile(
-    join(soureLocalDir!, DOCKER_DEPS_FILE_NAME),
+    join(sourceLocalDir!, DOCKER_DEPS_FILE_NAME),
     fileLines.join("\n"),
   );
 
   interface FreshProject {
     buildArgs?: string[];
   }
+  interface ImportMap {
+    imports: Record<string, string>;
+  }
+  const genImportMap = async () => {
+    const denoJSON = join(sourceLocalDir!, "deno.json");
+    const parsedImportMap: ImportMap = await Deno.readTextFile(
+      denoJSON,
+    ).then(
+      (m) => JSON.parse(m),
+    );
+    const WELL_KNOWN_REGISTRIES = [
+      "https://esm.sh",
+      "https://deno.land",
+      "https://denopkg.com",
+      "https://cdn.jsdelivr.net",
+      "https://registry.npmjs.org",
+    ];
+
+    const registries = new Set(WELL_KNOWN_REGISTRIES);
+
+    for (const importUrl of Object.values(parsedImportMap.imports)) {
+      if (!importUrl.startsWith("http")) {
+        continue;
+      }
+      const url = new URL(importUrl);
+      registries.add(url.origin);
+    }
+
+    for (const registry of registries.values()) {
+      parsedImportMap.imports[`${registry}/`] =
+        `https://decocdn-service.default.svc.cluster.local:8000/${registry}/`;
+    }
+    await Deno.writeTextFile(
+      denoJSON,
+      JSON.stringify(parsedImportMap, null, 2),
+    );
+  };
   const getFrshProject = async (): Promise<FreshProject | undefined> => {
     const readFileOrUndefined = (file: string) =>
-      Deno.readTextFile(join(soureLocalDir!, file)).catch((err) => {
+      Deno.readTextFile(join(sourceLocalDir!, file)).catch((err) => {
         if (err instanceof Deno.errors.NotFound) {
           return undefined;
         }
@@ -74,7 +111,15 @@ async function build() {
     const hasFreshImport = parsedDenoJson?.imports?.["$fresh/"];
     return {
       buildArgs: hasFreshImport
-        ? ["run", "--node-modules-dir=false", "-A", "dev.ts", "build"]
+        ? [
+          "run",
+          "--unsafely-ignore-certificate-errors=decocdn-service.default.svc.cluster.local",
+          "--node-modules-dir=false",
+          "-A",
+          "--deny-run",
+          "dev.ts",
+          "build",
+        ]
         : undefined,
     };
   };
@@ -110,7 +155,10 @@ async function build() {
     for (const { directory, filename, getData } of entries) {
       if (directory) continue;
 
-      const filepath = join(soureLocalDir!, filename.replace(rootFilename, ""));
+      const filepath = join(
+        sourceLocalDir!,
+        filename.replace(rootFilename, ""),
+      );
 
       await ensureFile(filepath);
       const file = await Deno.open(filepath, { create: true, write: true });
@@ -128,7 +176,7 @@ async function build() {
         "main.ts",
         ...isFreshProject ? [DOCKER_DEPS_FILE_NAME] : [],
       ],
-      cwd: soureLocalDir,
+      cwd: sourceLocalDir,
       stdout: "inherit",
       stderr: "inherit",
       stdin: "inherit",
@@ -142,7 +190,10 @@ async function build() {
   const build = async (buildArgs: string[]) => {
     const cmd = new Deno.Command(Deno.execPath(), {
       args: buildArgs,
-      cwd: soureLocalDir,
+      env: {
+        FRESH_ESBUILD_LOADER: "portable"
+      },
+      cwd: sourceLocalDir,
       stdout: "inherit",
       stderr: "inherit",
       stdin: "inherit",
@@ -156,9 +207,10 @@ async function build() {
 
   console.log(`downloading source from git ${gitRepository} - ${commitSha}...`);
   await downloadFromGit();
+  await genImportMap();
   console.log(`generating cache...`);
   const freshPrj = await getFrshProject();
-  await genCache(freshPrj !== undefined);
+  // await genCache(freshPrj !== undefined);
   if (freshPrj?.buildArgs) {
     console.log(`building project...`);
     await build(freshPrj.buildArgs);
