@@ -4,7 +4,7 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import {
   AvailableActions,
   AvailableLoaders,
-} from "deco/routes/live/invoke/index.ts";
+} from "deco/utils/invoke.types.ts";
 import { AppManifest } from "deco/types.ts";
 import { deferred } from "std/async/deferred.ts";
 import openai, {

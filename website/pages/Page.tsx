@@ -5,7 +5,7 @@ import { context } from "deco/live.ts";
 import {
   usePageContext as useDecoPageContext,
   useRouterContext,
-} from "deco/routes/[...catchall].tsx";
+} from "deco/runtime/fresh/routes/entrypoint.tsx";
 import { JSX } from "preact";
 import Events from "../components/Events.tsx";
 import LiveControls from "../components/_Controls.tsx";
