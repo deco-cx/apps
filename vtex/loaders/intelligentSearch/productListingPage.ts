@@ -422,7 +422,7 @@ export const cacheKey = (req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (url.searchParams.has("q") || !isAnonymous(ctx)) {
-    return "";
+    return null;
   }
 
   const params = new URLSearchParams();
