@@ -5,18 +5,15 @@ import {
 } from "../deps.ts";
 import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
-import { JSONSchema7 } from "deco/deps.ts";
+import { JSONSchema7, weakcache } from "deco/deps.ts";
 import { genSchemas } from "deco/engine/schema/reader.ts";
 import { Context } from "deco/live.ts";
 import { AppManifest } from "deco/mod.ts";
-import { mschema } from "deco/runtime/fresh/routes/_meta.ts";
 import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
-let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
-  null;
 
 /**
  * Select functions from manifest based on the available functions or pickall loaders and actions.
@@ -40,25 +37,37 @@ const pickFunctions = (
   }
   return newManifest;
 };
+
+const toolsCache = new weakcache.WeakLRUCache({
+  cacheSize: 16, // up to 16 different schemas stored here.
+});
+
 /**
  * Builds assistant tools that can be used by OpenAI assistant to execute actions based on users requests.
  * @param assistant the assistant that will handle the request
  * @returns an array of available functions that can be used.
  */
-const appTools = (assistant: AIAssistant): Promise<
+const appTools = async (assistant: AIAssistant): Promise<
   AssistantCreateParams.AssistantToolsFunction[]
 > => {
-  return tools ??= Context.active().runtime!.then(async (runtime) => {
+  const ctx = Context.active();
+  const assistantsKey = assistant.availableFunctions?.join(",") ?? "all";
+  const revision = await ctx.release!.revision();
+  const cacheKey = `${assistantsKey}@${revision}`;
+  if (toolsCache.has(cacheKey)) {
+    return toolsCache.get(cacheKey)!;
+  }
+  const toolsPromise = ctx.runtime!.then(async (runtime) => {
     const manifest = assistant.availableFunctions
       ? pickFunctions(assistant.availableFunctions, runtime.manifest)
       : runtime.manifest;
-    const schemas = mschema ??
-      await genSchemas(manifest, runtime.sourceMap);
+
+    const schemas = await genSchemas(manifest, runtime.sourceMap);
     const functionKeys = assistant.availableFunctions ?? Object.keys({
       ...runtime.manifest.loaders,
       ...runtime.manifest.actions,
     });
-    return functionKeys.map(
+    const tools = functionKeys.map(
       (functionKey) => {
         const functionDefinition = btoa(functionKey);
         const schema = schemas.definitions[functionDefinition];
@@ -95,7 +104,12 @@ const appTools = (assistant: AIAssistant): Promise<
         };
       },
     ).filter(notUndefined);
+
+    toolsCache.set(ctx, tools);
+    return tools;
   });
+  toolsCache.set(cacheKey, toolsPromise);
+  return toolsPromise;
 };
 
 export interface ProcessorOpts {
