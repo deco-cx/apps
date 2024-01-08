@@ -34,6 +34,7 @@ import type {
   SelectedFacet,
   Sort,
 } from "../../utils/types.ts";
+import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -273,7 +274,15 @@ const loader = async (
     page,
     ...args
   } = searchArgsOf(props, url);
-  const pageTypesPromise = pageTypesFromPathname(url.pathname, ctx);
+
+  let pathToUse = url.pathname;
+
+  if (pathToUse === "/" || pathToUse === "/*") {
+    const result = await PLPDefaultPath({ level: 1 }, req, ctx);
+    pathToUse = result?.possiblePaths[0] ?? pathToUse;
+  }
+
+  const pageTypesPromise = pageTypesFromPathname(pathToUse, ctx);
   const pageTypes = await pageTypesPromise;
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
