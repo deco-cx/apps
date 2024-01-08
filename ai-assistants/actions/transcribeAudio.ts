@@ -3,12 +3,16 @@ import OpenAI from "https://deno.land/x/openai@v4.24.1/mod.ts";
 const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 
 export interface TranscribeAudioProps {
-  file: string;
+  file: string | ArrayBuffer | null;
 }
 
 // TODO(ItamarRocha): Move this to a utils file and remove duplicated code from awsUpload
-function base64ToBlob(base64: string): Blob {
+function base64ToBlob(base64: string | ArrayBuffer): Blob {
   // Split the base64 string into the MIME type and the base64 encoded data
+  if (typeof base64 !== "string") {
+    throw new Error("Expected a base64 string");
+  }
+
   const parts = base64.match(/^data:(audio\/[a-z]+);base64,(.*)$/);
   if (!parts || parts.length !== 3) {
     throw new Error("Base64 string is not properly formatted");
@@ -35,6 +39,10 @@ function base64ToBlob(base64: string): Blob {
 export default async function transcribeAudio(
   transcribeAudioProps: TranscribeAudioProps,
 ) {
+  if (!transcribeAudioProps.file) {
+    throw new Error("File is empty");
+  }
+
   const blobData = base64ToBlob(transcribeAudioProps.file); // {size, type}
   const file = new File([blobData], "input.wav", { type: "audio/wav" });
   const response = await openai.audio.transcriptions.create({

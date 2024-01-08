@@ -38,6 +38,7 @@ const process = async (
 export interface MessageContentText {
   type: "text";
   value: string;
+  options?: string[];
 }
 
 export interface MessageContentFile {

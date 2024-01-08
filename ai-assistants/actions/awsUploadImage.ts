@@ -8,7 +8,7 @@ const awsSecretAccessKey = Deno.env.get("AWS_SECRET_ACCESS_KEY")!;
 const URL_EXPIRATION_SECONDS = 1000;
 
 export interface AWSUploadImageProps {
-  file: string;
+  file: string | ArrayBuffer | null;
 }
 
 const s3 = new AWS.S3({
@@ -17,7 +17,10 @@ const s3 = new AWS.S3({
   secretAccessKey: awsSecretAccessKey,
 });
 
-function base64ToBlob(base64: string): Blob {
+function base64ToBlob(base64: string | ArrayBuffer | null): Blob {
+  if (typeof base64 !== "string") {
+    throw new Error("Expected a base64 string");
+  }
   // Split the base64 string into the MIME type and the base64 encoded data
   const parts = base64.match(/^data:(image\/[a-z]+);base64,(.*)$/);
   if (!parts || parts.length !== 3) {
