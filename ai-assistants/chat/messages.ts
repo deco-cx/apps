@@ -7,9 +7,9 @@ import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
 import { JSONSchema7 } from "deco/deps.ts";
 import { genSchemas } from "deco/engine/schema/reader.ts";
-import { context } from "deco/live.ts";
+import { Context } from "deco/live.ts";
 import { AppManifest } from "deco/mod.ts";
-import { mschema } from "deco/routes/live/_meta.ts";
+import { mschema } from "deco/runtime/fresh/routes/_meta.ts";
 import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
@@ -48,7 +48,7 @@ const pickFunctions = (
 const appTools = (assistant: AIAssistant): Promise<
   AssistantCreateParams.AssistantToolsFunction[]
 > => {
-  return tools ??= context.runtime!.then(async (runtime) => {
+  return tools ??= Context.active().runtime!.then(async (runtime) => {
     const manifest = assistant.availableFunctions
       ? pickFunctions(assistant.availableFunctions, runtime.manifest)
       : runtime.manifest;

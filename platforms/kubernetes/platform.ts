@@ -1,5 +1,4 @@
-import { badRequest } from "deco/mod.ts";
-import { Deployment, Platform } from "../../admin/platform.ts";
+import { Platform } from "../../admin/platform.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
@@ -11,45 +10,6 @@ export interface Props {
 }
 
 const DECO_RELEASE_ENV_VAR = "DECO_RELEASE";
-
-/**
- * Reconciles the site state based on the desired state.
- */
-async function buildAndDeploy(
-  { site, state: desiredState, deploymentId }: Props,
-  { actions }: Kubernetes,
-): Promise<Deployment> {
-  const source = desiredState.source;
-  if (!source) {
-    badRequest({ message: "there's no source to deploy" });
-  }
-  // when code has changed so we need to build it.
-  const buildResult = await actions.build({
-    commitSha: source!.commitSha,
-    repo: source!.repo,
-    owner: source!.owner,
-    builderImage: desiredState.builderImage,
-    site,
-  });
-  await buildResult.waitUntil("succeed", 300_000);
-
-  // a new service should be created regardless
-  await actions.deployments.create({
-    scaling: desiredState.scaling,
-    labels: {
-      deploymentId,
-    },
-    site,
-    deploymentId,
-    siteState: desiredState,
-  });
-
-  const domains = [{
-    url: `https://sites-${site}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
-    production: false,
-  }];
-  return { id: deploymentId, domains };
-}
 
 type Kubernetes = AppContext["invoke"]["kubernetes"];
 export default function kubernetes(
@@ -84,11 +44,14 @@ export default function kubernetes(
             repo,
           },
         };
-        const deployment = await buildAndDeploy({
+        const deployment = await actions.deployments.create({
           site,
-          state: desiredState,
+          siteState: desiredState,
           deploymentId,
-        }, k8s);
+          labels: {
+            deploymentId,
+          },
+        });
         if (production) {
           await actions.deployments.promote({
             site,
@@ -121,11 +84,14 @@ export default function kubernetes(
           }],
         };
         const deploymentId = DeploymentId.new();
-        const deployment = await buildAndDeploy({
+        const deployment = await actions.deployments.create({
           site,
-          state: desiredState,
+          siteState: desiredState,
           deploymentId,
-        }, k8s);
+          labels: {
+            deploymentId,
+          },
+        });
         await actions.deployments.promote({
           site,
           state: desiredState,

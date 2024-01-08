@@ -100,5 +100,5 @@ export default async function getSiteState(
     }
     throw err;
   });
-  return secret ? State.fromSecret(secret.body) : ctx.defaultSiteState;
+  return secret ? State.fromSecret(secret.body) : undefined;
 }
