@@ -53,6 +53,14 @@ export const toProductPage = (
     "@type": "ProductDetailsPage",
     breadcrumbList: toBreadcrumbList(product, sku),
     product: toProduct(product, sku, url),
+    // In shopify storefront, if the product SEO properties are identical
+    // to the product title and description, they are not returned.
+    // See: https://github.com/Shopify/storefront-api-feedback/discussions/181#discussioncomment-5734355
+    seo: {
+      title: product.seo?.title ?? product.title,
+      description: product.seo?.description ?? product.description,
+      canonical: `${url.origin}${getPath(product, sku)}`,
+    },
   };
 };
 
@@ -139,7 +147,14 @@ export const toProduct = (
       hasVariant: hasVariant || [],
       url: `${url.host}${getPath(product)}`,
       name: product.title,
-      additionalProperty: [],
+      additionalProperty: [
+        ...product.tags?.map((value) =>
+          toPropertyValue({ name: "TAG", value })
+        ),
+        ...product.collections?.nodes.map(({ title }) =>
+          toPropertyValue({ name: "COLLECTION", value: title })
+        ),
+      ],
       image: nonEmptyArray(images.nodes)?.map((img) => ({
         "@type": "ImageObject",
         alternateName: img.altText ?? "",
