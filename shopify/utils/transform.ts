@@ -239,7 +239,7 @@ const filtersURL = (filter: FilterShopify, value: FilterValue, _url: URL) => {
   params.delete("page");
   params.delete("startCursor");
   params.delete("endCursor");
-  if (params.has(filter.id)) {
+  if (params.has(filter.id, value.label)) {
     params.delete(filter.id);
   } else {
     params.append(filter.id, value.label);
