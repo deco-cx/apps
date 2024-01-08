@@ -92,8 +92,7 @@ export default async function newSite(
     }).catch(ignoreIfExists),
   ]);
   const state = {
-    ...ctx.defaultSiteState,
-    envVars: [...ctx.defaultSiteState?.envVars ?? [], secretEnvVar],
+    envVars: [secretEnvVar],
   };
   await ctx.invoke.kubernetes.actions.siteState.upsert({
     site,

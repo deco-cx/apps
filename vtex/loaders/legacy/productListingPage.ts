@@ -20,6 +20,7 @@ import type {
   LegacyProduct,
   LegacySort,
 } from "../../utils/types.ts";
+import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 
 const MAX_ALLOWED_PAGES = 500;
 
@@ -157,7 +158,12 @@ const loader = async (
   const count = Number(countFromSearchParams ?? props.count ?? 12);
 
   const maybeMap = props.map || url.searchParams.get("map") || undefined;
-  const maybeTerm = props.term || url.pathname || "";
+  let maybeTerm = props.term || url.pathname || "";
+
+  if (maybeTerm === "/" || maybeTerm === "/*") {
+    const result = await PLPDefaultPath({ level: 1 }, req, ctx);
+    maybeTerm = result?.possiblePaths[0] ?? maybeTerm;
+  }
 
   const page = url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
