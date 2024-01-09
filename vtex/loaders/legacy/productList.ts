@@ -94,13 +94,13 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 // deno-lint-ignore no-explicit-any
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
 
-const preferredSKU = (items : LegacyItem[], {props} : Props ) => {
-  let fetchedSkus : string[] = [];
-  if(isSKUIDProps(props)){
+const preferredSKU = (items: LegacyItem[], { props }: Props) => {
+  let fetchedSkus: string[] = [];
+  if (isSKUIDProps(props)) {
     fetchedSkus = props.ids ?? [];
   }
   return items.find((item) => fetchedSkus.includes(item.itemId)) || items[0];
-}
+};
 
 const fromProps = ({ props }: Props) => {
   const params = { fq: [] } as {
@@ -191,7 +191,7 @@ const loader = async (
   // If a property is missing from the final `products` array you can add
   // it in here
   const products = vtexProducts.map((p) =>
-    toProduct(p, preferredSKU(p.items, {props}), 0, {
+    toProduct(p, preferredSKU(p.items, { props }), 0, {
       baseUrl: baseUrl,
       priceCurrency: segment?.payload?.currencyCode ?? "BRL",
     })
