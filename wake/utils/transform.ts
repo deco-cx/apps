@@ -341,8 +341,9 @@ export const toProduct = (
     reviewRating: {
       "@type": "AggregateRating" as const,
       bestRating: 5,
-      worstRating: 0,
+      worstRating: 1,
       ratingValue: review?.rating ?? undefined,
+      ratingCount: 1,
     },
   })) ?? [];
 
