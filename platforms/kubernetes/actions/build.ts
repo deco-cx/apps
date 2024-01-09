@@ -1,6 +1,6 @@
 import { badRequest } from "deco/mod.ts";
-import { delay } from "std/async/mod.ts";
 import buildScript from "../common/cmds/build.ts";
+import { watchJobStatus } from "../common/jobs.ts";
 import { ignoreIfExists } from "../common/objects.ts";
 import { k8s } from "../deps.ts";
 import { hashString } from "../hash/shortHash.ts";
@@ -174,16 +174,13 @@ const buildJobOf = (
 };
 
 /**
- * this function is an heuristic that says that in 99% of the cases when the build will fail it will happen in the first five seconds.
+ * Returns running if job is not found or job status is not defined or succeed / failed depending on the Complete condition.
  */
-const getBuildStatus = (buildStartTimeMs: number) =>
-async (
-  api: k8s.BatchV1Api,
-  namespace: string,
-  jobName: string,
-): Promise<BuildStatus> => {
-  const job = await api.readNamespacedJob(jobName, namespace);
-  const jobStatus = job.body.status;
+const buildStatusOf = (job: k8s.V1Job | null): BuildStatus => {
+  if (!job) {
+    return "running" as const;
+  }
+  const jobStatus = job.status;
   if (!jobStatus) {
     return "running" as const;
   }
@@ -192,59 +189,33 @@ async (
     cond: k8s.V1JobCondition,
   ) => cond.status === "True");
   if (!condition) {
-    if (performance.now() - buildStartTimeMs > 5_000) {
-      return "will_probably_succeed";
-    }
     return "running" as const;
   }
 
   return condition.type === "Complete" ? "succeed" : "failed";
 };
 
-const finalStatus: BuildStatus[] = ["succeed", "failed"];
-const waitWithPooling =
-  (getStatusFunc: () => Promise<BuildStatus>, pollingDelayMs: number) =>
-  async (status: BuildStatus, timeoutMs?: number) => {
-    let timedOut = false;
-    const timeout = timeoutMs && setTimeout(() => {
-      timedOut = true;
-    }, timeoutMs);
-    const isProbablySucceed = status === "will_probably_succeed";
-    try {
-      const waitUntil = async () => {
-        const currentStatus = await getStatusFunc();
-        if (
-          currentStatus === status ||
-          (isProbablySucceed && currentStatus === "succeed")
-        ) {
-          return;
-        }
+/**
+ * Fetches the job and gets the build status based on the job condition.
+ */
+const getBuildStatus = async (
+  api: k8s.BatchV1Api,
+  namespace: string,
+  jobName: string,
+): Promise<BuildStatus> => {
+  const job = await api.readNamespacedJob(jobName, namespace);
+  return buildStatusOf(job.body);
+};
 
-        // unexpected final status
-        if (finalStatus.includes(currentStatus)) {
-          throw new Error(`unexpected final job status ${currentStatus}`);
-        }
-        if (timedOut) {
-          throw new Error("timeout");
-        }
-        await delay(pollingDelayMs);
-        await waitUntil();
-      };
-      return await waitUntil();
-    } finally {
-      timeout && clearTimeout(timeout);
-    }
-  };
 export type BuildStatus =
   | "succeed"
   | "failed"
-  | "will_probably_succeed"
   | "running";
 
 export interface BuildResult {
   sourceBinder: SourceBinder;
   getBuildStatus: () => Promise<BuildStatus>;
-  waitUntil: (status: BuildStatus, timeoutMs?: number) => Promise<void>;
+  wait: (timeoutMs?: number) => Promise<BuildStatus>;
 }
 
 /**
@@ -262,10 +233,11 @@ export default async function build(
   const batchAPI = ctx.kc.makeApiClient(k8s.BatchV1Api);
   const binder = SrcBinder.fromRepo(owner, repo, commitSha);
   // Define the Job specification
+  const jobName = `build-${await hashString(
+    `build-${commitSha}-${owner}-${repo}`,
+  )}`;
   const job = buildJobOf({
-    name: `build-${await hashString(
-      `build-${commitSha}-${owner}-${repo}`,
-    )}`,
+    name: jobName,
     githubToken: ctx.githubToken,
     commitSha,
     owner,
@@ -280,11 +252,16 @@ export default async function build(
     job,
   ).catch(ignoreIfExists);
 
-  const statusFn = getBuildStatus(performance.now());
-  const getBuildStatusFn = () => statusFn(batchAPI, site, job.metadata!.name!);
+  const getBuildStatusFn = () =>
+    getBuildStatus(batchAPI, site, job.metadata!.name!);
   return {
     sourceBinder: binder,
-    waitUntil: waitWithPooling(getBuildStatusFn, 5_000),
+    wait: (timeout?: number) =>
+      watchJobStatus(ctx.kc, site, jobName, timeout).then(buildStatusOf).catch(
+        () => {
+          return "running" as const;
+        },
+      ),
     getBuildStatus: getBuildStatusFn,
   };
 }

@@ -1,13 +1,16 @@
 import { shortcircuit } from "deco/engine/errors.ts";
 import { badRequest } from "deco/mod.ts";
 import ShortUniqueId from "https://esm.sh/v135/short-unique-id@v4.4.2";
+import { Deployment } from "../../../../admin/platform.ts";
 import runScript from "../../common/cmds/run.ts";
 import { routeOf } from "../../common/knative/route.ts";
 import { ignoreIfExists, upsertObject } from "../../common/objects.ts";
 import { k8s } from "../../deps.ts";
 import { ServiceScaling, SiteState } from "../../loaders/siteState/get.ts";
-import { AppContext } from "../../mod.ts";
+import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
 import { SourceBinder, SrcBinder } from "../build.ts";
+import { Routes } from "./rollout.ts";
+
 
 const uid = new ShortUniqueId({ length: 10, dictionary: "alpha_lower" });
 export const DeploymentId = {
@@ -21,6 +24,7 @@ export interface Props {
   deploymentId: string;
   runnerImage?: string;
   siteState: SiteState;
+  build?: boolean;
 }
 
 export interface EnvVar {
@@ -200,26 +204,43 @@ const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
  */
 export default async function newDeployment(
   {
+    build = true,
     site,
     deploymentId,
     labels,
     runnerImage,
-    siteState,
-    siteState: { source },
-    scaling = { initialScale: 0, maxScale: 3, minScale: 0 },
+    siteState: desiredState,
+    scaling: _scaling,
   }: Props,
   _req: Request,
   ctx: AppContext,
-) {
+): Promise<Deployment> {
+  const siteState = ctx.withDefaults(desiredState);
+  const { source, scaling = _scaling } = siteState;
   if (!source) {
     badRequest({ message: "source is required" });
-    return;
   }
-  const { owner, repo, commitSha } = source;
+
+  const { owner, repo, commitSha } = source!;
+  if (build) {
+    // when code has changed so we need to build it.
+    const buildResult = await ctx.invoke.kubernetes.actions.build({
+      commitSha,
+      repo,
+      owner,
+      builderImage: siteState.builderImage,
+      site,
+    });
+    const status = await buildResult.wait(300_000);
+
+    if (status !== "succeed") {
+      badRequest({ message: `unexpected build status ${status}` });
+    }
+  }
+
   const runnerImg = runnerImage ?? siteState?.runnerImage;
   if (!runnerImg) {
     badRequest({ message: "runner image is required" });
-    return;
   }
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
   const revisionName = `${site}-site-${deploymentId}`;
@@ -238,7 +259,7 @@ export default async function newDeployment(
     namespace: site,
     deploymentId,
     labels,
-    scaling,
+    scaling: scaling ?? { initialScale: 0, maxScale: 3, minScale: 0 },
     runnerImage: runnerImg!,
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
@@ -291,4 +312,10 @@ export default async function newDeployment(
       ),
     );
   });
+
+  const domains = [{
+    url: `https://${Routes.prod(site)}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
+    production: false,
+  }];
+  return { id: deploymentId, domains };
 }

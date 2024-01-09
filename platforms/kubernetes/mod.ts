@@ -5,15 +5,11 @@ import { k8s } from "./deps.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
-const DEFAULT_BUILDER_IMAGE =
-  "578348582779.dkr.ecr.sa-east-1.amazonaws.com/builder:builder-latest-158bdf1cfdba357c995ef9613c3312c76567eed4461d8f33fb2256a342d0e105";
-const DEFAULT_RUNNER_IMAGE =
-  "578348582779.dkr.ecr.sa-east-1.amazonaws.com/runner:runner-latest-e18bba14a8fc9c2f5d5297daebc37106e1ab23d6ae31be9fc1a3bf5f857e27af";
 export const CONTROL_PLANE_DOMAIN = "decocdn.com";
 
 export interface State {
   kc: k8s.KubeConfig;
-  defaultSiteState: SiteState;
+  withDefaults: (siteState: SiteState) => SiteState;
   controlPlaneDomain: string;
   githubToken?: string;
 }
@@ -40,22 +36,25 @@ export default function App(
       console.error("couldn't not load from kuberentes state", err);
     }
   }
+  const _defaultSiteState = defaultSiteState ?? {
+    scaling: {
+      maxScale: 100,
+      initialScale: 3,
+      minScale: 0,
+      retentionPeriod: "5m",
+    },
+  };
   return {
     manifest,
     state: {
       kc,
       githubToken: githubToken?.get?.() ?? Deno.env.get("OCTOKIT_TOKEN"),
       controlPlaneDomain: CONTROL_PLANE_DOMAIN,
-      defaultSiteState: defaultSiteState ?? {
-        runnerImage: DEFAULT_RUNNER_IMAGE,
-        builderImage: DEFAULT_BUILDER_IMAGE,
-        scaling: {
-          maxScale: 100,
-          initialScale: 3,
-          minScale: 0,
-          retentionPeriod: "5m",
-        },
-      },
+      withDefaults: (state) => ({
+        ..._defaultSiteState,
+        ...state,
+        envVars: [..._defaultSiteState.envVars ?? [], ...state?.envVars ?? []],
+      }),
     },
   };
 }

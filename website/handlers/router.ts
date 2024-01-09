@@ -23,16 +23,22 @@ interface MaybePriorityHandler {
 
 const HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE = 1000;
 
-const rankRoute = (pattern: string) =>
+const rankRoute = (pattern: string): number =>
   pattern
     .split("/")
     .reduce(
-      (acc, routePart) =>
-        routePart.endsWith("*")
-          ? acc
-          : routePart.startsWith(":")
-          ? acc + 1
-          : acc + 2,
+      (acc, routePart) => {
+        if (routePart === "*") {
+          return acc;
+        }
+        if (routePart.startsWith(":")) {
+          return acc + 1;
+        }
+        if (routePart.includes("*")) {
+          return acc + 2;
+        }
+        return acc + 3;
+      },
       0,
     );
 
@@ -185,6 +191,8 @@ export default function RoutesSelection(
       ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
         rankRoute(routeStringA))
     );
+
+    console.log(builtRoutes)
 
     const server = router(
       builtRoutes.map((route) => ({

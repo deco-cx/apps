@@ -5,7 +5,7 @@ import { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Apps, LoaderContext } from "deco/mod.ts";
-import { MiddlewareConfig } from "deco/routes/_middleware.ts";
+import { MiddlewareConfig } from "deco/runtime/fresh/middlewares/3_main.ts";
 
 /**
  * @titleBy key

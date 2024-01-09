@@ -7,6 +7,10 @@ export interface Props {
   deploymentId: string;
 }
 
+export const Routes = {
+  prod: (site: string) => `sites-${site}`,
+};
+
 /**
  * Rollout an specific deployment to production without promotion(next pushes will take changes back in prod).
  * @title Deployment Rollout
@@ -20,7 +24,7 @@ export default async function rollout(
   await upsertObject(
     ctx.kc,
     routeOf({
-      routeName: `sites-${site}`,
+      routeName: Routes.prod(site),
       revisionName,
       namespace: site,
     }),

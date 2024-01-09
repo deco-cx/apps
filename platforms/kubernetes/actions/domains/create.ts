@@ -1,6 +1,7 @@
 import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
+import { Routes } from "../deployments/rollout.ts";
 
 export interface Props {
   site: string;
@@ -50,8 +51,8 @@ export default async function newDomain(
     },
     spec: {
       ref: {
-        name: `${site}-site`,
-        kind: "Service",
+        name: Routes.prod(site),
+        kind: "Route",
         apiVersion: "serving.knative.dev/v1",
       },
       tls: {

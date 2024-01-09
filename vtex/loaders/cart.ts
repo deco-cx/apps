@@ -3,7 +3,7 @@ import { proxySetCookie } from "../utils/cookies.ts";
 import { hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
 import { getSegmentFromBag } from "../utils/segment.ts";
 import type { MarketingData, OrderForm } from "../utils/types.ts";
-import updateAttachment from "../actions/cart/updateAttachment.ts";
+import { DEFAULT_EXPECTED_SECTIONS } from "../actions/cart/removeItemAttachment.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
@@ -61,12 +61,24 @@ const loader = async (
       !cart.marketingData ||
       hasDifferentMarketingData(cart.marketingData, marketingData)
     ) {
-      const result = await updateAttachment(
-        { attachment: "marketingData", body: { ...marketingData } },
-        req,
-        ctx,
-      );
-      return result;
+      const expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS;
+      const result = await vcsDeprecated
+        ["POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"](
+          {
+            orderFormId: cart.orderFormId,
+            attachment: "marketingData",
+            sc: segment?.payload.channel,
+          },
+          {
+            body: { expectedOrderFormSections, ...marketingData },
+            headers: {
+              accept: "application/json",
+              "content-type": "application/json",
+              cookie,
+            },
+          },
+        );
+      return result.json();
     }
   }
 
