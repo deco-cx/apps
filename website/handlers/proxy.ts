@@ -38,8 +38,8 @@ async function logClonedResponseBody(
   const clonedResponse = response.clone();
   const text = await clonedResponse.text();
 
-  monitoring?.logger?.error?.(
-    `Proxy error = ${response.statusText}, body = ${text}`,
+  monitoring?.rootSpan?.setAttribute?.("proxy.error", 
+    `${response.statusText}, body = ${text}`,
   );
 }
 
@@ -147,7 +147,7 @@ export default function Proxy({
           body: req.body,
         });
       } catch (err) {
-        monitoring?.logger?.error?.(err);
+        monitoring?.rootSpan?.setAttribute?.("proxy.exception", err.message);
 
         throw err;
       }

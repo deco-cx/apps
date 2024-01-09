@@ -1,5 +1,6 @@
 import { Platform } from "../../admin/platform.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
+import { Routes } from "./actions/deployments/rollout.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
 
@@ -61,7 +62,7 @@ export default function kubernetes(
           return {
             ...deployment,
             domains: [...deployment.domains, {
-              url: `https://sites-${site}.${CONTROL_PLANE_DOMAIN}`,
+              url: `https://${Routes.prod(site)}.${CONTROL_PLANE_DOMAIN}`,
               production: true,
             }],
           };
@@ -100,7 +101,7 @@ export default function kubernetes(
         return {
           ...deployment,
           domains: [...deployment.domains, {
-            url: `https://sites-${site}.${CONTROL_PLANE_DOMAIN}`,
+            url: `https://${Routes.prod(site)}.${CONTROL_PLANE_DOMAIN}`,
             production: true,
           }],
         };

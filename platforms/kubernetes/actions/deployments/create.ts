@@ -9,6 +9,8 @@ import { k8s } from "../../deps.ts";
 import { ServiceScaling, SiteState } from "../../loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
 import { SourceBinder, SrcBinder } from "../build.ts";
+import { Routes } from "./rollout.ts";
+
 
 const uid = new ShortUniqueId({ length: 10, dictionary: "alpha_lower" });
 export const DeploymentId = {
@@ -312,7 +314,7 @@ export default async function newDeployment(
   });
 
   const domains = [{
-    url: `https://sites-${site}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
+    url: `https://${Routes.prod(site)}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
     production: false,
   }];
   return { id: deploymentId, domains };
