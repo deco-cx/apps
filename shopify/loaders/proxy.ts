@@ -11,7 +11,6 @@ const PATHS_TO_PROXY = [
   "/password/*",
   "/challenge",
   "/challenge/*",
-  "/sitemap*",
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
@@ -22,7 +21,6 @@ const PATHS_WITH_DIGEST = new Set([
   "/password/*",
   "/challenge",
   "/challenge/*",
-  "/sitemap*",
 ]);
 
 const buildProxyRoutes = (

@@ -38,7 +38,8 @@ async function logClonedResponseBody(
   const clonedResponse = response.clone();
   const text = await clonedResponse.text();
 
-  monitoring?.rootSpan?.setAttribute?.("proxy.error", 
+  monitoring?.rootSpan?.setAttribute?.(
+    "proxy.error",
     `${response.statusText}, body = ${text}`,
   );
 }

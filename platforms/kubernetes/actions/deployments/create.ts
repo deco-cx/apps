@@ -11,7 +11,6 @@ import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
 import { SourceBinder, SrcBinder } from "../build.ts";
 import { Routes } from "./rollout.ts";
 
-
 const uid = new ShortUniqueId({ length: 10, dictionary: "alpha_lower" });
 export const DeploymentId = {
   new: () => uid.randomUUID(),
