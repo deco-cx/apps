@@ -192,8 +192,6 @@ export default function RoutesSelection(
         rankRoute(routeStringA))
     );
 
-    console.log(builtRoutes)
-
     const server = router(
       builtRoutes.map((route) => ({
         pathTemplate: route[0],
