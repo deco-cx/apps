@@ -3,40 +3,16 @@ import {
   RequiredActionFunctionToolCall,
   Thread,
 } from "../deps.ts";
-import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
+import { Tokens, threadMessageToReply } from "../loaders/messages.ts";
 
 import { JSONSchema7, weakcache } from "deco/deps.ts";
-import { genSchemas } from "deco/engine/schema/reader.ts";
+import { lazySchemaFor } from "deco/engine/schema/lazy.ts";
 import { Context } from "deco/live.ts";
-import { AppManifest } from "deco/mod.ts";
 import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
-
-/**
- * Select functions from manifest based on the available functions or pickall loaders and actions.
- */
-const pickFunctions = (
-  funcs: string[],
-  { name, baseUrl, ...blocks }: AppManifest,
-): AppManifest => {
-  const newManifest: AppManifest = { name, baseUrl };
-  for (const [blockType, blockValues] of Object.entries(blocks)) {
-    for (const blockKey of Object.keys(blockValues)) {
-      if (funcs.includes(blockKey)) {
-        newManifest[
-          blockType as keyof Omit<AppManifest, "name" | "baseUrl">
-        ] ??= {};
-        newManifest[blockType as keyof Omit<AppManifest, "name" | "baseUrl">]![
-          blockKey
-        ] = blockValues[blockKey];
-      }
-    }
-  }
-  return newManifest;
-};
 
 const toolsCache = new weakcache.WeakLRUCache({
   cacheSize: 16, // up to 16 different schemas stored here.
@@ -58,11 +34,7 @@ const appTools = async (assistant: AIAssistant): Promise<
     return toolsCache.get(cacheKey)!;
   }
   const toolsPromise = ctx.runtime!.then(async (runtime) => {
-    const manifest = assistant.availableFunctions
-      ? pickFunctions(assistant.availableFunctions, runtime.manifest)
-      : runtime.manifest;
-
-    const schemas = await genSchemas(manifest, runtime.sourceMap);
+    const schemas = await lazySchemaFor(ctx).value;
     const functionKeys = assistant.availableFunctions ?? Object.keys({
       ...runtime.manifest.loaders,
       ...runtime.manifest.actions,
