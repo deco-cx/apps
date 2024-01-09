@@ -31,10 +31,10 @@ const rankRoute = (pattern: string): number =>
         if (routePart === "*") {
           return acc;
         }
-        if (routePart.endsWith("*")) {
+        if (routePart.startsWith(":")) {
           return acc + 1;
         }
-        if (routePart.startsWith(":")) {
+        if (routePart.includes("*")) {
           return acc + 2;
         }
         return acc + 3;
@@ -191,6 +191,8 @@ export default function RoutesSelection(
       ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
         rankRoute(routeStringA))
     );
+
+    console.log(builtRoutes)
 
     const server = router(
       builtRoutes.map((route) => ({
