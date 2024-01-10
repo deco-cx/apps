@@ -1,41 +1,17 @@
-import { context } from "deco/live.ts";
 import type { App, FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 // deno-lint-ignore ban-types
 export type State = {};
+
 /**
  * @title Deco Hub
  */
-const ADMIN_APP = "decohub/apps/admin.ts";
-export default async function App(
+export default function App(
   state: State,
-): Promise<App<Manifest, State>> {
-  const resolvedImport = import.meta.resolve("../admin/mod.ts");
-  return {
-    manifest: {
-      ...manifest,
-      apps: {
-        ...manifest.apps,
-        ...context.play // this is an optimization to not include the admin code for everyone in case of play is not being used.
-          ? {
-            [ADMIN_APP]: await import(
-              resolvedImport
-            ),
-          }
-          : {},
-      },
-    } as Manifest,
-    state,
-    ...context.play
-      ? {
-        sourceMap: {
-          [ADMIN_APP]: resolvedImport,
-        },
-      }
-      : {},
-  };
+): App<Manifest, State> {
+  return { manifest, state };
 }
 
 export type AppContext = FnContext<State, Manifest>;

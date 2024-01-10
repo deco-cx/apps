@@ -9,7 +9,7 @@ import {
   WebhookEventName,
   Webhooks,
 } from "./deps.ts";
-import { FsBlockStorage } from "./fsStorage.ts";
+import { storage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
 import { State as Resolvables } from "./loaders/state.ts";
@@ -108,7 +108,7 @@ export default function App(
         pushEventHandler as GithubEventListener,
         prEventHandler as GithubEventListener,
       ],
-      storage: new FsBlockStorage(),
+      storage,
       octokit: new Octokit({
         auth: githubAPIToken,
       }),

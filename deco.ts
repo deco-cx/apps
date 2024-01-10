@@ -16,6 +16,7 @@ const paltformApps = [{
 const config = {
   apps: [
     app("ai-assistants"),
+    app("files"),
     app("openai"),
     app("brand-assistant"),
     app("implementation"),
