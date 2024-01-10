@@ -9,6 +9,16 @@
 
 
 export interface OpenAPI {
+"GET /api/v2/products/:productId/videos": {
+response: {
+id?: number
+url?: string
+embed_url?: string
+thumbnail_url?: string
+updated_at?: number
+variant_ids?: number
+}[]
+}
 "GET /api/v2/seo_data": {
 searchParams: {
 resource_type?: string

@@ -75,6 +75,7 @@ function productVariantToProduct(
     ),
     image: images.map((image: ProductImage) => ({
       "@type": "ImageObject",
+      encodingFormat: "image",
       url: image.src,
     })),
     category: getPreferredLanguage(categories[0]?.name || ""), // Assuming there's only one category
