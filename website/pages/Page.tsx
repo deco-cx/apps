@@ -55,6 +55,9 @@ Component<{ fallback: ComponentFunc<any> }> {
 
   // deno-lint-ignore no-explicit-any
   static getDerivedStateFromError(error: any) {
+    if (error instanceof HttpError && error.status >= 400) {
+      throw error;
+    }
     return { error };
   }
 
