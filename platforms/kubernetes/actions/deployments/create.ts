@@ -289,7 +289,7 @@ export default async function newDeployment(
         },
       };
     },
-  );
+  ).catch(ignoreIfExists);
 
   const deploymentRoute = `sites-${site}-${deploymentId}`;
   await k8sApi.createNamespacedCustomObject(
