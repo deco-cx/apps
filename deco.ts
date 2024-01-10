@@ -11,6 +11,7 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("konfidency"),
+    app("discord-bot"),
     app("mailchimp"),
     app("ai-assistants"),
     app("files"),

@@ -1,5 +1,5 @@
-import { Octokit } from "octokit";
-import { Endpoints } from "octokit/types";
+import { Octokit } from "https://cdn.skypack.dev/@octokit/rest@19.0.4";
+import { Endpoints } from "https://esm.sh/@octokit/types@9.0.0";
 
 export interface DiscordCommandOption {
   name: string;
@@ -37,7 +37,6 @@ export interface DiscordClient {
  * Also: RepoOwner shouldn't be constant in the future (repos will be hosted elsewhere),
  * so we might use the opportunity to take this into consideration
  */
-
 const _client = (octokit_token: string) =>
   new Octokit({
     auth: octokit_token,

@@ -25,6 +25,21 @@ export async function PullRequestsBot(
     discord_channel_id,
     repositories,
   } = ctx;
+
+  const bot_token = discord_bot_token.get();
+
+  if (!bot_token) {
+    return new Response(
+      JSON.stringify({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: "Bot token not found",
+        },
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   const organization = getOrganization(repositories, repo);
 
   if (organization === null) {
@@ -41,7 +56,7 @@ export async function PullRequestsBot(
 
   const openPRs = await queryGitOpenedPR(organization, repo, ctx);
 
-  if (openPRs === null) {
+  if (openPRs === undefined) {
     return new Response(
       JSON.stringify({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -59,7 +74,7 @@ export async function PullRequestsBot(
 
   //Create the bot
   const bot = await createBot({
-    token: discord_bot_token,
+    token: bot_token,
   });
 
   const thread = await startThreadWithoutMessage(bot, channel_id, {
@@ -70,7 +85,10 @@ export async function PullRequestsBot(
 
   await Promise.all(
     openPRs.map(async (pr) =>
-      await sendPRMessageOnDiscord({ channelID: thread.id, pr, bot }, ctx)
+      await sendPRMessageOnDiscord(
+        { channelID: String(thread.id), pr, bot },
+        ctx,
+      )
     ),
   );
 
@@ -94,13 +112,27 @@ export async function sendPRMessageOnDiscord(
     usersFromGitToDiscord,
   }: AppContext,
 ) {
+  const bot_token = discord_bot_token.get();
+
+  if (!bot_token) {
+    return new Response(
+      JSON.stringify({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: "Bot token not found",
+        },
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   const assign = pr.reviewers?.map((rev) =>
     `<@${getDiscordUsers(usersFromGitToDiscord, rev.login) ?? rev.login}>`
   ).join(", ");
 
   if (bot === undefined) {
     bot = await createBot({
-      token: discord_bot_token,
+      token: bot_token,
     });
   }
 
@@ -127,30 +159,34 @@ const queryGitOpenedPR = async (
   {
     octokit_token,
   }: AppContext,
-): Promise<PullRequest[] | null> => {
+): Promise<PullRequest[] | undefined> => {
+  const git_token = octokit_token.get();
+  if (!git_token) {
+    return undefined;
+  }
+
   const activePulls = await GithubClient.getAllActivePulls(
     organization,
     repo,
-    octokit_token,
-  )
-    .catch(
-      (err) => {
-        console.log("error");
-        if ((err as { status: number })?.status === 404) {
-          return null;
-        }
-        throw err;
-      },
-    );
+    git_token,
+  ).catch(
+    (err) => {
+      console.log("error");
+      if ((err as { status: number })?.status === 404) {
+        return undefined;
+      }
+      throw err;
+    },
+  );
 
-  const prs = activePulls.map((pr) => ({
+  const prs = activePulls?.map((pr) => ({
     url: pr.html_url,
     state: pr.state,
     title: pr.title,
-    owner: pr.user.login,
-    reviewers: pr.requested_reviewers.map((rev) => ({
+    owner: pr.user?.login ?? "",
+    reviewers: pr.requested_reviewers?.map((rev) => ({
       login: rev.login,
-    })),
+    })) ?? [],
   }));
 
   return prs;

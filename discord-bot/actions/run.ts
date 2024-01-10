@@ -1,4 +1,4 @@
-import { Manifest } from "./../../../runtime.ts";
+import { Manifest } from "./manifest.gen.ts";
 import { AppContext } from "../mod.ts";
 import { WorkflowProps } from "deco-sites/admin/actions/workflows/start.ts";
 
