@@ -94,6 +94,7 @@ export function toProduct(
       .sort((a, _b) => a.id.toString() == image_id ? -1 : 1)
       .map((image: ProductImage) => ({
         "@type": "ImageObject",
+        encodingFormat: "image",
         url: image.src,
       })),
     category: getPreferredLanguage(categories[0]?.name || ""), // Assuming there's only one category

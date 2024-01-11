@@ -62,7 +62,7 @@ export interface Props {
    * @default 1
    * @deprecated
    */
-  salesChannel?: "1" | "2" | "3" | "4" | "5";
+  salesChannel?: string;
 
   /**
    * @title Default Segment

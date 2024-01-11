@@ -196,24 +196,27 @@ export const toFilters = (
 };
 
 export const toBreadcrumbList = (
-  product: Product,
   breadcrumbs: SingleProductFragment["breadcrumbs"] = [],
-  { base: _base }: { base: URL },
+  { base: base }: { base: URL },
+  product?: Product,
 ): BreadcrumbList => {
   const itemListElement = [
     ...(breadcrumbs ?? []).map((item, i): ListItem<string> => ({
       "@type": "ListItem",
       name: item!.text!,
       position: i + 1,
-      item: item!.link!,
+      item: new URL(item!.link!, base).href,
     })),
-    {
+  ];
+
+  if (product) {
+    itemListElement.push({
       "@type": "ListItem",
       name: product.isVariantOf?.name,
-      item: product.isVariantOf?.url,
+      item: product.isVariantOf?.url!,
       position: (breadcrumbs ?? []).length + 1,
-    } as ListItem<string>,
-  ];
+    });
+  }
 
   return {
     "@type": "BreadcrumbList",
@@ -230,6 +233,7 @@ export const toProduct = (
 ): Product => {
   const images = variant.images?.map((image) => ({
     "@type": "ImageObject" as const,
+    encodingFormat: "image",
     url: image?.url ?? "",
     alternateName: image?.fileName ?? "",
   }));
@@ -272,6 +276,7 @@ export const toProduct = (
         image: promotion!.fullStampUrl
           ? [{
             "@type": "ImageObject",
+            encodingFormat: "image",
             url: promotion!.fullStampUrl,
           }]
           : undefined,
@@ -324,7 +329,6 @@ export const toProduct = (
       }
     });
   }
-
   const review = (variant as SingleProductFragment).reviews?.map((review) => ({
     "@type": "Review" as const,
     author: [
@@ -339,8 +343,9 @@ export const toProduct = (
     reviewRating: {
       "@type": "AggregateRating" as const,
       bestRating: 5,
-      worstRating: 0,
+      worstRating: 1,
       ratingValue: review?.rating ?? undefined,
+      ratingCount: 1,
     },
   })) ?? [];
 
@@ -351,6 +356,18 @@ export const toProduct = (
   const variantSelected = variants.find((v) => {
     return Number(v.productID) === Number(variantId);
   }) ?? {};
+
+  const aggregateRating = (variant.numberOfVotes ||
+      (variant as SingleProductFragment).reviews?.length)
+    ? {
+      "@type": "AggregateRating" as const,
+      bestRating: 5,
+      ratingCount: variant.numberOfVotes || undefined,
+      ratingValue: variant.averageRating ?? undefined,
+      reviewCount: (variant as SingleProductFragment).reviews?.length,
+      worstRating: 1,
+    }
+    : undefined;
 
   return {
     "@type": "Product",
@@ -373,20 +390,12 @@ export const toProduct = (
       logo: variant.productBrand?.fullUrlLogo ??
         undefined,
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      bestRating: 5,
-      ratingCount: variant.numberOfVotes ?? undefined,
-      ratingValue: variant.averageRating ?? undefined,
-      reviewCount: (variant as SingleProductFragment).reviews?.length,
-      worstRating: 0,
-    },
     additionalProperty,
-    review,
     offers: {
       "@type": "AggregateOffer",
       highPrice: variant.prices?.price,
       lowPrice: variant.prices?.price,
+      priceCurrency: "BRL",
       offerCount: 1,
       offers: [{
         "@type": "Offer",
@@ -402,6 +411,8 @@ export const toProduct = (
     },
     ...variantSelected,
     isSimilarTo,
+    review,
+    aggregateRating,
     isVariantOf: {
       "@type": "ProductGroup",
       url: getProductUrl(variant, base).href,

@@ -1,10 +1,14 @@
 import { AppContext } from "../mod.ts";
 import { Script } from "../../website/types.ts";
-import { exclusionPropsAndHashScript } from "../scripts/plausible_scripts.ts";
+import {
+  defaultExclusionPropsAndHashScript,
+  exclusionPropsAndHashScript,
+} from "../scripts/plausible_scripts.ts";
 import { getFlagsFromCookies } from "../../utils/cookie.ts";
 
 export type Props = {
   defer?: boolean;
+  domain?: string;
 };
 
 const loader = (
@@ -28,7 +32,13 @@ const loader = (
       ) => (`event-${flagName}="${flagActive}"`)).join(
         " ",
       )
-    } data-api="https://plausible.io/api/event">${exclusionPropsAndHashScript}</script>`;
+    } ${
+      props.domain ? "data-domain=" + props.domain : ""
+    } data-api="https://plausible.io/api/event">${
+      props.domain
+        ? defaultExclusionPropsAndHashScript
+        : exclusionPropsAndHashScript
+    }</script>`;
     return dnsPrefetchLink + preconnectLink + plausibleScript;
   };
   return ({ src: transformReq });

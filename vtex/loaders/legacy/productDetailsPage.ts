@@ -7,6 +7,7 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { LegacyProduct } from "../../utils/types.ts";
+import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -30,6 +31,14 @@ async function loader(
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
+  const haveToUseSlug = slug && !slug.startsWith(":");
+  let defaultPaths;
+  if (!haveToUseSlug) {
+    defaultPaths = await PDPDefaultPath({ count: 1 }, req, ctx);
+  }
+  const lowercaseSlug = haveToUseSlug
+    ? slug?.toLowerCase()
+    : defaultPaths?.possiblePaths[0] || "/";
   const url = new URL(baseUrl);
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
@@ -37,7 +46,7 @@ async function loader(
 
   const response = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:slug/p"](
-      { ...params, slug },
+      { ...params, slug: lowercaseSlug },
       { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json());
 
@@ -70,7 +79,7 @@ async function loader(
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: segment.payload.currencyCode ?? "BRL",
+    priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   });
 
   return {
