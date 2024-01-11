@@ -50,7 +50,7 @@ export interface Thing {
 
 export interface MediaObject {
   /** Media type typically expressed using a MIME format (see IANA site and MDN reference) */
-  encodingFormat: string;
+  encodingFormat?: string;
   /** A URL pointing to a player for a specific video. */
   embedUrl?: string;
   /** Actual bytes of the media object, for example the image file or video file. */
