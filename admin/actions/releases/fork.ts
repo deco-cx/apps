@@ -57,7 +57,7 @@ const action = (_props: Props, req: Request) => {
           type: "state-patched",
           payload: operations,
           etag: await storage.revision(),
-          metadata: {}, // TODO: add metadataß
+          metadata: {}, // TODO: add metadata
           ack,
         });
       } catch ({ name, operation }) {
