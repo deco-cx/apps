@@ -12,6 +12,7 @@ import * as $$$6 from "./loaders/proxy.ts";
 import * as $$$7 from "./loaders/suggestion.ts";
 import * as $$$8 from "./loaders/cart.ts";
 import * as $$$9 from "./loaders/user.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/submmitForm.ts";
 import * as $$$$$$$$$1 from "./actions/notifyme.ts";
 import * as $$$$$$$$$2 from "./actions/review/create.ts";
@@ -37,6 +38,9 @@ const manifest = {
     "wake/loaders/suggestion.ts": $$$7,
     "wake/loaders/user.ts": $$$9,
     "wake/loaders/wishlist.ts": $$$3,
+  },
+  "handlers": {
+    "wake/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "wake/actions/cart/addCoupon.ts": $$$$$$$$$3,
