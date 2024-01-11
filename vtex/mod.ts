@@ -137,6 +137,8 @@ export default function VTEX({
     io,
     vcs,
     api,
+    appKey,
+    appToken,
   };
 
   const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
