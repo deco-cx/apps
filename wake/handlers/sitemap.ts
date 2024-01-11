@@ -1,4 +1,4 @@
-import Proxy from "../../website/handlers/proxy.ts";
+import Proxy, { Header } from "../../website/handlers/proxy.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
 
@@ -15,16 +15,15 @@ const includeSiteMaps = (
 ) => {
   const siteMapIncludeTags = [];
 
-  if (currentXML.includes(xmlHeader)) {
-    for (const include of (includes ?? [])) {
-      siteMapIncludeTags.push(`
-            <sitemap>
-                <loc>${
-        include.startsWith("/") ? `${origin}${include}` : include
-      }</loc>
-                <lastmod>${new Date().toISOString().substring(0, 10)}</lastmod>
-            </sitemap>`);
-    }
+  for (const include of (includes ?? [])) {
+    siteMapIncludeTags.push(`
+      <sitemap>
+          <loc>${
+      include.startsWith("/") ? `${origin}${include}` : include
+    }</loc>
+          <lastmod>${new Date().toISOString().substring(0, 10)}</lastmod>
+      </sitemap>
+    `);
   }
 
   return siteMapIncludeTags.length > 0
@@ -34,20 +33,6 @@ const includeSiteMaps = (
     )
     : currentXML;
 };
-
-/**
- * @title {{{key}}} - {{{value}}}
- */
-export interface Header {
-  /**
-   * @title Key
-   */
-  key: string;
-  /**
-   * @title Value
-   */
-  value: string;
-}
 
 export interface Props {
   include?: string[];
@@ -68,9 +53,6 @@ export default function Sitemap(
       throw new Error("Missing account");
     }
 
-    /**
-     * Some stores were having problems with the IO sitemap (missing categories and brands)
-     */
     const publicUrl = `${BASE_SITEMAP_URL}/${account}/`;
 
     const response = await Proxy({
