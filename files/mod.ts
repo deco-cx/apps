@@ -36,8 +36,9 @@ const compile = async (
 ): Promise<[AppManifest, SourceMap]> => {
   await initializePromise;
   const tsModule = await importFromString(content);
-  const blockPath = join(currdir, blockType, path);
-  const blockKey = `${manifest.name}/${blockType}/${path}`;
+  const blockPath = join(currdir, path);
+  const blockKey = join(manifest.name, path);
+
   return [{
     ...manifest,
     [blockType]: {

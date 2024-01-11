@@ -7,16 +7,17 @@ import * as $$$1 from "./loaders/blocks/published.ts";
 import * as $$$2 from "./loaders/blocks/latest.ts";
 import * as $$$3 from "./loaders/blocks/listRevisions.ts";
 import * as $$$4 from "./loaders/state.ts";
-import * as $$$5 from "./loaders/releases/blocks.ts";
-import * as $$$6 from "./loaders/platforms/forSite.ts";
-import * as $$$7 from "./loaders/deploy.ts";
-import * as $$$8 from "./loaders/pages/list.ts";
+import * as $$$5 from "./loaders/releases/get.ts";
+import * as $$$6 from "./loaders/releases/blocks.ts";
+import * as $$$7 from "./loaders/platforms/forSite.ts";
+import * as $$$8 from "./loaders/deploy.ts";
+import * as $$$9 from "./loaders/pages/list.ts";
 import * as $$$$$$$$$0 from "./actions/blocks/publish.ts";
 import * as $$$$$$$$$1 from "./actions/blocks/restore.ts";
 import * as $$$$$$$$$2 from "./actions/blocks/safeDelete.ts";
 import * as $$$$$$$$$3 from "./actions/blocks/newRevision.ts";
 import * as $$$$$$$$$4 from "./actions/blocks/delete.ts";
-import * as $$$$$$$$$5 from "./actions/workspaces/connect.ts";
+import * as $$$$$$$$$5 from "./actions/releases/fork.ts";
 import * as $$$$$$$$$6 from "./actions/sites/linkRepo.ts";
 import * as $$$$$$$$$7 from "./actions/sites/newDomain.ts";
 import * as $$$$$$$$$8 from "./actions/sites/unlinkRepo.ts";
@@ -32,10 +33,11 @@ const manifest = {
     "deco-sites/admin/loaders/blocks/listRevisions.ts": $$$3,
     "deco-sites/admin/loaders/blocks/published.ts": $$$1,
     "deco-sites/admin/loaders/blocks/revision.ts": $$$0,
-    "deco-sites/admin/loaders/deploy.ts": $$$7,
-    "deco-sites/admin/loaders/pages/list.ts": $$$8,
-    "deco-sites/admin/loaders/platforms/forSite.ts": $$$6,
-    "deco-sites/admin/loaders/releases/blocks.ts": $$$5,
+    "deco-sites/admin/loaders/deploy.ts": $$$8,
+    "deco-sites/admin/loaders/pages/list.ts": $$$9,
+    "deco-sites/admin/loaders/platforms/forSite.ts": $$$7,
+    "deco-sites/admin/loaders/releases/blocks.ts": $$$6,
+    "deco-sites/admin/loaders/releases/get.ts": $$$5,
     "deco-sites/admin/loaders/state.ts": $$$4,
   },
   "actions": {
@@ -49,10 +51,10 @@ const manifest = {
     "deco-sites/admin/actions/pages/delete.ts": $$$$$$$$$13,
     "deco-sites/admin/actions/pages/new.ts": $$$$$$$$$12,
     "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$11,
+    "deco-sites/admin/actions/releases/fork.ts": $$$$$$$$$5,
     "deco-sites/admin/actions/sites/linkRepo.ts": $$$$$$$$$6,
     "deco-sites/admin/actions/sites/newDomain.ts": $$$$$$$$$7,
     "deco-sites/admin/actions/sites/unlinkRepo.ts": $$$$$$$$$8,
-    "deco-sites/admin/actions/workspaces/connect.ts": $$$$$$$$$5,
   },
   "name": "deco-sites/admin",
   "baseUrl": import.meta.url,
