@@ -15,7 +15,7 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<CreateNewDocument> => {
-  const { vcsDeprecated, appKey, appToken } = ctx;
+  const { vcsDeprecated } = ctx;
   const { data, acronym } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
@@ -28,12 +28,6 @@ const action = async (
           accept: "application/json",
           "content-type": "application/json",
           cookie,
-          "X-VTEX-API-AppKey": typeof appKey === "string"
-            ? appKey
-            : appKey?.get?.() ?? "",
-          "X-VTEX-API-AppToken": typeof appToken === "string"
-            ? appToken
-            : appToken?.get?.() ?? "",
         },
       },
     );
