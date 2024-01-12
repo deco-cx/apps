@@ -110,7 +110,6 @@ export default function VTEX({
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
     base: `https://${account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
-    headers: headers,
   });
   const io = createGraphqlClient({
     endpoint:
