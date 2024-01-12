@@ -1,8 +1,12 @@
 import type { AIAssistant } from "../../../ai-assistants/mod.ts";
 
+interface Prompt {
+  context: string;
+  content: string;
+}
+
 export interface Props {
-  /** @description Base snippet to generate the code from */
-  snippet: string;
+  prompts?: Prompt[];
 }
 
 const BASE_INSTRUCTIONS = `
@@ -49,11 +53,6 @@ export default function loader(props: Props): AIAssistant {
     model: "gpt-3.5-turbo-1106",
     availableFunctions: [],
     instructions: BASE_INSTRUCTIONS,
-    prompts: [
-      {
-        context: "This is a snippet of the code you should generate from",
-        content: props.snippet,
-      },
-    ],
+    prompts: props.prompts,
   };
 }
