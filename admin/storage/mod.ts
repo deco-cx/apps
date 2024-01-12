@@ -82,8 +82,9 @@ export interface Repository {
 export class BranchProvider {
 }
 export class Storage implements Repository {
-  checkout(opts?: CheckoutOpts): Promise<Branch> {
-    throw new Error("Method not implemented.");
+  constructor(protected defaultBranch: Branch) {}
+  checkout(_opts?: CheckoutOpts): Promise<Branch> {
+    return Promise.resolve(this.defaultBranch);
   }
   sync({ from, to }: SyncOpts): Disposable {
     const abort = new Notify();
@@ -98,7 +99,7 @@ export class Storage implements Repository {
           return;
         }
         to.add({ changeSet: cs.value });
-        await to.commit();
+        await Promise.race([to.commit(), abort.notified()]);
       }
     })();
 
