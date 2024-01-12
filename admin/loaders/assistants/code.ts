@@ -1,9 +1,4 @@
-import type { AIAssistant } from "../../../ai-assistants/mod.ts";
-
-interface Prompt {
-  context: string;
-  content: string;
-}
+import type { AIAssistant, Prompt } from "../../../ai-assistants/mod.ts";
 
 export interface Props {
   prompts?: Prompt[];
