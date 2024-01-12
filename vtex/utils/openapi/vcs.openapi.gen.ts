@@ -3237,7 +3237,8 @@ SkuId?: number
 }
 /**
  * Associates attachments to an SKU based on a given SKU ID and attachment names.
- * This request removes existing SKU attachment associations and recreates the associations with the attachments being sent. 
+ * 
+This request removes existing SKU attachment associations and recreates the associations with the attachments being sent. 
  * ## Request body example
  * 
  * ```json
@@ -8671,7 +8672,8 @@ searchParams: {
 /**
  * This parameter defines which promotions apply to the simulation. Use `0` for simulations at cart stage, which means all promotions apply. In case of window simulation use `1`, which indicates promotions that apply nominal discounts over the total purchase value shouldn't be considered on the simulation.
  * 
- * Note that if this not sent, the parameter is `1`.
+ * 
+Note that if this not sent, the parameter is `1`.
  */
 RnbBehavior?: number
 /**
@@ -9421,7 +9423,8 @@ assemblyOptions?: any[]
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` obtained in response is the identification code of the newly created cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "GET /api/checkout/pub/orderForm": {
 searchParams: {
@@ -9436,7 +9439,8 @@ forceNewCart?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "GET /api/checkout/pub/orderForm/:orderFormId": {
 searchParams: {
@@ -9479,21 +9483,25 @@ response: {
 /**
  * You can use this request to:
  * 
- * 1. Change the quantity of one or more items in a specific cart.
- * 2. Remove an item from the cart (by sending the `quantity` value = `0` in the request body).
+ * 
+1. Change the quantity of one or more items in a specific cart.
+ * 
+2. Remove an item from the cart (by sending the `quantity` value = `0` in the request body).
  * 
  * **Important**: To remove all items from the cart at the same time, use the [Remove all items](https://developers.vtex.com/vtex-rest-api/reference/removeallitems) endpoint.
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure that represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/items/update": {
 searchParams: {
 /**
  * In order to optimize performance, this parameter allows some information to not be updated when there are changes in the minicart. For instance, if a shopper adds another unit of a given SKU to the cart, it may not be necessary to recalculate payment information, which could impact performance.
  * 
- * This array accepts strings and currently the only possible value is `”paymentData”`.
+ * 
+This array accepts strings and currently the only possible value is `”paymentData”`.
  */
 allowedOutdatedData?: any[]
 }
@@ -10600,14 +10608,16 @@ ascending?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/items": {
 searchParams: {
 /**
  * In order to optimize performance, this parameter allows some information to not be updated when there are changes in the minicart. For instance, if a shopper adds another unit of a given SKU to the cart, it may not be necessary to recalculate payment information, which could impact performance.
  * 
- * This array accepts strings and currently the only possible value is `”paymentData”`.
+ * 
+This array accepts strings and currently the only possible value is `”paymentData”`.
  */
 allowedOutdatedData?: any[]
 }
@@ -11724,14 +11734,17 @@ ascending?: boolean
 /**
  * You can use this request to:
  * 
- * 1. Change the quantity or price of one or more items to the shopping cart.
- * 2. Add a new item to the shopping cart.
+ * 
+1. Change the quantity or price of one or more items to the shopping cart.
+ * 
+2. Add a new item to the shopping cart.
  * 
  * **Important**: To add a new item to the shopping cart, do not send the string `index` in the request body.
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure that represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "PATCH /api/checkout/pub/orderForm/:orderFormId/items": {
 body: {
@@ -12872,13 +12885,17 @@ ascending?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * You need to inform which cart you are referring to, by sending its `orderFormId` and what is the item whose price you want to change, by sending its `itemIndex`.
  * 
- * You also need to pass the new price value in the body.
+You need to inform which cart you are referring to, by sending its `orderFormId` and what is the item whose price you want to change, by sending its `itemIndex`.
  * 
- * Remember that, to use this endpoint, the feature of *manual price* must be active. To check if it's active, use the [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm) endpoint. To make it active, use the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) endpoint, making the `allowManualPrice` field `true`.
  * 
- * > Whenever you use this request to change the price of an item, all items in that cart with the same SKU are affected by this change. This applies even to items that share the SKU but have been separated into different objects in the `items` array due to customizations or attachments, for example.
+You also need to pass the new price value in the body.
+ * 
+ * 
+Remember that, to use this endpoint, the feature of *manual price* must be active. To check if it's active, use the [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm) endpoint. To make it active, use the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) endpoint, making the `allowManualPrice` field `true`.
+ * 
+ * 
+> Whenever you use this request to change the price of an item, all items in that cart with the same SKU are affected by this change. This applies even to items that share the SKU but have been separated into different objects in the `items` array due to customizations or attachments, for example.
  */
 "PUT /api/checkout/pub/orderForm/:orderFormId/items/:itemIndex/price": {
 body: PriceChangeRequest
@@ -12901,10 +12918,13 @@ ignoreProfileData?: boolean
 /**
  * Retrieve a client's profile information by providing an email address.
  * 
- * If the response body fields are empty, the following situations may have occurred:
  * 
- * 1. There is no client registered with the email address provided in your store, or;
- * 2. Client profile is invalid or incomplete. However, you can use the query parameter `ensureComplete=false` to get incomplete profiles. For more information, see [SmartCheckout - Customer information automatic fill-in](https://help.vtex.com/en/tutorial/smartcheckout-customer-information-automatic-fill-in--2Nuu3xAFzdhIzJIldAdtan).
+If the response body fields are empty, the following situations may have occurred:
+ * 
+ * 
+1. There is no client registered with the email address provided in your store, or;
+ * 
+2. Client profile is invalid or incomplete. However, you can use the query parameter `ensureComplete=false` to get incomplete profiles. For more information, see [SmartCheckout - Customer information automatic fill-in](https://help.vtex.com/en/tutorial/smartcheckout-customer-information-automatic-fill-in--2Nuu3xAFzdhIzJIldAdtan).
  * 
  * >⚠️ The authentication of this endpoint can change depending on the customer context. If you are consulting information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.
  */
@@ -13065,7 +13085,8 @@ isComplete?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  * 
  * >⚠️ The authentication of this endpoint can change depending on the customer context. If you are modifying information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.
  */
@@ -13131,7 +13152,8 @@ isCorporate?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  * 
  * >⚠️ The authentication of this endpoint can change depending on the customer context. If you are modifying information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.
  */
@@ -14278,7 +14300,8 @@ itemsOrdination?: (null | {
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/clientPreferencesData": {
 body: {
@@ -14298,14 +14321,16 @@ response: any
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/marketingData": {
 body: {
 /**
  * Sending an existing coupon code in this field will return the corresponding discount in the purchase. Use the [cart simulation](https://developers.vtex.com/vtex-rest-api/reference/orderform#orderformsimulation) request to check which coupons might apply before placing the order.
  * 
- * To send more than one coupon code to the same cart, use commas. E.g.`"sales25, blackfriday30"`.
+ * 
+To send more than one coupon code to the same cart, use commas. E.g.`"sales25, blackfriday30"`.
  */
 coupon?: string
 /**
@@ -14343,7 +14368,8 @@ utmiCampaign?: string
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/paymentData": {
 body: {
@@ -14395,7 +14421,8 @@ hasDefaultBillingAddress?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/merchantContextData": {
 body: {
@@ -14419,9 +14446,11 @@ salesAssociateId?: string
 /**
  * Your account may create `apps`, which contain custom fields, through the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) request. The values of these custom fields can then be updated by this request.
  * 
- * To do that, you need to inform the ID of the app you created with the configuration API (`appId`).
  * 
- * In the body of the request, for each field created in this app (`appFieldName`) you will inform a value (`appFieldValue`).
+To do that, you need to inform the ID of the app you created with the configuration API (`appId`).
+ * 
+ * 
+In the body of the request, for each field created in this app (`appFieldName`) you will inform a value (`appFieldValue`).
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  */
@@ -14437,9 +14466,11 @@ response: any
 /**
  * Your account may create `apps`, which contain custom fields, through the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) request. The value of a specific custom field can then be updated by this request.
  * 
- * To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
  * 
- * In the body of the request, you will inform the new value (`appFieldValue`, passed through the body) of the specific field created in this app (identified by the `appFieldName` parameter, passed through the URL).
+To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
+ * 
+ * 
+In the body of the request, you will inform the new value (`appFieldValue`, passed through the body) of the specific field created in this app (identified by the `appFieldName` parameter, passed through the URL).
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  */
@@ -14449,9 +14480,11 @@ body: SetsinglecustomfieldvalueRequest
 /**
  * Your account may create `apps`, which contain custom fields, through the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) request. The value of a specific custom field can be removed by this request.
  * 
- * To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
  * 
- * You also need to iform the specific field created in this app (identified by the `appFieldName` parameter, also passed through the URL) whose value you want to remove.
+To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
+ * 
+ * 
+You also need to iform the specific field created in this app (identified by the `appFieldName` parameter, also passed through the URL) whose value you want to remove.
  */
 "DELETE /api/checkout/pub/orderForm/:orderFormId/customData/:appId/:appFieldName": {
 
@@ -14459,9 +14492,11 @@ body: SetsinglecustomfieldvalueRequest
 /**
  * Retrieves the settings that are currently applied to every orderForm in the account.
  * 
- * These settings are defined by the request [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm).
  * 
- * Always use this request to retrieve the current configuration before performing an update. By doing so you ensure that you are modifying only the properties you want.
+These settings are defined by the request [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm).
+ * 
+ * 
+Always use this request to retrieve the current configuration before performing an update. By doing so you ensure that you are modifying only the properties you want.
  */
 "GET /api/checkout/pvt/configuration/orderForm": {
 response: {
@@ -14547,10 +14582,14 @@ maskFirstPurchaseData?: (null | boolean)
 /**
  * Configures reCAPTCHA validation for the account, defining in which situations the shopper will be prompted to validate a purchase with reCAPTCHA. Learn more about [reCAPTCHA validation for VTEX stores](https://help.vtex.com/en/tutorial/using-recaptcha-at-checkout--18Te3oDd7f4qcjKu9jhNzP)
  * 
- * Possible values are:
- * - `"never"`: no purchases are validated with reCAPTCHA.
- * - `"always"`: every purchase is validated with reCAPTCHA.
- * - `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX's algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
+ * 
+Possible values are:
+ * 
+- `"never"`: no purchases are validated with reCAPTCHA.
+ * 
+- `"always"`: every purchase is validated with reCAPTCHA.
+ * 
+- `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX's algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
  */
 recaptchaValidation?: string
 /**
@@ -14570,9 +14609,11 @@ cartAgeToUseNewCardSeconds?: number
 /**
  * Determines settings that will apply to every orderForm in the account.
  * 
- * For example, if you create an app using this request, every orderForm of this account will have the custom fields created though it.
  * 
- * >ℹ️ Always retrieve the current configuration before performing an update to ensure that you are modifying only the properties you want. Otherwise, old values can be overwritten. To retrieve the current configuration, use the request [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm).
+For example, if you create an app using this request, every orderForm of this account will have the custom fields created though it.
+ * 
+ * 
+>ℹ️ Always retrieve the current configuration before performing an update to ensure that you are modifying only the properties you want. Otherwise, old values can be overwritten. To retrieve the current configuration, use the request [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm).
  */
 "POST /api/checkout/pvt/configuration/orderForm": {
 body: UpdateorderFormconfigurationRequest
@@ -14580,7 +14621,8 @@ body: UpdateorderFormconfigurationRequest
 /**
  * Retrieves a marketplace’s window to change seller, that is, the period when it is possible to choose another seller to fulfill a given order after the original seller has canceled it.
  * 
- * The default period for this window is of 2 days, but it can be configured by the request Update window to change seller.
+ * 
+The default period for this window is of 2 days, but it can be configured by the request Update window to change seller.
  */
 "GET /api/checkout/pvt/configuration/window-to-change-seller": {
 
@@ -14588,7 +14630,8 @@ body: UpdateorderFormconfigurationRequest
 /**
  * Updates a marketplace’s window to change seller, that is, the period when it is possible to choose another seller to fulfill a given order after the original seller has canceled it.
  * 
- * It is possible to check the current window using the request Get window to change seller.
+ * 
+It is possible to check the current window using the request Get window to change seller.
  */
 "POST /api/checkout/pvt/configuration/window-to-change-seller": {
 body: WaitingTime
@@ -15693,9 +15736,11 @@ ascending?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * This endpoint can be used to get the installment options for only one payment method at a time.
  * 
- * This endpoint should be called only after the selected `orderForm` already has a `paymentData`.
+This endpoint can be used to get the installment options for only one payment method at a time.
+ * 
+ * 
+This endpoint should be called only after the selected `orderForm` already has a `paymentData`.
  */
 "GET /api/checkout/pub/orderForm/:orderFormId/installments": {
 searchParams: {
@@ -15708,10 +15753,13 @@ paymentSystem: number
 /**
  * Use this request to add coupons to a given shopping cart.
  * 
- * To add multiple coupons to the same cart, you need to:
  * 
- * 1. Request the activation of this feature through the [Support VTEX](https://help.vtex.com/support) if this is the first time you perform this action on your store.
- * 2. Submit all coupon codes in the same requisition separated by commas. E.g.: {"text": "freeshipping, discount10, holiday30"}.
+To add multiple coupons to the same cart, you need to:
+ * 
+ * 
+1. Request the activation of this feature through the [Support VTEX](https://help.vtex.com/support) if this is the first time you perform this action on your store.
+ * 
+2. Submit all coupon codes in the same requisition separated by commas. E.g.: {"text": "freeshipping, discount10, holiday30"}.
  * 
  * For more information on multiple coupons, access the [coupons tutorial](https://help.vtex.com/en/tutorial/creating-a-coupon-beta--7lMk3MmhNp2IEccyGApxU).
  */
@@ -16804,7 +16852,8 @@ ascending?: boolean
 /**
  * Retrieves information on pickup points close to a given location determined by geocoordinates or postal code.
  * 
- * The pickup points returned are not necessarily all active ones. Make sure to validate the information consumed by integrations.
+ * 
+The pickup points returned are not necessarily all active ones. Make sure to validate the information consumed by integrations.
  */
 "GET /api/checkout/pub/pickup-points": {
 searchParams: {
@@ -16833,7 +16882,8 @@ countryCode?: string
 /**
  * This endpoint places an order from an existing `orderForm` object, meaning an existing cart.
  * 
- * After the creation of an order with this request, you have five minutes to send payment information and then request payment processing.
+ * 
+After the creation of an order with this request, you have five minutes to send payment information and then request payment processing.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/transaction": {
 body: {
@@ -16977,9 +17027,11 @@ isGift?: boolean
 /**
  * Customer's profile information. The `email` functions as a customer's ID.
  * 
- * For customers already in your database, sending only the email address is enough to register the order to the shopper’s existing account.
  * 
- * > If the shopper exists in you database but is not logged in, sending other profile information along with the email will cause the platform to fail placing the order. This happens because this action is interpreted as an attempt to edit profile data, which is not possible unless the customer is logged in to the store.
+For customers already in your database, sending only the email address is enough to register the order to the shopper’s existing account.
+ * 
+ * 
+> If the shopper exists in you database but is not logged in, sending other profile information along with the email will cause the platform to fail placing the order. This happens because this action is interpreted as an attempt to edit profile data, which is not possible unless the customer is logged in to the store.
  */
 clientProfileData: {
 /**
@@ -17038,7 +17090,8 @@ shippingData: {
 /**
  * Shipping address.
  * 
- * For customers already in your data base, it is enough to send this object only with an `addressId`, which you may obtain from a [Cart simulation request](https://developers.vtex.com/vtex-rest-api/reference/shopping-cart#cartsimulation), for example.
+ * 
+For customers already in your data base, it is enough to send this object only with an `addressId`, which you may obtain from a [Cart simulation request](https://developers.vtex.com/vtex-rest-api/reference/shopping-cart#cartsimulation), for example.
  */
 address?: {
 /**
@@ -18393,7 +18446,8 @@ salesAssociateId?: string
 /**
  * Order processing callback request, which is made after an order's payment is approved.
  * 
- * > This request has to be made within five minutes after the [Place order](https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders) or [Place order from existing cart](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/transaction) request has been made, or else, the order will not be processed.
+ * 
+> This request has to be made within five minutes after the [Place order](https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders) or [Place order from existing cart](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/transaction) request has been made, or else, the order will not be processed.
  */
 "POST /api/checkout/pub/gatewayCallback/:orderGroup": {
 
@@ -18401,12 +18455,16 @@ salesAssociateId?: string
 /**
  * Retrieves a list of sellers that cater to a specific region or address, according to your setup of our [regionalization feature](https://help.vtex.com/en/tutorial/setting-up-price-and-availability-of-skus-by-region--12ne58BmvYsYuGsimmugoc#). Learn more about [Region v2](https://developers.vtex.com/docs/guides/region-v2-release).
  * 
- * To access the list of sellers, you must choose one of the following methods:
  * 
- * 1. Send the identification of the list of sellers (`regionId`) as a path parameter through the URL. Or;
- * 2. Send the `country` (3-digit ISO code) and at least one of the two values (`postal Code` or `geo Coordinates`) as query parameters through the URL. For this method, it is also allowed to send both values (`postalCode` or `geoCoordinates`) in the same request.
+To access the list of sellers, you must choose one of the following methods:
  * 
- * > The `regionId` and `country` parameters are indicated as required in this documentation. However, only one of them should be sent in the request according to one of the methods mentioned above.
+ * 
+1. Send the identification of the list of sellers (`regionId`) as a path parameter through the URL. Or;
+ * 
+2. Send the `country` (3-digit ISO code) and at least one of the two values (`postal Code` or `geo Coordinates`) as query parameters through the URL. For this method, it is also allowed to send both values (`postalCode` or `geoCoordinates`) in the same request.
+ * 
+ * 
+> The `regionId` and `country` parameters are indicated as required in this documentation. However, only one of them should be sent in the request according to one of the methods mentioned above.
  */
 "GET /api/checkout/pub/regions/:regionId": {
 searchParams: {
@@ -20424,10 +20482,14 @@ maskFirstPurchaseData?: boolean
 /**
  * Configures reCAPTCHA validation for the account, defining in which situations the shopper will be prompted to validate a purchase with reCAPTCHA. Learn more about [reCAPTCHA validation for VTEX stores](https://help.vtex.com/tutorial/recaptcha-no-checkout--18Te3oDd7f4qcjKu9jhNzP)
  * 
- * Possible values are:
- * - `"never"`: no purchases are validated with reCAPTCHA.
- * - `"always"`: every purchase is validated with reCAPTCHA.
- * - `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX’s algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
+ * 
+Possible values are:
+ * 
+- `"never"`: no purchases are validated with reCAPTCHA.
+ * 
+- `"always"`: every purchase is validated with reCAPTCHA.
+ * 
+- `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX’s algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
  */
 recaptchaValidation?: string
 /**
