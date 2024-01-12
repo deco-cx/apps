@@ -5,6 +5,7 @@ import { ignoreIfExists } from "../common/objects.ts";
 import { k8s } from "../deps.ts";
 import { hashString } from "../hash/shortHash.ts";
 import { AppContext } from "../mod.ts";
+import { Namespace } from "./sites/create.ts";
 
 export interface Props {
   site: string;
@@ -64,7 +65,7 @@ const buildJobOf = (
     kind: "Job",
     metadata: {
       name,
-      namespace: site,
+      namespace: Namespace.forSite(site),
       labels: {
         site,
         repo,

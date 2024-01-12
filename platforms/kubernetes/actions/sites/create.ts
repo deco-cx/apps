@@ -12,6 +12,10 @@ export interface Props {
   site: string;
 }
 
+export const Namespace = {
+  forSite: (site: string) => `sites-${site}`,
+};
+
 const DECO_DENO_TOKEN = Deno.env.get("DECO_DENO_TOKEN");
 
 interface KvDb {
@@ -83,7 +87,7 @@ export default async function newSite(
   const [secretEnvVar] = await Promise.all([
     secretEnvVarPromise,
     corev1Api.createNamespacedPersistentVolumeClaim(site, {
-      metadata: { name: DECO_SITES_PVC, namespace: site },
+      metadata: { name: DECO_SITES_PVC, namespace: Namespace.forSite(site) },
       spec: {
         accessModes: ["ReadWriteMany"],
         storageClassName: EFS_SC,
