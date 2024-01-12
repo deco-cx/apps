@@ -82,7 +82,7 @@ export default async function newSite(
   });
 
   await corev1Api.createNamespace({
-    metadata: { name: site },
+    metadata: { name: Namespace.forSite(site) },
   }).catch(ignoreIfExists);
   const [secretEnvVar] = await Promise.all([
     secretEnvVarPromise,
