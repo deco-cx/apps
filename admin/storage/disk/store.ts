@@ -1,36 +1,46 @@
-import { dirname, join } from "std/path/mod.ts";
+import { join } from "std/path/mod.ts";
 import { InMemory } from "../memory/store.ts";
 import {
   AddChangeSetOpts,
-  BranchOpts,
+  Branch,
   ChangeSet,
   CommitOpts,
-  DiffSinceOpts,
-  FetchStateOpts,
+  ForkOpts,
   ListenOpts,
+  LogSinceOpts,
+  PullStateOpts,
   State,
-  Storage,
 } from "../mod.ts";
-
-export class Disk implements Storage {
+export interface BranchState {
+  changeSets: ChangeSet[];
+}
+export class Disk implements Branch {
   protected stash: Promise<InMemory>;
-  protected directory: string;
-  constructor(protected filePath: string, changeSet?: ChangeSet[]) {
+  protected filePath: string;
+  constructor(
+    public name: string,
+    protected directory: string,
+    changeSet?: ChangeSet[],
+  ) {
+    const memName = `mem:${name}`;
     if (changeSet) {
-      this.stash = Promise.resolve(new InMemory([...changeSet]));
+      this.stash = Promise.resolve(new InMemory(memName, [...changeSet]));
     } else {
-      this.stash = Deno.readTextFile(filePath).then((text) =>
-        new InMemory(JSON.parse(text))
-      );
+      this.stash = Deno.readTextFile(join(directory, name)).then(
+        this.parseState,
+      ).then(({ changeSets }) => new InMemory(memName, changeSets));
     }
-    this.directory = dirname(filePath);
+    this.filePath = join(this.directory, name);
+  }
+  private parseState(text: string): BranchState {
+    return JSON.parse(text);
   }
   revision(): Promise<string> {
     return this.stash.then((s) => s.revision());
   }
-  async fetch(opts?: FetchStateOpts | undefined): Promise<State> {
+  async pull(opts?: PullStateOpts | undefined): Promise<State> {
     const stash = await this.stash;
-    return stash.fetch(opts);
+    return stash.pull(opts);
   }
   add(opts: AddChangeSetOpts): void {
     this.stash = this.stash.then((stash) => {
@@ -38,19 +48,20 @@ export class Disk implements Storage {
       return stash;
     });
   }
-  async branch(opts: BranchOpts): Promise<Storage> {
+  async fork(opts: ForkOpts): Promise<Branch> {
     const stash = await this.stash;
     return new Disk(
-      join(this.directory, `${opts.name}.json`),
-      await stash.diff(),
+      opts.name,
+      this.directory,
+      await stash.log(),
     );
   }
 
   async commit(opts?: CommitOpts | undefined): Promise<State> {
     const stash = await this.stash;
     const state = await stash.commit(opts);
-    const cs = await stash.diff();
-    await Deno.writeTextFile(this.filePath, JSON.stringify(cs)); // FIXME(mcandeia) racing condition between listen and this.
+    const cs = await stash.log();
+    await Deno.writeTextFile(this.filePath, JSON.stringify({ changeSets: cs })); // FIXME(mcandeia) racing condition between listen and this.
     return state;
   }
   async *listen(
@@ -59,8 +70,8 @@ export class Disk implements Storage {
     const stash = await this.stash;
     return yield* stash.listen(opts);
   }
-  async diff(opts: DiffSinceOpts): Promise<ChangeSet[]> {
+  async log(opts: LogSinceOpts): Promise<ChangeSet[]> {
     const stash = await this.stash;
-    return stash.diff(opts);
+    return stash.log(opts);
   }
 }

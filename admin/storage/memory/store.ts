@@ -1,21 +1,21 @@
 import { fjp, ulid } from "../../deps.ts";
 import {
   AddChangeSetOpts,
-  BranchOpts,
+  Branch,
   ChangeSet,
   CommitOpts,
-  DiffOpts,
-  FetchStateOpts,
+  ForkOpts,
   ListenOpts,
+  LogOpts,
+  PullStateOpts,
   State,
-  Storage,
 } from "../mod.ts";
 
-export class InMemory implements Storage {
+export class InMemory implements Branch {
   protected _state: State;
   private stash: ChangeSet[] = [];
   private subscriptions: Array<() => void> = [];
-  constructor(protected history: ChangeSet[] = []) {
+  constructor(public name: string, protected history: ChangeSet[] = []) {
     this._state = history.flatMap((h) => h.patches).reduce(fjp.applyReducer, {
       decofile: {},
       revision: ulid(),
@@ -31,7 +31,7 @@ export class InMemory implements Storage {
     return Promise.resolve(this.history[this.history.length - 1].id) ?? ulid();
   }
 
-  fetch(_opts?: FetchStateOpts | undefined): Promise<State> {
+  pull(_opts?: PullStateOpts | undefined): Promise<State> {
     return Promise.resolve(this._state);
   }
 
@@ -39,8 +39,8 @@ export class InMemory implements Storage {
     this.stash.push(opts.changeSet);
   }
 
-  branch(_opts?: BranchOpts): Promise<Storage> {
-    return Promise.resolve(new InMemory([...this.history]));
+  fork(_opts: ForkOpts): Promise<Branch> {
+    return Promise.resolve(new InMemory(_opts.name, [...this.history]));
   }
 
   commit(_opts?: CommitOpts | undefined): Promise<State> {
@@ -78,7 +78,7 @@ export class InMemory implements Storage {
     } while (await this.subscribe());
   }
 
-  diff(opts?: DiffOpts): Promise<ChangeSet[]> {
+  log(opts?: LogOpts): Promise<ChangeSet[]> {
     const since = opts?.since;
     const history = since
       ? this.history.slice(

@@ -21,12 +21,12 @@ export interface State {
   revision: string;
 }
 // deno-lint-ignore no-empty-interface
-export interface FetchStateOpts {}
+export interface PullStateOpts {}
 export interface AddChangeSetOpts {
   changeSet: ChangeSet;
 }
 
-export interface BranchOpts {
+export interface ForkOpts {
   name: string;
 }
 
@@ -40,54 +40,77 @@ export interface Disposable {
   dispose(): void;
 }
 
-export interface SyncOpts {
-  storage: Storage;
-}
-
-export interface DiffSinceOpts {
+export interface LogSinceOpts {
   since?: string;
 }
 
-export type DiffOpts = DiffSinceOpts;
-export const isDiffSinceOpts = (opts: DiffOpts): opts is DiffSinceOpts => {
-  return (opts as DiffSinceOpts)?.since !== undefined;
+export type LogOpts = LogSinceOpts;
+export const isDiffSinceOpts = (opts: LogOpts): opts is LogSinceOpts => {
+  return (opts as LogSinceOpts)?.since !== undefined;
 };
-export interface Storage {
+export interface Branch {
+  name: string;
   revision(): Promise<string>;
-  fetch(opts?: FetchStateOpts): Promise<State>;
+  pull(opts?: PullStateOpts): Promise<State>;
   add(opts: AddChangeSetOpts): void;
-  branch(opts: BranchOpts): Promise<Storage>;
+  fork(opts: ForkOpts): Promise<Branch>;
   commit(opts?: CommitOpts): Promise<State>;
   listen(opts?: ListenOpts): AsyncIterableIterator<ChangeSet>;
-  diff(opts?: DiffOpts): Promise<ChangeSet[]>;
+  log(opts?: LogOpts): Promise<ChangeSet[]>;
 }
 
-export const sync = (from: Storage, to: Storage): Disposable => {
-  const abort = new Notify();
-  (async () => {
-    const csStream = from.listen();
-    while (true) {
-      const cs = await Promise.race([abort.notified(), csStream.next()]);
-      if (typeof cs !== "object") {
-        return;
-      }
-      if (cs.done) {
-        return;
-      }
-      to.add({ changeSet: cs.value });
-      await to.commit();
-    }
-  })();
+export interface SyncOpts {
+  from: Branch;
+  to: Branch;
+}
 
-  return {
-    dispose: () => {
-      abort.notifyAll();
-    },
-  };
-};
+export interface MergeOpts {
+  from: Branch;
+  to: Branch;
+}
 
-export const merge = async (from: Storage, to: Storage): Promise<State> => {
-  const diff = await from.diff({ since: await to.revision() });
-  diff.forEach((cs) => to.add({ changeSet: cs }));
-  return to.commit();
-};
+export interface CheckoutOpts {
+  branchName: string;
+}
+
+export interface Repository {
+  checkout(opts?: CheckoutOpts): Promise<Branch>;
+  sync(opts: SyncOpts): Disposable;
+  merge(opts: SyncOpts): Promise<State>;
+}
+
+export class BranchProvider {
+}
+export class Storage implements Repository {
+  checkout(opts?: CheckoutOpts): Promise<Branch> {
+    throw new Error("Method not implemented.");
+  }
+  sync({ from, to }: SyncOpts): Disposable {
+    const abort = new Notify();
+    (async () => {
+      const csStream = from.listen();
+      while (true) {
+        const cs = await Promise.race([abort.notified(), csStream.next()]);
+        if (typeof cs !== "object") {
+          return;
+        }
+        if (cs.done) {
+          return;
+        }
+        to.add({ changeSet: cs.value });
+        await to.commit();
+      }
+    })();
+
+    return {
+      dispose: () => {
+        abort.notifyAll();
+      },
+    };
+  }
+  async merge({ from, to }: SyncOpts): Promise<State> {
+    const diff = await from.log({ since: await to.revision() });
+    diff.forEach((cs) => to.add({ changeSet: cs }));
+    return to.commit();
+  }
+}
