@@ -220,6 +220,7 @@ export default async function newDeployment(
   if (!source) {
     badRequest({ message: "source is required" });
   }
+  const siteNs = Namespace.forSite(site);
 
   const { owner, repo, commitSha } = source!;
   if (build) {
@@ -256,7 +257,7 @@ export default async function newDeployment(
     envVars: siteState.envVars,
     sourceBinder,
     site,
-    namespace: Namespace.forSite(site),
+    namespace: siteNs,
     deploymentId,
     labels,
     scaling: scaling ?? { initialScale: 0, maxScale: 3, minScale: 0 },
@@ -296,12 +297,12 @@ export default async function newDeployment(
   await k8sApi.createNamespacedCustomObject(
     "serving.knative.dev",
     "v1",
-    site,
+    siteNs,
     "routes",
     routeOf({
       routeName: deploymentRoute,
       revisionName,
-      namespace: Namespace.forSite(site),
+      namespace: siteNs,
     }),
   ).catch(ignoreIfExists).catch((err) => {
     console.error("creating site route error", err);

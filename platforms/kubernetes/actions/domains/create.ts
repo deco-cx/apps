@@ -18,12 +18,13 @@ export default async function newDomain(
   _req: Request,
   ctx: AppContext,
 ) {
+  const siteNs = Namespace.forSite(site);
   const certificateManifest = {
     apiVersion: "cert-manager.io/v1",
     kind: "Certificate",
     metadata: {
       name: domain,
-      namespace: Namespace.forSite(site),
+      namespace: siteNs,
     },
     spec: {
       commonName: "selfsigned-ca",
@@ -48,7 +49,7 @@ export default async function newDomain(
     kind: "DomainMapping",
     metadata: {
       name: domain,
-      namespace: Namespace.forSite(site),
+      namespace: siteNs,
     },
     spec: {
       ref: {
@@ -68,14 +69,14 @@ export default async function newDomain(
     k8sApi.createNamespacedCustomObject(
       "cert-manager.io",
       "v1",
-      site,
+      siteNs,
       "certificates",
       certificateManifest,
     ),
     k8sApi.createNamespacedCustomObject(
       "serving.knative.dev",
       "v1beta1",
-      site,
+      siteNs,
       "domainmappings",
       domainMappingManifest,
     ),
