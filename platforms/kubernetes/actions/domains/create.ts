@@ -2,6 +2,7 @@ import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 import { Routes } from "../deployments/rollout.ts";
+import { Namespace } from "../sites/create.ts";
 
 export interface Props {
   site: string;
@@ -22,7 +23,7 @@ export default async function newDomain(
     kind: "Certificate",
     metadata: {
       name: domain,
-      namespace: site,
+      namespace: Namespace.forSite(site),
     },
     spec: {
       commonName: "selfsigned-ca",
@@ -47,7 +48,7 @@ export default async function newDomain(
     kind: "DomainMapping",
     metadata: {
       name: domain,
-      namespace: site,
+      namespace: Namespace.forSite(site),
     },
     spec: {
       ref: {
