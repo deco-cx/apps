@@ -1,5 +1,6 @@
 import type {
   AggregateOffer,
+  Brand,
   BreadcrumbList,
   Filter,
   FilterToggleValue,
@@ -15,6 +16,7 @@ import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
+  Brand as BrandVTEX,
   Category,
   Facet as FacetVTEX,
   FacetValueBoolean,
@@ -775,6 +777,16 @@ function nodeToNavbar(node: Category): SiteNavigationElement {
 export const categoryTreeToNavbar = (
   tree: Category[],
 ): SiteNavigationElement[] => tree.map(nodeToNavbar);
+
+export const toBrand = (
+  { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+): Brand => ({
+  "@type": "Brand",
+  "@id": `${id}`,
+  name,
+  logo: imageUrl ?? undefined,
+  description: metaTagDescription,
+});
 
 export const normalizeFacet = (facet: LegacyFacet) => {
   return {
