@@ -1,5 +1,6 @@
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
+import { Namespace } from "./create.ts";
 
 export interface Props {
   site: string;
@@ -16,5 +17,5 @@ export default async function deleteSite(
 ) {
   const corev1Api = ctx.kc.makeApiClient(k8s.CoreV1Api);
 
-  await corev1Api.deleteNamespace(site);
+  await corev1Api.deleteNamespace(Namespace.forSite(site));
 }

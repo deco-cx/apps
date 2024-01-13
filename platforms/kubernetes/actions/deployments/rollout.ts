@@ -1,6 +1,7 @@
 import { routeOf } from "../../common/knative/route.ts";
 import { upsertObject } from "../../common/objects.ts";
 import { AppContext } from "../../mod.ts";
+import { Namespace } from "../sites/create.ts";
 
 export interface Props {
   site: string;
@@ -26,7 +27,7 @@ export default async function rollout(
     routeOf({
       routeName: Routes.prod(site),
       revisionName,
-      namespace: site,
+      namespace: Namespace.forSite(site),
     }),
     "serving.knative.dev",
     "v1",

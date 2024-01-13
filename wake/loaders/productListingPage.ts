@@ -89,25 +89,18 @@ export interface Props {
 const OUTSIDE_ATTRIBUTES_FILTERS = ["precoPor"];
 
 const filtersFromParams = (searchParams: URLSearchParams) => {
-  const mapped = searchParams.getAll(FILTER_PARAM).reduce((acc, value) => {
-    const test = /.*:.*/;
+  const filters: Array<{ field: string; values: string[] }> = [];
 
-    // todo validar
+  searchParams.getAll(FILTER_PARAM).forEach((value) => {
+    const test = /.*:.*/;
     const [field, val] = test.test(value)
       ? value.split(":")
       : value.split("__");
 
-    if (OUTSIDE_ATTRIBUTES_FILTERS.includes(field)) return acc;
-
-    if (!acc.has(field)) acc.set(field, []);
-    acc.get(field)?.push(val);
-    return acc;
-  }, new Map<string, string[]>());
-
-  const filters: Array<{ field: string; values: string[] }> = [];
-  for (const [field, values] of mapped.entries()) {
-    filters.push({ field, values });
-  }
+    if (!OUTSIDE_ATTRIBUTES_FILTERS.includes(field)) {
+      filters.push({ field, values: [val] });
+    }
+  });
 
   return filters;
 };
