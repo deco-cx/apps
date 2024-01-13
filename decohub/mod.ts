@@ -1,5 +1,5 @@
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import { context, type App, type FnContext } from "deco/mod.ts";
+import { type App, context, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
