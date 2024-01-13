@@ -26,7 +26,7 @@ async function loader(
   const variantId = url.searchParams.get("skuId") || null;
   const { id } = parseSlug(slug);
 
-  const maybeProduct = await  api["GET /api/v2/products/:id"]({
+  const maybeProduct = await api["GET /api/v2/products/:id"]({
     id,
     include_images: "true",
   }, STALE)
@@ -48,11 +48,14 @@ async function loader(
 
   let seoArray;
   if (product.isVariantOf?.productGroupID) {
-    seoArray = await api["GET /api/v2/seo_data"]({ resource_type: "Product", resource_id: Number(product.isVariantOf.productGroupID)}, STALE).then((res) => res.json())
-    .catch(() => undefined)
+    seoArray = await api["GET /api/v2/seo_data"]({
+      resource_type: "Product",
+      resource_id: Number(product.isVariantOf.productGroupID),
+    }, STALE).then((res) => res.json())
+      .catch(() => undefined);
   }
-    
-  const seo = seoArray?.at(-1)
+
+  const seo = seoArray?.at(-1);
 
   return {
     "@type": "ProductDetailsPage",
