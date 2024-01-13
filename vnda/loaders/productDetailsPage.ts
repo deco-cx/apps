@@ -26,7 +26,7 @@ async function loader(
   const variantId = url.searchParams.get("skuId") || null;
   const { id } = parseSlug(slug);
 
-  const maybeProduct = await api["GET /api/v2/products/:id"]({
+  const maybeProduct = await  api["GET /api/v2/products/:id"]({
     id,
     include_images: "true",
   }, STALE)
@@ -46,6 +46,14 @@ async function loader(
 
   const segments = url.pathname.slice(1).split("/");
 
+  let seoArray;
+  if (product.isVariantOf?.productGroupID) {
+    seoArray = await api["GET /api/v2/seo_data"]({ resource_type: "Product", resource_id: Number(product.isVariantOf.productGroupID)}, STALE).then((res) => res.json())
+    .catch(() => undefined)
+  }
+    
+  const seo = seoArray?.at(-1)
+
   return {
     "@type": "ProductDetailsPage",
     // TODO: Find out what's the right breadcrumb on vnda
@@ -61,8 +69,8 @@ async function loader(
     },
     product,
     seo: {
-      title: product.name ?? "",
-      description: product.description ?? "",
+      title: seo?.title || (product.name ?? ""),
+      description: seo?.description || (product.description ?? ""),
       canonical: new URL(`/${segments.join("/")}`, url).href,
     },
   };
