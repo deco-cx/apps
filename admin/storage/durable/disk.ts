@@ -1,16 +1,16 @@
 import { join } from "std/path/mod.ts";
-import { InMemory } from "../memory/store.ts";
 import {
   AddChangeSetOpts,
   Branch,
   ChangeSet,
   CommitOpts,
+  DiffOpts,
   ForkOpts,
   ListenOpts,
-  LogSinceOpts,
   PullStateOpts,
   State,
 } from "../mod.ts";
+import { InMemory } from "../volatile/memory.ts";
 export interface BranchState {
   changeSets: ChangeSet[];
 }
@@ -53,25 +53,25 @@ export class Disk implements Branch {
     return new Disk(
       opts.name,
       this.directory,
-      await stash.log(),
+      await stash.diff(),
     );
   }
 
   async commit(opts?: CommitOpts | undefined): Promise<State> {
     const stash = await this.stash;
     const state = await stash.commit(opts);
-    const cs = await stash.log();
+    const cs = await stash.diff();
     await Deno.writeTextFile(this.filePath, JSON.stringify({ changeSets: cs })); // FIXME(mcandeia) racing condition between listen and this.
     return state;
   }
   async *listen(
     opts?: ListenOpts | undefined,
-  ): AsyncIterableIterator<ChangeSet> {
+  ): AsyncIterableIterator<ChangeSet[]> {
     const stash = await this.stash;
     return yield* stash.listen(opts);
   }
-  async log(opts: LogSinceOpts): Promise<ChangeSet[]> {
+  async diff(opts: DiffOpts): Promise<ChangeSet[]> {
     const stash = await this.stash;
-    return stash.log(opts);
+    return stash.diff(opts);
   }
 }

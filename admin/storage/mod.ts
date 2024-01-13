@@ -40,13 +40,13 @@ export interface Disposable {
   dispose(): void;
 }
 
-export interface LogSinceOpts {
+export interface DiffSinceOpts {
   since?: string;
 }
 
-export type LogOpts = LogSinceOpts;
-export const isDiffSinceOpts = (opts: LogOpts): opts is LogSinceOpts => {
-  return (opts as LogSinceOpts)?.since !== undefined;
+export type DiffOpts = DiffSinceOpts;
+export const isDiffSinceOpts = (opts: DiffOpts): opts is DiffSinceOpts => {
+  return (opts as DiffSinceOpts)?.since !== undefined;
 };
 export interface Branch {
   name: string;
@@ -55,8 +55,8 @@ export interface Branch {
   add(opts: AddChangeSetOpts): void;
   fork(opts: ForkOpts): Promise<Branch>;
   commit(opts?: CommitOpts): Promise<State>;
-  listen(opts?: ListenOpts): AsyncIterableIterator<ChangeSet>;
-  log(opts?: LogOpts): Promise<ChangeSet[]>;
+  listen(opts?: ListenOpts): AsyncIterableIterator<ChangeSet[]>;
+  diff(opts?: DiffOpts): Promise<ChangeSet[]>;
 }
 
 export interface SyncOpts {
@@ -71,6 +71,12 @@ export interface MergeOpts {
 
 export interface CheckoutOpts {
   branchName: string;
+}
+
+export interface Release {
+  revision: string;
+  alias?: string;
+  state: () => Promise<State>;
 }
 
 export interface Repository {
@@ -98,7 +104,7 @@ export class Storage implements Repository {
         if (cs.done) {
           return;
         }
-        to.add({ changeSet: cs.value });
+        cs.value.forEach((cs) => to.add({ changeSet: cs }));
         await Promise.race([to.commit(), abort.notified()]);
       }
     })();
@@ -110,7 +116,7 @@ export class Storage implements Repository {
     };
   }
   async merge({ from, to }: SyncOpts): Promise<State> {
-    const diff = await from.log({ since: await to.revision() });
+    const diff = await from.diff({ since: await to.revision() });
     diff.forEach((cs) => to.add({ changeSet: cs }));
     return to.commit();
   }

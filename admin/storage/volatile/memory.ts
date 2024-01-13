@@ -4,9 +4,9 @@ import {
   Branch,
   ChangeSet,
   CommitOpts,
+  DiffOpts,
   ForkOpts,
   ListenOpts,
-  LogOpts,
   PullStateOpts,
   State,
 } from "../mod.ts";
@@ -65,20 +65,22 @@ export class InMemory implements Branch {
 
   async *listen(
     opts?: ListenOpts | undefined,
-  ): AsyncIterableIterator<ChangeSet> {
+  ): AsyncIterableIterator<ChangeSet[]> {
     const since = opts?.since;
     const sinceHistory = !since
       ? this.history.length - 1
       : this.history.findIndex(({ id }) => since.localeCompare(id));
     let index = sinceHistory === -1 ? 0 : sinceHistory;
+    let subscription;
     do {
-      for (; index < this.history.length; index++) {
-        yield this.history[index];
-      }
-    } while (await this.subscribe());
+      const historyLen = this.history.length; // we should capture the length of the history before we yield since yield pauses the execution and length can change
+      subscription = this.subscribe();
+      yield this.history.slice(index);
+      index = historyLen;
+    } while (await subscription);
   }
 
-  log(opts?: LogOpts): Promise<ChangeSet[]> {
+  diff(opts?: DiffOpts): Promise<ChangeSet[]> {
     const since = opts?.since;
     const history = since
       ? this.history.slice(
