@@ -19,15 +19,16 @@ import * as $$$$$$$$$2 from "./actions/blocks/safeDelete.ts";
 import * as $$$$$$$$$3 from "./actions/blocks/newRevision.ts";
 import * as $$$$$$$$$4 from "./actions/blocks/delete.ts";
 import * as $$$$$$$$$5 from "./actions/releases/fork.ts";
-import * as $$$$$$$$$6 from "./actions/code/suggestions.ts";
-import * as $$$$$$$$$7 from "./actions/sites/linkRepo.ts";
-import * as $$$$$$$$$8 from "./actions/sites/newDomain.ts";
-import * as $$$$$$$$$9 from "./actions/sites/unlinkRepo.ts";
-import * as $$$$$$$$$10 from "./actions/github/setStatus.ts";
-import * as $$$$$$$$$11 from "./actions/github/webhooks/broker.ts";
-import * as $$$$$$$$$12 from "./actions/pages/publish.ts";
-import * as $$$$$$$$$13 from "./actions/pages/new.ts";
-import * as $$$$$$$$$14 from "./actions/pages/delete.ts";
+import * as $$$$$$$$$6 from "./actions/code/vision.ts";
+import * as $$$$$$$$$7 from "./actions/code/suggestions.ts";
+import * as $$$$$$$$$8 from "./actions/sites/linkRepo.ts";
+import * as $$$$$$$$$9 from "./actions/sites/newDomain.ts";
+import * as $$$$$$$$$10 from "./actions/sites/unlinkRepo.ts";
+import * as $$$$$$$$$11 from "./actions/github/setStatus.ts";
+import * as $$$$$$$$$12 from "./actions/github/webhooks/broker.ts";
+import * as $$$$$$$$$13 from "./actions/pages/publish.ts";
+import * as $$$$$$$$$14 from "./actions/pages/new.ts";
+import * as $$$$$$$$$15 from "./actions/pages/delete.ts";
 
 const manifest = {
   "loaders": {
@@ -49,16 +50,17 @@ const manifest = {
     "deco-sites/admin/actions/blocks/publish.ts": $$$$$$$$$0,
     "deco-sites/admin/actions/blocks/restore.ts": $$$$$$$$$1,
     "deco-sites/admin/actions/blocks/safeDelete.ts": $$$$$$$$$2,
-    "deco-sites/admin/actions/code/suggestions.ts": $$$$$$$$$6,
-    "deco-sites/admin/actions/github/setStatus.ts": $$$$$$$$$10,
-    "deco-sites/admin/actions/github/webhooks/broker.ts": $$$$$$$$$11,
-    "deco-sites/admin/actions/pages/delete.ts": $$$$$$$$$14,
-    "deco-sites/admin/actions/pages/new.ts": $$$$$$$$$13,
-    "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$12,
+    "deco-sites/admin/actions/code/suggestions.ts": $$$$$$$$$7,
+    "deco-sites/admin/actions/code/vision.ts": $$$$$$$$$6,
+    "deco-sites/admin/actions/github/setStatus.ts": $$$$$$$$$11,
+    "deco-sites/admin/actions/github/webhooks/broker.ts": $$$$$$$$$12,
+    "deco-sites/admin/actions/pages/delete.ts": $$$$$$$$$15,
+    "deco-sites/admin/actions/pages/new.ts": $$$$$$$$$14,
+    "deco-sites/admin/actions/pages/publish.ts": $$$$$$$$$13,
     "deco-sites/admin/actions/releases/fork.ts": $$$$$$$$$5,
-    "deco-sites/admin/actions/sites/linkRepo.ts": $$$$$$$$$7,
-    "deco-sites/admin/actions/sites/newDomain.ts": $$$$$$$$$8,
-    "deco-sites/admin/actions/sites/unlinkRepo.ts": $$$$$$$$$9,
+    "deco-sites/admin/actions/sites/linkRepo.ts": $$$$$$$$$8,
+    "deco-sites/admin/actions/sites/newDomain.ts": $$$$$$$$$9,
+    "deco-sites/admin/actions/sites/unlinkRepo.ts": $$$$$$$$$10,
   },
   "name": "deco-sites/admin",
   "baseUrl": import.meta.url,
