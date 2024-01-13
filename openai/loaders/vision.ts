@@ -23,29 +23,24 @@ export default async function (
   _req: Request,
   ctx: AppContext,
 ): Promise<Return> {
-  try {
-    const response = await ctx.openAI.chat.completions.create({
-      n: choices,
-      stream: false,
-      max_tokens: maxTokens,
-      model: "gpt-4-vision-preview",
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            ...images.map((image) => ({
-              type: "image_url" as const,
-              image_url: { "url": image },
-            })),
-          ],
-        },
-      ],
-    });
+  const response = await ctx.openAI.chat.completions.create({
+    n: choices,
+    stream: false,
+    max_tokens: maxTokens,
+    model: "gpt-4-vision-preview",
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: prompt },
+          ...images.map((image) => ({
+            type: "image_url" as const,
+            image_url: { "url": image },
+          })),
+        ],
+      },
+    ],
+  });
 
-    return response;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  return response;
 }
