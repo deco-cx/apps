@@ -141,45 +141,53 @@ const searchLoader = async (
       .filter((name): name is string => typeof name === "string")
     : undefined;
 
-  const defaultOperator = props.filterOperator?.type_tags ?? "and";
+    const defaultOperator = props.filterOperator?.type_tags ?? "and";
 
-  // TODO: Ensure continued functionality for pages like s?q=, and verify that search functionality works with paths like /example.
-  const preference = categoryTagsToFilter
+    const preference = categoryTagsToFilter
     ? term
     : qQueryString ?? url.pathname.slice(1);
 
-  const response = await api["GET /api/v2/products/search"]({
-    term: term ?? preference,
-    sort,
-    page,
-    per_page: count,
-    "tags[]": initialTags ?? categoryTagsToFilter,
-    wildcard: true,
-    "property1_values[]": properties1,
-    "property2_values[]": properties2,
-    "property3_values[]": properties3,
-    ...handleOperator("type_tags", defaultOperator, props.filterOperator),
-    ...handleOperator("property1", defaultOperator, props.filterOperator),
-    ...handleOperator("property2", defaultOperator, props.filterOperator),
-    ...handleOperator("property3", defaultOperator, props.filterOperator),
-    ...Object.fromEntries(
-      typeTags.reduce<Array<[string, Array<unknown>]>>(
-        (acc, { key, value, isProperty }) => {
-          if (isProperty) return acc;
+    const tag = categories.at(-1);
 
-          const pos = acc.findIndex((item) => item[0] === key);
-
-          if (pos !== -1) {
-            acc[pos] = [key, [...acc[pos][1], value]];
-            return acc;
-          }
-
-          return [...acc, [key, [value]]];
-        },
-        [],
-      ),
-    ),
-  }, STALE);
+    const [response, seo = []] = await Promise.all([
+      await api["GET /api/v2/products/search"]({
+        term: term ?? preference,
+        sort,
+        page,
+        per_page: count,
+        "tags[]": initialTags ?? categoryTagsToFilter,
+        wildcard: true,
+        "property1_values[]": properties1,
+        "property2_values[]": properties2,
+        "property3_values[]": properties3,
+        ...handleOperator("type_tags", defaultOperator, props.filterOperator),
+        ...handleOperator("property1", defaultOperator, props.filterOperator),
+        ...handleOperator("property2", defaultOperator, props.filterOperator),
+        ...handleOperator("property3", defaultOperator, props.filterOperator),
+        ...Object.fromEntries(
+          typeTags.reduce<Array<[string, Array<unknown>]>>(
+            (acc, { key, value, isProperty }) => {
+              if (isProperty) return acc;
+    
+              const pos = acc.findIndex((item) => item[0] === key);
+    
+              if (pos !== -1) {
+                acc[pos] = [key, [...acc[pos][1], value]];
+                return acc;
+              }
+    
+              return [...acc, [key, [value]]];
+            },
+            [],
+          ),
+        ),
+      }, STALE),
+      api["GET /api/v2/seo_data"](
+        { resource_type: "Tag", code: tag?.name },
+        STALE,
+      ).then((res) => res.json())
+        .catch(() => undefined),
+    ]);
 
   const pagination = JSON.parse(
     response.headers.get("x-pagination") ?? "null",
@@ -213,7 +221,7 @@ const searchLoader = async (
 
   return {
     "@type": "ProductListingPage",
-    seo: isSearchPage ? undefined : getSEOFromTag(categories, url),
+    seo: isSearchPage ? undefined : getSEOFromTag(categories, url, seo.at(-1)),
     breadcrumb: isSearchPage
       ? {
         "@type": "BreadcrumbList",
