@@ -13,16 +13,16 @@ function base64ToBlob(base64: string | ArrayBuffer): Blob {
     throw new Error("Expected a base64 string");
   }
 
-  const parts = base64.match(/^data:(audio\/[a-z]+);base64,(.*)$/);
+  const parts = base64.match(/^data:(audio\/[a-z]+|video\/[a-z]+|audio\/mp[34]|video\/mp4);base64,(.*)$/);
   if (!parts || parts.length !== 3) {
     throw new Error("Base64 string is not properly formatted");
   }
 
-  const mimeType = parts[1]; // e.g., 'audio/png'
-  const audioData = parts[2];
+  const mimeType = parts[1]; // e.g., 'audio/png' or 'video/mp4' or 'audio/mp3'
+  const mediaData = parts[2];
 
   // Convert the base64 encoded data to a binary string
-  const binaryStr = atob(audioData);
+  const binaryStr = atob(mediaData);
 
   // Convert the binary string to an array of bytes (Uint8Array)
   const length = binaryStr.length;
