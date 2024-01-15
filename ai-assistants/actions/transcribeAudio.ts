@@ -13,7 +13,9 @@ function base64ToBlob(base64: string | ArrayBuffer): Blob {
     throw new Error("Expected a base64 string");
   }
 
-  const parts = base64.match(/^data:(audio\/[a-z]+|video\/[a-z]+|audio\/mp[34]|video\/mp4);base64,(.*)$/);
+  const parts = base64.match(
+    /^data:(audio\/[a-z]+|video\/[a-z]+|audio\/mp[34]|video\/mp4);base64,(.*)$/,
+  );
   if (!parts || parts.length !== 3) {
     throw new Error("Base64 string is not properly formatted");
   }
