@@ -35,8 +35,8 @@ export class Disk implements Branch {
   private parseState(text: string): BranchState {
     return JSON.parse(text);
   }
-  revision(): Promise<string> {
-    return this.stash.then((s) => s.revision());
+  head(): Promise<string> {
+    return this.stash.then((s) => s.head());
   }
   async pull(opts?: PullStateOpts | undefined): Promise<State> {
     const stash = await this.stash;

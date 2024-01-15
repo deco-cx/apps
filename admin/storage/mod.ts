@@ -50,7 +50,7 @@ export const isDiffSinceOpts = (opts: DiffOpts): opts is DiffSinceOpts => {
 };
 export interface Branch {
   name: string;
-  revision(): Promise<string>;
+  head(): Promise<string>;
   pull(opts?: PullStateOpts): Promise<State>;
   add(opts: AddChangeSetOpts): void;
   fork(opts: ForkOpts): Promise<Branch>;
@@ -79,18 +79,28 @@ export interface Release {
   state: () => Promise<State>;
 }
 
+export interface PushOpts {
+  branch: Branch;
+}
+
 export interface Repository {
   checkout(opts?: CheckoutOpts): Promise<Branch>;
   sync(opts: SyncOpts): Disposable;
-  merge(opts: SyncOpts): Promise<State>;
+  merge(opts: MergeOpts): Promise<State>;
+  push(opts: PushOpts): Promise<State>;
 }
 
-export class BranchProvider {
+export interface StateProvider {
+  push(opts: ChangeSet[]): Promise<State>;
 }
-export class Storage implements Repository {
+
+export class Local implements Repository {
   constructor(protected defaultBranch: Branch) {}
   checkout(_opts?: CheckoutOpts): Promise<Branch> {
     return Promise.resolve(this.defaultBranch);
+  }
+  push(opts: PushOpts): Promise<State> {
+    return opts.branch.commit();
   }
   sync({ from, to }: SyncOpts): Disposable {
     const abort = new Notify();
@@ -116,7 +126,7 @@ export class Storage implements Repository {
     };
   }
   async merge({ from, to }: SyncOpts): Promise<State> {
-    const diff = await from.diff({ since: await to.revision() });
+    const diff = await from.diff({ since: await to.head() });
     diff.forEach((cs) => to.add({ changeSet: cs }));
     return to.commit();
   }

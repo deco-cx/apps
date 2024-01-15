@@ -27,7 +27,7 @@ export class InMemory implements Branch {
       return retn;
     };
   }
-  revision(): Promise<string> {
+  head(): Promise<string> {
     return Promise.resolve(this.history[this.history.length - 1].id) ?? ulid();
   }
 
