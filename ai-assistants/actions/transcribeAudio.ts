@@ -17,7 +17,7 @@ function base64ToBlob(base64: string | ArrayBuffer): Blob {
     /^data:(audio\/[a-z]+|video\/[a-z]+|audio\/mp[34]|video\/mp4);base64,(.*)$/,
   );
   if (!parts || parts.length !== 3) {
-    throw new Error("Base64 string is not properly formatted");
+    throw new Error(`Base64 string is not properly formatted: ${parts}`);
   }
 
   const mimeType = parts[1]; // e.g., 'audio/png' or 'video/mp4' or 'audio/mp3'
