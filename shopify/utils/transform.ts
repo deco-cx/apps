@@ -145,7 +145,7 @@ export const toProduct = (
       "@type": "ProductGroup",
       productGroupID,
       hasVariant: hasVariant || [],
-      url: `${url.host}${getPath(product)}`,
+      url: `${url.origin}${getPath(product)}`,
       name: product.title,
       additionalProperty: [
         ...product.tags?.map((value) =>
