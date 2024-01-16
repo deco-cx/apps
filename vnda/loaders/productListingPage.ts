@@ -127,8 +127,9 @@ const searchLoader = async (
     : undefined;
 
   // TODO: Ensure continued functionality for pages like s?q=, and verify that search functionality works with paths like /example.
-  const preference = (categoryTagsToFilter ? term : qQueryString) ??
-    url.pathname.slice(1);
+  const preference = categoryTagsToFilter
+    ? term
+    : qQueryString ?? url.pathname.slice(1);
 
   const response = await api["GET /api/v2/products/search"]({
     term: term ?? preference,
