@@ -63,8 +63,15 @@ export interface CreativeWork {
 }
 
 export interface ImageObject
-  extends MediaObject, CreativeWork, Omit<Thing, "@type"> {
+  extends MediaObject, CreativeWork, Omit<Thing, "@type" | "url"> {
+  /**
+   * @ignore
+   */
   "@type": "ImageObject";
+  /**
+   * @format image-uri
+   */
+  url?: string;
 }
 
 export interface PropertyValue extends Omit<Thing, "@type"> {
@@ -530,7 +537,9 @@ export interface Suggestion {
 
 /** @titleBy url */
 export interface SiteNavigationElementLeaf {
-  /** @hidden */
+  /** 
+   * @ignore
+   */
   "@type": "SiteNavigationElement";
   /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. In RDFa syntax, it is better to use the native RDFa syntax - the 'typeof' attribute - for multiple types. Schema.org tools may have only weaker understanding of extra types, in particular those defined externally. */
   additionalType?: string;
