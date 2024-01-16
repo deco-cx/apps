@@ -11,7 +11,8 @@ const PATHS_TO_PROXY = [
   ["/Login/Authenticate"],
   ["/Carrinho/*"],
   ["/api/*"],
-  ["/MinhaConta"]
+  ["/MinhaConta"],
+  ["/MinhaConta/*"],
 ];
 
 const decoSiteMapUrl = "/sitemap/deco.xml";
