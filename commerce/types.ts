@@ -537,7 +537,7 @@ export interface Suggestion {
 
 /** @titleBy url */
 export interface SiteNavigationElementLeaf {
-  /** 
+  /**
    * @ignore
    */
   "@type": "SiteNavigationElement";
