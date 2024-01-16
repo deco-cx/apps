@@ -11,6 +11,7 @@ const PATHS_TO_PROXY = [
   ["/Login/Authenticate"],
   ["/Carrinho/*"],
   ["/api/*"],
+  ["/MinhaConta"]
 ];
 
 const decoSiteMapUrl = "/sitemap/deco.xml";
@@ -31,7 +32,7 @@ export interface Props {
  * @title Wake Proxy Routes
  */
 function loader(
-  props: unknown,
+  props: Props,
   _req: Request,
   { checkoutUrl }: AppContext,
 ): Route[] {
