@@ -23,24 +23,20 @@ export default function AnalyticsEvent({ events }: Props) {
     {},
   );
 
+  // deno-fmt-ignore
   const renderEventListeners = () => {
     return Object.entries(groupedEvents).map(([trigger, events]) => `
-        window.addEventListener('${trigger}', function() {
-          ${
-      events.map((event) => `
-            document.querySelector('${event.type.cssSelector}').addEventListener('${event.type.trigger}', function() {
-              console.log("Click detected on ${event.type.name}!");
-              gtag('event', '${event.type.name}', {
-                ${
-        event.type.extraParams?.map((param) => `${param.key}: ${param.value},`)
-          .join("\n")
-      }
-              });
+    window.addEventListener('${trigger}', function() {
+        ${events.map(event => `
+        document.querySelector('${event.type.cssSelector}').addEventListener('${event.type.trigger}', function() {
+            console.log("Click detected on ${event.type.name}!");
+            gtag('event', '${event.type.name}', {
+            ${event.type.extraParams?.map(param => `${param.key}: ${param.value},`).join('\n')}
             });
-          `).join("\n")
-    }
         });
-      `).join("\n");
+        `).join('\n')}
+    });
+    `).join('\n');
   };
 
   return (
