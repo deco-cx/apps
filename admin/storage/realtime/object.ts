@@ -63,6 +63,7 @@ export const realtime = <T extends object | unknown[]>(
     },
     options.sendDebounce ?? 200,
   );
+  // needs to receive ack and rejects from server.
 
   const { object: observedObject, stopObserving, startObserving } = observe(
     object,
