@@ -15,13 +15,15 @@ const doSimulate = (items: {
   seller: string | undefined;
 }[], ctx: AppContext) => {
   const {
-    priceTables,
-    utm_campaign,
-    utm_source,
-    utmi_campaign,
-    campaigns,
-    channel,
-    regionId,
+    payload: {
+      priceTables,
+      utm_campaign,
+      utm_source,
+      utmi_campaign,
+      campaigns,
+      channel,
+      regionId,
+    },
   } = getSegmentFromBag(ctx);
 
   const md = new Map<string, unknown>();
@@ -50,12 +52,8 @@ const doSimulate = (items: {
     .then((res) => res.json());
 };
 
-export const extension = async (
-  products: Product[],
-  _req: Request,
-  ctx: AppContext,
-) => {
-  if (isAnonymous(getSegmentFromBag(ctx))) {
+export const extension = async (products: Product[], ctx: AppContext) => {
+  if (isAnonymous(ctx)) {
     return products;
   }
 

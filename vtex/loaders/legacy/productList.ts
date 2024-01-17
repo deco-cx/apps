@@ -5,7 +5,7 @@ import { toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { LegacySort } from "../../utils/types.ts";
+import type { LegacyItem, LegacySort } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -70,11 +70,11 @@ export interface CommonProps {
 
 export type Props = {
   props:
-  | CollectionProps
-  | TermProps
-  | ProductIDProps
-  | SkuIDProps
-  | FQProps;
+    | CollectionProps
+    | TermProps
+    | ProductIDProps
+    | SkuIDProps
+    | FQProps;
 };
 
 // deno-lint-ignore no-explicit-any
@@ -93,6 +93,14 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 
 // deno-lint-ignore no-explicit-any
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
+
+const preferredSKU = (items: LegacyItem[], { props }: Props) => {
+  let fetchedSkus: string[] = [];
+  if (isSKUIDProps(props)) {
+    fetchedSkus = props.ids ?? [];
+  }
+  return items.find((item) => fetchedSkus.includes(item.itemId)) || items[0];
+};
 
 const fromProps = ({ props }: Props) => {
   const params = { fq: [] } as {
@@ -167,23 +175,25 @@ const loader = async (
   const params = fromProps({ props });
 
   const vtexProducts = await vcsDeprecated
-  ["GET /api/catalog_system/pub/products/search/:term?"]({
-    ...segmentParams,
-    ...params,
-  }, { ...STALE, headers: withSegmentCookie(segment) })
+    ["GET /api/catalog_system/pub/products/search/:term?"]({
+      ...segmentParams,
+      ...params,
+    }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
 
   if (vtexProducts && !Array.isArray(vtexProducts)) {
-    throw new Error(`Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`)
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`,
+    );
   }
 
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
   const products = vtexProducts.map((p) =>
-    toProduct(p, p.items[0], 0, {
+    toProduct(p, preferredSKU(p.items, { props }), 0, {
       baseUrl: baseUrl,
-      priceCurrency: segment.currencyCode ?? "BRL",
+      priceCurrency: segment?.payload?.currencyCode ?? "BRL",
     })
   );
 
@@ -193,5 +203,7 @@ const loader = async (
     ),
   );
 };
+
+export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
 
 export default loader;

@@ -30,7 +30,7 @@ const action = async (
     ["PUT /api/checkout/pub/orderForm/:orderFormId/items/:index/price"]({
       orderFormId,
       index: itemIndex,
-      sc: segment?.channel,
+      sc: segment?.payload.channel,
     }, {
       body: { price },
       headers: {
