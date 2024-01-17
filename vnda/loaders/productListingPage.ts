@@ -147,9 +147,14 @@ const searchLoader = async (
     : undefined;
 
   const defaultOperator = props.filterOperator?.type_tags ?? "and";
+  
+  // TODO: Ensure continued functionality for pages like s?q=, and verify that search functionality works with paths like /example.
+  const preference = categoryTagsToFilter
+    ? term
+    : qQueryString ?? url.pathname.slice(1);
 
   const response = await api["GET /api/v2/products/search"]({
-    term,
+    term: term ?? preference,
     sort,
     page,
     per_page: count,
