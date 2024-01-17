@@ -46,7 +46,7 @@ export interface Props {
 
   filterByTags?: boolean;
 
-  filterOperator: "and" | "or";
+  filterOperator?: "and" | "or";
 }
 
 const getBreadcrumbList = (categories: Tag[], url: URL): BreadcrumbList => ({
