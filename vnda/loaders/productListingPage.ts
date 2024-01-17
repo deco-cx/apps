@@ -45,6 +45,8 @@ export interface Props {
   slug?: RequestURLParam;
 
   filterByTags?: boolean;
+
+  filterOperator: "and" | "or";
 }
 
 const getBreadcrumbList = (categories: Tag[], url: URL): BreadcrumbList => ({
@@ -130,6 +132,7 @@ const searchLoader = async (
     term,
     sort,
     page,
+    type_tags_operator: props.filterOperator,
     per_page: count,
     "tags[]": initialTags ?? categoryTagsToFilter,
     wildcard: true,
@@ -137,9 +140,21 @@ const searchLoader = async (
     "property2_values[]": properties2,
     "property3_values[]": properties3,
     ...Object.fromEntries(
-      typeTags.filter(({ isProperty }) => !isProperty).map((
-        { key, value },
-      ) => [key, value]),
+      typeTags.reduce<Array<[string, Array<unknown>]>>(
+        (acc, { key, value, isProperty }) => {
+          if (isProperty) return acc;
+
+          const pos = acc.findIndex((item) => item[0] === key);
+
+          if (pos !== -1) {
+            acc[pos] = [key, [...acc[pos][1], value]];
+            return acc;
+          }
+
+          return [...acc, [key, [value]]];
+        },
+        [],
+      ),
     ),
   }, STALE);
 
