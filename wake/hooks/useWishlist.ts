@@ -14,13 +14,12 @@ type EnqueuableActions<
 const enqueue = <
   K extends keyof Manifest["actions"],
 >(key: EnqueuableActions<K>) =>
-(props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
-  storeState.enqueue((signal) =>
-    invoke({ wishlist: { key, props } } as any, { signal }) as any
-  );
+  (props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
+    storeState.enqueue((signal) =>
+      invoke({ wishlist: { key, props } } as any, { signal }) as any
+    );
 
-// TODO TYPE
-const getItem = (item: Partial<any>) =>
+const getItem = (item: { productId }) =>
   wishlist.value?.find((id) => id.productId == item.productId);
 
 const state = {
