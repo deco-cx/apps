@@ -1,5 +1,6 @@
 import {
   Filter,
+  ImageObject,
   Offer,
   Product,
   PropertyValue,
@@ -185,6 +186,22 @@ const toPropertyValueTags = (tags: ProductSearch["tags"]): PropertyValue[] =>
     } as PropertyValue)
   );
 
+const toPropertyValueCategoryTags = (
+  categoryTags: OProduct["category_tags"],
+) => {
+  if (!categoryTags) return [];
+
+  return categoryTags.map((tag) => {
+    return {
+      "@type": "PropertyValue",
+      name: tag.tag_type,
+      value: tag.name,
+      description: tag.title,
+      valueReference: "TAGS",
+    } as PropertyValue;
+  });
+};
+
 // deno-lint-ignore no-explicit-any
 const isProductVariant = (p: any): p is VariantProductSearch =>
   typeof p.id === "number";
@@ -195,6 +212,17 @@ const normalizeVariants = (
   variants.flatMap((v) =>
     isProductVariant(v) ? [v] : Object.values(v) as VNDAProduct[]
   );
+
+const toImageObjectVideo = (
+  video: OpenAPI["GET /api/v2/products/:productId/videos"]["response"],
+): ImageObject[] =>
+  video?.map(({ url, embed_url, thumbnail_url }) => ({
+    "@type": "ImageObject",
+    encodingFormat: "video",
+    contentUrl: url,
+    thumbnailUrl: thumbnail_url,
+    embedUrl: embed_url,
+  } as ImageObject));
 
 export const toProduct = (
   product: VNDAProductGroup,
@@ -219,6 +247,9 @@ export const toProduct = (
   const offers = offer ? [offer] : [];
 
   const myTags = "tags" in product ? product.tags : [];
+  const myCategoryTags = "category_tags" in product
+    ? product.category_tags
+    : [];
 
   return {
     "@type": "Product",
@@ -230,6 +261,7 @@ export const toProduct = (
     additionalProperty: [
       ...toPropertyValue(variant),
       ...toPropertyValueTags(myTags),
+      ...toPropertyValueCategoryTags(myCategoryTags),
     ],
     inProductGroupWithID: productGroupID,
     gtin: product.reference,
@@ -247,12 +279,14 @@ export const toProduct = (
     image: product.images?.length ?? 0 > 1
       ? product.images?.map((img) => ({
         "@type": "ImageObject" as const,
+        encodingFormat: "image",
         alternateName: `${img.url}`,
         url: toURL(img.url!),
       }))
       : [
         {
           "@type": "ImageObject",
+          encodingFormat: "image",
           alternateName: product.name ?? "",
           url: toURL(product.image_url ?? ""),
         },
@@ -405,3 +439,14 @@ export const typeTagExtractor = (url: URL, tags: { type?: string }[]) => {
     cleanUrl,
   };
 };
+
+export const addVideoToProduct = (
+  product: Product,
+  video: OpenAPI["GET /api/v2/products/:productId/videos"]["response"] | null,
+): Product => ({
+  ...product,
+  image: [
+    ...(product?.image ?? []),
+    ...(video ? toImageObjectVideo(video) : []),
+  ],
+});

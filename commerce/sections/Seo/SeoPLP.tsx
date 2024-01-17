@@ -9,11 +9,13 @@ export type Props = {
 function Section({ jsonLD, ...props }: Props) {
   const title = jsonLD?.seo?.title;
   const description = jsonLD?.seo?.description;
-  const canonical = jsonLD?.seo?.canonical
+  const canonical = props.canonical
+    ? props.canonical
+    : jsonLD?.seo?.canonical
     ? jsonLD.seo.canonical
     : jsonLD?.breadcrumb
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
-    : null;
+    : undefined;
 
   const noIndexing = !jsonLD || !jsonLD.products.length;
 
@@ -22,7 +24,7 @@ function Section({ jsonLD, ...props }: Props) {
       {...props}
       title={title || props.title}
       description={description || props.description}
-      canonical={canonical || props.canonical}
+      canonical={canonical}
       jsonLDs={[jsonLD]}
       noIndexing={noIndexing}
     />

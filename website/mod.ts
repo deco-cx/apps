@@ -6,10 +6,33 @@ import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { Page } from "deco/blocks/page.tsx";
 
 export type AppContext = FnContext<Props, Manifest>;
 
 export type SectionProps<T> = T & { id: string };
+
+export interface CacheDirectiveBase {
+  name: string;
+  value: number;
+}
+
+export interface StaleWhileRevalidate extends CacheDirectiveBase {
+  name: "stale-while-revalidate";
+  value: number;
+}
+
+export interface MaxAge extends CacheDirectiveBase {
+  name: "max-age";
+  value: number;
+}
+
+export type CacheDirective = StaleWhileRevalidate | MaxAge;
+
+export interface Caching {
+  enabled?: boolean;
+  directives?: CacheDirective[];
+}
 
 export interface Props {
   /**
@@ -25,6 +48,18 @@ export interface Props {
    * @description These sections will be included on all website/pages/Page.ts
    */
   global?: Section[];
+
+  /**
+   * @title Error Page
+   * @description This page will be used when something goes wrong beyond section error-boundaries when rendering a page
+   */
+  errorPage?: Page;
+
+  /**
+   * @title Caching configuration of pages
+   * @description the caching configuration
+   */
+  caching?: Caching;
 }
 
 /**
@@ -96,12 +131,17 @@ const deferPropsResolve = (
   return routes;
 };
 
-export const onBeforeResolveProps = <T extends { routes?: Routes[] }>(
+export const onBeforeResolveProps = <
+  T extends { routes?: Routes[]; errorPage?: Page },
+>(
   props: T,
 ): T => {
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
+      errorPage: props.errorPage
+        ? asResolved(props.errorPage, true)
+        : undefined,
       routes: props.routes.map(deferPropsResolve),
     };
     return newRoutes;

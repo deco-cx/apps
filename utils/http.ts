@@ -46,7 +46,7 @@ type URLPatternParams<URL extends string> = URL extends
   // deno-lint-ignore ban-types
   : {};
 
-type ClientOf<T> = {
+export type ClientOf<T> = {
   [key in (keyof T) & `${HttpVerb} /${string}`]: key extends
     `${HttpVerb} /${infer path}` ? T[key] extends {
       response?: infer ResBody;
@@ -128,6 +128,7 @@ export const createHttpClient = <T>({
           .join("/");
 
         const url = new URL(compiled, base);
+
         mapped.forEach((value, key) => {
           if (value === undefined) return;
 
@@ -149,7 +150,7 @@ export const createHttpClient = <T>({
 
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
 
-        return fetcher(url, {
+        return fetcher(url.href, {
           ...init,
           headers,
           method,

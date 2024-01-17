@@ -1,9 +1,10 @@
 import type { App, FnContext } from "deco/mod.ts";
 
-import { createHttpClient } from "../utils/http.ts";
-import { PowerReviews } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import { createHttpClient } from "../utils/http.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { PowerReviews } from "./utils/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -11,7 +12,7 @@ export interface Props {
   /**
    * @title App Key
    */
-  appKey: string;
+  appKey: Secret;
   /**
    * @title Locale
    */
@@ -31,12 +32,20 @@ interface State extends Props {
   apiWrite: ReturnType<typeof createHttpClient<PowerReviews>>;
 }
 
-export default function App(state: Props): App<Manifest, State> {
+export default function App(
+  { appKey, locale, merchantId, merchantGroup }: Props,
+) {
+  if (!appKey) throw new Error("Missing appKey");
+
+  const stringAppKey = typeof appKey === "string"
+    ? appKey
+    : appKey?.get?.() ?? "";
+
   const api = createHttpClient<PowerReviews>({
     base: `https://readservices-b2c.powerreviews.com`,
     fetcher: fetchSafe,
     headers: new Headers({
-      Authorization: state.appKey,
+      Authorization: stringAppKey,
     }),
   });
 
@@ -44,12 +53,21 @@ export default function App(state: Props): App<Manifest, State> {
     base: `https://writeservices.powerreviews.com`,
     fetcher: fetchSafe,
     headers: new Headers({
-      Authorization: state.appKey,
+      Authorization: stringAppKey,
     }),
   });
 
-  return {
-    state: { ...state, api, apiWrite },
+  const state = {
+    appKey: stringAppKey,
+    locale,
+    merchantId,
+    merchantGroup,
+    api,
+    apiWrite,
+  };
+
+  const app: App<Manifest, typeof state> = {
+    state,
     manifest: {
       ...manifest,
       sections: {
@@ -58,9 +76,7 @@ export default function App(state: Props): App<Manifest, State> {
           ...manifest.sections["power-reviews/sections/WriteReviewForm.tsx"],
           default: () =>
             manifest.sections["power-reviews/sections/WriteReviewForm.tsx"]
-              .default({
-                ...state,
-              }),
+              .default(state),
         },
         "power-reviews/sections/Question.tsx": {
           ...manifest.sections["power-reviews/sections/Question.tsx"],
@@ -73,4 +89,6 @@ export default function App(state: Props): App<Manifest, State> {
       },
     },
   };
+
+  return app;
 }

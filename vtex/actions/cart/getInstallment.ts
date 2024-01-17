@@ -1,7 +1,7 @@
 import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
-import type { OrderForm } from "../../utils/types.ts";
+import type { InstallmentOption } from "../../utils/types.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 
 export interface Props {
@@ -15,7 +15,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<OrderForm> => {
+): Promise<InstallmentOption> => {
   const { vcsDeprecated } = ctx;
   const { paymentSystem } = props;
   const { orderFormId } = parseCookie(req.headers);
@@ -24,7 +24,7 @@ const action = async (
 
   const response = await vcsDeprecated
     ["GET /api/checkout/pub/orderForm/:orderFormId/installments"](
-      { orderFormId, paymentSystem, sc: segment?.channel },
+      { orderFormId, paymentSystem, sc: segment?.payload.channel },
       { headers: { accept: "application/json", cookie } },
     );
 

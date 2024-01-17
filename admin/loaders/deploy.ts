@@ -1,6 +1,7 @@
 import { context } from "deco/live.ts";
 import { walk } from "std/fs/mod.ts";
 import { SEP } from "std/path/separator.ts";
+import { encode } from "std/encoding/base64.ts";
 
 export interface Bundle {
   release: Record<string, unknown>;
@@ -16,13 +17,23 @@ export default async function code(_props: unknown): Promise<Bundle | null> {
   for await (
     const entry of walk(Deno.cwd(), {
       includeDirs: false,
-      skip: [/.github/, /.git$/, /.release.json/, /node_modules/, /_fresh/],
+      skip: [
+        /.github/,
+        /.git$/,
+        /.release.json/,
+        /.decofile.json/,
+        /node_modules/,
+        /_fresh/,
+      ],
     })
   ) {
     codeEntries.push(
-      Deno.readTextFile(entry.path).then((
+      Deno.readFile(entry.path).then((
         content,
-      ) => [entry.path.replace(`${Deno.cwd()}${SEP}`, ""), content]),
+      ) => [
+        entry.path.replace(`${Deno.cwd()}${SEP}`, ""),
+        encode(content),
+      ]),
     );
   }
 

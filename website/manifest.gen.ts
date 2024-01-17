@@ -3,17 +3,18 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $0 from "./functions/requestToParam.ts";
-import * as $$$0 from "./loaders/image.ts";
-import * as $$$1 from "./loaders/redirectsFromCsv.ts";
-import * as $$$2 from "./loaders/secretString.ts";
-import * as $$$3 from "./loaders/extension.ts";
-import * as $$$4 from "./loaders/secret.ts";
-import * as $$$5 from "./loaders/redirects.ts";
-import * as $$$6 from "./loaders/pages.ts";
-import * as $$$7 from "./loaders/redirect.ts";
-import * as $$$8 from "./loaders/asset.ts";
-import * as $$$9 from "./loaders/fonts/local.ts";
-import * as $$$10 from "./loaders/fonts/googleFonts.ts";
+import * as $$$0 from "./loaders/options/urlParams.ts";
+import * as $$$1 from "./loaders/image.ts";
+import * as $$$2 from "./loaders/redirectsFromCsv.ts";
+import * as $$$3 from "./loaders/secretString.ts";
+import * as $$$4 from "./loaders/extension.ts";
+import * as $$$5 from "./loaders/secret.ts";
+import * as $$$6 from "./loaders/redirects.ts";
+import * as $$$7 from "./loaders/pages.ts";
+import * as $$$8 from "./loaders/redirect.ts";
+import * as $$$9 from "./loaders/asset.ts";
+import * as $$$10 from "./loaders/fonts/local.ts";
+import * as $$$11 from "./loaders/fonts/googleFonts.ts";
 import * as $$$$0 from "./handlers/router.ts";
 import * as $$$$1 from "./handlers/sitemap.ts";
 import * as $$$$2 from "./handlers/proxy.ts";
@@ -51,17 +52,18 @@ const manifest = {
     "website/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "website/loaders/asset.ts": $$$8,
-    "website/loaders/extension.ts": $$$3,
-    "website/loaders/fonts/googleFonts.ts": $$$10,
-    "website/loaders/fonts/local.ts": $$$9,
-    "website/loaders/image.ts": $$$0,
-    "website/loaders/pages.ts": $$$6,
-    "website/loaders/redirect.ts": $$$7,
-    "website/loaders/redirects.ts": $$$5,
-    "website/loaders/redirectsFromCsv.ts": $$$1,
-    "website/loaders/secret.ts": $$$4,
-    "website/loaders/secretString.ts": $$$2,
+    "website/loaders/asset.ts": $$$9,
+    "website/loaders/extension.ts": $$$4,
+    "website/loaders/fonts/googleFonts.ts": $$$11,
+    "website/loaders/fonts/local.ts": $$$10,
+    "website/loaders/image.ts": $$$1,
+    "website/loaders/options/urlParams.ts": $$$0,
+    "website/loaders/pages.ts": $$$7,
+    "website/loaders/redirect.ts": $$$8,
+    "website/loaders/redirects.ts": $$$6,
+    "website/loaders/redirectsFromCsv.ts": $$$2,
+    "website/loaders/secret.ts": $$$5,
+    "website/loaders/secretString.ts": $$$3,
   },
   "handlers": {
     "website/handlers/fresh.ts": $$$$3,

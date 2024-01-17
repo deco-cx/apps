@@ -3,6 +3,10 @@ import type { Flag, Site } from "deco/types.ts";
 import { context } from "deco/live.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 import { Page } from "../../commerce/types.ts";
+import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
+import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
+
+const IS_LOCALHOST = context.deploymentId === undefined;
 
 interface Live {
   page?: Page;
@@ -21,6 +25,17 @@ type EditorEvent = {
   type: "editor::inject";
   args: { script: string };
 };
+
+const domInspectorModule = IS_LOCALHOST
+  ? `
+const DomInspectorActivators = {
+  Backquote: {
+    label: "\` (backtick) or Ctrl + X",
+    matchEvent: (event) => event.code === "Backquote" || (event.ctrlKey && event.key === "x"),
+  },
+};
+${DomInspector.toString()}`
+  : "";
 
 const snippet = (live: Live) => {
   const onKeydown = (event: KeyboardEvent) => {
@@ -75,6 +90,17 @@ const snippet = (live: Live) => {
     }
   };
 
+  //@ts-ignore: "DomInspector not available"
+  const inspector = typeof DomInspector !== "undefined" &&
+    //@ts-ignore: "DomInspector not available"
+    new DomInspector(document.body, {
+      outline: "1px dashed #2fd080",
+      backgroundColor: "rgba(47, 208, 128, 0.33)",
+      backgroundBlendMode: "multiply",
+      activator: DomInspectorActivators.Backquote,
+      path: "/live/inspect",
+    });
+
   /** Setup global variables */
   window.LIVE = { ...window.LIVE, ...live };
 
@@ -98,6 +124,11 @@ function LiveControls({ site, page, flags = [] }: Props) {
           flags,
           play: !!context.play,
         })}
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: domInspectorModule,
+        }}
       />
     </Head>
   );

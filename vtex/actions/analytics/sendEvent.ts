@@ -1,6 +1,6 @@
 // Intelligent Search analytics integration
 import { AppContext } from "../../mod.ts";
-import { getOrSetISCookie } from "../../utils/intelligentSearch.ts";
+import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
 
 export type Props =
   | {
@@ -27,17 +27,20 @@ export type Props =
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: unknown,
   ctx: AppContext,
 ): Promise<null> => {
   const { sp } = ctx;
-  const { anonymous, session } = getOrSetISCookie(req, ctx.response.headers);
+  const cookies = getISCookiesFromBag(ctx);
+
+  if (!cookies) {
+    throw new Error("Missing IS Cookies");
+  }
 
   await sp["POST /event-api/v1/:account/event"]({ account: ctx.account }, {
     body: {
       ...props,
-      anonymous,
-      session,
+      ...cookies,
       agent: "deco-sites/apps",
     },
     headers: {

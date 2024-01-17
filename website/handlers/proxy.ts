@@ -1,8 +1,9 @@
-import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { isFreshCtx } from "deco/runtime/fresh/context.ts";
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
+import { Monitoring } from "deco/engine/core/resolver.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -26,119 +27,22 @@ const removeCFHeaders = (headers: Headers) => {
   });
 };
 
-const proxyTo = (
-  {
-    url: rawProxyUrl,
-    basePath,
-    host: hostToUse,
-    customHeaders = [],
-    includeScriptsToHead,
-  }: Props,
-): Handler =>
-async (req, _ctx) => {
-  const url = new URL(req.url);
-  const proxyUrl = noTrailingSlashes(rawProxyUrl);
-  const qs = url.searchParams.toString();
-  const path = basePath && basePath.length > 0
-    ? url.pathname.replace(basePath, "")
-    : url.pathname;
+async function logClonedResponseBody(
+  response: Response,
+  monitoring: Monitoring | undefined,
+): Promise<void> {
+  if (!response.body) {
+    return;
+  }
 
-  const to = new URL(
-    `${proxyUrl}${sanitize(path)}?${qs}`,
+  const clonedResponse = response.clone();
+  const text = await clonedResponse.text();
+
+  monitoring?.rootSpan?.setAttribute?.(
+    "proxy.error",
+    `${response.statusText}, body = ${text}`,
   );
-
-  const headers = new Headers(req.headers);
-  HOP_BY_HOP.forEach((h) => headers.delete(h));
-
-  if (isFreshCtx<DecoSiteState>(_ctx)) {
-    _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
-  }
-  removeCFHeaders(headers); // cf-headers are not ASCII-compliant
-  if (isFreshCtx<DecoSiteState>(_ctx)) {
-    _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
-  }
-
-  headers.set("origin", req.headers.get("origin") ?? url.origin);
-  headers.set("host", hostToUse ?? to.host);
-  headers.set("x-forwarded-host", url.host);
-
-  for (const { key, value } of customHeaders) {
-    headers.set(key, value);
-  }
-
-  const response = await fetch(to, {
-    headers,
-    redirect: "manual",
-    method: req.method,
-    body: req.body,
-  });
-
-  const contentType = response.headers.get("Content-Type");
-
-  const decoder = new TextDecoder();
-  const encoder = new TextEncoder();
-
-  let newBodyStream = null;
-
-  if (
-    contentType?.includes("text/html") &&
-    includeScriptsToHead?.includes &&
-    includeScriptsToHead.includes.length > 0
-  ) {
-    let accHtml: string | undefined = "";
-    const insertPlausible = new TransformStream({
-      async transform(chunk, controller) {
-        let newChunk = await chunk;
-        if (accHtml !== undefined && includeScriptsToHead.includes) {
-          for (let i = 0; i < chunk.length; i++) {
-            accHtml = accHtml.slice(-5) + decoder.decode(chunk.slice(i, i + 1));
-
-            if (accHtml === "<head>") {
-              accHtml = "";
-
-              accHtml += decoder.decode(chunk.slice(0, i + 1));
-              for (const script of includeScriptsToHead.includes) {
-                if ((typeof script.src === "string")) {
-                  accHtml += script.src;
-                } else {
-                  accHtml += script.src(req);
-                }
-              }
-              accHtml += decoder.decode(chunk.slice(i + 1, chunk.length));
-
-              newChunk = encoder.encode(accHtml);
-              accHtml = undefined;
-              break;
-            }
-          }
-        }
-        controller.enqueue(newChunk);
-      },
-    });
-    await response.body!.pipeThrough(insertPlausible);
-    newBodyStream = insertPlausible.readable;
-  }
-
-  // Change cookies domain
-  const responseHeaders = new Headers(response.headers);
-  responseHeaders.delete("set-cookie");
-
-  proxySetCookie(response.headers, responseHeaders, url);
-
-  if (response.status >= 300 && response.status < 400) { // redirect change location header
-    const location = responseHeaders.get("location");
-    if (location) {
-      responseHeaders.set(
-        "location",
-        location.replace(proxyUrl, url.origin),
-      );
-    }
-  }
-  return new Response(newBodyStream === null ? response.body : newBodyStream, {
-    status: response.status,
-    headers: responseHeaders,
-  });
-};
+}
 
 /**
  * @title {{{key}}} - {{{value}}}
@@ -180,14 +84,148 @@ export interface Props {
   includeScriptsToHead?: {
     includes?: Script[];
   };
+
+  /**
+   * @description follow redirects
+   * @default 'manual'
+   */
+  redirect?: "manual" | "follow";
 }
 
 /**
  * @title Proxy
  * @description Proxies request to the target url.
  */
-export default function Proxy(
-  { url, basePath, host, customHeaders, includeScriptsToHead }: Props,
-) {
-  return proxyTo({ url, basePath, host, customHeaders, includeScriptsToHead });
+export default function Proxy({
+  url: rawProxyUrl,
+  basePath,
+  host: hostToUse,
+  customHeaders = [],
+  includeScriptsToHead,
+  redirect = "manual",
+}: Props): Handler {
+  return async (req, _ctx) => {
+    const url = new URL(req.url);
+    const proxyUrl = noTrailingSlashes(rawProxyUrl);
+    const qs = url.searchParams.toString();
+    const path = basePath && basePath.length > 0
+      ? url.pathname.replace(basePath, "")
+      : url.pathname;
+
+    const to = new URL(
+      `${proxyUrl}${sanitize(path)}?${qs}`,
+    );
+
+    const headers = new Headers(req.headers);
+    HOP_BY_HOP.forEach((h) => headers.delete(h));
+
+    if (isFreshCtx<DecoSiteState>(_ctx)) {
+      _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
+    }
+    removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    if (isFreshCtx<DecoSiteState>(_ctx)) {
+      _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
+    }
+
+    headers.set("origin", req.headers.get("origin") ?? url.origin);
+    headers.set("host", hostToUse ?? to.host);
+    headers.set("x-forwarded-host", url.host);
+
+    for (const { key, value } of customHeaders) {
+      headers.set(key, value);
+    }
+
+    const monitoring = isFreshCtx<DecoSiteState>(_ctx)
+      ? _ctx?.state?.monitoring
+      : undefined;
+
+    const fecthFunction = async () => {
+      try {
+        return await fetch(to, {
+          headers,
+          redirect,
+          method: req.method,
+          body: req.body,
+        });
+      } catch (err) {
+        monitoring?.rootSpan?.setAttribute?.("proxy.exception", err.message);
+
+        throw err;
+      }
+    };
+
+    const response = await fecthFunction();
+
+    if (response.status >= 299 || response.status < 200) {
+      await logClonedResponseBody(response, monitoring);
+    }
+
+    const contentType = response.headers.get("Content-Type");
+
+    let newBodyStream = null;
+
+    if (
+      contentType?.includes("text/html") &&
+      includeScriptsToHead?.includes &&
+      includeScriptsToHead.includes.length > 0
+    ) {
+      // Use a more efficient approach to insert scripts
+      const insertScriptsStream = new TransformStream({
+        async transform(chunk, controller) {
+          const chunkStr = new TextDecoder().decode(await chunk);
+
+          // Find the position of <head> tag
+          const headEndPos = chunkStr.indexOf("</head>");
+          if (headEndPos !== -1) {
+            // Split the chunk at </head> position
+            const beforeHeadEnd = chunkStr.substring(0, headEndPos);
+            const afterHeadEnd = chunkStr.substring(headEndPos);
+
+            // Prepare scripts to insert
+            let scriptsInsert = "";
+            for (const script of (includeScriptsToHead?.includes ?? [])) {
+              scriptsInsert += typeof script.src === "string"
+                ? script.src
+                : script.src(req);
+            }
+
+            // Combine and encode the new chunk
+            const newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
+            controller.enqueue(new TextEncoder().encode(newChunkStr));
+          } else {
+            // If </head> not found, pass the chunk unchanged
+            controller.enqueue(chunk);
+          }
+        },
+      });
+
+      // Modify the response body by piping through the transform stream
+      if (response.body) {
+        newBodyStream = response.body.pipeThrough(insertScriptsStream);
+      }
+    }
+
+    // Change cookies domain
+    const responseHeaders = new Headers(response.headers);
+    responseHeaders.delete("set-cookie");
+
+    proxySetCookie(response.headers, responseHeaders, url);
+
+    if (response.status >= 300 && response.status < 400) { // redirect change location header
+      const location = responseHeaders.get("location");
+      if (location) {
+        responseHeaders.set(
+          "location",
+          location.replace(proxyUrl, url.origin),
+        );
+      }
+    }
+    return new Response(
+      newBodyStream === null ? response.body : newBodyStream,
+      {
+        status: response.status,
+        headers: responseHeaders,
+      },
+    );
+  };
 }

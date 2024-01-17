@@ -2,6 +2,10 @@ import {
   fetchAPI as _fetchAPI,
   fetchSafe as _fetchSafe,
 } from "../../utils/fetch.ts";
+import {
+  removeNonLatin1Chars,
+  removeScriptChars,
+} from "../../utils/normalize.ts";
 
 type CachingMode = "stale-while-revalidate";
 
@@ -31,14 +35,9 @@ const getSanitizedInput = (
     if (url.searchParams.has(qsToSanatize)) {
       const searchParams = url.searchParams;
       const testParamValues = searchParams.getAll(qsToSanatize);
-      const updatedTestParamValues = testParamValues.map((paramValue) => {
-        const removedPlus = paramValue.replace(/\+/g, "").replaceAll(" ", "");
-        const normalized = removedPlus.normalize("NFD").replace(
-          /[\u0300-\u036f]/g,
-          "",
-        );
-        return normalized;
-      });
+      const updatedTestParamValues = testParamValues.map((str) =>
+        removeScriptChars(removeNonLatin1Chars(str))
+      );
       searchParams.delete(qsToSanatize);
       updatedTestParamValues.forEach((updatedValue) =>
         updatedValue && searchParams.append(qsToSanatize, updatedValue)

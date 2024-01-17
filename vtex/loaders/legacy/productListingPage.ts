@@ -8,7 +8,11 @@ import {
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
@@ -16,6 +20,7 @@ import type {
   LegacyProduct,
   LegacySort,
 } from "../../utils/types.ts";
+import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 
 const MAX_ALLOWED_PAGES = 500;
 
@@ -153,7 +158,12 @@ const loader = async (
   const count = Number(countFromSearchParams ?? props.count ?? 12);
 
   const maybeMap = props.map || url.searchParams.get("map") || undefined;
-  const maybeTerm = props.term || url.pathname || "";
+  let maybeTerm = props.term || url.pathname || "";
+
+  if (maybeTerm === "/" || maybeTerm === "/*") {
+    const result = await PLPDefaultPath({ level: 1 }, req, ctx);
+    maybeTerm = result?.possiblePaths[0] ?? maybeTerm;
+  }
 
   const page = url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
@@ -220,6 +230,12 @@ const loader = async (
   const resources = vtexProductsResponse.headers.get("resources") ?? "";
   const [, _total] = resources.split("/");
 
+  if (vtexProducts && !Array.isArray(vtexProducts)) {
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(vtexProducts)}`,
+    );
+  }
+
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
@@ -228,7 +244,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO: fix currency
+          priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
@@ -290,6 +306,8 @@ const loader = async (
     previousPage.set("page", (page + currentPageoffset - 1).toString());
   }
 
+  const currentPage = page + currentPageoffset;
+
   return {
     "@type": "ProductListingPage",
     breadcrumb: {
@@ -302,13 +320,33 @@ const loader = async (
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage.toString()}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage.toString()}` : undefined,
-      currentPage: page + currentPageoffset,
+      currentPage,
       records: parseInt(_total, 10),
       recordPerPage: count,
     },
     sortOptions,
-    seo: pageTypesToSeo(pageTypes, req),
+    seo: pageTypesToSeo(
+      pageTypes,
+      baseUrl,
+      previousPage ? currentPage : undefined,
+    ),
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+
+  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+    return null;
+  }
+
+  url.searchParams.sort();
+  url.searchParams.set("segment", token);
+
+  return url.href;
 };
 
 export default loader;
