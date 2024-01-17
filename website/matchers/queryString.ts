@@ -90,6 +90,19 @@ const matchesAtLeastOne = (
   return params.filter((param) => compare(param, value)).length > 0;
 };
 
+const operations: Record<
+    Condition["case"]["type"], 
+    (param: string[], condition: Condition) => boolean
+> = Object.freeze({
+    Equals: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a == b),
+    Greater: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a > b),
+    GreaterOrEquals: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a >= b),
+    Includes: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a.includes(b)),
+    Lesser: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a < b),
+    LesserOrEquals: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a <= b),
+    Exists: (_params, _condition) => true,
+});
+
 /**
  * @title Query String
  */
@@ -106,36 +119,8 @@ const MatchQueryString = (
       matches = false;
       return;
     }
-
-    switch (condition.case.type) {
-      case "Equals":
-        matches = matches &&
-          matchesAtLeastOne(params, condition, (a, b) => a == b);
-        break;
-      case "Greater":
-        matches = matches &&
-          matchesAtLeastOne(params, condition, (a, b) => a > b);
-        break;
-      case "Lesser":
-        matches = matches &&
-          matchesAtLeastOne(params, condition, (a, b) => a < b);
-        break;
-      case "GreaterOrEquals":
-        matches = matches &&
-          matchesAtLeastOne(params, condition, (a, b) => a >= b);
-        break;
-      case "LesserOrEquals":
-        matches = matches &&
-          matchesAtLeastOne(params, condition, (a, b) => a <= b);
-        break;
-      case "Includes":
-        matches = matches &&
-          matchesAtLeastOne(params, condition, (a, b) => a.includes(b));
-        break;
-      case "Exists":
-        matches = matches && true;
-        break;
-    }
+    
+    matches = matches && operations[condition.case.type](params, condition);
   });
 
   return matches;
