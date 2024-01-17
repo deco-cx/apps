@@ -13,7 +13,11 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -30,6 +34,7 @@ import type {
   SelectedFacet,
   Sort,
 } from "../../utils/types.ts";
+import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -75,6 +80,16 @@ const mapLabelledFuzzyToFuzzy = (
       return;
   }
 };
+
+const ALLOWED_PARAMS = new Set([
+  "ps",
+  "sort",
+  "page",
+  "o",
+  "q",
+  "fuzzy",
+  "map",
+]);
 
 export interface Props {
   /**
@@ -126,21 +141,6 @@ export interface Props {
    */
   page?: number;
 }
-
-// TODO (mcandeia) investigating bugs related to returning the same set of products but different queries.
-const _singleFlightKey = (props: Props, { request }: { request: Request }) => {
-  const url = new URL(request.url);
-  const { query, count, sort, page, selectedFacets, fuzzy } = searchArgsOf(
-    props,
-    url,
-  );
-  return `${query}${count}${sort}${page}${fuzzy}${
-    selectedFacets
-      .map((f) => `${f.key}${f.value}`)
-      .sort()
-      .join("")
-  }`;
-};
 
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
@@ -274,7 +274,15 @@ const loader = async (
     page,
     ...args
   } = searchArgsOf(props, url);
-  const pageTypesPromise = pageTypesFromPathname(url.pathname, ctx);
+
+  let pathToUse = url.pathname;
+
+  if (pathToUse === "/" || pathToUse === "/*") {
+    const result = await PLPDefaultPath({ level: 1 }, req, ctx);
+    pathToUse = result?.possiblePaths[0] ?? pathToUse;
+  }
+
+  const pageTypesPromise = pageTypesFromPathname(pathToUse, ctx);
   const pageTypes = await pageTypesPromise;
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
@@ -327,7 +335,7 @@ const loader = async (
             misspelled: productsResult.correction?.misspelled ?? false,
             match: productsResult.recordsFiltered,
             operator: productsResult.operator,
-            locale: "pt-BR", // config?.defaultLocale, // TODO
+            locale: segment?.payload?.cultureInfo ?? "pt-BR",
           },
           req,
           ctx,
@@ -351,7 +359,7 @@ const loader = async (
       .map((p) =>
         toProduct(p, p.items[0], 0, {
           baseUrl: baseUrl,
-          priceCurrency: "BRL", // config!.defaultPriceCurrency, // TODO
+          priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })
       )
       .map((product) =>
@@ -402,10 +410,37 @@ const loader = async (
     sortOptions,
     seo: pageTypesToSeo(
       pageTypes,
-      req,
+      baseUrl,
       hasPreviousPage ? currentPage : undefined,
     ),
   };
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+  if (url.searchParams.has("q") || !isAnonymous(ctx)) {
+    return null;
+  }
+
+  const params = new URLSearchParams();
+
+  url.searchParams.forEach((value, key) => {
+    if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !key.startsWith("filter.")) {
+      return;
+    }
+
+    params.append(key, value);
+  });
+
+  params.sort();
+  params.set("segment", token);
+
+  url.search = params.toString();
+
+  return url.href;
 };
 
 export default loader;

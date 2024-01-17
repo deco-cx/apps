@@ -1,5 +1,6 @@
 import type {
   AggregateOffer,
+  Brand,
   BreadcrumbList,
   Filter,
   FilterToggleValue,
@@ -15,6 +16,7 @@ import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
+  Brand as BrandVTEX,
   Category,
   Facet as FacetVTEX,
   FacetValueBoolean,
@@ -421,8 +423,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
       const alternateName = imageText || imageLabel || "";
       const name = imageLabel || "";
+      const encodingFormat = "image";
 
-      return { "@type": "ImageObject" as const, alternateName, url, name };
+      return {
+        "@type": "ImageObject" as const,
+        alternateName,
+        url,
+        name,
+        encodingFormat,
+      };
     }) ?? [DEFAULT_IMAGE],
     offers: aggregateOffers(offers, priceCurrency),
   };
@@ -544,6 +553,11 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
       price: offer.Price,
+    },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SRP",
+      price: offer.PriceWithoutDiscount,
     },
     ...offer.Installments.map(
       (installment): UnitPriceSpecification => ({
@@ -809,6 +823,16 @@ function nodeToNavbar(node: Category): SiteNavigationElement {
 export const categoryTreeToNavbar = (
   tree: Category[],
 ): SiteNavigationElement[] => tree.map(nodeToNavbar);
+
+export const toBrand = (
+  { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+): Brand => ({
+  "@type": "Brand",
+  "@id": `${id}`,
+  name,
+  logo: imageUrl ?? undefined,
+  description: metaTagDescription,
+});
 
 export const normalizeFacet = (facet: LegacyFacet) => {
   return {

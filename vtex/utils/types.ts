@@ -232,14 +232,14 @@ export interface PriceTag {
 export type AvailableAssociations = Record<string, string>;
 
 export interface MarketingData {
-  utmSource: string;
-  utmMedium: null;
-  utmCampaign: string;
-  utmipage: null;
-  utmiPart: null;
-  utmiCampaign: null;
-  coupon: null;
-  marketingTags: string[];
+  utmSource: string | undefined;
+  utmMedium: string | undefined;
+  utmCampaign: string | undefined;
+  utmiPage: string | undefined;
+  utmiPart: string | undefined;
+  utmiCampaign: string | undefined;
+  coupon: string | undefined;
+  marketingTags: string[] | undefined;
 }
 
 export interface Message {
@@ -1057,7 +1057,10 @@ export interface Segment {
   regionId: string | null;
   utm_campaign: string | null;
   utm_source: string | null;
+  utm_medium: string | null;
   utmi_campaign: string | null;
+  utmi_page: string | null;
+  utmi_part: string | null;
   /** @description BRL, USD stc */
   currencyCode: string;
   /** @description R$, $ etc */
@@ -1127,4 +1130,22 @@ export interface CreateNewDocument {
   Id: string;
   Href: string;
   DocumentId: string;
+}
+
+export interface SelectableGifts {
+  id: string;
+  selectedGifts: {
+    id: string;
+    seller: string;
+    index: number;
+  }[];
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+  isActive: boolean;
+  title: string;
+  metaTagDescription: string;
+  imageUrl: string | null;
 }

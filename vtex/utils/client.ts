@@ -1,7 +1,9 @@
 import {
+  Brand,
   Category,
   CreateNewDocument,
   FacetSearchResult,
+  InstallmentOption,
   LegacyFacets,
   LegacyProduct,
   LegacySort,
@@ -9,6 +11,7 @@ import {
   PageType,
   PortalSuggestion,
   ProductSearchResult,
+  SelectableGifts,
   SimulationItem,
   SimulationOrderForm,
   SPEvent,
@@ -16,6 +19,12 @@ import {
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
+  "POST /api/checkout/pub/orderForm/:orderFormId/selectable-gifts/:giftId": {
+    body: SelectableGifts & {
+      expectedOrderFormSections: string[];
+    };
+    response: OrderForm;
+  };
   "POST /no-cache/Newsletter.aspx": { body: FormData };
   "POST /no-cache/AviseMe.aspx": { body: FormData };
   "GET /api/catalog_system/pub/portal/pagetype/:term": { response: PageType };
@@ -122,7 +131,7 @@ export interface VTEXCommerceStable {
     response: OrderForm;
   };
   "GET /api/checkout/pub/orderForm/:orderFormId/installments": {
-    response: OrderForm;
+    response: InstallmentOption;
     searchParams: { paymentSystem: number; sc?: string };
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/profile": {
@@ -208,6 +217,9 @@ export interface VTEXCommerceStable {
   "POST /api/dataentities/:acronym/documents": {
     response: CreateNewDocument;
     body: Record<string, unknown>;
+  };
+  "GET /api/catalog_system/pub/brand/list": {
+    response: Brand[];
   };
 }
 

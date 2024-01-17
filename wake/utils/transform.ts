@@ -1,6 +1,8 @@
 import {
   BreadcrumbList,
+  FilterRange,
   ListItem,
+  OfferItemCondition,
   Product,
   ProductListingPage,
   PropertyValue,
@@ -14,6 +16,13 @@ import {
 } from "./graphql/storefront.graphql.gen.ts";
 
 export const FILTER_PARAM = "filtro";
+
+export const CONDITIONS: Record<string, OfferItemCondition> = {
+  "Novo": "https://schema.org/NewCondition",
+  "Usado": "https://schema.org/UsedCondition",
+  "Renovado": "https://schema.org/RefurbishedCondition",
+  "Danificado": "https://schema.org/DamagedCondition",
+};
 
 export const camposAdicionais = [
   "Atacado",
@@ -45,77 +54,169 @@ export const getProductUrl = (
 export const getVariantUrl = (
   variant: ProductFragment | SingleProductFragment,
   base: URL | string,
+  variantId?: string,
 ) => {
   const url = getProductUrl(variant, base);
 
-  url.searchParams.set("skuId", variant.productVariantId);
+  url.searchParams.set("skuId", variantId ?? variant.productVariantId);
 
   return url;
 };
 
+type WakeFilterItem = NonNullable<
+  NonNullable<
+    NonNullable<SearchQuery["result"]>["aggregations"]
+  >["filters"]
+>[0];
+
+export const toFilterItem = (
+  filter: WakeFilterItem,
+  base: URL,
+) => ({
+  "@type": "FilterToggle" as const,
+  key: filter?.origin ?? "",
+  label: filter?.field ?? "",
+  quantity: filter?.values?.length ?? 0,
+  values: filter?.values?.map((filterValue) => {
+    const url = new URL(base);
+    const { name, quantity } = filterValue!;
+
+    const filterParams = url.searchParams
+      .getAll(FILTER_PARAM);
+
+    const index = filterParams
+      .findIndex((f) => (f.split("__")[1] || f.split(":")[1]) === name);
+
+    const selected = index > -1;
+
+    if (selected) {
+      const params = new URLSearchParams();
+      url.searchParams.forEach((value, key) => {
+        if (key !== FILTER_PARAM || !value.endsWith(name!)) {
+          params.append(key, value);
+        }
+      });
+      url.search = `${params}`;
+    } else {
+      url.searchParams.append(FILTER_PARAM, `${filter.field}__${name}`);
+    }
+
+    return {
+      value: name!,
+      label: name!,
+      quantity: quantity!,
+      selected,
+      url: url.href,
+    };
+  }) ?? [],
+});
+
+export const toPriceFilter = (
+  filter: NonNullable<
+    NonNullable<
+      NonNullable<SearchQuery["result"]>["aggregations"]
+    >["priceRanges"]
+  >,
+  base: URL,
+) => ({
+  "@type": "FilterToggle" as const,
+  key: "precoPor",
+  label: "Preço",
+  quantity: filter.length ?? 0,
+  values: filter.map((filterValue) => {
+    const url = new URL(base);
+    const { range, quantity } = filterValue!;
+    const [min, max] = range?.split("-") ?? [];
+    const name = `${min};${max}`;
+
+    const isDirectParam = url.searchParams.getAll("precoPor");
+
+    const filterParams = isDirectParam ? isDirectParam : url.searchParams
+      .getAll(FILTER_PARAM);
+
+    const index = isDirectParam
+      ? filterParams.findIndex((f) => f === name)
+      : filterParams
+        .findIndex((f) => (f.split("__")[1] || f.split(":")[1]) === name);
+
+    const selected = index > -1;
+
+    if (selected) {
+      const params = new URLSearchParams();
+      url.searchParams.forEach((value, key) => {
+        if (
+          (key !== FILTER_PARAM && key !== "precoPor") || !value.endsWith(name)
+        ) {
+          params.append(key, value);
+        }
+      });
+      url.search = `${params}`;
+    } else {
+      url.searchParams.append("precoPor", `${name}`);
+    }
+
+    return {
+      value: range!,
+      label: range!,
+      quantity: quantity!,
+      selected,
+      url: url.href,
+    };
+  }) ?? [],
+});
+
 export const toFilters = (
-  aggregations: NonNullable<SearchQuery["search"]>["aggregations"],
+  aggregations: NonNullable<SearchQuery["result"]>["aggregations"],
   { base }: { base: URL },
-): ProductListingPage["filters"] =>
-  aggregations?.filters?.map((filter) => ({
-    "@type": "FilterToggle",
-    key: filter?.origin ?? "",
-    label: filter?.field ?? "",
-    quantity: 0,
-    values: filter?.values?.map((filterValue) => {
-      const url = new URL(base);
-      const { name, quantity } = filterValue!;
-      const index = url.searchParams
-        .getAll(FILTER_PARAM)
-        .findIndex((f) => f === name);
-      const selected = index > -1;
+): ProductListingPage["filters"] => {
+  const filters: ProductListingPage["filters"] =
+    aggregations?.filters?.map((filter) => toFilterItem(filter, base)) ?? [];
 
-      if (selected) {
-        const params = new URLSearchParams();
-        url.searchParams.forEach((value, key) => {
-          if (key !== FILTER_PARAM || !value.endsWith(name!)) {
-            params.append(key, value);
-          }
-        });
-        url.search = `${params}`;
-      } else {
-        url.searchParams.append(FILTER_PARAM, `${filter.field}:${name}`);
-      }
+  if (aggregations?.priceRanges) {
+    const pricefilter = toPriceFilter(aggregations?.priceRanges, base);
 
-      return {
-        value: name!,
-        label: name!,
-        quantity: quantity!,
-        selected,
-        url: url.href,
-      };
-    }) ?? [],
-  })) ?? [];
+    filters.push(pricefilter);
+  }
+
+  if (aggregations?.maximumPrice && aggregations?.minimumPrice) {
+    const priceRange: FilterRange = {
+      "@type": "FilterRange" as const,
+      key: "precoPor",
+      label: "Preço",
+      values: {
+        max: aggregations.maximumPrice,
+        min: aggregations.minimumPrice,
+      },
+    };
+
+    filters.push(priceRange);
+  }
+
+  return filters;
+};
 
 export const toBreadcrumbList = (
-  product: Product,
-  categories: ProductFragment["productCategories"],
-  { base }: { base: URL },
+  breadcrumbs: SingleProductFragment["breadcrumbs"] = [],
+  { base: base }: { base: URL },
+  product?: Product,
 ): BreadcrumbList => {
-  const category = categories?.find((c) => c?.main);
-  const segments = category?.url?.split("/") ?? [];
-  const names = category?.hierarchy?.split(" > ") ?? [];
-  const itemListElement = segments.length === names.length
-    ? [
-      ...segments.map((_, i): ListItem<string> => ({
-        "@type": "ListItem",
-        name: names[i],
-        position: i + 1,
-        item: new URL(`/${segments.slice(0, i + 1).join("/")}`, base).href,
-      })),
-      {
-        "@type": "ListItem",
-        name: product.isVariantOf?.name,
-        url: product.isVariantOf?.url,
-        position: segments.length + 1,
-      } as ListItem<string>,
-    ]
-    : [];
+  const itemListElement = [
+    ...(breadcrumbs ?? []).map((item, i): ListItem<string> => ({
+      "@type": "ListItem",
+      name: item!.text!,
+      position: i + 1,
+      item: new URL(item!.link!, base).href,
+    })),
+  ];
+
+  if (product) {
+    itemListElement.push({
+      "@type": "ListItem",
+      name: product.isVariantOf?.name,
+      item: product.isVariantOf?.url!,
+      position: (breadcrumbs ?? []).length + 1,
+    });
+  }
 
   return {
     "@type": "BreadcrumbList",
@@ -127,17 +228,22 @@ export const toBreadcrumbList = (
 export const toProduct = (
   variant: ProductFragment | SingleProductFragment,
   { base }: { base: URL | string },
+  variants: Product[] = [],
+  variantId?: number | null,
 ): Product => {
   const images = variant.images?.map((image) => ({
     "@type": "ImageObject" as const,
+    encodingFormat: "image",
     url: image?.url ?? "",
     alternateName: image?.fileName ?? "",
   }));
+
   const additionalProperty: PropertyValue[] = [];
   variant.informations?.forEach((info) =>
     additionalProperty.push({
       "@type": "PropertyValue",
-      name: info?.title ?? undefined,
+      name: info?.type ?? undefined,
+      alternateName: info?.title ?? undefined,
       value: info?.value ?? undefined,
       valueReference: "INFORMATION",
     })
@@ -151,7 +257,45 @@ export const toProduct = (
     })
   );
 
+  if (variant.urlVideo) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "urlVideo",
+      value: variant.urlVideo,
+      valueReference: "PROPERTY",
+    });
+  }
+
+  if (variant.promotions) {
+    variant.promotions.map((promotion) => {
+      additionalProperty.push({
+        "@type": "PropertyValue",
+        name: promotion!.title ?? undefined,
+        value: promotion!.content ?? undefined,
+        identifier: promotion!.id,
+        image: promotion!.fullStampUrl
+          ? [{
+            "@type": "ImageObject",
+            encodingFormat: "image",
+            url: promotion!.fullStampUrl,
+          }]
+          : undefined,
+        valueReference: "PROMOTION",
+      });
+    });
+  }
+
+  if (variant.collection) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "collection",
+      value: variant.collection ?? undefined,
+      valueReference: "COLLECTION",
+    });
+  }
+
   const priceSpecification: UnitPriceSpecification[] = [];
+
   if (variant.prices?.listPrice) {
     priceSpecification.push({
       "@type": "UnitPriceSpecification",
@@ -185,6 +329,45 @@ export const toProduct = (
       }
     });
   }
+  const review = (variant as SingleProductFragment).reviews?.map((review) => ({
+    "@type": "Review" as const,
+    author: [
+      {
+        "@type": "Author" as const,
+        name: review?.customer ?? undefined,
+        identifier: review?.email ?? undefined,
+      },
+    ],
+    datePublished: review?.reviewDate ?? undefined,
+    reviewBody: review?.review ?? undefined,
+    reviewRating: {
+      "@type": "AggregateRating" as const,
+      bestRating: 5,
+      worstRating: 1,
+      ratingValue: review?.rating ?? undefined,
+      ratingCount: 1,
+    },
+  })) ?? [];
+
+  const isSimilarTo = variant.similarProducts?.map((p) =>
+    toProduct(p!, { base })
+  );
+
+  const variantSelected = variants.find((v) => {
+    return Number(v.productID) === Number(variantId);
+  }) ?? {};
+
+  const aggregateRating = (variant.numberOfVotes ||
+      (variant as SingleProductFragment).reviews?.length)
+    ? {
+      "@type": "AggregateRating" as const,
+      bestRating: 5,
+      ratingCount: variant.numberOfVotes || undefined,
+      ratingValue: variant.averageRating ?? undefined,
+      reviewCount: (variant as SingleProductFragment).reviews?.length,
+      worstRating: 1,
+    }
+    : undefined;
 
   return {
     "@type": "Product",
@@ -200,35 +383,43 @@ export const toProduct = (
     image: !images?.length ? [DEFAULT_IMAGE] : images,
     brand: {
       "@type": "Brand",
-      name: variant.productBrand?.name ?? "",
-      url: variant.productBrand?.logoUrl ?? variant.productBrand?.fullUrlLogo ??
-        "",
-    },
-    isSimilarTo: [],
-    isVariantOf: {
-      "@type": "ProductGroup",
-      url: getProductUrl(variant, base).href,
-      name: variant.productName ?? undefined,
-      productGroupID: variant.productId,
-      hasVariant: [],
-      additionalProperty: [],
+      name: variant.productBrand?.name ?? undefined,
+      url: variant.productBrand?.alias
+        ? new URL(`/${variant.productBrand.alias}`, base).href
+        : undefined,
+      logo: variant.productBrand?.fullUrlLogo ??
+        undefined,
     },
     additionalProperty,
     offers: {
       "@type": "AggregateOffer",
       highPrice: variant.prices?.price,
       lowPrice: variant.prices?.price,
+      priceCurrency: "BRL",
       offerCount: 1,
       offers: [{
         "@type": "Offer",
         seller: variant.seller?.name ?? undefined,
         price: variant.prices?.price,
         priceSpecification,
+        itemCondition: CONDITIONS[variant.condition!],
         availability: variant.available
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
         inventoryLevel: { value: variant.stock },
       }],
+    },
+    ...variantSelected,
+    isSimilarTo,
+    review,
+    aggregateRating,
+    isVariantOf: {
+      "@type": "ProductGroup",
+      url: getProductUrl(variant, base).href,
+      name: variant.productName ?? undefined,
+      productGroupID: variant.productId,
+      hasVariant: variants,
+      additionalProperty: [],
     },
   };
 };

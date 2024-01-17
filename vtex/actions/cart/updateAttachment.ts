@@ -31,7 +31,7 @@ const action = async (
     ["POST /api/checkout/pub/orderForm/:orderFormId/attachments/:attachment"]({
       orderFormId,
       attachment,
-      sc: segment?.channel,
+      sc: segment?.payload.channel,
     }, {
       body: { expectedOrderFormSections, ...body },
       headers: {

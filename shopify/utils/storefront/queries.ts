@@ -41,6 +41,20 @@ fragment ProductVariant on ProductVariant {
 }
 `;
 
+const Collection = gql`
+fragment Collection on Collection {
+  description
+  descriptionHtml
+  handle
+  id
+  image {
+    altText
+    url
+  }
+  title
+  updatedAt
+}`;
+
 const Product = gql`
 fragment Product on Product {
   availableForSale
@@ -96,12 +110,31 @@ fragment Product on Product {
   title
   totalInventory
   updatedAt
-  variants(first: 10) {
+  variants(first: 250) {
     nodes {
       ...ProductVariant
     }
   }
   vendor
+  collections(first: 250) {
+    nodes {
+      ...Collection
+    }
+  }
+}
+`;
+
+const Filter = gql`
+fragment Filter on Filter{
+  id
+  label
+  type
+  values {
+    count
+    id
+    input
+    label
+  }
 }
 `;
 
@@ -191,14 +224,14 @@ export const GetCart = {
 };
 
 export const GetProduct = {
-  fragments: [Product, ProductVariant],
+  fragments: [Product, ProductVariant, Collection],
   query: gql`query GetProduct($handle: String) {
     product(handle: $handle) { ...Product }
   }`,
 };
 
 export const ListProducts = {
-  fragments: [Product, ProductVariant],
+  fragments: [Product, ProductVariant, Collection],
   query: gql`query ListProducts($first: Int, $after: String, $query: String) {
     products(first: $first, after: $after, query: $query) {
       nodes {
@@ -209,15 +242,90 @@ export const ListProducts = {
 };
 
 export const SearchProducts = {
-  fragments: [Product, ProductVariant],
-  query: gql`query SearchProducts($first: Int, $after: String, $query: String) {
-    products(first: $first, after: $after, query: $query) {
+  fragments: [Product, ProductVariant, Filter, Collection],
+  query: gql`query searchWithFilters(
+      $first: Int, 
+      $last: Int, 
+      $after: String, 
+      $before: String,  
+      $query: String!, 
+      $productFilters: [ProductFilter!]
+      $sortKey: SearchSortKeys, 
+      $reverse: Boolean
+     ){
+    search(
+      first: $first, 
+      last: $last, 
+      after: $after, 
+      before: $before, 
+      query: $query, 
+      productFilters: $productFilters, 
+      types: PRODUCT, 
+      sortKey: $sortKey,
+      reverse: $reverse,
+    ){
+      totalCount
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        endCursor
+        startCursor
+      }
+      productFilters {
+        ...Filter
       }
       nodes {
         ...Product
       }
+    }
+  }`,
+};
+
+export const ProductsByCollection = {
+  fragments: [Product, ProductVariant, Collection, Filter],
+  query: gql`query AllProducts(
+      $first: Int, 
+      $last: Int, 
+      $after: String, 
+      $before: String, 
+      $handle: String,
+      $sortKey: ProductCollectionSortKeys, 
+      $reverse: Boolean, 
+      $filters: [ProductFilter!]
+    ){
+    collection(handle: $handle) {
+      handle
+      products(
+        first: $first, 
+        last: $last, 
+        after: $after, 
+        before: $before, 
+        sortKey: $sortKey, 
+        reverse: $reverse, 
+        filters: $filters
+      ){
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          endCursor
+          startCursor
+        }
+        filters {
+          ...Filter
+        }
+        nodes {
+          ...Product
+        }
+      }
+    }
+  }`,
+};
+
+export const ProductRecommendations = {
+  fragments: [Product, ProductVariant, Collection],
+  query: gql`query productRecommendations($productId: ID!) {
+    productRecommendations(productId: $productId) {
+      ...Product
     }
   }`,
 };

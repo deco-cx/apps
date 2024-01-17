@@ -30,8 +30,8 @@ const domInspectorModule = IS_LOCALHOST
   ? `
 const DomInspectorActivators = {
   Backquote: {
-    label: "\` (backtick)",
-    matchEvent: (event) => event.code === "Backquote",
+    label: "\` (backtick) or Ctrl + X",
+    matchEvent: (event) => event.code === "Backquote" || (event.ctrlKey && event.key === "x"),
   },
 };
 ${DomInspector.toString()}`

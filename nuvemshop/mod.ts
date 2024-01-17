@@ -9,7 +9,7 @@ import workflow from "../workflows/mod.ts";
 import { NuvemShopAPI } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { SecretString } from "../website/loaders/secretString.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 
 import { ClientOf } from "../utils/http.ts";
 
@@ -45,7 +45,7 @@ export interface Props {
   /**
    * @title Access Token
    */
-  accessToken: SecretString;
+  accessToken: Secret;
 
   /**
    * @description Use Nuvemshop as backend platform
@@ -61,9 +61,13 @@ export const color = 0x272D4B;
 export default function Nuvemshop(
   { storeId, accessToken, publicUrl }: Props,
 ) {
+  const stringAccessToken = typeof accessToken === "string"
+    ? accessToken
+    : accessToken?.get?.() ?? "";
+
   const headers = new Headers();
   headers.set("accept", "application/json");
-  headers.set("Authentication", `bearer ${accessToken}`);
+  headers.set("Authentication", `bearer ${stringAccessToken}`);
   headers.set("content-type", "application/json");
 
   const api = createHttpClient<NuvemShopAPI>({

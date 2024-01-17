@@ -3,10 +3,11 @@ import { capitalize } from "../../utils/capitalize.ts";
 import { STALE } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
 import { slugify } from "../utils/slugify.ts";
-import type { PageType, Segment } from "../utils/types.ts";
+import type { PageType } from "../utils/types.ts";
+import { WrappedSegment } from "./segment.ts";
 
 export const toSegmentParams = (
-  segment: Partial<Segment>,
+  { payload: segment }: WrappedSegment,
 ) => (Object.fromEntries(
   Object.entries({
     utmi_campaign: segment.utmi_campaign ?? undefined,
@@ -100,19 +101,19 @@ export const pageTypesToBreadcrumbList = (
 
 export const pageTypesToSeo = (
   pages: PageType[],
-  req: Request,
+  baseUrl: string,
   currentPage?: number,
 ): Seo | null => {
   const current = pages.at(-1);
 
-  const url = new URL(req.url);
+  const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
 
   if (!current && fullTextSearch) {
     return {
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
-      canonical: req.url,
+      canonical: url.href,
     };
   }
 

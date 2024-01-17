@@ -126,8 +126,13 @@ const searchLoader = async (
     ? resolvedTagNames
     : undefined;
 
+  // TODO: Ensure continued functionality for pages like s?q=, and verify that search functionality works with paths like /example.
+  const preference = categoryTagsToFilter
+    ? term
+    : qQueryString ?? url.pathname.slice(1);
+
   const response = await api["GET /api/v2/products/search"]({
-    term,
+    term: term ?? preference,
     sort,
     page,
     per_page: count,
@@ -149,14 +154,18 @@ const searchLoader = async (
 
   const search = await response.json();
 
-  const { results: searchResults } = search;
+  const { results: searchResults = [] } = search;
 
-  const products = searchResults?.map((product) =>
-    toProduct(product, null, {
+  const validProducts = searchResults.filter(({ variants }) => {
+    return variants.length !== 0;
+  });
+
+  const products = validProducts.map((product) => {
+    return toProduct(product, null, {
       url,
       priceCurrency: "BRL",
-    })
-  );
+    });
+  });
 
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);
@@ -180,7 +189,7 @@ const searchLoader = async (
       }
       : getBreadcrumbList(categories, url),
     filters: toFilters(search.aggregations, typeTags, cleanUrl),
-    products: products ?? [],
+    products,
     pageInfo: {
       nextPage: pagination?.next_page ? `?${nextPage}` : undefined,
       previousPage: pagination?.prev_page ? `?${previousPage}` : undefined,

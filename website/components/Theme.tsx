@@ -14,9 +14,13 @@ export type Font = {
 export interface Props {
   variables?: Variable[];
   fonts?: Font[];
+  colorScheme?: "light" | "dark";
 }
 
-function Theme({ fonts = [], variables = [] }: Props) {
+const withPrefersColorScheme = (scheme: "light" | "dark", css: string) =>
+  `@media (prefers-color-scheme: ${scheme}) { ${css} }`;
+
+function Theme({ fonts = [], variables = [], colorScheme }: Props) {
   const id = useId();
 
   const family = fonts.reduce(
@@ -24,12 +28,15 @@ function Theme({ fonts = [], variables = [] }: Props) {
     "",
   );
 
-  const css = [
+  const vars = [
     { name: "--font-family", value: family },
     ...variables,
   ]
     .map(({ name, value }) => `${name}: ${value}`)
     .join(";");
+
+  const css = `* {${vars}}`;
+  const html = colorScheme ? withPrefersColorScheme(colorScheme, css) : css;
 
   return (
     <Head>
@@ -42,9 +49,7 @@ function Theme({ fonts = [], variables = [] }: Props) {
       <style
         type="text/css"
         id={`__DESIGN_SYSTEM_VARS-${id}`}
-        dangerouslySetInnerHTML={{
-          __html: `* {${css}}`,
-        }}
+        dangerouslySetInnerHTML={{ __html: html }}
       />
     </Head>
   );

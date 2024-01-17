@@ -35,7 +35,7 @@ const action = async (
     ["POST /api/checkout/pub/orderForm/:orderFormId/items/update"]({
       orderFormId,
       allowedOutdatedData,
-      sc: segment?.channel,
+      sc: segment?.payload.channel,
     }, {
       body: { orderItems },
       headers: {
