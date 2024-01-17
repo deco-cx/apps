@@ -1,101 +1,197 @@
-import { fjp, ulid } from "../../deps.ts";
+import { Deferred, deferred } from "deco/utils/promise.ts";
+import { fjp, Queue, ulid } from "../../deps.ts";
 import { ChangeSet } from "../mod2.ts";
+import { deepMerge } from "./merge.ts";
 import { observe } from "./observer.ts";
-import { batcher } from "./sender.ts";
 
 export interface Realtime<T> {
   object: T;
 }
 
-export interface Message {
+export interface ObjectState<T> {
+  value: T;
   id: string;
+}
+
+export interface Message {
   peerId: string;
-  changes: ChangeSet[];
+  changeSet: ChangeSet;
 }
 
-export interface LeaderChannel {
+export interface LeaderChannel<T extends object | unknown[]> {
   receive: () => AsyncIterableIterator<Message>;
-  accept: (message: Message) => void;
-  // deno-lint-ignore no-explicit-any
-  reject: (message: Message, reason: any) => void;
+  accept: (message: AcceptedMessage) => void;
+  reject: (message: RejectedMessage<T>) => void;
+  awaitLeadership: () => Promise<void>;
+  broadcastState: (state: ObjectState<T>) => void;
+  die: () => Promise<void>;
 }
-export interface FollowerChannel {
-  send: (message: Message) => void;
-  receiveAccept: (message: Message) => void;
-  receiveReject: (message: Message) => void;
-}
-export interface MessagesChannel {
-  leader: LeaderChannel;
-  follower: FollowerChannel;
+export interface AckedMessage {
+  peerId: string;
+  changeSet: ChangeSet;
+  type: string;
 }
 
-export interface RealtimeOptions {
-  channel: MessagesChannel;
+export interface AcceptedMessage extends AckedMessage {
+  type: "accepted";
+}
+
+export interface RejectedMessage<T extends object | unknown[]>
+  extends AckedMessage {
+  type: "rejected";
+  state: ObjectState<T>;
+  // deno-lint-ignore no-explicit-any
+  reason: any;
+}
+
+export interface FollowerChannel<T extends object | unknown[]> {
+  send: (message: Message) => void;
+  rejected: () => AsyncIterableIterator<RejectedMessage<T>>;
+  accepted: () => AsyncIterableIterator<AcceptedMessage>;
+}
+export interface MessagesChannel<T extends object | unknown[]> {
+  leader: LeaderChannel<T>;
+  follower: FollowerChannel<T>;
+}
+
+export interface RealtimeOptions<T extends object | unknown[]> {
+  channel: MessagesChannel<T>;
+  onConflict: (
+    state: ObjectState<T>,
+    changeSet: ChangeSet,
+    // deno-lint-ignore no-explicit-any
+    reason: any,
+  ) => Promise<T>;
+  onChange: (state: ObjectState<T>) => Promise<void>;
   sendDebounce?: number;
 }
 
+/**
+ * background function, it receives an async function and invokes it
+ */
+export const bg = (f: () => Promise<void>) => {
+  setTimeout(f, 0);
+};
 export const realtime = <T extends object | unknown[]>(
   object: T,
-  options: RealtimeOptions,
+  options: RealtimeOptions<T>,
 ): Realtime<T> => {
+  const currentState = { value: structuredClone(object), id: ulid() };
   const peerId = crypto.randomUUID();
-  // create a batcher to avoid send every change.
-  const send = batcher<fjp.Operation[], void>(
-    (patches: fjp.Operation[][]) => {
-      const changeSets = patches.map((p) => {
-        return {
-          id: ulid(),
-          patches: p,
+  const changesQ = new Queue<fjp.Operation[]>();
+  const ack: Record<string, Deferred<void>> = {};
+  // send loop
+  bg(async () => {
+    while (true) {
+      const patches = await changesQ.pop();
+      const id = ulid();
+      options.channel.follower.send({
+        peerId,
+        changeSet: {
+          id,
+          patches,
           metadata: {
             authors: [{
               name: "unknown",
             }],
             timestamp: Date.now(),
           },
-        };
+        },
       });
-      options.channel.follower.send({
-        changes: changeSets,
-        id: ulid(),
-        peerId,
-      });
-      return Promise.resolve();
-    },
-    options.sendDebounce ?? 200,
-  );
+      ack[id] = deferred<void>();
+      await ack[id];
+    }
+  });
+
   // needs to receive ack and rejects from server.
-
-  const { object: observedObject, stopObserving, startObserving } = observe(
+  const { object: desiredState, stopObserving, startObserving } = observe(
     object,
-    send,
+    changesQ.push.bind(changesQ),
   );
 
-  // create a channel loop receive to receive notifications from others.
-  // the leader should be the one that receives messages and acknowledge them
-  (async () => {
-    const leader = options.channel.leader;
+  // reject loop
+  bg(async () => {
+    const follower = options.channel.follower;
     for await (
-      const message of leader.receive()
+      const message of follower.rejected()
     ) {
-      const { changes } = message;
+      const { changeSet, reason, state } = message;
+      deepMerge(
+        desiredState,
+        await options.onConflict(state, changeSet, reason),
+      ); // this will trigger the desired patches.
+    }
+  });
+
+  // accept loop
+  bg(async () => {
+    const follower = options.channel.follower;
+    for await (
+      const message of follower.accepted()
+    ) {
+      const { changeSet, peerId: fromPeer } = message;
+      if (fromPeer === peerId) { // if it is an accept message by me so ack should be necessary so I can send next message.
+        ack[changeSet.id].resolve();
+        continue;
+      }
+      try {
+        currentState.value = changeSet.patches.reduce(
+          fjp.applyReducer,
+          currentState.value,
+        );
+        currentState.id = changeSet.id;
+      } catch (err) {
+        console.error(
+          "this error seems a bug in the realtime algorithm as followers should always be possible to apply patches as they arrive.",
+        );
+        throw err;
+      }
       try {
         stopObserving();
-        Object.assign(
-          observedObject,
-          changes.flatMap((c) => c.patches).reduce(
-            fjp.applyReducer,
-            observedObject,
-          ),
-        );
-        leader.accept(message);
+        fjp.applyPatch(desiredState, changeSet.patches, true, true);
       } catch (err) {
-        leader.reject(message, err);
+        startObserving();
+        // resolving conflict
+        deepMerge(
+          desiredState,
+          await options.onConflict(currentState, changeSet, err),
+        ); // this will trigger the desired patches.
       } finally {
         startObserving();
       }
+      await options.onChange(currentState);
     }
-  })();
+  });
+
+  // the leader should be the one that receives messages and acknowledge them
+  bg(async () => {
+    const leader = options.channel.leader;
+    await leader.awaitLeadership();
+    leader.broadcastState(currentState);
+    for await (
+      const message of leader.receive()
+    ) {
+      const { changeSet } = message;
+      try {
+        currentState.value = changeSet.patches.reduce(
+          fjp.applyReducer,
+          currentState.value,
+        );
+        currentState.id = changeSet.id;
+        leader.accept({ changeSet, peerId, type: "accepted" });
+      } catch (err) {
+        leader.reject({
+          changeSet,
+          peerId,
+          type: "rejected",
+          state: currentState,
+          reason: err,
+        });
+      }
+    }
+    await leader.die();
+  });
   return {
-    object: observedObject,
+    object: desiredState,
   };
 };
