@@ -91,16 +91,22 @@ const matchesAtLeastOne = (
 };
 
 const operations: Record<
-    Condition["case"]["type"], 
-    (param: string[], condition: Condition) => boolean
+  Condition["case"]["type"],
+  (param: string[], condition: Condition) => boolean
 > = Object.freeze({
-    Equals: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a == b),
-    Greater: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a > b),
-    GreaterOrEquals: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a >= b),
-    Includes: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a.includes(b)),
-    Lesser: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a < b),
-    LesserOrEquals: (params, condition) => matchesAtLeastOne(params, condition, (a, b) => a <= b),
-    Exists: (_params, _condition) => true,
+  Equals: (params, condition) =>
+    matchesAtLeastOne(params, condition, (a, b) => a == b),
+  Greater: (params, condition) =>
+    matchesAtLeastOne(params, condition, (a, b) => a > b),
+  GreaterOrEquals: (params, condition) =>
+    matchesAtLeastOne(params, condition, (a, b) => a >= b),
+  Includes: (params, condition) =>
+    matchesAtLeastOne(params, condition, (a, b) => a.includes(b)),
+  Lesser: (params, condition) =>
+    matchesAtLeastOne(params, condition, (a, b) => a < b),
+  LesserOrEquals: (params, condition) =>
+    matchesAtLeastOne(params, condition, (a, b) => a <= b),
+  Exists: (_params, _condition) => true,
 });
 
 /**
@@ -119,7 +125,7 @@ const MatchQueryString = (
       matches = false;
       return;
     }
-    
+
     matches = matches && operations[condition.case.type](params, condition);
   });
 
