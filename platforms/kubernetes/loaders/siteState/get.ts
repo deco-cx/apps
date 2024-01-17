@@ -1,5 +1,6 @@
 import { Domain } from "../../../../admin/platform.ts";
 import { EnvVar } from "../../actions/deployments/create.ts";
+import { Namespace } from "../../actions/sites/create.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 
@@ -90,9 +91,10 @@ export default async function getSiteState(
   ctx: AppContext,
 ): Promise<SiteState | undefined> {
   const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
+  const siteNs = Namespace.forSite(site);
   const secret = await k8sApi.readNamespacedSecret(
     State.secretName,
-    site,
+    siteNs,
   ).catch(async (err) => {
     if ((err as k8s.HttpError)?.statusCode === 404) {
       await ctx.invoke.kubernetes.actions.sites.create({ site }); // create site on 404

@@ -94,7 +94,7 @@ export default async function openChat(
   props: Props,
   req: Request,
   ctx: AppContext,
-) {
+): Promise<Response | { replies: Reply<unknown>[]; thread: string }> {
   if (!props.assistant) {
     notFound();
   }

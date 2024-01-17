@@ -60,6 +60,10 @@ export const getSavedAES = (kv: Deno.Kv) => {
 
 export const CRYPTO_KEY_ENV_VAR = "DECO_CRYPTO_KEY";
 
+export const hasLocalCryptoKey = () => {
+  return Deno.env.has(CRYPTO_KEY_ENV_VAR);
+};
+
 export const generateAESKey = async (): Promise<SavedAESKey> => {
   const generatedKey = await generateKey();
   const rawKey = new Uint8Array(
@@ -83,7 +87,7 @@ const getOrGenerateKey = (): Promise<AESKey> => {
   if (key) {
     return key;
   }
-  if (Deno.env.has(CRYPTO_KEY_ENV_VAR)) {
+  if (hasLocalCryptoKey()) {
     return fromSavedAESKey(JSON.parse(atob(Deno.env.get(CRYPTO_KEY_ENV_VAR)!)));
   }
   if (!kv) {

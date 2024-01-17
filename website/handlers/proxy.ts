@@ -1,4 +1,4 @@
-import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { isFreshCtx } from "deco/runtime/fresh/context.ts";
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
@@ -38,7 +38,8 @@ async function logClonedResponseBody(
   const clonedResponse = response.clone();
   const text = await clonedResponse.text();
 
-  monitoring?.rootSpan?.setAttribute?.("proxy.error", 
+  monitoring?.rootSpan?.setAttribute?.(
+    "proxy.error",
     `${response.statusText}, body = ${text}`,
   );
 }

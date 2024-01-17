@@ -9,8 +9,8 @@ import { k8s } from "../../deps.ts";
 import { ServiceScaling, SiteState } from "../../loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
 import { SourceBinder, SrcBinder } from "../build.ts";
+import { Namespace } from "../sites/create.ts";
 import { Routes } from "./rollout.ts";
-
 
 const uid = new ShortUniqueId({ length: 10, dictionary: "alpha_lower" });
 export const DeploymentId = {
@@ -220,6 +220,7 @@ export default async function newDeployment(
   if (!source) {
     badRequest({ message: "source is required" });
   }
+  const siteNs = Namespace.forSite(site);
 
   const { owner, repo, commitSha } = source!;
   if (build) {
@@ -256,7 +257,7 @@ export default async function newDeployment(
     envVars: siteState.envVars,
     sourceBinder,
     site,
-    namespace: site,
+    namespace: siteNs,
     deploymentId,
     labels,
     scaling: scaling ?? { initialScale: 0, maxScale: 3, minScale: 0 },
@@ -290,18 +291,18 @@ export default async function newDeployment(
         },
       };
     },
-  );
+  ).catch(ignoreIfExists);
 
   const deploymentRoute = `sites-${site}-${deploymentId}`;
   await k8sApi.createNamespacedCustomObject(
     "serving.knative.dev",
     "v1",
-    site,
+    siteNs,
     "routes",
     routeOf({
       routeName: deploymentRoute,
       revisionName,
-      namespace: site,
+      namespace: siteNs,
     }),
   ).catch(ignoreIfExists).catch((err) => {
     console.error("creating site route error", err);

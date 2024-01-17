@@ -14,18 +14,24 @@ import {
   ProductVariant,
 } from "./types.ts";
 
-export function toProduct(
+const getProductGroupURL = (
+  origin: string,
   product: ProductBaseNuvemShop,
-  baseUrl: URL,
-  sku: string | null,
-): Product[] {
-  const { canonical_url } = product;
+) => new URL(`/produtos/${getPreferredLanguage(product.handle)}`, origin);
 
-  const nuvemUrl = new URL(canonical_url);
-  const localUrl = new URL(nuvemUrl.pathname, baseUrl.origin);
+const getProductURL = (
+  origin: string,
+  product: ProductBaseNuvemShop,
+  skuId?: string,
+) => {
+  const canonicalUrl = getProductGroupURL(origin, product);
 
-  return getVariants(product, localUrl, sku);
-}
+  if (skuId) {
+    canonicalUrl.searchParams.set("sku", skuId);
+  }
+
+  return canonicalUrl;
+};
 
 function getVariants(
   product: ProductBaseNuvemShop,
@@ -33,50 +39,64 @@ function getVariants(
   sku: string | null,
   level = 0,
 ) {
-  const products = product
-    .variants.filter((variant) => !sku || variant.sku === sku)
+  const variants = product
+    .variants.filter((variant) =>
+      !sku || variant.sku === sku || variant.id.toString() === sku
+    )
     .map(
       (variant) => {
         const { values } = variant;
-
         const name = values.reduce(
           (name, value) => name + " " + getPreferredLanguage(value),
           ``,
         );
         const variantWithName = { ...variant, name: name.trim() };
 
-        return productVariantToProduct(variantWithName, product, url, level);
+        const variantUrl = getProductURL(
+          url.origin,
+          product,
+          variant.sku || variant.id.toString(),
+        );
+        return toProduct(variantWithName, product, variantUrl, level);
       },
     );
-  return products;
+  return variants;
 }
 
-function productVariantToProduct(
+export function toProduct(
   variant: ProductVariant,
   product: ProductBaseNuvemShop,
   url: URL,
   level = 0,
 ): Product {
-  const { product_id, sku, promotional_price, price } = variant;
+  const { id, product_id, sku, promotional_price, price, values, image_id } =
+    variant;
+  const variantName = values.reduce(
+    (name, value) => name + " " + getPreferredLanguage(value),
+    ``,
+  );
   const { name, description, images, categories, brand, attributes } = product;
   const variantUrl = new URL(url);
 
-  variantUrl.searchParams.set("sku", sku);
+  variantUrl.searchParams.set("sku", sku || id.toString());
 
   const schemaProduct: Product = {
     "@type": "Product",
-    productID: sku,
-    sku: sku,
-    name: getPreferredLanguage(name) + " " + variant.name,
+    productID: id.toString(),
+    sku: sku || id.toString(),
+    name: getPreferredLanguage(name) + " " + variantName,
     // NuvemShop description is returned as HTML and special characters and not working properly
     description: getPreferredLanguage(description).replace(
       /<(?:"[^"]*"['"]*|'[^']*'['"]*|[^'">])+>/g,
       "",
     ),
-    image: images.map((image: ProductImage) => ({
-      "@type": "ImageObject",
-      url: image.src,
-    })),
+    image: images
+      .sort((a, _b) => a.id.toString() == image_id ? -1 : 1)
+      .map((image: ProductImage) => ({
+        "@type": "ImageObject",
+        encodingFormat: "image",
+        url: image.src,
+      })),
     category: getPreferredLanguage(categories[0]?.name || ""), // Assuming there's only one category
     brand: { "@type": "Brand", name: brand ?? undefined },
     offers: {
@@ -102,7 +122,7 @@ function productVariantToProduct(
       variant,
       attributes,
     ),
-    url: variantUrl.href,
+    url: getProductURL(url.origin, product, sku || id.toString()).href,
   };
 
   return schemaProduct;
@@ -115,7 +135,7 @@ function getOffer(variant: ProductVariant): Offer {
     inventoryLevel: {
       value: getStockVariant(variant.stock),
     } as QuantitativeValue,
-    price: variant.promotional_price || 0,
+    price: Number(variant.promotional_price) || Number(variant.price) || 0,
     availability: getStockVariant(variant.stock) > 0
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
@@ -123,12 +143,12 @@ function getOffer(variant: ProductVariant): Offer {
       {
         "@type": "UnitPriceSpecification",
         priceType: "https://schema.org/ListPrice",
-        price: variant.price || 0,
+        price: Number(variant.price) || 0,
       },
       {
         "@type": "UnitPriceSpecification",
         priceType: "https://schema.org/SalePrice",
-        price: variant.promotional_price || 0,
+        price: Number(variant.promotional_price) || 0,
       },
     ],
   };
@@ -283,8 +303,8 @@ export const getBreadCrumbs = (
 
       return {
         "@type": "ListItem" as const,
-        name: getPreferredLanguage(category.name),
-        item: `/${getPreferredLanguage(category.name)}`,
+        name: getPreferredLanguage(category.name).toLowerCase(),
+        item: `/${getPreferredLanguage(category.name).toLowerCase()}`,
         position,
       };
     }),

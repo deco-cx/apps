@@ -145,7 +145,7 @@ export const toProduct = (
       "@type": "ProductGroup",
       productGroupID,
       hasVariant: hasVariant || [],
-      url: `${url.host}${getPath(product)}`,
+      url: `${url.origin}${getPath(product)}`,
       name: product.title,
       additionalProperty: [
         ...product.tags?.map((value) =>
@@ -157,12 +157,14 @@ export const toProduct = (
       ],
       image: nonEmptyArray(images.nodes)?.map((img) => ({
         "@type": "ImageObject",
+        encodingFormat: "image",
         alternateName: img.altText ?? "",
         url: img.url,
       })),
     },
     image: skuImages?.map((img) => ({
       "@type": "ImageObject",
+      encodingFormat: "image",
       alternateName: img?.altText ?? "",
       url: img?.url,
     })) ?? [DEFAULT_IMAGE],

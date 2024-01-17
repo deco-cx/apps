@@ -1,4 +1,5 @@
 import {
+  Brand,
   Category,
   CreateNewDocument,
   FacetSearchResult,
@@ -216,6 +217,9 @@ export interface VTEXCommerceStable {
   "POST /api/dataentities/:acronym/documents": {
     response: CreateNewDocument;
     body: Record<string, unknown>;
+  };
+  "GET /api/catalog_system/pub/brand/list": {
+    response: Brand[];
   };
 }
 

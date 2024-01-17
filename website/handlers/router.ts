@@ -6,7 +6,7 @@ import {
 } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
-import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { isFreshCtx } from "deco/runtime/fresh/context.ts";
 import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
@@ -191,8 +191,6 @@ export default function RoutesSelection(
       ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
         rankRoute(routeStringA))
     );
-
-    console.log(builtRoutes)
 
     const server = router(
       builtRoutes.map((route) => ({
