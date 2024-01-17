@@ -66,7 +66,7 @@ const LEGACY_TO_IS: Record<string, Sort> = {
   OrderByBestDiscountDESC: "discount:desc",
 };
 
-const mapLabelledFuzzyToFuzzy = (
+export const mapLabelledFuzzyToFuzzy = (
   labelledFuzzy?: LabelledFuzzy,
 ): Fuzzy | undefined => {
   switch (labelledFuzzy) {
