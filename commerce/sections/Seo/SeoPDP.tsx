@@ -4,10 +4,10 @@ import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 
 export type Props = {
   jsonLD: ProductDetailsPage | null;
- omitVariants?: boolean;
+   omitVariants?: boolean;
 } & Partial<Omit<SeoProps, "jsonLDs">>;
 
-function Section({ jsonLD,omitVariants, ...props }: Props) {
+function Section({ jsonLD, omitVariants, ...props }: Props) {
   const title = jsonLD?.seo?.title;
   const description = jsonLD?.seo?.description;
   const image = jsonLD?.product.image?.[0]?.url;
