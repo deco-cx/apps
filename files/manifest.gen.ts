@@ -2,13 +2,8 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/vision.ts";
-
 const manifest = {
-  "loaders": {
-    "openai/loaders/vision.ts": $$$0,
-  },
-  "name": "openai",
+  "name": "files",
   "baseUrl": import.meta.url,
 };
 

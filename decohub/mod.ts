@@ -1,10 +1,11 @@
-import { context } from "deco/live.ts";
-import type { App, FnContext } from "deco/mod.ts";
+import { buildSourceMap } from "deco/blocks/utils.tsx";
+import { type App, context, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 // deno-lint-ignore ban-types
 export type State = {};
+
 /**
  * @title Deco Hub
  */
@@ -31,6 +32,7 @@ export default async function App(
     ...context.play
       ? {
         sourceMap: {
+          ...buildSourceMap(manifest),
           [ADMIN_APP]: resolvedImport,
         },
       }

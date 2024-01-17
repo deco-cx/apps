@@ -1,6 +1,7 @@
 import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
+import { Namespace } from "../sites/create.ts";
 
 export interface Props {
   site: string;
@@ -17,19 +18,20 @@ export default async function deleteDomain(
   ctx: AppContext,
 ) {
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
+  const siteNs = Namespace.forSite(site);
 
   const [_certificate, _domainMapping, currentSiteState] = await Promise.all([
     k8sApi.deleteNamespacedCustomObject(
       "cert-manager.io",
       "v1",
-      site,
+      siteNs,
       "certificates",
       domain,
     ),
     k8sApi.deleteNamespacedCustomObject(
       "serving.knative.dev",
       "v1beta1",
-      site,
+      siteNs,
       "domainmappings",
       domain,
     ),

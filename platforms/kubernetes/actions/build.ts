@@ -5,6 +5,7 @@ import { ignoreIfExists } from "../common/objects.ts";
 import { k8s } from "../deps.ts";
 import { hashString } from "../hash/shortHash.ts";
 import { AppContext } from "../mod.ts";
+import { Namespace } from "./sites/create.ts";
 
 export interface Props {
   site: string;
@@ -64,7 +65,7 @@ const buildJobOf = (
     kind: "Job",
     metadata: {
       name,
-      namespace: site,
+      namespace: Namespace.forSite(site),
       labels: {
         site,
         repo,
@@ -230,6 +231,7 @@ export default async function build(
   if (!builderImg) {
     badRequest({ message: "builder image is required" });
   }
+  const siteNs = Namespace.forSite(site);
   const batchAPI = ctx.kc.makeApiClient(k8s.BatchV1Api);
   const binder = SrcBinder.fromRepo(owner, repo, commitSha);
   // Define the Job specification
@@ -248,20 +250,21 @@ export default async function build(
   });
 
   await batchAPI.createNamespacedJob(
-    site,
+    siteNs,
     job,
   ).catch(ignoreIfExists);
 
   const getBuildStatusFn = () =>
-    getBuildStatus(batchAPI, site, job.metadata!.name!);
+    getBuildStatus(batchAPI, siteNs, job.metadata!.name!);
   return {
     sourceBinder: binder,
     wait: (timeout?: number) =>
-      watchJobStatus(ctx.kc, site, jobName, timeout).then(buildStatusOf).catch(
-        () => {
-          return "running" as const;
-        },
-      ),
+      watchJobStatus(ctx.kc, siteNs, jobName, timeout).then(buildStatusOf)
+        .catch(
+          () => {
+            return "running" as const;
+          },
+        ),
     getBuildStatus: getBuildStatusFn,
   };
 }
