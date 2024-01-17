@@ -35,21 +35,28 @@ const productListLoader = async (
   const url = new URL(req.url);
   const { api } = ctx;
 
-  const search = await api["GET /api/v2/products/search"]({
-    term: props?.term,
-    wildcard: props?.wildcard,
-    sort: props?.sort,
-    per_page: props?.count,
-    "tags[]": props?.tags,
-    "ids[]": props?.ids,
-  }, STALE).then((res) => res.json());
+  const { results: searchResults = [] } = await api
+    ["GET /api/v2/products/search"]({
+      term: props?.term,
+      wildcard: props?.wildcard,
+      sort: props?.sort,
+      per_page: props?.count,
+      "tags[]": props?.tags,
+      "ids[]": props?.ids,
+    }, STALE).then((res) => res.json());
 
-  return search.results?.map((product) =>
-    toProduct(product, null, {
+  const validProducts = searchResults.filter(({ variants }) => {
+    return variants.length !== 0;
+  });
+
+  if (validProducts.length === 0) return null;
+
+  return validProducts.map((product) => {
+    return toProduct(product, null, {
       url,
       priceCurrency: "BRL",
-    })
-  ) ?? null;
+    });
+  });
 };
 
 export default productListLoader;

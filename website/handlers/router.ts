@@ -6,7 +6,7 @@ import {
 } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
-import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { isFreshCtx } from "deco/runtime/fresh/context.ts";
 import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
@@ -23,16 +23,22 @@ interface MaybePriorityHandler {
 
 const HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE = 1000;
 
-const rankRoute = (pattern: string) =>
+const rankRoute = (pattern: string): number =>
   pattern
     .split("/")
     .reduce(
-      (acc, routePart) =>
-        routePart.endsWith("*")
-          ? acc
-          : routePart.startsWith(":")
-          ? acc + 1
-          : acc + 2,
+      (acc, routePart) => {
+        if (routePart === "*") {
+          return acc;
+        }
+        if (routePart.startsWith(":")) {
+          return acc + 1;
+        }
+        if (routePart.includes("*")) {
+          return acc + 2;
+        }
+        return acc + 3;
+      },
       0,
     );
 
@@ -70,16 +76,11 @@ export const router = (
           { context: ctx, request: req },
         );
 
-      const end = configs?.monitoring?.timings?.start?.("load-data");
       const hand = isAwaitable(resolvedOrPromise)
         ? await resolvedOrPromise
         : resolvedOrPromise;
-      end?.();
 
-      return await hand(
-        req,
-        ctx,
-      );
+      return await hand(req, ctx);
     };
 
     const handler = hrefRoutes[`${url.pathname}${url.search || ""}`] ??
@@ -165,9 +166,13 @@ export default function RoutesSelection(
   ctx: AppContext,
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
+    // TODO: (@tlgimenes) Remove routing from request cycle
+
     const monitoring = isFreshCtx<DecoSiteState>(connInfo)
       ? connInfo.state.monitoring
       : undefined;
+
+    const timing = monitoring?.timings.start("router");
 
     const routesFromProps = Array.isArray(audiences) ? audiences : [];
     // everyone should come first in the list given that we override the everyone value with the upcoming flags.
@@ -194,10 +199,10 @@ export default function RoutesSelection(
       })),
       hrefRoutes,
       ctx.get,
-      {
-        monitoring,
-      },
+      { monitoring },
     );
+
+    timing?.end();
 
     return await server(req, connInfo);
   };

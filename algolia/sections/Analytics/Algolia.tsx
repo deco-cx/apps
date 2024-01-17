@@ -33,12 +33,23 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
     document.head.appendChild(script);
   }
 
+  function createUserToken() {
+    if (
+      typeof crypto !== "undefined" &&
+      typeof crypto.randomUUID === "function"
+    ) {
+      return crypto.randomUUID();
+    }
+
+    return (Math.random() * 1e9).toFixed();
+  }
+
   function setupSession() {
     window.aa("init", { appId, apiKey });
 
-    const userToken = localStorage.getItem("ALGOLIA_TOKEN") ||
-      (Math.random() * 1e6).toFixed();
-    localStorage.setItem("ALGOLIA_TOKEN", userToken);
+    const userToken = localStorage.getItem("ALGOLIA_USER_TOKEN") ||
+      createUserToken();
+    localStorage.setItem("ALGOLIA_USER_TOKEN", userToken);
     window.aa("setUserToken", userToken);
   }
 
@@ -79,7 +90,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
       // deno-lint-ignore no-explicit-any
       typeof (item as any).item_id === "string";
 
-    const UNKNOWN = "not-from-algolia";
+    const PRODUCTS = "products";
     const MAX_BATCH_SIZE = 20;
 
     window.DECO.events.subscribe((event) => {
@@ -114,8 +125,8 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         } else {
           window.aa("clickedObjectIDs", {
             eventName,
+            index: PRODUCTS,
             objectIDs: [item.item_id],
-            index: UNKNOWN,
           });
         }
       }
@@ -139,26 +150,21 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         } else {
           window.aa("convertedObjectIDs", {
             eventName,
+            index: PRODUCTS,
             objectIDs,
-            index: UNKNOWN,
           });
         }
       }
 
       if (isViewItem(event)) {
-        const [head] = event.params.items;
-        const item_url = head && head.item_url;
         const objectIDs = event.params.items
           .filter(hasItemId)
           .map((i) => i.item_id);
 
-        const attr = attributesFromURL(window.location.href) ||
-          attributesFromURL(item_url || "");
-
         for (let it = 0; it < objectIDs.length; it += MAX_BATCH_SIZE) {
           window.aa("viewedObjectIDs", {
             eventName,
-            index: attr ? attr.indexName : UNKNOWN,
+            index: PRODUCTS,
             objectIDs: objectIDs.slice(it, (it + 1) * MAX_BATCH_SIZE),
           });
         }

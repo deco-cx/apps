@@ -1,8 +1,9 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 export interface ConfigVerifiedReviews {
   idWebsite: string;
-  secretKey?: string;
+  secretKey?: Secret;
   plateforme?: string;
 }
 

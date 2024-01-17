@@ -24,6 +24,55 @@
     }
   ],
   "paths": {
+    "/api/v2/products/{product_id}/videos": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "product_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Retorna os videos do produto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "embed_url": {
+                        "type": "string"
+                      },
+                      "thumbnail_url": {
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "integer"
+                      },
+                      "variant_ids": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/seo_data": {
       "get": {
         "responses": {
@@ -7084,7 +7133,7 @@
               }
             },
             "in": "query",
-            "name": "property1_values",
+            "name": "property1_values[]",
             "description": "Filtra pelo valor da propriedade 1"
           },
           {
@@ -7107,7 +7156,7 @@
               }
             },
             "in": "query",
-            "name": "property2_values",
+            "name": "property2_values[]",
             "description": "Filtra pelo valor da propriedade 2"
           },
           {
@@ -7130,7 +7179,7 @@
               }
             },
             "in": "query",
-            "name": "property3_values",
+            "name": "property3_values[]",
             "description": "Filtra pelo valor da propriedade 3"
           },
           {
@@ -17946,6 +17995,10 @@
           "rebate_token": {
             "type": "string",
             "description": "Token do desconto"
+          },
+          "user_id": {
+            "type": "number",
+            "description": "Id do agente"
           }
         }
       },

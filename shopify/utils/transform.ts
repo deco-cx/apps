@@ -1,5 +1,6 @@
 import type {
   BreadcrumbList,
+  Filter,
   Product,
   ProductDetailsPage,
   PropertyValue,
@@ -7,6 +8,8 @@ import type {
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import {
+  Filter as FilterShopify,
+  FilterValue,
   ProductFragment as ProductShopify,
   ProductVariantFragment as SkuShopify,
 } from "./storefront/storefront.graphql.gen.ts";
@@ -50,6 +53,14 @@ export const toProductPage = (
     "@type": "ProductDetailsPage",
     breadcrumbList: toBreadcrumbList(product, sku),
     product: toProduct(product, sku, url),
+    // In shopify storefront, if the product SEO properties are identical
+    // to the product title and description, they are not returned.
+    // See: https://github.com/Shopify/storefront-api-feedback/discussions/181#discussioncomment-5734355
+    seo: {
+      title: product.seo?.title ?? product.title,
+      description: product.seo?.description ?? product.description,
+      canonical: `${url.origin}${getPath(product, sku)}`,
+    },
   };
 };
 
@@ -94,7 +105,14 @@ export const toProduct = (
     compareAtPrice,
   } = sku;
 
-  const additionalProperty = selectedOptions.map(toPropertyValue);
+  const descriptionHtml: PropertyValue = {
+    "@type": "PropertyValue",
+    "name": "descriptionHtml",
+    "value": product.descriptionHtml,
+  };
+  const additionalProperty: PropertyValue[] = selectedOptions.map(
+    toPropertyValue,
+  ).concat(descriptionHtml);
   const skuImages = nonEmptyArray([image]);
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));
@@ -127,17 +145,26 @@ export const toProduct = (
       "@type": "ProductGroup",
       productGroupID,
       hasVariant: hasVariant || [],
-      url: `${url.host}${getPath(product)}`,
+      url: `${url.origin}${getPath(product)}`,
       name: product.title,
-      additionalProperty: [],
+      additionalProperty: [
+        ...product.tags?.map((value) =>
+          toPropertyValue({ name: "TAG", value })
+        ),
+        ...product.collections?.nodes.map(({ title }) =>
+          toPropertyValue({ name: "COLLECTION", value: title })
+        ),
+      ],
       image: nonEmptyArray(images.nodes)?.map((img) => ({
         "@type": "ImageObject",
+        encodingFormat: "image",
         alternateName: img.altText ?? "",
         url: img.url,
       })),
     },
     image: skuImages?.map((img) => ({
       "@type": "ImageObject",
+      encodingFormat: "image",
       alternateName: img?.altText ?? "",
       url: img?.url,
     })) ?? [DEFAULT_IMAGE],
@@ -166,3 +193,60 @@ const toPropertyValue = (option: SelectedOptionShopify): PropertyValue => ({
   "@type": "PropertyValue",
   ...option,
 });
+
+const isSelectedFilter = (filterValue: FilterValue, url: URL) => {
+  let isSelected = false;
+  url.searchParams.forEach((value, key) => {
+    if (!key.startsWith("filter")) return;
+    if (value === filterValue.label) isSelected = true;
+  });
+  return isSelected;
+};
+
+export const toFilter = (filter: FilterShopify, url: URL): Filter => {
+  if (!filter.type.includes("RANGE")) {
+    return {
+      "@type": "FilterToggle",
+      label: filter.label,
+      key: filter.id,
+      values: filter.values.map((value) => {
+        return {
+          quantity: value.count,
+          label: value.label,
+          value: value.label,
+          selected: isSelectedFilter(value, url),
+          url: filtersURL(filter, value, url),
+        };
+      }),
+      quantity: filter.values.length,
+    };
+  } else {
+    const min = JSON.parse(filter.values[0].input).min;
+    const max = JSON.parse(filter.values[0].input).max;
+    return {
+      "@type": "FilterRange",
+      label: filter.label,
+      key: filter.id,
+      values: {
+        min,
+        max,
+      },
+    };
+  }
+};
+
+const filtersURL = (filter: FilterShopify, value: FilterValue, _url: URL) => {
+  const url = new URL(_url.href);
+  const params = new URLSearchParams(url.search);
+  params.delete("page");
+  params.delete("startCursor");
+  params.delete("endCursor");
+  if (params.has(filter.id, value.label)) {
+    params.delete(filter.id, value.label);
+  } else {
+    params.append(filter.id, value.label);
+  }
+
+  url.search = params.toString();
+  return url.toString();
+};

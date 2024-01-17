@@ -9,7 +9,7 @@ export default async function ListBlocks(
   _props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Pagination<BlockMetadata> | null> {
+): Promise<Pagination<Partial<BlockMetadata>> | null> {
   const state = await ctx.storage.state();
 
   if (!state) {
@@ -21,12 +21,16 @@ export default async function ListBlocks(
     };
   }
 
-  const data = Object.entries(state).map(([id, blockState]) => ({
-    id,
-    ...(blockState as Omit<BlockMetadata, "id">),
-    module: blockState.__resolveType,
-    __resolveType: undefined,
-  }));
+  const data = Object.entries(state).map(
+    ([id, { __resolveType, ...blockState }]) => ({
+      id,
+      data: {
+        ...blockState,
+        __resolveType,
+      },
+      module: __resolveType,
+    }),
+  );
 
   return {
     data: data,

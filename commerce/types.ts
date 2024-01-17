@@ -5,6 +5,21 @@ export declare type WithContext<T extends Things> = T & {
   "@context": "https://schema.org";
 };
 
+/**
+ * An store category
+ */
+export interface Category {
+  /**
+   * @title The Category Name
+   */
+  name: string;
+  /**
+   * @title Sub categories
+   * @description Store's sub categories
+   */
+  children?: Category[];
+}
+
 export declare type Things = Thing | Product | BreadcrumbList;
 
 export interface Thing {
@@ -33,7 +48,22 @@ export interface Thing {
   url?: string;
 }
 
-export interface ImageObject extends Omit<Thing, "@type"> {
+export interface MediaObject {
+  /** Media type typically expressed using a MIME format (see IANA site and MDN reference) */
+  encodingFormat?: string;
+  /** A URL pointing to a player for a specific video. */
+  embedUrl?: string;
+  /** Actual bytes of the media object, for example the image file or video file. */
+  contentUrl?: string;
+}
+
+export interface CreativeWork {
+  /** A thumbnail image relevant to the Thing */
+  thumbnailUrl?: string;
+}
+
+export interface ImageObject
+  extends MediaObject, CreativeWork, Omit<Thing, "@type"> {
   "@type": "ImageObject";
 }
 
@@ -379,7 +409,7 @@ export interface Product extends Omit<Thing, "@type"> {
   inProductGroupWithID?: string;
   // TODO: Make json schema generator support self-referencing types
   // /** A pointer to another, somehow related product (or multiple products). */
-  // isRelatedTo?: Product[];
+  isRelatedTo?: Product[];
   /** A pointer to another, functionally similar product (or multiple products). */
   isSimilarTo?: Product[];
   /** Indicates the kind of product that this is a variant of. In the case of {@link https://schema.org/ProductModel ProductModel}, this is a pointer (from a ProductModel) to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive. In the case of a {@link https://schema.org/ProductGroup ProductGroup}, the group description also serves as a template, representing a set of Products that vary on explicitly defined, specific dimensions only (so it defines both a set of variants, as well as which values distinguish amongst those variants). When used with {@link https://schema.org/ProductGroup ProductGroup}, this property can apply to any {@link https://schema.org/Product Product} included in the group. */
@@ -575,6 +605,7 @@ interface AnalyticsItemWithoutIdentifier {
   coupon?: string;
   discount?: number;
   index?: number;
+  item_group_id?: string;
   item_url?: string;
   item_brand?: string;
   item_category?: string;
@@ -595,7 +626,7 @@ export type AnalyticsItem = AnalyticsItemWithoutIdentifier & ItemIdentifier;
 export interface AddShippingInfoParams {
   currency?: Currency;
   value?: Value;
-  coupun?: string;
+  coupon?: string;
   shipping_tier?: string;
   items: AnalyticsItem[];
 }
@@ -682,7 +713,7 @@ export interface SelectPromotionParams {
   creative_slot?: string;
   promotion_id?: string;
   promotion_name?: string;
-  items: AnalyticsItem[];
+  items?: AnalyticsItem[];
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#select_promotion */
@@ -728,7 +759,7 @@ export interface ViewPromotionParams {
   creative_slot?: string;
   promotion_id?: string;
   promotion_name?: string;
-  items: AnalyticsItem[];
+  items?: AnalyticsItem[];
 }
 
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#view_promotion */
@@ -736,8 +767,18 @@ export interface ViewPromotionEvent extends IEvent<ViewPromotionParams> {
   name: "view_promotion";
 }
 
-export interface DecoFlagsEvent extends IEvent<Flag[]> {
-  name: "deco-flags";
+export interface Page {
+  id: string | number;
+  pathTemplate?: string;
+}
+
+export interface Deco {
+  flags: Flag[];
+  page: Page;
+}
+
+export interface DecoEvent extends IEvent<Deco> {
+  name: "deco";
 }
 
 export type AnalyticsEvent =
@@ -754,4 +795,4 @@ export type AnalyticsEvent =
   | ViewItemEvent
   | ViewItemListEvent
   | ViewPromotionEvent
-  | DecoFlagsEvent;
+  | DecoEvent;

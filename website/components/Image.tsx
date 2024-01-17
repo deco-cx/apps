@@ -7,7 +7,10 @@ export const PATH: `/live/invoke/${keyof Manifest["loaders"]}` =
   "/live/invoke/website/loaders/image.ts";
 
 export type Props =
-  & Omit<JSX.IntrinsicElements["img"], "width" | "height" | "preload">
+  & Omit<
+    JSX.IntrinsicElements["img"],
+    "width" | "height" | "preload"
+  >
   & {
     src: string;
     /** @description Improves Web Vitals (CLS|LCP) */
@@ -26,15 +29,21 @@ const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-export const getOptimizedMediaUrl = (
-  { originalSrc, width, height, factor, fit = "cover" }: {
-    originalSrc: string;
-    width: number;
-    height?: number;
-    factor: number;
-    fit?: FitOptions;
-  },
-) => {
+export const getOptimizedMediaUrl = ({
+  originalSrc,
+  width,
+  height,
+  factor,
+  fit = "cover",
+}: {
+  originalSrc: string;
+  width: number;
+  height?: number;
+  factor: number;
+  fit?: FitOptions;
+}) => {
+  if (originalSrc.startsWith("data:")) return originalSrc;
+
   const params = new URLSearchParams();
 
   params.set("src", originalSrc);
@@ -51,13 +60,18 @@ export const getSrcSet = (
   height?: number,
   fit?: FitOptions,
 ) =>
-  FACTORS
-    .map((factor) =>
+  FACTORS.map(
+    (factor) =>
       `${
-        getOptimizedMediaUrl({ originalSrc: src, width, height, factor, fit })
-      } ${Math.trunc(factor * width)}w`
-    )
-    .join(", ");
+        getOptimizedMediaUrl({
+          originalSrc: src,
+          width,
+          height,
+          factor,
+          fit,
+        })
+      } ${Math.trunc(factor * width)}w`,
+  ).join(", ");
 
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
@@ -80,16 +94,12 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
     <>
       {preload && (
         <Head>
-          <link
-            as="image"
-            rel="preload"
-            href={props.src}
-            {...linkProps}
-          />
+          <link as="image" rel="preload" href={props.src} {...linkProps} />
         </Head>
       )}
       <img
         {...props}
+        data-fresh-disable-lock={true}
         preload={undefined}
         src={props.src}
         srcSet={srcSet}

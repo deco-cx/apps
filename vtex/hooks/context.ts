@@ -58,7 +58,7 @@ const load = (signal: AbortSignal) =>
   invoke({
     cart: invoke.vtex.loaders.cart(),
     user: invoke.vtex.loaders.user(),
-    wishlist: invoke.vtex.loaders.wishlist(),
+    wishlist: invoke.vtex.loaders.wishlist({ allRecords: true }),
   }, { signal });
 
 if (IS_BROWSER) {

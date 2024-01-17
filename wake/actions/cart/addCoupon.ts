@@ -7,6 +7,7 @@ import {
   AddCouponMutationVariables,
   CheckoutFragment,
 } from "../../utils/graphql/storefront.graphql.gen.ts";
+import { parseHeaders } from "../../utils/parseHeaders.ts";
 
 export interface Props {
   coupon: string;
@@ -19,6 +20,7 @@ const action = async (
 ): Promise<Partial<CheckoutFragment>> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
+  const headers = parseHeaders(req.headers);
 
   if (!cartId) {
     throw new HttpError(400, "Missing cart cookie");
@@ -30,10 +32,13 @@ const action = async (
   >({
     variables: { checkoutId: cartId, ...props },
     ...AddCoupon,
-  });
+  }, { headers });
 
   const checkoutId = data.checkout?.checkoutId;
-  setCartCookie(ctx.response.headers, checkoutId);
+
+  if (cartId !== checkoutId) {
+    setCartCookie(ctx.response.headers, checkoutId);
+  }
 
   return data.checkout ?? {};
 };

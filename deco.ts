@@ -8,8 +8,17 @@ const compatibilityApps = [{
   name: "deco-sites/std",
 }];
 
+const paltformApps = [{
+  dir: "./platforms/kubernetes",
+  name: "kubernetes",
+}];
+
 const config = {
   apps: [
+    app("ai-assistants"),
+    app("files"),
+    app("openai"),
+    app("brand-assistant"),
     app("implementation"),
     app("weather"),
     {
@@ -17,6 +26,7 @@ const config = {
       name: "deco-sites/admin",
     },
     app("analytics"),
+    app("sourei"),
     app("typesense"),
     app("algolia"),
     app("handlebars"),
@@ -25,13 +35,16 @@ const config = {
     app("wake"),
     app("linx"),
     app("shopify"),
+    app("nuvemshop"),
     app("website"),
     app("commerce"),
     app("workflows"),
     app("verified-reviews"),
     app("power-reviews"),
+    app("crux"),
     app("decohub"),
     ...compatibilityApps,
+    ...paltformApps,
   ],
 };
 

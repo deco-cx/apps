@@ -1,17 +1,17 @@
 // deno-lint-ignore-file no-explicit-any
 import { Workflow, WorkflowFn } from "deco/blocks/workflow.ts";
-import { start } from "../initializer.ts"; // side-effect initialize
-import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 import { Arg, RuntimeParameters, WorkflowExecutionBase } from "deco/deps.ts";
 import { BlockFromKey, BlockFunc, BlockKeys } from "deco/engine/block.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
-import { Manifest } from "deco/live.gen.ts";
 import { context } from "deco/live.ts";
-import { DecoManifest } from "deco/types.ts";
+import { AppManifest } from "deco/mod.ts";
+import { start } from "../initializer.ts"; // side-effect initialize
+import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 
 export interface CommonProps<
   TMetadata extends WorkflowMetadata = WorkflowMetadata,
 > {
+  restart?: boolean;
   id?: string;
   metadata?: TMetadata;
   runtimeParameters?: RuntimeParameters;
@@ -26,7 +26,7 @@ export interface AnyWorkflow extends CommonProps {
 
 export type WorkflowProps<
   key extends string = string,
-  TManifest extends DecoManifest = Manifest,
+  TManifest extends AppManifest = AppManifest,
   block extends BlockFromKey<key, TManifest> = BlockFromKey<key, TManifest>,
 > = key extends BlockKeys<TManifest> & `${string}/workflows/${string}`
   ? BlockFunc<key, TManifest, block> extends
@@ -38,7 +38,7 @@ export type WorkflowProps<
 
 const fromWorkflowProps = <
   key extends string = string,
-  TManifest extends DecoManifest = Manifest,
+  TManifest extends AppManifest = AppManifest,
   block extends BlockFromKey<key, TManifest> = BlockFromKey<key, TManifest>,
 >(
   props: WorkflowProps<key, TManifest, block> | AnyWorkflow,
@@ -77,16 +77,17 @@ export const WorkflowQS = {
  */
 export default async function startWorkflow<
   key extends string = string,
-  TManifest extends DecoManifest = Manifest,
+  TManifest extends AppManifest = AppManifest,
   block extends BlockFromKey<key, TManifest> = BlockFromKey<key, TManifest>,
 >(
   props: WorkflowProps<key, TManifest, block> | AnyWorkflow,
 ): Promise<WorkflowExecution> {
   const { id, args, runtimeParameters } = props;
   const workflow = fromWorkflowProps(props);
-  const service = context.isDeploy
-    ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
-    : "ws://localhost:8000";
+  const service = Deno.env.get("MY_DURABLE_URL") ??
+    (context.isDeploy
+      ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
+      : "ws://localhost:8000");
 
   const url = new URL(
     `${service}/live/workflows/run?${WorkflowQS.buildFromProps(workflow)}`,
@@ -113,5 +114,6 @@ export default async function startWorkflow<
       ...(props?.metadata ?? {}),
     },
   };
-  return await start<Arg, unknown, WorkflowMetadata>(payload).then(toExecution);
+  return await start<Arg, unknown, WorkflowMetadata>(payload, props?.restart)
+    .then(toExecution);
 }

@@ -7,6 +7,7 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { LegacyProduct } from "../../utils/types.ts";
+import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -30,16 +31,32 @@ async function loader(
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
+  const haveToUseSlug = slug && !slug.startsWith(":");
+  let defaultPaths;
+  if (!haveToUseSlug) {
+    defaultPaths = await PDPDefaultPath({ count: 1 }, req, ctx);
+  }
+  const lowercaseSlug = haveToUseSlug
+    ? slug?.toLowerCase()
+    : defaultPaths?.possiblePaths[0] || "/";
   const url = new URL(baseUrl);
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
   const skuId = url.searchParams.get("skuId");
 
-  const [product] = await vcsDeprecated
+  const response = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:slug/p"](
-      { ...params, slug },
+      { ...params, slug: lowercaseSlug },
       { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json());
+
+  if (response && !Array.isArray(response)) {
+    throw new Error(
+      `Error while fetching VTEX data ${JSON.stringify(response)}`,
+    );
+  }
+
+  const [product] = response;
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -48,19 +65,21 @@ async function loader(
 
   const sku = pickSku(product, skuId?.toString());
 
-  const kitItems: LegacyProduct[] = sku.isKit && sku.kitItems
-    ? await vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
-      {
-        ...params,
-        fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
-      },
-      STALE,
-    ).then((res) => res.json())
-    : [];
+  const kitItems: LegacyProduct[] =
+    Array.isArray(sku.kitItems) && sku.kitItems.length > 0
+      ? await vcsDeprecated
+        ["GET /api/catalog_system/pub/products/search/:term?"](
+          {
+            ...params,
+            fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
+          },
+          STALE,
+        ).then((res) => res.json())
+      : [];
 
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
-    priceCurrency: "BRL", //  config!.defaultPriceCurrency, // TODO: fix currency
+    priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   });
 
   return {
@@ -75,5 +94,7 @@ async function loader(
     },
   };
 }
+
+export { cache, cacheKey } from "../intelligentSearch/productDetailsPage.ts";
 
 export default loader;

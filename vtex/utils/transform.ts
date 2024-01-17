@@ -1,5 +1,6 @@
 import type {
   AggregateOffer,
+  Brand,
   BreadcrumbList,
   Filter,
   FilterToggleValue,
@@ -15,6 +16,7 @@ import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
+  Brand as BrandVTEX,
   Category,
   Facet as FacetVTEX,
   FacetValueBoolean,
@@ -105,16 +107,13 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
   return sku.kitItems?.map(({ itemId }) => {
     const product = productBySkuId.get(itemId);
 
-    if (!product) {
-      throw new Error(
-        `Expected product for skuId ${itemId} but it was not returned by the search engine`,
-      );
-    }
+    /** Sometimes VTEX does not return what I've asked for */
+    if (!product) return;
 
     const sku = pickSku(product, itemId);
 
     return toProduct(product, sku, 0, options);
-  });
+  }).filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -124,7 +123,7 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   options: ProductOptions,
 ): Omit<ProductDetailsPage, "seo"> => {
   const partialProduct = toProduct(product, sku, 0, options);
-  // Get accessories in ProductPage only. I don't see where it's necessary outside this page for now
+  // This is deprecated. Compose this loader at loaders > product > extension > detailsPage.ts
   const isAccessoryOrSparePartFor = toAccessoryOrSparePartFor(
     sku,
     kitItems,
@@ -381,8 +380,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
       const alternateName = imageText || imageLabel || "";
       const name = imageLabel || "";
+      const encodingFormat = "image";
 
-      return { "@type": "ImageObject" as const, alternateName, url, name };
+      return {
+        "@type": "ImageObject" as const,
+        alternateName,
+        url,
+        name,
+        encodingFormat,
+      };
     }) ?? [DEFAULT_IMAGE],
     offers: aggregateOffers(offers, priceCurrency),
   };
@@ -504,6 +510,11 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
       price: offer.Price,
+    },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SRP",
+      price: offer.PriceWithoutDiscount,
     },
     ...offer.Installments.map(
       (installment): UnitPriceSpecification => ({
@@ -766,6 +777,16 @@ function nodeToNavbar(node: Category): SiteNavigationElement {
 export const categoryTreeToNavbar = (
   tree: Category[],
 ): SiteNavigationElement[] => tree.map(nodeToNavbar);
+
+export const toBrand = (
+  { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+): Brand => ({
+  "@type": "Brand",
+  "@id": `${id}`,
+  name,
+  logo: imageUrl ?? undefined,
+  description: metaTagDescription,
+});
 
 export const normalizeFacet = (facet: LegacyFacet) => {
   return {

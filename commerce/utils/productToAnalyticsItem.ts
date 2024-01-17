@@ -23,15 +23,25 @@ export const mapProductCategoryToAnalyticsCategories = (category: string) => {
 };
 
 export const mapProductToAnalyticsItem = (
-  { product, breadcrumbList, price, listPrice, index = 0 }: {
+  {
+    product,
+    breadcrumbList,
+    price,
+    listPrice,
+    index = 0,
+    quantity = 1,
+    coupon = "",
+  }: {
     product: Product;
     breadcrumbList?: BreadcrumbList;
     price?: number;
     listPrice?: number;
     index?: number;
+    quantity?: number;
+    coupon?: string;
   },
 ): AnalyticsItem => {
-  const { name, productID, isVariantOf, url } = product;
+  const { name, productID, inProductGroupWithID, isVariantOf, url } = product;
   const categories = breadcrumbList?.itemListElement
     ? mapCategoriesToAnalyticsCategories(
       breadcrumbList?.itemListElement.map(({ name: _name }) => _name ?? "")
@@ -42,8 +52,9 @@ export const mapProductToAnalyticsItem = (
 
   return {
     item_id: productID,
-    quantity: 1,
-    coupon: "",
+    item_group_id: inProductGroupWithID,
+    quantity,
+    coupon,
     price,
     index,
     discount: Number((price && listPrice ? listPrice - price : 0).toFixed(2)),

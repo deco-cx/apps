@@ -13,12 +13,23 @@ import { SP, VTEXCommerceStable } from "./utils/client.ts";
 import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
+import { Segment } from "./utils/types.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
 export type AppMiddlewareContext = AMC<App>;
 
+export type SegmentCulture = Omit<
+  Partial<Segment>,
+  | "utm_campaign"
+  | "utm_source"
+  | "utmi_campaign"
+  | "campaigns"
+  | "priceTables"
+  | "regionId"
+>;
 /** @title VTEX */
 export interface Props {
   /**
@@ -36,21 +47,27 @@ export interface Props {
    * @title App Key
    * @description Only required for extra features
    */
-  appKey?: string;
+  appKey?: Secret;
 
   /**
    * @title App Token
    * @description Only required for extra features
    * @format password
    */
-  appToken?: string;
+  appToken?: Secret;
 
   /**
    * @title Default Sales Channel
-   * @description Default sales channel to use
+   * @description (Use defaultSegment instead)
    * @default 1
+   * @deprecated
    */
-  salesChannel?: "1" | "2" | "3" | "4" | "5";
+  salesChannel?: string;
+
+  /**
+   * @title Default Segment
+   */
+  defaultSegment?: SegmentCulture;
 
   usePortalSitemap?: boolean;
 
@@ -60,18 +77,31 @@ export interface Props {
   platform: "vtex";
 }
 
-export const color = 0xF71963;
+export const color = 0xf71963;
 
 /**
  * @title VTEX
  */
-export default function VTEX(
-  { appKey, appToken, account, salesChannel, ...props }: Props,
-) {
+export default function VTEX({
+  appKey,
+  appToken,
+  account,
+  publicUrl,
+  salesChannel,
+  ...props
+}: Props) {
   const headers = new Headers();
 
-  appKey && headers.set("X-VTEX-API-AppKey", appKey);
-  appToken && headers.set("X-VTEX-API-AppToken", appToken);
+  appKey &&
+    headers.set(
+      "X-VTEX-API-AppKey",
+      typeof appKey === "string" ? appKey : appKey?.get?.() ?? "",
+    );
+  appToken &&
+    headers.set(
+      "X-VTEX-API-AppToken",
+      typeof appToken === "string" ? appToken : appToken?.get?.() ?? "",
+    );
 
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
@@ -101,6 +131,7 @@ export default function VTEX(
     ...props,
     salesChannel: salesChannel ?? "1",
     account,
+    publicUrl,
     vcsDeprecated,
     sp,
     io,

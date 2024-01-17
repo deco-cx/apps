@@ -19,7 +19,7 @@ const action = async (
 
   const response = await vcsDeprecated
     ["POST /api/checkout/pub/orderForm/:orderFormId/items/removeAll"](
-      { orderFormId, sc: segment?.channel },
+      { orderFormId, sc: segment?.payload.channel },
       {
         headers: {
           "content-type": "application/json",
