@@ -40,7 +40,7 @@ async function loader(
   }
 
   const products = result?.map((product) => {
-    return [...toProduct(product, new URL(url), null)];
+    return toProduct(product.variants[0], product, new URL(url), 0);
   }).flat();
 
   return products || [];
