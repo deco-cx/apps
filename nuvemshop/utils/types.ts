@@ -22,7 +22,7 @@ export interface ProductBaseNuvemShop {
   id: number;
   name: LanguageTypes;
   description: LanguageTypes;
-  handle: string[];
+  handle: LanguageTypes;
   variants: ProductVariant[];
   images: ProductImage[];
   categories: Category[];
