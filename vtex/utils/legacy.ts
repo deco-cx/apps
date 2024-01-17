@@ -142,5 +142,5 @@ function toCanonical(url: URL, page?: number) {
     url.searchParams.set("page", `${page}`);
   }
 
-  return url.href;
+  return url.href.toLowerCase();
 }
