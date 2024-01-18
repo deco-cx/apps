@@ -11,6 +11,9 @@ const compatibilityApps = [{
 const paltformApps = [{
   dir: "./platforms/kubernetes",
   name: "kubernetes",
+}, {
+  dir:"./platforms/subhosting",
+  name: "deno-subhosting",
 }];
 
 const config = {
