@@ -79,19 +79,12 @@ const runtimeTemplates: Record<Runtime, (name: Props) => Promise<CreateProps>> =
 /// <reference lib="dom" />
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
-import { start } from "$fresh/server.ts";
-import manifest from "./fresh.gen.ts";
-import decoManifest from "./manifest.gen.ts";
-import decoPlugin from "deco/plugins/deco.ts";
-import { context } from "deco/deco.ts";
 
-await start(manifest, {
-  plugins: [
-    decoPlugin({
-      manifest: decoManifest,
-    }),
-  ],
-});
+import { start } from "$fresh/server.ts";
+import config from "./fresh.config.ts";
+import manifest from "./fresh.gen.ts";
+
+await start(manifest, config);
             `,
             },
             {
@@ -165,6 +158,15 @@ export default manifest;
                 },
                 ...decofile,
               }),
+            },
+            {
+              name: "tailwind.config.ts",
+              content: `
+export default {
+  content: ["./**/*.tsx"],
+  theme: { container: { center: true } },
+};
+              `,
             },
             {
               name: "fresh.config.ts",
