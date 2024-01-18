@@ -11,12 +11,12 @@ export interface Site {
 }
 
 export default async function create(
-  { name }: Props,
+  { name, deployAccessToken, deployOrgId }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Site> {
   const { invoke } = ctx;
   const { actions: { projects: { create } } } = invoke["deno-subhosting"];
-  const site = await create({ name });
+  const site = await create({ name, deployAccessToken, deployOrgId });
   return site;
 }

@@ -17,8 +17,13 @@ export default async function create(
   const deployAccessToken = props.deployAccessToken ??
     ctx.deployAccessToken;
   const deployOrgId = props.deployOrgId ?? ctx.deployOrgId;
-  const projectId = props.projectId ?? ctx.projectId;
-  assertHasDeploymentParams({ deployAccessToken, deployOrgId, projectId });
+
+  assertHasDeploymentParams({
+    deployAccessToken,
+    deployOrgId,
+    projectId: "placeholder",
+  });
+
   const client = new Subhosting(deployAccessToken, deployOrgId);
   const pr = await client.createProject(props.name);
   const projectResponse = await pr.json();
