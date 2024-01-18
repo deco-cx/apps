@@ -2,6 +2,7 @@ import { badRequest } from "deco/mod.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 import { Routes } from "../deployments/rollout.ts";
+import { Namespace } from "../sites/create.ts";
 
 export interface Props {
   site: string;
@@ -17,12 +18,13 @@ export default async function newDomain(
   _req: Request,
   ctx: AppContext,
 ) {
+  const siteNs = Namespace.forSite(site);
   const certificateManifest = {
     apiVersion: "cert-manager.io/v1",
     kind: "Certificate",
     metadata: {
       name: domain,
-      namespace: site,
+      namespace: siteNs,
     },
     spec: {
       commonName: "selfsigned-ca",
@@ -47,7 +49,7 @@ export default async function newDomain(
     kind: "DomainMapping",
     metadata: {
       name: domain,
-      namespace: site,
+      namespace: siteNs,
     },
     spec: {
       ref: {
@@ -67,14 +69,14 @@ export default async function newDomain(
     k8sApi.createNamespacedCustomObject(
       "cert-manager.io",
       "v1",
-      site,
+      siteNs,
       "certificates",
       certificateManifest,
     ),
     k8sApi.createNamespacedCustomObject(
       "serving.knative.dev",
       "v1beta1",
-      site,
+      siteNs,
       "domainmappings",
       domainMappingManifest,
     ),

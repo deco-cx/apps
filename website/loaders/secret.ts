@@ -1,5 +1,7 @@
-import { decryptFromHex } from "../utils/crypto.ts";
-
+import { Context } from "deco/deco.ts";
+import * as colors from "std/fmt/colors.ts";
+import { once } from "../../typesense/utils/once.ts";
+import { decryptFromHex, hasLocalCryptoKey } from "../utils/crypto.ts";
 /**
  * @title Secret
  * @hideOption true
@@ -27,7 +29,15 @@ export interface Props {
 
 const cache: Record<string, Promise<string | null>> = {};
 
-const getSecret = (props: Props): Promise<string | null> => {
+const showWarningOnce = once(() => {
+  console.warn(
+    colors.brightYellow(
+      "DECO_CRYPTO_KEY is not set. Some features might not work due to the lack of encryption key.",
+    ),
+  );
+  return Promise.resolve();
+});
+const getSecret = async (props: Props): Promise<string | null> => {
   const name = props?.name;
   if (name && Deno.env.has(name)) {
     return Promise.resolve(Deno.env.get(name)!);
@@ -36,9 +46,16 @@ const getSecret = (props: Props): Promise<string | null> => {
   if (!encrypted) {
     return Promise.resolve(null);
   }
+  if (!hasLocalCryptoKey() && !Context.active().isDeploy) {
+    await showWarningOnce();
+    return Promise.resolve(null);
+  }
   return cache[encrypted] ??= decryptFromHex(encrypted).then((d) => d.decrypted)
     .catch((err) => {
-      console.error("decrypt secret error", err);
+      const prettyName = name ? colors.brightRed(name) : "anonymous secret";
+      console.error(
+        colors.red(`${prettyName} could not be decrypted: ${err.message}`),
+      );
       return null;
     });
 };

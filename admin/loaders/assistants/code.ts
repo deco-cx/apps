@@ -14,6 +14,8 @@ Things to consider:
   2. Do not wrapp with any code formatting strings, like backsticks etc
   3. Return a code that is ready to be used in a Deno like environment
   4. Since this is a server component, do not use preact hooks. Always prefer css-only solutions. 
+  5. Always make the component props as optional
+  6. Always set optional props a default value. This default value should be set in the function parameter, like in the example below.
 
 Examples: 
   question: Give me a fancy component
@@ -21,10 +23,10 @@ Examples:
     /**
     * @description The description of name.
     */
-    name: string;
+    name?: string;
   }
   
-  export default function Section({ name }: Props) {
+  export default function Section({ name = "Hello" }: Props) {
     return (<div class="bg-white p-8 rounded-md shadow-md">
       <h2 class="text-2xl font-semibold mb-4">Fancy Component</h2>
   
