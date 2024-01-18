@@ -25,19 +25,20 @@ import * as $$$$$$0 from "./sections/Rendering/Deferred.tsx";
 import * as $$$$$$1 from "./sections/Seo/Seo.tsx";
 import * as $$$$$$2 from "./sections/Analytics/Analytics.tsx";
 import * as $$$$$$$0 from "./matchers/date.ts";
-import * as $$$$$$$1 from "./matchers/environment.ts";
-import * as $$$$$$$2 from "./matchers/site.ts";
-import * as $$$$$$$3 from "./matchers/location.ts";
-import * as $$$$$$$4 from "./matchers/cookie.ts";
-import * as $$$$$$$5 from "./matchers/random.ts";
-import * as $$$$$$$6 from "./matchers/multi.ts";
-import * as $$$$$$$7 from "./matchers/never.ts";
-import * as $$$$$$$8 from "./matchers/negate.ts";
-import * as $$$$$$$9 from "./matchers/cron.ts";
-import * as $$$$$$$10 from "./matchers/device.ts";
-import * as $$$$$$$11 from "./matchers/host.ts";
-import * as $$$$$$$12 from "./matchers/always.ts";
-import * as $$$$$$$13 from "./matchers/userAgent.ts";
+import * as $$$$$$$1 from "./matchers/queryString.ts";
+import * as $$$$$$$2 from "./matchers/environment.ts";
+import * as $$$$$$$3 from "./matchers/site.ts";
+import * as $$$$$$$4 from "./matchers/location.ts";
+import * as $$$$$$$5 from "./matchers/cookie.ts";
+import * as $$$$$$$6 from "./matchers/random.ts";
+import * as $$$$$$$7 from "./matchers/multi.ts";
+import * as $$$$$$$8 from "./matchers/never.ts";
+import * as $$$$$$$9 from "./matchers/negate.ts";
+import * as $$$$$$$10 from "./matchers/cron.ts";
+import * as $$$$$$$11 from "./matchers/device.ts";
+import * as $$$$$$$12 from "./matchers/host.ts";
+import * as $$$$$$$13 from "./matchers/always.ts";
+import * as $$$$$$$14 from "./matchers/userAgent.ts";
 import * as $$$$$$$$0 from "./flags/multivariate/section.ts";
 import * as $$$$$$$$1 from "./flags/multivariate/page.ts";
 import * as $$$$$$$$2 from "./flags/multivariate/message.ts";
@@ -81,20 +82,21 @@ const manifest = {
     "website/sections/Seo/Seo.tsx": $$$$$$1,
   },
   "matchers": {
-    "website/matchers/always.ts": $$$$$$$12,
-    "website/matchers/cookie.ts": $$$$$$$4,
-    "website/matchers/cron.ts": $$$$$$$9,
+    "website/matchers/always.ts": $$$$$$$13,
+    "website/matchers/cookie.ts": $$$$$$$5,
+    "website/matchers/cron.ts": $$$$$$$10,
     "website/matchers/date.ts": $$$$$$$0,
-    "website/matchers/device.ts": $$$$$$$10,
-    "website/matchers/environment.ts": $$$$$$$1,
-    "website/matchers/host.ts": $$$$$$$11,
-    "website/matchers/location.ts": $$$$$$$3,
-    "website/matchers/multi.ts": $$$$$$$6,
-    "website/matchers/negate.ts": $$$$$$$8,
-    "website/matchers/never.ts": $$$$$$$7,
-    "website/matchers/random.ts": $$$$$$$5,
-    "website/matchers/site.ts": $$$$$$$2,
-    "website/matchers/userAgent.ts": $$$$$$$13,
+    "website/matchers/device.ts": $$$$$$$11,
+    "website/matchers/environment.ts": $$$$$$$2,
+    "website/matchers/host.ts": $$$$$$$12,
+    "website/matchers/location.ts": $$$$$$$4,
+    "website/matchers/multi.ts": $$$$$$$7,
+    "website/matchers/negate.ts": $$$$$$$9,
+    "website/matchers/never.ts": $$$$$$$8,
+    "website/matchers/queryString.ts": $$$$$$$1,
+    "website/matchers/random.ts": $$$$$$$6,
+    "website/matchers/site.ts": $$$$$$$3,
+    "website/matchers/userAgent.ts": $$$$$$$14,
   },
   "flags": {
     "website/flags/audience.ts": $$$$$$$$3,
