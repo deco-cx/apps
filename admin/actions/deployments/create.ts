@@ -146,6 +146,7 @@ export default manifest;
               content: JSON.stringify({
                 site: {
                   __resolveType: `${name}/apps/site.ts`,
+                  routes: [{ __resolveType: "website/loaders/pages.ts" }],
                 },
                 decohub: {
                   __resolveType: `${name}/apps/decohub.ts`,
@@ -172,7 +173,7 @@ export default {
               name: "fresh.config.ts",
               content: `
 import { defineConfig } from "$fresh/server.ts";
-import plugins from "https://denopkg.com/deco-sites/std@1.24.1/plugins/mod.ts";
+import plugins from "https://denopkg.com/deco-sites/std@1.24.2/plugins/mod.ts";
 import manifest from "./manifest.gen.ts";
 import tailwind from "./tailwind.config.ts";
 
@@ -196,21 +197,27 @@ export default defineConfig({
                 {
                   name: "site.ts",
                   content: `
-import type { App, AppContext as AC } from "deco/types.ts";
-import type { Manifest } from "../manifest.gen.ts";
-import manifest from "../manifest.gen.ts";
-export interface State {
-    url: string;
+import { App, AppContext as AC } from "deco/mod.ts";
+import website, { Props as WebSiteProps } from "apps/website/mod.ts";
+import manifest, { Manifest } from "../manifest.gen.ts";
+
+export type Props = WebSiteProps;
+
+export type AppContext = AC<ReturnType<typeof Site>>;
+
+export default function Site(
+  props: Props,
+): App<Manifest, Props, [ReturnType<typeof website>]> {
+  return {
+    state: props,
+    manifest,
+    dependencies: [
+      website(props),
+    ],
+  };
 }
-export default function App(
-    state: State,
-): App<Manifest, State> {
-    return {
-        manifest,
-        state,
-    };
-}
-export type AppContext = AC<ReturnType<typeof App>>;
+
+export { onBeforeResolveProps } from "apps/website/mod.ts";
     `,
                 },
               ],
