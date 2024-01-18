@@ -2,7 +2,7 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 
 const CART_COOKIE = "nuvemshop_cart_id";
 export const DESIRED_COOKIES = [
-  "store_session_payload_2734114",
+  "store_session_payload",
   "store_login_session",
 ];
 
