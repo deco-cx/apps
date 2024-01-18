@@ -99,10 +99,10 @@ await start(manifest, {
               content: JSON.stringify(importMapJson),
             },
             {
-              name: 'routes', 
+              name: "routes",
               nodes: [
                 {
-                  name: '_app.tsx',
+                  name: "_app.tsx",
                   content: `
 import { asset, Head } from "$fresh/runtime.ts";
 import { defineApp } from "$fresh/server.ts";
@@ -129,9 +129,9 @@ export default defineApp(async (_req, ctx) => {
       <ctx.Component />
     </>
   );
-});`
-                }
-              ]
+});`,
+                },
+              ],
             },
             {
               name: "fresh.gen.ts",
