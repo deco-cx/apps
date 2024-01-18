@@ -212,6 +212,7 @@ export default async function create(
 
     res.envVars = {
       ...res.envVars,
+      DECO_RELEASE: "file:///src/.decofile.json",
       USE_LOCAL_STORAGE_ONLY: "true",
       DECO_ALLOWED_AUTHORITIES: "configs.decocdn.com,deno.dev",
     };
