@@ -54,11 +54,11 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
   for (const { path, content } of walk(node)) {
     const encoded = textEncoder.encode(content);
     assetsBuild.push(
-      calculateGitSha1(encoded).then((gitSha1) => {
+      calculateGitSha1(encoded).then((_gitSha1) => {
         assets[path.slice(1)] = {
-          // content,
-          // encoding: "utf-8"
-          gitSha1,
+          content,
+          encoding: "utf-8",
+          //gitSha1,
           kind: "file",
         };
       }),
