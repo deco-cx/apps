@@ -121,13 +121,15 @@ export const pageTypesToSeo = (
     return null;
   }
 
+  console.log(current.url)
+
   return {
     title: current.title!,
     description: current.metaTagDescription!,
     canonical: toCanonical(
       new URL(
         current.url
-          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
+          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "").toLowerCase()
           : url,
         url,
       ),
@@ -142,5 +144,5 @@ function toCanonical(url: URL, page?: number) {
     url.searchParams.set("page", `${page}`);
   }
 
-  return url.href.toLowerCase();
+  return url.href;
 }
