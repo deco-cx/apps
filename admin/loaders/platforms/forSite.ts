@@ -14,6 +14,7 @@ export default async function forSite(
   ctx: AppContext,
 ): Promise<Platform> {
   const platformName = await getPlatformOf(_props.site);
+
   if (platformName === "kubernetes") {
     return kubernetes(ctx.invoke.kubernetes);
   } else if (platformName === "subhosting") {

@@ -5,7 +5,8 @@ export interface Props {
 const kv = await Deno.openKv();
 const keyPrefix = ["platforms", "sites"];
 export const getPlatformOf = async (site: string): Promise<string | null> => {
-  return (await kv.get<string>([...keyPrefix, site])).value;
+  return (await kv.get<{ platform: string }>([...keyPrefix, site])).value
+    ?.platform ?? null;
 };
 export default async function assign(
   _props: Props,

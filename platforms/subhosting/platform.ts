@@ -10,12 +10,15 @@ interface SiteState {
   site: string;
   projectId: string;
 }
+
+const PREFIX = ["subhosting", "sites"];
+
 const saveSiteState = async (state: SiteState) => {
-  await kv.set(["subhosting", "sites", state.site], state);
+  await kv.set([...PREFIX, state.site], state);
 };
 
 const getSiteState = async (site: string): Promise<SiteState | null> => {
-  return (await kv.get<SiteState>(["sites", site])).value;
+  return (await kv.get<SiteState>([...PREFIX, site])).value;
 };
 type Subhosting = AppContext["invoke"]["deno-subhosting"];
 export default function subhosting(
