@@ -109,7 +109,7 @@ export const pageTypesToSeo = (
   const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
 
-  if (!current && fullTextSearch) {
+  if ((!current || current.pageType === "Search" || current.pageType === "FullText") && fullTextSearch) {
     return {
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
