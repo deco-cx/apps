@@ -6,15 +6,23 @@ import {
 import { Project } from "./actions/projects/create.ts";
 import { AppContext } from "./mod.ts";
 
-const kv = await Deno.openKv();
+let kvPromise: Promise<Deno.Kv> | undefined;
 
 const PREFIX = ["subhosting", "sites"];
 
 const saveSiteState = async (state: Project) => {
+  kvPromise ??= Deno.openKv();
+
+  const kv = await kvPromise;
+
   await kv.set([...PREFIX, state.name], state);
 };
 
 const getSiteState = async (site: string): Promise<Project | null> => {
+  kvPromise ??= Deno.openKv();
+
+  const kv = await kvPromise;
+
   return (await kv.get<Project>([...PREFIX, site])).value;
 };
 type Subhosting = AppContext["invoke"]["deno-subhosting"];
@@ -22,6 +30,7 @@ export default function subhosting(
   subhosting: Subhosting,
 ): Platform {
   const { actions } = subhosting;
+
   return {
     name: "subhosting",
     domain: "deco.site",
