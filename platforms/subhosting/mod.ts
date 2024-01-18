@@ -23,8 +23,9 @@ export default function App(
   return {
     manifest,
     state: {
-      deployAccessToken: state.deployAccessToken?.get?.() ?? 'ddo_9CRjRBJ2bSVQvNBvZy1jYLECovQb3g1PbaUG',
-      deployOrgId: state.deployOrgId?.get?.() ?? '9ff6a5d8-94bd-45d8-90b4-891ab889d548',
+      deployAccessToken: state.deployAccessToken?.get?.() ??
+        Deno.env.get("DEPLOY_ACCESS_TOKEN"),
+      deployOrgId: state.deployOrgId?.get?.() ?? Deno.env.get("DEPLOY_ORG_ID"),
       projectId: state.projectId,
     },
   };
