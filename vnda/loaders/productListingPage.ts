@@ -132,10 +132,6 @@ const searchLoader = async (
   const filteredTags = tags
     .filter((tag): tag is Tag => typeof tag !== "undefined");
 
-  const resolvedTagNames = filteredTags
-    .map((t) => t.name)
-    .filter((name): name is string => typeof name === "string");
-
   const { cleanUrl, typeTags } = typeTagExtractor(url, filteredTags);
 
   const initialTags = props.tags && props.tags?.length > 0
@@ -143,7 +139,8 @@ const searchLoader = async (
     : undefined;
 
   const categoryTagsToFilter = categories.length > 0 && props.filterByTags
-    ? resolvedTagNames
+    ? categories.map((t) => t.name)
+      .filter((name): name is string => typeof name === "string")
     : undefined;
 
   const defaultOperator = props.filterOperator?.type_tags ?? "and";
