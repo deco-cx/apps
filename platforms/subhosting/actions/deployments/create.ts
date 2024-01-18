@@ -68,7 +68,7 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
   return assets;
 };
 
-const buildEntries = async (
+const _buildEntries = async (
   node: FileSystemNode,
 ): Promise<Record<string, ManifestEntry>> => {
   const entries: Record<string, ManifestEntry> = {};
