@@ -1,5 +1,4 @@
 import { FileSystemNode } from "../files/sdk.ts";
-
 export interface DomainOpts {
   site: string;
   domain: string;
@@ -15,14 +14,47 @@ export interface PromoteOpts {
   deploymentId: string;
 }
 
-export interface DeploymentOpts {
+export interface DeploymentBase {
   site: string;
+  production?: boolean;
+  mode: string;
+}
+export interface DeploymentFromRepo extends DeploymentBase {
+  mode: "repo";
   owner: string;
   repo: string;
   commitSha: string;
-  production?: boolean;
 }
 
+export interface CompilerOptions {
+  jsx: string;
+  jsxImportSource: string;
+}
+
+export interface DeploymentFromFiles extends DeploymentBase {
+  files: FileSystemNode;
+  compilerOptions: CompilerOptions | null;
+  entryPointUrl: string;
+  importMapUrl: string | null;
+  envVars?: Record<string, string>;
+}
+
+export type DeploymentOpts = DeploymentFromRepo | DeploymentFromFiles;
+export function assertDeploymentIsFromRepo(
+  opts: DeploymentOpts,
+): asserts opts is DeploymentFromRepo {
+  if (opts?.mode !== "repo") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
+
+export function assertDeploymentIsFromFile(
+  opts: DeploymentOpts,
+): asserts opts is DeploymentFromFiles {
+  if (opts?.mode !== "files") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
 export interface Domain {
   url: string;
   production: boolean;
@@ -51,8 +83,6 @@ export interface CreateSiteFromRepoOpts extends CreateSiteOptsBase {
 
 export interface CreateSiteFromFilesOpts extends CreateSiteOptsBase {
   mode: "files";
-  files: FileSystemNode;
-  decofile?: Record<string, unknown>;
 }
 
 export type CreateSiteOpts = CreateSiteFromRepoOpts | CreateSiteFromFilesOpts;

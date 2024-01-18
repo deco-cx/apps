@@ -29,8 +29,9 @@ import * as $$$$$$$$$12 from "./actions/github/webhooks/broker.ts";
 import * as $$$$$$$$$13 from "./actions/pages/publish.ts";
 import * as $$$$$$$$$14 from "./actions/pages/new.ts";
 import * as $$$$$$$$$15 from "./actions/pages/delete.ts";
-import * as $$$$$$$$$16 from "./actions/pages/delete.ts";
-import * as $$$$$$$$$17 from "./actions/deployments/create.ts";
+import * as $$$$$$$$$16 from "./actions/pages/new.ts";
+import * as $$$$$$$$$17 from "./actions/pages/delete.ts";
+import * as $$$$$$$$$18 from "./actions/deployments/create.ts";
 
 const manifest = {
   "loaders": {

@@ -1,7 +1,7 @@
 import { fjp } from "../../deps.ts";
 import { storage } from "../../fsStorage.ts";
-import { Acked, Commands, Events, State } from "../../types.ts";
 import { AppContext } from "../../mod.ts";
+import { Acked, Commands, Events, State } from "../../types.ts";
 
 export interface Props {
   /** Environment name to connect to */
@@ -33,6 +33,7 @@ const patchState = (ops: fjp.Operation[]) => {
 };
 
 const action = ({ site }: Props, req: Request, ctx: AppContext) => {
+  const admin = ctx.invoke["deco-sites/admin"];
   const { socket, response } = Deno.upgradeWebSocket(req);
 
   const broadcast = (event: Acked<Events>) => {
@@ -51,11 +52,12 @@ const action = ({ site }: Props, req: Request, ctx: AppContext) => {
     const { ack } = data;
 
     if (data.type === "publish-state") {
-      const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms
-        .forSite({ site });
-
       // Do some magic
-      const created = await platform.deployments.create();
+      const created = await admin.actions.deployments.create({
+        site,
+        decofile: await fetchState().then((s) => s.decofile),
+        files: data.payload.files,
+      });
 
       broadcast({
         type: "state-published",

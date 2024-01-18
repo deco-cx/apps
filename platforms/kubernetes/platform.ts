@@ -1,5 +1,8 @@
-import { assertCreateIsFromRepo } from "../../admin/platform.ts";
-import { Platform } from "../../admin/platform.ts";
+import {
+  assertCreateIsFromRepo,
+  assertDeploymentIsFromRepo,
+  Platform,
+} from "../../admin/platform.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
@@ -34,8 +37,10 @@ export default function kubernetes(
         await actions.deployments.rollout(props);
       },
       create: async (
-        { site, commitSha, owner, repo, production = false },
+        props,
       ) => {
+        assertDeploymentIsFromRepo(props);
+        const { site, commitSha, owner, repo, production = false } = props;
         const deploymentId = DeploymentId.new();
         const currentState = await loaders.siteState.get({ site });
         const desiredState = {

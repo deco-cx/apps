@@ -9,11 +9,8 @@ import { assertHasDeploymentParams, SubhostingConfig } from "../../commons.ts";
 import { Subhosting } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 import { calculateGitSha1 } from "../../sha1.ts";
+import { CompilerOptions } from "../../../../admin/platform.ts";
 
-export interface CompilerOptions {
-  jsx: string;
-  jsxImportSource: string;
-}
 export interface Props extends SubhostingConfig {
   files: FileSystemNode;
   compilerOptions: CompilerOptions | null;
@@ -55,7 +52,7 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
 
   for (const { path, content } of walk(node)) {
     assetsBuild.push(
-      calculateGitSha1(textEncoder.encode(content)).then((gitSha1) => {
+      calculateGitSha1(textEncoder.encode(content)).then((_gitSha1) => {
         assets[path.slice(1)] = {
           content,
           // gitSha1,
@@ -70,6 +67,7 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
 };
 
 export interface Deployment {
+  id: string;
   domain?: string;
   status: string;
 }
@@ -114,6 +112,7 @@ export default async function deploy(
   const domain = deployment.domains?.[0];
 
   return {
+    id: deployment.id,
     domain: domain ? `https://${domain}` : undefined,
     status: deployment.status,
   };

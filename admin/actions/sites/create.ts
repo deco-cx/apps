@@ -1,34 +1,32 @@
-import { SubhostingConfig } from "../../../platforms/subhosting/commons.ts";
 import { AppContext } from "../../mod.ts";
+import { Deployment } from "../../platform.ts";
 
-export interface Props extends Omit<SubhostingConfig, "projectId"> {
-  name?: string;
+export interface Props {
+  name: string;
+  platform: PlatformName;
 }
 
+export type PlatformName = "kubernetes" | "subhosting";
+
 export interface Site {
-  id: string;
   name: string;
-  domain?: string;
+  deployment?: Deployment;
 }
 
 export default async function create(
-  { name, deployAccessToken, deployOrgId }: Props,
+  { name, platform: platformName }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Site> {
-  const { invoke } = ctx;
-  const { actions: { projects } } = invoke["deno-subhosting"];
-  const site = await projects.create({ name, deployAccessToken, deployOrgId });
+  const { invoke: { "deco-sites/admin": admin } } = ctx;
+  await admin.actions.platforms.assign({ site: name, platform: platformName });
+  const platform = await admin.loaders.platforms.forSite({ site: name });
+  await platform.sites.create({ site: name, mode: "files" });
 
-  console.log({ site });
-
-  const deployment = await invoke["deco-sites/admin"].actions.deployments
+  const deployment = await admin.actions.deployments
     .create({
-      site: site.name,
-      projectId: site.id,
-      deployAccessToken,
-      deployOrgId,
+      site: name,
     });
 
-  return { ...site, ...deployment };
+  return { name, deployment };
 }

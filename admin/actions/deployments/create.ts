@@ -9,15 +9,15 @@ import {
 } from "../../../files/sdk.ts";
 import { Props as CreateProps } from "../../../platforms/subhosting/actions/deployments/create.ts";
 import { AppContext } from "../../mod.ts";
+import { Deployment } from "../../platform.ts";
 import importMapJson from "./deployment_deno.json" with { type: "json" };
-import { SubhostingConfig } from "../../../platforms/subhosting/commons.ts";
 
 export type Runtime = "fresh" | "naked";
 export interface SiteState {
   decofile: Record<string, unknown>;
   files: FileSystemNode;
 }
-export interface Props extends SiteState, SubhostingConfig {
+export interface Props extends SiteState {
   runtime?: Runtime;
   site: string;
 }
@@ -202,9 +202,6 @@ export type AppContext = AC<ReturnType<typeof App>>;
     },
   };
 
-export interface Deployment {
-  domain?: string;
-}
 export default async function create(
   props: Props,
   _req: Request,
@@ -219,8 +216,11 @@ export default async function create(
       DECO_ALLOWED_AUTHORITIES: "configs.decocdn.com,deno.dev",
     };
 
-    return await ctx.invoke["deno-subhosting"].actions.deployments.create(
-      res,
+    const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms
+      .forSite({ site: props.site });
+
+    return await platform.deployments.create(
+      { ...res, site: props.site, mode: "files" },
     );
   } catch (error) {
     console.error(error);

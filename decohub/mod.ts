@@ -10,9 +10,9 @@ export type State = {};
  * @title Deco Hub
  */
 // const ADMIN_APP = "decohub/apps/admin.ts";
-export default async function App(
+export default function App(
   state: State,
-): Promise<App<Manifest, State>> {
+): App<Manifest, State> {
   // const resolvedImport = import.meta.resolve("../admin/mod.ts");
   return {
     manifest: {
