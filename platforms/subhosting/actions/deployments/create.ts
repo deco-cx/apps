@@ -7,9 +7,9 @@ import {
   walk,
 } from "../../../../files/sdk.ts";
 import { assertHasDeploymentParams, SubhostingConfig } from "../../commons.ts";
-import { Subhosting } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 import { calculateGitSha1 } from "../../sha1.ts";
+import { ManifestEntry, Subhosting } from "../../subhosting.ts";
 
 export interface Props extends SubhostingConfig {
   files: FileSystemNode;
@@ -68,6 +68,39 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
   return assets;
 };
 
+const buildEntries = async (
+  node: FileSystemNode,
+): Promise<Record<string, ManifestEntry>> => {
+  const entries: Record<string, ManifestEntry> = {};
+
+  const entriesBuild: Promise<void>[] = [];
+
+  for (const { path, content } of walk(node)) {
+    const segments = path.split("/");
+    const fileName = segments.pop()!;
+    let currEntries = entries;
+    for (const dir of segments) {
+      const currDir = {
+        kind: "directory" as const,
+        entries: {},
+      };
+      currEntries[dir] = currDir;
+      currEntries = currDir.entries;
+    }
+    const data = textEncoder.encode(content);
+    const gitSha1Promise = calculateGitSha1(data);
+    entriesBuild.push(gitSha1Promise.then((gitSha1) => {
+      currEntries[fileName] = {
+        kind: "file" as const,
+        gitSha1,
+        size: data.byteLength,
+      };
+    }));
+  }
+  await Promise.all(entriesBuild);
+  return entries;
+};
+
 export interface Deployment {
   id: string;
   domain?: string;
@@ -94,6 +127,9 @@ export default async function deploy(
   const projectId = props.projectId ?? ctx.projectId;
   assertHasDeploymentParams({ deployAccessToken, deployOrgId, projectId });
   const client = new Subhosting(deployAccessToken, deployOrgId);
+  const entries = await buildEntries(props.files);
+  const response = await client.negotiateAssets(projectId!, { entries });
+  console.log(await response.json());
   const assets = await buildAssets(props.files);
   const created = await client.createDeployment(projectId!, {
     databases,
