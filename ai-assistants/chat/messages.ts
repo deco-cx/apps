@@ -293,13 +293,19 @@ export const messageProcessorFor = async (
     const token = getToken(lastMsg);
     console.log({ token });
     const replyMessage = threadMessageToReply(lastMsg);
-    console.log('functionCall length:', functionCallReplies.length, 'token positive?', token === Tokens.POSITIVE, {replyMessage})
+    console.log(
+      "functionCall length:",
+      functionCallReplies.length,
+      "token positive?",
+      token === Tokens.POSITIVE,
+      { replyMessage },
+    );
 
     const _latestMsg = lastMsg.id;
     reply(replyMessage);
 
     if (functionCallReplies.length > 0 && token === Tokens.POSITIVE) {
-      console.log('tem function call replies', functionCallReplies)
+      console.log("tem function call replies", functionCallReplies);
       reply({
         messageId,
         type: "function_calls" as const,
