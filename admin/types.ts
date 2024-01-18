@@ -1,6 +1,7 @@
 import { type Resolvable } from "deco/engine/core/resolver.ts";
 import { type FileSystemNode } from "../files/sdk.ts";
 import { type fjp } from "./deps.ts";
+import { type Deployment } from "./platform.ts";
 
 export interface Pagination<T> {
   data: T[];
@@ -28,7 +29,7 @@ export interface FetchState {
 export interface StatePublished {
   type: "state-published";
   payload: {
-    domain?: string;
+    deployment: Deployment;
   };
 }
 

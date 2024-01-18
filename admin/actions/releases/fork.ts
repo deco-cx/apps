@@ -61,9 +61,7 @@ const action = ({ site }: Props, req: Request, ctx: AppContext) => {
 
       broadcast({
         type: "state-published",
-        payload: {
-          domain: created.domains?.[0]?.url,
-        },
+        payload: { deployment: created },
         ack,
       });
     } else if (data.type === "patch-state") {
