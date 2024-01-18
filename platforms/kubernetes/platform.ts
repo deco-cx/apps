@@ -1,3 +1,4 @@
+import { assertCreateIsFromRepo } from "../../admin/platform.ts";
 import { Platform } from "../../admin/platform.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
@@ -23,6 +24,7 @@ export default function kubernetes(
     cfZoneId: "eba5bf129d0b006fd616fd32f0c71492",
     sites: {
       create: async (props) => {
+        assertCreateIsFromRepo(props);
         await actions.sites.create(props);
       },
       delete: async (props) => await actions.sites.delete(props),

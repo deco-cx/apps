@@ -1,3 +1,5 @@
+import { FileSystemNode } from "../files/sdk.ts";
+
 export interface DomainOpts {
   site: string;
   domain: string;
@@ -36,12 +38,39 @@ export interface UpdateDeploymentOpts {
   release: string;
 }
 
-export interface CreateSiteOpts {
+export interface CreateSiteOptsBase {
   site: string;
-  repo: Omit<RepoOpts, "site">;
   release?: string;
+  mode: string;
 }
 
+export interface CreateSiteFromRepoOpts extends CreateSiteOptsBase {
+  mode: "repo";
+  repo: Omit<RepoOpts, "site">;
+}
+
+export interface CreateSiteFromFilesOpts extends CreateSiteOptsBase {
+  mode: "files";
+  files: FileSystemNode;
+  decofile?: Record<string, unknown>;
+}
+
+export type CreateSiteOpts = CreateSiteFromRepoOpts | CreateSiteFromFilesOpts;
+export function assertCreateIsFromRepo(
+  opts: CreateSiteOpts,
+): asserts opts is CreateSiteFromRepoOpts {
+  if (opts?.mode !== "repo") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
+
+export function assertCreateIsFromFile(
+  opts: CreateSiteOpts,
+): asserts opts is CreateSiteFromFilesOpts {
+  if (opts?.mode !== "files") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
 export interface DeleteSiteOpts {
   site: string;
 }
