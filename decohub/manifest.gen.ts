@@ -21,7 +21,8 @@ import * as $$$$$$$$$$$15 from "./apps/shopify.ts";
 import * as $$$$$$$$$$$16 from "./apps/handlebars.ts";
 import * as $$$$$$$$$$$17 from "./apps/verified-reviews.ts";
 import * as $$$$$$$$$$$18 from "./apps/files.ts";
-import * as $$$$$$$$$$$19 from "./apps/power-reviews.ts";
+import * as $$$$$$$$$$$19 from "./apps/files.ts";
+import * as $$$$$$$$$$$20 from "./apps/power-reviews.ts";
 
 const manifest = {
   "apps": {
@@ -35,7 +36,7 @@ const manifest = {
     "decohub/apps/implementation.ts": $$$$$$$$$$$6,
     "decohub/apps/linx.ts": $$$$$$$$$$$10,
     "decohub/apps/nuvemshop.ts": $$$$$$$$$$$9,
-    "decohub/apps/power-reviews.ts": $$$$$$$$$$$19,
+    "decohub/apps/power-reviews.ts": $$$$$$$$$$$20,
     "decohub/apps/shopify.ts": $$$$$$$$$$$15,
     "decohub/apps/sourei.ts": $$$$$$$$$$$14,
     "decohub/apps/typesense.ts": $$$$$$$$$$$0,

@@ -9,23 +9,23 @@ export type State = {};
 /**
  * @title Deco Hub
  */
-const ADMIN_APP = "decohub/apps/admin.ts";
+// const ADMIN_APP = "decohub/apps/admin.ts";
 export default async function App(
   state: State,
 ): Promise<App<Manifest, State>> {
-  const resolvedImport = import.meta.resolve("../admin/mod.ts");
+  // const resolvedImport = import.meta.resolve("../admin/mod.ts");
   return {
     manifest: {
       ...manifest,
       apps: {
         ...manifest.apps,
-        ...context.play // this is an optimization to not include the admin code for everyone in case of play is not being used.
-          ? {
-            [ADMIN_APP]: await import(
-              resolvedImport
-            ),
-          }
-          : {},
+        // ...context.play // this is an optimization to not include the admin code for everyone in case of play is not being used.
+        //   ? {
+        //     [ADMIN_APP]: await import(
+        //       resolvedImport
+        //     ),
+        //   }
+        //   : {},
       },
     } as Manifest,
     state,
@@ -33,7 +33,7 @@ export default async function App(
       ? {
         sourceMap: {
           ...buildSourceMap(manifest),
-          [ADMIN_APP]: resolvedImport,
+          // [ADMIN_APP]: resolvedImport,
         },
       }
       : {},

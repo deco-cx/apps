@@ -73,6 +73,13 @@ export const mergeFs = (
         nodes.push(entry);
       }
     }
+    for (const [entryName, entry] of Object.entries(sourceMap)) {
+      if (targetMap[entryName]) {
+        continue;
+      } else {
+        nodes.push(entry);
+      }
+    }
     return { ...target, nodes };
   } else if (!isDir(target) && !isDir(source)) {
     return target;

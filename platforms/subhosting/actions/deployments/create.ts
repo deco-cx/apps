@@ -17,7 +17,7 @@ export interface CompilerOptions {
 export interface Props extends SubhostingConfig {
   files: FileSystemNode;
   compilerOptions: CompilerOptions | null;
-  entrypointUrl: string;
+  entryPointUrl: string;
   importMapUrl: string | null;
   envVars?: Record<string, string>;
 }
@@ -56,9 +56,9 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
   for (const { path, content } of walk(node)) {
     assetsBuild.push(
       calculateGitSha1(textEncoder.encode(content)).then((gitSha1) => {
-        assets[path] = {
+        assets[path.slice(1)] = {
           content,
-          gitSha1,
+          // gitSha1,
           encoding: "utf-8",
           kind: "file",
         };
@@ -70,12 +70,14 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
 };
 
 export interface Deployment {
-  domain: string;
+  domain?: string;
   status: string;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default async function deploy(
-  { compilerOptions, entrypointUrl, importMapUrl, envVars, ...props }: Props,
+  { compilerOptions, entryPointUrl, importMapUrl, envVars, ...props }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
@@ -86,17 +88,33 @@ export default async function deploy(
   assertHasDeploymentParams({ deployAccessToken, deployOrgId, projectId });
   const client = new Subhosting(deployAccessToken, deployOrgId);
   const assets = await buildAssets(props.files);
-  const deployment = await client.createDeployment(projectId!, {
+  const created = await client.createDeployment(projectId!, {
     assets,
     compilerOptions,
-    entrypointUrl,
+    entryPointUrl,
     importMapUrl,
     envVars,
   }).then((d) => d.json());
-  console.log({ deployment });
+
+  let deployment = created;
+  while (true) {
+    const deployments = await client.listDeployments(projectId!).then((res) =>
+      res.json()
+    );
+
+    deployment = deployments.find((d: { id: string }) => d.id === created.id);
+
+    if (deployment.status !== "pending") {
+      break;
+    }
+
+    await sleep(2.5e3);
+  }
+
+  const domain = deployment.domains?.[0];
 
   return {
-    domain: deployment.domains[0],
+    domain: domain ? `https://${domain}` : undefined,
     status: deployment.status,
   };
 }

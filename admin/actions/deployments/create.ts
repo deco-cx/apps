@@ -12,7 +12,7 @@ import { AppContext } from "../../mod.ts";
 import importMapJson from "./deployment_deno.json" with { type: "json" };
 import { SubhostingConfig } from "../../../platforms/subhosting/commons.ts";
 
-export type Runtime = "fresh";
+export type Runtime = "fresh" | "naked";
 export interface SiteState {
   decofile: Record<string, unknown>;
   files: FileSystemNode;
@@ -42,13 +42,29 @@ function assertIsDir(fs: FileSystemNode): asserts fs is DirectoryEntry {
 
 const runtimeTemplates: Record<Runtime, (name: Props) => Promise<CreateProps>> =
   {
+    naked: (
+      { runtime: _ignore, ...props },
+    ) =>
+      Promise.resolve({
+        ...props,
+        entryPointUrl: "main.ts",
+        importMapUrl: null,
+        compilerOptions: null,
+        files: {
+          name: "",
+          nodes: [{
+            name: "main.ts",
+            content: `Deno.serve(() => new Response("Hello, World!"));`,
+          }],
+        },
+      }),
     fresh: async (
       { site: name, files, decofile, runtime: _ignore, ...props },
     ) => {
       const siteState = {
         ...props,
-        entrypointUrl: "main.ts",
-        importMapUrl: "import_map.json",
+        entryPointUrl: "main.ts",
+        importMapUrl: "deno.json",
         compilerOptions: {
           jsx: "react-jsx",
           jsxImportSource: "preact",
@@ -56,6 +72,28 @@ const runtimeTemplates: Record<Runtime, (name: Props) => Promise<CreateProps>> =
         files: {
           name: "",
           nodes: [
+            {
+              name: "main.ts",
+              content: `
+/// <reference no-default-lib="true"/>
+/// <reference lib="dom" />
+/// <reference lib="deno.ns" />
+/// <reference lib="esnext" />
+import { start } from "$fresh/server.ts";
+import manifest from "./fresh.gen.ts";
+import decoManifest from "./manifest.gen.ts";
+import decoPlugin from "deco/plugins/deco.ts";
+import { context } from "deco/deco.ts";
+
+await start(manifest, {
+  plugins: [
+    decoPlugin({
+      manifest: decoManifest,
+    }),
+  ],
+});
+            `,
+            },
             {
               name: "deno.json",
               content: JSON.stringify(importMapJson),
@@ -70,6 +108,24 @@ const manifest = {
 };
 export default manifest;
     `,
+            },
+            {
+              name: ".decofile.json",
+              content: JSON.stringify({
+                site: {
+                  __resolveType: `${name}/apps/site.ts`,
+                },
+                decohub: {
+                  __resolveType: `${name}/apps/decohub.ts`,
+                },
+                "admin-app": {
+                  __resolveType: `decohub/apps/admin.ts`,
+                },
+                "files": {
+                  __resolveType: `decohub/apps/files.ts`
+                },
+                ...decofile,
+              }),
             },
             {
               name: "fresh.config.ts",
@@ -91,6 +147,11 @@ export default defineConfig({
             {
               name: "apps",
               nodes: [
+                {
+                  name: "decohub.ts",
+                  content:
+                    `export { default, Preview } from "apps/decohub/mod.ts";`,
+                },
                 {
                   name: "site.ts",
                   content: `
@@ -115,20 +176,23 @@ export type AppContext = AC<ReturnType<typeof App>>;
             },
           ],
         },
-        decofile: {
-          site: {
-            __resolveType: `${name}/apps/site.ts`,
-          },
-          ...decofile,
-        },
       };
-      const resultFs = mergeFs(files, siteState.files);
+      const resultFs = mergeFs(
+        files ?? { name: "", nodes: [] },
+        siteState.files,
+      );
       assertIsDir(resultFs);
       const nodeMap = nodesToMap(resultFs.nodes);
       const manifest = {
         name: "manifest.gen.ts",
         content: (await decoManifestBuilder("", name, async function* (dir) {
-          for await (const file of walk(nodeMap[dir])) {
+          const fs = nodeMap[dir];
+
+          if (!fs) {
+            return;
+          }
+
+          for await (const file of walk(fs)) {
             yield file;
           }
         })).build(),
@@ -139,14 +203,24 @@ export type AppContext = AC<ReturnType<typeof App>>;
   };
 
 export interface Deployment {
-  domain: string;
+  domain?: string;
 }
 export default async function create(
   props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
-  return await ctx.invoke["deno-subhosting"].actions.deployments.create(
-    await runtimeTemplates[props.runtime ?? "fresh"](props),
-  );
+  try {
+    const res = await runtimeTemplates[props.runtime ?? "fresh"](props);
+
+    res.envVars = { ...res.envVars, USE_LOCAL_STORAGE_ONLY: "true" };
+
+    return await ctx.invoke["deno-subhosting"].actions.deployments.create(
+      res,
+    );
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
 }
