@@ -49,7 +49,7 @@ async function loader(
     count,
   } = props;
   const segment = getSegmentFromBag(ctx);
-  const params = toSegmentParams(segment);
+  const params = toSegmentParams(segment, ctx);
 
   const getProductGroupID = async (props: { slug?: string; id?: string }) => {
     const { id, slug } = props;

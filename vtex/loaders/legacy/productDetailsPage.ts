@@ -41,7 +41,7 @@ async function loader(
     : defaultPaths?.possiblePaths[0] || "/";
   const url = new URL(baseUrl);
   const segment = getSegmentFromBag(ctx);
-  const params = toSegmentParams(segment);
+  const params = toSegmentParams(segment, ctx);
   const skuId = url.searchParams.get("skuId");
 
   const response = await vcsDeprecated

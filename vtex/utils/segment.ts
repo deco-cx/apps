@@ -14,7 +14,7 @@ export interface WrappedSegment {
 /**
  * by default segment starts with null values
  */
-const DEFAULT_SEGMENT: Partial<Segment> = {
+export const DEFAULT_SEGMENT: Partial<Segment> = {
   utmi_campaign: null,
   utmi_page: null,
   utmi_part: null,
