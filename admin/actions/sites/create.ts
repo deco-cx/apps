@@ -1,5 +1,13 @@
+import {
+  adjectives,
+  animals,
+  NumberDictionary,
+  uniqueNamesGenerator,
+} from "https://esm.sh/v135/unique-names-generator@4.7.1";
 import { AppContext } from "../../mod.ts";
 import { Deployment } from "../../platform.ts";
+
+const numberDictionary = NumberDictionary.generate({ min: 10, max: 99 });
 
 export interface Props {
   name: string;
@@ -14,10 +22,15 @@ export interface Site {
 }
 
 export default async function create(
-  { name, platform: platformName }: Props,
+  { name: _name, platform: platformName }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Site> {
+  const name = _name ?? uniqueNamesGenerator({
+    dictionaries: [animals, adjectives, numberDictionary],
+    length: 3,
+    separator: "-",
+  });
   const { invoke: { "deco-sites/admin": admin } } = ctx;
   await admin.actions.platforms.assign({ site: name, platform: platformName });
   const platform = await admin.loaders.platforms.forSite({ site: name });
