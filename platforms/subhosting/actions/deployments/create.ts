@@ -27,6 +27,10 @@ export interface File extends AssetBase {
   kind: "file";
   content: string;
   encoding?: "utf-8" | "base64";
+}
+
+export interface Hash extends AssetBase {
+  kind: "file";
   gitSha1?: string;
 }
 
@@ -35,7 +39,7 @@ interface Symlink extends AssetBase {
   target: string;
 }
 
-type Asset = File | Symlink;
+type Asset = Hash | File | Symlink;
 
 type Assets = Record<string, Asset>;
 
@@ -54,13 +58,10 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
   for (const { path, content } of walk(node)) {
     const encoded = textEncoder.encode(content);
     assetsBuild.push(
-      calculateGitSha1(encoded).then((_gitSha1) => {
-        assets[path.slice(1)] = {
-          content,
-          encoding: "utf-8",
-          //gitSha1,
-          kind: "file",
-        };
+      calculateGitSha1(encoded).then((gitSha1) => {
+        assets[path.slice(1)] = path === "/main.ts"
+          ? { gitSha1, kind: "file" }
+          : { content, encoding: "utf-8", kind: "file" };
       }),
     );
   }

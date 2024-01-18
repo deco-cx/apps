@@ -218,8 +218,7 @@ Deno.serve(async (req, conn) => {
               nodes: [
                 {
                   name: "decohub.ts",
-                  content:
-                    `
+                  content: `
 import * as admin from "apps/admin/mod.ts";
 import * as files from "apps/files/mod.ts";
 
@@ -433,8 +432,7 @@ export default defineConfig({
               nodes: [
                 {
                   name: "decohub.ts",
-                  content:
-                    `
+                  content: `
 import * as admin from "apps/admin/mod.ts";
 import * as files from "apps/files/mod.ts";
 
