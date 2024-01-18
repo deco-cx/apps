@@ -12,7 +12,7 @@ const paltformApps = [{
   dir: "./platforms/kubernetes",
   name: "kubernetes",
 }, {
-  dir:"./platforms/subhosting",
+  dir: "./platforms/subhosting",
   name: "deno-subhosting",
 }];
 
