@@ -122,7 +122,7 @@ export default manifest;
                   __resolveType: `decohub/apps/admin.ts`,
                 },
                 "files": {
-                  __resolveType: `decohub/apps/files.ts`
+                  __resolveType: `decohub/apps/files.ts`,
                 },
                 ...decofile,
               }),
@@ -213,7 +213,11 @@ export default async function create(
   try {
     const res = await runtimeTemplates[props.runtime ?? "fresh"](props);
 
-    res.envVars = { ...res.envVars, USE_LOCAL_STORAGE_ONLY: "true" };
+    res.envVars = {
+      ...res.envVars,
+      USE_LOCAL_STORAGE_ONLY: "true",
+      DECO_ALLOWED_AUTHORITIES: "configs.decocdn.com,deno.dev",
+    };
 
     return await ctx.invoke["deno-subhosting"].actions.deployments.create(
       res,
