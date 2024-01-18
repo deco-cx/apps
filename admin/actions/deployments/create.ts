@@ -99,10 +99,49 @@ await start(manifest, {
               content: JSON.stringify(importMapJson),
             },
             {
+              name: 'routes', 
+              nodes: [
+                {
+                  name: '_app.tsx',
+                  content: `
+import { asset, Head } from "$fresh/runtime.ts";
+import { defineApp } from "$fresh/server.ts";
+import { Context } from "deco/deco.ts";
+
+export default defineApp(async (_req, ctx) => {
+  const revision = await Context.active().release?.revision();
+
+  return (
+    <>
+      {/* Include Icons and manifest */}
+      <Head>
+        {/* Enable View Transitions API */}
+        <meta name="view-transition" content="same-origin" />
+
+        {/* Tailwind v3 CSS file */}
+        <link
+          href={asset(\`/styles.css?revision=\${revision}\`)}
+          rel="stylesheet"
+        />
+      </Head>
+
+      {/* Rest of Preact tree */}
+      <ctx.Component />
+    </>
+  );
+});`
+                }
+              ]
+            },
+            {
               name: "fresh.gen.ts",
               content: `
-const manifest = {
-    routes: {},
+import * as $_app from "./routes/_app.tsx";              
+
+const manifest = { 
+    routes: {
+      "./routes/_app.tsx": $_app,
+    },
     islands: {},
     baseUrl: import.meta.url,
 };
@@ -213,8 +252,8 @@ export default async function create(
     res.envVars = {
       ...res.envVars,
       DECO_RELEASE: "file:///src/.decofile.json",
-      USE_LOCAL_STORAGE_ONLY: "true",
       DECO_ALLOWED_AUTHORITIES: "configs.decocdn.com,deno.dev",
+      DECO_SITE_NAME: props.site,
     };
 
     const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms

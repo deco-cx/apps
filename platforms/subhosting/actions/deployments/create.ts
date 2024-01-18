@@ -1,12 +1,12 @@
 import { badRequest } from "deco/mod.ts";
 import { CompilerOptions } from "../../../../admin/platform.ts";
 import {
-  isDir,
-  walk,
   type DirectoryEntry,
   type FileSystemNode,
+  isDir,
+  walk,
 } from "../../../../files/sdk.ts";
-import { SubhostingConfig, assertHasDeploymentParams } from "../../commons.ts";
+import { assertHasDeploymentParams, SubhostingConfig } from "../../commons.ts";
 import { Subhosting } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 import { calculateGitSha1 } from "../../sha1.ts";
@@ -52,12 +52,13 @@ const buildAssets = async (node: FileSystemNode): Promise<Assets> => {
   const assetsBuild: Promise<void>[] = [];
 
   for (const { path, content } of walk(node)) {
+    const encoded = textEncoder.encode(content);
     assetsBuild.push(
-      calculateGitSha1(textEncoder.encode(content)).then((_gitSha1) => {
+      calculateGitSha1(encoded).then((gitSha1) => {
         assets[path.slice(1)] = {
-          content,
-          // gitSha1,
-          encoding: "utf-8",
+          // content,
+          // encoding: "utf-8"
+          gitSha1,
           kind: "file",
         };
       }),
@@ -76,7 +77,14 @@ export interface Deployment {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default async function deploy(
-  { compilerOptions, entryPointUrl, importMapUrl, envVars, databases, ...props }: Props,
+  {
+    compilerOptions,
+    entryPointUrl,
+    importMapUrl,
+    envVars,
+    databases,
+    ...props
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
@@ -95,6 +103,8 @@ export default async function deploy(
     importMapUrl,
     envVars,
   }).then((d) => d.json());
+
+  console.log(created);
 
   let deployment = created;
   while (true) {
