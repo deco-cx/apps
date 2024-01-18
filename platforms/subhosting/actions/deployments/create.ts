@@ -1,15 +1,15 @@
 import { badRequest } from "deco/mod.ts";
+import { CompilerOptions } from "../../../../admin/platform.ts";
 import {
-  type DirectoryEntry,
-  type FileSystemNode,
   isDir,
   walk,
+  type DirectoryEntry,
+  type FileSystemNode,
 } from "../../../../files/sdk.ts";
-import { assertHasDeploymentParams, SubhostingConfig } from "../../commons.ts";
+import { SubhostingConfig, assertHasDeploymentParams } from "../../commons.ts";
 import { Subhosting } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 import { calculateGitSha1 } from "../../sha1.ts";
-import { CompilerOptions } from "../../../../admin/platform.ts";
 
 export interface Props extends SubhostingConfig {
   files: FileSystemNode;
@@ -17,6 +17,7 @@ export interface Props extends SubhostingConfig {
   entryPointUrl: string;
   importMapUrl: string | null;
   envVars?: Record<string, string>;
+  databases?: Record<string, string>;
 }
 
 interface AssetBase {
@@ -75,7 +76,7 @@ export interface Deployment {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default async function deploy(
-  { compilerOptions, entryPointUrl, importMapUrl, envVars, ...props }: Props,
+  { compilerOptions, entryPointUrl, importMapUrl, envVars, databases, ...props }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
@@ -87,6 +88,7 @@ export default async function deploy(
   const client = new Subhosting(deployAccessToken, deployOrgId);
   const assets = await buildAssets(props.files);
   const created = await client.createDeployment(projectId!, {
+    databases,
     assets,
     compilerOptions,
     entryPointUrl,

@@ -3,22 +3,19 @@ import {
   assertDeploymentIsFromFile,
   Platform,
 } from "../../admin/platform.ts";
+import { Project } from "./actions/projects/create.ts";
 import { AppContext } from "./mod.ts";
 
 const kv = await Deno.openKv();
-interface SiteState {
-  site: string;
-  projectId: string;
-}
 
 const PREFIX = ["subhosting", "sites"];
 
-const saveSiteState = async (state: SiteState) => {
-  await kv.set([...PREFIX, state.site], state);
+const saveSiteState = async (state: Project) => {
+  await kv.set([...PREFIX, state.name], state);
 };
 
-const getSiteState = async (site: string): Promise<SiteState | null> => {
-  return (await kv.get<SiteState>([...PREFIX, site])).value;
+const getSiteState = async (site: string): Promise<Project | null> => {
+  return (await kv.get<Project>([...PREFIX, site])).value;
 };
 type Subhosting = AppContext["invoke"]["deno-subhosting"];
 export default function subhosting(
@@ -33,7 +30,7 @@ export default function subhosting(
       create: async (props) => {
         assertCreateIsFromFile(props);
         const project = await actions.projects.create({ name: props.site });
-        await saveSiteState({ site: project.name, projectId: project.id });
+        await saveSiteState(project);
       },
       delete: (_props) => {
         throw new Error("not implemented");
@@ -52,7 +49,10 @@ export default function subhosting(
           throw new Error(`site ${props.site} not found`);
         }
         const deployment = await actions.deployments.create({
-          projectId: state?.projectId,
+          projectId: state?.id,
+          databases: {
+            default: state.defaultDatabaseId,
+          },
           ...props,
         });
         return {
