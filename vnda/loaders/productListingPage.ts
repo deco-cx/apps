@@ -108,9 +108,7 @@ const searchLoader = async (
   const properties2 = url.searchParams.getAll("type_tags[property2][]");
   const properties3 = url.searchParams.getAll("type_tags[property3][]");
 
-  const categoryTagNames = Object.values(
-    Object.fromEntries(url.searchParams.entries()),
-  );
+  const categoryTagNames = Array.from(url.searchParams.values());
 
   const tags = await Promise.all([
     ...categoryTagNames,
