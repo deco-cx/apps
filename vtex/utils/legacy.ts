@@ -121,8 +121,6 @@ export const pageTypesToSeo = (
     return null;
   }
 
-  console.log(current.url)
-
   return {
     title: current.title!,
     description: current.metaTagDescription!,
