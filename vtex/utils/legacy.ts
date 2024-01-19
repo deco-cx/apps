@@ -4,18 +4,16 @@ import { STALE } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
 import { slugify } from "../utils/slugify.ts";
 import type { PageType } from "../utils/types.ts";
-import { DEFAULT_SEGMENT, WrappedSegment } from "./segment.ts";
+import { WrappedSegment } from "./segment.ts";
 
 export const toSegmentParams = (
   { payload: segment }: WrappedSegment,
-  ctx?: AppContext,
 ) => (Object.fromEntries(
   Object.entries({
     utmi_campaign: segment.utmi_campaign ?? undefined,
     utm_campaign: segment.utm_campaign ?? undefined,
     utm_source: segment.utm_source ?? undefined,
-    sc: segment.channel ?? ctx?.defaultSegment?.channel ??
-      DEFAULT_SEGMENT["channel"],
+    sc: segment.channel ?? undefined,
   }).filter(([_, v]) => v != undefined),
 ));
 

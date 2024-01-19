@@ -149,7 +149,7 @@ const loader = async (
   const { url: baseUrl } = req;
   const url = new URL(baseUrl);
   const segment = getSegmentFromBag(ctx);
-  const params = toSegmentParams(segment, ctx);
+  const params = toSegmentParams(segment);
   const currentPageoffset = props.pageOffset ?? 1;
 
   const filtersBehavior = props.filters || "dynamic";

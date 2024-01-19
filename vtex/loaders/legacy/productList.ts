@@ -171,7 +171,7 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const segment = getSegmentFromBag(ctx);
-  const segmentParams = toSegmentParams(segment, ctx);
+  const segmentParams = toSegmentParams(segment);
   const params = fromProps({ props });
 
   const vtexProducts = await vcsDeprecated
