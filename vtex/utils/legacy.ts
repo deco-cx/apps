@@ -131,7 +131,8 @@ export const pageTypesToSeo = (
     canonical: toCanonical(
       new URL(
         current.url
-          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "").toLowerCase()
+          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
+            .toLowerCase()
           : url,
         url,
       ),
