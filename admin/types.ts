@@ -1,20 +1,11 @@
 import { type Resolvable } from "deco/engine/core/resolver.ts";
-import { type FileSystemNode } from "../files/sdk.ts";
 import { type fjp } from "./deps.ts";
-import { type Deployment } from "./platform.ts";
 
 export interface Pagination<T> {
   data: T[];
   page: number;
   pageSize: number;
   total: number;
-}
-
-export interface PublishState {
-  type: "publish-state";
-  payload: {
-    files?: FileSystemNode;
-  };
 }
 
 export interface PatchState {
@@ -24,13 +15,6 @@ export interface PatchState {
 
 export interface FetchState {
   type: "fetch-state";
-}
-
-export interface StatePublished {
-  type: "state-published";
-  payload: {
-    deployment: Deployment;
-  };
 }
 
 export interface StatePatched {
@@ -53,5 +37,5 @@ export interface State {
   decofile: Record<string, Resolvable>;
 }
 
-export type Commands = PatchState | FetchState | PublishState;
-export type Events = StatePatched | StateFetched | StatePublished;
+export type Commands = PatchState | FetchState;
+export type Events = StatePatched | StateFetched;

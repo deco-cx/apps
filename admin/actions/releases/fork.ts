@@ -32,8 +32,7 @@ const patchState = (ops: fjp.Operation[]) => {
   return queue;
 };
 
-const action = ({ site }: Props, req: Request, ctx: AppContext) => {
-  const admin = ctx.invoke["deco-sites/admin"];
+const action = (_: Props, req: Request, ctx: AppContext) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
   const broadcast = (event: Acked<Events>) => {
@@ -51,20 +50,7 @@ const action = ({ site }: Props, req: Request, ctx: AppContext) => {
 
     const { ack } = data;
 
-    if (data.type === "publish-state") {
-      // Do some magic
-      const created = await admin.actions.deployments.create({
-        site,
-        decofile: await fetchState().then((s) => s.decofile),
-        files: data.payload.files,
-      });
-
-      broadcast({
-        type: "state-published",
-        payload: { deployment: created },
-        ack,
-      });
-    } else if (data.type === "patch-state") {
+    if (data.type === "patch-state") {
       try {
         const { payload: operations } = data;
 
