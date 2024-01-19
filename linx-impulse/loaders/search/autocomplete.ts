@@ -50,9 +50,6 @@ const loaders = async (
     ),
   };
 
-  await Deno.writeTextFile("raw_search.json", JSON.stringify(search, null, 2));
-  await Deno.writeTextFile("search.json", JSON.stringify(result, null, 2));
-
   return result;
 };
 
