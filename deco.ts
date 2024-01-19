@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("linx-impulse"),
     app("ai-assistants"),
     app("openai"),
     app("brand-assistant"),
