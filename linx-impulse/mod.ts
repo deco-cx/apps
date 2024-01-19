@@ -2,7 +2,7 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { EventsAPI } from "./utils/events.ts";
-import { SearchAPI } from "./utils/search.ts";
+import { LinxAPI } from "./utils/search.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -34,7 +34,7 @@ export default function App(props: State) {
     }),
   });
 
-  const searchApi = createHttpClient<SearchAPI>({
+  const api = createHttpClient<LinxAPI>({
     base: "http://api.linximpulse.com/",
     headers: new Headers({
       "Accept": "application/json",
@@ -45,7 +45,7 @@ export default function App(props: State) {
     }),
   });
 
-  const state = { ...props, eventsApi, searchApi };
+  const state = { ...props, eventsApi, api };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 

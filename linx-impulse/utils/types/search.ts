@@ -11,6 +11,8 @@ export type SortBy =
   | "descReview"
   | "descDiscount";
 
+export type InteractionType = "PRODUCT_VIEW" | "ADD_TO_CART";
+
 export interface Query {
   query: string;
   link: string;

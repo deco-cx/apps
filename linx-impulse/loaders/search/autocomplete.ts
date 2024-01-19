@@ -21,12 +21,12 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { searchApi, apiKey, secretKey } = ctx;
+  const { api, apiKey, secretKey } = ctx;
   const { query, count = 20 } = props;
 
   if (!query) return null;
 
-  const search = await searchApi["GET /engage/search/v3/autocompletes"]({
+  const search = await api["GET /engage/search/v3/autocompletes"]({
     apiKey,
     secretKey,
     prefix: query,
