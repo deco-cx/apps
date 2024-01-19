@@ -128,9 +128,6 @@ export default async function deploy(
   const projectId = props.projectId ?? ctx.projectId;
   assertHasDeploymentParams({ deployAccessToken, deployOrgId, projectId });
   const client = new Subhosting(deployAccessToken, deployOrgId);
-  // const entries = await buildEntries(props.files);
-  // const response = await client.negotiateAssets(projectId!, { entries });
-  // console.log(await response.json());
   const assets = await buildAssets(props.files);
   const created = await client.createDeployment(projectId!, {
     databases,
@@ -140,8 +137,6 @@ export default async function deploy(
     importMapUrl,
     envVars,
   }).then((d) => d.json());
-
-  console.log(created);
 
   let deployment = created;
   while (true) {
