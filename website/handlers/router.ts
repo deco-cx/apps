@@ -11,6 +11,7 @@ import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
+import NewRadixTree from "../../utils/radixTree.ts"
 
 export interface SelectionConfig {
   audiences: Routes[];
@@ -50,6 +51,17 @@ export const router = (
   resolver: ResolveFunc,
   configs?: ResolveOptions,
 ): Handler => {
+
+  const radixTree = NewRadixTree<Route["handler"]>();
+  const remainingRoutes: Route[] = [];
+  for (const route of routes) {
+    // only add simple routes to radix tree
+    if (/^[\/\-a-zA-Z0-9]+$/.test(route.pathTemplate))
+      radixTree.insert(route.pathTemplate, route.handler);
+    else
+      remainingRoutes.push(route);
+  }
+
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
     const url = new URL(req.url);
     const route = async (
@@ -92,7 +104,13 @@ export const router = (
       );
     }
 
-    for (const { pathTemplate: routePath, handler } of routes) {
+    const matchedHandler = radixTree.search(url.pathname);
+    if (matchedHandler !== undefined) {
+      return await route(matchedHandler.value, url.pathname, {});
+    }
+
+    // couldn't find route on radix tree, seaching on remaining routes next
+    for (const { pathTemplate: routePath, handler } of remainingRoutes) {
       const pattern = urlPatternCache[routePath] ??= new URLPattern({
         pathname: routePath,
       });
@@ -165,6 +183,7 @@ export default function RoutesSelection(
   { audiences }: SelectionConfig,
   ctx: AppContext,
 ): Handler {
+  
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
     // TODO: (@tlgimenes) Remove routing from request cycle
 
@@ -181,6 +200,7 @@ export default function RoutesSelection(
         ? [...ctx.routes, ...routesFromProps]
         : routesFromProps,
     );
+
     // build the router from entries
     const builtRoutes = Object.entries(routes).sort((
       [routeStringA, { highPriority: highPriorityA }],
