@@ -3,7 +3,7 @@ import { SectionProps } from "deco/mod.ts";
 import { AppContext } from "../../mod.ts";
 
 export const loader = (_props: unknown, _req: Request, ctx: AppContext) => ({
-  apiKey: ctx.account,
+  apiKey: ctx.apiKey,
 });
 
 export default function LinxImpulseScript(
