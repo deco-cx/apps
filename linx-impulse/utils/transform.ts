@@ -128,6 +128,8 @@ export const toProduct = (
 
   const image = Object.values(product.images ?? {}).map(toImage) ?? [];
 
+  const trackingId = new URLSearchParams(product.clickUrl).get("trackingId");
+
   return {
     "@type": "Product",
     productID: `${product.id}`,
@@ -170,6 +172,11 @@ export const toProduct = (
             name: key,
             value: sanitizeValue(value[0]),
           })),
+        {
+          "@type": "PropertyValue" as const,
+          name: "trackingId",
+          value: trackingId ?? undefined,
+        },
       ],
       hasVariant,
     },
