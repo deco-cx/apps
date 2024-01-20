@@ -34,7 +34,11 @@ export default async function create(
   const { invoke: { "deco-sites/admin": admin } } = ctx;
   await admin.actions.platforms.assign({ site: name, platform: platformName });
   const platform = await admin.loaders.platforms.forSite({ site: name });
-  await platform.sites.create({ site: name, mode: "files" });
+  await platform.sites.create({
+    site: name,
+    mode: "files",
+    lifecycle: "ephemeral", // this should be changed when site creation is moved to the control plane
+  });
 
   const deployment = await admin.actions.deployments
     .create({

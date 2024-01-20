@@ -1,6 +1,5 @@
 import { fjp } from "../../deps.ts";
 import { storage } from "../../fsStorage.ts";
-import { AppContext } from "../../mod.ts";
 import { Acked, Commands, Events, State } from "../../types.ts";
 
 export interface Props {
@@ -32,7 +31,7 @@ const patchState = (ops: fjp.Operation[]) => {
   return queue;
 };
 
-const action = (_: Props, req: Request, ctx: AppContext) => {
+const action = (_: Props, req: Request) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
   const broadcast = (event: Acked<Events>) => {

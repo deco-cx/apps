@@ -1,27 +1,28 @@
 import { badRequest } from "deco/mod.ts";
+import { walk } from "../../../files/sdk.ts";
 import buildScript from "../common/cmds/build.ts";
 import { watchJobStatus } from "../common/jobs.ts";
 import { ignoreIfExists } from "../common/objects.ts";
 import { k8s } from "../deps.ts";
 import { hashString } from "../hash/shortHash.ts";
+import {
+  Files,
+  Github,
+  Source,
+  sourceIsFromFiles,
+} from "../loaders/siteState/get.ts";
 import { AppContext } from "../mod.ts";
 import { Namespace } from "./sites/create.ts";
 
 export interface Props {
   site: string;
-  commitSha: string;
-  repo: string;
-  owner: string;
+  sourceBinder: SourceBinder;
   builderImage?: string;
 }
 
 export const DECO_SITES_PVC = "deco-sites-sources";
 interface BuildJobOpts {
-  githubToken?: string;
   name: string;
-  commitSha: string;
-  repo: string;
-  owner: string;
   site: string;
   builderImage: string;
   sourceBinder: SourceBinder;
@@ -32,32 +33,170 @@ export interface VolumeBinder {
   mountPath: string;
   sourcePath: string;
 }
+export interface SourceBinder {
+  envVars: k8s.V1EnvVar[];
+  volumes: k8s.V1Volume[];
+  volumeMounts: k8s.V1VolumeMount[];
+  labels?: Record<string, string>;
+  mountPath: string;
+  sourceOutput: string;
+  cacheOutput?: string;
+  sourceId: string;
+}
+
+export interface BinderOptions {
+  ctx: AppContext;
+  deploymentId: string;
+  site: string;
+  siteNs: string;
+}
+const ASSETS_VOLUME_NAME = "assets";
+const SOURCE_LOCAL_NAME = "source-local";
+const SOURCE_LOCAL_MOUNT_PATH = "/app/deco";
 
 export const SrcBinder = {
-  fromRepo: (owner: string, repo: string, commitSha: string): SourceBinder => {
+  from: (
+    source: Source,
+    opts: BinderOptions,
+  ): Promise<SourceBinder> => {
+    const { ctx } = opts;
+    if (!sourceIsFromFiles(source)) {
+      return Promise.resolve(SrcBinder.fromGithub(
+        source,
+        ctx.githubToken,
+      ));
+    }
+    return SrcBinder.fromFiles(source, opts);
+  },
+  fromFiles: async (
+    { files }: Files,
+    { deploymentId, site, siteNs, ctx }: BinderOptions,
+  ): Promise<SourceBinder> => {
+    const configMapName = `files-${deploymentId}`;
+    const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
+    const data: Record<string, string> = {};
+
+    for (const file of walk(files)) {
+      data[file.path] = file.content;
+    }
+
+    await k8sApi.createNamespacedConfigMap(siteNs, {
+      apiVersion: "v1",
+      kind: "ConfigMap",
+      metadata: {
+        name: configMapName,
+        namespace: siteNs,
+      },
+      data,
+    });
+
+    const mountPath = `/${DECO_SITES_PVC}`;
+    const owner = "deco-sites-files";
+    const repo = site;
+
     return {
-      claimName: DECO_SITES_PVC,
-      mountPath: `/${DECO_SITES_PVC}`,
-      sourcePath: `/${DECO_SITES_PVC}/${owner}/${repo}/${commitSha}/source.tar`,
+      sourceId: deploymentId,
+      labels: {},
+      volumes: [{
+        name: ASSETS_VOLUME_NAME,
+        persistentVolumeClaim: {
+          claimName: DECO_SITES_PVC,
+        },
+      }, {
+        name: SOURCE_LOCAL_NAME,
+        configMap: {
+          name: `files-${deploymentId}`,
+        },
+      }],
+      volumeMounts: [{
+        name: ASSETS_VOLUME_NAME,
+        mountPath,
+      }, {
+        name: SOURCE_LOCAL_NAME,
+        mountPath: SOURCE_LOCAL_MOUNT_PATH,
+      }],
+      mountPath,
+      cacheOutput: `${mountPath}/${owner}/${repo}/cache.tar`,
+      sourceOutput: `${mountPath}/${owner}/${repo}/${deploymentId}/source.tar`,
+      envVars: [
+        {
+          name: "SOURCE_PROVIDER",
+          value: "FILES",
+        },
+      ],
+    };
+  },
+  fromGithub: (
+    { owner, repo, commitSha }: Github,
+    githubToken?: string,
+  ): SourceBinder => {
+    const mountPath = `/${DECO_SITES_PVC}`;
+    return {
+      sourceId: `${commitSha}-${owner}-${repo}`,
+      labels: {
+        repo,
+        owner,
+      },
+      envVars: [
+        {
+          name: "SOURCE_LOCAL_DIR",
+          value: SOURCE_LOCAL_MOUNT_PATH,
+        },
+        {
+          name: "SOURCE_PROVIDER",
+          value: "GITHUB",
+        },
+        {
+          name: "GITHUB_TOKEN",
+          ...githubToken ? { value: githubToken } : {
+            valueFrom: {
+              secretKeyRef: {
+                name: "github-token",
+                key: "token",
+              },
+            },
+          },
+        },
+        {
+          name: "GIT_REPO",
+          value: `https://github.com/${owner}/${repo}`,
+        },
+        {
+          name: "COMMIT_SHA",
+          value: commitSha,
+        },
+      ],
+      volumes: [{
+        name: SOURCE_LOCAL_NAME,
+        emptyDir: {},
+      }, {
+        name: ASSETS_VOLUME_NAME,
+        persistentVolumeClaim: {
+          claimName: DECO_SITES_PVC,
+        },
+      }],
+      volumeMounts: [{
+        name: SOURCE_LOCAL_NAME,
+        mountPath: SOURCE_LOCAL_MOUNT_PATH,
+      }, {
+        name: ASSETS_VOLUME_NAME,
+        mountPath,
+      }],
+      mountPath,
+      cacheOutput: `${mountPath}/${owner}/${repo}/cache.tar`,
+      sourceOutput: `${mountPath}/${owner}/${repo}/${commitSha}/source.tar`,
     };
   },
 };
 
-export type SourceBinder = VolumeBinder;
 const buildJobOf = (
   {
-    githubToken,
     name,
-    commitSha,
-    repo,
-    owner,
     site,
     builderImage,
     sourceBinder,
   }: BuildJobOpts,
 ): k8s.V1Job => {
-  const sourcesMountPath = "/deco-sites-sources";
-  const sourceLocalMountPath = "/app/deco";
   const cacheLocalMountPath = "/cache";
   const esbuildCacheMountPath = "/esbuild-cache";
   return {
@@ -68,8 +207,7 @@ const buildJobOf = (
       namespace: Namespace.forSite(site),
       labels: {
         site,
-        repo,
-        owner,
+        ...sourceBinder.labels ?? {},
       },
     },
     spec: {
@@ -81,17 +219,9 @@ const buildJobOf = (
             name: "cache-local",
             emptyDir: {},
           }, {
-            name: "source-local",
-            emptyDir: {},
-          }, {
             name: "esbuild-cache",
             emptyDir: {},
-          }, {
-            name: "assets",
-            persistentVolumeClaim: {
-              claimName: sourceBinder.claimName,
-            },
-          }],
+          }, ...sourceBinder.volumes],
           containers: [
             {
               command: ["/bin/sh", "-c"],
@@ -108,24 +238,12 @@ const buildJobOf = (
                   value: cacheLocalMountPath,
                 },
                 {
-                  name: "SOURCE_LOCAL_DIR",
-                  value: sourceLocalMountPath,
-                },
-                {
                   name: "SOURCE_REMOTE_OUTPUT",
-                  value: sourceBinder.sourcePath,
+                  value: sourceBinder.sourceOutput,
                 },
                 {
                   name: "CACHE_REMOTE_OUTPUT",
-                  value: `${sourceBinder.mountPath}/${owner}/${repo}/cache.tar`,
-                },
-                {
-                  name: "GIT_REPO",
-                  value: `https://github.com/${owner}/${repo}`,
-                },
-                {
-                  name: "COMMIT_SHA",
-                  value: commitSha,
+                  value: sourceBinder.cacheOutput,
                 },
                 {
                   name: "DENO_DIR",
@@ -135,17 +253,7 @@ const buildJobOf = (
                   name: "XDG_CACHE_HOME",
                   value: esbuildCacheMountPath,
                 },
-                {
-                  name: "GITHUB_TOKEN",
-                  ...githubToken ? { value: githubToken } : {
-                    valueFrom: {
-                      secretKeyRef: {
-                        name: "github-token",
-                        key: "token",
-                      },
-                    },
-                  },
-                },
+                ...sourceBinder.envVars,
               ],
               volumeMounts: [
                 {
@@ -156,14 +264,7 @@ const buildJobOf = (
                   name: "cache-local",
                   mountPath: cacheLocalMountPath,
                 },
-                {
-                  name: "source-local",
-                  mountPath: sourceLocalMountPath,
-                },
-                {
-                  name: "assets",
-                  mountPath: sourcesMountPath,
-                },
+                ...sourceBinder.volumeMounts,
               ],
             },
           ],
@@ -223,7 +324,7 @@ export interface BuildResult {
  * Builds a specific commit repo and owner using the given builder image or getting from builder image default.
  */
 export default async function build(
-  { commitSha, repo, owner, site, builderImage }: Props,
+  { sourceBinder: binder, site, builderImage }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<BuildResult> {
@@ -233,17 +334,13 @@ export default async function build(
   }
   const siteNs = Namespace.forSite(site);
   const batchAPI = ctx.kc.makeApiClient(k8s.BatchV1Api);
-  const binder = SrcBinder.fromRepo(owner, repo, commitSha);
+  // const binder = SrcBinder.fromRepo(owner, repo, commitSha, ctx.githubToken);
   // Define the Job specification
   const jobName = `build-${await hashString(
-    `build-${commitSha}-${owner}-${repo}`,
+    `build-${binder.sourceId}`,
   )}`;
   const job = buildJobOf({
     name: jobName,
-    githubToken: ctx.githubToken,
-    commitSha,
-    owner,
-    repo,
     site,
     builderImage: builderImg!,
     sourceBinder: binder,

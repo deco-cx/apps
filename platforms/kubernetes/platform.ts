@@ -1,8 +1,4 @@
-import {
-  assertCreateIsFromRepo,
-  assertDeploymentIsFromRepo,
-  Platform,
-} from "../../admin/platform.ts";
+import { assertDeploymentIsFromRepo, Platform } from "../../admin/platform.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
@@ -16,18 +12,18 @@ export interface Props {
 
 const DECO_RELEASE_ENV_VAR = "DECO_RELEASE";
 
-type Kubernetes = AppContext["invoke"]["kubernetes"];
+export type Kubernetes = AppContext["invoke"]["kubernetes"];
 export default function kubernetes(
   k8s: Kubernetes,
 ): Platform {
   const { loaders, actions } = k8s;
   return {
+    supportsDynamicImport: true,
     name: "kubernetes",
     domain: CONTROL_PLANE_DOMAIN,
     cfZoneId: "eba5bf129d0b006fd616fd32f0c71492",
     sites: {
       create: async (props) => {
-        assertCreateIsFromRepo(props);
         await actions.sites.create(props);
       },
       delete: async (props) => await actions.sites.delete(props),

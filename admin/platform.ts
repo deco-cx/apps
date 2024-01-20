@@ -70,10 +70,13 @@ export interface UpdateDeploymentOpts {
   release: string;
 }
 
+export type SiteLifecycle = "ephemeral";
+
 export interface CreateSiteOptsBase {
   site: string;
   release?: string;
   mode: string;
+  lifecycle?: SiteLifecycle;
 }
 
 export interface CreateSiteFromRepoOpts extends CreateSiteOptsBase {
@@ -122,6 +125,7 @@ export interface Sites {
 }
 
 export interface Platform {
+  supportsDynamicImport?: boolean;
   name: string;
   cfZoneId: string;
   domain: string;

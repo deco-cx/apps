@@ -12,6 +12,7 @@ import { AppContext } from "../../mod.ts";
 import { Deployment } from "../../platform.ts";
 import importMapJson from "./deployment_deno.json" with { type: "json" };
 
+const DECOFILE_NAME = ".decofile.json";
 export type Runtime = "fresh" | "naked";
 export interface SiteState {
   decofile: Record<string, unknown>;
@@ -40,25 +41,27 @@ function assertIsDir(fs: FileSystemNode): asserts fs is DirectoryEntry {
   }
 }
 
-const runtimeTemplates: Record<Runtime, (name: Props) => Promise<CreateProps>> =
-  {
-    naked: async (
-      { site: name, files, decofile, runtime: _ignore, ...props },
-    ) => {
-      const siteState = {
-        ...props,
-        entryPointUrl: "main.ts",
-        importMapUrl: "deno.json",
-        compilerOptions: {
-          jsx: "react-jsx",
-          jsxImportSource: "preact",
-        },
-        files: {
-          name: "",
-          nodes: [
-            {
-              name: "main.ts",
-              content: `
+const runtimeTemplates: Record<
+  Runtime,
+  (props: Props, supportsDynamicImport?: boolean) => Promise<CreateProps>
+> = {
+  naked: async (
+    { site: name, files, decofile, runtime: _ignore, ...props },
+  ) => {
+    const siteState = {
+      ...props,
+      entryPointUrl: "main.ts",
+      importMapUrl: "deno.json",
+      compilerOptions: {
+        jsx: "react-jsx",
+        jsxImportSource: "preact",
+      },
+      files: {
+        name: "",
+        nodes: [
+          {
+            name: "main.ts",
+            content: `
 import { FreshContext } from "$fresh/server.ts";
 import { Page } from "deco/blocks/page.tsx";
 import { fromEndpoint } from "deco/engine/releases/fetcher.ts";
@@ -189,36 +192,36 @@ Deno.serve(async (req, conn) => {
   return await handler(req, ctx);
 });
               `,
-            },
-            {
-              name: "deno.json",
-              content: JSON.stringify(importMapJson),
-            },
-            {
-              name: ".decofile.json",
-              content: JSON.stringify({
-                site: {
-                  __resolveType: `${name}/apps/site.ts`,
-                  routes: [{ __resolveType: "website/loaders/pages.ts" }],
-                },
-                decohub: {
-                  __resolveType: `${name}/apps/decohub.ts`,
-                },
-                "admin-app": {
-                  __resolveType: `decohub/apps/admin.ts`,
-                },
-                "files": {
-                  __resolveType: `decohub/apps/files.ts`,
-                },
-                ...decofile,
-              }),
-            },
-            {
-              name: "apps",
-              nodes: [
-                {
-                  name: "decohub.ts",
-                  content: `
+          },
+          {
+            name: "deno.json",
+            content: JSON.stringify(importMapJson),
+          },
+          {
+            name: ".decofile.json",
+            content: JSON.stringify({
+              site: {
+                __resolveType: `${name}/apps/site.ts`,
+                routes: [{ __resolveType: "website/loaders/pages.ts" }],
+              },
+              decohub: {
+                __resolveType: `${name}/apps/decohub.ts`,
+              },
+              "admin-app": {
+                __resolveType: `decohub/apps/admin.ts`,
+              },
+              "files": {
+                __resolveType: `decohub/apps/files.ts`,
+              },
+              ...decofile,
+            }),
+          },
+          {
+            name: "apps",
+            nodes: [
+              {
+                name: "decohub.ts",
+                content: `
 import * as admin from "apps/admin/mod.ts";
 import * as files from "apps/files/mod.ts";
 
@@ -244,10 +247,10 @@ export default async function App(
   };
 }
 `,
-                },
-                {
-                  name: "site.ts",
-                  content: `
+              },
+              {
+                name: "site.ts",
+                content: `
   import { App, AppContext as AC } from "deco/mod.ts";
   import website, { Props as WebSiteProps } from "apps/website/mod.ts";
   import manifest, { Manifest } from "../manifest.gen.ts";
@@ -270,52 +273,53 @@ export default async function App(
   
   export { onBeforeResolveProps } from "apps/website/mod.ts";
       `,
-                },
-              ],
-            },
-          ],
-        },
-      };
-      const resultFs = mergeFs(
-        files ?? { name: "", nodes: [] },
-        siteState.files,
-      );
-      assertIsDir(resultFs);
-      const nodeMap = nodesToMap(resultFs.nodes);
-      const manifest = {
-        name: "manifest.gen.ts",
-        content: (await decoManifestBuilder("", name, async function* (dir) {
-          const fs = nodeMap[dir];
+              },
+            ],
+          },
+        ],
+      },
+    };
+    const resultFs = mergeFs(
+      files ?? { name: "", nodes: [] },
+      siteState.files,
+    );
+    assertIsDir(resultFs);
+    const nodeMap = nodesToMap(resultFs.nodes);
+    const manifest = {
+      name: "manifest.gen.ts",
+      content: (await decoManifestBuilder("", name, async function* (dir) {
+        const fs = nodeMap[dir];
 
-          if (!fs) {
-            return;
-          }
+        if (!fs) {
+          return;
+        }
 
-          for await (const file of walk(fs)) {
-            yield file;
-          }
-        })).build(),
-      };
-      resultFs.nodes.push(manifest);
-      return { ...siteState, files: resultFs };
-    },
-    fresh: async (
-      { site: name, files, decofile, runtime: _ignore, ...props },
-    ) => {
-      const siteState = {
-        ...props,
-        entryPointUrl: "main.ts",
-        importMapUrl: "deno.json",
-        compilerOptions: {
-          jsx: "react-jsx",
-          jsxImportSource: "preact",
-        },
-        files: {
-          name: "",
-          nodes: [
-            {
-              name: "main.ts",
-              content: `
+        for await (const file of walk(fs)) {
+          yield file;
+        }
+      })).build(),
+    };
+    resultFs.nodes.push(manifest);
+    return { ...siteState, files: resultFs };
+  },
+  fresh: async (
+    { site: name, files, decofile, runtime: _ignore, ...props },
+    supportsDynamicImport,
+  ) => {
+    const siteState = {
+      ...props,
+      entryPointUrl: "main.ts",
+      importMapUrl: "deno.json",
+      compilerOptions: {
+        jsx: "react-jsx",
+        jsxImportSource: "preact",
+      },
+      files: {
+        name: "",
+        nodes: [
+          {
+            name: "main.ts",
+            content: `
 /// <reference no-default-lib="true"/>
 /// <reference lib="dom" />
 /// <reference lib="deno.ns" />
@@ -327,17 +331,17 @@ import manifest from "./fresh.gen.ts";
 
 await start(manifest, config);
             `,
-            },
-            {
-              name: "deno.json",
-              content: JSON.stringify(importMapJson),
-            },
-            {
-              name: "routes",
-              nodes: [
-                {
-                  name: "_app.tsx",
-                  content: `
+          },
+          {
+            name: "deno.json",
+            content: JSON.stringify(importMapJson),
+          },
+          {
+            name: "routes",
+            nodes: [
+              {
+                name: "_app.tsx",
+                content: `
 import { asset, Head } from "$fresh/runtime.ts";
 import { defineApp } from "$fresh/server.ts";
 import { Context } from "deco/deco.ts";
@@ -364,15 +368,15 @@ export default defineApp(async (_req, ctx) => {
     </>
   );
 });`,
-                },
-              ],
-            },
-            {
-              name: "fresh.gen.ts",
-              content: `
-import * as $_app from "./routes/_app.tsx";              
+              },
+            ],
+          },
+          {
+            name: "fresh.gen.ts",
+            content: `
+import * as $_app from "./routes/_app.tsx";
 
-const manifest = { 
+const manifest = {
     routes: {
       "./routes/_app.tsx": $_app,
     },
@@ -381,38 +385,38 @@ const manifest = {
 };
 export default manifest;
     `,
-            },
-            {
-              name: ".decofile.json",
-              content: JSON.stringify({
-                site: {
-                  __resolveType: `${name}/apps/site.ts`,
-                  routes: [{ __resolveType: "website/loaders/pages.ts" }],
-                },
-                decohub: {
-                  __resolveType: `${name}/apps/decohub.ts`,
-                },
-                "admin-app": {
-                  __resolveType: `decohub/apps/admin.ts`,
-                },
-                "files": {
-                  __resolveType: `decohub/apps/files.ts`,
-                },
-                ...decofile,
-              }),
-            },
-            {
-              name: "tailwind.config.ts",
-              content: `
+          },
+          {
+            name: ".decofile.json",
+            content: JSON.stringify({
+              site: {
+                __resolveType: `${name}/apps/site.ts`,
+                routes: [{ __resolveType: "website/loaders/pages.ts" }],
+              },
+              decohub: {
+                __resolveType: `${name}/apps/decohub.ts`,
+              },
+              "admin-app": {
+                __resolveType: `decohub/apps/admin.ts`,
+              },
+              "files": {
+                __resolveType: `decohub/apps/files.ts`,
+              },
+              ...decofile,
+            }),
+          },
+          {
+            name: "tailwind.config.ts",
+            content: `
 export default {
   content: ["./**/*.tsx"],
   theme: { container: { center: true } },
 };
               `,
-            },
-            {
-              name: "fresh.config.ts",
-              content: `
+          },
+          {
+            name: "fresh.config.ts",
+            content: `
 import { defineConfig } from "$fresh/server.ts";
 import plugins from "https://denopkg.com/deco-sites/std@1.24.2/plugins/mod.ts";
 import manifest from "./manifest.gen.ts";
@@ -426,13 +430,13 @@ export default defineConfig({
     }),
 });
                 `,
-            },
-            {
-              name: "apps",
-              nodes: [
-                {
-                  name: "decohub.ts",
-                  content: `
+          },
+          {
+            name: "apps",
+            nodes: [
+              {
+                name: "decohub.ts",
+                content: `
 import * as admin from "apps/admin/mod.ts";
 import * as files from "apps/files/mod.ts";
 
@@ -458,10 +462,10 @@ export default async function App(
   };
 }
                     `,
-                },
-                {
-                  name: "site.ts",
-                  content: `
+              },
+              {
+                name: "site.ts",
+                content: `
 import { App, AppContext as AC } from "deco/mod.ts";
 import website, { Props as WebSiteProps } from "apps/website/mod.ts";
 import manifest, { Manifest } from "../manifest.gen.ts";
@@ -484,36 +488,69 @@ export default function Site(
 
 export { onBeforeResolveProps } from "apps/website/mod.ts";
     `,
-                },
-              ],
-            },
-          ],
-        },
-      };
-      const resultFs = mergeFs(
+              },
+            ],
+          },
+        ],
+      },
+    };
+    let resultFs: FileSystemNode = siteState.files;
+    const decofileContent = {
+      site: {
+        __resolveType: `${name}/apps/site.ts`,
+        routes: [{ __resolveType: "website/loaders/pages.ts" }],
+      },
+      decohub: {
+        __resolveType: `${name}/apps/decohub.ts`,
+      },
+      "admin-app": {
+        __resolveType: `decohub/apps/admin.ts`,
+      },
+      "files": {
+        root: {
+          name: "",
+          nodes: [],
+        } as FileSystemNode,
+        __resolveType: `decohub/apps/files.ts`,
+      },
+      ...decofile,
+    };
+    if (!supportsDynamicImport) {
+      resultFs = mergeFs(
         files ?? { name: "", nodes: [] },
         siteState.files,
       );
-      assertIsDir(resultFs);
-      const nodeMap = nodesToMap(resultFs.nodes);
-      const manifest = {
-        name: "manifest.gen.ts",
-        content: (await decoManifestBuilder("", name, async function* (dir) {
-          const fs = nodeMap[dir];
+    } else {
+      decofileContent.files = { ...decofileContent.files, root: files };
+    }
+    assertIsDir(resultFs);
+    // add decofile
+    resultFs.nodes.push({
+      name: DECOFILE_NAME,
+      content: JSON.stringify(decofileContent),
+    });
+    // end add decofile
+    // build manifest
+    const nodeMap = nodesToMap(resultFs.nodes);
+    const manifest = {
+      name: "manifest.gen.ts",
+      content: (await decoManifestBuilder("", name, async function* (dir) {
+        const fs = nodeMap[dir];
 
-          if (!fs) {
-            return;
-          }
+        if (!fs) {
+          return;
+        }
 
-          for await (const file of walk(fs)) {
-            yield file;
-          }
-        })).build(),
-      };
-      resultFs.nodes.push(manifest);
-      return { ...siteState, files: resultFs };
-    },
-  };
+        for await (const file of walk(fs)) {
+          yield file;
+        }
+      })).build(),
+    };
+    resultFs.nodes.push(manifest);
+    //
+    return { ...siteState, files: resultFs };
+  },
+};
 
 export default async function create(
   props: Props,
@@ -521,17 +558,16 @@ export default async function create(
   ctx: AppContext,
 ): Promise<Deployment> {
   try {
+    const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms
+      .forSite({ site: props.site });
+
     const res = await runtimeTemplates[props.runtime ?? "fresh"](props);
 
     res.envVars = {
       ...res.envVars,
-      DECO_RELEASE: "file:///src/.decofile.json",
-      DECO_ALLOWED_AUTHORITIES: "configs.decocdn.com,deno.dev",
+      DECO_RELEASE: `file:///src/${DECOFILE_NAME}`,
       DECO_SITE_NAME: props.site,
     };
-
-    const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms
-      .forSite({ site: props.site });
 
     return await platform.deployments.create(
       { ...res, site: props.site, mode: "files" },

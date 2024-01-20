@@ -10,6 +10,7 @@ async function build() {
 
   const cacheLocalDir = Deno.env.get("CACHE_LOCAL_DIR");
   const soureLocalDir = Deno.env.get("SOURCE_LOCAL_DIR");
+  const sourceProvider = Deno.env.get("SOURCE_PROVIDER"); // GITHUB or FILES
   const gitRepository = Deno.env.get("GIT_REPO");
   const commitSha = Deno.env.get("COMMIT_SHA") ?? "main";
   const ghToken = Deno.env.get("GITHUB_TOKEN");
@@ -154,8 +155,12 @@ async function build() {
     }
   };
 
-  console.log(`downloading source from git ${gitRepository} - ${commitSha}...`);
-  await downloadFromGit();
+  if (!sourceProvider || sourceProvider === "GITHUB") {
+    console.log(
+      `downloading source from git ${gitRepository} - ${commitSha}...`,
+    );
+    await downloadFromGit();
+  }
   console.log(`generating cache...`);
   const freshPrj = await getFrshProject();
   await genCache(freshPrj !== undefined);
