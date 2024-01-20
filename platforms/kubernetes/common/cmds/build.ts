@@ -8,9 +8,25 @@ async function build() {
     ZipReader,
   } = await import("https://deno.land/x/zipjs@v2.7.30/index.js");
 
+  const exists = async (filename: string): Promise<boolean> => {
+    try {
+      await Deno.stat(filename);
+      // successful, file or directory must exist
+      return true;
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) {
+        // file or directory does not exist
+        return false;
+      } else {
+        // unexpected error, maybe permissions, pass it along
+        throw error;
+      }
+    }
+  };
   const cacheLocalDir = Deno.env.get("CACHE_LOCAL_DIR");
-  const soureLocalDir = Deno.env.get("SOURCE_LOCAL_DIR");
+  const sourceLocalDir = Deno.env.get("SOURCE_LOCAL_DIR");
   const sourceProvider = Deno.env.get("SOURCE_PROVIDER"); // GITHUB or FILES
+  const filesLocalPath = Deno.env.get("FILES_LOCAL_PATH"); // readonly path should be copied to a writable path.
   const gitRepository = Deno.env.get("GIT_REPO");
   const commitSha = Deno.env.get("COMMIT_SHA") ?? "main";
   const ghToken = Deno.env.get("GITHUB_TOKEN");
@@ -34,7 +50,7 @@ async function build() {
 
   const DOCKER_DEPS_FILE_NAME = `_docker_deps.ts`;
   const dockerDepsPromise = Deno.writeTextFile(
-    join(soureLocalDir!, DOCKER_DEPS_FILE_NAME),
+    join(sourceLocalDir!, DOCKER_DEPS_FILE_NAME),
     fileLines.join("\n"),
   );
 
@@ -43,7 +59,7 @@ async function build() {
   }
   const getFrshProject = async (): Promise<FreshProject | undefined> => {
     const readFileOrUndefined = (file: string) =>
-      Deno.readTextFile(join(soureLocalDir!, file)).catch((err) => {
+      Deno.readTextFile(join(sourceLocalDir!, file)).catch((err) => {
         if (err instanceof Deno.errors.NotFound) {
           return undefined;
         }
@@ -111,7 +127,10 @@ async function build() {
     for (const { directory, filename, getData } of entries) {
       if (directory) continue;
 
-      const filepath = join(soureLocalDir!, filename.replace(rootFilename, ""));
+      const filepath = join(
+        sourceLocalDir!,
+        filename.replace(rootFilename, ""),
+      );
 
       await ensureFile(filepath);
       const file = await Deno.open(filepath, { create: true, write: true });
@@ -129,7 +148,7 @@ async function build() {
         "main.ts",
         ...isFreshProject ? [DOCKER_DEPS_FILE_NAME] : [],
       ],
-      cwd: soureLocalDir,
+      cwd: sourceLocalDir,
       stdout: "inherit",
       stderr: "inherit",
       stdin: "inherit",
@@ -141,9 +160,13 @@ async function build() {
     }
   };
   const build = async (buildArgs: string[]) => {
+    if (!(await exists(join(sourceLocalDir!, "dev.ts")))) {
+      console.log("no dev.ts file found, skipping build");
+      return;
+    }
     const cmd = new Deno.Command(Deno.execPath(), {
       args: buildArgs,
-      cwd: soureLocalDir,
+      cwd: sourceLocalDir,
       stdout: "inherit",
       stderr: "inherit",
       stdin: "inherit",
@@ -160,6 +183,19 @@ async function build() {
       `downloading source from git ${gitRepository} - ${commitSha}...`,
     );
     await downloadFromGit();
+  } else {
+    console.log(`copying source from ${filesLocalPath}...`);
+    const copyCmd = new Deno.Command("cp", {
+      args: ["-r", `${filesLocalPath}/.`!, `${sourceLocalDir}/.`],
+      stdout: "inherit",
+      stderr: "inherit",
+      stdin: "inherit",
+    }).spawn();
+    const status = await copyCmd.status;
+    if (!status.success) {
+      console.error("Failed to copy files");
+      Deno.exit(status.code);
+    }
   }
   console.log(`generating cache...`);
   const freshPrj = await getFrshProject();
@@ -182,7 +218,7 @@ if [[ -f "$SOURCE_REMOTE_OUTPUT" ]]; then
 fi
 [[ -f "$CACHE_REMOTE_OUTPUT" ]] && echo "restoring cache..." && tar xvf "$CACHE_REMOTE_OUTPUT" -C $CACHE_LOCAL_DIR && echo "cache successfully restored!"
 
-deno run -A - << 'EOF'
+deno run -A --unstable - << 'EOF'
 ${build};
 await build();
 EOF

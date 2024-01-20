@@ -1,4 +1,5 @@
-import { assertDeploymentIsFromRepo, Platform } from "../../admin/platform.ts";
+import { isDeploymentFromRepo, Platform } from "../../admin/platform.ts";
+import { SOURCE_LOCAL_MOUNT_PATH } from "./actions/build.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
@@ -22,6 +23,7 @@ export default function kubernetes(
     name: "kubernetes",
     domain: CONTROL_PLANE_DOMAIN,
     cfZoneId: "eba5bf129d0b006fd616fd32f0c71492",
+    sourceDirectory: SOURCE_LOCAL_MOUNT_PATH,
     sites: {
       create: async (props) => {
         await actions.sites.create(props);
@@ -35,19 +37,37 @@ export default function kubernetes(
       create: async (
         props,
       ) => {
-        assertDeploymentIsFromRepo(props);
-        const { site, commitSha, owner, repo, production = false } = props;
         const deploymentId = DeploymentId.new();
-        const currentState = await loaders.siteState.get({ site });
-        const desiredState = {
-          ...currentState ?? {},
-          source: {
-            type: "github" as const,
-            commitSha,
-            owner,
-            repo,
-          },
-        };
+        const { site, production = false } = props;
+
+        let desiredState = await loaders.siteState.get({ site });
+        if (isDeploymentFromRepo(props)) {
+          const { commitSha, owner, repo } = props;
+          desiredState = {
+            ...desiredState ?? {},
+            source: {
+              type: "github" as const,
+              commitSha,
+              owner,
+              repo,
+            },
+          };
+        } else {
+          desiredState = {
+            ...desiredState ?? {},
+            envVars: [
+              ...desiredState?.envVars ?? [],
+              ...Object.entries(props.envVars ?? {}).map(([name, value]) => ({
+                name,
+                value,
+              })),
+            ],
+            source: {
+              type: "files",
+              files: props.files,
+            },
+          };
+        }
         const deployment = await actions.deployments.create({
           site,
           siteState: desiredState,

@@ -112,13 +112,7 @@ export const knativeServiceOf = (
         },
         spec: {
           serviceAccountName,
-          volumes: [
-            ...sourceBinder.volumes,
-            {
-              name: "code",
-              emptyDir: {},
-            },
-          ],
+          volumes: sourceBinder.volumes,
           containers: [
             {
               name: "app",
@@ -159,10 +153,7 @@ export const knativeServiceOf = (
                 // Add other environment variables as needed
               ],
               image: runnerImage,
-              volumeMounts: [
-                ...sourceBinder.volumeMounts,
-                { name: "code", mountPath: "/app/deco" },
-              ],
+              volumeMounts: sourceBinder.volumeMounts,
               ports: [{ name: "http1", containerPort: 8000 }],
             },
           ],

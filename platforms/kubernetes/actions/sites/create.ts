@@ -102,23 +102,23 @@ export default async function newSite(
   const setupPromises: Promise<unknown>[] = [];
   const isEphemeral = lifecycle === "ephemeral";
   if (isEphemeral) {
-    setupPromises.push(
-      corev1Api.createNamespacedResourceQuota(siteNs, {
-        apiVersion: "v1",
-        kind: "ResourceQuota",
-        metadata: {
-          name: `${siteNs}-quota`,
-        },
-        spec: {
-          hard: {
-            "requests.cpu": "500m",
-            "requests.memory": "512Mi",
-            "limits.cpu": "1000m",
-            "limits.memory": "1Gi",
-          },
-        },
-      }).catch(ignoreIfExists),
-    );
+    // setupPromises.push(
+    //   corev1Api.createNamespacedResourceQuota(siteNs, {
+    //     apiVersion: "v1",
+    //     kind: "ResourceQuota",
+    //     metadata: {
+    //       name: `${siteNs}-quota`,
+    //     },
+    //     spec: {
+    //       hard: {
+    //         "requests.cpu": "2000m",
+    //         "requests.memory": "512Mi",
+    //         "limits.cpu": "4000m",
+    //         "limits.memory": "2Gi",
+    //       },
+    //     },
+    //   }).catch(ignoreIfExists),
+    // );
   }
   const [secretEnvVar] = await Promise.all([
     secretEnvVarPromise,

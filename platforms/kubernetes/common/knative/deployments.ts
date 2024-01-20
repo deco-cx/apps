@@ -65,7 +65,10 @@ const deployService = async (
         },
       };
     },
-  ).catch(ignoreIfExists);
+  ).catch(ignoreIfExists).catch((err) => {
+    console.log(JSON.stringify(err));
+    throw err;
+  });
 
   const deploymentRoute = `sites-${site}-${deploymentId}`;
   await k8sApi.createNamespacedCustomObject(

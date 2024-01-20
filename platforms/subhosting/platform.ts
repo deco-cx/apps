@@ -35,6 +35,7 @@ export default function subhosting(
     name: "subhosting",
     domain: "deco.site",
     cfZoneId: "c95fc4cec7fc52453228d9db170c372c",
+    sourceDirectory: "/src",
     sites: {
       create: async (props) => {
         assertCreateIsFromFile(props);

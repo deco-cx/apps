@@ -52,7 +52,7 @@ export interface BinderOptions {
 }
 const ASSETS_VOLUME_NAME = "assets";
 const SOURCE_LOCAL_NAME = "source-local";
-const SOURCE_LOCAL_MOUNT_PATH = "/app/deco";
+export const SOURCE_LOCAL_MOUNT_PATH = "/app/deco";
 
 export const SrcBinder = {
   from: (
@@ -72,12 +72,18 @@ export const SrcBinder = {
     { files }: Files,
     { deploymentId, site, siteNs, ctx }: BinderOptions,
   ): Promise<SourceBinder> => {
+    const FILES_VOLUME_NAME = "app-files";
+    const FILES_MOUNT_PATH = "/etc/app-files";
     const configMapName = `files-${deploymentId}`;
     const k8sApi = ctx.kc.makeApiClient(k8s.CoreV1Api);
     const data: Record<string, string> = {};
+    const items: Array<{ key: string; path: string }> = [];
 
     for (const file of walk(files)) {
-      data[file.path] = file.content;
+      const path = file.path.slice(1);
+      const key = path.replaceAll("/", "_");
+      data[key] = file.content;
+      items.push({ path, key });
     }
 
     await k8sApi.createNamespacedConfigMap(siteNs, {
@@ -88,6 +94,9 @@ export const SrcBinder = {
         namespace: siteNs,
       },
       data,
+    }).catch((err) => {
+      console.log(JSON.stringify(err));
+      throw err;
     });
 
     const mountPath = `/${DECO_SITES_PVC}`;
@@ -104,8 +113,12 @@ export const SrcBinder = {
         },
       }, {
         name: SOURCE_LOCAL_NAME,
+        emptyDir: {},
+      }, {
+        name: FILES_VOLUME_NAME,
         configMap: {
-          name: `files-${deploymentId}`,
+          name: configMapName,
+          items,
         },
       }],
       volumeMounts: [{
@@ -114,14 +127,25 @@ export const SrcBinder = {
       }, {
         name: SOURCE_LOCAL_NAME,
         mountPath: SOURCE_LOCAL_MOUNT_PATH,
+      }, {
+        name: FILES_VOLUME_NAME,
+        mountPath: FILES_MOUNT_PATH,
       }],
       mountPath,
-      cacheOutput: `${mountPath}/${owner}/${repo}/cache.tar`,
+      cacheOutput: `${mountPath}/${owner}/cache.tar`,
       sourceOutput: `${mountPath}/${owner}/${repo}/${deploymentId}/source.tar`,
       envVars: [
         {
           name: "SOURCE_PROVIDER",
           value: "FILES",
+        },
+        {
+          name: "FILES_LOCAL_PATH",
+          value: FILES_MOUNT_PATH,
+        },
+        {
+          name: "SOURCE_LOCAL_DIR",
+          value: SOURCE_LOCAL_MOUNT_PATH,
         },
       ],
     };

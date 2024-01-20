@@ -40,6 +40,13 @@ export interface DeploymentFromFiles extends DeploymentBase {
 }
 
 export type DeploymentOpts = DeploymentFromRepo | DeploymentFromFiles;
+
+export const isDeploymentFromRepo = (
+  opts: DeploymentOpts,
+): opts is DeploymentFromRepo => {
+  return (opts as DeploymentOpts)?.mode === "repo";
+};
+
 export function assertDeploymentIsFromRepo(
   opts: DeploymentOpts,
 ): asserts opts is DeploymentFromRepo {
@@ -126,6 +133,7 @@ export interface Sites {
 
 export interface Platform {
   supportsDynamicImport?: boolean;
+  sourceDirectory: string;
   name: string;
   cfZoneId: string;
   domain: string;
