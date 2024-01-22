@@ -59,7 +59,8 @@ export interface API {
       sort?: Sort;
       per_page?: number;
       wildcard?: boolean;
-    } & { [x: string]: unknown };
+      type_tags_operator?: string;
+    } & { [x: string]: unknown | unknown[] };
   };
 
   /** @docs https://developers.vnda.com.br/reference/get-api-v2-carts-id */
