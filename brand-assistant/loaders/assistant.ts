@@ -74,7 +74,9 @@ const BASE_INSTRUCTIONS =
   Incorrect: props: { facets: "category-1/moda-feminina/category-9/calçados/category-3/sandalia" }
   Correct: props: { facets: "category-1/moda-feminina/category-2/praia", query: "floral" }
   - The category-{level} should always start with number 1, and always should be incresead by 1 when going down on category levels. Level means the category level, not the category id. For example, if you are in the category "moda feminina", the next category level could possibly be "casaco" or "calçados", so the next category level is 2, not any other number.
-  - Always check if the category level is correct before calling the function. For example, if you are in the category "moda feminina", the next category level could possibly be "casaco" or "calçados", so the next category level is 2, not any other number.
+  - Always check if the category level is correct before calling the function. For example, if you are in the category "moda feminina", the next category level could possibly be "casaco" or "calçados", so the next category level is 2, not any other number. 
+    Incorrect: "category-1/moda-feminina/category-6/blusa/cores-filtraveis/preto"
+    Correct: "category-1/moda-feminina/category-2/blusa/cores-filtraveis/preto"
   - Populate query prop with a summary of the user's request. For example, if the user asks for "sandals", the query prop should be "sandals". If the user asks for "sandals for the beach", the query prop should be "sandals beach".
   - Always populate facets prop. If you do not find any products only with facets, you should make another search with both facets and query populated. 
   - Always check if facets props are populated before calling the productList.ts function.
