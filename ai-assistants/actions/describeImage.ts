@@ -21,7 +21,7 @@ export default async function describeImage(
             {
               type: "text",
               text:
-                `Describe this image in few words focus on it's main characteristics. 
+                `Describe this image in few words focus on it's main characteristics. Use the same language as the user prompt.
                               This description will be used to search similar items in an e-commerce store, 
                               so describe name of the product and other relevant information. Use NO MORE than 3 words to describe the product.
                                Avoid using colors. Also, take into consideration the user prompt and describe the object it 
