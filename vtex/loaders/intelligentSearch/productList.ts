@@ -26,6 +26,25 @@ export interface CollectionProps extends CommonProps {
   count: number;
 }
 
+export interface FacetsProps extends CommonProps {
+  /**
+   * @description query to use on search
+   * @examples "shoes"\n"blue shoes"
+   */
+  query: string;
+  /**
+   * @title Facets string (e.g.: 'catergory-1/moda-feminina/category-2/calcados')
+   * @pattern \d*
+   */
+  facets: string;
+  /**
+   * @description search sort parameter
+   */
+  sort?: Sort;
+  /** @description total number of items to display. Required for collection */
+  count: number;
+}
+
 export interface QueryProps extends CommonProps {
   /**
    * @description query to use on search
@@ -64,11 +83,14 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props = { props: CollectionProps | QueryProps | ProductIDProps };
+export type Props = { props: CollectionProps | QueryProps | ProductIDProps | FacetsProps };
 
 // deno-lint-ignore no-explicit-any
 const isCollectionList = (p: any): p is CollectionProps =>
   typeof p.collection === "string" && typeof p.count === "number";
+// deno-lint-ignore no-explicit-any
+const isFacetsList = (p: any): p is FacetsProps =>
+  typeof p.facets === "string" && typeof p.count === "number";
 // deno-lint-ignore no-explicit-any
 const isQueryList = (p: any): p is QueryProps =>
   typeof p.query === "string" && typeof p.count === "number";
@@ -77,6 +99,16 @@ const isProductIDList = (p: any): p is ProductIDProps =>
   Array.isArray(p.ids) && p.ids.length > 0;
 
 const fromProps = ({ props }: Props) => {
+  if (isFacetsList(props)) {
+    return {
+      query: props.query,
+      count: props.count || 12,
+      sort: props.sort || "",
+      selectedFacets: [{ key: "", value: props.facets }],
+      hideUnavailableItems: props.hideUnavailableItems,
+    } as const;
+  }
+
   if (isProductIDList(props)) {
     return {
       query: `sku:${props.ids.join(";")}`,
@@ -130,6 +162,8 @@ const loader = async (
 
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);
+  console.log({selectedFacets})
+  console.log({params})
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   const { products: vtexProducts } = await vcsDeprecated

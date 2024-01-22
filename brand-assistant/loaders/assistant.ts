@@ -63,6 +63,25 @@ const BASE_INSTRUCTIONS =
   - Never say things like "If you want, I can show you our options", "Would you like to explore these options?", because if you found products you are already showing them to the user. Instead, provide more details about the products you found.
   - If you do not find anything relevant to the user's query, suggest related products or search for a broader category.
   - If you already found products, do not ask "Would you like to explore these options?" because the products are already being shown. Instead, provide more details about the products you found or ask the user if they are looking for any specific features or information.
+  - Identify the product type the user is inquiring about.
+  - Use the categories prop to access the store's category tree data.
+  - When receiving a product request, identify not only exact keywords but also related terms. For example, if a user asks for "bikinis," associate this request with related categories such as "Swimwear".
+  - Populate props Object: When constructing the props object for the API call, ensure the structure adheres to the expected format:
+  Correct: props: { facets: "category-1/moda-feminina/category-2/calçados/category-3/sandalia" }
+  Incorrect: props: { props: { facets: "category-1/moda-feminina/category-2/calçados/category-3/sandalia" } }
+  Incorrect: props: { facets: "category-1/moda-feminina/category-9/casaco/cores-filtraveis/azul"}
+  - The category-{level} should always start with number 1, and always should be incresead by 1 when going down on category levels. Level means the category level, not the category id. For example, if you are in the category "moda feminina", the next category level could possibly be "casaco" or "calçados", so the next category level is 2, not any other number.
+  - Populate query prop with a summary of the user's request. For example, if the user asks for "sandals", the query prop should be "sandals". If the user asks for "sandals for the beach", the query prop should be "sandals beach".
+  - Always populate facets prop. If you do not find any products only with facets, you should make another search with both facets and query populated. 
+  - Always check if facets props are populated before calling the productList.ts function.
+  - Por exemplo, para sandálias, a instrução seria algo como: "Use a árvore de categorias para encontrar a URL da API para a categoria 'Sandália'". O assistente então buscará na árvore de categorias e fornecerá a URL formatada corretamente, como "category-1/moda-feminina/category-2/calçados/category-3/sandalia".
+  - Se o usuário pedir uma cor especifica, como "sandálias pretas", você deve adicionar a cor ao final da chave facets. Por exemplo, "category-1/moda-feminina/category-2/calcados/category-3/sandalia/cores-filtraveis/preto".
+  - Avoid Nested props: Be cautious to not nest the props object within itself. The structure of the props object should be flat, without additional levels of props.
+  - Call productList.ts Function: With the facets prop correctly set, call the productList.ts function to retrieve the list of products that match the user's request.
+  - Display Product Suggestions: Present the user with suggestions or options based on the search results obtained from the productList.ts function. Use a friendly and engaging tone, in line with your assistant's mood/personality.
+  - Make sure you have information enough to make the search, otherwise ask for more information.
+  - If function productList.ts returns an empty array of products: "products": [], you should say something like "I'm sorry, I couldn't find any products that match your search. Please try again with a different search term.".
+  - If function productList.ts returns an empty array of products: "products": [], you should always end your message with a ${Tokens.NEGATIVE} symbol.
   Your goal is to enhance user experience by providing informative yet brief responses that encourage further interaction and exploration within our store.
   `;
 export default function brandAssistant(props: Props): AIAssistant {
@@ -79,7 +98,8 @@ export default function brandAssistant(props: Props): AIAssistant {
       }
       return {
         props: {
-          count: 10,
+          count: 20,
+          facets: "",
           query: "",
           ...typeof props.props === "object" ? props.props : {},
         },

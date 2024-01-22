@@ -115,20 +115,20 @@ const cache: Record<string, unknown> = {};
 //   );
 // };
 
-const checkAndHandleResults = (products: Product[], queryCategory: string) => {
-  if (products.length === 0) {
-    return "I couldn't find any products matching your search. Could you specify what you're looking for a bit more?";
-  }
+// const checkAndHandleResults = (products: Product[], queryCategory: string) => {
+//   if (products.length === 0) {
+//     return "I couldn't find any products matching your search. Could you specify what you're looking for a bit more?";
+//   }
 
-  const isCategoryMatch = products.some((product: Product) =>
-    product.category?.includes(queryCategory)
-  );
-  if (!isCategoryMatch) {
-    return "It seems the products found don't exactly match your search. Could you specify what you're looking for a bit more?";
-  }
+//   const isCategoryMatch = products.some((product: Product) =>
+//     product.category?.includes(queryCategory)
+//   );
+//   if (!isCategoryMatch) {
+//     return "It seems the products found don't exactly match your search. Could you specify what you're looking for a bit more?";
+//   }
 
-  return null; // No issues with the results
-};
+//   return null; // No issues with the results
+// };
 
 const invokeFor = (
   ctx: AppContext,
@@ -158,10 +158,7 @@ const invokeFor = (
       onFunctionCallStart(call, assistantProps);
       const invokeResponse = await cache[cacheKey];
       onFunctionCallEnd(call, assistantProps, invokeResponse);
-      const response = checkAndHandleResults(
-        invokeResponse as Product[],
-        assistantProps.query,
-      );
+      const response = invokeResponse;
       return {
         tool_call_id: call.id,
         output: JSON.stringify(response),
@@ -241,11 +238,14 @@ export const messageProcessorFor = async (
         },
       });
     }, (call, props, response) => {
-      functionCallReplies.push({
-        name: call.function.name,
-        props,
-        response,
-      });
+      console.log({call, props, response});
+      if (call.function.name !== "multi_tool_use.parallel") {
+        functionCallReplies.push({
+          name: call.function.name,
+          props,
+          response,
+        });
+      }
     });
 
     let runStatus;
@@ -286,7 +286,7 @@ export const messageProcessorFor = async (
 
     if (!lastMsg) {
       // TODO(@mcandeia) in some cases the bot didn't respond anything.
-
+      reply("I'm sorry, I didn't understand that. Could you rephrase it?");
       return;
     }
 
@@ -302,9 +302,13 @@ export const messageProcessorFor = async (
     );
 
     const _latestMsg = lastMsg.id;
-    reply(replyMessage);
+    if (functionCallReplies.length < 0) {
+      reply("I couldn't find any products matching your search. Would you like to search for something else?");
+    } else {
+      reply(replyMessage);
+    }
 
-    if (functionCallReplies.length > 0 && token === Tokens.POSITIVE) {
+    if (functionCallReplies.length > 0) {
       console.log("tem function call replies", functionCallReplies);
       reply({
         messageId,

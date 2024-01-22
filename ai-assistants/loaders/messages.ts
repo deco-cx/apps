@@ -14,7 +14,7 @@ export interface Props {
 export const Tokens = {
   POSITIVE: "@",
   NEGATIVE: "#",
-  OPTIONS: "****",
+  OPTIONS: "&",
 };
 
 const normalize = (strContent: string) => {
