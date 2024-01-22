@@ -61,6 +61,7 @@ const loader = async (
     | ProductConnection
     | undefined = undefined;
   let shopifyFilters = undefined;
+  let records = undefined;
 
   const sort = url.searchParams.get("sort") ?? "";
 
@@ -84,6 +85,7 @@ const loader = async (
 
       shopifyProducts = data.search;
       shopifyFilters = data.search?.productFilters;
+      records = data.search?.totalCount;
       hasNextPage = Boolean(data?.search?.pageInfo.hasNextPage ?? false);
       hasPreviousPage = Boolean(
         data?.search?.pageInfo.hasPreviousPage ?? false,
@@ -169,6 +171,7 @@ const loader = async (
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage: page,
+      records,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
   };

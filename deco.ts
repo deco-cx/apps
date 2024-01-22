@@ -8,10 +8,16 @@ const compatibilityApps = [{
   name: "deco-sites/std",
 }];
 
+const paltformApps = [{
+  dir: "./platforms/kubernetes",
+  name: "kubernetes",
+}];
+
 const config = {
   apps: [
     app("linx-impulse"),
     app("ai-assistants"),
+    app("files"),
     app("openai"),
     app("brand-assistant"),
     app("implementation"),
@@ -39,6 +45,7 @@ const config = {
     app("crux"),
     app("decohub"),
     ...compatibilityApps,
+    ...paltformApps,
   ],
 };
 

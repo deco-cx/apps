@@ -1,5 +1,6 @@
 import { Cookie, getCookies } from "std/http/mod.ts";
 import { stringify } from "./cookies.ts";
+import { MarketingData } from "./types.ts";
 
 const VTEX_CHECKOUT_COOKIE = "checkout.vtex.com";
 
@@ -52,3 +53,13 @@ export const formatCookie = (orderFormId: string): Cookie => ({
   secure: true,
   sameSite: "Lax",
 });
+
+export const hasDifferentMarketingData = (
+  md1: MarketingData,
+  md2: MarketingData,
+) => {
+  const someDifferent = Object.keys(md1).some((key) =>
+    md1[key as keyof MarketingData] !== md2[key as keyof MarketingData]
+  );
+  return someDifferent;
+};

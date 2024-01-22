@@ -169,6 +169,7 @@ export const toFilters = (
   aggregations: NonNullable<SearchQuery["result"]>["aggregations"],
   { base }: { base: URL },
 ): ProductListingPage["filters"] => {
+  base.searchParams.delete("page");
   const filters: ProductListingPage["filters"] =
     aggregations?.filters?.map((filter) => toFilterItem(filter, base)) ?? [];
 
@@ -233,6 +234,7 @@ export const toProduct = (
 ): Product => {
   const images = variant.images?.map((image) => ({
     "@type": "ImageObject" as const,
+    encodingFormat: "image",
     url: image?.url ?? "",
     alternateName: image?.fileName ?? "",
   }));
@@ -275,6 +277,7 @@ export const toProduct = (
         image: promotion!.fullStampUrl
           ? [{
             "@type": "ImageObject",
+            encodingFormat: "image",
             url: promotion!.fullStampUrl,
           }]
           : undefined,
@@ -327,7 +330,6 @@ export const toProduct = (
       }
     });
   }
-
   const review = (variant as SingleProductFragment).reviews?.map((review) => ({
     "@type": "Review" as const,
     author: [
@@ -342,8 +344,9 @@ export const toProduct = (
     reviewRating: {
       "@type": "AggregateRating" as const,
       bestRating: 5,
-      worstRating: 0,
+      worstRating: 1,
       ratingValue: review?.rating ?? undefined,
+      ratingCount: 1,
     },
   })) ?? [];
 
@@ -388,9 +391,7 @@ export const toProduct = (
       logo: variant.productBrand?.fullUrlLogo ??
         undefined,
     },
-    aggregateRating,
     additionalProperty,
-    review,
     offers: {
       "@type": "AggregateOffer",
       highPrice: variant.prices?.price,
@@ -411,6 +412,8 @@ export const toProduct = (
     },
     ...variantSelected,
     isSimilarTo,
+    review,
+    aggregateRating,
     isVariantOf: {
       "@type": "ProductGroup",
       url: getProductUrl(variant, base).href,

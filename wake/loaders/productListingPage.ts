@@ -84,30 +84,29 @@ export interface Props {
 
   /** @description Retrieve variantions for each product. */
   getVariations?: boolean;
+
+  /**
+   * @title Starting page query parameter offset.
+   * @description Set the starting page offset. Default to 1.
+   */
+  pageOffset?: 0 | 1;
 }
 
 const OUTSIDE_ATTRIBUTES_FILTERS = ["precoPor"];
 
 const filtersFromParams = (searchParams: URLSearchParams) => {
-  const mapped = searchParams.getAll(FILTER_PARAM).reduce((acc, value) => {
-    const test = /.*:.*/;
+  const filters: Array<{ field: string; values: string[] }> = [];
 
-    // todo validar
+  searchParams.getAll(FILTER_PARAM).forEach((value) => {
+    const test = /.*:.*/;
     const [field, val] = test.test(value)
       ? value.split(":")
       : value.split("__");
 
-    if (OUTSIDE_ATTRIBUTES_FILTERS.includes(field)) return acc;
-
-    if (!acc.has(field)) acc.set(field, []);
-    acc.get(field)?.push(val);
-    return acc;
-  }, new Map<string, string[]>());
-
-  const filters: Array<{ field: string; values: string[] }> = [];
-  for (const [field, values] of mapped.entries()) {
-    filters.push({ field, values });
-  }
+    if (!OUTSIDE_ATTRIBUTES_FILTERS.includes(field)) {
+      filters.push({ field, values: [val] });
+    }
+  });
 
   return filters;
 };
@@ -166,7 +165,7 @@ const searchLoader = async (
 
   const isHotsite = urlData.uri?.kind === "HOTSITE";
 
-  const comoonParams = {
+  const commonParams = {
     sortDirection,
     sortKey,
     filters,
@@ -182,14 +181,14 @@ const searchLoader = async (
   const data = isHotsite
     ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({
       variables: {
-        ...comoonParams,
+        ...commonParams,
         url: url.pathname,
       },
       ...Hotsite,
     })
     : await storefront.query<SearchQuery, SearchQueryVariables>({
       variables: {
-        ...comoonParams,
+        ...commonParams,
         query,
         operation,
       },
@@ -202,18 +201,21 @@ const searchLoader = async (
   const previousPage = new URLSearchParams(url.searchParams);
 
   const hasNextPage = Boolean(
-    (data?.result?.productsByOffset?.totalCount ?? 0) %
-      (data?.result?.productsByOffset?.pageSize ?? 0),
+    (data?.result?.productsByOffset?.totalCount ?? 0) /
+        (data?.result?.pageSize ?? limit) >
+      (data?.result?.productsByOffset?.page ?? 0),
   );
 
-  const hasPreviouePage = page > 1;
+  const hasPreviousPage = page > 1;
+
+  const pageOffset = props.pageOffset ?? 1;
 
   if (hasNextPage) {
-    nextPage.set("page", (page + 1).toString());
+    nextPage.set("page", (page + pageOffset + 1).toString());
   }
 
-  if (hasPreviouePage) {
-    previousPage.set("page", (page - 1).toString());
+  if (hasPreviousPage) {
+    previousPage.set("page", (page + pageOffset - 1).toString());
   }
 
   const productIDs = products.map((i) => i?.productId);
@@ -243,8 +245,8 @@ const searchLoader = async (
     "@type": "ProductListingPage",
     filters: toFilters(data?.result?.aggregations, { base: url }),
     pageInfo: {
-      nextPage: hasPreviouePage ? `?${nextPage}` : undefined,
-      previousPage: hasNextPage ? `?${previousPage}` : undefined,
+      nextPage: hasNextPage ? `?${nextPage}` : undefined,
+      previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage: data?.result?.productsByOffset?.page ?? 1,
       records: data?.result?.productsByOffset?.totalCount,
       recordPerPage: limit,

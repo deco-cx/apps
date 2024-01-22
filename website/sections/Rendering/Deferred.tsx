@@ -44,6 +44,7 @@ const script = (
     addEventListener(
       "scroll",
       () => setTimeout(() => element.click(), Number(payload) || 200),
+      { once: true },
     );
   }
 

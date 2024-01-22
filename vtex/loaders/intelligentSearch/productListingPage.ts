@@ -13,7 +13,11 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -30,6 +34,7 @@ import type {
   SelectedFacet,
   Sort,
 } from "../../utils/types.ts";
+import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -61,7 +66,7 @@ const LEGACY_TO_IS: Record<string, Sort> = {
   OrderByBestDiscountDESC: "discount:desc",
 };
 
-const mapLabelledFuzzyToFuzzy = (
+export const mapLabelledFuzzyToFuzzy = (
   labelledFuzzy?: LabelledFuzzy,
 ): Fuzzy | undefined => {
   switch (labelledFuzzy) {
@@ -269,7 +274,15 @@ const loader = async (
     page,
     ...args
   } = searchArgsOf(props, url);
-  const pageTypesPromise = pageTypesFromPathname(url.pathname, ctx);
+
+  let pathToUse = url.pathname;
+
+  if (pathToUse === "/" || pathToUse === "/*") {
+    const result = await PLPDefaultPath({ level: 1 }, req, ctx);
+    pathToUse = result?.possiblePaths[0] ?? pathToUse;
+  }
+
+  const pageTypesPromise = pageTypesFromPathname(pathToUse, ctx);
   const pageTypes = await pageTypesPromise;
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
@@ -408,6 +421,9 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
+  if (url.searchParams.has("q") || !isAnonymous(ctx)) {
+    return null;
+  }
 
   const params = new URLSearchParams();
 

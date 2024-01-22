@@ -8,10 +8,15 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
+import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -46,7 +51,16 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const { slug } = props;
-  const lowercaseSlug = slug?.toLowerCase();
+  const haveToUseSlug = slug && !slug.startsWith(":");
+  let defaultPaths;
+
+  if (!haveToUseSlug) {
+    defaultPaths = await PDPDefaultPath({ count: 1 }, req, ctx);
+  }
+
+  const lowercaseSlug = haveToUseSlug
+    ? slug?.toLowerCase()
+    : defaultPaths?.possiblePaths[0];
   const segment = getSegmentFromBag(ctx);
 
   const pageTypePromise = vcsDeprecated
@@ -129,6 +143,9 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (req: Request, ctx: AppContext) => {
+  if (!isAnonymous(ctx)) {
+    return null;
+  }
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 

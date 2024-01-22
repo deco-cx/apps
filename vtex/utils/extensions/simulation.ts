@@ -53,7 +53,7 @@ const doSimulate = (items: {
 };
 
 export const extension = async (products: Product[], ctx: AppContext) => {
-  if (isAnonymous(getSegmentFromBag(ctx))) {
+  if (isAnonymous(ctx)) {
     return products;
   }
 
