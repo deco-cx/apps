@@ -6,8 +6,8 @@ import * as $$$0 from "./loaders/events.ts";
 import * as $$$1 from "./loaders/get.ts";
 import * as $$$$0 from "./handlers/workflowRunner.ts";
 import * as $$$$$$$$$0 from "./actions/cancel.ts";
-import * as $$$$$$$$$1 from "./actions/start.ts";
-import * as $$$$$$$$$2 from "./actions/signal.ts";
+import * as $$$$$$$$$1 from "./actions/signal.ts";
+import * as $$$$$$$$$2 from "./actions/start.ts";
 
 const manifest = {
   "loaders": {
@@ -19,8 +19,8 @@ const manifest = {
   },
   "actions": {
     "workflows/actions/cancel.ts": $$$$$$$$$0,
-    "workflows/actions/signal.ts": $$$$$$$$$2,
-    "workflows/actions/start.ts": $$$$$$$$$1,
+    "workflows/actions/signal.ts": $$$$$$$$$1,
+    "workflows/actions/start.ts": $$$$$$$$$2,
   },
   "name": "workflows",
   "baseUrl": import.meta.url,

@@ -72,7 +72,7 @@ export default function Analytics(
     <>
       {/* TODO: Add debug from query string @author Igor Brasileiro */}
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}
-      {isDeploy && trackingIds && (
+      {/* {isDeploy && trackingIds && (
         trackingIds.map((trackingId) => (
           <GoogleTagManager
             trackingId={trackingId.trim()}
@@ -112,7 +112,7 @@ export default function Analytics(
           id="analytics-script"
           src={scriptAsDataURI(snippet)}
         />
-      )}
+      )} */}
     </>
   );
 }

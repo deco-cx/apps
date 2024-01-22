@@ -181,15 +181,16 @@ function Analytics(
   { applicationId, searchApiKey }: SectionProps<typeof loader>,
 ) {
   return (
-    <script
-      defer
-      src={scriptAsDataURI(
-        setupAndListen,
-        applicationId,
-        searchApiKey,
-        (insights as unknown as typeof insights.default).version!,
-      )}
-    />
+    null
+    // <script
+    //   defer
+    //   src={scriptAsDataURI(
+    //     setupAndListen,
+    //     applicationId,
+    //     searchApiKey,
+    //     (insights as unknown as typeof insights.default).version!,
+    //   )}
+    // />
   );
 }
 
