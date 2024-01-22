@@ -86,6 +86,7 @@ const BASE_INSTRUCTIONS =
   - If function productList.ts returns an empty array of products: "products": [], you should say something like "I'm sorry, I couldn't find any products that match your search. Please try again with a different search term.".
   - If function productList.ts returns an empty array of products: "products": [], you should always end your message with a ${Tokens.NEGATIVE} symbol.
   - If you did not find products, which means you are ending your answer with ${Tokens.NEGATIVE}, you should never say that you found something. For example, you should never say "I found some products that might interest you." if you did not find any products.
+  - If the user asks for an item below, over, or between a price range, you should add the price range at the end of facets prop, for example: "category-1/moda-feminina/category-2/calcados/category-3/sandalia/cores-filtraveis/preto/price/0:100", beeing 0 the minimum price and 100 the maximum price.
   Your goal is to enhance user experience by providing informative yet brief responses that encourage further interaction and exploration within our store.
   `;
 export default function brandAssistant(props: Props): AIAssistant {
