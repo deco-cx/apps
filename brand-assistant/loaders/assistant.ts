@@ -69,12 +69,15 @@ const BASE_INSTRUCTIONS =
   - Populate props Object: When constructing the props object for the API call, ensure the structure adheres to the expected format:
   Correct: props: { facets: "category-1/moda-feminina/category-2/calçados/category-3/sandalia" }
   Incorrect: props: { props: { facets: "category-1/moda-feminina/category-2/calçados/category-3/sandalia" } }
-  Incorrect: props: { facets: "category-1/moda-feminina/category-9/casaco/cores-filtraveis/azul"}
+  Incorrect: props: { facets: "category-1/moda-feminina/category-2/calçados/category-3/sandalia" }
+  Incorrect: props: { facets: "facets: "category-1/moda-feminina/category-113/praia" }
+  Incorrect: props: { facets: "category-1/moda-feminina/category-9/calçados/category-3/sandalia" }
+  Correct: props: { facets: "category-1/moda-feminina/category-2/praia", query: "floral" }
   - The category-{level} should always start with number 1, and always should be incresead by 1 when going down on category levels. Level means the category level, not the category id. For example, if you are in the category "moda feminina", the next category level could possibly be "casaco" or "calçados", so the next category level is 2, not any other number.
+  - Always check if the category level is correct before calling the function. For example, if you are in the category "moda feminina", the next category level could possibly be "casaco" or "calçados", so the next category level is 2, not any other number.
   - Populate query prop with a summary of the user's request. For example, if the user asks for "sandals", the query prop should be "sandals". If the user asks for "sandals for the beach", the query prop should be "sandals beach".
   - Always populate facets prop. If you do not find any products only with facets, you should make another search with both facets and query populated. 
   - Always check if facets props are populated before calling the productList.ts function.
-  - Por exemplo, para sandálias, a instrução seria algo como: "Use a árvore de categorias para encontrar a URL da API para a categoria 'Sandália'". O assistente então buscará na árvore de categorias e fornecerá a URL formatada corretamente, como "category-1/moda-feminina/category-2/calçados/category-3/sandalia".
   - Se o usuário pedir uma cor especifica, como "sandálias pretas", você deve adicionar a cor ao final da chave facets. Por exemplo, "category-1/moda-feminina/category-2/calcados/category-3/sandalia/cores-filtraveis/preto".
   - Avoid Nested props: Be cautious to not nest the props object within itself. The structure of the props object should be flat, without additional levels of props.
   - Call productList.ts Function: With the facets prop correctly set, call the productList.ts function to retrieve the list of products that match the user's request.
@@ -82,6 +85,7 @@ const BASE_INSTRUCTIONS =
   - Make sure you have information enough to make the search, otherwise ask for more information.
   - If function productList.ts returns an empty array of products: "products": [], you should say something like "I'm sorry, I couldn't find any products that match your search. Please try again with a different search term.".
   - If function productList.ts returns an empty array of products: "products": [], you should always end your message with a ${Tokens.NEGATIVE} symbol.
+  - If you did not find products, which means you are ending your answer with ${Tokens.NEGATIVE}, you should never say that you found something. For example, you should never say "I found some products that might interest you." if you did not find any products.
   Your goal is to enhance user experience by providing informative yet brief responses that encourage further interaction and exploration within our store.
   `;
 export default function brandAssistant(props: Props): AIAssistant {

@@ -238,7 +238,7 @@ export const messageProcessorFor = async (
         },
       });
     }, (call, props, response) => {
-      console.log({call, props, response});
+      console.log({ call, props, response });
       if (call.function.name !== "multi_tool_use.parallel") {
         functionCallReplies.push({
           name: call.function.name,
@@ -303,7 +303,9 @@ export const messageProcessorFor = async (
 
     const _latestMsg = lastMsg.id;
     if (functionCallReplies.length < 0) {
-      reply("I couldn't find any products matching your search. Would you like to search for something else?");
+      reply(
+        "I couldn't find any products matching your search. Would you like to search for something else?",
+      );
     } else {
       reply(replyMessage);
     }
