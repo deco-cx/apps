@@ -102,6 +102,7 @@ export default async function newSite(
   const setupPromises: Promise<unknown>[] = [];
   const isEphemeral = lifecycle === "ephemeral";
   if (isEphemeral) {
+    // TODO put this back when resource quota is well designed.
     // setupPromises.push(
     //   corev1Api.createNamespacedResourceQuota(siteNs, {
     //     apiVersion: "v1",
