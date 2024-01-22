@@ -358,7 +358,6 @@ export default async function build(
   }
   const siteNs = Namespace.forSite(site);
   const batchAPI = ctx.kc.makeApiClient(k8s.BatchV1Api);
-  // const binder = SrcBinder.fromRepo(owner, repo, commitSha, ctx.githubToken);
   // Define the Job specification
   const jobName = `build-${await hashString(
     `build-${binder.sourceId}`,
