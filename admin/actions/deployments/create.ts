@@ -418,7 +418,7 @@ export default {
             name: "fresh.config.ts",
             content: `
 import { defineConfig } from "$fresh/server.ts";
-import plugins from "https://denopkg.com/deco-sites/std@1.24.2/plugins/mod.ts";
+import plugins from "https://denopkg.com/deco-sites/std@10bfbc4446818c47f49525857edbb2a1f3bb09d7/plugins/mod.ts";
 import manifest from "./manifest.gen.ts";
 import tailwind from "./tailwind.config.ts";
 
