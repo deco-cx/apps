@@ -7,5 +7,5 @@ export const cacheKey = (_req: Request, ctx: AppContext) => {
   if (!isAnonymous(ctx)) {
     return null;
   }
-  return getSegmentFromBag(ctx).token;
+  return getSegmentFromBag(ctx)?.token;
 };
