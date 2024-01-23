@@ -64,6 +64,8 @@ const manifest = {
     "deco-sites/admin/actions/sites/linkRepo.ts": $$$$$$$$$8,
     "deco-sites/admin/actions/sites/newDomain.ts": $$$$$$$$$9,
     "deco-sites/admin/actions/sites/unlinkRepo.ts": $$$$$$$$$10,
+    "deco-sites/admin/actions/sites/linkRepo.ts": $$$$$$$$$9,
+    "deco-sites/admin/actions/sites/newDomain.ts": $$$$$$$$$10,
   },
   "name": "deco-sites/admin",
   "baseUrl": import.meta.url,
