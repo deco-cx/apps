@@ -10,7 +10,7 @@ export interface DescribeImageProps {
 export default async function describeImage(
   describeImageProps: DescribeImageProps,
 ) {
-  console.log("describe image props: ", describeImageProps)
+  console.log("describe image props: ", describeImageProps);
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-4-vision-preview",
