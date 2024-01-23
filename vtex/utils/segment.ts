@@ -37,7 +37,8 @@ const isDefautSalesChannel = (ctx: AppContext, channel?: string) => {
 export const isAnonymous = (
   ctx: AppContext,
 ) => {
-  if (!getSegmentFromBag(ctx)?.payload) {
+  const payload = getSegmentFromBag(ctx)?.payload
+  if (!payload) {
     return true;
   }
   const {
@@ -48,7 +49,7 @@ export const isAnonymous = (
     channel,
     priceTables,
     regionId,
-  } = getSegmentFromBag(ctx)?.payload;
+  } = payload;
   return !campaigns &&
     !utm_campaign &&
     !utm_source &&
