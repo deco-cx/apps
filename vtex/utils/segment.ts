@@ -37,6 +37,9 @@ const isDefautSalesChannel = (ctx: AppContext, channel?: string) => {
 export const isAnonymous = (
   ctx: AppContext,
 ) => {
+  if (!getSegmentFromBag(ctx)?.payload) {
+    return true;
+  }
   const {
     campaigns,
     utm_campaign,
@@ -45,7 +48,7 @@ export const isAnonymous = (
     channel,
     priceTables,
     regionId,
-  } = getSegmentFromBag(ctx).payload;
+  } = getSegmentFromBag(ctx)?.payload;
   return !campaigns &&
     !utm_campaign &&
     !utm_source &&
@@ -130,10 +133,15 @@ export const buildSegmentCookie = (req: Request): Partial<Segment> => {
 };
 
 export const withSegmentCookie = (
-  { token }: WrappedSegment,
+  segment: WrappedSegment,
   headers?: Headers,
 ) => {
   const h = new Headers(headers);
+  if (!segment) {
+    return h;
+  }
+
+  const { token } = segment;
 
   h.set("cookie", `${SEGMENT_COOKIE_NAME}=${token}`);
 
