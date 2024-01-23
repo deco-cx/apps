@@ -238,7 +238,7 @@ export const messageProcessorFor = async (
         },
       });
     }, (call, props, response) => {
-      console.log({ call, props, response });
+      console.log({ call, props });
       if (call.function.name !== "multi_tool_use.parallel") {
         functionCallReplies.push({
           name: call.function.name,
@@ -311,7 +311,7 @@ export const messageProcessorFor = async (
     }
 
     if (functionCallReplies.length > 0) {
-      console.log("tem function call replies", functionCallReplies);
+      console.log("tem function call replies");
       reply({
         messageId,
         type: "function_calls" as const,
