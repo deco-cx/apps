@@ -1,3 +1,13 @@
+<hr/>
+
+<a href="https://deco.cx/discord" target="_blank"><img alt="Discord" src="https://img.shields.io/discord/985687648595243068?label=Discord&color=7289da" /></a>
+  &nbsp;
+  <a href="https://x.com/deco_frontend" target="_blank"><img src="https://img.shields.io/twitter/follow/deco_frontend" alt="Deco Twitter" /></a>
+&nbsp;
+  ![Build Status](https://github.com/deco-cx/apps/workflows/ci/badge.svg?event=push&branch=main)
+
+<hr/>
+
 # Deco Standard **Apps** Library
 
 <img align="right" src="/assets/logo.svg" height="150px" alt="The Deco Framework logo: A capybara in its natural habitat">
