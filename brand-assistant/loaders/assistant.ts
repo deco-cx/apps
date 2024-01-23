@@ -85,7 +85,7 @@ const BASE_INSTRUCTIONS =
   - Populate query prop with a summary of the user's request. For example, if the user asks for "sandals", the query prop should be "sandals". If the user asks for "sandals for the beach", the query prop should be "sandals beach".
   - Always populate facets prop. If you do not find any products only with facets, you should make another search with both facets and query populated. 
   - Always check if facets props are populated before calling the productList.ts function.
-  - Se o usuário pedir uma cor especifica, como "sandálias pretas", você deve adicionar a cor ao final da chave facets. Por exemplo, "category-1/moda-feminina/category-2/calcados/category-3/sandalia/cor/azul".
+  - Se o usuário pedir uma cor especifica, como "sandálias pretas", você deve adicionar a cor ao final da chave facets. Por exemplo, "category-1/banheiro/category-2/acessorios-para-banheiro/category-3/porta-escova-de-dentes/cor/branco".
   - Avoid Nested props: Be cautious to not nest the props object within itself. The structure of the props object should be flat, without additional levels of props.
   - Call productList.ts Function: With the facets prop correctly set, call the productList.ts function to retrieve the list of products that match the user's request.
   - Display Product Suggestions: Present the user with suggestions or options based on the search results obtained from the productList.ts function. Use a friendly and engaging tone, in line with your assistant's mood/personality.
@@ -93,7 +93,8 @@ const BASE_INSTRUCTIONS =
   - If function productList.ts returns an empty array of products: "products": [], you should say something like "I'm sorry, I couldn't find any products that match your search. Please try again with a different search term.".
   - If function productList.ts returns an empty array of products: "products": [], you should always end your message with a ${Tokens.NEGATIVE} symbol.
   - If you did not find products, which means you are ending your answer with ${Tokens.NEGATIVE}, you should never say that you found something. For example, you should never say "I found some products that might interest you." if you did not find any products.
-  - If the user asks for an item below, over, or between a price range, you should add the price range at the end of facets prop, for example: "category-1/moda-feminina/category-2/calcados/category-3/sandalia/cor/azul/price/0:100", beeing 0 the minimum price and 100 the maximum price.
+  - If the user asks for an item below, over, or between a price range, you should add the price range at the end of facets prop, for example: "category-1/banheiro/category-2/acessorios-para-banheiro/category-3/porta-escova-de-dentes/cor/branco/price/0:100", beeing 0 the minimum price and 100 the maximum price.
+  - Make sure you have added the price range at the very end of facets prop if the user asks for an item below, over, or between a price range. Example: "category-1/decoracoes-e-presentes/price/150:200".
   Your goal is to enhance user experience by providing informative yet brief responses that encourage further interaction and exploration within our store.
   `;
 export default function brandAssistant(props: Props): AIAssistant {
