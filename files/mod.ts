@@ -1,13 +1,13 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import type { AppContext as AC, App, AppManifest } from "deco/mod.ts";
+import type { App, AppContext as AC, AppManifest } from "deco/mod.ts";
 import {
   initialize,
   transform,
 } from "https://deno.land/x/esbuild@v0.19.7/wasm.js";
 import { dirname, join } from "std/path/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { FileSystemNode, create, walk } from "./sdk.ts";
+import { create, FileSystemNode, walk } from "./sdk.ts";
 
 const initializePromise = initialize({
   wasmURL: "https://deno.land/x/esbuild@v0.19.7/esbuild.wasm",
@@ -35,14 +35,14 @@ const compile = async (
   sourceMap: SourceMap,
 ): Promise<[AppManifest, SourceMap]> => {
   await initializePromise;
-  const tsModule = await importFromString(content).catch(err => {
+  const tsModule = await importFromString(content).catch((err) => {
     console.error("could not compile module", path, err);
     return null;
   });
   if (!tsModule) {
     return [manifest, sourceMap];
   }
-  const blockPath = join(currdir, path);q
+  const blockPath = join(currdir, path);
   const blockKey = join(manifest.name, path);
 
   return [{
