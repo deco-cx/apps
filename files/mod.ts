@@ -1,13 +1,32 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
 import type { AppContext as AC, App, AppManifest } from "deco/mod.ts";
+import {
+  initialize,
+  transform,
+} from "https://deno.land/x/esbuild@v0.19.7/wasm.js";
 import { dirname, join } from "std/path/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { FileSystemNode, create, walk } from "./sdk.ts";
 
+const initializePromise = initialize({
+  wasmURL: "https://deno.land/x/esbuild@v0.19.7/esbuild.wasm",
+  worker: false,
+});
+
 const currdir = dirname(import.meta.url);
-const importFromString = (modData: string) =>
-  import(`data:application/typescript-x;base64,${btoa(modData)}`);
+const importFromString = async (modData: string) =>
+  await transform(modData, {
+    loader: "tsx",
+    platform: "browser",
+    target: ["es2022"],
+    format: "esm",
+    minify: false,
+    jsx: "automatic",
+    jsxImportSource: "preact",
+  }).then((res) =>
+    import(`data:application/javascript;base64,${btoa(res.code)}`)
+  );
 
 const compile = async (
   blockType: keyof Omit<AppManifest, "baseUrl" | "name">,
@@ -15,14 +34,15 @@ const compile = async (
   manifest: AppManifest,
   sourceMap: SourceMap,
 ): Promise<[AppManifest, SourceMap]> => {
+  await initializePromise;
   const tsModule = await importFromString(content).catch(err => {
-    console.error("error when compiling module", path, err);
+    console.error("could not compile module", path, err);
     return null;
   });
   if (!tsModule) {
     return [manifest, sourceMap];
   }
-  const blockPath = join(currdir, path);
+  const blockPath = join(currdir, path);q
   const blockKey = join(manifest.name, path);
 
   return [{
