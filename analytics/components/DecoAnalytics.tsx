@@ -81,22 +81,23 @@ const snippet = () => {
 
 function Component({ exclude, domain }: Props) {
   return (
-    <Head>
-      <link rel="dns-prefetch" href="https://plausible.io/api/event" />
-      <link
-        rel="preconnect"
-        href="https://plausible.io/api/event"
-        crossOrigin="anonymous"
-      />
-      <script
-        defer
-        data-domain={domain}
-        data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
-        data-api="https://plausible.io/api/event"
-        src="https://plausible.io/js/script.manual.js"
-      />
-      <script defer src={scriptAsDataURI(snippet)} />
-    </Head>
+    null
+    // <Head>
+    //   <link rel="dns-prefetch" href="https://plausible.io/api/event" />
+    //   <link
+    //     rel="preconnect"
+    //     href="https://plausible.io/api/event"
+    //     crossOrigin="anonymous"
+    //   />
+    //   <script
+    //     defer
+    //     data-domain={domain}
+    //     data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
+    //     data-api="https://plausible.io/api/event"
+    //     src="https://plausible.io/js/script.manual.js"
+    //   />
+    //   <script defer src={scriptAsDataURI(snippet)} />
+    // </Head>
   );
 }
 

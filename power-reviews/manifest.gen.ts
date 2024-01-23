@@ -4,9 +4,9 @@
 
 import * as $$$0 from "./loaders/productDetailsPage.ts";
 import * as $$$1 from "./loaders/productList.ts";
-import * as $$$2 from "./loaders/reviewForm.ts";
+import * as $$$2 from "./loaders/productListingPage.ts";
 import * as $$$3 from "./loaders/review.ts";
-import * as $$$4 from "./loaders/productListingPage.ts";
+import * as $$$4 from "./loaders/reviewForm.ts";
 import * as $$$$$$0 from "./sections/Question.tsx";
 import * as $$$$$$1 from "./sections/WriteReviewForm.tsx";
 import * as $$$$$$$$$0 from "./actions/submitReview.ts";
@@ -15,9 +15,9 @@ const manifest = {
   "loaders": {
     "power-reviews/loaders/productDetailsPage.ts": $$$0,
     "power-reviews/loaders/productList.ts": $$$1,
-    "power-reviews/loaders/productListingPage.ts": $$$4,
+    "power-reviews/loaders/productListingPage.ts": $$$2,
     "power-reviews/loaders/review.ts": $$$3,
-    "power-reviews/loaders/reviewForm.ts": $$$2,
+    "power-reviews/loaders/reviewForm.ts": $$$4,
   },
   "sections": {
     "power-reviews/sections/Question.tsx": $$$$$$0,
