@@ -11,7 +11,6 @@ import * as $$$$$$$$$$$5 from "./apps/workflows.ts";
 import * as $$$$$$$$$$$6 from "./apps/implementation.ts";
 import * as $$$$$$$$$$$7 from "./apps/vnda.ts";
 import * as $$$$$$$$$$$8 from "./apps/algolia.ts";
-import * as $$$$$$$$$$$9 from "./apps/admin.ts";
 import * as $$$$$$$$$$$10 from "./apps/nuvemshop.ts";
 import * as $$$$$$$$$$$11 from "./apps/linx.ts";
 import * as $$$$$$$$$$$12 from "./apps/vtex.ts";
@@ -26,7 +25,6 @@ import * as $$$$$$$$$$$20 from "./apps/power-reviews.ts";
 
 const manifest = {
   "apps": {
-    "decohub/apps/admin.ts": $$$$$$$$$$$9,
     "decohub/apps/ai-assistants.ts": $$$$$$$$$$$3,
     "decohub/apps/algolia.ts": $$$$$$$$$$$8,
     "decohub/apps/analytics.ts": $$$$$$$$$$$4,

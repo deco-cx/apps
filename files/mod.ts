@@ -1,10 +1,9 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import type { AppContext as AC, App, AppManifest } from "deco/mod.ts";
+import type { App, AppContext as AC, AppManifest } from "deco/mod.ts";
 import { dirname, join } from "std/path/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { FileSystemNode, create, walk } from "./sdk.ts";
-
+import { create, FileSystemNode, walk } from "./sdk.ts";
 
 const currdir = dirname(import.meta.url);
 const importFromString = (modData: string) =>
