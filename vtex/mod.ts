@@ -23,9 +23,12 @@ export type AppMiddlewareContext = AMC<App>;
 
 export type SegmentCulture = Omit<
   Partial<Segment>,
+  | "utm_medium"
   | "utm_campaign"
   | "utm_source"
   | "utmi_campaign"
+  | "utmi_part"
+  | "utmi_page"
   | "campaigns"
   | "priceTables"
   | "regionId"
