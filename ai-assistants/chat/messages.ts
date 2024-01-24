@@ -10,10 +10,13 @@ import { genSchemas } from "deco/engine/schema/reader.ts";
 import { Context } from "deco/live.ts";
 import { AppManifest } from "deco/mod.ts";
 import { mschema } from "deco/runtime/fresh/routes/_meta.ts";
-import { ChatMessage, FunctionCallReply } from "../actions/chat.ts";
+import {
+  ChatMessage,
+  FunctionCallReply,
+  ReplyMessage,
+} from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
-import type { Product } from "../../commerce/types.ts";
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 let tools: Promise<AssistantCreateParams.AssistantToolsFunction[]> | null =
@@ -239,13 +242,11 @@ export const messageProcessorFor = async (
       });
     }, (call, props, response) => {
       console.log({ call, props });
-      if (call.function.name !== "multi_tool_use.parallel") {
-        functionCallReplies.push({
-          name: call.function.name,
-          props,
-          response,
-        });
-      }
+      functionCallReplies.push({
+        name: call.function.name,
+        props,
+        response,
+      });
     });
 
     let runStatus;
@@ -262,7 +263,7 @@ export const messageProcessorFor = async (
         const tool_outputs = await Promise.all(
           outputs.tool_calls.map(invoke),
         );
-        console.log({tool_outputs})
+        console.log({ tool_outputs });
         await threads.runs.submitToolOutputs(
           thread.id,
           run.id,
@@ -287,7 +288,19 @@ export const messageProcessorFor = async (
 
     if (!lastMsg) {
       // TODO(@mcandeia) in some cases the bot didn't respond anything.
-      reply("I'm sorry, I didn't understand that. Could you rephrase it?");
+      const message: ReplyMessage = {
+        messageId: Date.now().toString(),
+        type: "message",
+        content: [
+          {
+            type: "text",
+            value:
+              "Parece que estamos enfrentando um pequeno problema ao localizar seu produto. Por favor, tente recarregar a página e realizar a busca novamente.",
+          },
+        ],
+        role: "assistant",
+      };
+      reply(message);
       return;
     }
 
@@ -303,16 +316,29 @@ export const messageProcessorFor = async (
     );
 
     const _latestMsg = lastMsg.id;
-    if (functionCallReplies.length < 0) {
-      reply(
-        "I couldn't find any products matching your search. Would you like to search for something else?",
-      );
+    if (
+      functionCallReplies.length > 0 &&
+      functionCallReplies[0].name === "multi_tool_use.parallel"
+    ) {
+      console.log("function call replies name", functionCallReplies[0].name);
+      const message: ReplyMessage = {
+        messageId: Date.now().toString(),
+        type: "message",
+        content: [
+          {
+            type: "text",
+            value:
+              "Parece que estamos enfrentando um pequeno problema ao localizar seu produto. Por favor, tente recarregar a página e realizar a busca novamente.",
+          },
+        ],
+        role: "assistant",
+      };
+      reply(message);
     } else {
       reply(replyMessage);
     }
 
     if (functionCallReplies.length > 0) {
-      console.log("tem function call replies");
       reply({
         messageId,
         type: "function_calls" as const,
