@@ -1,44 +1,10 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import type { App, AppContext as AC, AppManifest } from "deco/mod.ts";
-import { dirname, join } from "std/path/mod.ts";
+import type { AppContext as AC, App } from "deco/mod.ts";
+import { ensureFile } from "std/fs/ensure_file.ts";
+import { join } from "std/path/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { create, FileSystemNode, walk } from "./sdk.ts";
-
-const currdir = dirname(import.meta.url);
-const importFromString = (modData: string) =>
-  import(`data:text/tsx;base64,${btoa(modData)}`);
-
-const compile = async (
-  blockType: keyof Omit<AppManifest, "baseUrl" | "name">,
-  { path, content }: TsContent,
-  manifest: AppManifest,
-  sourceMap: SourceMap,
-): Promise<[AppManifest, SourceMap]> => {
-  const tsModule = await importFromString(content).catch((err) => {
-    console.error("could not compile module", path, err);
-    return null;
-  });
-  if (!tsModule) {
-    return [manifest, sourceMap];
-  }
-  const blockPath = join(currdir, path);
-  const blockKey = join(manifest.name, path);
-
-  return [{
-    ...manifest,
-    [blockType]: {
-      ...manifest[blockType],
-      [blockKey]: tsModule,
-    },
-  }, {
-    ...sourceMap,
-    [blockKey]: {
-      path: blockPath,
-      content: content,
-    },
-  }];
-};
+import { FileSystemNode, create, walk } from "./sdk.ts";
 
 export interface TsContent {
   path: string;
@@ -63,22 +29,57 @@ export default async function App(
   let appManifest = manifest;
   let appSourceMap: SourceMap = buildSourceMap(appManifest);
 
+  // output all files to filesystem
   for (const file of walk(root)) {
     if (!/\.tsx?$/.test(file.path)) {
       continue;
     }
 
-    const [_, blockType] = file.path.split("/");
+    const fullpath = join(base, file.path);
 
-    const [newManifest, newSourceMap] = await compile(
-      blockType as keyof Omit<AppManifest, "baseUrl" | "name">,
-      file,
-      appManifest,
-      appSourceMap,
-    );
-    appManifest = newManifest;
-    appSourceMap = newSourceMap;
+    const previous = await Deno.readTextFile(fullpath).catch(() => null);
+
+    if (file.content !== previous) {
+      await ensureFile(fullpath);
+      await Deno.writeTextFile(fullpath, file.content);
+    }
   }
+
+  // import files
+  for (const file of walk(root)) {
+    if (!/\.tsx?$/.test(file.path)) {
+      continue;
+    }
+
+    try {
+      const [_, blockType] = file.path.split("/");
+      const blockPath = join(base, file.path);
+      const blockKey = join(manifest.name, file.path);
+      const tsModule = await import(
+        `data:text/tsx;base64,${btoa(file.content)}`
+      );
+
+      appManifest = {
+        ...appManifest,
+        [blockType]: {
+          ...appManifest[blockType],
+          [blockKey]: tsModule,
+        },
+      };
+
+      appSourceMap = {
+        ...appSourceMap,
+        [blockKey]: {
+          path: blockPath,
+          content: file.content,
+        },
+      };
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  import(`http://localhost:8000/`)
 
   return { manifest: appManifest, state, sourceMap: appSourceMap };
 }
