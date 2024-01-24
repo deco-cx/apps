@@ -2,6 +2,7 @@
 import { Product } from "../../commerce/types.ts";
 import { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
+import { WishlistReducedProductFragment } from "../utils/graphql/storefront.graphql.gen.ts";
 import { state as storeState } from "./context.ts";
 
 const { wishlist, loading } = storeState;
@@ -14,12 +15,12 @@ type EnqueuableActions<
 const enqueue = <
   K extends keyof Manifest["actions"],
 >(key: EnqueuableActions<K>) =>
-  (props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
-    storeState.enqueue((signal) =>
-      invoke({ wishlist: { key, props } } as any, { signal }) as any
-    );
+(props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
+  storeState.enqueue((signal) =>
+    invoke({ wishlist: { key, props } } as any, { signal }) as any
+  );
 
-const getItem = (item: { productId }) =>
+const getItem = (item: Omit<WishlistReducedProductFragment, "productName">) =>
   wishlist.value?.find((id) => id.productId == item.productId);
 
 const state = {
