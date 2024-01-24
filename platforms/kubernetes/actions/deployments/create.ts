@@ -1,16 +1,10 @@
-import { shortcircuit } from "deco/engine/errors.ts";
-import { badRequest } from "deco/mod.ts";
 import ShortUniqueId from "https://esm.sh/v135/short-unique-id@v4.4.2";
 import { Deployment } from "../../../../admin/platform.ts";
-import runScript from "../../common/cmds/run.ts";
-import { routeOf } from "../../common/knative/route.ts";
-import { ignoreIfExists, upsertObject } from "../../common/objects.ts";
-import { k8s } from "../../deps.ts";
+import { assertsOrBadRequest } from "../../common/assertions.ts";
+import { deployFromSource } from "../../common/knative/deployments.ts";
 import { ServiceScaling, SiteState } from "../../loaders/siteState/get.ts";
-import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
-import { SourceBinder, SrcBinder } from "../build.ts";
+import { AppContext } from "../../mod.ts";
 import { Namespace } from "../sites/create.ts";
-import { Routes } from "./rollout.ts";
 
 const uid = new ShortUniqueId({ length: 10, dictionary: "alpha_lower" });
 export const DeploymentId = {
@@ -27,182 +21,11 @@ export interface Props {
   build?: boolean;
 }
 
-export interface EnvVar {
-  name: string;
-  value: string;
-}
-
-interface KnativeSerivceOpts {
-  controlPlaneDomain: string;
-  cachePath: string;
-  revisionName: string;
-  site: string;
-  namespace: string;
-  deploymentId: string;
-  labels?: Record<string, string>;
-  scaling: ServiceScaling;
-  runnerImage: string;
-  sourceBinder: SourceBinder;
-  envVars?: EnvVar[];
-  serviceAccountName?: string;
-  runArgs?: string;
-}
-
-const typeToAttributes: Record<
-  Required<ServiceScaling>["metric"]["type"],
-  (metric: Required<ServiceScaling>["metric"]) => Record<string, string>
-> = {
-  concurrency: (metric) => {
-    return {
-      "autoscaling.knative.dev/metric": "concurrency",
-      "autoscaling.knative.dev/target-utilization-percentage":
-        `${metric.target}`,
-    };
-  },
-  cpu: (metric) => {
-    return {
-      "autoscaling.knative.dev/class": "hpa.autoscaling.knative.dev",
-      "autoscaling.knative.dev/metric": "cpu",
-      "autoscaling.knative.dev/target": `${metric.target}`,
-    };
-  },
-  memory: (metric) => {
-    return {
-      "autoscaling.knative.dev/class": "hpa.autoscaling.knative.dev",
-      "autoscaling.knative.dev/metric": "concurrency",
-      "autoscaling.knative.dev/target": `${metric.target}`,
-    };
-  },
-  rps: (metric) => {
-    return {
-      "autoscaling.knative.dev/metric": "rps",
-      "autoscaling.knative.dev/target": `${metric.target}`,
-    };
-  },
-};
-
-const metricToAnnotations = (
-  metric: ServiceScaling["metric"],
-): Record<string, string> => {
-  if (!metric) {
-    return {};
-  }
-  return typeToAttributes[metric.type](metric);
-};
-
-const knativeServiceOf = (
-  {
-    cachePath,
-    runArgs,
-    site,
-    namespace,
-    deploymentId,
-    labels,
-    scaling: { initialScale, maxScale, minScale, retentionPeriod, metric },
-    runnerImage,
-    revisionName,
-    sourceBinder,
-    envVars,
-    serviceAccountName,
-    controlPlaneDomain,
-  }: KnativeSerivceOpts,
-) => {
-  return {
-    apiVersion: "serving.knative.dev/v1",
-    kind: "Service",
-    metadata: {
-      name: `${site}-site`,
-      namespace,
-      annotations: {
-        "networking.knative.dev/wildcardDomain": `*.${controlPlaneDomain}`,
-      },
-      labels,
-    },
-    spec: {
-      template: {
-        metadata: {
-          name: revisionName,
-          annotations: {
-            ...metricToAnnotations(metric),
-            "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
-            "autoscaling.knative.dev/max-scale": `${maxScale ?? 0}`,
-            "autoscaling.knative.dev/min-scale": `${minScale ?? 0}`,
-            "autoscaling.knative.dev/scale-to-zero-pod-retention-period": `${
-              retentionPeriod ?? "0s"
-            }`,
-          },
-        },
-        spec: {
-          serviceAccountName,
-          volumes: [
-            {
-              name: "assets",
-              persistentVolumeClaim: {
-                claimName: sourceBinder.claimName,
-              },
-            },
-            {
-              name: "code",
-              emptyDir: {},
-            },
-          ],
-          containers: [
-            {
-              name: "app",
-              command: ["/bin/sh", "-c"],
-              args: [runScript],
-              // TODO Inject default environment variables (e.g. OTEL_* configs)
-              // envFrom: [
-              //   {
-              //     configMapRef: {
-              //       name: "workload-default-env",
-              //     },
-              //   },
-              // ],
-              env: [
-                {
-                  name: "ASSETS_MOUNT_PATH",
-                  value: sourceBinder.mountPath,
-                },
-                { name: "EXTRA_RUN_ARGS", value: runArgs },
-                { name: "DECO_SITE_NAME", value: site },
-                {
-                  name: "DENO_DEPLOYMENT_ID",
-                  value: deploymentId,
-                },
-                {
-                  name: "CACHE_PATH",
-                  value: cachePath,
-                },
-                {
-                  name: "SOURCE_ASSET_PATH",
-                  value: sourceBinder.sourcePath,
-                },
-                { name: "APP_PORT", value: "8000" },
-                ...envVars ?? [],
-                // Add other environment variables as needed
-              ],
-              image: runnerImage,
-              volumeMounts: [
-                { name: "assets", mountPath: sourceBinder.mountPath },
-                { name: "code", mountPath: "/app/deco" },
-              ],
-              ports: [{ name: "http1", containerPort: 8000 }],
-            },
-          ],
-        },
-      },
-    },
-  };
-};
-
-const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
-
 /**
  * Creates a new Knative Service and the route that points to it.
  * @title Create k8s Deployment
  */
-export default async function newDeployment(
+export default function newDeployment(
   {
     build = true,
     site,
@@ -216,107 +39,29 @@ export default async function newDeployment(
   ctx: AppContext,
 ): Promise<Deployment> {
   const siteState = ctx.withDefaults(desiredState);
+
   const { source, scaling = _scaling } = siteState;
-  if (!source) {
-    badRequest({ message: "source is required" });
-  }
-  const siteNs = Namespace.forSite(site);
-
-  const { owner, repo, commitSha } = source!;
-  if (build) {
-    // when code has changed so we need to build it.
-    const buildResult = await ctx.invoke.kubernetes.actions.build({
-      commitSha,
-      repo,
-      owner,
-      builderImage: siteState.builderImage,
-      site,
-    });
-    const status = await buildResult.wait(300_000);
-
-    if (status !== "succeed") {
-      badRequest({ message: `unexpected build status ${status}` });
-    }
-  }
+  assertsOrBadRequest(typeof source !== "undefined", {
+    message: "source is required",
+  });
 
   const runnerImg = runnerImage ?? siteState?.runnerImage;
-  if (!runnerImg) {
-    badRequest({ message: "runner image is required" });
-  }
-  const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
-  const revisionName = `${site}-site-${deploymentId}`;
 
-  const sourceBinder = SrcBinder.fromRepo(
-    owner,
-    repo,
-    commitSha,
-  );
-  const service = knativeServiceOf({
-    controlPlaneDomain: ctx.controlPlaneDomain,
-    cachePath: `${sourceBinder.mountPath}/${owner}/${repo}/cache.tar`,
-    envVars: siteState.envVars,
-    sourceBinder,
+  assertsOrBadRequest(typeof runnerImg !== "undefined", {
+    message: "runner image is required",
+  });
+
+  const siteNs = Namespace.forSite(site);
+
+  return deployFromSource({
+    source,
+    build,
     site,
-    namespace: siteNs,
+    siteState,
     deploymentId,
-    labels,
-    scaling: scaling ?? { initialScale: 0, maxScale: 3, minScale: 0 },
-    runnerImage: runnerImg!,
-    revisionName,
-    serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
-    runArgs: siteState?.runArgs,
-  });
-  await upsertObject(
-    ctx.kc,
-    service,
-    "serving.knative.dev",
-    "v1",
-    "services",
-    (current) => {
-      return {
-        ...service,
-        metadata: {
-          ...current.metadata,
-          ...service.metadata,
-          annotations: {
-            ...current.metadata.annotations,
-            ...service.metadata.annotations,
-            ...IMMUTABLE_ANNOTATIONS.reduce((acc, key) => {
-              if (current.metadata.annotations?.[key]) {
-                acc[key] = current.metadata.annotations[key];
-              }
-              return acc;
-            }, {} as Record<string, string>),
-          },
-        },
-      };
-    },
-  ).catch(ignoreIfExists);
-
-  const deploymentRoute = `sites-${site}-${deploymentId}`;
-  await k8sApi.createNamespacedCustomObject(
-    "serving.knative.dev",
-    "v1",
     siteNs,
-    "routes",
-    routeOf({
-      routeName: deploymentRoute,
-      revisionName,
-      namespace: siteNs,
-    }),
-  ).catch(ignoreIfExists).catch((err) => {
-    console.error("creating site route error", err);
-    shortcircuit(
-      new Response(
-        JSON.stringify({ message: "could not create deployment route" }),
-        { status: 500 },
-      ),
-    );
-  });
-
-  const domains = [{
-    url: `https://${Routes.prod(site)}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
-    production: false,
-  }];
-  return { id: deploymentId, domains };
+    labels,
+    scaling,
+    runnerImage: runnerImg,
+  }, ctx);
 }
