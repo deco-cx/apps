@@ -1,60 +1,65 @@
-import { Context } from "deco/deco.ts";
-import { join } from "std/path/mod.ts";
-import { create, walk } from "../../files/sdk.ts";
+import { decoManifestBuilder } from "deco/engine/manifest/manifestGen.ts";
+import {
+  assertIsDir,
+  create,
+  FileSystemNode,
+  nodesToMap,
+  read,
+  walk,
+} from "../../files/sdk.ts";
 
-const handler = (_props: unknown) => {
-  return async (req: Request) => {
-    const url = new URL(req.url);
+const genManifest = async (root: FileSystemNode) => {
+  assertIsDir(root);
 
-    if (url.pathname.includes("manifest.gen.ts")) {
-      const state = await Context.active().release?.state();
+  const nodeMap = nodesToMap(root.nodes);
+  const builder = await decoManifestBuilder(
+    "",
+    "files",
+    async function* (dir) {
+      const fs = nodeMap[dir];
 
-      const files = Object.values(state ?? {}).find(({ __resolveType }) =>
-        __resolveType.includes("decohub/apps/files.ts")
-      );
-
-      if (!files) {
+      if (!fs) {
         return;
       }
 
-      const { root = create() } = files;
-
-      for (const file of walk(root)) {
-        if (!/\.tsx?$/.test(file.path)) {
-          continue;
-        }
-
-        try {
-          const [_, blockType] = file.path.split("/");
-
-          const blockKey = join("files", file.path);
-          const tsModule = await import(
-            `data:text/tsx;base64,${btoa(file.content)}`
-          );
-
-            
-
-          appManifest = {
-            ...appManifest,
-            [blockType]: {
-              ...appManifest[blockType],
-              [blockKey]: tsModule,
-            },
-          };
-
-          appSourceMap = {
-            ...appSourceMap,
-            [blockKey]: {
-              path: file.path,
-              content: file.content,
-            },
-          };
-        } catch (error) {
-          console.error(error);
-        }
+      for await (const file of walk(fs)) {
+        yield file;
       }
-    } else {
+    },
+  );
+
+  return builder.build();
+};
+
+const handler = (_props: unknown) => {
+  return async (req: Request, ctx) => {
+    // TODO: sitename from release
+    const { sitename, "0": path } = ctx.params;
+
+    const state = JSON.parse(
+      await Deno.readTextFile("/Users/gimenes/code/storefront/.decofile.json"),
+    );
+
+    const files = Object.values(state ?? {}).find(({ __resolveType }) =>
+      __resolveType?.includes("decohub/apps/files.ts")
+    );
+
+    if (!files) {
+      return new Response(`No filesystem found`, { status: 404 });
     }
+
+    const { root = create() } = files as any;
+
+    const content = path === "manifest.gen.ts"
+      ? await genManifest(root)
+      : read(root, `/${path}`);
+
+    return new Response(content, {
+      status: content ? 200 : 404,
+      headers: {
+        "content-type": "text/typescript",
+      },
+    });
   };
 };
 
