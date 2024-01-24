@@ -1,7 +1,12 @@
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
+import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
 import k8s, { Props as K8sProps } from "../platforms/kubernetes/mod.ts";
+import subhosting, {
+  Props as SubhostingProps,
+} from "../platforms/subhosting/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import {
   EventPayloadMap,
@@ -14,8 +19,6 @@ import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
-import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
-import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
 export interface BlockStore extends Release {
@@ -79,7 +82,8 @@ export interface GithubProps {
 export interface Props {
   resolvables?: Resolvables;
   github?: GithubProps;
-  kubernetes: K8sProps;
+  kubernetes?: K8sProps;
+  subhosting?: SubhostingProps;
 }
 
 /**
@@ -90,13 +94,15 @@ export default function App(
     resolvables,
     github,
     kubernetes,
+    subhosting: subhostingProps,
   }: Props,
 ): App<
   AppManifest,
   State,
-  [ReturnType<typeof k8s>]
+  [ReturnType<typeof k8s>, ReturnType<typeof subhosting>]
 > {
   const k8sApp = k8s(kubernetes ?? {});
+  const subhostingApp = subhosting(subhostingProps ?? {});
   const githubAPIToken = github?.octokitAPIToken?.get?.() ??
     Deno.env.get("OCTOKIT_TOKEN");
   const githubWebhookSecret = github?.webhookSecret?.get?.() ??
@@ -121,7 +127,7 @@ export default function App(
         : undefined,
     },
     resolvables,
-    dependencies: [k8sApp],
+    dependencies: [k8sApp, subhostingApp],
   };
 }
 

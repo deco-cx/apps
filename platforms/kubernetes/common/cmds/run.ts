@@ -1,7 +1,8 @@
+import { SOURCE_LOCAL_MOUNT_PATH } from "../../actions/build.ts";
 const script = `
 #!/bin/bash
 
-CODE_DIR=/app/deco
+CODE_DIR=${SOURCE_LOCAL_MOUNT_PATH}
 start=$(date +%s)
 
 tar xvf $SOURCE_ASSET_PATH -C $CODE_DIR &

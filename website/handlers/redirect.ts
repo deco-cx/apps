@@ -39,7 +39,9 @@ export default function Redirect({ to, type = "temporary" }: RedirectConfig) {
      *
      * (Useful for tracking parameters e.g Google's gclid, utm_source...)
      */
-    const finalLocation = location.includes("?")
+    const finalLocation = !queryString
+      ? location
+      : location.includes("?")
       ? `${location}&${queryString}`
       : `${location}?${queryString}`;
 

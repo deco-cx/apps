@@ -5,6 +5,9 @@ import { Acked, Commands, Events, State } from "../../types.ts";
 export interface Props {
   /** Environment name to connect to */
   name: string;
+
+  /** Site name */
+  site: string;
 }
 
 const subscribers: WebSocket[] = [];
@@ -28,7 +31,7 @@ const patchState = (ops: fjp.Operation[]) => {
   return queue;
 };
 
-const action = (_props: Props, req: Request) => {
+const action = (_: Props, req: Request) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
   const broadcast = (event: Acked<Events>) => {
