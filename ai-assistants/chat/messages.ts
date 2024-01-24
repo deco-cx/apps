@@ -262,6 +262,7 @@ export const messageProcessorFor = async (
         const tool_outputs = await Promise.all(
           outputs.tool_calls.map(invoke),
         );
+        console.log({tool_outputs})
         await threads.runs.submitToolOutputs(
           thread.id,
           run.id,
