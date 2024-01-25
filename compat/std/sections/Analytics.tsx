@@ -91,7 +91,8 @@ export default function Analtyics({
       <Script
         dangerouslySetInnerHTML={{
           // add all globals variables here
-          __html: `debugGlobals = () => { console.table([["datalayer", dataLayer]]); }`,
+          __html:
+            `debugGlobals = () => { console.table([["datalayer", dataLayer]]); }`,
         }}
         forward={["debugGlobals"]}
       />
@@ -99,7 +100,8 @@ export default function Analtyics({
         type="module"
         id="analytics-script"
         dangerouslySetInnerHTML={{
-          __html: `window.DECO_SITES_STD = { sendAnalyticsEvent: ${sendAnalyticsEvent.toString()} }`,
+          __html:
+            `window.DECO_SITES_STD = { sendAnalyticsEvent: ${sendAnalyticsEvent.toString()} }`,
         }}
       />
     </>

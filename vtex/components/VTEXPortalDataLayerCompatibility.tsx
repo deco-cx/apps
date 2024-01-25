@@ -26,7 +26,7 @@ function addVTEXPortalDataSnippet(accountName: string) {
     structuredDatas.push(JSON.parse(v.text));
   });
   const breadcrumbSD = structuredDatas.find(
-    (s) => s["@type"] === "BreadcrumbList"
+    (s) => s["@type"] === "BreadcrumbList",
   );
   performance.mark("end-sd");
 
@@ -136,7 +136,7 @@ export function ProductDetailsTemplate({
   ...props
 }: ProductDetailsTemplateProps) {
   const departament = product.additionalProperty?.find(
-    (p) => p.name === "category"
+    (p) => p.name === "category",
   );
   const category = product.additionalProperty
     ?.slice()
@@ -195,8 +195,8 @@ export function ProductInfo({ product, ...props }: ProductInfoProps) {
       defer
       data-product-info
       src={scriptAsDataURI((t) => {
-        globalThis.window.shelfProductIds =
-          globalThis.window.shelfProductIds || [];
+        globalThis.window.shelfProductIds = globalThis.window.shelfProductIds ||
+          [];
         globalThis.window.shelfProductIds.push(t);
       }, product.isVariantOf.productGroupID)}
     />
