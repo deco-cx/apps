@@ -18,12 +18,11 @@ declare global {
 const setupAndListen = (appId: string, apiKey: string, version: string) => {
   function setupScriptTag() {
     globalThis.window.AlgoliaAnalyticsObject = "aa";
-    globalThis.window.aa =
-      globalThis.window.aa ||
+    globalThis.window.aa = globalThis.window.aa ||
       function () {
         // @ts-expect-error monkey patch before initialization
         (globalThis.window.aa.queue = globalThis.window.aa.queue || []).push(
-          arguments
+          arguments,
         );
       };
     globalThis.window.aa.version = version;
@@ -32,7 +31,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
     script.setAttribute("async", "");
     script.setAttribute(
       "src",
-      `https://cdn.jsdelivr.net/npm/search-insights@${version}/dist/search-insights.min.js`
+      `https://cdn.jsdelivr.net/npm/search-insights@${version}/dist/search-insights.min.js`,
     );
     document.head.appendChild(script);
   }
@@ -51,8 +50,8 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
   function setupSession() {
     globalThis.window.aa("init", { appId, apiKey });
 
-    const userToken =
-      localStorage.getItem("ALGOLIA_USER_TOKEN") || createUserToken();
+    const userToken = localStorage.getItem("ALGOLIA_USER_TOKEN") ||
+      createUserToken();
     localStorage.setItem("ALGOLIA_USER_TOKEN", userToken);
     globalThis.window.aa("setUserToken", userToken);
   }
@@ -83,7 +82,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
 
     function isViewItem(
       // deno-lint-ignore no-explicit-any
-      event: any
+      event: any,
     ): event is ViewItemEvent | ViewItemListEvent {
       return event.name === "view_item" || event.name === "view_item_list";
     }
@@ -113,7 +112,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         ) {
           return console.warn(
             "Failed sending event to Algolia. Missing index, item_id or item_url",
-            JSON.stringify(event, null, 2)
+            JSON.stringify(event, null, 2),
           );
         }
 
@@ -139,8 +138,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
       if (isAddToCartEvent(event)) {
         const [item] = event.params.items;
 
-        const attr =
-          attributesFromURL(globalThis.window.location.href) ||
+        const attr = attributesFromURL(globalThis.window.location.href) ||
           attributesFromURL(item.item_url || "");
         const objectIDs = event.params.items
           .filter(hasItemId)
@@ -194,7 +192,7 @@ function Analytics({
         setupAndListen,
         applicationId,
         searchApiKey,
-        (insights as unknown as typeof insights.default).version!
+        (insights as unknown as typeof insights.default).version!,
       )}
     />
   );
