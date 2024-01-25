@@ -1,10 +1,10 @@
 import { Head } from "$fresh/runtime.ts";
-import type { Flag, Site } from "deco/types.ts";
 import { context } from "deco/live.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
-import { Page } from "../../commerce/types.ts";
-import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
+import type { Flag, Site } from "deco/types.ts";
 import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
+import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
+import { Page } from "../../commerce/types.ts";
+import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 const IS_LOCALHOST = context.deploymentId === undefined;
 
@@ -40,7 +40,7 @@ ${DomInspector.toString()}`
 const snippet = (live: Live) => {
   const onKeydown = (event: KeyboardEvent) => {
     // in case loaded in iframe, avoid redirecting to editor while in editor
-    if (window !== window.parent) {
+    if (globalThis.window !== globalThis.window.parent) {
       return;
     }
 
@@ -102,7 +102,7 @@ const snippet = (live: Live) => {
     });
 
   /** Setup global variables */
-  window.LIVE = { ...window.LIVE, ...live };
+  globalThis.window.LIVE = { ...globalThis.window.LIVE, ...live };
 
   /** Setup listeners */
 

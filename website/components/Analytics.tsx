@@ -9,14 +9,20 @@ import { scriptAsDataURI } from "../../utils/dataURI.ts";
  * Add another ecommerce analytics modules here.
  */
 const snippet = () => {
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (
-      !event || !window.dataLayer ||
-      typeof window.dataLayer.push !== "function"
-    ) return;
+      !event ||
+      !globalThis.window.dataLayer ||
+      typeof globalThis.window.dataLayer.push !== "function"
+    ) {
+      return;
+    }
 
-    window.dataLayer.push({ ecommerce: null });
-    window.dataLayer.push({ event: event.name, ecommerce: event.params });
+    globalThis.window.dataLayer.push({ ecommerce: null });
+    globalThis.window.dataLayer.push({
+      event: event.name,
+      ecommerce: event.params,
+    });
   });
 };
 
@@ -56,40 +62,38 @@ export interface Props {
   disableAutomaticEventPush?: boolean;
 }
 
-export default function Analytics(
-  {
-    trackingIds,
-    src,
-    dangerouslyRunOnMainThread,
-    googleAnalyticsIds,
-    preventForward,
-    disableAutomaticEventPush,
-  }: Props,
-) {
+export default function Analytics({
+  trackingIds,
+  src,
+  dangerouslyRunOnMainThread,
+  googleAnalyticsIds,
+  preventForward,
+  disableAutomaticEventPush,
+}: Props) {
   const isDeploy = !!context.isDeploy;
 
   return (
     <>
       {/* TODO: Add debug from query string @author Igor Brasileiro */}
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}
-      {isDeploy && trackingIds && (
+      {isDeploy &&
+        trackingIds &&
         trackingIds.map((trackingId) => (
           <GoogleTagManager
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
             preventForward={preventForward}
           />
-        ))
-      )}
-      {isDeploy && googleAnalyticsIds && (
+        ))}
+      {isDeploy &&
+        googleAnalyticsIds &&
         googleAnalyticsIds.map((trackingId) => (
           <GoogleTagScript
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
             preventForward={preventForward}
           />
-        ))
-      )}
+        ))}
       {isDeploy && src && (
         <GoogleTagManager
           src={src}
@@ -107,11 +111,7 @@ export default function Analytics(
         forward={["debugGlobals"]}
       />
       {disableAutomaticEventPush !== true && (
-        <script
-          defer
-          id="analytics-script"
-          src={scriptAsDataURI(snippet)}
-        />
+        <script defer id="analytics-script" src={scriptAsDataURI(snippet)} />
       )}
     </>
   );
