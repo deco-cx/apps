@@ -20,7 +20,7 @@ export interface Props {
   tags?: string[];
 
   /** @description search for products that have certain type_tag */
-  typeTags?: { key?: string; value?: string }[] | undefined;
+  typeTags?: { key?: string; value?: string }[];
 
   /** @description search for products by id */
   ids: number[];
