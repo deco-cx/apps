@@ -9,49 +9,49 @@ interface BaseCase {
  */
 interface Equals extends BaseCase {
   /**
-   * @readonly
+   * @hide
    */
   type: "Equals";
 }
 
 interface Greater extends BaseCase {
   /**
-   * @readonly
+   * @hide
    */
   type: "Greater";
 }
 
 interface Lesser extends BaseCase {
   /**
-   * @readonly
+   * @hide
    */
   type: "Lesser";
 }
 
 interface GreaterOrEquals extends BaseCase {
   /**
-   * @readonly
+   * @hide
    */
   type: "GreaterOrEquals";
 }
 
 interface LesserOrEquals extends BaseCase {
   /**
-   * @readonly
+   * @hide
    */
   type: "LesserOrEquals";
 }
 
 interface Includes extends BaseCase {
   /**
-   * @readonly
+   * @hide
    */
   type: "Includes";
 }
 
 interface Exists {
   /**
-   * @readonly
+   * @hide
    */
   type: "Exists";
 }
