@@ -72,9 +72,9 @@ const snippet = ({ flags, page }: Deco) => {
     };
   };
 
-  window.DECO_SITES_STD = { sendAnalyticsEvent: dispatch };
-  window.DECO = {
-    ...window.DECO,
+  globalThis.window.DECO_SITES_STD = { sendAnalyticsEvent: dispatch };
+  globalThis.window.DECO = {
+    ...globalThis.window.DECO,
     events: { dispatch, subscribe },
   };
 };
@@ -82,11 +82,7 @@ const snippet = ({ flags, page }: Deco) => {
 function Events({ deco }: { deco: Deco }) {
   return (
     <Head>
-      <script
-        defer
-        id="deco-events"
-        src={scriptAsDataURI(snippet, deco)}
-      />
+      <script defer id="deco-events" src={scriptAsDataURI(snippet, deco)} />
     </Head>
   );
 }
