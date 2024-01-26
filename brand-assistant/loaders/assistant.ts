@@ -81,7 +81,8 @@ const BASE_INSTRUCTIONS =
 
   Category Tree and Function Calling:
   - If you are not sure a category exists in the category tree, do not use it, and do not fill facets prop. Instead, fill the query prop only.
-      Examples: User asks for something related to "banheiro cromado". Do not fill facets like "category-1/banheiro/category-2/por-cores-banheiro/category-3/banheiro-cromado", because "banheiro-cromado" is not a category from the category tree. Instead, try to fill with a category that you are sure exists on the tree, otherwise you can fill the query prop only, and not the facets.
+      Example: User asks for something related to "banheiro cromado". Do not fill facets like "category-1/banheiro/category-2/por-cores-banheiro/category-3/banheiro-cromado", because "banheiro-cromado" is not a category from the category tree. Instead, try to fill with a category that you are sure exists on the tree, if you are not sure a relevant or broader category exists, you can fill the query prop only, and not the facets.
+      Example: Usuário pede pelo maior cesto organizador que tem. Não preencha facets como "category-1/organizadores/category-2/organizacao-de-ambiente", porque "organizacao-de-ambiente"" não é uma categoria da category tree. Em vez disso, tente preencher com uma categoria que você tem certeza que existe na árvore, caso nao tenha certeza que existe que existe uma categoria relevante ou uma categoria mais genérica para a query, você pode preencher apenas a prop query, e não a facets.
   - Identify the product type the user is inquiring about.
   - If the user asks for a product that it's category is not in the category tree, you should mention that you do not have that kind of category in the store, but suggest categories you have available.
   - Do not suggest quick replies options that are not in the scope of the category tree you have access to.
