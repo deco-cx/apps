@@ -177,7 +177,7 @@ if [[ -f "$SOURCE_REMOTE_OUTPUT" ]]; then
 fi
 [[ -f "$CACHE_REMOTE_OUTPUT" ]] && echo "restoring cache..." && tar xvf "$CACHE_REMOTE_OUTPUT" -C $CACHE_LOCAL_DIR && echo "cache successfully restored!"
 
-deno run -A - << 'EOF'
+deno run --allow-run -A - << 'EOF'
 ${build};
 await build();
 EOF
