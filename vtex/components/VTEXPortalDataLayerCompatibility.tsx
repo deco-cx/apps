@@ -16,7 +16,7 @@ type ScriptProps = ComponentProps<typeof Script>;
 
 function addVTEXPortalDataSnippet(accountName: string) {
   performance.mark("start-vtex-dl");
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.window.location.href);
   const structuredDataScripts =
     document.querySelectorAll('script[type="application/ld+json"]') || [];
   // deno-lint-ignore no-explicit-any
@@ -56,7 +56,7 @@ function addVTEXPortalDataSnippet(accountName: string) {
   const props: Record<string, any> = {
     pageCategory: "Home",
     pageDepartment: null,
-    pageUrl: window.location.href,
+    pageUrl: globalThis.window.location.href,
     pageTitle: document.title,
     skuStockOutFromShelf: [],
     skuStockOutFromProductDetail: [],
@@ -69,7 +69,7 @@ function addVTEXPortalDataSnippet(accountName: string) {
   if (pageType === "productView") {
     props.pageCategory = "Product";
     props.pageDepartment = department?.name || null;
-    const product = window.datalayer_product || {};
+    const product = globalThis.window.datalayer_product || {};
     Object.assign(props, product);
   }
 
@@ -98,14 +98,14 @@ function addVTEXPortalDataSnippet(accountName: string) {
     props.pageCategory = pathNames.pop() || null;
   }
 
-  props.shelfProductIds = window.shelfProductIds || [];
+  props.shelfProductIds = globalThis.window.shelfProductIds || [];
 
-  window.dataLayer = window.dataLayer || [];
+  globalThis.window.dataLayer = globalThis.window.dataLayer || [];
   // VTEX Default position is first...
-  window.dataLayer.unshift(props);
+  globalThis.window.dataLayer.unshift(props);
   // But GTM handles .push function
-  window.dataLayer.push(props);
-  window.dataLayer.push({ event: pageType });
+  globalThis.window.dataLayer.push(props);
+  globalThis.window.dataLayer.push({ event: pageType });
   performance.mark("end-vtex-dl");
   performance.measure("vtex-dl-qs-ld-json", "start-vtex-dl", "end-sd");
   performance.measure("vtex-dl-compat", "start-vtex-dl", "end-vtex-dl");
@@ -175,7 +175,7 @@ export function ProductDetailsTemplate(
       {...props}
       defer
       src={scriptAsDataURI((t) => {
-        window.datalayer_product = t;
+        globalThis.window.datalayer_product = t;
       }, template)}
     />
   );
@@ -195,8 +195,9 @@ export function ProductInfo(
       defer
       data-product-info
       src={scriptAsDataURI((t) => {
-        window.shelfProductIds = window.shelfProductIds || [];
-        window.shelfProductIds.push(t);
+        globalThis.window.shelfProductIds = globalThis.window.shelfProductIds ||
+          [];
+        globalThis.window.shelfProductIds.push(t);
       }, product.isVariantOf.productGroupID)}
     />
   );
@@ -211,7 +212,7 @@ export function ProductSKUJson({ product, ...props }: ProductSKUJsonProps) {
       {...props}
       defer
       src={scriptAsDataURI((p) => {
-        window.skuJson = p;
+        globalThis.window.skuJson = p;
       }, product)}
     />
   );

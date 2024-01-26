@@ -23,7 +23,8 @@ const snippet = () => {
   // Flags and additional dimentions
   const props: Record<string, string> = {};
 
-  const trackPageview = () => window.plausible("pageview", { props });
+  const trackPageview = () =>
+    globalThis.window.plausible("pageview", { props });
 
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
@@ -40,7 +41,7 @@ const snippet = () => {
   const truncate = (str: string) => `${str}`.slice(0, 990);
 
   // setup plausible script and unsubscribe
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (!event || event.name !== "deco") return;
 
     if (event.params) {
@@ -56,7 +57,7 @@ const snippet = () => {
     trackPageview();
   })();
 
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (!event) return;
 
     const { name, params } = event;
@@ -75,7 +76,7 @@ const snippet = () => {
       }
     }
 
-    window.plausible(name, { props: values });
+    globalThis.window.plausible(name, { props: values });
   });
 };
 

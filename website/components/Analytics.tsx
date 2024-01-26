@@ -9,14 +9,17 @@ import { scriptAsDataURI } from "../../utils/dataURI.ts";
  * Add another ecommerce analytics modules here.
  */
 const snippet = () => {
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (
-      !event || !window.dataLayer ||
-      typeof window.dataLayer.push !== "function"
+      !event || !globalThis.window.dataLayer ||
+      typeof globalThis.window.dataLayer.push !== "function"
     ) return;
 
-    window.dataLayer.push({ ecommerce: null });
-    window.dataLayer.push({ event: event.name, ecommerce: event.params });
+    globalThis.window.dataLayer.push({ ecommerce: null });
+    globalThis.window.dataLayer.push({
+      event: event.name,
+      ecommerce: event.params,
+    });
   });
 };
 

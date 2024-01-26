@@ -29,7 +29,7 @@ export default function WriteReviewForm(state: Props) {
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            window.pwr = window.pwr || function () {
+            globalThis.window.pwr = globalThis.window.pwr || function () {
               (pwr.q = pwr.q || []).push(arguments); 
             };
             pwr("render", {
@@ -38,7 +38,7 @@ export default function WriteReviewForm(state: Props) {
               merchant_group_id: '${state.merchantGroup}',
               merchant_id: '${state.merchantId}',
               on_submit:function(config, data){
-                    window.scrollTo(0,0);
+                    globalThis.window.scrollTo(0,0);
                     },
               components: {
                   Write: 'pr-write',

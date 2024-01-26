@@ -21,14 +21,15 @@ declare global {
 const sendAnalyticsEvent = <T extends AnalyticsEvent>(
   event: T,
 ) => {
-  window.dataLayer && window.dataLayer.push({ ecommerce: null });
-  window.dataLayer && window.dataLayer.push({
+  globalThis.window.dataLayer &&
+    globalThis.window.dataLayer.push({ ecommerce: null });
+  globalThis.window.dataLayer && globalThis.window.dataLayer.push({
     event: event.name,
     ecommerce: event.params,
   });
 
-  window.DECO_ANALYTICS &&
-    Object.values(window.DECO_ANALYTICS).map((f) =>
+  globalThis.window.DECO_ANALYTICS &&
+    Object.values(globalThis.window.DECO_ANALYTICS).map((f) =>
       f("track", "ecommerce", event)
     );
 };
@@ -98,7 +99,7 @@ export default function Analtyics(
         id="analytics-script"
         dangerouslySetInnerHTML={{
           __html:
-            `window.DECO_SITES_STD = { sendAnalyticsEvent: ${sendAnalyticsEvent.toString()} }`,
+            `globalThis.window.DECO_SITES_STD = { sendAnalyticsEvent: ${sendAnalyticsEvent.toString()} }`,
         }}
       />
     </>

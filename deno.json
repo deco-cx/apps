@@ -35,5 +35,6 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
-  }
+  },
+  "experimentalDecorators": true
 }

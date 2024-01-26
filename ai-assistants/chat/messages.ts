@@ -3,7 +3,7 @@ import {
   RequiredActionFunctionToolCall,
   Thread,
 } from "../deps.ts";
-import { Tokens, threadMessageToReply } from "../loaders/messages.ts";
+import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
 import { JSONSchema7, weakcache } from "deco/deps.ts";
 import { lazySchemaFor } from "deco/engine/schema/lazy.ts";

@@ -23,8 +23,8 @@ interface Props {
 }
 
 const snippet = () => {
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
+  globalThis.window.dataLayer = globalThis.window.dataLayer || [];
+  globalThis.window.dataLayer.push({
     "gtm.start": new Date().getTime(),
     event: "gtm.js",
   });
@@ -47,11 +47,11 @@ const snippet = () => {
 
   const fixIndex = ({ index, ...rest }: any) => ({ ...rest, index: index + 1 });
 
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (!event) return;
 
     if (event.name === "deco") {
-      window.dataLayer.push(event);
+      globalThis.window.dataLayer.push(event);
       return;
     }
 
@@ -68,8 +68,8 @@ const snippet = () => {
       ecommerce.value = rounded(ecommerce.value);
     }
 
-    window.dataLayer.push({ ecommerce: null });
-    window.dataLayer.push({ event: event.name, ecommerce });
+    globalThis.window.dataLayer.push({ ecommerce: null });
+    globalThis.window.dataLayer.push({ event: event.name, ecommerce });
   });
 };
 

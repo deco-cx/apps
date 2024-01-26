@@ -46,7 +46,7 @@ export default function Question(
       <script
         dangerouslySetInnerHTML={{
           __html: `
-           window.pwr = window.pwr || function () {
+           globalThis.window.pwr = globalThis.window.pwr || function () {
             (pwr.q = pwr.q || []).push(arguments); 
            };
            pwr("render", {

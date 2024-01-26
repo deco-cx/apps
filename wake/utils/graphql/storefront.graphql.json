@@ -10026,7 +10026,7 @@
                 },
                 {
                   "name": "userCredential",
-                  "description": "The user credential after authorizing through the google popup window.",
+                  "description": "The user credential after authorizing through the google popup globalThis.window.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
