@@ -264,6 +264,23 @@ export const messageProcessorFor = async (
           outputs.tool_calls.map(invoke),
         );
         console.log({ tool_outputs });
+        if (tool_outputs.length === 0) {
+          console.log('TOOL OUTPUT VAZIO??????')
+          const message: ReplyMessage = {
+            messageId: Date.now().toString(),
+            type: "message",
+            content: [
+              {
+                type: "text",
+                value:
+                  "Ei, algo não saiu como esperávamos... 🚧 Por favor, recarregue a página e tente novamente.",
+              },
+            ],
+            role: "assistant",
+          };
+          reply(message);
+          return;
+        }
         await threads.runs.submitToolOutputs(
           thread.id,
           run.id,
@@ -317,10 +334,10 @@ export const messageProcessorFor = async (
 
     const _latestMsg = lastMsg.id;
     if (
-      functionCallReplies.length > 0 &&
+      functionCallReplies.length === 1 &&
       functionCallReplies[0].name === "multi_tool_use.parallel"
     ) {
-      console.log("function call replies name", functionCallReplies[0].name);
+      console.log("function call replies name", functionCallReplies[0].name, functionCallReplies);
       const message: ReplyMessage = {
         messageId: Date.now().toString(),
         type: "message",
@@ -328,7 +345,7 @@ export const messageProcessorFor = async (
           {
             type: "text",
             value:
-              "Parece que estamos enfrentando um pequeno problema ao localizar seu produto. Por favor, tente recarregar a página e realizar a busca novamente.",
+              "Ei, algo não saiu como esperávamos... 🚧 Experimente repetir a ação e, se não der certo, atualizar a página deve ajudar!",
           },
         ],
         role: "assistant",

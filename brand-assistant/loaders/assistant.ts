@@ -80,6 +80,8 @@ const BASE_INSTRUCTIONS =
       Example: If you found North Face hiking backpacks that match the user's query, present a brief overview of these backpacks, highlighting their most appealing features.
 
   Category Tree and Function Calling:
+  - If you are not sure a category exists in the category tree, do not use it, and do not fill facets prop. Instead, fill the query prop only.
+      Examples: User asks for something related to "banheiro cromado". Do not fill facets like "category-1/banheiro/category-2/por-cores-banheiro/category-3/banheiro-cromado", because "banheiro-cromado" is not a category from the category tree. Instead, try to fill with a category that you are sure exists on the tree, otherwise you can fill the query prop only, and not the facets.
   - Identify the product type the user is inquiring about.
   - If the user asks for a product that it's category is not in the category tree, you should mention that you do not have that kind of category in the store, but suggest categories you have available.
   - Do not suggest quick replies options that are not in the scope of the category tree you have access to.
@@ -101,6 +103,8 @@ const BASE_INSTRUCTIONS =
       Correct: "category-1/decoracoes-e-presentes/category-2/decoracao/category-3/vasos-e-cachepots".
       Correct: "category-1/organizadores/category-2/organizacao-de-armario/cor/azul"
       Correct: "category-1/cozinha/category-2/por-cores-cozinha/category-3/cozinha-preta"
+      Correct: "category-1/banheiro/category-2/por-cores-banheiro/category-3/banheiro-cromado---inox"
+      Incorrect: "category-1/banheiro/category-2/por-cores-banheiro/category-3/banheiro-cromado"
       Incorrect: "category-1/cozinha/por-cores-cozinha/category-2/cozinha-preta"
       Incorrect: "category-1/organizadores/category-6/organizacao-de-armario/cor/azul"
   - DO NOT make categories up by yourself. ALWAYS make sure the categories you are searching for exist in the category tree before making the function call. Only make a call to the productList.ts function if you have filled the facets with categories you have seen on the category tree.
