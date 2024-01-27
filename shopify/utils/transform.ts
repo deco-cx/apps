@@ -151,12 +151,25 @@ export const toProduct = (
         ...product.tags?.map((value) =>
           toPropertyValue({ name: "TAG", value })
         ),
-        ...product.collections?.nodes.map(({ title, handle, id }) =>
+        ...product.collections?.nodes.map((
+          { title, handle, id, description, descriptionHtml, image },
+        ) =>
           toPropertyValue({
             "@id": id,
-            name: title,
-            value: handle,
-            propertyID: "COLLECTION",
+            name: "COLLECTION",
+            value: title,
+            valueReference: handle,
+            description,
+            disambiguatingDescription: descriptionHtml,
+            ...(image &&
+              {
+                image: [{
+                  "@type": "ImageObject",
+                  encodingFormat: "image",
+                  alternateName: image.altText ?? "",
+                  url: image.url,
+                }],
+              }),
           })
         ),
       ],
@@ -195,7 +208,7 @@ export const toProduct = (
 };
 
 const toPropertyValue = (
-  option: SelectedOptionShopify & { propertyID?: string; "@id"?: string },
+  option: Omit<PropertyValue, "@type">,
 ): PropertyValue => ({
   "@type": "PropertyValue",
   ...option,
