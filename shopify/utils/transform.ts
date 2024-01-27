@@ -13,7 +13,6 @@ import {
   ProductFragment as ProductShopify,
   ProductVariantFragment as SkuShopify,
 } from "./storefront/storefront.graphql.gen.ts";
-import { SelectedOption as SelectedOptionShopify } from "./types.ts";
 
 const getPath = ({ handle }: ProductShopify, sku?: SkuShopify) =>
   sku
