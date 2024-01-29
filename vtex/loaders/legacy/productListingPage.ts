@@ -170,9 +170,10 @@ const loader = async (
     maybeTerm = result?.possiblePaths[0] ?? maybeTerm;
   }
 
-  const page = props.page || url.searchParams.get("page")
-    ? Number(url.searchParams.get("page")) - currentPageoffset
-    : 0;
+  const pageParam = url.searchParams.get("page")
+  ? Number(url.searchParams.get("page")) - currentPageoffset
+  : 0
+  const page = props.page || pageParam;
   const O = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
