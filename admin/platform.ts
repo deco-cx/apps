@@ -1,3 +1,4 @@
+import { FileSystemNode } from "../files/sdk.ts";
 export interface DomainOpts {
   site: string;
   domain: string;
@@ -13,14 +14,54 @@ export interface PromoteOpts {
   deploymentId: string;
 }
 
-export interface DeploymentOpts {
+export interface DeploymentBase {
   site: string;
+  production?: boolean;
+  mode: string;
+}
+export interface DeploymentFromRepo extends DeploymentBase {
+  mode: "repo";
   owner: string;
   repo: string;
   commitSha: string;
-  production?: boolean;
 }
 
+export interface CompilerOptions {
+  jsx: string;
+  jsxImportSource: string;
+}
+
+export interface DeploymentFromFiles extends DeploymentBase {
+  files: FileSystemNode;
+  compilerOptions: CompilerOptions | null;
+  entryPointUrl: string;
+  importMapUrl: string | null;
+  envVars?: Record<string, string>;
+}
+
+export type DeploymentOpts = DeploymentFromRepo | DeploymentFromFiles;
+
+export const isDeploymentFromRepo = (
+  opts: DeploymentOpts,
+): opts is DeploymentFromRepo => {
+  return (opts as DeploymentOpts)?.mode === "repo";
+};
+
+export function assertDeploymentIsFromRepo(
+  opts: DeploymentOpts,
+): asserts opts is DeploymentFromRepo {
+  if (opts?.mode !== "repo") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
+
+export function assertDeploymentIsFromFile(
+  opts: DeploymentOpts,
+): asserts opts is DeploymentFromFiles {
+  if (opts?.mode !== "files") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
 export interface Domain {
   url: string;
   production: boolean;
@@ -36,12 +77,40 @@ export interface UpdateDeploymentOpts {
   release: string;
 }
 
-export interface CreateSiteOpts {
+export type SiteLifecycle = "ephemeral";
+
+export interface CreateSiteOptsBase {
   site: string;
-  repo: Omit<RepoOpts, "site">;
   release?: string;
+  mode: string;
+  lifecycle?: SiteLifecycle;
 }
 
+export interface CreateSiteFromRepoOpts extends CreateSiteOptsBase {
+  mode: "repo";
+  repo: Omit<RepoOpts, "site">;
+}
+
+export interface CreateSiteFromFilesOpts extends CreateSiteOptsBase {
+  mode: "files";
+}
+
+export type CreateSiteOpts = CreateSiteFromRepoOpts | CreateSiteFromFilesOpts;
+export function assertCreateIsFromRepo(
+  opts: CreateSiteOpts,
+): asserts opts is CreateSiteFromRepoOpts {
+  if (opts?.mode !== "repo") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
+
+export function assertCreateIsFromFile(
+  opts: CreateSiteOpts,
+): asserts opts is CreateSiteFromFilesOpts {
+  if (opts?.mode !== "files") {
+    throw new Error(`create from ${opts?.mode} not supported`);
+  }
+}
 export interface DeleteSiteOpts {
   site: string;
 }
@@ -63,6 +132,8 @@ export interface Sites {
 }
 
 export interface Platform {
+  supportsDynamicImport?: boolean;
+  sourceDirectory: string;
   name: string;
   cfZoneId: string;
   domain: string;

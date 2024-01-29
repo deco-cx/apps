@@ -169,6 +169,7 @@ export const toFilters = (
   aggregations: NonNullable<SearchQuery["result"]>["aggregations"],
   { base }: { base: URL },
 ): ProductListingPage["filters"] => {
+  base.searchParams.delete("page");
   const filters: ProductListingPage["filters"] =
     aggregations?.filters?.map((filter) => toFilterItem(filter, base)) ?? [];
 

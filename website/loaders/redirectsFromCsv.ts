@@ -42,7 +42,7 @@ const getRedirectFromFile = async (
   }
 
   const redirectsFromFiles: Redirects["redirects"] = redirectsRaw
-    ?.split("\r\n")
+    ?.split(/\r\n|\r|\n/)
     .slice(1)
     .map((row) => {
       // this regex is necessary to handle csv with comma as part of value

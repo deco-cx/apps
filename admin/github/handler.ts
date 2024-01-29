@@ -35,6 +35,7 @@ export const handleChange = async (
     statusControllerGroup.pending();
     const platform = await loaders.platforms.forSite({ site });
     const { domains } = await platform.deployments.create({
+      mode: "repo",
       commitSha,
       owner,
       repo,

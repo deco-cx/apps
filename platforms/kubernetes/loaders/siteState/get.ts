@@ -1,6 +1,7 @@
 import { Domain } from "../../../../admin/platform.ts";
-import { EnvVar } from "../../actions/deployments/create.ts";
+import { FileSystemNode } from "../../../../files/sdk.ts";
 import { Namespace } from "../../actions/sites/create.ts";
+import { EnvVar } from "../../common/knative/service.ts";
 import { k8s } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 
@@ -68,7 +69,26 @@ export interface Github {
   owner: string;
   commitSha: string;
 }
-export type Source = Github;
+
+export interface Files {
+  type: "files";
+  files: FileSystemNode;
+}
+
+export type Source = Github | Files;
+
+export const sourceIsFromFiles = (source: Source): source is Files => {
+  return (source?.type ?? "github") === "files";
+};
+
+export interface Resource {
+  cpu: string;
+  memory: string;
+}
+export interface ResourceRequirements {
+  requests: Resource;
+  limits: Resource;
+}
 export interface SiteState {
   entrypoint?: string; // defaults to main.ts
   source?: Source;
@@ -78,6 +98,7 @@ export interface SiteState {
   envVars?: EnvVar[];
   useServiceAccount?: boolean;
   scaling?: ServiceScaling;
+  resources?: ResourceRequirements;
   domains?: Domain[];
 }
 
