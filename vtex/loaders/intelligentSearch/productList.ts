@@ -10,6 +10,10 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
+import {
+  LabelledFuzzy,
+  mapLabelledFuzzyToFuzzy,
+} from "./productListingPage.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -61,6 +65,11 @@ export interface QueryProps extends CommonProps {
    * @examples 1\n2
    */
   count: number;
+
+  /**
+   * @title Fuzzy
+   */
+  fuzzy?: LabelledFuzzy;
 }
 
 export interface ProductIDProps extends CommonProps {
@@ -126,6 +135,7 @@ const fromProps = ({ props }: Props) => {
       query: props.query || "",
       count: props.count || 12,
       sort: props.sort || "",
+      fuzzy: mapLabelledFuzzyToFuzzy(props.fuzzy),
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
     } as const;

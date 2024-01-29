@@ -6,7 +6,7 @@ import {
 } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
-import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { isFreshCtx } from "../handlers/fresh.ts";
 import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";

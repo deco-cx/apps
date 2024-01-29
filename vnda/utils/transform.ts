@@ -40,6 +40,7 @@ export const canonicalFromTags = (
 export const getSEOFromTag = (
   tags: Pick<SEO, "name" | "title" | "description">[],
   url: URL,
+  seo: OpenAPI["GET /api/v2/seo_data"]["response"][0] | undefined,
 ): Seo => {
   const tag = tags.at(-1);
   const canonical = canonicalFromTags(tags, url);
@@ -49,8 +50,8 @@ export const getSEOFromTag = (
   }
 
   return {
-    title: tag?.title || "",
-    description: tag?.description || "",
+    title: seo?.title || tag?.title || "",
+    description: seo?.description || tag?.description || "",
     canonical: canonical.href,
   };
 };

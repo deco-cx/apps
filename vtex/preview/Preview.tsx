@@ -18,8 +18,7 @@ export const PreviewVtex = (
   const account = app.state?.account || "";
   const withoutSubDomain = publicUrl.split(".").slice(1).join(".");
   return (
-    <div class="h-full px-4">
-      <script defer src="https://unpkg.com/windicss-runtime-dom"></script>
+    <div class="h-full px-4 relative">
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -46,7 +45,7 @@ export const PreviewVtex = (
             General Information
           </summary>
           <div
-            class="absolute w-[90%] top-[70px] left-[5%] bg-white rounded-lg p-4"
+            class="absolute top-[70px] w-full left-0 bg-white rounded-lg p-4"
             style={{
               boxShadow: "0px 0px 5px 3px rgba(0,0,0,0.20)",
             }}
@@ -59,7 +58,7 @@ export const PreviewVtex = (
             Go Live (pt-BR)
           </summary>
           <ul
-            class="absolute w-[90%] top-[70px] left-[5%] bg-white rounded-lg p-4"
+            class="absolute top-[70px] w-full left-0 bg-white rounded-lg p-4"
             style={{
               boxShadow: "0px 0px 5px 3px rgba(0,0,0,0.20)",
             }}
@@ -86,6 +85,7 @@ export const PreviewVtex = (
           }}
         >
         </script>
+        <script src="https://unpkg.com/windicss-runtime-dom"></script>
       </div>
     </div>
   );

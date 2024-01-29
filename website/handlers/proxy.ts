@@ -1,4 +1,4 @@
-import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { isFreshCtx } from "../handlers/fresh.ts";
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";

@@ -113,7 +113,6 @@ const loader = async (
 
       shopifyProducts = data.collection?.products;
       shopifyFilters = data.collection?.products?.filters;
-      console.log(data.collection);
       hasNextPage = Boolean(
         data?.collection?.products.pageInfo.hasNextPage ?? false,
       );

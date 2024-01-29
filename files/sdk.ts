@@ -44,6 +44,49 @@ export function* walk(
     name: fs.name,
   };
 }
+export const nodesToMap = (
+  nodes: FileSystemNode[],
+): Record<string, FileSystemNode> => {
+  const maps: Record<string, FileSystemNode> = {};
+  for (const entry of nodes) {
+    maps[entry.name] = entry;
+  }
+  return maps;
+};
+export const mergeFs = (
+  target: FileSystemNode,
+  source: FileSystemNode,
+): FileSystemNode => {
+  if (target.name !== source.name) {
+    return target;
+  }
+  if (isDir(target) && isDir(source)) {
+    const nodes = [];
+
+    const targetMap = nodesToMap(target.nodes);
+    const sourceMap = nodesToMap(source.nodes);
+
+    for (const [entryName, entry] of Object.entries(targetMap)) {
+      if (sourceMap[entryName]) {
+        nodes.push(mergeFs(entry, sourceMap[entryName]));
+      } else {
+        nodes.push(entry);
+      }
+    }
+    for (const [entryName, entry] of Object.entries(sourceMap)) {
+      if (targetMap[entryName]) {
+        continue;
+      } else {
+        nodes.push(entry);
+      }
+    }
+    return { ...target, nodes };
+  } else if (!isDir(target) && !isDir(source)) {
+    return target;
+  } else {
+    return target;
+  }
+};
 
 export const write = (fs: FileSystemNode, path: string, data: string): void => {
   const segments = path.split("/").slice(1);
