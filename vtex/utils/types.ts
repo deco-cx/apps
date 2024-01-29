@@ -1149,3 +1149,27 @@ export interface Brand {
   metaTagDescription: string;
   imageUrl: string | null;
 }
+
+export interface Collection {
+  id: number;
+  name: "Live influencers";
+  searchable: boolean;
+  highlight: boolean;
+  dateFrom: string;
+  dateTo: string;
+  totalSku: number;
+  totalProducts: number;
+  type: "Manual" | "Automatic" | "Hybrid";
+  lastModifiedBy?: string;
+}
+
+export interface CollectionList {
+  paging: {
+    page: number;
+    perPage: number;
+    total: number;
+    pages: number;
+    limit: number;
+  };
+  items?: Collection[];
+}
