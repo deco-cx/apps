@@ -65,6 +65,11 @@ export interface Props {
   pageOffset?: number;
 
   /**
+   * @title Page query parameter
+   */
+  page?: number;
+
+  /**
    * @description Include similar products
    * @deprecated Use product extensions instead
    */
@@ -165,7 +170,7 @@ const loader = async (
     maybeTerm = result?.possiblePaths[0] ?? maybeTerm;
   }
 
-  const page = url.searchParams.get("page")
+  const page = props.page || url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
   const O = (url.searchParams.get("O") as LegacySort) ??
