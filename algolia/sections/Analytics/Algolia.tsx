@@ -17,12 +17,15 @@ declare global {
 
 const setupAndListen = (appId: string, apiKey: string, version: string) => {
   function setupScriptTag() {
-    window.AlgoliaAnalyticsObject = "aa";
-    window.aa = window.aa || function () {
-      // @ts-expect-error monkey patch before initialization
-      (window.aa.queue = window.aa.queue || []).push(arguments);
-    };
-    window.aa.version = version;
+    globalThis.window.AlgoliaAnalyticsObject = "aa";
+    globalThis.window.aa = globalThis.window.aa ||
+      function () {
+        // @ts-expect-error monkey patch before initialization
+        (globalThis.window.aa.queue = globalThis.window.aa.queue || []).push(
+          arguments,
+        );
+      };
+    globalThis.window.aa.version = version;
 
     const script = document.createElement("script");
     script.setAttribute("async", "");
@@ -45,12 +48,12 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
   }
 
   function setupSession() {
-    window.aa("init", { appId, apiKey });
+    globalThis.window.aa("init", { appId, apiKey });
 
     const userToken = localStorage.getItem("ALGOLIA_USER_TOKEN") ||
       createUserToken();
     localStorage.setItem("ALGOLIA_USER_TOKEN", userToken);
-    window.aa("setUserToken", userToken);
+    globalThis.window.aa("setUserToken", userToken);
   }
 
   function setupEventListeners() {
@@ -93,7 +96,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
     const PRODUCTS = "products";
     const MAX_BATCH_SIZE = 20;
 
-    window.DECO.events.subscribe((event) => {
+    globalThis.window.DECO.events.subscribe((event) => {
       if (!event) return;
 
       const eventName = event.name;
@@ -102,7 +105,8 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         const [item] = event.params.items;
 
         if (
-          !item || !hasItemId(item) ||
+          !item ||
+          !hasItemId(item) ||
           typeof item.index !== "number" ||
           typeof item.item_url !== "string"
         ) {
@@ -115,7 +119,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         const attr = attributesFromURL(item.item_url);
 
         if (attr) {
-          window.aa("clickedObjectIDsAfterSearch", {
+          globalThis.window.aa("clickedObjectIDsAfterSearch", {
             eventName,
             index: attr.indexName,
             queryID: attr.queryID,
@@ -123,7 +127,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
             positions: [item.index + 1],
           });
         } else {
-          window.aa("clickedObjectIDs", {
+          globalThis.window.aa("clickedObjectIDs", {
             eventName,
             index: PRODUCTS,
             objectIDs: [item.item_id],
@@ -134,21 +138,21 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
       if (isAddToCartEvent(event)) {
         const [item] = event.params.items;
 
-        const attr = attributesFromURL(window.location.href) ||
+        const attr = attributesFromURL(globalThis.window.location.href) ||
           attributesFromURL(item.item_url || "");
         const objectIDs = event.params.items
           .filter(hasItemId)
           .map((i) => i.item_id);
 
         if (attr) {
-          window.aa("convertedObjectIDsAfterSearch", {
+          globalThis.window.aa("convertedObjectIDsAfterSearch", {
             eventName,
             objectIDs,
             index: attr.indexName,
             queryID: attr.queryID,
           });
         } else {
-          window.aa("convertedObjectIDs", {
+          globalThis.window.aa("convertedObjectIDs", {
             eventName,
             index: PRODUCTS,
             objectIDs,
@@ -162,7 +166,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           .map((i) => i.item_id);
 
         for (let it = 0; it < objectIDs.length; it += MAX_BATCH_SIZE) {
-          window.aa("viewedObjectIDs", {
+          globalThis.window.aa("viewedObjectIDs", {
             eventName,
             index: PRODUCTS,
             objectIDs: objectIDs.slice(it, (it + 1) * MAX_BATCH_SIZE),
@@ -177,9 +181,10 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
   setupEventListeners();
 };
 
-function Analytics(
-  { applicationId, searchApiKey }: SectionProps<typeof loader>,
-) {
+function Analytics({
+  applicationId,
+  searchApiKey,
+}: SectionProps<typeof loader>) {
   return (
     <script
       defer
