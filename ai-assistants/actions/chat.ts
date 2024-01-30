@@ -47,6 +47,7 @@ export interface MessageContentFile {
 }
 
 export interface ReplyMessage {
+  threadId: string;
   messageId: string;
   type: "message";
   content: Array<MessageContentText | MessageContentFile>;
@@ -63,11 +64,13 @@ export interface FunctionCallReply<T> extends FunctionCall {
 }
 
 export interface ReplyStartFunctionCall {
+  threadId: string;
   messageId: string;
   type: "start_function_call";
   content: FunctionCall;
 }
 export interface ReplyFunctionCalls<T> {
+  threadId: string;
   messageId: string;
   type: "function_calls";
   content: FunctionCallReply<T>[];
@@ -127,6 +130,13 @@ export default function openChat(
       }),
     );
     assistant.then((aiAssistant) => {
+      socket.send(
+        JSON.stringify({
+          type: "Id",
+          assistantId: aiAssistant.id,
+          threadId: aiAssistant.threadId,
+        }),
+      );
       socket.send(aiAssistant.welcomeMessage ?? "Welcome to the chat!");
     });
   };

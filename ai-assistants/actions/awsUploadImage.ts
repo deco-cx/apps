@@ -1,4 +1,7 @@
 import AWS from "https://esm.sh/aws-sdk";
+import { logger } from "deco/observability/otel/config.ts";
+import base64ToBlob from "../utils/blobConversion.ts";
+import { Ids } from "../types.ts";
 
 const bucketName = Deno.env.get("UPLOAD_BUCKET")!;
 const awsRegion = Deno.env.get("AWS_REGION")!;
@@ -9,6 +12,7 @@ const URL_EXPIRATION_SECONDS = 1000;
 
 export interface AWSUploadImageProps {
   file: string | ArrayBuffer | null;
+  ids?: Ids;
 }
 
 const s3 = new AWS.S3({
@@ -16,34 +20,6 @@ const s3 = new AWS.S3({
   accessKeyId: awsAccessKeyId,
   secretAccessKey: awsSecretAccessKey,
 });
-
-function base64ToBlob(base64: string | ArrayBuffer | null): Blob {
-  if (typeof base64 !== "string") {
-    throw new Error("Expected a base64 string");
-  }
-  // Split the base64 string into the MIME type and the base64 encoded data
-  const parts = base64.match(/^data:(image\/[a-z]+);base64,(.*)$/);
-  if (!parts || parts.length !== 3) {
-    throw new Error("Base64 string is not properly formatted");
-  }
-
-  const mimeType = parts[1]; // e.g., 'image/png'
-  const imageData = parts[2];
-
-  // Convert the base64 encoded data to a binary string
-  const binaryStr = atob(imageData);
-
-  // Convert the binary string to an array of bytes (Uint8Array)
-  const length = binaryStr.length;
-  const arrayBuffer = new Uint8Array(new ArrayBuffer(length));
-
-  for (let i = 0; i < length; i++) {
-    arrayBuffer[i] = binaryStr.charCodeAt(i);
-  }
-
-  // Create and return the Blob object
-  return new Blob([arrayBuffer], { type: mimeType });
-}
 
 // TODO(ItamarRocha): Check if possible to upload straight to bucket instead of using presigned url
 async function getSignedUrl(mimetype: string): Promise<string> {
@@ -65,23 +41,38 @@ async function getSignedUrl(mimetype: string): Promise<string> {
 
 async function uploadFileToS3(presignedUrl: string, data: Blob) {
   const response = await fetch(presignedUrl, { method: "PUT", body: data });
-
-  if (!response.ok) {
-    throw new Error(`Failed to upload file: ${response.statusText}`);
-  }
   return response;
 }
 
 export default async function awsUploadImage(
   awsUploadImageProps: AWSUploadImageProps,
 ) {
-  console.log("awsUploadImageProps");
-  const blobData = base64ToBlob(awsUploadImageProps.file); // {size, type}
+  const blobData = base64ToBlob(
+    awsUploadImageProps.file,
+    "image",
+    awsUploadImageProps.ids,
+  );
   const uploadURL = await getSignedUrl(blobData.type);
   const uploadResponse = await uploadFileToS3(uploadURL, blobData);
 
   if (!uploadResponse.ok) {
+    logger.error(`${
+      JSON.stringify({
+        assistantId: awsUploadImageProps.ids?.assistantId,
+        threadId: awsUploadImageProps.ids?.threadId,
+        context: "awsUploadImage",
+        error: `Failed to upload file: ${uploadResponse.statusText}`,
+      })
+    }`);
     throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
   }
+  logger.info({
+    assistantId: awsUploadImageProps.ids?.assistantId,
+    threadId: awsUploadImageProps.ids?.threadId,
+    context: "awsUploadImage",
+    subcontext: "uploadResponse",
+    response: JSON.stringify(uploadResponse),
+    uploadUrl: uploadURL,
+  });
   return uploadURL.split("?")[0]; // only the url without the query params
 }

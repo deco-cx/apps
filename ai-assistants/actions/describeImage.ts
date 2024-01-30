@@ -1,10 +1,13 @@
 import OpenAI from "https://deno.land/x/openai@v4.24.1/mod.ts";
+import { logger } from "deco/observability/otel/config.ts";
+import { Ids } from "../types.ts";
 
 const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 
 export interface DescribeImageProps {
   uploadURL: string;
   userPrompt: string;
+  ids?: Ids;
 }
 
 export default async function describeImage(
@@ -39,6 +42,22 @@ export default async function describeImage(
       },
     ],
   });
-  console.log("describe image response: ", response);
+
+  logger.info(`${
+    JSON.stringify({
+      assistantId: describeImageProps.ids?.assistantId,
+      threadId: describeImageProps.ids?.threadId,
+      context: "describeImage",
+      subcontext: "props",
+      props: describeImageProps,
+    })
+  }`);
+  logger.info({
+    assistantId: describeImageProps.ids?.assistantId,
+    threadId: describeImageProps.ids?.threadId,
+    context: "describeImage",
+    subcontext: "response",
+    response: JSON.stringify(response),
+  });
   return response;
 }

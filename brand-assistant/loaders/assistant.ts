@@ -1,5 +1,6 @@
 import type { ManifestOf } from "deco/mod.ts";
-import type { AIAssistant, Prompt } from "../../ai-assistants/mod.ts";
+import { logger } from "deco/observability/otel/config.ts";
+import type { AIAssistant, Log, Prompt } from "../../ai-assistants/mod.ts";
 import type { Category, Product, Suggestion } from "../../commerce/types.ts";
 import type { Manifest as OpenAIManifest } from "../../openai/manifest.gen.ts";
 import type vtex from "../../vtex/mod.ts";
@@ -83,6 +84,26 @@ export default function brandAssistant(props: Props): AIAssistant {
           ...typeof props.props === "object" ? props.props : {},
         },
       };
+    },
+    onMessageReceived: (logInfo: Log) => {
+      logger.info({
+        assistantId: logInfo.assistantId,
+        threadId: logInfo.threadId,
+        runId: logInfo.runId,
+        context: "Message received",
+        model: logInfo.model,
+        message: JSON.stringify(logInfo.message),
+      });
+    },
+    onMessageSent: (logInfo: Log) => {
+      logger.info({
+        assistantId: logInfo.assistantId,
+        threadId: logInfo.threadId,
+        runId: logInfo.runId,
+        context: "Message sent",
+        model: logInfo.model,
+        message: JSON.stringify(logInfo.message),
+      });
     },
     availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
     name: props.name,

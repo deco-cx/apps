@@ -40,6 +40,7 @@ export const getToken = (message: ThreadMessage): string => {
 
 export const threadMessageToReply = (message: ThreadMessage): ReplyMessage => {
   return {
+    threadId: message.thread_id!,
     messageId: message.run_id!,
     type: "message",
     content: message.content.map((cnt) =>

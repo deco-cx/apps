@@ -65,9 +65,41 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
   useProps?: (props: unknown) => unknown;
 
   /**
+   * Optional function to log the received messages from the user.
+   * @param {Log} logInfo - User message / information.
+   * @returns {void} - The modified properties.
+   */
+  onMessageReceived?: (logInfo: Log) => void;
+
+  /**
+   * Optional function to log the received messages sent by the assistant.
+   * @param {Log} logInfo - Assistant message / information.
+   * @returns {void} - The modified properties.
+   */
+  onMessageSent?: (logInfo: Log) => void;
+
+  /**
    * The GPT model that will be used, if not specified the assistant model will be used.
    */
   model?: GPTModel | { custom: string };
+
+  /**
+   * The Id of the assistant
+   */
+  id?: string;
+
+  /**
+   * The Id of the assistant thread
+   */
+  threadId?: string;
+}
+
+export interface Log {
+  assistantId: string;
+  threadId: string;
+  runId: string;
+  model: string;
+  message: object;
 }
 
 export interface Prompt {
