@@ -5,16 +5,27 @@ import {
 } from "../deps.ts";
 import { getToken, threadMessageToReply, Tokens } from "../loaders/messages.ts";
 
-import { JSONSchema7, weakcache } from "deco/deps.ts";
+import { JSONSchema7, ValueType, weakcache } from "deco/deps.ts";
 import { lazySchemaFor } from "deco/engine/schema/lazy.ts";
 import { Context } from "deco/live.ts";
+import { meter } from "deco/observability/otel/metrics.ts";
 import {
   ChatMessage,
   FunctionCallReply,
+  Reply,
   ReplyMessage,
 } from "../actions/chat.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
+
+const stats = {
+  latency: meter.createHistogram("assistant_latency", {
+    description:
+      "assistant latency (time it takes from the moment the server receives the request to the moment it sends the response)",
+    unit: "ms",
+    valueType: ValueType.DOUBLE,
+  }),
+};
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 
@@ -188,16 +199,21 @@ export const messageProcessorFor = async (
     If you are positive that your response contains the information that the user requests (like product descriptions, product names, prices, colors, and sizes), add an ${Tokens.POSITIVE} symbol at the end of the phrase. Otherwise, add a ${Tokens.NEGATIVE} symbol.
     For example, if the user asks about product availability and you have the information, respond with "The product is in stock. @". If you don't have the information, respond with "I'm sorry, the product is currently unavailable. ${Tokens.NEGATIVE}".
     `;
-  const aiAssistant = await ctx.assistant.then((assistant) => assistant.id);
+  const assistantId = await ctx.assistant.then((assistant) => assistant.id);
   const tools = await appTools(assistant);
+
+  // Update the assistant object with the thread and assistant id
+  assistant.threadId = thread.id;
+  assistant.id = assistantId;
 
   /**
    * Processes an incoming chat message.
    * @param {ChatMessage} message - The incoming chat message.
    * @returns {Promise<void>} - A promise representing the completion of message processing.
    */
-  return async ({ text: content, reply }: ChatMessage) => {
+  return async ({ text: content, reply: _reply }: ChatMessage) => {
     // send message
+    const start = performance.now();
     await threads.messages.create(thread.id, {
       content,
       role: "user",
@@ -207,7 +223,7 @@ export const messageProcessorFor = async (
       model: typeof assistant.model === "object"
         ? assistant.model.custom
         : assistant.model,
-      assistant_id: aiAssistant,
+      assistant_id: assistantId,
       instructions: instructions.slice(0, 25000),
       tools,
     });
@@ -216,15 +232,40 @@ export const messageProcessorFor = async (
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
 
+    // Log the message sent by the assistant and reply to the user
+    const reply = (message: Reply<unknown>) => {
+      assistant.onMessageSent?.({
+        assistantId: run.assistant_id,
+        threadId: thread.id,
+        runId: run.id,
+        model: run.model,
+        message,
+      });
+      return _reply(message);
+    };
+    // Log the message received by the assistant
+    assistant.onMessageReceived?.({
+      assistantId: run.assistant_id,
+      threadId: thread.id,
+      runId: run.id,
+      model: run.model,
+      message: { type: "text", value: content },
+    });
+
     const invoke = invokeFor(ctx, assistant, (call, props) => {
       console.log({ props });
       reply({
+        threadId: thread.id,
         messageId,
         type: "start_function_call",
         content: {
           name: call.function.name,
           props,
         },
+      });
+      stats.latency.record(performance.now() - start, {
+        type: "start_function_call",
+        assistant_id: run.assistant_id,
       });
     }, (call, props, response) => {
       console.log({ call, props });
@@ -254,6 +295,7 @@ export const messageProcessorFor = async (
           console.log("TOOL OUTPUT VAZIO??????");
           const message: ReplyMessage = {
             messageId: Date.now().toString(),
+            threadId: thread.id,
             type: "message",
             content: [
               {
@@ -293,6 +335,7 @@ export const messageProcessorFor = async (
       // TODO(@mcandeia) in some cases the bot didn't respond anything.
       const message: ReplyMessage = {
         messageId: Date.now().toString(),
+        threadId: thread.id,
         type: "message",
         content: [
           {
@@ -330,6 +373,7 @@ export const messageProcessorFor = async (
       );
       const message: ReplyMessage = {
         messageId: Date.now().toString(),
+        threadId: thread.id,
         type: "message",
         content: [
           {
@@ -343,13 +387,23 @@ export const messageProcessorFor = async (
       reply(message);
     } else {
       reply(replyMessage);
+      stats.latency.record(performance.now() - start, {
+        type: "text",
+        assistant_id: run.assistant_id,
+      });
     }
 
     if (functionCallReplies.length > 0) {
+      console.log("tem function call replies", functionCallReplies);
       reply({
+        threadId: thread.id,
         messageId,
         type: "function_calls" as const,
         content: functionCallReplies,
+      });
+      stats.latency.record(performance.now() - start, {
+        type: "function_calls",
+        assistant_id: run.assistant_id,
       });
     }
   };
