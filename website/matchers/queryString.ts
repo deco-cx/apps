@@ -111,6 +111,8 @@ const operations: Record<
 
 /**
  * @title Query String
+ * @description Match with a specific querystring
+ * @icon question-mark
  */
 const MatchQueryString = (
   props: Props,
