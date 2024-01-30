@@ -131,15 +131,15 @@ export interface Props {
   pageOffset?: number;
 
   /**
+   * @title Page query parameter
+   */
+  page?: number;
+
+  /**
    * @description Include similar products
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
-
-  /**
-   * @ignore
-   */
-  page?: number;
 }
 
 const searchArgsOf = (props: Props, url: URL) => {
