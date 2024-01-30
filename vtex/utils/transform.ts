@@ -569,8 +569,6 @@ export const legacyFacetToFilter = (
   term: string,
   behavior: "dynamic" | "static",
 ): Filter | null => {
-  
- 
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = term
     .replace(/^\//, "")
@@ -630,7 +628,16 @@ export const legacyFacetToFilter = (
         url: getLink(normalizedFacet, selected),
         label: normalizedFacet.Name,
         selected,
-        children: facet.Children?.length > 0 ? legacyFacetToFilter(normalizedFacet.Name, facet.Children, url, map, term, behavior) : undefined
+        children: facet.Children?.length > 0
+          ? legacyFacetToFilter(
+            normalizedFacet.Name,
+            facet.Children,
+            url,
+            map,
+            term,
+            behavior,
+          )
+          : undefined,
       };
     }),
   };
