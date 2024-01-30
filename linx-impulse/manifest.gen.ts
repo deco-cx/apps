@@ -3,6 +3,7 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/search/autocomplete.ts";
+import * as $$$1 from "./loaders/search/popular.ts";
 import * as $$$$$$0 from "./sections/Analytics/LinxImpulsePageView.tsx";
 import * as $$$$$$1 from "./sections/Script/LinxImpulseScript.tsx";
 import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
@@ -10,6 +11,7 @@ import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
 const manifest = {
   "loaders": {
     "linx-impulse/loaders/search/autocomplete.ts": $$$0,
+    "linx-impulse/loaders/search/popular.ts": $$$1,
   },
   "sections": {
     "linx-impulse/sections/Analytics/LinxImpulsePageView.tsx": $$$$$$0,

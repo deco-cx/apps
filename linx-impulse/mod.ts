@@ -2,7 +2,7 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { EventsAPI } from "./utils/events.ts";
-import { LinxAPI } from "./utils/search.ts";
+import { LinxAPI } from "./utils/client.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
