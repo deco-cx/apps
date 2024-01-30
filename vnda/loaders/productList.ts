@@ -19,6 +19,9 @@ export interface Props {
   /** @description search for products that have certain tag */
   tags?: string[];
 
+  /** @description search for products that have certain type_tag */
+  typeTags?: { key?: string; value?: string }[];
+
   /** @description search for products by id */
   ids: number[];
 }
@@ -42,6 +45,7 @@ const productListLoader = async (
       sort: props?.sort,
       per_page: props?.count,
       "tags[]": props?.tags,
+      "type_tags[]": props?.typeTags ?? [],
       "ids[]": props?.ids,
     }, STALE).then((res) => res.json());
 
