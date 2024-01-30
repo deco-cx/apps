@@ -24,3 +24,15 @@ export interface AssistantPersonalization {
     | "Confident"
     | "Helpful";
 }
+
+export interface Ids {
+  /**
+   * @title The assistant's id
+   */
+  assistantId?: string;
+
+  /**
+   * @title The current thread id
+   */
+  threadId?: string;
+}
