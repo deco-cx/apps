@@ -1388,9 +1388,7 @@ wildcard?: boolean
 /**
  * Filtra pelo nome da tag dentro de um tipo de tag. Exemplo, type_tags[cor]=verde
  */
-type_tags?: {
-
-}
+"type_tags[]"?: { key?: string; value?: string }[]
 /**
  * Operador lógico para o filtro de tag
  */
