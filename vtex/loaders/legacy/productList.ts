@@ -12,6 +12,8 @@ export interface CollectionProps extends CommonProps {
   /**
    * @description Collection ID or (Product Cluster id). For more info: https://developers.vtex.com/docs/api-reference/search-api#get-/api/catalog_system/pub/products/search .
    * @pattern \d*
+   * @format dynamic-options
+   * @options vtex/loaders/collections/list.ts
    */
   collection: string;
   /**
