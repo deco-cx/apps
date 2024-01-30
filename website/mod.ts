@@ -41,7 +41,7 @@ export interface Props {
   routes?: Routes[];
 
   /** @title Seo */
-  seo?: Omit<Seo, "jsonLDs">;
+  seo?: Omit<Seo, "jsonLDs" | "titleTemplate" | "descriptionTemplate" | "canonical">;
 
   /**
    * @title Global Sections
