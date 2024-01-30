@@ -18,6 +18,35 @@ export interface LinxAPI {
     };
   };
 
+  "GET /engage/search/v3/autocompletes/popular": {
+    response: AutocompleteResponse;
+    searchParams: {
+      apiKey: string;
+      secretKey: string;
+      deviceId: string;
+      productFormat?: ProductFormat;
+      salesChannel?: string;
+      userId?: string;
+      source?: Source;
+    };
+  };
+
+  "GET /engage/search/v3/autocompletes/products": {
+    response: Omit<AutocompleteResponse, "queries">;
+    searchParams: {
+      terms: string;
+      apiKey: string;
+      secretKey: string;
+      deviceId: string;
+      categoryId?: string;
+      resultsProducts?: number;
+      productFormat?: ProductFormat;
+      salesChannel?: string;
+      userId?: string;
+      source?: Source;
+    };
+  };
+
   "GET /engage/search/v3/clicks": {
     response: void;
     searchParams: {
