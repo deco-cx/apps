@@ -171,8 +171,8 @@ const loader = async (
   }
 
   const pageParam = url.searchParams.get("page")
-  ? Number(url.searchParams.get("page")) - currentPageoffset
-  : 0
+    ? Number(url.searchParams.get("page")) - currentPageoffset
+    : 0;
   const page = props.page || pageParam;
   const O = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??

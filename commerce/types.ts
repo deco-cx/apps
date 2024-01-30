@@ -469,6 +469,7 @@ export interface FilterToggleValue {
   value: string;
   selected: boolean;
   url: string;
+  children?: Filter | null;
 }
 
 export interface FilterRangeValue {
