@@ -207,7 +207,7 @@ async function build() {
     }
   };
 
-  const overrideDenoJson = (
+  const overrideDenoJson = async (
     configFileName: string,
     // deno-lint-ignore no-explicit-any
     denoJson: Record<string, any>,
@@ -220,9 +220,7 @@ async function build() {
     if (hasNodeModulesDir && hasNodeModulesDir !== "false") {
       denoJson.nodeModulesDir = "false";
       const fileContent = JSON.stringify(denoJson, null, 2);
-      const encoder = new TextEncoder();
-      const data = encoder.encode(fileContent);
-      Deno.writeFile(join(sourceLocalDir!, configFileName), data).catch(
+      await Deno.writeTextFile(join(sourceLocalDir!, configFileName), fileContent).catch(
         (err) => {
           if (err instanceof Deno.errors.NotFound) {
             return denoJson;
@@ -237,7 +235,7 @@ async function build() {
 
   const [configFileName, denoJson] = await getDenoJson();
 
-  const finalDenoJson = overrideDenoJson(configFileName, denoJson);
+  const finalDenoJson = await overrideDenoJson(configFileName, denoJson);
 
   console.log(`generating cache...`);
   const freshPrj = getFrshProject(finalDenoJson);
