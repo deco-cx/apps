@@ -51,9 +51,9 @@ const handler = async (
   props: Props,
   req: Request,
 ): Promise<Response> => {
+  const params = parseParams(props);
   try {
     const preferredMediaType = acceptMediaType(req);
-    const params = parseParams(props);
     const engine = ENGINES.find((e) => e.accepts(params.src)) ?? passThrough;
 
     const response = await engine.resolve(params, preferredMediaType, req);
@@ -70,13 +70,7 @@ const handler = async (
   } catch (error) {
     console.error(error);
 
-    return new Response(error.message ?? Deno.inspect(error), {
-      status: error instanceof HttpError ? error.status : 500,
-      headers: {
-        "cache-control": "no-cache, no-store",
-        "vary": "Accept",
-      },
-    });
+    return Response.redirect(params.src)
   }
 };
 
