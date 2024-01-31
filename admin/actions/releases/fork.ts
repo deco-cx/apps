@@ -14,20 +14,20 @@ export interface Props {
 
 const subscribers: WebSocket[] = [];
 
-export const fetchState = async (storage: Release): Promise<State> => ({
-  decofile: await storage.state(),
+export const fetchState = async (release: Release): Promise<State> => ({
+  decofile: await release.state({ forceFresh: true }),
 });
 
-const saveState = (storage: Release, { decofile }: State): Promise<void> =>
-  storage.set!(decofile);
+const saveState = (release: Release, { decofile }: State): Promise<void> =>
+  release.set!(decofile);
 
 // Apply patch and save state ATOMICALLY!
 // This is easily done on play. On production, however, we probably
 // need a distributed queue
 let queue = Promise.resolve();
-const patchState = (storage: Release, ops: fjp.Operation[]) => {
+const patchState = (release: Release, ops: fjp.Operation[]) => {
   queue = queue.catch(() => null).then(async () =>
-    saveState(storage, ops.reduce(fjp.applyReducer, await fetchState(storage)))
+    saveState(release, ops.reduce(fjp.applyReducer, await fetchState(release)))
   );
 
   return queue;
@@ -36,7 +36,7 @@ const patchState = (storage: Release, ops: fjp.Operation[]) => {
 const action = (_props: Props, req: Request) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
-  const storage = ctx.storage();
+  const storage = ctx.release();
   const broadcast = (event: Acked<Events>) => {
     const message = JSON.stringify(event);
     subscribers.forEach((s) => s.send(message));

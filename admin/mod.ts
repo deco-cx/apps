@@ -1,6 +1,7 @@
+import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
-import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type { AppContext as AC, App, ManifestOf } from "deco/mod.ts";
 import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
 import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
 import k8s, { Props as K8sProps } from "../platforms/kubernetes/mod.ts";
@@ -14,11 +15,11 @@ import {
   WebhookEventName,
   Webhooks,
 } from "./deps.ts";
+import { storage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
-import { storage } from "./fsStorage.ts";
 
 export const ANONYMOUS = "Anonymous";
 
@@ -57,7 +58,8 @@ export interface GithubEventListener<
 }
 
 export interface State {
-  storage: () => Release;
+  storage: BlockStore;
+  release: () => Release;
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
@@ -100,7 +102,6 @@ export interface Props {
   github?: GithubProps;
   kubernetes?: K8sProps;
   subhosting?: SubhostingProps;
-  storage?: () => Release;
   /** @description property used at deco admin  */
   workspaces: SignalStringified<Workspace>[];
 }
@@ -114,7 +115,6 @@ export default function App(
     github,
     kubernetes,
     subhosting: subhostingProps,
-    storage: _storage,
   }: Props,
 ): App<
   AppManifest,
@@ -130,9 +130,11 @@ export default function App(
   return {
     manifest,
     state: {
-      storage: _storage ?? (() => {
-        return storage;
-      }),
+      storage,
+      release: () => {
+        const ctx = Context.active();
+        return ctx.release!;
+      },
       githubWebhookSecret,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
