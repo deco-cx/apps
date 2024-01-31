@@ -612,7 +612,7 @@ export const legacyFacetToFilter = (
   };
   return {
     "@type": "FilterToggle",
-    quantity: facets.length,
+    quantity: facets?.length,
     label: name,
     key: name,
     values: facets.map((facet) => {
@@ -622,13 +622,22 @@ export const legacyFacetToFilter = (
 
       const selected = mapSet.has(normalizedFacet.Map) &&
         pathSet.has(normalizedFacet.Value);
-
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
         url: getLink(normalizedFacet, selected),
         label: normalizedFacet.Name,
         selected,
+        children: facet.Children?.length > 0
+          ? legacyFacetToFilter(
+            normalizedFacet.Name,
+            facet.Children,
+            url,
+            map,
+            term,
+            behavior,
+          )
+          : undefined,
       };
     }),
   };
