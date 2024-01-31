@@ -14,11 +14,11 @@ import {
   WebhookEventName,
   Webhooks,
 } from "./deps.ts";
-import { storage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
+import { storage } from "./fsStorage.ts";
 
 export const ANONYMOUS = "Anonymous";
 
@@ -38,7 +38,10 @@ export interface BlockStore extends Release {
   patch(
     resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>>;
-  update(resolvables: Record<string, Resolvable>): Promise<void>;
+  set(
+    resolvables: Record<string, Resolvable>,
+    reivsion?: string,
+  ): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
@@ -54,7 +57,7 @@ export interface GithubEventListener<
 }
 
 export interface State {
-  storage: BlockStore;
+  storage: () => Release;
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
@@ -97,6 +100,7 @@ export interface Props {
   github?: GithubProps;
   kubernetes?: K8sProps;
   subhosting?: SubhostingProps;
+  storage?: () => Release;
   /** @description property used at deco admin  */
   workspaces: SignalStringified<Workspace>[];
 }
@@ -110,6 +114,7 @@ export default function App(
     github,
     kubernetes,
     subhosting: subhostingProps,
+    storage: _storage,
   }: Props,
 ): App<
   AppManifest,
@@ -125,13 +130,15 @@ export default function App(
   return {
     manifest,
     state: {
+      storage: _storage ?? (() => {
+        return storage;
+      }),
       githubWebhookSecret,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
         prEventHandler as GithubEventListener,
       ],
-      storage,
       octokit: new Octokit({
         auth: githubAPIToken,
       }),

@@ -1,5 +1,6 @@
+import { Release } from "deco/engine/releases/provider.ts";
 import { fjp } from "../../deps.ts";
-import { storage } from "../../fsStorage.ts";
+import { AppContext } from "../../mod.ts";
 import { Acked, Commands, Events, State } from "../../types.ts";
 
 export interface Props {
@@ -13,20 +14,20 @@ export interface Props {
 
 const subscribers: WebSocket[] = [];
 
-export const fetchState = async (): Promise<State> => ({
+export const fetchState = async (storage: Release): Promise<State> => ({
   decofile: await storage.state(),
 });
 
-const saveState = ({ decofile }: State): Promise<void> =>
-  storage.update(decofile);
+const saveState = (storage: Release, { decofile }: State): Promise<void> =>
+  storage.set!(decofile);
 
 // Apply patch and save state ATOMICALLY!
 // This is easily done on play. On production, however, we probably
 // need a distributed queue
 let queue = Promise.resolve();
-const patchState = (ops: fjp.Operation[]) => {
+const patchState = (storage: Release, ops: fjp.Operation[]) => {
   queue = queue.catch(() => null).then(async () =>
-    saveState(ops.reduce(fjp.applyReducer, await fetchState()))
+    saveState(storage, ops.reduce(fjp.applyReducer, await fetchState(storage)))
   );
 
   return queue;
@@ -35,6 +36,7 @@ const patchState = (ops: fjp.Operation[]) => {
 const action = (_props: Props, req: Request) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
+  const storage = ctx.storage();
   const broadcast = (event: Acked<Events>) => {
     const message = JSON.stringify(event);
     subscribers.forEach((s) => s.send(message));
@@ -55,7 +57,7 @@ const action = (_props: Props, req: Request) => {
         try {
           const { payload: operations } = data;
 
-          await patchState(operations);
+        await patchState(storage, operations);
 
           // Broadcast changes
           broadcast({
@@ -71,7 +73,7 @@ const action = (_props: Props, req: Request) => {
       } else if (data.type === "fetch-state") {
         send({
           type: "state-fetched",
-          payload: await fetchState(),
+        payload: await fetchState(storage),
           etag: await storage.revision(),
           ack,
         });
