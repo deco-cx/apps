@@ -70,7 +70,7 @@ const handler = async (
   } catch (error) {
     console.error(error);
 
-    return Response.redirect(params.src)
+    return Response.redirect(params.src);
   }
 };
 
