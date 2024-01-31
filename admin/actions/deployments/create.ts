@@ -1,8 +1,7 @@
 import { decoManifestBuilder } from "deco/engine/manifest/manifestGen.ts";
 import {
-  DirectoryEntry,
+  assertIsDir,
   FileSystemNode,
-  isDir,
   mergeFs,
   nodesToMap,
   walk,
@@ -33,12 +32,6 @@ export interface RuntimeTemplate extends SiteState {
   importMapUrl: string | null;
   compilerOptions: CompilerOptions | null;
   envVars?: Record<string, string>;
-}
-
-function assertIsDir(fs: FileSystemNode): asserts fs is DirectoryEntry {
-  if (!isDir(fs)) {
-    throw new Error("Expected directory");
-  }
 }
 
 const runtimeTemplates: Record<

@@ -13,6 +13,7 @@ import * as $$$7 from "./loaders/platforms/forSite.ts";
 import * as $$$8 from "./loaders/assistants/code.ts";
 import * as $$$9 from "./loaders/deploy.ts";
 import * as $$$10 from "./loaders/pages/list.ts";
+import * as $$$$0 from "./handlers/files.ts";
 import * as $$$$$$$$$0 from "./actions/blocks/publish.ts";
 import * as $$$$$$$$$1 from "./actions/blocks/restore.ts";
 import * as $$$$$$$$$2 from "./actions/blocks/safeDelete.ts";
@@ -46,6 +47,9 @@ const manifest = {
     "deco-sites/admin/loaders/releases/blocks.ts": $$$6,
     "deco-sites/admin/loaders/releases/get.ts": $$$5,
     "deco-sites/admin/loaders/state.ts": $$$4,
+  },
+  "handlers": {
+    "deco-sites/admin/handlers/files.ts": $$$$0,
   },
   "actions": {
     "deco-sites/admin/actions/blocks/delete.ts": $$$$$$$$$4,

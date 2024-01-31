@@ -19,6 +19,12 @@ export interface DirectoryEntry {
   nodes: FileSystemNode[];
 }
 
+export function assertIsDir(fs: FileSystemNode): asserts fs is DirectoryEntry {
+  if (!isDir(fs)) {
+    throw new Error("Expected directory");
+  }
+}
+
 export const isDir = (n: FileSystemNode): n is DirectoryEntry => {
   return Array.isArray((n as DirectoryEntry)?.nodes);
 };
