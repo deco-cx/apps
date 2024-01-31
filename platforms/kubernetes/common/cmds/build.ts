@@ -220,7 +220,10 @@ async function build() {
     if (hasNodeModulesDir && hasNodeModulesDir !== "false") {
       denoJson.nodeModulesDir = "false";
       const fileContent = JSON.stringify(denoJson, null, 2);
-      await Deno.writeTextFile(join(sourceLocalDir!, configFileName), fileContent).catch(
+      await Deno.writeTextFile(
+        join(sourceLocalDir!, configFileName),
+        fileContent,
+      ).catch(
         (err) => {
           if (err instanceof Deno.errors.NotFound) {
             return denoJson;
