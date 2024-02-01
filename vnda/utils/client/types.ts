@@ -399,19 +399,3 @@ export interface ProductPrice {
   installments: Installment[];
   variants: ProductPriceVariant[];
 }
-
-export interface VariantPrice {
-  main: boolean;
-  sku: string;
-  price: number;
-  on_sale: boolean;
-  sale_price: number;
-  intl_price: number;
-  available: boolean;
-  properties: Record<string, Property>;
-  stock: number;
-  installments: Installment[];
-  inventories: Inventory[];
-  updated_at: string;
-  restocking_enabled: boolean;
-}

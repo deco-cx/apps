@@ -273,7 +273,6 @@ export const toProduct = (
     )
     : null;
   const offers = toOffer(variantPrices ?? variant);
-  console.log({ variantPrices, offers });
 
   const variantUrl = new URL(
     `/produto/${product.slug}-${product.id}?skuId=${variant.sku}`,
