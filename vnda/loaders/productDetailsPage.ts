@@ -41,9 +41,10 @@ async function loader(
   }
 
   // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
-  const productPrice: ProductPrice | null = await api["GET /api/v2/products/:productId/price"]({
-    productId: id,
-  }, STALE)
+  const productPrice: ProductPrice | null = await api
+    ["GET /api/v2/products/:productId/price"]({
+      productId: id,
+    }, STALE)
     .then((r) => r.json()).catch(() => null);
 
   const product = toProduct(maybeProduct, variantId, {

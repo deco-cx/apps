@@ -76,7 +76,9 @@ const pickVariant = (
   variantId: string | null,
   normalize = true,
 ) => {
-  const normalizedVariants = normalize ? normalizeVariants(variants) : variants as VariantProductSearch[];
+  const normalizedVariants = normalize
+    ? normalizeVariants(variants)
+    : variants as VariantProductSearch[];
   const [head] = normalizedVariants;
 
   let [target, main, available]: Array<
