@@ -6,7 +6,6 @@ export interface Props {
 }
 
 const loader = (props: Props, req: Request, ctx: AppContext): string[] => {
-  console.log(props);
   Object.entries(allowCorsFor(req)).map(([name, value]) => {
     ctx.response.headers.set(name, value);
   });
