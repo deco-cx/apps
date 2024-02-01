@@ -27,9 +27,7 @@ export interface Props {
    * @description overides the query term
    */
   query?: string;
-  /**
-   * 
-   */
+  /** */
   collectionName?: string;
   /**
    * @title Items per page
@@ -58,11 +56,8 @@ const loader = async (
   const query = props.query || url.searchParams.get("q") || "";
   const page = props.page || Number(url.searchParams.get("page")) || 0;
   const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
-  const startCursor = props.startCursor || url.searchParams.get("startCursor") || "";
-
-  console.log(startCursor)
-
-  console.log(url)
+  const startCursor = props.startCursor ||
+    url.searchParams.get("startCursor") || "";
 
   const isSearch = Boolean(query);
   let hasNextPage = false;
@@ -163,7 +158,6 @@ const loader = async (
   const filters = shopifyFilters?.map((filter) =>
     toFilter(filter, new URL(req.url))
   );
-
 
   return {
     "@type": "ProductListingPage",
