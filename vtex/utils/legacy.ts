@@ -13,6 +13,7 @@ export const toSegmentParams = (
     utmi_campaign: segment.utmi_campaign ?? undefined,
     utm_campaign: segment.utm_campaign ?? undefined,
     utm_source: segment.utm_source ?? undefined,
+    sc: segment.channel ?? undefined,
   }).filter(([_, v]) => v != undefined),
 ));
 
@@ -109,7 +110,10 @@ export const pageTypesToSeo = (
   const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
 
-  if ((!current || current.pageType === "Search" || current.pageType === "FullText") && fullTextSearch) {
+  if (
+    (!current || current.pageType === "Search" ||
+      current.pageType === "FullText") && fullTextSearch
+  ) {
     return {
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
@@ -127,7 +131,8 @@ export const pageTypesToSeo = (
     canonical: toCanonical(
       new URL(
         current.url
-          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "").toLowerCase()
+          ? current.url.replace(/.+\.vtexcommercestable\.com\.br/, "")
+            .toLowerCase()
           : url,
         url,
       ),

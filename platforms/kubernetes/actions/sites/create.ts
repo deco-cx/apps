@@ -1,3 +1,4 @@
+import { SiteLifecycle } from "../../../../admin/platform.ts";
 import {
   CRYPTO_KEY_ENV_VAR,
   generateAESKey,
@@ -5,11 +6,13 @@ import {
 } from "../../../../website/utils/crypto.ts";
 import { ignoreIfExists } from "../../common/objects.ts";
 import { k8s } from "../../deps.ts";
+import { ServiceScaling } from "../../loaders/siteState/get.ts";
 import { AppContext } from "../../mod.ts";
 import { DECO_SITES_PVC } from "../build.ts";
 
 export interface Props {
   site: string;
+  lifecycle?: SiteLifecycle;
 }
 
 export const Namespace = {
@@ -64,12 +67,19 @@ const getOrGenerateAESKey = async (site: string) => {
     kv?.close();
   }
 };
+
+const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
+  maxScale: 1,
+  initialScale: 1,
+  minScale: 0,
+  retentionPeriod: "5m",
+};
 /**
  * Provision namespace of the new site and required resources.
  * @title Create Site
  */
 export default async function newSite(
-  { site }: Props,
+  { site, lifecycle }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
@@ -84,10 +94,36 @@ export default async function newSite(
   const siteNs = Namespace.forSite(site);
 
   await corev1Api.createNamespace({
-    metadata: { name: siteNs },
+    metadata: {
+      name: siteNs,
+      ...lifecycle ? { labels: { ["site-lifecycle"]: lifecycle } } : {},
+    },
   }).catch(ignoreIfExists);
+  const setupPromises: Promise<unknown>[] = [];
+  const isEphemeral = lifecycle === "ephemeral";
+  if (isEphemeral) {
+    // TODO put this back when resource quota is well designed.
+    // setupPromises.push(
+    //   corev1Api.createNamespacedResourceQuota(siteNs, {
+    //     apiVersion: "v1",
+    //     kind: "ResourceQuota",
+    //     metadata: {
+    //       name: `${siteNs}-quota`,
+    //     },
+    //     spec: {
+    //       hard: {
+    //         "requests.cpu": "2000m",
+    //         "requests.memory": "512Mi",
+    //         "limits.cpu": "4000m",
+    //         "limits.memory": "2Gi",
+    //       },
+    //     },
+    //   }).catch(ignoreIfExists),
+    // );
+  }
   const [secretEnvVar] = await Promise.all([
     secretEnvVarPromise,
+    ...setupPromises,
     corev1Api.createNamespacedPersistentVolumeClaim(siteNs, {
       metadata: { name: DECO_SITES_PVC, namespace: siteNs },
       spec: {
@@ -98,6 +134,7 @@ export default async function newSite(
     }).catch(ignoreIfExists),
   ]);
   const state = {
+    ...isEphemeral ? { scaling: EPHEMERAL_SERVICE_SCALING } : {},
     envVars: [secretEnvVar],
   };
   await ctx.invoke.kubernetes.actions.siteState.upsert({

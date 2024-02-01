@@ -20,7 +20,9 @@ export interface Props {
 }
 
 /**
- * @title Weather Matcher
+ * @title Weather
+ * @description Target users based on specific temperature
+ * @icon cloud-storm
  */
 export default function MatchWeather(
   { temperatureRanges, temperature }: Props,

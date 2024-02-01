@@ -1,3 +1,4 @@
+import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { DECO_FILE_NAME, newFsProvider } from "deco/engine/releases/fs.ts";
 import {
@@ -8,6 +9,69 @@ import {
 import { join } from "std/path/mod.ts";
 import { BlockStore } from "./mod.ts";
 
+export class MemoryBlockStorage implements BlockStore {
+  protected callbacks: OnChangeCallback[] = [() => {
+    const ctx = Context.active();
+    ctx.release?.set?.(this._state);
+  }];
+  protected _revision = crypto.randomUUID();
+  constructor() {
+  }
+
+  get _state(): Promise<Record<string, Resolvable>> {
+    const ctx = Context.active();
+    return ctx.release?.state?.() ?? Promise.resolve({});
+  }
+  set _state(value) {
+    value.then((v) => {
+      const ctx = Context.active();
+      ctx.release?.set?.(v);
+    });
+  }
+  async mergeWith(other: Record<string, Resolvable>) {
+    const currentState = await this._state;
+    return { ...currentState, ...other };
+  }
+  async patch(
+    resolvables: Record<string, Resolvable>,
+  ): Promise<Record<string, Resolvable>> {
+    this._state = this.mergeWith(resolvables);
+    await this.notify();
+    return this._state;
+  }
+  async update(resolvables: Record<string, Resolvable>): Promise<void> {
+    this._state = Promise.resolve(resolvables);
+    await this.notify();
+  }
+  async notify() {
+    await this._state;
+    this._revision = crypto.randomUUID();
+    this.callbacks.forEach((cb) => cb());
+  }
+  async delete(id: string): Promise<void> {
+    const state = await this._state;
+    delete state[id];
+    this._state = Promise.resolve(state);
+    await this.notify();
+  }
+  state(
+    _options?: ReadOptions | undefined,
+  ): Promise<Record<string, Resolvable>> {
+    return this._state;
+  }
+  archived(
+    _options?: ReadOptions | undefined,
+  ): Promise<Record<string, Resolvable>> {
+    return Promise.resolve({});
+  }
+  revision(): Promise<string> {
+    return Promise.resolve(this._revision);
+  }
+  onChange(callback: OnChangeCallback): void {
+    this.callbacks.push(callback);
+  }
+  dispose?: (() => void) | undefined;
+}
 export class FsBlockStorage implements BlockStore {
   protected _readOnly: Release | undefined;
   protected path: string;
@@ -58,4 +122,11 @@ export class FsBlockStorage implements BlockStore {
   }
 }
 
-export const storage = new FsBlockStorage();
+const hasWritePerm = async (): Promise<boolean> => {
+  return await Deno.permissions.query(
+    { name: "write" } as const,
+  ).then((status) => status.state === "granted");
+};
+export const storage = await hasWritePerm()
+  ? new FsBlockStorage()
+  : new MemoryBlockStorage();
