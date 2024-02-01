@@ -28,10 +28,18 @@ export interface Props {
    */
   query?: string;
   /**
+   * 
+   */
+  collectionName?: string;
+  /**
    * @title Items per page
    * @description number of products per page to display
    */
   count: number;
+
+  page?: number;
+  startCursor?: string;
+  endCursor?: string;
 }
 
 /**
@@ -48,9 +56,13 @@ const loader = async (
 
   const count = props.count ?? 12;
   const query = props.query || url.searchParams.get("q") || "";
-  const page = Number(url.searchParams.get("page")) ?? 0;
-  const endCursor = url.searchParams.get("endCursor") ?? "";
-  const startCursor = url.searchParams.get("startCursor") ?? "";
+  const page = props.page || Number(url.searchParams.get("page")) || 0;
+  const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
+  const startCursor = props.startCursor || url.searchParams.get("startCursor") || "";
+
+  console.log(startCursor)
+
+  console.log(url)
 
   const isSearch = Boolean(query);
   let hasNextPage = false;
@@ -93,7 +105,7 @@ const loader = async (
     } else {
       // TODO: understand how accept more than one path
       // example: /collections/first-collection/second-collection
-      const pathname = url.pathname.split("/")[1];
+      const pathname = props.collectionName || url.pathname.split("/")[1];
 
       const data = await storefront.query<
         QueryRoot,
@@ -151,6 +163,7 @@ const loader = async (
   const filters = shopifyFilters?.map((filter) =>
     toFilter(filter, new URL(req.url))
   );
+
 
   return {
     "@type": "ProductListingPage",
