@@ -2,6 +2,7 @@ import type { ProductDetailsPage } from "../../commerce/types.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
+import { ProductPrice } from "../utils/client/types.ts";
 import { parseSlug, toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -39,9 +40,16 @@ async function loader(
     return null;
   }
 
+  // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
+  const productPrice: ProductPrice | null = await api["GET /api/v2/products/:productId/price"]({
+    productId: id,
+  }, STALE)
+    .then((r) => r.json()).catch(() => null);
+
   const product = toProduct(maybeProduct, variantId, {
     url,
     priceCurrency: "BRL",
+    productPrice,
   });
 
   const segments = url.pathname.slice(1).split("/");

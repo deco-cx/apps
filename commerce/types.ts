@@ -228,6 +228,12 @@ export interface Offer extends Omit<Thing, "@type"> {
    * - Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.
    */
   price: number;
+  /**
+   * The currency of the price, or a price component when attached to {@link https://schema.org/PriceSpecification PriceSpecification} and its subtypes.
+   *
+   * Use standard formats: {@link http://en.wikipedia.org/wiki/ISO_4217 ISO 4217 currency format} e.g. "USD"; {@link https://en.wikipedia.org/wiki/List_of_cryptocurrencies Ticker symbol} for cryptocurrencies e.g. "BTC"; well known names for {@link https://en.wikipedia.org/wiki/Local_exchange_trading_system Local Exchange Tradings Systems} (LETS) and other currency types e.g. "Ithaca HOUR".
+   */
+  priceCurrency?: string;
   /** One or more detailed price specifications, indicating the unit price and delivery or payment charges. */
   priceSpecification: UnitPriceSpecification[];
   /** The date after which the price is no longer available. */
