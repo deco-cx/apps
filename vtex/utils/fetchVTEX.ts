@@ -60,6 +60,15 @@ const getSanitizedInput = (
     }
   });
 
+  const productNameContains = url.searchParams.get("productNameContains");
+
+  if (productNameContains) {
+    return url.toString().replace(
+      /productNameContains=([^&#]*)/,
+      `productNameContains=${encodeURIComponent(productNameContains)}`,
+    );
+  }
+
   return url.toString();
 };
 
