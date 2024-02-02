@@ -89,6 +89,7 @@ const fixURL = (url: string): string =>
 const toProductUrl = (url: string, origin: string, sku?: string): string => {
   const productURL = new URL(fixURL(url));
   productURL.searchParams.delete("v");
+  productURL.pathname += "/p";
 
   if (sku) {
     productURL.searchParams.set("v", sku);
