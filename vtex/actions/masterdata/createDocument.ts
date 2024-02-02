@@ -15,11 +15,11 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<CreateNewDocument> => {
-  const { vcsDeprecated } = ctx;
+  const { vcs } = ctx;
   const { data, acronym } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
-  const response = await vcsDeprecated
+  const response = await vcs
     [`POST /api/dataentities/:acronym/documents`](
       { acronym },
       {
