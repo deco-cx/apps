@@ -1,12 +1,23 @@
 import type {
+  Filter,
   Offer,
   Person,
   Product,
+  ProductListingPage,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
+import { FilterToggleValue } from "../../commerce/types.ts";
 import type { LinxUser } from "./types/analytics.ts";
-import type { Product as LinxProduct, Sku } from "./types/linx.ts";
-import { Query } from "./types/search.ts";
+import type {
+  Filter as LinxFilter,
+  Product as LinxProduct,
+  Sku,
+} from "./types/linx.ts";
+import { DiscreteValue, SortBy } from "./types/linx.ts";
+import type { Query } from "./types/search.ts";
+import { HotsiteResponse } from "./types/search.ts";
+import { SearchResponse } from "./types/search.ts";
+import { NavigateResponse } from "./types/search.ts";
 
 const toOffer = (variant: Sku): Offer => {
   const { properties } = variant;
@@ -207,3 +218,118 @@ export const toSearch = ({ query, link }: Query) => ({
   term: query,
   href: link,
 });
+
+const toFilterValue = (
+  filter: DiscreteValue,
+  parent: LinxFilter,
+  url: URL,
+): FilterToggleValue => {
+  const _url = new URL(url.toString());
+  _url.searchParams.delete("page");
+
+  const value = `d:${filter.id}:${filter.id}`;
+  const selected = _url.searchParams.has("filter", value);
+  const hasChildren = filter.filters && filter.filters.length > 0;
+
+  if (selected) {
+    _url.searchParams.delete("filter", value);
+  } else {
+    _url.searchParams.append("filter", value);
+  }
+
+  return {
+    label: filter.label,
+    selected,
+    url: _url.pathname + _url.search,
+    quantity: filter.size,
+    value: `d:${parent.id}:${filter.id}`,
+    ...(hasChildren && {
+      children: {
+        "@type": "FilterToggle",
+        label: filter.label,
+        key: `${filter.id}`,
+        quantity: filter.size,
+        values: filter.filters!.map((f) => toFilterValue(f, parent, url)),
+      },
+    }),
+  };
+};
+
+export const toFilter = (
+  filter: LinxFilter,
+  url: URL,
+): Filter => {
+  if (filter.type === "discrete") {
+    const quantity = filter.values.reduce((acc, f) => acc + f.size, 0);
+
+    return {
+      "@type": "FilterToggle",
+      label: filter.attribute,
+      key: `${filter.id}`,
+      quantity,
+      values: filter.values.map((f) => toFilterValue(f, filter, url)),
+    };
+  }
+
+  return {
+    "@type": "FilterRange",
+    label: filter.attribute,
+    key: `${filter.id}`,
+    values: {
+      min: filter.values[0].min.value,
+      max: filter.values[0].max.value,
+    },
+  };
+};
+
+const generatePages = (page: number, url: string) => {
+  const _url = new URL(url);
+  _url.searchParams.set("page", (page + 1).toString());
+  const nextPage = _url.pathname + _url.search;
+  _url.searchParams.set("page", (page - 1).toString());
+  const previousPage = page > 1 ? _url.pathname + _url.search : undefined;
+  return { nextPage, previousPage };
+};
+
+export const sortOptions: { value: SortBy; label: string }[] = [
+  { value: "relevance", label: "Relevância" },
+  { value: "pid", label: "Id de produto" },
+  { value: "ascPrice", label: "Menor preço" },
+  { value: "descPrice", label: "Maior preço" },
+  { value: "descDate", label: "Lançamento" },
+  { value: "ascSold", label: "Menor venda" },
+  { value: "descSold", label: "Maior venda" },
+  { value: "ascReview", label: "Menor avaliação" },
+  { value: "descReview", label: "Maior avaliação" },
+  { value: "descDiscount", label: "Maiores descontos" },
+];
+
+export const toProductListingPage = (
+  response: NavigateResponse | SearchResponse | HotsiteResponse,
+  page: number,
+  resultsPerPage: number,
+  url: string,
+): ProductListingPage => {
+  const { nextPage, previousPage } = generatePages(page, url);
+
+  return {
+    "@type": "ProductListingPage",
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [],
+      numberOfItems: 0,
+    },
+    sortOptions,
+    products: response.products.map((p) =>
+      toProduct(p, p.selectedSku ?? null, new URL(url).origin)
+    ),
+    pageInfo: {
+      currentPage: page,
+      nextPage,
+      previousPage,
+      records: response.size,
+      recordPerPage: resultsPerPage,
+    },
+    filters: response.filters.map((f) => toFilter(f, new URL(url))),
+  };
+};

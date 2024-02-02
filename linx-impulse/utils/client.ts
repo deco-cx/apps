@@ -1,5 +1,11 @@
-import { ProductFormat, Source } from "./types/linx.ts";
-import { AutocompleteResponse, InteractionType } from "./types/search.ts";
+import type { ProductFormat, SortBy, Source } from "./types/linx.ts";
+import type {
+  AutocompleteResponse,
+  HotsiteResponse,
+  InteractionType,
+  NavigateResponse,
+  SearchResponse,
+} from "./types/search.ts";
 
 export interface LinxAPI {
   "GET /engage/search/v3/autocompletes": {
@@ -57,6 +63,68 @@ export interface LinxAPI {
       source: Source;
       userId?: string;
       interactionType?: InteractionType;
+    };
+  };
+
+  "GET /engage/search/v3/navigates": {
+    response: NavigateResponse;
+    searchParams: {
+      fields?: string[];
+      category?: string[];
+      multicategory?: string[];
+      page?: number;
+      resultsPerPage?: number;
+      sortBy?: SortBy;
+      showOnlyAvailable?: boolean;
+      allowRedirect?: boolean;
+      filter?: string[];
+      apiKey: string;
+      secretKey: string;
+      deviceId: string;
+      salesChannel?: string;
+      productFormat?: ProductFormat;
+      userId?: string;
+      source?: Source;
+    };
+  };
+
+  "GET /engage/search/v3/search": {
+    response: SearchResponse;
+    searchParams: {
+      terms: string;
+      pids?: string[];
+      page?: number;
+      resultsPerPage?: number;
+      sortBy?: SortBy;
+      showOnlyAvailable?: boolean;
+      allowRedirect?: boolean;
+      filter?: string[];
+      apiKey: string;
+      secretKey: string;
+      deviceId: string;
+      salesChannel?: string;
+      productFormat?: ProductFormat;
+      userId?: string;
+      source?: Source;
+    };
+  };
+
+  "GET /engage/search/v3/hotsites": {
+    response: HotsiteResponse;
+    searchParams: {
+      name: string;
+      page?: number;
+      resultsPerPage?: number;
+      sortBy?: SortBy;
+      showOnlyAvailable?: boolean;
+      filter?: string[];
+      apiKey: string;
+      secretKey: string;
+      deviceId: string;
+      salesChannel?: string;
+      productFormat?: ProductFormat;
+      userId?: string;
+      source?: Source;
     };
   };
 }
