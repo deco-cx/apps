@@ -31,6 +31,12 @@ export interface StateFetched {
   etag: string;
 }
 
+export interface OperationFailed {
+  type: "operation-failed";
+  code: "UNAUTHORIZED" | "INTERNAL_SERVER_ERROR";
+  reason: string;
+}
+
 export type Acked<T> = T & { ack: string };
 
 export interface State {
@@ -38,4 +44,4 @@ export interface State {
 }
 
 export type Commands = PatchState | FetchState;
-export type Events = StatePatched | StateFetched;
+export type Events = StatePatched | StateFetched | OperationFailed;
