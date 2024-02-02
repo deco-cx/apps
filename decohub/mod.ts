@@ -1,7 +1,6 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import { type App, AppModule, type FnContext } from "deco/mod.ts";
-import { dirname, fromFileUrl, join } from "std/path/mod.ts";
+import { AppModule, type App, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -13,10 +12,7 @@ export interface DynamicApp {
 export interface State {
   apps: DynamicApp[];
 }
-const currdir = dirname(import.meta.url);
-const mockContent = `
-export default function App(props: unknown) {}
-`;
+
 /**
  * @title Deco Hub
  */
@@ -37,12 +33,7 @@ export default async function App(
         }, {
           ...sourcemap,
           ...app.sourceMap ?? {},
-          [appName]: {
-            path: currdir.startsWith("http")
-              ? `${currdir}/apps/${appTs}`
-              : `file://${join(fromFileUrl(currdir), "apps", appTs)}`,
-            content: mockContent,
-          },
+          [appName]: import.meta.resolve("../website/mod.ts")
         }];
       },
       [{} as Record<string, AppModule>, baseSourceMap],
