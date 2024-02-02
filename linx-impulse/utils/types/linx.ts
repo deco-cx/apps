@@ -20,7 +20,13 @@ interface Tag {
 export interface Sku {
   sku: string;
   specs: Record<string, string[]>;
-  properties: Properties;
+  properties?: Properties;
+  images?: Images;
+  price?: number;
+  oldPrice?: number;
+  installment?: Installment;
+  url?: string;
+  status?: string;
 }
 
 interface Properties {
@@ -65,7 +71,7 @@ export interface Product {
   iId?: string;
   categories: Category[];
   tags?: Tag[] | null;
-  specs: Record<string, Spec[]>;
+  specs?: Record<string, Spec[]>;
   created: string;
   brand: string | null;
   selectedSku?: string;

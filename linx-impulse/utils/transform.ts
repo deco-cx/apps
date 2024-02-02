@@ -20,26 +20,31 @@ import { SearchResponse } from "./types/search.ts";
 import { NavigateResponse } from "./types/search.ts";
 
 const toOffer = (variant: Sku): Offer => {
-  const { properties } = variant;
+  const {
+    oldPrice = variant.properties?.oldPrice ?? 0,
+    price = variant.properties?.price ?? 0,
+    installment = variant.properties?.installment ?? { count: 0, price: 0 },
+    status = variant.properties?.status ?? "unavailable",
+  } = variant;
 
   const priceSpecification: UnitPriceSpecification[] = [
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/ListPrice",
-      price: properties.oldPrice ?? Infinity,
+      price: oldPrice ?? Infinity,
     },
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
-      price: properties.price ?? Infinity,
+      price: price ?? Infinity,
     },
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
       priceComponentType: "https://schema.org/Installment",
-      billingDuration: properties.installment.count,
-      billingIncrement: properties.installment.price,
-      price: properties.installment.price * properties.installment.count,
+      billingDuration: installment.count,
+      billingIncrement: installment.price,
+      price: installment.price * installment.count,
     },
   ];
 
@@ -47,10 +52,10 @@ const toOffer = (variant: Sku): Offer => {
     "@type": "Offer",
     seller: undefined,
     priceValidUntil: undefined,
-    price: properties.price ?? properties.oldPrice ?? Infinity,
+    price: price ?? oldPrice ?? Infinity,
     priceSpecification,
     inventoryLevel: {},
-    availability: properties.status.toLowerCase() === "available"
+    availability: status.toLowerCase() === "available"
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
   };
@@ -122,7 +127,7 @@ export const toProduct = (
   const offers = offer ? [offer] : [];
 
   const additionalProperty =
-    Object.entries(variant.properties.details ?? {})?.map(([key, value]) => ({
+    Object.entries(variant.properties?.details ?? {})?.map(([key, value]) => ({
       "@type": "PropertyValue" as const,
       name: key,
       value: sanitizeValue(value),
@@ -148,7 +153,7 @@ export const toProduct = (
     sku: `${variant.sku}`,
     url: toProductUrl(product.url, origin, variant.sku),
     category: product.categories.map((c) => c.name).join(">"),
-    name: variant.properties.name,
+    name: variant.properties?.name,
     gtin: undefined,
     brand: {
       "@type": "Brand",
@@ -167,7 +172,7 @@ export const toProduct = (
       productGroupID: product.id,
       additionalProperty: [
         ...Object
-          .entries(product.specs)
+          .entries(product.specs ?? {})
           .flatMap((
             [key, value],
           ) =>
@@ -195,9 +200,11 @@ export const toProduct = (
     offers: {
       "@type": "AggregateOffer" as const,
       priceCurrency: "BRL",
-      lowPrice: variant.properties.price ?? variant.properties.oldPrice ??
+      lowPrice: variant.price ?? variant.properties?.price ??
+        variant.properties?.oldPrice ??
         Infinity,
-      highPrice: variant.properties.price ?? variant.properties.oldPrice ??
+      highPrice: variant.oldPrice ?? variant.properties?.oldPrice ??
+        variant.properties?.price ??
         Infinity,
       offerCount: offers.length,
       offers,

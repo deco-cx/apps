@@ -3,6 +3,7 @@ import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { EventsAPI } from "./utils/events.ts";
 import { LinxAPI } from "./utils/client.ts";
+import { ChaordicAPI } from "./utils/chaordic.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -36,16 +37,15 @@ export default function App(props: State) {
 
   const api = createHttpClient<LinxAPI>({
     base: "http://api.linximpulse.com/",
-    headers: new Headers({
-      "Accept": "application/json",
-      "User-Agent":
-        "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-      "x-api-key": props.apiKey,
-      "x-secret-key": props.secretKey,
-    }),
+    headers: new Headers({ "Accept": "application/json" }),
   });
 
-  const state = { ...props, eventsApi, api };
+  const chaordicApi = createHttpClient<ChaordicAPI>({
+    base: "https://recs.chaordicsystems.com/",
+    headers: new Headers({ "Accept": "application/json" }),
+  });
+
+  const state = { ...props, eventsApi, api, chaordicApi };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 

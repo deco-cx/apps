@@ -101,13 +101,6 @@ const loader = async (
   const filter = url.searchParams.getAll("filter");
   const source = device === "desktop" ? "desktop" : "mobile";
 
-  console.log({
-    searchTerm,
-    category,
-    multicategory,
-    props,
-  });
-
   try {
     if (!searchTerm && category.length >= 2 && category[0] === "hotsite") {
       const response = await api["GET /engage/search/v3/hotsites"]({
