@@ -1,11 +1,22 @@
+import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import { type App, context, type FnContext } from "deco/mod.ts";
+import { type App, AppModule, type FnContext } from "deco/mod.ts";
+import { dirname, fromFileUrl, join } from "std/path/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
-// deno-lint-ignore ban-types
-export type State = {};
-
+export interface DynamicApp {
+  module: AppModule;
+  name: string;
+  sourceMap?: SourceMap;
+}
+export interface State {
+  apps: DynamicApp[];
+}
+const currdir = dirname(import.meta.url);
+const mockContent = `
+export default function App(props: unknown) {}
+`;
 /**
  * @title Deco Hub
  */
@@ -14,29 +25,43 @@ export default async function App(
   state: State,
 ): Promise<App<Manifest, State>> {
   const resolvedImport = import.meta.resolve("../admin/mod.ts");
+  const baseSourceMap = buildSourceMap(manifest);
+  const [dynamicApps, enhancedSourceMap] = (state?.apps ?? []).filter(Boolean)
+    .reduce(
+      ([apps, sourcemap], app) => {
+        const appTs = `${app.name}.ts`;
+        const appName = `${manifest.name}/apps/${appTs}`;
+        return [{
+          ...apps,
+          [appName]: app.module,
+        }, {
+          ...sourcemap,
+          ...app.sourceMap ?? {},
+          [appName]: {
+            path: `file://${join(fromFileUrl(currdir), "apps", appTs)}`,
+            content: mockContent,
+          },
+        }];
+      },
+      [{} as Record<string, AppModule>, baseSourceMap],
+    );
   return {
     manifest: {
       ...manifest,
       apps: {
+        // build apps based on name
+        ...dynamicApps,
         ...manifest.apps,
-        ...context.play // this is an optimization to not include the admin code for everyone in case of play is not being used.
-          ? {
-            [ADMIN_APP]: await import(
-              resolvedImport
-            ),
-          }
-          : {},
+        [ADMIN_APP]: await import(
+          resolvedImport
+        ),
       },
     } as Manifest,
     state,
-    ...context.play
-      ? {
-        sourceMap: {
-          ...buildSourceMap(manifest),
-          [ADMIN_APP]: resolvedImport,
-        },
-      }
-      : {},
+    sourceMap: {
+      ...enhancedSourceMap,
+      [ADMIN_APP]: resolvedImport,
+    },
   };
 }
 
