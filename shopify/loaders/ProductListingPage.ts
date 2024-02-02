@@ -134,9 +134,7 @@ const loader = async (
   // it in here
   const products = shopifyProducts?.nodes?.map((
     p,
-  ) =>
-    toProduct(p as Product, (p as Product).variants.nodes[0], url)
-  );
+  ) => toProduct(p as Product, (p as Product).variants.nodes[0], url));
 
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);
@@ -153,9 +151,7 @@ const loader = async (
     previousPage.delete("startCursor");
   }
 
-  const filters = shopifyFilters?.map((filter) =>
-    toFilter(filter, url)
-  );
+  const filters = shopifyFilters?.map((filter) => toFilter(filter, url));
 
   return {
     "@type": "ProductListingPage",

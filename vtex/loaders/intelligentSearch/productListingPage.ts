@@ -412,7 +412,9 @@ const loader = async (
       currentPage,
       records: recordsFiltered,
       recordPerPage: pagination.perPage,
-      showMore: hasNextPage ? "vtex/actions/showMore/intelligentSearch/productListingPage.ts" : undefined,
+      showMore: hasNextPage
+        ? "vtex/actions/showMore/intelligentSearch/productListingPage.ts"
+        : undefined,
     },
     sortOptions,
     seo: pageTypesToSeo(
