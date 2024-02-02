@@ -34,6 +34,7 @@ const loader = async (
   _req: Request,
   ctx: VTEXContext,
 ): Promise<Navbar[] | null> => {
+
   const navbar = await ctx.invoke.vtex.loaders.navbar(props);
 
   return navbar?.map(transform) ?? null;

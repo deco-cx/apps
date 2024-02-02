@@ -32,6 +32,11 @@ export interface Props {
    * @description number of products per page to display
    */
   count: number;
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 /**
@@ -43,7 +48,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const url = new URL(req.url);
+  const url = new URL(props.pageHref || req.url);
   const { storefront } = ctx;
 
   const count = props.count ?? 12;
@@ -77,7 +82,7 @@ const loader = async (
           ...(startCursor && { after: startCursor }),
           ...(endCursor && { before: endCursor }),
           query: query,
-          productFilters: getFiltersByUrl(new URL(req.url)),
+          productFilters: getFiltersByUrl(url),
           ...searchSortShopify[sort],
         },
         ...SearchProducts,
@@ -105,7 +110,7 @@ const loader = async (
           ...(startCursor && { after: startCursor }),
           ...(endCursor && { before: endCursor }),
           handle: pathname,
-          filters: getFiltersByUrl(new URL(req.url)),
+          filters: getFiltersByUrl(url),
           ...sortShopify[sort],
         },
         ...ProductsByCollection,
@@ -130,7 +135,7 @@ const loader = async (
   const products = shopifyProducts?.nodes?.map((
     p,
   ) =>
-    toProduct(p as Product, (p as Product).variants.nodes[0], new URL(req.url))
+    toProduct(p as Product, (p as Product).variants.nodes[0], url)
   );
 
   const nextPage = new URLSearchParams(url.searchParams);
@@ -149,7 +154,7 @@ const loader = async (
   }
 
   const filters = shopifyFilters?.map((filter) =>
-    toFilter(filter, new URL(req.url))
+    toFilter(filter, url)
   );
 
   return {
