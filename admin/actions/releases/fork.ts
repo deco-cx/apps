@@ -3,17 +3,18 @@ import { storage } from "../../fsStorage.ts";
 import { Acked, Commands, Events, State } from "../../types.ts";
 
 export interface Props {
-  /** Environment name to connect to */
-  name: string;
-
   /** Site name */
   site: string;
+  /** Environment name */
+  name?: string;
+  /** Revision etag value */
+  revision?: string;
 }
 
 const subscribers: WebSocket[] = [];
 
 export const fetchState = async (): Promise<State> => ({
-  decofile: await storage.state({ forceFresh: true }),
+  decofile: await storage.state(),
 });
 
 const saveState = ({ decofile }: State): Promise<void> =>
@@ -31,7 +32,7 @@ const patchState = (ops: fjp.Operation[]) => {
   return queue;
 };
 
-const action = (_: Props, req: Request) => {
+const action = (_props: Props, req: Request) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
   const broadcast = (event: Acked<Events>) => {
@@ -49,32 +50,43 @@ const action = (_: Props, req: Request) => {
 
     const { ack } = data;
 
-    if (data.type === "patch-state") {
-      try {
-        const { payload: operations } = data;
+    try {
+      if (data.type === "patch-state") {
+        try {
+          const { payload: operations } = data;
 
-        await patchState(operations);
+          await patchState(operations);
 
-        // Broadcast changes
-        broadcast({
-          type: "state-patched",
-          payload: operations,
+          // Broadcast changes
+          broadcast({
+            type: "state-patched",
+            payload: operations,
+            etag: await storage.revision(),
+            metadata: {}, // TODO: add metadata
+            ack,
+          });
+        } catch ({ name, operation }) {
+          console.error({ name, operation });
+        }
+      } else if (data.type === "fetch-state") {
+        send({
+          type: "state-fetched",
+          payload: await fetchState(),
           etag: await storage.revision(),
-          metadata: {}, // TODO: add metadata
           ack,
         });
-      } catch ({ name, operation }) {
-        console.error({ name, operation });
+      } else {
+        console.error("UNKNOWN EVENT", event);
       }
-    } else if (data.type === "fetch-state") {
+    } catch (error) {
+      console.error(error);
+
       send({
-        type: "state-fetched",
-        payload: await fetchState(),
-        etag: await storage.revision(),
+        type: "operation-failed",
+        reason: error.toString(),
+        code: "INTERNAL_SERVER_ERROR",
         ack,
       });
-    } else {
-      console.error("UNKNOWN EVENT", event);
     }
   };
 
@@ -82,6 +94,7 @@ const action = (_: Props, req: Request) => {
    * Handles the WebSocket connection on open event.
    */
   socket.onopen = open;
+
   /**
    * Handles the WebSocket connection on close event.
    */
@@ -91,7 +104,7 @@ const action = (_: Props, req: Request) => {
    * Handles the WebSocket connection on message event.
    * @param {MessageEvent} event - The WebSocket message event.
    */
-  socket.onmessage = (e) => message(e).catch(() => {});
+  socket.onmessage = (e) => message(e).catch(console.error);
 
   return response;
 };
