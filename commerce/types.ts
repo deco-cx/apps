@@ -502,18 +502,21 @@ export interface ProductDetailsPage {
   seo?: Seo | null;
 }
 
+export interface PageInfo {
+  currentPage: number;
+  nextPage: string | undefined;
+  previousPage: string | undefined;
+  records?: number | undefined;
+  recordPerPage?: number | undefined;
+  showMore?: string | undefined;
+}
+
 export interface ProductListingPage {
   "@type": "ProductListingPage";
   breadcrumb: BreadcrumbList;
   filters: Filter[];
   products: Product[];
-  pageInfo: {
-    currentPage: number;
-    nextPage: string | undefined;
-    previousPage: string | undefined;
-    records?: number | undefined;
-    recordPerPage?: number | undefined;
-  };
+  pageInfo: PageInfo;
   sortOptions: SortOption[];
   seo?: Seo | null;
 }
