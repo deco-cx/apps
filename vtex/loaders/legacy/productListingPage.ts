@@ -70,6 +70,11 @@ export interface Props {
   page?: number;
 
   /**
+   * @title Always show filters
+   */
+  alwaysShowFilters?: boolean;
+
+  /**
    * @description Include similar products
    * @deprecated Use product extensions instead
    */
@@ -281,18 +286,44 @@ const loader = async (
     return [];
   };
 
+  const flatCategories = props.alwaysShowFilters && !pageType.id
+    ? (vtexFacets.CategoriesTrees as LegacyFacet[]).reduce(
+      (acc, curr) => ({
+        ...acc,
+        [curr.Name]: curr.Children,
+      }),
+      {},
+    )
+    : {};
+
   const filters = Object.entries({
     Departments: vtexFacets.Departments,
     Categories: getCategoryFacets(vtexFacets.CategoriesTrees),
     Brands: vtexFacets.Brands,
     ...vtexFacets.SpecificationFilters,
     PriceRanges: vtexFacets.PriceRanges,
+    ...flatCategories,
   })
-    .map(([name, facets]) =>
+    .flatMap(([name, facets]) =>
       legacyFacetToFilter(name, facets, url, map, term, filtersBehavior)
     )
-    .flat()
-    .filter((x): x is Filter => Boolean(x));
+    .filter((x): x is Filter => Boolean(x))
+    // Sort category name by position of api facets
+    // because order is not preserved by object
+    .sort((a, b) => {
+      const aIndex = (vtexFacets.CategoriesTrees as LegacyFacet[]).findIndex(
+        ({ Name }) => a.label.localeCompare(Name),
+      );
+      const bIndex = (vtexFacets.CategoriesTrees as LegacyFacet[]).findIndex(
+        ({ Name }) => b.label.localeCompare(Name),
+      );
+
+      if (aIndex === -1) return 0;
+      if (bIndex === -1) return 0;
+
+      return aIndex - bIndex;
+    });
+
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
 
   const hasMoreResources = _to < parseInt(_total, 10) - 1;
