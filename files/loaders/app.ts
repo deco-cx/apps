@@ -4,7 +4,7 @@ import { dirname, join } from "std/path/mod.ts";
 import { DynamicApp } from "../../decohub/mod.ts";
 import { AppContext } from "../mod.ts";
 import { create, walk } from "../sdk.ts";
-import website from "apps/website/mod.ts";
+import website, { Props as WebSiteProps } from "../../website/mod.ts";
 
 const currdir = dirname(import.meta.url);
 const importFromString = (modData: string) =>
@@ -81,7 +81,7 @@ const loader = async (
   return {
     name: props.name,
     module: {
-      default: (props: Props) => {
+      default: (props: WebSiteProps) => {
         return {
           state: props,
           manifest: appManifest,
