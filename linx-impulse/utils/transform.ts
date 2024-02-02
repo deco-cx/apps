@@ -110,7 +110,7 @@ export const toProduct = (
   const offers = offer ? [offer] : [];
 
   const additionalProperty =
-    Object.entries(variant.properties.details)?.map(([key, value]) => ({
+    Object.entries(variant.properties.details ?? {})?.map(([key, value]) => ({
       "@type": "PropertyValue" as const,
       name: key,
       value: sanitizeValue(value),

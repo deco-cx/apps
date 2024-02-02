@@ -14,26 +14,26 @@ interface Category {
 interface Tag {
   id: string;
   name: string;
-  parents: string[];
+  parents: string[] | null;
 }
 
 export interface Sku {
   sku: string;
-  specs: Record<string, unknown>;
+  specs: Record<string, string[]>;
   properties: Properties;
 }
 
 interface Properties {
-  name: string;
+  name?: string;
   url: string;
   images: Images;
   status: string;
   price: number;
   installment: Installment;
   oldPrice: number;
-  stock: number;
-  eanCode: string;
-  details: Record<string, unknown>;
+  stock?: number;
+  eanCode?: string;
+  details?: Record<string, unknown>;
 }
 
 interface Installment {
@@ -64,13 +64,14 @@ export interface Product {
   cId?: string;
   iId?: string;
   categories: Category[];
-  tags: Tag[] | null;
+  tags?: Tag[] | null;
   specs: Record<string, Spec[]>;
   created: string;
   brand: string | null;
+  selectedSku?: string;
   skus: Sku[];
   details: Record<string, string[]>;
-  description: string;
+  description?: string;
 }
 
 export type ProductFormat = "onlyIds" | "complete" | "compact";
