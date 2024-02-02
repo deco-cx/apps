@@ -21,6 +21,19 @@ import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
+
+type SignalStringified<Data> = { __signal: Data };
+// deno-lint-ignore no-explicit-any
+type Layout = any;
+// deno-lint-ignore no-explicit-any
+type Tab = any;
+
+export interface Workspace {
+  name: string;
+  layout: Layout[];
+  tabs: Record<string, Tab>;
+}
+
 export interface BlockStore extends Release {
   patch(
     resolvables: Record<string, Resolvable>,
@@ -84,6 +97,8 @@ export interface Props {
   github?: GithubProps;
   kubernetes?: K8sProps;
   subhosting?: SubhostingProps;
+  /** @description property used at deco play  */
+  workspaces: SignalStringified<Workspace>[];
 }
 
 /**
