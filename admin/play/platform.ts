@@ -1,9 +1,11 @@
 import kubernetes from "../../platforms/kubernetes/platform.ts";
 import { AppContext } from "../mod.ts";
 import { Platform } from "../platform.ts";
+import { DeploymentId } from "../../platforms/kubernetes/actions/deployments/create.ts";
 
 export type Kubernetes = AppContext["invoke"]["kubernetes"];
 const siteName = "play";
+const domain = "deco.site";
 export default function play(
   k8s: Kubernetes,
 ): Platform {
@@ -11,10 +13,11 @@ export default function play(
   return {
     ...k8sPlatform,
     name: "play",
+    domain,
     sites: {
       create: async (props) => {
         await k8s.actions.domains.create({
-          domain: `${props.site}.deco.site`,
+          domain: `${props.site}.${domain}`,
           site: siteName,
           ephemeral: true,
         });
@@ -28,9 +31,15 @@ export default function play(
         throw new Error("not implemented");
       },
       create: (
-        _props,
+        props,
       ) => {
-        throw new Error("not implemented");
+        return Promise.resolve({
+          id: DeploymentId.new(),
+          domains: [{
+            url: `https://${props.site}.${domain}`,
+            production: true,
+          }],
+        });
       },
       update: (_props) => {
         throw new Error("not implemented");

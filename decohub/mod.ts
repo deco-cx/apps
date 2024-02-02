@@ -38,7 +38,9 @@ export default async function App(
           ...sourcemap,
           ...app.sourceMap ?? {},
           [appName]: {
-            path: `file://${join(fromFileUrl(currdir), "apps", appTs)}`,
+            path: currdir.startsWith("http")
+              ? `${currdir}/apps/${appTs}`
+              : `file://${join(fromFileUrl(currdir), "apps", appTs)}`,
             content: mockContent,
           },
         }];
