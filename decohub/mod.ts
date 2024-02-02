@@ -1,6 +1,6 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import { AppModule, type App, type FnContext } from "deco/mod.ts";
+import { type App, AppModule, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -33,7 +33,7 @@ export default async function App(
         }, {
           ...sourcemap,
           ...app.sourceMap ?? {},
-          [appName]: import.meta.resolve("../website/mod.ts")
+          [appName]: import.meta.resolve("../website/mod.ts"),
         }];
       },
       [{} as Record<string, AppModule>, baseSourceMap],

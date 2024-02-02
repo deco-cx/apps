@@ -33,7 +33,7 @@ const patchState = (release: Release, ops: fjp.Operation[]) => {
   return queue;
 };
 
-const action = (_props: Props, req: Request) => {
+const action = (_props: Props, req: Request, ctx: AppContext) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
   const storage = ctx.release();
@@ -57,7 +57,7 @@ const action = (_props: Props, req: Request) => {
         try {
           const { payload: operations } = data;
 
-        await patchState(storage, operations);
+          await patchState(storage, operations);
 
           // Broadcast changes
           broadcast({
@@ -73,7 +73,7 @@ const action = (_props: Props, req: Request) => {
       } else if (data.type === "fetch-state") {
         send({
           type: "state-fetched",
-        payload: await fetchState(storage),
+          payload: await fetchState(storage),
           etag: await storage.revision(),
           ack,
         });
