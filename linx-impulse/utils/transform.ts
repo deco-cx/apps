@@ -31,12 +31,12 @@ const toOffer = (variant: Sku): Offer => {
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/ListPrice",
-      price: oldPrice ?? Infinity,
+      price: oldPrice,
     },
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
-      price: price ?? Infinity,
+      price,
     },
     {
       "@type": "UnitPriceSpecification",
@@ -52,7 +52,7 @@ const toOffer = (variant: Sku): Offer => {
     "@type": "Offer",
     seller: undefined,
     priceValidUntil: undefined,
-    price: price ?? oldPrice ?? Infinity,
+    price: price ?? oldPrice,
     priceSpecification,
     inventoryLevel: {},
     availability: status.toLowerCase() === "available"
@@ -201,11 +201,9 @@ export const toProduct = (
       "@type": "AggregateOffer" as const,
       priceCurrency: "BRL",
       lowPrice: variant.price ?? variant.properties?.price ??
-        variant.properties?.oldPrice ??
-        Infinity,
+        variant.properties?.oldPrice ?? 0,
       highPrice: variant.oldPrice ?? variant.properties?.oldPrice ??
-        variant.properties?.price ??
-        Infinity,
+        variant.properties?.price ?? 0,
       offerCount: offers.length,
       offers,
     },

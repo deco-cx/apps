@@ -63,6 +63,9 @@ interface SearchPageProps extends BaseProps {
    * @hide
    */
   page: "search";
+  /**
+   * @description It is recommended to create a global loader so that the loader is not called more than once
+   */
   loader: ProductListingPage | null;
 }
 
@@ -97,16 +100,16 @@ const generateParams = (
     }
     case "search": {
       const productIds =
-        props.loader?.products.map((p) => p["@id"]).filter((id): id is string =>
-          typeof id === "string"
-        ) ?? [];
+        props.loader?.products.map((p) => p.productID).filter((
+          id,
+        ): id is string => typeof id === "string") ?? [];
       return {
         name: "search",
         productId: productIds,
       };
     }
     case "product": {
-      const productId = props.loader?.product["@id"];
+      const productId = props.loader?.product.productID;
       return {
         name: "product",
         productId: productId ? [productId] : [],
