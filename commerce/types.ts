@@ -508,7 +508,6 @@ export interface PageInfo {
   previousPage: string | undefined;
   records?: number | undefined;
   recordPerPage?: number | undefined;
-  showMore?: string | undefined;
 }
 
 export interface ProductListingPage {

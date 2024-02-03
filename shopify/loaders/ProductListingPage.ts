@@ -173,9 +173,6 @@ const loader = async (
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage: page,
       records,
-      showMore: hasNextPage
-        ? "shopify/actions/showMore/productListingPage.ts"
-        : undefined,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
   };
