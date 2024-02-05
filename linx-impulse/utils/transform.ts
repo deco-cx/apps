@@ -8,24 +8,36 @@ import type {
 } from "../../commerce/types.ts";
 import { FilterToggleValue } from "../../commerce/types.ts";
 import type { LinxUser } from "./types/analytics.ts";
+import type { ChaordicProduct } from "./types/chaordic.ts";
+import type { ImpulseProduct, ImpulseSku } from "./types/impulse.ts";
 import type {
+  DiscreteValue,
   Filter as LinxFilter,
   Product as LinxProduct,
   Sku,
+  SortBy,
 } from "./types/linx.ts";
-import { DiscreteValue, SortBy } from "./types/linx.ts";
-import type { Query } from "./types/search.ts";
-import { HotsiteResponse } from "./types/search.ts";
-import { SearchResponse } from "./types/search.ts";
-import { NavigateResponse } from "./types/search.ts";
+import type {
+  HotsiteResponse,
+  NavigateResponse,
+  Query,
+  SearchResponse,
+} from "./types/search.ts";
+
+const isImpulseProduct = (product: LinxProduct): product is ImpulseProduct => {
+  return "clickUrl" in product || "collectInfo" in product;
+};
+const isImpulseSku = (sku: Sku): sku is ImpulseSku => {
+  return "properties" in sku && !("status" in sku);
+};
 
 const toOffer = (variant: Sku): Offer => {
   const {
-    oldPrice = variant.properties?.oldPrice ?? 0,
-    price = variant.properties?.price ?? 0,
-    installment = variant.properties?.installment ?? { count: 0, price: 0 },
-    status = variant.properties?.status ?? "unavailable",
-  } = variant;
+    oldPrice = 0,
+    price = 0,
+    installment = { count: 0, price: 0 },
+    status = "unavailable",
+  } = isImpulseSku(variant) ? variant.properties : variant;
 
   const priceSpecification: UnitPriceSpecification[] = [
     {
@@ -61,8 +73,8 @@ const toOffer = (variant: Sku): Offer => {
   };
 };
 
-const pickVariant = (variants: Sku[], variantId: string | null) => {
-  if (variantId === null) {
+const pickVariant = <T extends Sku>(variants: T[], variantId?: string): T => {
+  if (!variantId) {
     return variants[0];
   }
 
@@ -114,14 +126,14 @@ const toProductUrl = (url: string, origin: string, sku?: string): string => {
   return `${origin}${productURL.pathname}${productURL.search}`;
 };
 
-export const toProduct = (
-  product: LinxProduct,
-  variantId: string | null,
+const productFromImpulse = (
+  product: ImpulseProduct,
   origin: string,
+  variantId?: string,
   level = 0,
 ): Product => {
   const variants = product.skus ?? [];
-  const variant = pickVariant(product.skus, variantId);
+  const variant = pickVariant(product.skus, variantId ?? product.selectedSku);
 
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
@@ -134,7 +146,9 @@ export const toProduct = (
     })) ?? [];
 
   const hasVariant = level < 1
-    ? variants.map((variant) => toProduct(product, variant.sku, origin, 1))
+    ? variants.map((variant) =>
+      productFromImpulse(product, origin, variant.sku, 1)
+    )
     : [];
 
   const toImage = (url: string) => ({
@@ -144,7 +158,6 @@ export const toProduct = (
   });
 
   const image = Object.values(product.images ?? {}).map(toImage) ?? [];
-
   const trackingId = new URLSearchParams(product.clickUrl).get("trackingId");
 
   return {
@@ -153,13 +166,11 @@ export const toProduct = (
     sku: `${variant.sku}`,
     url: toProductUrl(product.url, origin, variant.sku),
     category: product.categories.map((c) => c.name).join(">"),
-    name: variant.properties?.name,
-    gtin: undefined,
+    name: variant.properties?.name ?? product.name,
     brand: {
       "@type": "Brand",
       "@id": `${product.brand}`,
       name: product.brand ?? undefined,
-      logo: undefined,
     },
     additionalProperty,
     image,
@@ -200,14 +211,127 @@ export const toProduct = (
     offers: {
       "@type": "AggregateOffer" as const,
       priceCurrency: "BRL",
-      lowPrice: variant.price ?? variant.properties?.price ??
-        variant.properties?.oldPrice ?? 0,
-      highPrice: variant.oldPrice ?? variant.properties?.oldPrice ??
-        variant.properties?.price ?? 0,
+      lowPrice: variant.properties?.price ?? variant.properties?.oldPrice ?? 0,
+      highPrice: variant.properties?.oldPrice ?? variant.properties?.price ?? 0,
       offerCount: offers.length,
       offers,
     },
   };
+};
+
+const productFromChaordic = (
+  product: ChaordicProduct,
+  origin: string,
+  variantId?: string,
+  level = 0,
+): Product => {
+  const variants = product.skus ?? [];
+  const variant = pickVariant(product.skus, variantId);
+
+  const offer = toOffer(variant);
+  const offers = offer ? [offer] : [];
+
+  const additionalProperty =
+    Object.entries(variant?.details ?? {})?.map(([key, value]) => ({
+      "@type": "PropertyValue" as const,
+      name: key,
+      value: sanitizeValue(value),
+    })) ?? [];
+
+  const hasVariant = level < 1
+    ? variants.map((variant) =>
+      productFromChaordic(product, origin, variant.sku, 1)
+    )
+    : [];
+
+  const toImage = (url: string) => ({
+    "@type": "ImageObject" as const,
+    alternateName: product.name,
+    url: fixURL(url),
+  });
+
+  const image = Object.values(product.images ?? {}).map(toImage) ?? [];
+
+  return {
+    "@type": "Product",
+    productID: `${product.id}`,
+    sku: `${variant.sku}`,
+    url: toProductUrl(product.url, origin, variant.sku),
+    category: product.categories.map((c) => c.name).join(">"),
+    name: variant?.name ?? product.name,
+    brand: {
+      "@type": "Brand",
+      "@id": `${product.brand}`,
+      name: product.brand ?? undefined,
+    },
+    additionalProperty,
+    image,
+    isVariantOf: {
+      "@type": "ProductGroup",
+      url: toProductUrl(product.url, origin),
+      name: product.name,
+      image,
+      productGroupID: product.id,
+      additionalProperty: [
+        ...Object
+          .entries(variant.specs ?? {})
+          .flatMap((
+            [key, value],
+          ) => {
+            if (Array.isArray(value)) {
+              return value.map((spec) => ({
+                "@type": "PropertyValue" as const,
+                name: key,
+                value: sanitizeValue(spec),
+              }));
+            }
+            return {
+              "@type": "PropertyValue" as const,
+              name: key,
+              value: sanitizeValue(value),
+            };
+          }),
+        ...Object
+          .entries(product.details)
+          .flatMap(([key, value]) => {
+            if (Array.isArray(value)) {
+              return value.map((spec) => ({
+                "@type": "PropertyValue" as const,
+                name: key,
+                value: sanitizeValue(spec),
+              }));
+            }
+            return {
+              "@type": "PropertyValue" as const,
+              name: key,
+              value: sanitizeValue(value),
+            };
+          }),
+      ],
+      hasVariant,
+    },
+    offers: {
+      "@type": "AggregateOffer" as const,
+      priceCurrency: "BRL",
+      lowPrice: variant.price ?? variant.oldPrice ?? 0,
+      highPrice: variant.oldPrice ?? variant.price ?? 0,
+      offerCount: offers.length,
+      offers,
+    },
+  };
+};
+
+export const toProduct = (
+  product: LinxProduct,
+  origin: string,
+  level = 0,
+): Product => {
+  const isImpulse = isImpulseProduct(product);
+  if (isImpulse) {
+    return productFromImpulse(product, origin, product.selectedSku, level);
+  }
+
+  return productFromChaordic(product, origin, undefined, level);
 };
 
 export const toUser = (user: Person): LinxUser => ({
@@ -325,9 +449,7 @@ export const toProductListingPage = (
       numberOfItems: 0,
     },
     sortOptions,
-    products: response.products.map((p) =>
-      toProduct(p, p.selectedSku ?? null, new URL(url).origin)
-    ),
+    products: response.products.map((p) => toProduct(p, new URL(url).origin)),
     pageInfo: {
       currentPage: page,
       nextPage,

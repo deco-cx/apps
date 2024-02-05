@@ -44,9 +44,7 @@ const loaders = async (
   const origin = new URL(req.url).origin;
   const result = {
     searches: [],
-    products: search.products.map((product) =>
-      toProduct(product, product.id, origin)
-    ),
+    products: search.products.map((product) => toProduct(product, origin)),
   };
 
   return result;
