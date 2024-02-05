@@ -15,9 +15,9 @@ export interface ChaordicAPI {
       source: Source;
       deviceId: string;
       url?: string;
-      categoryId?: string[];
-      tagId?: string[];
-      productId?: string[];
+      "categoryId[]"?: string[];
+      "tagId[]"?: string[];
+      "productId[]"?: string[];
       userId?: string;
       productFormat?: ProductFormat;
       salesChannel?: string;

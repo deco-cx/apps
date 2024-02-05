@@ -81,7 +81,7 @@ type Props =
 const generateParams = (
   props: Props,
   req: Request,
-): { name: PageName; categoryId?: string[]; productId?: string[] } => {
+): { name: PageName; "categoryId[]"?: string[]; "productId[]"?: string[] } => {
   switch (props.page) {
     case "home": {
       return {
@@ -89,30 +89,30 @@ const generateParams = (
       };
     }
     case "category": {
-      const categoryId = new URL(req.url).pathname.split("/").slice(1).filter((
-        path,
-      ) => path !== "hotsite");
+      const categoryId = new URL(req.url).pathname
+        .split("/")
+        .slice(1)
+        .filter((path) => path !== "hotsite");
 
       return {
         name: categoryId.length > 1 ? "subcategory" : "category",
-        categoryId,
+        "categoryId[]": categoryId,
       };
     }
     case "search": {
-      const productIds =
-        props.loader?.products.map((p) => p.productID).filter((
-          id,
-        ): id is string => typeof id === "string") ?? [];
+      const productIds = props.loader?.products
+        .map((p) => p.productID)
+        .filter((id): id is string => typeof id === "string") ?? [];
       return {
         name: "search",
-        productId: productIds,
+        "productId[]": productIds,
       };
     }
     case "product": {
       const productId = props.loader?.product.productID;
       return {
         name: "product",
-        productId: productId ? [productId] : [],
+        "productId[]": productId ? [productId] : [],
       };
     }
     default: {
