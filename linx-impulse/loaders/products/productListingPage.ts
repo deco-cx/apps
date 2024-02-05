@@ -1,6 +1,7 @@
 import type { Person, ProductListingPage } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import getDeviceId from "../../utils/deviceId.ts";
+import getSource from "../../utils/source.ts";
 import { sortOptions, toProductListingPage } from "../../utils/transform.ts";
 import type { SortBy } from "../../utils/types/linx.ts";
 
@@ -80,8 +81,9 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const { resultsPerPage, allowRedirect, showOnlyAvailable, user } = props;
-  const { apiKey, secretKey, salesChannel, api, device } = ctx;
+  const { apiKey, secretKey, salesChannel, api } = ctx;
   const deviceId = getDeviceId(req, ctx);
+  const source = getSource(ctx);
   const url = new URL(req.url);
 
   const category = props.categories && props.categories.length > 0
@@ -99,7 +101,6 @@ const loader = async (
     props.sort;
   const fields = url.searchParams.getAll("fields");
   const filter = url.searchParams.getAll("filter");
-  const source = device === "desktop" ? "desktop" : "mobile";
 
   try {
     if (!searchTerm && category.length >= 2 && category[0] === "hotsite") {

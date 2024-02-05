@@ -1,6 +1,7 @@
 import type { Suggestion } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import getDeviceId from "../../utils/deviceId.ts";
+import getSource from "../../utils/source.ts";
 import { toProduct, toSearch } from "../../utils/transform.ts";
 
 /**
@@ -19,7 +20,7 @@ const loaders = async (
     secretKey,
     deviceId: getDeviceId(req, ctx),
     salesChannel: ctx.salesChannel,
-    source: ctx.device === "desktop" ? "desktop" : "mobile",
+    source: getSource(ctx),
     productFormat: "complete",
   })
     .then((res) => res.json())

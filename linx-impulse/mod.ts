@@ -18,6 +18,7 @@ export interface State {
    */
   secretKey: string;
   salesChannel?: string;
+  enableMobileSource?: boolean;
 }
 
 export const color = 0xFF6A3B;

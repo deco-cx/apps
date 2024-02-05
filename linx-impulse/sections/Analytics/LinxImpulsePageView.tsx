@@ -4,6 +4,7 @@ import {
   ProductListingPage,
 } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
+import getSource from "../../utils/source.ts";
 import type { LinxMeta, LinxUser } from "../../utils/types/analytics.ts";
 
 declare global {
@@ -115,7 +116,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   const { event } = props;
 
   const url = new URL(req.url);
-  const source = device === "desktop" ? "desktop" : "mobile";
+  const source = getSource(ctx);
   const user: LinxUser | undefined = props.user
     ? {
       id: props.user["@id"] ?? props.user.email ?? "",
