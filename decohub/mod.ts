@@ -1,6 +1,6 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import { type App, AppModule, type FnContext, context } from "deco/mod.ts";
+import { type App, AppModule, context, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -63,7 +63,6 @@ export default async function App(
         },
       }
       : {},
-    
   };
 }
 
