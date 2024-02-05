@@ -1,5 +1,3 @@
-import type { Product } from "../types/linx.ts";
-
 export type PageName =
   | "home"
   | "product"
@@ -16,12 +14,12 @@ export type PageName =
 export type UserIdType = "userId" | "email";
 
 interface RecommendationDisplay {
-  references: Product[];
-  recommendations: Product[];
+  references: ChaordicProduct[];
+  recommendations: ChaordicProduct[];
   refreshReferenceUrl: string;
 }
 
-interface RecommendationShelf {
+export interface RecommendationShelf {
   id: string;
   title: string;
   name: string;
@@ -34,4 +32,65 @@ export interface RecommendationsResponse {
   top: RecommendationShelf[];
   middle: RecommendationShelf[];
   bottom: RecommendationShelf[];
+}
+
+interface Images {
+  [key: string | "default"]: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  parents: string[];
+}
+
+interface Tag {
+  id: string;
+  name: string;
+  parents: string[] | null;
+}
+
+interface Installment {
+  count: number;
+  price: number;
+}
+
+interface Details {
+  [key: string]: string | number | unknown[] | Record<string, unknown>;
+}
+
+interface Specs {
+  [key: string]: string | number | unknown[];
+}
+
+export interface ChaordicSku {
+  name: string;
+  url: string;
+  images: Images;
+  status: string;
+  price: number;
+  installment: Installment;
+  oldPrice: number;
+  eanCode: string;
+  details: Details;
+  sku: string;
+  specs: Specs;
+  customBusicess?: Record<string, unknown>;
+}
+
+export interface ChaordicProduct {
+  id: string;
+  name: string;
+  price: number;
+  oldPrice: number;
+  url: string;
+  images: Images;
+  brand: string;
+  installment: Installment;
+  status: string;
+  categories: Category[];
+  tags: Tag[] | null;
+  details: Record<string, string | number>;
+  skus: ChaordicSku[];
+  trackingUrl: string;
 }
