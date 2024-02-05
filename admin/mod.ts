@@ -97,7 +97,7 @@ export interface Props {
   github?: GithubProps;
   kubernetes?: K8sProps;
   subhosting?: SubhostingProps;
-  /** @description property used at deco play  */
+  /** @description property used at deco admin  */
   workspaces: SignalStringified<Workspace>[];
 }
 
