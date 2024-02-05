@@ -68,17 +68,39 @@ interface ViewEvent {
     };
 }
 
+interface ClickEventParams {
+  trackingId: string;
+  source: Source;
+  user?: LinxUser;
+  interactionType?: "PRODUCT_VIEW" | "ADD_TO_CART";
+}
+
+interface ChaordicClickEventParams {
+  trackingId: string;
+  interactionType: "SHELF_CLICK";
+}
+
 interface ClickEvent {
   event: "click";
+  params: ClickEventParams | ChaordicClickEventParams;
+}
+
+interface ImpressionEvent {
+  event: "impression";
   params: {
-    trackingId: string;
-    source: Source;
-    user?: LinxUser;
-    interactionType?: "PRODUCT_VIEW" | "ADD_TO_CART";
+    trackingImpression: string;
+    /**
+     * @description Contains the position of the first product shown in the visible area of the product shelf, with index from 0.
+     */
+    firstOffset: number;
+    /**
+     * @description Contains the position of the last product shown in the visible area of the product shelf
+     */
+    lastOffset: number;
   };
 }
 
-type Props = ViewEvent | ClickEvent;
+type Props = ViewEvent | ClickEvent | ImpressionEvent;
 
 /**
  * @docs https://docs.linximpulse.com/api/events/getting-started
@@ -89,7 +111,7 @@ const action = async (
   ctx: AppContext,
 ): Promise<null> => {
   const { event, params } = props;
-  const { eventsApi, api, salesChannel, secretKey, apiKey } = ctx;
+  const { eventsApi, api, salesChannel, secretKey, apiKey, chaordicApi } = ctx;
 
   switch (event) {
     case "view": {
@@ -185,7 +207,19 @@ const action = async (
       break;
     }
     case "click": {
-      const { trackingId, source, user, interactionType } = params;
+      const { trackingId, interactionType } = params;
+
+      // Chaordic event click
+      if (interactionType === "SHELF_CLICK") {
+        await chaordicApi["GET /v0/click"]({
+          trackingClick: trackingId,
+          deviceId: getDeviceId(req, ctx),
+        });
+        return null;
+      }
+
+      // Impulse event click
+      const { source, user } = params;
       await api["GET /engage/search/v3/clicks"]({
         apiKey,
         secretKey,
@@ -193,6 +227,16 @@ const action = async (
         source,
         userId: user?.id,
         interactionType,
+        deviceId: getDeviceId(req, ctx),
+      });
+      break;
+    }
+    case "impression": {
+      const { trackingImpression, firstOffset, lastOffset } = params;
+      await chaordicApi["GET /v0/impression"]({
+        trackingImpression,
+        firstOffset,
+        lastOffset,
         deviceId: getDeviceId(req, ctx),
       });
       break;

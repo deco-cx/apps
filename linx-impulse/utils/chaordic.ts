@@ -27,4 +27,20 @@ export interface ChaordicAPI {
       userIdType?: UserIdType;
     };
   };
+  "GET /v0/impression": {
+    response: void;
+    searchParams: {
+      trackingImpression: string;
+      firstOffset: number;
+      lastOffset: number;
+      deviceId: string;
+    };
+  };
+  "GET /v0/click": {
+    response: void;
+    searchParams: {
+      trackingClick: string;
+      deviceId: string;
+    };
+  };
 }
