@@ -1,6 +1,6 @@
 import { SourceMap } from "deco/blocks/app.ts";
 import { buildSourceMap } from "deco/blocks/utils.tsx";
-import { type App, AppModule, type FnContext } from "deco/mod.ts";
+import { type App, AppModule, type FnContext, context } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -45,16 +45,25 @@ export default async function App(
         // build apps based on name
         ...dynamicApps,
         ...manifest.apps,
-        [ADMIN_APP]: await import(
-          resolvedImport
-        ),
+        ...context.play // this is an optimization to not include the admin code for everyone in case of play is not being used.
+          ? {
+            [ADMIN_APP]: await import(
+              resolvedImport
+            ),
+          }
+          : {},
       },
     } as Manifest,
     state,
-    sourceMap: {
-      ...enhancedSourceMap,
-      [ADMIN_APP]: resolvedImport,
-    },
+    ...context.play
+      ? {
+        sourceMap: {
+          ...enhancedSourceMap,
+          [ADMIN_APP]: resolvedImport,
+        },
+      }
+      : {},
+    
   };
 }
 
