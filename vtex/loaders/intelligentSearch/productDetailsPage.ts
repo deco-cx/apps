@@ -142,7 +142,7 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   if (!isAnonymous(ctx)) {
     return null;
   }
@@ -152,6 +152,7 @@ export const cacheKey = (req: Request, ctx: AppContext) => {
   const params = new URLSearchParams();
   params.set("skuId", url.searchParams.get("skuId") ?? "");
   params.set("segment", token);
+  params.set("slug", props.slug);
 
   url.search = params.toString();
 
