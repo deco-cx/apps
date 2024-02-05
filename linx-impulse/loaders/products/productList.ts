@@ -154,17 +154,6 @@ const loader = async (
     ? shelves.find((r) => r.feature === props.feature) || shelves[0]
     : shelves[0];
 
-  console.log(shelves, {
-    ...params,
-    apiKey,
-    secretKey,
-    deviceId,
-    source,
-    salesChannel,
-    showOnlyAvailable,
-    productFormat: "complete",
-  });
-
   if (!shelf || !shelf.displays.length) {
     return null;
   }
