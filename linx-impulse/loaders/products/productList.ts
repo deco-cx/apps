@@ -16,6 +16,8 @@ interface BaseProps {
   /**
    * @title Feature
    * @description Search for a specific feature, if not informed or found, the first one will be used
+   * @format dynamic-options
+   * @options linx-impulse/loaders/products/options.ts?type=home
    */
   feature?: string;
   showOnlyAvailable?: boolean;
@@ -29,6 +31,13 @@ interface HomePageProps extends BaseProps {
    * @hide
    */
   page: "home";
+  /**
+   * @title Feature
+   * @description Search for a specific feature, if not informed or found, the first one will be used
+   * @format dynamic-options
+   * @options linx-impulse/loaders/products/options.ts?type=home
+   */
+  feature?: string;
 }
 
 /**
@@ -39,6 +48,13 @@ interface ProductPageProps extends BaseProps {
    * @hide
    */
   page: "product";
+  /**
+   * @title Feature
+   * @description Search for a specific feature, if not informed or found, the first one will be used
+   * @format dynamic-options
+   * @options linx-impulse/loaders/products/options.ts?type=product
+   */
+  feature?: string;
   /**
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
@@ -53,6 +69,13 @@ interface CategoryPageProps extends BaseProps {
    * @hide
    */
   page: "category";
+  /**
+   * @title Feature
+   * @description Search for a specific feature, if not informed or found, the first one will be used
+   * @format dynamic-options
+   * @options linx-impulse/loaders/products/options.ts?type=category
+   */
+  feature?: string;
 }
 
 /**
@@ -63,6 +86,13 @@ interface SearchPageProps extends BaseProps {
    * @hide
    */
   page: "search";
+  /**
+   * @title Feature
+   * @description Search for a specific feature, if not informed or found, the first one will be used
+   * @format dynamic-options
+   * @options linx-impulse/loaders/products/options.ts?type=search
+   */
+  feature?: string;
   /**
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
