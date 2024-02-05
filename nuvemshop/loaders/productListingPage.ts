@@ -15,6 +15,12 @@ export interface Props {
   limit: number;
   // Sort in NuvemShort do not work when using q in query params
   // sort?: NuvemShopSort;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 /**
@@ -27,7 +33,7 @@ async function loader(
 ): Promise<ProductListingPage | null> {
   const { api, storeId } = ctx;
   const { url: baseUrl } = req;
-  const url = new URL(baseUrl);
+  const url = new URL(props.pageHref || baseUrl);
 
   const per_page = props.limit ?? 10;
   const page = Number(url.searchParams.get("page")) || 1;
