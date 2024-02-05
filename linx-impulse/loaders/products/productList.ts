@@ -6,6 +6,7 @@ import type {
 } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import getDeviceId from "../../utils/deviceId.ts";
+import getSource from "../../utils/source.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { PageName } from "../../utils/types/chaordic.ts";
 
@@ -163,9 +164,9 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const { showOnlyAvailable } = props;
-  const { chaordicApi, apiKey, secretKey, salesChannel, device } = ctx;
+  const { chaordicApi, apiKey, secretKey, salesChannel } = ctx;
   const deviceId = getDeviceId(req, ctx);
-  const source = device === "desktop" ? "desktop" : "mobile";
+  const source = getSource(ctx);
 
   const params = generateParams(props, req);
 
