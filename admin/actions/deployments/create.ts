@@ -565,7 +565,9 @@ export default async function create(
 
     res.envVars = {
       ...res.envVars,
-      DECO_RELEASE: `file://${platform.sourceDirectory}/${DECOFILE_NAME}`,
+      DECO_RELEASE: `file://${
+        platform.sourceDirectory ?? "/src"
+      }/${DECOFILE_NAME}`,
       DECO_SITE_NAME: props.site,
     };
 

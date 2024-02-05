@@ -1,3 +1,4 @@
+import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
@@ -38,7 +39,10 @@ export interface BlockStore extends Release {
   patch(
     resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>>;
-  update(resolvables: Record<string, Resolvable>): Promise<void>;
+  set(
+    resolvables: Record<string, Resolvable>,
+    reivsion?: string,
+  ): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
@@ -55,6 +59,7 @@ export interface GithubEventListener<
 
 export interface State {
   storage: BlockStore;
+  release: () => Release;
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
@@ -125,13 +130,17 @@ export default function App(
   return {
     manifest,
     state: {
+      storage,
+      release: () => {
+        const ctx = Context.active();
+        return ctx.release!;
+      },
       githubWebhookSecret,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
         prEventHandler as GithubEventListener,
       ],
-      storage,
       octokit: new Octokit({
         auth: githubAPIToken,
       }),

@@ -10,7 +10,7 @@ import {
 import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
 import { assertsOrBadRequest } from "../assertions.ts";
 import { ignoreIfExists, upsertObject } from "../objects.ts";
-import { routeOf } from "./route.ts";
+import { revisionRoute } from "./route.ts";
 import { knativeServiceOf } from "./service.ts";
 
 export interface DeployOptions {
@@ -76,7 +76,7 @@ const deployService = async (
     "v1",
     siteNs,
     "routes",
-    routeOf({
+    revisionRoute({
       routeName: deploymentRoute,
       revisionName,
       namespace: siteNs,

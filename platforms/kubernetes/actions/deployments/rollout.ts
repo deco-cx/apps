@@ -1,4 +1,4 @@
-import { routeOf } from "../../common/knative/route.ts";
+import { revisionRoute } from "../../common/knative/route.ts";
 import { upsertObject } from "../../common/objects.ts";
 import { AppContext } from "../../mod.ts";
 import { Namespace } from "../sites/create.ts";
@@ -24,7 +24,7 @@ export default async function rollout(
   const revisionName = `${site}-site-${deploymentId}`;
   await upsertObject(
     ctx.kc,
-    routeOf({
+    revisionRoute({
       routeName: Routes.prod(site),
       revisionName,
       namespace: Namespace.forSite(site),
