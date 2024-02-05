@@ -10,6 +10,7 @@ export interface DynamicApp {
   sourceMap?: SourceMap;
 }
 export interface State {
+  enableAdmin?: boolean;
   apps: DynamicApp[];
 }
 
@@ -45,7 +46,7 @@ export default async function App(
         // build apps based on name
         ...dynamicApps,
         ...manifest.apps,
-        ...context.play // this is an optimization to not include the admin code for everyone in case of play is not being used.
+        ...context.play || state.enableAdmin // this is an optimization to not include the admin code for everyone in case of play is not being used.
           ? {
             [ADMIN_APP]: await import(
               resolvedImport
@@ -55,7 +56,7 @@ export default async function App(
       },
     } as Manifest,
     state,
-    ...context.play
+    ...context.play || state.enableAdmin
       ? {
         sourceMap: {
           ...enhancedSourceMap,
