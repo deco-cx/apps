@@ -2,6 +2,7 @@ import type {
   Product,
   ProductDetailsPage,
   ProductListingPage,
+  PropertyValue,
 } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import getDeviceId from "../../utils/deviceId.ts";
@@ -188,9 +189,26 @@ const loader = async (
     return null;
   }
 
-  const products = shelf.displays[0].recommendations.map((p) =>
-    toProduct(p, p.selectedSku ?? null, new URL(req.url).origin)
+  const trackingImpression = new URL(shelf.impressionUrl).searchParams.get(
+    "trackingImpression",
   );
+  const products = shelf.displays[0].recommendations.map((p) => {
+    const product = toProduct(p, new URL(req.url).origin);
+    const impressionProperty: PropertyValue = {
+      "@type": "PropertyValue",
+      name: "trackingImpression",
+      value: trackingImpression ?? "",
+    };
+
+    if (Array.isArray(product.additionalProperty)) {
+      product.additionalProperty.push(impressionProperty);
+      return product;
+    }
+
+    product.additionalProperty = [impressionProperty];
+
+    return product;
+  });
 
   return products;
 };
