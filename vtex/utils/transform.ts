@@ -303,7 +303,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     items,
   } = product;
   const { name, ean, itemId: skuId, referenceId = [], kitItems, videos } = sku;
-  const video = nonEmptyArray(videos);
+  const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
@@ -355,7 +355,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     };
   }) ?? [DEFAULT_IMAGE];
 
-  const finalVideos = video && video.map((video) => {
+  const finalVideos = nonEmptyVideos?.map((video) => {
     const url = video;
     const alternateName = "Product video";
     const name = "Product video";
@@ -406,7 +406,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: finalVideos ? [...finalImages, ...finalVideos] : finalImages,
+    image: finalImages.concat(finalVideos || []),
     offers: aggregateOffers(offers, priceCurrency),
   };
 };
