@@ -27,16 +27,29 @@ export interface Props {
    * @description overides the query term
    */
   query?: string;
-  /** */
+  /**
+   * @title Collection Name
+   */
   collectionName?: string;
   /**
    * @title Items per page
    * @description number of products per page to display
    */
   count: number;
-
+  /**
+   * @hide
+   * @description it is hidden because only page prop is not sufficient, we need cursors
+   */
   page?: number;
+  /**
+   * @hide
+   * @description at admin user do not know cursor, it is useful to invokes like show more products
+   */
   startCursor?: string;
+    /**
+   * @hide
+   * @description at admin user do not know cursor, it is useful to invokes like show more products
+   */
   endCursor?: string;
 }
 
