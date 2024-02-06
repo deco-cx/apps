@@ -1,7 +1,7 @@
 import { AppRuntime } from "deco/types.ts";
 import { App } from "../mod.ts";
 import type { JSX } from "preact";
-import { context } from "deco/live.ts";
+import { Context } from "deco/live.ts";
 import { BaseContext } from "deco/engine/core/resolver.ts";
 
 export interface Props {
@@ -13,6 +13,7 @@ export const PreviewVtex = (
     markdownContent: () => JSX.Element;
   },
 ) => {
+  const context = Context.active();
   const decoSite = context.site;
   const publicUrl = app.state?.publicUrl || "";
   const account = app.state?.account || "";

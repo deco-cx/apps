@@ -90,6 +90,12 @@ export interface Props {
    * @description Set the starting page offset. Default to 1.
    */
   pageOffset?: 0 | 1;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 const OUTSIDE_ATTRIBUTES_FILTERS = ["precoPor"];
@@ -122,8 +128,8 @@ const searchLoader = async (
 ): Promise<ProductListingPage | null> => {
   // get url from params
   const url = new URL(req.url).pathname === "/live/invoke"
-    ? new URL(req.headers.get("referer") ?? req.url)
-    : new URL(req.url);
+    ? new URL(props.pageHref || req.headers.get("referer") || req.url)
+    : new URL(props.pageHref || req.url);
 
   const { storefront } = ctx;
 
