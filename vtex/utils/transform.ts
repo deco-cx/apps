@@ -302,7 +302,8 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [], kitItems } = sku;
+  const { name, ean, itemId: skuId, referenceId = [], kitItems, videos } = sku;
+  const video = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
@@ -338,6 +339,35 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       model: productReference,
     } satisfies ProductGroup)
     : undefined;
+
+  const finalImages = images?.map(({ imageUrl, imageText, imageLabel }) => {
+    const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
+    const alternateName = imageText || imageLabel || "";
+    const name = imageLabel || "";
+    const encodingFormat = "image";
+
+    return {
+      "@type": "ImageObject" as const,
+      alternateName,
+      url,
+      name,
+      encodingFormat,
+    };
+  }) ?? [DEFAULT_IMAGE];
+
+  const finalVideos = video && video.map((video) => {
+    const url = video;
+    const alternateName = "Product video";
+    const name = "Product video";
+    const encodingFormat = "video";
+    return {
+      "@type": "ImageObject" as const,
+      alternateName,
+      url,
+      name,
+      encodingFormat,
+    };
+  });
 
   // From schema.org: A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy
   const categoriesString = splitCategory(product.categories[0]).join(
@@ -376,20 +406,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: images?.map(({ imageUrl, imageText, imageLabel }) => {
-      const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
-      const alternateName = imageText || imageLabel || "";
-      const name = imageLabel || "";
-      const encodingFormat = "image";
-
-      return {
-        "@type": "ImageObject" as const,
-        alternateName,
-        url,
-        name,
-        encodingFormat,
-      };
-    }) ?? [DEFAULT_IMAGE],
+    image: finalVideos ? [...finalImages, ...finalVideos] : finalImages,
     offers: aggregateOffers(offers, priceCurrency),
   };
 };

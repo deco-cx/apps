@@ -739,7 +739,7 @@ export interface Item {
   unitMultiplier: number;
   modalType: unknown | null;
   images: Image[];
-  Videos: string[];
+  videos: string[];
   variations: Array<{
     name: string;
     values: string[];
