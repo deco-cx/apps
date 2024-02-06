@@ -340,7 +340,7 @@ const loader = async (
     seo: pageTypesToSeo(
       pageTypes,
       baseUrl,
-      previousPage ? currentPage : undefined,
+      hasPreviousPage ? currentPage : undefined,
     ),
   };
 };
