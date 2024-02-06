@@ -46,7 +46,7 @@ export interface Props {
    * @description at admin user do not know cursor, it is useful to invokes like show more products
    */
   startCursor?: string;
-    /**
+  /**
    * @hide
    * @description at admin user do not know cursor, it is useful to invokes like show more products
    */
