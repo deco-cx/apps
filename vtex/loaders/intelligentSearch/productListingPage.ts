@@ -431,7 +431,15 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
 
-  const params = new URLSearchParams();
+  const params = new URLSearchParams([
+    ["query", props.query ?? ""],
+    ["count", props.count.toString()],
+    ["page", (props.page ?? 1).toString()],
+    ["sort", props.sort ?? ""],
+    ["fuzzy", props.fuzzy ?? ""],
+    ["hideUnavailableItems", props.hideUnavailableItems?.toString() ?? ""],
+    ["pageOffset", (props.pageOffset ?? 1).toString()],
+  ]);
 
   url.searchParams.forEach((value, key) => {
     if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !key.startsWith("filter.")) {
@@ -443,16 +451,6 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
 
   params.sort();
   params.set("segment", token);
-  params.set("query", props.query ?? "");
-  params.set("count", props.count.toString());
-  params.set("page", (props.page ?? 1).toString());
-  params.set("sort", props.sort ?? "");
-  params.set("fuzzy", props.fuzzy ?? "");
-  params.set(
-    "hideUnavailableItems",
-    props.hideUnavailableItems?.toString() ?? "",
-  );
-  params.set("pageOffset", (props.pageOffset ?? 1).toString());
 
   url.search = params.toString();
 
