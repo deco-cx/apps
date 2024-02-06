@@ -9,14 +9,14 @@ export interface Props {
   /**
    * @title Title template
    * @description add a %s whenever you want it to be replaced with the product name, category name or search term
-   * @default %s | Deco.cx
+   * @default %s
    */
   titleTemplate?: string;
   description?: string;
   /**
    * @title Description template
    * @description add a %s whenever you want it to be replaced with the product name, category name or search term
-   * @default %s | Deco.cx
+   * @default %s
    */
   descriptionTemplate?: string;
   /** @default website */

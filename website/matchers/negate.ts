@@ -8,7 +8,9 @@ export interface Props {
 }
 
 /**
- * @title Negates a matcher
+ * @title Negates
+ * @description Create conditions that target users who do not meet certain criteria
+ * @icon minus
  */
 const NegateMacher = ({ matcher }: Props) => (ctx: MatchContext) => {
   return !matcher(ctx);

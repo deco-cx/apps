@@ -16,8 +16,11 @@ export interface WrappedSegment {
  */
 const DEFAULT_SEGMENT: Partial<Segment> = {
   utmi_campaign: null,
+  utmi_page: null,
+  utmi_part: null,
   utm_campaign: null,
   utm_source: null,
+  utm_medium: null,
   channel: "1",
   cultureInfo: "pt-BR",
   currencyCode: "BRL",
@@ -25,8 +28,20 @@ const DEFAULT_SEGMENT: Partial<Segment> = {
   countryCode: "BRA",
 };
 
-export const isAnonymous = ({
-  payload: {
+const isDefautSalesChannel = (ctx: AppContext, channel?: string) => {
+  return channel ===
+    (ctx.salesChannel || DEFAULT_SEGMENT.channel ||
+      ctx.defaultSegment?.channel);
+};
+
+export const isAnonymous = (
+  ctx: AppContext,
+) => {
+  const payload = getSegmentFromBag(ctx)?.payload;
+  if (!payload) {
+    return true;
+  }
+  const {
     campaigns,
     utm_campaign,
     utm_source,
@@ -34,15 +49,15 @@ export const isAnonymous = ({
     channel,
     priceTables,
     regionId,
-  },
-}: WrappedSegment) =>
-  !campaigns &&
-  !utm_campaign &&
-  !utm_source &&
-  !utmi_campaign &&
-  !channel &&
-  !priceTables &&
-  !regionId;
+  } = payload;
+  return !campaigns &&
+    !utm_campaign &&
+    !utm_source &&
+    !utmi_campaign &&
+    (!channel || isDefautSalesChannel(ctx, channel)) &&
+    !priceTables &&
+    !regionId;
+};
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
   ctx.bag?.set(SEGMENT, data);
@@ -64,7 +79,10 @@ const serialize = ({
   regionId,
   utm_campaign,
   utm_source,
+  utm_medium,
   utmi_campaign,
+  utmi_page,
+  utmi_part,
   currencyCode,
   currencySymbol,
   countryCode,
@@ -78,7 +96,10 @@ const serialize = ({
     regionId,
     utm_campaign: utm_campaign && removeNonLatin1Chars(utm_campaign),
     utm_source: utm_source && removeNonLatin1Chars(utm_source),
+    utm_medium: utm_medium && removeNonLatin1Chars(utm_medium),
     utmi_campaign: utmi_campaign && removeNonLatin1Chars(utmi_campaign),
+    utmi_page: utmi_page && removeNonLatin1Chars(utmi_page),
+    utmi_part: utmi_part && removeNonLatin1Chars(utmi_part),
     currencyCode,
     currencySymbol,
     countryCode,
@@ -92,8 +113,11 @@ const parse = (cookie: string) => JSON.parse(atob(cookie));
 
 const SEGMENT_QUERY_PARAMS = [
   "utmi_campaign" as const,
+  "utmi_page" as const,
+  "utmi_part" as const,
   "utm_campaign" as const,
   "utm_source" as const,
+  "utm_medium" as const,
 ];
 
 export const buildSegmentCookie = (req: Request): Partial<Segment> => {
@@ -110,10 +134,15 @@ export const buildSegmentCookie = (req: Request): Partial<Segment> => {
 };
 
 export const withSegmentCookie = (
-  { token }: WrappedSegment,
+  segment: WrappedSegment,
   headers?: Headers,
 ) => {
   const h = new Headers(headers);
+  if (!segment) {
+    return h;
+  }
+
+  const { token } = segment;
 
   h.set("cookie", `${SEGMENT_COOKIE_NAME}=${token}`);
 

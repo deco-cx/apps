@@ -1,7 +1,7 @@
 import { AppContext } from "../mod.ts";
-import { AggregateRating, Product } from "../../commerce/types.ts";
+import { Product } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
-import { Ratings } from "../utils/types.ts";
+import { getRatingProduct } from "../utils/transform.ts";
 import { createClient, getProductId } from "../utils/client.ts";
 
 /**
@@ -37,22 +37,3 @@ export default function productList(
     });
   };
 }
-
-const getRatingProduct = ({
-  ratings,
-  productId,
-}: {
-  ratings: Ratings | undefined;
-  productId: string;
-}): AggregateRating | undefined => {
-  const rating = ratings?.[productId]?.[0];
-  if (!rating) {
-    return undefined;
-  }
-
-  return {
-    "@type": "AggregateRating",
-    ratingCount: Number(rating.count),
-    ratingValue: Number(parseFloat(rating.rate).toFixed(1)),
-  };
-};

@@ -9,7 +9,9 @@ export interface Props {
 }
 
 /**
- * @title User Agent Matcher
+ * @title User Agent
+ * @description Target users based on their web browser or operational system
+ * @icon world
  */
 const MatchUserAgent = (
   { includes, match }: Props,

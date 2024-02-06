@@ -12,6 +12,7 @@ import {
   RemoveItemFromCartMutation,
   RemoveItemFromCartMutationVariables,
 } from "../../utils/graphql/storefront.graphql.gen.ts";
+import { parseHeaders } from "../../utils/parseHeaders.ts";
 
 export interface Props {
   productVariantId: number;
@@ -24,6 +25,7 @@ const addToCart = (
   props: Props,
   cartId: string,
   ctx: AppContext,
+  headers: Headers,
 ) =>
   ctx.storefront.query<
     AddItemToCartMutation,
@@ -33,12 +35,13 @@ const addToCart = (
       input: { id: cartId, products: [props] },
     },
     ...AddItemToCart,
-  });
+  }, { headers });
 
 const removeFromCart = (
   props: Props,
   cartId: string,
   ctx: AppContext,
+  headers: Headers,
 ) =>
   ctx.storefront.query<
     RemoveItemFromCartMutation,
@@ -48,7 +51,7 @@ const removeFromCart = (
       input: { id: cartId, products: [{ ...props, quantity: 1e6 }] },
     },
     ...RemoveItemFromCart,
-  });
+  }, { headers });
 
 const action = async (
   props: Props,
@@ -56,20 +59,23 @@ const action = async (
   ctx: AppContext,
 ): Promise<Partial<CheckoutFragment>> => {
   const cartId = getCartCookie(req.headers);
+  const headers = parseHeaders(req.headers);
 
   if (!cartId) {
     throw new HttpError(400, "Missing cart cookie");
   }
 
-  let data = await removeFromCart(props, cartId, ctx);
+  let data = await removeFromCart(props, cartId, ctx, headers);
 
   if (props.quantity > 0) {
-    data = await addToCart(props, cartId, ctx);
+    data = await addToCart(props, cartId, ctx, headers);
   }
 
   const checkoutId = data.checkout?.checkoutId;
-  setCartCookie(ctx.response.headers, checkoutId);
 
+  if (cartId !== checkoutId) {
+    setCartCookie(ctx.response.headers, checkoutId);
+  }
   return data.checkout ?? {};
 };
 

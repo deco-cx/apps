@@ -1,7 +1,7 @@
 import { context } from "deco/live.ts";
-import GoogleTagManager from "partytown/integrations/GTM.tsx";
-import GoogleTagScript from "partytown/integrations/GTAG.tsx";
 import Script from "partytown/Script.tsx";
+import GoogleTagScript from "partytown/integrations/GTAG.tsx";
+import GoogleTagManager from "partytown/integrations/GTM.tsx";
 import { AnalyticsEvent } from "../../../commerce/types.ts";
 
 declare global {
@@ -18,17 +18,17 @@ declare global {
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const sendAnalyticsEvent = <T extends AnalyticsEvent>(
-  event: T,
-) => {
-  window.dataLayer && window.dataLayer.push({ ecommerce: null });
-  window.dataLayer && window.dataLayer.push({
-    event: event.name,
-    ecommerce: event.params,
-  });
+const sendAnalyticsEvent = <T extends AnalyticsEvent>(event: T) => {
+  globalThis.window.dataLayer &&
+    globalThis.window.dataLayer.push({ ecommerce: null });
+  globalThis.window.dataLayer &&
+    globalThis.window.dataLayer.push({
+      event: event.name,
+      ecommerce: event.params,
+    });
 
-  window.DECO_ANALYTICS &&
-    Object.values(window.DECO_ANALYTICS).map((f) =>
+  globalThis.window.DECO_ANALYTICS &&
+    Object.values(globalThis.window.DECO_ANALYTICS).map((f) =>
       f("track", "ecommerce", event)
     );
 };
@@ -54,30 +54,33 @@ export interface Props {
   dangerouslyRunOnMainThread?: boolean;
 }
 
-export default function Analtyics(
-  { trackingIds, src, dangerouslyRunOnMainThread, googleAnalyticsIds }: Props,
-) {
+export default function Analtyics({
+  trackingIds,
+  src,
+  dangerouslyRunOnMainThread,
+  googleAnalyticsIds,
+}: Props) {
   const isDeploy = !!context.isDeploy;
   return (
     <>
       {/* TODO: Add debug from query string @author Igor Brasileiro */}
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}
-      {isDeploy && trackingIds && (
+      {isDeploy &&
+        trackingIds &&
         trackingIds.map((trackingId) => (
           <GoogleTagManager
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
           />
-        ))
-      )}
-      {isDeploy && googleAnalyticsIds && (
+        ))}
+      {isDeploy &&
+        googleAnalyticsIds &&
         googleAnalyticsIds.map((trackingId) => (
           <GoogleTagScript
             trackingId={trackingId.trim()}
             dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
           />
-        ))
-      )}
+        ))}
       {isDeploy && src && (
         <GoogleTagManager
           src={src}

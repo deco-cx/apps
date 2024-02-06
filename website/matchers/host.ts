@@ -9,7 +9,9 @@ export interface Props {
 }
 
 /**
- * @title Host Matcher
+ * @title Host
+ * @description Target users based on the domain or subdomain they are accessing your site from
+ * @icon world-www
  */
 const MatchHost = (
   { includes, match }: Props,

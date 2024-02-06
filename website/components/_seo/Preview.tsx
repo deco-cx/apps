@@ -12,7 +12,7 @@ import Slack from "./Slack.tsx";
 import Telegram from "./Telegram.tsx";
 import Twitter from "./Twitter.tsx";
 import WhatsApp from "./WhatsApp.tsx";
-import instructions from "./instructions.json" assert { type: "json" };
+import instructions from "./instructions.json" with { type: "json" };
 
 type SeoProps = ComponentProps<typeof Seo>;
 
@@ -95,7 +95,7 @@ function PreviewItem(
 }
 
 function Preview(props: SeoProps) {
-  const path = useMemo(() => window.location?.host, []);
+  const path = useMemo(() => globalThis.window.location?.host, []);
 
   return (
     <>

@@ -39,8 +39,9 @@ const ideviceToDevice: Record<string, Device> = {
 };
 
 /**
- * @title Device Matcher
- * @description Matches the user based on the used device, options are: mobile, desktop or tablet.
+ * @title Device
+ * @description Target users based on their device type, such as desktop, tablet, or mobile
+ * @icon device-mobile
  */
 const MatchDevice = (
   { mobile, tablet, desktop, ...rest }: Props,

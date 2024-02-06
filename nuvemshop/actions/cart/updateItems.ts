@@ -32,7 +32,6 @@ const action = async (
 
   const urlencoded = new URLSearchParams();
   urlencoded.append(`quantity[${itemId}]`, quantity.toString());
-
   const requestOptions = {
     method: "POST",
     headers: myHeaders,

@@ -36,7 +36,16 @@ async function loader(
     return null;
   }
 
-  const [product] = toProduct(nuvemProduct[0], new URL(req.url), sku);
+  const defaultProduct = nuvemProduct[0].variants[0];
+  const productBySku = nuvemProduct[0].variants.filter((variant) =>
+    variant.sku === sku || variant.id.toString() === sku
+  );
+  const product = toProduct(
+    productBySku[0] || defaultProduct,
+    nuvemProduct[0],
+    new URL(url),
+    0,
+  );
 
   return {
     "@type": "ProductDetailsPage",

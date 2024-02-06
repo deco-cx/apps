@@ -13,7 +13,6 @@ import {
   ProductFragment as ProductShopify,
   ProductVariantFragment as SkuShopify,
 } from "./storefront/storefront.graphql.gen.ts";
-import { SelectedOption as SelectedOptionShopify } from "./types.ts";
 
 const getPath = ({ handle }: ProductShopify, sku?: SkuShopify) =>
   sku
@@ -53,6 +52,14 @@ export const toProductPage = (
     "@type": "ProductDetailsPage",
     breadcrumbList: toBreadcrumbList(product, sku),
     product: toProduct(product, sku, url),
+    // In shopify storefront, if the product SEO properties are identical
+    // to the product title and description, they are not returned.
+    // See: https://github.com/Shopify/storefront-api-feedback/discussions/181#discussioncomment-5734355
+    seo: {
+      title: product.seo?.title ?? product.title,
+      description: product.seo?.description ?? product.description,
+      canonical: `${url.origin}${getPath(product, sku)}`,
+    },
   };
 };
 
@@ -97,7 +104,14 @@ export const toProduct = (
     compareAtPrice,
   } = sku;
 
-  const additionalProperty = selectedOptions.map(toPropertyValue);
+  const descriptionHtml: PropertyValue = {
+    "@type": "PropertyValue",
+    "name": "descriptionHtml",
+    "value": product.descriptionHtml,
+  };
+  const additionalProperty: PropertyValue[] = selectedOptions.map(
+    toPropertyValue,
+  ).concat(descriptionHtml);
   const skuImages = nonEmptyArray([image]);
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));
@@ -130,17 +144,44 @@ export const toProduct = (
       "@type": "ProductGroup",
       productGroupID,
       hasVariant: hasVariant || [],
-      url: `${url.host}${getPath(product)}`,
+      url: `${url.origin}${getPath(product)}`,
       name: product.title,
-      additionalProperty: [],
+      additionalProperty: [
+        ...product.tags?.map((value) =>
+          toPropertyValue({ name: "TAG", value })
+        ),
+        ...product.collections?.nodes.map((
+          { title, handle, id, description, descriptionHtml, image },
+        ) =>
+          toPropertyValue({
+            "@id": id,
+            name: "COLLECTION",
+            value: title,
+            valueReference: handle,
+            description,
+            disambiguatingDescription: descriptionHtml,
+            ...(image &&
+              {
+                image: [{
+                  "@type": "ImageObject",
+                  encodingFormat: "image",
+                  alternateName: image.altText ?? "",
+                  url: image.url,
+                }],
+              }),
+          })
+        ),
+      ],
       image: nonEmptyArray(images.nodes)?.map((img) => ({
         "@type": "ImageObject",
+        encodingFormat: "image",
         alternateName: img.altText ?? "",
         url: img.url,
       })),
     },
     image: skuImages?.map((img) => ({
       "@type": "ImageObject",
+      encodingFormat: "image",
       alternateName: img?.altText ?? "",
       url: img?.url,
     })) ?? [DEFAULT_IMAGE],
@@ -165,7 +206,9 @@ export const toProduct = (
   };
 };
 
-const toPropertyValue = (option: SelectedOptionShopify): PropertyValue => ({
+const toPropertyValue = (
+  option: Omit<PropertyValue, "@type">,
+): PropertyValue => ({
   "@type": "PropertyValue",
   ...option,
 });

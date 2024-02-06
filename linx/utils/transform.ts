@@ -143,6 +143,7 @@ export const toProduct = (
 
   const toImage = (url: string) => ({
     "@type": "ImageObject" as const,
+    encodingFormat: "image",
     alternateName: product.Name,
     url: new URL(url, cdn).href,
   });

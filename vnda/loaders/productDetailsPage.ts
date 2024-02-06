@@ -32,8 +32,10 @@ async function loader(
   }, STALE)
     .then((r) => r.json()).catch(() => null);
 
+  const variantsLength = maybeProduct?.variants?.length ?? 0;
+
   // 404: product not found
-  if (!maybeProduct) {
+  if (!maybeProduct || variantsLength === 0) {
     return null;
   }
 
@@ -43,6 +45,17 @@ async function loader(
   });
 
   const segments = url.pathname.slice(1).split("/");
+
+  let seoArray;
+  if (product.isVariantOf?.productGroupID) {
+    seoArray = await api["GET /api/v2/seo_data"]({
+      resource_type: "Product",
+      resource_id: Number(product.isVariantOf.productGroupID),
+    }, STALE).then((res) => res.json())
+      .catch(() => undefined);
+  }
+
+  const seo = seoArray?.at(-1);
 
   return {
     "@type": "ProductDetailsPage",
@@ -59,8 +72,8 @@ async function loader(
     },
     product,
     seo: {
-      title: product.name ?? "",
-      description: product.description ?? "",
+      title: seo?.title || (product.name ?? ""),
+      description: seo?.description || (product.description ?? ""),
       canonical: new URL(`/${segments.join("/")}`, url).href,
     },
   };

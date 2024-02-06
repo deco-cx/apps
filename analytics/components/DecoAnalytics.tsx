@@ -6,6 +6,7 @@ export interface Props {
    * @description paths to be excluded.
    */
   exclude?: string;
+  domain?: string;
 }
 
 declare global {
@@ -22,7 +23,8 @@ const snippet = () => {
   // Flags and additional dimentions
   const props: Record<string, string> = {};
 
-  const trackPageview = () => window.plausible("pageview", { props });
+  const trackPageview = () =>
+    globalThis.window.plausible("pageview", { props });
 
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
@@ -39,7 +41,7 @@ const snippet = () => {
   const truncate = (str: string) => `${str}`.slice(0, 990);
 
   // setup plausible script and unsubscribe
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (!event || event.name !== "deco") return;
 
     if (event.params) {
@@ -55,7 +57,7 @@ const snippet = () => {
     trackPageview();
   })();
 
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (!event) return;
 
     const { name, params } = event;
@@ -69,16 +71,16 @@ const snippet = () => {
 
       if (value !== null && value !== undefined) {
         values[key] = truncate(
-          (typeof value !== "object") ? value : JSON.stringify(value),
+          typeof value !== "object" ? value : JSON.stringify(value),
         );
       }
     }
 
-    window.plausible(name, { props: values });
+    globalThis.window.plausible(name, { props: values });
   });
 };
 
-function Component({ exclude }: Props) {
+function Component({ exclude, domain }: Props) {
   return (
     <Head>
       <link rel="dns-prefetch" href="https://plausible.io/api/event" />
@@ -89,6 +91,7 @@ function Component({ exclude }: Props) {
       />
       <script
         defer
+        data-domain={domain}
         data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
         data-api="https://plausible.io/api/event"
         src="https://plausible.io/js/script.manual.js"

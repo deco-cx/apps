@@ -57,7 +57,7 @@ export const itemToAnalyticsItem = (
   item_name: item.name ?? item.skuName ?? "",
   item_variant: item.skuName,
   item_brand: item.additionalInfo.brandName ?? "",
-  item_url: new URL(item.detailUrl, window.location.href).href,
+  item_url: new URL(item.detailUrl, globalThis.window.location.href).href,
   ...(mapItemCategoriesToAnalyticsCategories(item)),
 });
 
@@ -88,6 +88,7 @@ const state = {
   addItemAttachment: enqueue("vtex/actions/cart/updateItemAttachment.ts"),
   removeItemAttachment: enqueue("vtex/actions/cart/removeItemAttachment.ts"),
   sendAttachment: enqueue("vtex/actions/cart/updateAttachment.ts"),
+  updateGifts: enqueue("vtex/actions/cart/updateGifts.ts"),
   simulate: invoke.vtex.actions.cart.simulation,
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };

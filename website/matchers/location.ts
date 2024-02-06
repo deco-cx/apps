@@ -51,7 +51,9 @@ const escaped = ({ city, country, regionCode }: Location): Location => {
   };
 };
 /**
- * @title Location Matcher
+ * @title Location
+ * @description Target users based on their geographical location, such as country, city, or region
+ * @icon map-2
  */
 export default function MatchLocation(
   { includeLocations, excludeLocations }: Props,
@@ -59,8 +61,8 @@ export default function MatchLocation(
 ) {
   const city = request.headers.get("cf-ipcity") ?? undefined;
   const country = request.headers.get("cf-ipcountry") ?? undefined;
-  const postalCode = request.headers.get("cf-postal-code") ?? undefined;
-  const userLocation = { city, country, postalCode };
+  const regionCode = request.headers.get("cf-region-code") ?? undefined;
+  const userLocation = { city, country, regionCode };
   const isLocationExcluded = excludeLocations?.some(
     matchLocation(false, userLocation),
   ) ?? false;

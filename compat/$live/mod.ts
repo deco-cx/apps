@@ -47,7 +47,6 @@ const manifestMappings: ManifestMappings = {
     "$live/pages/LivePage.tsx": "website/pages/Page.tsx",
   },
   loaders: {
-    "$live/loaders/secret.ts": "website/loaders/secret.ts",
     "$live/loaders/workflows/events.ts": "workflows/loaders/events.ts",
     "$live/loaders/workflows/get.ts": "workflows/loaders/get.ts",
   },

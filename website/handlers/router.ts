@@ -6,7 +6,7 @@ import {
 } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
-import { isFreshCtx } from "deco/handlers/fresh.ts";
+import { isFreshCtx } from "../handlers/fresh.ts";
 import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
@@ -23,16 +23,22 @@ interface MaybePriorityHandler {
 
 const HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE = 1000;
 
-const rankRoute = (pattern: string) =>
+const rankRoute = (pattern: string): number =>
   pattern
     .split("/")
     .reduce(
-      (acc, routePart) =>
-        routePart.endsWith("*")
-          ? acc
-          : routePart.startsWith(":")
-          ? acc + 1
-          : acc + 2,
+      (acc, routePart) => {
+        if (routePart === "*") {
+          return acc;
+        }
+        if (routePart.startsWith(":")) {
+          return acc + 1;
+        }
+        if (routePart.includes("*")) {
+          return acc + 2;
+        }
+        return acc + 3;
+      },
       0,
     );
 

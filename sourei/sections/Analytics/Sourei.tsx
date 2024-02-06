@@ -23,8 +23,8 @@ interface Props {
 }
 
 const snippet = () => {
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
+  globalThis.window.dataLayer = globalThis.window.dataLayer || [];
+  globalThis.window.dataLayer.push({
     "gtm.start": new Date().getTime(),
     event: "gtm.js",
   });
@@ -33,12 +33,10 @@ const snippet = () => {
 
   const fixId = ({ item_id, item_group_id, item_url, ...rest }: any) =>
     item_group_id
-      ? ({ item_id: `${item_group_id}_${item_id}`, ...rest })
-      : ({ item_id, ...rest });
+      ? { item_id: `${item_group_id}_${item_id}`, ...rest }
+      : { item_id, ...rest };
 
-  const fixPrices = (
-    { price, discount = 0, quantity = 1, ...rest }: any,
-  ) => ({
+  const fixPrices = ({ price, discount = 0, quantity = 1, ...rest }: any) => ({
     ...rest,
     quantity,
     discount: rounded(discount),
@@ -47,29 +45,26 @@ const snippet = () => {
 
   const fixIndex = ({ index, ...rest }: any) => ({ ...rest, index: index + 1 });
 
-  window.DECO.events.subscribe((event) => {
+  globalThis.window.DECO.events.subscribe((event) => {
     if (!event) return;
 
     if (event.name === "deco") {
-      window.dataLayer.push(event);
+      globalThis.window.dataLayer.push(event);
       return;
     }
 
     const ecommerce: any = { ...event.params };
 
     if (ecommerce && Array.isArray(ecommerce.items)) {
-      ecommerce.items = ecommerce.items
-        .map(fixId)
-        .map(fixPrices)
-        .map(fixIndex);
+      ecommerce.items = ecommerce.items.map(fixId).map(fixPrices).map(fixIndex);
     }
 
     if (typeof ecommerce.value === "number") {
       ecommerce.value = rounded(ecommerce.value);
     }
 
-    window.dataLayer.push({ ecommerce: null });
-    window.dataLayer.push({ event: event.name, ecommerce });
+    globalThis.window.dataLayer.push({ ecommerce: null });
+    globalThis.window.dataLayer.push({ event: event.name, ecommerce });
   });
 };
 
@@ -91,11 +86,7 @@ function Section({
           async={loading === "async"}
           type={loading === "module" ? "module" : "text/javascript"}
         />
-        <script
-          src={scriptAsDataURI(snippet)}
-          defer
-          type="text/javascript"
-        />
+        <script src={scriptAsDataURI(snippet)} defer type="text/javascript" />
       </Head>
 
       {/* Body */}

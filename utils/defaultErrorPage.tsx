@@ -138,8 +138,6 @@ const Squares = () => (
 );
 
 export default function ErrorPageComponent({ error }: Props) {
-  console.log("error", error);
-  console.log("asset", asset(`/sprites.svg#alert-circle`));
   return (
     <>
       <Head>

@@ -1,5 +1,6 @@
 import type {
   AggregateOffer,
+  Brand,
   BreadcrumbList,
   Filter,
   FilterToggleValue,
@@ -15,6 +16,7 @@ import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
+  Brand as BrandVTEX,
   Category,
   Facet as FacetVTEX,
   FacetValueBoolean,
@@ -378,8 +380,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
       const alternateName = imageText || imageLabel || "";
       const name = imageLabel || "";
+      const encodingFormat = "image";
 
-      return { "@type": "ImageObject" as const, alternateName, url, name };
+      return {
+        "@type": "ImageObject" as const,
+        alternateName,
+        url,
+        name,
+        encodingFormat,
+      };
     }) ?? [DEFAULT_IMAGE],
     offers: aggregateOffers(offers, priceCurrency),
   };
@@ -616,7 +625,7 @@ export const legacyFacetToFilter = (
   };
   return {
     "@type": "FilterToggle",
-    quantity: facets.length,
+    quantity: facets?.length,
     label: name,
     key: name,
     values: facets.map((facet) => {
@@ -626,13 +635,22 @@ export const legacyFacetToFilter = (
 
       const selected = mapSet.has(normalizedFacet.Map) &&
         pathSet.has(normalizedFacet.Value);
-
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
         url: getLink(normalizedFacet, selected),
         label: normalizedFacet.Name,
         selected,
+        children: facet.Children?.length > 0
+          ? legacyFacetToFilter(
+            normalizedFacet.Name,
+            facet.Children,
+            url,
+            map,
+            term,
+            behavior,
+          )
+          : undefined,
       };
     }),
   };
@@ -781,6 +799,16 @@ function nodeToNavbar(node: Category): SiteNavigationElement {
 export const categoryTreeToNavbar = (
   tree: Category[],
 ): SiteNavigationElement[] => tree.map(nodeToNavbar);
+
+export const toBrand = (
+  { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+): Brand => ({
+  "@type": "Brand",
+  "@id": `${id}`,
+  name,
+  logo: imageUrl ?? undefined,
+  description: metaTagDescription,
+});
 
 export const normalizeFacet = (facet: LegacyFacet) => {
   return {

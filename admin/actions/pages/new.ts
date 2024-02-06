@@ -1,5 +1,6 @@
 import { ANONYMOUS, AppContext, BlockState } from "../../mod.ts";
-import { PAGE_RESOLVE_TYPE } from "../../loaders/pages/list.ts";
+
+const PAGE_RESOLVE_TYPE = "website/pages/Page.tsx";
 
 export interface Props {
   name: string;

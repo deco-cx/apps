@@ -10,12 +10,18 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { ProductID, Sort } from "../../utils/types.ts";
+import {
+  LabelledFuzzy,
+  mapLabelledFuzzyToFuzzy,
+} from "./productListingPage.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
   /**
    * @title Collection ID (e.g.: 139)
    * @pattern \d*
+   * @format dynamic-options
+   * @options vtex/loaders/collections/list.ts
    */
   collection: string;
   /**
@@ -27,14 +33,26 @@ export interface CollectionProps extends CommonProps {
 }
 
 export interface QueryProps extends CommonProps {
-  /** @description query to use on search */
+  /**
+   * @description query to use on search
+   * @examples "shoes"\n"blue shoes"
+   */
   query: string;
   /**
    * @description search sort parameter
+   * @examples "price:asc"
    */
   sort?: Sort;
-  /** @description total number of items to display. Required for query */
+  /**
+   * @description total number of items to display. Required for query
+   * @examples 1\n2
+   */
   count: number;
+
+  /**
+   * @title Fuzzy
+   */
+  fuzzy?: LabelledFuzzy;
 }
 
 export interface ProductIDProps extends CommonProps {
@@ -85,6 +103,7 @@ const fromProps = ({ props }: Props) => {
       query: props.query || "",
       count: props.count || 12,
       sort: props.sort || "",
+      fuzzy: mapLabelledFuzzyToFuzzy(props.fuzzy),
       selectedFacets: [],
       hideUnavailableItems: props.hideUnavailableItems,
     } as const;
@@ -106,6 +125,7 @@ const fromProps = ({ props }: Props) => {
 /**
  * @title VTEX Integration - Intelligent Search
  * @description Product List loader
+ * @examples { "props": { "collection": "139", "count": 12 } }\n{ "props": { "query": "shoes", "count": 12 } }\n{ "props": { "ids": ["2000001", "2000002"], "count": 12 } }
  */
 const loader = async (
   expandedProps: Props,
@@ -131,7 +151,7 @@ const loader = async (
 
   const options = {
     baseUrl: url,
-    priceCurrency: segment.payload.currencyCode ?? "BRL",
+    priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   };
 
   // Transform VTEX product format into schema.org's compatible format

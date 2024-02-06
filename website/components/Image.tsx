@@ -99,6 +99,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
       )}
       <img
         {...props}
+        data-fresh-disable-lock={true}
         preload={undefined}
         src={props.src}
         srcSet={srcSet}

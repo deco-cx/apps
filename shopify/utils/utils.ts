@@ -126,10 +126,12 @@ export const getFiltersByUrl = (url: URL) => {
       filters.push({ tag: value });
     } else if (key.startsWith("filter.p.type")) {
       filters.push({ productType: value });
+    } else if (key.startsWith("filter.p.product_type")) {
+      filters.push({ productType: value });
     } else if (key.startsWith("filter.p.vendor")) {
       filters.push({ productVendor: value });
     } else if (key.startsWith("filter.v.availability")) {
-      filters.push({ available: value === "In Stock" });
+      filters.push({ available: value.toLowerCase() === "in stock" });
     } else if (key.startsWith("filter.v.price.gte")) {
       filters.push({ price: { min: Number(value) } });
     } else if (key.startsWith("filter.v.price.lte")) {

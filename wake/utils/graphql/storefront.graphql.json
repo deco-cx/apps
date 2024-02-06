@@ -4016,6 +4016,18 @@
               "deprecationReason": null
             },
             {
+              "name": "numberOfVotes",
+              "description": "The number of votes that the average rating consists of.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "attributes",
               "description": "List of the product attributes.",
               "args": [],
@@ -4095,6 +4107,18 @@
                   "name": "SingleProduct",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "collection",
+              "description": "The product collection.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -4655,6 +4679,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "variantStock",
+              "description": "The available aggregated variant stock at the default distribution center.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Long",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -6351,6 +6387,18 @@
               "deprecationReason": null
             },
             {
+              "name": "collection",
+              "description": "The product collection.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "condition",
               "description": "The product condition.",
               "args": [],
@@ -6842,6 +6890,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "variantStock",
+              "description": "The available aggregated variant stock at the default distribution center.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Long",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -19598,6 +19658,18 @@
               "deprecationReason": null
             },
             {
+              "name": "collection",
+              "description": "The product collection.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "condition",
               "description": "The product condition.",
               "args": [],
@@ -20153,6 +20225,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "variantStock",
+              "description": "The available aggregated variant stock at the default distribution center.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Long",
                 "ofType": null
               },
               "isDeprecated": false,

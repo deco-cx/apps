@@ -1,7 +1,12 @@
 import { AppContext } from "../mod.ts";
-import { getSegmentFromBag } from "./segment.ts";
+import { getSegmentFromBag, isAnonymous } from "./segment.ts";
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (_req: Request, ctx: AppContext) =>
-  getSegmentFromBag(ctx).token;
+// deno-lint-ignore no-explicit-any
+export const cacheKey = (_props: any, _req: Request, ctx: AppContext) => {
+  if (!isAnonymous(ctx)) {
+    return null;
+  }
+  return getSegmentFromBag(ctx)?.token;
+};

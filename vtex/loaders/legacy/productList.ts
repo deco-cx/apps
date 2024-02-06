@@ -5,13 +5,15 @@ import { toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { LegacySort } from "../../utils/types.ts";
+import type { LegacyItem, LegacySort } from "../../utils/types.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
   /**
    * @description Collection ID or (Product Cluster id). For more info: https://developers.vtex.com/docs/api-reference/search-api#get-/api/catalog_system/pub/products/search .
    * @pattern \d*
+   * @format dynamic-options
+   * @options vtex/loaders/collections/list.ts
    */
   collection: string;
   /**
@@ -93,6 +95,14 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 
 // deno-lint-ignore no-explicit-any
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
+
+const preferredSKU = (items: LegacyItem[], { props }: Props) => {
+  let fetchedSkus: string[] = [];
+  if (isSKUIDProps(props)) {
+    fetchedSkus = props.ids ?? [];
+  }
+  return items.find((item) => fetchedSkus.includes(item.itemId)) || items[0];
+};
 
 const fromProps = ({ props }: Props) => {
   const params = { fq: [] } as {
@@ -183,9 +193,9 @@ const loader = async (
   // If a property is missing from the final `products` array you can add
   // it in here
   const products = vtexProducts.map((p) =>
-    toProduct(p, p.items[0], 0, {
+    toProduct(p, preferredSKU(p.items, { props }), 0, {
       baseUrl: baseUrl,
-      priceCurrency: segment.payload.currencyCode ?? "BRL",
+      priceCurrency: segment?.payload?.currencyCode ?? "BRL",
     })
   );
 

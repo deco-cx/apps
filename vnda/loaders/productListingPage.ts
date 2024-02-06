@@ -24,6 +24,15 @@ export const VNDA_SORT_OPTIONS: SortOption[] = [
   { value: "highest_price", label: "Maior preço" },
 ];
 
+type Operators = "and" | "or";
+
+interface FilterOperator {
+  type_tags?: Operators;
+  property1?: Operators;
+  property2?: Operators;
+  property3?: Operators;
+}
+
 export interface Props {
   /**
    * @description overides the query term
@@ -45,6 +54,15 @@ export interface Props {
   slug?: RequestURLParam;
 
   filterByTags?: boolean;
+
+  /** @description if properties are empty, "typeTags" value will apply to all. Defaults to "and" */
+  filterOperator?: FilterOperator;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 const getBreadcrumbList = (categories: Tag[], url: URL): BreadcrumbList => ({
@@ -58,6 +76,14 @@ const getBreadcrumbList = (categories: Tag[], url: URL): BreadcrumbList => ({
   numberOfItems: categories.length,
 });
 
+const handleOperator = (
+  key: "type_tags" | "property1" | "property2" | "property3",
+  defaultValue: Operators,
+  filterOperators?: FilterOperator,
+) => ({
+  [`${key}_operator`]: filterOperators?.[key] ?? defaultValue ?? "and",
+});
+
 /**
  * @title VNDA Integration
  * @description Product Listing Page loader
@@ -68,7 +94,7 @@ const searchLoader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   // get url from params
-  const url = new URL(req.url);
+  const url = new URL(props.pageHref || req.url);
   const { api } = ctx;
 
   const count = props.count ?? 12;
@@ -88,9 +114,7 @@ const searchLoader = async (
   const properties2 = url.searchParams.getAll("type_tags[property2][]");
   const properties3 = url.searchParams.getAll("type_tags[property3][]");
 
-  const categoryTagNames = Object.values(
-    Object.fromEntries(url.searchParams.entries()),
-  );
+  const categoryTagNames = Array.from(url.searchParams.values());
 
   const tags = await Promise.all([
     ...categoryTagNames,
@@ -112,10 +136,6 @@ const searchLoader = async (
   const filteredTags = tags
     .filter((tag): tag is Tag => typeof tag !== "undefined");
 
-  const resolvedTagNames = filteredTags
-    .map((t) => t.name)
-    .filter((name): name is string => typeof name === "string");
-
   const { cleanUrl, typeTags } = typeTagExtractor(url, filteredTags);
 
   const initialTags = props.tags && props.tags?.length > 0
@@ -123,25 +143,57 @@ const searchLoader = async (
     : undefined;
 
   const categoryTagsToFilter = categories.length > 0 && props.filterByTags
-    ? resolvedTagNames
+    ? categories.map((t) => t.name)
+      .filter((name): name is string => typeof name === "string")
     : undefined;
 
-  const response = await api["GET /api/v2/products/search"]({
-    term,
-    sort,
-    page,
-    per_page: count,
-    "tags[]": initialTags ?? categoryTagsToFilter,
-    wildcard: true,
-    "property1_values[]": properties1,
-    "property2_values[]": properties2,
-    "property3_values[]": properties3,
-    ...Object.fromEntries(
-      typeTags.filter(({ isProperty }) => !isProperty).map((
-        { key, value },
-      ) => [key, value]),
-    ),
-  }, STALE);
+  const defaultOperator = props.filterOperator?.type_tags ?? "and";
+
+  const preference = categoryTagsToFilter
+    ? term
+    : qQueryString ?? url.pathname.slice(1);
+
+  const tag = categories.at(-1);
+
+  const [response, seo = []] = await Promise.all([
+    await api["GET /api/v2/products/search"]({
+      term: term ?? preference,
+      sort,
+      page,
+      per_page: count,
+      "tags[]": initialTags ?? categoryTagsToFilter,
+      wildcard: true,
+      "property1_values[]": properties1,
+      "property2_values[]": properties2,
+      "property3_values[]": properties3,
+      ...handleOperator("type_tags", defaultOperator, props.filterOperator),
+      ...handleOperator("property1", defaultOperator, props.filterOperator),
+      ...handleOperator("property2", defaultOperator, props.filterOperator),
+      ...handleOperator("property3", defaultOperator, props.filterOperator),
+      ...Object.fromEntries(
+        typeTags.reduce<Array<[string, Array<unknown>]>>(
+          (acc, { key, value, isProperty }) => {
+            if (isProperty) return acc;
+
+            const pos = acc.findIndex((item) => item[0] === key);
+
+            if (pos !== -1) {
+              acc[pos] = [key, [...acc[pos][1], value]];
+              return acc;
+            }
+
+            return [...acc, [key, [value]]];
+          },
+          [],
+        ),
+      ),
+    }, STALE),
+    api["GET /api/v2/seo_data"](
+      { resource_type: "Tag", code: tag?.name },
+      STALE,
+    ).then((res) => res.json())
+      .catch(() => undefined),
+  ]);
 
   const pagination = JSON.parse(
     response.headers.get("x-pagination") ?? "null",
@@ -149,14 +201,18 @@ const searchLoader = async (
 
   const search = await response.json();
 
-  const { results: searchResults } = search;
+  const { results: searchResults = [] } = search;
 
-  const products = searchResults?.map((product) =>
-    toProduct(product, null, {
+  const validProducts = searchResults.filter(({ variants }) => {
+    return variants.length !== 0;
+  });
+
+  const products = validProducts.map((product) => {
+    return toProduct(product, null, {
       url,
       priceCurrency: "BRL",
-    })
-  );
+    });
+  });
 
   const nextPage = new URLSearchParams(url.searchParams);
   const previousPage = new URLSearchParams(url.searchParams);
@@ -171,7 +227,7 @@ const searchLoader = async (
 
   return {
     "@type": "ProductListingPage",
-    seo: isSearchPage ? undefined : getSEOFromTag(categories, url),
+    seo: isSearchPage ? undefined : getSEOFromTag(categories, url, seo.at(-1)),
     breadcrumb: isSearchPage
       ? {
         "@type": "BreadcrumbList",
@@ -180,7 +236,7 @@ const searchLoader = async (
       }
       : getBreadcrumbList(categories, url),
     filters: toFilters(search.aggregations, typeTags, cleanUrl),
-    products: products ?? [],
+    products,
     pageInfo: {
       nextPage: pagination?.next_page ? `?${nextPage}` : undefined,
       previousPage: pagination?.prev_page ? `?${previousPage}` : undefined,

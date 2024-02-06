@@ -9,7 +9,9 @@ export interface Props {
 }
 
 /**
- * @title OR & AND Matcher
+ * @title Multi
+ * @description Create more complex conditions by combining multiple matchers
+ * @icon plus
  */
 const MatchMulti = ({ op, matchers }: Props) => (ctx: MatchContext) => {
   return op === "or"

@@ -6,6 +6,8 @@ export interface Props {
   /**
    * @default slug
    * @description Param name to extract from the Request URL
+   * @format dynamic-options
+   * @options website/loaders/options/urlParams.ts
    */
   param: string;
 }
