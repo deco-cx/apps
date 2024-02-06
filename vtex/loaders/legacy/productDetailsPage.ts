@@ -17,6 +17,11 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Return videos?
+   * @default false
+   */
+    returnVideos?: boolean;
 }
 
 /**
@@ -30,7 +35,7 @@ async function loader(
 ): Promise<ProductDetailsPage | null> {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const { slug } = props;
+  const { slug, returnVideos } = props;
   const haveToUseSlug = slug && !slug.startsWith(":");
   let defaultPaths;
   if (!haveToUseSlug) {
@@ -80,7 +85,7 @@ async function loader(
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
-  });
+  }, returnVideos);
 
   return {
     ...page,
