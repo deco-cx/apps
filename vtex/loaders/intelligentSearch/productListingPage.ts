@@ -140,6 +140,12 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 const searchArgsOf = (props: Props, url: URL) => {
@@ -266,7 +272,7 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const url = new URL(baseUrl);
+  const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
   const {
