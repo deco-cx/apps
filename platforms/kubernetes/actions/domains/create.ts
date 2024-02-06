@@ -7,6 +7,7 @@ import { Namespace } from "../sites/create.ts";
 export interface Props {
   site: string;
   domain: string;
+  ephemeral?: boolean;
 }
 
 /**
@@ -14,7 +15,7 @@ export interface Props {
  * @title Create Domain
  */
 export default async function newDomain(
-  { site, domain }: Props,
+  { site, domain, ephemeral }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
@@ -64,8 +65,11 @@ export default async function newDomain(
   };
 
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
+  const currentSitePromise = ctx.invoke.kubernetes.loaders.siteState.get({
+    site,
+  });
 
-  const [_certificate, _domainMapping, currentSiteState] = await Promise.all([
+  await Promise.all([
     k8sApi.createNamespacedCustomObject(
       "cert-manager.io",
       "v1",
@@ -80,8 +84,11 @@ export default async function newDomain(
       "domainmappings",
       domainMappingManifest,
     ),
-    ctx.invoke.kubernetes.loaders.siteState.get({ site }),
   ]);
+  if (ephemeral) {
+    return;
+  }
+  const currentSiteState = await currentSitePromise;
 
   if (!currentSiteState) {
     badRequest({ message: "site not found" });

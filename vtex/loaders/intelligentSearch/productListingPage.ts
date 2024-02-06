@@ -140,6 +140,12 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 const searchArgsOf = (props: Props, url: URL) => {
@@ -266,7 +272,7 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const url = new URL(baseUrl);
+  const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
   const {
@@ -418,7 +424,7 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (url.searchParams.has("q") || !isAnonymous(ctx)) {
@@ -437,6 +443,16 @@ export const cacheKey = (req: Request, ctx: AppContext) => {
 
   params.sort();
   params.set("segment", token);
+  params.set("query", props.query ?? "");
+  params.set("count", props.count.toString());
+  params.set("page", (props.page ?? 1).toString());
+  params.set("sort", props.sort ?? "");
+  params.set("fuzzy", props.fuzzy ?? "");
+  params.set(
+    "hideUnavailableItems",
+    props.hideUnavailableItems?.toString() ?? "",
+  );
+  params.set("pageOffset", (props.pageOffset ?? 1).toString());
 
   url.search = params.toString();
 
