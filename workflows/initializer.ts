@@ -1,4 +1,4 @@
-import { context } from "deco/live.ts";
+import { Context } from "deco/live.ts";
 import {
   Arg,
   cancel as durableCancel,
@@ -23,6 +23,7 @@ export const initOnce = () => {
   if (initialized) {
     return;
   }
+  const context = Context.active();
   initialized = true;
   const setupLocal = {
     durableEndpoint: "http://localhost:8001",
