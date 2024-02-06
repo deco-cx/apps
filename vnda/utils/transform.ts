@@ -323,8 +323,7 @@ const removeFilter = (
   filter: { key: string; value: string },
 ) =>
   typeTagsInUse.filter((inUse) =>
-    inUse.key !== filter.key &&
-    inUse.value !== filter.value
+    !(inUse.key === filter.key && inUse.value === filter.value)
   );
 
 export const toFilters = (
