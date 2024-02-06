@@ -133,7 +133,7 @@ export interface Sites {
 
 export interface Platform {
   supportsDynamicImport?: boolean;
-  sourceDirectory: string;
+  sourceDirectory?: string;
   name: string;
   cfZoneId: string;
   domain: string;
