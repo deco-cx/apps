@@ -149,10 +149,11 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
-  const params = new URLSearchParams();
+  const params = new URLSearchParams([
+    ["slug", props.slug],
+  ]);
   params.set("skuId", url.searchParams.get("skuId") ?? "");
   params.set("segment", token);
-  params.set("slug", props.slug);
 
   url.search = params.toString();
 
