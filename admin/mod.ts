@@ -1,3 +1,4 @@
+import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
@@ -21,11 +22,27 @@ import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
+
+type SignalStringified<Data> = { __signal: Data };
+// deno-lint-ignore no-explicit-any
+type Layout = any;
+// deno-lint-ignore no-explicit-any
+type Tab = any;
+
+export interface Workspace {
+  name: string;
+  layout: Layout[];
+  tabs: Record<string, Tab>;
+}
+
 export interface BlockStore extends Release {
   patch(
     resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>>;
-  update(resolvables: Record<string, Resolvable>): Promise<void>;
+  set(
+    resolvables: Record<string, Resolvable>,
+    reivsion?: string,
+  ): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
@@ -42,6 +59,7 @@ export interface GithubEventListener<
 
 export interface State {
   storage: BlockStore;
+  release: () => Release;
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
@@ -84,6 +102,8 @@ export interface Props {
   github?: GithubProps;
   kubernetes?: K8sProps;
   subhosting?: SubhostingProps;
+  /** @description property used at deco admin  */
+  workspaces: SignalStringified<Workspace>[];
 }
 
 /**
@@ -110,13 +130,17 @@ export default function App(
   return {
     manifest,
     state: {
+      storage,
+      release: () => {
+        const ctx = Context.active();
+        return ctx.release!;
+      },
       githubWebhookSecret,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
         prEventHandler as GithubEventListener,
       ],
-      storage,
       octokit: new Octokit({
         auth: githubAPIToken,
       }),
