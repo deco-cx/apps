@@ -98,7 +98,7 @@ function Page(
     & Props
     & { errorPage?: Page; devMode: boolean },
 ): JSX.Element {
-  const context = Context.active()
+  const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 
