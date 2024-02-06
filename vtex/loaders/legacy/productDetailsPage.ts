@@ -18,10 +18,11 @@ export interface Props {
    */
   similars?: boolean;
   /**
-   * @title Return videos?
+   * @title Return product videos
+   * @description Includes videos that are registered in the VTEX product admin.
    * @default false
    */
-    returnVideos?: boolean;
+  returnVideos?: boolean;
 }
 
 /**

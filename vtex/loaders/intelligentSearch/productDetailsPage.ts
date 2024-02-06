@@ -25,7 +25,7 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
-    /**
+  /**
    * @title Return videos?
    * @default false
    */
