@@ -31,7 +31,7 @@ const loaders = async (
 
   const suggestions = await vcsDeprecated["GET /buscaautocomplete"]({
     maxRows: count,
-    productNameContains: query,
+    productNameContains: encodeURIComponent(query ?? ""),
     suggestionsStack: "",
   }, {
     // Not adding suggestions to cache since queries are very spread out
