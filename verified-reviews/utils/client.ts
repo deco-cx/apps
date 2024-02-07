@@ -168,11 +168,34 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     }
   };
 
+  const storeReview = async (): Promise<Reviews["reviews"] | null> => {
+    try {
+      const response = await fetchAPI<Reviews["reviews"]>(
+        `https://cl.avis-verifies.com/br/cache/8/6/a/${idWebsite}/AWS/WEBSITE_API/reviews.json`,
+        {
+          method: "GET",
+        },
+      );
+
+      return (
+        response ? response : []
+      );
+    } catch (error) {
+      if (context.isDeploy) {
+        console.error(MessageError.ratings, error);
+      } else {
+        throw new Error(`${MessageError.ratings} - ${error}`);
+      }
+      return null;
+    }
+  };
+
   return {
     rating,
     ratings,
     reviews,
     fullReview,
+    storeReview,
   };
 };
 
