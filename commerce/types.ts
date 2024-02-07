@@ -63,8 +63,8 @@ export interface CreativeWork {
   thumbnailUrl?: string;
 }
 
-export interface VideoObject 
-extends MediaObject, CreativeWork, Omit<Thing, "@type" | "url"> {
+export interface VideoObject
+  extends MediaObject, CreativeWork, Omit<Thing, "@type" | "url"> {
   /**
    * @ignore
    */
