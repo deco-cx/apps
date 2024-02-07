@@ -1,5 +1,8 @@
-import { Ratings } from "./types.ts";
-import { AggregateRating } from "../../commerce/types.ts";
+import {
+  AggregateRating,
+  Review as CommerceReview,
+} from "../../commerce/types.ts";
+import { Ratings, Review } from "./types.ts";
 
 export const getRatingProduct = ({
   ratings,
@@ -19,3 +22,19 @@ export const getRatingProduct = ({
     ratingValue: Number(parseFloat(rating.rate).toFixed(1)),
   };
 };
+
+export const toReview = (review: Review): CommerceReview => ({
+  "@type": "Review",
+  author: [
+    {
+      "@type": "Author",
+      name: `${review.firstname} ${review.lastname}`,
+    },
+  ],
+  datePublished: review.review_date,
+  reviewBody: review.review,
+  reviewRating: {
+    "@type": "AggregateRating",
+    ratingValue: Number(review.rate),
+  },
+});
