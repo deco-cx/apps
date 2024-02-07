@@ -78,6 +78,10 @@ interface CategoryPageProps extends BaseProps {
    * @options linx-impulse/loaders/products/options.ts?type=category
    */
   feature?: string;
+  /**
+   * @description It is recommended to create a global loader so that the loader is not called more than once
+   */
+  loader: ProductListingPage | null;
 }
 
 /**
@@ -101,6 +105,13 @@ interface SearchPageProps extends BaseProps {
   loader: ProductListingPage | null;
 }
 
+const nonNullable = <T>(value: T): value is NonNullable<T> =>
+  value != null && typeof value !== "undefined";
+const normalize = (value: string) =>
+  value.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
 /**
  * @title Page
  */
@@ -113,7 +124,7 @@ type Props =
 const generateParams = (
   props: Props,
   req: Request,
-): { name: PageName; "categoryId[]"?: string[]; "productId[]"?: string[] } => {
+): { name: PageName } & Record<string, unknown> => {
   switch (props.page) {
     case "home": {
       return {
@@ -121,20 +132,35 @@ const generateParams = (
       };
     }
     case "category": {
-      const categoryId = new URL(req.url).pathname
-        .split("/")
+      const properties = props.loader?.products
+        .flatMap((p) => p.isVariantOf?.additionalProperty)
+        .filter(nonNullable) ?? [];
+      const categoriesId = new URL(req.url).pathname
+        .toLowerCase()
         .slice(1)
-        .filter((path) => path !== "hotsite");
+        .split("/")
+        .map((category) =>
+          properties
+            .find((p) =>
+              p.name === "category" &&
+              p.propertyID &&
+              normalize(p.value ?? "") === category
+            )
+            ?.propertyID
+        )
+        .filter(nonNullable) ?? [];
+
+      console.log({ categoriesId });
 
       return {
-        name: categoryId.length > 1 ? "subcategory" : "category",
-        "categoryId[]": categoryId,
+        name: categoriesId.length > 1 ? "subcategory" : "category",
+        "categoryId[]": categoriesId,
       };
     }
     case "search": {
       const productIds = props.loader?.products
         .map((p) => p.productID)
-        .filter((id): id is string => typeof id === "string") ?? [];
+        .filter(nonNullable) ?? [];
       return {
         name: "search",
         "productId[]": productIds,
@@ -155,6 +181,8 @@ const generateParams = (
   }
 };
 
+type Position = "top" | "middle" | "bottom";
+
 /**
  * @title Linx Impulse - Chaordic System
  */
@@ -163,12 +191,20 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
+  if (req.url.includes("_frsh")) {
+    return null;
+  }
+
   const { showOnlyAvailable } = props;
-  const { chaordicApi, apiKey, secretKey, salesChannel } = ctx;
+  const { chaordicApi, apiKey, secretKey, salesChannel, origin, cdn } = ctx;
   const deviceId = getDeviceId(req, ctx);
   const source = getSource(ctx);
 
   const params = generateParams(props, req);
+  const headers = new Headers();
+  if (origin) {
+    headers.set("Origin", origin);
+  }
 
   const response = await chaordicApi["GET /v0/pages/recommendations"]({
     ...params,
@@ -179,11 +215,14 @@ const loader = async (
     salesChannel,
     showOnlyAvailable,
     productFormat: "complete",
-  }).then((res) => res.json());
+  }, { headers }).then((res) => res.json());
 
-  const shelves = [...response.top, ...response.middle, ...response.bottom];
-  const shelf = props.feature
-    ? shelves.find((r) => r.feature === props.feature) || shelves[0]
+  const [feature, position] = props.feature ? props.feature.split(",") : [];
+  const shelves = position
+    ? response[position as Position] ?? response.top
+    : [...response.top, ...response.middle, ...response.bottom];
+  const shelf = feature
+    ? shelves.find((s) => s.feature === feature) || shelves[0]
     : shelves[0];
 
   if (!shelf || !shelf.displays.length) {
@@ -194,7 +233,7 @@ const loader = async (
     "trackingImpression",
   );
   const products = shelf.displays[0].recommendations.map((p) => {
-    const product = toProduct(p, new URL(req.url).origin);
+    const product = toProduct(p, new URL(req.url).origin, cdn);
     const impressionProperty: PropertyValue = {
       "@type": "PropertyValue",
       name: "trackingImpression",

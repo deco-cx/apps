@@ -13,7 +13,8 @@ export interface LinxAPI {
     searchParams: {
       prefix: string;
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
+      origin?: string;
       deviceId: string;
       resultsQueries?: number;
       resultsProducts?: number;
@@ -28,7 +29,8 @@ export interface LinxAPI {
     response: AutocompleteResponse;
     searchParams: {
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
+      origin?: string;
       deviceId: string;
       productFormat?: ProductFormat;
       salesChannel?: string;
@@ -42,7 +44,8 @@ export interface LinxAPI {
     searchParams: {
       terms: string;
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
+      origin?: string;
       deviceId: string;
       categoryId?: string;
       resultsProducts?: number;
@@ -57,7 +60,8 @@ export interface LinxAPI {
     response: void;
     searchParams: {
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
+      origin?: string;
       trackingId: string;
       deviceId: string;
       source: Source;
@@ -79,7 +83,8 @@ export interface LinxAPI {
       allowRedirect?: boolean;
       filter?: string[];
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
+      origin?: string;
       deviceId: string;
       salesChannel?: string;
       productFormat?: ProductFormat;
@@ -100,7 +105,8 @@ export interface LinxAPI {
       allowRedirect?: boolean;
       filter?: string[];
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
+      origin?: string;
       deviceId: string;
       salesChannel?: string;
       productFormat?: ProductFormat;
@@ -119,7 +125,8 @@ export interface LinxAPI {
       showOnlyAvailable?: boolean;
       filter?: string[];
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
+      origin?: string;
       deviceId: string;
       salesChannel?: string;
       productFormat?: ProductFormat;

@@ -1,9 +1,20 @@
-import {
-  CommonBody,
+import type {
   LinxCartItem,
   LinxProduct,
+  LinxUser,
   SearchItem,
 } from "./types/analytics.ts";
+import type { Source } from "./types/linx.ts";
+
+interface CommonBody {
+  apiKey: string;
+  secretKey?: string;
+  origin?: string;
+  source: Source;
+  deviceId: string;
+  salesChannel?: string;
+  user?: Omit<LinxUser, "birthday" | "gender" | "name">;
+}
 
 export interface EventsAPI {
   "POST /v7/events/views/category": {

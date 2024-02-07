@@ -6,6 +6,7 @@ import type {
   ProductListingPage,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
+import { Search } from "../../commerce/types.ts";
 import { FilterToggleValue } from "../../commerce/types.ts";
 import type { LinxUser } from "./types/analytics.ts";
 import type { ChaordicProduct } from "./types/chaordic.ts";
@@ -103,21 +104,27 @@ const sanitizeValue = (value: unknown): string | undefined => {
 };
 
 /**
- * @description Adds protocol to URL if missing
+ * @description Handle URL from linx
  * @param url
  * @returns {string}
  */
-const fixURL = (url: string): string =>
+const fixURL = (url: string, cdn?: string): string =>
   url.startsWith("http")
     ? url
     : url.startsWith("//")
     ? `https:${url}`
+    : cdn
+    ? `${cdn}${url.startsWith("/") ? url : `/${url}`}`
     : `https://${url}`;
 
-const toProductUrl = (url: string, origin: string, sku?: string): string => {
-  const productURL = new URL(fixURL(url));
+const toProductUrl = (
+  url: string,
+  origin: string,
+  sku?: string,
+  cdn?: string,
+): string => {
+  const productURL = new URL(fixURL(url, cdn));
   productURL.searchParams.delete("v");
-  productURL.pathname += "/p";
 
   if (sku) {
     productURL.searchParams.set("v", sku);
@@ -130,6 +137,7 @@ const productFromImpulse = (
   product: ImpulseProduct,
   origin: string,
   variantId?: string,
+  cdn?: string,
   level = 0,
 ): Product => {
   const variants = product.skus ?? [];
@@ -147,14 +155,14 @@ const productFromImpulse = (
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
-      productFromImpulse(product, origin, variant.sku, 1)
+      productFromImpulse(product, origin, variant.sku, cdn, 1)
     )
     : [];
 
   const toImage = (url: string) => ({
     "@type": "ImageObject" as const,
     alternateName: product.name,
-    url: fixURL(url),
+    url: fixURL(url, cdn),
   });
 
   const image = Object.values(product.images ?? {}).map(toImage) ?? [];
@@ -200,6 +208,12 @@ const productFromImpulse = (
             name: key,
             value: sanitizeValue(value[0]),
           })),
+        ...product.categories.map((c) => ({
+          "@type": "PropertyValue" as const,
+          name: "category",
+          value: c.name,
+          propertyID: c.id,
+        })),
         {
           "@type": "PropertyValue" as const,
           name: "trackingId",
@@ -223,6 +237,7 @@ const productFromChaordic = (
   product: ChaordicProduct,
   origin: string,
   variantId?: string,
+  cdn?: string,
   level = 0,
 ): Product => {
   const variants = product.skus ?? [];
@@ -240,14 +255,14 @@ const productFromChaordic = (
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
-      productFromChaordic(product, origin, variant.sku, 1)
+      productFromChaordic(product, origin, variant.sku, cdn, 1)
     )
     : [];
 
   const toImage = (url: string) => ({
     "@type": "ImageObject" as const,
     alternateName: product.name,
-    url: fixURL(url),
+    url: fixURL(url, cdn),
   });
 
   const image = Object.values(product.images ?? {}).map(toImage) ?? [];
@@ -324,14 +339,15 @@ const productFromChaordic = (
 export const toProduct = (
   product: LinxProduct,
   origin: string,
+  cdn?: string,
   level = 0,
 ): Product => {
   const isImpulse = isImpulseProduct(product);
   if (isImpulse) {
-    return productFromImpulse(product, origin, product.selectedSku, level);
+    return productFromImpulse(product, origin, product.selectedSku, cdn, level);
   }
 
-  return productFromChaordic(product, origin, undefined, level);
+  return productFromChaordic(product, origin, undefined, cdn, level);
 };
 
 export const toUser = (user: Person): LinxUser => ({
@@ -343,9 +359,15 @@ export const toUser = (user: Person): LinxUser => ({
   gender: user.gender === "https://schema.org/Male" ? "M" : "F",
 });
 
-export const toSearch = ({ query, link }: Query) => ({
+export const toSearch = (
+  { query, link, category, categoryId }: Query,
+): Search => ({
   term: query,
   href: link,
+  facets: [{
+    key: category ?? "category",
+    values: [categoryId ?? "categoryId"],
+  }],
 });
 
 const toFilterValue = (
@@ -438,6 +460,7 @@ export const toProductListingPage = (
   page: number,
   resultsPerPage: number,
   url: string,
+  cdn?: string,
 ): ProductListingPage => {
   const { nextPage, previousPage } = generatePages(page, url);
 
@@ -449,7 +472,9 @@ export const toProductListingPage = (
       numberOfItems: 0,
     },
     sortOptions,
-    products: response.products.map((p) => toProduct(p, new URL(url).origin)),
+    products: response.products.map((p) =>
+      toProduct(p, new URL(url).origin, cdn)
+    ),
     pageInfo: {
       currentPage: page,
       nextPage,

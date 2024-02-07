@@ -22,7 +22,7 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { api, apiKey, secretKey } = ctx;
+  const { api, apiKey, secretKey, origin, cdn } = ctx;
   const { query, count = 20 } = props;
 
   if (!query) return null;
@@ -30,6 +30,7 @@ const loaders = async (
   const search = await api["GET /engage/search/v3/autocompletes"]({
     apiKey,
     secretKey,
+    origin,
     prefix: query,
     deviceId: getDeviceId(req, ctx),
     resultsProducts: count,
@@ -43,10 +44,11 @@ const loaders = async (
 
   if (!search) return null;
 
-  const origin = new URL(req.url).origin;
   const result = {
     searches: search.queries.map(toSearch),
-    products: search.products.map((product) => toProduct(product, origin)),
+    products: search.products.map((product) =>
+      toProduct(product, new URL(req.url).origin, cdn)
+    ),
   };
 
   return result;

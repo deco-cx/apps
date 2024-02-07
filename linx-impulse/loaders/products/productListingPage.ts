@@ -80,8 +80,12 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
+  if (req.url.includes("_frsh")) {
+    return null;
+  }
+
   const { resultsPerPage, allowRedirect, showOnlyAvailable, user } = props;
-  const { apiKey, secretKey, salesChannel, api } = ctx;
+  const { apiKey, secretKey, origin, salesChannel, api, cdn } = ctx;
   const deviceId = getDeviceId(req, ctx);
   const source = getSource(ctx);
   const url = new URL(req.url);
@@ -107,6 +111,7 @@ const loader = async (
       const response = await api["GET /engage/search/v3/hotsites"]({
         apiKey,
         secretKey,
+        origin,
         salesChannel,
         deviceId,
         showOnlyAvailable,
@@ -120,13 +125,14 @@ const loader = async (
         name: category[1],
       }).then((res) => res.json());
 
-      return toProductListingPage(response, page, resultsPerPage, req.url);
+      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
     } else if (
       !searchTerm && (category.length > 0 || multicategory.length > 0)
     ) {
       const response = await api["GET /engage/search/v3/navigates"]({
         apiKey,
         secretKey,
+        origin,
         salesChannel,
         deviceId,
         allowRedirect,
@@ -142,11 +148,12 @@ const loader = async (
         ...(multicategory.length > 0 ? { multicategory } : { category }),
       }).then((res) => res.json());
 
-      return toProductListingPage(response, page, resultsPerPage, req.url);
+      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
     } else if (searchTerm) {
       const response = await api["GET /engage/search/v3/search"]({
         apiKey,
         secretKey,
+        origin,
         salesChannel,
         deviceId,
         allowRedirect,
@@ -161,7 +168,7 @@ const loader = async (
         productFormat: "complete",
       }).then((res) => res.json());
 
-      return toProductListingPage(response, page, resultsPerPage, req.url);
+      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
     }
   } catch (err) {
     console.error(err);

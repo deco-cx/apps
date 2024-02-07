@@ -5,24 +5,31 @@ import {
 } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import getSource from "../../utils/source.ts";
-import type { LinxMeta, LinxUser } from "../../utils/types/analytics.ts";
+import type { LinxUser } from "../../utils/types/analytics.ts";
 
-declare global {
-  interface Window {
-    linxMeta: LinxMeta;
-  }
-}
+type Page =
+  | "home"
+  | "category"
+  | "product"
+  | "search"
+  | "checkout"
+  | "landingpage"
+  | "notfound"
+  | "hotsite"
+  | "userprofile"
+  | "other";
 
 interface Category {
   /**
+   * @hide
    * @default category
    */
   page: string;
-  pageInfo: ProductListingPage | null;
 }
 
 interface Product {
   /**
+   * @hide
    * @default product
    */
   page: string;
@@ -31,6 +38,7 @@ interface Product {
 
 interface Home {
   /**
+   * @hide
    * @default home
    */
   page: string;
@@ -38,6 +46,7 @@ interface Home {
 
 interface Other {
   /**
+   * @hide
    * @default other
    */
   page: string;
@@ -45,6 +54,7 @@ interface Other {
 
 interface Search {
   /**
+   * @hide
    * @default search
    */
   page: string;
@@ -53,6 +63,7 @@ interface Search {
 
 interface Checkout {
   /**
+   * @hide
    * @default checkout
    */
   page: string;
@@ -60,6 +71,7 @@ interface Checkout {
 
 interface LandingPage {
   /**
+   * @hide
    * @default landingpage
    */
   page: string;
@@ -67,6 +79,7 @@ interface LandingPage {
 
 interface NotFound {
   /**
+   * @hide
    * @default notfound
    */
   page: string;
@@ -74,6 +87,7 @@ interface NotFound {
 
 interface Hotsite {
   /**
+   * @hide
    * @default hotsite
    */
   page: string;
@@ -81,15 +95,11 @@ interface Hotsite {
 
 interface UserProfile {
   /**
+   * @hide
    * @default userprofile
    */
   page: string;
 }
-
-/**
- * @title none
- */
-type Null = null;
 
 interface Props {
   /**
@@ -107,13 +117,13 @@ interface Props {
     | NotFound
     | Hotsite
     | UserProfile;
-  user: Person | Null;
+  user: Person | null;
 }
 
 /** @title Linx Impulse Integration - Events */
 export const loader = async (props: Props, req: Request, ctx: AppContext) => {
-  const { device } = ctx;
   const { event } = props;
+  const page = event.page as Page;
 
   const url = new URL(req.url);
   const source = getSource(ctx);
@@ -129,19 +139,15 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
     }
     : undefined;
 
-  switch (event.page) {
+  switch (page) {
     case "category": {
-      if (!("pageInfo" in event)) break;
       await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
         event: "view",
         params: {
-          page: "category",
+          page,
           source,
           user,
-          categories:
-            event.pageInfo?.breadcrumb?.itemListElement?.filter((item) =>
-              item.name
-            ).map((item) => item.name!) ?? [],
+          categories: url.pathname.slice(1).split("/"),
         },
       });
       break;
@@ -153,7 +159,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
         event: "view",
         params: {
-          page: "product",
+          page,
           source,
           user,
           pid: details.product.isVariantOf?.productGroupID ??
@@ -174,7 +180,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
         event: "view",
         params: {
-          page: "search",
+          page,
           source,
           user,
           query,
@@ -190,14 +196,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
         event: "view",
         params: {
-          page: event.page as
-            | "home"
-            | "checkout"
-            | "landingpage"
-            | "notfound"
-            | "hotsite"
-            | "userprofile"
-            | "other",
+          page,
           source,
           user,
         },

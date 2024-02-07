@@ -13,11 +13,12 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { api, apiKey, secretKey } = ctx;
+  const { api, apiKey, secretKey, origin, cdn } = ctx;
 
   const search = await api["GET /engage/search/v3/autocompletes/popular"]({
     apiKey,
     secretKey,
+    origin,
     deviceId: getDeviceId(req, ctx),
     salesChannel: ctx.salesChannel,
     source: getSource(ctx),
@@ -28,10 +29,11 @@ const loaders = async (
 
   if (!search) return null;
 
-  const origin = new URL(req.url).origin;
   const result = {
     searches: search.queries.map(toSearch),
-    products: search.products.map((product) => toProduct(product, origin)),
+    products: search.products.map((product) =>
+      toProduct(product, new URL(req.url).origin, cdn)
+    ),
   };
 
   return result;

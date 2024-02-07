@@ -10,13 +10,23 @@ export type AppContext = AC<ReturnType<typeof App>>;
 /** @title LINX Impulse */
 export interface State {
   /**
-   * @title LINX Api Key
+   * @title Api Key
    */
   apiKey: string;
   /**
-   * @title LINX Secret Key
+   * @title Secret Key
    */
-  secretKey: string;
+  secretKey?: string;
+  /**
+   * @title Origin URL
+   * @description Set the origin URL to authenticate the request if not using the secret key
+   */
+  origin?: string;
+  /**
+   * @title Image CDN URL
+   * @description e.g.: https://{account}.myvtex.com/
+   */
+  cdn?: string;
   salesChannel?: string;
   enableMobileSource?: boolean;
 }
@@ -24,7 +34,7 @@ export interface State {
 export const color = 0xFF6A3B;
 
 /**
- * @title LINX
+ * @title Linx Impulse
  */
 export default function App(props: State) {
   const eventsApi = createHttpClient<EventsAPI>({
@@ -46,7 +56,13 @@ export default function App(props: State) {
     headers: new Headers({ "Accept": "application/json" }),
   });
 
-  const state = { ...props, eventsApi, api, chaordicApi };
+  const state = {
+    ...props,
+    eventsApi,
+    api,
+    chaordicApi,
+    cdn: props.cdn?.replace(/\/$/, "") ?? "", // remove trailing slash
+  };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 

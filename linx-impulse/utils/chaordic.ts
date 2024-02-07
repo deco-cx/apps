@@ -10,7 +10,7 @@ export interface ChaordicAPI {
     response: RecommendationsResponse;
     searchParams: {
       apiKey: string;
-      secretKey: string;
+      secretKey?: string;
       name: PageName;
       source: Source;
       deviceId: string;

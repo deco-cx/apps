@@ -1,5 +1,3 @@
-import { Source } from "./linx.ts";
-
 export type LinxUser = {
   id: string;
   email: string;
@@ -121,15 +119,6 @@ export type LinxMeta =
     salesChannel?: string;
     user?: LinxUser;
   };
-
-export type CommonBody = {
-  apiKey: string;
-  secretKey: string;
-  source: Source;
-  deviceId: string;
-  salesChannel?: string;
-  user?: Omit<LinxUser, "birthday" | "gender" | "name">;
-};
 
 export type SearchItem = {
   pid: string;
