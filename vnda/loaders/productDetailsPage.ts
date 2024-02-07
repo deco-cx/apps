@@ -27,11 +27,34 @@ async function loader(
   const variantId = url.searchParams.get("skuId") || null;
   const { id } = parseSlug(slug);
 
-  const maybeProduct = await api["GET /api/v2/products/:id"]({
-    id,
-    include_images: "true",
-  }, STALE)
-    .then((r) => r.json()).catch(() => null);
+  const getMaybeProduct = async (id: number) => {
+    try {
+      const result = await api["GET /api/v2/products/:id"]({
+        id,
+        include_images: "true",
+      }, STALE);
+      return result.json();
+    } catch (_error) {
+      return null;
+    }
+  };
+
+  // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
+  const getProductPrice = async (id: number): Promise<ProductPrice | null> => {
+    try {
+      const result = await api["GET /api/v2/products/:productId/price"]({
+        productId: id,
+      }, STALE);
+      return result.json();
+    } catch (_error) {
+      return null;
+    }
+  };
+
+  const [maybeProduct, productPrice] = await Promise.all([
+    getMaybeProduct(id),
+    getProductPrice(id),
+  ]);
 
   const variantsLength = maybeProduct?.variants?.length ?? 0;
 
@@ -39,13 +62,6 @@ async function loader(
   if (!maybeProduct || variantsLength === 0) {
     return null;
   }
-
-  // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
-  const productPrice: ProductPrice | null = await api
-    ["GET /api/v2/products/:productId/price"]({
-      productId: id,
-    }, STALE)
-    .then((r) => r.json()).catch(() => null);
 
   const product = toProduct(maybeProduct, variantId, {
     url,
