@@ -7,6 +7,7 @@ import { parseSlug, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
+  priceIntl?: boolean;
 }
 
 /**
@@ -19,7 +20,7 @@ async function loader(
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
-  const { slug } = props;
+  const { slug, priceIntl = false } = props;
   const { api } = ctx;
 
   if (!slug) return null;
@@ -41,13 +42,17 @@ async function loader(
 
   // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
   const getProductPrice = async (id: number): Promise<ProductPrice | null> => {
-    try {
-      const result = await api["GET /api/v2/products/:productId/price"]({
-        productId: id,
-      }, STALE);
-      return result.json();
-    } catch (_error) {
+    if (!priceIntl) {
       return null;
+    } else {
+      try {
+        const result = await api["GET /api/v2/products/:productId/price"]({
+          productId: id,
+        }, STALE);
+        return result.json();
+      } catch (_error) {
+        return null;
+      }
     }
   };
 
