@@ -15,7 +15,7 @@ export interface Props {
 const subscribers: WebSocket[] = [];
 
 export const fetchState = async (release: Release): Promise<State> => ({
-  decofile: await release.state({ forceFresh: true }),
+  decofile: await release.state(),
 });
 
 const saveState = (release: Release, { decofile }: State): Promise<void> =>
