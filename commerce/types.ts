@@ -38,6 +38,7 @@ export interface Thing {
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
   image?: ImageObject[];
+  video?: VideoObject[];
   /** The name of the item. */
   name?: string;
   /** URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website. */
@@ -60,6 +61,23 @@ export interface MediaObject {
 export interface CreativeWork {
   /** A thumbnail image relevant to the Thing */
   thumbnailUrl?: string;
+}
+
+export interface VideoObject 
+extends MediaObject, CreativeWork, Omit<Thing, "@type" | "url"> {
+  /**
+   * @ignore
+   */
+  "@type": "VideoObject";
+  /**
+   * @description date when video was published first time, format ISO 8601: https://en.wikipedia.org/wiki/ISO_8601
+   */
+  uploadDate?: string;
+  /**
+   * @description video duration, format ISO 8601: https://en.wikipedia.org/wiki/ISO_8601,
+   * PT00H30M5S means 30 minutes and 5 seconds
+   */
+  duration?: string;
 }
 
 export interface ImageObject

@@ -121,9 +121,8 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   sku: T["items"][number],
   kitItems: T[],
   options: ProductOptions,
-  returnVideos?: boolean,
 ): Omit<ProductDetailsPage, "seo"> => {
-  const partialProduct = toProduct(product, sku, 0, options, returnVideos);
+  const partialProduct = toProduct(product, sku, 0, options);
   // This is deprecated. Compose this loader at loaders > product > extension > detailsPage.ts
   const isAccessoryOrSparePartFor = toAccessoryOrSparePartFor(
     sku,
@@ -291,7 +290,6 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   sku: P["items"][number],
   level = 0, // prevent inifinte loop while self referencing the product
   options: ProductOptions,
-  returnVideos?: boolean,
 ): Product => {
   const { baseUrl, priceCurrency } = options;
   const {
@@ -333,7 +331,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       "@type": "ProductGroup",
       productGroupID: productId,
       hasVariant: items.map((sku) =>
-        toProduct(product, sku, 1, { ...options, imagesByKey }, returnVideos)
+        toProduct(product, sku, 1, { ...options, imagesByKey })
       ),
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
@@ -357,15 +355,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     };
   }) ?? [DEFAULT_IMAGE];
 
-  const finalVideos = returnVideos && nonEmptyVideos?.map((video) => {
+  const finalVideos = nonEmptyVideos?.map((video) => {
     const url = video;
     const alternateName = "Product video";
     const name = "Product video";
     const encodingFormat = "video";
     return {
-      "@type": "ImageObject" as const,
+      "@type": "VideoObject" as const,
       alternateName,
-      url,
+      contentUrl: url,
       name,
       encodingFormat,
     };
@@ -408,7 +406,8 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: finalImages.concat(finalVideos || []),
+    image: finalImages,
+    video: finalVideos,
     offers: aggregateOffers(offers, priceCurrency),
   };
 };
