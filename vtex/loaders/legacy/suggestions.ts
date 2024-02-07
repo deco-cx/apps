@@ -29,28 +29,40 @@ const loaders = async (
   const { count = 4, query } = props;
   const segment = getSegmentFromBag(ctx);
 
-  const suggestions = await vcsDeprecated["GET /buscaautocomplete"]({
-    maxRows: count,
-    productNameContains: encodeURIComponent(query ?? ""),
-    suggestionsStack: "",
-  }, {
-    // Not adding suggestions to cache since queries are very spread out
-    // deco: { cache: "stale-while-revalidate" },
-    headers: withSegmentCookie(segment),
-  }).then((res) => res.json());
+  const suggestions = await vcsDeprecated["GET /buscaautocomplete"](
+    {
+      maxRows: count,
+      productNameContains: encodeURIComponent(query ?? ""),
+      suggestionsStack: "",
+    },
+    {
+      // Not adding suggestions to cache since queries are very spread out
+      // deco: { cache: "stale-while-revalidate" },
+      headers: withSegmentCookie(segment),
+    },
+  ).then((res) => res.json());
 
-  const searches: Suggestion["searches"] = suggestions.itemsReturned.filter((
-    { items },
-  ) => !items?.length).map(({ name, href }) => ({ term: name, href }));
+  const searches: Suggestion["searches"] = suggestions.itemsReturned
+    .filter(({ items }) => !items?.length)
+    .map(({ name, href }) => ({ term: name, href }));
 
   const products: Suggestion["products"] = suggestions.itemsReturned
     .filter(({ items }) => !!items.length)
-    .map(({ items: [{ productId, itemId }] }): Product => ({
-      "@type": "Product",
-      productID: itemId,
-      sku: itemId,
-      inProductGroupWithID: productId,
-    }));
+    .map(
+      ({ items: [{ productId, itemId, imageUrl, name }], href }): Product => {
+        const url = new URL(href);
+
+        return {
+          "@type": "Product",
+          productID: itemId,
+          sku: itemId,
+          inProductGroupWithID: productId,
+          image: [{ "@type": "ImageObject", url: imageUrl }],
+          name,
+          url: url.pathname + url.search + url.hash,
+        };
+      },
+    );
 
   return {
     searches,
