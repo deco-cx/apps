@@ -4,7 +4,7 @@ import { dirname, join } from "std/path/mod.ts";
 import { DynamicApp } from "../../decohub/mod.ts";
 import website, { Props as WebSiteProps } from "../../website/mod.ts";
 import { AppContext } from "../mod.ts";
-import { FileSystemNode, create, isDir, walk } from "../sdk.ts";
+import { create, FileSystemNode, isDir, walk } from "../sdk.ts";
 // import {
 //   build,
 //   initialize,
@@ -88,10 +88,10 @@ const compile = async (
   };
 };
 
-const buildImportMap = (root: FileSystemNode, appName: string): ImportMap => {
+const buildImportMap = (root: FileSystemNode): ImportMap => {
   const importMap: ImportMap = { imports: {} };
 
-  for (const { path, content } of walk(root, `/${appName}`)) {
+  for (const { path, content } of walk(root)) {
     if (!/\.tsx?$/.test(path)) {
       continue;
     }
@@ -124,13 +124,13 @@ const loader = async (
   if (!appFolder) {
     throw new Error(`app ${props.name} not found`);
   }
-  const importMap = buildImportMap(appFolder, props.name);
+  const importMap = buildImportMap(appFolder);
 
   let appManifest = {
     name: props.name,
     baseUrl: import.meta.url,
   };
-  for (const file of walk(appFolder, `/${props.name}`)) {
+  for (const file of walk(appFolder)) {
     if (!/\.tsx?$/.test(file.path)) {
       continue;
     }
