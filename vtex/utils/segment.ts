@@ -60,11 +60,11 @@ export const isAnonymous = (
 };
 
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
-  ctx.bag?.set(SEGMENT, data);
+  ctx?.bag?.set(SEGMENT, data);
 
 export const getSegmentFromBag = (
   ctx: AppContext,
-): WrappedSegment => ctx.bag?.get(SEGMENT);
+): WrappedSegment => ctx?.bag?.get(SEGMENT);
 
 /**
  * Stable serialization.
