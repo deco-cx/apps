@@ -57,6 +57,12 @@ export interface Props {
 
   /** @description if properties are empty, "typeTags" value will apply to all. Defaults to "and" */
   filterOperator?: FilterOperator;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 const getBreadcrumbList = (categories: Tag[], url: URL): BreadcrumbList => ({
@@ -88,7 +94,7 @@ const searchLoader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   // get url from params
-  const url = new URL(req.url);
+  const url = new URL(props.pageHref || req.url);
   const { api } = ctx;
 
   const count = props.count ?? 12;

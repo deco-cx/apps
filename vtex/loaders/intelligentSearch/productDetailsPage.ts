@@ -142,14 +142,16 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   if (!isAnonymous(ctx)) {
     return null;
   }
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
-  const params = new URLSearchParams();
+  const params = new URLSearchParams([
+    ["slug", props.slug],
+  ]);
   params.set("skuId", url.searchParams.get("skuId") ?? "");
   params.set("segment", token);
 

@@ -3,7 +3,7 @@ import { Workflow, WorkflowFn } from "deco/blocks/workflow.ts";
 import { Arg, RuntimeParameters, WorkflowExecutionBase } from "deco/deps.ts";
 import { BlockFromKey, BlockFunc, BlockKeys } from "deco/engine/block.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
-import { context } from "deco/live.ts";
+import { Context } from "deco/live.ts";
 import { AppManifest } from "deco/mod.ts";
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
@@ -84,6 +84,7 @@ export default async function startWorkflow<
 ): Promise<WorkflowExecution> {
   const { id, args, runtimeParameters } = props;
   const workflow = fromWorkflowProps(props);
+  const context = Context.active();
   const service = Deno.env.get("MY_DURABLE_URL") ??
     (context.isDeploy
       ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
