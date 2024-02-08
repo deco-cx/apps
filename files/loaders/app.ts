@@ -8,7 +8,7 @@ import website, { Props as WebSiteProps } from "../../website/mod.ts";
 
 const currdir = dirname(import.meta.url);
 const importFromString = (modData: string) =>
-  import(`data:text/tsx;base64,${btoa(encodeURIComponent(modData))}`);
+  import(`data:text/tsx;charset=utf-8;base64,${btoa(modData)}`);
 
 export interface TsContent {
   path: string;
