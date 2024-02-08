@@ -9,6 +9,8 @@ import getDeviceId from "../../utils/deviceId.ts";
 import getSource from "../../utils/source.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { PageName } from "../../utils/types/chaordic.ts";
+import { Position } from "../../utils/types/chaordic.ts";
+import { Feature } from "../../utils/types/chaordic.ts";
 
 interface BaseProps {
   /**
@@ -18,10 +20,13 @@ interface BaseProps {
   /**
    * @title Feature
    * @description Search for a specific feature, if not informed or found, the first one will be used
-   * @format dynamic-options
-   * @options linx-impulse/loaders/products/options.ts?type=home
    */
-  feature?: string;
+  feature: Feature;
+  /**
+   * @title Position
+   * @description Position of the shelf
+   */
+  position: Position;
   showOnlyAvailable?: boolean;
 }
 
@@ -33,13 +38,6 @@ interface HomePageProps extends BaseProps {
    * @hide
    */
   page: "home";
-  /**
-   * @title Feature
-   * @description Search for a specific feature, if not informed or found, the first one will be used
-   * @format dynamic-options
-   * @options linx-impulse/loaders/products/options.ts?type=home
-   */
-  feature?: string;
 }
 
 /**
@@ -50,13 +48,6 @@ interface ProductPageProps extends BaseProps {
    * @hide
    */
   page: "product";
-  /**
-   * @title Feature
-   * @description Search for a specific feature, if not informed or found, the first one will be used
-   * @format dynamic-options
-   * @options linx-impulse/loaders/products/options.ts?type=product
-   */
-  feature?: string;
   /**
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
@@ -72,13 +63,6 @@ interface CategoryPageProps extends BaseProps {
    */
   page: "category";
   /**
-   * @title Feature
-   * @description Search for a specific feature, if not informed or found, the first one will be used
-   * @format dynamic-options
-   * @options linx-impulse/loaders/products/options.ts?type=category
-   */
-  feature?: string;
-  /**
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
   loader: ProductListingPage | null;
@@ -92,13 +76,6 @@ interface SearchPageProps extends BaseProps {
    * @hide
    */
   page: "search";
-  /**
-   * @title Feature
-   * @description Search for a specific feature, if not informed or found, the first one will be used
-   * @format dynamic-options
-   * @options linx-impulse/loaders/products/options.ts?type=search
-   */
-  feature?: string;
   /**
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
@@ -181,8 +158,6 @@ const generateParams = (
   }
 };
 
-type Position = "top" | "middle" | "bottom";
-
 /**
  * @title Linx Impulse - Chaordic System
  */
@@ -217,12 +192,12 @@ const loader = async (
     productFormat: "complete",
   }, { headers }).then((res) => res.json());
 
-  const [feature, position] = props.feature ? props.feature.split(",") : [];
-  const shelves = position
-    ? response[position as Position] ?? response.top
+  const shelves = props.position
+    ? response[props.position] ??
+      [...response.top, ...response.middle, ...response.bottom]
     : [...response.top, ...response.middle, ...response.bottom];
-  const shelf = feature
-    ? shelves.find((s) => s.feature === feature) || shelves[0]
+  const shelf = props.feature
+    ? shelves.find((shelf) => shelf.feature === props.feature) || shelves[0]
     : shelves[0];
 
   if (!shelf || !shelf.displays.length) {

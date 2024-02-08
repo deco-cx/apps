@@ -1,3 +1,13 @@
+export type Position = "top" | "middle" | "bottom";
+
+export type Feature =
+  | "MostPopular"
+  | "Offers"
+  | "New4You"
+  | "Push"
+  | "HistoryPersonalized"
+  | "SimilarItems";
+
 export type PageName =
   | "home"
   | "product"
