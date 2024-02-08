@@ -21,12 +21,12 @@ interface BaseProps {
    * @title Feature
    * @description Search for a specific feature, if not informed or found, the first one will be used
    */
-  feature: Feature;
+  feature?: Feature;
   /**
    * @title Position
    * @description Position of the shelf
    */
-  position: Position;
+  position?: Position;
   showOnlyAvailable?: boolean;
 }
 
@@ -126,8 +126,6 @@ const generateParams = (
             ?.propertyID
         )
         .filter(nonNullable) ?? [];
-
-      console.log({ categoriesId });
 
       return {
         name: categoriesId.length > 1 ? "subcategory" : "category",
