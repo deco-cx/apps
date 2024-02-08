@@ -21,7 +21,6 @@ const ADMIN_APP = "decohub/apps/admin.ts";
 export default async function App(
   state: State,
 ): Promise<App<Manifest, State>> {
-  console.log(state?.apps);
   const resolvedImport = import.meta.resolve("../admin/mod.ts");
   const baseImportMap = buildImportMap(manifest);
   const [dynamicApps, enhancedImportMap] = (state?.apps ?? []).filter(Boolean)
