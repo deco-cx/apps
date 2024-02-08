@@ -4,7 +4,7 @@ import { dirname, join } from "std/path/mod.ts";
 import { DynamicApp } from "../../decohub/mod.ts";
 import website, { Props as WebSiteProps } from "../../website/mod.ts";
 import { AppContext } from "../mod.ts";
-import { FileSystemNode, create, walk } from "../sdk.ts";
+import { FileSystemNode, create, isDir, walk } from "../sdk.ts";
 // import {
 //   build,
 //   initialize,
@@ -116,13 +116,21 @@ const loader = async (
   ctx: AppContext,
 ): Promise<DynamicApp> => {
   const { root = create() } = ctx;
-  const importMap = buildImportMap(root, props.name);
+
+  if (!isDir(root)) {
+    throw new Error("root should be a directory");
+  }
+  const appFolder = root.nodes.find((node) => node.name === props.name);
+  if (!appFolder) {
+    throw new Error(`app ${props.name} not found`);
+  }
+  const importMap = buildImportMap(appFolder, props.name);
 
   let appManifest = {
     name: props.name,
     baseUrl: import.meta.url,
   };
-  for (const file of walk(root, `/${props.name}`)) {
+  for (const file of walk(appFolder, `/${props.name}`)) {
     if (!/\.tsx?$/.test(file.path)) {
       continue;
     }
