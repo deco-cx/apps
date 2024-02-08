@@ -5,12 +5,11 @@ import type {
   PropertyValue,
 } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
-import getDeviceId from "../../utils/deviceId.ts";
+import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 import getSource from "../../utils/source.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { PageName } from "../../utils/types/chaordic.ts";
-import { Position } from "../../utils/types/chaordic.ts";
-import { Feature } from "../../utils/types/chaordic.ts";
+import { Feature, Position } from "../../utils/types/chaordic.ts";
 
 interface BaseProps {
   /**
@@ -110,7 +109,7 @@ const generateParams = (
     }
     case "category": {
       const properties = props.loader?.products
-        .flatMap((p) => p.isVariantOf?.additionalProperty)
+        .flatMap((p) => p?.additionalProperty)
         .filter(nonNullable) ?? [];
       const categoriesId = new URL(req.url).pathname
         .toLowerCase()
@@ -120,10 +119,10 @@ const generateParams = (
           properties
             .find((p) =>
               p.name === "category" &&
-              p.propertyID &&
-              normalize(p.value ?? "") === category
+              p.value &&
+              normalize(p.value!) === category
             )
-            ?.propertyID
+            ?.value
         )
         .filter(nonNullable) ?? [];
 
@@ -170,7 +169,7 @@ const loader = async (
 
   const { showOnlyAvailable } = props;
   const { chaordicApi, apiKey, secretKey, salesChannel, origin, cdn } = ctx;
-  const deviceId = getDeviceId(req, ctx);
+  const deviceId = getDeviceIdFromBag(ctx);
   const source = getSource(ctx);
 
   const params = generateParams(props, req);

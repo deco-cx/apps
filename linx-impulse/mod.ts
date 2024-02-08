@@ -1,11 +1,18 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type {
+  App as A,
+  AppContext as AC,
+  AppMiddlewareContext as AMC,
+} from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { EventsAPI } from "./utils/events.ts";
-import { LinxAPI } from "./utils/client.ts";
+import { middleware } from "./middleware.ts";
 import { ChaordicAPI } from "./utils/chaordic.ts";
+import { LinxAPI } from "./utils/client.ts";
+import { EventsAPI } from "./utils/events.ts";
 
-export type AppContext = AC<ReturnType<typeof App>>;
+export type App = ReturnType<typeof Linx>;
+export type AppContext = AC<App>;
+export type AppMiddlewareContext = AMC<App>;
 
 /** @title LINX Impulse */
 export interface State {
@@ -36,7 +43,7 @@ export const color = 0xFF6A3B;
 /**
  * @title Linx Impulse
  */
-export default function App(props: State) {
+export default function Linx(props: State) {
   const eventsApi = createHttpClient<EventsAPI>({
     base: "https://api.event.linximpulse.net/",
     headers: new Headers({
@@ -64,7 +71,7 @@ export default function App(props: State) {
     cdn: props.cdn?.replace(/\/$/, "") ?? "", // remove trailing slash
   };
 
-  const app: App<Manifest, typeof state> = { manifest, state };
+  const app: A<Manifest, typeof state> = { manifest, state, middleware };
 
   return app;
 }

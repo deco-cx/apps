@@ -1,11 +1,11 @@
 import { AppContext } from "../../mod.ts";
-import getDeviceId from "../../utils/deviceId.ts";
 import {
   LinxCartItem,
   LinxUser,
   SearchItem,
 } from "../../utils/types/analytics.ts";
 import { Source } from "../../utils/types/linx.ts";
+import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 
 type CategoryParams = {
   page: "category";
@@ -107,11 +107,12 @@ type Props = ViewEvent | ClickEvent | ImpressionEvent;
  */
 const action = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<null> => {
   const { event, params } = props;
   const { eventsApi, api, salesChannel, secretKey, apiKey, chaordicApi } = ctx;
+  const deviceId = getDeviceIdFromBag(ctx);
 
   switch (event) {
     case "view": {
@@ -122,7 +123,7 @@ const action = async (
         source,
         user,
         salesChannel,
-        deviceId: getDeviceId(req, ctx),
+        deviceId,
       };
 
       const headers = {
@@ -213,7 +214,7 @@ const action = async (
       if (interactionType === "SHELF_CLICK") {
         await chaordicApi["GET /v0/click"]({
           trackingClick: trackingId,
-          deviceId: getDeviceId(req, ctx),
+          deviceId,
         });
         return null;
       }
@@ -227,7 +228,7 @@ const action = async (
         source,
         userId: user?.id,
         interactionType,
-        deviceId: getDeviceId(req, ctx),
+        deviceId,
       });
       break;
     }
@@ -237,7 +238,7 @@ const action = async (
         trackingImpression,
         firstOffset,
         lastOffset,
-        deviceId: getDeviceId(req, ctx),
+        deviceId,
       });
       break;
     }

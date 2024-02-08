@@ -1,6 +1,6 @@
 import type { Person, ProductListingPage } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
-import getDeviceId from "../../utils/deviceId.ts";
+import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 import getSource from "../../utils/source.ts";
 import { sortOptions, toProductListingPage } from "../../utils/transform.ts";
 import type { SortBy } from "../../utils/types/linx.ts";
@@ -86,7 +86,7 @@ const loader = async (
 
   const { resultsPerPage, allowRedirect, showOnlyAvailable, user } = props;
   const { apiKey, secretKey, origin, salesChannel, api, cdn } = ctx;
-  const deviceId = getDeviceId(req, ctx);
+  const deviceId = getDeviceIdFromBag(ctx);
   const source = getSource(ctx);
   const url = new URL(req.url);
 

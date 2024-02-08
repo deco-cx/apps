@@ -1,6 +1,6 @@
 import type { Suggestion } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
-import getDeviceId from "../../utils/deviceId.ts";
+import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 import getSource from "../../utils/source.ts";
 import { toProduct, toSearch } from "../../utils/transform.ts";
 
@@ -19,7 +19,7 @@ const loaders = async (
     apiKey,
     secretKey,
     origin,
-    deviceId: getDeviceId(req, ctx),
+    deviceId: getDeviceIdFromBag(ctx),
     salesChannel: ctx.salesChannel,
     source: getSource(ctx),
     productFormat: "complete",
