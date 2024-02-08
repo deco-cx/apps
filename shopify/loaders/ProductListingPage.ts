@@ -24,11 +24,12 @@ import {
 
 export interface Props {
   /**
-   * @description overides the query term
+   * @description overrides the query term at url
    */
   query?: string;
   /**
    * @title Collection Name
+   * @description overrides the collection name at url
    */
   collectionName?: string;
   /**
