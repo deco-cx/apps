@@ -1,5 +1,6 @@
 import { shortcircuit } from "deco/engine/errors.ts";
-import { badRequest, context } from "deco/mod.ts";
+import { badRequest } from "deco/mod.ts";
+import { Context } from "deco/live.ts";
 import manifest from "../../manifest.gen.ts";
 import { AppContext } from "../../mod.ts";
 
@@ -8,6 +9,8 @@ export interface Props {
   owner: string;
   repo: string;
 }
+
+const context = Context.active();
 
 export const webhookUrl = (site: string, domain: string) =>
   `https://sites-${context.site}.${domain}/live/invoke/${manifest.name}/actions/github/webhooks/broker.ts?site=${site}`;

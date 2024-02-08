@@ -1,5 +1,6 @@
+import { Release } from "deco/engine/releases/provider.ts";
 import { fjp } from "../../deps.ts";
-import { storage } from "../../fsStorage.ts";
+import { AppContext } from "../../mod.ts";
 import { Acked, Commands, Events, State } from "../../types.ts";
 
 export interface Props {
@@ -13,28 +14,34 @@ export interface Props {
 
 const subscribers: WebSocket[] = [];
 
-export const fetchState = async (): Promise<State> => ({
-  decofile: await storage.state(),
-});
+export const fetchState = async (release: Release): Promise<State> => {
+  const [decofile, revision] = await Promise.all([
+    release.state(),
+    release.revision(),
+  ]);
 
-const saveState = ({ decofile }: State): Promise<void> =>
-  storage.update(decofile);
+  return { decofile, revision };
+};
+
+const saveState = (release: Release, { decofile }: State): Promise<void> =>
+  release.set!(decofile);
 
 // Apply patch and save state ATOMICALLY!
 // This is easily done on play. On production, however, we probably
 // need a distributed queue
 let queue = Promise.resolve();
-const patchState = (ops: fjp.Operation[]) => {
+const patchState = (release: Release, ops: fjp.Operation[]) => {
   queue = queue.catch(() => null).then(async () =>
-    saveState(ops.reduce(fjp.applyReducer, await fetchState()))
+    saveState(release, ops.reduce(fjp.applyReducer, await fetchState(release)))
   );
 
   return queue;
 };
 
-const action = (_props: Props, req: Request) => {
+const action = (_props: Props, req: Request, ctx: AppContext) => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
+  const storage = ctx.release();
   const broadcast = (event: Acked<Events>) => {
     const message = JSON.stringify(event);
     subscribers.forEach((s) => s.send(message));
@@ -53,15 +60,15 @@ const action = (_props: Props, req: Request) => {
     try {
       if (data.type === "patch-state") {
         try {
-          const { payload: operations } = data;
+          const { payload: operations, revision } = data;
 
-          await patchState(operations);
+          await patchState(storage, operations);
 
           // Broadcast changes
           broadcast({
             type: "state-patched",
             payload: operations,
-            etag: await storage.revision(),
+            revision,
             metadata: {}, // TODO: add metadata
             ack,
           });
@@ -71,8 +78,7 @@ const action = (_props: Props, req: Request) => {
       } else if (data.type === "fetch-state") {
         send({
           type: "state-fetched",
-          payload: await fetchState(),
-          etag: await storage.revision(),
+          payload: await fetchState(storage),
           ack,
         });
       } else {
