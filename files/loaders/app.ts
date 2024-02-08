@@ -4,7 +4,7 @@ import { dirname, join } from "std/path/mod.ts";
 import { DynamicApp } from "../../decohub/mod.ts";
 import website, { Props as WebSiteProps } from "../../website/mod.ts";
 import { AppContext } from "../mod.ts";
-import { create, FileSystemNode, walk } from "../sdk.ts";
+import { FileSystemNode, create, walk } from "../sdk.ts";
 // import {
 //   build,
 //   initialize,
@@ -78,13 +78,12 @@ const compile = async (
   if (!tsModule) {
     return manifest;
   }
-  const blockKey = join(manifest.name, path);
 
   return {
     ...manifest,
     [blockType]: {
       ...manifest[blockType],
-      [blockKey]: tsModule,
+      [path]: tsModule,
     },
   };
 };
@@ -92,18 +91,18 @@ const compile = async (
 const buildImportMap = (root: FileSystemNode, appName: string): ImportMap => {
   const importMap: ImportMap = { imports: {} };
 
-  for (const { path, content } of walk(root)) {
+  for (const { path, content } of walk(root, `/${appName}`)) {
     if (!/\.tsx?$/.test(path)) {
       continue;
     }
 
     const dataUri = contentToDataUri(
-      join(currdir, appName, path),
+      join(currdir, path),
       content,
     );
-    const blockKey = join(appName, path);
 
-    importMap.imports[blockKey] = dataUri;
+    console.log(path, join(currdir, path));
+    importMap.imports[path] = dataUri;
   }
   return importMap;
 };
@@ -123,7 +122,7 @@ const loader = async (
     name: props.name,
     baseUrl: import.meta.url,
   };
-  for (const file of walk(root)) {
+  for (const file of walk(root, `/${props.name}`)) {
     if (!/\.tsx?$/.test(file.path)) {
       continue;
     }
