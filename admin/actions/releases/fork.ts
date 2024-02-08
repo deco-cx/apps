@@ -14,9 +14,14 @@ export interface Props {
 
 const subscribers: WebSocket[] = [];
 
-export const fetchState = async (release: Release): Promise<State> => ({
-  decofile: await release.state({ forceFresh: true }),
-});
+export const fetchState = async (release: Release): Promise<State> => {
+  const [decofile, revision] = await Promise.all([
+    release.state(),
+    release.revision(),
+  ]);
+
+  return { decofile, revision };
+};
 
 const saveState = (release: Release, { decofile }: State): Promise<void> =>
   release.set!(decofile);
@@ -55,7 +60,7 @@ const action = (_props: Props, req: Request, ctx: AppContext) => {
     try {
       if (data.type === "patch-state") {
         try {
-          const { payload: operations } = data;
+          const { payload: operations, revision } = data;
 
           await patchState(storage, operations);
 
@@ -63,7 +68,7 @@ const action = (_props: Props, req: Request, ctx: AppContext) => {
           broadcast({
             type: "state-patched",
             payload: operations,
-            etag: await storage.revision(),
+            revision,
             metadata: {}, // TODO: add metadata
             ack,
           });
@@ -74,7 +79,6 @@ const action = (_props: Props, req: Request, ctx: AppContext) => {
         send({
           type: "state-fetched",
           payload: await fetchState(storage),
-          etag: await storage.revision(),
           ack,
         });
       } else {

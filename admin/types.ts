@@ -11,6 +11,7 @@ export interface Pagination<T> {
 export interface PatchState {
   type: "patch-state";
   payload: fjp.Operation[];
+  revision: string;
 }
 
 export interface FetchState {
@@ -20,7 +21,7 @@ export interface FetchState {
 export interface StatePatched {
   type: "state-patched";
   payload: fjp.Operation[];
-  etag: string;
+  revision: string;
   // Maybe add data and user info in here
   metadata?: unknown;
 }
@@ -28,7 +29,6 @@ export interface StatePatched {
 export interface StateFetched {
   type: "state-fetched";
   payload: State;
-  etag: string;
 }
 
 export interface OperationFailed {
@@ -41,6 +41,7 @@ export type Acked<T> = T & { ack: string };
 
 export interface State {
   decofile: Record<string, Resolvable>;
+  revision: string;
 }
 
 export type Commands = PatchState | FetchState;
