@@ -1,5 +1,5 @@
-import { SourceMap } from "deco/blocks/app.ts";
-import { buildSourceMap } from "deco/blocks/utils.tsx";
+import { ImportMap } from "deco/blocks/app.ts";
+import { buildImportMap } from "deco/blocks/utils.tsx";
 import { type App, AppModule, context, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
@@ -7,7 +7,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 export interface DynamicApp {
   module: AppModule;
   name: string;
-  sourceMap?: SourceMap;
+  importMap?: ImportMap;
 }
 export interface State {
   enableAdmin?: boolean;
@@ -21,23 +21,28 @@ const ADMIN_APP = "decohub/apps/admin.ts";
 export default async function App(
   state: State,
 ): Promise<App<Manifest, State>> {
+  console.log(state?.apps);
   const resolvedImport = import.meta.resolve("../admin/mod.ts");
-  const baseSourceMap = buildSourceMap(manifest);
-  const [dynamicApps, enhancedSourceMap] = (state?.apps ?? []).filter(Boolean)
+  const baseImportMap = buildImportMap(manifest);
+  const [dynamicApps, enhancedImportMap] = (state?.apps ?? []).filter(Boolean)
     .reduce(
-      ([apps, sourcemap], app) => {
+      ([apps, importmap], app) => {
         const appTs = `${app.name}.ts`;
         const appName = `${manifest.name}/apps/${appTs}`;
         return [{
           ...apps,
           [appName]: app.module,
         }, {
-          ...sourcemap,
-          ...app.sourceMap ?? {},
-          [appName]: import.meta.resolve("../website/mod.ts"),
+          ...importmap,
+          ...app.importMap ?? {},
+          imports: {
+            ...importmap?.imports ?? {},
+            ...app.importMap?.imports ?? {},
+            [appName]: import.meta.resolve("../website/mod.ts"),
+          },
         }];
       },
-      [{} as Record<string, AppModule>, baseSourceMap],
+      [{} as Record<string, AppModule>, baseImportMap],
     );
   return {
     manifest: {
@@ -58,9 +63,12 @@ export default async function App(
     state,
     ...context.play || state.enableAdmin
       ? {
-        sourceMap: {
-          ...enhancedSourceMap,
-          [ADMIN_APP]: resolvedImport,
+        importMap: {
+          ...enhancedImportMap,
+          imports: {
+            ...enhancedImportMap?.imports ?? {},
+            [ADMIN_APP]: resolvedImport,
+          },
         },
       }
       : {},
