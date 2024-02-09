@@ -31,7 +31,7 @@ export interface Props {
  * @description Product List loader
  */
 const productListLoader = async (
-  { typeTags = [], ...props }: Props,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
