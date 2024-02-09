@@ -29,7 +29,7 @@ const loader = (
     } data-exclude="/proxy" ${
       flags.map((
         { flagName, flagActive },
-      ) => (`event-${encodeURIComponent(flagName)}="${flagActive}"`)).join(
+      ) => (`event-${flagName.replaceAll(" ", "+")}="${flagActive}"`)).join(
         " ",
       )
     } ${
