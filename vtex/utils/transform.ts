@@ -302,7 +302,8 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [], kitItems } = sku;
+  const { name, ean, itemId: skuId, referenceId = [], kitItems, videos } = sku;
+  const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
@@ -338,6 +339,35 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       model: productReference,
     } satisfies ProductGroup)
     : undefined;
+
+  const finalImages = images?.map(({ imageUrl, imageText, imageLabel }) => {
+    const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
+    const alternateName = imageText || imageLabel || "";
+    const name = imageLabel || "";
+    const encodingFormat = "image";
+
+    return {
+      "@type": "ImageObject" as const,
+      alternateName,
+      url,
+      name,
+      encodingFormat,
+    };
+  }) ?? [DEFAULT_IMAGE];
+
+  const finalVideos = nonEmptyVideos?.map((video) => {
+    const url = video;
+    const alternateName = "Product video";
+    const name = "Product video";
+    const encodingFormat = "video";
+    return {
+      "@type": "VideoObject" as const,
+      alternateName,
+      contentUrl: url,
+      name,
+      encodingFormat,
+    };
+  });
 
   // From schema.org: A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy
   const categoriesString = splitCategory(product.categories[0]).join(
@@ -376,20 +406,8 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: images?.map(({ imageUrl, imageText, imageLabel }) => {
-      const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
-      const alternateName = imageText || imageLabel || "";
-      const name = imageLabel || "";
-      const encodingFormat = "image";
-
-      return {
-        "@type": "ImageObject" as const,
-        alternateName,
-        url,
-        name,
-        encodingFormat,
-      };
-    }) ?? [DEFAULT_IMAGE],
+    image: finalImages,
+    video: finalVideos,
     offers: aggregateOffers(offers, priceCurrency),
   };
 };
@@ -612,7 +630,7 @@ export const legacyFacetToFilter = (
   };
   return {
     "@type": "FilterToggle",
-    quantity: facets.length,
+    quantity: facets?.length,
     label: name,
     key: name,
     values: facets.map((facet) => {
@@ -622,13 +640,22 @@ export const legacyFacetToFilter = (
 
       const selected = mapSet.has(normalizedFacet.Map) &&
         pathSet.has(normalizedFacet.Value);
-
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
         url: getLink(normalizedFacet, selected),
         label: normalizedFacet.Name,
         selected,
+        children: facet.Children?.length > 0
+          ? legacyFacetToFilter(
+            normalizedFacet.Name,
+            facet.Children,
+            url,
+            map,
+            term,
+            behavior,
+          )
+          : undefined,
       };
     }),
   };

@@ -2,17 +2,18 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/blocks/revision.ts";
-import * as $$$1 from "./loaders/blocks/published.ts";
-import * as $$$2 from "./loaders/blocks/latest.ts";
-import * as $$$3 from "./loaders/blocks/listRevisions.ts";
-import * as $$$4 from "./loaders/state.ts";
-import * as $$$5 from "./loaders/releases/get.ts";
-import * as $$$6 from "./loaders/releases/blocks.ts";
-import * as $$$7 from "./loaders/platforms/forSite.ts";
-import * as $$$8 from "./loaders/assistants/code.ts";
-import * as $$$9 from "./loaders/deploy.ts";
-import * as $$$10 from "./loaders/pages/list.ts";
+import * as $$$0 from "./loaders/blocks/get.ts";
+import * as $$$1 from "./loaders/blocks/revision.ts";
+import * as $$$2 from "./loaders/blocks/published.ts";
+import * as $$$3 from "./loaders/blocks/latest.ts";
+import * as $$$4 from "./loaders/blocks/listRevisions.ts";
+import * as $$$5 from "./loaders/state.ts";
+import * as $$$6 from "./loaders/releases/get.ts";
+import * as $$$7 from "./loaders/releases/blocks.ts";
+import * as $$$8 from "./loaders/platforms/forSite.ts";
+import * as $$$9 from "./loaders/assistants/code.ts";
+import * as $$$10 from "./loaders/deploy.ts";
+import * as $$$11 from "./loaders/pages/list.ts";
 import * as $$$$$$$$$0 from "./actions/blocks/publish.ts";
 import * as $$$$$$$$$1 from "./actions/blocks/restore.ts";
 import * as $$$$$$$$$2 from "./actions/blocks/safeDelete.ts";
@@ -35,17 +36,18 @@ import * as $$$$$$$$$18 from "./actions/deployments/create.ts";
 
 const manifest = {
   "loaders": {
-    "deco-sites/admin/loaders/assistants/code.ts": $$$8,
-    "deco-sites/admin/loaders/blocks/latest.ts": $$$2,
-    "deco-sites/admin/loaders/blocks/listRevisions.ts": $$$3,
-    "deco-sites/admin/loaders/blocks/published.ts": $$$1,
-    "deco-sites/admin/loaders/blocks/revision.ts": $$$0,
-    "deco-sites/admin/loaders/deploy.ts": $$$9,
-    "deco-sites/admin/loaders/pages/list.ts": $$$10,
-    "deco-sites/admin/loaders/platforms/forSite.ts": $$$7,
-    "deco-sites/admin/loaders/releases/blocks.ts": $$$6,
-    "deco-sites/admin/loaders/releases/get.ts": $$$5,
-    "deco-sites/admin/loaders/state.ts": $$$4,
+    "deco-sites/admin/loaders/assistants/code.ts": $$$9,
+    "deco-sites/admin/loaders/blocks/get.ts": $$$0,
+    "deco-sites/admin/loaders/blocks/latest.ts": $$$3,
+    "deco-sites/admin/loaders/blocks/listRevisions.ts": $$$4,
+    "deco-sites/admin/loaders/blocks/published.ts": $$$2,
+    "deco-sites/admin/loaders/blocks/revision.ts": $$$1,
+    "deco-sites/admin/loaders/deploy.ts": $$$10,
+    "deco-sites/admin/loaders/pages/list.ts": $$$11,
+    "deco-sites/admin/loaders/platforms/forSite.ts": $$$8,
+    "deco-sites/admin/loaders/releases/blocks.ts": $$$7,
+    "deco-sites/admin/loaders/releases/get.ts": $$$6,
+    "deco-sites/admin/loaders/state.ts": $$$5,
   },
   "actions": {
     "deco-sites/admin/actions/blocks/delete.ts": $$$$$$$$$4,

@@ -65,10 +65,21 @@ export interface Props {
   pageOffset?: number;
 
   /**
+   * @title Page query parameter
+   */
+  page?: number;
+
+  /**
    * @description Include similar products
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 export const sortOptions = [
@@ -147,7 +158,7 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const url = new URL(baseUrl);
+  const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
   const currentPageoffset = props.pageOffset ?? 1;
@@ -165,9 +176,10 @@ const loader = async (
     maybeTerm = result?.possiblePaths[0] ?? maybeTerm;
   }
 
-  const page = url.searchParams.get("page")
+  const pageParam = url.searchParams.get("page")
     ? Number(url.searchParams.get("page")) - currentPageoffset
     : 0;
+  const page = props.page || pageParam;
   const O = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
@@ -328,14 +340,14 @@ const loader = async (
     seo: pageTypesToSeo(
       pageTypes,
       baseUrl,
-      previousPage ? currentPage : undefined,
+      hasPreviousPage ? currentPage : undefined,
     ),
   };
 };
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
@@ -345,6 +357,15 @@ export const cacheKey = (req: Request, ctx: AppContext) => {
 
   url.searchParams.sort();
   url.searchParams.set("segment", token);
+  url.searchParams.set("term", props.term ?? "");
+  url.searchParams.set("count", props.count.toString());
+  url.searchParams.set("page", (props.page ?? 1).toString());
+  url.searchParams.set("sort", props.sort ?? "");
+  url.searchParams.set("filters", props.filters ?? "");
+  url.searchParams.set("fq", props.fq ?? "");
+  url.searchParams.set("ft", props.ft ?? "");
+  url.searchParams.set("map", props.map ?? "");
+  url.searchParams.set("pageOffset", (props.pageOffset ?? 1).toString());
 
   return url.href;
 };

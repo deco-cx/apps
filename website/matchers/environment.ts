@@ -6,7 +6,9 @@ export interface Props {
 }
 
 /**
- * @title Environment Matcher
+ * @title Environment
+ * @description Target users based from where they are accessing your site (development, testing, or production)
+ * @icon code
  */
 const MatchEnvironment = ({ environment }: Props) => {
   const deploymentId = Deno.env.get("DENO_DEPLOYMENT_ID") || "";

@@ -14,7 +14,7 @@ export class MemoryBlockStorage implements BlockStore {
     const ctx = Context.active();
     ctx.release?.set?.(this._state);
   }];
-  protected _revision = crypto.randomUUID();
+  protected _revision: string = crypto.randomUUID();
   constructor() {
   }
 
@@ -39,13 +39,16 @@ export class MemoryBlockStorage implements BlockStore {
     await this.notify();
     return this._state;
   }
-  async update(resolvables: Record<string, Resolvable>): Promise<void> {
+  async set(
+    resolvables: Record<string, Resolvable>,
+    revision?: string,
+  ): Promise<void> {
     this._state = Promise.resolve(resolvables);
-    await this.notify();
+    await this.notify(revision);
   }
-  async notify() {
+  async notify(revision?: string) {
     await this._state;
-    this._revision = crypto.randomUUID();
+    this._revision = revision ?? crypto.randomUUID();
     this.callbacks.forEach((cb) => cb());
   }
   async delete(id: string): Promise<void> {
@@ -83,7 +86,7 @@ export class FsBlockStorage implements BlockStore {
     return this._readOnly ??= newFsProvider(this.fileName);
   }
 
-  async update(resolvables: Record<string, Resolvable>): Promise<void> {
+  async set(resolvables: Record<string, Resolvable>): Promise<void> {
     await Deno.writeTextFile(this.path, JSON.stringify(resolvables));
   }
 
@@ -92,7 +95,7 @@ export class FsBlockStorage implements BlockStore {
   ): Promise<Record<string, Resolvable>> {
     const state = await this.state();
     const merged = { ...state, ...resolvables };
-    await this.update(merged);
+    await this.set(merged);
     return merged;
   }
 
@@ -100,7 +103,7 @@ export class FsBlockStorage implements BlockStore {
     const state = await this.state();
     if (state[id]) {
       delete state[id];
-      await this.update(state);
+      await this.set(state);
     }
   }
 

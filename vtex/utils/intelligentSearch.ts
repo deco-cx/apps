@@ -69,8 +69,8 @@ const IS_ANONYMOUS = Symbol("segment");
 const IS_SESSION = Symbol("segment");
 
 export const getISCookiesFromBag = (ctx: AppContext) => {
-  const anonymous = ctx.bag.get(IS_ANONYMOUS);
-  const session = ctx.bag.get(IS_SESSION);
+  const anonymous = ctx?.bag.get(IS_ANONYMOUS);
+  const session = ctx?.bag.get(IS_SESSION);
 
   if (anonymous && session) {
     return {
@@ -115,8 +115,8 @@ export const setISCookiesBag = (
     });
   }
 
-  ctx.bag.set(IS_ANONYMOUS, anonymous);
-  ctx.bag.set(IS_SESSION, session);
+  ctx?.bag.set(IS_ANONYMOUS, anonymous);
+  ctx?.bag.set(IS_SESSION, session);
 
   return {
     anonymous,

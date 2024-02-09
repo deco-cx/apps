@@ -4,7 +4,7 @@ export interface RouteOpts {
   revisionName: string;
 }
 
-export const routeOf = (
+export const revisionRoute = (
   { namespace, routeName: name, revisionName }: RouteOpts,
 ) => {
   return {
