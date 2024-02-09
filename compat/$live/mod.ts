@@ -104,6 +104,10 @@ export default function App(
   const importMap: ImportMap = {
     ...webSiteManifestImportMap,
     ...workflowsManifestImportMap,
+    imports: {
+      ...webSiteManifestImportMap.imports,
+      ...workflowsManifestImportMap.imports,
+    },
   };
   const _manifest = { ...manifest };
 
