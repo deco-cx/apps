@@ -46,7 +46,7 @@ const productListLoader = async (
       per_page: props?.count,
       "tags[]": props?.tags,
       ...Object.fromEntries(
-        typeTags.map(({ key, value }) => [`type_tags[${key}][]`, value]),
+        (props.typeTags || []).map(({ key, value }) => [`type_tags[${key}][]`, value]),
       ),
       "ids[]": props?.ids,
     }, STALE).then((res) => res.json());
