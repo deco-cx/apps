@@ -31,7 +31,7 @@ export interface Props {
  * @description Product List loader
  */
 const productListLoader = async (
-  { typeTags = [], ...props }: Props,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
@@ -46,7 +46,9 @@ const productListLoader = async (
       per_page: props?.count,
       "tags[]": props?.tags,
       ...Object.fromEntries(
-        typeTags.map(({ key, value }) => [`type_tags[${key}][]`, value]),
+        (props.typeTags || []).map((
+          { key, value },
+        ) => [`type_tags[${key}][]`, value]),
       ),
       "ids[]": props?.ids,
     }, STALE).then((res) => res.json());
