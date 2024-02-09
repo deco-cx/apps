@@ -5,50 +5,12 @@ import { DynamicApp } from "../../decohub/mod.ts";
 import website, { Props as WebSiteProps } from "../../website/mod.ts";
 import { AppContext } from "../mod.ts";
 import { create, FileSystemNode, isDir, walk } from "../sdk.ts";
-// import {
-//   build,
-//   initialize,
-//   transform,
-// } from "https://deno.land/x/esbuild@v0.19.7/wasm.js";
-// import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.8.5/mod.ts';
 
-// const initializePromise = initialize({
-//   wasmURL: "https://deno.land/x/esbuild@v0.19.7/esbuild.wasm",
-//   worker: false,
-// });
 const currdir = dirname(import.meta.url);
 export const contentToDataUri = (path: string, modData: string) =>
   `data:text/tsx;path=${encodeURIComponent(path)};charset=utf-8;base64,${
     btoa(modData)
   }`;
-
-// const importFromString = async (modData: string) => {
-//   await initializePromise;
-//   await build({
-//     write: false,
-//     stdin: {
-//       contents: modData,
-//       loader: "tsx", // or 'ts', 'tsx', etc., depending on your source type
-//     },
-//     platform: "browser",
-//     target: ["es2022"],
-//     format: "esm",
-//     jsx: "automatic",
-//     jsxImportSource: "preact",
-//     plugins: denoPlugins({
-//       nodeModulesDir: false,
-//       configPath: configurationPath ?? undefined,
-//       importMapURL: configurationPath
-//         ? undefined
-//         : (importMapUrl?.href ?? undefined),
-//       loader: 'portable',
-//     })
-//   }).then((res) =>
-//     import(
-//       `data:application/javascript;base64,${btoa(res.outputFiles[0].text)}`
-//     )
-//   );
-// };
 
 export interface TsContent {
   path: string;
@@ -101,7 +63,6 @@ const buildImportMap = (root: FileSystemNode): ImportMap => {
       content,
     );
 
-    console.log(path, join(currdir, path));
     importMap.imports[path] = dataUri;
   }
   return importMap;
