@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import { Section } from "deco/blocks/section.ts";
 import { ComponentMetadata } from "deco/engine/block.ts";
-import { context } from "deco/live.ts";
+import { Context } from "deco/live.ts";
 import {
   usePageContext as useDecoPageContext,
   useRouterContext,
@@ -98,6 +98,7 @@ function Page(
     & Props
     & { errorPage?: Page; devMode: boolean },
 ): JSX.Element {
+  const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 

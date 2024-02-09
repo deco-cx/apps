@@ -51,7 +51,9 @@ const escaped = ({ city, country, regionCode }: Location): Location => {
   };
 };
 /**
- * @title Location Matcher
+ * @title Location
+ * @description Target users based on their geographical location, such as country, city, or region
+ * @icon map-2
  */
 export default function MatchLocation(
   { includeLocations, excludeLocations }: Props,

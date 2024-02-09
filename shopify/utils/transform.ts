@@ -13,7 +13,6 @@ import {
   ProductFragment as ProductShopify,
   ProductVariantFragment as SkuShopify,
 } from "./storefront/storefront.graphql.gen.ts";
-import { SelectedOption as SelectedOptionShopify } from "./types.ts";
 
 const getPath = ({ handle }: ProductShopify, sku?: SkuShopify) =>
   sku
@@ -151,8 +150,26 @@ export const toProduct = (
         ...product.tags?.map((value) =>
           toPropertyValue({ name: "TAG", value })
         ),
-        ...product.collections?.nodes.map(({ title }) =>
-          toPropertyValue({ name: "COLLECTION", value: title })
+        ...product.collections?.nodes.map((
+          { title, handle, id, description, descriptionHtml, image },
+        ) =>
+          toPropertyValue({
+            "@id": id,
+            name: "COLLECTION",
+            value: title,
+            valueReference: handle,
+            description,
+            disambiguatingDescription: descriptionHtml,
+            ...(image &&
+              {
+                image: [{
+                  "@type": "ImageObject",
+                  encodingFormat: "image",
+                  alternateName: image.altText ?? "",
+                  url: image.url,
+                }],
+              }),
+          })
         ),
       ],
       image: nonEmptyArray(images.nodes)?.map((img) => ({
@@ -189,7 +206,9 @@ export const toProduct = (
   };
 };
 
-const toPropertyValue = (option: SelectedOptionShopify): PropertyValue => ({
+const toPropertyValue = (
+  option: Omit<PropertyValue, "@type">,
+): PropertyValue => ({
   "@type": "PropertyValue",
   ...option,
 });

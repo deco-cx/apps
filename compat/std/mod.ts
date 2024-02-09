@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 export { onBeforeResolveProps } from "../../website/mod.ts";
-import { SourceMap } from "deco/blocks/app.ts";
-import { buildSourceMap } from "deco/blocks/utils.tsx";
+import { ImportMap } from "deco/blocks/app.ts";
+import { buildImportMap } from "deco/blocks/utils.tsx";
 import type { App, AppContext as AC, AppManifest } from "deco/mod.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
 import $live, { Props as LiveProps } from "../$live/mod.ts";
@@ -212,17 +212,17 @@ export function WithoutCommerce(
 > {
   const targetApps: Record<
     string,
-    { manifest: AppManifest; sourceMap: SourceMap }
+    { manifest: AppManifest; importMap: ImportMap }
   > = {};
 
   const liveApp = $live(props);
   const { resolvables: _ignoreResolvables, ...webSiteApp } =
     liveApp.dependencies![0];
-  const sourceMap: SourceMap = {
-    ...buildSourceMap(manifest),
+  const importMap: ImportMap = {
+    ...buildImportMap(manifest),
   };
   targetApps["website"] = {
-    sourceMap: buildSourceMap(webSiteApp.manifest),
+    importMap: buildImportMap(webSiteApp.manifest),
     manifest: webSiteApp.manifest,
   };
   const _manifest = { ...manifest };
@@ -231,17 +231,17 @@ export function WithoutCommerce(
     _manifest[blockKey] = { ...(manifest as any)[blockKey] ?? {} };
     for (const [from, to] of Object.entries(blockMappings)) {
       if (to === null) {
-        sourceMap[from] = null;
+        importMap.imports[from] = `data:text/javascript,;`; // ignore
         continue;
       }
       for (
-        const [target, { sourceMap: appSourceMap, manifest: appManifest }]
+        const [target, { importMap: appImportMap, manifest: appManifest }]
           of Object.entries(targetApps)
       ) {
         if (to?.startsWith(target)) {
           // @ts-ignore: blockkeys and from/to always exists for those types
           _manifest[blockKey][from] = appManifest[blockKey][to];
-          sourceMap[from] = appSourceMap[to];
+          importMap.imports[from] = appImportMap.imports[to];
           break;
         }
       }
@@ -250,7 +250,7 @@ export function WithoutCommerce(
 
   return {
     state: props,
-    sourceMap,
+    importMap,
     manifest: _manifest as Manifest,
     dependencies: [liveApp],
   };
@@ -274,7 +274,7 @@ export default function Std(
 > {
   const targetApps: Record<
     string,
-    { manifest: AppManifest; sourceMap: SourceMap }
+    { manifest: AppManifest; importMap: ImportMap }
   > = {};
 
   if (!props.commerce) {
@@ -297,7 +297,7 @@ export default function Std(
     const { manifest, state: appState } = vtex(props.commerce);
     state = { ...state, ...appState };
     targetApps["vtex"] = {
-      sourceMap: buildSourceMap(manifest),
+      importMap: buildImportMap(manifest),
       manifest,
     };
   }
@@ -308,7 +308,7 @@ export default function Std(
     state = { ...state, ...appState };
 
     targetApps["shopify"] = {
-      sourceMap: buildSourceMap(manifest),
+      importMap: buildImportMap(manifest),
       manifest,
     };
   }
@@ -327,18 +327,18 @@ export default function Std(
     state = { ...state, ...appState };
 
     targetApps["vnda"] = {
-      sourceMap: buildSourceMap(manifest),
+      importMap: buildImportMap(manifest),
       manifest,
     };
   }
   const liveApp = $live(props);
   const { resolvables: _ignoreResolvables, ...webSiteApp } =
     liveApp.dependencies![0];
-  const sourceMap: SourceMap = {
-    ...buildSourceMap(manifest),
+  const importMap: ImportMap = {
+    ...buildImportMap(manifest),
   };
   targetApps["website"] = {
-    sourceMap: buildSourceMap(webSiteApp.manifest),
+    importMap: buildImportMap(webSiteApp.manifest),
     manifest: webSiteApp.manifest,
   };
   const _manifest = { ...manifest };
@@ -347,17 +347,17 @@ export default function Std(
     _manifest[blockKey] = { ...(manifest as any)[blockKey] ?? {} };
     for (const [from, to] of Object.entries(blockMappings)) {
       if (to === null) {
-        sourceMap[from] = null;
+        importMap.imports[from] = `data:text/javascript,;`; // ignore
         continue;
       }
       for (
-        const [target, { sourceMap: appSourceMap, manifest: appManifest }]
+        const [target, { importMap: appImportMap, manifest: appManifest }]
           of Object.entries(targetApps)
       ) {
         if (to?.startsWith(target)) {
           // @ts-ignore: blockkeys and from/to always exists for those types
           _manifest[blockKey][from] = appManifest[blockKey][to];
-          sourceMap[from] = appSourceMap[to];
+          importMap.imports[from] = appImportMap.imports[to];
           break;
         }
       }
@@ -368,7 +368,7 @@ export default function Std(
 
   return {
     state,
-    sourceMap,
+    importMap,
     manifest: _manifest as Manifest,
     dependencies: [liveApp, {
       ...commerceApp,

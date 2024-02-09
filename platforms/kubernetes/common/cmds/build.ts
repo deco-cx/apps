@@ -57,38 +57,12 @@ async function build() {
   interface FreshProject {
     buildArgs?: string[];
   }
-  const getFrshProject = async (): Promise<FreshProject | undefined> => {
-    const readFileOrUndefined = (file: string) =>
-      Deno.readTextFile(join(sourceLocalDir!, file)).catch((err) => {
-        if (err instanceof Deno.errors.NotFound) {
-          return undefined;
-        }
-        throw err;
-      });
-    const denoJson = await Promise.all([
-      readFileOrUndefined("deno.json").then((str) =>
-        str ? JSON.parse(str) : str
-      )
-        .catch((_err) => undefined),
-      readFileOrUndefined("deno.jsonc").then(async (str) => {
-        if (!str) {
-          return undefined;
-        }
-
-        const parser = await import(
-          "https://deno.land/std@0.204.0/jsonc/parse.ts"
-        ).catch((_err) => undefined);
-        if (!parser) {
-          return undefined;
-        }
-        return parser.parse(str);
-      }),
-    ]);
-    const parsedDenoJson = denoJson.find(Boolean);
-    if (!parsedDenoJson) {
+  // deno-lint-ignore no-explicit-any
+  const getFrshProject = (denoJson: any): FreshProject | undefined => {
+    if (!denoJson) {
       return undefined;
     }
-    const hasFreshImport = parsedDenoJson?.imports?.["$fresh/"];
+    const hasFreshImport = denoJson?.imports?.["$fresh/"];
     return {
       buildArgs: hasFreshImport
         ? ["run", "--node-modules-dir=false", "-A", "dev.ts", "build"]
@@ -197,8 +171,77 @@ async function build() {
       Deno.exit(status.code);
     }
   }
+
+  const getDenoJson = async () => {
+    const readFileOrUndefined = (file: string) =>
+      Deno.readTextFile(join(sourceLocalDir!, file)).catch((err) => {
+        if (err instanceof Deno.errors.NotFound) {
+          return undefined;
+        }
+        throw err;
+      });
+    const denoJson = await Promise.all([
+      readFileOrUndefined("deno.json").then((str) =>
+        str ? JSON.parse(str) : str
+      )
+        .catch((_err) => undefined),
+      readFileOrUndefined("deno.jsonc").then(async (str) => {
+        if (!str) {
+          return undefined;
+        }
+
+        const parser = await import(
+          "https://deno.land/std@0.204.0/jsonc/parse.ts"
+        ).catch((_err) => undefined);
+        if (!parser) {
+          return undefined;
+        }
+        return parser.parse(str);
+      }),
+    ]);
+
+    if (denoJson[0]) {
+      return ["deno.json", denoJson[0]];
+    } else {
+      return ["deno.jsonc", denoJson[1]];
+    }
+  };
+
+  const overrideDenoJson = async (
+    configFileName: string,
+    // deno-lint-ignore no-explicit-any
+    denoJson: Record<string, any>,
+  ) => {
+    if (!denoJson) {
+      return undefined;
+    }
+    const hasNodeModulesDir = denoJson?.nodeModulesDir;
+
+    if (hasNodeModulesDir && hasNodeModulesDir !== false) {
+      denoJson.nodeModulesDir = false;
+      const fileContent = JSON.stringify(denoJson, null, 2);
+      await Deno.writeTextFile(
+        join(sourceLocalDir!, configFileName),
+        fileContent,
+      ).catch(
+        (err) => {
+          if (err instanceof Deno.errors.NotFound) {
+            return denoJson;
+          }
+          throw err;
+        },
+      );
+    }
+
+    return denoJson;
+  };
+
+  const [configFileName, denoJson] = await getDenoJson();
+
+  const finalDenoJson = await overrideDenoJson(configFileName, denoJson);
+
   console.log(`generating cache...`);
-  const freshPrj = await getFrshProject();
+  const freshPrj = getFrshProject(finalDenoJson);
   await genCache(freshPrj !== undefined);
   if (freshPrj?.buildArgs) {
     console.log(`building project...`);

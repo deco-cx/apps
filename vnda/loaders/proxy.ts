@@ -16,6 +16,7 @@ const PAGE_PATHS = [
   "/conta/*",
   "/cupom/ajax",
   "/entrar",
+  "/entrar/*",
   "/images/*",
   "/javascripts/*",
   "/loja/configuracoes",

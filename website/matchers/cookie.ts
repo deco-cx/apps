@@ -10,7 +10,9 @@ export interface Props {
 }
 
 /**
- * @title Cookie Matcher
+ * @title Cookie
+ * @description Target users that have a specific cookie
+ * @icon cookie
  */
 const MatchCookie = (
   { name, value }: Props,
