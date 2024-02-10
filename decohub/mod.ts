@@ -1,15 +1,19 @@
 import { ImportMap } from "deco/blocks/app.ts";
 import { buildImportMap } from "deco/blocks/utils.tsx";
 import { notUndefined } from "deco/engine/core/utils.ts";
-import { AppModule, context, type App, type FnContext } from "deco/mod.ts";
+import { type App, AppModule, context, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
+/**
+ * @title App
+ */
 export interface DynamicApp {
   importUrl: string;
   name: string;
   importMap?: ImportMap;
 }
+
 export interface State {
   enableAdmin?: boolean;
   apps: DynamicApp[];

@@ -1,12 +1,15 @@
 import { ImportMap } from "deco/blocks/app.ts";
 import { decoManifestBuilder } from "deco/engine/manifest/manifestGen.ts";
-import { AppManifest } from "deco/mod.ts";
 import { createCache } from "https://deno.land/x/deno_cache@0.6.3/mod.ts";
 import { build, initialize } from "https://deno.land/x/esbuild@v0.19.7/wasm.js";
+import {
+  resolveImportMap,
+  resolveModuleSpecifier,
+} from "https://deno.land/x/importmap@0.2.1/mod.ts";
 import { dirname, join } from "std/path/mod.ts";
 import { DynamicApp } from "../../decohub/mod.ts";
 import { AppContext } from "../mod.ts";
-import { create, FileSystemNode, isDir, nodesToMap, walk } from "../sdk.ts";
+import { FileSystemNode, create, isDir, nodesToMap, walk } from "../sdk.ts";
 
 const initializePromise = initialize({
   wasmURL: "https://deno.land/x/esbuild@v0.19.7/esbuild.wasm",
@@ -15,71 +18,90 @@ const initializePromise = initialize({
 
 const decoder = new TextDecoder();
 let cache: ReturnType<typeof createCache> | null = null;
+
 async function resolveImports(
   contents: string,
-  inlineImportMap: ImportMap,
+  importMap: ImportMap,
 ): Promise<string> {
   await initializePromise;
-  const resolvedImportMap: ImportMap = { imports: {} };
-  cache ??= createCache();
+  const currdirUrl = new URL(currdir);
+  const resolvedImportMap = resolveImportMap(importMap, currdirUrl);
 
-  for (const [key, value] of Object.entries(inlineImportMap.imports)) {
-    resolvedImportMap.imports[key] = await cache.load(value).then(
-      (cached) => {
-        const content = (cached as { content: string | Uint8Array }).content;
-        if (!content) {
-          return key;
-        }
-        if (typeof content === "string") {
-          return content;
-        }
-        return decoder.decode(content);
-      },
-    );
-  }
   const { outputFiles } = await build({
     stdin: {
       contents,
       loader: "tsx",
     },
+    platform: "browser",
     jsxImportSource: "preact",
+    jsx: "automatic",
     format: "esm", // Set output format to ESM
     bundle: true,
     write: false,
-    plugins: [{
-      name: "replace-imports",
-      setup(build) {
-        build.onResolve({ filter: /.*/ }, async (args) => {
-          const specifier = args.path;
-          if (specifier in resolvedImportMap.imports) {
-            return {
-              path: contentToDataUri(
-                await resolveImports(
-                  resolvedImportMap.imports[specifier],
+    plugins: [
+      {
+        name: "env",
+        setup(build) {
+          build.onResolve({ filter: /.*/ }, (args) => {
+            try {
+              return {
+                path: resolveModuleSpecifier(
+                  args.path,
                   resolvedImportMap,
+                  currdirUrl,
                 ),
-                specifier,
-              ),
-              external: true,
-            };
-          } else {
-            console.log("DOES NOT HAVE", specifier);
-          }
-          return null;
-        });
+                namespace: "code-inline",
+              };
+            } catch {
+              return {
+                path: args.path,
+                external: true,
+              };
+            }
+          });
+          build.onLoad(
+            { filter: /.*/, namespace: "code-inline" },
+            async (args) => {
+              const specifier = args.path;
+              cache ??= createCache();
+              return {
+                loader: "tsx",
+                contents: await cache.load(specifier).then(
+                  (cached) => {
+                    const content = (cached as { content: string | Uint8Array })
+                      ?.content;
+                    if (!content) {
+                      return specifier;
+                    }
+                    if (typeof content === "string") {
+                      return content;
+                    }
+                    return decoder.decode(content);
+                  },
+                ),
+              };
+            },
+          );
+        },
       },
-    }],
+    ],
   });
 
   return outputFiles[0].text;
 }
 
 const currdir = dirname(import.meta.url);
-export const contentToDataUri = (path: string, modData: string) =>
-  `data:text/tsx;path=${encodeURIComponent(path)};charset=utf-8;base64,${
+
+export const contentToDataUri = (
+  path: string,
+  modData: string,
+  mimeType = "text/tsx",
+) =>
+  `data:${mimeType};path=${encodeURIComponent(path)};charset=utf-8;base64,${
     btoa(modData)
   }`;
-
+export const contentToJSONDataUri = (path: string, modData: string) =>
+  contentToDataUri(path, modData, "application/json");
 export interface TsContent {
   path: string;
   content: string;
@@ -93,32 +115,6 @@ const rewriteImports = (content: string, importMap: ImportMap): string => {
     );
   }
   return initialContent;
-};
-const compile = async (
-  blockType: keyof Omit<AppManifest, "baseUrl" | "name">,
-  { path, content }: TsContent,
-  manifest: AppManifest,
-  importMap: ImportMap,
-): Promise<AppManifest> => {
-  const dataUri = contentToDataUri(
-    join(currdir, manifest.name, path),
-    rewriteImports(content, importMap),
-  );
-  const tsModule = await import(dataUri).catch((err) => {
-    console.error("could not compile module", path, err);
-    return null;
-  });
-  if (!tsModule) {
-    return manifest;
-  }
-
-  return {
-    ...manifest,
-    [blockType]: {
-      ...manifest[blockType],
-      [path]: tsModule,
-    },
-  };
 };
 
 const buildImportMap = (root: FileSystemNode): ImportMap => {
@@ -172,6 +168,8 @@ const loader = async (
   }
 
   const importMap = buildImportMap(appFolder);
+  importMap.imports[`${props.name}/`] = `./`;
+  importMap.imports["./"] = currdir;
   const nodeMap = nodesToMap(appFolder.nodes);
 
   const manifestString =
@@ -186,9 +184,10 @@ const loader = async (
         yield file;
       }
     })).build();
+  const withRelativeImports = includeRelative(props.name, importMap);
   const bundledManifest = await resolveImports(
     manifestString,
-    includeRelative(props.name, importMap),
+    withRelativeImports,
   );
 
   console.log(bundledManifest);
