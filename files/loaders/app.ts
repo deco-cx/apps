@@ -19,7 +19,7 @@ const initializePromise = initialize({
 const decoder = new TextDecoder();
 let cache: ReturnType<typeof createCache> | null = null;
 
-async function resolveImports(
+async function bundle(
   contents: string,
   importMap: ImportMap,
 ): Promise<string> {
@@ -44,12 +44,19 @@ async function resolveImports(
         setup(build) {
           build.onResolve({ filter: /.*/ }, (args) => {
             try {
+              const resolvedByInlineImportMap = resolveModuleSpecifier(
+                args.path,
+                resolvedImportMap,
+                currdirUrl,
+              );
+              if (!resolvedByInlineImportMap.startsWith("data:")) {
+                return {
+                  path: args.path,
+                  external: true,
+                };
+              }
               return {
-                path: resolveModuleSpecifier(
-                  args.path,
-                  resolvedImportMap,
-                  currdirUrl,
-                ),
+                path: resolvedByInlineImportMap,
                 namespace: "code-inline",
               };
             } catch {
@@ -102,20 +109,11 @@ export const contentToDataUri = (
   }`;
 export const contentToJSONDataUri = (path: string, modData: string) =>
   contentToDataUri(path, modData, "application/json");
+
 export interface TsContent {
   path: string;
   content: string;
 }
-const rewriteImports = (content: string, importMap: ImportMap): string => {
-  let initialContent = content;
-  for (const [key, value] of Object.entries(importMap.imports)) {
-    initialContent = initialContent.replaceAll(
-      `from "${key}"`,
-      `from "${value}"`,
-    );
-  }
-  return initialContent;
-};
 
 const buildImportMap = (root: FileSystemNode): ImportMap => {
   const importMap: ImportMap = { imports: {} };
@@ -184,26 +182,25 @@ const loader = async (
         yield file;
       }
     })).build();
-  const withRelativeImports = includeRelative(props.name, importMap);
-  const bundledManifest = await resolveImports(
-    manifestString,
-    withRelativeImports,
-  );
 
-  console.log(bundledManifest);
-
-  let importUrl: string;
-  const modTs = appFolder.nodes.find((node) => node.name === "mod.ts");
   const manifestImport = contentToDataUri(
     join(currdir, props.name, "manifest.gen.ts"),
-    bundledManifest,
+    manifestString,
   );
-  if (!modTs || isDir(modTs)) {
-    importUrl = contentToDataUri(
-      join(currdir, props.name, "mod.ts"),
-      `
+
+  const manifestImportStr = `${props.name}/manifest.gen.ts`;
+
+  importMap.imports[manifestImportStr] = manifestImport;
+
+  const withRelativeImports = includeRelative(props.name, importMap);
+
+  const modTs = appFolder.nodes.find((node) => node.name === "mod.ts");
+
+  let modTsContent = modTs && !isDir(modTs) ? modTs.content : undefined;
+  if (!modTsContent) {
+    modTsContent = `
 \n
-import manifest, { Manifest } from "${manifestImport}";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import website, { Props as WebSiteProps } from "apps/website/mod.ts";
 import { App, AppContext as AC } from "deco/mod.ts";
 
@@ -217,34 +214,16 @@ export default function App(props: WebSiteProps): App<Manifest, WebSiteProps, [R
 }
 export type AppContext = AC<ReturnType<typeof App>>;
 \n
-`,
-    );
-  } else {
-    importUrl = contentToDataUri(
-      join(currdir, props.name, "mod.ts"),
-      rewriteImports(modTs.content, {
-        ...importMap,
-        imports: {
-          ...importMap.imports,
-          [`${props.name}/manifest.gen.ts`]: manifestImport,
-        },
-      }),
-    );
+    `;
   }
+
   return {
     name: props.name,
-    importUrl,
+    importUrl: contentToDataUri(
+      join(currdir, props.name, "mod.ts"),
+      await bundle(modTsContent, withRelativeImports),
+    ),
     importMap,
-    // module: {
-    //   default: (props: WebSiteProps) => {
-    //     return {
-    //       state: props,
-    //       manifest: appManifest,
-    //       importMap: importMap,
-    //       dependencies: [website(props)],
-    //     };
-    //   },
-    // },
   };
 };
 
