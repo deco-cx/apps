@@ -1,11 +1,7 @@
 import { getFlagsFromCookies } from "../../utils/cookie.ts";
 import { Script } from "../../website/types.ts";
 import { AppContext } from "../mod.ts";
-import {
-  defaultExclusionPropsAndHashScript,
-  exclusionPropsAndHashScript,
-} from "../scripts/plausible_scripts.ts";
-import { dataURI, scriptAsDataURI } from "../../utils/dataURI.ts";
+import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 export type Props = {
   defer?: boolean;
@@ -21,6 +17,25 @@ declare global {
   }
 }
 
+const snippet = (flags: Record<string, string | boolean>) => {
+
+  const trackPageview = () => globalThis.window.plausible("pageview", { props : flags });
+
+  // First load
+  trackPageview();
+
+  // Attach pushState and popState listeners
+  const originalPushState = history.pushState;
+  if (originalPushState) {
+    history.pushState = function () {
+      // @ts-ignore monkey patch
+      originalPushState.apply(this, arguments);
+      trackPageview();
+    };
+    addEventListener("popstate", trackPageview);
+  }
+}
+
 const loader = (
   props: Props,
   _req: Request,
@@ -32,7 +47,9 @@ const loader = (
     const preconnectLink =
       '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
 
-    const flags = getFlagsFromCookies(req);
+    const _flags = getFlagsFromCookies(req);
+    const flags: Record<string, string | boolean> = {}
+    _flags.forEach((flag) => flags[flag.flagName] = flag.flagActive)
 
     const plausibleScript = `<script ${
       props.defer ? "defer" : ""
@@ -40,13 +57,7 @@ const loader = (
       props.domain ? "data-domain=" + props.domain : ""
     } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.local.js"></script>`;
 
-    const snippet = `
-      plausible('pageview', {props: {
-        ${flags.map(({ flagName, flagActive }) => `"${flagName}": "${flagActive}",`)}
-      }})
-    `
-
-    const flagsScript = `<script defer src="${dataURI("text/javascript", true, `(${snippet})()`)}"></script>`;
+    const flagsScript = `<script defer src="${scriptAsDataURI(snippet, flags)}"></script>`;
 
     return dnsPrefetchLink + preconnectLink + plausibleScript + flagsScript;
   };
