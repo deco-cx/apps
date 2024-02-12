@@ -596,19 +596,19 @@ export const legacyFacetToFilter = (
   const mapSet = new Set(mapSegments);
   const pathSet = new Set(pathSegments);
 
+  // for productClusterIds, we have to use the full path
+  // example: 
+  // category2/123?map=c,productClusterIds -> DO NOT WORK
+  // category1/category2/123?map=c,c,productClusterIds -> WORK
+  const hasToBeFullpath = mapSegments.includes("productClusterIds")
+
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
 
-    // for productClusterIds, we have to use the full path
-    // example: 
-    // category2/123?map=c,productClusterIds -> DO NOT WORK
-    // category1/category2/123?map=c,c,productClusterIds -> WORK
-    const haveToBeFullpath = mapSegments.includes("productClusterIds")
-
-    const map = haveToBeFullpath ? facet.Link.split("map=")[1].split(",") : [facet.Map]
-    const value = haveToBeFullpath ? facet.Link.split("?")[0].slice(1).split("/") : [facet.Value]
-    const _mapSegments = haveToBeFullpath ? ["productClusterIds"] : mapSegments
-    const _pathSegments = haveToBeFullpath ? [pathSegments[mapSegments.indexOf("productClusterIds")]] : pathSegments
+    const map = hasToBeFullpath ? facet.Link.split("map=")[1].split(",") : [facet.Map]
+    const value = hasToBeFullpath ? facet.Link.split("?")[0].slice(1).split("/") : [facet.Value]
+    const _mapSegments = hasToBeFullpath ? ["productClusterIds"] : mapSegments
+    const _pathSegments = hasToBeFullpath ? [pathSegments[mapSegments.indexOf("productClusterIds")]] : pathSegments
 
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
