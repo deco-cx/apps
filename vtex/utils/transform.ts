@@ -598,7 +598,6 @@ export const legacyFacetToFilter = (
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
-
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
       : [...mapSegments, facet.Map];
@@ -609,21 +608,21 @@ export const legacyFacetToFilter = (
     // Insertion-sort like algorithm. Uses the c-continuum theorem
     const zipped: [string, string][] = [];
     for (let it = 0; it < newMap.length; it++) {
-        let i = 0;
-        if (newMap[it] === "productClusterIds") {
-            // If it's "productClusterIds", insert at the beginning, before all others
-            zipped.splice(i, 0, [newMap[it], newPath[it]]);
-        } else {
-            // Find the correct position for elements that are not "productClusterIds"
-            while (i < zipped.length && zipped[i][0] === "productClusterIds") {
-                i++; // Skip all "productClusterIds" to maintain their priority
-            }
-            // Now, find the position for inserting, considering 'c' or 'C'
-            while (i < zipped.length && (zipped[i][0].toLowerCase() === "c")) {
-                i++; // Skip elements starting with 'c' or 'C', which have lower priority than "productClusterIds"
-            }
-            zipped.splice(i, 0, [newMap[it], newPath[it]]);
+      let i = 0;
+      if (newMap[it] === "productClusterIds") {
+        // If it's "productClusterIds", insert at the beginning, before all others
+        zipped.splice(i, 0, [newMap[it], newPath[it]]);
+      } else {
+        // Find the correct position for elements that are not "productClusterIds"
+        while (i < zipped.length && zipped[i][0] === "productClusterIds") {
+          i++; // Skip all "productClusterIds" to maintain their priority
         }
+        // Now, find the position for inserting, considering 'c' or 'C'
+        while (i < zipped.length && (zipped[i][0].toLowerCase() === "c")) {
+          i++; // Skip elements starting with 'c' or 'C', which have lower priority than "productClusterIds"
+        }
+        zipped.splice(i, 0, [newMap[it], newPath[it]]);
+      }
     }
 
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
