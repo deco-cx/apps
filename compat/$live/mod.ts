@@ -1,14 +1,14 @@
 // deno-lint-ignore-file no-explicit-any
 import type { App } from "deco/mod.ts";
 // this should not be changed to $live because newly created versions might not include live.gen.ts.
-import { buildSourceMap } from "deco/blocks/utils.tsx";
+import { buildImportMap } from "deco/blocks/utils.tsx";
 import type { Manifest as LiveManifest } from "deco/live.gen.ts";
 
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
 import webSite, { Props } from "../../website/mod.ts";
 import type { Manifest as WorkflowsManifest } from "../../workflows/manifest.gen.ts";
 
-import { AppContext as AC, SourceMap } from "deco/blocks/app.ts";
+import { AppContext as AC, ImportMap } from "deco/blocks/app.ts";
 import workflows from "../../workflows/mod.ts";
 import manifest, { Manifest as _Manifest } from "./manifest.gen.ts";
 
@@ -99,11 +99,15 @@ export default function App(
   const workflowsApp = workflows({});
   const webSiteManifest = webSiteApp.manifest;
   const workflowsManifest = workflowsApp.manifest;
-  const webSiteManifestSourceMap = buildSourceMap(webSiteManifest);
-  const workflowsManifestSourceMap = buildSourceMap(workflowsManifest);
-  const sourceMap: SourceMap = {
-    ...webSiteManifestSourceMap,
-    ...workflowsManifestSourceMap,
+  const webSiteManifestImportMap = buildImportMap(webSiteManifest);
+  const workflowsManifestImportMap = buildImportMap(workflowsManifest);
+  const importMap: ImportMap = {
+    ...webSiteManifestImportMap,
+    ...workflowsManifestImportMap,
+    imports: {
+      ...webSiteManifestImportMap.imports,
+      ...workflowsManifestImportMap.imports,
+    },
   };
   const _manifest = { ...manifest };
 
@@ -114,18 +118,26 @@ export default function App(
       if (to.startsWith("website")) {
         // @ts-ignore: blockkeys and from/to always exists for those types
         _manifest[blockKey][from] = webSiteManifest[blockKey][to];
-        sourceMap[from] = webSiteManifestSourceMap[to];
+        importMap.imports[from] = webSiteManifestImportMap.imports[to];
       } else if (to.startsWith("workflows")) {
         // @ts-ignore: blockkeys and from/to always exists for those types
         _manifest[blockKey][from] = workflowsManifest[blockKey][to];
-        sourceMap[from] = workflowsManifestSourceMap[to];
+        importMap.imports[from] = workflowsManifestImportMap.imports[to];
       }
     }
   }
 
+  const liveImportMap = buildImportMap(manifest);
   return {
     state,
-    sourceMap: { ...buildSourceMap(manifest), ...sourceMap },
+    importMap: {
+      ...liveImportMap,
+      ...importMap,
+      imports: {
+        ...liveImportMap.imports,
+        ...importMap.imports,
+      },
+    },
     manifest: _manifest as Manifest,
     dependencies: [webSiteApp, workflowsApp],
   };

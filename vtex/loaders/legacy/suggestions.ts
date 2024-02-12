@@ -32,7 +32,7 @@ const loaders = async (
   const suggestions = await vcsDeprecated["GET /buscaautocomplete"](
     {
       maxRows: count,
-      productNameContains: query,
+      productNameContains: encodeURIComponent(query ?? ""),
       suggestionsStack: "",
     },
     {

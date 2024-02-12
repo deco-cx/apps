@@ -24,14 +24,34 @@ import {
 
 export interface Props {
   /**
-   * @description overides the query term
+   * @description overrides the query term at url
    */
   query?: string;
+  /**
+   * @title Collection Name
+   * @description overrides the collection name at url
+   */
+  collectionName?: string;
   /**
    * @title Items per page
    * @description number of products per page to display
    */
   count: number;
+  /**
+   * @hide
+   * @description it is hidden because only page prop is not sufficient, we need cursors
+   */
+  page?: number;
+  /**
+   * @hide
+   * @description at admin user do not know cursor, it is useful to invokes like show more products
+   */
+  startCursor?: string;
+  /**
+   * @hide
+   * @description at admin user do not know cursor, it is useful to invokes like show more products
+   */
+  endCursor?: string;
   /**
    * @hide true
    * @description The URL of the page, used to override URL from request
@@ -53,9 +73,10 @@ const loader = async (
 
   const count = props.count ?? 12;
   const query = props.query || url.searchParams.get("q") || "";
-  const page = Number(url.searchParams.get("page")) ?? 0;
-  const endCursor = url.searchParams.get("endCursor") ?? "";
-  const startCursor = url.searchParams.get("startCursor") ?? "";
+  const page = props.page || Number(url.searchParams.get("page")) || 0;
+  const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
+  const startCursor = props.startCursor ||
+    url.searchParams.get("startCursor") || "";
 
   const isSearch = Boolean(query);
   let hasNextPage = false;
@@ -98,7 +119,7 @@ const loader = async (
     } else {
       // TODO: understand how accept more than one path
       // example: /collections/first-collection/second-collection
-      const pathname = url.pathname.split("/")[1];
+      const pathname = props.collectionName || url.pathname.split("/")[1];
 
       const data = await storefront.query<
         QueryRoot,

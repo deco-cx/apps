@@ -25,11 +25,18 @@ export const isDir = (n: FileSystemNode): n is DirectoryEntry => {
 
 export const create = (): DirectoryEntry => ({ nodes: [], name: "" });
 
+const join = (first: string, second: string) =>
+  !first.endsWith("/") && !second.startsWith("/")
+    ? `${first}/${second}`
+    : first.endsWith("/") && second.startsWith("/")
+    ? `${first}${second.slice(1)}`
+    : `${first}${second}`;
+
 export function* walk(
   fs: FileSystemNode,
   path = "",
 ): Generator<{ content: string; path: string; name: string }> {
-  const currentPath = `${path}/${fs.name}`;
+  const currentPath = join(path, fs.name);
   if (isDir(fs)) {
     for (const node of fs.nodes) {
       yield* walk(node, currentPath);
