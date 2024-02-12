@@ -126,6 +126,10 @@ const toProductUrl = (
   const productURL = new URL(fixURL(url, cdn));
   productURL.searchParams.delete("v");
 
+  if (!productURL.pathname.endsWith("/p")) {
+    productURL.pathname += "/p";
+  }
+
   if (sku) {
     productURL.searchParams.set("v", sku);
   }
