@@ -1,3 +1,5 @@
+import { ProductPriceVariant } from "../openapi/vnda.openapi.gen.ts";
+
 export type Sort = "newest" | "oldest" | "lowest_price" | "highest_price";
 
 export interface ProductSearchResult {
@@ -384,4 +386,16 @@ export interface SEO {
   resource_type: string;
   resource_id: number;
   parent_id: null | number;
+}
+
+export interface ProductPrice {
+  available: boolean;
+  on_sale: boolean;
+  price: number;
+  sale_price: number;
+  intl_price: number;
+  discount_rule?: unknown;
+  updated_at: string;
+  installments: Installment[];
+  variants: ProductPriceVariant[];
 }

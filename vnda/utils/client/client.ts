@@ -2,6 +2,7 @@ import {
   Item,
   OrderForm,
   ProductGroup,
+  ProductPrice,
   ProductSearchResult,
   RelatedItemTag,
   SEO,
@@ -15,6 +16,12 @@ export interface API {
   "GET /api/v2/products/:id": {
     response: ProductGroup;
     searchParams: { include_images: boolean };
+  };
+
+  /** @docs https://developers.vnda.com.br/reference/get-api-v2-products-product_id-price */
+  "GET /api/v2/products/:productId/price": {
+    response: ProductPrice;
+    searchParams: { coupon_codes?: string[] };
   };
 
   /** @docs https://developers.vnda.com.br/reference/get-api-v2-banners */
