@@ -120,9 +120,10 @@ const generateParams = (
             .find((p) =>
               p.name === "category" &&
               p.value &&
+              p.propertyID &&
               normalize(p.value!) === category
             )
-            ?.value
+            ?.propertyID
         )
         .filter(nonNullable) ?? [];
 
