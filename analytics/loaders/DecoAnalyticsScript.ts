@@ -18,8 +18,8 @@ declare global {
 }
 
 const snippet = (flags: Record<string, string | boolean>) => {
-
-  const trackPageview = () => globalThis.window.plausible("pageview", { props : flags });
+  const trackPageview = () =>
+    globalThis.window.plausible("pageview", { props: flags });
 
   // First load
   trackPageview();
@@ -34,7 +34,7 @@ const snippet = (flags: Record<string, string | boolean>) => {
     };
     addEventListener("popstate", trackPageview);
   }
-}
+};
 
 const loader = (
   props: Props,
@@ -48,8 +48,8 @@ const loader = (
       '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
 
     const _flags = getFlagsFromCookies(req);
-    const flags: Record<string, string | boolean> = {}
-    _flags.forEach((flag) => flags[flag.flagName] = flag.flagActive)
+    const flags: Record<string, string | boolean> = {};
+    _flags.forEach((flag) => flags[flag.flagName] = flag.flagActive);
 
     const plausibleScript = `<script ${
       props.defer ? "defer" : ""
@@ -57,7 +57,9 @@ const loader = (
       props.domain ? "data-domain=" + props.domain : ""
     } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.local.js"></script>`;
 
-    const flagsScript = `<script defer src="${scriptAsDataURI(snippet, flags)}"></script>`;
+    const flagsScript = `<script defer src="${
+      scriptAsDataURI(snippet, flags)
+    }"></script>`;
 
     return dnsPrefetchLink + preconnectLink + plausibleScript + flagsScript;
   };

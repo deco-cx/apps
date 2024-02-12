@@ -43,6 +43,7 @@ const snippet = () => {
   // setup plausible script and unsubscribe
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event || event.name !== "deco") return;
+
     if (event.params) {
       const { flags, page } = event.params;
       if (Array.isArray(flags)) {
@@ -62,6 +63,7 @@ const snippet = () => {
     const { name, params } = event;
 
     if (!name || !params || name === "deco") return;
+
     const values = { ...props };
     for (const key in params) {
       // @ts-expect-error somehow typescript bugs
