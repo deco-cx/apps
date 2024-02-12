@@ -108,8 +108,6 @@ const loader = async (
   const userId = user?.["@id"];
   const productFormat = "complete";
 
-  console.log({ searchTerm, category, multicategory });
-
   try {
     if (searchTerm) {
       const response = await api["GET /engage/search/v3/search"]({
