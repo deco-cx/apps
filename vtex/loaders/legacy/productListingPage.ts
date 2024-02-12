@@ -310,16 +310,13 @@ const loader = async (
     .filter((x): x is Filter => Boolean(x))
     // Sort category name by position of api facets
     // because order is not preserved by object
-    .sort((a, b) => {
-      const aIndex = (vtexFacets.CategoriesTrees as LegacyFacet[]).findIndex(
-        ({ Name }) => a.label.localeCompare(Name),
+    .toSorted((a, b) => {
+      const aIndex = vtexFacets.Departments.findIndex((x) =>
+        x.Name === a.label
       );
-      const bIndex = (vtexFacets.CategoriesTrees as LegacyFacet[]).findIndex(
-        ({ Name }) => b.label.localeCompare(Name),
+      const bIndex = vtexFacets.Departments.findIndex((x) =>
+        x.Name === b.label
       );
-
-      if (aIndex === -1) return 0;
-      if (bIndex === -1) return 0;
 
       return aIndex - bIndex;
     });
