@@ -638,8 +638,8 @@ export const legacyFacetToFilter = (
         ? facet
         : normalizeFacet(facet);
 
-      const selected = mapSet.has(normalizedFacet.Map.toLowerCase()) &&
-        pathSet.has(normalizedFacet.Value.toLowerCase());
+      const selected = mapSet.has(normalizedFacet.Map) &&
+        pathSet.has(normalizedFacet.Value);
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
