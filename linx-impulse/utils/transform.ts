@@ -131,7 +131,7 @@ const toProductUrl = (
   }
 
   if (sku) {
-    productURL.searchParams.set("v", sku);
+    productURL.searchParams.set("skuId", sku);
   }
 
   return `${origin}${productURL.pathname}${productURL.search}`;

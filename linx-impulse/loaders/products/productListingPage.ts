@@ -105,51 +105,13 @@ const loader = async (
     props.sort;
   const fields = url.searchParams.getAll("fields");
   const filter = url.searchParams.getAll("filter");
+  const userId = user?.["@id"];
+  const productFormat = "complete";
+
+  console.log({ searchTerm, category, multicategory });
 
   try {
-    if (!searchTerm && category.length >= 2 && category[0] === "hotsite") {
-      const response = await api["GET /engage/search/v3/hotsites"]({
-        apiKey,
-        secretKey,
-        origin,
-        salesChannel,
-        deviceId,
-        showOnlyAvailable,
-        resultsPerPage,
-        page,
-        sortBy,
-        filter,
-        source,
-        userId: user?.["@id"],
-        productFormat: "complete",
-        name: category[1],
-      }).then((res) => res.json());
-
-      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
-    } else if (
-      !searchTerm && (category.length > 0 || multicategory.length > 0)
-    ) {
-      const response = await api["GET /engage/search/v3/navigates"]({
-        apiKey,
-        secretKey,
-        origin,
-        salesChannel,
-        deviceId,
-        allowRedirect,
-        showOnlyAvailable,
-        resultsPerPage,
-        page,
-        sortBy,
-        fields,
-        filter,
-        source,
-        userId: user?.["@id"],
-        productFormat: "complete",
-        ...(multicategory.length > 0 ? { multicategory } : { category }),
-      }).then((res) => res.json());
-
-      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
-    } else if (searchTerm) {
+    if (searchTerm) {
       const response = await api["GET /engage/search/v3/search"]({
         apiKey,
         secretKey,
@@ -164,8 +126,48 @@ const loader = async (
         filter,
         source,
         terms: searchTerm,
-        userId: user?.["@id"],
-        productFormat: "complete",
+        userId,
+        productFormat,
+      }).then((res) => res.json());
+
+      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
+    } else if (category.length >= 2 && category[0] === "hotsite") {
+      const response = await api["GET /engage/search/v3/hotsites"]({
+        apiKey,
+        secretKey,
+        origin,
+        salesChannel,
+        deviceId,
+        showOnlyAvailable,
+        resultsPerPage,
+        page,
+        sortBy,
+        filter,
+        source,
+        userId,
+        productFormat,
+        name: category[1],
+      }).then((res) => res.json());
+
+      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
+    } else if (category.length > 0 || multicategory.length > 0) {
+      const response = await api["GET /engage/search/v3/navigates"]({
+        apiKey,
+        secretKey,
+        origin,
+        salesChannel,
+        deviceId,
+        allowRedirect,
+        showOnlyAvailable,
+        resultsPerPage,
+        page,
+        sortBy,
+        fields,
+        filter,
+        source,
+        userId,
+        productFormat,
+        ...(multicategory.length > 0 ? { multicategory } : { category }),
       }).then((res) => res.json());
 
       return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
