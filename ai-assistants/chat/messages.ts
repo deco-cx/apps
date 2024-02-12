@@ -108,28 +108,6 @@ const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
 
 const cache: Record<string, unknown> = {};
 
-// const matchProductCategory = (products: any, queryCategory: string) => {
-//   console.log("matchProductCategory", products[0]);
-//   return products.every((product: any) =>
-//     product.category.includes(queryCategory)
-//   );
-// };
-
-// const checkAndHandleResults = (products: Product[], queryCategory: string) => {
-//   if (products.length === 0) {
-//     return "I couldn't find any products matching your search. Could you specify what you're looking for a bit more?";
-//   }
-
-//   const isCategoryMatch = products.some((product: Product) =>
-//     product.category?.includes(queryCategory)
-//   );
-//   if (!isCategoryMatch) {
-//     return "It seems the products found don't exactly match your search. Could you specify what you're looking for a bit more?";
-//   }
-
-//   return null; // No issues with the results
-// };
-
 const invokeFor = (
   ctx: AppContext,
   assistant: AIAssistant,
