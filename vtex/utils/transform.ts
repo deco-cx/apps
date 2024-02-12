@@ -598,37 +598,40 @@ export const legacyFacetToFilter = (
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
+
+    // for productClusterIds, we have to use the full path
+    // example: 
+    // category2/123?map=c,productClusterIds -> DO NOT WORK
+    // category1/category2/123?map=c,c,productClusterIds -> WORK
+    const haveToBeFullpath = mapSegments.includes("productClusterIds")
+
+    const map = haveToBeFullpath ? facet.Link.split("map=")[1].split(",") : [facet.Map]
+    const value = haveToBeFullpath ? facet.Link.split("?")[0].slice(1).split("/") : [facet.Value]
+    const _mapSegments = haveToBeFullpath ? ["productClusterIds"] : mapSegments
+    const _pathSegments = haveToBeFullpath ? [pathSegments[mapSegments.indexOf("productClusterIds")]] : pathSegments
+
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
-      : [...mapSegments, facet.Map];
+      : [..._mapSegments, ...map];
     const newPath = selected
       ? [...pathSegments.filter((_, i) => i !== index)]
-      : [...pathSegments, facet.Value];
+      : [..._pathSegments, ...value];
 
     // Insertion-sort like algorithm. Uses the c-continuum theorem
     const zipped: [string, string][] = [];
     for (let it = 0; it < newMap.length; it++) {
       let i = 0;
-      if (newMap[it] === "productClusterIds") {
-        // If it's "productClusterIds", insert at the beginning, before all others
-        zipped.splice(i, 0, [newMap[it], newPath[it]]);
-      } else {
-        // Find the correct position for elements that are not "productClusterIds"
-        while (i < zipped.length && zipped[i][0] === "productClusterIds") {
-          i++; // Skip all "productClusterIds" to maintain their priority
-        }
-        // Now, find the position for inserting, considering 'c' or 'C'
-        while (i < zipped.length && (zipped[i][0].toLowerCase() === "c")) {
-          i++; // Skip elements starting with 'c' or 'C', which have lower priority than "productClusterIds"
-        }
-        zipped.splice(i, 0, [newMap[it], newPath[it]]);
-      }
+      while (
+        i < zipped.length && (zipped[i][0] === "c" || zipped[i][0] === "C")
+      ) i++;
+
+      zipped.splice(i, 0, [newMap[it], newPath[it]]);
     }
 
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
+      link.searchParams.set("fmap", url.searchParams.get("fmap") || map[0]);
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {

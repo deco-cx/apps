@@ -190,7 +190,7 @@ const loader = async (
 
   const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
   const pageType = pageTypes.at(-1) || pageTypes[0];
-
+  console.log(pageType)
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
   const [map, term] = missingParams && fq.length > 0
     ? ["", ""]
