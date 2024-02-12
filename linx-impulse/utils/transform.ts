@@ -4,6 +4,7 @@ import type {
   Person,
   Product,
   ProductListingPage,
+  PropertyValue,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import { Search } from "../../commerce/types.ts";
@@ -38,6 +39,7 @@ const toOffer = (variant: Sku): Offer => {
     price = 0,
     installment = { count: 0, price: 0 },
     status = "unavailable",
+    stock = 0,
   } = isImpulseSku(variant) ? variant.properties : variant;
 
   const priceSpecification: UnitPriceSpecification[] = [
@@ -67,7 +69,9 @@ const toOffer = (variant: Sku): Offer => {
     priceValidUntil: undefined,
     price: price ?? oldPrice,
     priceSpecification,
-    inventoryLevel: {},
+    inventoryLevel: {
+      value: stock,
+    },
     availability: status.toLowerCase() === "available"
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
@@ -137,6 +141,13 @@ const toProductUrl = (
   return `${origin}${productURL.pathname}${productURL.search}`;
 };
 
+const toPropertyValue = (
+  value: Partial<Omit<PropertyValue, "@type">>,
+): PropertyValue => ({
+  "@type": "PropertyValue",
+  ...value,
+});
+
 const productFromImpulse = (
   product: ImpulseProduct,
   origin: string,
@@ -151,11 +162,9 @@ const productFromImpulse = (
   const offers = offer ? [offer] : [];
 
   const additionalProperty =
-    Object.entries(variant.properties?.details ?? {})?.map(([key, value]) => ({
-      "@type": "PropertyValue" as const,
-      name: key,
-      value: sanitizeValue(value),
-    })) ?? [];
+    Object.entries(variant.properties?.details ?? {})?.map(([key, value]) =>
+      toPropertyValue({ name: key, value: sanitizeValue(value) })
+    ) ?? [];
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
@@ -184,7 +193,16 @@ const productFromImpulse = (
       "@id": `${product.brand}`,
       name: product.brand ?? undefined,
     },
-    additionalProperty,
+    additionalProperty: [
+      ...additionalProperty,
+      ...product.categories.map((c) =>
+        toPropertyValue({
+          name: "category",
+          value: c.name,
+          propertyID: c.id,
+        })
+      ),
+    ],
     image,
     isVariantOf: {
       "@type": "ProductGroup",
@@ -199,30 +217,20 @@ const productFromImpulse = (
           .flatMap((
             [key, value],
           ) =>
-            value.map((spec) => ({
-              "@type": "PropertyValue" as const,
-              name: key,
-              value: sanitizeValue(spec.label),
-            }))
+            value.map((spec) =>
+              toPropertyValue({
+                name: key,
+                value: sanitizeValue(spec.label),
+                propertyID: spec.id,
+              })
+            )
           ),
         ...Object
           .entries(product.details)
-          .map(([key, value]) => ({
-            "@type": "PropertyValue" as const,
-            name: key,
-            value: sanitizeValue(value[0]),
-          })),
-        ...product.categories.map((c) => ({
-          "@type": "PropertyValue" as const,
-          name: "category",
-          value: c.name,
-          propertyID: c.id,
-        })),
-        {
-          "@type": "PropertyValue" as const,
-          name: "trackingId",
-          value: trackingId ?? undefined,
-        },
+          .map(([key, value]) =>
+            toPropertyValue({ name: key, value: sanitizeValue(value[0]) })
+          ),
+        toPropertyValue({ name: "trackingId", value: trackingId ?? undefined }),
       ],
       hasVariant,
     },
@@ -251,11 +259,9 @@ const productFromChaordic = (
   const offers = offer ? [offer] : [];
 
   const additionalProperty =
-    Object.entries(variant?.details ?? {})?.map(([key, value]) => ({
-      "@type": "PropertyValue" as const,
-      name: key,
-      value: sanitizeValue(value),
-    })) ?? [];
+    Object.entries(variant?.details ?? {})?.map(([key, value]) =>
+      toPropertyValue({ name: key, value: sanitizeValue(value) })
+    ) ?? [];
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
@@ -298,33 +304,27 @@ const productFromChaordic = (
             [key, value],
           ) => {
             if (Array.isArray(value)) {
-              return value.map((spec) => ({
-                "@type": "PropertyValue" as const,
-                name: key,
-                value: sanitizeValue(spec),
-              }));
+              return value.map((spec) =>
+                toPropertyValue({
+                  name: key,
+                  value: sanitizeValue(spec),
+                })
+              );
             }
-            return {
-              "@type": "PropertyValue" as const,
-              name: key,
-              value: sanitizeValue(value),
-            };
+            return toPropertyValue({ name: key, value: sanitizeValue(value) });
           }),
         ...Object
           .entries(product.details)
           .flatMap(([key, value]) => {
             if (Array.isArray(value)) {
-              return value.map((spec) => ({
-                "@type": "PropertyValue" as const,
-                name: key,
-                value: sanitizeValue(spec),
-              }));
+              return value.map((spec) =>
+                toPropertyValue({
+                  name: key,
+                  value: sanitizeValue(spec),
+                })
+              );
             }
-            return {
-              "@type": "PropertyValue" as const,
-              name: key,
-              value: sanitizeValue(value),
-            };
+            return toPropertyValue({ name: key, value: sanitizeValue(value) });
           }),
       ],
       hasVariant,
