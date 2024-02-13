@@ -78,7 +78,18 @@ const loader = async (
             },
           },
         );
-      return result.json();
+      const orderForm = (await result.json()) as OrderForm;
+      return {
+        ...orderForm,
+        items: orderForm.items.map((x) => {
+          return {
+            ...x,
+            imageUrl: x.imageUrl.startsWith("http://")
+              ? x.imageUrl.replace("http://", "https://")
+              : x.imageUrl,
+          };
+        }),
+      };
     }
   }
 
