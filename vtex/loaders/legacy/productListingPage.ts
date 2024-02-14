@@ -305,7 +305,7 @@ const loader = async (
   };
 
   const isDepartmentOrCategoryPage = pageType.pageType === "Department" ||
-    pageType.pageType === "Category";
+    pageType.pageType === "Category" || pageType.pageType === "SubCategory";
 
   // at search, collection and brand pages, the products are not of a specific category
   // so we need to get the categories from the facets
