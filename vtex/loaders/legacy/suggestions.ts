@@ -23,7 +23,7 @@ export interface Props {
 const loaders = async (
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Suggestion | null> => {
   const { vcsDeprecated } = ctx;
   const { count = 4, query } = props;
@@ -39,7 +39,7 @@ const loaders = async (
       // Not adding suggestions to cache since queries are very spread out
       // deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
-    }
+    },
   ).then((res) => res.json());
 
   const searches: Suggestion["searches"] = suggestions.itemsReturned
@@ -72,7 +72,7 @@ const loaders = async (
           name,
           url: url.pathname + url.search + url.hash,
         };
-      }
+      },
     );
 
   return {
