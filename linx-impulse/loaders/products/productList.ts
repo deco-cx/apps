@@ -51,6 +51,10 @@ interface ProductPageProps extends BaseProps {
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
   loader: ProductDetailsPage | null;
+  /**
+   * @ignore
+   */
+  productId?: string;
 }
 
 /**
@@ -65,6 +69,10 @@ interface CategoryPageProps extends BaseProps {
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
   loader: ProductListingPage | null;
+  /**
+   * @ignore
+   */
+  categoryIds?: string[];
 }
 
 /**
@@ -79,6 +87,10 @@ interface SearchPageProps extends BaseProps {
    * @description It is recommended to create a global loader so that the loader is not called more than once
    */
   loader: ProductListingPage | null;
+  /**
+   * @ignore
+   */
+  productIds?: string[];
 }
 
 const nonNullable = <T>(value: T): value is NonNullable<T> =>
@@ -108,6 +120,13 @@ const generateParams = (
       };
     }
     case "category": {
+      if (props.categoryIds?.length) {
+        return {
+          name: "category",
+          "categoryId[]": props.categoryIds,
+        };
+      }
+
       const properties = props.loader?.products
         .flatMap((p) => p?.additionalProperty)
         .filter(nonNullable) ?? [];
@@ -133,16 +152,17 @@ const generateParams = (
       };
     }
     case "search": {
-      const productIds = props.loader?.products
+      const productIds = props.productIds ?? props.loader?.products
         .map((p) => p.productID)
-        .filter(nonNullable) ?? [];
+        .filter(nonNullable) ??
+        [];
       return {
         name: "search",
         "productId[]": productIds,
       };
     }
     case "product": {
-      const productId = props.loader?.product.productID;
+      const productId = props.productId ?? props.loader?.product.productID;
       return {
         name: "product",
         "productId[]": productId ? [productId] : [],
@@ -189,6 +209,8 @@ const loader = async (
     showOnlyAvailable,
     productFormat: "complete",
   }, { headers }).then((res) => res.json());
+
+  console.log({ response }, params);
 
   const shelves = props.position
     ? response[props.position] ??
