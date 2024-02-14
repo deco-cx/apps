@@ -596,14 +596,39 @@ export const legacyFacetToFilter = (
   const mapSet = new Set(mapSegments);
   const pathSet = new Set(pathSegments);
 
+  // for productClusterIds, we have to use the full path
+  // example:
+  // category2/123?map=c,productClusterIds -> DO NOT WORK
+  // category1/category2/123?map=c,c,productClusterIds -> WORK
+  const hasProductClusterIds = mapSegments.includes("productClusterIds");
+  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") || mapSegments.includes("b");
+
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
+
+    const map = hasToBeFullpath
+      ? facet.Link.split("map=")[1].split(",")
+      : [facet.Map];
+    const value = hasToBeFullpath
+      ? facet.Link.split("?")[0].slice(1).split("/")
+      : [facet.Value];
+
+    const pathSegmentsFiltered = hasProductClusterIds
+      ? [pathSegments[mapSegments.indexOf("productClusterIds")]]
+      : [];
+    const mapSegmentsFiltered = hasProductClusterIds
+      ? ["productClusterIds"]
+      : [];
+
+    const _mapSegments = hasToBeFullpath ? mapSegmentsFiltered : mapSegments;
+    const _pathSegments = hasToBeFullpath ? pathSegmentsFiltered : pathSegments;
+
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
-      : [...mapSegments, facet.Map];
+      : [..._mapSegments, ...map];
     const newPath = selected
       ? [...pathSegments.filter((_, i) => i !== index)]
-      : [...pathSegments, facet.Value];
+      : [..._pathSegments, ...value];
 
     // Insertion-sort like algorithm. Uses the c-continuum theorem
     const zipped: [string, string][] = [];
@@ -619,7 +644,7 @@ export const legacyFacetToFilter = (
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
+      link.searchParams.set("fmap", url.searchParams.get("fmap") || map[0]);
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {
@@ -628,6 +653,7 @@ export const legacyFacetToFilter = (
 
     return `${link.pathname}${link.search}`;
   };
+
   return {
     "@type": "FilterToggle",
     quantity: facets?.length,
