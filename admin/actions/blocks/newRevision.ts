@@ -12,14 +12,17 @@ export default async function NewRevision(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlockState | null> {
-  await ctx.storage.patch({ [blockId]: block });
+  const newHead = await ctx.storage.patchDecofile(site, (decofile) => {
+    decofile[blockId] = block;
+    return Promise.resolve();
+  });
 
   return {
     site,
     id: blockId,
     createdAt: new Date(),
     createdBy: ANONYMOUS,
-    revision: await ctx.storage.revision(),
+    revision: newHead,
     resolveType: block.__resolveType,
     value: block,
   };

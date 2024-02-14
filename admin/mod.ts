@@ -15,11 +15,11 @@ import {
   WebhookEventName,
   Webhooks,
 } from "./deps.ts";
-import { storage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
 import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
+import { Decofile, IRepository, Repository } from "./storage/mod.ts";
 
 export const ANONYMOUS = "Anonymous";
 
@@ -35,17 +35,6 @@ export interface Workspace {
   tabs: Record<string, Tab>;
 }
 
-export interface BlockStore extends Release {
-  patch(
-    resolvables: Record<string, Resolvable>,
-  ): Promise<Record<string, Resolvable>>;
-  set(
-    resolvables: Record<string, Resolvable>,
-    reivsion?: string,
-  ): Promise<void>;
-  delete(id: string): Promise<void>;
-}
-
 export interface GithubEventListener<
   TEvents extends WebhookEventName = WebhookEventName,
 > {
@@ -56,9 +45,20 @@ export interface GithubEventListener<
     ctx: AppContext,
   ) => Promise<void>;
 }
-
+export interface StorageProvider {
+  getRepository(site: string): Promise<IRepository>;
+  useRepository(
+    site: string,
+    f: (repo: IRepository) => Promise<IRepository>,
+  ): Promise<IRepository>;
+  patchDecofile(
+    site: string,
+    f: (decofile: Decofile) => Promise<void>,
+    message?: string,
+  ): Promise<string>;
+}
 export interface State {
-  storage: BlockStore;
+  storage: StorageProvider;
   release: () => Release;
   octokit: Octokit;
   webhooks?: Webhooks;
@@ -106,6 +106,30 @@ export interface Props {
   workspaces: SignalStringified<Workspace>[];
 }
 
+const getRepository = (site = "default"): Promise<IRepository> => {
+  return siteRepo[site] ??= Promise.resolve(new Repository());
+};
+
+const setRepository = (site = "default", p: Promise<IRepository>) => {
+  siteRepo[site] = p;
+};
+function useRepository(
+  site: string,
+  useFn: (repo: IRepository) => Promise<IRepository>,
+): Promise<IRepository> {
+  const repo = getRepository(site);
+  const usePromise = repo.then(useFn);
+  setRepository(
+    site,
+    usePromise.catch((err) => {
+      console.error(`use repository error ${err} for site ${site}`);
+      return repo;
+    }),
+  );
+  return usePromise;
+}
+
+const siteRepo: Record<string, Promise<IRepository>> = {};
 /**
  * @title Admin
  */
@@ -130,7 +154,22 @@ export default function App(
   return {
     manifest,
     state: {
-      storage,
+      storage: {
+        getRepository,
+        useRepository,
+        patchDecofile(site, useDecofile, message = "empty") {
+          return useRepository(site, async (repo) => {
+            const stash = repo.workingTree();
+            await stash.withinTransaction(useDecofile);
+            const newRepository = await repo.commit(stash.createCommit({
+              message,
+              committer: { name: "Anonymous" },
+            }));
+
+            return newRepository.push();
+          }).then((repo) => repo.head!);
+        },
+      },
       release: () => {
         const ctx = Context.active();
         return ctx.release!;

@@ -7,11 +7,14 @@ export const PAGE_RESOLVE_TYPES = [
 ];
 
 export default async function ListPages(
-  _props: unknown,
+  { site }: { site: string },
   _req: Request,
   ctx: AppContext,
 ): Promise<Pagination<BlockMetadata> | null> {
-  const state = await ctx.storage.state();
+  const repo = await ctx.storage.getRepository(site);
+  const stash = repo.workingTree();
+
+  const state = stash.state();
 
   if (!state) {
     return {

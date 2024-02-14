@@ -1,4 +1,4 @@
-import { ANONYMOUS, AppContext, BlockState } from "../../mod.ts";
+import { AppContext, BlockState } from "../../mod.ts";
 
 const PAGE_RESOLVE_TYPE = "website/pages/Page.tsx";
 
@@ -42,15 +42,12 @@ export default async function NewPage(
       .replace(/\//g, "-")
   }-${uniqueId}`;
 
-  await ctx.storage.patch({ [blockId]: initialValue });
-
-  return {
+  return ctx.invoke["deco-sites/admin"].actions.blocks.newRevision({
+    block: {
+      data: initialValue,
+      __resolveType: "resolved",
+    },
+    blockId,
     site,
-    id: blockId,
-    createdAt: new Date(),
-    createdBy: ANONYMOUS,
-    revision: await ctx.storage.revision(),
-    resolveType: PAGE_RESOLVE_TYPE,
-    value: initialValue,
-  };
+  });
 }

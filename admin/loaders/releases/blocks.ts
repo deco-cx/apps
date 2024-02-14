@@ -6,11 +6,14 @@ export interface Props {
 }
 
 export default async function ListBlocks(
-  _props: Props,
+  { site }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Pagination<Partial<BlockMetadata>> | null> {
-  const state = await ctx.storage.state();
+  const repo = await ctx.storage.getRepository(site);
+  const stash = repo.workingTree();
+
+  const state = stash.state();
 
   if (!state) {
     return {
