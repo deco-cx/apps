@@ -96,7 +96,7 @@ export interface ChaordicProduct {
   oldPrice: number;
   url: string;
   images: Images;
-  brand: string;
+  brand?: string;
   installment: Installment;
   status: string;
   categories: Category[];

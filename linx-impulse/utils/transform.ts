@@ -7,8 +7,12 @@ import type {
   PropertyValue,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
-import { Search } from "../../commerce/types.ts";
-import { FilterToggleValue } from "../../commerce/types.ts";
+import {
+  Brand,
+  FilterToggleValue,
+  ProductGroup,
+  Search,
+} from "../../commerce/types.ts";
 import type { LinxUser } from "./types/analytics.ts";
 import type { ChaordicProduct } from "./types/chaordic.ts";
 import type { ImpulseProduct, ImpulseSku } from "./types/impulse.ts";
@@ -65,8 +69,7 @@ const toOffer = (variant: Sku): Offer => {
 
   return {
     "@type": "Offer",
-    seller: undefined,
-    priceValidUntil: undefined,
+    seller: "Linx Impulse",
     price: price ?? oldPrice,
     priceSpecification,
     inventoryLevel: {
@@ -157,14 +160,55 @@ const productFromImpulse = (
 ): Product => {
   const variants = product.skus ?? [];
   const variant = pickVariant(product.skus, variantId ?? product.selectedSku);
+  const trackingId = new URLSearchParams(product.clickUrl).get("trackingId");
+  const brandName = product.brand ?? sanitizeValue(product.details["brand"]);
+  const brand = brandName
+    ? {
+      "@type": "Brand",
+      name: brandName,
+    } satisfies Brand
+    : undefined;
 
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
 
-  const additionalProperty =
-    Object.entries(variant.properties?.details ?? {})?.map(([key, value]) =>
-      toPropertyValue({ name: key, value: sanitizeValue(value) })
-    ) ?? [];
+  const isVariantOfAdditionalProperty = [
+    ...Object
+      .entries(product.specs ?? {})
+      .flatMap((
+        [key, value],
+      ) =>
+        value.map((spec) =>
+          toPropertyValue({
+            name: key,
+            value: sanitizeValue(spec.label),
+            propertyID: spec.id,
+          })
+        )
+      ),
+    ...Object
+      .entries(product.details)
+      .map(([key, value]) =>
+        toPropertyValue({ name: key, value: sanitizeValue(value[0]) })
+      ),
+    toPropertyValue({
+      name: "trackingId",
+      value: trackingId ?? undefined,
+    }),
+  ];
+  const additionalProperty: PropertyValue[] = [
+    ...Object.entries(variant.properties?.details ?? {})?.map((
+      [key, value],
+    ) => toPropertyValue({ name: key, value: sanitizeValue(value) })),
+    ...product.categories.map((c) =>
+      toPropertyValue({
+        name: "category",
+        value: c.name,
+        propertyID: c.id,
+      })
+    ),
+    ...(level >= 1 ? isVariantOfAdditionalProperty : []),
+  ];
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
@@ -179,7 +223,18 @@ const productFromImpulse = (
   });
 
   const image = Object.values(product.images ?? {}).map(toImage) ?? [];
-  const trackingId = new URLSearchParams(product.clickUrl).get("trackingId");
+  const isVariantOf = level < 1
+    ? {
+      "@type": "ProductGroup",
+      url: toProductUrl(product.url, origin),
+      name: product.name,
+      description: product.description,
+      image,
+      productGroupID: product.id,
+      additionalProperty: isVariantOfAdditionalProperty,
+      hasVariant,
+    } satisfies ProductGroup
+    : undefined;
 
   return {
     "@type": "Product",
@@ -188,57 +243,17 @@ const productFromImpulse = (
     url: toProductUrl(product.url, origin, variant.sku),
     category: product.categories.map((c) => c.name).join(">"),
     name: variant.properties?.name ?? product.name,
-    brand: {
-      "@type": "Brand",
-      "@id": `${product.brand}`,
-      name: product.brand ?? undefined,
-    },
-    additionalProperty: [
-      ...additionalProperty,
-      ...product.categories.map((c) =>
-        toPropertyValue({
-          name: "category",
-          value: c.name,
-          propertyID: c.id,
-        })
-      ),
-    ],
+    brand,
+    additionalProperty,
     image,
-    isVariantOf: {
-      "@type": "ProductGroup",
-      url: toProductUrl(product.url, origin),
-      name: product.name,
-      description: product.description,
-      image,
-      productGroupID: product.id,
-      additionalProperty: [
-        ...Object
-          .entries(product.specs ?? {})
-          .flatMap((
-            [key, value],
-          ) =>
-            value.map((spec) =>
-              toPropertyValue({
-                name: key,
-                value: sanitizeValue(spec.label),
-                propertyID: spec.id,
-              })
-            )
-          ),
-        ...Object
-          .entries(product.details)
-          .map(([key, value]) =>
-            toPropertyValue({ name: key, value: sanitizeValue(value[0]) })
-          ),
-        toPropertyValue({ name: "trackingId", value: trackingId ?? undefined }),
-      ],
-      hasVariant,
-    },
+    isVariantOf,
     offers: {
-      "@type": "AggregateOffer" as const,
+      "@type": "AggregateOffer",
       priceCurrency: "BRL",
-      lowPrice: variant.properties?.price ?? variant.properties?.oldPrice ?? 0,
-      highPrice: variant.properties?.oldPrice ?? variant.properties?.price ?? 0,
+      lowPrice: variant.properties?.price ?? variant.properties?.oldPrice ??
+        0,
+      highPrice: variant.properties?.oldPrice ?? variant.properties?.price ??
+        0,
       offerCount: offers.length,
       offers,
     },
@@ -254,14 +269,53 @@ const productFromChaordic = (
 ): Product => {
   const variants = product.skus ?? [];
   const variant = pickVariant(product.skus, variantId);
+  const brandName = product.brand ?? sanitizeValue(product.details["brand"]);
+  const brand = brandName
+    ? {
+      "@type": "Brand",
+      name: brandName,
+    } satisfies Brand
+    : undefined;
 
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
 
-  const additionalProperty =
-    Object.entries(variant?.details ?? {})?.map(([key, value]) =>
+  const isVariantOfAdditionalProperty = [
+    ...Object
+      .entries(variant.specs ?? {})
+      .flatMap((
+        [key, value],
+      ) => {
+        if (Array.isArray(value)) {
+          return value.map((spec) =>
+            toPropertyValue({
+              name: key,
+              value: sanitizeValue(spec),
+            })
+          );
+        }
+        return toPropertyValue({ name: key, value: sanitizeValue(value) });
+      }),
+    ...Object
+      .entries(product.details)
+      .flatMap(([key, value]) => {
+        if (Array.isArray(value)) {
+          return value.map((spec) =>
+            toPropertyValue({
+              name: key,
+              value: sanitizeValue(spec),
+            })
+          );
+        }
+        return toPropertyValue({ name: key, value: sanitizeValue(value) });
+      }),
+  ];
+  const additionalProperty: PropertyValue[] = [
+    ...Object.entries(variant?.details ?? {})?.map(([key, value]) =>
       toPropertyValue({ name: key, value: sanitizeValue(value) })
-    ) ?? [];
+    ),
+    ...(level >= 1 ? isVariantOfAdditionalProperty : []),
+  ];
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
@@ -276,22 +330,8 @@ const productFromChaordic = (
   });
 
   const image = Object.values(product.images ?? {}).map(toImage) ?? [];
-
-  return {
-    "@type": "Product",
-    productID: `${product.id}`,
-    sku: `${variant.sku}`,
-    url: toProductUrl(product.url, origin, variant.sku),
-    category: product.categories.map((c) => c.name).join(">"),
-    name: variant?.name ?? product.name,
-    brand: {
-      "@type": "Brand",
-      "@id": `${product.brand}`,
-      name: product.brand ?? undefined,
-    },
-    additionalProperty,
-    image,
-    isVariantOf: {
+  const isVariantOf = level < 1
+    ? {
       "@type": "ProductGroup",
       url: toProductUrl(product.url, origin),
       name: product.name,
@@ -328,7 +368,20 @@ const productFromChaordic = (
           }),
       ],
       hasVariant,
-    },
+    } satisfies ProductGroup
+    : undefined;
+
+  return {
+    "@type": "Product",
+    productID: `${product.id}`,
+    sku: `${variant.sku}`,
+    url: toProductUrl(product.url, origin, variant.sku),
+    category: product.categories.map((c) => c.name).join(">"),
+    name: variant?.name ?? product.name,
+    brand,
+    additionalProperty,
+    image,
+    isVariantOf,
     offers: {
       "@type": "AggregateOffer" as const,
       priceCurrency: "BRL",

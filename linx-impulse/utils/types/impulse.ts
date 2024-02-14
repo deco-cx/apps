@@ -68,6 +68,6 @@ export interface ImpulseProduct {
   brand: string | null;
   selectedSku?: string;
   skus: ImpulseSku[];
-  details: Record<string, string[]> | string;
+  details: Record<string, string[] | string>;
   description?: string;
 }
