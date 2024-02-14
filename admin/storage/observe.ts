@@ -1,4 +1,4 @@
-import { Decofile } from "./mod2.ts";
+import { Decofile } from "./mod.ts";
 
 export interface Observable {
   decofile: Decofile;

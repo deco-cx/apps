@@ -1,6 +1,6 @@
 import { Deferred, deferred } from "deco/utils/promise.ts";
 import { fjp, Queue, ulid } from "../../deps.ts";
-import { ChangeSet } from "../mod2.ts";
+import { ChangeSet } from "../mod.ts";
 import { deepMerge } from "./merge.ts";
 import { observe } from "./observer.ts";
 

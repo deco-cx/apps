@@ -10,11 +10,10 @@ export default async function Latest(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlockState | null> {
-  const state = await ctx.storage.state({
-    forceFresh: true,
-  });
+  const repo = await ctx.storage.getRepository(site);
+  const stash = repo.workingTree();
 
-  const block = state[blockId];
+  const block = stash.state()[blockId];
   if (!block) {
     return null;
   }
@@ -24,7 +23,7 @@ export default async function Latest(
     id: blockId,
     createdAt: new Date(),
     createdBy: ANONYMOUS,
-    revision: await ctx.storage.revision(),
+    revision: repo.head!,
     resolveType: block.__resolveType,
     value: block,
   };
