@@ -264,10 +264,24 @@ const loader = async (
       ),
   );
 
+  const getFlatCategories = (
+    CategoriesTrees: LegacyFacet[],
+  ): Record<string, LegacyFacet[]> => {
+    const flatCategories: Record<string, LegacyFacet[]> = {};
+
+    CategoriesTrees.forEach((
+      category,
+    ) => (flatCategories[category.Name] = category.Children || []));
+
+    return flatCategories;
+  };
+
   // Get categories of the current department/category
-  const getCategoryFacets = (CategoriesTrees: LegacyFacet[]): LegacyFacet[] => {
-    const isDepartmentOrCategoryPage = !pageType;
-    if (isDepartmentOrCategoryPage) {
+  const getCategoryFacets = (
+    CategoriesTrees: LegacyFacet[],
+    isDepartmentOrCategoryPage: boolean,
+  ): LegacyFacet[] => {
+    if (!isDepartmentOrCategoryPage) {
       return [];
     }
 
@@ -276,7 +290,10 @@ const loader = async (
       if (isCurrentCategory) {
         return category.Children || [];
       } else if (category.Children.length) {
-        const childFacets = getCategoryFacets(category.Children);
+        const childFacets = getCategoryFacets(
+          category.Children,
+          isDepartmentOrCategoryPage,
+        );
         const hasChildFacets = childFacets.length;
         if (hasChildFacets) {
           return childFacets;
@@ -287,12 +304,25 @@ const loader = async (
     return [];
   };
 
+  const isDepartmentOrCategoryPage = pageType.pageType === "Department" ||
+    pageType.pageType === "Category" || pageType.pageType === "SubCategory";
+
+  // at search, collection and brand pages, the products are not of a specific category
+  // so we need to get the categories from the facets
+  const flatCategories = !isDepartmentOrCategoryPage
+    ? getFlatCategories(vtexFacets.CategoriesTrees)
+    : {};
+
   const filters = Object.entries({
     Departments: vtexFacets.Departments,
-    Categories: getCategoryFacets(vtexFacets.CategoriesTrees),
+    Categories: getCategoryFacets(
+      vtexFacets.CategoriesTrees,
+      isDepartmentOrCategoryPage,
+    ),
     Brands: vtexFacets.Brands,
     ...vtexFacets.SpecificationFilters,
     PriceRanges: vtexFacets.PriceRanges,
+    ...flatCategories,
   })
     .map(([name, facets]) =>
       legacyFacetToFilter(name, facets, url, map, term, filtersBehavior)
