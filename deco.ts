@@ -35,6 +35,7 @@ const config = {
     app("vtex"),
     app("vnda"),
     app("wake"),
+    app("wap"),
     app("linx"),
     app("shopify"),
     app("nuvemshop"),
