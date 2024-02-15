@@ -399,7 +399,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
 
   params.sort();
   params.set("segment", token);
-  
+
   url.search = params.toString();
 
   return url.href;
