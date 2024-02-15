@@ -4,7 +4,7 @@ import { Flag } from "deco/types.ts";
 import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
 
 export const getFlagsFromCookies = (req: Request) => {
-  const flags : Flag[] = [];
+  const flags: Flag[] = [];
   const cookies = getCookies(req.headers);
   const segment = cookies[DECO_SEGMENT]
     ? tryOrDefault(
@@ -13,8 +13,12 @@ export const getFlagsFromCookies = (req: Request) => {
     )
     : {};
 
-  segment.active?.forEach((flag : string) => flags.push({ name: flag, value: true }));
-  segment.inactiveDrawn?.forEach((flag : string) => flags.push({ name: flag, value: false }));
+  segment.active?.forEach((flag: string) =>
+    flags.push({ name: flag, value: true })
+  );
+  segment.inactiveDrawn?.forEach((flag: string) =>
+    flags.push({ name: flag, value: false })
+  );
 
   return flags;
 };

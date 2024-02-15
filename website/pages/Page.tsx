@@ -103,7 +103,7 @@ function Page(
   const site = { id: context.siteId, name: context.site };
   const deco = {
     ...useDeco(),
-    flags
+    flags,
   };
 
   return (
@@ -142,14 +142,14 @@ export const loader = async (
       ? await ctx.errorPage()
       : undefined,
     devMode,
-    flags
+    flags,
   };
 };
 
 export function Preview({ sections, flags }: Props & { flags: Flag[] }) {
   const deco = {
     ...useDeco(),
-    flags
+    flags,
   };
 
   return (

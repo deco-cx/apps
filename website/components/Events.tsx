@@ -29,7 +29,6 @@ declare global {
  * Add another ecommerce analytics modules here.
  */
 const snippet = ({ flags, page }: Deco) => {
-
   const target = new EventTarget();
 
   const dispatch: EventsAPI["dispatch"] = (event: unknown) => {
