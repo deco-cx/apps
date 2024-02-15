@@ -1,6 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { Flag } from "deco/types.ts";
 
 type EventHandler = (event?: AnalyticsEvent) => void | Promise<void>;
 
@@ -28,7 +29,31 @@ declare global {
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const snippet = ({ flags, page }: Deco) => {
+const snippet = ({ page }: Deco) => {
+
+  const cookie = document.cookie;
+  const out: Record<string, string> = {};
+  if (cookie !== null) {
+    const c = cookie.split(";");
+    for (const kv of c) {
+      const [cookieKey, ...cookieVal] = kv.split("=");
+      const key = cookieKey.trim();
+      out[key] = cookieVal.join("=");
+    }
+  }
+
+  const flags : Flag[] = [];
+  const segment = out["deco_segment"]
+    ? JSON.parse(decodeURIComponent(atob(out["deco_segment"])))
+    : {};
+
+  segment.active?.forEach((flag: string) =>
+    flags.push({ name: flag, value: true })
+  );
+  segment.inactiveDrawn?.forEach((flag: string) =>
+    flags.push({ name: flag, value: false })
+  );
+
   const target = new EventTarget();
 
   const dispatch: EventsAPI["dispatch"] = (event: unknown) => {

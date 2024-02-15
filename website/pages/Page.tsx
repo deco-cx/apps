@@ -17,7 +17,7 @@ import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import { getFlagsFromCookies } from "../../utils/cookie.ts";
+import { getFlagsFromRequest } from "../../utils/cookie.ts";
 import { Flag } from "deco/types.ts";
 
 /**
@@ -135,7 +135,7 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
-  const flags = getFlagsFromCookies(req);
+  const flags = getFlagsFromRequest(req);
   return {
     sections,
     errorPage: isDeferred<Page>(ctx.errorPage)

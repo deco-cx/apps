@@ -3,9 +3,14 @@ import { tryOrDefault } from "deco/utils/object.ts";
 import { Flag } from "deco/types.ts";
 import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
 
-export const getFlagsFromCookies = (req: Request) => {
-  const flags: Flag[] = [];
+export const getFlagsFromRequest = (req: Request) => {
+
   const cookies = getCookies(req.headers);
+  return getFlagsFromCookies(cookies);
+} 
+
+export const getFlagsFromCookies = ( cookies: Record<string, string>) => {
+  const flags: Flag[] = [];
   const segment = cookies[DECO_SEGMENT]
     ? tryOrDefault(
       () => JSON.parse(decodeURIComponent(atob(cookies[DECO_SEGMENT]))),
