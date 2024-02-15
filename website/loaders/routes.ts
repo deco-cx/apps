@@ -34,8 +34,10 @@ export default function loader(
   }
 
   return routes.map((route) => ({
-    label: (route.handler.value as HandlerValue).page.__resolveType.split("-")
-      .slice(1, -1).join(" "),
+    label: `${
+      (route.handler.value as HandlerValue).page.__resolveType.split("-")
+        .slice(1, -1).join(" ")
+    } ( ${route.pathTemplate} )`,
     value: route.pathTemplate,
   }));
 }
