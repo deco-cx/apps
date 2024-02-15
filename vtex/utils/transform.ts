@@ -593,8 +593,8 @@ export const legacyFacetToFilter = (
     .split("/")
     .slice(0, mapSegments.length);
 
-  const mapSet = new Set(mapSegments);
-  const pathSet = new Set(pathSegments);
+  const mapSet = new Set(mapSegments.map(i => i.toLowerCase()));
+  const pathSet = new Set(pathSegments.map(i => i.toLowerCase()));
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
