@@ -385,17 +385,22 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
 
-  url.searchParams.sort();
-  url.searchParams.set("segment", token);
-  url.searchParams.set("term", props.term ?? "");
-  url.searchParams.set("count", props.count.toString());
-  url.searchParams.set("page", (props.page ?? 1).toString());
-  url.searchParams.set("sort", props.sort ?? "");
-  url.searchParams.set("filters", props.filters ?? "");
-  url.searchParams.set("fq", props.fq ?? "");
-  url.searchParams.set("ft", props.ft ?? "");
-  url.searchParams.set("map", props.map ?? "");
-  url.searchParams.set("pageOffset", (props.pageOffset ?? 1).toString());
+  const params = new URLSearchParams([
+    ["term", props.term ?? ""],
+    ["count", props.count.toString()],
+    ["page", (props.page ?? 1).toString()],
+    ["sort", props.sort ?? ""],
+    ["filters", props.filters ?? ""],
+    ["fq", props.fq ?? ""],
+    ["ft", props.ft ?? ""],
+    ["map", props.map ?? ""],
+    ["pageOffset", (props.pageOffset ?? 1).toString()],
+  ]);
+
+  params.sort();
+  params.set("segment", token);
+  
+  url.search = params.toString();
 
   return url.href;
 };
