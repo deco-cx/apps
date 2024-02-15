@@ -10,6 +10,7 @@ import { scriptAsDataURI } from "../../utils/dataURI.ts";
  */
 const snippet = () => {
   globalThis.window.DECO.events.subscribe((event) => {
+    globalThis.window.dataLayer = globalThis.window.dataLayer || [];
     if (
       !event ||
       !globalThis.window.dataLayer ||
@@ -18,12 +19,20 @@ const snippet = () => {
       return;
     }
 
+    if(event.name === "deco"){
+      globalThis.window.dataLayer.push({
+        event: event.name,
+        deco_event: event.params,
+      });
+    }
+
     globalThis.window.dataLayer.push({ ecommerce: null });
     globalThis.window.dataLayer.push({
       event: event.name,
       ecommerce: event.params,
     });
   });
+  
 };
 
 export interface Props {

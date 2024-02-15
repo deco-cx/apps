@@ -19,6 +19,7 @@ declare global {
  * Add another ecommerce analytics modules here.
  */
 const sendAnalyticsEvent = <T extends AnalyticsEvent>(event: T) => {
+  console.log(event)
   globalThis.window.dataLayer &&
     globalThis.window.dataLayer.push({ ecommerce: null });
   globalThis.window.dataLayer &&
