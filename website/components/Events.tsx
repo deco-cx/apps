@@ -30,7 +30,6 @@ declare global {
  * Add another ecommerce analytics modules here.
  */
 const snippet = ({ page }: Deco) => {
-
   const cookie = document.cookie;
   const out: Record<string, string> = {};
   if (cookie !== null) {
@@ -42,7 +41,7 @@ const snippet = ({ page }: Deco) => {
     }
   }
 
-  const flags : Flag[] = [];
+  const flags: Flag[] = [];
   const segment = out["deco_segment"]
     ? JSON.parse(decodeURIComponent(atob(out["deco_segment"])))
     : {};

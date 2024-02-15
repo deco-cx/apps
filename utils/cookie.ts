@@ -4,12 +4,11 @@ import { Flag } from "deco/types.ts";
 import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
 
 export const getFlagsFromRequest = (req: Request) => {
-
   const cookies = getCookies(req.headers);
   return getFlagsFromCookies(cookies);
-} 
+};
 
-export const getFlagsFromCookies = ( cookies: Record<string, string>) => {
+export const getFlagsFromCookies = (cookies: Record<string, string>) => {
   const flags: Flag[] = [];
   const segment = cookies[DECO_SEGMENT]
     ? tryOrDefault(
