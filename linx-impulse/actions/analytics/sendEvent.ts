@@ -111,7 +111,15 @@ const action = async (
   ctx: AppContext,
 ): Promise<null> => {
   const { event, params } = props;
-  const { eventsApi, api, salesChannel, secretKey, apiKey, chaordicApi } = ctx;
+  const {
+    eventsApi,
+    api,
+    salesChannel,
+    secretKey,
+    apiKey,
+    chaordicApi,
+    origin,
+  } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
 
   switch (event) {
