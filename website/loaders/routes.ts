@@ -27,8 +27,6 @@ export default function loader(
     )
   );
 
-  console.log(routes);
-
   if (!routes) {
     return [];
   }
