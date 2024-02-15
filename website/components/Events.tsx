@@ -29,29 +29,6 @@ declare global {
  * Add another ecommerce analytics modules here.
  */
 const snippet = ({ flags, page }: Deco) => {
-  const appendSessionFlags = () => {
-    const knownFlags = new Set(flags.map((f) => f.name));
-    const cookies = document.cookie.split(";");
-
-    for (let i = 0; i < cookies.length; i++) {
-      const ck = cookies[i].trim();
-
-      if (ck.startsWith("deco_matcher_")) {
-        const name = atob(ck.slice(ck.lastIndexOf("=") + 1, ck.indexOf("@")));
-        const value = ck.at(-1) === "1" ? true : false;
-
-        if (knownFlags.has(name)) continue;
-
-        flags.push({ name, value });
-      }
-    }
-  };
-
-  try {
-    appendSessionFlags();
-  } catch (error) {
-    console.error(error);
-  }
 
   const target = new EventTarget();
 

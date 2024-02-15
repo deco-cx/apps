@@ -1,19 +1,21 @@
 import { getCookies, getSetCookies, setCookie } from "std/http/cookie.ts";
-import { DECO_MATCHER_PREFIX } from "deco/blocks/matcher.ts";
+import { tryOrDefault } from "deco/utils/object.ts";
+import { Flag } from "deco/types.ts";
+import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
 
 export const getFlagsFromCookies = (req: Request) => {
-  const flags = [];
+  const flags : Flag[] = [];
   const cookies = getCookies(req.headers);
+  const segment = cookies[DECO_SEGMENT]
+    ? tryOrDefault(
+      () => JSON.parse(decodeURIComponent(atob(cookies[DECO_SEGMENT]))),
+      {},
+    )
+    : {};
 
-  for (const [key, value] of Object.entries(cookies)) {
-    if (key.startsWith(DECO_MATCHER_PREFIX)) {
-      const flagName = atob(
-        value.slice(value.lastIndexOf("=") + 1, value.indexOf("@")),
-      );
-      const flagActive = value.at(-1) === "1";
-      flags.push({ flagName, flagActive });
-    }
-  }
+  segment.active?.forEach((flag : string) => flags.push({ name: flag, value: true }));
+  segment.inactiveDrawn?.forEach((flag : string) => flags.push({ name: flag, value: false }));
+
   return flags;
 };
 

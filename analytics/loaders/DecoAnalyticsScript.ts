@@ -49,13 +49,15 @@ const loader = (
 
     const _flags = getFlagsFromCookies(req);
     const flags: Record<string, string | boolean> = {};
-    _flags.forEach((flag) => flags[flag.flagName] = flag.flagActive);
+    _flags.forEach((flag) => flags[flag.name] = flag.value);
 
+    // if you want to test it local, add ".local" to src
+    // example: /script.manual.local.js
     const plausibleScript = `<script ${
       props.defer ? "defer" : ""
     } data-exclude="/proxy" ${
       props.domain ? "data-domain=" + props.domain : ""
-    } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.js"></script>`;
+    } data-api="https://plausible.io/api/event" src=https://plausible.io/js/script.manual.js></script>`;
 
     const flagsScript = `<script defer src="${
       scriptAsDataURI(snippet, flags)

@@ -17,6 +17,8 @@ import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import { getFlagsFromCookies } from "../../utils/cookie.ts";
+import { Flag } from "deco/types.ts";
 
 /**
  * @title Sections
@@ -82,7 +84,6 @@ const useDeco = () => {
   const routerCtx = useRouterContext();
   const pageId = pageIdFromMetadata(metadata);
   return {
-    flags: routerCtx?.flags ?? [],
     page: {
       id: pageId,
       pathTemplate: routerCtx?.pagePath,
@@ -94,13 +95,16 @@ const useDeco = () => {
  * @title Page
  */
 function Page(
-  { sections, errorPage, devMode }:
+  { sections, errorPage, devMode, flags }:
     & Props
-    & { errorPage?: Page; devMode: boolean },
+    & { errorPage?: Page; devMode: boolean; flags: Flag[] },
 ): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
-  const deco = useDeco();
+  const deco = {
+    ...useDeco(),
+    flags
+  };
 
   return (
     <ErrorBoundary
@@ -131,17 +135,22 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
+  const flags = getFlagsFromCookies(req);
   return {
     sections,
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
     devMode,
+    flags
   };
 };
 
-export function Preview({ sections }: Props) {
-  const deco = useDeco();
+export function Preview({ sections, flags }: Props & { flags: Flag[] }) {
+  const deco = {
+    ...useDeco(),
+    flags
+  };
 
   return (
     <>
