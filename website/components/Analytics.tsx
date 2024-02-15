@@ -22,7 +22,7 @@ const snippet = () => {
     if (event.name === "deco") {
       globalThis.window.dataLayer.push({
         event: event.name,
-        deco_event: event.params,
+        deco: event.params,
       });
       return;
     }
