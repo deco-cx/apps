@@ -18,10 +18,9 @@ import * as $$$$$$$$$$$12 from "./apps/weather.ts";
 import * as $$$$$$$$$$$13 from "./apps/brand-assistant.ts";
 import * as $$$$$$$$$$$14 from "./apps/sourei.ts";
 import * as $$$$$$$$$$$15 from "./apps/shopify.ts";
-import * as $$$$$$$$$$$16 from "./apps/handlebars.ts";
-import * as $$$$$$$$$$$17 from "./apps/verified-reviews.ts";
-import * as $$$$$$$$$$$18 from "./apps/files.ts";
-import * as $$$$$$$$$$$19 from "./apps/power-reviews.ts";
+import * as $$$$$$$$$$$16 from "./apps/verified-reviews.ts";
+import * as $$$$$$$$$$$17 from "./apps/files.ts";
+import * as $$$$$$$$$$$18 from "./apps/power-reviews.ts";
 
 const manifest = {
   "apps": {
@@ -30,16 +29,15 @@ const manifest = {
     "decohub/apps/analytics.ts": $$$$$$$$$$$4,
     "decohub/apps/brand-assistant.ts": $$$$$$$$$$$13,
     "decohub/apps/crux.ts": $$$$$$$$$$$2,
-    "decohub/apps/files.ts": $$$$$$$$$$$18,
-    "decohub/apps/handlebars.ts": $$$$$$$$$$$16,
+    "decohub/apps/files.ts": $$$$$$$$$$$17,
     "decohub/apps/implementation.ts": $$$$$$$$$$$6,
     "decohub/apps/linx.ts": $$$$$$$$$$$10,
     "decohub/apps/nuvemshop.ts": $$$$$$$$$$$9,
-    "decohub/apps/power-reviews.ts": $$$$$$$$$$$19,
+    "decohub/apps/power-reviews.ts": $$$$$$$$$$$18,
     "decohub/apps/shopify.ts": $$$$$$$$$$$15,
     "decohub/apps/sourei.ts": $$$$$$$$$$$14,
     "decohub/apps/typesense.ts": $$$$$$$$$$$0,
-    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$17,
+    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$16,
     "decohub/apps/vnda.ts": $$$$$$$$$$$7,
     "decohub/apps/vtex.ts": $$$$$$$$$$$11,
     "decohub/apps/wake.ts": $$$$$$$$$$$1,

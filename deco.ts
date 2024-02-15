@@ -32,7 +32,6 @@ const config = {
     app("sourei"),
     app("typesense"),
     app("algolia"),
-    app("handlebars"),
     app("vtex"),
     app("vnda"),
     app("wake"),

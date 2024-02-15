@@ -38,6 +38,7 @@ export interface Thing {
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
   image?: ImageObject[];
+  video?: VideoObject[];
   /** The name of the item. */
   name?: string;
   /** URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website. */
@@ -60,6 +61,23 @@ export interface MediaObject {
 export interface CreativeWork {
   /** A thumbnail image relevant to the Thing */
   thumbnailUrl?: string;
+}
+
+export interface VideoObject
+  extends MediaObject, CreativeWork, Omit<Thing, "@type" | "url"> {
+  /**
+   * @ignore
+   */
+  "@type": "VideoObject";
+  /**
+   * @description date when video was published first time, format ISO 8601: https://en.wikipedia.org/wiki/ISO_8601
+   */
+  uploadDate?: string;
+  /**
+   * @description video duration, format ISO 8601: https://en.wikipedia.org/wiki/ISO_8601,
+   * PT00H30M5S means 30 minutes and 5 seconds
+   */
+  duration?: string;
 }
 
 export interface ImageObject
@@ -228,6 +246,12 @@ export interface Offer extends Omit<Thing, "@type"> {
    * - Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.
    */
   price: number;
+  /**
+   * The currency of the price, or a price component when attached to {@link https://schema.org/PriceSpecification PriceSpecification} and its subtypes.
+   *
+   * Use standard formats: {@link http://en.wikipedia.org/wiki/ISO_4217 ISO 4217 currency format} e.g. "USD"; {@link https://en.wikipedia.org/wiki/List_of_cryptocurrencies Ticker symbol} for cryptocurrencies e.g. "BTC"; well known names for {@link https://en.wikipedia.org/wiki/Local_exchange_trading_system Local Exchange Tradings Systems} (LETS) and other currency types e.g. "Ithaca HOUR".
+   */
+  priceCurrency?: string;
   /** One or more detailed price specifications, indicating the unit price and delivery or payment charges. */
   priceSpecification: UnitPriceSpecification[];
   /** The date after which the price is no longer available. */
@@ -502,18 +526,20 @@ export interface ProductDetailsPage {
   seo?: Seo | null;
 }
 
+export interface PageInfo {
+  currentPage: number;
+  nextPage: string | undefined;
+  previousPage: string | undefined;
+  records?: number | undefined;
+  recordPerPage?: number | undefined;
+}
+
 export interface ProductListingPage {
   "@type": "ProductListingPage";
   breadcrumb: BreadcrumbList;
   filters: Filter[];
   products: Product[];
-  pageInfo: {
-    currentPage: number;
-    nextPage: string | undefined;
-    previousPage: string | undefined;
-    records?: number | undefined;
-    recordPerPage?: number | undefined;
-  };
+  pageInfo: PageInfo;
   sortOptions: SortOption[];
   seo?: Seo | null;
 }

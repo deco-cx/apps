@@ -14,7 +14,7 @@ export interface Props {
   platform: PlatformName;
 }
 
-export type PlatformName = "kubernetes" | "subhosting";
+export type PlatformName = "kubernetes" | "subhosting" | "play";
 
 export interface Site {
   name: string;
