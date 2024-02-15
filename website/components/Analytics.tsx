@@ -19,7 +19,7 @@ const snippet = () => {
       return;
     }
 
-    if(event.name === "deco"){
+    if (event.name === "deco") {
       globalThis.window.dataLayer.push({
         event: event.name,
         deco_event: event.params,
@@ -32,7 +32,6 @@ const snippet = () => {
       ecommerce: event.params,
     });
   });
-  
 };
 
 export interface Props {
