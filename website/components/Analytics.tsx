@@ -24,6 +24,7 @@ const snippet = () => {
         event: event.name,
         deco_event: event.params,
       });
+      return;
     }
 
     globalThis.window.dataLayer.push({ ecommerce: null });
