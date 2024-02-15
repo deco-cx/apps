@@ -59,8 +59,9 @@ const getProductURL = (
   return canonicalUrl;
 };
 
-const nonEmptyArray = <T>(array: T[] | null | undefined) =>
-  Array.isArray(array) && array.length > 0 ? array : null;
+const nonEmptyArray = <T>(
+  array: T[] | null | undefined,
+) => (Array.isArray(array) && array.length > 0 ? array : null);
 
 interface ProductOptions {
   baseUrl: string;
@@ -81,8 +82,7 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
   maybeSkuId?: string,
 ): T["items"][number] => {
-  const skuId = maybeSkuId ??
-    findFirstAvailable(product.items)?.itemId ??
+  const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
 
   for (const item of product.items) {
@@ -105,16 +105,18 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
     return map;
   }, new Map<string, T>());
 
-  return sku.kitItems?.map(({ itemId }) => {
-    const product = productBySkuId.get(itemId);
+  return sku.kitItems
+    ?.map(({ itemId }) => {
+      const product = productBySkuId.get(itemId);
 
-    /** Sometimes VTEX does not return what I've asked for */
-    if (!product) return;
+      /** Sometimes VTEX does not return what I've asked for */
+      if (!product) return;
 
-    const sku = pickSku(product, itemId);
+      const sku = pickSku(product, itemId);
 
-    return toProduct(product, sku, 0, options);
-  }).filter((p): p is Product => typeof p !== "undefined");
+      return toProduct(product, sku, 0, options);
+    })
+    .filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -211,10 +213,10 @@ const toAdditionalPropertyClusters = <
     : new Set(product.clusterHighlights.map(({ id }) => id));
 
   return allClusters.map((cluster) =>
-    toAdditionalPropertyCluster(
-      { propertyID: cluster.id, value: cluster.name || "" },
-      highlightsSet,
-    )
+    toAdditionalPropertyCluster({
+      propertyID: cluster.id,
+      value: cluster.name || "",
+    }, highlightsSet)
   );
 };
 
@@ -430,8 +432,8 @@ const toBreadcrumbList = (
         return {
           "@type": "ListItem" as const,
           name,
-          item: new URL(`/${segments.slice(0, position).join("/")}`, baseUrl)
-            .href,
+          item:
+            new URL(`/${segments.slice(0, position).join("/")}`, baseUrl).href,
           position,
         };
       }),
@@ -458,12 +460,13 @@ const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
 const toProductGroupAdditionalProperties = ({ properties = [] }: ProductVTEX) =>
   properties.flatMap(({ name, values }) =>
     values.map(
-      (value) => ({
-        "@type": "PropertyValue",
-        name,
-        value,
-        valueReference: "PROPERTY" as string,
-      } as const),
+      (value) =>
+        ({
+          "@type": "PropertyValue",
+          name,
+          value,
+          valueReference: "PROPERTY" as string,
+        }) as const,
     )
   );
 
@@ -498,14 +501,15 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   );
 
   const attachmentProperties = attachments.map(
-    (attachment) => ({
-      "@type": "PropertyValue",
-      propertyID: `${attachment.id}`,
-      name: attachment.name,
-      value: attachment.domainValues,
-      required: attachment.required,
-      valueReference: "ATTACHMENT",
-    } as const),
+    (attachment) =>
+      ({
+        "@type": "PropertyValue",
+        propertyID: `${attachment.id}`,
+        name: attachment.name,
+        value: attachment.domainValues,
+        required: attachment.required,
+        valueReference: "ATTACHMENT",
+      }) as const,
   );
 
   return [...specificationProperties, ...attachmentProperties];
@@ -581,23 +585,24 @@ const toOfferLegacy = (seller: SellerVTEX): Offer => {
         name: teaser["<Name>k__BackingField"],
         generalValues: teaser["<GeneralValues>k__BackingField"],
         conditions: {
-          minimumQuantity: teaser["<Conditions>k__BackingField"][
-            "<MinimumQuantity>k__BackingField"
-          ],
-          parameters: teaser["<Conditions>k__BackingField"][
-            "<Parameters>k__BackingField"
-          ].map((parameter) => ({
-            name: parameter["<Name>k__BackingField"],
-            value: parameter["<Value>k__BackingField"],
-          })),
+          minimumQuantity:
+            teaser["<Conditions>k__BackingField"][
+              "<MinimumQuantity>k__BackingField"
+            ],
+          parameters:
+            teaser["<Conditions>k__BackingField"]["<Parameters>k__BackingField"]
+              .map((parameter) => ({
+                name: parameter["<Name>k__BackingField"],
+                value: parameter["<Value>k__BackingField"],
+              })),
         },
         effects: {
-          parameters: teaser["<Effects>k__BackingField"][
-            "<Parameters>k__BackingField"
-          ].map((parameter) => ({
-            name: parameter["<Name>k__BackingField"],
-            value: parameter["<Value>k__BackingField"],
-          })),
+          parameters:
+            teaser["<Effects>k__BackingField"]["<Parameters>k__BackingField"]
+              .map((parameter) => ({
+                name: parameter["<Name>k__BackingField"],
+                value: parameter["<Value>k__BackingField"],
+              })),
         },
       })),
     ],
@@ -613,13 +618,13 @@ export const legacyFacetToFilter = (
   behavior: "dynamic" | "static",
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = term
-    .replace(/^\//, "")
-    .split("/")
-    .slice(0, mapSegments.length);
+  const pathSegments = term.replace(/^\//, "").split("/").slice(
+    0,
+    mapSegments.length,
+  );
 
-  const mapSet = new Set(mapSegments);
-  const pathSet = new Set(pathSegments);
+  const mapSet = new Set(mapSegments.map((i) => i.toLowerCase()));
+  const pathSet = new Set(pathSegments.map((i) => i.toLowerCase()));
 
   // for productClusterIds, we have to use the full path
   // example:
@@ -692,6 +697,7 @@ export const legacyFacetToFilter = (
 
       const selected = mapSet.has(normalizedFacet.Map.toLowerCase()) &&
         pathSet.has(normalizedFacet.Value.toLowerCase());
+
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
@@ -804,33 +810,34 @@ const isValueRange = (
   // deno-lint-ignore no-explicit-any
   Boolean((facet as any).range);
 
-const facetToToggle = (
-  selectedFacets: SelectedFacet[],
-  key: string,
-  paramsToPersist?: URLSearchParams,
-) =>
-(item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
-  const { quantity, selected } = item;
-  const isRange = isValueRange(item);
+const facetToToggle =
+  (
+    selectedFacets: SelectedFacet[],
+    key: string,
+    paramsToPersist?: URLSearchParams,
+  ) =>
+  (item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
+    const { quantity, selected } = item;
+    const isRange = isValueRange(item);
 
-  const value = isRange
-    ? formatRange(item.range.from, item.range.to)
-    : item.value;
-  const label = isRange ? value : item.name;
-  const facet = { key, value };
+    const value = isRange
+      ? formatRange(item.range.from, item.range.to)
+      : item.value;
+    const label = isRange ? value : item.name;
+    const facet = { key, value };
 
-  const filters = selected
-    ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
-    : [...selectedFacets, facet];
+    const filters = selected
+      ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
+      : [...selectedFacets, facet];
 
-  return {
-    value,
-    quantity,
-    selected,
-    url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
-    label,
+    return {
+      value,
+      quantity,
+      selected,
+      url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
+      label,
+    };
   };
-};
 
 export const toFilter =
   (selectedFacets: SelectedFacet[], paramsToPersist?: URLSearchParams) =>
