@@ -5,6 +5,7 @@ import { parseCookie } from "../../utils/vtexId.ts";
 export interface Props {
   data: Record<string, unknown>;
   acronym: string;
+  isPrivateEntity?: boolean;
 }
 
 /**
@@ -15,22 +16,29 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<CreateNewDocument> => {
-  const { vcs } = ctx;
-  const { data, acronym } = props;
+  const { vcs, vcsDeprecated } = ctx;
+  const { data, acronym, isPrivateEntity } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
-  const response = await vcs
-    [`POST /api/dataentities/:acronym/documents`](
-      { acronym },
-      {
-        body: data,
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          cookie,
-        },
-      },
-    );
+  const requestOptions = {
+    body: data,
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      cookie,
+    },
+  };
+
+  const response =
+    await (isPrivateEntity
+      ? vcs[`POST /api/dataentities/:acronym/documents`](
+        { acronym },
+        requestOptions,
+      )
+      : vcsDeprecated[`POST /api/dataentities/:acronym/documents`](
+        { acronym },
+        requestOptions,
+      ));
 
   return response.json();
 };
