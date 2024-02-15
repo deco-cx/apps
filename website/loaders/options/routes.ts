@@ -1,5 +1,5 @@
 import { allowCorsFor } from "deco/mod.ts";
-import { AppContext } from "../mod.ts";
+import { AppContext } from "../../mod.ts";
 
 type Resolvable<
   T extends Record<string, unknown> = Record<string, unknown>,

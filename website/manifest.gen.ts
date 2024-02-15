@@ -8,12 +8,12 @@ import * as $$$1 from "./loaders/extension.ts";
 import * as $$$2 from "./loaders/fonts/googleFonts.ts";
 import * as $$$3 from "./loaders/fonts/local.ts";
 import * as $$$4 from "./loaders/image.ts";
-import * as $$$5 from "./loaders/options/urlParams.ts";
-import * as $$$6 from "./loaders/pages.ts";
-import * as $$$7 from "./loaders/redirect.ts";
-import * as $$$8 from "./loaders/redirects.ts";
-import * as $$$9 from "./loaders/redirectsFromCsv.ts";
-import * as $$$10 from "./loaders/routes.ts";
+import * as $$$5 from "./loaders/options/routes.ts";
+import * as $$$6 from "./loaders/options/urlParams.ts";
+import * as $$$7 from "./loaders/pages.ts";
+import * as $$$8 from "./loaders/redirect.ts";
+import * as $$$9 from "./loaders/redirects.ts";
+import * as $$$10 from "./loaders/redirectsFromCsv.ts";
 import * as $$$11 from "./loaders/secret.ts";
 import * as $$$12 from "./loaders/secretString.ts";
 import * as $$$$0 from "./handlers/fresh.ts";
@@ -59,12 +59,12 @@ const manifest = {
     "website/loaders/fonts/googleFonts.ts": $$$2,
     "website/loaders/fonts/local.ts": $$$3,
     "website/loaders/image.ts": $$$4,
-    "website/loaders/options/urlParams.ts": $$$5,
-    "website/loaders/pages.ts": $$$6,
-    "website/loaders/redirect.ts": $$$7,
-    "website/loaders/redirects.ts": $$$8,
-    "website/loaders/redirectsFromCsv.ts": $$$9,
-    "website/loaders/routes.ts": $$$10,
+    "website/loaders/options/routes.ts": $$$5,
+    "website/loaders/options/urlParams.ts": $$$6,
+    "website/loaders/pages.ts": $$$7,
+    "website/loaders/redirect.ts": $$$8,
+    "website/loaders/redirects.ts": $$$9,
+    "website/loaders/redirectsFromCsv.ts": $$$10,
     "website/loaders/secret.ts": $$$11,
     "website/loaders/secretString.ts": $$$12,
   },
