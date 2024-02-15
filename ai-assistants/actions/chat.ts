@@ -50,7 +50,7 @@ export interface MessageContentFile {
 export interface ReplyMessage {
   threadId: string;
   messageId: string;
-  type: "message";
+  type: "message" | "error";
   content: Array<MessageContentText | MessageContentFile>;
   role: "user" | "assistant";
 }

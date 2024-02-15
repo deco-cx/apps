@@ -274,14 +274,8 @@ export const messageProcessorFor = async (
           const message: ReplyMessage = {
             messageId: Date.now().toString(),
             threadId: thread.id,
-            type: "message",
-            content: [
-              {
-                type: "text",
-                value:
-                  "Ei, algo não saiu como esperávamos... 🚧 Por favor, recarregue a página e tente novamente.",
-              },
-            ],
+            type: "error",
+            content: [],
             role: "assistant",
           };
           reply(message);
@@ -314,14 +308,8 @@ export const messageProcessorFor = async (
       const message: ReplyMessage = {
         messageId: Date.now().toString(),
         threadId: thread.id,
-        type: "message",
-        content: [
-          {
-            type: "text",
-            value:
-              "Parece que estamos enfrentando um pequeno problema ao localizar seu produto. Por favor, tente recarregar a página e realizar a busca novamente.",
-          },
-        ],
+        type: "error",
+        content: [],
         role: "assistant",
       };
       reply(message);
