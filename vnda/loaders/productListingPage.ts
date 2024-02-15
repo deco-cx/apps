@@ -104,7 +104,7 @@ const searchLoader = async (
   const sort = url.searchParams.get("sort") as Sort;
   const page = Number(url.searchParams.get("page")) || 1;
 
-  const isSearchPage = url.pathname === "/busca" || url.pathname === "/s" || url.pathname === props.searchPagePath;
+  const isSearchPage = props.searchPagePath ? props.searchPagePath ===  url.pathname : url.pathname === "/busca" || url.pathname === "/s";
   const qQueryString = url.searchParams.get("q");
   const term = props.term || props.slug || qQueryString ||
     undefined;
