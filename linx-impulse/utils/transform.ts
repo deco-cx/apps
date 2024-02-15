@@ -207,7 +207,10 @@ const productFromImpulse = (
         propertyID: c.id,
       })
     ),
-    ...(level >= 1 ? isVariantOfAdditionalProperty : []),
+    ...(level >= 1 ? isVariantOfAdditionalProperty : [toPropertyValue({
+      name: "trackingId",
+      value: trackingId ?? undefined,
+    })]),
   ];
 
   const hasVariant = level < 1
@@ -238,7 +241,7 @@ const productFromImpulse = (
 
   return {
     "@type": "Product",
-    productID: `${product.id}`,
+    productID: `${variant.sku}`,
     sku: `${variant.sku}`,
     url: toProductUrl(product.url, origin, variant.sku),
     category: product.categories.map((c) => c.name).join(">"),
@@ -269,6 +272,9 @@ const productFromChaordic = (
 ): Product => {
   const variants = product.skus ?? [];
   const variant = pickVariant(product.skus, variantId);
+  const trackingId = new URL(product.trackingUrl).searchParams.get(
+    "trackingId",
+  );
   const brandName = product.brand ?? sanitizeValue(product.details["brand"]);
   const brand = brandName
     ? {
@@ -309,12 +315,19 @@ const productFromChaordic = (
         }
         return toPropertyValue({ name: key, value: sanitizeValue(value) });
       }),
+    toPropertyValue({
+      name: "trackingId",
+      value: trackingId ?? undefined,
+    }),
   ];
   const additionalProperty: PropertyValue[] = [
     ...Object.entries(variant?.details ?? {})?.map(([key, value]) =>
       toPropertyValue({ name: key, value: sanitizeValue(value) })
     ),
-    ...(level >= 1 ? isVariantOfAdditionalProperty : []),
+    ...(level >= 1 ? isVariantOfAdditionalProperty : [toPropertyValue({
+      name: "trackingId",
+      value: trackingId ?? undefined,
+    })]),
   ];
 
   const hasVariant = level < 1
@@ -337,43 +350,14 @@ const productFromChaordic = (
       name: product.name,
       image,
       productGroupID: product.id,
-      additionalProperty: [
-        ...Object
-          .entries(variant.specs ?? {})
-          .flatMap((
-            [key, value],
-          ) => {
-            if (Array.isArray(value)) {
-              return value.map((spec) =>
-                toPropertyValue({
-                  name: key,
-                  value: sanitizeValue(spec),
-                })
-              );
-            }
-            return toPropertyValue({ name: key, value: sanitizeValue(value) });
-          }),
-        ...Object
-          .entries(product.details)
-          .flatMap(([key, value]) => {
-            if (Array.isArray(value)) {
-              return value.map((spec) =>
-                toPropertyValue({
-                  name: key,
-                  value: sanitizeValue(spec),
-                })
-              );
-            }
-            return toPropertyValue({ name: key, value: sanitizeValue(value) });
-          }),
-      ],
+      additionalProperty: isVariantOfAdditionalProperty,
       hasVariant,
     } satisfies ProductGroup
     : undefined;
 
   return {
     "@type": "Product",
-    productID: `${product.id}`,
+    productID: `${variant.sku}`,
     sku: `${variant.sku}`,
     url: toProductUrl(product.url, origin, variant.sku),
     category: product.categories.map((c) => c.name).join(">"),

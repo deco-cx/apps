@@ -213,7 +213,8 @@ const action = async (
       // Chaordic event click
       if (interactionType === "SHELF_CLICK") {
         await chaordicApi["GET /v0/click"]({
-          trackingClick: trackingId,
+          trackingId: trackingId,
+          apiKey,
           deviceId,
         });
         return null;
@@ -235,6 +236,8 @@ const action = async (
     case "impression": {
       const { trackingImpression, firstOffset, lastOffset } = params;
       await chaordicApi["GET /v0/impression"]({
+        apiKey,
+        origin,
         trackingImpression,
         firstOffset,
         lastOffset,

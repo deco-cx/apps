@@ -30,6 +30,9 @@ export interface ChaordicAPI {
   "GET /v0/impression": {
     response: void;
     searchParams: {
+      apiKey: string;
+      secretKey?: string;
+      origin?: string;
       trackingImpression: string;
       firstOffset: number;
       lastOffset: number;
@@ -39,7 +42,8 @@ export interface ChaordicAPI {
   "GET /v0/click": {
     response: void;
     searchParams: {
-      trackingClick: string;
+      trackingId: string;
+      apiKey: string;
       deviceId: string;
     };
   };
