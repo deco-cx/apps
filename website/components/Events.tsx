@@ -30,7 +30,9 @@ declare global {
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const snippet = ({ deco: { page }, segmentCookie } : {deco: Deco; segmentCookie: string}) => {
+const snippet = (
+  { deco: { page }, segmentCookie }: { deco: Deco; segmentCookie: string },
+) => {
   const cookie = document.cookie;
   const out: Record<string, string> = {};
   if (cookie !== null) {
@@ -86,7 +88,11 @@ const snippet = ({ deco: { page }, segmentCookie } : {deco: Deco; segmentCookie:
 function Events({ deco }: { deco: Deco }) {
   return (
     <Head>
-      <script defer id="deco-events" src={scriptAsDataURI(snippet, {deco, segmentCookie: DECO_SEGMENT})} />
+      <script
+        defer
+        id="deco-events"
+        src={scriptAsDataURI(snippet, { deco, segmentCookie: DECO_SEGMENT })}
+      />
     </Head>
   );
 }
