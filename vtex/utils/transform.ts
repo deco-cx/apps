@@ -117,7 +117,7 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
   }).filter((p): p is Product => typeof p !== "undefined");
 };
 
-export const processOrderFormImages = (orderForm: OrderForm) => {
+export const forceHttpsOnAssets = (orderForm: OrderForm) => {
   orderForm.items.forEach((item) => {
     if (item.imageUrl) {
       item.imageUrl = item.imageUrl.startsWith("http://")
