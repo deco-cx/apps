@@ -240,24 +240,21 @@ export const toProduct = (
   }));
   const additionalProperty: PropertyValue[] = [];
 
-
-  if (variant.attributeSelections) { 
+  if (variant.attributeSelections) {
     variant.attributeSelections?.selections?.forEach((selection) => {
-      if(selection?.name == "Outras Opções") {
+      if (selection?.name == "Outras Opções") {
         selection.values?.forEach((value) => {
           additionalProperty.push({
             "@type": "PropertyValue",
-            alias: value?.alias ?? undefined,
-            available: value?.available ?? undefined,
-            selected: value?.selected ?? undefined,
-            valor: value?.value ?? undefined,
-          })
-        })
+            url: value?.alias ?? undefined,
+            value: value?.selected ? "true" : "false",
+            name: value?.value ?? undefined,
+            valueReference: "SELECTIONS",
+          });
+        });
       }
     });
   }
-
-  // console.log(additionalSelections)
 
   variant.informations?.forEach((info) =>
     additionalProperty.push({
@@ -313,7 +310,6 @@ export const toProduct = (
       valueReference: "COLLECTION",
     });
   }
-
 
   const priceSpecification: UnitPriceSpecification[] = [];
 
@@ -424,8 +420,8 @@ export const toProduct = (
         priceSpecification,
         itemCondition: CONDITIONS[variant.condition!],
         availability: variant.available
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
         inventoryLevel: { value: variant.stock },
       }],
     },
