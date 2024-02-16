@@ -18,18 +18,14 @@ export default async function loader(
     ctx.response.headers.set(name, value);
   });
 
-  try {
-    const pages = await ctx.invoke.website.loaders.pages();
+  const pages = await ctx.invoke.website.loaders.pages();
 
-    return pages.map((route) => ({
-      label: `${
-        (route.handler.value as HandlerValue).page.__resolveType.split("-")
-          .slice(1, -1).join(" ")
-      } ( ${route.pathTemplate} )`,
-      value: route.pathTemplate,
-    }));
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
+  return pages?.map((route) => ({
+    label: `${
+      (route.handler.value as HandlerValue).page.__resolveType.split("-")
+        .slice(1, -1).join(" ")
+    } ( ${route.pathTemplate} )`,
+    value: route.pathTemplate,
+  }));
+
 }
