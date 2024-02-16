@@ -25,6 +25,7 @@ import type {
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
+  OrderForm,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
@@ -115,6 +116,17 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
     return toProduct(product, sku, 0, options);
   }).filter((p): p is Product => typeof p !== "undefined");
 };
+
+export const processOrderFormImages = (orderForm: OrderForm) => {
+  orderForm.items.forEach((item) => {
+    if (item.imageUrl) {
+      item.imageUrl = item.imageUrl.startsWith("http://")
+      ? item.imageUrl.replace("http://", "https://")
+      : item.imageUrl;
+    }
+  });
+  return orderForm;
+}
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
