@@ -9,7 +9,7 @@ import {
 import { dirname, join } from "std/path/mod.ts";
 import { DynamicApp } from "../../decohub/mod.ts";
 import { AppContext } from "../mod.ts";
-import { FileSystemNode, create, isDir, nodesToMap, walk } from "../sdk.ts";
+import { create, FileSystemNode, isDir, nodesToMap, walk } from "../sdk.ts";
 
 const initializePromise = initialize({
   wasmURL: "https://deno.land/x/esbuild@v0.19.7/esbuild.wasm",
@@ -209,7 +209,7 @@ export default function App(props: WebSiteProps): App<Manifest, WebSiteProps, [R
     state: props,
     manifest,
     dependencies: [website(props)],
-    importMap: { imports: { "a": "b"} },
+    importMap: null,
   };
 }
 export type AppContext = AC<ReturnType<typeof App>>;
