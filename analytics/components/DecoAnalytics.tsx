@@ -94,7 +94,7 @@ function Component({ exclude, domain }: Props) {
         data-domain={domain}
         data-exclude={`${"/proxy" + (exclude ? "," + exclude : "")}`}
         data-api="https://plausible.io/api/event"
-        src="https://plausible.io/js/script.manual.js"
+        src="https://plausible.io/js/script.manual.local.js"
       />
       <script defer src={scriptAsDataURI(snippet)} />
     </Head>

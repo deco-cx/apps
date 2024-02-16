@@ -42,17 +42,17 @@ const snippet = ({ page }: Deco) => {
   }
 
   const flags: Flag[] = [];
-  if(out["deco_segment"]){
+  if (out["deco_segment"]) {
     try {
-      const segment = JSON.parse(decodeURIComponent(atob(out["deco_segment"])))
+      const segment = JSON.parse(decodeURIComponent(atob(out["deco_segment"])));
       segment.active?.forEach((flag: string) =>
-      flags.push({ name: flag, value: true })
+        flags.push({ name: flag, value: true })
       );
       segment.inactiveDrawn?.forEach((flag: string) =>
         flags.push({ name: flag, value: false })
       );
-    }catch {
-      console.error("Error parsing deco_segment cookie")
+    } catch {
+      console.error("Error parsing deco_segment cookie");
     }
   }
 
