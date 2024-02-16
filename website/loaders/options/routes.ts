@@ -7,11 +7,9 @@ type Resolvable<
   __resolveType: string;
 } & T;
 
-type HandlerValue = Resolvable<{
-  page: Resolvable<{ __resolveType: string }>;
-}>;
+type HandlerValue = Resolvable<{ page: Resolvable }>;
 
-export default function loader(
+export default async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
@@ -20,22 +18,18 @@ export default function loader(
     ctx.response.headers.set(name, value);
   });
 
-  const routes = ctx.routes?.find((routes) =>
-    routes.some((route) =>
-      (route.handler.value as HandlerValue).__resolveType ===
-        "website/handlers/fresh.ts"
-    )
-  );
+  try {
+    const pages = await ctx.invoke.website.loaders.pages();
 
-  if (!routes) {
+    return pages.map((route) => ({
+      label: `${
+        (route.handler.value as HandlerValue).page.__resolveType.split("-")
+          .slice(1, -1).join(" ")
+      } ( ${route.pathTemplate} )`,
+      value: route.pathTemplate,
+    }));
+  } catch (error) {
+    console.error(error);
     return [];
   }
-
-  return routes.map((route) => ({
-    label: `${
-      (route.handler.value as HandlerValue).page.__resolveType.split("-")
-        .slice(1, -1).join(" ")
-    } ( ${route.pathTemplate} )`,
-    value: route.pathTemplate,
-  }));
 }
