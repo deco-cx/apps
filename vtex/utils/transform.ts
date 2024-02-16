@@ -635,7 +635,7 @@ export const legacyFacetToFilter = (
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
-    const index = pathSegments.findIndex((s) => s === facet.Value);
+    const index = pathSegments.findIndex((s) => s.toLowerCase() === facet.Value.toLowerCase());
 
     const map = hasToBeFullpath
       ? facet.Link.split("map=")[1].split(",")
