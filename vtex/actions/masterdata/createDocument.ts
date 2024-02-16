@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
-import type { CreateNewDocument } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
+import type { CreateNewDocument } from "../../utils/types.ts";
 
 export interface Props {
   data: Record<string, unknown>;
@@ -15,6 +15,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
+  /* no-explicit-any */
 ): Promise<CreateNewDocument> => {
   const { vcs, vcsDeprecated } = ctx;
   const { data, acronym, isPrivateEntity } = props;
