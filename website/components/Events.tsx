@@ -1,4 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
+import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
 import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 import { Flag } from "deco/types.ts";
@@ -29,7 +30,7 @@ declare global {
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const snippet = ({ page }: Deco) => {
+const snippet = ({ deco: { page }, segmentCookie } : {deco: Deco; segmentCookie: string}) => {
   const cookie = document.cookie;
   const out: Record<string, string> = {};
   if (cookie !== null) {
@@ -42,9 +43,9 @@ const snippet = ({ page }: Deco) => {
   }
 
   const flags: Flag[] = [];
-  if (out["deco_segment"]) {
+  if (out[segmentCookie]) {
     try {
-      const segment = JSON.parse(decodeURIComponent(atob(out["deco_segment"])));
+      const segment = JSON.parse(decodeURIComponent(atob(out[segmentCookie])));
       segment.active?.forEach((flag: string) =>
         flags.push({ name: flag, value: true })
       );
@@ -85,7 +86,7 @@ const snippet = ({ page }: Deco) => {
 function Events({ deco }: { deco: Deco }) {
   return (
     <Head>
-      <script defer id="deco-events" src={scriptAsDataURI(snippet, deco)} />
+      <script defer id="deco-events" src={scriptAsDataURI(snippet, {deco, segmentCookie: DECO_SEGMENT})} />
     </Head>
   );
 }
