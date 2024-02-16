@@ -20,7 +20,7 @@ export interface Props {
   tags?: string[];
 
   /** @description search for products that have certain type_tag */
-  typeTags?: { key?: string; value?: string }[];
+  typeTags?: { key: string; value: string }[];
 
   /** @description search for products by id */
   ids: number[];
@@ -45,7 +45,11 @@ const productListLoader = async (
       sort: props?.sort,
       per_page: props?.count,
       "tags[]": props?.tags,
-      "type_tags[]": props?.typeTags ?? [],
+      ...Object.fromEntries(
+        (props.typeTags || []).map((
+          { key, value },
+        ) => [`type_tags[${key}][]`, value]),
+      ),
       "ids[]": props?.ids,
     }, STALE).then((res) => res.json());
 

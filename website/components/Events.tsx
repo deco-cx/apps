@@ -37,7 +37,7 @@ const snippet = ({ flags, page }: Deco) => {
       const ck = cookies[i].trim();
 
       if (ck.startsWith("deco_matcher_")) {
-        const name = atob(ck.slice(ck.indexOf("=") + 1, ck.indexOf("@")));
+        const name = atob(ck.slice(ck.lastIndexOf("=") + 1, ck.indexOf("@")));
         const value = ck.at(-1) === "1" ? true : false;
 
         if (knownFlags.has(name)) continue;

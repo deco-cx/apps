@@ -1,14 +1,19 @@
 import { ImportMap } from "deco/blocks/app.ts";
 import { buildImportMap } from "deco/blocks/utils.tsx";
+import { notUndefined } from "deco/engine/core/utils.ts";
 import { type App, AppModule, context, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
+/**
+ * @title App
+ */
 export interface DynamicApp {
-  module: AppModule;
+  importUrl: string;
   name: string;
   importMap?: ImportMap;
 }
+
 export interface State {
   enableAdmin?: boolean;
   apps: DynamicApp[];
@@ -23,7 +28,24 @@ export default async function App(
 ): Promise<App<Manifest, State>> {
   const resolvedImport = import.meta.resolve("../admin/mod.ts");
   const baseImportMap = buildImportMap(manifest);
-  const [dynamicApps, enhancedImportMap] = (state?.apps ?? []).filter(Boolean)
+  const appModules = await Promise.all(
+    (state?.apps ?? []).filter(Boolean).map(async (app) => {
+      const appMod = await import(app.importUrl).catch((err) => {
+        console.error("error when importing app", app.name, app.importUrl, err);
+        return null;
+      });
+      if (!appMod) {
+        return null;
+      }
+      return {
+        module: appMod,
+        importUrl: app.importUrl,
+        importMap: app.importMap,
+        name: app.name,
+      };
+    }),
+  );
+  const [dynamicApps, enhancedImportMap] = appModules.filter(notUndefined)
     .reduce(
       ([apps, importmap], app) => {
         const appTs = `${app.name}.ts`;
@@ -37,7 +59,7 @@ export default async function App(
           imports: {
             ...importmap?.imports ?? {},
             ...app.importMap?.imports ?? {},
-            [appName]: import.meta.resolve("../website/mod.ts"),
+            [appName]: app.importUrl,
           },
         }];
       },
