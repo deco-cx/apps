@@ -10,11 +10,20 @@ import { scriptAsDataURI } from "../../utils/dataURI.ts";
  */
 const snippet = () => {
   globalThis.window.DECO.events.subscribe((event) => {
+    globalThis.window.dataLayer = globalThis.window.dataLayer || [];
     if (
       !event ||
       !globalThis.window.dataLayer ||
       typeof globalThis.window.dataLayer.push !== "function"
     ) {
+      return;
+    }
+
+    if (event.name === "deco") {
+      globalThis.window.dataLayer.push({
+        event: event.name,
+        deco: event.params,
+      });
       return;
     }
 
