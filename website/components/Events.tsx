@@ -42,16 +42,19 @@ const snippet = ({ page }: Deco) => {
   }
 
   const flags: Flag[] = [];
-  const segment = out["deco_segment"]
-    ? JSON.parse(decodeURIComponent(atob(out["deco_segment"])))
-    : {};
-
-  segment.active?.forEach((flag: string) =>
-    flags.push({ name: flag, value: true })
-  );
-  segment.inactiveDrawn?.forEach((flag: string) =>
-    flags.push({ name: flag, value: false })
-  );
+  if(out["deco_segment"]){
+    try {
+      const segment = JSON.parse(decodeURIComponent(atob(out["deco_segment"])))
+      segment.active?.forEach((flag: string) =>
+      flags.push({ name: flag, value: true })
+      );
+      segment.inactiveDrawn?.forEach((flag: string) =>
+        flags.push({ name: flag, value: false })
+      );
+    }catch {
+      console.error("Error parsing deco_segment cookie")
+    }
+  }
 
   const target = new EventTarget();
 

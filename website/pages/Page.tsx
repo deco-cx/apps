@@ -17,8 +17,6 @@ import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import { getFlagsFromRequest } from "../../utils/cookie.ts";
-import { Flag } from "deco/types.ts";
 
 /**
  * @title Sections
@@ -102,7 +100,7 @@ function Page(
 ): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
-  const deco = useDeco()
+  const deco = useDeco();
 
   return (
     <ErrorBoundary
@@ -142,8 +140,8 @@ export const loader = async (
   };
 };
 
-export function Preview({ sections, flags }: Props & { flags: Flag[] }) {
-  const deco = useDeco()
+export function Preview({ sections }: Props) {
+  const deco = useDeco();
 
   return (
     <>
