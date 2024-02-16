@@ -57,7 +57,7 @@ const loader = (
       props.defer ? "defer" : ""
     } data-exclude="/proxy" ${
       props.domain ? "data-domain=" + props.domain : ""
-    } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.local.js"></script>`;
+    } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.js"></script>`;
 
     const flagsScript = `<script defer src="${
       scriptAsDataURI(snippet, flags)
