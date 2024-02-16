@@ -84,6 +84,7 @@ const useDeco = () => {
   const routerCtx = useRouterContext();
   const pageId = pageIdFromMetadata(metadata);
   return {
+    flags: routerCtx?.flags ?? [],
     page: {
       id: pageId,
       pathTemplate: routerCtx?.pagePath,
@@ -95,16 +96,13 @@ const useDeco = () => {
  * @title Page
  */
 function Page(
-  { sections, errorPage, devMode, flags }:
+  { sections, errorPage, devMode }:
     & Props
-    & { errorPage?: Page; devMode: boolean; flags: Flag[] },
+    & { errorPage?: Page; devMode: boolean },
 ): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
-  const deco = {
-    ...useDeco(),
-    flags,
-  };
+  const deco = useDeco()
 
   return (
     <ErrorBoundary
@@ -135,22 +133,17 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
-  const flags = getFlagsFromRequest(req);
   return {
     sections,
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
     devMode,
-    flags,
   };
 };
 
 export function Preview({ sections, flags }: Props & { flags: Flag[] }) {
-  const deco = {
-    ...useDeco(),
-    flags,
-  };
+  const deco = useDeco()
 
   return (
     <>
