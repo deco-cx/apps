@@ -94,6 +94,10 @@ export interface ImageObject
 
 export interface PropertyValue extends Omit<Thing, "@type"> {
   "@type": "PropertyValue";
+  alias?: string;
+  available?: boolean;
+  selected?: boolean;
+  valor?: string;
   /** The upper value of some characteristic or property. */
   maxValue?: number;
   /** The lower value of some characteristic or property. */

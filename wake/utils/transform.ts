@@ -227,7 +227,7 @@ export const toBreadcrumbList = (
 };
 
 export const toProduct = (
-  variant: ProductFragment | SingleProductFragment,
+  variant: SingleProductFragment,
   { base }: { base: URL | string },
   variants: Product[] = [],
   variantId?: number | null,
@@ -238,8 +238,27 @@ export const toProduct = (
     url: image?.url ?? "",
     alternateName: image?.fileName ?? "",
   }));
-
   const additionalProperty: PropertyValue[] = [];
+
+
+  if (variant.attributeSelections) { 
+    variant.attributeSelections?.selections?.forEach((selection) => {
+      if(selection?.name == "Outras Opções") {
+        selection.values?.forEach((value) => {
+          additionalProperty.push({
+            "@type": "PropertyValue",
+            alias: value?.alias ?? undefined,
+            available: value?.available ?? undefined,
+            selected: value?.selected ?? undefined,
+            valor: value?.value ?? undefined,
+          })
+        })
+      }
+    });
+  }
+
+  // console.log(additionalSelections)
+
   variant.informations?.forEach((info) =>
     additionalProperty.push({
       "@type": "PropertyValue",
@@ -294,6 +313,7 @@ export const toProduct = (
       valueReference: "COLLECTION",
     });
   }
+
 
   const priceSpecification: UnitPriceSpecification[] = [];
 
@@ -391,7 +411,6 @@ export const toProduct = (
       logo: variant.productBrand?.fullUrlLogo ??
         undefined,
     },
-    additionalProperty,
     offers: {
       "@type": "AggregateOffer",
       highPrice: variant.prices?.price,
@@ -405,12 +424,13 @@ export const toProduct = (
         priceSpecification,
         itemCondition: CONDITIONS[variant.condition!],
         availability: variant.available
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
         inventoryLevel: { value: variant.stock },
       }],
     },
     ...variantSelected,
+    additionalProperty,
     isSimilarTo,
     review,
     aggregateRating,
