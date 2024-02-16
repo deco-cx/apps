@@ -121,12 +121,12 @@ export const processOrderFormImages = (orderForm: OrderForm) => {
   orderForm.items.forEach((item) => {
     if (item.imageUrl) {
       item.imageUrl = item.imageUrl.startsWith("http://")
-      ? item.imageUrl.replace("http://", "https://")
-      : item.imageUrl;
+        ? item.imageUrl.replace("http://", "https://")
+        : item.imageUrl;
     }
   });
   return orderForm;
-}
+};
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
