@@ -19,6 +19,7 @@ export interface State {
   apps: DynamicApp[];
 }
 
+const DENY_DYNAMIC_IMPORT = Deno.env.get("DENY_DYNAMIC_IMPORT") === "true";
 /**
  * @title Deco Hub
  */
@@ -28,7 +29,7 @@ export default async function App(
 ): Promise<App<Manifest, State>> {
   const resolvedImport = import.meta.resolve("../admin/mod.ts");
   const baseImportMap = buildImportMap(manifest);
-  const appModules = await Promise.all(
+  const appModules = DENY_DYNAMIC_IMPORT ? [] : await Promise.all(
     (state?.apps ?? []).filter(Boolean).map(async (app) => {
       const appMod = await import(app.importUrl).catch((err) => {
         console.error("error when importing app", app.name, app.importUrl, err);
