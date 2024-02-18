@@ -1,10 +1,11 @@
 import { AppContext } from "../../mod.ts";
-import type { CreateNewDocument } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
+import type { CreateNewDocument } from "../../utils/types.ts";
 
 export interface Props {
   data: Record<string, unknown>;
   acronym: string;
+  isPrivateEntity?: boolean;
 }
 
 /**
@@ -14,23 +15,31 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
+  /* no-explicit-any */
 ): Promise<CreateNewDocument> => {
-  const { vcsDeprecated } = ctx;
-  const { data, acronym } = props;
+  const { vcs, vcsDeprecated } = ctx;
+  const { data, acronym, isPrivateEntity } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
-  const response = await vcsDeprecated
-    [`POST /api/dataentities/:acronym/documents`](
-      { acronym },
-      {
-        body: data,
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          cookie,
-        },
-      },
-    );
+  const requestOptions = {
+    body: data,
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      cookie,
+    },
+  };
+
+  const response =
+    await (isPrivateEntity
+      ? vcs[`POST /api/dataentities/:acronym/documents`](
+        { acronym },
+        requestOptions,
+      )
+      : vcsDeprecated[`POST /api/dataentities/:acronym/documents`](
+        { acronym },
+        requestOptions,
+      ));
 
   return response.json();
 };

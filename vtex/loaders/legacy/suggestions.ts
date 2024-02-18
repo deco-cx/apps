@@ -49,7 +49,10 @@ const loaders = async (
   const products: Suggestion["products"] = suggestions.itemsReturned
     .filter(({ items }) => !!items.length)
     .map(
-      ({ items: [{ productId, itemId, imageUrl, name }], href }): Product => {
+      ({
+        items: [{ productId, itemId, imageUrl, name, nameComplete }],
+        href,
+      }): Product => {
         const url = new URL(href);
 
         return {
@@ -57,6 +60,14 @@ const loaders = async (
           productID: itemId,
           sku: itemId,
           inProductGroupWithID: productId,
+          isVariantOf: {
+            "@type": "ProductGroup",
+            name: nameComplete,
+            url: new URL(href).pathname,
+            hasVariant: [],
+            additionalProperty: [],
+            productGroupID: productId,
+          },
           image: [{ "@type": "ImageObject", url: imageUrl }],
           name,
           url: url.pathname + url.search + url.hash,
