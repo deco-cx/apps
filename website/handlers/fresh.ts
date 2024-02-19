@@ -1,5 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { Page } from "deco/blocks/page.tsx";
+import { RequestContext } from "deco/deco.ts";
 import {
   asResolved,
   BaseContext,
@@ -30,22 +31,52 @@ export const isFreshCtx = <TState>(
  */
 export default function Fresh(
   freshConfig: FreshConfig,
-  appContext: Pick<AppContext, "monitoring" | "response" | "caching">,
+  appContext: Pick<
+    AppContext,
+    "monitoring" | "response" | "caching" | "firstByteThresholdMS" | "isBot"
+  >,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
     if (req.method === "HEAD") {
       return new Response(null, { status: 200 });
     }
     const timing = appContext?.monitoring?.timings?.start?.("load-data");
+    const url = new URL(req.url);
+    const asJson = url.searchParams.get("asJson");
+    const delay = Number(
+      url.searchParams.get("__decoFBT") ?? appContext.firstByteThresholdMS,
+    );
+
+    /** Controller to abort third party fetch (loaders) */
+    const ctrl = new AbortController();
+
+    /** Aborts when: Incomming request is aborted */
+    req.signal.addEventListener("abort", () => ctrl.abort());
+
+    /**
+     * Aborts when:
+     *
+     * 1. Page is HTML
+     * 2. Async Rendering Feature is activated
+     * 3. Is not a bot (bot requires the whole page html for boosting SEO)
+     */
+    const firstByteThreshold = !asJson && delay && !appContext.isBot
+      ? setTimeout(() => ctrl.abort(), delay)
+      : undefined;
+
+    const getPage = RequestContext.bind(
+      { signal: ctrl.signal },
+      async () =>
+        isDeferred<Page, BaseContext & { context: ConnInfo }>(freshConfig.page)
+          ? await freshConfig.page({ context: ctx })
+          : freshConfig.page,
+    );
+
     const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
       "load-data",
       async (span) => {
         try {
-          return isDeferred<Page, BaseContext & { context: ConnInfo }>(
-              freshConfig.page,
-            )
-            ? await freshConfig.page({ context: ctx })
-            : freshConfig.page;
+          return await getPage();
         } catch (e) {
           span.recordException(e);
           throw e;
@@ -56,8 +87,9 @@ export default function Fresh(
       },
     );
 
-    const url = new URL(req.url);
-    if (url.searchParams.get("asJson") !== null) {
+    clearTimeout(firstByteThreshold);
+
+    if (asJson !== null) {
       return Response.json(page, { headers: allowCorsFor(req) });
     }
     if (isFreshCtx<DecoState>(ctx)) {
