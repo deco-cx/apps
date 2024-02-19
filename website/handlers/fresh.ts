@@ -44,7 +44,7 @@ export default function Fresh(
     const url = new URL(req.url);
     const asJson = url.searchParams.get("asJson");
     const delay = Number(
-      url.searchParams.get("__deco_fbt") ?? appContext.firstByteThresholdMS,
+      url.searchParams.get("__decoFBT") ?? appContext.firstByteThresholdMS,
     );
 
     /** Controller to abort third party fetch (loaders) */
