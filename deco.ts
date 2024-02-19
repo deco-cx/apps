@@ -18,6 +18,7 @@ const paltformApps = [{
 
 const config = {
   apps: [
+    app("linx-impulse"),
     app("ai-assistants"),
     app("files"),
     app("openai"),
@@ -36,6 +37,7 @@ const config = {
     app("vnda"),
     app("wake"),
     app("linx"),
+    app("linx-impulse"),
     app("shopify"),
     app("nuvemshop"),
     app("website"),
