@@ -227,7 +227,7 @@ export const toBreadcrumbList = (
 };
 
 export const toProduct = (
-  variant: SingleProductFragment,
+  variant: ProductFragment | SingleProductFragment,
   { base }: { base: URL | string },
   variants: Product[] = [],
   variantId?: number | null,
@@ -240,20 +240,21 @@ export const toProduct = (
   }));
   const additionalProperty: PropertyValue[] = [];
 
-  if (variant.attributeSelections) {
-    variant.attributeSelections?.selections?.forEach((selection) => {
-      if (selection?.name == "Outras Opções") {
-        selection.values?.forEach((value) => {
-          additionalProperty.push({
-            "@type": "PropertyValue",
-            url: value?.alias ?? undefined,
-            value: value?.selected ? "true" : "false",
-            name: value?.value ?? undefined,
-            valueReference: "SELECTIONS",
+  if ((variant as SingleProductFragment)?.attributeSelections) {
+    (variant as SingleProductFragment)?.attributeSelections?.selections
+      ?.forEach((selection) => {
+        if (selection?.name == "Outras Opções") {
+          selection.values?.forEach((value) => {
+            additionalProperty.push({
+              "@type": "PropertyValue",
+              url: value?.alias ?? undefined,
+              value: value?.selected ? "true" : "false",
+              name: value?.value ?? undefined,
+              valueReference: "SELECTIONS",
+            });
           });
-        });
-      }
-    });
+        }
+      });
   }
 
   variant.informations?.forEach((info) =>
