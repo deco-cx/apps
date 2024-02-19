@@ -82,7 +82,7 @@ const BASE_INSTRUCTIONS =
       Example: If you found North Face hiking backpacks that match the user's query, present a brief overview of these backpacks, highlighting their most appealing features.
 
   Category Tree and Function Calling:
-  - Always fill count prop with 20.
+  - Always fill count prop with 12.
   - Always filll hideUnavailableItems prop with true.
   - Always populate the query prop with a summary of the user's request.
   - Always populate facets prop with the category tree path that matches the user's query.
@@ -164,7 +164,7 @@ export default function brandAssistant(props: Props): AIAssistant {
       }
       return {
         props: {
-          count: 20,
+          count: 12,
           facets: "",
           query: "",
           hideUnavailableItems: true,
