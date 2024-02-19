@@ -27,5 +27,4 @@ export default async function loader(
     } ( ${route.pathTemplate} )`,
     value: route.pathTemplate,
   }));
-
 }
