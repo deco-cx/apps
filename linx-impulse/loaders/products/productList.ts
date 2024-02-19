@@ -210,8 +210,6 @@ const loader = async (
     productFormat: "complete",
   }, { headers }).then((res) => res.json());
 
-  console.log({ response }, params);
-
   const shelves = props.position
     ? response[props.position] ??
       [...response.top, ...response.middle, ...response.bottom]
