@@ -1127,9 +1127,9 @@ export type SPEvent =
   };
 
 export interface CreateNewDocument {
-  Id: string;
-  Href: string;
-  DocumentId: string;
+  Id?: string;
+  Href?: string;
+  DocumentId?: string;
 }
 
 export interface SelectableGifts {

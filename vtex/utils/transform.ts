@@ -25,6 +25,7 @@ import type {
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
+  OrderForm,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
@@ -114,6 +115,17 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
 
     return toProduct(product, sku, 0, options);
   }).filter((p): p is Product => typeof p !== "undefined");
+};
+
+export const forceHttpsOnAssets = (orderForm: OrderForm) => {
+  orderForm.items.forEach((item) => {
+    if (item.imageUrl) {
+      item.imageUrl = item.imageUrl.startsWith("http://")
+        ? item.imageUrl.replace("http://", "https://")
+        : item.imageUrl;
+    }
+  });
+  return orderForm;
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -601,7 +613,8 @@ export const legacyFacetToFilter = (
   // category2/123?map=c,productClusterIds -> DO NOT WORK
   // category1/category2/123?map=c,c,productClusterIds -> WORK
   const hasProductClusterIds = mapSegments.includes("productClusterIds");
-  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") || mapSegments.includes("b");
+  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") ||
+    mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);

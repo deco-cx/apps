@@ -116,6 +116,19 @@ to?: number
 }
 }
 /**
+ * Create a new document
+ */
+"POST /api/dataentities/:acronym/documents": {
+body: {
+anyProperty?: string
+}
+response: {
+Id?: string
+Href?: string
+DocumentId?: string
+}
+}
+/**
  * Retrieves a specific Product by its ID. This information is exactly what is needed to create a new Product. 
  * > 📘 Onboarding guide 
  * >
