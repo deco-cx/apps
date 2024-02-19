@@ -63,6 +63,13 @@ export interface Props {
    * @description the caching configuration
    */
   caching?: Caching;
+
+  /**
+   * @title Async Rendering
+   * @description Number of milliseconds to wait before rendering preview. Set to 0 to disable it.
+   * @default 0
+   */
+  firstByteThresholdMS?: 0 | 1 | 100 | 300 | 500 | 700;
 }
 
 /**

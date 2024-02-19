@@ -1,5 +1,5 @@
 import { MatchContext } from "deco/blocks/matcher.ts";
-import { UAParser } from "https://esm.sh/ua-parser-js@1.0.35";
+import { UAParser } from "https://esm.sh/ua-parser-js@2.0.0-beta.2";
 
 /**
  * @title {{{.}}}
