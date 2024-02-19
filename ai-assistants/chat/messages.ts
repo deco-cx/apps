@@ -262,7 +262,7 @@ export const messageProcessorFor = async (
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
-        console.log(outputs.tool_calls);
+        console.log(outputs.tool_calls[0].function.arguments);
         const tool_outputs = await Promise.all(
           outputs.tool_calls.map(invoke),
         );
