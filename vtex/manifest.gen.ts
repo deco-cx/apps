@@ -23,14 +23,15 @@ import * as $$$17 from "./loaders/workflow/products.ts";
 import * as $$$18 from "./loaders/proxy.ts";
 import * as $$$19 from "./loaders/intelligentSearch/productList.ts";
 import * as $$$20 from "./loaders/intelligentSearch/productDetailsPage.ts";
-import * as $$$21 from "./loaders/intelligentSearch/topsearches.ts";
-import * as $$$22 from "./loaders/intelligentSearch/productListingPage.ts";
-import * as $$$23 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$24 from "./loaders/config.ts";
-import * as $$$25 from "./loaders/collections/list.ts";
-import * as $$$26 from "./loaders/cart.ts";
-import * as $$$27 from "./loaders/categories/tree.ts";
-import * as $$$28 from "./loaders/user.ts";
+import * as $$$21 from "./loaders/intelligentSearch/productSearchValidator.ts";
+import * as $$$22 from "./loaders/intelligentSearch/topsearches.ts";
+import * as $$$23 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$24 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$25 from "./loaders/config.ts";
+import * as $$$26 from "./loaders/collections/list.ts";
+import * as $$$27 from "./loaders/cart.ts";
+import * as $$$28 from "./loaders/categories/tree.ts";
+import * as $$$29 from "./loaders/user.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/trigger.ts";
 import * as $$$$$$$$$1 from "./actions/notifyme.ts";
@@ -57,10 +58,10 @@ import * as $$$$$$$$$$1 from "./workflows/events.ts";
 
 const manifest = {
   "loaders": {
-    "vtex/loaders/cart.ts": $$$26,
-    "vtex/loaders/categories/tree.ts": $$$27,
-    "vtex/loaders/collections/list.ts": $$$25,
-    "vtex/loaders/config.ts": $$$24,
+    "vtex/loaders/cart.ts": $$$27,
+    "vtex/loaders/categories/tree.ts": $$$28,
+    "vtex/loaders/collections/list.ts": $$$26,
+    "vtex/loaders/config.ts": $$$25,
     "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$20,
     "vtex/loaders/intelligentSearch/productList.ts": $$$19,
     "vtex/loaders/intelligentSearch/productListingPage.ts": $$$23,
@@ -83,7 +84,7 @@ const manifest = {
     "vtex/loaders/product/extensions/suggestions.ts": $$$11,
     "vtex/loaders/product/wishlist.ts": $$$12,
     "vtex/loaders/proxy.ts": $$$18,
-    "vtex/loaders/user.ts": $$$28,
+    "vtex/loaders/user.ts": $$$29,
     "vtex/loaders/wishlist.ts": $$$14,
     "vtex/loaders/workflow/product.ts": $$$16,
     "vtex/loaders/workflow/products.ts": $$$17,
