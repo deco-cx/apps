@@ -7,40 +7,40 @@ import {
 import { Source } from "../../utils/types/linx.ts";
 import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 
-type CategoryParams = {
+interface CategoryParams {
   page: "category";
   categories: string[];
   tags?: string[];
-};
+}
 
-type ProductParams = {
+interface ProductParams {
   page: "product";
   pid: string;
   sku?: string;
   price?: number;
-};
+}
 
-type CartParams = {
+interface CartParams {
   page: "cart";
   id: string;
   items: LinxCartItem[];
-};
+}
 
-type TransactionParams = {
+interface TransactionParams {
   page: "transaction";
   id: string;
   items: LinxCartItem[];
   total: number;
-};
+}
 
-type SearchParams = {
+interface SearchParams {
   page: "search";
   query: string;
   items: SearchItem[];
   searchId?: string;
-};
+}
 
-type OtherParams = {
+interface OtherParams {
   page:
     | "home"
     | "other"
@@ -49,7 +49,7 @@ type OtherParams = {
     | "notfound"
     | "hotsite"
     | "userprofile";
-};
+}
 
 interface ViewEvent {
   event: "view";
@@ -100,13 +100,11 @@ interface ImpressionEvent {
   };
 }
 
-type Props = ViewEvent | ClickEvent | ImpressionEvent;
-
 /**
  * @docs https://docs.linximpulse.com/api/events/getting-started
  */
 const action = async (
-  props: Props,
+  props: ViewEvent | ClickEvent | ImpressionEvent,
   _req: Request,
   ctx: AppContext,
 ): Promise<null> => {
