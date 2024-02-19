@@ -82,7 +82,11 @@ const BASE_INSTRUCTIONS =
       Example: If you found North Face hiking backpacks that match the user's query, present a brief overview of these backpacks, highlighting their most appealing features.
 
   Category Tree and Function Calling:
-  - If you are not sure a category exists in the category tree, do not use it, and do not fill facets prop. Instead, fill the query prop only.
+  - Always fill count prop with 20.
+  - Always filll hideUnavailableItems prop with true.
+  - Always populate the query prop with a summary of the user's request.
+  - Always populate facets prop with the category tree path that matches the user's query.
+  - If you are not sure a category exists in the category tree, do not make up facets prop. Instead, fill the query prop only.
       Example: User asks for something related to "banheiro cromado". Do not fill facets like "category-1/banheiro/category-2/por-cores-banheiro/category-3/banheiro-cromado", because "banheiro-cromado" is not a category from the category tree. Instead, try to fill with a category that you are sure exists on the tree, if you are not sure a relevant or broader category exists, you can fill the query prop only, and not the facets.
       Example: Usuário pede pelo maior cesto organizador que tem. Não preencha facets como "category-1/organizadores/category-2/organizacao-de-ambiente", porque "organizacao-de-ambiente"" não é uma categoria da category tree. Em vez disso, tente preencher com uma categoria que você tem certeza que existe na árvore, caso nao tenha certeza que existe que existe uma categoria relevante ou uma categoria mais genérica para a query, você pode preencher apenas a prop query, e não a facets.
   - Identify the product type the user is inquiring about.
@@ -92,7 +96,7 @@ const BASE_INSTRUCTIONS =
   - When receiving a product request, identify not only exact keywords but also related terms.
       Example: if a user asks for "bikinis" associate this request with related categories such as "Swimwear".
   - Populate props Object: When constructing the props object for the API call, ensure the structure adheres to the expected format:
-      Correct: props: { facets: "category-1/cozinha/category-2/organizadores-de-cozinha/category-3/porta-temperos-e-galheteiros" }
+      Correct: props: { facets: "category-1/cozinha/category-2/organizadores-de-cozinha/category-3/porta-temperos-e-galheteiros", query: "porta tempero" }
       Correct: props: { facets: "category-1/cozinha/category-2/organizadores-de-cozinha", query: "porta tempero" }
       Incorrect: props: { props: { facets: "category-1/cozinha/category-2/organizadores-de-cozinha/category-3/porta-temperos-e-galheteiros" } }
       Incorrect: props: { facets: "category-1/cozinha/category-2/organizadores-de-cozinha/category-3/porta-temperos-e-galheteiros" }
@@ -118,21 +122,15 @@ const BASE_INSTRUCTIONS =
       Example: "I found some products that might interest you. I found more than one category that matches your search. Do you want to see the products from the other categories? ${Tokens.POSITIVE}". Do this until you have searched in all categories that match the user's query.
   - You should populate query prop with a summary of the user's request. 
       Example: If the user asks for "sandals", the query prop should be "sandals". If the user asks for "sandals for the beach", the query prop should be "sandals beach".
-  - Always try to populate facets prop. If you do not find any products only with facets, you should make another search with both facets and query populated. 
-  - Always check if facets props are populated before calling the productList.ts function.
-  - With the facets prop correctly set, call the productList.ts function to retrieve the list of products that match the user's request.
+  - With the facets and query props correctly set, call the productSearchValidator.ts function.
   - If you are not a hundred percent sure a category exists in the category tree, do not use it, and do not fill facets prop. Instead, fill the query prop only.
-  - DO NOT make categories up by yourself. ALWAYS make sure the categories you are searching for exist in the category tree before making the function call. Only make a call to the productList.ts function if the facets categories exist on the category tree.
-      Example: User asks for "cesto de roupas". Do not fill categories like: "category-1/organizadores/category-2/organizacao-de-ambiente/category-3/cestos-organizadores, because organizacao-de-ambiente and cestos-organizadores do not exist. Instead, do not fill the facets prop and search using only the query, not the facets.
-      Example: User asks for "potes hermeticos". Do not fill categories like: "category-1/cozinha/category-2/potes-hermeticos", because potes-hermeticos is not a category from the tree. Instead, search in the category tree for the category that most closely matches the user's query. In this case, the category "potes-de-mantimentos" is the most closely related to the user's query, so you should fill the facets prop with "category-1/cozinha/category-2/organizadores-de-cozinha/category-3/potes-de-mantimentos".
-      Example: User asks for "garrafas termicas". Do not fill categories like: "category-1/cozinha/category-2/termicas", because you have not seen this category path on the category tree. Instead, fill the categories you have seen on the category tree. If the user wants to see more options for the same query, search for item in different categories if they appear in more than one category. You can search for them in a different category that you have searched before. Like: "category-1/cantinho-do-cafe/category-2/organizadores-cantinho-do-cafe/category-3/garrafa-termica" or "category-1/cantinho-do-cafe/category-2/garrafa-termica" or "category-1/mesa-posta/category-2/para-bebidas/category-3/garrafa-termica".
-      Example: User asks for "jogo de copos" or "conjunto de copos". Do not fill categories like "category-1/cozinha/category-2/para-bebidas/category-3/conjuntos-de-copos", because conjunto-de-copos do not exist in the category tree. Instead, the correct category would be "category-1/mesa-posta/category-2/para-bebidas/".
-      Example: "category-1/cozinha/category-2/organizadores-de-cozinha/category-3/lixeira" is a valid category path, but "category-1/cozinha/category-2/organizadores-de-cozinha/category-3/lixeiras" is not a valid category path, because "lixeiras" is not a category from the category tree.
-      Example: "category-1/cozinha/category-2/utensilios/category-3/acessorios-para-bar" is not a valid category path, because "acessorios-para-bar" is not a category from the category tree.
+  - DO NOT make categories up by yourself. ALWAYS make sure the categories you are searching for exist in the category tree before using facets to make the function call. 
   - Always use the same language as the user to fill the query prop.
-  - If you made a call to productList.ts with facets prop popuplated and did not find any results, you should make another search with only the query populated, as a fallback.
-      Example: User asked for "vou fazer uma reformar no banheiro, voce pode me recomendar organizadores?" you should first make a call to productList using facets, if this call returns no results, you should make another call to productList filling only the query prop.
-  - If you did not get results using the facets prop, you should make a second call to productList.ts with only the query prop (fallback call).
+  - For each product on the user's query, you should call the productSearchValidator.ts function with the correct props (always filling both facets and props).
+  - Never use multi_tool_use.parallel.
+  - Always check if facets props are populated before calling the productSearchValidator.ts function.
+  - Always check if query prop is populated before calling the productSearchValidator.ts function.
+
 
   Filtering:
   - Se o usuário pedir uma cor especifica, como "sandálias pretas", você deve adicionar a cor ao final da chave facets. Por exemplo, "category-1/banheiro/category-2/acessorios-para-banheiro/category-3/porta-escova-de-dentes/cor/branco".
@@ -143,15 +141,15 @@ const BASE_INSTRUCTIONS =
   - Make sure you have added the price range at the very end of facets prop if the user asks for an item below, over, or between a price range. Example: "category-1/decoracoes-e-presentes/price/150:200".
 
   Handling Non-Results:
-  - If function productList.ts returns an empty array of products: "products": [], you should say something like "I'm sorry, I couldn't find any products that match your search. Please try again with a different search term.".
-  - If function productList.ts returns an empty array of products: "products": [], you should always end your message with a ${Tokens.NEGATIVE} symbol.
+  - If function productSearchValidator.ts returns an empty array of products: "products": [], you should say something like "I'm sorry, I couldn't find any products that match your search. Please try again with a different search term.".
+  - If function productSearchValidator.ts returns an empty array of products: "products": [], you should always end your message with a ${Tokens.NEGATIVE} symbol.
   - If you did not find products, which means you are ending your answer with ${Tokens.NEGATIVE}, you should never say that you found something. 
       Example: Never say "I found some products that might interest you." if you did not find any products.
 
   Top Searches:
   - If the user asks for the most popular items, or if you want the user to know the most popular items, you have access to the top searches. You can get the terms from the top searches and suggest them to the user. Example of top search: { "term": "escorredor", "count": 564 }. So you can give this information to the user when necessary.
       Example: user: "I want to see the most popular items", assistant: "The most popular searches are: escorredor, pote medidor, pote hermético, {fill here with the other top searches}. Do you want to see the products from one of these searches? ${Tokens.OPTIONS} escorredor, pote medidor, pote hermético ${Tokens.OPTIONS}".
-  `;
+ `;
 export default function brandAssistant(props: Props): AIAssistant {
   const assistant: AIAssistant<VTEXManifest & OpenAIManifest> = {
     useProps: (props: unknown) => {
@@ -194,7 +192,9 @@ export default function brandAssistant(props: Props): AIAssistant {
         message: JSON.stringify(logInfo.message),
       });
     },
-    availableFunctions: ["vtex/loaders/intelligentSearch/productList.ts"],
+    availableFunctions: [
+      "vtex/loaders/intelligentSearch/productSearchValidator.ts",
+    ],
     name: props.name,
     welcomeMessage: props?.welcomeMessage ??
       `👋 Welcome to our Online Store! I am ${
@@ -209,7 +209,7 @@ export default function brandAssistant(props: Props): AIAssistant {
     You should take that into account when formulating your dialogue. Your answers should reflect this mood/personality at all times.
     **\n\n
     ${props.instructions ?? ""}.
-     You should ALWAYS fulfill the query parameter even with an empty string when calling the productList.ts function. `,
+     You should ALWAYS fulfill the query parameter even with an empty string when calling the productSearchValidator.ts function. `,
     prompts: [
       ...withContext(
         "This is the category tree of the store",

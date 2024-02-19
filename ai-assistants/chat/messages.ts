@@ -3,8 +3,7 @@ import {
   RequiredActionFunctionToolCall,
   Thread,
 } from "../deps.ts";
-import { getToken, threadMessageToReply, Tokens } from "../loaders/messages.ts";
-
+import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 import { JSONSchema7, ValueType, weakcache } from "deco/deps.ts";
 import { lazySchemaFor } from "deco/engine/schema/lazy.ts";
 import { Context } from "deco/live.ts";
@@ -231,7 +230,6 @@ export const messageProcessorFor = async (
     });
 
     const invoke = invokeFor(ctx, assistant, (call, props) => {
-      console.log({ props });
       reply({
         threadId: thread.id,
         messageId,
@@ -246,7 +244,6 @@ export const messageProcessorFor = async (
         assistant_id: run.assistant_id,
       });
     }, (call, props, response) => {
-      console.log({ call, props });
       functionCallReplies.push({
         name: call.function.name,
         props,
@@ -265,10 +262,10 @@ export const messageProcessorFor = async (
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
+        console.log({ outputs });
         const tool_outputs = await Promise.all(
           outputs.tool_calls.map(invoke),
         );
-        console.log({ tool_outputs });
         if (tool_outputs.length === 0) {
           console.log("TOOL OUTPUT VAZIO??????");
           const message: ReplyMessage = {
@@ -316,38 +313,21 @@ export const messageProcessorFor = async (
       return;
     }
 
-    const token = getToken(lastMsg);
-    console.log({ token });
     const replyMessage = threadMessageToReply(lastMsg);
     console.log(
       "functionCall length:",
       functionCallReplies.length,
-      "token positive?",
-      token === Tokens.POSITIVE,
-      { replyMessage },
     );
 
-    const _latestMsg = lastMsg.id;
     if (
       functionCallReplies.length === 1 &&
       functionCallReplies[0].name === "multi_tool_use.parallel"
     ) {
-      console.log(
-        "function call replies name",
-        functionCallReplies[0].name,
-        functionCallReplies,
-      );
       const message: ReplyMessage = {
         messageId: Date.now().toString(),
         threadId: thread.id,
-        type: "message",
-        content: [
-          {
-            type: "text",
-            value:
-              "Ei, algo não saiu como esperávamos... 🚧 Experimente repetir a ação e, se não der certo, atualizar a página deve ajudar!",
-          },
-        ],
+        type: "error",
+        content: [],
         role: "assistant",
       };
       reply(message);
@@ -360,7 +340,6 @@ export const messageProcessorFor = async (
     }
 
     if (functionCallReplies.length > 0) {
-      console.log("tem function call replies", functionCallReplies);
       reply({
         threadId: thread.id,
         messageId,

@@ -174,8 +174,6 @@ const loader = async (
 
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams(args);
-  console.log({ selectedFacets });
-  console.log({ params });
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   const { products: vtexProducts } = await vcsDeprecated
