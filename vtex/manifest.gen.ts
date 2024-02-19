@@ -23,11 +23,11 @@ import * as $$$17 from "./loaders/workflow/products.ts";
 import * as $$$18 from "./loaders/proxy.ts";
 import * as $$$19 from "./loaders/intelligentSearch/productList.ts";
 import * as $$$20 from "./loaders/intelligentSearch/productDetailsPage.ts";
-import * as $$$21 from "./loaders/intelligentSearch/productSearchValidator.ts";
-import * as $$$22 from "./loaders/intelligentSearch/topsearches.ts";
-import * as $$$23 from "./loaders/intelligentSearch/productListingPage.ts";
-import * as $$$24 from "./loaders/intelligentSearch/suggestions.ts";
-import * as $$$25 from "./loaders/config.ts";
+import * as $$$21 from "./loaders/intelligentSearch/topsearches.ts";
+import * as $$$22 from "./loaders/intelligentSearch/productListingPage.ts";
+import * as $$$23 from "./loaders/intelligentSearch/suggestions.ts";
+import * as $$$24 from "./loaders/config.ts";
+import * as $$$25 from "./loaders/collections/list.ts";
 import * as $$$26 from "./loaders/cart.ts";
 import * as $$$27 from "./loaders/categories/tree.ts";
 import * as $$$28 from "./loaders/user.ts";
@@ -59,7 +59,8 @@ const manifest = {
   "loaders": {
     "vtex/loaders/cart.ts": $$$26,
     "vtex/loaders/categories/tree.ts": $$$27,
-    "vtex/loaders/config.ts": $$$25,
+    "vtex/loaders/collections/list.ts": $$$25,
+    "vtex/loaders/config.ts": $$$24,
     "vtex/loaders/intelligentSearch/productDetailsPage.ts": $$$20,
     "vtex/loaders/intelligentSearch/productList.ts": $$$19,
     "vtex/loaders/intelligentSearch/productListingPage.ts": $$$23,

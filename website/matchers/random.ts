@@ -9,7 +9,9 @@ export interface Props {
 export const sticky = "session";
 
 /**
- * @title Random Matcher
+ * @title Random
+ * @description Target a percentage of the total traffic to do an A/B test
+ * @icon arrow-split
  */
 const MatchRandom = (
   { traffic }: Props,

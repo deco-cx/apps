@@ -41,7 +41,10 @@ export interface Props {
   routes?: Routes[];
 
   /** @title Seo */
-  seo?: Omit<Seo, "jsonLDs">;
+  seo?: Omit<
+    Seo,
+    "jsonLDs" | "titleTemplate" | "descriptionTemplate" | "canonical"
+  >;
 
   /**
    * @title Global Sections
@@ -60,6 +63,13 @@ export interface Props {
    * @description the caching configuration
    */
   caching?: Caching;
+
+  /**
+   * @title Async Rendering
+   * @description Number of milliseconds to wait before rendering preview. Set to 0 to disable it.
+   * @default 0
+   */
+  firstByteThresholdMS?: 0 | 1 | 100 | 300 | 500 | 700;
 }
 
 /**

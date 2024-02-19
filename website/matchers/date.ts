@@ -13,7 +13,9 @@ export interface Props {
 }
 
 /**
- * @title Date Matcher
+ * @title Date and Time
+ * @description Target users based on specific dates or date ranges, including specific times
+ * @icon calendar-event
  */
 const MatchDate = (props: Props) => {
   const now = new Date();

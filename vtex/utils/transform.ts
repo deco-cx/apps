@@ -25,6 +25,7 @@ import type {
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
+  OrderForm,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
@@ -114,6 +115,17 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
 
     return toProduct(product, sku, 0, options);
   }).filter((p): p is Product => typeof p !== "undefined");
+};
+
+export const forceHttpsOnAssets = (orderForm: OrderForm) => {
+  orderForm.items.forEach((item) => {
+    if (item.imageUrl) {
+      item.imageUrl = item.imageUrl.startsWith("http://")
+        ? item.imageUrl.replace("http://", "https://")
+        : item.imageUrl;
+    }
+  });
+  return orderForm;
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -302,7 +314,8 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [], kitItems } = sku;
+  const { name, ean, itemId: skuId, referenceId = [], kitItems, videos } = sku;
+  const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
       .flatMap((i) => i.images)
@@ -338,6 +351,35 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       model: productReference,
     } satisfies ProductGroup)
     : undefined;
+
+  const finalImages = images?.map(({ imageUrl, imageText, imageLabel }) => {
+    const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
+    const alternateName = imageText || imageLabel || "";
+    const name = imageLabel || "";
+    const encodingFormat = "image";
+
+    return {
+      "@type": "ImageObject" as const,
+      alternateName,
+      url,
+      name,
+      encodingFormat,
+    };
+  }) ?? [DEFAULT_IMAGE];
+
+  const finalVideos = nonEmptyVideos?.map((video) => {
+    const url = video;
+    const alternateName = "Product video";
+    const name = "Product video";
+    const encodingFormat = "video";
+    return {
+      "@type": "VideoObject" as const,
+      alternateName,
+      contentUrl: url,
+      name,
+      encodingFormat,
+    };
+  });
 
   // From schema.org: A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy
   const categoriesString = splitCategory(product.categories[0]).join(
@@ -376,20 +418,8 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     additionalProperty,
     isVariantOf,
-    image: images?.map(({ imageUrl, imageText, imageLabel }) => {
-      const url = imagesByKey.get(getImageKey(imageUrl)) ?? imageUrl;
-      const alternateName = imageText || imageLabel || "";
-      const name = imageLabel || "";
-      const encodingFormat = "image";
-
-      return {
-        "@type": "ImageObject" as const,
-        alternateName,
-        url,
-        name,
-        encodingFormat,
-      };
-    }) ?? [DEFAULT_IMAGE],
+    image: finalImages,
+    video: finalVideos,
     offers: aggregateOffers(offers, priceCurrency),
   };
 };
@@ -578,14 +608,40 @@ export const legacyFacetToFilter = (
   const mapSet = new Set(mapSegments);
   const pathSet = new Set(pathSegments);
 
+  // for productClusterIds, we have to use the full path
+  // example:
+  // category2/123?map=c,productClusterIds -> DO NOT WORK
+  // category1/category2/123?map=c,c,productClusterIds -> WORK
+  const hasProductClusterIds = mapSegments.includes("productClusterIds");
+  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") ||
+    mapSegments.includes("b");
+
   const getLink = (facet: LegacyFacet, selected: boolean) => {
     const index = pathSegments.findIndex((s) => s === facet.Value);
+
+    const map = hasToBeFullpath
+      ? facet.Link.split("map=")[1].split(",")
+      : [facet.Map];
+    const value = hasToBeFullpath
+      ? facet.Link.split("?")[0].slice(1).split("/")
+      : [facet.Value];
+
+    const pathSegmentsFiltered = hasProductClusterIds
+      ? [pathSegments[mapSegments.indexOf("productClusterIds")]]
+      : [];
+    const mapSegmentsFiltered = hasProductClusterIds
+      ? ["productClusterIds"]
+      : [];
+
+    const _mapSegments = hasToBeFullpath ? mapSegmentsFiltered : mapSegments;
+    const _pathSegments = hasToBeFullpath ? pathSegmentsFiltered : pathSegments;
+
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
-      : [...mapSegments, facet.Map];
+      : [..._mapSegments, ...map];
     const newPath = selected
       ? [...pathSegments.filter((_, i) => i !== index)]
-      : [...pathSegments, facet.Value];
+      : [..._pathSegments, ...value];
 
     // Insertion-sort like algorithm. Uses the c-continuum theorem
     const zipped: [string, string][] = [];
@@ -601,7 +657,7 @@ export const legacyFacetToFilter = (
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
+      link.searchParams.set("fmap", url.searchParams.get("fmap") || map[0]);
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {
@@ -610,9 +666,10 @@ export const legacyFacetToFilter = (
 
     return `${link.pathname}${link.search}`;
   };
+
   return {
     "@type": "FilterToggle",
-    quantity: facets.length,
+    quantity: facets?.length,
     label: name,
     key: name,
     values: facets.map((facet) => {
@@ -622,13 +679,22 @@ export const legacyFacetToFilter = (
 
       const selected = mapSet.has(normalizedFacet.Map) &&
         pathSet.has(normalizedFacet.Value);
-
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
         url: getLink(normalizedFacet, selected),
         label: normalizedFacet.Name,
         selected,
+        children: facet.Children?.length > 0
+          ? legacyFacetToFilter(
+            normalizedFacet.Name,
+            facet.Children,
+            url,
+            map,
+            term,
+            behavior,
+          )
+          : undefined,
       };
     }),
   };

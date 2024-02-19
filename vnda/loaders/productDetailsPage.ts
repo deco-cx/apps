@@ -2,10 +2,12 @@ import type { ProductDetailsPage } from "../../commerce/types.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
+import { ProductPrice } from "../utils/client/types.ts";
 import { parseSlug, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
+  priceIntl?: boolean;
 }
 
 /**
@@ -18,7 +20,7 @@ async function loader(
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
-  const { slug } = props;
+  const { slug, priceIntl = false } = props;
   const { api } = ctx;
 
   if (!slug) return null;
@@ -26,11 +28,38 @@ async function loader(
   const variantId = url.searchParams.get("skuId") || null;
   const { id } = parseSlug(slug);
 
-  const maybeProduct = await api["GET /api/v2/products/:id"]({
-    id,
-    include_images: "true",
-  }, STALE)
-    .then((r) => r.json()).catch(() => null);
+  const getMaybeProduct = async (id: number) => {
+    try {
+      const result = await api["GET /api/v2/products/:id"]({
+        id,
+        include_images: "true",
+      }, STALE);
+      return result.json();
+    } catch (_error) {
+      return null;
+    }
+  };
+
+  // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
+  const getProductPrice = async (id: number): Promise<ProductPrice | null> => {
+    if (!priceIntl) {
+      return null;
+    } else {
+      try {
+        const result = await api["GET /api/v2/products/:productId/price"]({
+          productId: id,
+        }, STALE);
+        return result.json();
+      } catch (_error) {
+        return null;
+      }
+    }
+  };
+
+  const [maybeProduct, productPrice] = await Promise.all([
+    getMaybeProduct(id),
+    getProductPrice(id),
+  ]);
 
   const variantsLength = maybeProduct?.variants?.length ?? 0;
 
@@ -42,6 +71,7 @@ async function loader(
   const product = toProduct(maybeProduct, variantId, {
     url,
     priceCurrency: "BRL",
+    productPrice,
   });
 
   const segments = url.pathname.slice(1).split("/");

@@ -4,6 +4,7 @@ import { hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
 import { getSegmentFromBag } from "../utils/segment.ts";
 import type { MarketingData, OrderForm } from "../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "../actions/cart/removeItemAttachment.ts";
+import { forceHttpsOnAssets } from "../utils/transform.ts";
 
 /**
  * @docs https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm
@@ -27,7 +28,7 @@ const loader = async (
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   if (!segment?.payload) {
-    return result;
+    return forceHttpsOnAssets((await result) as OrderForm);
   }
 
   const {
@@ -78,11 +79,11 @@ const loader = async (
             },
           },
         );
-      return result.json();
+      return forceHttpsOnAssets((await result.json()) as OrderForm);
     }
   }
 
-  return result;
+  return forceHttpsOnAssets((await result) as OrderForm);
 };
 
 export default loader;

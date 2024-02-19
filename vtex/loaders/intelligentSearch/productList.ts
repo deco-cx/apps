@@ -20,6 +20,8 @@ export interface CollectionProps extends CommonProps {
   /**
    * @title Collection ID (e.g.: 139)
    * @pattern \d*
+   * @format dynamic-options
+   * @options vtex/loaders/collections/list.ts
    */
   collection: string;
   /**
