@@ -8,8 +8,6 @@ import {
 } from "deco/engine/core/resolver.ts";
 import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
-import { UAParser } from "https://esm.sh/ua-parser-js@2.0.0-beta.2";
-import { Bots } from "https://esm.sh/ua-parser-js@2.0.0-beta.2/extensions";
 import { getSetCookies } from "std/http/cookie.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
@@ -27,15 +25,6 @@ export const isFreshCtx = <TState>(
   return typeof (ctx as HandlerContext).render === "function";
 };
 
-const UABotParser = new UAParser(Bots);
-
-const isBot = (req: Request) => {
-  return (UABotParser.setUA(req.headers.get("user-agent") || "")
-    // deno-lint-ignore no-explicit-any
-    .getBrowser() as any)
-    .type === "bot";
-};
-
 /**
  * @title Fresh Page
  * @description Renders a fresh page.
@@ -44,7 +33,7 @@ export default function Fresh(
   freshConfig: FreshConfig,
   appContext: Pick<
     AppContext,
-    "monitoring" | "response" | "caching" | "firstByteThresholdMS"
+    "monitoring" | "response" | "caching" | "firstByteThresholdMS" | "isBot"
   >,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
@@ -71,7 +60,7 @@ export default function Fresh(
      * 2. Async Rendering Feature is activated
      * 3. Is not a bot (bot requires the whole page html for boosting SEO)
      */
-    const firstByteThreshold = !asJson && delay && !isBot(req)
+    const firstByteThreshold = !asJson && delay && !appContext.isBot
       ? setTimeout(() => ctrl.abort(), delay)
       : undefined;
 
