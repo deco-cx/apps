@@ -1,7 +1,7 @@
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
-import { toBreadcrumbList, toProduct } from "../utils/transform.ts";
+import { getUrl, toBreadcrumbList, toProduct } from "../utils/transform.ts";
 import { WapProductDatailsPage } from "../utils/type.ts";
 
 export interface Props {
@@ -19,6 +19,7 @@ const loader = async (
 ): Promise<ProductDetailsPage | null> => {
   const { api } = ctx;
   const { url: baseUrl } = req;
+  const url = new URL(baseUrl);
 
   const {
     slug,
@@ -44,8 +45,8 @@ const loader = async (
     seo: {
       title: data.estrutura.seo.title,
       description: data.estrutura.seo.description,
-      // TODO canonical
-      canonical: data.estrutura.seo.canonical,
+      canonical:
+        getUrl(new URL(data.estrutura.seo.canonical).pathname, url.origin).href,
       noIndexing: !data.estrutura.seo.indexar,
     },
   };

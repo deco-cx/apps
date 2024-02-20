@@ -1,6 +1,11 @@
 import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-import { toBreadcrumbList, toFilters, toProduct } from "../utils/transform.ts";
+import {
+  getUrl,
+  toBreadcrumbList,
+  toFilters,
+  toProduct,
+} from "../utils/transform.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { WapProductsListPage } from "../utils/type.ts";
 import { TypedResponse } from "../../utils/http.ts";
@@ -40,7 +45,7 @@ const loader = async (
   const rawSearch = url.searchParams.get("busca") ?? props.busca;
   const busca = rawSearch && encodeURIComponent(rawSearch);
 
-  const page = Number(props.page || 1);
+  const page = Number(url.searchParams.get("pg") || props.page || 1);
 
   const limit = Number(url.searchParams.get("ipp") ?? props.limit ?? 12);
 
@@ -57,6 +62,7 @@ const loader = async (
 
   const params: Record<string, string | string[]> = {};
   url.searchParams.delete("busca");
+  url.searchParams.delete("pg");
   url.searchParams.forEach((v, k) => {
     if (params[k]) {
       params[k] = [...params[k], v];
@@ -98,19 +104,13 @@ const loader = async (
     toProduct(produto, baseUrl)
   );
 
-  const pageMatch = `.*/${page}`;
-
   const previousPage = new URL(url);
 
-  previousPage.pathname = new RegExp(pageMatch).test(previousPage.pathname)
-    ? previousPage.pathname.replace(`/${page}`, `/${page - 1}`)
-    : `${previousPage.pathname}/${page - 1}`;
+  previousPage.searchParams.append("pg", String(page - 1));
 
   const nextPage = new URL(url);
 
-  nextPage.pathname = new RegExp(pageMatch).test(nextPage.pathname)
-    ? nextPage.pathname.replace(`/${page}`, `/${page + 1}`)
-    : `${nextPage.pathname}/${page + 1}`;
+  nextPage.searchParams.append("pg", String(page + 1));
 
   return {
     "@type": "ProductListingPage",
@@ -133,7 +133,8 @@ const loader = async (
       title: data.estrutura.seo.title,
       description: data.estrutura.seo.description,
       // TODO canonical
-      canonical: data.estrutura.seo.canonical,
+      canonical:
+        getUrl(new URL(data.estrutura.seo.canonical).pathname, url.origin).href,
     },
   };
 };
