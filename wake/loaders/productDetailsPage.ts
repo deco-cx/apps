@@ -79,7 +79,6 @@ async function loader(
     variantsItems,
     variantId,
   );
-
   return {
     "@type": "ProductDetailsPage",
     breadcrumbList: toBreadcrumbList(wakeProduct.breadcrumbs, {
