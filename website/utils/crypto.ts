@@ -88,7 +88,13 @@ const getOrGenerateKey = (): Promise<AESKey> => {
     return key;
   }
   if (hasLocalCryptoKey()) {
-    return fromSavedAESKey(JSON.parse(atob(Deno.env.get(CRYPTO_KEY_ENV_VAR)!)));
+    const parsedAESKey: SavedAESKey = JSON.parse(
+      atob(Deno.env.get(CRYPTO_KEY_ENV_VAR)!),
+    );
+    return fromSavedAESKey({
+      key: new Uint8Array(Object.values(parsedAESKey.key)),
+      iv: new Uint8Array(Object.values(parsedAESKey.iv)),
+    });
   }
   if (!kv) {
     throw new Error("could not generate keys, kv is not available.");
