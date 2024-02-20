@@ -125,12 +125,18 @@ function Page(
 }
 
 export const loader = async (
-  { sections }: Props,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ) => {
+  const { sections } = props;
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
+  const renderHooks = ctx?.renderHooks ?? [];
+  renderHooks.forEach((hook) => {
+    hook?.onBeforeRenderStart?.(props, req, ctx);
+  });
+
   return {
     sections,
     errorPage: isDeferred<Page>(ctx.errorPage)

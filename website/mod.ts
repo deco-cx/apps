@@ -7,6 +7,7 @@ import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Page } from "deco/blocks/page.tsx";
+import { Props as PageProps } from "./pages/Page.tsx";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -32,6 +33,14 @@ export type CacheDirective = StaleWhileRevalidate | MaxAge;
 export interface Caching {
   enabled?: boolean;
   directives?: CacheDirective[];
+}
+
+export interface RenderHooks {
+  onBeforeRenderStart: (
+    props: PageProps,
+    req: Request,
+    appContext: AppContext,
+  ) => void;
 }
 
 export interface Props {
@@ -70,6 +79,8 @@ export interface Props {
    * @default 0
    */
   firstByteThresholdMS?: 0 | 1 | 100 | 300 | 500 | 700;
+
+  renderHooks?: RenderHooks[];
 }
 
 /**
