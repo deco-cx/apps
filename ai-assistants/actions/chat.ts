@@ -156,6 +156,7 @@ export default async function openChat(
       }),
     );
     assistant.then((aiAssistant) => {
+      // TODO(@ItamarRocha): Refactor this part and the corresponding part in the deco-sites
       socket.send(
         JSON.stringify({
           type: "Id",
