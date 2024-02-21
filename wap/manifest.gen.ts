@@ -10,7 +10,9 @@ import * as $$$4 from "./loaders/productListLastSeen.ts";
 import * as $$$5 from "./loaders/productDetailsPage.ts";
 import * as $$$6 from "./loaders/wishlist.ts";
 import * as $$$7 from "./loaders/productListIndicated.ts";
-import * as $$$8 from "./loaders/productListingPage.ts";
+import * as $$$8 from "./loaders/suggestions.ts";
+import * as $$$9 from "./loaders/loader.ts";
+import * as $$$10 from "./loaders/productListingPage.ts";
 import * as $$$$$$$$$0 from "./actions/evaluations/product.ts";
 import * as $$$$$$$$$1 from "./actions/shipment/product.ts";
 import * as $$$$$$$$$2 from "./actions/forms/contact.ts";
@@ -29,12 +31,14 @@ import * as $$$$$$$$$13 from "./actions/cart/addItems.ts";
 const manifest = {
   "loaders": {
     "wap/loaders/cart.ts": $$$1,
+    "wap/loaders/loader.ts": $$$9,
     "wap/loaders/productDetailsPage.ts": $$$5,
     "wap/loaders/productList.ts": $$$2,
     "wap/loaders/productListIndicated.ts": $$$7,
-    "wap/loaders/productListingPage.ts": $$$8,
+    "wap/loaders/productListingPage.ts": $$$10,
     "wap/loaders/productListLastSeen.ts": $$$4,
     "wap/loaders/proxy.ts": $$$0,
+    "wap/loaders/suggestions.ts": $$$8,
     "wap/loaders/user.ts": $$$3,
     "wap/loaders/wishlist.ts": $$$6,
   },

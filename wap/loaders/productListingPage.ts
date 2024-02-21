@@ -6,7 +6,6 @@ import {
   toFilters,
   toProduct,
 } from "../utils/transform.ts";
-import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { WapProductsListPage } from "../utils/type.ts";
 import { TypedResponse } from "../../utils/http.ts";
 
@@ -17,7 +16,6 @@ export interface Props {
    * @default 12
    */
   limit?: number;
-  page: RequestURLParam;
 }
 
 const endPoint = {
@@ -45,7 +43,7 @@ const loader = async (
   const rawSearch = url.searchParams.get("busca") ?? props.busca;
   const busca = rawSearch && encodeURIComponent(rawSearch);
 
-  const page = Number(url.searchParams.get("pg") || props.page || 1);
+  const page = Number(url.searchParams.get("pg") || 1);
 
   const limit = Number(url.searchParams.get("ipp") ?? props.limit ?? 12);
 
