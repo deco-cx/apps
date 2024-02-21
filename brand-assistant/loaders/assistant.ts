@@ -1,3 +1,4 @@
+// deno-lint-ignore-file ban-unused-ignore no-explicit-any
 import type { ManifestOf } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import type { AIAssistant, Log, Prompt } from "../../ai-assistants/mod.ts";
@@ -28,7 +29,6 @@ const removePropertiesRecursively = <T>(category: T): T => {
     return category;
   }
 
-  // deno-lint-ignore no-explicit-any
   const { hasChildren: _ignoreHasChildren, url: _ignoreUrl, ...rest} = category as any;
 
   rest.children = rest.children.map(removePropertiesRecursively)
