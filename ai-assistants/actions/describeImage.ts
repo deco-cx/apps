@@ -1,7 +1,21 @@
 import OpenAI from "https://deno.land/x/openai@v4.24.1/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
+import { meter } from "deco/observability/otel/metrics.ts";
 import { Ids } from "../types.ts";
+import { ValueType } from "deco/deps.ts";
 
+const stats = {
+  promptTokens: meter.createHistogram("assistant_image_prompt_tokens", {
+    description:
+      "Tokens used in Sales Assistant Describe Image Input - OpenAI",
+    valueType: ValueType.INT,
+  }),
+  completionTokens: meter.createHistogram("assistant_image_completion_tokens", {
+    description:
+      "Tokens used in Sales Assistant Describe Image Output - OpenAI",
+    valueType: ValueType.INT,
+  }),
+};
 const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 
 export interface DescribeImageProps {
@@ -52,6 +66,7 @@ export default async function describeImage(
         },
       ],
     });
+
     logger.info({
       assistantId: describeImageProps.ids?.assistantId,
       threadId: describeImageProps.ids?.threadId,
@@ -59,6 +74,8 @@ export default async function describeImage(
       subcontext: "response",
       response: JSON.stringify(response),
     });
+    stats.promptTokens.record(response.usage?.prompt_tokens, {assistant_id: describeImageProps.ids?.assistantId});
+    stats.completionTokens.record(response.usage?.completion_tokens, {assistant_id: describeImageProps.ids?.assistantId})
     return response;
   } catch (error) {
     logger.error(`${
