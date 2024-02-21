@@ -1,7 +1,6 @@
 import { logger } from "deco/observability/otel/config.ts";
 import { Ids } from "../types.ts";
 
-// TODO(ItamarRocha): pass the ids here as well
 export default function base64ToBlob(
   base64: string | ArrayBuffer | null,
   context: string,
