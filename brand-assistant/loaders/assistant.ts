@@ -21,6 +21,18 @@ const withContext = <T>(context: string, v: T | undefined): Prompt[] => {
   }
   return [{ context, content: JSON.stringify(v) }];
 };
+const ensureArray = <T>(data: T | T[]): T[] => Array.isArray(data) ? data : [data];
+const removePropertiesRecursively = <T>(category: T): T => {
+  // Base case: If obj is not an object, return it directly
+  if (typeof category !== 'object' || category === null) {
+    return category;
+  }
+  // deno-lint-ignore no-explicit-any
+  const { hasChildren: _ignoreHasChildren, url: _ignoreUrl, ...rest} = category as any;
+  rest.children = rest.children.map(removePropertiesRecursively)
+  return rest;
+};
+
 type VTEXManifest = ManifestOf<ReturnType<typeof vtex>>;
 // TODO(ItamarRocha): Add store name in props or gather it from elsewhere.
 const BASE_INSTRUCTIONS =
@@ -214,8 +226,12 @@ export default function brandAssistant(props: Props): AIAssistant {
     prompts: [
       ...withContext(
         "This is the category tree of the store",
-        props?.categories,
+        ensureArray(props?.categories).map((category) => {
+          return removePropertiesRecursively(category);
+        }
+      ).filter(item => item !== null),
       ),
+      // TODO(@ItamarRocha): As of now, this information is not being included as the context limit is 30k characters.
       ...withContext("This is the store topsearches", props?.topSearches),
       ...withContext(
         "This is a sample of the store's products",

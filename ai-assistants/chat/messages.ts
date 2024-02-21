@@ -201,10 +201,10 @@ export const messageProcessorFor = async (
         ? assistant.model.custom
         : assistant.model,
       assistant_id: assistantId,
-      instructions: instructions.slice(0, 25000),
+      instructions: instructions.slice(0, 30000),
       tools,
     });
-
+    
     const messageId = run.id;
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
