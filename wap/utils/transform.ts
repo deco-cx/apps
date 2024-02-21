@@ -28,7 +28,6 @@ export const toBreadcrumbList = (
   breadcrumbs: Breadcrumb[],
   baseUrl: string,
 ) => {
-  // TODO Change URL
   return breadcrumbs.slice(1).map((breadcrumb, index) => (
     {
       "@type": "ListItem" as const,
@@ -147,7 +146,7 @@ export const toProduct = (
   if ((product as WapProductDatiled)?.video) {
     additionalProperty.push({
       "@type": "PropertyValue",
-      name: "assinatura",
+      name: "video",
       value: (product as WapProductDatiled)?.video?.url,
       description: (product as WapProductDatiled).video?.plataforma,
       valueReference: "PROPERTY",
