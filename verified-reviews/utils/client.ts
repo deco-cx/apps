@@ -151,6 +151,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
             reviewRating: {
               "@type": "AggregateRating",
               ratingValue: Number(item.rate),
+              reviewCount: 1
             },
           }))
           : [],
