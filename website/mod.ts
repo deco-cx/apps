@@ -158,3 +158,5 @@ export const onBeforeResolveProps = <
   }
   return props;
 };
+
+export { default as Preview } from "./Preview.tsx";
