@@ -22,6 +22,12 @@ export interface State {
 
 export const color = 0xFF6A3B;
 
+
+/**
+*  IMPORTANT: This app needs the DECO_PROXY_DOMAIN=linx.decocache.com 
+*  environment variable to work properly.
+*/
+
 /**
  * @title LINX
  */
