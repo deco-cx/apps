@@ -27,8 +27,10 @@ const removePropertiesRecursively = <T>(category: T): T => {
   if (typeof category !== 'object' || category === null) {
     return category;
   }
+
   // deno-lint-ignore no-explicit-any
   const { hasChildren: _ignoreHasChildren, url: _ignoreUrl, ...rest} = category as any;
+
   rest.children = rest.children.map(removePropertiesRecursively)
   return rest;
 };
