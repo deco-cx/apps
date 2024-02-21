@@ -8,7 +8,7 @@ const awsRegion = Deno.env.get("AWS_REGION")!;
 const awsAccessKeyId = Deno.env.get("AWS_ACCESS_KEY_ID")!;
 const awsSecretAccessKey = Deno.env.get("AWS_SECRET_ACCESS_KEY")!;
 
-const URL_EXPIRATION_SECONDS = 1000;
+const URL_EXPIRATION_SECONDS = 2 * 60 * 60; // 2 hours
 
 export interface AWSUploadImageProps {
   file: string | ArrayBuffer | null;
