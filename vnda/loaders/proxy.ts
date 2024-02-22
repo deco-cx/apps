@@ -60,17 +60,19 @@ function loader(
 
   const customHeaders = [{ key: VNDA_HOST_HEADER, value: url.hostname }];
 
-  const [include, routes] = generateDecoSiteMap ? [
-    [...(includeSiteMap ?? []), decoSiteMapUrl], [{
-      pathTemplate: decoSiteMapUrl,
-      handler: {
-        value: {
-          __resolveType: "website/handlers/sitemap.ts",
+  const [include, routes] = generateDecoSiteMap
+    ? [
+      [...(includeSiteMap ?? []), decoSiteMapUrl],
+      [{
+        pathTemplate: decoSiteMapUrl,
+        handler: {
+          value: {
+            __resolveType: "website/handlers/sitemap.ts",
+          },
         },
-      },
-    }]
-  ] : [includeSiteMap, []]
-
+      }],
+    ]
+    : [includeSiteMap, []];
 
   const internalDomainPaths = [
     ...PAGE_PATHS,
@@ -98,10 +100,10 @@ function loader(
       value: {
         include,
         __resolveType: "vnda/handlers/sitemap.ts",
-        customHeaders
+        customHeaders,
       },
     },
-  }
+  };
 
   const apiDomainPaths = API_PATHS.map((pathTemplate) => ({
     pathTemplate,

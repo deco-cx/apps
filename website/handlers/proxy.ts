@@ -105,7 +105,7 @@ export default function Proxy({
   customHeaders = [],
   includeScriptsToHead,
   redirect = "manual",
-  avoidAppendPath
+  avoidAppendPath,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
