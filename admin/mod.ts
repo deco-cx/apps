@@ -9,6 +9,7 @@ import subhosting, {
   Props as SubhostingProps,
 } from "../platforms/subhosting/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import { PlatformName } from "./actions/sites/create.ts";
 import {
   EventPayloadMap,
   Octokit,
@@ -64,6 +65,7 @@ export interface State {
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
   githubWebhookSecret?: string;
+  platformAssignments: Record<string, PlatformName | undefined>;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -97,6 +99,16 @@ export interface GithubProps {
   eventListeners?: GithubEventListener[];
 }
 
+/**
+ * @format dynamic-options
+ * @options deco-sites/admin/loaders/sites/list.ts
+ */
+export type SiteName = string;
+export interface PlatformAssignment {
+  site: SiteName;
+  platform: PlatformName;
+}
+
 export interface Props {
   resolvables?: Resolvables;
   github?: GithubProps;
@@ -104,6 +116,7 @@ export interface Props {
   subhosting?: SubhostingProps;
   /** @description property used at deco admin  */
   workspaces: SignalStringified<Workspace>[];
+  platformAssignments?: PlatformAssignment[];
 }
 
 /**
@@ -115,6 +128,7 @@ export default function App(
     github,
     kubernetes,
     subhosting: subhostingProps,
+    platformAssignments = [],
   }: Props,
 ): App<
   AppManifest,
@@ -130,6 +144,12 @@ export default function App(
   return {
     manifest,
     state: {
+      platformAssignments: platformAssignments.reduce(
+        (assignments, { site, platform }) => {
+          return { ...assignments, [site]: platform };
+        },
+        {} as Record<string, PlatformName | undefined>,
+      ),
       storage,
       release: () => {
         const ctx = Context.active();
