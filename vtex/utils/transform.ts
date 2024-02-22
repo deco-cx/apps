@@ -597,10 +597,9 @@ const toOfferLegacy = (seller: SellerVTEX): Offer => {
         name: teaser["<Name>k__BackingField"],
         generalValues: teaser["<GeneralValues>k__BackingField"],
         conditions: {
-          minimumQuantity:
-            teaser["<Conditions>k__BackingField"][
-              "<MinimumQuantity>k__BackingField"
-            ],
+          minimumQuantity: teaser["<Conditions>k__BackingField"][
+            "<MinimumQuantity>k__BackingField"
+          ],
           parameters:
             teaser["<Conditions>k__BackingField"]["<Parameters>k__BackingField"]
               .map((parameter) => ({
@@ -628,6 +627,7 @@ export const legacyFacetToFilter = (
   map: string,
   term: string,
   behavior: "dynamic" | "static",
+  ignoreCaseSelected?: boolean,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = term.replace(/^\//, "").split("/").slice(
@@ -635,8 +635,12 @@ export const legacyFacetToFilter = (
     mapSegments.length,
   );
 
-  const mapSet = new Set(mapSegments.map((i) => i.toLowerCase()));
-  const pathSet = new Set(pathSegments.map((i) => i.toLowerCase()));
+  const mapSet = new Set(
+    mapSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
+  const pathSet = new Set(
+    pathSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
 
   // for productClusterIds, we have to use the full path
   // example:
@@ -647,7 +651,13 @@ export const legacyFacetToFilter = (
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
-    const index = pathSegments.findIndex((s) => s.toLowerCase() === facet.Value.toLowerCase());
+    const index = pathSegments.findIndex((s) => {
+      if (ignoreCaseSelected) {
+        return s.toLowerCase() === facet.Value.toLowerCase();
+      }
+
+      return s === facet.Value;
+    });
 
     const map = hasToBeFullpath
       ? facet.Link.split("map=")[1].split(",")
@@ -707,8 +717,16 @@ export const legacyFacetToFilter = (
         ? facet
         : normalizeFacet(facet);
 
-      const selected = mapSet.has(normalizedFacet.Map.toLowerCase()) &&
-        pathSet.has(normalizedFacet.Value.toLowerCase());
+      const selected = mapSet.has(
+        ignoreCaseSelected
+          ? normalizedFacet.Map.toLowerCase()
+          : normalizedFacet.Map,
+      ) &&
+        pathSet.has(
+          ignoreCaseSelected
+            ? normalizedFacet.Value.toLowerCase()
+            : normalizedFacet.Value,
+        );
 
       return {
         value: normalizedFacet.Value,
@@ -822,34 +840,33 @@ const isValueRange = (
   // deno-lint-ignore no-explicit-any
   Boolean((facet as any).range);
 
-const facetToToggle =
-  (
-    selectedFacets: SelectedFacet[],
-    key: string,
-    paramsToPersist?: URLSearchParams,
-  ) =>
-  (item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
-    const { quantity, selected } = item;
-    const isRange = isValueRange(item);
+const facetToToggle = (
+  selectedFacets: SelectedFacet[],
+  key: string,
+  paramsToPersist?: URLSearchParams,
+) =>
+(item: FacetValueRange | FacetValueBoolean): FilterToggleValue => {
+  const { quantity, selected } = item;
+  const isRange = isValueRange(item);
 
-    const value = isRange
-      ? formatRange(item.range.from, item.range.to)
-      : item.value;
-    const label = isRange ? value : item.name;
-    const facet = { key, value };
+  const value = isRange
+    ? formatRange(item.range.from, item.range.to)
+    : item.value;
+  const label = isRange ? value : item.name;
+  const facet = { key, value };
 
-    const filters = selected
-      ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
-      : [...selectedFacets, facet];
+  const filters = selected
+    ? selectedFacets.filter((f) => f.key !== key || f.value !== value)
+    : [...selectedFacets, facet];
 
-    return {
-      value,
-      quantity,
-      selected,
-      url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
-      label,
-    };
+  return {
+    value,
+    quantity,
+    selected,
+    url: `?${filtersToSearchParams(filters, paramsToPersist)}`,
+    label,
   };
+};
 
 export const toFilter =
   (selectedFacets: SelectedFacet[], paramsToPersist?: URLSearchParams) =>
