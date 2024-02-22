@@ -25,9 +25,11 @@ import type {
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
+  OrderForm,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
+  Teasers,
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";
@@ -114,6 +116,17 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
 
     return toProduct(product, sku, 0, options);
   }).filter((p): p is Product => typeof p !== "undefined");
+};
+
+export const forceHttpsOnAssets = (orderForm: OrderForm) => {
+  orderForm.items.forEach((item) => {
+    if (item.imageUrl) {
+      item.imageUrl = item.imageUrl.startsWith("http://")
+        ? item.imageUrl.replace("http://", "https://")
+        : item.imageUrl;
+    }
+  });
+  return orderForm;
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -552,32 +565,55 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
     : "https://schema.org/OutOfStock",
 });
 
-const toOfferLegacy = (seller: SellerVTEX): Offer => ({
-  ...toOffer(seller),
-  teasers: (seller.commertialOffer.Teasers ?? []).map((teaser) => ({
-    name: teaser["<Name>k__BackingField"],
-    generalValues: teaser["<GeneralValues>k__BackingField"],
-    conditions: {
-      minimumQuantity: teaser["<Conditions>k__BackingField"][
-        "<MinimumQuantity>k__BackingField"
-      ],
-      parameters: teaser["<Conditions>k__BackingField"][
-        "<Parameters>k__BackingField"
-      ].map((parameter) => ({
-        name: parameter["<Name>k__BackingField"],
-        value: parameter["<Value>k__BackingField"],
+const toOfferLegacy = (seller: SellerVTEX): Offer => {
+  const otherTeasers = seller.commertialOffer.DiscountHighLight?.map((i) => {
+    const discount = i as Record<string, string>;
+    const [_k__BackingField, discountName] = Object.entries(discount)?.[0] ?? [];
+
+    const teasers: Teasers = {
+      name: discountName,
+      conditions: {
+        minimumQuantity: 0,
+        parameters: [],
+      },
+      effects: {
+        parameters: [],
+      },
+    };
+
+    return teasers;
+  }) ?? [];
+
+  return {
+    ...toOffer(seller),
+    teasers: [
+      ...otherTeasers,
+      ...(seller.commertialOffer.Teasers ?? []).map((teaser) => ({
+        name: teaser["<Name>k__BackingField"],
+        generalValues: teaser["<GeneralValues>k__BackingField"],
+        conditions: {
+          minimumQuantity: teaser["<Conditions>k__BackingField"][
+            "<MinimumQuantity>k__BackingField"
+          ],
+          parameters: teaser["<Conditions>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
+        },
+        effects: {
+          parameters: teaser["<Effects>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
+        },
       })),
-    },
-    effects: {
-      parameters: teaser["<Effects>k__BackingField"][
-        "<Parameters>k__BackingField"
-      ].map((parameter) => ({
-        name: parameter["<Name>k__BackingField"],
-        value: parameter["<Value>k__BackingField"],
-      })),
-    },
-  })),
-});
+    ],
+  };
+};
 
 export const legacyFacetToFilter = (
   name: string,
