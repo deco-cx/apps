@@ -6,6 +6,7 @@ import * as $$$$$$$$$0 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$1 from "./actions/cart/simulation.ts";
 import * as $$$$$$$$$2 from "./actions/cart/updateCart.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
 import * as $$$2 from "./loaders/productDetailsPageVideo.ts";
@@ -21,6 +22,9 @@ const manifest = {
     "vnda/loaders/productList.ts": $$$3,
     "vnda/loaders/productListingPage.ts": $$$4,
     "vnda/loaders/proxy.ts": $$$5,
+  },
+  "handlers": {
+    "vnda/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "vnda/actions/cart/addItem.ts": $$$$$$$$$0,
