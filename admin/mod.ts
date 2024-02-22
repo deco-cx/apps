@@ -1,7 +1,7 @@
 import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
-import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type { AppContext as AC, App, ManifestOf } from "deco/mod.ts";
 import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
 import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
 import k8s, { Props as K8sProps } from "../platforms/kubernetes/mod.ts";
@@ -9,6 +9,7 @@ import subhosting, {
   Props as SubhostingProps,
 } from "../platforms/subhosting/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import { PlatformName } from "./actions/sites/create.ts";
 import {
   EventPayloadMap,
   Octokit,
@@ -64,6 +65,7 @@ export interface State {
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
   githubWebhookSecret?: string;
+  platformAssignments: Record<string, PlatformName | undefined>;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -97,13 +99,33 @@ export interface GithubProps {
   eventListeners?: GithubEventListener[];
 }
 
+/**
+ * @format dynamic-options
+ * @options deco-sites/admin/loaders/sites/list.ts
+ */
+export type SiteName = string;
+/**
+ * @title {{{site}}} - {{{platform}}}
+ */
+export interface PlatformAssignment {
+  site: SiteName;
+  platform: PlatformName;
+}
+
 export interface Props {
   resolvables?: Resolvables;
   github?: GithubProps;
-  kubernetes?: K8sProps;
-  subhosting?: SubhostingProps;
+  /**
+   * @default null
+   */
+  kubernetes?: K8sProps | null;
+  /**
+   * @default null
+   */
+  subhosting?: SubhostingProps | null;
   /** @description property used at deco admin  */
   workspaces: SignalStringified<Workspace>[];
+  platformAssignments?: PlatformAssignment[];
 }
 
 /**
@@ -115,6 +137,7 @@ export default function App(
     github,
     kubernetes,
     subhosting: subhostingProps,
+    platformAssignments = [],
   }: Props,
 ): App<
   AppManifest,
@@ -130,6 +153,12 @@ export default function App(
   return {
     manifest,
     state: {
+      platformAssignments: platformAssignments.reduce(
+        (assignments, { site, platform }) => {
+          return { ...assignments, [site]: platform };
+        },
+        {} as Record<string, PlatformName | undefined>,
+      ),
       storage,
       release: () => {
         const ctx = Context.active();

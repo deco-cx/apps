@@ -33,7 +33,9 @@ export default async function create(
   });
   const { invoke: { "deco-sites/admin": admin } } = ctx;
   await admin.actions.platforms.assign({ site: name, platform: platformName });
-  const platform = await admin.loaders.platforms.forSite({ site: name });
+  const platform = await admin.loaders.platforms.forSite({
+    site: name,
+  });
   await platform.sites.create({
     site: name,
     mode: "files",
