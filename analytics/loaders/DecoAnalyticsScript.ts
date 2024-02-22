@@ -1,4 +1,4 @@
-import { getFlagsFromCookies } from "../../utils/cookie.ts";
+import { getFlagsFromRequest } from "../../utils/cookie.ts";
 import { Script } from "../../website/types.ts";
 import { AppContext } from "../mod.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
@@ -47,10 +47,12 @@ const loader = (
     const preconnectLink =
       '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
 
-    const _flags = getFlagsFromCookies(req);
+    const _flags = getFlagsFromRequest(req);
     const flags: Record<string, string | boolean> = {};
-    _flags.forEach((flag) => flags[flag.flagName] = flag.flagActive);
+    _flags.forEach((flag) => flags[flag.name] = flag.value);
 
+    // if you want to test it local, add ".local" to src
+    // example: /script.manual.local.js
     const plausibleScript = `<script ${
       props.defer ? "defer" : ""
     } data-exclude="/proxy" ${

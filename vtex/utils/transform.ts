@@ -568,7 +568,8 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
 const toOfferLegacy = (seller: SellerVTEX): Offer => {
   const otherTeasers = seller.commertialOffer.DiscountHighLight?.map((i) => {
     const discount = i as Record<string, string>;
-    const [_k__BackingField, discountName] = Object.entries(discount)?.[0] ?? [];
+    const [_k__BackingField, discountName] = Object.entries(discount)?.[0] ??
+      [];
 
     const teasers: Teasers = {
       name: discountName,
