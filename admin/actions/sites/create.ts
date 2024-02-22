@@ -35,7 +35,6 @@ export default async function create(
   await admin.actions.platforms.assign({ site: name, platform: platformName });
   const platform = await admin.loaders.platforms.forSite({
     site: name,
-    default: "kubernetes",
   });
   await platform.sites.create({
     site: name,
