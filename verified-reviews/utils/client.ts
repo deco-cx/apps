@@ -152,7 +152,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
               "@type": "AggregateRating",
               ratingValue: Number(item.rate),
               // this api does not support multiple reviews
-              reviewCount: 1
+              reviewCount: 1,
             },
           }))
           : [],

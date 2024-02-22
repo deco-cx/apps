@@ -600,20 +600,20 @@ const toOfferLegacy = (seller: SellerVTEX): Offer => {
           minimumQuantity: teaser["<Conditions>k__BackingField"][
             "<MinimumQuantity>k__BackingField"
           ],
-          parameters:
-            teaser["<Conditions>k__BackingField"]["<Parameters>k__BackingField"]
-              .map((parameter) => ({
-                name: parameter["<Name>k__BackingField"],
-                value: parameter["<Value>k__BackingField"],
-              })),
+          parameters: teaser["<Conditions>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
         },
         effects: {
-          parameters:
-            teaser["<Effects>k__BackingField"]["<Parameters>k__BackingField"]
-              .map((parameter) => ({
-                name: parameter["<Name>k__BackingField"],
-                value: parameter["<Value>k__BackingField"],
-              })),
+          parameters: teaser["<Effects>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
         },
       })),
     ],
