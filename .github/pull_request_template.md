@@ -5,5 +5,5 @@
 > Record a quick screencast describing your changes to show the team and help reviewers.
 
 ## Link
-> Insert a branch url that is using this PR that show it working.
+> Please provide a link to a branch that demonstrates this pull request in action.
 
