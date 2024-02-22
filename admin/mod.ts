@@ -1,7 +1,7 @@
 import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
-import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type { AppContext as AC, App, ManifestOf } from "deco/mod.ts";
 import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
 import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
 import k8s, { Props as K8sProps } from "../platforms/kubernetes/mod.ts";
@@ -102,9 +102,11 @@ export interface GithubProps {
 /**
  * @format dynamic-options
  * @options deco-sites/admin/loaders/sites/list.ts
- * @title {{{site}}}
  */
 export type SiteName = string;
+/**
+ * @title {{{site}}} - {{{platform}}}
+ */
 export interface PlatformAssignment {
   site: SiteName;
   platform: PlatformName;
@@ -113,7 +115,13 @@ export interface PlatformAssignment {
 export interface Props {
   resolvables?: Resolvables;
   github?: GithubProps;
+  /**
+   * @default null
+   */
   kubernetes?: K8sProps | null;
+  /**
+   * @default null
+   */
   subhosting?: SubhostingProps | null;
   /** @description property used at deco admin  */
   workspaces: SignalStringified<Workspace>[];
