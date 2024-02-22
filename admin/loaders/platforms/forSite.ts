@@ -10,11 +10,13 @@ export interface Props {
 }
 
 export default async function forSite(
-  _props: Props,
+  { site }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Platform> {
-  const platformName = await getPlatformOf(_props.site);
+  // add dummy platform.
+  const platformName = ctx.platformAssignments[site] ??
+    await getPlatformOf(site);
 
   if (platformName === "kubernetes") {
     return kubernetes(ctx.invoke.kubernetes);
@@ -22,6 +24,8 @@ export default async function forSite(
     return subhosting(ctx.invoke["deno-subhosting"]);
   } else if (platformName === "play") {
     return play(ctx.invoke.kubernetes);
+  } else if (platformName === "none") {
+    throw new Error(`none platform is used for ${site}`);
   }
   return kubernetes(ctx.invoke.kubernetes);
 }
