@@ -1,6 +1,6 @@
-import { AppContext } from "../../mod.ts";
+import { AppContext, SiteName } from "../../mod.ts";
 export interface Props {
-  site: string;
+  site: SiteName;
   domain: string;
 }
 
