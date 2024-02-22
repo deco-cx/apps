@@ -14,7 +14,7 @@ export interface Props {
   platform: PlatformName;
 }
 
-export type PlatformName = "kubernetes" | "subhosting" | "play" | "none";
+export type PlatformName = "kubernetes" | "subhosting" | "play";
 
 export interface Site {
   name: string;
@@ -33,7 +33,10 @@ export default async function create(
   });
   const { invoke: { "deco-sites/admin": admin } } = ctx;
   await admin.actions.platforms.assign({ site: name, platform: platformName });
-  const platform = await admin.loaders.platforms.forSite({ site: name });
+  const platform = await admin.loaders.platforms.forSite({
+    site: name,
+    default: "kubernetes",
+  });
   await platform.sites.create({
     site: name,
     mode: "files",
