@@ -7,13 +7,15 @@ let kvPromise: Promise<Deno.Kv> | undefined;
 
 const keyPrefix = ["platforms", "sites"];
 
-export const getPlatformOf = async (site: string): Promise<string | null> => {
+export const getPlatformOf = async (
+  site: string,
+): Promise<string | undefined> => {
   kvPromise ??= Deno.openKv();
 
   const kv = await kvPromise;
 
   return (await kv.get<{ platform: string }>([...keyPrefix, site])).value
-    ?.platform ?? null;
+    ?.platform ?? undefined;
 };
 
 export default async function assign(

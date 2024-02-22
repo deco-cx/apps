@@ -25,9 +25,11 @@ import type {
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
+  OrderForm,
   Product as ProductVTEX,
   SelectedFacet,
   Seller as SellerVTEX,
+  Teasers,
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";
@@ -58,8 +60,9 @@ const getProductURL = (
   return canonicalUrl;
 };
 
-const nonEmptyArray = <T>(array: T[] | null | undefined) =>
-  Array.isArray(array) && array.length > 0 ? array : null;
+const nonEmptyArray = <T>(
+  array: T[] | null | undefined,
+) => (Array.isArray(array) && array.length > 0 ? array : null);
 
 interface ProductOptions {
   baseUrl: string;
@@ -80,8 +83,7 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
   maybeSkuId?: string,
 ): T["items"][number] => {
-  const skuId = maybeSkuId ??
-    findFirstAvailable(product.items)?.itemId ??
+  const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
 
   for (const item of product.items) {
@@ -104,16 +106,29 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
     return map;
   }, new Map<string, T>());
 
-  return sku.kitItems?.map(({ itemId }) => {
-    const product = productBySkuId.get(itemId);
+  return sku.kitItems
+    ?.map(({ itemId }) => {
+      const product = productBySkuId.get(itemId);
 
-    /** Sometimes VTEX does not return what I've asked for */
-    if (!product) return;
+      /** Sometimes VTEX does not return what I've asked for */
+      if (!product) return;
 
-    const sku = pickSku(product, itemId);
+      const sku = pickSku(product, itemId);
 
-    return toProduct(product, sku, 0, options);
-  }).filter((p): p is Product => typeof p !== "undefined");
+      return toProduct(product, sku, 0, options);
+    })
+    .filter((p): p is Product => typeof p !== "undefined");
+};
+
+export const forceHttpsOnAssets = (orderForm: OrderForm) => {
+  orderForm.items.forEach((item) => {
+    if (item.imageUrl) {
+      item.imageUrl = item.imageUrl.startsWith("http://")
+        ? item.imageUrl.replace("http://", "https://")
+        : item.imageUrl;
+    }
+  });
+  return orderForm;
 };
 
 export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -210,10 +225,10 @@ const toAdditionalPropertyClusters = <
     : new Set(product.clusterHighlights.map(({ id }) => id));
 
   return allClusters.map((cluster) =>
-    toAdditionalPropertyCluster(
-      { propertyID: cluster.id, value: cluster.name || "" },
-      highlightsSet,
-    )
+    toAdditionalPropertyCluster({
+      propertyID: cluster.id,
+      value: cluster.name || "",
+    }, highlightsSet)
   );
 };
 
@@ -429,8 +444,8 @@ const toBreadcrumbList = (
         return {
           "@type": "ListItem" as const,
           name,
-          item: new URL(`/${segments.slice(0, position).join("/")}`, baseUrl)
-            .href,
+          item:
+            new URL(`/${segments.slice(0, position).join("/")}`, baseUrl).href,
           position,
         };
       }),
@@ -457,12 +472,13 @@ const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
 const toProductGroupAdditionalProperties = ({ properties = [] }: ProductVTEX) =>
   properties.flatMap(({ name, values }) =>
     values.map(
-      (value) => ({
-        "@type": "PropertyValue",
-        name,
-        value,
-        valueReference: "PROPERTY" as string,
-      } as const),
+      (value) =>
+        ({
+          "@type": "PropertyValue",
+          name,
+          value,
+          valueReference: "PROPERTY" as string,
+        }) as const,
     )
   );
 
@@ -497,14 +513,15 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   );
 
   const attachmentProperties = attachments.map(
-    (attachment) => ({
-      "@type": "PropertyValue",
-      propertyID: `${attachment.id}`,
-      name: attachment.name,
-      value: attachment.domainValues,
-      required: attachment.required,
-      valueReference: "ATTACHMENT",
-    } as const),
+    (attachment) =>
+      ({
+        "@type": "PropertyValue",
+        propertyID: `${attachment.id}`,
+        name: attachment.name,
+        value: attachment.domainValues,
+        required: attachment.required,
+        valueReference: "ATTACHMENT",
+      }) as const,
   );
 
   return [...specificationProperties, ...attachmentProperties];
@@ -552,32 +569,56 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
     : "https://schema.org/OutOfStock",
 });
 
-const toOfferLegacy = (seller: SellerVTEX): Offer => ({
-  ...toOffer(seller),
-  teasers: (seller.commertialOffer.Teasers ?? []).map((teaser) => ({
-    name: teaser["<Name>k__BackingField"],
-    generalValues: teaser["<GeneralValues>k__BackingField"],
-    conditions: {
-      minimumQuantity: teaser["<Conditions>k__BackingField"][
-        "<MinimumQuantity>k__BackingField"
-      ],
-      parameters: teaser["<Conditions>k__BackingField"][
-        "<Parameters>k__BackingField"
-      ].map((parameter) => ({
-        name: parameter["<Name>k__BackingField"],
-        value: parameter["<Value>k__BackingField"],
+const toOfferLegacy = (seller: SellerVTEX): Offer => {
+  const otherTeasers = seller.commertialOffer.DiscountHighLight?.map((i) => {
+    const discount = i as Record<string, string>;
+    const [_k__BackingField, discountName] = Object.entries(discount)?.[0] ??
+      [];
+
+    const teasers: Teasers = {
+      name: discountName,
+      conditions: {
+        minimumQuantity: 0,
+        parameters: [],
+      },
+      effects: {
+        parameters: [],
+      },
+    };
+
+    return teasers;
+  }) ?? [];
+
+  return {
+    ...toOffer(seller),
+    teasers: [
+      ...otherTeasers,
+      ...(seller.commertialOffer.Teasers ?? []).map((teaser) => ({
+        name: teaser["<Name>k__BackingField"],
+        generalValues: teaser["<GeneralValues>k__BackingField"],
+        conditions: {
+          minimumQuantity: teaser["<Conditions>k__BackingField"][
+            "<MinimumQuantity>k__BackingField"
+          ],
+          parameters: teaser["<Conditions>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
+        },
+        effects: {
+          parameters: teaser["<Effects>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
+        },
       })),
-    },
-    effects: {
-      parameters: teaser["<Effects>k__BackingField"][
-        "<Parameters>k__BackingField"
-      ].map((parameter) => ({
-        name: parameter["<Name>k__BackingField"],
-        value: parameter["<Value>k__BackingField"],
-      })),
-    },
-  })),
-});
+    ],
+  };
+};
 
 export const legacyFacetToFilter = (
   name: string,
@@ -586,24 +627,61 @@ export const legacyFacetToFilter = (
   map: string,
   term: string,
   behavior: "dynamic" | "static",
+  ignoreCaseSelected?: boolean,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = term
-    .replace(/^\//, "")
-    .split("/")
-    .slice(0, mapSegments.length);
+  const pathSegments = term.replace(/^\//, "").split("/").slice(
+    0,
+    mapSegments.length,
+  );
 
-  const mapSet = new Set(mapSegments.map(i => i.toLowerCase()));
-  const pathSet = new Set(pathSegments.map(i => i.toLowerCase()));
+  const mapSet = new Set(
+    mapSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
+  const pathSet = new Set(
+    pathSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
+
+  // for productClusterIds, we have to use the full path
+  // example:
+  // category2/123?map=c,productClusterIds -> DO NOT WORK
+  // category1/category2/123?map=c,c,productClusterIds -> WORK
+  const hasProductClusterIds = mapSegments.includes("productClusterIds");
+  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") ||
+    mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
-    const index = pathSegments.findIndex((s) => s === facet.Value);
+    const index = pathSegments.findIndex((s) => {
+      if (ignoreCaseSelected) {
+        return s.toLowerCase() === facet.Value.toLowerCase();
+      }
+
+      return s === facet.Value;
+    });
+
+    const map = hasToBeFullpath
+      ? facet.Link.split("map=")[1].split(",")
+      : [facet.Map];
+    const value = hasToBeFullpath
+      ? facet.Link.split("?")[0].slice(1).split("/")
+      : [facet.Value];
+
+    const pathSegmentsFiltered = hasProductClusterIds
+      ? [pathSegments[mapSegments.indexOf("productClusterIds")]]
+      : [];
+    const mapSegmentsFiltered = hasProductClusterIds
+      ? ["productClusterIds"]
+      : [];
+
+    const _mapSegments = hasToBeFullpath ? mapSegmentsFiltered : mapSegments;
+    const _pathSegments = hasToBeFullpath ? pathSegmentsFiltered : pathSegments;
+
     const newMap = selected
       ? [...mapSegments.filter((_, i) => i !== index)]
-      : [...mapSegments, facet.Map];
+      : [..._mapSegments, ...map];
     const newPath = selected
       ? [...pathSegments.filter((_, i) => i !== index)]
-      : [...pathSegments, facet.Value];
+      : [..._pathSegments, ...value];
 
     // Insertion-sort like algorithm. Uses the c-continuum theorem
     const zipped: [string, string][] = [];
@@ -619,7 +697,7 @@ export const legacyFacetToFilter = (
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || map);
+      link.searchParams.set("fmap", url.searchParams.get("fmap") || map[0]);
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {
@@ -628,6 +706,7 @@ export const legacyFacetToFilter = (
 
     return `${link.pathname}${link.search}`;
   };
+
   return {
     "@type": "FilterToggle",
     quantity: facets?.length,
@@ -638,8 +717,17 @@ export const legacyFacetToFilter = (
         ? facet
         : normalizeFacet(facet);
 
-      const selected = mapSet.has(normalizedFacet.Map.toLowerCase()) &&
-        pathSet.has(normalizedFacet.Value.toLowerCase());
+      const selected = mapSet.has(
+        ignoreCaseSelected
+          ? normalizedFacet.Map.toLowerCase()
+          : normalizedFacet.Map,
+      ) &&
+        pathSet.has(
+          ignoreCaseSelected
+            ? normalizedFacet.Value.toLowerCase()
+            : normalizedFacet.Value,
+        );
+
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
