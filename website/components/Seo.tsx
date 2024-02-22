@@ -1,6 +1,9 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ImageWidget } from "../../admin/widgets.ts";
 import { stripHTML } from "../utils/html.ts";
+import { JSX } from "preact";
+
+export type SEOSection = JSX.Element;
 
 export type OGType = "website" | "article";
 
@@ -50,7 +53,7 @@ function Component({
   canonical,
   noIndexing,
   jsonLDs = [],
-}: Props) {
+}: Props): SEOSection {
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
   const description = stripHTML(desc || "");
   const title = stripHTML(t);

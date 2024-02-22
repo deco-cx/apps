@@ -1,4 +1,7 @@
-import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
+import Seo, {
+  Props as SeoProps,
+  SEOSection,
+} from "../../../website/components/Seo.tsx";
 import { ProductDetailsPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 
@@ -7,7 +10,7 @@ export type Props = {
   omitVariants?: boolean;
 } & Partial<Omit<SeoProps, "jsonLDs">>;
 
-function Section({ jsonLD, omitVariants, ...props }: Props) {
+function Section({ jsonLD, omitVariants, ...props }: Props): SEOSection {
   const title = jsonLD?.seo?.title;
   const description = jsonLD?.seo?.description;
   const image = jsonLD?.product.image?.[0]?.url;
@@ -34,5 +37,7 @@ function Section({ jsonLD, omitVariants, ...props }: Props) {
     />
   );
 }
+
+export { default as Preview } from "../../../website/components/_seo/Preview.tsx";
 
 export default Section;

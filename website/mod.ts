@@ -40,7 +40,9 @@ export interface Props {
    */
   routes?: Routes[];
 
-  /** @title Seo */
+  /**
+   * @title Seo
+   */
   seo?: Omit<
     Seo,
     "jsonLDs" | "titleTemplate" | "descriptionTemplate" | "canonical"
@@ -75,9 +77,7 @@ export interface Props {
 /**
  * @title Website
  */
-export default function App(
-  state: Props,
-): App<Manifest, Props> {
+export default function App(state: Props): App<Manifest, Props> {
   return {
     state,
     manifest: {
@@ -105,12 +105,12 @@ export default function App(
           Preview: (props) =>
             manifest.pages["website/pages/Page.tsx"].Preview({
               ...props,
-              sections: [...state.global ?? [], ...props.sections],
+              sections: [...(state.global ?? []), ...props.sections],
             }),
           default: (props) =>
             manifest.pages["website/pages/Page.tsx"].default({
               ...props,
-              sections: [...state.global ?? [], ...props.sections],
+              sections: [...(state.global ?? []), ...props.sections],
             }),
         },
       },
@@ -123,9 +123,7 @@ export default function App(
   };
 }
 
-const deferPropsResolve = (
-  routes: Routes,
-): Routes => {
+const deferPropsResolve = (routes: Routes): Routes => {
   if (Array.isArray(routes)) {
     const newRoutes = [];
     for (const route of routes) {
