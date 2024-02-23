@@ -3,8 +3,8 @@ import { logger } from "deco/observability/otel/config.ts";
 import base64ToBlob from "../utils/blobConversion.ts";
 import { Ids } from "../types.ts";
 
-const bucketName = Deno.env.get("UPLOAD_BUCKET")!;
-const awsRegion = Deno.env.get("AWS_REGION")!;
+const assistantBucketName = Deno.env.get("ASSISTANT_BUCKET_NAME")!;
+const assistantBucketRegion = Deno.env.get("ASSISTANT_BUCKET_REGION")!;
 const awsAccessKeyId = Deno.env.get("AWS_ACCESS_KEY_ID")!;
 const awsSecretAccessKey = Deno.env.get("AWS_SECRET_ACCESS_KEY")!;
 
@@ -16,7 +16,7 @@ export interface AWSUploadImageProps {
 }
 
 const s3 = new AWS.S3({
-  region: awsRegion,
+  region: assistantBucketRegion,
   accessKeyId: awsAccessKeyId,
   secretAccessKey: awsSecretAccessKey,
 });
@@ -28,7 +28,7 @@ async function getSignedUrl(mimetype: string): Promise<string> {
 
   // Get signed URL from S3
   const s3Params = {
-    Bucket: bucketName,
+    Bucket: assistantBucketName,
     Key: name,
     Expires: URL_EXPIRATION_SECONDS,
     ContentType: mimetype,
@@ -74,5 +74,6 @@ export default async function awsUploadImage(
     response: JSON.stringify(uploadResponse),
     uploadUrl: uploadURL,
   });
-  return uploadURL.split("?")[0]; // only the url without the query params
+  const imageUrl = new URL(uploadURL);
+  return `${imageUrl.origin}${imageUrl.pathname}`;
 }
