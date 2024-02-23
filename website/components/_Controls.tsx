@@ -76,6 +76,12 @@ const snippet = (live: Live) => {
         "pathTemplate",
         encodeURIComponent(window.LIVE.page.pathTemplate || "/*"),
       );
+
+      if (event.ctrlKey && event.key === ".") {
+        window.open(href, "_blank");
+        return;
+      }
+      
       window.location.href = `${href}`;
     }
   };
