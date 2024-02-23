@@ -7,7 +7,6 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-
   // Call the search function with the expanded properties
   const response = await fetchProductList(ctx, expandedProps);
   if (response !== null && response.length > 0) {

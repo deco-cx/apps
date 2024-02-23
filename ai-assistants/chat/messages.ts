@@ -312,10 +312,6 @@ export const messageProcessorFor = async (
     }
 
     const replyMessage = threadMessageToReply(lastMsg);
-    console.log(
-      "functionCall length:",
-      functionCallReplies.length,
-    );
 
     if (
       functionCallReplies.length === 1 &&
