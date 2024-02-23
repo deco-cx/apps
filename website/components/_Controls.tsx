@@ -60,29 +60,29 @@ const snippet = (live: Live) => {
       event.preventDefault();
       event.stopPropagation();
 
-      const pathname = window.LIVE.play
-        ? `/play/blocks/${window.LIVE.page.id}?domain=${window.location.origin}`
-        : `/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
+      const pathname = globalThis.window.LIVE.play
+        ? `/play/blocks/${globalThis.window.LIVE.page.id}?domain=${globalThis.window.location.origin}`
+        : `/sites/${globalThis.window.LIVE.site.name}/blocks/${globalThis.window.LIVE.page.id}`;
 
       const href = new URL(pathname, "https://admin.deco.cx");
 
       href.searchParams.set(
         "path",
         encodeURIComponent(
-          `${window.location.pathname}${window.location.search}`,
+          `${globalThis.window.location.pathname}${globalThis.window.location.search}`,
         ),
       );
       href.searchParams.set(
         "pathTemplate",
-        encodeURIComponent(window.LIVE.page.pathTemplate || "/*"),
+        encodeURIComponent(globalThis.window.LIVE.page.pathTemplate || "/*"),
       );
 
       if ((event.ctrlKey || event.metaKey) && event.key === ".") {
-        window.open(href, "_blank");
+        globalThis.window.open(href, "_blank");
         return;
       }
       
-      window.location.href = `${href}`;
+      globalThis.window.location.href = `${href}`;
     }
   };
 
