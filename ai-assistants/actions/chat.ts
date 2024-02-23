@@ -156,15 +156,19 @@ export default async function openChat(
       }),
     );
     assistant.then((aiAssistant) => {
-      // TODO(@ItamarRocha): Refactor this part and the corresponding part in the deco-sites
       socket.send(
         JSON.stringify({
-          type: "Id",
-          assistantId: aiAssistant.id,
+          isWelcomeMessage: true,
           threadId: aiAssistant.threadId,
+          assistantId: aiAssistant.id,
+          type: "message",
+          content: [{
+            type: "text",
+            value: aiAssistant.welcomeMessage ?? "Welcome to the chat!",
+          }],
+          role: "assistant",
         }),
       );
-      socket.send(aiAssistant.welcomeMessage ?? "Welcome to the chat!");
     });
   };
   /**
