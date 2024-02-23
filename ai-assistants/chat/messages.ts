@@ -204,12 +204,12 @@ export const messageProcessorFor = async (
       instructions: instructions.slice(0, 25000),
       tools,
     });
-    
+
     const messageId = run.id;
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
 
-    // Log the message sent by the assistant and reply to the user
+    // Reply to the user
     const reply = (message: Reply<unknown>) => {
       assistant.onMessageSent?.({
         assistantId: run.assistant_id,
@@ -220,7 +220,7 @@ export const messageProcessorFor = async (
       });
       return _reply(message);
     };
-    // Log the message received by the assistant
+
     assistant.onMessageReceived?.({
       assistantId: run.assistant_id,
       threadId: thread.id,
@@ -258,16 +258,14 @@ export const messageProcessorFor = async (
         run.id,
       );
 
-      console.log("status", runStatus.status);
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
-        console.log(outputs.tool_calls[0].function.arguments);
+
         const tool_outputs = await Promise.all(
           outputs.tool_calls.map(invoke),
         );
         if (tool_outputs.length === 0) {
-          console.log("TOOL OUTPUT VAZIO??????");
           const message: ReplyMessage = {
             messageId: Date.now().toString(),
             threadId: thread.id,

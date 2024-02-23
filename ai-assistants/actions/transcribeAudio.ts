@@ -43,7 +43,9 @@ export default async function transcribeAudio(
   );
   const file = new File([blobData], "input.wav", { type: "audio/wav" });
 
-  stats.audioSize.record(transcribeAudioProps.audioDuration, {assistant_id: transcribeAudioProps.ids?.assistantId});
+  stats.audioSize.record(transcribeAudioProps.audioDuration, {
+    assistant_id: transcribeAudioProps.ids?.assistantId,
+  });
   const response = await openai.audio.transcriptions.create({
     model: "whisper-1",
     file: file,

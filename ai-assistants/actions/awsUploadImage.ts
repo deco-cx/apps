@@ -23,7 +23,7 @@ const s3 = new AWS.S3({
 
 // TODO(ItamarRocha): Check if possible to upload straight to bucket instead of using presigned url
 async function getSignedUrl(mimetype: string): Promise<string> {
-  const randomID = Math.floor(Math.random() * 10000000);
+  const randomID = crypto.randomUUID();
   const name = `${randomID}.${mimetype.split("/")[1]}`;
 
   // Get signed URL from S3

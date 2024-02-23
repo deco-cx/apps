@@ -22,16 +22,18 @@ const withContext = <T>(context: string, v: T | undefined): Prompt[] => {
   }
   return [{ context, content: JSON.stringify(v) }];
 };
-const ensureArray = <T>(data: T | T[]): T[] => Array.isArray(data) ? data : [data];
+const ensureArray = <T>(data: T | T[]): T[] =>
+  Array.isArray(data) ? data : [data];
 const removePropertiesRecursively = <T>(category: T): T => {
   // Base case: If obj is not an object, return it directly
-  if (typeof category !== 'object' || category === null) {
+  if (typeof category !== "object" || category === null) {
     return category;
   }
 
-  const { hasChildren: _ignoreHasChildren, url: _ignoreUrl, ...rest} = category as any;
+  const { hasChildren: _ignoreHasChildren, url: _ignoreUrl, ...rest } =
+    category as any;
 
-  rest.children = rest.children.map(removePropertiesRecursively)
+  rest.children = rest.children.map(removePropertiesRecursively);
   return rest;
 };
 
@@ -230,8 +232,7 @@ export default function brandAssistant(props: Props): AIAssistant {
         "This is the category tree of the store",
         ensureArray(props?.categories).map((category) => {
           return removePropertiesRecursively(category);
-        }
-      ).filter(item => item !== null),
+        }).filter((item) => item !== null),
       ),
       // TODO(@ItamarRocha): As of now, this information is not being included as the context limit is 30k characters.
       ...withContext("This is the store topsearches", props?.topSearches),

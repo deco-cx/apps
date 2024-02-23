@@ -6,8 +6,7 @@ import { ValueType } from "deco/deps.ts";
 
 const stats = {
   promptTokens: meter.createHistogram("assistant_image_prompt_tokens", {
-    description:
-      "Tokens used in Sales Assistant Describe Image Input - OpenAI",
+    description: "Tokens used in Sales Assistant Describe Image Input - OpenAI",
     valueType: ValueType.INT,
   }),
   completionTokens: meter.createHistogram("assistant_image_completion_tokens", {
@@ -74,8 +73,12 @@ export default async function describeImage(
       subcontext: "response",
       response: JSON.stringify(response),
     });
-    stats.promptTokens.record(response.usage?.prompt_tokens ?? 0, {assistant_id: describeImageProps.ids?.assistantId});
-    stats.completionTokens.record(response.usage?.completion_tokens ?? 0, {assistant_id: describeImageProps.ids?.assistantId})
+    stats.promptTokens.record(response.usage?.prompt_tokens ?? 0, {
+      assistant_id: describeImageProps.ids?.assistantId,
+    });
+    stats.completionTokens.record(response.usage?.completion_tokens ?? 0, {
+      assistant_id: describeImageProps.ids?.assistantId,
+    });
     return response;
   } catch (error) {
     logger.error(`${

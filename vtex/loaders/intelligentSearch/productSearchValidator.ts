@@ -7,7 +7,6 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  console.log("aiAssistant running");
 
   // Call the search function with the expanded properties
   const response = await fetchProductList(ctx, expandedProps);
@@ -34,7 +33,6 @@ async function fetchProductList(
   const response = await ctx.invoke.vtex.loaders.intelligentSearch.productList(
     props,
   );
-  console.log(response?.length ?? "No response");
   return response;
 }
 

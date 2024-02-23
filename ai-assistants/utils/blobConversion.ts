@@ -11,7 +11,6 @@ export default function base64ToBlob(
   if (context === "image") {
     regex = /^data:(image\/[a-z]+);base64,(.*)$/;
   }
-  console.log(regex);
   // Split the base64 string into the MIME type and the base64 encoded data
   if (!base64 || typeof base64 !== "string") {
     logger.error(`${
@@ -26,8 +25,6 @@ export default function base64ToBlob(
   }
 
   const parts = base64.match(regex);
-  // console.log(base64);
-  console.log(parts);
   if (!parts || parts.length !== 3) {
     logger.error(`${
       JSON.stringify({
