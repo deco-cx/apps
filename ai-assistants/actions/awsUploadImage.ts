@@ -1,7 +1,7 @@
 import { logger } from "deco/observability/otel/config.ts";
 import base64ToBlob from "../utils/blobConversion.ts";
 import { Ids } from "../types.ts";
-import {AppContext} from "../mod.ts";
+import { AppContext } from "../mod.ts";
 
 const URL_EXPIRATION_SECONDS = 2 * 60 * 60; // 2 hours
 
@@ -11,7 +11,10 @@ export interface AWSUploadImageProps {
 }
 
 // TODO(ItamarRocha): Check if possible to upload straight to bucket instead of using presigned url
-async function getSignedUrl(mimetype: string, ctx: AppContext): Promise<string> {
+async function getSignedUrl(
+  mimetype: string,
+  ctx: AppContext,
+): Promise<string> {
   const randomID = crypto.randomUUID();
   const name = `${randomID}.${mimetype.split("/")[1]}`;
 
@@ -38,7 +41,6 @@ export default async function awsUploadImage(
   _req: Request,
   ctx: AppContext,
 ) {
-
   const blobData = base64ToBlob(
     awsUploadImageProps.file,
     "image",

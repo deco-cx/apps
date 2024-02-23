@@ -170,9 +170,12 @@ export default function App(
         state.assistantId,
       ),
       s3: new AWS.S3({
-        region: state.assistantAwsProps?.assistantBucketRegion.get?.() ?? Deno.env.get("ASSISTANT_BUCKET_REGION"),
-        accessKeyId: state.assistantAwsProps?.accessKeyId.get?.() ?? Deno.env.get("AWS_ACCESS_KEY_ID"),
-        secretAccessKey: state.assistantAwsProps?.secretAccessKey.get?.() ?? Deno.env.get("AWS_SECRET_ACCESS_KEY"),
+        region: state.assistantAwsProps?.assistantBucketRegion.get?.() ??
+          Deno.env.get("ASSISTANT_BUCKET_REGION"),
+        accessKeyId: state.assistantAwsProps?.accessKeyId.get?.() ??
+          Deno.env.get("AWS_ACCESS_KEY_ID"),
+        secretAccessKey: state.assistantAwsProps?.secretAccessKey.get?.() ??
+          Deno.env.get("AWS_SECRET_ACCESS_KEY"),
       }),
       assistantAwsProps: state.assistantAwsProps,
     },
