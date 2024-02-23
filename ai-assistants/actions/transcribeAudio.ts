@@ -2,7 +2,7 @@ import OpenAI from "https://deno.land/x/openai@v4.24.1/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import base64ToBlob from "../utils/blobConversion.ts";
 import { meter } from "deco/observability/otel/metrics.ts";
-import { Ids } from "../types.ts";
+import { AssistantIds } from "../types.ts";
 import { ValueType } from "deco/deps.ts";
 
 const stats = {
@@ -17,7 +17,7 @@ const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 
 export interface TranscribeAudioProps {
   file: string | ArrayBuffer | null;
-  ids?: Ids;
+  assistantIds?: AssistantIds;
   audioDuration: number;
 }
 
@@ -27,8 +27,8 @@ export default async function transcribeAudio(
   if (!transcribeAudioProps.file) {
     logger.error(`${
       JSON.stringify({
-        assistantId: transcribeAudioProps.ids?.assistantId,
-        threadId: transcribeAudioProps.ids?.threadId,
+        assistantId: transcribeAudioProps.assistantIds?.assistantId,
+        threadId: transcribeAudioProps.assistantIds?.threadId,
         context: "transcribeAudio",
         error: "Audio file is empty",
       })
@@ -39,20 +39,20 @@ export default async function transcribeAudio(
   const blobData = base64ToBlob(
     transcribeAudioProps.file,
     "audio",
-    transcribeAudioProps.ids,
+    transcribeAudioProps.assistantIds,
   );
   const file = new File([blobData], "input.wav", { type: "audio/wav" });
 
   stats.audioSize.record(transcribeAudioProps.audioDuration, {
-    assistant_id: transcribeAudioProps.ids?.assistantId,
+    assistant_id: transcribeAudioProps.assistantIds?.assistantId,
   });
   const response = await openai.audio.transcriptions.create({
     model: "whisper-1",
     file: file,
   });
   logger.info({
-    assistantId: transcribeAudioProps.ids?.assistantId,
-    threadId: transcribeAudioProps.ids?.threadId,
+    assistantId: transcribeAudioProps.assistantIds?.assistantId,
+    threadId: transcribeAudioProps.assistantIds?.threadId,
     context: "transcribeAudio",
     subcontext: "response",
     response: JSON.stringify(response),

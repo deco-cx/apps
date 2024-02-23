@@ -1,13 +1,13 @@
 import { logger } from "deco/observability/otel/config.ts";
 import base64ToBlob from "../utils/blobConversion.ts";
-import { Ids } from "../types.ts";
+import { AssistantIds } from "../types.ts";
 import { AppContext } from "../mod.ts";
 
 const URL_EXPIRATION_SECONDS = 2 * 60 * 60; // 2 hours
 
 export interface AWSUploadImageProps {
   file: string | ArrayBuffer | null;
-  ids?: Ids;
+  assistantIds?: AssistantIds;
 }
 
 // TODO(ItamarRocha): Check if possible to upload straight to bucket instead of using presigned url
@@ -44,7 +44,7 @@ export default async function awsUploadImage(
   const blobData = base64ToBlob(
     awsUploadImageProps.file,
     "image",
-    awsUploadImageProps.ids,
+    awsUploadImageProps.assistantIds,
   );
   const uploadURL = await getSignedUrl(blobData.type, ctx);
   const uploadResponse = await uploadFileToS3(uploadURL, blobData);
@@ -52,8 +52,8 @@ export default async function awsUploadImage(
   if (!uploadResponse.ok) {
     logger.error(`${
       JSON.stringify({
-        assistantId: awsUploadImageProps.ids?.assistantId,
-        threadId: awsUploadImageProps.ids?.threadId,
+        assistantId: awsUploadImageProps.assistantIds?.assistantId,
+        threadId: awsUploadImageProps.assistantIds?.threadId,
         context: "awsUploadImage",
         error: `Failed to upload file: ${uploadResponse.statusText}`,
       })
@@ -61,8 +61,8 @@ export default async function awsUploadImage(
     throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
   }
   logger.info({
-    assistantId: awsUploadImageProps.ids?.assistantId,
-    threadId: awsUploadImageProps.ids?.threadId,
+    assistantId: awsUploadImageProps.assistantIds?.assistantId,
+    threadId: awsUploadImageProps.assistantIds?.threadId,
     context: "awsUploadImage",
     subcontext: "uploadResponse",
     response: JSON.stringify(uploadResponse),

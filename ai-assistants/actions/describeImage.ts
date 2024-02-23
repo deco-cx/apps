@@ -1,7 +1,7 @@
 import OpenAI from "https://deno.land/x/openai@v4.24.1/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { meter } from "deco/observability/otel/metrics.ts";
-import { Ids } from "../types.ts";
+import { AssistantIds } from "../types.ts";
 import { ValueType } from "deco/deps.ts";
 
 const stats = {
@@ -20,7 +20,7 @@ const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 export interface DescribeImageProps {
   uploadURL: string;
   userPrompt: string;
-  ids?: Ids;
+  assistantIds?: AssistantIds;
 }
 
 export default async function describeImage(
@@ -28,8 +28,8 @@ export default async function describeImage(
 ) {
   logger.info(`${
     JSON.stringify({
-      assistantId: describeImageProps.ids?.assistantId,
-      threadId: describeImageProps.ids?.threadId,
+      assistantId: describeImageProps.assistantIds?.assistantId,
+      threadId: describeImageProps.assistantIds?.threadId,
       context: "describeImage",
       subcontext: "props",
       props: describeImageProps,
@@ -67,24 +67,24 @@ export default async function describeImage(
     });
 
     logger.info({
-      assistantId: describeImageProps.ids?.assistantId,
-      threadId: describeImageProps.ids?.threadId,
+      assistantId: describeImageProps.assistantIds?.assistantId,
+      threadId: describeImageProps.assistantIds?.threadId,
       context: "describeImage",
       subcontext: "response",
       response: JSON.stringify(response),
     });
     stats.promptTokens.record(response.usage?.prompt_tokens ?? 0, {
-      assistant_id: describeImageProps.ids?.assistantId,
+      assistant_id: describeImageProps.assistantIds?.assistantId,
     });
     stats.completionTokens.record(response.usage?.completion_tokens ?? 0, {
-      assistant_id: describeImageProps.ids?.assistantId,
+      assistant_id: describeImageProps.assistantIds?.assistantId,
     });
     return response;
   } catch (error) {
     logger.error(`${
       JSON.stringify({
-        assistantId: describeImageProps.ids?.assistantId,
-        threadId: describeImageProps.ids?.threadId,
+        assistantId: describeImageProps.assistantIds?.assistantId,
+        threadId: describeImageProps.assistantIds?.threadId,
         context: "describeImage",
         error: JSON.stringify(error),
       })

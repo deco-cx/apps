@@ -25,7 +25,7 @@ export interface AssistantPersonalization {
     | "Helpful";
 }
 
-export interface Ids {
+export interface AssistantIds {
   /**
    * @title The assistant's id
    */

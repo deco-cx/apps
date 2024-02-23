@@ -1,10 +1,10 @@
 import { logger } from "deco/observability/otel/config.ts";
-import { Ids } from "../types.ts";
+import { AssistantIds } from "../types.ts";
 
 export default function base64ToBlob(
   base64: string | ArrayBuffer | null,
   context: string,
-  ids?: Ids,
+  assistantIds?: AssistantIds,
 ): Blob {
   let regex =
     /^data:(audio\/[a-z]+|video\/[a-z]+|audio\/mp[34]|video\/mp4);base64,(.*)$/;
@@ -15,8 +15,8 @@ export default function base64ToBlob(
   if (!base64 || typeof base64 !== "string") {
     logger.error(`${
       JSON.stringify({
-        assistantId: ids?.assistantId,
-        threadId: ids?.threadId,
+        assistantId: assistantIds?.assistantId,
+        threadId: assistantIds?.threadId,
         context: context,
         error: "Expected a base64 string, typeof base64 is not string",
       })
@@ -28,8 +28,8 @@ export default function base64ToBlob(
   if (!parts || parts.length !== 3) {
     logger.error(`${
       JSON.stringify({
-        assistantId: ids?.assistantId,
-        threadId: ids?.threadId,
+        assistantId: assistantIds?.assistantId,
+        threadId: assistantIds?.threadId,
         context: context,
         error: `${context} Base64 string is not properly formatted: ${base64}`,
       })
