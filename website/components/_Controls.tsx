@@ -77,7 +77,7 @@ const snippet = (live: Live) => {
         encodeURIComponent(window.LIVE.page.pathTemplate || "/*"),
       );
 
-      if (event.ctrlKey && event.key === ".") {
+      if ((event.ctrlKey || event.metaKey) && event.key === ".") {
         window.open(href, "_blank");
         return;
       }
