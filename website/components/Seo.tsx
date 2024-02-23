@@ -3,6 +3,9 @@ import type { ImageWidget } from "../../admin/widgets.ts";
 import { stripHTML } from "../utils/html.ts";
 import { JSX } from "preact";
 
+/**
+ * @widget select
+ */
 export type SEOSection = JSX.Element;
 
 export type OGType = "website" | "article";
