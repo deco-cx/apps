@@ -1,3 +1,4 @@
+import AWS from "https://esm.sh/aws-sdk";
 import { asResolved, isDeferred } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import type { App, AppContext as AC } from "deco/mod.ts";
@@ -10,6 +11,7 @@ import openai, {
 } from "../openai/mod.ts";
 import { Assistant } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { Secret } from "../website/loaders/secret.ts";
 
 export type GPTModel =
   | "gpt-4-0613"
@@ -104,6 +106,13 @@ export interface Prompt {
   context: string;
 }
 
+export interface AssistantAwsProps {
+  assistantBucketRegion: Secret;
+  accessKeyId: Secret;
+  secretAccessKey: Secret;
+  assistantBucketName: Secret;
+}
+
 export interface Props extends OpenAIProps {
   /**
    * @description the assistant Id
@@ -114,12 +123,16 @@ export interface Props extends OpenAIProps {
    */
   instructions?: string;
   assistants?: AIAssistant[];
+  assistantAwsProps?: AssistantAwsProps;
+  s3?: AWS.S3;
 }
 
 export interface State extends OpenAIState {
   instructions?: string;
   assistant: Promise<Assistant>;
   assistants: Record<string, Promise<AIAssistant>>;
+  assistantAwsProps?: AssistantAwsProps;
+  s3?: AWS.S3;
 }
 /**
  * @title AI Assistants Hub
@@ -156,6 +169,12 @@ export default function App(
       assistant: assistantsAPI.retrieve(
         state.assistantId,
       ),
+      s3: new AWS.S3({
+        region: state.assistantAwsProps?.assistantBucketRegion.get?.() ?? Deno.env.get("ASSISTANT_BUCKET_REGION"),
+        accessKeyId: state.assistantAwsProps?.accessKeyId.get?.() ?? Deno.env.get("AWS_ACCESS_KEY_ID"),
+        secretAccessKey: state.assistantAwsProps?.secretAccessKey.get?.() ?? Deno.env.get("AWS_SECRET_ACCESS_KEY"),
+      }),
+      assistantAwsProps: state.assistantAwsProps,
     },
     dependencies: [openAIApp],
   };
