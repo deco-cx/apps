@@ -26,6 +26,9 @@ const stats = {
   }),
 };
 
+// Max length of instructions. The maximum context of the assistant is 32K chars. We use 25K for instructions to be safe.
+const MAX_INSTRUCTIONS_LENGTH = 25000;
+
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
 
 const toolsCache = new weakcache.WeakLRUCache({
@@ -201,7 +204,7 @@ export const messageProcessorFor = async (
         ? assistant.model.custom
         : assistant.model,
       assistant_id: assistantId,
-      instructions: instructions.slice(0, 25000),
+      instructions: instructions.slice(0, MAX_INSTRUCTIONS_LENGTH),
       tools,
     });
 
