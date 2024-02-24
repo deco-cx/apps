@@ -1,9 +1,18 @@
 import { logger } from "deco/observability/otel/config.ts";
+import { meter } from "deco/observability/otel/metrics.ts";
 import base64ToBlob from "../utils/blobConversion.ts";
 import { AssistantIds } from "../types.ts";
+import { ValueType } from "deco/deps.ts";
 import { AppContext } from "../mod.ts";
 
 const URL_EXPIRATION_SECONDS = 2 * 60 * 60; // 2 hours
+
+const stats = {
+  awsUploadImageError: meter.createCounter("assistant_aws_upload_error", {
+    unit: "1",
+    valueType: ValueType.INT,
+  }),
+};
 
 export interface AWSUploadImageProps {
   file: string | ArrayBuffer | null;
@@ -41,6 +50,8 @@ export default async function awsUploadImage(
   _req: Request,
   ctx: AppContext,
 ) {
+  const assistantId = awsUploadImageProps.assistantIds?.assistantId;
+  const threadId = awsUploadImageProps.assistantIds?.threadId;
   const blobData = base64ToBlob(
     awsUploadImageProps.file,
     "image",
@@ -50,21 +61,15 @@ export default async function awsUploadImage(
   const uploadResponse = await uploadFileToS3(uploadURL, blobData);
 
   if (!uploadResponse.ok) {
-    logger.error(`${
-      JSON.stringify({
-        assistantId: awsUploadImageProps.assistantIds?.assistantId,
-        threadId: awsUploadImageProps.assistantIds?.threadId,
-        context: "awsUploadImage",
-        error: `Failed to upload file: ${uploadResponse.statusText}`,
-      })
-    }`);
+    stats.awsUploadImageError.add(1, {
+      assistantId,
+    });
     throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
   }
   logger.info({
-    assistantId: awsUploadImageProps.assistantIds?.assistantId,
-    threadId: awsUploadImageProps.assistantIds?.threadId,
+    assistantId: assistantId,
+    threadId: threadId,
     context: "awsUploadImage",
-    subcontext: "uploadResponse",
     response: JSON.stringify(uploadResponse),
     uploadUrl: uploadURL,
   });
