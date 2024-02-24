@@ -12,10 +12,13 @@ const stats = {
     unit: "s",
     valueType: ValueType.DOUBLE,
   }),
-  transcribeAudioError: meter.createCounter("assistant_transcribe_audio_error", {
-    unit: "1",
-    valueType: ValueType.INT,
-  }),
+  transcribeAudioError: meter.createCounter(
+    "assistant_transcribe_audio_error",
+    {
+      unit: "1",
+      valueType: ValueType.INT,
+    },
+  ),
 };
 const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 
