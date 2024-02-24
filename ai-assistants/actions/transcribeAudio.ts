@@ -12,6 +12,10 @@ const stats = {
     unit: "s",
     valueType: ValueType.DOUBLE,
   }),
+  transcribeAudioError: meter.createCounter("assistant_transcribe_audio_error", {
+    unit: "1",
+    valueType: ValueType.INT,
+  }),
 };
 const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 
@@ -24,15 +28,12 @@ export interface TranscribeAudioProps {
 export default async function transcribeAudio(
   transcribeAudioProps: TranscribeAudioProps,
 ) {
+  const assistantId = transcribeAudioProps.assistantIds?.assistantId;
+  const threadId = transcribeAudioProps.assistantIds?.threadId;
   if (!transcribeAudioProps.file) {
-    logger.error(`${
-      JSON.stringify({
-        assistantId: transcribeAudioProps.assistantIds?.assistantId,
-        threadId: transcribeAudioProps.assistantIds?.threadId,
-        context: "transcribeAudio",
-        error: "Audio file is empty",
-      })
-    }`);
+    stats.transcribeAudioError.add(1, {
+      assistantId,
+    });
     throw new Error("Audio file is empty");
   }
 
@@ -44,15 +45,15 @@ export default async function transcribeAudio(
   const file = new File([blobData], "input.wav", { type: "audio/wav" });
 
   stats.audioSize.record(transcribeAudioProps.audioDuration, {
-    assistant_id: transcribeAudioProps.assistantIds?.assistantId,
+    assistant_id: assistantId,
   });
   const response = await openai.audio.transcriptions.create({
     model: "whisper-1",
     file: file,
   });
   logger.info({
-    assistantId: transcribeAudioProps.assistantIds?.assistantId,
-    threadId: transcribeAudioProps.assistantIds?.threadId,
+    assistantId: assistantId,
+    threadId: threadId,
     context: "transcribeAudio",
     subcontext: "response",
     response: JSON.stringify(response),
