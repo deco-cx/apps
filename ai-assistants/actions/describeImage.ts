@@ -26,6 +26,7 @@ export interface DescribeImageProps {
   assistantIds?: AssistantIds;
 }
 
+// TODO(@ItamarRocha): Refactor to use https://github.com/deco-cx/apps/blob/main/openai/loaders/vision.ts
 export default async function describeImage(
   describeImageProps: DescribeImageProps,
   _req: Request,
