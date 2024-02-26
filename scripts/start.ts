@@ -224,7 +224,7 @@ const generateGraphQL = async () => {
     const config: CodegenConfig = {
       silent: true,
       schema: join(Deno.cwd(), path),
-      documents: [`**/*.ts`],
+      documents: [`./queries.ts`],
       generates: {
         [outfile]: {
           // This order matters

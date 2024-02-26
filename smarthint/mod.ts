@@ -10,6 +10,7 @@ export type AppMiddlewareContext = AMC<ReturnType<typeof App>>;
 export interface Props {
     token: string;
     shcode: string;
+    isServeSide?: boolean;
 };
 
 export interface State extends Props {

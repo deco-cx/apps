@@ -1,13 +1,61 @@
 import { Head } from "$fresh/runtime.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { AppContext } from "../mod.ts"
 
-export interface Cookie {
-  name: string;
-  value: unknown;
-  path: string;
+export type PageType = "category" |
+   "search" |
+    "searchWithResult" |
+    "home" |
+    "cart" |
+    "emptycart" |
+    "checkout" |
+    "notfound" |
+    "product" |
+    "other"
+
+export interface Page {
+  /** 
+   * @format dynamic-options 
+   * @options website/loaders/options/routes.ts
+  */
+  page: string, 
+  pageType: PageType 
 }
 
-const tracking = () => {
+export interface Props {
+  pages: Page[]
+  
+};
+interface Cookie {
+ name: string;
+ value: unknown;
+ path: string;
+}
+
+export const loader = (props: Props, req: Request, ctx: AppContext) => {
+  return { shcode: ctx.shcode, ...props}
+}
+
+const tracking = (props: ReturnType<typeof loader>) => {
+  function diffInSeconds(timestamp: number): string {
+    // Obtém o timestamp atual em milissegundos
+    const currentTimestamp = new Date().getTime();
+    
+    // Calcula a diferença entre os timestamps em milissegundos
+    const differenceInMillis = currentTimestamp - timestamp;
+    
+    // Converte a diferença de milissegundos para segundos
+    const differenceInSeconds = Math.floor(differenceInMillis / 1000);
+    
+    return differenceInSeconds.toString();
+  }
+
+  const getData = () => {
+    const dataWithComma = new Date().toLocaleString("pt-BR");
+    const data = dataWithComma.replace(",", "")
+    return data
+  }
+
   function parse(cookieString: string): Record<string, string> {
     const cookies: Record<string, string> = {};
     const cookiePairs = cookieString.split(";");
@@ -28,7 +76,8 @@ const tracking = () => {
     type:
       | "smarthint_anonymous_consumer"
       | "smarthint_session"
-      | "smarthint_timestamp",
+      | "smarthint_timestamp"
+      | "smarthint_origin",
   ): string | undefined => {
     const cookies = parse(document.cookie);
     const cookie = cookies[type];
@@ -40,7 +89,8 @@ const tracking = () => {
     type:
       | "smarthint_anonymous_consumer"
       | "smarthint_session"
-      | "smarthint_timestamp",
+      | "smarthint_timestamp"
+      | "smarthint_origin",
   ) => {
     setCookie({
       value: segment,
@@ -108,13 +158,43 @@ const tracking = () => {
       setSegmentCookie(timestamp.toString(), "smarthint_timestamp");
     }
   };
+
+  const pageView = async ({shcode, pages}: ReturnType<typeof loader>) => {
+    const smarthint_anonymous_consumer = getSegmentFromCookie("smarthint_anonymous_consumer") as string
+    const smarthint_session = getSegmentFromCookie("smarthint_session") as string
+    const smarthint_timestamp = getSegmentFromCookie("smarthint_timestamp")
+    const smarthint_origin = getSegmentFromCookie("smarthint_origin")
+
+    const page = pages.find(({page}) => new URLPattern({ pathname: page}).test(window.location.href) )
+
+    const apiEndpoint = `https://recs.smarthint.co/track/pageView?anonymousConsumer=${encodeURIComponent(smarthint_anonymous_consumer)}&session=${encodeURIComponent(smarthint_session)}&shcode=${encodeURIComponent(shcode)}&url=${encodeURIComponent(window.location.href)}&date=${encodeURIComponent(getData())}&pageType=${encodeURIComponent(page?.pageType ?? "other")}&elapsedTime=${encodeURIComponent(diffInSeconds(Number(smarthint_timestamp)))}&origin=${encodeURIComponent(smarthint_origin ?? window.location.href)}`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+
+try {
+  await fetch(apiEndpoint, requestOptions);
+
+} catch (error) {
+  console.error("Error sending request:", error);
+}
+
+    setSegmentCookie(window.location.href, "smarthint_origin")
+  }
+
   verifyCookies();
+  console.log(props)
+  pageView(props)
 };
 
-export default function () {
+export default function (props: ReturnType<typeof loader>) {
   return (
     <Head>
-      <script src={scriptAsDataURI(tracking)} defer type="text/javascript" />
+      <script src={scriptAsDataURI(tracking, props)} defer type="text/javascript" />
     </Head>
   );
 }

@@ -2,15 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/productList.ts";
-import * as $$$$$$0 from "./sections/smartHintTracking.tsx";
+import * as $$$$$$0 from "./sections/pageView.tsx";
+import * as $$$$$$1 from "./sections/smartHintTracking.tsx";
 
 const manifest = {
-  "loaders": {
-    "smarthint/loaders/productList.ts": $$$0,
-  },
   "sections": {
-    "smarthint/sections/smartHintTracking.tsx": $$$$$$0,
+    "smarthint/sections/pageView.tsx": $$$$$$0,
+    "smarthint/sections/smartHintTracking.tsx": $$$$$$1,
   },
   "name": "smarthint",
   "baseUrl": import.meta.url,
