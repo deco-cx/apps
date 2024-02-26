@@ -1185,16 +1185,16 @@ export interface ProductRating {
 }
 
 export interface ProductReview {
-  id?: string;
-  productId?: string;
-  rating?: number;
-  title?: string;
-  text?: string;
-  reviewerName?: string;
-  shopperId?: string;
-  reviewDateTime?: string;
-  searchDate?: string;
-  verifiedPurchaser?: boolean;
+  id?: string | undefined;
+  productId?: string | undefined;
+  rating?: number | undefined;
+  title?: string | undefined;
+  text?: string | undefined;
+  reviewerName?: string | undefined;
+  shopperId?: string | undefined;
+  reviewDateTime?: string | undefined;
+  searchDate?: string | undefined;
+  verifiedPurchaser?: boolean | undefined;
   sku?: string | null;
   approved?: boolean;
   location?: string | null;
@@ -1209,6 +1209,6 @@ export interface ProductReviewRange {
 }
 
 export interface ProductReviewData {
-  data?: ProductReview[];
+  data?: ProductReview[] | undefined;
   range?: ProductReviewRange;
 }

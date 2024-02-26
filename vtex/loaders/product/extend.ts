@@ -3,6 +3,7 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { toReview } from "../../utils/transform.ts";
 import listLoader from "../legacy/productList.ts";
 
 export interface Props {
@@ -107,43 +108,8 @@ const reviewsExt = async (
   const ratings = await Promise.all(ratingPromises);
   const reviews = await Promise.all(reviewPromises);
 
-  const reviewCount = ratings.reduce(
-    (acc, curr) => acc + (curr.totalCount || 0),
-    0,
-  );
+  return toReview(products, ratings, reviews);
 
-  return products.map((p, index) => {
-    const productReviews = reviews[index]?.data || [];
-    const productReviewIndexes = productReviews.map((_, reviewIndex) =>
-      reviewIndex
-    );
-
-    return {
-      ...p,
-      aggregateRating: {
-        "@type": "AggregateRating",
-        reviewCount,
-        ratingValue: ratings[index]?.average || 0,
-      },
-      review: productReviewIndexes.map((reviewIndex) => ({
-        "@type": "Review",
-        id: productReviews[reviewIndex]?.id?.toString(),
-        author: [{
-          "@type": "Author",
-          name: productReviews[reviewIndex]?.reviewerName,
-          verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
-        }],
-        itemReviewed: productReviews[reviewIndex]?.productId,
-        datePublished: productReviews[reviewIndex]?.reviewDateTime,
-        reviewHeadline: productReviews[reviewIndex]?.title,
-        reviewBody: productReviews[reviewIndex]?.text,
-        reviewRating: {
-          "@type": "AggregateRating",
-          ratingValue: productReviews[reviewIndex]?.rating || 0,
-        },
-      })),
-    };
-  });
 };
 
 export default async (

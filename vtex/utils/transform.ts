@@ -30,6 +30,8 @@ import type {
   SelectedFacet,
   Seller as SellerVTEX,
   Teasers,
+  ProductRating,
+  ProductReviewData,
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";
@@ -886,3 +888,44 @@ export const normalizeFacet = (facet: LegacyFacet) => {
     Value: facet.Slug!,
   };
 };
+
+export const toReview = (products: Product[], ratings: ProductRating[], reviews: ProductReviewData[]) => {
+  
+  return products.map((p, index) => {
+    const reviewCount = ratings.reduce(
+      (acc, curr) => acc + (curr.totalCount || 0),
+      0,
+    );
+
+    const productReviews = reviews[index]?.data || [];
+    const productReviewIndexes = productReviews.map((_, reviewIndex) =>
+      reviewIndex
+    );
+
+    return {
+      ...p,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        reviewCount,
+        ratingValue: ratings[index]?.average || 0,
+      },
+      review: productReviewIndexes.map((reviewIndex) => ({
+        "@type": "Review",
+        id: productReviews[reviewIndex]?.id?.toString(),
+        author: [{
+          "@type": "Author",
+          name: productReviews[reviewIndex]?.reviewerName,
+          verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
+        }],
+        itemReviewed: productReviews[reviewIndex]?.productId,
+        datePublished: productReviews[reviewIndex]?.reviewDateTime,
+        reviewHeadline: productReviews[reviewIndex]?.title,
+        reviewBody: productReviews[reviewIndex]?.text,
+        reviewRating: {
+          "@type": "AggregateRating",
+          ratingValue: productReviews[reviewIndex]?.rating || 0,
+        },
+      })),
+    };
+  });
+}

@@ -43,14 +43,12 @@ function processTypeInNestedObject(obj: any) {
 for await (const entry of walk(".")) {
   if (entry.isFile) {
     if (
-      entry.path.endsWith(OPENAPI_EXTENSION) &&
-      (entry.path === "vtex\\utils\\openapi\\my.openapi.json")
+      entry.path.endsWith(OPENAPI_EXTENSION)
     ) {
       allOpenAPIPaths.push(entry.path);
     }
     if (
-      entry.path.endsWith(GRAPHQL_EXTENSION) &&
-      (entry.path === "vtex\\utils\\openapi\\my.openapi.json")
+      entry.path.endsWith(GRAPHQL_EXTENSION)
     ) {
       allGraphqlPaths.push(entry.path);
     }
