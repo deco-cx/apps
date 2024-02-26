@@ -3,6 +3,7 @@ import { meter } from "deco/observability/otel/metrics.ts";
 import { AssistantIds } from "../types.ts";
 import { ValueType } from "deco/deps.ts";
 import { AppContext } from "../mod.ts";
+import { shortcircuit } from "deco/engine/errors.ts";
 
 const stats = {
   promptTokens: meter.createHistogram("assistant_image_prompt_tokens", {
@@ -84,9 +85,11 @@ export default async function describeImage(
     stats.describeImageError.add(1, {
       assistantId,
     });
-    return new Response(JSON.stringify({ error: error.error.message }), {
-      status: error.status,
-      headers: error.headers,
-    });
+    shortcircuit(
+      new Response(JSON.stringify({ error: error.error.message }), {
+        status: error.status,
+        headers: error.headers,
+      }),
+    );
   }
 }
