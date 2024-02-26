@@ -13,6 +13,7 @@ import { SP, VTEXCommerceStable } from "./utils/client.ts";
 import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
+import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 
@@ -110,6 +111,10 @@ export default function VTEX({
     base: `https://sp.vtex.com`,
     fetcher: fetchSafe,
   });
+  const my = createHttpClient<MY>({
+    base: `https://${account}.myvtex.com/`,
+    fetcher: fetchSafe,
+  });
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
     base: `https://${account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
@@ -139,6 +144,7 @@ export default function VTEX({
     sp,
     io,
     vcs,
+    my,
     api,
   };
 

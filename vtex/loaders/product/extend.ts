@@ -10,6 +10,7 @@ export interface Props {
   similars?: boolean;
   kitItems?: boolean;
   variants?: boolean;
+  reviews?: boolean;
 
   products: Product[];
 }
@@ -87,6 +88,60 @@ const variantsExt = async (
   }));
 };
 
+const reviewsExt = async (
+  products: Product[],
+  ctx: AppContext,
+): Promise<Product[]> => {
+
+  const reviewPromises = products.map((product) =>
+  ctx.my["GET /reviews-and-ratings/api/reviews"]({
+    productId: product.productID,
+  }).then((res) => res.json())
+);
+
+  const ratingPromises = products.map((product) =>
+    ctx.my["GET /reviews-and-ratings/api/rating/:inProductGroupWithId"]({
+      inProductGroupWithId: product.inProductGroupWithID ?? '',
+    }).then((res) => res.json())
+  );
+
+  const ratings = await Promise.all(ratingPromises);
+  const reviews = await Promise.all(reviewPromises);
+
+  const reviewCount = ratings.reduce((acc, curr) => acc + (curr.totalCount || 0), 0);
+
+  return products.map((p, index) => {
+    const productReviews = reviews[index]?.data || [];
+    const productReviewIndexes = productReviews.map((_, reviewIndex) => reviewIndex);
+
+    return {
+      ...p,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        reviewCount,
+        ratingValue: ratings[index]?.average || 0
+      },
+      review: productReviewIndexes.map((reviewIndex) => ({
+        "@type": "Review",
+        id: productReviews[reviewIndex]?.id?.toString(),
+        author: [{
+          "@type": "Author",
+          name: productReviews[reviewIndex]?.reviewerName,
+          verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
+        }],
+        itemReviewed: productReviews[reviewIndex]?.productId,
+        datePublished: productReviews[reviewIndex]?.reviewDateTime,
+        reviewHeadline: productReviews[reviewIndex]?.title,
+        reviewBody: productReviews[reviewIndex]?.text,
+        reviewRating: {
+          "@type": "AggregateRating",
+          ratingValue: productReviews[reviewIndex]?.rating || 0
+        }
+      }))
+    };
+  });
+};
+
 export default async (
   {
     products,
@@ -94,6 +149,7 @@ export default async (
     kitItems,
     similars,
     simulate,
+    reviews
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -114,6 +170,10 @@ export default async (
 
   if (simulate) {
     p = await simulateExt(p, ctx);
+  }
+
+  if (reviews) {
+    p = await reviewsExt(p, ctx)
   }
 
   return p;

@@ -42,10 +42,10 @@ function processTypeInNestedObject(obj: any) {
 
 for await (const entry of walk(".")) {
   if (entry.isFile) {
-    if (entry.path.endsWith(OPENAPI_EXTENSION)) {
+    if (entry.path.endsWith(OPENAPI_EXTENSION) && (entry.path === "vtex\\utils\\openapi\\my.openapi.json")) {
       allOpenAPIPaths.push(entry.path);
     }
-    if (entry.path.endsWith(GRAPHQL_EXTENSION)) {
+    if (entry.path.endsWith(GRAPHQL_EXTENSION) && (entry.path === "vtex\\utils\\openapi\\my.openapi.json")) {
       allGraphqlPaths.push(entry.path);
     }
   }
@@ -118,6 +118,7 @@ const generateOpenAPI = async () => {
       required: [],
     };
 
+
     for (const [path, pathItem] of Object.entries(document.paths)) {
       const pathTemplate = toPathTemplate(path);
 
@@ -127,6 +128,7 @@ const generateOpenAPI = async () => {
         if (!item) {
           continue;
         }
+
         const {
           parameters = [],
           requestBody,
@@ -189,7 +191,7 @@ const generateOpenAPI = async () => {
           schema.required?.push("response");
           schema.properties!["response"] = processTypeInNestedObject(response);
         }
-
+        
         const type = `${verb.toUpperCase()} ${pathTemplate}`;
         finalSchema.required?.push(type);
         finalSchema.properties![type] = schema;
