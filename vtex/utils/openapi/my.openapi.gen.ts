@@ -24,7 +24,7 @@ totalCount?: number
 "GET /reviews-and-ratings/api/reviews": {
 response: {
 data?: {
-id?: number
+id?: string
 cacheId?: number
 productId?: string
 rating?: number

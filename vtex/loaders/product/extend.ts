@@ -105,11 +105,15 @@ const reviewsExt = async (
     }).then((res) => res.json())
   );
 
-  const ratings = await Promise.all(ratingPromises);
-  const reviews = await Promise.all(reviewPromises);
+  const reviewsPromise = Promise.all(reviewPromises);
+  const ratingsPromise = Promise.all(ratingPromises);
+
+  const [reviews, ratings] = await Promise.all([
+    reviewsPromise,
+    ratingsPromise,
+  ]);
 
   return toReview(products, ratings, reviews);
-
 };
 
 export default async (

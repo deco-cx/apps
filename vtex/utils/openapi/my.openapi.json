@@ -273,8 +273,8 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "string",
+                            "example": "1"
                           },
                           "cacheId": {
                             "type": "integer",

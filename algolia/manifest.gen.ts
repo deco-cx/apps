@@ -2,13 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/index/product.ts";
+import * as $$$$$$$$$1 from "./actions/index/wait.ts";
+import * as $$$$$$$$$2 from "./actions/setup.ts";
 import * as $$$0 from "./loaders/product/list.ts";
 import * as $$$1 from "./loaders/product/listingPage.ts";
 import * as $$$2 from "./loaders/product/suggestions.ts";
 import * as $$$$$$0 from "./sections/Analytics/Algolia.tsx";
-import * as $$$$$$$$$0 from "./actions/index/product.ts";
-import * as $$$$$$$$$1 from "./actions/index/wait.ts";
-import * as $$$$$$$$$2 from "./actions/setup.ts";
 import * as $$$$$$$$$$0 from "./workflows/index/product.ts";
 
 const manifest = {

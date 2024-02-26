@@ -2,17 +2,6 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/productDetailsPage.ts";
-import * as $$$2 from "./loaders/productList.ts";
-import * as $$$3 from "./loaders/productListingPage.ts";
-import * as $$$4 from "./loaders/proxy.ts";
-import * as $$$5 from "./loaders/recommendations.ts";
-import * as $$$6 from "./loaders/shop.ts";
-import * as $$$7 from "./loaders/suggestion.ts";
-import * as $$$8 from "./loaders/user.ts";
-import * as $$$9 from "./loaders/wishlist.ts";
-import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$$$$$$$0 from "./actions/cart/addCoupon.ts";
 import * as $$$$$$$$$1 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
@@ -25,6 +14,17 @@ import * as $$$$$$$$$8 from "./actions/shippingSimulation.ts";
 import * as $$$$$$$$$9 from "./actions/submmitForm.ts";
 import * as $$$$$$$$$10 from "./actions/wishlist/addProduct.ts";
 import * as $$$$$$$$$11 from "./actions/wishlist/removeProduct.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
+import * as $$$0 from "./loaders/cart.ts";
+import * as $$$1 from "./loaders/productDetailsPage.ts";
+import * as $$$2 from "./loaders/productList.ts";
+import * as $$$3 from "./loaders/productListingPage.ts";
+import * as $$$4 from "./loaders/proxy.ts";
+import * as $$$5 from "./loaders/recommendations.ts";
+import * as $$$6 from "./loaders/shop.ts";
+import * as $$$7 from "./loaders/suggestion.ts";
+import * as $$$8 from "./loaders/user.ts";
+import * as $$$9 from "./loaders/wishlist.ts";
 
 const manifest = {
   "loaders": {

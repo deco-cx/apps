@@ -27,11 +27,11 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   Product as ProductVTEX,
+  ProductRating,
+  ProductReviewData,
   SelectedFacet,
   Seller as SellerVTEX,
   Teasers,
-  ProductRating,
-  ProductReviewData,
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";
@@ -889,18 +889,18 @@ export const normalizeFacet = (facet: LegacyFacet) => {
   };
 };
 
-export const toReview = (products: Product[], ratings: ProductRating[], reviews: ProductReviewData[]) => {
-  
+export const toReview = (
+  products: Product[],
+  ratings: ProductRating[],
+  reviews: ProductReviewData[],
+): Product[] => {
   return products.map((p, index) => {
     const reviewCount = ratings.reduce(
       (acc, curr) => acc + (curr.totalCount || 0),
       0,
     );
 
-    const productReviews = reviews[index]?.data || [];
-    const productReviewIndexes = productReviews.map((_, reviewIndex) =>
-      reviewIndex
-    );
+    const productReviews = reviews[index].data || [];
 
     return {
       ...p,
@@ -909,7 +909,7 @@ export const toReview = (products: Product[], ratings: ProductRating[], reviews:
         reviewCount,
         ratingValue: ratings[index]?.average || 0,
       },
-      review: productReviewIndexes.map((reviewIndex) => ({
+      review: productReviews.map((_, reviewIndex) => ({
         "@type": "Review",
         id: productReviews[reviewIndex]?.id?.toString(),
         author: [{
@@ -928,4 +928,4 @@ export const toReview = (products: Product[], ratings: ProductRating[], reviews:
       })),
     };
   });
-}
+};

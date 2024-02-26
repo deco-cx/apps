@@ -2,6 +2,27 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
+import * as $$$$$$$$$1 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$2 from "./actions/cart/getInstallment.ts";
+import * as $$$$$$$$$3 from "./actions/cart/removeItemAttachment.ts";
+import * as $$$$$$$$$4 from "./actions/cart/removeItems.ts";
+import * as $$$$$$$$$5 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$6 from "./actions/cart/updateAttachment.ts";
+import * as $$$$$$$$$7 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$8 from "./actions/cart/updateGifts.ts";
+import * as $$$$$$$$$9 from "./actions/cart/updateItemAttachment.ts";
+import * as $$$$$$$$$10 from "./actions/cart/updateItemPrice.ts";
+import * as $$$$$$$$$11 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$12 from "./actions/cart/updateProfile.ts";
+import * as $$$$$$$$$13 from "./actions/cart/updateUser.ts";
+import * as $$$$$$$$$14 from "./actions/masterdata/createDocument.ts";
+import * as $$$$$$$$$15 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$16 from "./actions/notifyme.ts";
+import * as $$$$$$$$$17 from "./actions/trigger.ts";
+import * as $$$$$$$$$18 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$19 from "./actions/wishlist/removeItem.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/categories/tree.ts";
 import * as $$$2 from "./loaders/collections/list.ts";
@@ -31,27 +52,6 @@ import * as $$$25 from "./loaders/user.ts";
 import * as $$$26 from "./loaders/wishlist.ts";
 import * as $$$27 from "./loaders/workflow/product.ts";
 import * as $$$28 from "./loaders/workflow/products.ts";
-import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
-import * as $$$$$$$$$1 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$2 from "./actions/cart/getInstallment.ts";
-import * as $$$$$$$$$3 from "./actions/cart/removeItemAttachment.ts";
-import * as $$$$$$$$$4 from "./actions/cart/removeItems.ts";
-import * as $$$$$$$$$5 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$6 from "./actions/cart/updateAttachment.ts";
-import * as $$$$$$$$$7 from "./actions/cart/updateCoupons.ts";
-import * as $$$$$$$$$8 from "./actions/cart/updateGifts.ts";
-import * as $$$$$$$$$9 from "./actions/cart/updateItemAttachment.ts";
-import * as $$$$$$$$$10 from "./actions/cart/updateItemPrice.ts";
-import * as $$$$$$$$$11 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$12 from "./actions/cart/updateProfile.ts";
-import * as $$$$$$$$$13 from "./actions/cart/updateUser.ts";
-import * as $$$$$$$$$14 from "./actions/masterdata/createDocument.ts";
-import * as $$$$$$$$$15 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$16 from "./actions/notifyme.ts";
-import * as $$$$$$$$$17 from "./actions/trigger.ts";
-import * as $$$$$$$$$18 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$19 from "./actions/wishlist/removeItem.ts";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
 

@@ -2,18 +2,6 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/assistants/code.ts";
-import * as $$$1 from "./loaders/blocks/get.ts";
-import * as $$$2 from "./loaders/blocks/latest.ts";
-import * as $$$3 from "./loaders/blocks/listRevisions.ts";
-import * as $$$4 from "./loaders/blocks/published.ts";
-import * as $$$5 from "./loaders/blocks/revision.ts";
-import * as $$$6 from "./loaders/deploy.ts";
-import * as $$$7 from "./loaders/pages/list.ts";
-import * as $$$8 from "./loaders/platforms/forSite.ts";
-import * as $$$9 from "./loaders/releases/blocks.ts";
-import * as $$$10 from "./loaders/releases/get.ts";
-import * as $$$11 from "./loaders/state.ts";
 import * as $$$$$$$$$0 from "./actions/blocks/delete.ts";
 import * as $$$$$$$$$1 from "./actions/blocks/newRevision.ts";
 import * as $$$$$$$$$2 from "./actions/blocks/publish.ts";
@@ -33,6 +21,18 @@ import * as $$$$$$$$$15 from "./actions/sites/create.ts";
 import * as $$$$$$$$$16 from "./actions/sites/linkRepo.ts";
 import * as $$$$$$$$$17 from "./actions/sites/newDomain.ts";
 import * as $$$$$$$$$18 from "./actions/sites/unlinkRepo.ts";
+import * as $$$0 from "./loaders/assistants/code.ts";
+import * as $$$1 from "./loaders/blocks/get.ts";
+import * as $$$2 from "./loaders/blocks/latest.ts";
+import * as $$$3 from "./loaders/blocks/listRevisions.ts";
+import * as $$$4 from "./loaders/blocks/published.ts";
+import * as $$$5 from "./loaders/blocks/revision.ts";
+import * as $$$6 from "./loaders/deploy.ts";
+import * as $$$7 from "./loaders/pages/list.ts";
+import * as $$$8 from "./loaders/platforms/forSite.ts";
+import * as $$$9 from "./loaders/releases/blocks.ts";
+import * as $$$10 from "./loaders/releases/get.ts";
+import * as $$$11 from "./loaders/state.ts";
 
 const manifest = {
   "loaders": {
