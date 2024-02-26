@@ -32,9 +32,10 @@ export const handleChange = async (
       : noop,
   );
   try {
-    const platform = await loaders.platforms.forSite({ site }).then(p => p).catch(_err => {
-      return null
-    });
+    const platform = await loaders.platforms.forSite({ site }).then((p) => p)
+      .catch((_err) => {
+        return null;
+      });
     if (platform === null) {
       return;
     }

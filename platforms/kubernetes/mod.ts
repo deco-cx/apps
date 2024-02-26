@@ -1,5 +1,5 @@
 import { context } from "deco/live.ts";
-import type { AppContext as AC, App, ManifestOf } from "deco/mod.ts";
+import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
 import { Secret } from "../../website/loaders/secret.ts";
 import { k8s } from "./deps.ts";
 import { SiteState } from "./loaders/siteState/get.ts";

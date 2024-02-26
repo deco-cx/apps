@@ -92,34 +92,38 @@ const reviewsExt = async (
   products: Product[],
   ctx: AppContext,
 ): Promise<Product[]> => {
-
   const reviewPromises = products.map((product) =>
-  ctx.my["GET /reviews-and-ratings/api/reviews"]({
-    productId: product.productID,
-  }).then((res) => res.json())
-);
+    ctx.my["GET /reviews-and-ratings/api/reviews"]({
+      productId: product.productID,
+    }).then((res) => res.json())
+  );
 
   const ratingPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/rating/:inProductGroupWithId"]({
-      inProductGroupWithId: product.inProductGroupWithID ?? '',
+      inProductGroupWithId: product.inProductGroupWithID ?? "",
     }).then((res) => res.json())
   );
 
   const ratings = await Promise.all(ratingPromises);
   const reviews = await Promise.all(reviewPromises);
 
-  const reviewCount = ratings.reduce((acc, curr) => acc + (curr.totalCount || 0), 0);
+  const reviewCount = ratings.reduce(
+    (acc, curr) => acc + (curr.totalCount || 0),
+    0,
+  );
 
   return products.map((p, index) => {
     const productReviews = reviews[index]?.data || [];
-    const productReviewIndexes = productReviews.map((_, reviewIndex) => reviewIndex);
+    const productReviewIndexes = productReviews.map((_, reviewIndex) =>
+      reviewIndex
+    );
 
     return {
       ...p,
       aggregateRating: {
         "@type": "AggregateRating",
         reviewCount,
-        ratingValue: ratings[index]?.average || 0
+        ratingValue: ratings[index]?.average || 0,
       },
       review: productReviewIndexes.map((reviewIndex) => ({
         "@type": "Review",
@@ -135,9 +139,9 @@ const reviewsExt = async (
         reviewBody: productReviews[reviewIndex]?.text,
         reviewRating: {
           "@type": "AggregateRating",
-          ratingValue: productReviews[reviewIndex]?.rating || 0
-        }
-      }))
+          ratingValue: productReviews[reviewIndex]?.rating || 0,
+        },
+      })),
     };
   });
 };
@@ -149,7 +153,7 @@ export default async (
     kitItems,
     similars,
     simulate,
-    reviews
+    reviews,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -173,7 +177,7 @@ export default async (
   }
 
   if (reviews) {
-    p = await reviewsExt(p, ctx)
+    p = await reviewsExt(p, ctx);
   }
 
   return p;

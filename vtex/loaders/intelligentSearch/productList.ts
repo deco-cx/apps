@@ -98,8 +98,6 @@ const fromProps = ({ props }: Props) => {
     } as const;
   }
 
-  console.log("testandooo")
-
   if (isQueryList(props)) {
     return {
       query: props.query || "",

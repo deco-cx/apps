@@ -12,7 +12,6 @@ import {
   toAdditionalPropertyReferenceId,
   toAdditionalPropertySpecification,
 } from "../../utils/transform.ts";
-import { ProductRating, ProductReviewData } from "../../utils/types.ts";
 
 export type Props = {
   productID: string;
@@ -27,7 +26,7 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Product | null> => {
-  const { vcs, my } = ctx;
+  const { vcs } = ctx;
   const sc = 1;
 
   const sku = await vcs
@@ -55,17 +54,6 @@ const loader = async (
       }).then((res) => res.json())
     ),
   ]);
-
-  const productRating: any = await my
-    ["GET /reviews-and-ratings/api/rating/:productId"]({
-      productId: props.productID,
-    }).then((res) => res.json());
-
-
-    const productReviews: any = await my
-    ["GET /reviews-and-ratings/api/reviews"]({
-      productId: props.productID,
-    }).then((res) => res.json());
 
   const channel = salesChannels.find((c) => c.Id === sc);
 
@@ -204,10 +192,6 @@ const loader = async (
       name: sku.BrandName,
     },
     offers: aggregateOffers(offers, channel?.CurrencyCode),
-    productRatingAndReviews: {
-      productRating,
-      productReviews
-    }
   };
 };
 
