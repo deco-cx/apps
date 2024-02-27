@@ -27,6 +27,8 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   Product as ProductVTEX,
+  ProductRating,
+  ProductReviewData,
   SelectedFacet,
   Seller as SellerVTEX,
   Teasers,
@@ -885,4 +887,45 @@ export const normalizeFacet = (facet: LegacyFacet) => {
     Map: "priceFrom",
     Value: facet.Slug!,
   };
+};
+
+export const toReview = (
+  products: Product[],
+  ratings: ProductRating[],
+  reviews: ProductReviewData[],
+): Product[] => {
+  return products.map((p, index) => {
+    const reviewCount = ratings.reduce(
+      (acc, curr) => acc + (curr.totalCount || 0),
+      0,
+    );
+
+    const productReviews = reviews[index].data || [];
+
+    return {
+      ...p,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        reviewCount,
+        ratingValue: ratings[index]?.average || 0,
+      },
+      review: productReviews.map((_, reviewIndex) => ({
+        "@type": "Review",
+        id: productReviews[reviewIndex]?.id?.toString(),
+        author: [{
+          "@type": "Author",
+          name: productReviews[reviewIndex]?.reviewerName,
+          verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
+        }],
+        itemReviewed: productReviews[reviewIndex]?.productId,
+        datePublished: productReviews[reviewIndex]?.reviewDateTime,
+        reviewHeadline: productReviews[reviewIndex]?.title,
+        reviewBody: productReviews[reviewIndex]?.text,
+        reviewRating: {
+          "@type": "AggregateRating",
+          ratingValue: productReviews[reviewIndex]?.rating || 0,
+        },
+      })),
+    };
+  });
 };

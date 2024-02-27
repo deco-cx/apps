@@ -2,7 +2,20 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
+import * as $$$$$$$$0 from "./flags/audience.ts";
+import * as $$$$$$$$1 from "./flags/everyone.ts";
+import * as $$$$$$$$2 from "./flags/flag.ts";
+import * as $$$$$$$$3 from "./flags/multivariate.ts";
+import * as $$$$$$$$4 from "./flags/multivariate/message.ts";
+import * as $$$$$$$$5 from "./flags/multivariate/page.ts";
+import * as $$$$$$$$6 from "./flags/multivariate/section.ts";
 import * as $0 from "./functions/requestToParam.ts";
+import * as $$$$0 from "./handlers/fresh.ts";
+import * as $$$$1 from "./handlers/proxy.ts";
+import * as $$$$2 from "./handlers/redirect.ts";
+import * as $$$$3 from "./handlers/router.ts";
+import * as $$$$4 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/asset.ts";
 import * as $$$1 from "./loaders/extension.ts";
 import * as $$$2 from "./loaders/fonts/googleFonts.ts";
@@ -16,15 +29,6 @@ import * as $$$9 from "./loaders/redirects.ts";
 import * as $$$10 from "./loaders/redirectsFromCsv.ts";
 import * as $$$11 from "./loaders/secret.ts";
 import * as $$$12 from "./loaders/secretString.ts";
-import * as $$$$0 from "./handlers/fresh.ts";
-import * as $$$$1 from "./handlers/proxy.ts";
-import * as $$$$2 from "./handlers/redirect.ts";
-import * as $$$$3 from "./handlers/router.ts";
-import * as $$$$4 from "./handlers/sitemap.ts";
-import * as $$$$$0 from "./pages/Page.tsx";
-import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
-import * as $$$$$$1 from "./sections/Rendering/Deferred.tsx";
-import * as $$$$$$2 from "./sections/Seo/Seo.tsx";
 import * as $$$$$$$0 from "./matchers/always.ts";
 import * as $$$$$$$1 from "./matchers/cookie.ts";
 import * as $$$$$$$2 from "./matchers/cron.ts";
@@ -40,14 +44,10 @@ import * as $$$$$$$11 from "./matchers/queryString.ts";
 import * as $$$$$$$12 from "./matchers/random.ts";
 import * as $$$$$$$13 from "./matchers/site.ts";
 import * as $$$$$$$14 from "./matchers/userAgent.ts";
-import * as $$$$$$$$0 from "./flags/audience.ts";
-import * as $$$$$$$$1 from "./flags/everyone.ts";
-import * as $$$$$$$$2 from "./flags/flag.ts";
-import * as $$$$$$$$3 from "./flags/multivariate/message.ts";
-import * as $$$$$$$$4 from "./flags/multivariate/page.ts";
-import * as $$$$$$$$5 from "./flags/multivariate/section.ts";
-import * as $$$$$$$$6 from "./flags/multivariate.ts";
-import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
+import * as $$$$$0 from "./pages/Page.tsx";
+import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
+import * as $$$$$$1 from "./sections/Rendering/Deferred.tsx";
+import * as $$$$$$2 from "./sections/Seo/Seo.tsx";
 
 const manifest = {
   "functions": {
@@ -104,10 +104,10 @@ const manifest = {
     "website/flags/audience.ts": $$$$$$$$0,
     "website/flags/everyone.ts": $$$$$$$$1,
     "website/flags/flag.ts": $$$$$$$$2,
-    "website/flags/multivariate.ts": $$$$$$$$6,
-    "website/flags/multivariate/message.ts": $$$$$$$$3,
-    "website/flags/multivariate/page.ts": $$$$$$$$4,
-    "website/flags/multivariate/section.ts": $$$$$$$$5,
+    "website/flags/multivariate.ts": $$$$$$$$3,
+    "website/flags/multivariate/message.ts": $$$$$$$$4,
+    "website/flags/multivariate/page.ts": $$$$$$$$5,
+    "website/flags/multivariate/section.ts": $$$$$$$$6,
   },
   "actions": {
     "website/actions/secrets/encrypt.ts": $$$$$$$$$0,
