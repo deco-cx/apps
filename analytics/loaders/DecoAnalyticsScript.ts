@@ -19,7 +19,7 @@ declare global {
 
 const snippet = (flags: Record<string, string | boolean>) => {
   const trackPageview = () =>
-    globalThis.window.plausible("pageview", { props: flags });
+    globalThis.window.plausible?.("pageview", { props: flags });
 
   // First load
   trackPageview();

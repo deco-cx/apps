@@ -104,6 +104,9 @@ export interface GithubProps {
  * @options deco-sites/admin/loaders/sites/list.ts
  */
 export type SiteName = string;
+/**
+ * @title {{{site}}} - {{{platform}}}
+ */
 export interface PlatformAssignment {
   site: SiteName;
   platform: PlatformName;
@@ -112,8 +115,14 @@ export interface PlatformAssignment {
 export interface Props {
   resolvables?: Resolvables;
   github?: GithubProps;
-  kubernetes?: K8sProps;
-  subhosting?: SubhostingProps;
+  /**
+   * @default null
+   */
+  kubernetes?: K8sProps | null;
+  /**
+   * @default null
+   */
+  subhosting?: SubhostingProps | null;
   /** @description property used at deco admin  */
   workspaces: SignalStringified<Workspace>[];
   platformAssignments?: PlatformAssignment[];
