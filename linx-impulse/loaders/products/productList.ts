@@ -100,17 +100,16 @@ const normalize = (value: string) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
-/**
- * @title Page
- */
-type Props =
-  | HomePageProps
-  | ProductPageProps
-  | CategoryPageProps
-  | SearchPageProps;
+interface Props {
+  props:
+    | HomePageProps
+    | ProductPageProps
+    | CategoryPageProps
+    | SearchPageProps;
+}
 
 const generateParams = (
-  props: Props,
+  props: Props["props"],
   req: Request,
 ): { name: PageName } & Record<string, unknown> => {
   switch (props.page) {
@@ -180,7 +179,7 @@ const generateParams = (
  * @title Linx Impulse - Chaordic System
  */
 const loader = async (
-  props: Props,
+  { props }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
