@@ -14,6 +14,7 @@ import type {
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
+import { AppContext } from "../mod.ts";
 import { slugify } from "./slugify.ts";
 import type {
   Brand as BrandVTEX,
@@ -136,8 +137,9 @@ export const toProductPage = <T extends ProductVTEX | LegacyProductVTEX>(
   sku: T["items"][number],
   kitItems: T[],
   options: ProductOptions,
+  ctx: AppContext,
 ): Omit<ProductDetailsPage, "seo"> => {
-  const partialProduct = toProduct(product, sku, 0, options);
+  const partialProduct = toProduct(product, sku, 0, options, ctx);
   // This is deprecated. Compose this loader at loaders > product > extension > detailsPage.ts
   const isAccessoryOrSparePartFor = toAccessoryOrSparePartFor(
     sku,
@@ -305,6 +307,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   sku: P["items"][number],
   level = 0, // prevent inifinte loop while self referencing the product
   options: ProductOptions,
+  ctx?: AppContext,
 ): Product => {
   const { baseUrl, priceCurrency } = options;
   const {
@@ -424,6 +427,11 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     image: finalImages,
     video: finalVideos,
     offers: aggregateOffers(offers, priceCurrency),
+    getIsSimilarTo: async () =>
+      await ctx?.invoke.vtex.loaders.legacy.relatedProductsLoader({
+        id: productId,
+        crossSelling: "similars",
+      }) || [],
   };
 };
 
