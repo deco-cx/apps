@@ -110,48 +110,35 @@ export const router = (
   };
 };
 
-export const toRouteMap = (
-  routes?: Route[],
-): [
-  Record<string, MaybePriorityHandler>,
-  Record<string, Resolvable<Handler>>,
-] => {
-  const routeMap: Record<string, MaybePriorityHandler> = {};
-  const hrefRoutes: Record<string, Resolvable<Handler>> = {};
-  (routes ?? [])
-    .forEach(
-      ({ pathTemplate, isHref, highPriority, handler: { value: handler } }) => {
-        if (isHref) {
-          hrefRoutes[pathTemplate] = handler;
-        } else {
-          routeMap[pathTemplate] = { func: handler, highPriority };
-        }
-      },
-    );
-  return [routeMap, hrefRoutes];
-};
-
-export const buildRoutes = (audiences: Routes[]): [
-  Record<string, MaybePriorityHandler>,
-  Record<string, Resolvable<Handler>>,
-] => {
-  // We should tackle this problem elsewhere
-  return audiences.filter(Boolean)
-    .reduce(
-      ([routes, hrefRoutes], audience) => {
-        // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
-        const [newRoutes, newHrefRoutes] = toRouteMap(audience ?? []);
-        return [
-          { ...routes, ...newRoutes },
-          { ...hrefRoutes, ...newHrefRoutes },
-        ];
-      },
-      [{}, {}] as [
-        Record<string, MaybePriorityHandler>,
-        Record<string, Resolvable<Handler>>,
-      ],
-    );
-};
+export const buildRoutes = (
+    audiences: Routes[],
+  ): [
+    Record<string, MaybePriorityHandler>,
+    Record<string, Resolvable<Handler>>,
+  ] => {
+    const routeMap: Record<string, MaybePriorityHandler> = {};
+    const hrefRoutes: Record<string, Resolvable<Handler>> = {};
+  
+    // We should tackle this problem elsewhere
+    // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
+    for (const audience of audiences.filter(Boolean).flat()) {
+      const {
+        pathTemplate,
+        isHref,
+        highPriority,
+        handler: { value: handler },
+      } = audience;
+  
+      if (isHref) {
+        hrefRoutes[pathTemplate] = handler;
+      } else {
+        routeMap[pathTemplate] = { func: handler, highPriority };
+      }
+    }
+  
+  
+    return [routeMap, hrefRoutes];
+  };
 
 export interface SelectionConfig {
   audiences: Routes[];
