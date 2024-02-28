@@ -80,7 +80,7 @@ async function loader(
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
-  });
+  }, ctx);
 
   return {
     ...page,
