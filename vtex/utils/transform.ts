@@ -27,8 +27,11 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   Product as ProductVTEX,
+  ProductRating,
+  ProductReviewData,
   SelectedFacet,
   Seller as SellerVTEX,
+  Teasers,
 } from "./types.ts";
 
 const DEFAULT_CATEGORY_SEPARATOR = ">";
@@ -564,32 +567,56 @@ const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
     : "https://schema.org/OutOfStock",
 });
 
-const toOfferLegacy = (seller: SellerVTEX): Offer => ({
-  ...toOffer(seller),
-  teasers: (seller.commertialOffer.Teasers ?? []).map((teaser) => ({
-    name: teaser["<Name>k__BackingField"],
-    generalValues: teaser["<GeneralValues>k__BackingField"],
-    conditions: {
-      minimumQuantity: teaser["<Conditions>k__BackingField"][
-        "<MinimumQuantity>k__BackingField"
-      ],
-      parameters: teaser["<Conditions>k__BackingField"][
-        "<Parameters>k__BackingField"
-      ].map((parameter) => ({
-        name: parameter["<Name>k__BackingField"],
-        value: parameter["<Value>k__BackingField"],
+const toOfferLegacy = (seller: SellerVTEX): Offer => {
+  const otherTeasers = seller.commertialOffer.DiscountHighLight?.map((i) => {
+    const discount = i as Record<string, string>;
+    const [_k__BackingField, discountName] = Object.entries(discount)?.[0] ??
+      [];
+
+    const teasers: Teasers = {
+      name: discountName,
+      conditions: {
+        minimumQuantity: 0,
+        parameters: [],
+      },
+      effects: {
+        parameters: [],
+      },
+    };
+
+    return teasers;
+  }) ?? [];
+
+  return {
+    ...toOffer(seller),
+    teasers: [
+      ...otherTeasers,
+      ...(seller.commertialOffer.Teasers ?? []).map((teaser) => ({
+        name: teaser["<Name>k__BackingField"],
+        generalValues: teaser["<GeneralValues>k__BackingField"],
+        conditions: {
+          minimumQuantity: teaser["<Conditions>k__BackingField"][
+            "<MinimumQuantity>k__BackingField"
+          ],
+          parameters: teaser["<Conditions>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
+        },
+        effects: {
+          parameters: teaser["<Effects>k__BackingField"][
+            "<Parameters>k__BackingField"
+          ].map((parameter) => ({
+            name: parameter["<Name>k__BackingField"],
+            value: parameter["<Value>k__BackingField"],
+          })),
+        },
       })),
-    },
-    effects: {
-      parameters: teaser["<Effects>k__BackingField"][
-        "<Parameters>k__BackingField"
-      ].map((parameter) => ({
-        name: parameter["<Name>k__BackingField"],
-        value: parameter["<Value>k__BackingField"],
-      })),
-    },
-  })),
-});
+    ],
+  };
+};
 
 export const legacyFacetToFilter = (
   name: string,
@@ -860,4 +887,45 @@ export const normalizeFacet = (facet: LegacyFacet) => {
     Map: "priceFrom",
     Value: facet.Slug!,
   };
+};
+
+export const toReview = (
+  products: Product[],
+  ratings: ProductRating[],
+  reviews: ProductReviewData[],
+): Product[] => {
+  return products.map((p, index) => {
+    const reviewCount = ratings.reduce(
+      (acc, curr) => acc + (curr.totalCount || 0),
+      0,
+    );
+
+    const productReviews = reviews[index].data || [];
+
+    return {
+      ...p,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        reviewCount,
+        ratingValue: ratings[index]?.average || 0,
+      },
+      review: productReviews.map((_, reviewIndex) => ({
+        "@type": "Review",
+        id: productReviews[reviewIndex]?.id?.toString(),
+        author: [{
+          "@type": "Author",
+          name: productReviews[reviewIndex]?.reviewerName,
+          verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
+        }],
+        itemReviewed: productReviews[reviewIndex]?.productId,
+        datePublished: productReviews[reviewIndex]?.reviewDateTime,
+        reviewHeadline: productReviews[reviewIndex]?.title,
+        reviewBody: productReviews[reviewIndex]?.text,
+        reviewRating: {
+          "@type": "AggregateRating",
+          ratingValue: productReviews[reviewIndex]?.rating || 0,
+        },
+      })),
+    };
+  });
 };

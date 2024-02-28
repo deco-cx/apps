@@ -1173,3 +1173,42 @@ export interface CollectionList {
   };
   items?: Collection[];
 }
+
+export interface ProductRatingAndReviews {
+  productRating?: ProductRating;
+  productReviews?: ProductReviewData;
+}
+
+export interface ProductRating {
+  average?: number;
+  totalCount?: number;
+}
+
+export interface ProductReview {
+  id?: string | undefined;
+  productId?: string | undefined;
+  rating?: number | undefined;
+  title?: string | undefined;
+  text?: string | undefined;
+  reviewerName?: string | undefined;
+  shopperId?: string | undefined;
+  reviewDateTime?: string | undefined;
+  searchDate?: string | undefined;
+  verifiedPurchaser?: boolean | undefined;
+  sku?: string | null;
+  approved?: boolean;
+  location?: string | null;
+  locale?: string | null;
+  pastReviews?: string | null;
+}
+
+export interface ProductReviewRange {
+  total?: number;
+  from?: number;
+  to?: number;
+}
+
+export interface ProductReviewData {
+  data?: ProductReview[] | undefined;
+  range?: ProductReviewRange;
+}
