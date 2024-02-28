@@ -1,80 +1,11 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ImageWidget } from "../../admin/widgets.ts";
 import { stripHTML } from "../utils/html.ts";
-import { JSX } from "preact";
-
-type BaseSEOProperties =
-  | "title"
-  | "description"
-  | "type"
-  | "image"
-  | "favicon"
-  | "themeColor";
-type DefaultBaseSEOProperties = `${BaseSEOProperties}Default`;
-
-export const SEOPropsToBeMerged: BaseSEOProperties[] = [
-  "title",
-  "description",
-  "type",
-  "image",
-  "favicon",
-  "themeColor",
-];
-
-export function mergeSeoProps<
-  // deno-lint-ignore no-explicit-any
-  BaseSEO extends Record<BaseSEOProperties, any>,
-  SEOProps extends Partial<
-    // deno-lint-ignore no-explicit-any
-    & Record<BaseSEOProperties, any>
-    // deno-lint-ignore no-explicit-any
-    & Record<DefaultBaseSEOProperties, any>
-  >,
->(
-  siteSeo: Partial<BaseSEO>,
-  seoProps: SEOProps,
-  keys: (keyof BaseSEO)[],
-  handleDefaultProps = true,
-): SEOProps {
-  if (!handleDefaultProps) {
-    return {
-      ...siteSeo,
-      ...seoProps,
-    };
-  }
-
-  const mergedSeo = keys.reduce(
-    (newProps, currentKey) => {
-      const currentKeyDefault = `${currentKey as string}Default`;
-      if (seoProps[currentKeyDefault as keyof SEOProps]) {
-        // TODO (@igorbrasileiro): improve this type
-        // deno-lint-ignore no-explicit-any
-        (newProps as any)[currentKey] = siteSeo[currentKey];
-      }
-
-      return newProps;
-    },
-    {
-      ...(seoProps ?? {}),
-    },
-  );
-
-  return mergedSeo;
-}
-
-/**
- * @widget select
- */
-export type SEOSection = JSX.Element;
 
 export type OGType = "website" | "article";
 
 export interface Props {
   title?: string;
-  /**
-   * @title Use Default
-   */
-  titleDefault?: boolean;
   /**
    * @title Title template
    * @description add a %s whenever you want it to be replaced with the product name, category name or search term
@@ -83,11 +14,6 @@ export interface Props {
   titleTemplate?: string;
   description?: string;
   /**
-   * @title Use Default
-   */
-  descriptionDefault?: boolean;
-
-  /**
    * @title Description template
    * @description add a %s whenever you want it to be replaced with the product name, category name or search term
    * @default %s
@@ -95,32 +21,12 @@ export interface Props {
   descriptionTemplate?: string;
   /** @default website */
   type?: OGType;
-  /**
-   * @title Use Default
-   */
-  typeDefault?: boolean;
-
   /** @description Recommended: 1200 x 630 px (up to 5MB) */
   image?: ImageWidget;
-  /**
-   * @title Use Default
-   */
-  imageDefault?: boolean;
-
   /** @description Recommended: 16 x 16 px */
   favicon?: ImageWidget;
-  /**
-   * @title Use Default
-   */
-  faviconDefault?: boolean;
-
   /** @description Suggested color that browsers should use to customize the display of the page or of the surrounding user interface */
   themeColor?: string;
-  /**
-   * @title Use Default
-   */
-  themeColorDefault?: boolean;
-
   /** @title Canonical URL */
   canonical?: string;
   /**
@@ -144,7 +50,7 @@ function Component({
   canonical,
   noIndexing,
   jsonLDs = [],
-}: Props): SEOSection {
+}: Props) {
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
   const description = stripHTML(desc || "");
   const title = stripHTML(t);

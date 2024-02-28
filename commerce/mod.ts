@@ -6,10 +6,6 @@ import wake, { Props as WakeProps } from "../wake/mod.ts";
 import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { bgYellow } from "std/fmt/colors.ts";
-import {
-  mergeSeoProps,
-  SEOPropsToBeMerged,
-} from "../website/components/Seo.tsx";
 
 type CustomPlatform = {
   platform: "other";
@@ -65,44 +61,18 @@ export default function Site(
         "commerce/sections/Seo/SeoPDP.tsx": {
           ...manifest.sections["commerce/sections/Seo/SeoPDP.tsx"],
           default: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].default(
-              mergeSeoProps(
-                state.seo ?? {},
-                props,
-                SEOPropsToBeMerged,
-                !!state.experimentalSEOMergeProps,
-              ),
-            ),
-          Preview: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].Preview(
-              mergeSeoProps(
-                state.seo ?? {},
-                props,
-                SEOPropsToBeMerged,
-                !!state.experimentalSEOMergeProps,
-              ),
-            ),
+            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
         },
         "commerce/sections/Seo/SeoPLP.tsx": {
           ...manifest.sections["commerce/sections/Seo/SeoPLP.tsx"],
           default: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].default(
-              mergeSeoProps(
-                state.seo ?? {},
-                props,
-                SEOPropsToBeMerged,
-                !!state.experimentalSEOMergeProps,
-              ),
-            ),
-          Preview: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].Preview(
-              mergeSeoProps(
-                state.seo ?? {},
-                props,
-                SEOPropsToBeMerged,
-                !!state.experimentalSEOMergeProps,
-              ),
-            ),
+            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
         },
       },
     },

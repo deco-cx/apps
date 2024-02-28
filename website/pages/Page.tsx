@@ -17,7 +17,6 @@ import { HttpError } from "deco/engine/errors.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import { SEOSection } from "../components/Seo.tsx";
 
 /**
  * @title Sections
@@ -40,7 +39,6 @@ export interface Props {
    * @format unused-path
    */
   path?: string;
-  seo: Section<SEOSection>;
   sections: Sections;
 }
 
@@ -95,7 +93,6 @@ function Page({
   sections,
   errorPage,
   devMode,
-  seo,
 }: Props & { errorPage?: Page; devMode: boolean }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -117,7 +114,6 @@ function Page({
             />
           )}
     >
-      {seo && renderSection(seo)}
       <LiveControls site={site} {...deco} />
       <Events deco={deco} />
       {sections.map(renderSection)}
@@ -143,7 +139,7 @@ export const loader = async (
 };
 
 export function Preview(props: Props) {
-  const { sections, seo } = props;
+  const { sections } = props;
   const deco = useDeco();
 
   return (
@@ -152,7 +148,6 @@ export function Preview(props: Props) {
         <meta name="robots" content="noindex, nofollow" />
       </Head>
 
-      {seo && renderSection(seo)}
       <Events deco={deco} />
       {sections.map(renderSection)}
     </>

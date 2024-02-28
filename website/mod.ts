@@ -7,7 +7,6 @@ import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Page } from "deco/blocks/page.tsx";
-import { mergeSeoProps, SEOPropsToBeMerged } from "./components/Seo.tsx";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -41,26 +40,11 @@ export interface Props {
    */
   routes?: Routes[];
 
-  /**
-   * @title Seo
-   */
+  /** @title Seo */
   seo?: Omit<
     Seo,
-    | "jsonLDs"
-    | "titleTemplate"
-    | "descriptionTemplate"
-    | "canonical"
-    | "titleDefault"
-    | "descriptionDefault"
-    | "typeDefault"
-    | "imageDefault"
-    | "faviconDefault"
-    | "themeColorDefault"
+    "jsonLDs" | "titleTemplate" | "descriptionTemplate" | "canonical"
   >;
-  /**
-   * @hide true
-   */
-  experimentalSEOMergeProps?: boolean;
 
   /**
    * @title Global Sections
@@ -101,23 +85,15 @@ export default function App(state: Props): App<Manifest, Props> {
         "website/sections/Seo/Seo.tsx": {
           ...manifest.sections["website/sections/Seo/Seo.tsx"],
           Preview: (props) =>
-            manifest.sections["website/sections/Seo/Seo.tsx"].Preview(
-              mergeSeoProps(
-                state.seo ?? {},
-                props,
-                SEOPropsToBeMerged,
-                !!state.experimentalSEOMergeProps,
-              ),
-            ),
+            manifest.sections["website/sections/Seo/Seo.tsx"].Preview({
+              ...state.seo,
+              ...props,
+            }),
           default: (props) =>
-            manifest.sections["website/sections/Seo/Seo.tsx"].default(
-              mergeSeoProps(
-                state.seo ?? {},
-                props,
-                SEOPropsToBeMerged,
-                !!state.experimentalSEOMergeProps,
-              ),
-            ),
+            manifest.sections["website/sections/Seo/Seo.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
         },
       },
       pages: {
@@ -127,12 +103,12 @@ export default function App(state: Props): App<Manifest, Props> {
           Preview: (props) =>
             manifest.pages["website/pages/Page.tsx"].Preview({
               ...props,
-              sections: [...(state.global ?? []), ...props.sections],
+              sections: [...state.global ?? [], ...props.sections],
             }),
           default: (props) =>
             manifest.pages["website/pages/Page.tsx"].default({
               ...props,
-              sections: [...(state.global ?? []), ...props.sections],
+              sections: [...state.global ?? [], ...props.sections],
             }),
         },
       },

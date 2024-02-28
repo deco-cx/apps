@@ -1,8 +1,8 @@
-import Seo, { Props as SeoProps, SEOSection } from "../../components/Seo.tsx";
+import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
 
 type Props = Omit<SeoProps, "jsonLDs">;
 
-function Section(props: Props): SEOSection {
+function Section(props: Props) {
   return <Seo {...props} />;
 }
 
