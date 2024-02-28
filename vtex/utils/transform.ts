@@ -182,12 +182,25 @@ const toAdditionalPropertyCategories = <
 >(
   product: P,
 ): Product["additionalProperty"] => {
-  const categories = splitCategory(product.categories[0]);
-  const categoryIds = splitCategory(product.categoriesIds[0]);
+  const categories = new Set<string>();
+  const categoryIds = new Set<string>();
 
-  return categories.map((category, index) =>
+  product.categories.forEach((productCategory, i) => {
+    const category = splitCategory(productCategory);
+    const categoryId = splitCategory(product.categoriesIds[i]);
+
+    category.forEach((splitCategoryItem, j) => {
+      categories.add(splitCategoryItem);
+      categoryIds.add(categoryId[j]);
+    });
+  });
+
+  const categoriesArray = Array.from(categories);
+  const categoryIdsArray = Array.from(categoryIds);
+
+  return categoriesArray.map((category, index) =>
     toAdditionalPropertyCategory({
-      propertyID: categoryIds[index],
+      propertyID: categoryIdsArray[index],
       value: category || "",
     })
   );
