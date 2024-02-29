@@ -249,13 +249,11 @@ async function build() {
     }
 
     if (
-      !denoJson.compilerOptions?.jsx ||
-      denoJson.compilerOptions?.jsx !== "precompile"
+      !denoJson.compilerOptions.jsx ||
+      denoJson.compilerOptions.jsx !== "precompile"
     ) {
-      denoJson.compilerOptions = {
-        ...denoJson.compilerOptions,
-        "jsx": "precompile",
-      };
+      denoJson.compilerOptions.jsx = "precompile";
+      
       return { denoJson, hasChange: true };
     }
 
