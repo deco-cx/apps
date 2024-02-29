@@ -8,7 +8,6 @@ import type { Source } from "./types/linx.ts";
 
 interface CommonBody {
   apiKey: string;
-  secretKey?: string;
   origin?: string;
   source: Source;
   deviceId: string;

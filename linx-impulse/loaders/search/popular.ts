@@ -13,11 +13,10 @@ const loaders = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { api, apiKey, secretKey, origin } = ctx;
+  const { api, apiKey, origin } = ctx;
 
   const search = await api["GET /engage/search/v3/autocompletes/popular"]({
     apiKey,
-    secretKey,
     origin,
     deviceId: getDeviceIdFromBag(ctx),
     salesChannel: ctx.salesChannel,

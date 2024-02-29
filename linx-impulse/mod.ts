@@ -44,26 +44,30 @@ export const color = 0xFF6A3B;
 /**
  * @title Linx Impulse
  */
-export default function Linx(props: State) {
+export default function Linx({ secretKey, ...props }: State) {
+  const headers = new Headers();
+  headers.set(
+    "x-secret-key",
+    typeof secretKey === "string" ? secretKey : secretKey?.get() ?? "",
+  );
+
   const eventsApi = createHttpClient<EventsAPI>({
     base: "https://api.event.linximpulse.net/",
+    headers,
   });
 
   const api = createHttpClient<LinxAPI>({
     base: "http://api.linximpulse.com/",
+    headers,
   });
 
   const chaordicApi = createHttpClient<ChaordicAPI>({
     base: "https://recs.chaordicsystems.com/",
+    headers,
   });
-
-  const secretKey = typeof props.secretKey === "string"
-    ? props.secretKey
-    : props.secretKey?.get() ?? "";
 
   const state = {
     ...props,
-    secretKey,
     eventsApi,
     api,
     chaordicApi,

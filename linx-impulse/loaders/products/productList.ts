@@ -188,7 +188,7 @@ const loader = async (
   }
 
   const { showOnlyAvailable } = props;
-  const { chaordicApi, apiKey, secretKey, salesChannel, origin, cdn } = ctx;
+  const { chaordicApi, apiKey, salesChannel, origin, cdn } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
   const source = getSource(ctx);
 
@@ -201,7 +201,6 @@ const loader = async (
   const response = await chaordicApi["GET /v0/pages/recommendations"]({
     ...params,
     apiKey,
-    secretKey,
     deviceId,
     source,
     salesChannel,

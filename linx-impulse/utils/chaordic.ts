@@ -10,7 +10,6 @@ export interface ChaordicAPI {
     response: RecommendationsResponse;
     searchParams: {
       apiKey: string;
-      secretKey?: string;
       name: PageName;
       source: Source;
       deviceId: string;
@@ -31,7 +30,6 @@ export interface ChaordicAPI {
     response: void;
     searchParams: {
       apiKey: string;
-      secretKey?: string;
       origin?: string;
       trackingImpression: string;
       firstOffset: number;
