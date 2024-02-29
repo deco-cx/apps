@@ -39,10 +39,10 @@ import * as $$$$$$$6 from "./matchers/host.ts";
 import * as $$$$$$$7 from "./matchers/location.ts";
 import * as $$$$$$$8 from "./matchers/multi.ts";
 import * as $$$$$$$9 from "./matchers/negate.ts";
-import * as $$$$$$$10 from "./matchers/cron.ts";
-import * as $$$$$$$11 from "./matchers/device.ts";
-import * as $$$$$$$12 from "./matchers/host.ts";
-import * as $$$$$$$13 from "./matchers/always.ts";
+import * as $$$$$$$10 from "./matchers/never.ts";
+import * as $$$$$$$11 from "./matchers/queryString.ts";
+import * as $$$$$$$12 from "./matchers/random.ts";
+import * as $$$$$$$13 from "./matchers/site.ts";
 import * as $$$$$$$14 from "./matchers/userAgent.ts";
 import * as $$$$$0 from "./pages/Page.tsx";
 import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
@@ -54,50 +54,50 @@ const manifest = {
     "website/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "website/loaders/asset.ts": $$$10,
-    "website/loaders/extension.ts": $$$5,
-    "website/loaders/fonts/googleFonts.ts": $$$12,
-    "website/loaders/fonts/local.ts": $$$11,
-    "website/loaders/image.ts": $$$2,
-    "website/loaders/options/routes.ts": $$$0,
-    "website/loaders/options/urlParams.ts": $$$1,
-    "website/loaders/pages.ts": $$$8,
-    "website/loaders/redirect.ts": $$$9,
-    "website/loaders/redirects.ts": $$$7,
-    "website/loaders/redirectsFromCsv.ts": $$$3,
-    "website/loaders/secret.ts": $$$6,
-    "website/loaders/secretString.ts": $$$4,
+    "website/loaders/asset.ts": $$$0,
+    "website/loaders/extension.ts": $$$1,
+    "website/loaders/fonts/googleFonts.ts": $$$2,
+    "website/loaders/fonts/local.ts": $$$3,
+    "website/loaders/image.ts": $$$4,
+    "website/loaders/options/routes.ts": $$$5,
+    "website/loaders/options/urlParams.ts": $$$6,
+    "website/loaders/pages.ts": $$$7,
+    "website/loaders/redirect.ts": $$$8,
+    "website/loaders/redirects.ts": $$$9,
+    "website/loaders/redirectsFromCsv.ts": $$$10,
+    "website/loaders/secret.ts": $$$11,
+    "website/loaders/secretString.ts": $$$12,
   },
   "handlers": {
-    "website/handlers/fresh.ts": $$$$3,
-    "website/handlers/proxy.ts": $$$$2,
-    "website/handlers/redirect.ts": $$$$4,
-    "website/handlers/router.ts": $$$$0,
-    "website/handlers/sitemap.ts": $$$$1,
+    "website/handlers/fresh.ts": $$$$0,
+    "website/handlers/proxy.ts": $$$$1,
+    "website/handlers/redirect.ts": $$$$2,
+    "website/handlers/router.ts": $$$$3,
+    "website/handlers/sitemap.ts": $$$$4,
   },
   "pages": {
     "website/pages/Page.tsx": $$$$$0,
   },
   "sections": {
-    "website/sections/Analytics/Analytics.tsx": $$$$$$2,
-    "website/sections/Rendering/Deferred.tsx": $$$$$$0,
-    "website/sections/Seo/Seo.tsx": $$$$$$1,
+    "website/sections/Analytics/Analytics.tsx": $$$$$$0,
+    "website/sections/Rendering/Deferred.tsx": $$$$$$1,
+    "website/sections/Seo/Seo.tsx": $$$$$$2,
   },
   "matchers": {
-    "website/matchers/always.ts": $$$$$$$13,
-    "website/matchers/cookie.ts": $$$$$$$5,
-    "website/matchers/cron.ts": $$$$$$$10,
-    "website/matchers/date.ts": $$$$$$$0,
-    "website/matchers/device.ts": $$$$$$$11,
-    "website/matchers/environment.ts": $$$$$$$2,
-    "website/matchers/host.ts": $$$$$$$12,
-    "website/matchers/location.ts": $$$$$$$4,
-    "website/matchers/multi.ts": $$$$$$$7,
+    "website/matchers/always.ts": $$$$$$$0,
+    "website/matchers/cookie.ts": $$$$$$$1,
+    "website/matchers/cron.ts": $$$$$$$2,
+    "website/matchers/date.ts": $$$$$$$3,
+    "website/matchers/device.ts": $$$$$$$4,
+    "website/matchers/environment.ts": $$$$$$$5,
+    "website/matchers/host.ts": $$$$$$$6,
+    "website/matchers/location.ts": $$$$$$$7,
+    "website/matchers/multi.ts": $$$$$$$8,
     "website/matchers/negate.ts": $$$$$$$9,
-    "website/matchers/never.ts": $$$$$$$8,
-    "website/matchers/queryString.ts": $$$$$$$1,
-    "website/matchers/random.ts": $$$$$$$6,
-    "website/matchers/site.ts": $$$$$$$3,
+    "website/matchers/never.ts": $$$$$$$10,
+    "website/matchers/queryString.ts": $$$$$$$11,
+    "website/matchers/random.ts": $$$$$$$12,
+    "website/matchers/site.ts": $$$$$$$13,
     "website/matchers/userAgent.ts": $$$$$$$14,
   },
   "flags": {

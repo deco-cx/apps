@@ -1,9 +1,9 @@
-import OpenAI from "https://deno.land/x/openai@v4.24.1/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import base64ToBlob from "../utils/blobConversion.ts";
 import { meter } from "deco/observability/otel/metrics.ts";
 import { AssistantIds } from "../types.ts";
 import { ValueType } from "deco/deps.ts";
+import { AppContext } from "../mod.ts";
 
 const stats = {
   audioSize: meter.createHistogram("assistant_transcribe_audio_size", {
@@ -20,7 +20,6 @@ const stats = {
     },
   ),
 };
-const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") || "" });
 
 export interface TranscribeAudioProps {
   file: string | ArrayBuffer | null;
@@ -30,6 +29,8 @@ export interface TranscribeAudioProps {
 
 export default async function transcribeAudio(
   transcribeAudioProps: TranscribeAudioProps,
+  _req: Request,
+  ctx: AppContext,
 ) {
   const assistantId = transcribeAudioProps.assistantIds?.assistantId;
   const threadId = transcribeAudioProps.assistantIds?.threadId;
@@ -50,7 +51,7 @@ export default async function transcribeAudio(
   stats.audioSize.record(transcribeAudioProps.audioDuration, {
     assistant_id: assistantId,
   });
-  const response = await openai.audio.transcriptions.create({
+  const response = await ctx.openAI.audio.transcriptions.create({
     model: "whisper-1",
     file: file,
   });
