@@ -111,34 +111,33 @@ export const router = (
 };
 
 export const buildRoutes = (
-    audiences: Routes[],
-  ): [
-    Record<string, MaybePriorityHandler>,
-    Record<string, Resolvable<Handler>>,
-  ] => {
-    const routeMap: Record<string, MaybePriorityHandler> = {};
-    const hrefRoutes: Record<string, Resolvable<Handler>> = {};
-  
-    // We should tackle this problem elsewhere
-    // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
-    for (const audience of audiences.filter(Boolean).flat()) {
-      const {
-        pathTemplate,
-        isHref,
-        highPriority,
-        handler: { value: handler },
-      } = audience;
-  
-      if (isHref) {
-        hrefRoutes[pathTemplate] = handler;
-      } else {
-        routeMap[pathTemplate] = { func: handler, highPriority };
-      }
+  audiences: Routes[],
+): [
+  Record<string, MaybePriorityHandler>,
+  Record<string, Resolvable<Handler>>,
+] => {
+  const routeMap: Record<string, MaybePriorityHandler> = {};
+  const hrefRoutes: Record<string, Resolvable<Handler>> = {};
+
+  // We should tackle this problem elsewhere
+  // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
+  for (const audience of audiences.filter(Boolean).flat()) {
+    const {
+      pathTemplate,
+      isHref,
+      highPriority,
+      handler: { value: handler },
+    } = audience;
+
+    if (isHref) {
+      hrefRoutes[pathTemplate] = handler;
+    } else {
+      routeMap[pathTemplate] = { func: handler, highPriority };
     }
-  
-  
-    return [routeMap, hrefRoutes];
-  };
+  }
+
+  return [routeMap, hrefRoutes];
+};
 
 export interface SelectionConfig {
   audiences: Routes[];
