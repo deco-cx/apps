@@ -81,7 +81,7 @@ const snippet = (live: Live) => {
         globalThis.window.open(href, "_blank");
         return;
       }
-      
+
       globalThis.window.location.href = `${href}`;
     }
   };

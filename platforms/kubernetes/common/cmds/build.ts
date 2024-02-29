@@ -215,25 +215,85 @@ async function build() {
     if (!denoJson) {
       return undefined;
     }
-    const hasNodeModulesDir = denoJson?.nodeModulesDir;
+
+    // To add a new override just add a new function like those below and add it to the overrides array.
+    const overrides = [overrideNodeModulesDir, overrideCompileOptions];
+
+    const { acc: newDenoJson, hasChange } = overrides.reduce(
+      ({ acc, hasChange }, override) => {
+        const newOverride = override(acc);
+
+        return {
+          acc: newOverride.denoJson,
+          hasChange: hasChange || newOverride.hasChange,
+        };
+      },
+      { acc: denoJson, hasChange: false },
+    );
+
+    if (hasChange) {
+      await updateFile(configFileName, denoJson);
+    }
+
+    return newDenoJson;
+  };
+
+  const overrideCompileOptions = (
+    // deno-lint-ignore no-explicit-any
+    denoJson: Record<string, any>,
+  ) => {
+    const hasCompilerOptions = denoJson.compilerOptions;
+
+    if (!hasCompilerOptions) {
+      denoJson.compilerOptions = {};
+    }
+
+    if (
+      !denoJson.compilerOptions?.jsx ||
+      denoJson.compilerOptions?.jsx !== "precompile"
+    ) {
+      denoJson.compilerOptions = {
+        ...denoJson.compilerOptions,
+        "jsx": "precompile",
+      };
+      return { denoJson, hasChange: true };
+    }
+
+    return { denoJson, hasChange: false };
+  };
+
+  const overrideNodeModulesDir = (
+    // deno-lint-ignore no-explicit-any
+    denoJson: Record<string, any>,
+  ) => {
+    const hasNodeModulesDir = denoJson.nodeModulesDir;
 
     if (hasNodeModulesDir && hasNodeModulesDir !== false) {
       denoJson.nodeModulesDir = false;
-      const fileContent = JSON.stringify(denoJson, null, 2);
-      await Deno.writeTextFile(
-        join(sourceLocalDir!, configFileName),
-        fileContent,
-      ).catch(
-        (err) => {
-          if (err instanceof Deno.errors.NotFound) {
-            return denoJson;
-          }
-          throw err;
-        },
-      );
+
+      return { denoJson, hasChange: true };
     }
 
-    return denoJson;
+    return { denoJson, hasChange: false };
+  };
+
+  const updateFile = async (
+    configFileName: string,
+    // deno-lint-ignore no-explicit-any
+    denoJson: Record<string, any>,
+  ) => {
+    const fileContent = JSON.stringify(denoJson, null, 2);
+    await Deno.writeTextFile(
+      join(sourceLocalDir!, configFileName),
+      fileContent,
+    ).catch(
+      (err) => {
+        if (err instanceof Deno.errors.NotFound) {
+          return;
+        }
+        throw err;
+      },
+    );
   };
 
   const [configFileName, denoJson] = await getDenoJson();
