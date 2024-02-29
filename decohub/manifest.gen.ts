@@ -9,7 +9,6 @@ import * as $$$$$$$$$$$3 from "./apps/brand-assistant.ts";
 import * as $$$$$$$$$$$4 from "./apps/crux.ts";
 import * as $$$$$$$$$$$5 from "./apps/files.ts";
 import * as $$$$$$$$$$$6 from "./apps/implementation.ts";
-
 import * as $$$$$$$$$$$7 from "./apps/linx-impulse.ts";
 import * as $$$$$$$$$$$8 from "./apps/linx.ts";
 import * as $$$$$$$$$$$9 from "./apps/nuvemshop.ts";
