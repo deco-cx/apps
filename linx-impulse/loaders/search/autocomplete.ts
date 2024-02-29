@@ -22,14 +22,13 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { api, apiKey, secretKey, origin, cdn } = ctx;
+  const { api, apiKey, origin, cdn } = ctx;
   const { query, count = 20 } = props;
 
   if (!query) return null;
 
   const search = await api["GET /engage/search/v3/autocompletes"]({
     apiKey,
-    secretKey,
     origin,
     prefix: query,
     deviceId: getDeviceIdFromBag(ctx),

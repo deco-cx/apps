@@ -23,7 +23,7 @@ const loaders = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
-  const { api, apiKey, secretKey, origin, cdn } = ctx;
+  const { api, apiKey, origin, cdn } = ctx;
   const { query = "", count = 20, categoryId } = props;
 
   const search = await api["GET /engage/search/v3/autocompletes/products"]({
@@ -31,7 +31,6 @@ const loaders = async (
     resultsProducts: count,
     categoryId,
     apiKey,
-    secretKey,
     origin,
     deviceId: getDeviceIdFromBag(ctx),
     salesChannel: ctx.salesChannel,

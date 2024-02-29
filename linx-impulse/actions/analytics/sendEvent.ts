@@ -113,7 +113,6 @@ const action = async (
     eventsApi,
     api,
     salesChannel,
-    secretKey,
     apiKey,
     chaordicApi,
     origin,
@@ -125,7 +124,6 @@ const action = async (
       const { page, source, user } = params;
       const commonBody = {
         apiKey,
-        secretKey,
         source,
         user,
         salesChannel,
@@ -230,7 +228,6 @@ const action = async (
       const { source, user } = params;
       await api["GET /engage/search/v3/clicks"]({
         apiKey,
-        secretKey,
         trackingId,
         source,
         userId: user?.id,

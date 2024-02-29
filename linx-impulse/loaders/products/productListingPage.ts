@@ -85,7 +85,7 @@ const loader = async (
   }
 
   const { resultsPerPage, allowRedirect, showOnlyAvailable, user } = props;
-  const { apiKey, secretKey, origin, salesChannel, api, cdn } = ctx;
+  const { apiKey, origin, salesChannel, api, cdn } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
   const source = getSource(ctx);
   const url = new URL(req.url);
@@ -112,7 +112,6 @@ const loader = async (
     if (searchTerm) {
       const response = await api["GET /engage/search/v3/search"]({
         apiKey,
-        secretKey,
         origin,
         salesChannel,
         deviceId,
@@ -132,7 +131,6 @@ const loader = async (
     } else if (category.length >= 2 && category[0] === "hotsite") {
       const response = await api["GET /engage/search/v3/hotsites"]({
         apiKey,
-        secretKey,
         origin,
         salesChannel,
         deviceId,
@@ -151,7 +149,6 @@ const loader = async (
     } else if (category.length > 0 || multicategory.length > 0) {
       const response = await api["GET /engage/search/v3/navigates"]({
         apiKey,
-        secretKey,
         origin,
         salesChannel,
         deviceId,
