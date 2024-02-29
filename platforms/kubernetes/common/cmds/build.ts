@@ -253,7 +253,7 @@ async function build() {
       denoJson.compilerOptions.jsx !== "precompile"
     ) {
       denoJson.compilerOptions.jsx = "precompile";
-      
+
       return { denoJson, hasChange: true };
     }
 
