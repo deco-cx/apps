@@ -27,6 +27,8 @@ import {
   Item as LinxSuggestionProductJSON,
   Product as LinxSuggestionProductGroupJSON,
 } from "./types/suggestionsJSON.ts";
+import { ProductAuction } from "./types/auctionJSON.ts";
+import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -279,6 +281,32 @@ export const toCart = (cart: Cart, { cdn }: { cdn: string }): Cart | null => {
         ...item,
         ImagePath: new URL(item.ImagePath || "", cdn).href,
       })),
+    },
+  });
+};
+
+export const toAuction = (
+  auction: ProductAuction,
+  { cdn }: { cdn: string },
+): ProductAuction => {
+  return ({
+    ...auction,
+    ProductImage: new URL(auction.ProductImage, cdn).href,
+  });
+};
+
+export const toAuctionDetail = (
+  auction: ProductAuctionDetail,
+  { cdn: _cdn }: { cdn: string },
+): ProductAuctionDetail => {
+  // TODO: Fix image URLs
+  return ({
+    ...auction,
+    Product: {
+      ...auction.Product,
+      Medias: [
+        ...auction.Product.Medias,
+      ],
     },
   });
 };
