@@ -5,6 +5,7 @@
 import * as $$$$$$$$$0 from "./actions/cart/addCoupon.ts";
 import * as $$$$$$$$$1 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$2 from "./actions/cart/updateItem.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/page.ts";
 import * as $$$2 from "./loaders/pages.ts";
@@ -13,6 +14,7 @@ import * as $$$4 from "./loaders/product/detailsPage.ts";
 import * as $$$5 from "./loaders/product/list.ts";
 import * as $$$6 from "./loaders/product/listingPage.ts";
 import * as $$$7 from "./loaders/product/suggestions.ts";
+import * as $$$8 from "./loaders/proxy.ts";
 
 const manifest = {
   "loaders": {
@@ -24,6 +26,10 @@ const manifest = {
     "linx/loaders/product/list.ts": $$$5,
     "linx/loaders/product/listingPage.ts": $$$6,
     "linx/loaders/product/suggestions.ts": $$$7,
+    "linx/loaders/proxy.ts": $$$8,
+  },
+  "handlers": {
+    "linx/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "linx/actions/cart/addCoupon.ts": $$$$$$$$$0,
