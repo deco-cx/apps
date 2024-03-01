@@ -24,7 +24,7 @@ export interface Props {
 
 /**
  * @title Wap Integration
- * @description Product Details loader
+ * @description Shipment Simulation Action
  */
 const loader = async (
   props: Props,

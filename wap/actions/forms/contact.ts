@@ -1,8 +1,5 @@
 import { AppContext } from "../../mod.ts";
-
-export interface Status {
-  sucesso: boolean;
-}
+import { Status } from "../../utils/type.ts";
 
 export interface Props {
   hashEmail: string;
@@ -15,7 +12,7 @@ export interface Props {
 
 /**
  * @title Wap Integration
- * @description Product Details loader
+ * @description Form Action
  */
 const loader = async (
   props: Props,

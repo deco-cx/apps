@@ -11,7 +11,7 @@ export interface Props {
 
 /**
  * @title Wap Integration
- * @description Product Details loader
+ * @description Wishlist add item action
  */
 const loader = async (
   props: Props,

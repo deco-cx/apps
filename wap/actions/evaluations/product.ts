@@ -1,8 +1,5 @@
 import { AppContext } from "../../mod.ts";
-
-export interface Status {
-  sucesso: boolean;
-}
+import { Status } from "../../utils/type.ts";
 
 export interface Props {
   idProduto: number;

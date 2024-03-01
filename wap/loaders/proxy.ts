@@ -1,31 +1,31 @@
 import { Route } from "../../website/flags/audience.ts";
-import { Script } from "../../website/types.ts";
 import { AppContext } from "../mod.ts";
 
+const DEFAULT_PROXY_PATHS = [
+  "/minha-conta",
+  "/minha-conta/*",
+  "/checkout",
+  "/checkout/*",
+];
+
 export interface Props {
-  /**
-   * @title Scripts to include on Html head
-   */
-  includeScriptsToHead?: {
-    includes?: Script[];
-  };
+  /** @description ex: /p/fale-conosco */
+  pagesToProxy?: string[];
 }
 
 /**
  * @title Wap Proxy Routes
  */
 function loader(
-  { includeScriptsToHead = { includes: [] } }: Props,
+  { pagesToProxy = [] }: Props,
   _req: Request,
   ctx: AppContext,
 ): Route[] {
   const { baseUrl } = ctx;
 
   const checkout = [
-    ["/minha-conta"],
-    ["/checkout"],
-    ["/checkout/*"],
-    ["/minha-conta/*"],
+    ...DEFAULT_PROXY_PATHS,
+    ...pagesToProxy,
   ].map(([pathTemplate, basePath]) => ({
     pathTemplate,
     handler: {
@@ -36,7 +36,6 @@ function loader(
         customHeaders: [{
           Host: baseUrl,
         }],
-        includeScriptsToHead,
       },
     },
   }));

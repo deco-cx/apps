@@ -220,8 +220,9 @@ export const toProduct = (
       sku: v.sku,
       offers: toOffers(v, product.status),
       name: product.nome,
-      url: `${getUrl(`/${product.rota.params.produto}`, baseUrl).href
-        }.html?sku=${v.sku}`,
+      url: `${
+        getUrl(`/${product.rota.params.produto}`, baseUrl).href
+      }.html?sku=${v.sku}`,
       additionalProperty: [
         {
           "@type": "PropertyValue",
@@ -238,7 +239,6 @@ export const toProduct = (
       ],
     })) ?? [];
 
-
   (product as WapProductDatiled).atributos
     ?.unico?.valores.forEach((v) => {
       hasVariant.push({
@@ -247,8 +247,9 @@ export const toProduct = (
         sku: product.sku,
         offers: toOffers(product, product.status),
         name: product.nome,
-        url: `${getUrl(`/${product.rota.params.produto}`, baseUrl).href
-        }.html?sku=${product.sku}`, 
+        url: `${
+          getUrl(`/${product.rota.params.produto}`, baseUrl).href
+        }.html?sku=${product.sku}`,
         additionalProperty: [
           {
             "@type": "PropertyValue",
@@ -257,16 +258,14 @@ export const toProduct = (
             propertyID: String(v.idAtributoValor),
             image: [{ "@type": "ImageObject", name: "imagem", url: v.imagem }, {
               "@type": "ImageObject",
-              name: "imagemOriginal", 
+              name: "imagemOriginal",
               url: v.imagemOriginal,
             }],
             valueReference: "ATRIBUTO UNICO",
           },
         ],
-      })
-    })
-
-
+      });
+    });
 
   const selected = hasVariant.find((i) => i.sku == sku) ?? hasVariant[0];
 

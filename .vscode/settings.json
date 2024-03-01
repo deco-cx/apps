@@ -1,9 +1,5 @@
 {
   "deno.enable": true,
   "deno.lint": true,
-  "deno.unstable": true,
-  "eslint.validate": [
-    "glimmer-ts",
-    "glimmer-js"
-  ]
+  "deno.unstable": true
 }

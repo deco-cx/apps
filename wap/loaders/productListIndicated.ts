@@ -7,7 +7,7 @@ import {
   WapProductsShowcasePage,
 } from "../utils/type.ts";
 
-export interface Dinamic {
+export interface Dynamic {
   slug: RequestURLParam;
 }
 
@@ -15,10 +15,10 @@ export interface Static {
   productId: number;
 }
 
-export type Props = { props: Static | Dinamic };
+export type Props = { props: Static | Dynamic };
 
 // deno-lint-ignore no-explicit-any
-const isDinamic = (p: any): p is Dinamic => typeof p.slug === "string";
+const isDynamic = (p: any): p is Dynamic => typeof p.slug === "string";
 
 /**
  * @title Wap Integration - Indicated Products
@@ -34,7 +34,7 @@ const loader = async (
 
   let productId = (props as Static)?.productId;
 
-  if (isDinamic(props)) {
+  if (isDynamic(props)) {
     const wapProduct = await api
       ["GET /api/v2/front/url/product/detail"]({
         url: `/${props.slug}.html`,

@@ -3,7 +3,6 @@ import shopify, { Props as ShopifyProps } from "../shopify/mod.ts";
 import vnda, { Props as VNDAProps } from "../vnda/mod.ts";
 import vtex, { Props as VTEXProps } from "../vtex/mod.ts";
 import wake, { Props as WakeProps } from "../wake/mod.ts";
-import wap, { Props as WapProps } from "../wap/mod.ts";
 import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { bgYellow } from "std/fmt/colors.ts";
@@ -19,7 +18,6 @@ export type Props = WebsiteProps & {
     | VTEXProps
     | ShopifyProps
     | WakeProps
-    | WapProps
     | CustomPlatform;
 };
 
@@ -28,7 +26,6 @@ type CommerceApp =
   | ReturnType<typeof vnda>
   | ReturnType<typeof vtex>
   | ReturnType<typeof wake>
-  | ReturnType<typeof wap>
   | ReturnType<typeof shopify>;
 
 export default function Site(
@@ -53,8 +50,6 @@ export default function Site(
     ? wake(commerce)
     : commerce?.platform === "shopify"
     ? shopify(commerce)
-    : commerce?.platform === "wap"
-    ? wap(commerce)
     : null;
 
   return {

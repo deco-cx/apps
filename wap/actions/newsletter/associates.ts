@@ -1,7 +1,7 @@
 import { AppContext } from "../../mod.ts";
+import { Status } from "../../utils/type.ts";
 
-export interface Status {
-  sucesso: boolean;
+export interface NewsletterStatus extends Status {
   mensagem: string;
 }
 
@@ -17,15 +17,17 @@ export interface Props {
   associados: Associated[];
 }
 
+// ! This Action has been added but not tested because we dont have a use case
+
 /**
  * @title Wap Integration
- * @description Product Details loader
+ * @description Newslleter Associates Action
  */
 const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Status | null> => {
+): Promise<NewsletterStatus | null> => {
   const { api } = ctx;
 
   const response = await api
@@ -34,7 +36,7 @@ const loader = async (
       body: props,
     });
 
-  return response.json() as Promise<Status>;
+  return response.json() as Promise<NewsletterStatus>;
 };
 
 export default loader;

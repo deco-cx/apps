@@ -18,6 +18,9 @@ export interface Props {
    * @description Use Wap as backend platform
    */
   platform: "wap";
+  /**
+   * @description URL of wap native environment
+   */
   baseUrl: string;
 }
 
@@ -42,8 +45,6 @@ export default function App(
   const state = {
     ...props,
     api,
-    // publicUrl: publicUrl,
-    // storeId: storeId,
   };
 
   return { manifest, state };

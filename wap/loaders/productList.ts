@@ -3,7 +3,7 @@ import { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 import { WapProductsListPage, WapProductsShowcasePage } from "../utils/type.ts";
 
-export interface VitrineProps {
+export interface ShowcaseProps {
   hash: string;
 }
 
@@ -16,10 +16,11 @@ export interface QueryProps {
   limit: number;
 }
 
-export type Props = { props: VitrineProps | QueryProps };
+export type Props = { props: ShowcaseProps | QueryProps };
 
 // deno-lint-ignore no-explicit-any
-const isVitrineList = (p: any): p is VitrineProps => typeof p.hash === "string";
+const isShowcaseList = (p: any): p is ShowcaseProps =>
+  typeof p.hash === "string";
 
 /**
  * @title Wap Integration
@@ -33,7 +34,7 @@ const loader = async (
   const { api } = ctx;
   const { url: baseUrl } = req;
 
-  const data = isVitrineList(props.props)
+  const data = isShowcaseList(props.props)
     ? await api["GET /api/v2/front/showcase/products/:hash"]({
       ...props.props,
     }).then((response) => response.json())
@@ -46,7 +47,7 @@ const loader = async (
 
   if (!data) return null;
 
-  const rawProducts = isVitrineList(props.props)
+  const rawProducts = isShowcaseList(props.props)
     ? (data as WapProductsShowcasePage).produtos
     : (data as WapProductsListPage).conteudo.produtos;
 
