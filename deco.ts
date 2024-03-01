@@ -37,6 +37,7 @@ const config = {
     app("wake"),
     app("wap"),
     app("linx"),
+    app("linx-impulse"),
     app("shopify"),
     app("nuvemshop"),
     app("website"),

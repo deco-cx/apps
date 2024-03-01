@@ -43,10 +43,14 @@ function processTypeInNestedObject(obj: any) {
 
 for await (const entry of walk(".")) {
   if (entry.isFile) {
-    if (entry.path.endsWith(OPENAPI_EXTENSION)) {
+    if (
+      entry.path.endsWith(OPENAPI_EXTENSION)
+    ) {
       allOpenAPIPaths.push(entry.path);
     }
-    if (entry.path.endsWith(GRAPHQL_EXTENSION)) {
+    if (
+      entry.path.endsWith(GRAPHQL_EXTENSION)
+    ) {
       allGraphqlPaths.push(entry.path);
     }
   }
@@ -128,6 +132,7 @@ const generateOpenAPI = async () => {
         if (!item) {
           continue;
         }
+
         const {
           parameters = [],
           requestBody,
