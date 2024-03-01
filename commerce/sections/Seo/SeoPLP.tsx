@@ -1,14 +1,16 @@
 import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
+import {
+  renderTemplateString,
+  SEOSection,
+} from "../../../website/components/Seo.tsx";
 import { ProductListingPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
+import { default as SEOPreview } from "../../../website/components/_seo/Preview.tsx";
 
-export type Props = {
-  jsonLD: ProductListingPage | null;
-} & Partial<Omit<SeoProps, "jsonLDs">>;
-
-function Section({ jsonLD, ...props }: Props) {
-  const title = jsonLD?.seo?.title;
-  const description = jsonLD?.seo?.description;
+const getSEOProps = (props: Props) => {
+  const { jsonLD } = props;
+  const title = jsonLD?.seo?.title || props.title;
+  const description = jsonLD?.seo?.description || props.description;
   const canonical = props.canonical
     ? props.canonical
     : jsonLD?.seo?.canonical
@@ -18,17 +20,37 @@ function Section({ jsonLD, ...props }: Props) {
     : undefined;
 
   const noIndexing = !jsonLD || !jsonLD.products.length;
+  return {
+    ...props,
+    title,
+    description,
+    canonical,
+    jsonLDs: [jsonLD],
+    noIndexing,
+  };
+};
 
-  return (
-    <Seo
-      {...props}
-      title={title || props.title}
-      description={description || props.description}
-      canonical={canonical}
-      jsonLDs={[jsonLD]}
-      noIndexing={noIndexing}
-    />
-  );
+export type Props = {
+  jsonLD: ProductListingPage | null;
+} & Partial<Omit<SeoProps, "jsonLDs">>;
+
+/** @title Product Listing */
+function Section(props: Props): SEOSection {
+  return <Seo {...getSEOProps(props)} />;
+}
+
+export function Preview(_props: Props) {
+  const props = getSEOProps(_props);
+  const {
+    titleTemplate = "",
+    title: _title = "",
+    descriptionTemplate = "",
+    description: _description = "",
+  } = props;
+  const title = renderTemplateString(titleTemplate, _title);
+  const description = renderTemplateString(descriptionTemplate, _description);
+
+  return <SEOPreview {...props} title={title} description={description} />;
 }
 
 export default Section;

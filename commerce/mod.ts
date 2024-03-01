@@ -65,11 +65,21 @@ export default function Site(
               ...state.seo,
               ...props,
             }),
+          Preview: (props) =>
+            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].Preview({
+              ...state.seo,
+              ...props,
+            }),
         },
         "commerce/sections/Seo/SeoPLP.tsx": {
           ...manifest.sections["commerce/sections/Seo/SeoPLP.tsx"],
           default: (props) =>
             manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
+          Preview: (props) =>
+            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].Preview({
               ...state.seo,
               ...props,
             }),
