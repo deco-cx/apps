@@ -2,6 +2,8 @@ import { WebPage as ProductWebPage } from "./types/productJSON.ts";
 import { WebPage as GridProductsWebPage } from "./types/gridProductsJSON.ts";
 import { WebPage as BasketWebPage } from "./types/basketJSON.ts";
 import { WebPage as SuggestionsWebPage } from "./types/suggestionsJSON.ts";
+import { WebPage as AuctionWebPage } from "./types/auctionJSON.ts";
+import { WebPage as AuctionDetailWebPage } from "./types/auctionDetailJSON.ts";
 import { ProductListResponse } from "./types/productList.ts";
 import { CartOperation } from "./types/basket.ts";
 
@@ -11,7 +13,9 @@ export interface API {
       | ProductWebPage
       | GridProductsWebPage
       | BasketWebPage
-      | SuggestionsWebPage;
+      | SuggestionsWebPage
+      | AuctionWebPage
+      | AuctionDetailWebPage;
   };
 
   "GET /web-api/v1/Catalog/Products/:source/:id": {
