@@ -318,9 +318,10 @@ export const messageProcessorFor = async (
     // multi tool use parallel seems to be some sort of openai bug, and it seems to have no solution yet.
     // https://community.openai.com/t/model-tries-to-call-unknown-function-multi-tool-use-parallel/490653
     // It's an error that only happens every now and then. Open ai tries to call "multi_tool_use.parallel" function that doesn't even exist and isn't even in the OpenAI documentation
+    // If functionCallReplies is not an array it should also be considered an error
     if (
-      functionCallReplies.length === 1 &&
-      functionCallReplies[0].name === "multi_tool_use.parallel"
+      (functionCallReplies.length === 1 &&
+      functionCallReplies[0].name === "multi_tool_use.parallel") || !Array.isArray(functionCallReplies)
     ) {
       const message: ReplyMessage = {
         messageId: Date.now().toString(),
