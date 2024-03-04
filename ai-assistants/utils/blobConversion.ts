@@ -7,7 +7,7 @@ export default function base64ToBlob(
   assistantIds?: AssistantIds,
 ): Blob {
   let regex =
-    /^data:(audio\/[a-z]+|video\/[a-z]+|audio\/mp[34]|video\/mp4);base64,(.*)$/;
+    /^data:(audio\/[a-z0-9\-\+\.]+|video\/[a-z0-9\-\+\.]+);base64,(.*)$/;
   if (context === "image") {
     regex = /^data:(image\/[a-z]+);base64,(.*)$/;
   }
