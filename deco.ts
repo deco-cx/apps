@@ -36,7 +36,6 @@ const config = {
     app("vnda"),
     app("wake"),
     app("linx"),
-    app("linx-impulse"),
     app("shopify"),
     app("nuvemshop"),
     app("website"),
