@@ -166,8 +166,6 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> => {
-  console.log("productList running");
-
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
@@ -184,8 +182,6 @@ const loader = async (
       facets: toPath(facets),
     }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
-
-  // console.log({ vtexProducts });
 
   const options = {
     baseUrl: url,

@@ -138,10 +138,9 @@ const invokeFor = (
       onFunctionCallStart(call, assistantProps);
       const invokeResponse = await cache[cacheKey];
       onFunctionCallEnd(call, assistantProps, invokeResponse);
-      const response = invokeResponse;
       return {
         tool_call_id: call.id,
-        output: JSON.stringify(response),
+        output: JSON.stringify(invokeResponse),
       };
     } catch (err) {
       console.error("invoke error", err);
@@ -316,6 +315,9 @@ export const messageProcessorFor = async (
 
     const replyMessage = threadMessageToReply(lastMsg);
 
+    // multi tool use parallel seems to be some sort of openai bug, and it seems to have no solution yet.
+    // https://community.openai.com/t/model-tries-to-call-unknown-function-multi-tool-use-parallel/490653
+    // It's an error that only happens every now and then. Open ai tries to call "multi_tool_use.parallel" function that doesn't even exist and isn't even in the OpenAI documentation
     if (
       functionCallReplies.length === 1 &&
       functionCallReplies[0].name === "multi_tool_use.parallel"

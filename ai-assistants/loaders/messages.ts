@@ -14,7 +14,7 @@ export interface Props {
 export const Tokens = {
   POSITIVE: "@",
   NEGATIVE: "#",
-  OPTIONS: "&",
+  OPTIONS: "&&&",
 };
 
 const normalize = (strContent: string) => {
@@ -54,7 +54,7 @@ export const threadMessageToReply = (message: ThreadMessage): ReplyMessage => {
   };
 };
 
-// Function to for the token **** in the message content and get everything after it to get the options.
+// Function to for the token OPTIONS in the message content and get everything after it to get the options.
 // If your response contains options for the user to choose from, make sure to include the ${Tokens.OPTIONS} symbol in your response, followed by the options separated by commas, followed by another ${Tokens.OPTIONS} symbol.
 const getOptions = (content: MessageContentText): string[] => {
   const text = content.text?.value;
