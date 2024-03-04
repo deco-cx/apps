@@ -13,8 +13,18 @@ import Telegram from "./Telegram.tsx";
 import Twitter from "./Twitter.tsx";
 import WhatsApp from "./WhatsApp.tsx";
 import instructions from "./instructions.json" with { type: "json" };
+import {
+  DiscordIcon,
+  FacebookIcon,
+  GoogleIcon,
+  LinkedInIcon,
+  SlackIcon,
+  TelegramIcon,
+  WhatsAppIcon,
+  XIcon,
+} from "./Icons.tsx";
 
-type SeoProps = ComponentProps<typeof Seo>;
+export type SeoProps = ComponentProps<typeof Seo>;
 
 export interface PreviewItem {
   title: string;
@@ -67,29 +77,30 @@ const DEFAULT_ITEM: PreviewItem = {
 };
 
 function PreviewItem(
-  { title, children, instructions }: {
+  { title, children, instructions, icon }: {
     title: string;
     children: ComponentChildren;
     instructions: string[];
+    icon?: ComponentChildren;
   },
 ) {
   return (
     <div class="w-[400px] flex flex-col h-full gap-[16px] sm:w-[522px]">
-      <div class="flex items-center">
+      <div class="flex items-center gap-2">
+        {icon}
         <h2 class="uppercase text-[13px] text-primary  pr-4 leading-4 font-semibold">
           {title}
         </h2>
         <div class="flex-grow h-px bg-divider"></div>
       </div>
-      <div class="text-[14px] text-primary font-medium leading-[20px]">
-        <p>Instructions:</p>
+      {children}
+      <div class="text-primary text-[13px] leading-[20px]">
         <ul>
           {instructions.map((instruction) => (
             <li class="list-disc list-inside">{instruction}</li>
           ))}
         </ul>
       </div>
-      {children}
     </div>
   );
 }
@@ -111,38 +122,67 @@ function Preview(props: SeoProps) {
           }}
         />
       </Head>
-      <section class="flex flex-col items-center">
-        <header class="px-10 w-full max-w-6xl py-8 text-primary">
-          <h1 class="font-semibold text-xl pb-1">Preview</h1>
-          <p class="text-base">
-            How your website is displayed on search engines and social media
-          </p>
-        </header>
+      <section class="flex flex-col items-center p-4">
         <div class="flex flex-col max-w-6xl items-center">
           <div class="flex flex-col items-center gap-8 mb-5 lg:grid lg:grid-cols-2 lg:justify-center">
-            <PreviewItem instructions={instructions.google} title="Google">
-              <Google {...DEFAULT_ITEM} {...props} path={path} />
+            <PreviewItem
+              instructions={instructions.google}
+              title="Google"
+              icon={<GoogleIcon />}
+            >
+              <Google {...DEFAULT_ITEM} {...props} />
             </PreviewItem>
-            <PreviewItem instructions={instructions.linkedin} title="Linkedin">
-              <LinkedIn {...DEFAULT_ITEM} {...props} path={path} />
+            <PreviewItem
+              instructions={instructions.whatsapp}
+              title="Whatsapp"
+              icon={<WhatsAppIcon />}
+            >
+              <WhatsApp {...DEFAULT_ITEM} {...props} />
             </PreviewItem>
-            <PreviewItem instructions={instructions.whatsapp} title="Whatsapp">
-              <WhatsApp {...DEFAULT_ITEM} {...props} path={path} />
-            </PreviewItem>
-            <PreviewItem instructions={instructions.telegram} title="Telegram">
-              <Telegram {...DEFAULT_ITEM} {...props} path={path} />
-            </PreviewItem>
-            <PreviewItem instructions={instructions.facebook} title="Facebook">
+
+            <PreviewItem
+              instructions={instructions.facebook}
+              title="Facebook"
+              icon={<FacebookIcon />}
+            >
               <Facebook {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
-            <PreviewItem instructions={instructions.twitter} title="Twitter">
+            <PreviewItem
+              instructions={instructions.twitter}
+              title="X (Former Twitter)"
+              icon={<XIcon />}
+            >
               <Twitter {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
-            <PreviewItem instructions={instructions.discord} title="Discord">
-              <Discord {...DEFAULT_ITEM} {...props} path={path} />
+
+            <PreviewItem
+              instructions={instructions.telegram}
+              title="Telegram"
+              icon={<TelegramIcon />}
+            >
+              <Telegram {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
-            <PreviewItem instructions={instructions.slack} title="Slack">
+            <PreviewItem
+              instructions={instructions.linkedin}
+              title="Linkedin"
+              icon={<LinkedInIcon />}
+            >
+              <LinkedIn {...DEFAULT_ITEM} {...props} />
+            </PreviewItem>
+
+            <PreviewItem
+              instructions={instructions.slack}
+              title="Slack"
+              icon={<SlackIcon />}
+            >
               <Slack {...DEFAULT_ITEM} {...props} path={path} />
+            </PreviewItem>
+            <PreviewItem
+              instructions={instructions.discord}
+              title="Discord"
+              icon={<DiscordIcon />}
+            >
+              <Discord {...DEFAULT_ITEM} {...props} path={path} />
             </PreviewItem>
           </div>
         </div>

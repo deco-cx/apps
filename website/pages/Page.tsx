@@ -49,8 +49,8 @@ export function renderSection(section: Props["sections"][number]) {
   return <Component {...props} />;
 }
 
-class ErrorBoundary extends // deno-lint-ignore no-explicit-any
-Component<{ fallback: ComponentFunc<any> }> {
+class ErrorBoundary // deno-lint-ignore no-explicit-any
+  extends Component<{ fallback: ComponentFunc<any> }> {
   state = { error: null as Error | null };
 
   // deno-lint-ignore no-explicit-any
@@ -62,12 +62,8 @@ Component<{ fallback: ComponentFunc<any> }> {
     if (this.state.error) {
       const err = this?.state?.error;
       const msg = `rendering: ${this.props} ${err?.stack}`;
-      logger.error(
-        msg,
-      );
-      console.error(
-        msg,
-      );
+      logger.error(msg);
+      console.error(msg);
     }
     return !this.state.error ||
         (this.state.error instanceof HttpError &&
@@ -93,20 +89,22 @@ const useDeco = () => {
 /**
  * @title Page
  */
-function Page(
-  { sections, errorPage, devMode }:
-    & Props
-    & { errorPage?: Page; devMode: boolean },
-): JSX.Element {
+function Page({
+  sections,
+  errorPage,
+  devMode,
+}: Props & { errorPage?: Page; devMode: boolean }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 
   return (
     <ErrorBoundary
-      fallback={(error) => (
-        error instanceof HttpError && errorPage !== undefined &&
-          errorPage !== null && !devMode
+      fallback={(error) =>
+        error instanceof HttpError &&
+          errorPage !== undefined &&
+          errorPage !== null &&
+          !devMode
           ? <errorPage.Component {...errorPage.props}></errorPage.Component>
           : (
             <ErrorPageComponent
@@ -114,8 +112,7 @@ function Page(
                 ? error.stack
                 : "") || ""}
             />
-          )
-      )}
+          )}
     >
       <LiveControls site={site} {...deco} />
       <Events deco={deco} />
@@ -125,13 +122,14 @@ function Page(
 }
 
 export const loader = async (
-  { sections }: Props,
+  { sections, ...restProps }: Props,
   req: Request,
   ctx: AppContext,
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
   return {
+    ...restProps,
     sections,
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
@@ -140,7 +138,8 @@ export const loader = async (
   };
 };
 
-export function Preview({ sections }: Props) {
+export function Preview(props: Props) {
+  const { sections } = props;
   const deco = useDeco();
 
   return (
@@ -148,6 +147,7 @@ export function Preview({ sections }: Props) {
       <Head>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
+
       <Events deco={deco} />
       {sections.map(renderSection)}
     </>
@@ -155,18 +155,15 @@ export function Preview({ sections }: Props) {
 }
 
 const PAGE_NOT_FOUND = -1;
-export const pageIdFromMetadata = (
-  metadata: ComponentMetadata | undefined,
-) => {
+export const pageIdFromMetadata = (metadata: ComponentMetadata | undefined) => {
   if (!metadata) {
     return PAGE_NOT_FOUND;
   }
 
   const { resolveChain, component } = metadata;
-  const pageResolverIndex =
-    (resolveChain.findLastIndex((chain) =>
-      chain.type === "resolver" && chain.value === component
-    )) || PAGE_NOT_FOUND;
+  const pageResolverIndex = resolveChain.findLastIndex(
+    (chain) => chain.type === "resolver" && chain.value === component,
+  ) || PAGE_NOT_FOUND;
 
   const pageParent = pageResolverIndex > 0
     ? resolveChain[pageResolverIndex - 1]
