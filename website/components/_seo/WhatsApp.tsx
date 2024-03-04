@@ -10,7 +10,7 @@ function WhatsAppBiggerImages(props: SeoProps) {
     image = "",
     title = "",
     description,
-    canonical = "https://www.yoursite.com",
+    canonical = "https://www.example.com",
   } = props;
   const titleMaxLength = 105;
 
@@ -91,14 +91,6 @@ function _WhatsAppSmallerImages(props: PreviewItem) {
 }
 
 function Whatsapp(props: SeoProps) {
-  // handle _WhatsAppSmallerImages
-  // if (width === 0) {
-  //   return <div></div>;
-  // }
-  //
-  // if (width < 300 && width !== 0) {
-  //   return <WhatsAppSmallerImages {...props} />;
-  // }
 
   return <WhatsAppBiggerImages {...props} />;
 }
