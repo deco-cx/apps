@@ -2,39 +2,45 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/cart/addCoupon.ts";
-import * as $$$$$$$$$1 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$2 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$0 from "./actions/auction/addBid.ts";
+import * as $$$$$$$$$1 from "./actions/cart/addCoupon.ts";
+import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
+import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/page.ts";
-import * as $$$2 from "./loaders/pages.ts";
-import * as $$$3 from "./loaders/path.ts";
-import * as $$$4 from "./loaders/product/detailsPage.ts";
-import * as $$$5 from "./loaders/product/list.ts";
-import * as $$$6 from "./loaders/product/listingPage.ts";
-import * as $$$7 from "./loaders/product/suggestions.ts";
-import * as $$$8 from "./loaders/proxy.ts";
+import * as $$$0 from "./loaders/auction/detailsPage.ts";
+import * as $$$1 from "./loaders/auction/list.ts";
+import * as $$$2 from "./loaders/cart.ts";
+import * as $$$3 from "./loaders/page.ts";
+import * as $$$4 from "./loaders/pages.ts";
+import * as $$$5 from "./loaders/path.ts";
+import * as $$$6 from "./loaders/product/detailsPage.ts";
+import * as $$$7 from "./loaders/product/list.ts";
+import * as $$$8 from "./loaders/product/listingPage.ts";
+import * as $$$9 from "./loaders/product/suggestions.ts";
+import * as $$$10 from "./loaders/proxy.ts";
 
 const manifest = {
   "loaders": {
-    "linx/loaders/cart.ts": $$$0,
-    "linx/loaders/page.ts": $$$1,
-    "linx/loaders/pages.ts": $$$2,
-    "linx/loaders/path.ts": $$$3,
-    "linx/loaders/product/detailsPage.ts": $$$4,
-    "linx/loaders/product/list.ts": $$$5,
-    "linx/loaders/product/listingPage.ts": $$$6,
-    "linx/loaders/product/suggestions.ts": $$$7,
-    "linx/loaders/proxy.ts": $$$8,
+    "linx/loaders/auction/detailsPage.ts": $$$0,
+    "linx/loaders/auction/list.ts": $$$1,
+    "linx/loaders/cart.ts": $$$2,
+    "linx/loaders/page.ts": $$$3,
+    "linx/loaders/pages.ts": $$$4,
+    "linx/loaders/path.ts": $$$5,
+    "linx/loaders/product/detailsPage.ts": $$$6,
+    "linx/loaders/product/list.ts": $$$7,
+    "linx/loaders/product/listingPage.ts": $$$8,
+    "linx/loaders/product/suggestions.ts": $$$9,
+    "linx/loaders/proxy.ts": $$$10,
   },
   "handlers": {
     "linx/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
-    "linx/actions/cart/addCoupon.ts": $$$$$$$$$0,
-    "linx/actions/cart/addItem.ts": $$$$$$$$$1,
-    "linx/actions/cart/updateItem.ts": $$$$$$$$$2,
+    "linx/actions/auction/addBid.ts": $$$$$$$$$0,
+    "linx/actions/cart/addCoupon.ts": $$$$$$$$$1,
+    "linx/actions/cart/addItem.ts": $$$$$$$$$2,
+    "linx/actions/cart/updateItem.ts": $$$$$$$$$3,
   },
   "name": "linx",
   "baseUrl": import.meta.url,
