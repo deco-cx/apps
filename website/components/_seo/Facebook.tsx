@@ -134,7 +134,6 @@ function _FacebookSmallOpenGraph(props: PreviewItem) {
 }
 
 function Facebook(props: PreviewItem & SeoProps) {
-
   return <FacebookBigOpenGraph {...props} />;
 }
 

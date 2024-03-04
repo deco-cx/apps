@@ -106,11 +106,6 @@ function _TwitterWebsite(props: SeoProps) {
 }
 
 function Twitter(props: PreviewItem) {
-  // Handle type website and article
-  // if (type === "website") {
-  //   return <TwitterWebsite {...props} />;
-  // }
-
   return (
     <CardWrapper {...props}>
       <TwitterArticle {...props} />

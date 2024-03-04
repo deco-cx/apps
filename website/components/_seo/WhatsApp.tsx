@@ -91,7 +91,6 @@ function _WhatsAppSmallerImages(props: PreviewItem) {
 }
 
 function Whatsapp(props: SeoProps) {
-
   return <WhatsAppBiggerImages {...props} />;
 }
 
