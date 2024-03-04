@@ -46,4 +46,9 @@ export interface API {
     response: CartOperation;
     body: { CouponCode: string };
   };
+
+  "POST /Shopping/ProductAuction/AddBid": {
+    response: CartOperation;
+    body: FormData;
+  };
 }
