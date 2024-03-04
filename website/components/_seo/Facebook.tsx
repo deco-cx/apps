@@ -10,7 +10,7 @@ function FacebookBigOpenGraph(props: PreviewItem & SeoProps) {
     description,
     width,
     height,
-    canonical = "https://www.yoursite.com",
+    canonical = "https://www.example.com",
   } = props;
   const titleMaxLength = 120;
   const url = new URL(canonical);
@@ -134,18 +134,6 @@ function _FacebookSmallOpenGraph(props: PreviewItem) {
 }
 
 function Facebook(props: PreviewItem & SeoProps) {
-  // Handle other dimensions
-  // if (height < 300 && height !== 0) {
-  //   return <FacebookSmallOpenGraph {...props} />;
-  // }
-  //
-  // if (width > height) {
-  //   return <FacebookBigOpenGraph {...props} />;
-  // }
-  //
-  // if (height <= 600 && height >= 300 || height > width) {
-  //   return <FacebookMediumOpenGraph {...props} />;
-  // }
 
   return <FacebookBigOpenGraph {...props} />;
 }

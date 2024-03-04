@@ -11,7 +11,7 @@ function SlackArticle(props: PreviewItem & SeoProps) {
     type,
     width,
     height,
-    canonical = "https://www.yoursite.com.br",
+    canonical = "https://www.example.com",
   } = props;
   const containerMaxLength = 1248;
 
@@ -58,7 +58,7 @@ function SlackWebsite(props: PreviewItem & SeoProps) {
     image,
     width,
     height,
-    canonical = "https://www.yoursite.com.br",
+    canonical = "https://www.example.com",
   } = props;
 
   const url = new URL(canonical);

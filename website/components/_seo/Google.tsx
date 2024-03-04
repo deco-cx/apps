@@ -8,7 +8,7 @@ function Google(
     title,
     description,
     image,
-    canonical = "https://www.yourdomain.com",
+    canonical = "https://www.example.com",
     favicon,
   }: SeoProps,
 ) {
