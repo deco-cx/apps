@@ -1,9 +1,18 @@
 import Image from "../../components/Image.tsx";
+import { SeoProps } from "./Preview.tsx";
 import { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
-function SlackArticle(props: PreviewItem) {
-  const { title, description, image, type, width, height, path } = props;
+function SlackArticle(props: PreviewItem & SeoProps) {
+  const {
+    title,
+    description,
+    image,
+    type,
+    width,
+    height,
+    canonical = "https://www.example.com",
+  } = props;
   const containerMaxLength = 1248;
 
   return (
@@ -19,7 +28,7 @@ function SlackArticle(props: PreviewItem) {
             width={16}
             height={16}
           />
-          <h2 class="font-bold">{path}</h2>
+          <h2 class="font-bold">{canonical}</h2>
         </div>
         <div class="flex flex-grow flex-col gap-[4px] lg:max-h-[600px] mr-2 sm:flex-wrap ">
           <div>
@@ -41,8 +50,19 @@ function SlackArticle(props: PreviewItem) {
   );
 }
 
-function SlackWebsite(props: PreviewItem) {
-  const { title, description, image, width, height, path } = props;
+function SlackWebsite(props: PreviewItem & SeoProps) {
+  const {
+    favicon = "",
+    title,
+    description,
+    image,
+    width,
+    height,
+    canonical = "https://www.example.com",
+  } = props;
+
+  const url = new URL(canonical);
+
   return (
     <div class="flex  w-[522px] sm:w-[522px]">
       <div class="min-w-[4px] w-[4px] bg-divider 
@@ -53,14 +73,16 @@ function SlackWebsite(props: PreviewItem) {
 
       <div class="flex flex-col  px-[12px] flex-grow ">
         <div class="flex">
-          <Image
-            src="https://github.com/deco-sites/start/blob/main/static/favicon-32x32.png?raw=true"
-            alt={title}
-            class=" object-contain mr-2 "
-            width={16}
-            height={16}
-          />
-          <h2 class="font-bold">{path}</h2>
+          {favicon && (
+            <Image
+              src={favicon}
+              alt={title}
+              class="object-contain mr-2"
+              width={16}
+              height={16}
+            />
+          )}
+          <h2 class="font-bold">{url.hostname.replace(/^www./, "")}</h2>
         </div>
         <div class="flex gap-6">
           <div class="flex-grow flex flex-col max-w-[310px] sm:max-w-[450px] flex-shrink">
@@ -80,7 +102,7 @@ function SlackWebsite(props: PreviewItem) {
   );
 }
 
-export default function Slack(props: PreviewItem) {
+export default function Slack(props: PreviewItem & SeoProps) {
   const { type } = props;
 
   if (type === "website") {

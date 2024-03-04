@@ -58,14 +58,13 @@ function DiscordWebsite(props: PreviewItem) {
   const descriptionMaxLength = 300;
 
   return (
-    <div class="flex  ">
-      <div
-        class={`flex flex-col w-[4px]  bg-[${
-          regex.test(themeColor) ? themeColor : "#D4DBD7"
-        }] rounded-l-lg    overflow-hidden box-border `}
-      >
-      </div>
-      <div class="bg-discord-bg flex pt-2 pb-4 pl-3 pr-4 rounded-r-md  ">
+    <div
+      class="overflow-hidden rounded-lg bg-[var(--bg-color)] pl-1"
+      style={{
+        "--bg-color": regex.test(themeColor) ? themeColor : "#D4DBD7",
+      }}
+    >
+      <div class="bg-discord-bg flex justify-between pt-2 pb-4 pl-3 pr-4 rounded-l">
         <div class=" rounded-r-md max-w-[392px] ">
           <h2 class="font-bold leading-[22px] mt-2 text-third max-w-[392px] w-full">
             {textShortner(title, titleMaxLength)}

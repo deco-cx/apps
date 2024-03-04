@@ -16,7 +16,7 @@ function Section({ jsonLD, omitVariants, ...props }: Props) {
     : jsonLD?.breadcrumbList
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumbList)
     : undefined;
-  const noIndexing = !jsonLD;
+  const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
   if (omitVariants && jsonLD?.product.isVariantOf?.hasVariant) {
     jsonLD.product.isVariantOf.hasVariant = [];

@@ -13,7 +13,12 @@ type CustomPlatform = {
 
 export type Props = WebsiteProps & {
   /** @deprecated Use selected commerce instead */
-  commerce?: VNDAProps | VTEXProps | ShopifyProps | WakeProps | CustomPlatform;
+  commerce?:
+    | VNDAProps
+    | VTEXProps
+    | ShopifyProps
+    | WakeProps
+    | CustomPlatform;
 };
 
 type WebsiteApp = ReturnType<typeof website>;
