@@ -20,8 +20,9 @@ import * as $$$$$$$$$$$14 from "./apps/verified-reviews.ts";
 import * as $$$$$$$$$$$15 from "./apps/vnda.ts";
 import * as $$$$$$$$$$$16 from "./apps/vtex.ts";
 import * as $$$$$$$$$$$17 from "./apps/wake.ts";
-import * as $$$$$$$$$$$18 from "./apps/weather.ts";
-import * as $$$$$$$$$$$19 from "./apps/workflows.ts";
+import * as $$$$$$$$$$$18 from "./apps/wap.ts";
+import * as $$$$$$$$$$$19 from "./apps/weather.ts";
+import * as $$$$$$$$$$$20 from "./apps/workflows.ts";
 
 const manifest = {
   "apps": {
@@ -43,8 +44,9 @@ const manifest = {
     "decohub/apps/vnda.ts": $$$$$$$$$$$15,
     "decohub/apps/vtex.ts": $$$$$$$$$$$16,
     "decohub/apps/wake.ts": $$$$$$$$$$$17,
-    "decohub/apps/weather.ts": $$$$$$$$$$$18,
-    "decohub/apps/workflows.ts": $$$$$$$$$$$19,
+    "decohub/apps/wap.ts": $$$$$$$$$$$18,
+    "decohub/apps/weather.ts": $$$$$$$$$$$19,
+    "decohub/apps/workflows.ts": $$$$$$$$$$$20,
   },
   "name": "decohub",
   "baseUrl": import.meta.url,

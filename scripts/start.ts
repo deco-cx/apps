@@ -2,6 +2,7 @@
 import "npm:@graphql-codegen/typescript";
 import "npm:@graphql-codegen/typescript-operations";
 import "npm:@graphql-codegen/add";
+import "npm:@graphql-codegen/schema-ast";
 
 import { CodegenConfig, generate } from "npm:@graphql-codegen/cli";
 import { compile } from "npm:json-schema-to-typescript";
@@ -240,6 +241,7 @@ const generateGraphQL = async () => {
               },
             },
             "typescript",
+            // "schema-ast",
             "typescript-operations",
           ],
           config: {

@@ -2,6 +2,7 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
 import * as $$$0 from "./loaders/config.ts";
 import * as $$$1 from "./loaders/products/productList.ts";
 import * as $$$2 from "./loaders/products/productListingPage.ts";
@@ -10,7 +11,6 @@ import * as $$$4 from "./loaders/search/popular.ts";
 import * as $$$5 from "./loaders/search/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/LinxImpulsePageView.tsx";
 import * as $$$$$$1 from "./sections/Script/LinxImpulseScript.tsx";
-import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
 
 const manifest = {
   "loaders": {
