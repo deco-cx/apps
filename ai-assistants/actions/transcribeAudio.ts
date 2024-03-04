@@ -27,6 +27,7 @@ export interface TranscribeAudioProps {
   audioDuration: number;
 }
 
+// TODO(ItamarRocha): Rate limit
 export default async function transcribeAudio(
   transcribeAudioProps: TranscribeAudioProps,
   _req: Request,

@@ -5,8 +5,6 @@ import { AssistantIds } from "../types.ts";
 import { ValueType } from "deco/deps.ts";
 import { AppContext } from "../mod.ts";
 
-const URL_EXPIRATION_SECONDS = 2 * 60 * 60; // 2 hours
-
 const stats = {
   awsUploadImageError: meter.createCounter("assistant_aws_upload_error", {
     unit: "1",
@@ -31,7 +29,6 @@ async function getSignedUrl(
   const s3Params = {
     Bucket: ctx.assistantAwsProps?.assistantBucketName.get?.() ?? "",
     Key: name,
-    Expires: URL_EXPIRATION_SECONDS,
     ContentType: mimetype,
     ACL: "public-read",
   };
@@ -45,6 +42,7 @@ async function uploadFileToS3(presignedUrl: string, data: Blob) {
   return response;
 }
 
+// TODO(ItamarRocha): Rate limit
 export default async function awsUploadImage(
   awsUploadImageProps: AWSUploadImageProps,
   _req: Request,
