@@ -26,13 +26,12 @@ function loader(
   const checkout = [
     ...DEFAULT_PROXY_PATHS,
     ...pagesToProxy,
-  ].map(([pathTemplate, basePath]) => ({
+  ].map((pathTemplate) => ({
     pathTemplate,
     handler: {
       value: {
         __resolveType: "website/handlers/proxy.ts",
         url: baseUrl,
-        basePath,
         customHeaders: [{
           Host: baseUrl,
         }],
