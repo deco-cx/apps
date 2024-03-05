@@ -34,7 +34,7 @@ export type Props = {
   jsonLD: ProductListingPage | null;
 } & Partial<Omit<SeoProps, "jsonLDs">>;
 
-/** @title Product Listing */
+/** @title Product listing */
 function Section(props: Props): SEOSection {
   return <Seo {...getSEOProps(props)} />;
 }
