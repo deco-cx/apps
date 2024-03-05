@@ -7,7 +7,6 @@ import * as $$$$$$$$$$$1 from "./apps/algolia.ts";
 import * as $$$$$$$$$$$2 from "./apps/analytics.ts";
 import * as $$$$$$$$$$$3 from "./apps/brand-assistant.ts";
 import * as $$$$$$$$$$$4 from "./apps/crux.ts";
-import * as $$$$$$$$$$$5 from "./apps/files.ts";
 import * as $$$$$$$$$$$6 from "./apps/implementation.ts";
 import * as $$$$$$$$$$$7 from "./apps/linx-impulse.ts";
 import * as $$$$$$$$$$$8 from "./apps/linx.ts";
@@ -31,7 +30,6 @@ const manifest = {
     "decohub/apps/analytics.ts": $$$$$$$$$$$2,
     "decohub/apps/brand-assistant.ts": $$$$$$$$$$$3,
     "decohub/apps/crux.ts": $$$$$$$$$$$4,
-    "decohub/apps/files.ts": $$$$$$$$$$$5,
     "decohub/apps/implementation.ts": $$$$$$$$$$$6,
     "decohub/apps/linx-impulse.ts": $$$$$$$$$$$7,
     "decohub/apps/linx.ts": $$$$$$$$$$$8,
