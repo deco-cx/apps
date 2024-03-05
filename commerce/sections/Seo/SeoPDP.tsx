@@ -1,4 +1,4 @@
-import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
+import Seo from "../../../website/components/Seo.tsx";
 import {
   renderTemplateString,
   SEOSection,
@@ -6,6 +6,7 @@ import {
 import { ProductDetailsPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 import { default as SEOPreview } from "../../../website/components/_seo/Preview.tsx";
+import { ImageWidget } from "../../../admin/widgets.ts";
 
 const getSEOProps = (props: Props) => {
   const { jsonLD, omitVariants } = props;
@@ -34,10 +35,23 @@ const getSEOProps = (props: Props) => {
   };
 };
 
-export type Props = {
+export interface Props {
+  /** @title Data Source */
   jsonLD: ProductDetailsPage | null;
   omitVariants?: boolean;
-} & Partial<Omit<SeoProps, "jsonLDs">>;
+  title?: string;
+  /** @hide true */
+  titleTemplate?: string;
+
+  description?: string;
+  /** @hide true */
+  descriptionTemplate?: string;
+
+  /** @hide true */
+  canonical?: string;
+  /** @hide true */
+  image?: ImageWidget;
+}
 
 /** @title Product details */
 function Section(props: Props): SEOSection {

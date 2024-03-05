@@ -1,4 +1,4 @@
-import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
+import Seo from "../../../website/components/Seo.tsx";
 import {
   renderTemplateString,
   SEOSection,
@@ -30,9 +30,19 @@ const getSEOProps = (props: Props) => {
   };
 };
 
-export type Props = {
+export interface Props {
+  /** @title Data Source */
   jsonLD: ProductListingPage | null;
-} & Partial<Omit<SeoProps, "jsonLDs">>;
+  title?: string;
+  /** @hide true */
+  titleTemplate?: string;
+
+  description?: string;
+  /** @hide true */
+  descriptionTemplate?: string;
+  /** @hide true */
+  canonical?: string;
+}
 
 /** @title Product listing */
 function Section(props: Props): SEOSection {
