@@ -106,6 +106,9 @@ const searchLoader = async (
   const term = props.term || props.slug || qQueryString ||
     undefined;
 
+  const priceFilterRegex = /de-(\d+)-a-(\d+)/;
+  const filterMatch = url.href.match(priceFilterRegex) ?? []
+
   const categoryTagName = (props.term || url.pathname.slice(1) || "").split(
     "/",
   );
@@ -163,6 +166,8 @@ const searchLoader = async (
       per_page: count,
       "tags[]": initialTags ?? categoryTagsToFilter,
       wildcard: true,
+      ...(filterMatch[1] && {min_price: Number(filterMatch[1])} ),
+      ...(filterMatch[2] && {max_price: Number(filterMatch[2])} ),
       "property1_values[]": properties1,
       "property2_values[]": properties2,
       "property3_values[]": properties3,
