@@ -1,4 +1,4 @@
-import { App } from "deco/mod.ts";
+import { App, FnContext } from "deco/mod.ts";
 import shopify, { Props as ShopifyProps } from "../shopify/mod.ts";
 import vnda, { Props as VNDAProps } from "../vnda/mod.ts";
 import vtex, { Props as VTEXProps } from "../vtex/mod.ts";
@@ -6,6 +6,8 @@ import wake, { Props as WakeProps } from "../wake/mod.ts";
 import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { bgYellow } from "std/fmt/colors.ts";
+
+export type AppContext = FnContext<Props, Manifest>;
 
 type CustomPlatform = {
   platform: "other";
@@ -58,32 +60,6 @@ export default function Site(
       ...manifest,
       sections: {
         ...manifest.sections,
-        "commerce/sections/Seo/SeoPDP.tsx": {
-          ...manifest.sections["commerce/sections/Seo/SeoPDP.tsx"],
-          default: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].default({
-              ...state.seo,
-              ...props,
-            }),
-          Preview: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].Preview({
-              ...state.seo,
-              ...props,
-            }),
-        },
-        "commerce/sections/Seo/SeoPLP.tsx": {
-          ...manifest.sections["commerce/sections/Seo/SeoPLP.tsx"],
-          default: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].default({
-              ...state.seo,
-              ...props,
-            }),
-          Preview: (props) =>
-            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].Preview({
-              ...state.seo,
-              ...props,
-            }),
-        },
       },
     },
     dependencies: ecommerce ? [site, ecommerce] : [site],

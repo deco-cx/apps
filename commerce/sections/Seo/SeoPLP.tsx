@@ -5,12 +5,40 @@ import {
 } from "../../../website/components/Seo.tsx";
 import { ProductListingPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
-import { default as SEOPreview } from "../../../website/components/_seo/Preview.tsx";
+import { AppContext } from "../../mod.ts";
 
-const getSEOProps = (props: Props) => {
-  const { jsonLD } = props;
-  const title = jsonLD?.seo?.title || props.title;
-  const description = jsonLD?.seo?.description || props.description;
+export interface Props {
+  /** @title Data Source */
+  jsonLD: ProductListingPage | null;
+  /** @title Title Override */
+  title?: string;
+  /** @hide true */
+  titleTemplate?: string;
+
+  /** @title Description Override */
+  description?: string;
+  /** @hide true */
+  descriptionTemplate?: string;
+  /** @hide true */
+  canonical?: string;
+}
+
+/** @title Product listing */
+export function loader(props: Props, _req: Request, ctx: AppContext) {
+  const {
+    titleTemplate = "",
+    descriptionTemplate = "",
+  } = ctx.seo ?? {};
+  const { title: titleProp, description: descriptionProp, jsonLD } = props;
+
+  const title = renderTemplateString(
+    titleTemplate,
+    titleProp || jsonLD?.seo?.title || "",
+  );
+  const description = renderTemplateString(
+    descriptionTemplate,
+    descriptionProp || jsonLD?.seo?.description || "",
+  );
   const canonical = props.canonical
     ? props.canonical
     : jsonLD?.seo?.canonical
@@ -20,7 +48,9 @@ const getSEOProps = (props: Props) => {
     : undefined;
 
   const noIndexing = !jsonLD || !jsonLD.products.length;
+
   return {
+    ...ctx.seo,
     ...props,
     title,
     description,
@@ -28,39 +58,12 @@ const getSEOProps = (props: Props) => {
     jsonLDs: [jsonLD],
     noIndexing,
   };
-};
-
-export interface Props {
-  /** @title Data Source */
-  jsonLD: ProductListingPage | null;
-  title?: string;
-  /** @hide true */
-  titleTemplate?: string;
-
-  description?: string;
-  /** @hide true */
-  descriptionTemplate?: string;
-  /** @hide true */
-  canonical?: string;
 }
 
-/** @title Product listing */
 function Section(props: Props): SEOSection {
-  return <Seo {...getSEOProps(props)} />;
+  return <Seo {...props} />;
 }
 
-export function Preview(_props: Props) {
-  const props = getSEOProps(_props);
-  const {
-    titleTemplate = "",
-    title: _title = "",
-    descriptionTemplate = "",
-    description: _description = "",
-  } = props;
-  const title = renderTemplateString(titleTemplate, _title);
-  const description = renderTemplateString(descriptionTemplate, _description);
-
-  return <SEOPreview {...props} title={title} description={description} />;
-}
+export { default as Preview } from "../../../website/components/_seo/Preview.tsx";
 
 export default Section;
