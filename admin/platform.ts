@@ -77,7 +77,7 @@ export interface UpdateDeploymentOpts {
   release: string;
 }
 
-export type SiteLifecycle = "ephemeral";
+export type SiteLifecycle = "ephemeral" | "persistent";
 
 export interface CreateSiteOptsBase {
   site: string;
