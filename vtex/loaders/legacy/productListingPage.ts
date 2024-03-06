@@ -397,6 +397,10 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["pageOffset", (props.pageOffset ?? 1).toString()],
   ]);
 
+  url.searchParams.forEach((value, key) => {
+    params.append(key, value);
+  });
+
   params.sort();
   params.set("segment", token);
 
