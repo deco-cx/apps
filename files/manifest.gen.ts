@@ -6,9 +6,9 @@ import * as $$$0 from "./loaders/app.ts";
 
 const manifest = {
   "loaders": {
-    "files/loaders/app.ts": $$$0,
+    "deco-sites/files/loaders/app.ts": $$$0,
   },
-  "name": "files",
+  "name": "deco-sites/files",
   "baseUrl": import.meta.url,
 };
 

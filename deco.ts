@@ -19,7 +19,6 @@ const paltformApps = [{
 const config = {
   apps: [
     app("ai-assistants"),
-    app("files"),
     app("openai"),
     app("brand-assistant"),
     app("implementation"),
@@ -27,6 +26,10 @@ const config = {
     {
       dir: "admin",
       name: "deco-sites/admin",
+    },
+    {
+      dir: "files",
+      name: "deco-sites/files",
     },
     app("analytics"),
     app("sourei"),
