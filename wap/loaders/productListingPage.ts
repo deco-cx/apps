@@ -138,8 +138,6 @@ const loader = async (
     }
   ));
 
-  console.log({ params, filterParams });
-
   const itemListElement = toBreadcrumbList(data.estrutura.breadcrumb, baseUrl);
 
   const filters = toFilters(data.conteudo.detalhes, baseUrl);
