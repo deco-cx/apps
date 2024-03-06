@@ -9,14 +9,39 @@ import {
 import { WapProductsListPage } from "../utils/type.ts";
 import { TypedResponse } from "../../utils/http.ts";
 
-export interface Props {
+type ORDER_OPTS = "Favoritos" | "Maior Preço" | "Menor Preço" | "Popularidade";
+
+export interface FilterItem {
+  /**
+   * @title Filter type
+   */
+  key: string;
+  /**
+   * @title Filter value
+   */
+  value: string;
+}
+
+export type Props = {
   busca?: string;
   /**
    * @max 100
    * @default 12
    */
   limit?: number;
-}
+  /**
+   * @description page number
+   */
+  page?: number;
+  /**
+   * @description order of products
+   */
+  order?: ORDER_OPTS;
+  /**
+   * @title filters
+   */
+  filterParams?: FilterItem[];
+};
 
 const endPoint = {
   "product/listing/category":
@@ -43,11 +68,23 @@ const loader = async (
   const rawSearch = url.searchParams.get("busca") ?? props.busca;
   const busca = rawSearch && encodeURIComponent(rawSearch);
 
-  const page = Number(url.searchParams.get("pg") || 1);
+  const page = Number(url.searchParams.get("pg") ?? props.page ?? 1);
 
   const limit = Number(url.searchParams.get("ipp") ?? props.limit ?? 12);
 
+  const order = url.searchParams.get("order") ?? props.order;
+
   const offset = page <= 1 ? 0 : (page - 1) * limit;
+
+  const filterParams = props.filterParams?.reduce((acc, { key, value }) => {
+    if (acc[key]) {
+      acc[key] = [...acc[key], value];
+    } else {
+      acc[key] = value;
+    }
+
+    return acc;
+  }, {} as Record<string, string | string[]>) ?? {};
 
   if (!busca && url.pathname.startsWith("%2F_fresh")) return null;
 
@@ -58,15 +95,20 @@ const loader = async (
 
   if (!busca && !nivel) return null;
 
-  const params: Record<string, string | string[]> = {};
+  const searchParams: Record<string, string | string[]> = {};
+
   url.searchParams.delete("busca");
   url.searchParams.delete("pg");
+  url.searchParams.delete("order");
+
   url.searchParams.forEach((v, k) => {
-    if (params[k]) {
-      params[k] = [...params[k], v];
+    if (searchParams[k]) {
+      searchParams[k] = [...searchParams[k], v];
     }
-    params[k] = v;
+    searchParams[k] = v;
   });
+
+  const params = { ...filterParams, ...searchParams };
 
   const endpoint = nivel && endPoint[nivel as keyof typeof endPoint];
 
@@ -75,6 +117,7 @@ const loader = async (
       url: url.pathname,
       limit: String(limit),
       offset: String(offset),
+      order,
       ...params,
     }).then((response: TypedResponse<unknown>) =>
       response.json()
@@ -84,6 +127,7 @@ const loader = async (
         busca,
         limit: String(limit),
         offset: String(offset),
+        order,
         ...params,
       }).then((response) => response.json()) as WapProductsListPage;
 

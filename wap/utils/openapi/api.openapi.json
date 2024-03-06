@@ -2998,6 +2998,14 @@
             }
           },
           {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "schema": {
@@ -3100,6 +3108,14 @@
             }
           },
           {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "schema": {
@@ -3147,6 +3163,14 @@
             "schema": {
               "type": "string",
               "example": "0"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
             }
           },
           {
@@ -3200,6 +3224,14 @@
             }
           },
           {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "schema": {
@@ -3247,6 +3279,14 @@
             "schema": {
               "type": "string",
               "example": "0"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
             }
           },
           {
