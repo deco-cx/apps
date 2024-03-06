@@ -8,24 +8,32 @@ type Props = Pick<
 >;
 
 export function loader(
-  props: Props,
+  _props: Props,
   _req: Request,
   ctx: AppContext,
 ) {
+  const props = { ..._props };
+  // backward compatibility: drop old props
+  // deno-lint-ignore no-explicit-any
+  delete (props as any).titleTemplate;
+  // deno-lint-ignore no-explicit-any
+  delete (props as any).descriptionTemplate;
+
   const {
     titleTemplate = "",
     descriptionTemplate = "",
     title: appTitle = "",
     description: appDescription = "",
+    ...seoSiteProps
   } = ctx.seo ?? {};
-  const { title: _title, description: _description } = props;
+  const { title: _title, description: _description, ...seoProps } = props;
   const title = renderTemplateString(titleTemplate, _title ?? appTitle);
   const description = renderTemplateString(
     descriptionTemplate,
     _description ?? appDescription,
   );
 
-  return { ...ctx.seo, ...props, title, description };
+  return { ...seoSiteProps, ...seoProps, title, description };
 }
 
 function Section(props: Props): SEOSection {

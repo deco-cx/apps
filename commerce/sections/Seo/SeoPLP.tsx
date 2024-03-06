@@ -12,22 +12,27 @@ export interface Props {
   jsonLD: ProductListingPage | null;
   /** @title Title Override */
   title?: string;
-  /** @hide true */
-  titleTemplate?: string;
-
   /** @title Description Override */
   description?: string;
-  /** @hide true */
-  descriptionTemplate?: string;
+
   /** @hide true */
   canonical?: string;
 }
 
 /** @title Product listing */
-export function loader(props: Props, _req: Request, ctx: AppContext) {
+export function loader(_props: Props, _req: Request, ctx: AppContext) {
+  const props = { ..._props };
+
+  // backward compatibility: drop old props
+  // deno-lint-ignore no-explicit-any
+  delete (props as any).titleTemplate;
+  // deno-lint-ignore no-explicit-any
+  delete (props as any).descriptionTemplate;
+
   const {
     titleTemplate = "",
     descriptionTemplate = "",
+    ...seoSiteProps
   } = ctx.seo ?? {};
   const { title: titleProp, description: descriptionProp, jsonLD } = props;
 
@@ -50,7 +55,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
   const noIndexing = !jsonLD || !jsonLD.products.length;
 
   return {
-    ...ctx.seo,
+    ...seoSiteProps,
     ...props,
     title,
     description,

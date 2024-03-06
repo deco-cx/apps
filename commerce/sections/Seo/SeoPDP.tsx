@@ -12,13 +12,10 @@ export interface Props {
   /** @title Data Source */
   jsonLD: ProductDetailsPage | null;
   omitVariants?: boolean;
+  /** @title Title Override */
   title?: string;
-  /** @hide true */
-  titleTemplate?: string;
-
+  /** @title Description Override */
   description?: string;
-  /** @hide true */
-  descriptionTemplate?: string;
 
   /** @hide true */
   canonical?: string;
@@ -27,10 +24,18 @@ export interface Props {
 }
 
 /** @title Product details */
-export function loader(props: Props, _req: Request, ctx: AppContext) {
+export function loader(_props: Props, _req: Request, ctx: AppContext) {
+  const props = { ..._props };
+  // backward compatibility: drop old props
+  // deno-lint-ignore no-explicit-any
+  delete (props as any).titleTemplate;
+  // deno-lint-ignore no-explicit-any
+  delete (props as any).descriptionTemplate;
+
   const {
     titleTemplate = "",
     descriptionTemplate = "",
+    ...seoSiteProps
   } = ctx.seo ?? {};
   const {
     title: titleProp,
@@ -60,7 +65,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
   }
 
   return {
-    ...ctx.seo,
+    ...seoSiteProps,
     ...props,
     title,
     description,
