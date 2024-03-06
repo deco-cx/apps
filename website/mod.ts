@@ -82,6 +82,19 @@ export default function App(state: Props): App<Manifest, Props> {
       ...manifest,
       sections: {
         ...manifest.sections,
+        "website/sections/Seo/Seo.tsx": {
+          ...manifest.sections["website/sections/Seo/Seo.tsx"],
+          Preview: (props) =>
+            manifest.sections["website/sections/Seo/Seo.tsx"].Preview({
+              ...state.seo,
+              ...props,
+            }),
+          default: (props) =>
+            manifest.sections["website/sections/Seo/Seo.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
+        },
       },
       pages: {
         ...manifest.pages,

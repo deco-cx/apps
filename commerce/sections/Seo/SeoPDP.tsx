@@ -1,60 +1,19 @@
-import Seo from "../../../website/components/Seo.tsx";
-import {
-  renderTemplateString,
-  SEOSection,
-} from "../../../website/components/Seo.tsx";
+import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
 import { ProductDetailsPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
-import { ImageWidget } from "../../../admin/widgets.ts";
-import { AppContext } from "../../mod.ts";
 
-export interface Props {
-  /** @title Data Source */
+export type Props = {
   jsonLD: ProductDetailsPage | null;
   omitVariants?: boolean;
-  /** @title Title Override */
-  title?: string;
-  /** @title Description Override */
-  description?: string;
+} & Partial<Omit<SeoProps, "jsonLDs">>;
 
-  /** @hide true */
-  canonical?: string;
-  /** @hide true */
-  image?: ImageWidget;
-}
-
-/** @title Product details */
-export function loader(_props: Props, _req: Request, ctx: AppContext) {
-  const props = { ..._props };
-  // backward compatibility: drop old props
-  // deno-lint-ignore no-explicit-any
-  delete (props as any).titleTemplate;
-  // deno-lint-ignore no-explicit-any
-  delete (props as any).descriptionTemplate;
-
-  const {
-    titleTemplate = "",
-    descriptionTemplate = "",
-    ...seoSiteProps
-  } = ctx.seo ?? {};
-  const {
-    title: titleProp,
-    description: descriptionProp,
-    jsonLD,
-    omitVariants,
-  } = props;
-
-  const title = renderTemplateString(
-    titleTemplate,
-    titleProp || jsonLD?.seo?.title || "",
-  );
-  const description = renderTemplateString(
-    descriptionTemplate,
-    descriptionProp || jsonLD?.seo?.description || "",
-  );
-  const image = jsonLD?.product.image?.[0]?.url || props.image;
-  const canonical = props.canonical || jsonLD?.seo?.canonical
-    ? jsonLD?.seo?.canonical
+/** @title SeoPDP deprecated */
+function Section({ jsonLD, omitVariants, ...props }: Props) {
+  const title = jsonLD?.seo?.title;
+  const description = jsonLD?.seo?.description;
+  const image = jsonLD?.product.image?.[0]?.url;
+  const canonical = jsonLD?.seo?.canonical
+    ? jsonLD.seo.canonical
     : jsonLD?.breadcrumbList
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumbList)
     : undefined;
@@ -64,22 +23,17 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     jsonLD.product.isVariantOf.hasVariant = [];
   }
 
-  return {
-    ...seoSiteProps,
-    ...props,
-    title,
-    description,
-    image,
-    canonical,
-    noIndexing,
-    jsonLDs: [jsonLD],
-  };
+  return (
+    <Seo
+      {...props}
+      title={title || props.title}
+      description={description || props.description}
+      image={image || props.image}
+      canonical={props.canonical || canonical}
+      jsonLDs={[jsonLD]}
+      noIndexing={noIndexing}
+    />
+  );
 }
-
-function Section(props: Props): SEOSection {
-  return <Seo {...props} />;
-}
-
-export { default as Preview } from "../../../website/components/_seo/Preview.tsx";
 
 export default Section;

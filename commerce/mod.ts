@@ -60,6 +60,22 @@ export default function Site(
       ...manifest,
       sections: {
         ...manifest.sections,
+        "commerce/sections/Seo/SeoPDP.tsx": {
+          ...manifest.sections["commerce/sections/Seo/SeoPDP.tsx"],
+          default: (props) =>
+            manifest.sections["commerce/sections/Seo/SeoPDP.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
+        },
+        "commerce/sections/Seo/SeoPLP.tsx": {
+          ...manifest.sections["commerce/sections/Seo/SeoPLP.tsx"],
+          default: (props) =>
+            manifest.sections["commerce/sections/Seo/SeoPLP.tsx"].default({
+              ...state.seo,
+              ...props,
+            }),
+        },
       },
     },
     dependencies: ecommerce ? [site, ecommerce] : [site],

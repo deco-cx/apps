@@ -1,49 +1,15 @@
-import Seo from "../../../website/components/Seo.tsx";
-import {
-  renderTemplateString,
-  SEOSection,
-} from "../../../website/components/Seo.tsx";
+import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
 import { ProductListingPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
-import { AppContext } from "../../mod.ts";
 
-export interface Props {
-  /** @title Data Source */
+export type Props = {
   jsonLD: ProductListingPage | null;
-  /** @title Title Override */
-  title?: string;
-  /** @title Description Override */
-  description?: string;
+} & Partial<Omit<SeoProps, "jsonLDs">>;
 
-  /** @hide true */
-  canonical?: string;
-}
-
-/** @title Product listing */
-export function loader(_props: Props, _req: Request, ctx: AppContext) {
-  const props = { ..._props };
-
-  // backward compatibility: drop old props
-  // deno-lint-ignore no-explicit-any
-  delete (props as any).titleTemplate;
-  // deno-lint-ignore no-explicit-any
-  delete (props as any).descriptionTemplate;
-
-  const {
-    titleTemplate = "",
-    descriptionTemplate = "",
-    ...seoSiteProps
-  } = ctx.seo ?? {};
-  const { title: titleProp, description: descriptionProp, jsonLD } = props;
-
-  const title = renderTemplateString(
-    titleTemplate,
-    titleProp || jsonLD?.seo?.title || "",
-  );
-  const description = renderTemplateString(
-    descriptionTemplate,
-    descriptionProp || jsonLD?.seo?.description || "",
-  );
+/** @title SeoPLP deprecated */
+function Section({ jsonLD, ...props }: Props) {
+  const title = jsonLD?.seo?.title;
+  const description = jsonLD?.seo?.description;
   const canonical = props.canonical
     ? props.canonical
     : jsonLD?.seo?.canonical
@@ -54,21 +20,16 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
 
   const noIndexing = !jsonLD || !jsonLD.products.length;
 
-  return {
-    ...seoSiteProps,
-    ...props,
-    title,
-    description,
-    canonical,
-    jsonLDs: [jsonLD],
-    noIndexing,
-  };
+  return (
+    <Seo
+      {...props}
+      title={title || props.title}
+      description={description || props.description}
+      canonical={canonical}
+      jsonLDs={[jsonLD]}
+      noIndexing={noIndexing}
+    />
+  );
 }
-
-function Section(props: Props): SEOSection {
-  return <Seo {...props} />;
-}
-
-export { default as Preview } from "../../../website/components/_seo/Preview.tsx";
 
 export default Section;
