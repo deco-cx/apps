@@ -59,8 +59,10 @@ async function build() {
   interface FreshProject {
     buildArgs?: string[];
   }
-  
-  const getFrshProject = (denoJson: DenoJSON | undefined): FreshProject | undefined => {
+
+  const getFrshProject = (
+    denoJson: DenoJSON | undefined,
+  ): FreshProject | undefined => {
     if (!denoJson) {
       return undefined;
     }
@@ -299,7 +301,7 @@ async function build() {
 
   const [configFileName, denoJson] = await getDenoJson();
 
-  console.log("Overriding deno.json file")
+  console.log("Overriding deno.json file");
   const finalDenoJson = await overrideDenoJson(configFileName, denoJson);
 
   console.log(`generating cache...`);
