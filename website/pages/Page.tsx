@@ -40,6 +40,7 @@ export interface Props {
    * @format unused-path
    */
   path?: string;
+  /** @hide true */
   seo?: Section<SEOSection>;
   sections: Sections;
 }

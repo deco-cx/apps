@@ -6,7 +6,11 @@ export type Props = {
   jsonLD: ProductListingPage | null;
 } & Partial<Omit<SeoProps, "jsonLDs">>;
 
-/** @title SeoPLP deprecated */
+/**
+ * @deprecated true
+ * @migrate commerce/sections/Seo/SeoPLPV2.tsx
+ * @title SeoPLP deprecated
+ */
 function Section({ jsonLD, ...props }: Props) {
   const title = jsonLD?.seo?.title;
   const description = jsonLD?.seo?.description;
