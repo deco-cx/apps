@@ -55,7 +55,7 @@ const getSortFromQuery = (query: string): SortBy | undefined => {
 };
 
 /**
- * @title Linx Impulse - Search
+ * @title Linx Impulse - Hotsite
  * @description Product Listing Page loader
  */
 const loader = async (
