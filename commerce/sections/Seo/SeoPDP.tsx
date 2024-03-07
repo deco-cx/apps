@@ -7,6 +7,11 @@ export type Props = {
   omitVariants?: boolean;
 } & Partial<Omit<SeoProps, "jsonLDs">>;
 
+/**
+ * @deprecated true
+ * @migrate commerce/sections/Seo/SeoPDPV2.tsx
+ * @title SeoPDP deprecated
+ */
 function Section({ jsonLD, omitVariants, ...props }: Props) {
   const title = jsonLD?.seo?.title;
   const description = jsonLD?.seo?.description;
