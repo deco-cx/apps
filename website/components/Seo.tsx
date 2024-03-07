@@ -1,7 +1,12 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ImageWidget } from "../../admin/widgets.ts";
 import { stripHTML } from "../utils/html.ts";
+import { JSX } from "preact";
 
+export const renderTemplateString = (template: string, value: string) =>
+  template.replace("%s", value);
+
+export type SEOSection = JSX.Element;
 export type OGType = "website" | "article";
 
 export interface Props {
@@ -57,10 +62,10 @@ function Component({
 
   return (
     <Head>
-      <title>{titleTemplate.replace("%s", title)}</title>
+      <title>{renderTemplateString(titleTemplate, title)}</title>
       <meta
         name="description"
-        content={descriptionTemplate.replace("%s", description)}
+        content={renderTemplateString(descriptionTemplate, description)}
       />
       <meta name="theme-color" content={themeColor} />
       <link rel="icon" href={favicon} />

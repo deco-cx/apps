@@ -43,7 +43,7 @@ export interface Props {
   /** @title Seo */
   seo?: Omit<
     Seo,
-    "jsonLDs" | "titleTemplate" | "descriptionTemplate" | "canonical"
+    "jsonLDs" | "canonical"
   >;
 
   /**
