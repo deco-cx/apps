@@ -19,7 +19,7 @@ declare global {
 
 const snippet = (flags: Record<string, string | boolean>) => {
   const trackPageview = () =>
-    globalThis.window.plausible("pageview", { props: flags });
+    globalThis.window.plausible?.("pageview", { props: flags });
 
   // First load
   trackPageview();
@@ -57,7 +57,7 @@ const loader = (
       props.defer ? "defer" : ""
     } data-exclude="/proxy" ${
       props.domain ? "data-domain=" + props.domain : ""
-    } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.js"></script>`;
+    } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.hash.js"></script>`;
 
     const flagsScript = `<script defer src="${
       scriptAsDataURI(snippet, flags)

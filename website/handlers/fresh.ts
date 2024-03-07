@@ -43,15 +43,17 @@ export default function Fresh(
     const timing = appContext?.monitoring?.timings?.start?.("load-data");
     const url = new URL(req.url);
     const asJson = url.searchParams.get("asJson");
+    const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
     const delay = Number(
-      url.searchParams.get("__decoFBT") ?? appContext.firstByteThresholdMS,
+      url.searchParams.get("__decoFBT") ?? delayFromProps,
     );
 
     /** Controller to abort third party fetch (loaders) */
     const ctrl = new AbortController();
 
     /** Aborts when: Incomming request is aborted */
-    req.signal.addEventListener("abort", () => ctrl.abort());
+    const abortHandler = () => ctrl.abort();
+    req.signal.addEventListener("abort", abortHandler);
 
     /**
      * Aborts when:
@@ -61,7 +63,7 @@ export default function Fresh(
      * 3. Is not a bot (bot requires the whole page html for boosting SEO)
      */
     const firstByteThreshold = !asJson && delay && !appContext.isBot
-      ? setTimeout(() => ctrl.abort(), delay)
+      ? delay === 1 ? ctrl.abort() : setTimeout(() => ctrl.abort(), delay)
       : undefined;
 
     const getPage = RequestContext.bind(
@@ -87,7 +89,9 @@ export default function Fresh(
       },
     );
 
-    clearTimeout(firstByteThreshold);
+    if (firstByteThreshold) {
+      clearTimeout(firstByteThreshold);
+    }
 
     if (asJson !== null) {
       return Response.json(page, { headers: allowCorsFor(req) });
@@ -123,6 +127,7 @@ export default function Fresh(
           } finally {
             span.end();
             timing?.end();
+            req.signal.removeEventListener("abort", abortHandler);
           }
         },
       );

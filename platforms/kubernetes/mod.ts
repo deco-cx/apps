@@ -1,10 +1,11 @@
 import { context } from "deco/live.ts";
-import type { AppContext as AC, App, ManifestOf } from "deco/mod.ts";
+import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
 import { Secret } from "../../website/loaders/secret.ts";
 import { k8s } from "./deps.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
+// TODO (mcandeia) use decosite export const CONTROL_PLANE_DOMAIN = "deco.site";
 export const CONTROL_PLANE_DOMAIN = "decocdn.com";
 
 export interface State {

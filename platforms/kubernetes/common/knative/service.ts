@@ -93,6 +93,7 @@ export const knativeServiceOf = (
       namespace,
       annotations: {
         "networking.knative.dev/wildcardDomain": `*.${controlPlaneDomain}`,
+        sub: site, // subdomain of dns
       },
       labels,
     },

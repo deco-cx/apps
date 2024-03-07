@@ -43,7 +43,7 @@ export interface Props {
   /** @title Seo */
   seo?: Omit<
     Seo,
-    "jsonLDs" | "titleTemplate" | "descriptionTemplate" | "canonical"
+    "jsonLDs" | "canonical"
   >;
 
   /**
@@ -66,18 +66,16 @@ export interface Props {
 
   /**
    * @title Async Rendering
-   * @description Number of milliseconds to wait before rendering preview. Set to 0 to disable it.
-   * @default 0
+   * @description Async sections will be deferred to the client-side
+   * @default false
    */
-  firstByteThresholdMS?: 0 | 1 | 100 | 300 | 500 | 700;
+  firstByteThresholdMS?: boolean;
 }
 
 /**
  * @title Website
  */
-export default function App(
-  state: Props,
-): App<Manifest, Props> {
+export default function App(state: Props): App<Manifest, Props> {
   return {
     state,
     manifest: {
@@ -123,9 +121,7 @@ export default function App(
   };
 }
 
-const deferPropsResolve = (
-  routes: Routes,
-): Routes => {
+const deferPropsResolve = (routes: Routes): Routes => {
   if (Array.isArray(routes)) {
     const newRoutes = [];
     for (const route of routes) {
@@ -158,3 +154,5 @@ export const onBeforeResolveProps = <
   }
   return props;
 };
+
+export { default as Preview } from "./Preview.tsx";
