@@ -520,6 +520,7 @@ url?: string
 searchParams: {
 url?: string
 offset?: string
+order?: string
 limit?: string
 }
 }
@@ -542,6 +543,7 @@ limit?: string
 searchParams: {
 url?: string
 offset?: string
+order?: string
 limit?: string
 }
 }
@@ -552,6 +554,7 @@ limit?: string
 searchParams: {
 url?: string
 offset?: string
+order?: string
 limit?: string
 }
 }
@@ -562,6 +565,7 @@ limit?: string
 searchParams: {
 url?: string
 offset?: string
+order?: string
 limit?: string
 }
 }
@@ -572,6 +576,7 @@ limit?: string
 searchParams: {
 busca?: string
 offset?: string
+order?: string
 limit?: string
 }
 }
