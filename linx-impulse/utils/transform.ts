@@ -107,6 +107,10 @@ const sanitizeValue = (value: unknown): string | undefined => {
     return `${value}`;
   }
 
+  if (Array.isArray(value)) {
+    return sanitizeValue(value[0]);
+  }
+
   return JSON.stringify(value);
 };
 
