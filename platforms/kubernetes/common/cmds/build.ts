@@ -1,3 +1,5 @@
+import { DenoJSON } from "../../types.ts";
+
 async function build() {
   const { ensureFile } = await import(
     "https://deno.land/std@0.204.0/fs/ensure_file.ts"
@@ -57,8 +59,8 @@ async function build() {
   interface FreshProject {
     buildArgs?: string[];
   }
-  // deno-lint-ignore no-explicit-any
-  const getFrshProject = (denoJson: any): FreshProject | undefined => {
+  
+  const getFrshProject = (denoJson: DenoJSON | undefined): FreshProject | undefined => {
     if (!denoJson) {
       return undefined;
     }
@@ -209,8 +211,7 @@ async function build() {
 
   const overrideDenoJson = async (
     configFileName: string,
-    // deno-lint-ignore no-explicit-any
-    denoJson: Record<string, any>,
+    denoJson: DenoJSON,
   ) => {
     if (!denoJson) {
       return undefined;
@@ -239,34 +240,37 @@ async function build() {
   };
 
   const overrideCompileOptions = (
-    // deno-lint-ignore no-explicit-any
-    denoJson: Record<string, any>,
+    denoJson: DenoJSON,
   ) => {
-    const hasCompilerOptions = denoJson.compilerOptions;
-
-    if (!hasCompilerOptions) {
+    let hasChange = false;
+    if (!denoJson.compilerOptions) {
       denoJson.compilerOptions = {};
     }
 
+    if (!denoJson.compilerOptions.experimentalDecorators) {
+      denoJson.compilerOptions.experimentalDecorators = true;
+      hasChange = true;
+    }
+
     if (
-      !denoJson.compilerOptions.jsx ||
+      !denoJson.compilerOptions?.jsx ||
       denoJson.compilerOptions.jsx !== "precompile"
     ) {
       denoJson.compilerOptions.jsx = "precompile";
+      denoJson.compilerOptions.jsxImportSource = "preact";
 
-      return { denoJson, hasChange: true };
+      hasChange = true;
     }
 
-    return { denoJson, hasChange: false };
+    return { denoJson, hasChange };
   };
 
   const overrideNodeModulesDir = (
-    // deno-lint-ignore no-explicit-any
-    denoJson: Record<string, any>,
+    denoJson: DenoJSON,
   ) => {
     const hasNodeModulesDir = denoJson.nodeModulesDir;
 
-    if (hasNodeModulesDir && hasNodeModulesDir !== false) {
+    if (hasNodeModulesDir !== undefined && hasNodeModulesDir !== false) {
       denoJson.nodeModulesDir = false;
 
       return { denoJson, hasChange: true };
@@ -277,8 +281,7 @@ async function build() {
 
   const updateFile = async (
     configFileName: string,
-    // deno-lint-ignore no-explicit-any
-    denoJson: Record<string, any>,
+    denoJson: DenoJSON,
   ) => {
     const fileContent = JSON.stringify(denoJson, null, 2);
     await Deno.writeTextFile(
@@ -296,6 +299,7 @@ async function build() {
 
   const [configFileName, denoJson] = await getDenoJson();
 
+  console.log("Overriding deno.json file")
   const finalDenoJson = await overrideDenoJson(configFileName, denoJson);
 
   console.log(`generating cache...`);
