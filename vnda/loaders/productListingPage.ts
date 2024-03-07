@@ -63,9 +63,6 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
-
-  /** @description Here is to put the pathname of the Search Page. Ex: /s. We have default values: "/busca" or "/s" */
-  searchPagePath?: string;
 }
 
 const getBreadcrumbList = (categories: Tag[], url: URL): BreadcrumbList => ({
@@ -104,7 +101,7 @@ const searchLoader = async (
   const sort = url.searchParams.get("sort") as Sort;
   const page = Number(url.searchParams.get("page")) || 1;
 
-  const isSearchPage = props.searchPagePath ? props.searchPagePath ===  url.pathname : url.pathname === "/busca" || url.pathname === "/s";
+  const isSearchPage = ctx.searchPagePath ? ctx.searchPagePath ===  url.pathname : url.pathname === "/busca" || url.pathname === "/s";
   const qQueryString = url.searchParams.get("q");
   const term = props.term || props.slug || qQueryString ||
     undefined;
