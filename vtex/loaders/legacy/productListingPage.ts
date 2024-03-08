@@ -80,6 +80,11 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+
+  /**
+   * @title Ignore case by checking for selected filter
+   */
+  ignoreCaseSelected?: boolean;
 }
 
 export const sortOptions = [
@@ -204,10 +209,8 @@ const loader = async (
 
   const ftFallback = getTermFallback(url, isPage, hasFilters);
 
-  const ft = props.ft ||
-    url.searchParams.get("ft") ||
-    url.searchParams.get("q") ||
-    ftFallback;
+  const ft = props.ft || url.searchParams.get("ft") ||
+    url.searchParams.get("q") || ftFallback;
 
   const isInSeachFormat = ft;
 
@@ -259,8 +262,10 @@ const loader = async (
           priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })
       )
-      .map((product) =>
-        props.similars ? withIsSimilarTo(req, ctx, product) : product
+      .map(
+        (
+          product,
+        ) => (props.similars ? withIsSimilarTo(req, ctx, product) : product),
       ),
   );
 
@@ -269,9 +274,9 @@ const loader = async (
   ): Record<string, LegacyFacet[]> => {
     const flatCategories: Record<string, LegacyFacet[]> = {};
 
-    CategoriesTrees.forEach((
-      category,
-    ) => (flatCategories[category.Name] = category.Children || []));
+    CategoriesTrees.forEach(
+      (category) => (flatCategories[category.Name] = category.Children || []),
+    );
 
     return flatCategories;
   };
@@ -325,7 +330,15 @@ const loader = async (
     ...flatCategories,
   })
     .map(([name, facets]) =>
-      legacyFacetToFilter(name, facets, url, map, term, filtersBehavior)
+      legacyFacetToFilter(
+        name,
+        facets,
+        url,
+        map,
+        term,
+        filtersBehavior,
+        props.ignoreCaseSelected,
+      )
     )
     .flat()
     .filter((x): x is Filter => Boolean(x));
@@ -396,6 +409,10 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["map", props.map ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
   ]);
+
+  url.searchParams.forEach((value, key) => {
+    params.append(key, value);
+  });
 
   params.sort();
   params.set("segment", token);
