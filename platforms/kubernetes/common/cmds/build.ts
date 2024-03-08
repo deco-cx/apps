@@ -245,19 +245,16 @@ async function build() {
     denoJson: DenoJSON,
   ) => {
     let hasChange = false;
-    if (!denoJson.compilerOptions) {
+    if (denoJson.compilerOptions === undefined) {
       denoJson.compilerOptions = {};
     }
 
-    if (!denoJson.compilerOptions.experimentalDecorators) {
+    if (denoJson.compilerOptions.experimentalDecorators === undefined) {
       denoJson.compilerOptions.experimentalDecorators = true;
       hasChange = true;
     }
 
-    if (
-      !denoJson.compilerOptions?.jsx ||
-      denoJson.compilerOptions.jsx !== "precompile"
-    ) {
+    if ( denoJson.compilerOptions.jsx === "react-jsx") {
       denoJson.compilerOptions.jsx = "precompile";
       denoJson.compilerOptions.jsxImportSource = "preact";
 
