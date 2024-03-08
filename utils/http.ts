@@ -169,3 +169,21 @@ export const nullOnNotFound = (error: any) => {
 
   throw error;
 };
+
+export const parseOrLogResponse = async <T>(
+  res: TypedResponse<T>,
+) => {
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    const log = `------------- Response Parsing Error -------------
+    Status ${res.status}
+    Response URL: ${res.url}
+    Response as text: ${await res.text()}
+    JS Error:`;
+    console.error(log, err);
+    throw err;
+  }
+  return data;
+};
