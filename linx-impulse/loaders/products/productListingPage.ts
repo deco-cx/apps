@@ -108,87 +108,65 @@ const loader = async (
   const userId = user?.["@id"];
   const productFormat = "complete";
 
-  try {
-    if (searchTerm) {
-      const response = await api["GET /engage/search/v3/search"]({
-        apiKey,
-        origin,
-        salesChannel,
-        deviceId,
-        allowRedirect,
-        showOnlyAvailable,
-        resultsPerPage,
-        page,
-        sortBy,
-        filter,
-        source,
-        terms: searchTerm,
-        userId,
-        productFormat,
-      }).then((res) => res.json());
+  if (searchTerm) {
+    const response = await api["GET /engage/search/v3/search"]({
+      apiKey,
+      origin,
+      salesChannel,
+      deviceId,
+      allowRedirect,
+      showOnlyAvailable,
+      resultsPerPage,
+      page,
+      sortBy,
+      filter,
+      source,
+      terms: searchTerm,
+      userId,
+      productFormat,
+    }).then((res) => res.json());
 
-      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
-    } else if (category.length >= 2 && category[0] === "hotsite") {
-      const response = await api["GET /engage/search/v3/hotsites"]({
-        apiKey,
-        origin,
-        salesChannel,
-        deviceId,
-        showOnlyAvailable,
-        resultsPerPage,
-        page,
-        sortBy,
-        filter,
-        source,
-        userId,
-        productFormat,
-        name: category[1],
-      }).then((res) => res.json());
+    return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
+  } else if (category.length > 0 || multicategory.length > 0) {
+    const response = await api["GET /engage/search/v3/navigates"]({
+      apiKey,
+      origin,
+      salesChannel,
+      deviceId,
+      allowRedirect,
+      showOnlyAvailable,
+      resultsPerPage,
+      page,
+      sortBy,
+      fields,
+      filter,
+      source,
+      userId,
+      productFormat,
+      ...(multicategory.length > 0 ? { multicategory } : { category }),
+    }).then((res) => res.json());
 
-      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
-    } else if (category.length > 0 || multicategory.length > 0) {
-      const response = await api["GET /engage/search/v3/navigates"]({
-        apiKey,
-        origin,
-        salesChannel,
-        deviceId,
-        allowRedirect,
-        showOnlyAvailable,
-        resultsPerPage,
-        page,
-        sortBy,
-        fields,
-        filter,
-        source,
-        userId,
-        productFormat,
-        ...(multicategory.length > 0 ? { multicategory } : { category }),
-      }).then((res) => res.json());
-
-      return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
-    }
-  } catch (err) {
-    console.error(err);
+    return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
+  } else {
+    return {
+      "@type": "ProductListingPage",
+      breadcrumb: {
+        "@type": "BreadcrumbList",
+        itemListElement: [],
+        numberOfItems: 0,
+      },
+      filters: [],
+      products: [],
+      pageInfo: {
+        nextPage: undefined,
+        previousPage: undefined,
+        currentPage: page,
+        records: 0,
+        recordPerPage: 0,
+      },
+      sortOptions,
+    };
   }
-
-  return {
-    "@type": "ProductListingPage",
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [],
-      numberOfItems: 0,
-    },
-    filters: [],
-    products: [],
-    pageInfo: {
-      nextPage: undefined,
-      previousPage: undefined,
-      currentPage: page,
-      records: 0,
-      recordPerPage: 0,
-    },
-    sortOptions,
-  };
 };
 
 export default loader;

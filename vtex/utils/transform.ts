@@ -62,8 +62,9 @@ const getProductURL = (
   return canonicalUrl;
 };
 
-const nonEmptyArray = <T>(array: T[] | null | undefined) =>
-  Array.isArray(array) && array.length > 0 ? array : null;
+const nonEmptyArray = <T>(
+  array: T[] | null | undefined,
+) => (Array.isArray(array) && array.length > 0 ? array : null);
 
 interface ProductOptions {
   baseUrl: string;
@@ -84,8 +85,7 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
   maybeSkuId?: string,
 ): T["items"][number] => {
-  const skuId = maybeSkuId ??
-    findFirstAvailable(product.items)?.itemId ??
+  const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
 
   for (const item of product.items) {
@@ -108,16 +108,18 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
     return map;
   }, new Map<string, T>());
 
-  return sku.kitItems?.map(({ itemId }) => {
-    const product = productBySkuId.get(itemId);
+  return sku.kitItems
+    ?.map(({ itemId }) => {
+      const product = productBySkuId.get(itemId);
 
-    /** Sometimes VTEX does not return what I've asked for */
-    if (!product) return;
+      /** Sometimes VTEX does not return what I've asked for */
+      if (!product) return;
 
-    const sku = pickSku(product, itemId);
+      const sku = pickSku(product, itemId);
 
-    return toProduct(product, sku, 0, options);
-  }).filter((p): p is Product => typeof p !== "undefined");
+      return toProduct(product, sku, 0, options);
+    })
+    .filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const forceHttpsOnAssets = (orderForm: OrderForm) => {
@@ -238,10 +240,10 @@ const toAdditionalPropertyClusters = <
     : new Set(product.clusterHighlights.map(({ id }) => id));
 
   return allClusters.map((cluster) =>
-    toAdditionalPropertyCluster(
-      { propertyID: cluster.id, value: cluster.name || "" },
-      highlightsSet,
-    )
+    toAdditionalPropertyCluster({
+      propertyID: cluster.id,
+      value: cluster.name || "",
+    }, highlightsSet)
   );
 };
 
@@ -457,8 +459,8 @@ const toBreadcrumbList = (
         return {
           "@type": "ListItem" as const,
           name,
-          item: new URL(`/${segments.slice(0, position).join("/")}`, baseUrl)
-            .href,
+          item:
+            new URL(`/${segments.slice(0, position).join("/")}`, baseUrl).href,
           position,
         };
       }),
@@ -485,12 +487,13 @@ const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
 const toProductGroupAdditionalProperties = ({ properties = [] }: ProductVTEX) =>
   properties.flatMap(({ name, values }) =>
     values.map(
-      (value) => ({
-        "@type": "PropertyValue",
-        name,
-        value,
-        valueReference: "PROPERTY" as string,
-      } as const),
+      (value) =>
+        ({
+          "@type": "PropertyValue",
+          name,
+          value,
+          valueReference: "PROPERTY" as string,
+        }) as const,
     )
   );
 
@@ -525,14 +528,15 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   );
 
   const attachmentProperties = attachments.map(
-    (attachment) => ({
-      "@type": "PropertyValue",
-      propertyID: `${attachment.id}`,
-      name: attachment.name,
-      value: attachment.domainValues,
-      required: attachment.required,
-      valueReference: "ATTACHMENT",
-    } as const),
+    (attachment) =>
+      ({
+        "@type": "PropertyValue",
+        propertyID: `${attachment.id}`,
+        name: attachment.name,
+        value: attachment.domainValues,
+        required: attachment.required,
+        valueReference: "ATTACHMENT",
+      }) as const,
   );
 
   return [...specificationProperties, ...attachmentProperties];
@@ -638,15 +642,20 @@ export const legacyFacetToFilter = (
   map: string,
   term: string,
   behavior: "dynamic" | "static",
+  ignoreCaseSelected?: boolean,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = term
-    .replace(/^\//, "")
-    .split("/")
-    .slice(0, mapSegments.length);
+  const pathSegments = term.replace(/^\//, "").split("/").slice(
+    0,
+    mapSegments.length,
+  );
 
-  const mapSet = new Set(mapSegments);
-  const pathSet = new Set(pathSegments);
+  const mapSet = new Set(
+    mapSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
+  const pathSet = new Set(
+    pathSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
 
   // for productClusterIds, we have to use the full path
   // example:
@@ -657,7 +666,13 @@ export const legacyFacetToFilter = (
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
-    const index = pathSegments.findIndex((s) => s === facet.Value);
+    const index = pathSegments.findIndex((s) => {
+      if (ignoreCaseSelected) {
+        return s.toLowerCase() === facet.Value.toLowerCase();
+      }
+
+      return s === facet.Value;
+    });
 
     const map = hasToBeFullpath
       ? facet.Link.split("map=")[1].split(",")
@@ -717,8 +732,17 @@ export const legacyFacetToFilter = (
         ? facet
         : normalizeFacet(facet);
 
-      const selected = mapSet.has(normalizedFacet.Map) &&
-        pathSet.has(normalizedFacet.Value);
+      const selected = mapSet.has(
+        ignoreCaseSelected
+          ? normalizedFacet.Map.toLowerCase()
+          : normalizedFacet.Map,
+      ) &&
+        pathSet.has(
+          ignoreCaseSelected
+            ? normalizedFacet.Value.toLowerCase()
+            : normalizedFacet.Value,
+        );
+
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
