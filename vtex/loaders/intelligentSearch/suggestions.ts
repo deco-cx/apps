@@ -1,4 +1,5 @@
 import { Suggestion } from "../../../commerce/types.ts";
+import { parseOrLogResponse } from "../../../utils/http.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
@@ -48,13 +49,13 @@ const loaders = async (
       // Not adding suggestions to cache since queries are very spread out
       // deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
-    }).then((res) => res.json());
+    }).then(parseOrLogResponse);
 
   const topSearches = () =>
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/top_searches"]({
       locale,
     }, { ...STALE, headers: withSegmentCookie(segment) })
-      .then((res) => res.json());
+      .then(parseOrLogResponse);
 
   const productSearch = () => {
     const facets = withDefaultFacets([], ctx);
@@ -65,7 +66,7 @@ const loaders = async (
         ...params,
         facets: toPath(facets),
       }, { ...STALE, headers: withSegmentCookie(segment) })
-      .then((res) => res.json());
+      .then(parseOrLogResponse);
   };
 
   const [{ searches }, { products }] = await Promise.all([

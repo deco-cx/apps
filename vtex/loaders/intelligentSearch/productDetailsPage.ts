@@ -1,4 +1,5 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import { parseOrLogResponse } from "../../../utils/http.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
@@ -67,7 +68,7 @@ const loader = async (
     ["GET /api/catalog_system/pub/portal/pagetype/:term"](
       { term: `${lowercaseSlug}/p` },
       STALE,
-    ).then((res) => res.json());
+    ).then(parseOrLogResponse);
 
   const url = new URL(baseUrl);
   const skuId = url.searchParams.get("skuId");
@@ -96,7 +97,7 @@ const loader = async (
       ...params,
       facets: toPath(facets),
     }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res) => res.json());
+    .then(parseOrLogResponse);
 
   // Product not found, return the 404 status code
   if (!product) {
@@ -117,7 +118,7 @@ const loader = async (
         ...params,
         facets: toPath(facets),
       }, { ...STALE, headers: withSegmentCookie(segment) })
-      .then((res) => res.json());
+      .then(parseOrLogResponse);
 
     kitItems = result.products;
   }

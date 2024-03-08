@@ -1,5 +1,6 @@
 import type { Product } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
+import { parseOrLogResponse } from "../../../utils/http.ts";
 
 export type Props = {
   page: number;
@@ -19,7 +20,7 @@ const loader = async (
 
   const ids = await vcs
     ["GET /api/catalog_system/pvt/sku/stockkeepingunitids"](props)
-    .then((res) => res.json());
+    .then(parseOrLogResponse);
 
   return ids.map((productID) => ({
     "@type": "Product",

@@ -2,6 +2,7 @@ import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { Suggestion } from "../../../commerce/types.ts";
+import { parseOrLogResponse } from "../../../utils/http.ts";
 
 export default async function (
   _props: unknown,
@@ -14,5 +15,5 @@ export default async function (
     ["GET /api/io/_v/api/intelligent-search/top_searches"]({
       locale,
     }, { ...STALE, headers: withSegmentCookie(getSegmentFromBag(ctx)) })
-    .then((res) => res.json());
+    .then(parseOrLogResponse);
 }

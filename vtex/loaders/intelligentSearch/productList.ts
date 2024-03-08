@@ -1,5 +1,6 @@
 import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
+import { parseOrLogResponse } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import {
   toPath,
@@ -181,7 +182,7 @@ const loader = async (
       ...params,
       facets: toPath(facets),
     }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res) => res.json());
+    .then(parseOrLogResponse);
 
   const options = {
     baseUrl: url,

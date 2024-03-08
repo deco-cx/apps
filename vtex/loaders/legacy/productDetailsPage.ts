@@ -1,4 +1,5 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import { parseOrLogResponse } from "../../../utils/http.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
@@ -48,7 +49,7 @@ async function loader(
     ["GET /api/catalog_system/pub/products/search/:slug/p"](
       { ...params, slug: lowercaseSlug },
       { ...STALE, headers: withSegmentCookie(segment) },
-    ).then((res) => res.json());
+    ).then(parseOrLogResponse);
 
   if (response && !Array.isArray(response)) {
     throw new Error(
@@ -74,7 +75,7 @@ async function loader(
             fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
           },
           STALE,
-        ).then((res) => res.json())
+        ).then(parseOrLogResponse)
       : [];
 
   const page = toProductPage(product, sku, kitItems, {

@@ -1,4 +1,5 @@
 import type { Product } from "../../../commerce/types.ts";
+import { parseOrLogResponse } from "../../../utils/http.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
@@ -181,7 +182,7 @@ const loader = async (
       ...segmentParams,
       ...params,
     }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then((res) => res.json());
+    .then(parseOrLogResponse);
 
   if (vtexProducts && !Array.isArray(vtexProducts)) {
     throw new Error(
