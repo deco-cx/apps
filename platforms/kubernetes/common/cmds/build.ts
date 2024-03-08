@@ -254,7 +254,7 @@ async function build() {
       hasChange = true;
     }
 
-    if ( denoJson.compilerOptions.jsx === "react-jsx") {
+    if (denoJson.compilerOptions.jsx === "react-jsx") {
       denoJson.compilerOptions.jsx = "precompile";
       denoJson.compilerOptions.jsxImportSource = "preact";
 
