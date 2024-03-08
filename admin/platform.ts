@@ -27,8 +27,9 @@ export interface DeploymentFromRepo extends DeploymentBase {
 }
 
 export interface CompilerOptions {
-  jsx: string;
-  jsxImportSource: string;
+  jsx?: string;
+  jsxImportSource?: string;
+  experimentalDecorators?: boolean;
 }
 
 export interface DeploymentFromFiles extends DeploymentBase {
