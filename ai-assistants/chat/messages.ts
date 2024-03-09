@@ -321,7 +321,8 @@ export const messageProcessorFor = async (
     // If functionCallReplies is not an array it should also be considered an error
     if (
       (functionCallReplies.length === 1 &&
-      functionCallReplies[0].name === "multi_tool_use.parallel") || !Array.isArray(functionCallReplies)
+        functionCallReplies[0].name === "multi_tool_use.parallel") ||
+      !Array.isArray(functionCallReplies)
     ) {
       const message: ReplyMessage = {
         messageId: Date.now().toString(),
