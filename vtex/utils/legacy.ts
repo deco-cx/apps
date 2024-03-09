@@ -5,7 +5,6 @@ import { AppContext } from "../mod.ts";
 import { slugify } from "../utils/slugify.ts";
 import type { PageType } from "../utils/types.ts";
 import { WrappedSegment } from "./segment.ts";
-import { parseOrLogResponse } from "../../utils/http.ts";
 
 export const toSegmentParams = (
   { payload: segment }: WrappedSegment,
@@ -44,7 +43,7 @@ export const pageTypesFromPathname = async (
     segments.map((_, index) =>
       vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
         term: segments.slice(0, index + 1).join("/"),
-      }, STALE).then(parseOrLogResponse)
+      }, STALE).then((res) => res.json())
     ),
   );
 

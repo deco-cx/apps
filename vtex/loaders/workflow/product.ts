@@ -4,7 +4,6 @@ import type {
   PropertyValue,
   UnitPriceSpecification,
 } from "../../../commerce/types.ts";
-import { parseOrLogResponse } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import {
   aggregateOffers,
@@ -33,7 +32,7 @@ const loader = async (
   const sku = await vcs
     ["GET /api/catalog_system/pvt/sku/stockkeepingunitbyid/:skuId"]({
       skuId: props.productID,
-    }).then(parseOrLogResponse);
+    }).then((res) => res.json());
 
   if (!sku.IsActive) return null;
 
@@ -43,16 +42,16 @@ const loader = async (
         {
           productId: sku.ProductId,
         },
-      ).then(parseOrLogResponse),
+      ).then((res) => res.json()),
     vcs["GET /api/catalog_system/pvt/saleschannel/list"]({})
-      .then(parseOrLogResponse),
+      .then((res) => res.json()),
     ...sku.SkuSellers.map(({ SellerId }) =>
       vcs["POST /api/checkout/pub/orderForms/simulation"]({
         RnbBehavior: 1,
         sc,
       }, {
         body: { items: [{ id: `${sku.Id}`, seller: SellerId, quantity: 1 }] },
-      }).then(parseOrLogResponse)
+      }).then((res) => res.json())
     ),
   ]);
 

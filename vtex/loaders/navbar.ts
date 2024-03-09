@@ -1,5 +1,4 @@
 import type { SiteNavigationElement } from "../../commerce/types.ts";
-import { parseOrLogResponse } from "../../utils/http.ts";
 import { STALE } from "../../utils/fetch.ts";
 import { AppContext } from "../mod.ts";
 import { categoryTreeToNavbar } from "../utils/transform.ts";
@@ -24,7 +23,7 @@ const loader = async (
     ["GET /api/catalog_system/pub/category/tree/:level"](
       { level: levels },
       STALE,
-    ).then(parseOrLogResponse);
+    ).then((res) => res.json());
 
   return categoryTreeToNavbar(tree);
 };

@@ -1,6 +1,5 @@
 import { Product, ProductLeaf } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-import { parseOrLogResponse } from "../../../utils/http.ts";
 import { batch } from "../batch.ts";
 import { OpenAPI } from "../openapi/vcs.openapi.gen.ts";
 import { getSegmentFromBag, isAnonymous } from "../segment.ts";
@@ -50,7 +49,7 @@ const doSimulate = (items: {
   return ctx.vcs["POST /api/checkout/pub/orderForms/simulation"](params, {
     body,
   })
-    .then(parseOrLogResponse);
+    .then((res) => res.json());
 };
 
 export const extension = async (products: Product[], ctx: AppContext) => {

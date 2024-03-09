@@ -1,5 +1,4 @@
 import type { Product } from "../../../commerce/types.ts";
-import { parseOrLogResponse } from "../../../utils/http.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
@@ -63,7 +62,7 @@ async function loader(
       const pageType = await vcsDeprecated
         ["GET /api/catalog_system/pub/portal/pagetype/:term"]({
           term: `${slug}/p`,
-        }, STALE).then(parseOrLogResponse);
+        }, STALE).then((res) => res.json());
 
       // Page type doesn't exists or this is not product page
       if (pageType?.pageType === "Product") {
@@ -88,7 +87,7 @@ async function loader(
       productId,
       ...params,
     }, { ...STALE, headers: withSegmentCookie(segment) })
-    .then(parseOrLogResponse);
+    .then((res) => res.json());
 
   if (products && !Array.isArray(products)) {
     throw new Error(

@@ -1,5 +1,4 @@
 import { AppContext } from "../../mod.ts";
-import { parseOrLogResponse } from "../../../utils/http.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { Category } from "../../../commerce/types.ts";
@@ -20,5 +19,5 @@ export default async function loader(
     ["GET /api/catalog_system/pub/category/tree/:level"]({
       level: categoryLevels ?? 1,
     }, { ...STALE, headers: withSegmentCookie(getSegmentFromBag(ctx)) })
-    .then(parseOrLogResponse);
+    .then((res) => res.json());
 }

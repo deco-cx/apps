@@ -1,6 +1,5 @@
 import { Product, ProductLeaf } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-import { parseOrLogResponse } from "../../../utils/http.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -97,13 +96,13 @@ const reviewsExt = async (
   const reviewPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/reviews"]({
       productId: product.productID,
-    }).then(parseOrLogResponse)
+    }).then((res) => res.json())
   );
 
   const ratingPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/rating/:inProductGroupWithId"]({
       inProductGroupWithId: product.inProductGroupWithID ?? "",
-    }).then(parseOrLogResponse)
+    }).then((res) => res.json())
   );
 
   const reviewsPromise = Promise.all(reviewPromises);

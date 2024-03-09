@@ -1,5 +1,4 @@
 import { Product, Suggestion } from "../../../commerce/types.ts";
-import { parseOrLogResponse } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 
@@ -41,7 +40,7 @@ const loaders = async (
       // deco: { cache: "stale-while-revalidate" },
       headers: withSegmentCookie(segment),
     },
-  ).then(parseOrLogResponse);
+  ).then((res) => res.json());
 
   const searches: Suggestion["searches"] = suggestions.itemsReturned
     .filter(({ items }) => !items?.length)

@@ -1,5 +1,4 @@
 import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
-import { parseOrLogResponse } from "../../../utils/http.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
@@ -239,7 +238,7 @@ const loader = async (
         map: fmap,
       },
       STALE,
-    ).then(parseOrLogResponse),
+    ).then((res) => res.json()),
   ]);
 
   const vtexProducts = (await vtexProductsResponse.json()) as LegacyProduct[];
