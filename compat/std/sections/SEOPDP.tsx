@@ -10,6 +10,7 @@ export interface Props extends Partial<Omit<SeoProps, "jsonLDs">> {
 
 /**
  * @deprecated true
+ * @migrate commerce/sections/Seo/SeoPDPV2.tsx
  */
 export default function SEOPDP(props: Props) {
   return (

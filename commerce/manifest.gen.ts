@@ -13,7 +13,9 @@ import * as $$$7 from "./loaders/product/extensions/suggestions.ts";
 import * as $$$8 from "./loaders/product/productListingPage.ts";
 import * as $$$9 from "./loaders/product/products.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoPDP.tsx";
-import * as $$$$$$1 from "./sections/Seo/SeoPLP.tsx";
+import * as $$$$$$1 from "./sections/Seo/SeoPDPV2.tsx";
+import * as $$$$$$2 from "./sections/Seo/SeoPLP.tsx";
+import * as $$$$$$3 from "./sections/Seo/SeoPLPV2.tsx";
 
 const manifest = {
   "loaders": {
@@ -30,7 +32,9 @@ const manifest = {
   },
   "sections": {
     "commerce/sections/Seo/SeoPDP.tsx": $$$$$$0,
-    "commerce/sections/Seo/SeoPLP.tsx": $$$$$$1,
+    "commerce/sections/Seo/SeoPDPV2.tsx": $$$$$$1,
+    "commerce/sections/Seo/SeoPLP.tsx": $$$$$$2,
+    "commerce/sections/Seo/SeoPLPV2.tsx": $$$$$$3,
   },
   "name": "commerce",
   "baseUrl": import.meta.url,

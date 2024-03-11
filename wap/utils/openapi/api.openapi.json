@@ -1,0 +1,3785 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Front-end wap.store",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "servers": [
+    {
+      "url": "{{api.wapstore}}"
+    },
+    {
+      "url": "https://botuxil.wapstore.dev.br"
+    }
+  ],
+  "paths": {
+    "/api/v2/front/promotional/coupon/{hashCupom}": {
+      "put": {
+        "tags": [],
+        "summary": "PUT coupon on session",
+        "description": "PUT coupon on session",
+        "operationId": "putCoupon",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "hashCupom",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/brands": {
+      "get": {
+        "tags": [
+          "Brands"
+        ],
+        "summary": "GET Brands",
+        "description": "GET Brands",
+        "operationId": "getBrands",
+        "parameters": [
+          {
+            "name": "ativo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "true"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "App-Token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{api.wapstore.v2.appToken}}"
+            }
+          },
+          {
+            "name": "Session",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{sessionId}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/checkout/cart": {
+      "get": {
+        "tags": [
+          "Checkout",
+          "Cart"
+        ],
+        "summary": "GET Checkout cart",
+        "description": "GET Checkout cart",
+        "operationId": "getCheckoutCart",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Checkout",
+          "Cart"
+        ],
+        "summary": "PUT Checkout cart",
+        "description": "PUT Checkout cart",
+        "operationId": "putCheckoutCart",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "adicional": {
+                    "type": "string",
+                    "example": "Dados adicionais do item (opcional)"
+                  },
+                  "idArmazem": {
+                    "type": "number",
+                    "example": 41
+                  },
+                  "idAtributoSimples": {
+                    "type": "number",
+                    "example": 44
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 52
+                  },
+                  "idUnidadeVenda": {
+                    "type": "number",
+                    "example": 34
+                  },
+                  "quantidade": {
+                    "type": "number",
+                    "example": 29
+                  },
+                  "tipo": {
+                    "type": "string",
+                    "example": "Tipo do item a ser adicionado[produto, lista]"
+                  }
+                }
+              },
+              "examples": {
+                "PUT Checkout cart": {
+                  "value": {
+                    "adicional": "Dados adicionais do item (opcional)",
+                    "idArmazem": 41,
+                    "idAtributoSimples": 44,
+                    "idProduto": 52,
+                    "idUnidadeVenda": 34,
+                    "quantidade": 29,
+                    "tipo": "Tipo do item a ser adicionado[produto, lista]"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Checkout",
+          "Cart"
+        ],
+        "summary": "POST Checkout cart",
+        "description": "POST Checkout cart",
+        "operationId": "postCheckoutCart",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itens": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "adicional": {
+                          "type": "string",
+                          "example": "Dados adicionais do item (opcional)"
+                        },
+                        "idArmazem": {
+                          "type": "number",
+                          "example": 66
+                        },
+                        "idAtributoSimples": {
+                          "type": "number",
+                          "example": 91
+                        },
+                        "idProduto": {
+                          "type": "number",
+                          "example": 77
+                        },
+                        "idUnidadeVenda": {
+                          "type": "number",
+                          "example": 45
+                        },
+                        "parametros": {
+                          "type": "string",
+                          "example": "Parâmetros adicionais (opcional)"
+                        },
+                        "quantidade": {
+                          "type": "number",
+                          "example": 43
+                        }
+                      }
+                    },
+                    "example": [
+                      {
+                        "adicional": "Dados adicionais do item (opcional)",
+                        "idArmazem": 66,
+                        "idAtributoSimples": 91,
+                        "idProduto": 77,
+                        "idUnidadeVenda": 45,
+                        "parametros": "Parâmetros adicionais (opcional)",
+                        "quantidade": 43
+                      }
+                    ]
+                  },
+                  "tipo": {
+                    "type": "string",
+                    "example": "Tipo do item a ser adicionado[produto, lista]"
+                  }
+                }
+              },
+              "examples": {
+                "POST Checkout cart": {
+                  "value": {
+                    "itens": [
+                      {
+                        "adicional": "Dados adicionais do item (opcional)",
+                        "idArmazem": 66,
+                        "idAtributoSimples": 91,
+                        "idProduto": 77,
+                        "idUnidadeVenda": 45,
+                        "parametros": "Parâmetros adicionais (opcional)",
+                        "quantidade": 43
+                      }
+                    ],
+                    "tipo": "Tipo do item a ser adicionado[produto, lista]"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Checkout",
+          "Cart"
+        ],
+        "summary": "DELETE Checkout cart",
+        "description": "DELETE Checkout cart",
+        "operationId": "deleteCheckoutCart",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "adicional": {
+                    "type": "string",
+                    "example": "Dados adicionais do item (opcional)"
+                  },
+                  "idArmazem": {
+                    "type": "number",
+                    "example": 63
+                  },
+                  "idAtributoSimples": {
+                    "type": "number",
+                    "example": 6
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 97
+                  },
+                  "idUnidadeVenda": {
+                    "type": "number",
+                    "example": 93
+                  },
+                  "tipo": {
+                    "type": "string",
+                    "example": "Tipo do item a ser adicionado[produto, lista]"
+                  }
+                }
+              },
+              "examples": {
+                "DELETE Checkout cart": {
+                  "value": {
+                    "adicional": "Dados adicionais do item (opcional)",
+                    "idArmazem": 63,
+                    "idAtributoSimples": 6,
+                    "idProduto": 97,
+                    "idUnidadeVenda": 93,
+                    "tipo": "Tipo do item a ser adicionado[produto, lista]"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/checkout/login": {
+      "post": {
+        "tags": [
+          "Checkout",
+          "Login"
+        ],
+        "summary": "POST Checkout login",
+        "description": "POST Checkout login",
+        "operationId": "postCheckoutLogin",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "revendedor": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "senha": {
+                    "type": "string",
+                    "example": "Senha do cliente"
+                  },
+                  "usuario": {
+                    "type": "string",
+                    "example": "E-mail, CPF ou CNPJ do cliente"
+                  }
+                }
+              },
+              "examples": {
+                "POST Checkout login": {
+                  "value": {
+                    "revendedor": true,
+                    "senha": "Senha do cliente",
+                    "usuario": "E-mail, CPF ou CNPJ do cliente"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/checkout/password-recovery": {
+      "post": {
+        "tags": [
+          "Checkout",
+          "Password-recovery"
+        ],
+        "summary": "POST Checkout password-recovery",
+        "description": "POST Checkout password-recovery",
+        "operationId": "postCheckoutPasswordRecovery",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "usuario": {
+                    "type": "string",
+                    "example": "E-mail, CPF ou CNPJ do usuário que deseja recuperar a senha"
+                  }
+                }
+              },
+              "examples": {
+                "POST Checkout password-recovery": {
+                  "value": {
+                    "usuario": "E-mail, CPF ou CNPJ do usuário que deseja recuperar a senha"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/checkout/user": {
+      "get": {
+        "tags": [
+          "Checkout",
+          "User"
+        ],
+        "summary": "GET Checkout user",
+        "description": "GET Checkout user",
+        "operationId": "getCheckoutUser",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/checkout/zipcode": {
+      "post": {
+        "tags": [
+          "Checkout",
+          "Zipcode"
+        ],
+        "summary": "POST Checkout zipcode",
+        "description": "POST Checkout zipcode",
+        "operationId": "postCheckoutZipcode",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cep": {
+                    "type": "string",
+                    "example": "CEP de entrega"
+                  }
+                }
+              },
+              "examples": {
+                "POST Checkout zipcode": {
+                  "value": {
+                    "cep": "CEP de entrega"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/client/reseller": {
+      "post": {
+        "tags": [
+          "Client",
+          "Reseller"
+        ],
+        "summary": "POST Client reseller",
+        "description": "POST Client reseller",
+        "operationId": "postClientReseller",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newsletter": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "sms": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              },
+              "examples": {
+                "POST Client reseller": {
+                  "value": {
+                    "newsletter": false,
+                    "sms": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/evaluations/list": {
+      "post": {
+        "tags": [
+          "Evaluations",
+          "List"
+        ],
+        "summary": "POST Evaluations list",
+        "description": "POST Evaluations list",
+        "operationId": "postEvaluationsList",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comentario": {
+                    "type": "string",
+                    "example": "Comentário da avaliação"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "idListaCompra": {
+                    "type": "number",
+                    "example": 14
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome do cliente"
+                  },
+                  "nota": {
+                    "type": "number",
+                    "example": 36
+                  },
+                  "recomenda": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              },
+              "examples": {
+                "POST Evaluations list": {
+                  "value": {
+                    "comentario": "Comentário da avaliação",
+                    "email": "E-mail do cliente",
+                    "idListaCompra": 14,
+                    "nome": "Nome do cliente",
+                    "nota": 36,
+                    "recomenda": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/evaluations/product": {
+      "get": {
+        "tags": [
+          "Evaluations",
+          "Product"
+        ],
+        "summary": "GET Evaluations product",
+        "description": "GET Evaluations product",
+        "operationId": "getEvaluationsProduct",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "ASC"
+            }
+          },
+          {
+            "name": "idCategoria",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "6"
+            }
+          },
+          {
+            "name": "nota",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Evaluations",
+          "Product"
+        ],
+        "summary": "POST Evaluations product",
+        "description": "POST Evaluations product",
+        "operationId": "postEvaluationsProduct",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "ASC"
+            }
+          },
+          {
+            "name": "idCategoria",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "6"
+            }
+          },
+          {
+            "name": "nota",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "anexos": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "Objeto com os arquivos de uma avaliação (opcional)"
+                    ]
+                  },
+                  "comentario": {
+                    "type": "string",
+                    "example": "Comentário da avaliação"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 100
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome do cliente"
+                  },
+                  "nota": {
+                    "type": "number",
+                    "example": 92
+                  },
+                  "recomenda": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              },
+              "examples": {
+                "POST Evaluations product": {
+                  "value": {
+                    "anexos": [
+                      "Objeto com os arquivos de uma avaliação (opcional)"
+                    ],
+                    "comentario": "Comentário da avaliação",
+                    "email": "E-mail do cliente",
+                    "idProduto": 100,
+                    "nome": "Nome do cliente",
+                    "nota": 92,
+                    "recomenda": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/evaluations/store/add/{key}": {
+      "get": {
+        "tags": [
+          "Evaluations",
+          "Store"
+        ],
+        "summary": "GET Evaluations store add",
+        "description": "GET Evaluations store add",
+        "operationId": "getEvaluationsStoreAdd",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Evaluations",
+          "Store"
+        ],
+        "summary": "POST Evaluations store add",
+        "description": "POST Evaluations store add",
+        "operationId": "postEvaluationsStoreAdd",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "atendimento": {
+                    "type": "number",
+                    "example": 53
+                  },
+                  "autorizacao": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "experiencia": {
+                    "type": "number",
+                    "example": 6
+                  },
+                  "mensagem": {
+                    "type": "string",
+                    "example": "Mensagem enviada pelo cliente (opcional)"
+                  },
+                  "satisfacao": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              },
+              "examples": {
+                "POST Evaluations store add": {
+                  "value": {
+                    "atendimento": 53,
+                    "autorizacao": true,
+                    "experiencia": 6,
+                    "mensagem": "Mensagem enviada pelo cliente (opcional)",
+                    "satisfacao": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "key",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/evaluations/store": {
+      "get": {
+        "tags": [
+          "Evaluations",
+          "Store"
+        ],
+        "summary": "GET Evaluations store",
+        "description": "GET Evaluations store",
+        "operationId": "getEvaluationsStore",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/form/contact": {
+      "post": {
+        "tags": [
+          "Form",
+          "Contact"
+        ],
+        "summary": "POST Form contact",
+        "description": "POST Form contact",
+        "operationId": "postFormContact",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assunto": {
+                    "type": "string",
+                    "example": "Assunto da mensagem (opcional)"
+                  },
+                  "contato": {
+                    "type": "string",
+                    "example": "Número de contato do cliente"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "hashEmail": {
+                    "type": "string",
+                    "example": "Hash do layout de e-mail que será enviado"
+                  },
+                  "mensagem": {
+                    "type": "string",
+                    "example": "Mensagem enviada pelo cliente (opcional)"
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome do cliente"
+                  }
+                }
+              },
+              "examples": {
+                "POST Form contact": {
+                  "value": {
+                    "assunto": "Assunto da mensagem (opcional)",
+                    "contato": "Número de contato do cliente",
+                    "email": "E-mail do cliente",
+                    "hashEmail": "Hash do layout de e-mail que será enviado",
+                    "mensagem": "Mensagem enviada pelo cliente (opcional)",
+                    "nome": "Nome do cliente"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/list/shop": {
+      "post": {
+        "tags": [
+          "List1",
+          "Shop"
+        ],
+        "summary": "POST List shop",
+        "description": "POST List shop",
+        "operationId": "postListShop",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "carrinho": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "idListaCompra": {
+                    "type": "number",
+                    "example": 7
+                  },
+                  "produtos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "example": 20
+                        },
+                        "idAtributoValor": {
+                          "type": "number",
+                          "example": 32
+                        },
+                        "preco": {
+                          "type": "number",
+                          "example": 54
+                        },
+                        "quantidade": {
+                          "type": "number",
+                          "example": 83
+                        }
+                      }
+                    },
+                    "example": [
+                      {
+                        "id": 20,
+                        "idAtributoValor": 32,
+                        "preco": 54,
+                        "quantidade": 83
+                      }
+                    ]
+                  }
+                }
+              },
+              "examples": {
+                "POST List shop": {
+                  "value": {
+                    "carrinho": true,
+                    "idListaCompra": 7,
+                    "produtos": [
+                      {
+                        "id": 20,
+                        "idAtributoValor": 32,
+                        "preco": 54,
+                        "quantidade": 83
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/marketplace/product/{idProduto}": {
+      "get": {
+        "tags": [
+          "Marketplace",
+          "Product1"
+        ],
+        "summary": "GET Product",
+        "description": "GET Product",
+        "operationId": "getProduct",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "productAttributeValueId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2"
+            }
+          },
+          {
+            "name": "sellerId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "cep",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "16202017"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "idProduto",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/browsing-history/{hash}": {
+      "post": {
+        "tags": [
+          "Browsing-history"
+        ],
+        "summary": "POST Browsing-history",
+        "description": "POST Browsing-history",
+        "operationId": "postBrowsingHistory",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "App-Token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{api.wapstore.v2.appToken}}"
+            }
+          },
+          {
+            "name": "Session",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{sessionId}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "Url a ser registrada no histórico"
+                  }
+                }
+              },
+              "examples": {
+                "POST Browsing-history": {
+                  "value": {
+                    "url": "Url a ser registrada no histórico"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "hash",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/newsletter/associates": {
+      "post": {
+        "tags": [
+          "Newsletter",
+          "Associates"
+        ],
+        "summary": "POST Newsletter associates",
+        "description": "POST Newsletter associates",
+        "operationId": "postNewsletterAssociates",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "associados": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "dataNascimento": {
+                          "type": "string",
+                          "example": "Data de nascimento do associado"
+                        },
+                        "informacoesAdicionais": {
+                          "type": "array",
+                          "items": {},
+                          "example": []
+                        },
+                        "nome": {
+                          "type": "string",
+                          "example": "Nome do associado"
+                        },
+                        "sexo": {
+                          "type": "string",
+                          "example": "Sexo do associado[m, f, i]"
+                        }
+                      }
+                    },
+                    "example": [
+                      {
+                        "dataNascimento": "Data de nascimento do associado",
+                        "informacoesAdicionais": [],
+                        "nome": "Nome do associado",
+                        "sexo": "Sexo do associado[m, f, i]"
+                      }
+                    ]
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail da newsletter"
+                  }
+                }
+              },
+              "examples": {
+                "POST Newsletter associates": {
+                  "value": {
+                    "associados": [
+                      {
+                        "dataNascimento": "Data de nascimento do associado",
+                        "informacoesAdicionais": [],
+                        "nome": "Nome do associado",
+                        "sexo": "Sexo do associado[m, f, i]"
+                      }
+                    ],
+                    "email": "E-mail da newsletter"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/newsletter": {
+      "post": {
+        "tags": [
+          "Newsletter"
+        ],
+        "summary": "POST Newsletter",
+        "description": "POST Newsletter",
+        "operationId": "postNewsletter",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "App-Token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{api.wapstore.v2.appToken}}"
+            }
+          },
+          {
+            "name": "Session",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{sessionId}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cupom": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "idEvento": {
+                    "type": "number",
+                    "example": 70
+                  },
+                  "informacoesAdicionais": {
+                    "type": "array",
+                    "items": {},
+                    "example": []
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome da cliente (opcional)"
+                  },
+                  "segmento": {
+                    "type": "string",
+                    "example": "Define o segmento da campanha[m, h, i] (opcional)"
+                  }
+                }
+              },
+              "examples": {
+                "POST Newsletter": {
+                  "value": {
+                    "cupom": false,
+                    "email": "E-mail do cliente",
+                    "idEvento": 70,
+                    "informacoesAdicionais": [],
+                    "nome": "Nome da cliente (opcional)",
+                    "segmento": "Define o segmento da campanha[m, h, i] (opcional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/ping": {
+      "get": {
+        "tags": [
+          "Ping"
+        ],
+        "summary": "GET Ping",
+        "description": "GET Ping",
+        "operationId": "getPing",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "App-Token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{api.wapstore.v2.appToken}}"
+            }
+          },
+          {
+            "name": "Session",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{sessionId}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/product/budget": {
+      "post": {
+        "tags": [
+          "Product12",
+          "Budget"
+        ],
+        "summary": "POST Product budget",
+        "description": "POST Product budget",
+        "operationId": "postProductBudget",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contato": {
+                    "type": "string",
+                    "example": "Número de contato do cliente"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "enviarEmail": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 53
+                  },
+                  "mailing": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "mensagem": {
+                    "type": "string",
+                    "example": "Mensagem enviada pelo cliente (opcional)"
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome do cliente"
+                  }
+                }
+              },
+              "examples": {
+                "POST Product budget": {
+                  "value": {
+                    "contato": "Número de contato do cliente",
+                    "email": "E-mail do cliente",
+                    "enviarEmail": false,
+                    "idProduto": 53,
+                    "mailing": true,
+                    "mensagem": "Mensagem enviada pelo cliente (opcional)",
+                    "nome": "Nome do cliente"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/product/combination": {
+      "post": {
+        "tags": [
+          "Product12",
+          "Combination"
+        ],
+        "summary": "POST Product combination",
+        "description": "POST Product combination",
+        "operationId": "postProductCombination",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "produtoIndicado": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "example": 19
+                      },
+                      "idAtributoValor": {
+                        "type": "number",
+                        "example": 17
+                      },
+                      "preco": {
+                        "type": "number",
+                        "example": 75
+                      }
+                    }
+                  },
+                  "produtoPrincipal": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "example": 44
+                      },
+                      "idAtributoValor": {
+                        "type": "number",
+                        "example": 94
+                      },
+                      "preco": {
+                        "type": "number",
+                        "example": 18
+                      }
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "POST Product combination": {
+                  "value": {
+                    "produtoIndicado": {
+                      "id": 19,
+                      "idAtributoValor": 17,
+                      "preco": 75
+                    },
+                    "produtoPrincipal": {
+                      "id": 44,
+                      "idAtributoValor": 94,
+                      "preco": 18
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/product/component/{id}": {
+      "get": {
+        "tags": [
+          "Product12",
+          "Component"
+        ],
+        "summary": "GET Product component",
+        "description": "GET Product component",
+        "operationId": "getProductComponent",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/product/predefination": {
+      "get": {
+        "tags": [
+          "Product12",
+          "Predefination"
+        ],
+        "summary": "GET Product predefination",
+        "description": "GET Product predefination",
+        "operationId": "getProductPredefination",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/product/shop": {
+      "post": {
+        "tags": [
+          "Product12",
+          "Shop1"
+        ],
+        "summary": "POST Product shop",
+        "description": "POST Product shop",
+        "operationId": "postProductShop",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "carrinho": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "produtos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "assinatura": {
+                          "type": "object",
+                          "properties": {
+                            "recorrencia": {
+                              "type": "number",
+                              "example": 100
+                            }
+                          }
+                        },
+                        "conjunto": {
+                          "type": "object",
+                          "properties": {
+                            "componentes": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "idConjuntoComponente": {
+                                    "type": "number",
+                                    "example": 94
+                                  },
+                                  "produto": {
+                                    "type": "object",
+                                    "properties": {
+                                      "adicional": {
+                                        "type": "string",
+                                        "example": "Hash com as informações adicionais do produto (opcional)"
+                                      },
+                                      "id": {
+                                        "type": "number",
+                                        "example": 29
+                                      },
+                                      "idAtributoValor": {
+                                        "type": "number",
+                                        "example": 68
+                                      },
+                                      "preco": {
+                                        "type": "number",
+                                        "example": 47
+                                      },
+                                      "quantidade": {
+                                        "type": "number",
+                                        "example": 62
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "example": [
+                                {
+                                  "idConjuntoComponente": 94,
+                                  "produto": {
+                                    "adicional": "Hash com as informações adicionais do produto (opcional)",
+                                    "id": 29,
+                                    "idAtributoValor": 68,
+                                    "preco": 47,
+                                    "quantidade": 62
+                                  }
+                                }
+                              ]
+                            },
+                            "id": {
+                              "type": "number",
+                              "example": 38
+                            }
+                          }
+                        },
+                        "editarPreco": {
+                          "type": "boolean",
+                          "example": false
+                        },
+                        "id": {
+                          "type": "number",
+                          "example": 94
+                        },
+                        "idAtributoValor": {
+                          "type": "number",
+                          "example": 7
+                        },
+                        "personalizacao": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number",
+                                "example": 73
+                              },
+                              "multiplicarPreco": {
+                                "type": "string",
+                                "example": "Multiplicar preço da personalização[s, n]"
+                              },
+                              "preco": {
+                                "type": "number",
+                                "example": 26
+                              },
+                              "tipo": {
+                                "type": "string",
+                                "example": "Tipo da personalização"
+                              },
+                              "valorSelect": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "number",
+                                    "example": 74
+                                  },
+                                  "preco": {
+                                    "type": "number",
+                                    "example": 81
+                                  },
+                                  "precoDefault": {
+                                    "type": "string",
+                                    "example": "Utilizar preço default da personalização[s, n]"
+                                  },
+                                  "valor": {
+                                    "type": "string",
+                                    "example": "Valor da personalização (opcional)"
+                                  }
+                                }
+                              },
+                              "valorText": {
+                                "type": "string",
+                                "example": "Valor da personalização tipo text (opcional)"
+                              },
+                              "valorUpload": {
+                                "type": "string",
+                                "example": "Valor do arquivo de upload em base64 (opcional)"
+                              },
+                              "valoresCheckbox": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "number",
+                                      "example": 60
+                                    },
+                                    "preco": {
+                                      "type": "number",
+                                      "example": 11
+                                    },
+                                    "precoDefault": {
+                                      "type": "string",
+                                      "example": "Utilizar preço default da personalização[s, n]"
+                                    },
+                                    "quantidade": {
+                                      "type": "number",
+                                      "example": 36
+                                    },
+                                    "valor": {
+                                      "type": "string",
+                                      "example": "Valor da personalização (opcional)"
+                                    }
+                                  }
+                                },
+                                "example": [
+                                  {
+                                    "id": 60,
+                                    "preco": 11,
+                                    "precoDefault": "Utilizar preço default da personalização[s, n]",
+                                    "quantidade": 36,
+                                    "valor": "Valor da personalização (opcional)"
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          "example": [
+                            {
+                              "id": 73,
+                              "multiplicarPreco": "Multiplicar preço da personalização[s, n]",
+                              "preco": 26,
+                              "tipo": "Tipo da personalização",
+                              "valorSelect": {
+                                "id": 74,
+                                "preco": 81,
+                                "precoDefault": "Utilizar preço default da personalização[s, n]",
+                                "valor": "Valor da personalização (opcional)"
+                              },
+                              "valorText": "Valor da personalização tipo text (opcional)",
+                              "valorUpload": "Valor do arquivo de upload em base64 (opcional)",
+                              "valoresCheckbox": [
+                                {
+                                  "id": 60,
+                                  "preco": 11,
+                                  "precoDefault": "Utilizar preço default da personalização[s, n]",
+                                  "quantidade": 36,
+                                  "valor": "Valor da personalização (opcional)"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "preco": {
+                          "type": "number",
+                          "example": 19
+                        },
+                        "quantidade": {
+                          "type": "number",
+                          "example": 28
+                        }
+                      }
+                    },
+                    "example": [
+                      {
+                        "assinatura": {
+                          "recorrencia": 100
+                        },
+                        "conjunto": {
+                          "componentes": [
+                            {
+                              "idConjuntoComponente": 94,
+                              "produto": {
+                                "adicional": "Hash com as informações adicionais do produto (opcional)",
+                                "id": 29,
+                                "idAtributoValor": 68,
+                                "preco": 47,
+                                "quantidade": 62
+                              }
+                            }
+                          ],
+                          "id": 38
+                        },
+                        "editarPreco": false,
+                        "id": 94,
+                        "idAtributoValor": 7,
+                        "personalizacao": [
+                          {
+                            "id": 73,
+                            "multiplicarPreco": "Multiplicar preço da personalização[s, n]",
+                            "preco": 26,
+                            "tipo": "Tipo da personalização",
+                            "valorSelect": {
+                              "id": 74,
+                              "preco": 81,
+                              "precoDefault": "Utilizar preço default da personalização[s, n]",
+                              "valor": "Valor da personalização (opcional)"
+                            },
+                            "valorText": "Valor da personalização tipo text (opcional)",
+                            "valorUpload": "Valor do arquivo de upload em base64 (opcional)",
+                            "valoresCheckbox": [
+                              {
+                                "id": 60,
+                                "preco": 11,
+                                "precoDefault": "Utilizar preço default da personalização[s, n]",
+                                "quantidade": 36,
+                                "valor": "Valor da personalização (opcional)"
+                              }
+                            ]
+                          }
+                        ],
+                        "preco": 19,
+                        "quantidade": 28
+                      }
+                    ]
+                  }
+                }
+              },
+              "examples": {
+                "POST Product shop": {
+                  "value": {
+                    "carrinho": false,
+                    "produtos": [
+                      {
+                        "assinatura": {
+                          "recorrencia": 100
+                        },
+                        "conjunto": {
+                          "componentes": [
+                            {
+                              "idConjuntoComponente": 94,
+                              "produto": {
+                                "adicional": "Hash com as informações adicionais do produto (opcional)",
+                                "id": 29,
+                                "idAtributoValor": 68,
+                                "preco": 47,
+                                "quantidade": 62
+                              }
+                            }
+                          ],
+                          "id": 38
+                        },
+                        "editarPreco": false,
+                        "id": 94,
+                        "idAtributoValor": 7,
+                        "personalizacao": [
+                          {
+                            "id": 73,
+                            "multiplicarPreco": "Multiplicar preço da personalização[s, n]",
+                            "preco": 26,
+                            "tipo": "Tipo da personalização",
+                            "valorSelect": {
+                              "id": 74,
+                              "preco": 81,
+                              "precoDefault": "Utilizar preço default da personalização[s, n]",
+                              "valor": "Valor da personalização (opcional)"
+                            },
+                            "valorText": "Valor da personalização tipo text (opcional)",
+                            "valorUpload": "Valor do arquivo de upload em base64 (opcional)",
+                            "valoresCheckbox": [
+                              {
+                                "id": 60,
+                                "preco": 11,
+                                "precoDefault": "Utilizar preço default da personalização[s, n]",
+                                "quantidade": 36,
+                                "valor": "Valor da personalização (opcional)"
+                              }
+                            ]
+                          }
+                        ],
+                        "preco": 19,
+                        "quantidade": 28
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/product/solicitation": {
+      "post": {
+        "tags": [
+          "Product12",
+          "Solicitation"
+        ],
+        "summary": "POST Product solicitation",
+        "description": "POST Product solicitation",
+        "operationId": "postProductSolicitation",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contato": {
+                    "type": "string",
+                    "example": "Número de contato do cliente (opcional)"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "idAtributoValor": {
+                    "type": "number",
+                    "example": 92
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 55
+                  },
+                  "mailing": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "mensagem": {
+                    "type": "string",
+                    "example": "Mensagem enviada pelo cliente (opcional)"
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome do cliente"
+                  }
+                }
+              },
+              "examples": {
+                "POST Product solicitation": {
+                  "value": {
+                    "contato": "Número de contato do cliente (opcional)",
+                    "email": "E-mail do cliente",
+                    "idAtributoValor": 92,
+                    "idProduto": 55,
+                    "mailing": true,
+                    "mensagem": "Mensagem enviada pelo cliente (opcional)",
+                    "nome": "Nome do cliente"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/question/answer": {
+      "post": {
+        "tags": [
+          "Question",
+          "Answer"
+        ],
+        "summary": "POST Question answer",
+        "description": "POST Question answer",
+        "operationId": "postQuestionAnswer",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contato": {
+                    "type": "string",
+                    "example": "Número de contato do cliente (opcional)"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "idPergunta": {
+                    "type": "number",
+                    "example": 39
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome do cliente"
+                  },
+                  "resposta": {
+                    "type": "string",
+                    "example": "Resposta enviada pelo cliente"
+                  }
+                }
+              },
+              "examples": {
+                "POST Question answer": {
+                  "value": {
+                    "contato": "Número de contato do cliente (opcional)",
+                    "email": "E-mail do cliente",
+                    "idPergunta": 39,
+                    "nome": "Nome do cliente",
+                    "resposta": "Resposta enviada pelo cliente"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/question": {
+      "post": {
+        "tags": [
+          "Question"
+        ],
+        "summary": "POST Question",
+        "description": "POST Question",
+        "operationId": "postQuestion",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "App-Token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{api.wapstore.v2.appToken}}"
+            }
+          },
+          {
+            "name": "Session",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{sessionId}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contato": {
+                    "type": "string",
+                    "example": "Número de contato do cliente (opcional)"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "E-mail do cliente"
+                  },
+                  "idNivel": {
+                    "type": "number",
+                    "example": 41
+                  },
+                  "nivel": {
+                    "type": "string",
+                    "example": "Nível vinculado a pergunta[produto, categoria, marca, landingPage]"
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Nome do cliente"
+                  },
+                  "pergunta": {
+                    "type": "string",
+                    "example": "Pergunta enviada pelo cliente"
+                  }
+                }
+              },
+              "examples": {
+                "POST Question": {
+                  "value": {
+                    "contato": "Número de contato do cliente (opcional)",
+                    "email": "E-mail do cliente",
+                    "idNivel": 41,
+                    "nivel": "Nível vinculado a pergunta[produto, categoria, marca, landingPage]",
+                    "nome": "Nome do cliente",
+                    "pergunta": "Pergunta enviada pelo cliente"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/sale/cancel": {
+      "post": {
+        "tags": [
+          "Sale",
+          "Cancel"
+        ],
+        "summary": "POST Sale cancel",
+        "description": "POST Sale cancel",
+        "operationId": "postSaleCancel",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/sales-channel/actual": {
+      "get": {
+        "tags": [
+          "Sales-channel",
+          "Actual"
+        ],
+        "summary": "GET Sales-channel actual",
+        "description": "GET Sales-channel actual",
+        "operationId": "getSalesChannelActual",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sales-channel",
+          "Actual"
+        ],
+        "summary": "PUT Sales-channel actual",
+        "description": "PUT Sales-channel actual",
+        "operationId": "putSalesChannelActual",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "example": 44
+                  }
+                }
+              },
+              "examples": {
+                "PUT Sales-channel actual": {
+                  "value": {
+                    "id": 44
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/settings": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "GET Settings",
+        "description": "GET Settings",
+        "operationId": "getSettings",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "App-Token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{api.wapstore.v2.appToken}}"
+            }
+          },
+          {
+            "name": "Session",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{sessionId}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/shipment/list": {
+      "post": {
+        "tags": [
+          "Shipment",
+          "List12"
+        ],
+        "summary": "POST Shipment list",
+        "description": "POST Shipment list",
+        "operationId": "postShipmentList",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cep": {
+                    "type": "string",
+                    "example": "CEP de entrega (somente números)"
+                  },
+                  "idLista": {
+                    "type": "number",
+                    "example": 92
+                  },
+                  "quantidade": {
+                    "type": "number",
+                    "example": 44
+                  }
+                }
+              },
+              "examples": {
+                "POST Shipment list": {
+                  "value": {
+                    "cep": "CEP de entrega (somente números)",
+                    "idLista": 92,
+                    "quantidade": 44
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/shipment/product": {
+      "post": {
+        "tags": [
+          "Shipment",
+          "Product123"
+        ],
+        "summary": "POST Shipment product",
+        "description": "POST Shipment product",
+        "operationId": "postShipmentProduct",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cep": {
+                    "type": "string",
+                    "example": "CEP de entrega (somente números)"
+                  },
+                  "idAtributoValor": {
+                    "type": "number",
+                    "example": 8
+                  },
+                  "idMarketplaceSeller": {
+                    "type": "number",
+                    "example": 26
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 28
+                  },
+                  "marketplace": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "quantidade": {
+                    "type": "number",
+                    "example": 75
+                  }
+                }
+              },
+              "examples": {
+                "POST Shipment product": {
+                  "value": {
+                    "cep": "CEP de entrega (somente números)",
+                    "idAtributoValor": 8,
+                    "idMarketplaceSeller": 26,
+                    "idProduto": 28,
+                    "marketplace": true,
+                    "quantidade": 75
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/showcase/banners/{hash}": {
+      "get": {
+        "tags": [
+          "Showcase",
+          "Banners"
+        ],
+        "summary": "GET Showcase banners",
+        "description": "GET Showcase banners",
+        "operationId": "getShowcaseBanners",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "hash",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/showcase/instagram": {
+      "get": {
+        "tags": [
+          "Showcase",
+          "Instagram"
+        ],
+        "summary": "GET Showcase instagram",
+        "description": "GET Showcase instagram",
+        "operationId": "getShowcaseInstagram",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/showcase/products/ultimos-vistos": {
+      "get": {
+        "tags": [
+          "Showcase",
+          "Products"
+        ],
+        "summary": "GET Showcase products ultimos-vistos",
+        "description": "GET Showcase products ultimos-vistos",
+        "operationId": "getShowcaseProductsUltimosVistos",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "223"
+            }
+          },
+          {
+            "name": "seenProducts",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "8;9;2;654"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/showcase/products/{hash}": {
+      "get": {
+        "tags": [
+          "Showcase",
+          "Products"
+        ],
+        "summary": "GET Showcase products",
+        "description": "GET Showcase products",
+        "operationId": "getShowcaseProducts",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "hash",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/showcase/products/produto-detalhe-indicados": {
+      "get": {
+        "tags": [
+          "Showcase",
+          "Products"
+        ],
+        "summary": "GET Indicated Showcase products",
+        "description": "GET Indicated Showcase products",
+        "operationId": "getIndicatedShowcaseProducts",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "223"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "hash",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/struct/menus/{hash}": {
+      "get": {
+        "tags": [
+          "Struct",
+          "Menus"
+        ],
+        "summary": "GET Struct menus",
+        "description": "GET Struct menus",
+        "operationId": "getStructMenus",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "hash",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/struct/popup/{nivel}": {
+      "get": {
+        "tags": [
+          "Struct",
+          "Popup"
+        ],
+        "summary": "GET Struct popup",
+        "description": "GET Struct popup",
+        "operationId": "getStructPopup",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "nivel",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v2/front/url/home": {
+      "get": {
+        "tags": [
+          "Url",
+          "Home"
+        ],
+        "summary": "GET Url home",
+        "description": "GET Url home",
+        "operationId": "getUrlHome",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/list/detail": {
+      "get": {
+        "tags": [
+          "Url",
+          "List123"
+        ],
+        "summary": "GET Url list detail",
+        "description": "GET Url list detail",
+        "operationId": "getUrlListDetail",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "/lista/lista-de-compra.html"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "AppToken",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "wapstore"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/list/listing": {
+      "get": {
+        "tags": [
+          "Url",
+          "List123"
+        ],
+        "summary": "GET Url list listing",
+        "description": "GET Url list listing",
+        "operationId": "getUrlListListing",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "/seu-filtro"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/page": {
+      "get": {
+        "tags": [
+          "Url",
+          "Page"
+        ],
+        "summary": "GET Url page",
+        "description": "GET Url page",
+        "operationId": "getUrlPage",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/product/detail": {
+      "get": {
+        "tags": [
+          "Url",
+          "Product1234"
+        ],
+        "summary": "GET Url product detail",
+        "description": "GET Url product detail",
+        "operationId": "getUrlProductDetail",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/product/listing/category": {
+      "get": {
+        "tags": [
+          "Url",
+          "Product1234"
+        ],
+        "summary": "GET Url product listing category",
+        "description": "GET Url product listing category",
+        "operationId": "getUrlProductListingCategory",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "/seu-filtro"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/product/listing/brand": {
+      "get": {
+        "tags": [
+          "Url",
+          "Product1234"
+        ],
+        "summary": "GET Url product listing brand",
+        "description": "GET Url product listing brand",
+        "operationId": "getUrlProductListingBrand",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "/seu-filtro"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/product/listing/landing-page": {
+      "get": {
+        "tags": [
+          "Url",
+          "Product1234"
+        ],
+        "summary": "GET Url product listing landing-page",
+        "description": "GET Url product listing landing-page",
+        "operationId": "getUrlProductListingLandingPage",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "/c/seu-filtro"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/product/listing/search": {
+      "get": {
+        "tags": [
+          "Url",
+          "Product1234"
+        ],
+        "summary": "GET Url product listing search",
+        "description": "GET Url product listing search",
+        "operationId": "getUrlProductListingSearch",
+        "parameters": [
+          {
+            "name": "busca",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Sua busca"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "0"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "Popularidade"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "100"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/url/verify": {
+      "get": {
+        "tags": [
+          "Url",
+          "Verify"
+        ],
+        "summary": "GET Url verify",
+        "description": "GET Url verify",
+        "operationId": "getUrlVerify",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "/lista/lista-de-teste-para-api.html"
+            }
+          },
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "nivel": "product/listing/brand"
+                  },
+                  "type": "object",
+                  "properties": {
+                    "nivel": {
+                      "type": "string",
+                      "description": "Nível da URL"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/front/wishlist/add": {
+      "post": {
+        "tags": [
+          "Wishlist",
+          "Add"
+        ],
+        "summary": "POST Wishlist add",
+        "description": "POST Wishlist add",
+        "operationId": "postWishlistAdd",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idAtributoSimples": {
+                    "type": "number",
+                    "example": 88
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 91
+                  },
+                  "idUnidadeVenda": {
+                    "type": "number",
+                    "example": 87
+                  },
+                  "parametroAdicional": {
+                    "type": "string",
+                    "example": "Paremetro adicional referente a personalização do produto (opcional)"
+                  },
+                  "quantidade": {
+                    "type": "number",
+                    "example": 59
+                  }
+                }
+              },
+              "examples": {
+                "POST Wishlist add": {
+                  "value": {
+                    "idAtributoSimples": 88,
+                    "idProduto": 91,
+                    "idUnidadeVenda": 87,
+                    "parametroAdicional": "Paremetro adicional referente a personalização do produto (opcional)",
+                    "quantidade": 59
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/wishlist/remove": {
+      "post": {
+        "tags": [
+          "Wishlist",
+          "Remove"
+        ],
+        "summary": "POST Wishlist remove",
+        "description": "POST Wishlist remove",
+        "operationId": "postWishlistRemove",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idAtributoSimples": {
+                    "type": "number",
+                    "example": 36
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 90
+                  },
+                  "idUnidadeVenda": {
+                    "type": "number",
+                    "example": 83
+                  },
+                  "parametroAdicional": {
+                    "type": "string",
+                    "example": "Paremetro adicional referente a personalização do produto (opcional)"
+                  },
+                  "quantidade": {
+                    "type": "number",
+                    "example": 25
+                  }
+                }
+              },
+              "examples": {
+                "POST Wishlist remove": {
+                  "value": {
+                    "idAtributoSimples": 36,
+                    "idProduto": 90,
+                    "idUnidadeVenda": 83,
+                    "parametroAdicional": "Paremetro adicional referente a personalização do produto (opcional)",
+                    "quantidade": 25
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/wishlist/verify": {
+      "post": {
+        "tags": [
+          "Wishlist",
+          "Verify1"
+        ],
+        "summary": "POST Wishlist verify",
+        "description": "POST Wishlist verify",
+        "operationId": "postWishlistVerify",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idAtributoSimples": {
+                    "type": "number",
+                    "example": 27
+                  },
+                  "idProduto": {
+                    "type": "number",
+                    "example": 56
+                  },
+                  "idUnidadeVenda": {
+                    "type": "number",
+                    "example": 50
+                  },
+                  "parametroAdicional": {
+                    "type": "string",
+                    "example": "Paremetro adicional referente a personalização do produto (opcional)"
+                  },
+                  "quantidade": {
+                    "type": "number",
+                    "example": 91
+                  }
+                }
+              },
+              "examples": {
+                "POST Wishlist verify": {
+                  "value": {
+                    "idAtributoSimples": 27,
+                    "idProduto": 56,
+                    "idUnidadeVenda": 50,
+                    "parametroAdicional": "Paremetro adicional referente a personalização do produto (opcional)",
+                    "quantidade": 91
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v2/front/wishlist": {
+      "get": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "GET Wishlist",
+        "description": "GET Wishlist",
+        "operationId": "getWishlist",
+        "parameters": [
+          {
+            "name": "Cache-Control",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "no-cache"
+            }
+          },
+          {
+            "name": "App-Token",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{api.wapstore.v2.appToken}}"
+            }
+          },
+          {
+            "name": "Session",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "{{sessionId}}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Brands"
+    },
+    {
+      "name": "Checkout"
+    },
+    {
+      "name": "Cart"
+    },
+    {
+      "name": "Login"
+    },
+    {
+      "name": "Password-recovery"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Zipcode"
+    },
+    {
+      "name": "Client"
+    },
+    {
+      "name": "Reseller"
+    },
+    {
+      "name": "Evaluations"
+    },
+    {
+      "name": "List"
+    },
+    {
+      "name": "Product"
+    },
+    {
+      "name": "Store"
+    },
+    {
+      "name": "Form"
+    },
+    {
+      "name": "Contact"
+    },
+    {
+      "name": "List1"
+    },
+    {
+      "name": "Shop"
+    },
+    {
+      "name": "Marketplace"
+    },
+    {
+      "name": "Product1"
+    },
+    {
+      "name": "Browsing-history"
+    },
+    {
+      "name": "Newsletter"
+    },
+    {
+      "name": "Associates"
+    },
+    {
+      "name": "Ping"
+    },
+    {
+      "name": "Product12"
+    },
+    {
+      "name": "Budget"
+    },
+    {
+      "name": "Combination"
+    },
+    {
+      "name": "Component"
+    },
+    {
+      "name": "Predefination"
+    },
+    {
+      "name": "Shop1"
+    },
+    {
+      "name": "Solicitation"
+    },
+    {
+      "name": "Question"
+    },
+    {
+      "name": "Answer"
+    },
+    {
+      "name": "Sale"
+    },
+    {
+      "name": "Cancel"
+    },
+    {
+      "name": "Sales-channel"
+    },
+    {
+      "name": "Actual"
+    },
+    {
+      "name": "Settings"
+    },
+    {
+      "name": "Shipment"
+    },
+    {
+      "name": "List12"
+    },
+    {
+      "name": "Product123"
+    },
+    {
+      "name": "Showcase"
+    },
+    {
+      "name": "Banners"
+    },
+    {
+      "name": "Instagram"
+    },
+    {
+      "name": "Products"
+    },
+    {
+      "name": "Struct"
+    },
+    {
+      "name": "Menus"
+    },
+    {
+      "name": "Popup"
+    },
+    {
+      "name": "Url"
+    },
+    {
+      "name": "Home"
+    },
+    {
+      "name": "List123"
+    },
+    {
+      "name": "Page"
+    },
+    {
+      "name": "Product1234"
+    },
+    {
+      "name": "Verify"
+    },
+    {
+      "name": "Wishlist"
+    },
+    {
+      "name": "Add"
+    },
+    {
+      "name": "Remove"
+    },
+    {
+      "name": "Verify1"
+    }
+  ]
+}
