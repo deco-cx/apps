@@ -8,6 +8,7 @@ import * as $$$$$$$$$2 from "./actions/setup.ts";
 import * as $$$0 from "./loaders/product/list.ts";
 import * as $$$1 from "./loaders/product/listingPage.ts";
 import * as $$$2 from "./loaders/product/suggestions.ts";
+import * as $$$3 from "./loaders/product/vndaListingPage.ts";
 import * as $$$$$$0 from "./sections/Analytics/Algolia.tsx";
 import * as $$$$$$$$$$0 from "./workflows/index/product.ts";
 
@@ -16,6 +17,7 @@ const manifest = {
     "algolia/loaders/product/list.ts": $$$0,
     "algolia/loaders/product/listingPage.ts": $$$1,
     "algolia/loaders/product/suggestions.ts": $$$2,
+    "algolia/loaders/product/vndaListingPage.ts": $$$3,
   },
   "sections": {
     "algolia/sections/Analytics/Algolia.tsx": $$$$$$0,
