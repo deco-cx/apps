@@ -29,6 +29,7 @@ import {
 } from "./types/suggestionsJSON.ts";
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
+import { Models } from "https://deno.land/x/openai@v4.19.1/resources/mod.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -130,12 +131,31 @@ export const toProduct = (
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
 
-  const additionalProperty = variant.SKUOptions?.map((option) => ({
+  const additionalPropertyBase = variant.SKUOptions?.map((option) => ({
     "@type": "PropertyValue" as const,
     name: option.Name,
     value: option.Title,
     propertyID: option.Value,
   })) ?? [];
+
+  const additionalProperty = additionalPropertyBase.concat(
+    product.ExtendedMetadatas?.map((item) => ({
+      "@type": "PropertyValue",
+      name: item.Alias,
+      value: item.Value,
+      propertyID: item.PropertyMetadataID.toString()
+    }))
+  )
+
+  /*
+  const productDescription = product?.Descriptions?.map((option) => ({
+    name: option.Name,
+    alias: option.Alias,
+    value: option.Value,
+    propertyID: option.Value,
+  }));
+  */
+
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
@@ -148,7 +168,7 @@ export const toProduct = (
     encodingFormat: "image",
     alternateName: product.Name,
     url: new URL(url, cdn).href,
-  });
+  }); 
 
   const productURL = new URL(product.Url, url);
   productURL.searchParams.set("productID", `${variant.ProductID}`);
@@ -185,17 +205,17 @@ export const toProduct = (
       name: product.BrandName ?? undefined,
       logo: product.BrandImageUrl ?? undefined,
     },
-    additionalProperty,
-    image,
+    additionalProperty,  
+    image,    
     isVariantOf: {
       "@type": "ProductGroup",
       url: new URL(product.Url, url).href,
       name: product.Name,
-      description: product.ShortDescription,
+      description: product.ShortDescription,      
       image: groupImages,
       productGroupID: product.ProductID.toString(),
       additionalProperty: [],
-      hasVariant,
+      hasVariant 
     },
     offers: {
       "@type": "AggregateOffer" as const,
