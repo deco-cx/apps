@@ -66,7 +66,7 @@ const getFontVariations = (variations: FontVariation[]) => {
     variants.push(`${italic ? "1," : "0,"}${weight}`);
   }
 
-  return `${hasItalic ? "ital," : ""}wght@${variants.join(";")}`;
+  return `:${hasItalic ? "ital," : ""}wght@${variants.join(";")}`;
 };
 
 const NEW_BROWSER_KEY = {
@@ -98,7 +98,7 @@ const loader = async (props: Props, _req: Request): Promise<Font> => {
   for (const font of Object.values(reduced)) {
     url.searchParams.append(
       "family",
-      `${font.family}:${getFontVariations(font.variations)}`,
+      `${font.family}${getFontVariations(font.variations)}`,
     );
   }
 
