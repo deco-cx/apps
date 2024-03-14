@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { ComponentChildren } from "preact";
 import Image from "../../components/Image.tsx";
 import { VerifiedIcon } from "./Icons.tsx";

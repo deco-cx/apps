@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { SectionProps } from "deco/blocks/section.ts";
 import insights from "npm:search-insights@2.9.0";
 import {

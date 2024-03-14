@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import SEO, {
   Props as SEOPDPProps,
 } from "../../../commerce/sections/Seo/SeoPDP.tsx";

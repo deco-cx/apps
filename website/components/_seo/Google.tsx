@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { SeoProps } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 

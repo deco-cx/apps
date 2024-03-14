@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import type { Section, SectionProps } from "deco/blocks/section.ts";
 import { usePartialSection } from "deco/hooks/usePartialSection.ts";
 import { useId } from "preact/hooks";

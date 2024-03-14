@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { state } from "../../nuvemshop/mod.ts";
 
 export default function Preview() {

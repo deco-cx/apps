@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Image from "../../components/Image.tsx";
 import { SeoProps } from "./Preview.tsx";
 import { Avatar, GlobeIcon } from "./Icons.tsx";

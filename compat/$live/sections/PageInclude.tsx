@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 /** TODO: Deprecate this file */
 import { Page } from "deco/blocks/page.tsx";
 import { notUndefined } from "deco/engine/core/utils.ts";

@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import {
   Person,
   ProductDetailsPage,

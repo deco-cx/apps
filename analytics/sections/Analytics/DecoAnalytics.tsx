@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Plausible, { type Props } from "../../components/DecoAnalytics.tsx";
 
 function Section(props: Props) {

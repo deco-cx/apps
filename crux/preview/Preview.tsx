@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { BaseContext } from "deco/engine/core/resolver.ts";
 import { AppRuntime } from "deco/types.ts";
 import { App } from "../mod.ts";

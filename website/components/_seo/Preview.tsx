@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import type { ComponentChildren, ComponentProps } from "preact";
 import { useMemo } from "preact/hooks";

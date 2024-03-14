@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { toPowerReviewId } from "../utils/tranform.ts";
 

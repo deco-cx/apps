@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { context } from "deco/live.ts";
 import Script from "partytown/Script.tsx";
 import GoogleTagScript from "partytown/integrations/GTAG.tsx";

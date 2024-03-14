@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 export const Avatar = ({ size = 40 }: { size?: number }) => (
   <img
     width={size}

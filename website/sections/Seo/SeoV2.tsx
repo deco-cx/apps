@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
 import { renderTemplateString, SEOSection } from "../../components/Seo.tsx";
 import { AppContext } from "../../mod.ts";

@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
 import { ProductListingPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";

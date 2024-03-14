@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 // deno-lint-ignore-file no-explicit-any
 import { Head } from "$fresh/runtime.ts";
 import { scriptAsDataURI } from "../../../utils/dataURI.ts";

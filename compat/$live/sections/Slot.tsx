@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { isSection, Section } from "deco/blocks/section.ts";
 
 export type WellKnownSlots =

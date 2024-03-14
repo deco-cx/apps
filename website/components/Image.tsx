@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";

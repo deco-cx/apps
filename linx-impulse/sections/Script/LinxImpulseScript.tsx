@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import { SectionProps } from "deco/mod.ts";
 import { AppContext } from "../../mod.ts";

@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 export interface Props {
   /**
    * @title App Key

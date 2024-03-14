@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Seo from "../../../website/components/Seo.tsx";
 import {
   renderTemplateString,

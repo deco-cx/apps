@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Image from "../../components/Image.tsx";
 import type { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";

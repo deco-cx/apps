@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 /**
  * TODO: Implement video preload with link[rel="preload"] tags once
  * browsers support it. More info at: https://stackoverflow.com/a/68368601

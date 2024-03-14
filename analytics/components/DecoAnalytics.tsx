@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { Head } from "$fresh/runtime.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 

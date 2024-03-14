@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import Script from "partytown/Script.tsx";
 import { ComponentProps } from "preact";
 import { Product } from "../../commerce/types.ts";

@@ -1,3 +1,5 @@
+/** @jsxImportSource preact */
+
 import { AppRuntime } from "deco/types.ts";
 import { App } from "../mod.ts";
 import type { JSX } from "preact";
