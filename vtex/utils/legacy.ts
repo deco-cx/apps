@@ -41,11 +41,13 @@ export const pageTypesFromPathname = async (
   let segments = segmentsFromTerm(term);
   const { vcsDeprecated } = ctx;
 
-  const limit = ctx.segmentRateLimit || DEFAULT_SEGMENT_RATE_LIMIT
+  const limit = ctx.segmentRateLimit || DEFAULT_SEGMENT_RATE_LIMIT;
 
-  if(segments.length > limit){
-    console.warn(`Rate limit exceeded, too much segments requested. Only the first ${limit} segments will be requested.`)
-    segments = segments.splice(0, limit)
+  if (segments.length > limit) {
+    console.warn(
+      `Rate limit exceeded, too much segments requested. Only the first ${limit} segments will be requested.`,
+    );
+    segments = segments.splice(0, limit);
   }
 
   const results = await Promise.all(
