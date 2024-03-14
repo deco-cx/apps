@@ -79,6 +79,11 @@ export interface Props {
    * @description Use VTEX as backend platform
    */
   platform: "vtex";
+
+  /**
+   * @description Rate limit for unique segment requests
+   */
+  segmentRateLimit?: number;
 }
 
 export const color = 0xf71963;
