@@ -46,7 +46,6 @@ import * as $$$$$$$13 from "./matchers/site.ts";
 import * as $$$$$$$14 from "./matchers/userAgent.ts";
 import * as $$$$$0 from "./pages/Page.tsx";
 import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
-import * as $$$$$$4 from "./sections/redirect.tsx";
 import * as $$$$$$1 from "./sections/Rendering/Deferred.tsx";
 import * as $$$$$$2 from "./sections/Seo/Seo.tsx";
 import * as $$$$$$3 from "./sections/Seo/SeoV2.tsx";
@@ -82,7 +81,6 @@ const manifest = {
   },
   "sections": {
     "website/sections/Analytics/Analytics.tsx": $$$$$$0,
-    "website/sections/redirect.tsx": $$$$$$4,
     "website/sections/Rendering/Deferred.tsx": $$$$$$1,
     "website/sections/Seo/Seo.tsx": $$$$$$2,
     "website/sections/Seo/SeoV2.tsx": $$$$$$3,
