@@ -330,9 +330,9 @@ const loader = async (
     ).then((res) => res.json()),
   ]);
 
-  if (url.pathname == "/masculino") {
+  if (productsResult.redirect) {
     redirect(
-      new URL("/camisa-masculina-xadrez-sun-e-azul/p?skuId=116", url.origin)
+      new URL(productsResult.redirect, url.origin)
         .href,
     );
   }
