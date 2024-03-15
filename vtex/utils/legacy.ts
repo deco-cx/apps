@@ -41,7 +41,7 @@ export const pageTypesFromPathname = async (
   let segments = segmentsFromTerm(term);
   const { vcsDeprecated } = ctx;
 
-  const limit = ctx.segmentRateLimit || DEFAULT_SEGMENT_RATE_LIMIT;
+  const limit = ctx.facetsLimit || DEFAULT_SEGMENT_RATE_LIMIT;
 
   if (segments.length > limit) {
     console.warn(

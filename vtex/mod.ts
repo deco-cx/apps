@@ -81,9 +81,9 @@ export interface Props {
   platform: "vtex";
 
   /**
-   * @description Rate limit for unique segment requests
+   * @description Maximum quantity of facets that can be requested in a single request. Default is 10
    */
-  segmentRateLimit?: number;
+  facetsLimit?: number;
 }
 
 export const color = 0xf71963;
