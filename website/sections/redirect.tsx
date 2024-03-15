@@ -1,14 +1,30 @@
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
-const snippet = () => {
-    window.location.href = "https://tavanoblog.com.br"
+export interface Props{
+    url: string;
 }
 
-export default function Redirect(){
+const snippet = (url: string) => {
+    console.log("teste")
+    setTimeout(() => {
+        console.log("timeout")
+    }, 5000);
+    window.addEventListener("load", () => {
+        setTimeout(() => {
+            console.log("timeout load")
+        }, 100);
+        console.log("loaddd")
+    })
+    window.location.href = url
+}
 
-    return (
-        <div id="tavano">
-            <script src={scriptAsDataURI(snippet)} />
-        </div>
+export default function Redirect({ url } : Props){
+
+    return(
+        <script 
+            type="text/javascript"
+            async
+            src={scriptAsDataURI(snippet, url)}
+        />
     )
 }
