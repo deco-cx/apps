@@ -35,7 +35,7 @@ import type {
   Sort,
 } from "../../utils/types.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
-import { redirect } from 'deco/mod.ts'
+import { redirect } from "deco/mod.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -330,10 +330,12 @@ const loader = async (
     ).then((res) => res.json()),
   ]);
 
-  if(url.pathname == "/masculino") {
-    redirect(new URL("/camisa-masculina-xadrez-sun-e-azul/p?skuId=116", url.origin).href)
+  if (url.pathname == "/masculino") {
+    redirect(
+      new URL("/camisa-masculina-xadrez-sun-e-azul/p?skuId=116", url.origin)
+        .href,
+    );
   }
-
 
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];
