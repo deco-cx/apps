@@ -1,7 +1,7 @@
 import { ImportMap } from "deco/blocks/app.ts";
 import { decoManifestBuilder } from "deco/engine/manifest/manifestGen.ts";
 import { createCache } from "https://deno.land/x/deno_cache@0.6.3/mod.ts";
-import { build, initialize } from "https://deno.land/x/esbuild@v0.19.7/wasm.js";
+import { build, initialize } from "https://deno.land/x/esbuild@v0.20.2/wasm.js";
 import {
   resolveImportMap,
   resolveModuleSpecifier,
@@ -12,7 +12,7 @@ import { AppContext } from "../mod.ts";
 import { create, FileSystemNode, isDir, nodesToMap, walk } from "../sdk.ts";
 
 const initializePromise = initialize({
-  wasmURL: "https://deno.land/x/esbuild@v0.19.7/esbuild.wasm",
+  wasmURL: "https://deno.land/x/esbuild@v0.20.2/esbuild.wasm",
   worker: false,
 });
 
