@@ -35,6 +35,7 @@ import type {
   Sort,
 } from "../../utils/types.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
+import { redirect } from "deco/mod.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -328,6 +329,15 @@ const loader = async (
       { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
     ).then((res) => res.json()),
   ]);
+
+  // It is a feature from Intelligent Search on VTEX panel
+  // redirect to a specific page based on configured rules
+  if (productsResult.redirect) {
+    redirect(
+      new URL(productsResult.redirect, url.origin)
+        .href,
+    );
+  }
 
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];

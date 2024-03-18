@@ -542,7 +542,9 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   return [...specificationProperties, ...attachmentProperties];
 };
 
-const toOffer = ({ commertialOffer: offer, sellerId, sellerName }: SellerVTEX): Offer => ({
+const toOffer = (
+  { commertialOffer: offer, sellerId, sellerName }: SellerVTEX,
+): Offer => ({
   "@type": "Offer",
   price: offer.spotPrice ?? offer.Price,
   seller: sellerId,
