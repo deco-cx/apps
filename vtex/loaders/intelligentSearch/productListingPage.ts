@@ -330,6 +330,8 @@ const loader = async (
     ).then((res) => res.json()),
   ]);
 
+  // It is a feature from Intelligent Search on VTEX panel
+  // redirect to a specific page based on configured rules
   if (productsResult.redirect) {
     redirect(
       new URL(productsResult.redirect, url.origin)
