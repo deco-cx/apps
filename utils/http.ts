@@ -155,11 +155,21 @@ export const createHttpClient = <T>({
           headers,
           method,
           body,
+        }).then((res) => {
+          res.json = () => parseJsonWithMetadata(res);
+          return res;
         });
       };
     },
   });
 };
+
+// const log = `------------- Response Parsing Error -------------
+// Status ${res.status}
+// Response URL: ${res.url}
+// Response as text: ${await res.text()}
+// JS Error:`;
+// console.error(log, err);
 
 // deno-lint-ignore no-explicit-any
 export const nullOnNotFound = (error: any) => {
@@ -168,4 +178,20 @@ export const nullOnNotFound = (error: any) => {
   }
 
   throw error;
+};
+
+export const parseJsonWithMetadata = async <T>(
+  res: TypedResponse<T>,
+) => {
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    err.__meta = {
+      res,
+      type: "parse_error",
+    };
+    throw err;
+  }
+  return data;
 };
