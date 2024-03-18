@@ -190,6 +190,12 @@ export default function RoutesSelection(
 
     timing?.end();
 
+    const regexFile = /(\.js)|(_frsh)/gm;
+    if (regexFile.test(req.url)) {
+      return new Response(null, {
+        status: 404,
+      });
+    }
     return await server(req, connInfo);
   };
 }
