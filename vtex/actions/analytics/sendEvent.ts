@@ -12,7 +12,7 @@ export type Props =
     products: {
       productId: string;
       quantity: number;
-    }[]
+    }[];
   }
   | {
     type: "page.empty_cart";
@@ -25,7 +25,7 @@ export type Props =
       productId: string;
       quantity: number;
       price: number;
-    }[]
+    }[];
   }
   | {
     type: "search.click";

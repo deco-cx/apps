@@ -1108,46 +1108,46 @@ export interface SimulationItem {
 }
 
 export type SPEvent =
-| {
-  type: "session.ping";
-  url: string;
-}
-| {
-  type: "page.cart";
-  products: {
+  | {
+    type: "session.ping";
+    url: string;
+  }
+  | {
+    type: "page.cart";
+    products: {
+      productId: string;
+      quantity: number;
+    }[];
+  }
+  | {
+    type: "page.empty_cart";
+    products: [];
+  }
+  | {
+    type: "page.confirmation";
+    order: string;
+    products: {
+      productId: string;
+      quantity: number;
+      price: number;
+    }[];
+  }
+  | {
+    type: "search.click";
+    position: number;
+    text: string;
     productId: string;
-    quantity: number;
-  }[]
-}
-| {
-  type: "page.empty_cart";
-  products: [];
-}
-| {
-  type: "page.confirmation";
-  order: string;
-  products: {
-    productId: string;
-    quantity: number;
-    price: number;
-  }[]
-}
-| {
-  type: "search.click";
-  position: number;
-  text: string;
-  productId: string;
-  url: string;
-}
-| {
-  type: "search.query";
-  url: string;
-  text: string;
-  misspelled: boolean;
-  match: number;
-  operator: string;
-  locale: string;
-};
+    url: string;
+  }
+  | {
+    type: "search.query";
+    url: string;
+    text: string;
+    misspelled: boolean;
+    match: number;
+    operator: string;
+    locale: string;
+  };
 
 export interface CreateNewDocument {
   Id?: string;

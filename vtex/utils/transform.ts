@@ -715,7 +715,10 @@ export const legacyFacetToFilter = (
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || mapSegments[0]);
+      link.searchParams.set(
+        "fmap",
+        url.searchParams.get("fmap") || mapSegments[0],
+      );
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {
