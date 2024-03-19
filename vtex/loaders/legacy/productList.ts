@@ -98,11 +98,8 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
 
 const preferredSKU = (items: LegacyItem[], { props }: Props) => {
-  let fetchedSkus: string[] = [];
-  if (isSKUIDProps(props)) {
-    fetchedSkus = props.ids ?? [];
-  }
-  return items.find((item) => fetchedSkus.includes(item.itemId)) || items[0];
+  const fetchedSkus = new Set((props as SkuIDProps).ids ?? []);
+  return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
 };
 
 const fromProps = ({ props }: Props) => {

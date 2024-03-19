@@ -158,11 +158,8 @@ const fromProps = ({ props }: Props) => {
 };
 
 const preferredSKU = (items: Item[], { props }: Props) => {
-  let fetchedSkus: string[] = [];
-  if (isProductIDList(props)) {
-    fetchedSkus = props.ids ?? [];
-  }
-  return items.find((item) => fetchedSkus.includes(item.itemId)) || items[0];
+  const fetchedSkus = new Set((props as ProductIDProps).ids ?? []);
+  return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
 };
 
 /**
