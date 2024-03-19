@@ -5,6 +5,27 @@ import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
 export type Props =
   | {
     type: "session.ping";
+    url: string;
+  }
+  | {
+    type: "page.cart";
+    products: {
+      productId: string;
+      quantity: number;
+    }[]
+  }
+  | {
+    type: "page.empty_cart";
+    products: [];
+  }
+  | {
+    type: "page.confirmation";
+    order: string;
+    products: {
+      productId: string;
+      quantity: number;
+      price: number;
+    }[]
   }
   | {
     type: "search.click";
@@ -15,6 +36,7 @@ export type Props =
   }
   | {
     type: "search.query";
+    url: string;
     text: string;
     misspelled: boolean;
     match: number;
