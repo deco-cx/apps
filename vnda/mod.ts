@@ -42,8 +42,8 @@ export interface Props {
    */
   platform: "vnda";
 
-   /** @description Here is to put the pathname of the Search Page. Ex: /s. We have default values: "/busca" or "/s" */
-   searchPagePath?: string;
+  /** @description Here is to put the pathname of the Search Page. Ex: /s. We have default values: "/busca" or "/s" */
+  searchPagePath?: string;
 }
 
 export interface State extends Props {

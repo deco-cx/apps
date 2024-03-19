@@ -6,6 +6,7 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
+import { sortProducts } from "../../utils/transform.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -198,6 +199,14 @@ const loader = async (
       priceCurrency: segment?.payload?.currencyCode ?? "BRL",
     })
   );
+
+  if (isSKUIDProps(props)) {
+    sortProducts(products, props.ids || [], "sku");
+  }
+
+  if (isProductIDProps(props)) {
+    sortProducts(products, props.productIds || [], "inProductGroupWithID");
+  }
 
   return Promise.all(
     products.map((product) =>
