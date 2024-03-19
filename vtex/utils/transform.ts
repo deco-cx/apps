@@ -715,7 +715,10 @@ export const legacyFacetToFilter = (
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || mapSegments[0]);
+      link.searchParams.set(
+        "fmap",
+        url.searchParams.get("fmap") || mapSegments[0],
+      );
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {
@@ -968,4 +971,20 @@ export const toReview = (
       })),
     };
   });
+};
+
+type ProductMap = Record<string, Product>;
+
+export const sortProducts = (
+  products: Product[],
+  orderOfIdsOrSkus: string[],
+  prop: "sku" | "inProductGroupWithID",
+) => {
+  const productMap: ProductMap = {};
+
+  products.forEach((product) => {
+    productMap[product[prop] || product["sku"]] = product;
+  });
+
+  return orderOfIdsOrSkus.map((id) => productMap[id]);
 };

@@ -474,7 +474,7 @@ export const typeTagExtractor = (url: URL, tags: { type?: string }[]) => {
 
   keysToDestroy.forEach((key) => cleanUrl.searchParams.delete(key));
 
-  cleanUrl.searchParams.delete('page')
+  cleanUrl.searchParams.delete("page");
 
   return {
     typeTags,
