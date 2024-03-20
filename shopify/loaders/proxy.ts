@@ -4,6 +4,7 @@ import { withDigestCookie } from "../utils/password.ts";
 
 const PATHS_TO_PROXY = [
   "/checkouts/*",
+  "/cart",
   "/cart/*",
   "/account",
   "/account/*",
@@ -11,6 +12,7 @@ const PATHS_TO_PROXY = [
   "/password/*",
   "/challenge",
   "/challenge/*",
+  "/services/*"
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 

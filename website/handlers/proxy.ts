@@ -135,14 +135,14 @@ export default function Proxy({
     headers.set("x-forwarded-host", url.host);
 
     for (const { key, value } of customHeaders) {
-      if(key === "cookie"){
-        const existingCookie = headers.get('cookie');
+      if (key === "cookie") {
+        const existingCookie = headers.get("cookie");
         if (existingCookie) {
-          headers.set('cookie', `${existingCookie}; ${value}`);
+          headers.set("cookie", `${existingCookie}; ${value}`);
         } else {
-          headers.set('cookie', value);
+          headers.set("cookie", value);
         }
-      }else{
+      } else {
         headers.set(key, value);
       }
     }
