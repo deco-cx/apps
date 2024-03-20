@@ -9,7 +9,7 @@ async function build() {
     BlobReader,
     ZipReader,
   } = await import("https://deno.land/x/zipjs@v2.7.30/index.js");
-  const { gte } = await import("https://deno.land/x/semver@v1.4.1/mod.ts")
+  const { gte } = await import("https://deno.land/x/semver@v1.4.1/mod.ts");
 
   const exists = async (filename: string): Promise<boolean> => {
     try {
