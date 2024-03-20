@@ -972,3 +972,19 @@ export const toReview = (
     };
   });
 };
+
+type ProductMap = Record<string, Product>;
+
+export const sortProducts = (
+  products: Product[],
+  orderOfIdsOrSkus: string[],
+  prop: "sku" | "inProductGroupWithID",
+) => {
+  const productMap: ProductMap = {};
+
+  products.forEach((product) => {
+    productMap[product[prop] || product["sku"]] = product;
+  });
+
+  return orderOfIdsOrSkus.map((id) => productMap[id]);
+};

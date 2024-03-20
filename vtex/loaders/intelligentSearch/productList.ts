@@ -9,11 +9,12 @@ import {
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { ProductID, Sort } from "../../utils/types.ts";
+import type { Item, ProductID, Sort } from "../../utils/types.ts";
 import {
   LabelledFuzzy,
   mapLabelledFuzzyToFuzzy,
 } from "./productListingPage.ts";
+import { sortProducts } from "../../utils/transform.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -156,6 +157,11 @@ const fromProps = ({ props }: Props) => {
   throw new Error(`Unknown props: ${JSON.stringify(props)}`);
 };
 
+const preferredSKU = (items: Item[], { props }: Props) => {
+  const fetchedSkus = new Set((props as ProductIDProps).ids ?? []);
+  return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
+};
+
 /**
  * @title VTEX Integration - Intelligent Search
  * @description Product List loader
@@ -191,9 +197,13 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
-  const products = vtexProducts?.map((p) =>
-    toProduct(p, p.items[0], 0, options)
+  let products = vtexProducts?.map((p) =>
+    toProduct(p, preferredSKU(p.items, { props }), 0, options)
   );
+
+  if (isProductIDList(props)) {
+    products = sortProducts(products, props.ids || [], "sku");
+  }
 
   return Promise.all(
     products.map((product) =>
