@@ -49,7 +49,7 @@ export type Props =
  */
 const action = async (
   props: Props,
-  _req: unknown,
+  req: Request,
   ctx: AppContext,
 ): Promise<null> => {
   const { sp } = ctx;
@@ -63,7 +63,7 @@ const action = async (
     body: {
       ...props,
       ...cookies,
-      agent: "deco-sites/apps",
+      agent: req.headers.get("user-agent") || "deco-sites/apps",
     },
     headers: {
       "content-type": "application/json",

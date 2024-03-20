@@ -53,6 +53,7 @@ import * as $$$26 from "./loaders/user.ts";
 import * as $$$27 from "./loaders/wishlist.ts";
 import * as $$$28 from "./loaders/workflow/product.ts";
 import * as $$$29 from "./loaders/workflow/products.ts";
+import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
 
@@ -91,6 +92,9 @@ const manifest = {
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
+  },
+  "sections": {
+    "vtex/sections/Analytics/Vtex.tsx": $$$$$$0,
   },
   "actions": {
     "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$0,
