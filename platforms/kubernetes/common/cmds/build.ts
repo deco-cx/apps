@@ -1,5 +1,4 @@
 import { DenoJSON } from "../../types.ts";
-import { compareVersions } from "https://deno.land/x/compare_versions@0.4.0/mod.ts";
 
 async function build() {
   const { ensureFile } = await import(
@@ -10,6 +9,7 @@ async function build() {
     BlobReader,
     ZipReader,
   } = await import("https://deno.land/x/zipjs@v2.7.30/index.js");
+  const { gte } = await import("https://deno.land/x/semver@v1.4.1/mod.ts")
 
   const exists = async (filename: string): Promise<boolean> => {
     try {
@@ -266,8 +266,8 @@ async function build() {
     ) {
       if (
         //https://github.com/denoland/fresh/pull/2035
-        compareVersions(preactVersion, minPreactVersion) >= 0 &&
-        compareVersions(freshVersion, minFreshVersion) >= 0
+        gte(preactVersion, minPreactVersion) &&
+        gte(freshVersion, minFreshVersion)
       ) {
         denoJson.compilerOptions.jsx = "precompile";
         denoJson.compilerOptions.jsxImportSource = "preact";
