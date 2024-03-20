@@ -37,7 +37,20 @@ export default async function App(
   props: Props
 ): Promise<App<Manifest, State>> {
   const { domain, primary, secondary } = props;
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+
+  let faviconUrl = `https://icon.horse/icon/${domain}`;
+
+  try {
+    const hasFavIcon = await colorthief.getColor(faviconUrl) as Promise<RGBColor>;
+  
+    if (!hasFavIcon) {
+      faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+    }
+  } catch (error) {
+    console.error("Error fetching favicon:", error);
+    faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  }
+
   const vtexProductsUrl = `https://${domain}/api/catalog_system/pub/products/search?&_from=1&_to=1`
   
   const colors: Colors = {
@@ -53,31 +66,31 @@ export default async function App(
   let vtexAccount = "bravtexfashionstore";
 
   try {
-    const [primaryColorRGB, paletteRGB, products] = await Promise.all([
+    const [primaryColorRGB, paletteRGB, products] = await Promise.allSettled([
       colorthief.getColor(faviconUrl) as Promise<RGBColor>,
       colorthief.getPalette(faviconUrl) as Promise<RGBColor[]>,
       fetch(vtexProductsUrl).then((res) => res.json() ) as Promise<LegacyProductVTEX[]>
     ]);
 
-    if (!primaryColorRGB || !paletteRGB) {
+    if (primaryColorRGB.status === "rejected" || paletteRGB.status === "rejected") {
       throw new Error("Failed to extract colors from image");  
      }
 
-    const secondaryColorRGB = findDissimilarColor(primaryColorRGB, paletteRGB);
+    const secondaryColorRGB = findDissimilarColor(primaryColorRGB.value, paletteRGB.value);
 
-    colors.primary.rgb = primaryColorRGB;
-    colors.primary.hex = rgbToHex(primaryColorRGB);
+    colors.primary.rgb = primaryColorRGB.value;
+    colors.primary.hex = rgbToHex(primaryColorRGB.value);
     colors.secondary.rgb = secondaryColorRGB;
     colors.secondary.hex = rgbToHex(secondaryColorRGB);
-    props.primary = rgbToHex(primaryColorRGB);
+    props.primary = rgbToHex(primaryColorRGB.value);
     props.secondary = rgbToHex(secondaryColorRGB);
 
 
-    if (!products) {
+    if (products.status === "rejected") {
       throw new Error("This site hasn't vtex")
     }
 
-    const [ product ] = products;
+    const [ product ] = products.value;
 
     const url = product.items[0].images[0].imageUrl
     const accountRegex = /https:\/\/(\w+)\./;
