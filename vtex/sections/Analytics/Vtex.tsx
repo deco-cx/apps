@@ -10,7 +10,9 @@ import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
 import { SPEvent } from "../../utils/types.ts";
 
 interface ISCookies {
+  // deno-lint-ignore no-explicit-any
   anonymous: any;
+  // deno-lint-ignore no-explicit-any
   session: any;
 }
 
