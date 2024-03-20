@@ -258,11 +258,17 @@ async function build() {
     const freshVersion = denoJson.imports?.["$fresh/"];
     const preactVersion = denoJson.imports?.["preact"];
 
-    if (denoJson.compilerOptions.jsx === "react-jsx" && freshVersion && preactVersion) {
-      if (compareVersions(preactVersion, '10.19.1') >= 0 && compareVersions(freshVersion, '1.6.0') >= 0) {
+    if (
+      denoJson.compilerOptions.jsx === "react-jsx" && freshVersion &&
+      preactVersion
+    ) {
+      if (
+        compareVersions(preactVersion, "10.19.1") >= 0 &&
+        compareVersions(freshVersion, "1.6.0") >= 0
+      ) {
         denoJson.compilerOptions.jsx = "precompile";
         denoJson.compilerOptions.jsxImportSource = "preact";
-  
+
         hasChange = true;
       }
     }
