@@ -1,4 +1,5 @@
 import { DenoJSON } from "../../types.ts";
+import { compareVersions } from "https://deno.land/x/compare_versions@0.4.0/mod.ts";
 
 async function build() {
   const { ensureFile } = await import(
@@ -254,11 +255,25 @@ async function build() {
       hasChange = true;
     }
 
-    if (denoJson.compilerOptions.jsx === "react-jsx") {
-      denoJson.compilerOptions.jsx = "precompile";
-      denoJson.compilerOptions.jsxImportSource = "preact";
+    const freshVersion = denoJson.imports?.["$fresh/"];
+    const minFreshVersion = "1.6.0";
+    const preactVersion = denoJson.imports?.["preact"];
+    const minPreactVersion = "10.19.1";
 
-      hasChange = true;
+    if (
+      denoJson.compilerOptions.jsx === "react-jsx" && freshVersion &&
+      preactVersion
+    ) {
+      if (
+        //https://github.com/denoland/fresh/pull/2035
+        compareVersions(preactVersion, minPreactVersion) >= 0 &&
+        compareVersions(freshVersion, minFreshVersion) >= 0
+      ) {
+        denoJson.compilerOptions.jsx = "precompile";
+        denoJson.compilerOptions.jsxImportSource = "preact";
+
+        hasChange = true;
+      }
     }
 
     return { denoJson, hasChange };
