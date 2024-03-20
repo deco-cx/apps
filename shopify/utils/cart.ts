@@ -8,7 +8,7 @@ const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 export const getCartCookie = (headers: Headers): string | null => {
   const cookies = getCookies(headers);
 
-  if(!cookies[CART_COOKIE]){
+  if (!cookies[CART_COOKIE]) {
     return null;
   }
 
@@ -25,4 +25,4 @@ export const setCartCookie = (headers: Headers, cartId: string) => {
     secure: true,
     sameSite: "Lax",
   });
-}
+};
