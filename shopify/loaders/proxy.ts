@@ -14,15 +14,6 @@ const PATHS_TO_PROXY = [
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
-const PATHS_WITH_DIGEST = new Set([
-  "/account",
-  "/account/*",
-  "/password",
-  "/password/*",
-  "/challenge",
-  "/challenge/*",
-]);
-
 const buildProxyRoutes = (
   {
     ctx,
@@ -59,9 +50,7 @@ const buildProxyRoutes = (
           __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
-          customHeaders: PATHS_WITH_DIGEST.has(pathTemplate)
-            ? withDigestCookie(ctx)
-            : [],
+          customHeaders: withDigestCookie(ctx),
         },
       },
     });
