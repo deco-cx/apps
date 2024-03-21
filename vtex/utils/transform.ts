@@ -447,7 +447,20 @@ const toBreadcrumbList = (
   { baseUrl }: ProductOptions,
 ): BreadcrumbList => {
   const { categories, productName } = product;
-  const names = categories[0]?.split("/").filter(Boolean);
+
+  // Prevents malformed breadcrumbs when a category name contains slashes
+  const names = categories.toReversed().reduce((acc, path, index) => {
+    const lastItem = acc[index - 1]; // Element before "item"
+
+    const regex = /^\/(.*)\/$/; // Extracts the term between slashes
+
+    if (!lastItem) return [path.replace(regex, "$1")];
+
+    const newItem = path.split(lastItem)[1].replace(regex, "$1");
+
+    return [...acc, newItem];
+  }, [] as string[]);
+
   const segments = names.map(slugify);
 
   return {
