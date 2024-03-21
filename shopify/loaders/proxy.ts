@@ -30,10 +30,12 @@ const buildProxyRoutes = (
     extraPaths,
     includeSiteMap,
     generateDecoSiteMap,
+    excludePathsFromDecoSiteMap,
   }: {
     extraPaths: string[];
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
+    excludePathsFromDecoSiteMap: string[];
     ctx: AppContext;
   },
 ) => {
@@ -74,6 +76,7 @@ const buildProxyRoutes = (
         pathTemplate: decoSiteMapUrl,
         handler: {
           value: {
+            excludePaths: excludePathsFromDecoSiteMap,
             __resolveType: "website/handlers/sitemap.ts",
           },
         },
@@ -118,19 +121,28 @@ export interface Props {
    * @title If deco site map should be exposed at /deco-sitemap.xml
    */
   generateDecoSiteMap?: boolean;
+  /**
+   * @title Exclude paths from /deco-sitemap.xml
+   */
+  excludePathsFromDecoSiteMap?: string[];
 }
 
 /**
  * @title Shopify Proxy Routes
  */
 function loader(
-  { extraPathsToProxy = [], includeSiteMap = [], generateDecoSiteMap = true }:
-    Props,
+  {
+    extraPathsToProxy = [],
+    includeSiteMap = [],
+    generateDecoSiteMap = true,
+    excludePathsFromDecoSiteMap = [],
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ): Route[] {
   return buildProxyRoutes({
     generateDecoSiteMap,
+    excludePathsFromDecoSiteMap,
     includeSiteMap,
     extraPaths: extraPathsToProxy,
     ctx,
