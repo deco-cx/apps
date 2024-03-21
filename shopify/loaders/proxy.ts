@@ -13,6 +13,7 @@ const PATHS_TO_PROXY = [
   "/challenge",
   "/challenge/*",
   "/services/*",
+  "/.well-known/*"
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
