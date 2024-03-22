@@ -6,6 +6,9 @@ interface Props {
   fonts: GoogleFont[];
 }
 
+/**
+ * @title {{weight}} {{#italic}}Italic{{/italic}}{{^italic}}{{/italic}}
+ */
 interface FontVariation {
   weight: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
   italic?: boolean;
@@ -22,18 +25,48 @@ const ASSET_LOADER_PATH =
     "loaders"
   ]}`;
 
-const getFontVariation = ({ italic, weight }: FontVariation) =>
-  `${italic ? "1" : "0"},${weight}`;
-
 const getFontVariations = (variations: FontVariation[]) => {
   if (variations.length === 0) {
     return "";
   }
 
-  return `,wght@${
-    variations.map(getFontVariation)
-      .join(";")
-  }`;
+  let hasItalic = false;
+  // We check if any of the variations are italic and set the hasItalic flag
+  // while we are sorting the variations by weight.
+  const sortedVariations = variations
+    .sort((a, b) => {
+      a.italic ??= false;
+      b.italic ??= false;
+
+      if (a.italic !== b.italic) {
+        hasItalic = true;
+
+        if (a.italic) return 1;
+        if (!a.italic) return -1;
+      }
+
+      return parseInt(a.weight) - parseInt(b.weight);
+    })
+    .filter((item, index, self) =>
+      // The user can add both italic and non-italic variations for the same weight
+      // So we need to make sure we only add the weight once.
+      index === self.findIndex((t) => (
+        t.weight === item.weight && t.italic === item.italic
+      ))
+    );
+
+  const variants = [];
+
+  for (const { weight, italic } of sortedVariations) {
+    if (!hasItalic) {
+      variants.push(weight);
+      continue;
+    }
+
+    variants.push(`${italic ? "1," : "0,"}${weight}`);
+  }
+
+  return `:${hasItalic ? "ital," : ""}wght@${variants.join(";")}`;
 };
 
 const NEW_BROWSER_KEY = {
@@ -65,7 +98,7 @@ const loader = async (props: Props, _req: Request): Promise<Font> => {
   for (const font of Object.values(reduced)) {
     url.searchParams.append(
       "family",
-      `${font.family}:ital${getFontVariations(font.variations)}`,
+      `${font.family}${getFontVariations(font.variations)}`,
     );
   }
 

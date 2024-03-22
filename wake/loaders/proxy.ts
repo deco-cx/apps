@@ -24,6 +24,10 @@ export interface Props {
    */
   generateDecoSiteMap?: boolean;
   /**
+   * @title Exclude paths from /deco-sitemap.xml
+   */
+  excludePathsFromDecoSiteMap?: string[];
+  /**
    * @title Other site maps to include
    */
   includeSiteMap?: string[];
@@ -37,8 +41,12 @@ function loader(
   _req: Request,
   { checkoutUrl }: AppContext,
 ): Route[] {
-  const { generateDecoSiteMap = true, includeSiteMap, extraPathsToProxy = [] } =
-    props as Props;
+  const {
+    generateDecoSiteMap = true,
+    excludePathsFromDecoSiteMap = [],
+    includeSiteMap,
+    extraPathsToProxy = [],
+  } = props as Props;
 
   const checkout = [...PATHS_TO_PROXY, ...extraPathsToProxy].map((
     [pathTemplate, basePath],
@@ -61,6 +69,7 @@ function loader(
       pathTemplate: decoSiteMapUrl,
       handler: {
         value: {
+          excludePaths: excludePathsFromDecoSiteMap,
           __resolveType: "website/handlers/sitemap.ts",
         },
       },

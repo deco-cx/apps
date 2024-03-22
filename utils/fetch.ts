@@ -46,8 +46,11 @@ export const fetchSafe = async (
     return response;
   }
 
+  /**
+   * This is not the best way to log errors, but it's only day one.
+   */
   console.error(`${input}\n`, response, `\n`);
-  throw new HttpError(response.status, `${input}`);
+  throw new HttpError(response.status, `${await response.text()}`);
 };
 
 export const fetchAPI = async <T>(

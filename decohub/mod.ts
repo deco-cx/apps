@@ -24,10 +24,12 @@ const DENY_DYNAMIC_IMPORT = Deno.env.get("DENY_DYNAMIC_IMPORT") === "true";
  * @title Deco Hub
  */
 const ADMIN_APP = "decohub/apps/admin.ts";
+const FILES_APP = "decohub/apps/files.ts";
 export default async function App(
   state: State,
 ): Promise<App<Manifest, State>> {
-  const resolvedImport = import.meta.resolve("../admin/mod.ts");
+  const resolvedAdminImport = import.meta.resolve("../admin/mod.ts");
+  const resolvedFilesImport = import.meta.resolve("../files/mod.ts");
   const baseImportMap = buildImportMap(manifest);
   const appModules = DENY_DYNAMIC_IMPORT ? [] : await Promise.all(
     (state?.apps ?? []).filter(Boolean).map(async (app) => {
@@ -76,7 +78,10 @@ export default async function App(
         ...context.play || state.enableAdmin // this is an optimization to not include the admin code for everyone in case of play is not being used.
           ? {
             [ADMIN_APP]: await import(
-              resolvedImport
+              resolvedAdminImport
+            ),
+            [FILES_APP]: await import(
+              resolvedFilesImport
             ),
           }
           : {},
@@ -89,7 +94,8 @@ export default async function App(
           ...enhancedImportMap,
           imports: {
             ...enhancedImportMap?.imports ?? {},
-            [ADMIN_APP]: resolvedImport,
+            [ADMIN_APP]: ADMIN_APP,
+            [FILES_APP]: FILES_APP,
           },
         },
       }

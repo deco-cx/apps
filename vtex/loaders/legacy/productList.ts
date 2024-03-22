@@ -6,6 +6,7 @@ import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
+import { sortProducts } from "../../utils/transform.ts";
 
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
@@ -97,11 +98,8 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
 
 const preferredSKU = (items: LegacyItem[], { props }: Props) => {
-  let fetchedSkus: string[] = [];
-  if (isSKUIDProps(props)) {
-    fetchedSkus = props.ids ?? [];
-  }
-  return items.find((item) => fetchedSkus.includes(item.itemId)) || items[0];
+  const fetchedSkus = new Set((props as SkuIDProps).ids ?? []);
+  return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
 };
 
 const fromProps = ({ props }: Props) => {
@@ -172,8 +170,8 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const segment = getSegmentFromBag(ctx);
-  const segmentParams = toSegmentParams(segment);
+  const segment = getSegmentFromBag(ctx) ?? {};
+  const segmentParams = toSegmentParams(segment ?? {});
   const params = fromProps({ props });
 
   const vtexProducts = await vcsDeprecated
@@ -192,12 +190,24 @@ const loader = async (
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
   // it in here
-  const products = vtexProducts.map((p) =>
+  let products = vtexProducts.map((p) =>
     toProduct(p, preferredSKU(p.items, { props }), 0, {
       baseUrl: baseUrl,
       priceCurrency: segment?.payload?.currencyCode ?? "BRL",
     })
   );
+
+  if (isSKUIDProps(props)) {
+    products = sortProducts(products, props.ids || [], "sku");
+  }
+
+  if (isProductIDProps(props)) {
+    products = sortProducts(
+      products,
+      props.productIds || [],
+      "inProductGroupWithID",
+    );
+  }
 
   return Promise.all(
     products.map((product) =>

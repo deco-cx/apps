@@ -258,6 +258,8 @@ export interface Offer extends Omit<Thing, "@type"> {
   priceValidUntil?: string;
   /** An entity which offers (sells / leases / lends / loans) the services / goods. A seller may also be a provider. */
   seller?: string;
+  /** Name of the seller */
+  sellerName?: string;
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku?: string;
   /** Used by some ecommerce sites to retrieve the sku of products that are part of the BuyAndWin promotion */
@@ -418,6 +420,33 @@ export interface Brand extends Omit<Thing, "@type"> {
   logo?: string;
 }
 
+export interface Answer extends Omit<Thing, "@type"> {
+  text: string;
+  /** The date that the anwser was published, in ISO 8601 date format.*/
+  dateModified?: string;
+  /** The date that the anwser was published, in ISO 8601 date format.*/
+  datePublished?: string;
+  /** Author of the */
+  author?: Author[];
+}
+
+export interface Question extends Omit<Thing, "@type" | "name"> {
+  "@type": "Question";
+  answerCount: number;
+  /** The answer(s) that has been accepted as best */
+  acceptedAnswer?: Answer;
+  /** List of answer(s) */
+  suggestedAnswer?: Answer[];
+  name: string;
+  text: string;
+  /** The date that the question was published, in ISO 8601 date format.*/
+  dateModified?: string;
+  /** The date that the question was published, in ISO 8601 date format.*/
+  datePublished?: string;
+  /** Author of the */
+  author?: Author[];
+}
+
 export interface Product extends Omit<Thing, "@type"> {
   "@type": "Product";
   /**
@@ -459,6 +488,8 @@ export interface Product extends Omit<Thing, "@type"> {
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
   isAccessoryOrSparePartFor?: ProductLeaf[];
+
+  questions?: Question[];
 }
 
 export interface ListItem<T = string> extends Omit<Thing, "@type"> {
@@ -548,6 +579,7 @@ export interface Seo {
   title: string;
   description: string;
   canonical: string;
+  noIndexing?: boolean;
 }
 
 export interface Search {

@@ -27,6 +27,8 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   Product as ProductVTEX,
+  ProductRating,
+  ProductReviewData,
   SelectedFacet,
   Seller as SellerVTEX,
   Teasers,
@@ -60,8 +62,9 @@ const getProductURL = (
   return canonicalUrl;
 };
 
-const nonEmptyArray = <T>(array: T[] | null | undefined) =>
-  Array.isArray(array) && array.length > 0 ? array : null;
+const nonEmptyArray = <T>(
+  array: T[] | null | undefined,
+) => (Array.isArray(array) && array.length > 0 ? array : null);
 
 interface ProductOptions {
   baseUrl: string;
@@ -82,8 +85,7 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
   product: T,
   maybeSkuId?: string,
 ): T["items"][number] => {
-  const skuId = maybeSkuId ??
-    findFirstAvailable(product.items)?.itemId ??
+  const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
 
   for (const item of product.items) {
@@ -106,16 +108,18 @@ const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
     return map;
   }, new Map<string, T>());
 
-  return sku.kitItems?.map(({ itemId }) => {
-    const product = productBySkuId.get(itemId);
+  return sku.kitItems
+    ?.map(({ itemId }) => {
+      const product = productBySkuId.get(itemId);
 
-    /** Sometimes VTEX does not return what I've asked for */
-    if (!product) return;
+      /** Sometimes VTEX does not return what I've asked for */
+      if (!product) return;
 
-    const sku = pickSku(product, itemId);
+      const sku = pickSku(product, itemId);
 
-    return toProduct(product, sku, 0, options);
-  }).filter((p): p is Product => typeof p !== "undefined");
+      return toProduct(product, sku, 0, options);
+    })
+    .filter((p): p is Product => typeof p !== "undefined");
 };
 
 export const forceHttpsOnAssets = (orderForm: OrderForm) => {
@@ -180,12 +184,25 @@ const toAdditionalPropertyCategories = <
 >(
   product: P,
 ): Product["additionalProperty"] => {
-  const categories = splitCategory(product.categories[0]);
-  const categoryIds = splitCategory(product.categoriesIds[0]);
+  const categories = new Set<string>();
+  const categoryIds = new Set<string>();
 
-  return categories.map((category, index) =>
+  product.categories.forEach((productCategory, i) => {
+    const category = splitCategory(productCategory);
+    const categoryId = splitCategory(product.categoriesIds[i]);
+
+    category.forEach((splitCategoryItem, j) => {
+      categories.add(splitCategoryItem);
+      categoryIds.add(categoryId[j]);
+    });
+  });
+
+  const categoriesArray = Array.from(categories);
+  const categoryIdsArray = Array.from(categoryIds);
+
+  return categoriesArray.map((category, index) =>
     toAdditionalPropertyCategory({
-      propertyID: categoryIds[index],
+      propertyID: categoryIdsArray[index],
       value: category || "",
     })
   );
@@ -223,10 +240,10 @@ const toAdditionalPropertyClusters = <
     : new Set(product.clusterHighlights.map(({ id }) => id));
 
   return allClusters.map((cluster) =>
-    toAdditionalPropertyCluster(
-      { propertyID: cluster.id, value: cluster.name || "" },
-      highlightsSet,
-    )
+    toAdditionalPropertyCluster({
+      propertyID: cluster.id,
+      value: cluster.name || "",
+    }, highlightsSet)
   );
 };
 
@@ -442,8 +459,8 @@ const toBreadcrumbList = (
         return {
           "@type": "ListItem" as const,
           name,
-          item: new URL(`/${segments.slice(0, position).join("/")}`, baseUrl)
-            .href,
+          item:
+            new URL(`/${segments.slice(0, position).join("/")}`, baseUrl).href,
           position,
         };
       }),
@@ -470,12 +487,13 @@ const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
 const toProductGroupAdditionalProperties = ({ properties = [] }: ProductVTEX) =>
   properties.flatMap(({ name, values }) =>
     values.map(
-      (value) => ({
-        "@type": "PropertyValue",
-        name,
-        value,
-        valueReference: "PROPERTY" as string,
-      } as const),
+      (value) =>
+        ({
+          "@type": "PropertyValue",
+          name,
+          value,
+          valueReference: "PROPERTY" as string,
+        }) as const,
     )
   );
 
@@ -510,23 +528,27 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   );
 
   const attachmentProperties = attachments.map(
-    (attachment) => ({
-      "@type": "PropertyValue",
-      propertyID: `${attachment.id}`,
-      name: attachment.name,
-      value: attachment.domainValues,
-      required: attachment.required,
-      valueReference: "ATTACHMENT",
-    } as const),
+    (attachment) =>
+      ({
+        "@type": "PropertyValue",
+        propertyID: `${attachment.id}`,
+        name: attachment.name,
+        value: attachment.domainValues,
+        required: attachment.required,
+        valueReference: "ATTACHMENT",
+      }) as const,
   );
 
   return [...specificationProperties, ...attachmentProperties];
 };
 
-const toOffer = ({ commertialOffer: offer, sellerId }: SellerVTEX): Offer => ({
+const toOffer = (
+  { commertialOffer: offer, sellerId, sellerName }: SellerVTEX,
+): Offer => ({
   "@type": "Offer",
   price: offer.spotPrice ?? offer.Price,
   seller: sellerId,
+  sellerName,
   priceValidUntil: offer.PriceValidUntil,
   inventoryLevel: { value: offer.AvailableQuantity },
   giftSkuIds: offer.GiftSkuIds ?? [],
@@ -623,15 +645,20 @@ export const legacyFacetToFilter = (
   map: string,
   term: string,
   behavior: "dynamic" | "static",
+  ignoreCaseSelected?: boolean,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
-  const pathSegments = term
-    .replace(/^\//, "")
-    .split("/")
-    .slice(0, mapSegments.length);
+  const pathSegments = term.replace(/^\//, "").split("/").slice(
+    0,
+    mapSegments.length,
+  );
 
-  const mapSet = new Set(mapSegments);
-  const pathSet = new Set(pathSegments);
+  const mapSet = new Set(
+    mapSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
+  const pathSet = new Set(
+    pathSegments.map((i) => ignoreCaseSelected ? i.toLowerCase() : i),
+  );
 
   // for productClusterIds, we have to use the full path
   // example:
@@ -642,7 +669,13 @@ export const legacyFacetToFilter = (
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
-    const index = pathSegments.findIndex((s) => s === facet.Value);
+    const index = pathSegments.findIndex((s) => {
+      if (ignoreCaseSelected) {
+        return s.toLowerCase() === facet.Value.toLowerCase();
+      }
+
+      return s === facet.Value;
+    });
 
     const map = hasToBeFullpath
       ? facet.Link.split("map=")[1].split(",")
@@ -682,7 +715,10 @@ export const legacyFacetToFilter = (
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || map[0]);
+      link.searchParams.set(
+        "fmap",
+        url.searchParams.get("fmap") || mapSegments[0],
+      );
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {
@@ -702,8 +738,17 @@ export const legacyFacetToFilter = (
         ? facet
         : normalizeFacet(facet);
 
-      const selected = mapSet.has(normalizedFacet.Map) &&
-        pathSet.has(normalizedFacet.Value);
+      const selected = mapSet.has(
+        ignoreCaseSelected
+          ? normalizedFacet.Map.toLowerCase()
+          : normalizedFacet.Map,
+      ) &&
+        pathSet.has(
+          ignoreCaseSelected
+            ? normalizedFacet.Value.toLowerCase()
+            : normalizedFacet.Value,
+        );
+
       return {
         value: normalizedFacet.Value,
         quantity: normalizedFacet.Quantity,
@@ -885,4 +930,61 @@ export const normalizeFacet = (facet: LegacyFacet) => {
     Map: "priceFrom",
     Value: facet.Slug!,
   };
+};
+
+export const toReview = (
+  products: Product[],
+  ratings: ProductRating[],
+  reviews: ProductReviewData[],
+): Product[] => {
+  return products.map((p, index) => {
+    const reviewCount = ratings.reduce(
+      (acc, curr) => acc + (curr.totalCount || 0),
+      0,
+    );
+
+    const productReviews = reviews[index].data || [];
+
+    return {
+      ...p,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        reviewCount,
+        ratingValue: ratings[index]?.average || 0,
+      },
+      review: productReviews.map((_, reviewIndex) => ({
+        "@type": "Review",
+        id: productReviews[reviewIndex]?.id?.toString(),
+        author: [{
+          "@type": "Author",
+          name: productReviews[reviewIndex]?.reviewerName,
+          verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
+        }],
+        itemReviewed: productReviews[reviewIndex]?.productId,
+        datePublished: productReviews[reviewIndex]?.reviewDateTime,
+        reviewHeadline: productReviews[reviewIndex]?.title,
+        reviewBody: productReviews[reviewIndex]?.text,
+        reviewRating: {
+          "@type": "AggregateRating",
+          ratingValue: productReviews[reviewIndex]?.rating || 0,
+        },
+      })),
+    };
+  });
+};
+
+type ProductMap = Record<string, Product>;
+
+export const sortProducts = (
+  products: Product[],
+  orderOfIdsOrSkus: string[],
+  prop: "sku" | "inProductGroupWithID",
+) => {
+  const productMap: ProductMap = {};
+
+  products.forEach((product) => {
+    productMap[product[prop] || product["sku"]] = product;
+  });
+
+  return orderOfIdsOrSkus.map((id) => productMap[id]);
 };

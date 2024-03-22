@@ -17,12 +17,14 @@ const buildProxyRoutes = (
     extraPaths,
     includeSiteMap,
     generateDecoSiteMap,
+    excludePathsFromDecoSiteMap,
     includeScriptsToHead,
   }: {
     publicUrl?: string;
     extraPaths: string[];
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
+    excludePathsFromDecoSiteMap: string[];
     includeScriptsToHead?: {
       includes?: Script[];
     };
@@ -65,6 +67,7 @@ const buildProxyRoutes = (
         pathTemplate: decoSiteMapUrl,
         handler: {
           value: {
+            excludePaths: excludePathsFromDecoSiteMap,
             __resolveType: "website/handlers/sitemap.ts",
           },
         },
@@ -110,6 +113,10 @@ export interface Props {
    */
   generateDecoSiteMap?: boolean;
   /**
+   * @title Exclude paths from /deco-sitemap.xml
+   */
+  excludePathsFromDecoSiteMap?: string[];
+  /**
    * @title Scripts to include on Html head
    */
   includeScriptsToHead?: {
@@ -125,6 +132,7 @@ function loader(
     extraPathsToProxy = [],
     includeSiteMap = [],
     generateDecoSiteMap = true,
+    excludePathsFromDecoSiteMap = [],
     includeScriptsToHead = { includes: [] },
   }: Props,
   _req: Request,
@@ -132,6 +140,7 @@ function loader(
 ): Route[] {
   return buildProxyRoutes({
     generateDecoSiteMap,
+    excludePathsFromDecoSiteMap,
     includeSiteMap,
     publicUrl: ctx.publicUrl,
     extraPaths: extraPathsToProxy,

@@ -52,7 +52,8 @@ export default function Fresh(
     const ctrl = new AbortController();
 
     /** Aborts when: Incomming request is aborted */
-    req.signal.addEventListener("abort", () => ctrl.abort());
+    const abortHandler = () => ctrl.abort();
+    req.signal.addEventListener("abort", abortHandler);
 
     /**
      * Aborts when:
@@ -126,6 +127,7 @@ export default function Fresh(
           } finally {
             span.end();
             timing?.end();
+            req.signal.removeEventListener("abort", abortHandler);
           }
         },
       );

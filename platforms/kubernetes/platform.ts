@@ -22,7 +22,7 @@ export default function kubernetes(
     supportsDynamicImport: true,
     name: "kubernetes",
     domain: CONTROL_PLANE_DOMAIN,
-    cfZoneId: "eba5bf129d0b006fd616fd32f0c71492",
+    cfZoneId: "eba5bf129d0b006fd616fd32f0c71492", // TODO (mcandeia) use deco.site c95fc4cec7fc52453228d9db170c372c
     sourceDirectory: SOURCE_LOCAL_MOUNT_PATH,
     sites: {
       create: async (props) => {

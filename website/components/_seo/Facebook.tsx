@@ -1,41 +1,76 @@
 import Image from "../../components/Image.tsx";
-import { PreviewItem } from "./Preview.tsx";
+import { Avatar, GlobeIcon, VerifiedIcon } from "./Icons.tsx";
+import { PreviewItem, SeoProps } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
-function FacebookBigOpenGraph(props: PreviewItem) {
-  const { image, title, description, path, width, height } = props;
+function FacebookBigOpenGraph(props: PreviewItem & SeoProps) {
+  const {
+    image,
+    title,
+    description,
+    width,
+    height,
+    canonical = "https://www.example.com",
+  } = props;
   const titleMaxLength = 120;
+  const url = new URL(canonical);
 
   return (
-    <div class="">
-      <Image
-        src={image}
-        alt={title}
-        class="w-full h-[210px] sm:h-[273px] w-[400px] sm:w-[552px] object-cover"
-        decoding="async"
-        loading="lazy"
-        width={width}
-        height={height}
-      />
-      <div class="px-4 py-3 flex flex-col gap-[3px] bg-facebook-bg ">
-        <p class="text-xs uppercase font-normal text-common leading-[15px]">
-          {path}
-        </p>
+    <div class="flex flex-col rounded-md border border-light-border bg-white">
+      <div class="p-4 flex flex-col gap-4">
+        <div class="flex gap-3">
+          <div>
+            <Avatar />
+          </div>
+          <div class="flex flex-col">
+            <span class="flex gap-2 items-center">
+              <span class="text-sm font-bold">Guilherme Rodrigues</span>
+              <VerifiedIcon />
+            </span>
+            <span class="flex gap-1 items-center">
+              <span class="text-xs text-[#1e1e1e99]">30m •</span>
+              <GlobeIcon />
+            </span>
+          </div>
+        </div>
 
-        <p class="text-base  font-thin text-secondary leading-[19px]  ">
-          {textShortner(title, titleMaxLength)}
-        </p>
-        <p class="text-sm text-common leading-[19px] overflow-ellipsis 
-        overflow-hidden max-w-full  whitespace-nowrap
-        ">
-          {title.length < 100 && description}
+        <p>
+          Here is a post you might write with the link of your website:{" "}
+          <span class="text-[#057EB5]">{canonical}</span>
         </p>
       </div>
+
+      <div class="">
+        <Image
+          src={image}
+          alt={title}
+          class="w-full h-[210px] sm:h-[273px] w-[400px] sm:w-[552px] object-cover"
+          decoding="async"
+          loading="lazy"
+          width={width}
+          height={height}
+        />
+        <div class="px-4 py-3 flex flex-col gap-[3px] bg-facebook-bg ">
+          <p class="text-xs uppercase font-normal text-common leading-[15px]">
+            {url.hostname}
+          </p>
+
+          <p class="text-base font-bold text-secondary leading-[19px]  ">
+            {textShortner(title, titleMaxLength)}
+          </p>
+          <p class="text-sm text-common leading-[19px] overflow-ellipsis 
+        overflow-hidden max-w-full  whitespace-nowrap
+        ">
+            {title.length < 100 && description}
+          </p>
+        </div>
+      </div>
+      <div />
     </div>
   );
 }
 
-function FacebookMediumOpenGraph(props: PreviewItem) {
+function _FacebookMediumOpenGraph(props: PreviewItem) {
   const { image, title, description, path, width, height } = props;
   const titleMaxLength = 90;
   const descriptionMaxLength = 110;
@@ -66,7 +101,7 @@ function FacebookMediumOpenGraph(props: PreviewItem) {
   );
 }
 
-function FacebookSmallOpenGraph(props: PreviewItem) {
+function _FacebookSmallOpenGraph(props: PreviewItem) {
   const { image, title, description, path } = props;
   const titleMaxLength = 90;
   const descriptionMaxLength = 110;
@@ -98,22 +133,8 @@ function FacebookSmallOpenGraph(props: PreviewItem) {
   );
 }
 
-function Facebook(props: PreviewItem) {
-  const { width, height } = props;
-
-  if (height < 300 && height !== 0) {
-    return <FacebookSmallOpenGraph {...props} />;
-  }
-
-  if (width > height) {
-    return <FacebookBigOpenGraph {...props} />;
-  }
-
-  if (height <= 600 && height >= 300 || height > width) {
-    return <FacebookMediumOpenGraph {...props} />;
-  }
-
-  return <div />;
+function Facebook(props: PreviewItem & SeoProps) {
+  return <FacebookBigOpenGraph {...props} />;
 }
 
 export default Facebook;
