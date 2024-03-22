@@ -1,5 +1,4 @@
 import type { App as A, AppContext as AC, ManifestOf } from "deco/mod.ts";
-import { fetchSafe } from "./utils/fetchSafe.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client.ts";
@@ -28,7 +27,6 @@ export default function Mailchimp(props: Props) {
 
   const api = createHttpClient<API>({
     base: `https://${serverPrefix}.api.mailchimp.com`,
-    fetcher: fetchSafe,
     headers,
   });
 
