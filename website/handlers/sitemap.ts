@@ -25,21 +25,33 @@ const buildSiteMap = (urls: string[]) => {
 };
 
 const sanitize = (url: string) => url.startsWith("/") ? url : `/${url}`;
-const siteMapFromRoutes = (publicUrl: string, routes: Route[]): string => {
+const siteMapFromRoutes = (
+  publicUrl: string,
+  routes: Route[],
+  excludePaths?: string[],
+): string => {
   const urls: string[] = [];
+  const excludePathsSet = new Set(excludePaths);
   for (const route of routes) {
-    if (isAbsolute(route.pathTemplate) && isPage(route.handler.value)) {
+    if (
+      !excludePathsSet.has(route.pathTemplate) &&
+      isAbsolute(route.pathTemplate) && isPage(route.handler.value)
+    ) {
       urls.push(`${publicUrl}${sanitize(route.pathTemplate)}`);
     }
   }
   return buildSiteMap(urls);
 };
 
+interface Props {
+  excludePaths?: string[];
+}
+
 /**
  * @title Sitemap
  * @description Return deco's sitemap.xml
  */
-export default function SiteMap(_props: unknown) {
+export default function SiteMap({ excludePaths = [] }: Props) {
   return function (req: Request, connInfo: ConnInfo) {
     const reqUrl = new URL(req.url);
     const ctx = connInfo as ConnInfo & {
@@ -51,7 +63,7 @@ export default function SiteMap(_props: unknown) {
     return new Response(
       `
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${siteMapFromRoutes(reqUrl.origin, ctx.state.routes ?? [])}
+${siteMapFromRoutes(reqUrl.origin, ctx.state.routes ?? [], excludePaths)}
 </urlset>`,
       { headers: { "content-type": "text/xml", status: "200" } },
     );
