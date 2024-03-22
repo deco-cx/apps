@@ -20,10 +20,9 @@ export interface Props {
  */
 export default function Mailchimp(props: Props) {
   const { serverPrefix, apiKey } = props;
-  const key = typeof apiKey === "string" ? apiKey : apiKey.get();
 
   const headers = new Headers();
-  headers.set("Authorization", `Basic ${btoa(`anystring:${key}`)}`);
+  headers.set("Authorization", `Basic ${btoa(`anystring:${apiKey.get()}`)}`);
 
   const api = createHttpClient<API>({
     base: `https://${serverPrefix}.api.mailchimp.com`,
