@@ -135,7 +135,16 @@ export default function Proxy({
     headers.set("x-forwarded-host", url.host);
 
     for (const { key, value } of customHeaders) {
-      headers.set(key, value);
+      if (key === "cookie") {
+        const existingCookie = headers.get("cookie");
+        if (existingCookie) {
+          headers.set("cookie", `${existingCookie}; ${value}`);
+        } else {
+          headers.set("cookie", value);
+        }
+      } else {
+        headers.set(key, value);
+      }
     }
 
     const monitoring = isFreshCtx<DecoSiteState>(_ctx)
