@@ -19,7 +19,6 @@ export interface Redirects {
   redirects: Redirect[];
 }
 
-let redirectsFromFile: Promise<Route[]> | null = null;
 const getRedirectFromFile = async (
   from: string,
   forcePermanentRedirects?: boolean,
@@ -93,16 +92,25 @@ const getRedirectFromFile = async (
 export const removeTrailingSlash = (path: string) =>
   path.endsWith("/") && path.length > 1 ? path.slice(0, path.length - 1) : path;
 
+const routesMap = new Map<string, Promise<Route[]>>();
+
 export default async function redirect({
   redirects,
-  from,
+  from = "",
   forcePermanentRedirects,
 }: Redirects): Promise<Route[]> {
-  redirectsFromFile ??= from
-    ? getRedirectFromFile(from, forcePermanentRedirects)
-    : Promise.resolve([]);
+  const current = routesMap.get(from);
 
-  const redirectsFromFiles: Route[] = await redirectsFromFile;
+  if (!current) {
+    routesMap.set(
+      from,
+      from
+        ? getRedirectFromFile(from, forcePermanentRedirects)
+        : Promise.resolve([]),
+    );
+  }
+
+  const redirectsFromFiles: Route[] = await routesMap.get(from)!;
 
   const routes: Route[] = (redirects || []).map(({ from, to, type }) => ({
     pathTemplate: from,
