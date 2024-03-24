@@ -153,7 +153,7 @@ const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
   const countFromSearchParams = url.searchParams.get("PS");
   const count = Number(countFromSearchParams ?? props.count ?? 12);
-  const query = props.query ?? url.searchParams.get("q") ?? "";
+  let query = props.query ?? url.searchParams.get("q") ?? "";
   const currentPageoffset = props.pageOffset ?? 1;
   const page = props.page ??
     Math.min(
@@ -170,6 +170,12 @@ const searchArgsOf = (props: Props, url: URL) => {
     props.selectedFacets ?? [],
     filtersFromURL(url),
   );
+  selectedFacets.forEach((facet, idx) => {
+    if (facet.key == "ft") {
+      query = facet.value;
+      selectedFacets.splice(idx, 1);
+    }
+  });
   const fuzzy = mapLabelledFuzzyToFuzzy(props.fuzzy) ??
     (url.searchParams.get("fuzzy") as Fuzzy);
 

@@ -810,7 +810,9 @@ export const legacyFacetsNormalize = (map: string, path: string) => {
  */
 export const legacyFacetsFromURL = (url: URL) => {
   const mapSegments = url.searchParams.get("map")?.split(",") ?? [];
-  const pathSegments = url.pathname.split("/").slice(1); // Remove first slash
+  const pathAtQuery = url.searchParams.get("query");
+  const pathToUse = pathAtQuery?.startsWith("/") ? pathAtQuery : url.pathname;
+  const pathSegments = pathToUse.split("/").slice(1); // Remove first slash
   const length = Math.min(mapSegments.length, pathSegments.length);
 
   const selectedFacets: SelectedFacet[] = [];
