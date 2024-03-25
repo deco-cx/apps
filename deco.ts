@@ -45,6 +45,7 @@ const config = {
     app("workflows"),
     app("verified-reviews"),
     app("power-reviews"),
+    app("yourviews"),
     app("crux"),
     app("decohub"),
     ...compatibilityApps,
