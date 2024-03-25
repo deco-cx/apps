@@ -79,6 +79,11 @@ export interface Props {
    * @description Use VTEX as backend platform
    */
   platform: "vtex";
+
+  /**
+   * @description Maximum quantity of facets that can be requested in a single request. Default is 10
+   */
+  facetsLimit?: number;
 }
 
 export const color = 0xf71963;
