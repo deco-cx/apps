@@ -4,6 +4,7 @@ import { withDigestCookie } from "../utils/password.ts";
 
 const PATHS_TO_PROXY = [
   "/checkouts/*",
+  "/cart",
   "/cart/*",
   "/account",
   "/account/*",
@@ -11,17 +12,10 @@ const PATHS_TO_PROXY = [
   "/password/*",
   "/challenge",
   "/challenge/*",
+  "/services/*",
+  "/.well-known/*",
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
-
-const PATHS_WITH_DIGEST = new Set([
-  "/account",
-  "/account/*",
-  "/password",
-  "/password/*",
-  "/challenge",
-  "/challenge/*",
-]);
 
 const buildProxyRoutes = (
   {
@@ -30,10 +24,12 @@ const buildProxyRoutes = (
     extraPaths,
     includeSiteMap,
     generateDecoSiteMap,
+    excludePathsFromDecoSiteMap,
   }: {
     extraPaths: string[];
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
+    excludePathsFromDecoSiteMap: string[];
     ctx: AppContext;
   },
 ) => {
@@ -59,9 +55,7 @@ const buildProxyRoutes = (
           __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
-          customHeaders: PATHS_WITH_DIGEST.has(pathTemplate)
-            ? withDigestCookie(ctx)
-            : [],
+          customHeaders: withDigestCookie(ctx),
         },
       },
     });
@@ -74,6 +68,7 @@ const buildProxyRoutes = (
         pathTemplate: decoSiteMapUrl,
         handler: {
           value: {
+            excludePaths: excludePathsFromDecoSiteMap,
             __resolveType: "website/handlers/sitemap.ts",
           },
         },
@@ -118,19 +113,28 @@ export interface Props {
    * @title If deco site map should be exposed at /deco-sitemap.xml
    */
   generateDecoSiteMap?: boolean;
+  /**
+   * @title Exclude paths from /deco-sitemap.xml
+   */
+  excludePathsFromDecoSiteMap?: string[];
 }
 
 /**
  * @title Shopify Proxy Routes
  */
 function loader(
-  { extraPathsToProxy = [], includeSiteMap = [], generateDecoSiteMap = true }:
-    Props,
+  {
+    extraPathsToProxy = [],
+    includeSiteMap = [],
+    generateDecoSiteMap = true,
+    excludePathsFromDecoSiteMap = [],
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ): Route[] {
   return buildProxyRoutes({
     generateDecoSiteMap,
+    excludePathsFromDecoSiteMap,
     includeSiteMap,
     extraPaths: extraPathsToProxy,
     ctx,
