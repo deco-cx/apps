@@ -269,11 +269,10 @@ async function build() {
         gte(preactVersion, minPreactVersion) &&
         gte(freshVersion, minFreshVersion)
       ) {
-        // TODO (mcandeia) fresh has a bug in precompile that is preventing children islands to be rendered
-        // denoJson.compilerOptions.jsx = "precompile";
-        // denoJson.compilerOptions.jsxImportSource = "preact";
+        denoJson.compilerOptions.jsx = "precompile";
+        denoJson.compilerOptions.jsxImportSource = "preact";
 
-        // hasChange = true;
+        hasChange = true;
       }
     }
 
