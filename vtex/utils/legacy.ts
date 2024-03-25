@@ -109,7 +109,8 @@ export const pageTypesToSeo = (
 
   const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
-  const hasMapTermOrSkuId = !!(url.searchParams.get("map") || url.searchParams.get("skuId"))
+  const hasMapTermOrSkuId =
+    !!(url.searchParams.get("map") || url.searchParams.get("skuId"));
 
   if (
     (!current || current.pageType === "Search" ||
@@ -119,7 +120,7 @@ export const pageTypesToSeo = (
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
       canonical: url.href,
-      noIndexing: hasMapTermOrSkuId
+      noIndexing: hasMapTermOrSkuId,
     };
   }
 
