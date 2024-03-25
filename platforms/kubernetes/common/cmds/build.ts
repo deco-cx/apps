@@ -9,7 +9,6 @@ async function build() {
     BlobReader,
     ZipReader,
   } = await import("https://deno.land/x/zipjs@v2.7.30/index.js");
-  const { gte } = await import("https://deno.land/x/semver@v1.4.1/mod.ts");
 
   const exists = async (filename: string): Promise<boolean> => {
     try {
@@ -255,26 +254,26 @@ async function build() {
       hasChange = true;
     }
 
-    const freshVersion = denoJson.imports?.["$fresh/"];
-    const minFreshVersion = "1.6.0";
-    const preactVersion = denoJson.imports?.["preact"];
-    const minPreactVersion = "10.19.1";
+    // const freshVersion = denoJson.imports?.["$fresh/"];
+    // const minFreshVersion = "1.6.0";
+    // const preactVersion = denoJson.imports?.["preact"];
+    // const minPreactVersion = "10.19.1";
 
-    if (
-      denoJson.compilerOptions.jsx === "react-jsx" && freshVersion &&
-      preactVersion
-    ) {
-      if (
-        //https://github.com/denoland/fresh/pull/2035
-        gte(preactVersion, minPreactVersion) &&
-        gte(freshVersion, minFreshVersion)
-      ) {
-        denoJson.compilerOptions.jsx = "precompile";
-        denoJson.compilerOptions.jsxImportSource = "preact";
+    // if (
+    //   denoJson.compilerOptions.jsx === "react-jsx" && freshVersion &&
+    //   preactVersion
+    // ) {
+    //   if (
+    //     //https://github.com/denoland/fresh/pull/2035
+    //     gte(preactVersion, minPreactVersion) &&
+    //     gte(freshVersion, minFreshVersion)
+    //   ) {
+    //     denoJson.compilerOptions.jsx = "precompile";
+    //     denoJson.compilerOptions.jsxImportSource = "preact";
 
-        hasChange = true;
-      }
-    }
+    //     hasChange = true;
+    //   }
+    // }
 
     return { denoJson, hasChange };
   };
