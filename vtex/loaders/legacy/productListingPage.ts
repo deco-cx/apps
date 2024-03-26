@@ -224,7 +224,6 @@ const loader = async (
   const [vtexProductsResponse, vtexFacets] = await Promise.all([
     vcsDeprecated["GET /api/catalog_system/pub/products/search/:term?"](
       {
-        ...params,
         ...args,
         term: getTerm(term, map),
       },
@@ -232,7 +231,6 @@ const loader = async (
     ),
     vcsDeprecated["GET /api/catalog_system/pub/facets/search/:term"](
       {
-        ...params,
         ...args,
         term: getTerm(term, fmap),
         map: fmap,
