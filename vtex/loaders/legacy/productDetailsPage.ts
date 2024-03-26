@@ -91,6 +91,7 @@ async function loader(
       title: product.productTitle,
       description: product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
+      noIndexing: !!skuId,
     },
   };
 }

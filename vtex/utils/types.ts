@@ -566,6 +566,7 @@ export interface ProductSearchResult {
   locale: string;
   query: string;
   operator: "and" | "or";
+  redirect: string;
   fuzzy: string;
   correction?: Correction;
 }
