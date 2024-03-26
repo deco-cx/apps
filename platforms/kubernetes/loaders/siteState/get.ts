@@ -82,12 +82,12 @@ export const sourceIsFromFiles = (source: Source): source is Files => {
 };
 
 export interface Resource {
-  cpu: string;
-  memory: string;
+  cpu?: string;
+  memory?: string;
 }
 export interface ResourceRequirements {
-  requests: Resource;
-  limits: Resource;
+  requests?: Resource;
+  limits?: Resource;
 }
 export interface SiteState {
   entrypoint?: string; // defaults to main.ts
