@@ -6,7 +6,11 @@ import {
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { Item, ProductID, Sort } from "../../utils/types.ts";
@@ -212,6 +216,71 @@ const loader = async (
   );
 };
 
-export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
+const getSearchParams = (props: Props) => {
+  if (isFacetsList(props)) {
+    return [
+      ["query", props.query],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+      ["selectedFacets", props.facets],
+      [
+        "hideUnavailableItems",
+        (props.hideUnavailableItems ?? false).toString(),
+      ],
+    ];
+  }
+
+  if (isQueryList(props)) {
+    return [
+      ["query", props.query],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+      ["fuzzy", mapLabelledFuzzyToFuzzy(props.fuzzy) ?? ""],
+      [
+        "hideUnavailableItems",
+        (props.hideUnavailableItems ?? false).toString(),
+      ],
+    ];
+  }
+
+  if (isCollectionList(props)) {
+    return [
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+      ["collection", props.collection],
+      [
+        "hideUnavailableItems",
+        (props.hideUnavailableItems ?? false).toString(),
+      ],
+    ];
+  }
+
+  return [];
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+  if (
+    url.searchParams.has("q") || !isAnonymous(ctx) || isProductIDList(props)
+  ) {
+    return null;
+  }
+
+  const params = new URLSearchParams(getSearchParams(props));
+
+  url.searchParams.forEach((value, key) => {
+    params.append(key, value);
+  });
+
+  params.sort();
+  params.set("segment", token);
+
+  url.search = params.toString();
+
+  return url.href;
+};
 
 export default loader;
