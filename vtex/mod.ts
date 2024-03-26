@@ -14,8 +14,9 @@ import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
-import { Segment } from "./utils/types.ts";
+import { Search, Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import { STALE } from "../utils/fetch.ts";
 
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
@@ -79,7 +80,15 @@ export interface Props {
    * @description Use VTEX as backend platform
    */
   platform: "vtex";
+
+  /**
+   * @title 
+   * @description 
+   */
+  queriesToForceCache?: PathsToCache
 }
+
+export type PathsToCache = Set<string>;
 
 export const color = 0xf71963;
 

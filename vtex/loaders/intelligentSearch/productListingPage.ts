@@ -436,8 +436,14 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
+  const queriesToForceCache = ctx.queriesToForceCache
   const url = new URL(req.url);
-  if (url.searchParams.has("q") || !isAnonymous(ctx)) {
+  const query = url.searchParams.get("q");
+
+
+  // I do not want to cache all search pages
+  // but I have some queries to bypass this decision
+  if ((query && !queriesToForceCache?.has(query)) || !isAnonymous(ctx)) {
     return null;
   }
 
