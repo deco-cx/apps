@@ -105,10 +105,8 @@ export const knativeServiceOf = (
       template: {
         metadata: {
           name: revisionName,
-          labels: { 
-            environment: production
-              ? ENVIRONMENT_PROD
-              : ENVIRONMENT_PREVIEW,
+          labels: {
+            environment: production ? ENVIRONMENT_PROD : ENVIRONMENT_PREVIEW,
           },
           annotations: {
             ...metricToAnnotations(metric),
