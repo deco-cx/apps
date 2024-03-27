@@ -65,6 +65,6 @@ export default function newDeployment(
     labels,
     scaling,
     runnerImage: runnerImg,
-    production
+    production,
   }, ctx);
 }

@@ -121,7 +121,9 @@ export const knativeServiceOf = (
           containers: [
             {
               labels: {
-                environment: production? ENVIRONMENT_PROD: ENVIRONMENT_PREVIEW
+                environment: production
+                  ? ENVIRONMENT_PROD
+                  : ENVIRONMENT_PREVIEW,
               },
               name: "app",
               command: ["/bin/sh", "-c"],
