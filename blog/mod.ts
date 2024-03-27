@@ -1,9 +1,10 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-export type AppContext = AC<ReturnType<typeof App>>;
 
 // deno-lint-ignore no-explicit-any
 export type State = any;
+
+export type AppContext = FnContext<State, Manifest>;
 
 export default function App(
   state: State,

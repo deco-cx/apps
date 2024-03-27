@@ -1,11 +1,20 @@
 import { Author } from "./Author.ts";
+import type { ImageWidget } from "../../admin/widgets.ts";
 
 export interface BlogPost {
   title: string;
   subtitle: string;
+  image?: ImageWidget;
   authors: Author[];
-  date: Date;
+  /**
+   * @format date
+   */
+  date: string;
   slug: string;
+  /**
+   * @title Content
+   * @format html
+   */
   content: string;
 }
 

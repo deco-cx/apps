@@ -1,3 +1,7 @@
+
+/**
+ * @titleBy name
+ */
 export interface Author {
   name: string;
   email: string;

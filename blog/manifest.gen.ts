@@ -3,12 +3,16 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/Author.ts";
-import * as $$$1 from "./loaders/Blogpost.ts";
+import * as $$$2 from "./loaders/Blogpost.ts";
+import * as $$$1 from "./loaders/BlogPostItem.ts";
+import * as $$$3 from "./loaders/BlogpostList.ts";
 
 const manifest = {
   "loaders": {
     "blog/loaders/Author.ts": $$$0,
-    "blog/loaders/Blogpost.ts": $$$1,
+    "blog/loaders/Blogpost.ts": $$$2,
+    "blog/loaders/BlogPostItem.ts": $$$1,
+    "blog/loaders/BlogpostList.ts": $$$3,
   },
   "name": "blog",
   "baseUrl": import.meta.url,
