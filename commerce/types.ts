@@ -1,4 +1,5 @@
 import { type Flag } from "deco/types.ts";
+import { PageType } from "../vtex/utils/types.ts";
 
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export declare type WithContext<T extends Things> = T & {
@@ -563,6 +564,7 @@ export interface PageInfo {
   previousPage: string | undefined;
   records?: number | undefined;
   recordPerPage?: number | undefined;
+  pageType?: PageType | undefined;
 }
 
 export interface ProductListingPage {

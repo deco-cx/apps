@@ -378,6 +378,7 @@ const loader = async (
       currentPage,
       records: parseInt(_total, 10),
       recordPerPage: count,
+      pageType,
     },
     sortOptions,
     seo: pageTypesToSeo(
