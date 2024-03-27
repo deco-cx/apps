@@ -63,8 +63,8 @@ export interface ServiceScaling {
   metric?: ScaleMetric;
 }
 
-export type ProductionServiceScaling = ServiceScaling
-export type PreviewServiceScaling = ServiceScaling
+export type ProductionServiceScaling = ServiceScaling;
+export type PreviewServiceScaling = ServiceScaling;
 
 export interface Github {
   type: "github";
