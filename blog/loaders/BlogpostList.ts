@@ -24,7 +24,7 @@ const ACCESSOR = "post";
 export default async function BlogPostList(
   _props: unknown,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<BlogPost[]> {
   return await getRecordsByPath<BlogPost>(ctx, COLLECTION_PATH, ACCESSOR);
 }

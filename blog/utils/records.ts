@@ -3,7 +3,7 @@ import { AppContext } from "../mod.ts";
 export async function getRecordsByPath<T>(
   ctx: AppContext,
   path: string,
-  accessor: string
+  accessor: string,
 ): Promise<T[]> {
   const resolvables = await ctx.get({
     __resolveType: "resolvables",
@@ -20,6 +20,6 @@ export async function getRecordsByPath<T>(
   }
 
   return (Object.values(current) as Record<string, T>[]).map(
-    (item) => item[accessor]
+    (item) => item[accessor],
   );
 }

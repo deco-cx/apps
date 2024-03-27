@@ -23,12 +23,12 @@ export interface Props {
 export default async function BlogPostItem(
   { slug }: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<BlogPost | null> {
   const blogPosts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
-    ACCESSOR
+    ACCESSOR,
   );
 
   return blogPosts.find((post) => post.slug === slug) || null;
