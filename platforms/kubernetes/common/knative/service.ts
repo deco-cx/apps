@@ -105,6 +105,11 @@ export const knativeServiceOf = (
       template: {
         metadata: {
           name: revisionName,
+          labels: { 
+            environment: production
+              ? ENVIRONMENT_PROD
+              : ENVIRONMENT_PREVIEW,
+          },
           annotations: {
             ...metricToAnnotations(metric),
             "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
@@ -120,11 +125,6 @@ export const knativeServiceOf = (
           volumes: sourceBinder.volumes,
           containers: [
             {
-              labels: {
-                environment: production
-                  ? ENVIRONMENT_PROD
-                  : ENVIRONMENT_PREVIEW,
-              },
               name: "app",
               command: ["/bin/sh", "-c"],
               args: [runScript],
