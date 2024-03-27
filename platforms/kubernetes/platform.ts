@@ -2,6 +2,7 @@ import { isDeploymentFromRepo, Platform } from "../../admin/platform.ts";
 import { SOURCE_LOCAL_MOUNT_PATH } from "./actions/build.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
+import { EPHEMERAL_SERVICE_SCALING } from "./actions/sites/create.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
 
@@ -45,9 +46,10 @@ export default function kubernetes(
           desiredState = {
             ...desiredState ?? {},
             scaling: {
-              ...desiredState?.scaling ?? {},
-              initialScale: 1,
-              minScale: 0,
+              ...desiredState?.previewScaling ?? {
+                ...desiredState?.scaling ?? {},
+                ...EPHEMERAL_SERVICE_SCALING,
+              },
             },
           };
         }
