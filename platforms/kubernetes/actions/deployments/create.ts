@@ -19,6 +19,7 @@ export interface Props {
   runnerImage?: string;
   siteState: SiteState;
   build?: boolean;
+  production?: boolean;
 }
 
 /**
@@ -34,6 +35,7 @@ export default function newDeployment(
     runnerImage,
     siteState: desiredState,
     scaling: _scaling,
+    production,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -63,5 +65,6 @@ export default function newDeployment(
     labels,
     scaling,
     runnerImage: runnerImg,
+    production
   }, ctx);
 }

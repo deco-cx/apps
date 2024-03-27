@@ -4,6 +4,8 @@ import {
   ResourceRequirements,
   ServiceScaling,
 } from "../../loaders/siteState/get.ts";
+import { ENVIRONMENT_PROD } from "./deployments.ts";
+import { ENVIRONMENT_PREVIEW } from "./deployments.ts";
 
 export interface EnvVar {
   name: string;
@@ -24,6 +26,7 @@ export interface KnativeSerivceOpts {
   serviceAccountName?: string;
   resources?: ResourceRequirements;
   runArgs?: string;
+  production?: boolean;
 }
 
 const typeToAttributes: Record<
@@ -83,6 +86,7 @@ export const knativeServiceOf = (
     serviceAccountName,
     controlPlaneDomain,
     resources,
+    production,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -116,6 +120,9 @@ export const knativeServiceOf = (
           volumes: sourceBinder.volumes,
           containers: [
             {
+              labels: {
+                environment: production? ENVIRONMENT_PROD: ENVIRONMENT_PREVIEW
+              },
               name: "app",
               command: ["/bin/sh", "-c"],
               args: [runScript],

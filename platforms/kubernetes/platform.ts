@@ -41,6 +41,16 @@ export default function kubernetes(
         const { site, production = false } = props;
 
         let desiredState = await loaders.siteState.get({ site });
+        if (!production) {
+          desiredState = {
+            ...desiredState ?? {},
+            scaling: {
+              ...desiredState?.scaling ?? {},
+              initialScale: 1,
+              minScale: 0,
+            },
+          };
+        }
         if (isDeploymentFromRepo(props)) {
           const { commitSha, owner, repo } = props;
           desiredState = {
@@ -75,6 +85,7 @@ export default function kubernetes(
           labels: {
             deploymentId,
           },
+          production,
         });
         if (production) {
           await actions.deployments.promote({
