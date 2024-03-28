@@ -151,12 +151,12 @@ export const deployFromSource = async (
     resources: {
       requests: {
         memory: "768Mi",
-        storage: "1Gi",
+        "ephemeral-storage": "512Mi",
         ...siteState?.resources?.requests ?? {},
       },
       limits: {
         memory: "1280Mi",
-        storage: "5Gi",
+        "ephemeral-storage": "5Gi",
         ...siteState?.resources?.limits ?? {},
       },
     },

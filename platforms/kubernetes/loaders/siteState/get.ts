@@ -84,7 +84,7 @@ export const sourceIsFromFiles = (source: Source): source is Files => {
 export interface Resource {
   cpu?: string;
   memory?: string;
-  storage?: string;
+  "ephemeral-storage"?: string;
 }
 export interface ResourceRequirements {
   requests?: Resource;
