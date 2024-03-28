@@ -11,7 +11,7 @@ import camel from "npm:camelcase";
 import { walk } from "std/fs/mod.ts";
 import { dirname, join } from "std/path/mod.ts";
 import { basename } from "std/path/win32.ts";
-import { setupGithooks } from "https://deno.land/x/githooks@0.0.4/githooks.ts";
+import { setupGithooks } from "https://deno.land/x/githooks@0.1.1/githooks.ts";
 
 await setupGithooks();
 
