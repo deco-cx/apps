@@ -1,4 +1,5 @@
-import { MultivariateFlag, Variant } from "deco/blocks/flag.ts";
+import { Variant } from "deco/blocks/flag.ts";
+import type { MultivariateFlag } from "deco/blocks/flag.ts";
 import { asResolved } from "deco/engine/core/resolver.ts";
 import { HintNode } from "deco/engine/core/hints.ts";
 

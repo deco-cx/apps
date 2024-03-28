@@ -148,8 +148,18 @@ export const deployFromSource = async (
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
     runArgs: siteState?.runArgs,
-    resources: siteState?.resources ??
-      { requests: { memory: "768Mi" }, limits: { memory: "1280Mi" } },
+    resources: {
+      requests: {
+        memory: "768Mi",
+        "ephemeral-storage": "512Mi",
+        ...siteState?.resources?.requests ?? {},
+      },
+      limits: {
+        memory: "1280Mi",
+        "ephemeral-storage": "5Gi",
+        ...siteState?.resources?.limits ?? {},
+      },
+    },
   });
 
   return deployService({
