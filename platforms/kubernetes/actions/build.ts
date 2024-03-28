@@ -22,7 +22,7 @@ export interface Props {
 
 const CACHE_FILE = "cache.tar"
 export const DECO_SITES_PVC = "deco-sites-sources";
-const START_CACHE = `/deco-sites/start/${CACHE_FILE}`;
+const START_CACHE = `deco-sites/start/${CACHE_FILE}`;
 
 interface BuildJobOpts {
   name: string;
