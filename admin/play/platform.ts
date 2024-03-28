@@ -1,7 +1,7 @@
+import { DeploymentId } from "../../platforms/kubernetes/actions/deployments/create.ts";
 import kubernetes from "../../platforms/kubernetes/platform.ts";
 import { AppContext } from "../mod.ts";
 import { Platform } from "../platform.ts";
-import { DeploymentId } from "../../platforms/kubernetes/actions/deployments/create.ts";
 
 export type Kubernetes = AppContext["invoke"]["kubernetes"];
 const siteName = "play";
@@ -22,8 +22,11 @@ export default function play(
           ephemeral: true,
         });
       },
-      delete: (_props) => {
-        throw new Error("not implemented");
+      delete: async (props) => {
+        await k8s.actions.domains.delete({
+          domain: `${props.site}.${domain}`,
+          site: siteName,
+        });
       },
     },
     deployments: {

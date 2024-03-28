@@ -342,7 +342,7 @@ const loader = async (
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];
   if (fullTextTerm) {
-    sendEvent({ type: "session.ping" }, req, ctx)
+    sendEvent({ type: "session.ping", url: url.href }, req, ctx)
       .then(() =>
         sendEvent(
           {
@@ -352,6 +352,7 @@ const loader = async (
             match: productsResult.recordsFiltered,
             operator: productsResult.operator,
             locale: segment?.payload?.cultureInfo ?? "pt-BR",
+            url: url.href,
           },
           req,
           ctx,
