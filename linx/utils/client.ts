@@ -4,6 +4,7 @@ import { WebPage as BasketWebPage } from "./types/basketJSON.ts";
 import { WebPage as SuggestionsWebPage } from "./types/suggestionsJSON.ts";
 import { WebPage as AuctionWebPage } from "./types/auctionJSON.ts";
 import { WebPage as AuctionDetailWebPage } from "./types/auctionDetailJSON.ts";
+import { WebPage as ListBidsWebPage } from "./types/ListBidsJSON.ts";
 import { ProductListResponse } from "./types/productList.ts";
 import { CartOperation } from "./types/basket.ts";
 
@@ -15,7 +16,8 @@ export interface API {
       | BasketWebPage
       | SuggestionsWebPage
       | AuctionWebPage
-      | AuctionDetailWebPage;
+      | AuctionDetailWebPage
+      | ListBidsWebPage;
   };
 
   "GET /web-api/v1/Catalog/Products/:source/:id": {
