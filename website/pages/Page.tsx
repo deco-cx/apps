@@ -10,7 +10,7 @@ import { JSX } from "preact";
 import Events from "../components/Events.tsx";
 import LiveControls from "../components/_Controls.tsx";
 import { AppContext } from "../mod.ts";
-import { Page } from "deco/blocks/page.tsx";
+import type { Page } from "deco/blocks/page.tsx";
 import { Component } from "preact";
 import { ComponentFunc } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
