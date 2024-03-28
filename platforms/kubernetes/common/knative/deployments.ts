@@ -23,9 +23,13 @@ export interface DeployOptions {
   labels?: Record<string, string>;
   scaling?: ServiceScaling;
   runnerImage: string;
+  production?: boolean;
 }
 
 const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
+
+export const ENVIRONMENT_PROD = "production";
+export const ENVIRONMENT_PREVIEW = "preview";
 
 interface DeployServiceOptions {
   service: ReturnType<typeof knativeServiceOf>;
@@ -109,6 +113,7 @@ export const deployFromSource = async (
     labels,
     scaling,
     runnerImage,
+    production,
   }: DeployOptions,
   ctx: AppContext,
 ) => {
@@ -150,6 +155,7 @@ export const deployFromSource = async (
     runArgs: siteState?.runArgs,
     resources: siteState?.resources ??
       { requests: { memory: "768Mi" }, limits: { memory: "1280Mi" } },
+    production,
   });
 
   return deployService({

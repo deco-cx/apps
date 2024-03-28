@@ -68,7 +68,7 @@ const getOrGenerateAESKey = async (site: string) => {
   }
 };
 
-const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
+export const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
   maxScale: 1,
   initialScale: 1,
   minScale: 0,
