@@ -10,7 +10,7 @@ import {
 import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
 import { assertsOrBadRequest } from "../assertions.ts";
 import { ignoreIfExists, upsertObject } from "../objects.ts";
-import { revisionRoute } from "./route.ts";
+import { revisionRoute, waitToBeReady } from "./route.ts";
 import { knativeServiceOf } from "./service.ts";
 
 export interface DeployOptions {
@@ -71,16 +71,17 @@ const deployService = async (
   });
 
   const deploymentRoute = `sites-${site}-${deploymentId}`;
+  const revRoute = {
+    routeName: deploymentRoute,
+    revisionName,
+    namespace: siteNs,
+  };
   await k8sApi.createNamespacedCustomObject(
     "serving.knative.dev",
     "v1",
     siteNs,
     "routes",
-    revisionRoute({
-      routeName: deploymentRoute,
-      revisionName,
-      namespace: siteNs,
-    }),
+    revisionRoute(revRoute),
   ).catch(ignoreIfExists).catch((err) => {
     console.error("creating site route error", err);
     shortcircuit(
@@ -90,6 +91,8 @@ const deployService = async (
       ),
     );
   });
+
+  await waitToBeReady(ctx.kc, revRoute);
 
   const domains = [{
     url: `https://${Routes.prod(site)}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
