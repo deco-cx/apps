@@ -1,10 +1,24 @@
 import { fetchSafe } from "../../../utils/fetch.ts";
 import { Font } from "../../components/Theme.tsx";
 import type { Manifest } from "../../manifest.gen.ts";
+import { hashStringSync } from "../../../utils/shortHash.ts";
 
 interface Props {
   fonts: GoogleFont[];
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: unknown) => {
+  const url = new URL(req.url);
+
+  const params = new URLSearchParams([
+    ["fonts", encodeURIComponent(hashStringSync(JSON.stringify(props.fonts)))],
+  ]);
+  url.pathname = "";
+  url.search = params.toString();
+  return url.href;
+};
 
 /**
  * @title {{weight}} {{#italic}}Italic{{/italic}}{{^italic}}{{/italic}}
