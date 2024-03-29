@@ -12,6 +12,7 @@ export interface Props {
 
 /**
  * @title BlogPostItem
+ * @description Fetches a specific blog post by its slug.
  *
  * Fetches a specific blog post by its slug.
  *

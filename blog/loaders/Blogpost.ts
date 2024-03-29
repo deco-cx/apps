@@ -12,8 +12,8 @@ export interface BlogPost {
   date: string;
   slug: string;
   /**
-   * @title Content
-   * @format html
+   * @title Post Content
+   * @format rich-text
    */
   content: string;
 }

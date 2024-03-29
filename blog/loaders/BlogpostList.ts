@@ -14,6 +14,9 @@ const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
 
 /**
+ * @title BlogPostList
+ * @description Retrieves a list of blog posts.
+ *
  * Retrieves a list of blog posts.
  *
  * @param _props - The props for the blog post list (unused).
