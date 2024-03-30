@@ -20,7 +20,7 @@ export interface Props {
   builderImage?: string;
 }
 
-const CACHE_FILE = "cache.tar"
+const CACHE_FILE = "cache.tar";
 export const DECO_SITES_PVC = "deco-sites-sources";
 const START_CACHE = `deco-sites/start/${CACHE_FILE}`;
 
@@ -282,7 +282,7 @@ const buildJobOf = (
                 },
                 {
                   name: "BUILD_CACHE_FALLBACK",
-                  value: `${sourceBinder.mountPath}/${START_CACHE}`
+                  value: `${sourceBinder.mountPath}/${START_CACHE}`,
                 },
                 ...sourceBinder.envVars,
               ],
