@@ -6,6 +6,7 @@ import * as $$$0 from "./loaders/Author.ts";
 import * as $$$2 from "./loaders/Blogpost.ts";
 import * as $$$1 from "./loaders/BlogPostItem.ts";
 import * as $$$3 from "./loaders/BlogpostList.ts";
+import * as $$$$$$0 from "./sections/Template.tsx";
 
 const manifest = {
   "loaders": {
@@ -13,6 +14,9 @@ const manifest = {
     "blog/loaders/Blogpost.ts": $$$2,
     "blog/loaders/BlogPostItem.ts": $$$1,
     "blog/loaders/BlogpostList.ts": $$$3,
+  },
+  "sections": {
+    "blog/sections/Template.tsx": $$$$$$0,
   },
   "name": "blog",
   "baseUrl": import.meta.url,

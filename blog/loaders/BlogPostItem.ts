@@ -26,11 +26,11 @@ export default async function BlogPostItem(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlogPost | null> {
-  const blogPosts = await getRecordsByPath<BlogPost>(
+  const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
     ACCESSOR,
   );
 
-  return blogPosts.find((post) => post.slug === slug) || null;
+  return posts.find((post) => post.slug === slug) || null;
 }
