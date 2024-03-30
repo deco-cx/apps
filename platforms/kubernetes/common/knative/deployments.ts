@@ -158,7 +158,7 @@ export const deployFromSource = async (
         ...siteState?.resources?.requests ?? {},
       },
       limits: {
-        memory: "1280Mi",
+        memory: "2Gi",
         "ephemeral-storage": "5Gi",
         ...siteState?.resources?.limits ?? {},
       },
