@@ -79,8 +79,8 @@ export const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
 };
 
 export const EPHEMERAL_SERVICE_RESOURCES: ResourceRequirements = {
-  limits: { memory: "1536Mi", "ephemeral-storage": "1Gi" },
-  requests: { memory: "768Mi", "ephemeral-storage": "512Mi" },
+  limits: { memory: "1280Mi", "ephemeral-storage": "1Gi" },
+  requests: { memory: "512Mi", "ephemeral-storage": "512Mi" },
 };
 
 /**

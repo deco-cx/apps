@@ -38,19 +38,24 @@ export default function App(
     }
   }
   // It is a default state for a production site
-  const _defaultSiteState = defaultSiteState ?? {
+  const _defaultSiteState = {
+    ...defaultSiteState ?? {},
     scaling: {
+      ...defaultSiteState?.scaling ?? {},
       maxScale: 20,
       initialScale: 1,
       minScale: 0,
       retentionPeriod: "10m",
     },
     resources: {
+      ...defaultSiteState?.resources ?? {},
       limits: {
+        ...defaultSiteState?.resources?.limits ?? {},
         memory: "1536Mi",
         "ephemeral-storage": "2Gi",
       },
       requests: {
+        ...defaultSiteState?.resources?.requests ?? {},
         memory: "512Mi",
         "ephemeral-storage": "1Gi",
       },

@@ -13,6 +13,7 @@ export const DeploymentId = {
 
 export interface Props {
   site: string;
+  /** @deprecated use siteState.scaling instead */
   scaling?: ServiceScaling;
   labels?: Record<string, string>;
   deploymentId: string;
@@ -33,14 +34,13 @@ export default function newDeployment(
     labels,
     runnerImage,
     siteState: desiredState,
-    scaling: _scaling,
   }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
   const siteState = ctx.withDefaults(desiredState);
 
-  const { source, scaling = _scaling } = siteState;
+  const { source } = siteState;
   assertsOrBadRequest(typeof source !== "undefined", {
     message: "source is required",
   });
@@ -61,7 +61,6 @@ export default function newDeployment(
     deploymentId,
     siteNs,
     labels,
-    scaling,
     runnerImage: runnerImg,
   }, ctx);
 }

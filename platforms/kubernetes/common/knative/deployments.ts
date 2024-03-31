@@ -25,6 +25,7 @@ export interface DeployOptions {
   siteNs: string;
   deploymentId: string;
   labels?: Record<string, string>;
+  /** @deprecated use siteState.scaling instead */
   scaling?: ServiceScaling;
   runnerImage: string;
 }
@@ -114,7 +115,6 @@ export const deployFromSource = async (
     deploymentId,
     siteNs,
     labels,
-    scaling,
     runnerImage,
   }: DeployOptions,
   ctx: AppContext,
@@ -150,7 +150,7 @@ export const deployFromSource = async (
     namespace: siteNs,
     deploymentId,
     labels,
-    scaling: scaling ?? EPHEMERAL_SERVICE_SCALING,
+    scaling: siteState.scaling ?? EPHEMERAL_SERVICE_SCALING,
     runnerImage,
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
