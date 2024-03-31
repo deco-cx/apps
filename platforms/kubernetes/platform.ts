@@ -2,7 +2,10 @@ import { isDeploymentFromRepo, Platform } from "../../admin/platform.ts";
 import { SOURCE_LOCAL_MOUNT_PATH } from "./actions/build.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
-import { EPHEMERAL_SERVICE_SCALING } from "./actions/sites/create.ts";
+import {
+  EPHEMERAL_SERVICE_RESOURCES,
+  EPHEMERAL_SERVICE_SCALING,
+} from "./actions/sites/create.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
 
@@ -42,17 +45,6 @@ export default function kubernetes(
         const { site, production = false } = props;
 
         let desiredState = await loaders.siteState.get({ site });
-        if (!production) {
-          desiredState = {
-            ...desiredState ?? {},
-            scaling: {
-              ...desiredState?.previewScaling ?? {
-                ...desiredState?.scaling ?? {},
-                ...EPHEMERAL_SERVICE_SCALING,
-              },
-            },
-          };
-        }
         if (isDeploymentFromRepo(props)) {
           const { commitSha, owner, repo } = props;
           desiredState = {
@@ -80,14 +72,23 @@ export default function kubernetes(
             },
           };
         }
+
+        let deploymentState = desiredState;
+        if (!production) {
+          deploymentState = {
+            ...deploymentState ?? {},
+            scaling: EPHEMERAL_SERVICE_SCALING,
+            resources: EPHEMERAL_SERVICE_RESOURCES,
+          };
+        }
+
         const deployment = await actions.deployments.create({
           site,
-          siteState: desiredState,
+          siteState: deploymentState,
           deploymentId,
           labels: {
             deploymentId,
           },
-          production,
         });
         if (production) {
           await actions.deployments.promote({

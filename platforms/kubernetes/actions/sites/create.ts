@@ -6,7 +6,10 @@ import {
 } from "../../../../website/utils/crypto.ts";
 import { ignoreIfExists } from "../../common/objects.ts";
 import { k8s } from "../../deps.ts";
-import { ServiceScaling } from "../../loaders/siteState/get.ts";
+import {
+  ResourceRequirements,
+  ServiceScaling,
+} from "../../loaders/siteState/get.ts";
 import { AppContext } from "../../mod.ts";
 import { DECO_SITES_PVC } from "../build.ts";
 
@@ -74,6 +77,12 @@ export const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
   minScale: 0,
   retentionPeriod: "5m",
 };
+
+export const EPHEMERAL_SERVICE_RESOURCES: ResourceRequirements = {
+  limits: { memory: "1536Mi", "ephemeral-storage": "1Gi" },
+  requests: { memory: "768Mi", "ephemeral-storage": "512Mi" },
+};
+
 /**
  * Provision namespace of the new site and required resources.
  * @title Create Site

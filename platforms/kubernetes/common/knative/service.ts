@@ -4,8 +4,6 @@ import {
   ResourceRequirements,
   ServiceScaling,
 } from "../../loaders/siteState/get.ts";
-import { ENVIRONMENT_PROD } from "./deployments.ts";
-import { ENVIRONMENT_PREVIEW } from "./deployments.ts";
 
 export interface EnvVar {
   name: string;
@@ -26,7 +24,6 @@ export interface KnativeSerivceOpts {
   serviceAccountName?: string;
   resources?: ResourceRequirements;
   runArgs?: string;
-  production?: boolean;
 }
 
 const typeToAttributes: Record<
@@ -86,7 +83,6 @@ export const knativeServiceOf = (
     serviceAccountName,
     controlPlaneDomain,
     resources,
-    production,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -105,9 +101,6 @@ export const knativeServiceOf = (
       template: {
         metadata: {
           name: revisionName,
-          labels: {
-            environment: production ? ENVIRONMENT_PROD : ENVIRONMENT_PREVIEW,
-          },
           annotations: {
             ...metricToAnnotations(metric),
             "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,

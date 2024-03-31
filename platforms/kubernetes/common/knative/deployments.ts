@@ -12,6 +12,10 @@ import { assertsOrBadRequest } from "../assertions.ts";
 import { ignoreIfExists, upsertObject } from "../objects.ts";
 import { revisionRoute, waitToBeReady } from "./route.ts";
 import { knativeServiceOf } from "./service.ts";
+import {
+  EPHEMERAL_SERVICE_RESOURCES,
+  EPHEMERAL_SERVICE_SCALING,
+} from "../../actions/sites/create.ts";
 
 export interface DeployOptions {
   source: Source;
@@ -23,13 +27,9 @@ export interface DeployOptions {
   labels?: Record<string, string>;
   scaling?: ServiceScaling;
   runnerImage: string;
-  production?: boolean;
 }
 
 const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
-
-export const ENVIRONMENT_PROD = "production";
-export const ENVIRONMENT_PREVIEW = "preview";
 
 interface DeployServiceOptions {
   service: ReturnType<typeof knativeServiceOf>;
@@ -74,7 +74,7 @@ const deployService = async (
     throw err;
   });
 
-  const deploymentRoute = `sites-${site}-${deploymentId}`;
+  const deploymentRoute = Routes.preview(site, deploymentId);
   const revRoute = {
     routeName: deploymentRoute,
     revisionName,
@@ -99,7 +99,7 @@ const deployService = async (
   await waitToBeReady(ctx.kc, revRoute);
 
   const domains = [{
-    url: `https://${Routes.prod(site)}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
+    url: `https://${deploymentRoute}.${CONTROL_PLANE_DOMAIN}`,
     production: false,
   }];
   return { id: deploymentId, domains };
@@ -116,7 +116,6 @@ export const deployFromSource = async (
     labels,
     scaling,
     runnerImage,
-    production,
   }: DeployOptions,
   ctx: AppContext,
 ) => {
@@ -151,20 +150,18 @@ export const deployFromSource = async (
     namespace: siteNs,
     deploymentId,
     labels,
-    scaling: scaling ?? { initialScale: 0, maxScale: 3, minScale: 0 },
+    scaling: scaling ?? EPHEMERAL_SERVICE_SCALING,
     runnerImage,
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
     runArgs: siteState?.runArgs,
     resources: {
       requests: {
-        memory: "768Mi",
-        "ephemeral-storage": "512Mi",
+        ...EPHEMERAL_SERVICE_RESOURCES.requests ?? {},
         ...siteState?.resources?.requests ?? {},
       },
       limits: {
-        memory: "2Gi",
-        "ephemeral-storage": "5Gi",
+        ...EPHEMERAL_SERVICE_RESOURCES.limits ?? {},
         ...siteState?.resources?.limits ?? {},
       },
     },

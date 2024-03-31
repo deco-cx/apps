@@ -63,9 +63,6 @@ export interface ServiceScaling {
   metric?: ScaleMetric;
 }
 
-export type ProductionServiceScaling = ServiceScaling;
-export type PreviewServiceScaling = ServiceScaling;
-
 export interface Github {
   type: "github";
   repo: string;
@@ -101,8 +98,7 @@ export interface SiteState {
   builderImage?: string;
   envVars?: EnvVar[];
   useServiceAccount?: boolean;
-  scaling?: ProductionServiceScaling;
-  previewScaling?: PreviewServiceScaling;
+  scaling?: ServiceScaling;
   resources?: ResourceRequirements;
   domains?: Domain[];
 }

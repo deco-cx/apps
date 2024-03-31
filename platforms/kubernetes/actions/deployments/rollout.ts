@@ -10,6 +10,8 @@ export interface Props {
 
 export const Routes = {
   prod: (site: string) => `sites-${site}`,
+  preview: (site: string, deploymentId: string) =>
+    `sites-${site}-${deploymentId}`,
 };
 
 /**
