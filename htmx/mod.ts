@@ -8,7 +8,7 @@ export interface Props {
   version?: string;
 
   /** @defaul https://cdn.jsdelivr.net/npm  */
-  cdn?: string
+  cdn?: string;
 }
 
 export default function Site(state: Props): App<Manifest, Props> {
