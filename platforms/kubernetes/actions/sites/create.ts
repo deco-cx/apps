@@ -83,6 +83,24 @@ export const PREVIEW_SERVICE_RESOURCES: ResourceRequirements = {
   requests: { memory: "512Mi", "ephemeral-storage": "512Mi" },
 };
 
+export const PRODUCTION_SERVICE_SCALING: ServiceScaling = {
+  maxScale: 20,
+  initialScale: 1,
+  minScale: 0,
+  retentionPeriod: "10m",
+};
+
+export const PRODUCTION_SERVICE_RESOURCES: ResourceRequirements = {
+  limits: {
+    memory: "1536Mi",
+    "ephemeral-storage": "2Gi",
+  },
+  requests: {
+    memory: "512Mi",
+    "ephemeral-storage": "1Gi",
+  },
+};
+
 /**
  * Provision namespace of the new site and required resources.
  * @title Create Site

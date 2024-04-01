@@ -5,6 +5,8 @@ import { Routes } from "./actions/deployments/rollout.ts";
 import {
   PREVIEW_SERVICE_RESOURCES,
   PREVIEW_SERVICE_SCALING,
+  PRODUCTION_SERVICE_RESOURCES,
+  PRODUCTION_SERVICE_SCALING,
 } from "./actions/sites/create.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
@@ -121,10 +123,29 @@ export default function kubernetes(
             value: release,
           }],
         };
+
+        const deploymentState = {
+          scaling: {
+            ...PRODUCTION_SERVICE_SCALING,
+            ...desiredState?.scaling ?? {},
+          },
+          resources: {
+            requests: {
+              ...PRODUCTION_SERVICE_RESOURCES.requests,
+              ...desiredState?.resources?.requests ?? {},
+            },
+            limits: {
+              ...PRODUCTION_SERVICE_RESOURCES.limits,
+              ...desiredState?.resources?.limits ?? {},
+            },
+          },
+          ...desiredState ?? {},
+        };
+
         const deploymentId = DeploymentId.new();
         const deployment = await actions.deployments.create({
           site,
-          siteState: desiredState,
+          siteState: deploymentState,
           deploymentId,
           labels: {
             deploymentId,

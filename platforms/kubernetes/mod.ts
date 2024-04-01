@@ -4,6 +4,10 @@ import { Secret } from "../../website/loaders/secret.ts";
 import { k8s } from "./deps.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
+import {
+  PRODUCTION_SERVICE_RESOURCES,
+  PRODUCTION_SERVICE_SCALING,
+} from "./actions/sites/create.ts";
 
 // TODO (mcandeia) use decosite export const CONTROL_PLANE_DOMAIN = "deco.site";
 export const CONTROL_PLANE_DOMAIN = "decocdn.com";
@@ -42,22 +46,17 @@ export default function App(
     ...defaultSiteState ?? {},
     scaling: {
       ...defaultSiteState?.scaling ?? {},
-      maxScale: 20,
-      initialScale: 1,
-      minScale: 0,
-      retentionPeriod: "10m",
+      ...PRODUCTION_SERVICE_SCALING,
     },
     resources: {
       ...defaultSiteState?.resources ?? {},
       limits: {
         ...defaultSiteState?.resources?.limits ?? {},
-        memory: "1536Mi",
-        "ephemeral-storage": "2Gi",
+        ...PRODUCTION_SERVICE_RESOURCES.limits,
       },
       requests: {
         ...defaultSiteState?.resources?.requests ?? {},
-        memory: "512Mi",
-        "ephemeral-storage": "1Gi",
+        ...PRODUCTION_SERVICE_RESOURCES.requests,
       },
     },
   };
