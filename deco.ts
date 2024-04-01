@@ -48,6 +48,7 @@ const config = {
     app("power-reviews"),
     app("crux"),
     app("decohub"),
+    app("htmx"),
     ...compatibilityApps,
     ...paltformApps,
   ],
