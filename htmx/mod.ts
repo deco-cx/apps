@@ -11,6 +11,7 @@ export interface Props {
   cdn?: string;
 }
 
+/** @title HTMX */
 export default function Site(state: Props): App<Manifest, Props> {
   return { state, manifest };
 }
