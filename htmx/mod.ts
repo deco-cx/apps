@@ -15,5 +15,3 @@ export interface Props {
 export default function Site(state: Props): App<Manifest, Props> {
   return { state, manifest };
 }
-
-export { onBeforeResolveProps } from "../website/mod.ts";
