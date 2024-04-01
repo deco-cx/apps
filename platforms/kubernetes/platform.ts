@@ -79,16 +79,16 @@ export default function kubernetes(
           deploymentState = {
             ...deploymentState ?? {},
             scaling: {
-              ...deploymentState?.scaling,
+              ...deploymentState?.scaling ?? {},
               ...PREVIEW_SERVICE_SCALING,
             },
             resources: {
               requests: {
-                ...deploymentState?.resources?.requests,
+                ...deploymentState?.resources?.requests ?? {},
                 ...PREVIEW_SERVICE_RESOURCES.requests,
               },
               limits: {
-                ...deploymentState?.resources?.limits,
+                ...deploymentState?.resources?.limits ?? {},
                 ...PREVIEW_SERVICE_RESOURCES.limits,
               },
             },
