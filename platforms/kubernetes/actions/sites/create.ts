@@ -6,11 +6,7 @@ import {
 } from "../../../../website/utils/crypto.ts";
 import { ignoreIfExists } from "../../common/objects.ts";
 import { k8s } from "../../deps.ts";
-import {
-  ResourceRequirements,
-  ServiceScaling,
-} from "../../loaders/siteState/get.ts";
-import { AppContext } from "../../mod.ts";
+import { AppContext, PREVIEW_SERVICE_SCALING } from "../../mod.ts";
 import { DECO_SITES_PVC } from "../build.ts";
 
 export interface Props {
@@ -69,18 +65,6 @@ const getOrGenerateAESKey = async (site: string) => {
   } finally {
     kv?.close();
   }
-};
-
-export const PREVIEW_SERVICE_SCALING: ServiceScaling = {
-  maxScale: 1,
-  initialScale: 1,
-  minScale: 0,
-  retentionPeriod: "5m",
-};
-
-export const PREVIEW_SERVICE_RESOURCES: ResourceRequirements = {
-  limits: { memory: "1280Mi", "ephemeral-storage": "1Gi" },
-  requests: { memory: "512Mi", "ephemeral-storage": "512Mi" },
 };
 
 /**

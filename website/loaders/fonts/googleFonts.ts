@@ -13,7 +13,10 @@ export const cacheKey = (props: Props, req: Request, _ctx: unknown) => {
   const url = new URL(req.url);
 
   const params = new URLSearchParams([
-    ["googlefontsloader", encodeURIComponent(hashStringSync(JSON.stringify(props.fonts)))],
+    [
+      "googlefontsloader",
+      encodeURIComponent(hashStringSync(JSON.stringify(props.fonts))),
+    ],
   ]);
   url.pathname = "";
   url.search = params.toString();

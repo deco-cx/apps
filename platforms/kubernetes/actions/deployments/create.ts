@@ -36,7 +36,7 @@ export default function newDeployment(
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
-  const siteState = ctx.withDefaults(desiredState);
+  const siteState = ctx.withBaseState(desiredState);
 
   const { source } = siteState;
   assertsOrBadRequest(typeof source !== "undefined", {
