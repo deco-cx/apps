@@ -18,7 +18,6 @@ export interface Props {
   runnerImage?: string;
   siteState: SiteState;
   build?: boolean;
-  production?: boolean;
 }
 
 /**
@@ -33,12 +32,11 @@ export default function newDeployment(
     labels,
     runnerImage,
     siteState: desiredState,
-    production = false,
   }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
-  const siteState = ctx.withDefaults(desiredState, production);
+  const siteState = ctx.withBaseState(desiredState);
 
   const { source } = siteState;
   assertsOrBadRequest(typeof source !== "undefined", {

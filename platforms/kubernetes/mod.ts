@@ -16,7 +16,7 @@ export const PREVIEW_SERVICE_SCALING: ServiceScaling = {
   retentionPeriod: "5m",
 };
 
-const PREVIEW_SERVICE_RESOURCES: ResourceRequirements = {
+export const PREVIEW_SERVICE_RESOURCES: ResourceRequirements = {
   limits: { memory: "1280Mi", "ephemeral-storage": "1Gi" },
   requests: { memory: "512Mi", "ephemeral-storage": "512Mi" },
 };
@@ -44,13 +44,13 @@ export const CONTROL_PLANE_DOMAIN = "decocdn.com";
 
 export interface State {
   kc: k8s.KubeConfig;
-  withDefaults: (siteState: SiteState, production: boolean) => SiteState;
+  withBaseState: (siteState: SiteState) => SiteState;
   controlPlaneDomain: string;
   githubToken?: string;
 }
 
 export interface Props {
-  defaultSiteState?: SiteState;
+  baseSiteState?: SiteState;
   githubToken?: Secret;
 }
 
@@ -59,7 +59,7 @@ export interface Props {
  */
 export default function App(
   {
-    defaultSiteState,
+    baseSiteState,
     githubToken,
   }: Props,
 ): App<AppManifest, State> {
@@ -72,31 +72,49 @@ export default function App(
     }
   }
 
+  // It is a base state for a production site
+  const _baseSiteState = {
+    ...baseSiteState ?? {},
+    scaling: {
+      ...baseSiteState?.scaling ?? {},
+      ...PRODUCTION_SERVICE_SCALING,
+    },
+    resources: {
+      ...baseSiteState?.resources ?? {},
+      limits: {
+        ...baseSiteState?.resources?.limits ?? {},
+        ...PRODUCTION_SERVICE_RESOURCES.limits,
+      },
+      requests: {
+        ...baseSiteState?.resources?.requests ?? {},
+        ...PRODUCTION_SERVICE_RESOURCES.requests,
+      },
+    },
+  };
+
   return {
     manifest,
     state: {
       kc,
       githubToken: githubToken?.get?.() ?? Deno.env.get("OCTOKIT_TOKEN"),
       controlPlaneDomain: CONTROL_PLANE_DOMAIN,
-      withDefaults: (state, production) => {
-        const scaling = buildSiteScaling(
-          defaultSiteState?.scaling,
+      withBaseState: (state) => {
+        const scaling = mergeSiteScaling(
+          _baseSiteState?.scaling,
           state?.scaling,
-          production,
         );
-        const resources = buildSiteResources(
-          defaultSiteState?.resources,
+        const resources = mergeSiteResources(
+          _baseSiteState?.resources,
           state?.resources,
-          production,
         );
 
         return {
-          ...defaultSiteState,
+          ..._baseSiteState,
           ...state,
           scaling,
           resources,
           envVars: [
-            ...defaultSiteState?.envVars ?? [],
+            ..._baseSiteState?.envVars ?? [],
             ...state?.envVars ?? [],
           ],
         };
@@ -109,36 +127,28 @@ export type AppContext = AC<ReturnType<typeof App>>;
 
 export type Manifest = ManifestOf<ReturnType<typeof App>>;
 
-function buildSiteScaling(
-  defaultSiteScaling: ServiceScaling | undefined,
+function mergeSiteScaling(
+  baseSiteState: ServiceScaling | undefined,
   stateScaling: ServiceScaling | undefined,
-  production: boolean,
 ) {
   return {
-    ...defaultSiteScaling ?? {},
-    ...(production ? PRODUCTION_SERVICE_SCALING : {}),
+    ...baseSiteState ?? {},
     ...stateScaling ?? {},
-    ...(!production ? PREVIEW_SERVICE_SCALING : {}),
   };
 }
 
-function buildSiteResources(
-  defaultSiteResources: ResourceRequirements | undefined,
+function mergeSiteResources(
+  baseSiteState: ResourceRequirements | undefined,
   stateResources: ResourceRequirements | undefined,
-  production: boolean,
 ) {
   return {
     requests: {
-      ...defaultSiteResources?.requests ?? {},
-      ...(production ? PRODUCTION_SERVICE_RESOURCES.requests : {}),
+      ...baseSiteState?.requests ?? {},
       ...stateResources?.requests ?? {},
-      ...(!production ? PREVIEW_SERVICE_RESOURCES.requests : {}),
     },
     limits: {
-      ...defaultSiteResources?.limits ?? {},
-      ...(production ? PRODUCTION_SERVICE_RESOURCES.limits : {}),
+      ...baseSiteState?.limits ?? {},
       ...stateResources?.limits ?? {},
-      ...(!production ? PREVIEW_SERVICE_RESOURCES.limits : {}),
     },
   };
 }
