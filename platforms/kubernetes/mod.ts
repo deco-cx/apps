@@ -37,14 +37,31 @@ export default function App(
       console.error("couldn't not load from kuberentes state", err);
     }
   }
-  const _defaultSiteState = defaultSiteState ?? {
+  // It is a default state for a production site
+  const _defaultSiteState = {
+    ...defaultSiteState ?? {},
     scaling: {
-      maxScale: 100,
-      initialScale: 3,
+      ...defaultSiteState?.scaling ?? {},
+      maxScale: 20,
+      initialScale: 1,
       minScale: 0,
-      retentionPeriod: "5m",
+      retentionPeriod: "10m",
+    },
+    resources: {
+      ...defaultSiteState?.resources ?? {},
+      limits: {
+        ...defaultSiteState?.resources?.limits ?? {},
+        memory: "1536Mi",
+        "ephemeral-storage": "2Gi",
+      },
+      requests: {
+        ...defaultSiteState?.resources?.requests ?? {},
+        memory: "512Mi",
+        "ephemeral-storage": "1Gi",
+      },
     },
   };
+
   return {
     manifest,
     state: {
