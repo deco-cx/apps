@@ -2,12 +2,6 @@ import { isDeploymentFromRepo, Platform } from "../../admin/platform.ts";
 import { SOURCE_LOCAL_MOUNT_PATH } from "./actions/build.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
-import {
-  PREVIEW_SERVICE_RESOURCES,
-  PREVIEW_SERVICE_SCALING,
-  PRODUCTION_SERVICE_RESOURCES,
-  PRODUCTION_SERVICE_SCALING,
-} from "./actions/sites/create.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
 
@@ -75,22 +69,14 @@ export default function kubernetes(
           };
         }
 
-        let deploymentState = desiredState;
-        if (!production) {
-          deploymentState = {
-            ...deploymentState ?? {},
-            scaling: PREVIEW_SERVICE_SCALING,
-            resources: PREVIEW_SERVICE_RESOURCES,
-          };
-        }
-
         const deployment = await actions.deployments.create({
           site,
-          siteState: deploymentState,
+          siteState: desiredState,
           deploymentId,
           labels: {
             deploymentId,
           },
+          production,
         });
         if (production) {
           await actions.deployments.promote({
@@ -124,32 +110,15 @@ export default function kubernetes(
           }],
         };
 
-        const deploymentState = {
-          scaling: {
-            ...PRODUCTION_SERVICE_SCALING,
-            ...desiredState?.scaling ?? {},
-          },
-          resources: {
-            requests: {
-              ...PRODUCTION_SERVICE_RESOURCES.requests,
-              ...desiredState?.resources?.requests ?? {},
-            },
-            limits: {
-              ...PRODUCTION_SERVICE_RESOURCES.limits,
-              ...desiredState?.resources?.limits ?? {},
-            },
-          },
-          ...desiredState ?? {},
-        };
-
         const deploymentId = DeploymentId.new();
         const deployment = await actions.deployments.create({
           site,
-          siteState: deploymentState,
+          siteState: desiredState,
           deploymentId,
           labels: {
             deploymentId,
           },
+          production: true,
         });
         await actions.deployments.promote({
           site,

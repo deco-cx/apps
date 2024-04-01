@@ -8,10 +8,6 @@ import { assertsOrBadRequest } from "../assertions.ts";
 import { ignoreIfExists, upsertObject } from "../objects.ts";
 import { revisionRoute, waitToBeReady } from "./route.ts";
 import { knativeServiceOf } from "./service.ts";
-import {
-  PREVIEW_SERVICE_RESOURCES,
-  PREVIEW_SERVICE_SCALING,
-} from "../../actions/sites/create.ts";
 
 export interface DeployOptions {
   source: Source;
@@ -144,21 +140,12 @@ export const deployFromSource = async (
     namespace: siteNs,
     deploymentId,
     labels,
-    scaling: siteState.scaling ?? PREVIEW_SERVICE_SCALING,
+    scaling: siteState.scaling!,
     runnerImage,
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
     runArgs: siteState?.runArgs,
-    resources: {
-      requests: {
-        ...PREVIEW_SERVICE_RESOURCES.requests ?? {},
-        ...siteState?.resources?.requests ?? {},
-      },
-      limits: {
-        ...PREVIEW_SERVICE_RESOURCES.limits ?? {},
-        ...siteState?.resources?.limits ?? {},
-      },
-    },
+    resources: siteState.resources!,
   });
 
   return deployService({
