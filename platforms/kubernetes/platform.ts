@@ -3,8 +3,8 @@ import { SOURCE_LOCAL_MOUNT_PATH } from "./actions/build.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
 import {
-  EPHEMERAL_SERVICE_RESOURCES,
-  EPHEMERAL_SERVICE_SCALING,
+  PREVIEW_SERVICE_RESOURCES,
+  PREVIEW_SERVICE_SCALING,
 } from "./actions/sites/create.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
@@ -77,8 +77,8 @@ export default function kubernetes(
         if (!production) {
           deploymentState = {
             ...deploymentState ?? {},
-            scaling: EPHEMERAL_SERVICE_SCALING,
-            resources: EPHEMERAL_SERVICE_RESOURCES,
+            scaling: PREVIEW_SERVICE_SCALING,
+            resources: PREVIEW_SERVICE_RESOURCES,
           };
         }
 

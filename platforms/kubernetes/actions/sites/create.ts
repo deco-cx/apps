@@ -71,14 +71,14 @@ const getOrGenerateAESKey = async (site: string) => {
   }
 };
 
-export const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
+export const PREVIEW_SERVICE_SCALING: ServiceScaling = {
   maxScale: 1,
   initialScale: 1,
   minScale: 0,
   retentionPeriod: "5m",
 };
 
-export const EPHEMERAL_SERVICE_RESOURCES: ResourceRequirements = {
+export const PREVIEW_SERVICE_RESOURCES: ResourceRequirements = {
   limits: { memory: "1280Mi", "ephemeral-storage": "1Gi" },
   requests: { memory: "512Mi", "ephemeral-storage": "512Mi" },
 };
@@ -143,7 +143,7 @@ export default async function newSite(
     }).catch(ignoreIfExists),
   ]);
   const state = {
-    ...isEphemeral ? { scaling: EPHEMERAL_SERVICE_SCALING } : {},
+    ...isEphemeral ? { scaling: PREVIEW_SERVICE_SCALING } : {},
     envVars: [secretEnvVar],
   };
   await ctx.invoke.kubernetes.actions.siteState.upsert({
