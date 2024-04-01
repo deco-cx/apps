@@ -2,16 +2,16 @@ import { shortcircuit } from "deco/engine/errors.ts";
 import { SrcBinder } from "../../actions/build.ts";
 import { Routes } from "../../actions/deployments/rollout.ts";
 import { k8s } from "../../deps.ts";
-import {
-  ServiceScaling,
-  SiteState,
-  Source,
-} from "../../loaders/siteState/get.ts";
+import { SiteState, Source } from "../../loaders/siteState/get.ts";
 import { AppContext, CONTROL_PLANE_DOMAIN } from "../../mod.ts";
 import { assertsOrBadRequest } from "../assertions.ts";
 import { ignoreIfExists, upsertObject } from "../objects.ts";
 import { revisionRoute, waitToBeReady } from "./route.ts";
 import { knativeServiceOf } from "./service.ts";
+import {
+  PREVIEW_SERVICE_RESOURCES,
+  PREVIEW_SERVICE_SCALING,
+} from "../../actions/sites/create.ts";
 
 export interface DeployOptions {
   source: Source;
@@ -21,7 +21,6 @@ export interface DeployOptions {
   siteNs: string;
   deploymentId: string;
   labels?: Record<string, string>;
-  scaling?: ServiceScaling;
   runnerImage: string;
 }
 
@@ -70,7 +69,7 @@ const deployService = async (
     throw err;
   });
 
-  const deploymentRoute = `sites-${site}-${deploymentId}`;
+  const deploymentRoute = Routes.preview(site, deploymentId);
   const revRoute = {
     routeName: deploymentRoute,
     revisionName,
@@ -95,7 +94,7 @@ const deployService = async (
   await waitToBeReady(ctx.kc, revRoute);
 
   const domains = [{
-    url: `https://${Routes.prod(site)}-${deploymentId}.${CONTROL_PLANE_DOMAIN}`,
+    url: `https://${deploymentRoute}.${CONTROL_PLANE_DOMAIN}`,
     production: false,
   }];
   return { id: deploymentId, domains };
@@ -110,7 +109,6 @@ export const deployFromSource = async (
     deploymentId,
     siteNs,
     labels,
-    scaling,
     runnerImage,
   }: DeployOptions,
   ctx: AppContext,
@@ -146,20 +144,18 @@ export const deployFromSource = async (
     namespace: siteNs,
     deploymentId,
     labels,
-    scaling: scaling ?? { initialScale: 0, maxScale: 3, minScale: 0 },
+    scaling: siteState.scaling ?? PREVIEW_SERVICE_SCALING,
     runnerImage,
     revisionName,
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
     runArgs: siteState?.runArgs,
     resources: {
       requests: {
-        memory: "768Mi",
-        "ephemeral-storage": "512Mi",
+        ...PREVIEW_SERVICE_RESOURCES.requests ?? {},
         ...siteState?.resources?.requests ?? {},
       },
       limits: {
-        memory: "2Gi",
-        "ephemeral-storage": "5Gi",
+        ...PREVIEW_SERVICE_RESOURCES.limits ?? {},
         ...siteState?.resources?.limits ?? {},
       },
     },

@@ -6,7 +6,10 @@ import {
 } from "../../../../website/utils/crypto.ts";
 import { ignoreIfExists } from "../../common/objects.ts";
 import { k8s } from "../../deps.ts";
-import { ServiceScaling } from "../../loaders/siteState/get.ts";
+import {
+  ResourceRequirements,
+  ServiceScaling,
+} from "../../loaders/siteState/get.ts";
 import { AppContext } from "../../mod.ts";
 import { DECO_SITES_PVC } from "../build.ts";
 
@@ -68,12 +71,18 @@ const getOrGenerateAESKey = async (site: string) => {
   }
 };
 
-const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
+export const PREVIEW_SERVICE_SCALING: ServiceScaling = {
   maxScale: 1,
   initialScale: 1,
   minScale: 0,
   retentionPeriod: "5m",
 };
+
+export const PREVIEW_SERVICE_RESOURCES: ResourceRequirements = {
+  limits: { memory: "1280Mi", "ephemeral-storage": "1Gi" },
+  requests: { memory: "512Mi", "ephemeral-storage": "512Mi" },
+};
+
 /**
  * Provision namespace of the new site and required resources.
  * @title Create Site
@@ -134,7 +143,7 @@ export default async function newSite(
     }).catch(ignoreIfExists),
   ]);
   const state = {
-    ...isEphemeral ? { scaling: EPHEMERAL_SERVICE_SCALING } : {},
+    ...isEphemeral ? { scaling: PREVIEW_SERVICE_SCALING } : {},
     envVars: [secretEnvVar],
   };
   await ctx.invoke.kubernetes.actions.siteState.upsert({
