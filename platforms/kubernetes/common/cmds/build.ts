@@ -334,7 +334,12 @@ if [[ -f "$SOURCE_REMOTE_OUTPUT" ]]; then
     echo "Source already exists... skipping build"
     exit 0;
 fi
-[[ -f "$CACHE_REMOTE_OUTPUT" ]] && echo "restoring cache..." && tar xvf "$CACHE_REMOTE_OUTPUT" -C $CACHE_LOCAL_DIR && echo "cache successfully restored!"
+BASE_BUILD_CACHE=$CACHE_REMOTE_OUTPUT
+if [[ ! -f "$BASE_BUILD_CACHE" ]]; then
+    BASE_BUILD_CACHE=$BUILD_CACHE_FALLBACK
+fi
+
+[[ -f "$BASE_BUILD_CACHE" ]] && echo "restoring cache..." && tar xvf "$BASE_BUILD_CACHE" -C $CACHE_LOCAL_DIR && echo "cache successfully restored! from $BASE_BUILD_CACHE"
 
 deno run -A --unstable - << 'EOF'
 ${build};

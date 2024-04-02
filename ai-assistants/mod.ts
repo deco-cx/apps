@@ -134,8 +134,12 @@ export interface State extends OpenAIState {
   assistantAwsProps?: AssistantAwsProps;
   s3?: AWS.S3;
 }
+
 /**
- * @title AI Assistants Hub
+ * @title Deco AI Assistant
+ * @description Create AI assistants on deco.cx.
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png
  */
 export default function App(
   state: Props,

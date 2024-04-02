@@ -8,7 +8,10 @@ export interface ConfigVerifiedReviews {
 }
 
 /**
- * @title App Opiniões Verificadas
+ * @title Verified Reviews
+ * @description A specialized solution in the collection of customer reviews
+ * @category Review
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/verified-reviews/logo.png
  */
 export default function App(
   state: ConfigVerifiedReviews,

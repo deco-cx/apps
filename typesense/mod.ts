@@ -27,6 +27,9 @@ export type Collections = ProductsCollectionName;
 
 /**
  * @title TypeSense
+ * @description Open source search engine meticulously engineered for performance & ease-of-use.
+ * @category Search
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/typesense/logo.png
  */
 export default function App(
   props: State,

@@ -53,6 +53,9 @@ export const color = 0xB600EE;
 
 /**
  * @title Wake
+ * @description Loaders, actions and workflows for adding Wake Commerce Platform to your website.
+ * @category Ecommmerce
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/wake/logo.png
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, storefrontToken, account, checkoutUrl } = props;
