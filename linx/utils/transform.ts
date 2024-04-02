@@ -143,9 +143,9 @@ export const toProduct = (
       "@type": "PropertyValue",
       name: item.Alias,
       value: item.Value,
-      propertyID: item.PropertyMetadataID.toString()
-    }))
-  )
+      propertyID: item.PropertyMetadataID.toString(),
+    })),
+  );
 
   /*
   const productDescription = product?.Descriptions?.map((option) => ({
@@ -155,7 +155,6 @@ export const toProduct = (
     propertyID: option.Value,
   }));
   */
-
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
@@ -168,7 +167,7 @@ export const toProduct = (
     encodingFormat: "image",
     alternateName: product.Name,
     url: new URL(url, cdn).href,
-  }); 
+  });
 
   const productURL = new URL(product.Url, url);
   productURL.searchParams.set("productID", `${variant.ProductID}`);
@@ -205,17 +204,17 @@ export const toProduct = (
       name: product.BrandName ?? undefined,
       logo: product.BrandImageUrl ?? undefined,
     },
-    additionalProperty,  
-    image,    
+    additionalProperty,
+    image,
     isVariantOf: {
       "@type": "ProductGroup",
       url: new URL(product.Url, url).href,
       name: product.Name,
-      description: product.ShortDescription,      
+      description: product.ShortDescription,
       image: groupImages,
       productGroupID: product.ProductID.toString(),
       additionalProperty: [],
-      hasVariant 
+      hasVariant,
     },
     offers: {
       "@type": "AggregateOffer" as const,

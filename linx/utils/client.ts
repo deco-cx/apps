@@ -53,4 +53,11 @@ export interface API {
     response: CartOperation;
     body: FormData;
   };
+
+  "GET /Shopping/ProductAuction/ListBids": {
+    response: ListBidsWebPage;
+    searchParams: {
+      ProductAuctionID: number;
+    };
+  };
 }
