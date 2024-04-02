@@ -4,7 +4,7 @@ import { isFreshCtx } from "./fresh.ts";
 export interface RedirectConfig {
   to: string;
   type?: "permanent" | "temporary";
-  concatenateParams?: boolean;
+  keepQueryParameters?: boolean;
 }
 
 /**
@@ -12,7 +12,7 @@ export interface RedirectConfig {
  * @description Redirect request to another url
  */
 export default function Redirect(
-  { to, type = "temporary", concatenateParams }: RedirectConfig,
+  { to, type = "temporary", keepQueryParameters }: RedirectConfig,
 ) {
   /** https://archive.is/kWvxu */
   const statusByRedirectType: Record<
@@ -42,7 +42,7 @@ export default function Redirect(
      *
      * (Useful for tracking parameters e.g Google's gclid, utm_source...)
      */
-    const finalLocation = !queryString || !concatenateParams
+    const finalLocation = !queryString || !keepQueryParameters
       ? location
       : location.includes("?")
       ? `${location}&${queryString}`

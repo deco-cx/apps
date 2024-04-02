@@ -13,9 +13,9 @@ export interface Redirect {
   to: string;
   type?: "temporary" | "permanent";
   /**
-   * @title Concatenate parameters
+   * @title Keep Query Parameters
    */
-  concatenateParams?: boolean;
+  keepQueryParameters?: boolean;
 }
 
 export interface Redirects {
@@ -24,7 +24,7 @@ export interface Redirects {
 
 export default function redirect({ redirects }: Redirects): Route[] {
   const routes: Route[] = (redirects || []).map((
-    { from, to, type, concatenateParams },
+    { from, to, type, keepQueryParameters },
   ) => ({
     pathTemplate: from,
     isHref: true,
@@ -33,7 +33,7 @@ export default function redirect({ redirects }: Redirects): Route[] {
         __resolveType: "website/handlers/redirect.ts",
         to,
         type,
-        concatenateParams,
+        keepQueryParameters,
       },
     },
   }));

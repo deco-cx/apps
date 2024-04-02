@@ -9,7 +9,7 @@ export interface Redirect {
   from: string;
   to: string;
   type?: "temporary" | "permanent";
-  concatenateParams?: boolean;
+  keepQueryParameters?: boolean;
 }
 
 export interface Redirects {
@@ -60,7 +60,7 @@ const getRedirectFromFile = async (
 
       const type = findAndRemove(parts, REDIRECT_TYPE_ENUM) ??
         (forcePermanentRedirects ? "permanent" : "temporary");
-      const concatenateParams =
+      const keepQueryParameters =
         findAndRemove(parts, CONCATENATE_PARAMS_VALUES) === "true";
       const from = parts[0];
       const to = parts[1];
@@ -69,18 +69,18 @@ const getRedirectFromFile = async (
         from,
         to,
         type,
-        concatenateParams,
+        keepQueryParameters,
       ];
     })
     .filter(([from, to]) => from && to && from !== to)
-    .map(([from, to, type, concatenateParams]) => ({
+    .map(([from, to, type, keepQueryParameters]) => ({
       from: from as string,
       to: to as string,
       type: type as Redirect["type"],
-      concatenateParams: concatenateParams as boolean,
+      keepQueryParameters: keepQueryParameters as boolean,
     }));
 
-  return redirectsFromFiles.map(({ from, to, type, concatenateParams }) => ({
+  return redirectsFromFiles.map(({ from, to, type, keepQueryParameters }) => ({
     pathTemplate: from,
     isHref: true,
     handler: {
@@ -88,7 +88,7 @@ const getRedirectFromFile = async (
         __resolveType: "website/handlers/redirect.ts",
         to,
         type,
-        concatenateParams,
+        keepQueryParameters,
       },
     },
   }));
@@ -118,7 +118,7 @@ export default async function redirect({
   const redirectsFromFiles: Route[] = await routesMap.get(from)!;
 
   const routes: Route[] = (redirects || []).map((
-    { from, to, type, concatenateParams },
+    { from, to, type, keepQueryParameters },
   ) => ({
     pathTemplate: from,
     isHref: true,
@@ -127,7 +127,7 @@ export default async function redirect({
         __resolveType: "website/handlers/redirect.ts",
         to,
         type,
-        concatenateParams,
+        keepQueryParameters,
       },
     },
   }));
