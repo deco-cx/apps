@@ -950,6 +950,7 @@ export const toReview = (
       aggregateRating: {
         "@type": "AggregateRating",
         reviewCount,
+        ratingCount: reviewCount,
         ratingValue: ratings[index]?.average || 0,
       },
       review: productReviews.map((_, reviewIndex) => ({
