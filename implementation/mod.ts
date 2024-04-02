@@ -47,7 +47,10 @@ export interface State {
 }
 
 /**
- * @title implementation
+ * @title Implementer
+ * @description The agency that's implementing your store
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/implementation/logo.png
  */
 export default function App(
   state: State,

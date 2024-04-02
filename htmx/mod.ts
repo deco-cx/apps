@@ -11,7 +11,12 @@ export interface Props {
   cdn?: string;
 }
 
-/** @title HTMX */
+/**
+ * @title HTMX
+ * @description high power tools for HTML.
+ * @category Frameworks
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/htmx/logo.png
+ */
 export default function Site(state: Props): App<Manifest, Props> {
   return { state, manifest };
 }

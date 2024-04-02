@@ -28,7 +28,10 @@ export const color = 0xFF6A3B;
  */
 
 /**
- * @title LINX
+ * @title Linx
+ * @description Loaders, actions and workflows for adding Linx Commerce Platform to your website.
+ * @category Ecommmerce
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/linx/logo.png
  */
 export default function App(
   { account, cdn }: State,
