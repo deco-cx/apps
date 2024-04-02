@@ -36,7 +36,7 @@ export const color = 0xFF6A3B;
  */
 export default function App(
   { account, cdn }: State,
-) {  
+) {
   const api = createHttpClient<API>({
     base: `https://${account}.core.dcg.com.br/`,
     headers: new Headers({
