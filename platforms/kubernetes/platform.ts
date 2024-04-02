@@ -3,7 +3,12 @@ import { SOURCE_LOCAL_MOUNT_PATH } from "./actions/build.ts";
 import { DeploymentId } from "./actions/deployments/create.ts";
 import { Routes } from "./actions/deployments/rollout.ts";
 import { SiteState } from "./loaders/siteState/get.ts";
-import { AppContext, CONTROL_PLANE_DOMAIN } from "./mod.ts";
+import {
+  AppContext,
+  CONTROL_PLANE_DOMAIN,
+  PREVIEW_SERVICE_RESOURCES,
+  PREVIEW_SERVICE_SCALING,
+} from "./mod.ts";
 
 export interface Props {
   site: string;
@@ -68,9 +73,31 @@ export default function kubernetes(
             },
           };
         }
+
+        let deploymentState = desiredState;
+        if (!production) {
+          deploymentState = {
+            ...deploymentState ?? {},
+            scaling: {
+              ...deploymentState?.scaling ?? {},
+              ...PREVIEW_SERVICE_SCALING,
+            },
+            resources: {
+              requests: {
+                ...deploymentState?.resources?.requests ?? {},
+                ...PREVIEW_SERVICE_RESOURCES.requests,
+              },
+              limits: {
+                ...deploymentState?.resources?.limits ?? {},
+                ...PREVIEW_SERVICE_RESOURCES.limits,
+              },
+            },
+          };
+        }
+
         const deployment = await actions.deployments.create({
           site,
-          siteState: desiredState,
+          siteState: deploymentState,
           deploymentId,
           labels: {
             deploymentId,
@@ -107,6 +134,7 @@ export default function kubernetes(
             value: release,
           }],
         };
+
         const deploymentId = DeploymentId.new();
         const deployment = await actions.deployments.create({
           site,
