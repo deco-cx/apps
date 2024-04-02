@@ -17,7 +17,7 @@ const loader = async (
   const upstream = new URL(req.url);
   const splat = upstream.pathname;
 
-  const response = await api["GET /*splat"]({ splat }, {
+  const response = await api["GET " + splat]({
     headers: req.headers,
   }).catch(nullOnNotFound);
 
@@ -26,7 +26,7 @@ const loader = async (
   }
 
   const auction = await response.json();
-
+  
   if (!auction || !isAuctionDetailModel(auction)) {
     throw new Error("Auction detail page returned another model than Auction");
   }

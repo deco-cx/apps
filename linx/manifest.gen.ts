@@ -7,31 +7,33 @@ import * as $$$$$$$$$1 from "./actions/cart/addCoupon.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$0 from "./loaders/auction/detailsPage.ts";
-import * as $$$1 from "./loaders/auction/list.ts";
-import * as $$$2 from "./loaders/cart.ts";
-import * as $$$3 from "./loaders/page.ts";
-import * as $$$4 from "./loaders/pages.ts";
-import * as $$$5 from "./loaders/path.ts";
-import * as $$$6 from "./loaders/product/detailsPage.ts";
-import * as $$$7 from "./loaders/product/list.ts";
-import * as $$$8 from "./loaders/product/listingPage.ts";
-import * as $$$9 from "./loaders/product/suggestions.ts";
-import * as $$$10 from "./loaders/proxy.ts";
+import * as $$$1 from "./loaders/auction/detailsPage.ts";
+import * as $$$2 from "./loaders/auction/list.ts";
+import * as $$$0 from "./loaders/auction/ListBids.ts";
+import * as $$$3 from "./loaders/cart.ts";
+import * as $$$4 from "./loaders/page.ts";
+import * as $$$5 from "./loaders/pages.ts";
+import * as $$$6 from "./loaders/path.ts";
+import * as $$$7 from "./loaders/product/detailsPage.ts";
+import * as $$$8 from "./loaders/product/list.ts";
+import * as $$$9 from "./loaders/product/listingPage.ts";
+import * as $$$10 from "./loaders/product/suggestions.ts";
+import * as $$$11 from "./loaders/proxy.ts";
 
 const manifest = {
   "loaders": {
-    "linx/loaders/auction/detailsPage.ts": $$$0,
-    "linx/loaders/auction/list.ts": $$$1,
-    "linx/loaders/cart.ts": $$$2,
-    "linx/loaders/page.ts": $$$3,
-    "linx/loaders/pages.ts": $$$4,
-    "linx/loaders/path.ts": $$$5,
-    "linx/loaders/product/detailsPage.ts": $$$6,
-    "linx/loaders/product/list.ts": $$$7,
-    "linx/loaders/product/listingPage.ts": $$$8,
-    "linx/loaders/product/suggestions.ts": $$$9,
-    "linx/loaders/proxy.ts": $$$10,
+    "linx/loaders/auction/detailsPage.ts": $$$1,
+    "linx/loaders/auction/list.ts": $$$2,
+    "linx/loaders/auction/ListBids.ts": $$$0,
+    "linx/loaders/cart.ts": $$$3,
+    "linx/loaders/page.ts": $$$4,
+    "linx/loaders/pages.ts": $$$5,
+    "linx/loaders/path.ts": $$$6,
+    "linx/loaders/product/detailsPage.ts": $$$7,
+    "linx/loaders/product/list.ts": $$$8,
+    "linx/loaders/product/listingPage.ts": $$$9,
+    "linx/loaders/product/suggestions.ts": $$$10,
+    "linx/loaders/proxy.ts": $$$11,
   },
   "handlers": {
     "linx/handlers/sitemap.ts": $$$$0,
