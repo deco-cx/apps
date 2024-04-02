@@ -28,7 +28,6 @@ export interface Props {
  * @title Wap
  * @description Loaders, actions and workflows for adding Wap Commerce Platform to your website.
  * @category Ecommmerce
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/wap/logo.png
  */
 export default function App(
   props: Props,

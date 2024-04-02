@@ -138,8 +138,8 @@ export interface State extends OpenAIState {
 /**
  * @title Deco AI Assistant
  * @description Create AI assistants on deco.cx.
- * @category AI
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistant/logo.png
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png
  */
 export default function App(
   state: Props,
