@@ -36,7 +36,7 @@ export interface Caching {
 
 export interface Props {
   /**
-   * @title Site Map
+   * @title Routes Map
    */
   routes?: Routes[];
 
