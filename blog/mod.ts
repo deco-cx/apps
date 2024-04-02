@@ -9,7 +9,7 @@ export type AppContext = FnContext<State, Manifest>;
 /**
  * @title Deco Blog
  * @description Manage your posts.
- * @category ORM
+ * @category Tool
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
  */
 export default function App(
