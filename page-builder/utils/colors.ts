@@ -1,6 +1,3 @@
-
-
-
 /**
  * Converts an RGB color value to its corresponding hexadecimal representation.
  * @param rgb - An array of three numbers representing the red, green, and blue values of the color.
@@ -21,10 +18,10 @@ export const rgbToHex = (rgb: number[]): string =>
  * @returns The Euclidean distance between the two RGB colors.
  */
 export function rgbDistance(color1: number[], color2: number[]): number {
-    return Math.sqrt(
-      color1.reduce((acc, val, i) => acc + Math.pow(val - color2[i], 2), 0),
-    );
-  }
+  return Math.sqrt(
+    color1.reduce((acc, val, i) => acc + Math.pow(val - color2[i], 2), 0),
+  );
+}
 
 /**
  * Finds the most dissimilar color to the given primary color from a color palette.
@@ -33,19 +30,19 @@ export function rgbDistance(color1: number[], color2: number[]): number {
  * @returns The most dissimilar color to the primary color from the color palette.
  */
 export function findDissimilarColor(
-    primaryColor: number[],
-    colorPalette: number[][],
-  ): number[] {
-    let maxDistance = -1;
-    let secondaryColor = primaryColor;
-  
-    for (const color of colorPalette) {
-      const distance = rgbDistance(primaryColor, color);
-      if (distance > maxDistance) {
-        maxDistance = distance;
-        secondaryColor = color;
-      }
+  primaryColor: number[],
+  colorPalette: number[][],
+): number[] {
+  let maxDistance = -1;
+  let secondaryColor = primaryColor;
+
+  for (const color of colorPalette) {
+    const distance = rgbDistance(primaryColor, color);
+    if (distance > maxDistance) {
+      maxDistance = distance;
+      secondaryColor = color;
     }
-  
-    return secondaryColor;
   }
+
+  return secondaryColor;
+}
