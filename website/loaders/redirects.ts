@@ -3,6 +3,8 @@ import { Route } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import { type Props as RedirectProps } from "./redirect.ts";
 
+const isHref = (from: string) => !from.includes("*") && !from.includes(":");
+
 async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
   const allRedirects = await ctx.get<
     RedirectProps[]
@@ -13,7 +15,7 @@ async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
 
   const routes: Route[] = allRedirects.map(({ redirect }) => ({
     pathTemplate: redirect.from,
-    isHref: true,
+    isHref: isHref(redirect.from),
     handler: {
       value: {
         __resolveType: "website/handlers/redirect.ts",
