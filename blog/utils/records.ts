@@ -1,25 +1,18 @@
 import { AppContext } from "../mod.ts";
+import { Resolvable } from "deco/engine/core/resolver.ts";
 
 export async function getRecordsByPath<T>(
   ctx: AppContext,
   path: string,
   accessor: string,
 ): Promise<T[]> {
-  const resolvables = await ctx.get({
+  const resolvables: Record<string, Resolvable<T>> = await ctx.get({
     __resolveType: "resolvables",
   });
 
-  const pathParts = path.split("/");
+  const current = Object.entries(resolvables).flatMap(([key, value]) => {
+    return key.startsWith(path) ? value : [];
+  });
 
-  let current = resolvables;
-  for (const part of pathParts) {
-    if (current[part] === undefined) {
-      return [];
-    }
-    current = current[part];
-  }
-
-  return (Object.values(current) as Record<string, T>[]).map(
-    (item) => item[accessor],
-  );
+  return (current as Record<string, T>[]).map((item) => item[accessor]);
 }
