@@ -11,6 +11,12 @@ export interface State {
   siteUrl: string;
 }
 
+/**
+ * @title Chrome User Experience Report
+ * @description Measure your site traffic at a glance in a simple and modern web analytics dashboard.
+ * @category Analytics
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/crux/logo.png
+ */
 export default function CRUX(state: State): A<Manifest, State> {
   return {
     state,

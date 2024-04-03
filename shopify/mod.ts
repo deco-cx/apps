@@ -53,6 +53,9 @@ export const color = 0x96BF48;
 
 /**
  * @title Shopify
+ * @description Loaders, actions and workflows for adding Shopify Commerce Platform to your website.
+ * @category Ecommmerce
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/shopify/logo.png
  */
 export default function App(props: Props): App<Manifest, State> {
   const { storeName, storefrontAccessToken, adminAccessToken } = props;

@@ -20,8 +20,12 @@ export interface State {
 }
 
 const DENY_DYNAMIC_IMPORT = Deno.env.get("DENY_DYNAMIC_IMPORT") === "true";
+
 /**
  * @title Deco Hub
+ * @description Unlock apps and integrations on deco.cx
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/decohub/logo.png
  */
 const ADMIN_APP = "decohub/apps/admin.ts";
 const FILES_APP = "decohub/apps/files.ts";

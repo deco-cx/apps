@@ -6,7 +6,10 @@ export interface Props {
 }
 
 /**
- * @title Brand Assistant
+ * @title Deco Brand Assistant
+ * @description A concierge for your ecommerce.
+ * @category Sales channel
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/brand-assistant/logo.png
  */
 export default function App(
   state: Props,
