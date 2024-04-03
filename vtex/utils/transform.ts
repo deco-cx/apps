@@ -717,7 +717,7 @@ export const legacyFacetToFilter = (
     if (behavior === "static") {
       link.searchParams.set(
         "fmap",
-        url.searchParams.get("fmap") || mapSegments[0],
+        url.searchParams.get("fmap") || mapSegments.join(",")
       );
     }
     const currentQuery = url.searchParams.get("q");
