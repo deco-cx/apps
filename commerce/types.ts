@@ -31,7 +31,7 @@ export interface Thing {
   /** An alias for the item. */
   alternateName?: string;
   /** A description of the item. */
-  description?: string;
+  description?: object;
   /** A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation. */
   disambiguatingDescription?: string;
   /** The identifier property represents any kind of identifier for any kind of {@link https://schema.org/Thing Thing}, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See {@link /docs/datamodel.html#identifierBg background notes} for more details. */

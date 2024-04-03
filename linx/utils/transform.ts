@@ -147,16 +147,6 @@ export const toProduct = (
     }))
   )
 
-  /*
-  const productDescription = product?.Descriptions?.map((option) => ({
-    name: option.Name,
-    alias: option.Alias,
-    value: option.Value,
-    propertyID: option.Value,
-  }));
-  */
-
-
   const hasVariant = level < 1
     ? variants.map((variant) =>
       toProduct(product, variant.ProductID, options, 1)
@@ -192,6 +182,15 @@ export const toProduct = (
     ? groupImages
     : [DEFAULT_IMAGE];
 
+  const productDescription = product?.Descriptions?.map((option) => ({
+    name: option.Name,
+    alias: option.Alias,
+    value: option.Value,
+    propertyID: option.Value,
+  }));
+
+  // const jsonDescription = JSON.stringify(productDescription);
+
   return {
     "@type": "Product",
     productID: `${variant.ProductID}`,
@@ -201,17 +200,17 @@ export const toProduct = (
     gtin: product.Uom,
     brand: {
       "@type": "Brand",
-      "@id": `${product.BrandID}`,
-      name: product.BrandName ?? undefined,
-      logo: product.BrandImageUrl ?? undefined,
+      "@id": `${product.BrandID}`, 
+      name: product.BrandName ?? undefined, 
+      logo: product.BrandImageUrl ?? undefined, 
     },
     additionalProperty,  
+    description: productDescription, 
     image,    
     isVariantOf: {
       "@type": "ProductGroup",
       url: new URL(product.Url, url).href,
-      name: product.Name,
-      description: product.ShortDescription,      
+      name: product.Name,     
       image: groupImages,
       productGroupID: product.ProductID.toString(),
       additionalProperty: [],
