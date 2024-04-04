@@ -1,10 +1,17 @@
 import type { AppContext } from "../../mod.ts";
 import type { Cart } from "../../utils/types/basketJSON.ts";
 
+interface Meta {
+  PropertyMetadataID: number;
+  PropertyName: string;
+  Value: number;
+}
+
 export interface Props {
   ProductID: string;
   SkuID: string;
   Quantity: number;
+  Metas?: Meta[];
 }
 
 const action = async (
