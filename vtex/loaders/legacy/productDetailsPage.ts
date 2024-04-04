@@ -64,6 +64,7 @@ async function loader(
   }
 
   const sku = pickSku(product, skuId?.toString());
+  console.log(sku.kitItems)
 
   const kitItems: LegacyProduct[] =
     Array.isArray(sku.kitItems) && sku.kitItems.length > 0
@@ -71,6 +72,8 @@ async function loader(
         ["GET /api/catalog_system/pub/products/search/:term?"](
           {
             ...params,
+            _from: 0,
+            _to: 49,
             fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
           },
           STALE,
