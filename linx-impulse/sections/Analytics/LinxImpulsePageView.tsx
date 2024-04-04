@@ -146,10 +146,12 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
 
       if ("products" in event && event.products) {
         for (const product of event.products.products ?? []) {
-          if (!searchId) {
-            searchId = product.isVariantOf?.additionalProperty?.find((p) =>
-              p.name === "searchId"
-            )?.value;
+          searchId = product.isVariantOf?.additionalProperty?.find((p) =>
+            p.name === "searchId"
+          )?.value;
+
+          if (searchId) {
+            break;
           }
         }
       }
