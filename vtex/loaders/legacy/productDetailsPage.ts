@@ -64,7 +64,6 @@ async function loader(
   }
 
   const sku = pickSku(product, skuId?.toString());
-  console.log(sku.kitItems)
 
   const kitItems: LegacyProduct[] =
     Array.isArray(sku.kitItems) && sku.kitItems.length > 0
