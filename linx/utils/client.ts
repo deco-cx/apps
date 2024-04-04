@@ -51,7 +51,11 @@ export interface API {
 
   "POST /Shopping/ProductAuction/AddBid": {
     response: CartOperation;
-    body: FormData;
+    searchParams: {
+      productAuctionID: number;
+      Amount: number;
+      IsListening: boolean;
+    };
   };
 
   "GET /Shopping/ProductAuction/ListBids": {

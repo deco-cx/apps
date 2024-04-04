@@ -14,8 +14,11 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ProductAuction[] | null> => {
   const { api, cdn } = ctx;
+  
+  const url = new URL(req.url);
+  const splat = `leilao.json?${url.searchParams.toString()}`;
 
-  const response = await api["GET /*splat"]({ splat: "leilao.json" }, {
+  const response = await api["GET /*splat"]({ splat }, {
     headers: req.headers,
   }).catch(nullOnNotFound);
 
