@@ -16,6 +16,7 @@ const PAGE_PATHS = [
   "/conta/*",
   "/cupom/ajax",
   "/entrar",
+  "/entrar/*",
   "/images/*",
   "/javascripts/*",
   "/loja/configuracoes",
@@ -24,7 +25,7 @@ const PAGE_PATHS = [
   "/recaptcha",
   "/recuperar_senha",
   "/sair",
-  "/sitemap.xml",
+  "/sitemap/vnda.xml",
   "/stylesheets/*",
   "/v/s",
   "/webform",
@@ -34,17 +35,30 @@ const API_PATHS = [
   "/api/*",
 ];
 
+const decoSiteMapUrl = "/sitemap/deco.xml";
+
 const VNDA_HOST_HEADER = "X-Shop-Host";
 export interface Props {
   /** @description ex: /p/fale-conosco */
   pagesToProxy?: string[];
+  generateDecoSiteMap?: boolean;
+  /**
+   * @title Exclude paths from /deco-sitemap.xml
+   */
+  excludePathsFromDecoSiteMap?: string[];
+  includeSiteMap?: string[];
 }
 
 /**
  * @title VNDA Proxy Routes
  */
 function loader(
-  { pagesToProxy = [] }: Props,
+  {
+    pagesToProxy = [],
+    generateDecoSiteMap,
+    excludePathsFromDecoSiteMap = [],
+    includeSiteMap,
+  }: Props,
   _req: Request,
   { publicUrl, account }: AppContext,
 ): Route[] {
@@ -54,6 +68,21 @@ function loader(
   );
 
   const customHeaders = [{ key: VNDA_HOST_HEADER, value: url.hostname }];
+
+  const [include, routes] = generateDecoSiteMap
+    ? [
+      [...(includeSiteMap ?? []), decoSiteMapUrl],
+      [{
+        pathTemplate: decoSiteMapUrl,
+        handler: {
+          value: {
+            excludePaths: excludePathsFromDecoSiteMap,
+            __resolveType: "website/handlers/sitemap.ts",
+          },
+        },
+      }],
+    ]
+    : [includeSiteMap, []];
 
   const internalDomainPaths = [
     ...PAGE_PATHS,
@@ -65,12 +94,26 @@ function loader(
     handler: {
       value: {
         __resolveType: "website/handlers/proxy.ts",
-        url: internalDomain,
+        avoidAppendPath: pathTemplate === "/sitemap/vnda.xml",
+        url: pathTemplate === "/sitemap/vnda.xml"
+          ? `https://sitemap.vnda.com.br/preview/${publicUrl}`
+          : internalDomain,
         host: url.hostname,
         customHeaders,
       },
     },
   }));
+
+  const siteMap = {
+    pathTemplate: "/sitemap.xml",
+    handler: {
+      value: {
+        include,
+        __resolveType: "vnda/handlers/sitemap.ts",
+        customHeaders,
+      },
+    },
+  };
 
   const apiDomainPaths = API_PATHS.map((pathTemplate) => ({
     pathTemplate,
@@ -84,7 +127,7 @@ function loader(
     },
   }));
 
-  return [...internalDomainPaths, ...apiDomainPaths];
+  return [...routes, ...internalDomainPaths, siteMap, ...apiDomainPaths];
 }
 
 export default loader;

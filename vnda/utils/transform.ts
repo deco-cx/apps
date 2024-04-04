@@ -7,7 +7,7 @@ import {
   Seo,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
-import { ProductGroup, SEO } from "./client/types.ts";
+import { ProductGroup, ProductPrice, SEO } from "./client/types.ts";
 import {
   OpenAPI,
   Product as OProduct,
@@ -24,6 +24,7 @@ interface ProductOptions {
   url: URL;
   /** Price coded currency, e.g.: USD, BRL */
   priceCurrency: string;
+  productPrice?: ProductPrice | null;
 }
 
 export const getProductCategoryTag = ({ tags }: ProductGroup) =>
@@ -70,15 +71,21 @@ export const parseSlug = (slug: string) => {
   };
 };
 
-const pickVariant = (product: VNDAProductGroup, variantId: string | null) => {
-  const variants = normalizeVariants(product.variants);
-  const [head] = variants;
+const pickVariant = (
+  variants: VNDAProductGroup["variants"],
+  variantId: string | null,
+  normalize = true,
+) => {
+  const normalizedVariants = normalize
+    ? normalizeVariants(variants)
+    : variants as VariantProductSearch[];
+  const [head] = normalizedVariants;
 
   let [target, main, available]: Array<
     VNDAProduct | null
   > = [null, head, null];
 
-  for (const variant of variants) {
+  for (const variant of normalizedVariants) {
     if (variant.sku === variantId) target = variant;
     else if (variant.main) main = variant;
     else if (variant.available && !available) available = variant;
@@ -116,12 +123,13 @@ const toURL = (src: string) => src.startsWith("//") ? `https:${src}` : src;
 const toOffer = ({
   price,
   sale_price,
+  intl_price,
   available_quantity,
   available,
   installments = [],
-}: VNDAProduct): Offer | null => {
+}: VNDAProduct & { intl_price?: number }): Offer[] => {
   if (!price || !sale_price) {
-    return null;
+    return [];
   }
 
   const priceSpecification: UnitPriceSpecification[] = [{
@@ -151,8 +159,8 @@ const toOffer = ({
     });
   }
 
-  return {
-    "@type": "Offer",
+  const offers: Offer[] = [{
+    "@type": "Offer" as const,
     seller: "VNDA",
     price,
     priceSpecification,
@@ -162,7 +170,30 @@ const toOffer = ({
     availability: available
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
-  };
+  }];
+
+  if (intl_price) {
+    offers.push({
+      "@type": "Offer",
+      seller: "VNDA_INTL",
+      price: intl_price,
+      priceSpecification: [{
+        "@type": "UnitPriceSpecification",
+        priceType: "https://schema.org/SalePrice",
+        price: intl_price,
+      }],
+      inventoryLevel: {
+        value: available_quantity,
+      },
+      availability: available
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      // Static since VNDA only have a BRL price and USD when intl_price is available
+      priceCurrency: "USD",
+    });
+  }
+
+  return offers;
 };
 
 const toPropertyValue = (variant: VNDAProduct): PropertyValue[] =>
@@ -231,21 +262,30 @@ export const toProduct = (
   options: ProductOptions,
   level = 0,
 ): Product => {
-  const { url, priceCurrency } = options;
-  const variant = pickVariant(product, variantId);
+  const { url, priceCurrency, productPrice } = options;
+  const variant = pickVariant(product.variants, variantId);
   const variants = normalizeVariants(product.variants);
+  const variantPrices = productPrice?.variants
+    ? pickVariant(
+      productPrice.variants as VNDAProductGroup["variants"],
+      variantId,
+      false,
+    )
+    : null;
+  const offers = toOffer(variantPrices ?? variant);
+
   const variantUrl = new URL(
     `/produto/${product.slug}-${product.id}?skuId=${variant.sku}`,
     url.origin,
   ).href;
+
   const productUrl = new URL(
     `/produto/${product.slug}-${product.id}`,
     url.origin,
   ).href;
+
   const productID = `${variant.sku}`;
   const productGroupID = `${product.id}`;
-  const offer = toOffer(variant);
-  const offers = offer ? [offer] : [];
 
   const myTags = "tags" in product ? product.tags : [];
   const myCategoryTags = "category_tags" in product
@@ -296,8 +336,8 @@ export const toProduct = (
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: priceCurrency,
-      highPrice: product.price!,
-      lowPrice: product.sale_price!,
+      highPrice: productPrice?.price ?? product.price!,
+      lowPrice: productPrice?.sale_price ?? product.sale_price!,
       offerCount: offers.length,
       offers: offers,
     },
@@ -323,8 +363,7 @@ const removeFilter = (
   filter: { key: string; value: string },
 ) =>
   typeTagsInUse.filter((inUse) =>
-    inUse.key !== filter.key &&
-    inUse.value !== filter.value
+    !(inUse.key === filter.key && inUse.value === filter.value)
   );
 
 export const toFilters = (
@@ -434,6 +473,8 @@ export const typeTagExtractor = (url: URL, tags: { type?: string }[]) => {
   });
 
   keysToDestroy.forEach((key) => cleanUrl.searchParams.delete(key));
+
+  cleanUrl.searchParams.delete("page");
 
   return {
     typeTags,

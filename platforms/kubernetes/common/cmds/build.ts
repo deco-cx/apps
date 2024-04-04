@@ -1,3 +1,5 @@
+import { DenoJSON } from "../../types.ts";
+
 async function build() {
   const { ensureFile } = await import(
     "https://deno.land/std@0.204.0/fs/ensure_file.ts"
@@ -57,8 +59,10 @@ async function build() {
   interface FreshProject {
     buildArgs?: string[];
   }
-  // deno-lint-ignore no-explicit-any
-  const getFrshProject = (denoJson: any): FreshProject | undefined => {
+
+  const getFrshProject = (
+    denoJson: DenoJSON | undefined,
+  ): FreshProject | undefined => {
     if (!denoJson) {
       return undefined;
     }
@@ -209,35 +213,106 @@ async function build() {
 
   const overrideDenoJson = async (
     configFileName: string,
-    // deno-lint-ignore no-explicit-any
-    denoJson: Record<string, any>,
+    denoJson: DenoJSON,
   ) => {
     if (!denoJson) {
       return undefined;
     }
-    const hasNodeModulesDir = denoJson?.nodeModulesDir;
 
-    if (hasNodeModulesDir && hasNodeModulesDir !== false) {
-      denoJson.nodeModulesDir = false;
-      const fileContent = JSON.stringify(denoJson, null, 2);
-      await Deno.writeTextFile(
-        join(sourceLocalDir!, configFileName),
-        fileContent,
-      ).catch(
-        (err) => {
-          if (err instanceof Deno.errors.NotFound) {
-            return denoJson;
-          }
-          throw err;
-        },
-      );
+    // To add a new override just add a new function like those below and add it to the overrides array.
+    const overrides = [overrideNodeModulesDir, overrideCompileOptions];
+
+    const { acc: newDenoJson, hasChange } = overrides.reduce(
+      ({ acc, hasChange }, override) => {
+        const newOverride = override(acc);
+
+        return {
+          acc: newOverride.denoJson,
+          hasChange: hasChange || newOverride.hasChange,
+        };
+      },
+      { acc: denoJson, hasChange: false },
+    );
+
+    if (hasChange) {
+      await updateFile(configFileName, denoJson);
     }
 
-    return denoJson;
+    return newDenoJson;
+  };
+
+  const overrideCompileOptions = (
+    denoJson: DenoJSON,
+  ) => {
+    let hasChange = false;
+    if (denoJson.compilerOptions === undefined) {
+      denoJson.compilerOptions = {};
+    }
+
+    if (denoJson.compilerOptions.experimentalDecorators === undefined) {
+      denoJson.compilerOptions.experimentalDecorators = true;
+      hasChange = true;
+    }
+
+    // const freshVersion = denoJson.imports?.["$fresh/"];
+    // const minFreshVersion = "1.6.0";
+    // const preactVersion = denoJson.imports?.["preact"];
+    // const minPreactVersion = "10.19.1";
+
+    // if (
+    //   denoJson.compilerOptions.jsx === "react-jsx" && freshVersion &&
+    //   preactVersion
+    // ) {
+    //   if (
+    //     //https://github.com/denoland/fresh/pull/2035
+    //     gte(preactVersion, minPreactVersion) &&
+    //     gte(freshVersion, minFreshVersion)
+    //   ) {
+    //     denoJson.compilerOptions.jsx = "precompile";
+    //     denoJson.compilerOptions.jsxImportSource = "preact";
+
+    //     hasChange = true;
+    //   }
+    // }
+
+    return { denoJson, hasChange };
+  };
+
+  const overrideNodeModulesDir = (
+    denoJson: DenoJSON,
+  ) => {
+    const hasNodeModulesDir = denoJson.nodeModulesDir;
+
+    if (hasNodeModulesDir !== undefined && hasNodeModulesDir !== false) {
+      denoJson.nodeModulesDir = false;
+
+      return { denoJson, hasChange: true };
+    }
+
+    return { denoJson, hasChange: false };
+  };
+
+  const updateFile = async (
+    configFileName: string,
+    denoJson: DenoJSON,
+  ) => {
+    const fileContent = JSON.stringify(denoJson, null, 2);
+    await Deno.writeTextFile(
+      join(sourceLocalDir!, configFileName),
+      fileContent,
+    ).catch(
+      (err) => {
+        if (err instanceof Deno.errors.NotFound) {
+          return;
+        }
+        throw err;
+      },
+    );
   };
 
   const [configFileName, denoJson] = await getDenoJson();
 
+  console.log("Overriding deno.json file");
   const finalDenoJson = await overrideDenoJson(configFileName, denoJson);
 
   console.log(`generating cache...`);
@@ -259,7 +334,12 @@ if [[ -f "$SOURCE_REMOTE_OUTPUT" ]]; then
     echo "Source already exists... skipping build"
     exit 0;
 fi
-[[ -f "$CACHE_REMOTE_OUTPUT" ]] && echo "restoring cache..." && tar xvf "$CACHE_REMOTE_OUTPUT" -C $CACHE_LOCAL_DIR && echo "cache successfully restored!"
+BASE_BUILD_CACHE=$CACHE_REMOTE_OUTPUT
+if [[ ! -f "$BASE_BUILD_CACHE" ]]; then
+    BASE_BUILD_CACHE=$BUILD_CACHE_FALLBACK
+fi
+
+[[ -f "$BASE_BUILD_CACHE" ]] && echo "restoring cache..." && tar xvf "$BASE_BUILD_CACHE" -C $CACHE_LOCAL_DIR && echo "cache successfully restored! from $BASE_BUILD_CACHE"
 
 deno run -A --unstable - << 'EOF'
 ${build};

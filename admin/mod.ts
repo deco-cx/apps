@@ -1,3 +1,4 @@
+import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
@@ -8,6 +9,7 @@ import subhosting, {
   Props as SubhostingProps,
 } from "../platforms/subhosting/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import { PlatformName } from "./actions/sites/create.ts";
 import {
   EventPayloadMap,
   Octokit,
@@ -21,11 +23,27 @@ import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
+
+type SignalStringified<Data> = { __signal: Data };
+// deno-lint-ignore no-explicit-any
+type Layout = any;
+// deno-lint-ignore no-explicit-any
+type Tab = any;
+
+export interface Workspace {
+  name: string;
+  layout: Layout[];
+  tabs: Record<string, Tab>;
+}
+
 export interface BlockStore extends Release {
   patch(
     resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>>;
-  update(resolvables: Record<string, Resolvable>): Promise<void>;
+  set(
+    resolvables: Record<string, Resolvable>,
+    reivsion?: string,
+  ): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
@@ -42,10 +60,12 @@ export interface GithubEventListener<
 
 export interface State {
   storage: BlockStore;
+  release: () => Release;
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
   githubWebhookSecret?: string;
+  platformAssignments: Record<string, PlatformName | undefined>;
 }
 
 export interface BlockState<TBlock = unknown> {
@@ -79,11 +99,33 @@ export interface GithubProps {
   eventListeners?: GithubEventListener[];
 }
 
+/**
+ * @format dynamic-options
+ * @options deco-sites/admin/loaders/sites/list.ts
+ */
+export type SiteName = string;
+/**
+ * @title {{{site}}} - {{{platform}}}
+ */
+export interface PlatformAssignment {
+  site: SiteName;
+  platform: PlatformName;
+}
+
 export interface Props {
   resolvables?: Resolvables;
   github?: GithubProps;
-  kubernetes?: K8sProps;
-  subhosting?: SubhostingProps;
+  /**
+   * @default null
+   */
+  kubernetes?: K8sProps | null;
+  /**
+   * @default null
+   */
+  subhosting?: SubhostingProps | null;
+  /** @description property used at deco admin  */
+  workspaces: SignalStringified<Workspace>[];
+  platformAssignments?: PlatformAssignment[];
 }
 
 /**
@@ -95,6 +137,7 @@ export default function App(
     github,
     kubernetes,
     subhosting: subhostingProps,
+    platformAssignments = [],
   }: Props,
 ): App<
   AppManifest,
@@ -110,13 +153,23 @@ export default function App(
   return {
     manifest,
     state: {
+      platformAssignments: platformAssignments.reduce(
+        (assignments, { site, platform }) => {
+          return { ...assignments, [site]: platform };
+        },
+        {} as Record<string, PlatformName | undefined>,
+      ),
+      storage,
+      release: () => {
+        const ctx = Context.active();
+        return ctx.release!;
+      },
       githubWebhookSecret,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
         prEventHandler as GithubEventListener,
       ],
-      storage,
       octokit: new Octokit({
         auth: githubAPIToken,
       }),

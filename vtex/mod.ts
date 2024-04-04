@@ -13,6 +13,7 @@ import { SP, VTEXCommerceStable } from "./utils/client.ts";
 import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
 import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
+import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 
@@ -84,6 +85,9 @@ export const color = 0xf71963;
 
 /**
  * @title VTEX
+ * @description Loaders, actions and workflows for adding VTEX Commerce Platform to your website.
+ * @category Ecommmerce
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vtex/logo.png
  */
 export default function VTEX({
   appKey,
@@ -108,6 +112,10 @@ export default function VTEX({
 
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
+    fetcher: fetchSafe,
+  });
+  const my = createHttpClient<MY>({
+    base: `https://${account}.myvtex.com/`,
     fetcher: fetchSafe,
   });
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
@@ -139,6 +147,7 @@ export default function VTEX({
     sp,
     io,
     vcs,
+    my,
     api,
   };
 

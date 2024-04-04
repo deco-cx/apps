@@ -56,7 +56,10 @@ export interface Props {
 export const color = 0x272D4B;
 
 /**
- * @title NuvemShop
+ * @title Nuvemshop
+ * @description Loaders, actions and workflows for adding Nuvemshop Commerce Platform to your website.
+ * @category Ecommmerce
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/nuvemshop/logo.png
  */
 export default function Nuvemshop(
   { storeId, accessToken, publicUrl }: Props,

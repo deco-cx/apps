@@ -27,8 +27,9 @@ export interface DeploymentFromRepo extends DeploymentBase {
 }
 
 export interface CompilerOptions {
-  jsx: string;
-  jsxImportSource: string;
+  jsx?: string;
+  jsxImportSource?: string;
+  experimentalDecorators?: boolean;
 }
 
 export interface DeploymentFromFiles extends DeploymentBase {
@@ -77,7 +78,7 @@ export interface UpdateDeploymentOpts {
   release: string;
 }
 
-export type SiteLifecycle = "ephemeral";
+export type SiteLifecycle = "ephemeral" | "persistent";
 
 export interface CreateSiteOptsBase {
   site: string;
@@ -133,7 +134,7 @@ export interface Sites {
 
 export interface Platform {
   supportsDynamicImport?: boolean;
-  sourceDirectory: string;
+  sourceDirectory?: string;
   name: string;
   cfZoneId: string;
   domain: string;

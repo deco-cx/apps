@@ -2,7 +2,7 @@ import ShortUniqueId from "https://esm.sh/v135/short-unique-id@v4.4.2";
 import { Deployment } from "../../../../admin/platform.ts";
 import { assertsOrBadRequest } from "../../common/assertions.ts";
 import { deployFromSource } from "../../common/knative/deployments.ts";
-import { ServiceScaling, SiteState } from "../../loaders/siteState/get.ts";
+import { SiteState } from "../../loaders/siteState/get.ts";
 import { AppContext } from "../../mod.ts";
 import { Namespace } from "../sites/create.ts";
 
@@ -13,7 +13,6 @@ export const DeploymentId = {
 
 export interface Props {
   site: string;
-  scaling?: ServiceScaling;
   labels?: Record<string, string>;
   deploymentId: string;
   runnerImage?: string;
@@ -33,14 +32,13 @@ export default function newDeployment(
     labels,
     runnerImage,
     siteState: desiredState,
-    scaling: _scaling,
   }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Deployment> {
-  const siteState = ctx.withDefaults(desiredState);
+  const siteState = ctx.withBaseState(desiredState);
 
-  const { source, scaling = _scaling } = siteState;
+  const { source } = siteState;
   assertsOrBadRequest(typeof source !== "undefined", {
     message: "source is required",
   });
@@ -61,7 +59,6 @@ export default function newDeployment(
     deploymentId,
     siteNs,
     labels,
-    scaling,
     runnerImage: runnerImg,
   }, ctx);
 }

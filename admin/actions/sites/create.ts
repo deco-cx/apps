@@ -12,9 +12,10 @@ const numberDictionary = NumberDictionary.generate({ min: 10, max: 99 });
 export interface Props {
   name: string;
   platform: PlatformName;
+  lifecycle?: "ephemeral" | "persistent";
 }
 
-export type PlatformName = "kubernetes" | "subhosting";
+export type PlatformName = "kubernetes" | "subhosting" | "play";
 
 export interface Site {
   name: string;
@@ -22,7 +23,7 @@ export interface Site {
 }
 
 export default async function create(
-  { name: _name, platform: platformName }: Props,
+  { name: _name, platform: platformName, lifecycle }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<Site> {
@@ -33,11 +34,13 @@ export default async function create(
   });
   const { invoke: { "deco-sites/admin": admin } } = ctx;
   await admin.actions.platforms.assign({ site: name, platform: platformName });
-  const platform = await admin.loaders.platforms.forSite({ site: name });
+  const platform = await admin.loaders.platforms.forSite({
+    site: name,
+  });
   await platform.sites.create({
     site: name,
     mode: "files",
-    lifecycle: "ephemeral", // this should be changed when site creation is moved to the control plane
+    lifecycle: lifecycle ?? "ephemeral", // this should be changed when site creation is moved to the control plane
   });
 
   const deployment = await admin.actions.deployments

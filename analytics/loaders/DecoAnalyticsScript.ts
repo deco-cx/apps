@@ -1,14 +1,39 @@
-import { getFlagsFromCookies } from "../../utils/cookie.ts";
+import { getFlagsFromRequest } from "../../utils/cookie.ts";
 import { Script } from "../../website/types.ts";
 import { AppContext } from "../mod.ts";
-import {
-  defaultExclusionPropsAndHashScript,
-  exclusionPropsAndHashScript,
-} from "../scripts/plausible_scripts.ts";
+import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 export type Props = {
   defer?: boolean;
   domain?: string;
+};
+
+declare global {
+  interface Window {
+    plausible: (
+      name: string,
+      params: { props: Record<string, string | boolean> },
+    ) => void;
+  }
+}
+
+const snippet = (flags: Record<string, string | boolean>) => {
+  const trackPageview = () =>
+    globalThis.window.plausible?.("pageview", { props: flags });
+
+  // First load
+  trackPageview();
+
+  // Attach pushState and popState listeners
+  const originalPushState = history.pushState;
+  if (originalPushState) {
+    history.pushState = function () {
+      // @ts-ignore monkey patch
+      originalPushState.apply(this, arguments);
+      trackPageview();
+    };
+    addEventListener("popstate", trackPageview);
+  }
 };
 
 const loader = (
@@ -22,24 +47,23 @@ const loader = (
     const preconnectLink =
       '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
 
-    const flags = getFlagsFromCookies(req);
+    const _flags = getFlagsFromRequest(req);
+    const flags: Record<string, string | boolean> = {};
+    _flags.forEach((flag) => flags[flag.name] = flag.value);
 
+    // if you want to test it local, add ".local" to src
+    // example: /script.manual.local.js
     const plausibleScript = `<script ${
       props.defer ? "defer" : ""
     } data-exclude="/proxy" ${
-      flags.map((
-        { flagName, flagActive },
-      ) => (`event-${flagName}="${flagActive}"`)).join(
-        " ",
-      )
-    } ${
       props.domain ? "data-domain=" + props.domain : ""
-    } data-api="https://plausible.io/api/event">${
-      props.domain
-        ? defaultExclusionPropsAndHashScript
-        : exclusionPropsAndHashScript
-    }</script>`;
-    return dnsPrefetchLink + preconnectLink + plausibleScript;
+    } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.hash.js"></script>`;
+
+    const flagsScript = `<script defer src="${
+      scriptAsDataURI(snippet, flags)
+    }"></script>`;
+
+    return dnsPrefetchLink + preconnectLink + plausibleScript + flagsScript;
   };
   return ({ src: transformReq });
 };

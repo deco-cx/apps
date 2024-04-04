@@ -9,6 +9,7 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import {
+  getValidTypesFromPageTypes,
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
@@ -23,6 +24,7 @@ import { slugify } from "../../utils/slugify.ts";
 import {
   filtersFromURL,
   mergeFacets,
+  parsePageType,
   toFilter,
   toProduct,
 } from "../../utils/transform.ts";
@@ -35,6 +37,7 @@ import type {
   Sort,
 } from "../../utils/types.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
+import { redirect } from "deco/mod.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
@@ -140,6 +143,12 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
 }
 
 const searchArgsOf = (props: Props, url: URL) => {
@@ -266,7 +275,7 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const url = new URL(baseUrl);
+  const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
   const {
@@ -283,7 +292,10 @@ const loader = async (
   }
 
   const pageTypesPromise = pageTypesFromPathname(pathToUse, ctx);
-  const pageTypes = await pageTypesPromise;
+  const allPageTypes = await pageTypesPromise;
+
+  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
@@ -323,10 +335,19 @@ const loader = async (
     ).then((res) => res.json()),
   ]);
 
+  // It is a feature from Intelligent Search on VTEX panel
+  // redirect to a specific page based on configured rules
+  if (productsResult.redirect) {
+    redirect(
+      new URL(productsResult.redirect, url.origin)
+        .href,
+    );
+  }
+
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];
   if (fullTextTerm) {
-    sendEvent({ type: "session.ping" }, req, ctx)
+    sendEvent({ type: "session.ping", url: url.href }, req, ctx)
       .then(() =>
         sendEvent(
           {
@@ -336,6 +357,7 @@ const loader = async (
             match: productsResult.recordsFiltered,
             operator: productsResult.operator,
             locale: segment?.payload?.cultureInfo ?? "pt-BR",
+            url: url.href,
           },
           req,
           ctx,
@@ -406,6 +428,7 @@ const loader = async (
       currentPage,
       records: recordsFiltered,
       recordPerPage: pagination.perPage,
+      pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
     seo: pageTypesToSeo(
@@ -418,14 +441,22 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (url.searchParams.has("q") || !isAnonymous(ctx)) {
     return null;
   }
 
-  const params = new URLSearchParams();
+  const params = new URLSearchParams([
+    ["query", props.query ?? ""],
+    ["count", props.count.toString()],
+    ["page", (props.page ?? 1).toString()],
+    ["sort", props.sort ?? ""],
+    ["fuzzy", props.fuzzy ?? ""],
+    ["hideUnavailableItems", props.hideUnavailableItems?.toString() ?? ""],
+    ["pageOffset", (props.pageOffset ?? 1).toString()],
+  ]);
 
   url.searchParams.forEach((value, key) => {
     if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !key.startsWith("filter.")) {

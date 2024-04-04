@@ -1,6 +1,6 @@
-import { AppContext } from "../../mod.ts";
+import { AppContext, SiteName } from "../../mod.ts";
 export interface Props {
-  site: string;
+  site: SiteName;
   domain: string;
 }
 
@@ -37,23 +37,31 @@ export default async function newDomain(
 ) {
   const platform = await ctx.invoke["deco-sites/admin"].loaders.platforms
     .forSite({ site });
-  const path =
-    `${CLOUDFLARE_API_HOST}/zones/${platform.cfZoneId}/custom_hostnames`;
+  const promises: Promise<void>[] = [];
+  const needsCustomHostname = !domain.endsWith(platform.domain);
+  if (needsCustomHostname) {
+    const path =
+      `${CLOUDFLARE_API_HOST}/zones/${platform.cfZoneId}/custom_hostnames`;
+    promises.push(
+      fetch(encodeURI(path), {
+        method: "POST",
+        body: JSON.stringify({
+          "hostname": domain,
+          ...CUSTOM_HOSTNAME_POST_BODY,
+        }),
+        headers: {
+          "Authorization": `Bearer ${CLOUDFLARE_TOKEN}`,
+          "Content-Type": "application/json",
+          "X-Auth-Email": `${CLOUDFLARE_API_EMAIL}`,
+          "X-Auth-Key": `${CLOUDFLARE_API_KEY}`,
+        },
+      }).then(() => {
+      }),
+    );
+  }
 
   await Promise.all([
     platform.domains.create({ site, domain }),
-    fetch(encodeURI(path), {
-      method: "POST",
-      body: JSON.stringify({
-        "hostname": domain,
-        ...CUSTOM_HOSTNAME_POST_BODY,
-      }),
-      headers: {
-        "Authorization": `Bearer ${CLOUDFLARE_TOKEN}`,
-        "Content-Type": "application/json",
-        "X-Auth-Email": `${CLOUDFLARE_API_EMAIL}`,
-        "X-Auth-Key": `${CLOUDFLARE_API_KEY}`,
-      },
-    }),
+    ...promises,
   ]);
 }

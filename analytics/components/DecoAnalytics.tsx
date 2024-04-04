@@ -24,7 +24,7 @@ const snippet = () => {
   const props: Record<string, string> = {};
 
   const trackPageview = () =>
-    globalThis.window.plausible("pageview", { props });
+    globalThis.window.plausible?.("pageview", { props });
 
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
@@ -76,7 +76,7 @@ const snippet = () => {
       }
     }
 
-    globalThis.window.plausible(name, { props: values });
+    globalThis.window.plausible?.(name, { props: values });
   });
 };
 

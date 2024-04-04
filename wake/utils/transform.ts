@@ -238,8 +238,25 @@ export const toProduct = (
     url: image?.url ?? "",
     alternateName: image?.fileName ?? "",
   }));
-
   const additionalProperty: PropertyValue[] = [];
+
+  if ((variant as SingleProductFragment)?.attributeSelections) {
+    (variant as SingleProductFragment)?.attributeSelections?.selections
+      ?.forEach((selection) => {
+        if (selection?.name == "Outras Opções") {
+          selection.values?.forEach((value) => {
+            additionalProperty.push({
+              "@type": "PropertyValue",
+              url: value?.alias ?? undefined,
+              value: value?.selected ? "true" : "false",
+              name: value?.value ?? undefined,
+              valueReference: "SELECTIONS",
+            });
+          });
+        }
+      });
+  }
+
   variant.informations?.forEach((info) =>
     additionalProperty.push({
       "@type": "PropertyValue",
@@ -391,7 +408,6 @@ export const toProduct = (
       logo: variant.productBrand?.fullUrlLogo ??
         undefined,
     },
-    additionalProperty,
     offers: {
       "@type": "AggregateOffer",
       highPrice: variant.prices?.price,
@@ -411,6 +427,7 @@ export const toProduct = (
       }],
     },
     ...variantSelected,
+    additionalProperty,
     isSimilarTo,
     review,
     aggregateRating,

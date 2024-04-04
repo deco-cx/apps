@@ -1,3 +1,4 @@
+import AWS from "https://esm.sh/aws-sdk";
 import { asResolved, isDeferred } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import type { App, AppContext as AC } from "deco/mod.ts";
@@ -10,6 +11,7 @@ import openai, {
 } from "../openai/mod.ts";
 import { Assistant } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { Secret } from "../website/loaders/secret.ts";
 
 export type GPTModel =
   | "gpt-4-0613"
@@ -62,14 +64,53 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
   useProps?: (props: unknown) => unknown;
 
   /**
+   * Optional function to log the received messages from the user.
+   * @param {Log} logInfo - User message / information.
+   * @returns {void} - The modified properties.
+   */
+  onMessageReceived?: (logInfo: Log) => void;
+
+  /**
+   * Optional function to log the received messages sent by the assistant.
+   * @param {Log} logInfo - Assistant message / information.
+   * @returns {void} - The modified properties.
+   */
+  onMessageSent?: (logInfo: Log) => void;
+
+  /**
    * The GPT model that will be used, if not specified the assistant model will be used.
    */
   model?: GPTModel | { custom: string };
+
+  /**
+   * The Id of the assistant
+   */
+  id?: string;
+
+  /**
+   * The Id of the assistant thread
+   */
+  threadId?: string;
+}
+
+export interface Log {
+  assistantId: string;
+  threadId: string;
+  runId: string;
+  model: string;
+  message: object;
 }
 
 export interface Prompt {
   content: string;
   context: string;
+}
+
+export interface AssistantAwsProps {
+  assistantBucketRegion: Secret;
+  accessKeyId: Secret;
+  secretAccessKey: Secret;
+  assistantBucketName: Secret;
 }
 
 export interface Props extends OpenAIProps {
@@ -82,15 +123,23 @@ export interface Props extends OpenAIProps {
    */
   instructions?: string;
   assistants?: AIAssistant[];
+  assistantAwsProps?: AssistantAwsProps;
+  s3?: AWS.S3;
 }
 
 export interface State extends OpenAIState {
   instructions?: string;
   assistant: Promise<Assistant>;
   assistants: Record<string, Promise<AIAssistant>>;
+  assistantAwsProps?: AssistantAwsProps;
+  s3?: AWS.S3;
 }
+
 /**
- * @title AI Assistants Hub
+ * @title Deco AI Assistant
+ * @description Create AI assistants on deco.cx.
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png
  */
 export default function App(
   state: Props,
@@ -124,6 +173,15 @@ export default function App(
       assistant: assistantsAPI.retrieve(
         state.assistantId,
       ),
+      s3: new AWS.S3({
+        region: state.assistantAwsProps?.assistantBucketRegion.get?.() ??
+          Deno.env.get("ASSISTANT_BUCKET_REGION"),
+        accessKeyId: state.assistantAwsProps?.accessKeyId.get?.() ??
+          Deno.env.get("AWS_ACCESS_KEY_ID"),
+        secretAccessKey: state.assistantAwsProps?.secretAccessKey.get?.() ??
+          Deno.env.get("AWS_SECRET_ACCESS_KEY"),
+      }),
+      assistantAwsProps: state.assistantAwsProps,
     },
     dependencies: [openAIApp],
   };

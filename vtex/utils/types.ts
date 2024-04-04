@@ -566,6 +566,7 @@ export interface ProductSearchResult {
   locale: string;
   query: string;
   operator: "and" | "or";
+  redirect: string;
   fuzzy: string;
   correction?: Correction;
 }
@@ -739,7 +740,7 @@ export interface Item {
   unitMultiplier: number;
   modalType: unknown | null;
   images: Image[];
-  Videos: string[];
+  videos: string[];
   variations: Array<{
     name: string;
     values: string[];
@@ -1109,6 +1110,27 @@ export interface SimulationItem {
 export type SPEvent =
   | {
     type: "session.ping";
+    url: string;
+  }
+  | {
+    type: "page.cart";
+    products: {
+      productId: string;
+      quantity: number;
+    }[];
+  }
+  | {
+    type: "page.empty_cart";
+    products: [];
+  }
+  | {
+    type: "page.confirmation";
+    order: string;
+    products: {
+      productId: string;
+      quantity: number;
+      price: number;
+    }[];
   }
   | {
     type: "search.click";
@@ -1119,6 +1141,7 @@ export type SPEvent =
   }
   | {
     type: "search.query";
+    url: string;
     text: string;
     misspelled: boolean;
     match: number;
@@ -1127,9 +1150,9 @@ export type SPEvent =
   };
 
 export interface CreateNewDocument {
-  Id: string;
-  Href: string;
-  DocumentId: string;
+  Id?: string;
+  Href?: string;
+  DocumentId?: string;
 }
 
 export interface SelectableGifts {
@@ -1172,4 +1195,43 @@ export interface CollectionList {
     limit: number;
   };
   items?: Collection[];
+}
+
+export interface ProductRatingAndReviews {
+  productRating?: ProductRating;
+  productReviews?: ProductReviewData;
+}
+
+export interface ProductRating {
+  average?: number;
+  totalCount?: number;
+}
+
+export interface ProductReview {
+  id?: string | undefined;
+  productId?: string | undefined;
+  rating?: number | undefined;
+  title?: string | undefined;
+  text?: string | undefined;
+  reviewerName?: string | undefined;
+  shopperId?: string | undefined;
+  reviewDateTime?: string | undefined;
+  searchDate?: string | undefined;
+  verifiedPurchaser?: boolean | undefined;
+  sku?: string | null;
+  approved?: boolean;
+  location?: string | null;
+  locale?: string | null;
+  pastReviews?: string | null;
+}
+
+export interface ProductReviewRange {
+  total?: number;
+  from?: number;
+  to?: number;
+}
+
+export interface ProductReviewData {
+  data?: ProductReview[] | undefined;
+  range?: ProductReviewRange;
 }

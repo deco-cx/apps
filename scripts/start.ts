@@ -2,6 +2,7 @@
 import "npm:@graphql-codegen/typescript";
 import "npm:@graphql-codegen/typescript-operations";
 import "npm:@graphql-codegen/add";
+import "npm:@graphql-codegen/schema-ast";
 
 import { CodegenConfig, generate } from "npm:@graphql-codegen/cli";
 import { compile } from "npm:json-schema-to-typescript";
@@ -42,10 +43,14 @@ function processTypeInNestedObject(obj: any) {
 
 for await (const entry of walk(".")) {
   if (entry.isFile) {
-    if (entry.path.endsWith(OPENAPI_EXTENSION)) {
+    if (
+      entry.path.endsWith(OPENAPI_EXTENSION)
+    ) {
       allOpenAPIPaths.push(entry.path);
     }
-    if (entry.path.endsWith(GRAPHQL_EXTENSION)) {
+    if (
+      entry.path.endsWith(GRAPHQL_EXTENSION)
+    ) {
       allGraphqlPaths.push(entry.path);
     }
   }
@@ -127,6 +132,7 @@ const generateOpenAPI = async () => {
         if (!item) {
           continue;
         }
+
         const {
           parameters = [],
           requestBody,
@@ -235,6 +241,7 @@ const generateGraphQL = async () => {
               },
             },
             "typescript",
+            // "schema-ast",
             "typescript-operations",
           ],
           config: {

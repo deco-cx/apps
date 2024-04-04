@@ -1,0 +1,356 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VTEX API",
+    "description": "created from https://github.com/vtex/openapi-schemas/tree/master",
+    "contact": {},
+    "version": "1.0"
+  },
+  "paths": {
+    "/reviews-and-ratings/api/rating/{inProductGroupWithID}": {
+      "get": {
+        "tags": [
+          "Product Rating"
+        ],
+        "summary": "Get Product Rating",
+        "parameters": [
+          {
+            "name": "inProductGroupWithID",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Content-Type": {
+                "schema": {
+                  "type": "string",
+                  "example": "application/json"
+                }
+              },
+              "Transfer-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "example": "chunked"
+                }
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string",
+                  "example": "keep-alive"
+                }
+              },
+              "Date": {
+                "schema": {
+                  "type": "string",
+                  "example": "Fri, 23 Feb 2024 17:29:13 GMT"
+                }
+              },
+              "Content-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "example": "gzip"
+                }
+              },
+              "X-VTEX-Janus-Router-Backend-App": {
+                "schema": {
+                  "type": "string",
+                  "example": "io-admins-vadmin-group-1+2-1a-z4z"
+                }
+              },
+              "X-Router-Cache": {
+                "schema": {
+                  "type": "string",
+                  "example": "MISS"
+                }
+              },
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string",
+                  "example": "8231da1db7e1447bbeb7fcce8695c06b"
+                }
+              },
+              "X-Vtex-Router-Version": {
+                "schema": {
+                  "type": "string",
+                  "example": "9.14.0"
+                }
+              },
+              "X-Vtex-Router-Elapsed-Time": {
+                "schema": {
+                  "type": "string",
+                  "example": "00:00:00.2134759"
+                }
+              },
+              "X-Vtex-Backend-Elapsed-Time": {
+                "schema": {
+                  "type": "string",
+                  "example": "00:00:00.1846180"
+                }
+              },
+              "X-Vtex-Io-Cluster-Id": {
+                "schema": {
+                  "type": "string",
+                  "example": "prod-dj-ioadmin-eks-use1a-z4z"
+                }
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              },
+              "X-Cache": {
+                "schema": {
+                  "type": "string",
+                  "example": "Miss from cloudfront"
+                }
+              },
+              "Via": {
+                "schema": {
+                  "type": "string",
+                  "example": "1.1 90c491496585980aceb1033cb1612270.cloudfront.net (CloudFront)"
+                }
+              },
+              "X-Amz-Cf-Pop": {
+                "schema": {
+                  "type": "string",
+                  "example": "GRU1-C2"
+                }
+              },
+              "X-Amz-Cf-Id": {
+                "schema": {
+                  "type": "string",
+                  "example": "REB9WZ74BDW3S8waNwpYbZhlGmLa3k-pkT4MobgY6ge0BHtvcOwBCQ=="
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "average": {
+                      "type": "number"
+                    },
+                    "totalCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reviews-and-ratings/api/reviews": {
+      "get": {
+        "tags": [
+          "Product Reviews"
+        ],
+        "summary": "Get List Reviews",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Content-Type": {
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=utf-8"
+                }
+              },
+              "Transfer-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "example": "chunked"
+                }
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string",
+                  "example": "keep-alive"
+                }
+              },
+              "Date": {
+                "schema": {
+                  "type": "string",
+                  "example": "Fri, 23 Feb 2024 17:29:55 GMT"
+                }
+              },
+              "Content-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "example": "gzip"
+                }
+              },
+              "X-VTEX-Janus-Router-Backend-App": {
+                "schema": {
+                  "type": "string",
+                  "example": "io-admins-vadmin-group-1+2-1a-z4z"
+                }
+              },
+              "X-Router-Cache": {
+                "schema": {
+                  "type": "string",
+                  "example": "MISS"
+                }
+              },
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string",
+                  "example": "130d1232071146e2b23f57369b4f6827"
+                }
+              },
+              "X-Vtex-Router-Version": {
+                "schema": {
+                  "type": "string",
+                  "example": "9.14.0"
+                }
+              },
+              "X-Vtex-Router-Elapsed-Time": {
+                "schema": {
+                  "type": "string",
+                  "example": "00:00:00.0712528"
+                }
+              },
+              "X-Vtex-Backend-Elapsed-Time": {
+                "schema": {
+                  "type": "string",
+                  "example": "00:00:00.0664149"
+                }
+              },
+              "X-Vtex-Io-Cluster-Id": {
+                "schema": {
+                  "type": "string",
+                  "example": "prod-dj-ioadmin-eks-use1a-z4z"
+                }
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              },
+              "X-Cache": {
+                "schema": {
+                  "type": "string",
+                  "example": "Miss from cloudfront"
+                }
+              },
+              "Via": {
+                "schema": {
+                  "type": "string",
+                  "example": "1.1 90c491496585980aceb1033cb1612270.cloudfront.net (CloudFront)"
+                }
+              },
+              "X-Amz-Cf-Pop": {
+                "schema": {
+                  "type": "string",
+                  "example": "GRU1-C2"
+                }
+              },
+              "X-Amz-Cf-Id": {
+                "schema": {
+                  "type": "string",
+                  "example": "lC74KNBkKXVgR7LunpeQ8TBoVcoXslgRPqxRU3rwIu1HMuQuRYJC2w=="
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "1"
+                          },
+                          "cacheId": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "productId": {
+                            "type": "string",
+                            "example": "30276"
+                          },
+                          "rating": {
+                            "type": "integer",
+                            "example": 3
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Produto inovador"
+                          },
+                          "text": {
+                            "type": "string",
+                            "example": "produto muito bom, realmente inovador!"
+                          },
+                          "reviewerName": {
+                            "type": "string",
+                            "example": "joao"
+                          },
+                          "shopperId": {
+                            "type": "string",
+                            "example": "joaoxcd@gmail.com"
+                          },
+                          "reviewDateTime": {
+                            "type": "string",
+                            "example": "12/15/2023 17:54:43"
+                          },
+                          "verifiedPurchaser": {
+                            "type": "boolean",
+                            "example": false
+                          },
+                          "sku": {
+                            "type": "null",
+                            "example": null
+                          },
+                          "approved": {
+                            "type": "boolean",
+                            "example": false
+                          },
+                          "location": {
+                            "type": "null",
+                            "example": null
+                          }
+                        }
+                      }
+                    },
+                    "range": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer",
+                          "example": 2
+                        },
+                        "from": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "to": {
+                          "type": "integer",
+                          "example": 3
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

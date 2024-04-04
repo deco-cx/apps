@@ -90,6 +90,8 @@ export interface Props {
    * @default 'manual'
    */
   redirect?: "manual" | "follow";
+
+  avoidAppendPath?: boolean;
 }
 
 /**
@@ -103,6 +105,7 @@ export default function Proxy({
   customHeaders = [],
   includeScriptsToHead,
   redirect = "manual",
+  avoidAppendPath,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -113,7 +116,7 @@ export default function Proxy({
       : url.pathname;
 
     const to = new URL(
-      `${proxyUrl}${sanitize(path)}?${qs}`,
+      `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}?${qs}`,
     );
 
     const headers = new Headers(req.headers);
@@ -132,7 +135,16 @@ export default function Proxy({
     headers.set("x-forwarded-host", url.host);
 
     for (const { key, value } of customHeaders) {
-      headers.set(key, value);
+      if (key === "cookie") {
+        const existingCookie = headers.get("cookie");
+        if (existingCookie) {
+          headers.set("cookie", `${existingCookie}; ${value}`);
+        } else {
+          headers.set("cookie", value);
+        }
+      } else {
+        headers.set(key, value);
+      }
     }
 
     const monitoring = isFreshCtx<DecoSiteState>(_ctx)

@@ -3,6 +3,7 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { toReview } from "../../utils/transform.ts";
 import listLoader from "../legacy/productList.ts";
 
 export interface Props {
@@ -10,6 +11,7 @@ export interface Props {
   similars?: boolean;
   kitItems?: boolean;
   variants?: boolean;
+  reviews?: boolean;
 
   products: Product[];
 }
@@ -87,6 +89,33 @@ const variantsExt = async (
   }));
 };
 
+const reviewsExt = async (
+  products: Product[],
+  ctx: AppContext,
+): Promise<Product[]> => {
+  const reviewPromises = products.map((product) =>
+    ctx.my["GET /reviews-and-ratings/api/reviews"]({
+      product_id: product.inProductGroupWithID,
+    }).then((res) => res.json())
+  );
+
+  const ratingPromises = products.map((product) =>
+    ctx.my["GET /reviews-and-ratings/api/rating/:inProductGroupWithId"]({
+      inProductGroupWithId: product.inProductGroupWithID ?? "",
+    }).then((res) => res.json())
+  );
+
+  const reviewsPromise = Promise.all(reviewPromises);
+  const ratingsPromise = Promise.all(ratingPromises);
+
+  const [reviews, ratings] = await Promise.all([
+    reviewsPromise,
+    ratingsPromise,
+  ]);
+
+  return toReview(products, ratings, reviews);
+};
+
 export default async (
   {
     products,
@@ -94,6 +123,7 @@ export default async (
     kitItems,
     similars,
     simulate,
+    reviews,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -114,6 +144,10 @@ export default async (
 
   if (simulate) {
     p = await simulateExt(p, ctx);
+  }
+
+  if (reviews) {
+    p = await reviewsExt(p, ctx);
   }
 
   return p;

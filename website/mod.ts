@@ -36,14 +36,14 @@ export interface Caching {
 
 export interface Props {
   /**
-   * @title Site Map
+   * @title Routes Map
    */
   routes?: Routes[];
 
   /** @title Seo */
   seo?: Omit<
     Seo,
-    "jsonLDs" | "titleTemplate" | "descriptionTemplate" | "canonical"
+    "jsonLDs" | "canonical"
   >;
 
   /**
@@ -63,14 +63,19 @@ export interface Props {
    * @description the caching configuration
    */
   caching?: Caching;
+
+  /**
+   * @title Async Rendering
+   * @description Async sections will be deferred to the client-side
+   * @default false
+   */
+  firstByteThresholdMS?: boolean;
 }
 
 /**
  * @title Website
  */
-export default function App(
-  state: Props,
-): App<Manifest, Props> {
+export default function App(state: Props): App<Manifest, Props> {
   return {
     state,
     manifest: {
@@ -116,9 +121,7 @@ export default function App(
   };
 }
 
-const deferPropsResolve = (
-  routes: Routes,
-): Routes => {
+const deferPropsResolve = (routes: Routes): Routes => {
   if (Array.isArray(routes)) {
     const newRoutes = [];
     for (const route of routes) {
@@ -151,3 +154,5 @@ export const onBeforeResolveProps = <
   }
   return props;
 };
+
+export { default as Preview } from "./Preview.tsx";

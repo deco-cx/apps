@@ -39,6 +39,7 @@ const process = async (
 export interface MessageContentText {
   type: "text";
   value: string;
+  options?: string[];
 }
 
 export interface MessageContentFile {
@@ -47,8 +48,9 @@ export interface MessageContentFile {
 }
 
 export interface ReplyMessage {
+  threadId: string;
   messageId: string;
-  type: "message";
+  type: "message" | "error";
   content: Array<MessageContentText | MessageContentFile>;
   role: "user" | "assistant";
 }
@@ -63,11 +65,13 @@ export interface FunctionCallReply<T> extends FunctionCall {
 }
 
 export interface ReplyStartFunctionCall {
+  threadId: string;
   messageId: string;
   type: "start_function_call";
   content: FunctionCall;
 }
 export interface ReplyFunctionCalls<T> {
+  threadId: string;
   messageId: string;
   type: "function_calls";
   content: FunctionCallReply<T>[];
@@ -152,7 +156,19 @@ export default async function openChat(
       }),
     );
     assistant.then((aiAssistant) => {
-      socket.send(aiAssistant.welcomeMessage ?? "Welcome to the chat!");
+      socket.send(
+        JSON.stringify({
+          isWelcomeMessage: true,
+          threadId: aiAssistant.threadId,
+          assistantId: aiAssistant.id,
+          type: "message",
+          content: [{
+            type: "text",
+            value: aiAssistant.welcomeMessage ?? "Welcome to the chat!",
+          }],
+          role: "assistant",
+        }),
+      );
     });
   };
   /**

@@ -3,6 +3,7 @@ import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
+  getValidTypesFromPageTypes,
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
@@ -14,6 +15,7 @@ import {
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { parsePageType } from "../../utils/transform.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
   LegacyFacet,
@@ -74,6 +76,17 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+
+  /**
+   * @hide true
+   * @description The URL of the page, used to override URL from request
+   */
+  pageHref?: string;
+
+  /**
+   * @title Ignore case by checking for selected filter
+   */
+  ignoreCaseSelected?: boolean;
 }
 
 export const sortOptions = [
@@ -152,7 +165,7 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
-  const url = new URL(baseUrl);
+  const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const params = toSegmentParams(segment);
   const currentPageoffset = props.pageOffset ?? 1;
@@ -182,7 +195,9 @@ const loader = async (
   const _from = page * count;
   const _to = (page + 1) * count - 1;
 
-  const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
+  const allPageTypes = await pageTypesFromPathname(maybeTerm, ctx);
+
+  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
@@ -198,10 +213,8 @@ const loader = async (
 
   const ftFallback = getTermFallback(url, isPage, hasFilters);
 
-  const ft = props.ft ||
-    url.searchParams.get("ft") ||
-    url.searchParams.get("q") ||
-    ftFallback;
+  const ft = props.ft || url.searchParams.get("ft") ||
+    url.searchParams.get("q") || ftFallback;
 
   const isInSeachFormat = ft;
 
@@ -253,15 +266,31 @@ const loader = async (
           priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })
       )
-      .map((product) =>
-        props.similars ? withIsSimilarTo(req, ctx, product) : product
+      .map(
+        (
+          product,
+        ) => (props.similars ? withIsSimilarTo(req, ctx, product) : product),
       ),
   );
 
+  const getFlatCategories = (
+    CategoriesTrees: LegacyFacet[],
+  ): Record<string, LegacyFacet[]> => {
+    const flatCategories: Record<string, LegacyFacet[]> = {};
+
+    CategoriesTrees.forEach(
+      (category) => (flatCategories[category.Name] = category.Children || []),
+    );
+
+    return flatCategories;
+  };
+
   // Get categories of the current department/category
-  const getCategoryFacets = (CategoriesTrees: LegacyFacet[]): LegacyFacet[] => {
-    const isDepartmentOrCategoryPage = !pageType;
-    if (isDepartmentOrCategoryPage) {
+  const getCategoryFacets = (
+    CategoriesTrees: LegacyFacet[],
+    isDepartmentOrCategoryPage: boolean,
+  ): LegacyFacet[] => {
+    if (!isDepartmentOrCategoryPage) {
       return [];
     }
 
@@ -270,7 +299,10 @@ const loader = async (
       if (isCurrentCategory) {
         return category.Children || [];
       } else if (category.Children.length) {
-        const childFacets = getCategoryFacets(category.Children);
+        const childFacets = getCategoryFacets(
+          category.Children,
+          isDepartmentOrCategoryPage,
+        );
         const hasChildFacets = childFacets.length;
         if (hasChildFacets) {
           return childFacets;
@@ -281,15 +313,36 @@ const loader = async (
     return [];
   };
 
+  const isDepartmentOrCategoryPage = pageType.pageType === "Department" ||
+    pageType.pageType === "Category" || pageType.pageType === "SubCategory";
+
+  // at search, collection and brand pages, the products are not of a specific category
+  // so we need to get the categories from the facets
+  const flatCategories = !isDepartmentOrCategoryPage
+    ? getFlatCategories(vtexFacets.CategoriesTrees)
+    : {};
+
   const filters = Object.entries({
     Departments: vtexFacets.Departments,
-    Categories: getCategoryFacets(vtexFacets.CategoriesTrees),
+    Categories: getCategoryFacets(
+      vtexFacets.CategoriesTrees,
+      isDepartmentOrCategoryPage,
+    ),
     Brands: vtexFacets.Brands,
     ...vtexFacets.SpecificationFilters,
     PriceRanges: vtexFacets.PriceRanges,
+    ...flatCategories,
   })
     .map(([name, facets]) =>
-      legacyFacetToFilter(name, facets, url, map, term, filtersBehavior)
+      legacyFacetToFilter(
+        name,
+        facets,
+        url,
+        map,
+        term,
+        filtersBehavior,
+        props.ignoreCaseSelected,
+      )
     )
     .flat()
     .filter((x): x is Filter => Boolean(x));
@@ -329,19 +382,20 @@ const loader = async (
       currentPage,
       records: parseInt(_total, 10),
       recordPerPage: count,
+      pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
     seo: pageTypesToSeo(
       pageTypes,
       baseUrl,
-      previousPage ? currentPage : undefined,
+      hasPreviousPage ? currentPage : undefined,
     ),
   };
 };
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
@@ -349,8 +403,26 @@ export const cacheKey = (req: Request, ctx: AppContext) => {
     return null;
   }
 
-  url.searchParams.sort();
-  url.searchParams.set("segment", token);
+  const params = new URLSearchParams([
+    ["term", props.term ?? ""],
+    ["count", props.count.toString()],
+    ["page", (props.page ?? 1).toString()],
+    ["sort", props.sort ?? ""],
+    ["filters", props.filters ?? ""],
+    ["fq", props.fq ?? ""],
+    ["ft", props.ft ?? ""],
+    ["map", props.map ?? ""],
+    ["pageOffset", (props.pageOffset ?? 1).toString()],
+  ]);
+
+  url.searchParams.forEach((value, key) => {
+    params.append(key, value);
+  });
+
+  params.sort();
+  params.set("segment", token);
+
+  url.search = params.toString();
 
   return url.href;
 };
