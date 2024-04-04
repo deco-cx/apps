@@ -1,8 +1,9 @@
+import { getCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { CartOperation } from "../../utils/types/basket.ts";
 
 export interface Props {
-  ProductAuctionID: number;
+  productAuctionID: number;
   Amount: number;
   IsListening: boolean;
 }
@@ -12,19 +13,21 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<CartOperation> => {
-  const fd = new FormData();
-  for (const [key, value] of Object.entries(props)) {
-    fd.append(key, value);
-  }
-  const response = await ctx.api["POST /Shopping/ProductAuction/AddBid"]({}, {
-    body: fd,
-    headers: {
-      "Content-Type": "multipart/form-data",
-      ...req.headers,
-    },
-  }).then((res) => res.json());
+  const cookies = getCookies(req.headers);
+  console.log({ cookies })
 
-  return response;
+  const session = cookies["_bc_hash"];
+  const response = await ctx.api["POST /Shopping/ProductAuction/AddBid"](props, {
+    headers: {
+      ...req.headers,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    credentials: "include",
+  });
+
+  console.log({response});
+
+  return response.json();
 };
 
 export default action;

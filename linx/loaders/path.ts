@@ -19,6 +19,10 @@ async function loader(
     params[key].push(value);
   });
 
+  if (upstream.pathname.endsWith(".png")) {
+    throw new Error("imagem");
+  }
+
   const splat = `${upstream.pathname.slice(1)}.json`;
 
   const defaults = {
