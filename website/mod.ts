@@ -45,7 +45,10 @@ export interface Props {
     Seo,
     "jsonLDs" | "canonical"
   >;
-
+  /**
+   * @title Theme
+   */
+  theme?: Section;
   /**
    * @title Global Sections
    * @description These sections will be included on all website/pages/Page.ts
@@ -75,7 +78,9 @@ export interface Props {
 /**
  * @title Website
  */
-export default function App(state: Props): App<Manifest, Props> {
+export default function App({ theme, ...state }: Props): App<Manifest, Props> {
+  const global = theme ? [...(state.global ?? []), theme] : state.global;
+
   return {
     state,
     manifest: {
@@ -103,12 +108,12 @@ export default function App(state: Props): App<Manifest, Props> {
           Preview: (props) =>
             manifest.pages["website/pages/Page.tsx"].Preview({
               ...props,
-              sections: [...state.global ?? [], ...props.sections],
+              sections: [...global ?? [], ...props.sections],
             }),
           default: (props) =>
             manifest.pages["website/pages/Page.tsx"].default({
               ...props,
-              sections: [...state.global ?? [], ...props.sections],
+              sections: [...global ?? [], ...props.sections],
             }),
         },
       },
