@@ -25,7 +25,7 @@ const PRODUCTION_SERVICE_SCALING: ServiceScaling = {
   maxScale: 20,
   initialScale: 1,
   minScale: 0,
-  retentionPeriod: "10m",
+  retentionPeriod: "5m",
 };
 
 const PRODUCTION_SERVICE_RESOURCES: ResourceRequirements = {
