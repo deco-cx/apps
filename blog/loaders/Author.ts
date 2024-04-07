@@ -1,5 +1,7 @@
 /**
  * @titleBy name
+ * @widget author
+ *
  */
 export interface Author {
   name: string;

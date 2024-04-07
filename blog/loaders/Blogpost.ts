@@ -1,15 +1,12 @@
 import type { ImageWidget } from "../../admin/widgets.ts";
-
-/**
- * @format dynamic-options
- * @options blog/loaders/AuthorOptions.ts
- */
-export type Author = string;
-
+import { Author } from "./Author.ts";
 export interface BlogPost {
   title: string;
   subtitle: string;
   image?: ImageWidget;
+  /**
+   * @options blog/loaders/AuthorOptions.ts
+   */
   authors: Author[];
   /**
    * @format date

@@ -7,7 +7,8 @@ import * as $$$1 from "./loaders/AuthorOptions.ts";
 import * as $$$3 from "./loaders/Blogpost.ts";
 import * as $$$2 from "./loaders/BlogPostItem.ts";
 import * as $$$4 from "./loaders/BlogpostList.ts";
-import * as $$$$$$0 from "./sections/Template.tsx";
+import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
+import * as $$$$$$1 from "./sections/Template.tsx";
 
 const manifest = {
   "loaders": {
@@ -18,7 +19,8 @@ const manifest = {
     "blog/loaders/BlogpostList.ts": $$$4,
   },
   "sections": {
-    "blog/sections/Template.tsx": $$$$$$0,
+    "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
+    "blog/sections/Template.tsx": $$$$$$1,
   },
   "name": "blog",
   "baseUrl": import.meta.url,

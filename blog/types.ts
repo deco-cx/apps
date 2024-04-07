@@ -14,3 +14,10 @@ export interface BlogPost {
   slug: string;
   content: string;
 }
+
+
+// export interface BlogPostPage {
+//   "@type": "BlogPostPage";
+//   post: BlogPost;
+//   seo?: Seo | null;
+// }

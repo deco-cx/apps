@@ -1,3 +1,4 @@
+import { allowCorsFor } from "deco/mod.ts";
 import { AppContext } from "../mod.ts";
 import { Author } from "./Author.ts";
 import { getRecordsByPath } from "../utils/records.ts";
@@ -18,14 +19,18 @@ const ACCESSOR = "author";
  */
 export default async function AuthorItem(
   _props: unknown,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<
   {
     label: string;
-    value: string;
+    value: Author;
   }[]
 > {
+  Object.entries(allowCorsFor(req)).map(([name, value]) => {
+    ctx.response.headers.set(name, value);
+  });
+
   const authors = await getRecordsByPath<Author>(
     ctx,
     COLLECTION_PATH,
@@ -34,6 +39,6 @@ export default async function AuthorItem(
 
   return authors.map((author) => ({
     label: author.name,
-    value: JSON.stringify(author),
+    value: author,
   }));
 }
