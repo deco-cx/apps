@@ -1,12 +1,4 @@
-/**
- * @titleBy name
- * @widget author
- *
- */
-export interface Author {
-  name: string;
-  email: string;
-}
+import { Author } from "../types.ts";
 
 const loader = ({ author }: { author: Author }): Author => author;
 

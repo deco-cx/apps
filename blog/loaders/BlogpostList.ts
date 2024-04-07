@@ -7,7 +7,7 @@
  * @returns A promise that resolves to an array of blog posts.
  */
 import { AppContext } from "../mod.ts";
-import { BlogPost } from "./Blogpost.ts";
+import { BlogPost } from "../types.ts";
 import { getRecordsByPath } from "../utils/records.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";

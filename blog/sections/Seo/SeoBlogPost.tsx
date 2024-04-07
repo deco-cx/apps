@@ -3,12 +3,12 @@ import {
   renderTemplateString,
   SEOSection,
 } from "../../../website/components/Seo.tsx";
-import { BlogPost } from "../../loaders/Blogpost.ts";
+import { BlogPostPage } from "../../types.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
   /** @title Data Source */
-  jsonLD: BlogPost | null;
+  jsonLD: BlogPostPage | null;
   /** @title Title Override */
   title?: string;
   /** @title Description Override */
@@ -24,15 +24,17 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
   } = ctx.seo ?? {};
   const { title: titleProp, description: descriptionProp, jsonLD } = props;
 
+  console.log(props);
+
   const title = renderTemplateString(
     titleTemplate,
-    titleProp || jsonLD?.title || ""
+    titleProp || jsonLD?.seo?.title || "",
   );
   const description = renderTemplateString(
     descriptionTemplate,
-    descriptionProp || jsonLD?.subtitle || ""
+    descriptionProp || jsonLD?.seo?.description || "",
   );
-  const image = jsonLD?.image;
+  const image = jsonLD?.post.image;
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
