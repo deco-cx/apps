@@ -3,24 +3,22 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/Author.ts";
-import * as $$$1 from "./loaders/AuthorOptions.ts";
-import * as $$$4 from "./loaders/Blogpost.ts";
-import * as $$$2 from "./loaders/BlogPostItem.ts";
-import * as $$$5 from "./loaders/BlogpostList.ts";
-import * as $$$3 from "./loaders/BlogPostPage.ts";
-import * as $$$6 from "./loaders/Category.ts";
+import * as $$$3 from "./loaders/Blogpost.ts";
+import * as $$$1 from "./loaders/BlogPostItem.ts";
+import * as $$$4 from "./loaders/BlogpostList.ts";
+import * as $$$2 from "./loaders/BlogPostPage.ts";
+import * as $$$5 from "./loaders/Category.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Template.tsx";
 
 const manifest = {
   "loaders": {
     "blog/loaders/Author.ts": $$$0,
-    "blog/loaders/AuthorOptions.ts": $$$1,
-    "blog/loaders/Blogpost.ts": $$$4,
-    "blog/loaders/BlogPostItem.ts": $$$2,
-    "blog/loaders/BlogpostList.ts": $$$5,
-    "blog/loaders/BlogPostPage.ts": $$$3,
-    "blog/loaders/Category.ts": $$$6,
+    "blog/loaders/Blogpost.ts": $$$3,
+    "blog/loaders/BlogPostItem.ts": $$$1,
+    "blog/loaders/BlogpostList.ts": $$$4,
+    "blog/loaders/BlogPostPage.ts": $$$2,
+    "blog/loaders/Category.ts": $$$5,
   },
   "sections": {
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
