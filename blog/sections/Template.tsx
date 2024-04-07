@@ -1,4 +1,4 @@
-import { BlogPost } from "../loaders/Blogpost.ts";
+import { BlogPost } from "../types.ts";
 import { CSS } from "../static/css.ts";
 
 export interface Props {
@@ -11,7 +11,7 @@ export default function Template({ post }: Props) {
   const {
     title = "Title",
     content = "Content",
-    subtitle = "Subtitle",
+    excerpt = "Excerpt",
     date,
     image,
   } = post;
@@ -21,7 +21,7 @@ export default function Template({ post }: Props) {
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div class="deco-post-preview">
         <h1>{title}</h1>
-        <p class="text-xl">{subtitle}</p>
+        <p class="text-xl">{excerpt}</p>
         <p>
           {date
             ? new Date(date).toLocaleDateString("en-US", {
