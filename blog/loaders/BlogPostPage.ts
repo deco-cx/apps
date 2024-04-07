@@ -19,7 +19,7 @@ export interface Props {
  * @param ctx - The application context.
  * @returns A promise that resolves to the blog post or undefined if not found.
  */
-export default async function BlogPostPage(
+export default async function BlogPostPageLoader(
   { slug }: Props,
   req: Request,
   ctx: AppContext,
