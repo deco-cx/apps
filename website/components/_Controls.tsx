@@ -60,9 +60,8 @@ const snippet = (live: Live) => {
       event.preventDefault();
       event.stopPropagation();
 
-      const pathname = globalThis.window.LIVE.play
-        ? `/play/blocks/${globalThis.window.LIVE.page.id}?domain=${globalThis.window.location.origin}`
-        : `/sites/${globalThis.window.LIVE.site.name}/blocks/${globalThis.window.LIVE.page.id}`;
+      const pathname =
+        `/choose-editor?site=${globalThis.window.LIVE.site.name}&domain=${globalThis.window.location.origin}&pageId=${globalThis.window.LIVE.page.id}`;
 
       const href = new URL(pathname, "https://admin.deco.cx");
 
