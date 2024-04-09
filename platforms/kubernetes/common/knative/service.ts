@@ -28,7 +28,6 @@ export interface KnativeSerivceOpts {
   runArgs?: string;
   nodeSelector?: NodeSelector;
   nodeAffinity?: k8s.V1NodeAffinity;
-  nodeAntiAffinity?: k8s.V1NodeAffinity;
 }
 
 const typeToAttributes: Record<
@@ -90,7 +89,6 @@ export const knativeServiceOf = (
     resources,
     nodeSelector,
     nodeAffinity,
-    nodeAntiAffinity,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -122,7 +120,6 @@ export const knativeServiceOf = (
         spec: {
           affinity: {
             nodeAffinity,
-            nodeAntiAffinity,
           },
           nodeSelector,
           serviceAccountName,

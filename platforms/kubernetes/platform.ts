@@ -182,7 +182,7 @@ function applyAffinitiesAndNodeSelectors(
 ): SiteState {
   const sitesToApplyNodeSelector = ["admin", "play"]; //preciso adicionar os templates?
 
-  if (!desiredState) {
+  if (desiredState === undefined) {
     desiredState = {};
   }
 
@@ -191,12 +191,13 @@ function applyAffinitiesAndNodeSelectors(
       desiredState.nodeSelector = defineNodeSelectorRules(site);
     }
   } else {
-    if (desiredState?.nodeAntiAffinity === undefined) {
-      //const affinitiesRules = []
-      const antiAffinitiesRules = [AntiAffinityPH];
+    if (
+      desiredState?.nodeAffinity === undefined &&
+      desiredState?.nodeSelector === undefined
+    ) {
+      const affinitiesRules = [AntiAffinityPH];
 
-      //desiredState.nodeAffinity = affinitiesRules.reduce((acc, rule) => { return rule(acc) }, desiredState.nodeAffinity)
-      desiredState.nodeAntiAffinity = antiAffinitiesRules.reduce(
+      desiredState.nodeAffinity = affinitiesRules.reduce(
         (acc: k8s.V1NodeAffinity, rule) => {
           return {
             ...acc,

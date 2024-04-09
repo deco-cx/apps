@@ -79,9 +79,7 @@ export const defineNodeSelectorRules = (_site: string): NodeSelector => {
     NODE_LABELS_VALUES[nodeLabelDecoEvent].PRODUCT_HUNT;
 
   return {
-    nodeSelector: {
-      [nodeLabelDecoEvent]: nodeValueProductHunt,
-    },
+    [nodeLabelDecoEvent]: nodeValueProductHunt,
   };
 };
 

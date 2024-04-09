@@ -91,9 +91,7 @@ export interface ResourceRequirements {
   limits?: Resource;
 }
 
-export interface NodeSelector {
-  nodeSelector: Record<string, string>;
-}
+export type NodeSelector = Record<string, string>;
 
 export const NODE_LABELS_KEY = {
   "DECO_EVENT": "deco.event",
@@ -118,7 +116,6 @@ export interface SiteState {
   domains?: Domain[];
   nodeSelector?: NodeSelector;
   nodeAffinity?: k8s.V1NodeAffinity;
-  nodeAntiAffinity?: k8s.V1NodeAffinity;
 }
 
 /**

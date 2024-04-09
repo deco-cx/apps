@@ -147,7 +147,6 @@ export const deployFromSource = async (
     runArgs: siteState?.runArgs,
     resources: siteState.resources!,
     nodeAffinity: siteState.nodeAffinity,
-    nodeAntiAffinity: siteState.nodeAntiAffinity,
     nodeSelector: siteState.nodeSelector,
   });
 
