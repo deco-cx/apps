@@ -71,6 +71,7 @@ const snippet = (live: Live) => {
           `${globalThis.window.location.pathname}${globalThis.window.location.search}`,
         ),
       );
+
       href.searchParams.set(
         "pathTemplate",
         encodeURIComponent(globalThis.window.LIVE.page.pathTemplate || "/*"),
