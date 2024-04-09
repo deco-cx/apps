@@ -1,9 +1,11 @@
 import { SourceBinder } from "../../actions/build.ts";
 import runScript from "../../common/cmds/run.ts";
 import {
+  NodeSelector,
   ResourceRequirements,
   ServiceScaling,
 } from "../../loaders/siteState/get.ts";
+import { k8s } from "../../deps.ts";
 
 export interface EnvVar {
   name: string;
@@ -24,6 +26,9 @@ export interface KnativeSerivceOpts {
   serviceAccountName?: string;
   resources?: ResourceRequirements;
   runArgs?: string;
+  nodeSelector?: NodeSelector;
+  nodeAffinity?: k8s.V1NodeAffinity;
+  nodeAntiAffinity?: k8s.V1NodeAffinity;
 }
 
 const typeToAttributes: Record<
@@ -83,6 +88,9 @@ export const knativeServiceOf = (
     serviceAccountName,
     controlPlaneDomain,
     resources,
+    nodeSelector,
+    nodeAffinity,
+    nodeAntiAffinity,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -112,6 +120,11 @@ export const knativeServiceOf = (
           },
         },
         spec: {
+          affinity: {
+            nodeAffinity,
+            nodeAntiAffinity,
+          },
+          nodeSelector,
           serviceAccountName,
           volumes: sourceBinder.volumes,
           containers: [

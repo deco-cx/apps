@@ -146,6 +146,9 @@ export const deployFromSource = async (
     serviceAccountName: siteState?.useServiceAccount ? `site-sa` : undefined,
     runArgs: siteState?.runArgs,
     resources: siteState.resources!,
+    nodeAffinity: siteState.nodeAffinity,
+    nodeAntiAffinity: siteState.nodeAntiAffinity,
+    nodeSelector: siteState.nodeSelector,
   });
 
   return deployService({
