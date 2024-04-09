@@ -24,6 +24,8 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
   } = ctx.seo ?? {};
   const { title: titleProp, description: descriptionProp, jsonLD } = props;
 
+  console.log(props);
+
   const title = renderTemplateString(
     titleTemplate,
     titleProp || jsonLD?.seo?.title || "",
