@@ -63,7 +63,14 @@ const snippet = (live: Live) => {
       const pathname =
         `/choose-editor?site=${globalThis.window.LIVE.site.name}&domain=${globalThis.window.location.origin}&pageId=${globalThis.window.LIVE.page.id}`;
 
-      const href = new URL("https://admin.deco.cx");
+      const href = new URL(pathname, "https://admin.deco.cx");
+
+      href.searchParams.set(
+        "path",
+        encodeURIComponent(
+          `${globalThis.window.location.pathname}${globalThis.window.location.search}`,
+        ),
+      );
 
       href.searchParams.set(
         "pathTemplate",
