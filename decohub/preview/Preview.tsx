@@ -4,7 +4,6 @@ import type { JSX } from "preact";
 import { BaseContext } from "deco/engine/core/resolver.ts";
 import Slider from "../components/Slider.tsx";
 import { useId as usePreactId, useMemo } from "preact/hooks";
-import SliderJS from "../components/SliderJS.tsx";
 import { Head } from "$fresh/runtime.ts";
 
 export const useId = () =>
@@ -13,6 +12,9 @@ export const useId = () =>
 export interface Props {
   publicUrl: string;
 }
+
+const DEFAULT_ICON =
+  "https://raw.githubusercontent.com/deco-cx/apps/main/decohub/logo.png";
 
 export interface PreviewProps {
   name: string;
@@ -36,6 +38,26 @@ export const Preview = (
   const author = app.config.author;
   const pages = app.config.pages;
   const icon = app.config.icon;
+  const step = 100 / (images.length + 1);
+
+  let tempStep = 0;
+  const keyframes = images.map((_, index) => {
+    const value1 = `
+      ${tempStep + step}% {
+        transform: translate3d(calc((${index * 100}% ${
+      index > 0 ? "+ 8px" : ""
+    }) * -1), 0, 0);
+      }`;
+
+    const value2 = `
+      ${tempStep + step + 5}% {
+        transform: translate3d(calc((${(index + 1) * 100}% + 8px) * -1), 0, 0);
+      }`;
+
+    const value = value1 + (index + 1 == images.length ? "" : value2);
+    tempStep = tempStep + step + 5;
+    return value;
+  }).join("");
 
   return (
     <>
@@ -47,6 +69,31 @@ export const Preview = (
         />
         <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
       </Head>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        .carousel .carousel-item {
+          animation: slide ${images.length * 3}s linear infinite;
+        }
+
+        .carousel:hover .carousel-item {
+          animation-play-state: paused;
+        } 
+
+
+        @keyframes slide {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          ${keyframes}
+          100% {
+            transform: translate3d(0, 0, 0); /* The image width */
+          }
+        }
+      `,
+        }}
+      >
+      </style>
       <div
         class="h-full flex flex-col gap-4 px-4 relative bg-[#0D1717] text-[#FAFAFA]"
         style={{ minHeight: "100vh" }}
@@ -55,7 +102,7 @@ export const Preview = (
           <div class="flex flex-col gap-4 w-full md:w-1/2">
             <div class="flex gap-4 items-center ">
               <img
-                src={`${icon}`}
+                src={icon ?? DEFAULT_ICON}
                 width={60}
                 height={60}
                 class="aspect-square rounded-lg object-cover"
@@ -71,7 +118,8 @@ export const Preview = (
           </div>
           <div class="w-full md:w-1/2" id={id}>
             <div class="w-full relative mx-auto">
-              <Slider.PrevButton class="disabled:hidden rotate-180 -translate-y-1/2 flex justify-center items-center bg-[#FAFAFA] w-7 h-7 rounded-lg absolute left-7 z-10 top-1/2 shadow-sm">
+              {
+                /* <Slider.PrevButton class="disabled:hidden rotate-180 -translate-y-1/2 flex justify-center items-center bg-[#FAFAFA] w-7 h-7 rounded-lg absolute left-7 z-10 top-1/2 shadow-sm">
                 <svg
                   width="16"
                   height="16"
@@ -86,9 +134,10 @@ export const Preview = (
                     fill="#0D1717"
                   />
                 </svg>
-              </Slider.PrevButton>
+              </Slider.PrevButton> */
+              }
 
-              <Slider class="carousel carousel-center gap-6">
+              <Slider class="carousel carousel-center gap-2">
                 {images.map((image, index) => (
                   <Slider.Item
                     index={index}
@@ -103,7 +152,8 @@ export const Preview = (
                   </Slider.Item>
                 ))}
               </Slider>
-              <Slider.NextButton class="disabled:hidden bg-[#FAFAFA] -translate-y-1/2 flex justify-center items-center w-7 h-7 rounded-lg absolute right-7 z-10 top-1/2 shadow-sm">
+              {
+                /* <Slider.NextButton class="disabled:hidden bg-[#FAFAFA] -translate-y-1/2 flex justify-center items-center w-7 h-7 rounded-lg absolute right-7 z-10 top-1/2 shadow-sm">
                 <svg
                   width="16"
                   height="16"
@@ -118,9 +168,11 @@ export const Preview = (
                     fill="#0D1717"
                   />
                 </svg>
-              </Slider.NextButton>
+              </Slider.NextButton> */
+              }
             </div>
-            <ul class="carousel items-end w-full justify-center col-span-full gap-4 z-10 row-start-4">
+            {
+              /* <ul class="carousel items-end w-full justify-center col-span-full gap-4 z-10 row-start-4">
               {images?.map((_, index) => (
                 <li class="carousel-item">
                   <Slider.Dot index={index}>
@@ -128,9 +180,10 @@ export const Preview = (
                   </Slider.Dot>
                 </li>
               ))}
-            </ul>
+            </ul> */
+            }
           </div>
-          <SliderJS rootId={id} interval={2000} infinite />
+          {/* <SliderJS rootId={id} interval={2000} infinite /> */}
         </div>
         <div>
           <div role="tablist" class="tabs tabs-bordered ">
