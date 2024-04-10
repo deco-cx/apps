@@ -27,7 +27,7 @@ function Slider({
   
   // Percentage of the item that has to be inside the container
   // for it it be considered as inside the container
-  const THRESHOLD = 0.6;
+  SLIDER_THRESHOLD = 0.6;
   
   const intersectionX = (element, container) => {
     const delta = container.width / 1_000;
@@ -83,7 +83,7 @@ function Slider({
   
         const ratio = intersectionX(rect, sliderRect) / rect.width;
   
-        if (ratio > THRESHOLD) {
+        if (ratio > SLIDER_THRESHOLD) {
           indices.push(index);
         }
       }
@@ -162,7 +162,7 @@ function Slider({
             }
           }
         }),
-      { threshold: THRESHOLD, root: slider },
+      { threshold: SLIDER_THRESHOLD, root: slider },
     );
   
     items.forEach((item) => observer.observe(item));
