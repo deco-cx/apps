@@ -2,8 +2,11 @@ import { ImportMap } from "deco/blocks/app.ts";
 import { buildImportMap } from "deco/blocks/utils.tsx";
 import { notUndefined } from "deco/engine/core/utils.ts";
 import { type App, AppModule, context, type FnContext } from "deco/mod.ts";
-import { Markdown2 } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { AppRuntime } from "deco/types.ts";
+import { PreviewMarkdown } from "./components/PreviewMarkdown.tsx";
+import { Preview as PreviewTemplate } from "./preview/Preview.tsx";
+import { Markdown } from "./components/Markdown.tsx";
 
 /**
  * @title App
@@ -109,6 +112,31 @@ export default async function App(
 
 export type AppContext = FnContext<State, Manifest>;
 
-export const Preview = await Markdown2(
+const CONFIG = {
+  name: "Deco Hub",
+  author: "deco.cx",
+  description: "Unlock apps and integrations on deco.cx",
+  icon: "https://raw.githubusercontent.com/deco-cx/apps/main/decohub/logo.png",
+  images: [],
+};
+
+export const preview = async (props: AppRuntime) => {
+  const markdownContent = await PreviewMarkdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewTemplate,
+    props: {
+      ...props,
+      config: {
+        ...CONFIG,
+        pages: [{ title: "About", content: markdownContent }],
+      },
+    },
+  };
+};
+
+export const Preview = await Markdown(
   new URL("./README.md", import.meta.url).href,
 );
