@@ -147,7 +147,7 @@ export const Preview = (
                       src={image}
                       width={434}
                       height={228}
-                      class="w-full rounded-lg"
+                      class="w-full rounded-lg object-cover h-full"
                     />
                   </Slider.Item>
                 ))}

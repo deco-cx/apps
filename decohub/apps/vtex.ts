@@ -13,7 +13,11 @@ const CONFIG = {
   description:
     "Loaders, actions and workflows for adding Vtex Commerce Platform to your website.",
   icon: "https://raw.githubusercontent.com/deco-cx/apps/main/vtex/logo.png",
-  images: [],
+  images: [
+    "https://github.com/IncognitaDev/apps/blob/feat/apps/preview/vtex/images/preview-1.png?raw=true",
+    "https://github.com/IncognitaDev/apps/blob/feat/apps/preview/vtex/images/preview-2.png?raw=true",
+    "https://github.com/IncognitaDev/apps/blob/feat/apps/preview/vtex/images/preview-3.png?raw=true",
+  ],
 };
 
 export const preview = async (props: AppRuntime) => {
