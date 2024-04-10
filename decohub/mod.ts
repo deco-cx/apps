@@ -2,7 +2,7 @@ import { ImportMap } from "deco/blocks/app.ts";
 import { buildImportMap } from "deco/blocks/utils.tsx";
 import { notUndefined } from "deco/engine/core/utils.ts";
 import { type App, AppModule, context, type FnContext } from "deco/mod.ts";
-import { Markdown } from "./components/Markdown.tsx";
+import { Markdown2 } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 /**
@@ -111,6 +111,6 @@ export default async function App(
 
 export type AppContext = FnContext<State, Manifest>;
 
-export const Preview = await Markdown(
+export const Preview = await Markdown2(
   new URL("./README.md", import.meta.url).href,
 );
