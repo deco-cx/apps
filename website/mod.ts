@@ -135,7 +135,7 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
         __resolveType: "website/handlers/router.ts",
         audiences: [
           ...(state.abTesting ? getAbTestAudience(state.abTesting) : []),
-        ]
+        ],
       },
     },
   };
@@ -148,44 +148,44 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       __resolveType: "website/handlers/proxy.ts",
       customHeaders: [],
       includeScriptsToHead: {
-        includes: []
-      }
-    }
-  }
+        includes: [],
+      },
+    },
+  };
   const matcher = {
     "op": "and",
     "matchers": [
       {
         "includes": abTesting.urlToSplit,
-        "__resolveType": "website/matchers/host.ts"
+        "__resolveType": "website/matchers/host.ts",
       },
       {
         "traffic": abTesting.percentage,
-        "__resolveType": "website/matchers/random.ts"
-      }
+        "__resolveType": "website/matchers/random.ts",
+      },
     ],
-    "__resolveType": "website/matchers/multi.ts"
-  }
+    "__resolveType": "website/matchers/multi.ts",
+  };
 
-  if(abTesting.enabled){
+  if (abTesting.enabled) {
     return [{
       name: abTesting.name,
       routes: [
         {
           handler,
-          pathTemplate: "/"
+          pathTemplate: "/",
         },
         {
           handler,
-          pathTemplate: "/*"
-        }
+          pathTemplate: "/*",
+        },
       ],
       matcher,
-      __resolveType: "website/flags/audience.ts"
+      __resolveType: "website/flags/audience.ts",
     }];
   }
-  return []
-}
+  return [];
+};
 
 const deferPropsResolve = (routes: Routes): Routes => {
   if (Array.isArray(routes)) {

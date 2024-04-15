@@ -58,7 +58,7 @@ export interface Header {
   value: string;
 }
 
-export interface TextReplace{
+export interface TextReplace {
   from: string;
   to: string;
 }
@@ -98,7 +98,7 @@ export interface Props {
 
   avoidAppendPath?: boolean;
 
-  replaces?: TextReplace[]
+  replaces?: TextReplace[];
 }
 
 /**
@@ -113,10 +113,9 @@ export default function Proxy({
   includeScriptsToHead,
   redirect = "manual",
   avoidAppendPath,
-  replaces
+  replaces,
 }: Props): Handler {
   return async (req, _ctx) => {
-    console.log("proxy")
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
     const qs = url.searchParams.toString();
@@ -212,9 +211,9 @@ export default function Proxy({
 
             // Combine and encode the new chunk
             let newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
-            replaces?.forEach(replace => {
+            replaces?.forEach((replace) => {
               newChunkStr = newChunkStr?.replaceAll(replace.from, replace.to);
-            })
+            });
             controller.enqueue(new TextEncoder().encode(newChunkStr));
           } else {
             // If </head> not found, pass the chunk unchanged
