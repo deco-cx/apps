@@ -32,9 +32,21 @@ const loader = async (
     throw new Error("/leilao.json returned another model than Auction");
   }
 
-  return auctions.Model.ProductAuctions.map((auction) =>
+  const produtos = auctions.Model.ProductAuctions.map((auction) =>
     toAuction(auction, { cdn })
   );
+  const facetas = auctions.Model.Grid.Facets;
+  const pagecount = auctions.Model.Grid.PageCount;
+  const pagenumber = auctions.Model.Grid.PageNumber;
+  const pageindex = auctions.Model.Grid.PageIndex;
+
+  return{
+    produtos: produtos,
+    facetas: facetas,
+    pagecount: pagecount,
+    pagenumber: pagenumber,
+    pageindex: pageindex
+  };
 };
 
 export default loader;
