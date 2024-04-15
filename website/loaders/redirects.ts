@@ -4,7 +4,7 @@ import { AppContext } from "../mod.ts";
 import { type Props as RedirectProps } from "./redirect.ts";
 
 const isHref = (from: string) =>
-  from.includes("http") || (!from?.includes("*") && !from?.includes("/:"));
+  from.startsWith("http") || (!from?.includes("*") && !from?.includes("/:"));
 
 async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
   const allRedirects = await ctx.get<
