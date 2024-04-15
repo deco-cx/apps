@@ -58,6 +58,11 @@ export interface Header {
   value: string;
 }
 
+export interface TextReplace{
+  from: string;
+  to: string;
+}
+
 export interface Props {
   /**
    * @description the proxy url.
@@ -92,6 +97,8 @@ export interface Props {
   redirect?: "manual" | "follow";
 
   avoidAppendPath?: boolean;
+
+  replaces?: TextReplace[]
 }
 
 /**
@@ -106,8 +113,10 @@ export default function Proxy({
   includeScriptsToHead,
   redirect = "manual",
   avoidAppendPath,
+  replaces
 }: Props): Handler {
   return async (req, _ctx) => {
+    console.log("proxy")
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
     const qs = url.searchParams.toString();
@@ -202,7 +211,10 @@ export default function Proxy({
             }
 
             // Combine and encode the new chunk
-            const newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
+            let newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
+            replaces?.forEach(replace => {
+              newChunkStr = newChunkStr?.replaceAll(replace.from, replace.to);
+            })
             controller.enqueue(new TextEncoder().encode(newChunkStr));
           } else {
             // If </head> not found, pass the chunk unchanged
@@ -232,6 +244,7 @@ export default function Proxy({
         );
       }
     }
+
     return new Response(
       newBodyStream === null ? response.body : newBodyStream,
       {

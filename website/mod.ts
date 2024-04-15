@@ -7,6 +7,7 @@ import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Page } from "deco/blocks/page.tsx";
+import { TextReplace } from "./handlers/proxy.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -32,6 +33,15 @@ export type CacheDirective = StaleWhileRevalidate | MaxAge;
 export interface Caching {
   enabled?: boolean;
   directives?: CacheDirective[];
+}
+
+export interface AbTesting {
+  enabled?: boolean;
+  name: string;
+  urlToRunAgainst?: string;
+  urlToSplit?: string;
+  replaces?: TextReplace[];
+  percentage?: number;
 }
 
 export interface Props {
@@ -73,6 +83,8 @@ export interface Props {
    * @default false
    */
   firstByteThresholdMS?: boolean;
+
+  abTesting?: AbTesting;
 }
 
 /**
@@ -121,9 +133,58 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
     resolvables: {
       "./routes/[...catchall].tsx": {
         __resolveType: "website/handlers/router.ts",
+        audiences: [
+          ...(state.abTesting ? getAbTestAudience(state.abTesting) : []),
+        ]
       },
     },
   };
+}
+
+const getAbTestAudience = (abTesting: AbTesting) => {
+  const handler = {
+    value: {
+      url: abTesting.urlToRunAgainst,
+      __resolveType: "website/handlers/proxy.ts",
+      customHeaders: [],
+      includeScriptsToHead: {
+        includes: []
+      }
+    }
+  }
+  const matcher = {
+    "op": "and",
+    "matchers": [
+      {
+        "includes": abTesting.urlToSplit,
+        "__resolveType": "website/matchers/host.ts"
+      },
+      {
+        "traffic": abTesting.percentage,
+        "__resolveType": "website/matchers/random.ts"
+      }
+    ],
+    "__resolveType": "website/matchers/multi.ts"
+  }
+
+  if(abTesting.enabled){
+    return [{
+      name: abTesting.name,
+      routes: [
+        {
+          handler,
+          pathTemplate: "/"
+        },
+        {
+          handler,
+          pathTemplate: "/*"
+        }
+      ],
+      matcher,
+      __resolveType: "website/flags/audience.ts"
+    }];
+  }
+  return []
 }
 
 const deferPropsResolve = (routes: Routes): Routes => {
