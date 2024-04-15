@@ -26,7 +26,7 @@ const loader = async (
   }
 
   const auction = await response.json();
-
+  
   if (!auction || !isAuctionDetailModel(auction)) {
     throw new Error("Auction detail page returned another model than Auction");
   }
