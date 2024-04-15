@@ -37,7 +37,7 @@ export interface Caching {
 
 export interface AbTesting {
   enabled?: boolean;
-  name: string;
+  name?: string;
   urlToRunAgainst?: string;
   urlToSplit?: string;
   replaces?: TextReplace[];
