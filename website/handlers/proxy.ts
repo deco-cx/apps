@@ -248,7 +248,7 @@ export default function Proxy({
     if (replaces && replaces.length > 0) {
       text = await response.text();
       replaces.forEach(({ from, to }) => {
-        text = text?.replace(from, to);
+        text = text?.replaceAll(from, to);
       });
     }
 
