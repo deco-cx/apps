@@ -247,10 +247,12 @@ export default function Proxy({
     let text: undefined | string = undefined;
 
     if (replaces && replaces.length > 0) {
-      text = await new Response(newBody).text();
-      replaces.forEach(({ from, to }) => {
-        text = text?.replaceAll(from, to);
-      });
+      if (newBodyStream || response.ok) {
+        text = await new Response(newBody).text();
+        replaces.forEach(({ from, to }) => {
+          text = text?.replaceAll(from, to);
+        });
+      }
     }
 
     return new Response(
