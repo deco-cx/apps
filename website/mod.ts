@@ -37,10 +37,25 @@ export interface Caching {
 
 export interface AbTesting {
   enabled?: boolean;
+  /**
+   * @description The name of the A/B test, it will be appear at cookie
+   */
   name?: string;
+  /**
+   * @description The url to run the A/B test against, eg: secure.mywebsite.com.br
+   */
   urlToRunAgainst?: string;
+  /**
+   * @description The url to split the traffic, main url, eg: www.mywebsite.com.br
+   */
   urlToSplit?: string;
+  /**
+   * @description Strings to replace in the response, for example, to replace absolute urls at HTML
+   */
   replaces?: TextReplace[];
+  /**
+   * @description The percentage of traffic to run the A/B test, 0.5 = 50%
+   */
   percentage?: number;
 }
 
@@ -84,6 +99,10 @@ export interface Props {
    */
   firstByteThresholdMS?: boolean;
 
+  /**
+   * @title A/B Testing
+   * @description A/B Testing configuration
+   */
   abTesting?: AbTesting;
 }
 
