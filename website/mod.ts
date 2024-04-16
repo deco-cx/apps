@@ -150,6 +150,7 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       includeScriptsToHead: {
         includes: [],
       },
+      replaces: abTesting.replaces,
     },
   };
   const matcher = {

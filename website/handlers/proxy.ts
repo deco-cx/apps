@@ -4,6 +4,7 @@ import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
 import { Monitoring } from "deco/engine/core/resolver.ts";
+import { replace } from "../../../../../Library/Caches/deno/npm/registry.npmjs.org/@types/lodash/4.14.202/index.d.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -210,10 +211,8 @@ export default function Proxy({
             }
 
             // Combine and encode the new chunk
-            let newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
-            replaces?.forEach((replace) => {
-              newChunkStr = newChunkStr?.replaceAll(replace.from, replace.to);
-            });
+            const newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
+
             controller.enqueue(new TextEncoder().encode(newChunkStr));
           } else {
             // If </head> not found, pass the chunk unchanged
@@ -244,8 +243,18 @@ export default function Proxy({
       }
     }
 
+    const newBody = newBodyStream === null ? response.body : newBodyStream;
+    
+    let text: undefined | string = undefined;
+    if(replaces && replaces.length > 0) {
+      text = await response.text();
+      replaces.forEach(({ from, to }) => {
+        text = text?.replace(from, to);
+      })
+    }
+
     return new Response(
-      newBodyStream === null ? response.body : newBodyStream,
+      text || newBody,
       {
         status: response.status,
         headers: responseHeaders,
