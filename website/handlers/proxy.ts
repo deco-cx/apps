@@ -4,7 +4,6 @@ import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
 import { Monitoring } from "deco/engine/core/resolver.ts";
-import { replace } from "../../../../../Library/Caches/deno/npm/registry.npmjs.org/@types/lodash/4.14.202/index.d.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -244,13 +243,13 @@ export default function Proxy({
     }
 
     const newBody = newBodyStream === null ? response.body : newBodyStream;
-    
+
     let text: undefined | string = undefined;
-    if(replaces && replaces.length > 0) {
+    if (replaces && replaces.length > 0) {
       text = await response.text();
       replaces.forEach(({ from, to }) => {
         text = text?.replace(from, to);
-      })
+      });
     }
 
     return new Response(
