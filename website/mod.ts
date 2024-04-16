@@ -8,6 +8,7 @@ import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Page } from "deco/blocks/page.tsx";
 import { TextReplace } from "./handlers/proxy.ts";
+import { Script } from "./types.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -57,6 +58,12 @@ export interface AbTesting {
    * @description The percentage of traffic to run the A/B test, 0.5 = 50%
    */
   percentage?: number;
+  /**
+   * @description Scripts to include in the head of the page proxied
+   */
+  includeScriptsToHead?: {
+    includes?: Script[];
+  };
 }
 
 export interface Props {
@@ -166,9 +173,7 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       url: abTesting.urlToRunAgainst,
       __resolveType: "website/handlers/proxy.ts",
       customHeaders: [],
-      includeScriptsToHead: {
-        includes: [],
-      },
+      includeScriptsToHead: abTesting.includeScriptsToHead,
       replaces: abTesting.replaces,
     },
   };

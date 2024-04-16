@@ -159,7 +159,7 @@ export default function Proxy({
       ? _ctx?.state?.monitoring
       : undefined;
 
-    const fecthFunction = async () => {
+    const fetchFunction = async () => {
       try {
         return await fetch(to, {
           headers,
@@ -174,7 +174,7 @@ export default function Proxy({
       }
     };
 
-    const response = await fecthFunction();
+    const response = await fetchFunction();
 
     if (response.status >= 299 || response.status < 200) {
       await logClonedResponseBody(response, monitoring);
@@ -245,8 +245,9 @@ export default function Proxy({
     const newBody = newBodyStream === null ? response.body : newBodyStream;
 
     let text: undefined | string = undefined;
+
     if (replaces && replaces.length > 0) {
-      text = await response.text();
+      text = await new Response(newBody).text();
       replaces.forEach(({ from, to }) => {
         text = text?.replaceAll(from, to);
       });
