@@ -3,6 +3,7 @@ import { AppContext } from "../mod.ts";
 import { withDigestCookie } from "../utils/password.ts";
 
 const PATHS_TO_PROXY = [
+  "/checkout",
   "/checkouts/*",
   "/cart",
   "/cart/*",
@@ -14,6 +15,11 @@ const PATHS_TO_PROXY = [
   "/challenge/*",
   "/services/*",
   "/.well-known/*",
+  "/services/*",
+  "/apps/*",
+  "/proxy/validate",
+  "/proxy/validate/*",
+  "/*/orders/*",
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
