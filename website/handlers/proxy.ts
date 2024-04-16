@@ -247,7 +247,7 @@ export default function Proxy({
     let text: undefined | string = undefined;
 
     if (replaces && replaces.length > 0) {
-      if (newBodyStream || response.ok) {
+      if (response.ok) {
         text = await new Response(newBody).text();
         replaces.forEach(({ from, to }) => {
           text = text?.replaceAll(from, to);
