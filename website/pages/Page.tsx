@@ -45,7 +45,8 @@ export interface Props {
   /** @hide true */
   seo?: Section<SEOSection>;
   sections: Sections;
-  noIndexing: boolean;
+  /** @hide true */
+  unindexedDomain: boolean;
 }
 
 export function renderSection(section: Props["sections"][number]) {
@@ -100,17 +101,15 @@ function Page({
   errorPage,
   devMode,
   seo,
-  noIndexing,
+  unindexedDomain,
 }: Props & { errorPage?: Page; devMode: boolean }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 
-  console.log(noIndexing);
-
   return (
     <>
-      {noIndexing && (
+      {unindexedDomain && (
         <Head>
           <meta name="robots" content="noindex, nofollow" />
         </Head>
@@ -147,7 +146,7 @@ export const loader = async (
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
 
-  const noIndexing = noIndexedDomains.some((domain) =>
+  const unindexedDomain = noIndexedDomains.some((domain) =>
     url.origin.includes(domain)
   );
 
@@ -158,7 +157,7 @@ export const loader = async (
       ? await ctx.errorPage()
       : undefined,
     devMode,
-    noIndexing,
+    unindexedDomain,
   };
 };
 
