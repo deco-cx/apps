@@ -7,6 +7,8 @@ import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Page } from "deco/blocks/page.tsx";
+import { TextReplace } from "./handlers/proxy.ts";
+import { Script } from "./types.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -32,6 +34,36 @@ export type CacheDirective = StaleWhileRevalidate | MaxAge;
 export interface Caching {
   enabled?: boolean;
   directives?: CacheDirective[];
+}
+
+export interface AbTesting {
+  enabled?: boolean;
+  /**
+   * @description The name of the A/B test, it will be appear at cookie
+   */
+  name?: string;
+  /**
+   * @description The url to run the A/B test against, eg: secure.mywebsite.com.br
+   */
+  urlToRunAgainst?: string;
+  /**
+   * @description The url to split the traffic, main url, eg: www.mywebsite.com.br
+   */
+  urlToSplit?: string;
+  /**
+   * @description Strings to replace in the response, for example, to replace absolute urls at HTML
+   */
+  replaces?: TextReplace[];
+  /**
+   * @description The percentage of traffic to run the A/B test, 0.5 = 50%
+   */
+  percentage?: number;
+  /**
+   * @description Scripts to include in the head of the page proxied
+   */
+  includeScriptsToHead?: {
+    includes?: Script[];
+  };
 }
 
 export interface Props {
@@ -73,6 +105,12 @@ export interface Props {
    * @default false
    */
   firstByteThresholdMS?: boolean;
+
+  /**
+   * @title A/B Testing
+   * @description A/B Testing configuration
+   */
+  abTesting?: AbTesting;
 }
 
 /**
@@ -121,10 +159,58 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
     resolvables: {
       "./routes/[...catchall].tsx": {
         __resolveType: "website/handlers/router.ts",
+        audiences: [
+          ...(state.abTesting ? getAbTestAudience(state.abTesting) : []),
+        ],
       },
     },
   };
 }
+
+const getAbTestAudience = (abTesting: AbTesting) => {
+  const handler = {
+    value: {
+      url: abTesting.urlToRunAgainst,
+      __resolveType: "website/handlers/proxy.ts",
+      customHeaders: [],
+      includeScriptsToHead: abTesting.includeScriptsToHead,
+      replaces: abTesting.replaces,
+    },
+  };
+  const matcher = {
+    "op": "and",
+    "matchers": [
+      {
+        "includes": abTesting.urlToSplit,
+        "__resolveType": "website/matchers/host.ts",
+      },
+      {
+        "traffic": abTesting.percentage,
+        "__resolveType": "website/matchers/random.ts",
+      },
+    ],
+    "__resolveType": "website/matchers/multi.ts",
+  };
+
+  if (abTesting.enabled) {
+    return [{
+      name: abTesting.name,
+      routes: [
+        {
+          handler,
+          pathTemplate: "/",
+        },
+        {
+          handler,
+          pathTemplate: "/*",
+        },
+      ],
+      matcher,
+      __resolveType: "website/flags/audience.ts",
+    }];
+  }
+  return [];
+};
 
 const deferPropsResolve = (routes: Routes): Routes => {
   if (Array.isArray(routes)) {

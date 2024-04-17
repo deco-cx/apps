@@ -5,7 +5,9 @@ import "https://esm.sh/prismjs@1.27.0/components/prism-tsx.js?no-check";
 import "https://esm.sh/prismjs@1.27.0/components/prism-typescript.js?no-check";
 
 export const Markdown = async (path: string) => {
-  const content = await fetch(path).then((res) => res.text());
+  const content = await fetch(path)
+    .then((res) => res.text())
+    .catch(() => `Could not fetch README.md for ${path}`);
 
   return () => {
     return (
