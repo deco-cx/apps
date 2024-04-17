@@ -19,6 +19,8 @@ import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import { SEOSection } from "../components/Seo.tsx";
 
+const noIndexedDomains = ["decocdn", "deco.site"];
+
 /**
  * @title Sections
  * @label hidden
@@ -43,6 +45,7 @@ export interface Props {
   /** @hide true */
   seo?: Section<SEOSection>;
   sections: Sections;
+  noIndexing: boolean;
 }
 
 export function renderSection(section: Props["sections"][number]) {
@@ -97,32 +100,42 @@ function Page({
   errorPage,
   devMode,
   seo,
+  noIndexing
 }: Props & { errorPage?: Page; devMode: boolean }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 
+  console.log(noIndexing);
+
   return (
-    <ErrorBoundary
-      fallback={(error) =>
-        error instanceof HttpError &&
-          errorPage !== undefined &&
-          errorPage !== null &&
-          !devMode
-          ? <errorPage.Component {...errorPage.props}></errorPage.Component>
-          : (
-            <ErrorPageComponent
-              error={(devMode && error instanceof (Error || HttpError)
-                ? error.stack
-                : "") || ""}
-            />
-          )}
-    >
-      {seo && renderSection(seo)}
-      <LiveControls site={site} {...deco} />
-      <Events deco={deco} />
-      {sections.map(renderSection)}
-    </ErrorBoundary>
+    <>
+      {noIndexing && (
+        <Head>
+          <meta name="robots" content="noindex, nofollow" />
+        </Head>
+      )}
+      <ErrorBoundary
+        fallback={(error) =>
+          error instanceof HttpError &&
+            errorPage !== undefined &&
+            errorPage !== null &&
+            !devMode
+            ? <errorPage.Component {...errorPage.props}></errorPage.Component>
+            : (
+              <ErrorPageComponent
+                error={(devMode && error instanceof (Error || HttpError)
+                  ? error.stack
+                  : "") || ""}
+              />
+            )}
+      >
+        {seo && renderSection(seo)}
+        <LiveControls site={site} {...deco} />
+        <Events deco={deco} />
+        {sections.map(renderSection)}
+      </ErrorBoundary>
+    </>
   );
 }
 
@@ -133,6 +146,9 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
+
+  const noIndexing = noIndexedDomains.some(domain => url.origin.includes(domain));
+
   return {
     ...restProps,
     sections,
@@ -140,6 +156,7 @@ export const loader = async (
       ? await ctx.errorPage()
       : undefined,
     devMode,
+    noIndexing
   };
 };
 
