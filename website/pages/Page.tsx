@@ -100,7 +100,7 @@ function Page({
   errorPage,
   devMode,
   seo,
-  noIndexing
+  noIndexing,
 }: Props & { errorPage?: Page; devMode: boolean }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -147,7 +147,9 @@ export const loader = async (
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
 
-  const noIndexing = noIndexedDomains.some(domain => url.origin.includes(domain));
+  const noIndexing = noIndexedDomains.some((domain) =>
+    url.origin.includes(domain)
+  );
 
   return {
     ...restProps,
@@ -156,7 +158,7 @@ export const loader = async (
       ? await ctx.errorPage()
       : undefined,
     devMode,
-    noIndexing
+    noIndexing,
   };
 };
 
