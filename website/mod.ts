@@ -59,6 +59,7 @@ export interface AbTesting {
    */
   percentage?: number;
   /**
+   * @title Scripts to include
    * @description Scripts to include in the head of the page proxied
    */
   includeScriptsToHead?: {
@@ -107,7 +108,7 @@ export interface Props {
   firstByteThresholdMS?: boolean;
 
   /**
-   * @title A/B Testing
+   * @title AB Testing
    * @description A/B Testing configuration
    */
   abTesting?: AbTesting;
