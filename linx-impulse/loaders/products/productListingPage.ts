@@ -126,7 +126,14 @@ const loader = async (
       productFormat,
     }).then((res) => res.json());
 
-    return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
+    return toProductListingPage(
+      response,
+      page,
+      resultsPerPage,
+      req.url,
+      response.searchId,
+      cdn,
+    );
   } else if (category.length > 0 || multicategory.length > 0) {
     const response = await api["GET /engage/search/v3/navigates"]({
       apiKey,
@@ -146,7 +153,14 @@ const loader = async (
       ...(multicategory.length > 0 ? { multicategory } : { category }),
     }).then((res) => res.json());
 
-    return toProductListingPage(response, page, resultsPerPage, req.url, cdn);
+    return toProductListingPage(
+      response,
+      page,
+      resultsPerPage,
+      req.url,
+      response.searchId,
+      cdn,
+    );
   } else {
     return {
       "@type": "ProductListingPage",

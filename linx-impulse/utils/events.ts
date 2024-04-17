@@ -21,6 +21,7 @@ export interface EventsAPI {
     body: {
       categories: string[];
       tags?: string[];
+      searchId?: string;
     } & CommonBody;
   };
 
@@ -29,6 +30,7 @@ export interface EventsAPI {
     body: {
       categories: string[];
       tags?: string[];
+      searchId?: string;
     } & CommonBody;
   };
 

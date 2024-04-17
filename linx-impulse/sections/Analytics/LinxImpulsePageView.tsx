@@ -25,6 +25,7 @@ interface Category {
    * @default category
    */
   page: string;
+  products: ProductListingPage | null;
 }
 
 interface Product {
@@ -141,12 +142,27 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
 
   switch (page) {
     case "category": {
+      let searchId: string | undefined;
+
+      if ("products" in event && event.products) {
+        for (const product of event.products.products ?? []) {
+          searchId = product.isVariantOf?.additionalProperty?.find((p) =>
+            p.name === "searchId"
+          )?.value;
+
+          if (searchId) {
+            break;
+          }
+        }
+      }
+
       await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
         event: "view",
         params: {
           page,
           source,
           user,
+          searchId,
           categories: url.pathname.slice(1).split("/"),
         },
       });
@@ -177,6 +193,19 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       const query = url.searchParams.get("q") ??
         url.pathname.split("/").pop() ?? "";
 
+      let searchId: string | undefined;
+      const items = result.products.map((product) => {
+        if (!searchId) {
+          searchId = product.isVariantOf?.additionalProperty?.find((p) =>
+            p.name === "searchId"
+          )?.value;
+        }
+        return ({
+          pid: product.isVariantOf?.productGroupID ?? product.productID,
+          sku: product.sku,
+        });
+      });
+
       await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
         event: "view",
         params: {
@@ -184,10 +213,8 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
           source,
           user,
           query,
-          items: result.products.map((product) => ({
-            pid: product.isVariantOf?.productGroupID ?? product.productID,
-            sku: product.sku,
-          })),
+          items,
+          searchId,
         },
       });
       break;
