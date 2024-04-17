@@ -5,6 +5,7 @@ import type {
   Filter,
   FilterToggleValue,
   Offer,
+  PageType,
   Product,
   ProductDetailsPage,
   ProductGroup,
@@ -26,6 +27,7 @@ import type {
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
+  PageType as PageTypeVTEX,
   Product as ProductVTEX,
   ProductRating,
   ProductReviewData,
@@ -717,7 +719,7 @@ export const legacyFacetToFilter = (
     if (behavior === "static") {
       link.searchParams.set(
         "fmap",
-        url.searchParams.get("fmap") || mapSegments[0],
+        url.searchParams.get("fmap") || mapSegments.join(","),
       );
     }
     const currentQuery = url.searchParams.get("q");
@@ -988,4 +990,20 @@ export const sortProducts = (
   });
 
   return orderOfIdsOrSkus.map((id) => productMap[id]);
+};
+
+export const parsePageType = (p: PageTypeVTEX): PageType => {
+  const type = p.pageType;
+
+  // Search or Busca vazia
+  if (type === "FullText") {
+    return "Search";
+  }
+
+  // A page that vtex doesn't recognize
+  if (type === "NotFound") {
+    return "Unknown";
+  }
+
+  return type;
 };

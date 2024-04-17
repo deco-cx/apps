@@ -6,6 +6,12 @@ export type State = any;
 
 export type AppContext = FnContext<State, Manifest>;
 
+/**
+ * @title Deco Blog
+ * @description Manage your posts.
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
+ */
 export default function App(
   state: State,
 ): App<Manifest, State> {

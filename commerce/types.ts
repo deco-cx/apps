@@ -556,12 +556,24 @@ export interface ProductDetailsPage {
   seo?: Seo | null;
 }
 
+export type PageType =
+  | "Brand"
+  | "Category"
+  | "Department"
+  | "SubCategory"
+  | "Product"
+  | "Collection"
+  | "Cluster"
+  | "Search"
+  | "Unknown";
+
 export interface PageInfo {
   currentPage: number;
   nextPage: string | undefined;
   previousPage: string | undefined;
   records?: number | undefined;
   recordPerPage?: number | undefined;
+  pageTypes?: PageType[];
 }
 
 export interface ProductListingPage {

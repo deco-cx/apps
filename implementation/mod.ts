@@ -47,7 +47,9 @@ export interface State {
 }
 
 /**
- * @title implementation
+ * @title Implementer
+ * @description The agency that's implementing your store
+ * @category Tool
  */
 export default function App(
   state: State,

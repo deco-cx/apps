@@ -9,6 +9,7 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import {
+  getValidTypesFromPageTypes,
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
@@ -23,6 +24,7 @@ import { slugify } from "../../utils/slugify.ts";
 import {
   filtersFromURL,
   mergeFacets,
+  parsePageType,
   toFilter,
   toProduct,
 } from "../../utils/transform.ts";
@@ -290,7 +292,10 @@ const loader = async (
   }
 
   const pageTypesPromise = pageTypesFromPathname(pathToUse, ctx);
-  const pageTypes = await pageTypesPromise;
+  const allPageTypes = await pageTypesPromise;
+
+  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
@@ -423,6 +428,7 @@ const loader = async (
       currentPage,
       records: recordsFiltered,
       recordPerPage: pagination.perPage,
+      pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
     seo: pageTypesToSeo(

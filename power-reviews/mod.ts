@@ -32,6 +32,12 @@ interface State extends Props {
   apiWrite: ReturnType<typeof createHttpClient<PowerReviews>>;
 }
 
+/**
+ * @title Power Reviews
+ * @description Collect more and better Ratings & Reviews and other UGC. Create UGC displays that convert. Analyze to enhance product experience and positioning.
+ * @category Review
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/power-reviews/logo.png
+ */
 export default function App(
   { appKey, locale, merchantId, merchantGroup }: Props,
 ) {

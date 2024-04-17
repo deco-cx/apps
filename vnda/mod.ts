@@ -54,6 +54,9 @@ export const color = 0x0C29D0;
 
 /**
  * @title VNDA
+ * @description Loaders, actions and workflows for adding VNDA Commerce Platform to your website.
+ * @category Ecommmerce
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vnda/logo.png
  */
 export default function VNDA(props: Props): App<Manifest, State> {
   const { authToken, publicUrl, sandbox } = props;
