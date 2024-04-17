@@ -43,6 +43,9 @@ export const color = 0xFF6A3B;
 
 /**
  * @title Linx Impulse
+ * @description Build, manage and deliver B2B, B2C and Marketplace commerce experiences.
+ * @category Search
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/linx-impulse/logo.png
  */
 export default function Linx({ secretKey, ...props }: State) {
   const headers = new Headers();

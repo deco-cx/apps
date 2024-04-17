@@ -6,8 +6,12 @@ import {
 } from "../../../../website/utils/crypto.ts";
 import { ignoreIfExists } from "../../common/objects.ts";
 import { k8s } from "../../deps.ts";
-import { ServiceScaling } from "../../loaders/siteState/get.ts";
-import { AppContext } from "../../mod.ts";
+import {
+  NODE_LABELS_KEY,
+  NODE_LABELS_VALUES,
+  NodeSelector,
+} from "../../loaders/siteState/get.ts";
+import { AppContext, PREVIEW_SERVICE_SCALING } from "../../mod.ts";
 import { DECO_SITES_PVC } from "../build.ts";
 
 export interface Props {
@@ -68,12 +72,17 @@ const getOrGenerateAESKey = async (site: string) => {
   }
 };
 
-const EPHEMERAL_SERVICE_SCALING: ServiceScaling = {
-  maxScale: 1,
-  initialScale: 1,
-  minScale: 0,
-  retentionPeriod: "5m",
+export const defineNodeSelectorRules = (_site: string): NodeSelector => {
+  // TODO: Replace this for actual rules, now we just need to isolate new sites from prod sites because of the PH
+  const nodeLabelDecoEvent = NODE_LABELS_KEY.DECO_EVENT;
+  const nodeValueProductHunt =
+    NODE_LABELS_VALUES[nodeLabelDecoEvent].PRODUCT_HUNT;
+
+  return {
+    [nodeLabelDecoEvent]: nodeValueProductHunt,
+  };
 };
+
 /**
  * Provision namespace of the new site and required resources.
  * @title Create Site
@@ -133,8 +142,12 @@ export default async function newSite(
       },
     }).catch(ignoreIfExists),
   ]);
+
+  const nodeSelector = defineNodeSelectorRules(site);
+
   const state = {
-    ...isEphemeral ? { scaling: EPHEMERAL_SERVICE_SCALING } : {},
+    nodeSelector,
+    ...isEphemeral ? { scaling: PREVIEW_SERVICE_SCALING } : {},
     envVars: [secretEnvVar],
   };
   await ctx.invoke.kubernetes.actions.siteState.upsert({

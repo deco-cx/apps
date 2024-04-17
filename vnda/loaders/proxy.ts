@@ -42,6 +42,10 @@ export interface Props {
   /** @description ex: /p/fale-conosco */
   pagesToProxy?: string[];
   generateDecoSiteMap?: boolean;
+  /**
+   * @title Exclude paths from /deco-sitemap.xml
+   */
+  excludePathsFromDecoSiteMap?: string[];
   includeSiteMap?: string[];
 }
 
@@ -49,7 +53,12 @@ export interface Props {
  * @title VNDA Proxy Routes
  */
 function loader(
-  { pagesToProxy = [], generateDecoSiteMap, includeSiteMap }: Props,
+  {
+    pagesToProxy = [],
+    generateDecoSiteMap,
+    excludePathsFromDecoSiteMap = [],
+    includeSiteMap,
+  }: Props,
   _req: Request,
   { publicUrl, account }: AppContext,
 ): Route[] {
@@ -67,6 +76,7 @@ function loader(
         pathTemplate: decoSiteMapUrl,
         handler: {
           value: {
+            excludePaths: excludePathsFromDecoSiteMap,
             __resolveType: "website/handlers/sitemap.ts",
           },
         },

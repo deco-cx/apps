@@ -71,6 +71,8 @@ async function loader(
         ["GET /api/catalog_system/pub/products/search/:term?"](
           {
             ...params,
+            _from: 0,
+            _to: 49,
             fq: sku.kitItems.map((item) => `skuId:${item.itemId}`),
           },
           STALE,
@@ -91,7 +93,7 @@ async function loader(
       title: product.productTitle,
       description: product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
-      noIndexing: !!skuId
+      noIndexing: !!skuId,
     },
   };
 }

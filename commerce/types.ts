@@ -395,7 +395,6 @@ export interface Author extends Omit<Thing, "@type"> {
 
 // TODO: fix this hack and use Product directly where it appears
 // Hack to prevent type self referencing and we end up with an infinite loop
-// deno-lint-ignore no-empty-interface
 export interface ProductLeaf extends Omit<Product, "isVariantOf"> {}
 
 export interface ProductGroup extends Omit<Thing, "@type"> {
@@ -557,12 +556,24 @@ export interface ProductDetailsPage {
   seo?: Seo | null;
 }
 
+export type PageType =
+  | "Brand"
+  | "Category"
+  | "Department"
+  | "SubCategory"
+  | "Product"
+  | "Collection"
+  | "Cluster"
+  | "Search"
+  | "Unknown";
+
 export interface PageInfo {
   currentPage: number;
   nextPage: string | undefined;
   previousPage: string | undefined;
   records?: number | undefined;
   recordPerPage?: number | undefined;
+  pageTypes?: PageType[];
 }
 
 export interface ProductListingPage {

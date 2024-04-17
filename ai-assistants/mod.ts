@@ -1,4 +1,4 @@
-import AWS from "https://esm.sh/aws-sdk";
+import AWS from "https://esm.sh/aws-sdk@2.1585.0";
 import { asResolved, isDeferred } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import type { App, AppContext as AC } from "deco/mod.ts";
@@ -134,8 +134,12 @@ export interface State extends OpenAIState {
   assistantAwsProps?: AssistantAwsProps;
   s3?: AWS.S3;
 }
+
 /**
- * @title AI Assistants Hub
+ * @title Deco AI Assistant
+ * @description Create AI assistants on deco.cx.
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png
  */
 export default function App(
   state: Props,

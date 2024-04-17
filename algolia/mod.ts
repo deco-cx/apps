@@ -29,7 +29,10 @@ export interface State {
 }
 
 /**
- * @title algolia
+ * @title Algolia
+ * @description Product search & discovery that increases conversions at scale.
+ * @category Search
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/algolia/logo.png
  */
 export default function App(
   props: State,

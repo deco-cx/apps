@@ -32,6 +32,11 @@ const PAGE_TYPE_TO_MAP_PARAM = {
 
 const segmentsFromTerm = (term: string) => term.split("/").filter(Boolean);
 
+export const getValidTypesFromPageTypes = (pagetypes: PageType[]) => {
+  return pagetypes
+    .filter((type) => PAGE_TYPE_TO_MAP_PARAM[type.pageType]);
+};
+
 export const pageTypesFromPathname = async (
   term: string,
   ctx: AppContext,
@@ -39,15 +44,13 @@ export const pageTypesFromPathname = async (
   const segments = segmentsFromTerm(term);
   const { vcsDeprecated } = ctx;
 
-  const results = await Promise.all(
+  return await Promise.all(
     segments.map((_, index) =>
       vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
         term: segments.slice(0, index + 1).join("/"),
       }, STALE).then((res) => res.json())
     ),
   );
-
-  return results.filter((result) => PAGE_TYPE_TO_MAP_PARAM[result.pageType]);
 };
 
 export const getMapAndTerm = (
@@ -109,7 +112,8 @@ export const pageTypesToSeo = (
 
   const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
-  const hasMapTermOrSkuId = !!(url.searchParams.get("map") || url.searchParams.get("skuId"))
+  const hasMapTermOrSkuId =
+    !!(url.searchParams.get("map") || url.searchParams.get("skuId"));
 
   if (
     (!current || current.pageType === "Search" ||
@@ -119,7 +123,7 @@ export const pageTypesToSeo = (
       title: capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
       canonical: url.href,
-      noIndexing: hasMapTermOrSkuId
+      noIndexing: hasMapTermOrSkuId,
     };
   }
 

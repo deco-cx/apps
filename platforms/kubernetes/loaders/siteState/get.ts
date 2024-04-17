@@ -82,13 +82,27 @@ export const sourceIsFromFiles = (source: Source): source is Files => {
 };
 
 export interface Resource {
-  cpu: string;
-  memory: string;
+  cpu?: string;
+  memory?: string;
+  "ephemeral-storage"?: string;
 }
 export interface ResourceRequirements {
-  requests: Resource;
-  limits: Resource;
+  requests?: Resource;
+  limits?: Resource;
 }
+
+export type NodeSelector = Record<string, string>;
+
+export const NODE_LABELS_KEY = {
+  "DECO_EVENT": "deco.event",
+};
+
+export const NODE_LABELS_VALUES = {
+  [NODE_LABELS_KEY.DECO_EVENT]: {
+    "PRODUCT_HUNT": "product-hunt",
+  },
+};
+
 export interface SiteState {
   entrypoint?: string; // defaults to main.ts
   source?: Source;
@@ -100,6 +114,8 @@ export interface SiteState {
   scaling?: ServiceScaling;
   resources?: ResourceRequirements;
   domains?: Domain[];
+  nodeSelector?: NodeSelector;
+  nodeAffinity?: k8s.V1NodeAffinity;
 }
 
 /**

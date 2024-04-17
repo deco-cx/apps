@@ -24,6 +24,7 @@ const config = {
     app("brand-assistant"),
     app("implementation"),
     app("weather"),
+    app("blog"),
     {
       dir: "admin",
       name: "deco-sites/admin",
@@ -47,6 +48,7 @@ const config = {
     app("power-reviews"),
     app("crux"),
     app("decohub"),
+    app("htmx"),
     ...compatibilityApps,
     ...paltformApps,
   ],
