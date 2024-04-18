@@ -49,9 +49,10 @@ export const router = (
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
   resolver: ResolveFunc,
   configs?: ResolveOptions,
+  parsedUrl?: URL,
 ): Handler => {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
-    const url = new URL(req.url);
+    const url = parsedUrl ?? new URL(req.url);
     const route = async (
       handler: Resolvable<Handler>,
       routePath: string,
@@ -153,7 +154,8 @@ export default function RoutesSelection(
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
     // TODO: (@tlgimenes) Remove routing from request cycle
-    if ((new URL(req.url)).pathname.startsWith("/_frsh/")) {
+    const url = new URL(req.url);
+    if (url.pathname.startsWith("/_frsh/")) {
       return new Response(null, {
         status: 404,
       });
@@ -190,6 +192,7 @@ export default function RoutesSelection(
       hrefRoutes,
       ctx.get,
       { monitoring },
+      url,
     );
 
     timing?.end();
