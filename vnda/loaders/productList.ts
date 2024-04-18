@@ -59,7 +59,7 @@ const productListLoader = async (
 
   if (validProducts.length === 0) return null;
 
-  const sortedProducts = props.ids.length > 0
+  const sortedProducts = props.ids?.length > 0
     ? props.ids.map((id) => validProducts.find((product) => product.id === id))
     : validProducts;
 
