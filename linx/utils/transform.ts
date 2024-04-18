@@ -7,7 +7,7 @@ import {
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
-import { Cart } from "./types/basketJSON.ts";
+import { CartResponse } from "./types/basketJSON.ts";
 import {
   Facet,
   Navigation as GridProductsNavigation,
@@ -29,7 +29,6 @@ import {
 } from "./types/suggestionsJSON.ts";
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
-import { Models } from "https://deno.land/x/openai@v4.19.1/resources/mod.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -285,21 +284,25 @@ export const toProductDetails = (
   };
 };
 
-export const toCart = (cart: Cart, { cdn }: { cdn: string }): Cart | null => {
-  if (!cart.Basket?.IsValid) {
+export const toCart = (
+  cart: CartResponse,
+  { cdn }: { cdn: string },
+): CartResponse | null => {
+  if (!cart.IsValid) {
     return null;
   }
 
   return ({
     ...cart,
-    Model: undefined,
-    PageInfo: undefined,
-    Basket: {
-      ...cart.Basket,
-      Items: cart.Basket.Items?.map((item) => ({
-        ...item,
-        ImagePath: new URL(item.ImagePath || "", cdn).href,
-      })),
+    Shopper: {
+      ...cart.Shopper,
+      Basket: {
+        ...cart.Shopper.Basket,
+        Items: cart.Shopper.Basket.Items?.map((item) => ({
+          ...item,
+          ImagePath: new URL(item.ImagePath || "", cdn).href,
+        })),
+      },
     },
   });
 };
