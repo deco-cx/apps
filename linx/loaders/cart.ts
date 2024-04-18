@@ -1,24 +1,27 @@
 import type { AppContext } from "../../linx/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
-import { nullOnNotFound } from "../../utils/http.ts";
-import { isBasketModel } from "../utils/paths.ts";
 import { toCart } from "../utils/transform.ts";
-import type { Cart } from "../utils/types/basketJSON.ts";
+import type { CartResponse } from "../utils/types/basketJSON.ts";
+
+export interface Props {
+  BasketID?: number;
+}
 
 /**
  * @title Linx Integration
  * @description Cart loader
  */
 const loader = async (
-  _props: unknown,
+  props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart | null> => {
+): Promise<CartResponse | null> => {
   const { api } = ctx;
 
-  const response = await api["GET /*splat"]({ splat: "carrinho.json" }, {
+  const response = await api["POST /web-api/v1/Shopping/Basket/Get"]({}, {
     headers: req.headers,
-  }).catch(nullOnNotFound);
+    body: props,
+  });
 
   if (response === null) {
     return null;
@@ -28,8 +31,8 @@ const loader = async (
 
   const cart = await response.json();
 
-  if (!cart || !isBasketModel(cart)) {
-    throw new Error("/carrinho.json returned another model than Basket");
+  if (!cart) {
+    throw new Error("Could not retrieve Basket");
   }
 
   return toCart(cart, ctx);

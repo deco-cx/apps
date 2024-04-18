@@ -13,3 +13,19 @@ export interface ResponseCallBack {
   Parameters: unknown[];
   Value: string;
 }
+
+export interface Meta {
+  PropertyMetadataID: number;
+  PropertyName: string;
+  Value: number;
+}
+
+export interface CartProduct {
+  ProductID: string;
+  SkuID: string;
+  Quantity: number;
+  Metas?: Meta[];
+  Name?: string;
+  Url?: string;
+  RetailPrice?: number;
+}
