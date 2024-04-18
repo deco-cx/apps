@@ -232,11 +232,16 @@ const searchLoader = async (
     previousPage.set("page", (page - 1).toString());
   }
 
-  const hasTypeTags = !![...typeTags, ...properties1, ...properties2, ...properties3].length
+  const hasTypeTags = !![
+    ...typeTags,
+    ...properties1,
+    ...properties2,
+    ...properties3,
+  ].length;
 
   return {
     "@type": "ProductListingPage",
-    seo:  getSEOFromTag(categories, url, seo.at(-1), hasTypeTags, isSearchPage),
+    seo: getSEOFromTag(categories, url, seo.at(-1), hasTypeTags, isSearchPage),
     breadcrumb: isSearchPage
       ? {
         "@type": "BreadcrumbList",
