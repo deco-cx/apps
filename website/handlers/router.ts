@@ -153,7 +153,11 @@ export default function RoutesSelection(
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
     // TODO: (@tlgimenes) Remove routing from request cycle
-
+    if ((new URL(req.url)).pathname.startsWith("/_frsh/")) {
+      return new Response(null, {
+        status: 404,
+      });
+    }
     const monitoring = isFreshCtx<DecoSiteState>(connInfo)
       ? connInfo.state.monitoring
       : undefined;
