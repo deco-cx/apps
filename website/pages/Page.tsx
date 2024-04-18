@@ -46,7 +46,7 @@ export interface Props {
   seo?: Section<SEOSection>;
   sections: Sections;
   /** @hide true */
-  unindexedDomain: boolean;
+  unindexedDomain?: boolean;
 }
 
 export function renderSection(section: Props["sections"][number]) {
