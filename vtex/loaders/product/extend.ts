@@ -97,12 +97,14 @@ const reviewsExt = async (
     ctx.my["GET /reviews-and-ratings/api/reviews"]({
       product_id: product.inProductGroupWithID,
     }).then((res) => res.json())
+      .catch(() => ({}))
   );
 
   const ratingPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/rating/:inProductGroupWithId"]({
       inProductGroupWithId: product.inProductGroupWithID ?? "",
     }).then((res) => res.json())
+      .catch(() => ({}))
   );
 
   const reviewsPromise = Promise.all(reviewPromises);
