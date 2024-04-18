@@ -13,19 +13,18 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<CartOperation> => {
-  const cookies = getCookies(req.headers);
-  console.log({ cookies })
+  // const cookies = getCookies(req.headers);
+  // console.log({ cookies })
 
-  const session = cookies["_bc_hash"];
-  const response = await ctx.api["POST /Shopping/ProductAuction/AddBid"](props, {
+  // const session = cookies["_bc_hash"];
+  const response = await ctx.api["POST /Shopping/ProductAuction/AddBid"]({}, {
     headers: {
       ...req.headers,
-      "Content-Type": "application/x-www-form-urlencoded",
     },
-    credentials: "include",
+    body: props,
   });
 
-  console.log({response});
+  console.log({ response });
 
   return response.json();
 };

@@ -2,6 +2,7 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client.ts";
+import { Secret } from "../website/loaders/secret.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -18,6 +19,12 @@ export interface State {
    * @description e.g.: https://{account}.cloudfront.net/
    */
   cdn: string;
+
+  /**
+   * @title Linx integration token
+   * @description user:password of a Linx integration account encoded in base64
+   */
+  integrationToken: Secret;
 }
 
 export const color = 0xFF6A3B;
@@ -31,15 +38,18 @@ export const color = 0xFF6A3B;
  * @title LINX
  */
 export default function App(
-  { account, cdn }: State,
+  { account, cdn, integrationToken }: State,
 ) {
+  const headers = new Headers({
+    "Accept": "application/json",
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+    "Authorization": `Basic ${integrationToken.get()}`,
+  });
+
   const api = createHttpClient<API>({
     base: `https://${account}.core.dcg.com.br/`,
-    headers: new Headers({
-      "Accept": "application/json",
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-    }),
+    headers,
   });
 
   const state = { cdn, api, account };

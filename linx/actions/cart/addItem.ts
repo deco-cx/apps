@@ -1,35 +1,36 @@
 import type { AppContext } from "../../mod.ts";
-import type { Cart } from "../../utils/types/basketJSON.ts";
-
-interface Meta {
-  PropertyMetadataID: number;
-  PropertyName: string;
-  Value: number;
-}
+import { CartProduct } from "../../utils/types/basket.ts";
+import type { CartResponse } from "../../utils/types/basketJSON.ts";
 
 export interface Props {
-  ProductID: string;
-  SkuID: string;
-  Quantity: number;
-  Metas?: Meta[];
+  BaseUrl?: string;
+  WebSiteID?: number;
+  FeatureID?: number;
+  Products: CartProduct[];
+  QueryString?: string;
 }
 
 const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart | null> => {
-  const Response = await ctx.api["POST /carrinho/adicionar-produto"]({}, {
-    body: { Products: [props] },
-    headers: req.headers,
-  }).then((res) => res.json());
+): Promise<CartResponse | null> => {
+  const response = await ctx.api["POST /web-api/v1/Shopping/Basket/AddProduct"](
+    {},
+    {
+      body: props,
+      headers: req.headers,
+    },
+  ).then((res) => res.json());
+
+  if (!response.IsValid) {
+    console.error("Could not add Item to cart: ", response.Errors);
+    return null;
+  }
 
   const cart = await ctx.invoke("linx/loaders/cart.ts");
 
-  return {
-    ...cart,
-    Response,
-  };
+  return cart;
 };
 
 export default action;

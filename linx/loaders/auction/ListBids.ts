@@ -1,7 +1,5 @@
 import type { AppContext } from "../../../linx/mod.ts";
 import { nullOnNotFound } from "../../../utils/http.ts";
-// import { isListBids } from "../../utils/paths.ts";
-// import { toListBids } from "../../utils/transform.ts";
 import { Bids } from "../../utils/types/ListBidsJSON.ts";
 
 /**
@@ -15,11 +13,10 @@ export interface Props {
 
 const bidsloader = async (
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<Bids | null> => {
-  const { api, cdn } = ctx;
-  const upstream = new URL(req.url);
+  const { api } = ctx;
 
   const response = await api["GET /Shopping/ProductAuction/ListBids"]({
     ...props,
@@ -31,13 +28,7 @@ const bidsloader = async (
 
   const auction = await response.json();
 
-  //   if (!auction || !isListBids(auction)) {
-  //     throw new Error("Auction detail page returned another model than Auction");
-  //   }
-
-  //   return toListBids(auction.Model, { cdn });
-
-  return (auction.Bids);
+  return auction.Bids;
 };
 
 export default bidsloader;
