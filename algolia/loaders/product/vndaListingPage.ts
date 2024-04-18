@@ -226,7 +226,6 @@ const loader = async (
     { hits, page, nbPages, nbHits, hitsPerPage },
     { facets },
   ] = results as SearchResponse<VNDAProduct>[];
-  console.log({facets})
 
   const products = hits.map((product) => {
     return toProduct(product, {
