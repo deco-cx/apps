@@ -1,11 +1,11 @@
-import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
-import { ProductDetailsPage } from "../../types.ts";
-import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
+import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx"
+import { ProductDetailsPage } from "../../types.ts"
+import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts"
 
 export type Props = {
-  jsonLD: ProductDetailsPage | null;
-  omitVariants?: boolean;
-} & Partial<Omit<SeoProps, "jsonLDs">>;
+  jsonLD: ProductDetailsPage | null
+  omitVariants?: boolean
+} & Partial<Omit<SeoProps, "jsonLDs">>
 
 /**
  * @deprecated true
@@ -13,18 +13,18 @@ export type Props = {
  * @title SeoPDP deprecated
  */
 function Section({ jsonLD, omitVariants, ...props }: Props) {
-  const title = jsonLD?.seo?.title;
-  const description = jsonLD?.seo?.description;
-  const image = jsonLD?.product.image?.[0]?.url;
+  const title = jsonLD?.seo?.title
+  const description = jsonLD?.seo?.description
+  const image = jsonLD?.product.image?.[0]?.url
   const canonical = jsonLD?.seo?.canonical
     ? jsonLD.seo.canonical
     : jsonLD?.breadcrumbList
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumbList)
-    : undefined;
-  const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
+    : undefined
+  const noIndexing = props.noIndexing || !jsonLD || jsonLD.seo?.noIndexing
 
   if (omitVariants && jsonLD?.product.isVariantOf?.hasVariant) {
-    jsonLD.product.isVariantOf.hasVariant = [];
+    jsonLD.product.isVariantOf.hasVariant = []
   }
 
   return (
@@ -37,7 +37,7 @@ function Section({ jsonLD, omitVariants, ...props }: Props) {
       jsonLDs={[jsonLD]}
       noIndexing={noIndexing}
     />
-  );
+  )
 }
 
-export default Section;
+export default Section
