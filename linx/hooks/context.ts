@@ -24,13 +24,19 @@ const enqueue = (
 
   queue = queue.then(async () => {
     try {
-      const { cart } = await cb(controller.signal);
+      const result = await cb(controller.signal);
+      const cart = result.cart ?? null;
 
       if (controller.signal.aborted) {
         throw { name: "AbortError" };
       }
 
-      context.cart.value = { ...context.cart.value, ...cart };
+      if (cart !== null) {
+        context.cart.value = {
+          ...context.cart.value,
+          ...cart,
+        };
+      }
 
       loading.value = false;
     } catch (error) {
