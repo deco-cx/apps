@@ -1,6 +1,4 @@
-
-
 export interface LinxError {
-    ErrorMessage: string;
-    ErrorCode: null;
+  ErrorMessage: string;
+  ErrorCode: string | null;
 }
