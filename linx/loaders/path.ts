@@ -6,16 +6,16 @@ import type { API } from "../utils/client.ts";
 /**
  * @title LINX Integration
  * @description Load Page as JSON
- * 
+ *
  * This is the loader used for getting a big part of a Linx website content,
  * including:
- * 
+ *
  * - Product Detail Pages
  * - Product Category Pages
  * - Product Listing Pages
  * - Auction Listing Pages
  * - Auction Detail Pages
- * 
+ *
  * This works by forwarding the upstream URL path then appending `.json` at
  * the end. Linx websites will accept this and return the page content as `JSON`.
  * All of the loaders cited up there use the linx path loader internally.
@@ -34,7 +34,7 @@ async function loader(
 
   /**
    * TODO: Fix the /*splat route being called for images and other assets.
-   * */ 
+   */
   if (upstream.pathname.endsWith(".png")) {
     throw new Error("imagem");
   }

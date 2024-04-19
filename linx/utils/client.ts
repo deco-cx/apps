@@ -9,6 +9,7 @@ import { ProductListResponse } from "./types/productList.ts";
 import { CartOperation } from "./types/basket.ts";
 import { Props as AddProductProps } from "../actions/cart/addItem.ts";
 import { LoginResponse } from "./types/login.ts";
+import { LinxError } from "./types/common.ts";
 
 export interface API {
   "GET /*splat": {
@@ -47,19 +48,27 @@ export interface API {
     body: AddProductProps;
   };
 
-  "POST /carrinho/alterar-quantidade": {
-    response: CartOperation;
-    body: { BasketItemID: number; Quantity: number };
+  "POST /web-api/v1/Shopping/Basket/AddCoupon": {
+    response: CartResponse;
+    body: {
+      CouponCode: string;
+      BasketID?: number;
+    };
   };
 
-  "POST /carrinho/remover-produto": {
-    response: CartOperation;
-    body: { BasketItemID: number };
+  "POST /web-api/v1/Shopping/Basket/UpdateBasketItem": {
+    response: CartResponse;
+    body: {
+      BasketItemID: number;
+      Quantity: number;
+    };
   };
 
-  "POST /carrinho/adicionar-cupom": {
-    response: CartOperation;
-    body: { CouponCode: string };
+  "POST /web-api/v1/Shopping/Basket/RemoveBasketItem": {
+    response: CartResponse;
+    body: {
+      BasketItemID: number;
+    };
   };
 
   "POST /Shopping/ProductAuction/AddBid": {
@@ -75,6 +84,22 @@ export interface API {
     response: ListBidsWebPage;
     searchParams: {
       ProductAuctionID: number;
+    };
+  };
+}
+
+export interface LayerAPI {
+  "POST /v1/Catalog/API.svc/web/SaveProductAuctionBid": {
+    response: {
+      IsValid: boolean;
+      Errors: LinxError[];
+      Warnings: string[];
+    };
+    body: {
+      ProductAuctionID: number;
+      Amount: number;
+      // CustomerName: string;
+      // CustomerState: string;
     };
   };
 }
