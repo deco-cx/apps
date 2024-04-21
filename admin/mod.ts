@@ -1,6 +1,6 @@
 import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
-import { Release } from "deco/engine/releases/provider.ts";
+import { DecofileProvider } from "deco/engine/decofile/provider.ts";
 import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
 import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
 import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
@@ -36,7 +36,7 @@ export interface Workspace {
   tabs: Record<string, Tab>;
 }
 
-export interface BlockStore extends Release {
+export interface BlockStore extends DecofileProvider {
   patch(
     resolvables: Record<string, Resolvable>,
   ): Promise<Record<string, Resolvable>>;
@@ -60,7 +60,7 @@ export interface GithubEventListener<
 
 export interface State {
   storage: BlockStore;
-  release: () => Release;
+  release: () => DecofileProvider;
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];

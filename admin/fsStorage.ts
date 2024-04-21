@@ -1,11 +1,11 @@
 import { Context } from "deco/deco.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
-import { DECO_FILE_NAME, newFsProvider } from "deco/engine/releases/fs.ts";
+import { DECO_FILE_NAME, newFsProvider } from "deco/engine/decofile/fs.ts";
 import {
+  DecofileProvider,
   OnChangeCallback,
   ReadOptions,
-  Release,
-} from "deco/engine/releases/provider.ts";
+} from "deco/engine/decofile/provider.ts";
 import { join } from "std/path/mod.ts";
 import { BlockStore } from "./mod.ts";
 
@@ -62,11 +62,6 @@ export class MemoryBlockStorage implements BlockStore {
   ): Promise<Record<string, Resolvable>> {
     return this._state;
   }
-  archived(
-    _options?: ReadOptions | undefined,
-  ): Promise<Record<string, Resolvable>> {
-    return Promise.resolve({});
-  }
   revision(): Promise<string> {
     return Promise.resolve(this._revision);
   }
@@ -76,7 +71,7 @@ export class MemoryBlockStorage implements BlockStore {
   dispose?: (() => void) | undefined;
 }
 export class FsBlockStorage implements BlockStore {
-  protected _readOnly: Release | undefined;
+  protected _readOnly: DecofileProvider | undefined;
   protected path: string;
   constructor(protected fileName = DECO_FILE_NAME) {
     this.path = join(Deno.cwd(), fileName);
@@ -111,11 +106,6 @@ export class FsBlockStorage implements BlockStore {
     options?: ReadOptions | undefined,
   ): Promise<Record<string, Resolvable>> {
     return this.readOnly.state(options);
-  }
-  archived(
-    options?: ReadOptions | undefined,
-  ): Promise<Record<string, Resolvable>> {
-    return this.readOnly.archived(options);
   }
   revision(): Promise<string> {
     return this.readOnly.revision();

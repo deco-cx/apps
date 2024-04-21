@@ -1,4 +1,4 @@
-import { Release } from "deco/engine/releases/provider.ts";
+import { DecofileProvider } from "deco/engine/decofile/provider.ts";
 import { fjp } from "../../deps.ts";
 import { AppContext } from "../../mod.ts";
 import { Acked, Commands, Events, State } from "../../types.ts";
@@ -14,7 +14,7 @@ export interface Props {
 
 const subscribers: WebSocket[] = [];
 
-export const fetchState = async (release: Release): Promise<State> => {
+export const fetchState = async (release: DecofileProvider): Promise<State> => {
   const [decofile, revision] = await Promise.all([
     release.state(),
     release.revision(),
@@ -23,14 +23,16 @@ export const fetchState = async (release: Release): Promise<State> => {
   return { decofile, revision };
 };
 
-const saveState = (release: Release, { decofile }: State): Promise<void> =>
-  release.set!(decofile);
+const saveState = (
+  release: DecofileProvider,
+  { decofile }: State,
+): Promise<void> => release.set!(decofile);
 
 // Apply patch and save state ATOMICALLY!
 // This is easily done on play. On production, however, we probably
 // need a distributed queue
 let queue = Promise.resolve();
-const patchState = (release: Release, ops: fjp.Operation[]) => {
+const patchState = (release: DecofileProvider, ops: fjp.Operation[]) => {
   queue = queue.catch(() => null).then(async () =>
     saveState(release, ops.reduce(fjp.applyReducer, await fetchState(release)))
   );
