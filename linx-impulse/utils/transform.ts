@@ -193,7 +193,10 @@ const productFromImpulse = (
     ...Object
       .entries(product.details)
       .map(([key, value]) =>
-        toPropertyValue({ name: key, value: sanitizeValue(value[0]) })
+        toPropertyValue({
+          name: key,
+          value: sanitizeValue(value),
+        })
       ),
     toPropertyValue({
       name: "trackingId",
@@ -505,6 +508,7 @@ export const toProductListingPage = (
   page: number,
   resultsPerPage: number,
   url: string,
+  searchId: string,
   cdn?: string,
 ): ProductListingPage => {
   const { nextPage, previousPage } = generatePages(page, url);
@@ -518,7 +522,11 @@ export const toProductListingPage = (
     },
     sortOptions,
     products: response.products.map((p) =>
-      toProduct(p, new URL(url).origin, cdn)
+      toProduct(
+        { ...p, details: { ...p.details, searchId } },
+        new URL(url).origin,
+        cdn,
+      )
     ),
     pageInfo: {
       currentPage: page,

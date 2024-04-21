@@ -95,7 +95,7 @@ export default async function App(
       },
     } as Manifest,
     state,
-    ...context.play || state.enableAdmin
+    ...(context.play || state.enableAdmin)
       ? {
         importMap: {
           ...enhancedImportMap,
@@ -106,7 +106,9 @@ export default async function App(
           },
         },
       }
-      : {},
+      : {
+        importMap: enhancedImportMap,
+      },
   };
 }
 
