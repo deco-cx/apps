@@ -3,16 +3,12 @@ import { proxySetCookie } from "../../utils/cookie.ts";
 import { toCart } from "../utils/transform.ts";
 import type { CartResponse } from "../utils/types/basketJSON.ts";
 
-export interface Props {
-  BasketID?: number;
-}
-
 /**
  * @title Linx Integration
  * @description Cart loader
  */
 const loader = async (
-  props: Props,
+  _props: unknown,
   req: Request,
   ctx: AppContext,
 ): Promise<CartResponse | null> => {
@@ -20,7 +16,7 @@ const loader = async (
 
   const response = await api["POST /web-api/v1/Shopping/Basket/Get"]({}, {
     headers: req.headers,
-    body: props,
+    body: {},
   });
 
   if (response === null) {

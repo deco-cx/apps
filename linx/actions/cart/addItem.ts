@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+import { toCart } from "../../utils/transform.ts";
 import { CartProduct } from "../../utils/types/basket.ts";
 import type { CartResponse } from "../../utils/types/basketJSON.ts";
 
@@ -30,7 +31,10 @@ const action = async (
 
   const cart = await ctx.invoke("linx/loaders/cart.ts");
 
-  return cart;
+  return toCart({
+    ...cart,
+    Shopper: response.Shopper,
+  } as CartResponse, { cdn: ctx.cdn });
 };
 
 export default action;
