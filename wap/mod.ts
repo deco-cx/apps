@@ -25,7 +25,9 @@ export interface Props {
 }
 
 /**
- * @title wap
+ * @title Wap
+ * @description Loaders, actions and workflows for adding Wap Commerce Platform to your website.
+ * @category Ecommmerce
  */
 export default function App(
   props: Props,

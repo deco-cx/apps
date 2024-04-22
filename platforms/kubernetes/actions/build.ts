@@ -20,7 +20,10 @@ export interface Props {
   builderImage?: string;
 }
 
+const CACHE_FILE = "cache.tar";
 export const DECO_SITES_PVC = "deco-sites-sources";
+const START_CACHE = `deco-sites/start/${CACHE_FILE}`;
+
 interface BuildJobOpts {
   name: string;
   site: string;
@@ -132,7 +135,7 @@ export const SrcBinder = {
         mountPath: FILES_MOUNT_PATH,
       }],
       mountPath,
-      cacheOutput: `${mountPath}/${owner}/cache.tar`,
+      cacheOutput: `${mountPath}/${owner}/${CACHE_FILE}`,
       sourceOutput: `${mountPath}/${owner}/${repo}/${deploymentId}/source.tar`,
       envVars: [
         {
@@ -207,7 +210,7 @@ export const SrcBinder = {
         mountPath,
       }],
       mountPath,
-      cacheOutput: `${mountPath}/${owner}/${repo}/cache.tar`,
+      cacheOutput: `${mountPath}/${owner}/${repo}/${CACHE_FILE}`,
       sourceOutput: `${mountPath}/${owner}/${repo}/${commitSha}/source.tar`,
     };
   },
@@ -276,6 +279,10 @@ const buildJobOf = (
                 {
                   name: "XDG_CACHE_HOME",
                   value: esbuildCacheMountPath,
+                },
+                {
+                  name: "BUILD_CACHE_FALLBACK",
+                  value: `${sourceBinder.mountPath}/${START_CACHE}`,
                 },
                 ...sourceBinder.envVars,
               ],

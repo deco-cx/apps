@@ -11,6 +11,7 @@ interface CategoryParams {
   page: "category";
   categories: string[];
   tags?: string[];
+  searchId?: string;
 }
 
 interface ProductParams {
@@ -136,7 +137,7 @@ const action = async (
 
       switch (page) {
         case "category": {
-          const { categories, tags } = params;
+          const { categories, tags, searchId } = params;
           const path = categories.length === 1
             ? "POST /v7/events/views/category"
             : "POST /v7/events/views/subcategory";
@@ -144,6 +145,7 @@ const action = async (
             body: {
               categories,
               tags,
+              searchId,
               ...commonBody,
             },
             headers,

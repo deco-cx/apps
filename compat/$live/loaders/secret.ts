@@ -1,7 +1,6 @@
-import SecretLoader, {
-  Props,
-  Secret,
-} from "../../../website/loaders/secret.ts";
+import SecretLoader, { Props } from "../../../website/loaders/secret.ts";
+
+import type { Secret } from "../../../website/loaders/secret.ts";
 
 /**
  * @deprecated true
