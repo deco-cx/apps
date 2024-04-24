@@ -4,6 +4,7 @@ import {
   Offer,
   Product,
   ProductDetailsPage,
+  PropertyValue,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
@@ -130,30 +131,35 @@ export const toProduct = (
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
 
-  const additionalPropertyBase = variant.SKUOptions?.map((option) => ({
+  const skuOptions: PropertyValue[] = variant.SKUOptions?.map((option) => ({
     "@type": "PropertyValue" as const,
     name: option.Name,
     value: option.Title,
     propertyID: option.Value,
-  })) ?? [];
-
-  const additionalProperty = additionalPropertyBase.concat(
-    product.ExtendedMetadatas?.map((item) => ({
-      "@type": "PropertyValue",
-      name: item.Alias,
-      value: item.Value,
-      propertyID: item.PropertyMetadataID.toString(),
-    })),
-  );
-
-  /*
-  const productDescription = product?.Descriptions?.map((option) => ({
-    name: option.Name,
-    alias: option.Alias,
-    value: option.Value,
-    propertyID: option.Value,
+    additionalType: "skuOptions",
   }));
-  */
+
+  const metadatas: PropertyValue[] = product.ExtendedMetadatas?.map((item) => ({
+    "@type": "PropertyValue" as const,
+    name: item.Alias,
+    value: item.Value,
+    propertyID: item.PropertyMetadataID.toString(),
+    additionalType: "metadatas",
+  }));
+
+  const descriptions: PropertyValue[] = product.Descriptions?.map((desc) => ({
+    "@type": "PropertyValue" as const,
+    name: desc.Name,
+    alternateName: desc.Alias,
+    value: desc.Value,
+    additionalType: "descriptions",
+  }));
+
+  const additionalProperty = [
+    ...skuOptions,
+    ...metadatas,
+    ...descriptions,
+  ];
 
   const hasVariant = level < 1
     ? variants.map((variant) =>
