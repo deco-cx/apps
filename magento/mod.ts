@@ -5,14 +5,15 @@ import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
 
 export interface Props {
-  /** @title Magento api url */
+  /**
+   * @title Magento api url
+   * @description The base url of the Magento API, If you have stores, put the name of the store at the end.
+   * @example https://magento.com/rest/store1 or https://magento.com/rest
+   */
   baseUrl: string;
 
   /** @title Magento api key */
   apiKey: Secret;
-
-  /** @title Magento store */
-  store?: string;
 }
 
 export interface State extends Props {
