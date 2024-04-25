@@ -414,10 +414,13 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
 
+  const complementName = product.items[0].complementName;
+
   return {
     "@type": "Product",
     category: categoriesString,
     productID: skuId,
+    complementName: complementName,
     url: getProductURL(baseUrl, product, sku.itemId).href,
     name,
     description,
