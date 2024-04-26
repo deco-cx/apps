@@ -1,9 +1,9 @@
-import { upsertObject } from "../../common/objects.ts";
+import { upsertObject } from "../objects.ts";
 import { AppContext } from "../../mod.ts";
 import { Namespace } from "../../actions/sites/create.ts";
 import {
   PLURAL_REVISIONS,
-  GROUP_SERVINGKNATIVEDEV,
+  GROUP_SERVING_KNATIVE_DEV,
   VERSION_V1,
   PLURAL_ROUTES,
 } from "../../constants.ts";
@@ -36,7 +36,7 @@ export const allowScaleToZero = async ({
   await upsertObject(
     ctx.kc,
     revisionBody,
-    GROUP_SERVINGKNATIVEDEV,
+    GROUP_SERVING_KNATIVE_DEV,
     VERSION_V1,
     PLURAL_REVISIONS,
     (current) => {
@@ -63,7 +63,7 @@ export const getProdRevision = async ({
 }) => {
   const prodRevision = await k8sApi
     .getNamespacedCustomObject(
-      GROUP_SERVINGKNATIVEDEV,
+      GROUP_SERVING_KNATIVE_DEV,
       VERSION_V1,
       Namespace.forSite(site),
       PLURAL_ROUTES,
