@@ -57,7 +57,9 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
     : undefined;
 
-  const noIndexing = !jsonLD || !jsonLD.products.length ||
+  const noIndexing = props.noIndexing ||
+    !jsonLD ||
+    !jsonLD.products.length ||
     jsonLD.seo?.noIndexing;
 
   if (props.configJsonLD?.removeVideos) {
