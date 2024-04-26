@@ -6,13 +6,13 @@ import { k8s } from "../../deps.ts";
 
 import {
   PLURAL_ROUTES,
-  GROUP_SERVINGKNATIVEDEV,
+  GROUP_SERVING_KNATIVE_DEV,
   VERSION_V1,
 } from "../../constants.ts";
 import {
   allowScaleToZero,
   getProdRevision,
-} from "../../common/knative/utils.ts";
+} from "../../common/knative/revisions.ts";
 
 export interface Props {
   site: string;
@@ -59,7 +59,7 @@ export default async function rollout(
       revisionName,
       namespace: Namespace.forSite(site),
     }),
-    GROUP_SERVINGKNATIVEDEV,
+    GROUP_SERVING_KNATIVE_DEV,
     VERSION_V1,
     PLURAL_ROUTES
   );
