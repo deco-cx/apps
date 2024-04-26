@@ -8,7 +8,15 @@ export interface K8sObject {
     resourceVersion?: string;
   };
 }
-
+export interface ProdRevisionBody {
+  spec: {
+    traffic: {
+      latestRevision: boolean;
+      percent: number;
+      revisionName: string;
+    }[];
+  };
+}
 export const ignoreIfExists = (err: unknown) => {
   if (
     (err as k8s.HttpError)?.statusCode === 409 &&
@@ -20,9 +28,7 @@ export const ignoreIfExists = (err: unknown) => {
 };
 
 export const undefinedIfNotExists = (err: unknown) => {
-  if (
-    (err as k8s.HttpError)?.statusCode === 404
-  ) {
+  if ((err as k8s.HttpError)?.statusCode === 404) {
     return undefined;
   }
   throw err;
@@ -38,21 +44,21 @@ export const upsertObject = async (
 ): Promise<{ response: { statusCode?: number } }> => {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
-  const currentObjVersion = await k8sApi.getNamespacedCustomObject(
-    group,
-    version,
-    obj.metadata.namespace,
-    plural,
-    obj.metadata.name,
-  ).catch((err) => {
-    if ((err as k8s.HttpError).statusCode === 404) {
-      return undefined;
-    }
-    throw err;
-  });
-  let response:
-    | { response: { statusCode?: number } }
-    | undefined = undefined;
+  const currentObjVersion = await k8sApi
+    .getNamespacedCustomObject(
+      group,
+      version,
+      obj.metadata.namespace,
+      plural,
+      obj.metadata.name,
+    )
+    .catch((err) => {
+      if ((err as k8s.HttpError).statusCode === 404) {
+        return undefined;
+      }
+      throw err;
+    });
+  let response: { response: { statusCode?: number } } | undefined = undefined;
   if (!currentObjVersion) {
     response = await k8sApi.createNamespacedCustomObject(
       group,
