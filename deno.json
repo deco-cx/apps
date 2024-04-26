@@ -9,7 +9,7 @@
     "std/": "https://deno.land/std@0.204.0/",
     "partytown/": "https://deno.land/x/partytown@0.4.8/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.25.1/",
-    "deco/": "https://denopkg.com/deco-cx/deco@fd7c2882bbd0a6f5d209c271298d095c6fcf4d6f/"
+    "deco/": "https://denopkg.com/deco-cx/deco@d36e2f595f7700cc52e24564d106a1ee2fdff937/"
   },
   "lock": false,
   "tasks": {
