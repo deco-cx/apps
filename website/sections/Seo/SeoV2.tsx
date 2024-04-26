@@ -4,14 +4,16 @@ import { AppContext } from "../../mod.ts";
 
 type Props = Pick<
   SeoProps,
-  "title" | "description" | "type" | "favicon" | "image" | "themeColor"
+  | "title"
+  | "description"
+  | "type"
+  | "favicon"
+  | "image"
+  | "themeColor"
+  | "noIndexing"
 >;
 
-export function loader(
-  props: Props,
-  _req: Request,
-  ctx: AppContext,
-) {
+export function loader(props: Props, _req: Request, ctx: AppContext) {
   const {
     titleTemplate = "",
     descriptionTemplate = "",
