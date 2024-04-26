@@ -40,12 +40,12 @@ const loader = async (
   const pageNumber = auctions.Model.Grid.PageNumber;
   const pageIndex = auctions.Model.Grid.PageIndex;
 
-  return{
+  return {
     products,
     facets,
     pageCount,
     pageIndex,
-    pageNumber
+    pageNumber,
   };
 };
 

@@ -7,6 +7,7 @@ import * as $$$$$$$$$1 from "./actions/cart/addCoupon.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
 import * as $$$$$$$$$4 from "./actions/login.ts";
+import * as $$$$$$$$$5 from "./actions/newsletter/subscribe.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$1 from "./loaders/auction/detailsPage.ts";
 import * as $$$2 from "./loaders/auction/list.ts";
@@ -45,6 +46,7 @@ const manifest = {
     "linx/actions/cart/addItem.ts": $$$$$$$$$2,
     "linx/actions/cart/updateItem.ts": $$$$$$$$$3,
     "linx/actions/login.ts": $$$$$$$$$4,
+    "linx/actions/newsletter/subscribe.ts": $$$$$$$$$5,
   },
   "name": "linx",
   "baseUrl": import.meta.url,
