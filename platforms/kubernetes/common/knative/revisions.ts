@@ -1,4 +1,4 @@
-import { ProdRevisionBody, upsertObject } from "../objects.ts";
+import { RouteBody, upsertObject } from "../objects.ts";
 import { AppContext } from "../../mod.ts";
 import { Namespace } from "../../actions/sites/create.ts";
 import {
@@ -14,28 +14,28 @@ import { k8s } from "../../deps.ts";
 export interface UpdateRevision {
   ctx: AppContext;
   site: string;
-  revision: string;
+  revisionName: string;
 }
 
 export const allowScaleToZero = async ({
-  revision,
+  revisionName,
   site,
   ctx,
 }: UpdateRevision) => {
-  const revisionBody = {
+  const revision = {
     metadata: {
-      name: revision,
+      name: revisionName,
       namespace: Namespace.forSite(site),
     },
   };
 
-  if (!revisionBody) {
+  if (!revision) {
     return;
   }
 
   await upsertObject(
     ctx.kc,
-    revisionBody,
+    revision,
     GROUP_SERVING_KNATIVE_DEV,
     VERSION_V1,
     PLURAL_REVISIONS,
@@ -50,27 +50,28 @@ export const allowScaleToZero = async ({
           },
         },
       };
-    },
+    }
   );
 };
 
-export const getProdRevision = async ({
+export const getProdRevisionName = async ({
   k8sApi,
   site,
 }: {
   k8sApi: k8s.CustomObjectsApi;
   site: string;
 }) => {
-  const prodRevision = await k8sApi
+  const prodRoute = await k8sApi
     .getNamespacedCustomObject(
       GROUP_SERVING_KNATIVE_DEV,
       VERSION_V1,
       Namespace.forSite(site),
       PLURAL_ROUTES,
-      Routes.prod(site),
+      Routes.prod(site)
     )
     .catch((err) => {
       logger.error(err);
     });
-  return prodRevision?.body as ProdRevisionBody;
+  const routeBody = prodRoute?.body as RouteBody;
+  return routeBody?.spec.traffic[0].revisionName;
 };

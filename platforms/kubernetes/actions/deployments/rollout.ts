@@ -11,7 +11,7 @@ import {
 } from "../../constants.ts";
 import {
   allowScaleToZero,
-  getProdRevision,
+  getProdRevisionName,
 } from "../../common/knative/revisions.ts";
 
 export interface Props {
@@ -32,12 +32,10 @@ export const Routes = {
 export default async function rollout(
   { site, deploymentId }: Props,
   _req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ) {
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
-  const currentProdRevisionBody = await getProdRevision({ k8sApi, site });
-  const previousProdRevisionName = currentProdRevisionBody?.spec.traffic[0]
-    .revisionName;
+  const previousProdRevisionName = await getProdRevisionName({ k8sApi, site });
 
   const revisionName = `${site}-site-${deploymentId}`;
   await upsertObject(
@@ -49,8 +47,8 @@ export default async function rollout(
     }),
     GROUP_SERVING_KNATIVE_DEV,
     VERSION_V1,
-    PLURAL_ROUTES,
+    PLURAL_ROUTES
   );
 
-  allowScaleToZero({ revision: previousProdRevisionName, site, ctx });
+  allowScaleToZero({ revisionName: previousProdRevisionName, site, ctx });
 }

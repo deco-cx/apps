@@ -8,7 +8,8 @@ export interface K8sObject {
     resourceVersion?: string;
   };
 }
-export interface ProdRevisionBody {
+
+export interface RouteBody {
   spec: {
     traffic: {
       latestRevision: boolean;
@@ -17,6 +18,7 @@ export interface ProdRevisionBody {
     }[];
   };
 }
+
 export const ignoreIfExists = (err: unknown) => {
   if (
     (err as k8s.HttpError)?.statusCode === 409 &&
@@ -40,7 +42,7 @@ export const upsertObject = async (
   group: string,
   version: string,
   plural: string,
-  beforeReplace?: (current: K8sObject) => K8sObject,
+  beforeReplace?: (current: K8sObject) => K8sObject
 ): Promise<{ response: { statusCode?: number } }> => {
   const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
@@ -50,7 +52,7 @@ export const upsertObject = async (
       version,
       obj.metadata.namespace,
       plural,
-      obj.metadata.name,
+      obj.metadata.name
     )
     .catch((err) => {
       if ((err as k8s.HttpError).statusCode === 404) {
@@ -65,7 +67,7 @@ export const upsertObject = async (
       version,
       obj.metadata.namespace,
       plural,
-      obj,
+      obj
     );
   } else {
     response = await k8sApi.replaceNamespacedCustomObject(
@@ -80,7 +82,7 @@ export const upsertObject = async (
           ...(currentObjVersion.body as K8sObject).metadata,
           ...obj.metadata,
         },
-      },
+      }
     );
   }
   return response;
