@@ -7,6 +7,14 @@ import { ProductListingPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 import { AppContext } from "../../mod.ts";
 
+export interface ConfigJsonLD {
+  /**
+   * @title Remove videos
+   * @description Remove product videos from structured data
+   */
+  removeVideos?: boolean;
+}
+
 export interface Props {
   /** @title Data Source */
   jsonLD: ProductListingPage | null;
@@ -16,6 +24,12 @@ export interface Props {
   description?: string;
   /** @hide true */
   canonical?: string;
+  /**
+   * @title Disable indexing
+   * @description In testing, you can use this to prevent search engines from indexing your site
+   */
+  noIndexing?: boolean;
+  configJsonLD?: ConfigJsonLD;
 }
 
 /** @title Product listing */
@@ -45,6 +59,12 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
   const noIndexing = !jsonLD || !jsonLD.products.length ||
     jsonLD.seo?.noIndexing;
+
+  if (props.configJsonLD?.removeVideos) {
+    jsonLD?.products.forEach((product) => {
+      product.video = [];
+    });
+  }
 
   return {
     ...seoSiteProps,
