@@ -18,6 +18,7 @@ export interface Props {
   runnerImage?: string;
   siteState: SiteState;
   build?: boolean;
+  hypervisor?: boolean;
 }
 
 /**
@@ -32,6 +33,7 @@ export default function newDeployment(
     labels,
     runnerImage,
     siteState: desiredState,
+    hypervisor,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -60,5 +62,6 @@ export default function newDeployment(
     siteNs,
     labels,
     runnerImage: runnerImg,
+    hypervisor,
   }, ctx);
 }

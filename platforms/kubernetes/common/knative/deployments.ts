@@ -18,6 +18,7 @@ export interface DeployOptions {
   deploymentId: string;
   labels?: Record<string, string>;
   runnerImage: string;
+  hypervisor?: boolean;
 }
 
 const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
@@ -106,6 +107,7 @@ export const deployFromSource = async (
     siteNs,
     labels,
     runnerImage,
+    hypervisor,
   }: DeployOptions,
   ctx: AppContext,
 ) => {
@@ -148,6 +150,9 @@ export const deployFromSource = async (
     resources: siteState.resources!,
     nodeAffinity: siteState.nodeAffinity,
     nodeSelector: siteState.nodeSelector,
+    volumeMounts: siteState.volumeMounts,
+    volumes: siteState.volumes,
+    hypervisor,
   });
 
   return deployService({

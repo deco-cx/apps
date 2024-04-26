@@ -1,5 +1,7 @@
 import { SourceBinder } from "../../actions/build.ts";
 import runScript from "../../common/cmds/run.ts";
+import hypervisorScript from "../../common/cmds/hypervisor.ts";
+
 import {
   NodeSelector,
   ResourceRequirements,
@@ -13,6 +15,7 @@ export interface EnvVar {
 }
 
 export interface KnativeSerivceOpts {
+  hypervisor?: boolean;
   controlPlaneDomain: string;
   revisionName: string;
   site: string;
@@ -28,6 +31,8 @@ export interface KnativeSerivceOpts {
   runArgs?: string;
   nodeSelector?: NodeSelector;
   nodeAffinity?: k8s.V1NodeAffinity;
+  volumes?: k8s.V1Volume[];
+  volumeMounts?: k8s.V1VolumeMount[];
 }
 
 const typeToAttributes: Record<
@@ -89,6 +94,9 @@ export const knativeServiceOf = (
     resources,
     nodeSelector,
     nodeAffinity,
+    volumeMounts,
+    volumes,
+    hypervisor,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -123,12 +131,12 @@ export const knativeServiceOf = (
           },
           nodeSelector,
           serviceAccountName,
-          volumes: sourceBinder.volumes,
+          volumes: [...sourceBinder.volumes, ...volumes ?? []],
           containers: [
             {
               name: "app",
               command: ["/bin/sh", "-c"],
-              args: [runScript],
+              args: [hypervisor ? hypervisorScript : runScript],
               resources,
               // TODO Inject default environment variables (e.g. OTEL_* configs)
               // envFrom: [
@@ -164,7 +172,10 @@ export const knativeServiceOf = (
                 // Add other environment variables as needed
               ],
               image: runnerImage,
-              volumeMounts: sourceBinder.volumeMounts,
+              volumeMounts: [
+                ...sourceBinder.volumeMounts,
+                ...volumeMounts ?? [],
+              ],
               ports: [{ name: "http1", containerPort: 8000 }],
             },
           ],
