@@ -1,11 +1,11 @@
-import { upsertObject } from "../objects.ts";
+import { ProdRevisionBody, upsertObject } from "../objects.ts";
 import { AppContext } from "../../mod.ts";
 import { Namespace } from "../../actions/sites/create.ts";
 import {
-  PLURAL_REVISIONS,
   GROUP_SERVING_KNATIVE_DEV,
-  VERSION_V1,
+  PLURAL_REVISIONS,
   PLURAL_ROUTES,
+  VERSION_V1,
 } from "../../constants.ts";
 import { Routes } from "../../actions/deployments/rollout.ts";
 import { logger } from "deco/observability/otel/config.ts";
@@ -50,7 +50,7 @@ export const allowScaleToZero = async ({
           },
         },
       };
-    }
+    },
   );
 };
 
@@ -67,10 +67,10 @@ export const getProdRevision = async ({
       VERSION_V1,
       Namespace.forSite(site),
       PLURAL_ROUTES,
-      Routes.prod(site)
+      Routes.prod(site),
     )
     .catch((err) => {
       logger.error(err);
     });
-  return prodRevision;
+  return prodRevision?.body as ProdRevisionBody;
 };

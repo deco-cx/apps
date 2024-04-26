@@ -5,8 +5,8 @@ import { Namespace } from "../sites/create.ts";
 import { k8s } from "../../deps.ts";
 
 import {
-  PLURAL_ROUTES,
   GROUP_SERVING_KNATIVE_DEV,
+  PLURAL_ROUTES,
   VERSION_V1,
 } from "../../constants.ts";
 import {
@@ -17,16 +17,6 @@ import {
 export interface Props {
   site: string;
   deploymentId: string;
-}
-
-interface CurrentProdRevisionBody {
-  spec: {
-    traffic: {
-      latestRevision: boolean;
-      percent: number;
-      revisionName: string;
-    }[];
-  };
 }
 
 export const Routes = {
@@ -42,14 +32,12 @@ export const Routes = {
 export default async function rollout(
   { site, deploymentId }: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ) {
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
-  const currentProdRevision = await getProdRevision({ k8sApi, site });
-  const currentProdRevisionBody =
-    currentProdRevision?.body as CurrentProdRevisionBody;
-  const previousProdRevisionName =
-    currentProdRevisionBody?.spec.traffic[0].revisionName;
+  const currentProdRevisionBody = await getProdRevision({ k8sApi, site });
+  const previousProdRevisionName = currentProdRevisionBody?.spec.traffic[0]
+    .revisionName;
 
   const revisionName = `${site}-site-${deploymentId}`;
   await upsertObject(
@@ -61,7 +49,7 @@ export default async function rollout(
     }),
     GROUP_SERVING_KNATIVE_DEV,
     VERSION_V1,
-    PLURAL_ROUTES
+    PLURAL_ROUTES,
   );
 
   allowScaleToZero({ revision: previousProdRevisionName, site, ctx });
