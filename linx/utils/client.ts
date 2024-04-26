@@ -10,6 +10,7 @@ import { CartOperation } from "./types/basket.ts";
 import { Props as AddProductProps } from "../actions/cart/addItem.ts";
 import { LoginResponse } from "./types/login.ts";
 import { LinxError } from "./types/common.ts";
+import { NewsletterResponse } from "./types/newsletterJSON.ts";
 
 export interface API {
   "GET /*splat": {
@@ -77,6 +78,16 @@ export interface API {
       productAuctionID: number;
       Amount: number;
       IsListening: boolean;
+    };
+  };
+
+  "POST /shopping/newsletter.json": {
+    response: NewsletterResponse;
+    searchParams: {
+      Name: string;
+      Email: string;
+      OptIn: boolean;
+      AllowReceiveNewsletter: boolean;
     };
   };
 
