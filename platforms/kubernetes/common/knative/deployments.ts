@@ -16,6 +16,7 @@ export interface DeployOptions {
   site: string;
   siteNs: string;
   deploymentId: string;
+  deploymentSlug?: string;
   labels?: Record<string, string>;
   runnerImage: string;
   hypervisor?: boolean;
@@ -27,12 +28,13 @@ interface DeployServiceOptions {
   service: ReturnType<typeof knativeServiceOf>;
   site: string;
   deploymentId: string;
+  deploymentSlug?: string;
   siteNs: string;
   revisionName: string;
   k8sApi: k8s.CustomObjectsApi;
 }
 const deployService = async (
-  { service, site, siteNs, deploymentId, revisionName, k8sApi }:
+  { service, site, siteNs, deploymentId, deploymentSlug, revisionName, k8sApi }:
     DeployServiceOptions,
   ctx: AppContext,
 ) => {
@@ -72,6 +74,29 @@ const deployService = async (
     revisionName,
     namespace: siteNs,
   };
+
+  const domains = [{
+    url: `https://${deploymentRoute}.${CONTROL_PLANE_DOMAIN}`,
+    production: false,
+  }];
+
+  const deploymentSlugRev = deploymentSlug
+    ? Routes.slug(site, deploymentSlug)
+    : undefined;
+
+  const slugRoute = deploymentSlugRev
+    ? upsertObject(
+      ctx.kc,
+      revisionRoute({
+        routeName: deploymentSlugRev,
+        revisionName,
+        namespace: siteNs,
+      }),
+      "serving.knative.dev",
+      "v1",
+      "routes",
+    ).then(() => {})
+    : Promise.resolve();
   await k8sApi.createNamespacedCustomObject(
     "serving.knative.dev",
     "v1",
@@ -89,11 +114,8 @@ const deployService = async (
   });
 
   await waitToBeReady(ctx.kc, revRoute);
+  await slugRoute;
 
-  const domains = [{
-    url: `https://${deploymentRoute}.${CONTROL_PLANE_DOMAIN}`,
-    production: false,
-  }];
   return { id: deploymentId, domains };
 };
 
@@ -108,6 +130,7 @@ export const deployFromSource = async (
     labels,
     runnerImage,
     hypervisor,
+    deploymentSlug,
   }: DeployOptions,
   ctx: AppContext,
 ) => {
@@ -158,6 +181,7 @@ export const deployFromSource = async (
   return deployService({
     service,
     site,
+    deploymentSlug,
     deploymentId,
     siteNs,
     revisionName,

@@ -100,6 +100,7 @@ export default function kubernetes(
           site,
           hypervisor: !production,
           siteState: deploymentState,
+          deploymentSlug: props.slug,
           deploymentId,
           labels: {
             deploymentId,
