@@ -1,4 +1,12 @@
-import { ProductSearchResult, SearchCriteria } from "./types.ts";
+import {
+  Categoria,
+  FieldsFilter,
+  MagentoProduct,
+} from "./types.ts";
+
+interface searchParams {
+  [key: string]: string | number | FieldsFilter;
+}
 
 export interface API {
   /** @docs https://developer.adobe.com/commerce/webapi/rest/quick-reference/ */
@@ -6,12 +14,26 @@ export interface API {
     response: string;
   };
 
-  "GET /V1/products-render-info": {
-    response: ProductSearchResult;
+  "GET /rest/granado/V1/products-render-info": {
+    response: MagentoProduct[];
+    searchParams: searchParams;
+  };
+
+  "GET /rest/granado/V1/products/:sku": {
+    response: MagentoProduct;
+    searchParams: searchParams;
+  };
+
+  "GET /rest/granado/V1/products": {
+    response: MagentoProduct[];
+    searchParams: searchParams;
+  };
+
+  "GET /rest/granado/V1/categories/:categoryId": {
+    response: Categoria;
     searchParams: {
-      storeId: number;
-      currencyCode: string;
-      searchCriteria: SearchCriteria;
+      categoryId: string;
+      fields?: string;
     };
   };
 }

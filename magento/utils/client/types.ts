@@ -3,14 +3,14 @@ export interface CategoryLink {
   category_id: string;
 }
 
-export interface MediaGalleryEntry {
-  id: number;
-  media_type: string;
-  label: string | null;
-  position: number;
-  disabled: boolean;
-  types: string[];
-  file: string;
+interface Image {
+  url: string;
+  code: string;
+  height: number;
+  width: number;
+  label: string;
+  resized_width: number;
+  resized_height: number;
 }
 
 export interface CustomAttribute {
@@ -18,7 +18,99 @@ export interface CustomAttribute {
   value: string | number | string[];
 }
 
-export interface ProductMagento {
+export interface Categoria {
+  id: number;
+  parent_id: number;
+  name: string;
+  is_active: boolean;
+  position: number;
+  level: number;
+  children: string;
+  created_at: string;
+  updated_at: string;
+  path: string;
+  include_in_menu: boolean;
+  custom_attributes: CustomAttribute[];
+}
+
+export interface PriceInfo {
+  final_price: number;
+  max_price: number;
+  max_regular_price: number;
+  minimal_regular_price: number;
+  special_price: number | null;
+  minimal_price: number;
+  regular_price: number;
+  formatted_prices: {
+    final_price: string;
+    max_price: string;
+    minimal_price: string;
+    max_regular_price: string;
+    minimal_regular_price: string | null;
+    special_price: string | null;
+    regular_price: string;
+  };
+  extension_attributes: {
+    msrp: {
+      msrp_price: string;
+      is_applicable: string;
+      is_shown_price_on_gesture: string;
+      msrp_message: string;
+      explanation_message: string;
+    };
+    tax_adjustments: {
+      final_price: number;
+      max_price: number;
+      max_regular_price: number;
+      minimal_regular_price: number;
+      special_price: number;
+      minimal_price: number;
+      regular_price: number;
+      formatted_prices: {
+        final_price: string;
+        max_price: string;
+        minimal_price: string;
+        max_regular_price: string;
+        minimal_regular_price: string | null;
+        special_price: string;
+        regular_price: string;
+      };
+    };
+    weee_attributes: unknown[];
+    weee_adjustment: string;
+  };
+}
+
+interface Stock {
+  item_id: number;
+  product_id: number;
+  stock_id: number;
+  qty: number;
+  is_in_stock: boolean;
+  is_qty_decimal: boolean;
+  show_default_notification_message: boolean;
+  use_config_min_qty: boolean;
+  min_qty: number;
+  use_config_min_sale_qty: boolean;
+  min_sale_qty: number;
+  use_config_max_sale_qty: boolean;
+  max_sale_qty: number;
+  use_config_backorders: boolean;
+  backorders: number;
+  use_config_notify_stock_qty: boolean;
+  notify_stock_qty: number;
+  use_config_qty_increments: boolean;
+  qty_increments: number;
+  use_config_enable_qty_inc: boolean;
+  enable_qty_increments: boolean;
+  use_config_manage_stock: boolean;
+  manage_stock: boolean;
+  low_stock_date: string | null;
+  is_decimal_divided: boolean;
+  stock_status_changed_auto: number;
+}
+
+export interface MagentoProduct {
   id: number;
   sku: string;
   name: string;
@@ -30,20 +122,24 @@ export interface ProductMagento {
   created_at: string;
   updated_at: string;
   weight: number;
+  url: string;
   extension_attributes: {
     website_ids: number[];
     category_links: CategoryLink[];
     subscription_options: unknown;
+    stock_item?: Stock;
   };
   product_links: unknown;
   options: unknown;
-  media_gallery_entries: MediaGalleryEntry[];
   tier_prices: unknown;
   custom_attributes: CustomAttribute[];
+  price_info?: PriceInfo;
+  currency_code?: string;
+  images?: Image[];
 }
 
 export interface ProductSearchResult {
-  items: ProductMagento[];
+  items: MagentoProduct[];
   search_criteria: SearchCriteria;
   total_count: number;
 }
@@ -55,7 +151,7 @@ export interface Filter {
   conditionType: string;
 }
 
-type FieldsFilter =
+export type FieldsFilter =
   | "url_key"
   | "name"
   | "price"
