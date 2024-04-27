@@ -95,7 +95,12 @@ const deployService = async (
       "serving.knative.dev",
       "v1",
       "routes",
-    ).then(() => {})
+    ).then(() => {
+      domains.push({
+        url: `https://${deploymentSlugRev}.${CONTROL_PLANE_DOMAIN}`,
+        production: false,
+      });
+    })
     : Promise.resolve();
   await k8sApi.createNamespacedCustomObject(
     "serving.knative.dev",
