@@ -59,7 +59,6 @@ export const withDefaultParams = ({
   fuzzy = "auto",
   // locale,
   hideUnavailableItems,
-  ...rest
 }: Partial<Params>) => ({
   page: page + 1,
   count,
@@ -68,7 +67,6 @@ export const withDefaultParams = ({
   fuzzy,
   // locale: locale ?? ctx.configVTEX!.defaultLocale,
   hideUnavailableItems: hideUnavailableItems ?? false,
-  ...rest,
 });
 
 const IS_ANONYMOUS = Symbol("segment");
