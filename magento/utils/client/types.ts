@@ -114,7 +114,6 @@ export interface MagentoProduct {
   id: number;
   sku: string;
   name: string;
-  attribute_set_id: number;
   price: number;
   status: number;
   visibility: number;
@@ -126,22 +125,12 @@ export interface MagentoProduct {
   extension_attributes: {
     website_ids: number[];
     category_links: CategoryLink[];
-    subscription_options: unknown;
     stock_item?: Stock;
   };
-  product_links: unknown;
-  options: unknown;
-  tier_prices: unknown;
   custom_attributes: CustomAttribute[];
   price_info?: PriceInfo;
   currency_code?: string;
   images?: Image[];
-}
-
-export interface ProductSearchResult {
-  items: MagentoProduct[];
-  search_criteria: SearchCriteria;
-  total_count: number;
 }
 
 //Query params for the request
@@ -185,4 +174,10 @@ export interface SearchCriteria {
   sortOrders?: SortOrder[];
   pageSize?: number;
   currentPage?: number;
+}
+
+export interface ProductSearchResult {
+  items: MagentoProduct[];
+  search_criteria: SearchCriteria;
+  total_count: number;
 }

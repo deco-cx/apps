@@ -14,9 +14,17 @@ export interface Props {
 
   /** @title Magento api key */
   apiKey: Secret;
+
+  /** @title Magento store */
+  site: string;
+
+  /** @title Magento store id */
+  storeId: number;
 }
 
-export interface State extends Props {
+type PartialProps = Omit<Props, "baseUrl">;
+
+export interface State extends PartialProps {
   clientGuest: ReturnType<typeof createHttpClient<API>>;
   clientAdmin: ReturnType<typeof createHttpClient<API>>;
 }
@@ -28,7 +36,7 @@ export interface State extends Props {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl } = props;
+  const { baseUrl, site, storeId, apiKey } = props;
 
   const clientGuest = createHttpClient<API>({
     base: baseUrl,
@@ -37,12 +45,15 @@ export default function App(props: Props): App<Manifest, State> {
     base: baseUrl,
     headers: new Headers(
       {
-        "Authorization": `Bearer 29jwufq03hb3yxia0m50aneof9fw4erw`,
+        "Authorization": `Bearer ${apiKey}`,
       },
     ),
   });
 
-  return { manifest, state: { ...props, clientGuest, clientAdmin } };
+  return {
+    manifest,
+    state: { site, storeId, apiKey, clientGuest, clientAdmin },
+  };
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;

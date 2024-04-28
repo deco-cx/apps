@@ -1,8 +1,8 @@
 import type { ListItem, ProductDetailsPage } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
-import { KEY_FIELD, KEY_VALUE } from "../utils/constants.ts";
-import { parseSlug, toProduct } from "../utils/transform.ts";
+import { KEY_FIELD, KEY_VALUE, URL_KEY } from "../utils/constants.ts";
+import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -23,75 +23,64 @@ async function loader(
   const { slug, currencyCode = "" } = props;
   const { clientGuest, clientAdmin } = ctx;
 
+  if (!slug) {
+    return null;
+  }
+
   const getMaybeProduct = async (slug: string) => {
     try {
-      console.log(
-        await clientAdmin["GET /rest/granado/V1/products"]({
-          currencyCode: currencyCode,
-          [KEY_FIELD]: "url_key",
-          [KEY_VALUE]: "kit-lata-sabonetes-em-barra-rosmarino",
-        }).then((res) => res.json()),
-      );
-      return await clientAdmin["GET /rest/granado/V1/products"]({
+      const response = await clientAdmin["GET /rest/granado/V1/products"]({
         currencyCode: currencyCode,
-        [KEY_FIELD]: "url_key",
-        [KEY_VALUE]: "kit-lata-sabonetes-em-barra-rosmarino",
+        [KEY_FIELD]: URL_KEY,
+        [KEY_VALUE]: slug,
       }).then((res) => res.json());
-    } catch (error) {
-      return error;
+      return response.items[0];
+    } catch (_error) {
+      return null;
     }
   };
-
-  const getProductPrice = async (sku: string | null) => {
+  const getProductPriceAndImages = async (sku: string | null) => {
     if (!sku) {
       return null;
     }
     try {
-      console.log(
-        await clientGuest["GET /rest/granado/V1/products-render-info"]({
+      const response = await clientGuest
+        ["GET /rest/granado/V1/products-render-info"]({
           [KEY_FIELD]: "sku",
           [KEY_VALUE]: sku,
           storeId: 21,
           currencyCode: currencyCode,
-          field: "items[price_info]",
-        }).then((res) => res.json()),
-      );
-      return await clientGuest["GET /rest/granado/V1/products-render-info"]({
-        [KEY_FIELD]: "sku",
-        [KEY_VALUE]: sku,
-        storeId: 21,
-        currencyCode: currencyCode,
-        field: "items[price_info]",
-      }).then((res) => res.json());
-    } catch (error) {
-      return error;
+          field: "items[price_info,image,currency_code,url]",
+        }).then((res) => res.json());
+
+      return {
+        priceInfo: response.items[0].price_info,
+        currencyCode: response.items[0].currency_code,
+        images: response.items[0].images,
+        url: response.items[0].url,
+      };
+    } catch (_error) {
+      return null;
     }
   };
-  console.log("call getMaybeProduct");
-  const productMagento = await getMaybeProduct(slug);
-  console.log(productMagento[0].sku);
-
-  // 404: product not found
-  if (!productMagento) {
-    console.log("product not found");
-    return null;
-  }
-  console.log("call getProductPrice");
-  const productMagentoPrice = await getProductPrice(productMagento[0].sku);
-  console.log(productMagentoPrice);
-
-  // 404: price not found
-  if (!productMagentoPrice) {
-    return null;
-  }
-
-  const categoryLinks = productMagento[0].extension_attributes?.category_links;
-
-  const product = toProduct({
-    ...productMagento[0],
-    ...productMagentoPrice[0],
-  });
-
+  const getProductStock = async (sku: string | null) => {
+    if (!sku) {
+      return null;
+    }
+    try {
+      const response = await clientGuest
+        ["GET /rest/granado/V1/products-render-info"]({
+          [KEY_FIELD]: "sku",
+          [KEY_VALUE]: sku,
+          storeId: 21,
+          currencyCode: currencyCode,
+          field: "items[extension_attributes.stock_item]",
+        }).then((res) => res.json());
+      return response.items[0].extension_attributes?.stock_item;
+    } catch (_error) {
+      return null;
+    }
+  };
   const getCategoryName = async (categoryId: string) => {
     try {
       return await clientAdmin["GET /rest/granado/V1/categories/:categoryId"]({
@@ -102,6 +91,40 @@ async function loader(
       return error;
     }
   };
+
+  const productInfo = await getMaybeProduct(slug);
+
+  // 404: product not found
+  if (!productInfo) {
+    console.log("product not found");
+    return null;
+  }
+
+  const [productPriceInfos, stock_item] = await Promise.all(
+    [
+      getProductPriceAndImages(productInfo.sku),
+      getProductStock(productInfo.sku),
+    ],
+  );
+
+  // 404: price not found
+  if (!productPriceInfos) {
+    return null;
+  }
+
+  const categoryLinks = productInfo.extension_attributes?.category_links;
+
+  const product = toProduct({
+    ...productInfo!,
+    price_info: productPriceInfos.priceInfo,
+    images: productPriceInfos.images,
+    currency_code: productPriceInfos.currencyCode,
+    url: productPriceInfos.url,
+    extension_attributes: {
+      ...productInfo.extension_attributes,
+      stock_item: stock_item ?? undefined,
+    },
+  });
 
   const categoryName = categoryLinks.map(
     (category: { category_id: string }) => {
@@ -133,7 +156,7 @@ async function loader(
     seo: {
       title: product.name ?? "",
       description: product.description ?? "",
-      canonical: new URL(`/${product.name}`, url).href,
+      canonical: product.url ?? "",
     },
   };
 }
