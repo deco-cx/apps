@@ -78,7 +78,9 @@ const variantsExt = async (
   const productsById = new Map<string, Product>();
   for (const batch of batched) {
     for (const product of batch || []) {
-      productsById.set(product.productID, product);
+      if (product) {
+        productsById.set(product.productID, product);
+      }
     }
   }
 
