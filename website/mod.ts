@@ -9,6 +9,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import { Page } from "deco/blocks/page.tsx";
 import { TextReplace } from "./handlers/proxy.ts";
 import { Script } from "./types.ts";
+import { Matcher } from "deco/blocks/matcher.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -65,6 +66,11 @@ export interface AbTesting {
   includeScriptsToHead?: {
     includes?: Script[];
   };
+  /**
+   * @title Override Matcher
+   * @description Override traffic matcher with a custom one
+   */
+  overrideMatcher?: Matcher;
 }
 
 export interface Props {
@@ -206,7 +212,7 @@ const getAbTestAudience = (abTesting: AbTesting) => {
           pathTemplate: "/*",
         },
       ],
-      matcher,
+      matcher: abTesting.overrideMatcher || matcher,
       __resolveType: "website/flags/audience.ts",
     }];
   }
