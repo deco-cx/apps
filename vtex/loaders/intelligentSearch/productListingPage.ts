@@ -94,6 +94,11 @@ const ALLOWED_PARAMS = new Set([
   "map",
 ]);
 
+enum AdditionalParameters {
+  showSponsered,
+  placement
+}
+
 export interface Props {
   /**
    * @description overides the query term
@@ -143,12 +148,15 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
-
   /**
    * @hide true
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+  aditionalFieldsInQuery?: {
+    label: string,
+    value: string
+  }[]
 }
 
 const searchArgsOf = (props: Props, url: URL) => {
@@ -172,6 +180,7 @@ const searchArgsOf = (props: Props, url: URL) => {
     props.selectedFacets ?? [],
     filtersFromURL(url),
   );
+
   const fuzzy = mapLabelledFuzzyToFuzzy(props.fuzzy) ??
     (url.searchParams.get("fuzzy") as Fuzzy);
 
@@ -284,6 +293,12 @@ const loader = async (
     ...args
   } = searchArgsOf(props, url);
 
+  const aditionalFieldsInQuery: {[key in keyof typeof AdditionalParameters | string]?: string | number | boolean} = {}
+  props.aditionalFieldsInQuery?.map(item => {
+    aditionalFieldsInQuery[item.label] = item.value
+  })
+
+
   let pathToUse = url.pathname;
 
   if (pathToUse === "/" || pathToUse === "/*") {
@@ -315,12 +330,15 @@ const loader = async (
 
   const params = withDefaultParams({ ...searchArgs, page });
 
+
+
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated[
       "GET /api/io/_v/api/intelligent-search/product_search/*facets"
     ](
       {
+        ...aditionalFieldsInQuery,
         ...params,
         facets: toPath(selected),
       },
@@ -329,6 +347,7 @@ const loader = async (
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"](
       {
         ...params,
+        ...aditionalFieldsInQuery,
         facets: toPath(fselected),
       },
       { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },

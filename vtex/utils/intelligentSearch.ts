@@ -28,7 +28,7 @@ export const withDefaultFacets = (
 
   // if (regionFacet !== null) {
   //   facets.push(regionFacet);
-  // }
+  // }  
 
   // return facets;
   return [...allFacets];
@@ -45,6 +45,10 @@ interface Params {
   fuzzy: string;
   locale: string;
   hideUnavailableItems: boolean;
+  aditionalFieldsInQuery?: {
+    label: string,
+    value: string
+  }[]
 }
 
 export const withDefaultParams = ({

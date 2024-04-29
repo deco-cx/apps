@@ -116,6 +116,8 @@ export interface VTEXCommerceStable {
       fuzzy?: string;
       locale?: string;
       hideUnavailableItems: boolean;
+      showSponsored?: boolean;
+      placement?: string
     };
   };
 
