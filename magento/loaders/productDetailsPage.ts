@@ -18,72 +18,50 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
-  console.log("loader start");
   const url = new URL(req.url);
-  const { slug, currencyCode = "" } = props;
-  const { clientGuest, clientAdmin, site, storeId } = ctx;
+  const { slug } = props;
+  const { clientGuest, clientAdmin, site, storeId, currencyCode = "" } = ctx;
 
   if (!slug) {
     return null;
   }
 
-  const getMaybeProduct = async (slug: string) => {
+  const getProduct = async (slug: string) => {
     try {
-      const response = await clientAdmin["GET /rest/:site/V1/products"]({
+      const { items } = await clientAdmin["GET /rest/:site/V1/products"]({
         site,
         currencyCode: currencyCode,
         [KEY_FIELD]: URL_KEY,
         [KEY_VALUE]: slug,
       }).then((res) => res.json());
-      return response.items[0];
+      console.log(items[0].sku);
+      console.log(await clientGuest
+        ["GET /rest/:site/V1/products/:sku"]({
+          site,
+          sku: items[0].sku,
+          storeId: storeId,
+          currencyCode: currencyCode,
+          fields: "extension_attributes[stock_item[item_id,qty]]",
+        }).then((res) => res.json()));
+      
+      const stockInfo = await clientGuest
+        ["GET /rest/:site/V1/products/:sku"]({
+          sku: items[0].sku,
+          site,
+          storeId: storeId,
+          currencyCode: currencyCode,
+          fields: "image,currency_code,url,extension_attributes[stock_item[item_id,qty]]",
+        }).then((res) => res.json());
+        console.log({stockInfo});
+        return {
+          ...items[0],
+          ...stockInfo
+        };
     } catch (_error) {
       return null;
     }
   };
-  const getProductPriceAndImages = async (sku: string | null) => {
-    if (!sku) {
-      return null;
-    }
-    try {
-      const response = await clientGuest
-        ["GET /rest/:site/V1/products-render-info"]({
-          site,
-          [KEY_FIELD]: "sku",
-          [KEY_VALUE]: sku,
-          storeId: storeId,
-          currencyCode: currencyCode,
-          fields: "items[price_info,image,currency_code,url]",
-        }).then((res) => res.json());
 
-      return {
-        priceInfo: response.items[0].price_info,
-        currencyCode: response.items[0].currency_code,
-        images: response.items[0].images,
-        url: response.items[0].url,
-      };
-    } catch (_error) {
-      return null;
-    }
-  };
-  const getProductStock = async (sku: string | null) => {
-    if (!sku) {
-      return null;
-    }
-    try {
-      const response = await clientGuest
-        ["GET /rest/:site/V1/products-render-info"]({
-          site,
-          [KEY_FIELD]: "sku",
-          [KEY_VALUE]: sku,
-          storeId: storeId,
-          currencyCode: currencyCode,
-          fields: "items[extension_attributes.stock_item]",
-        }).then((res) => res.json());
-      return response.items[0].extension_attributes?.stock_item;
-    } catch (_error) {
-      return null;
-    }
-  };
   const getCategoryName = async (categoryId: string) => {
     try {
       return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"]({
@@ -92,42 +70,23 @@ async function loader(
         fields: "name,position",
       }).then((res) => res.json());
     } catch (error) {
-      return error;
+      console.error(error);
+      return null;
     }
   };
 
-  const productInfo = await getMaybeProduct(slug);
+  const productMagento = await getProduct(slug);
 
   // 404: product not found
-  if (!productInfo) {
+  if (!productMagento) {
     console.log("product not found");
     return null;
   }
 
-  const [productPriceInfos, stock_item] = await Promise.all(
-    [
-      getProductPriceAndImages(productInfo.sku),
-      getProductStock(productInfo.sku),
-    ],
-  );
-
-  // 404: price not found
-  if (!productPriceInfos) {
-    return null;
-  }
-
-  const categoryLinks = productInfo.extension_attributes?.category_links;
+  const categoryLinks = productMagento.extension_attributes?.category_links;
 
   const product = toProduct({
-    ...productInfo!,
-    price_info: productPriceInfos.priceInfo,
-    images: productPriceInfos.images,
-    currency_code: productPriceInfos.currencyCode,
-    url: productPriceInfos.url,
-    extension_attributes: {
-      ...productInfo.extension_attributes,
-      stock_item: stock_item ?? undefined,
-    },
+    ...productMagento,
   });
 
   const categoryName = categoryLinks.map(

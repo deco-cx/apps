@@ -3,7 +3,7 @@ export interface CategoryLink {
   category_id: string;
 }
 
-interface Image {
+interface MagentoImage {
   url: string;
   code: string;
   height: number;
@@ -18,7 +18,7 @@ export interface CustomAttribute {
   value: string | number | string[];
 }
 
-export interface Categoria {
+export interface MagentoCategory {
   id: number;
   parent_id: number;
   name: string;
@@ -33,7 +33,7 @@ export interface Categoria {
   custom_attributes: CustomAttribute[];
 }
 
-export interface PriceInfo {
+export interface MagentoPriceInfo {
   final_price: number;
   max_price: number;
   max_regular_price: number;
@@ -81,7 +81,7 @@ export interface PriceInfo {
   };
 }
 
-interface Stock {
+interface MagentoStock {
   item_id: number;
   product_id: number;
   stock_id: number;
@@ -125,12 +125,12 @@ export interface MagentoProduct {
   extension_attributes: {
     website_ids: number[];
     category_links: CategoryLink[];
-    stock_item?: Stock;
+    stock_item?: MagentoStock;
   };
   custom_attributes: CustomAttribute[];
-  price_info?: PriceInfo;
+  price_info?: MagentoPriceInfo;
   currency_code?: string;
-  images?: Image[];
+  images?: MagentoImage[];
 }
 
 //Query params for the request

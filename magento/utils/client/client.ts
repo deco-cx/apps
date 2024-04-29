@@ -1,4 +1,4 @@
-import { Categoria, FieldsFilter, MagentoProduct } from "./types.ts";
+import { FieldsFilter, MagentoCategory, MagentoProduct } from "./types.ts";
 
 interface searchParams {
   [key: string]: string | number | undefined | FieldsFilter;
@@ -37,7 +37,7 @@ export interface API {
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/categoriescategoryId#operation/GetV1CategoriesCategoryId */
   "GET /rest/:site/V1/categories/:categoryId": {
-    response: Categoria;
+    response: MagentoCategory;
     searchParams: {
       categoryId: string;
       fields?: string;
