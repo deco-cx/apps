@@ -21,7 +21,7 @@ async function loader(
   console.log("loader start");
   const url = new URL(req.url);
   const { slug, currencyCode = "" } = props;
-  const { clientGuest, clientAdmin } = ctx;
+  const { clientGuest, clientAdmin, site, storeId } = ctx;
 
   if (!slug) {
     return null;
@@ -29,7 +29,8 @@ async function loader(
 
   const getMaybeProduct = async (slug: string) => {
     try {
-      const response = await clientAdmin["GET /rest/granado/V1/products"]({
+      const response = await clientAdmin["GET /rest/:site/V1/products"]({
+        site,
         currencyCode: currencyCode,
         [KEY_FIELD]: URL_KEY,
         [KEY_VALUE]: slug,
@@ -45,12 +46,13 @@ async function loader(
     }
     try {
       const response = await clientGuest
-        ["GET /rest/granado/V1/products-render-info"]({
+        ["GET /rest/:site/V1/products-render-info"]({
+          site,
           [KEY_FIELD]: "sku",
           [KEY_VALUE]: sku,
-          storeId: 21,
+          storeId: storeId,
           currencyCode: currencyCode,
-          field: "items[price_info,image,currency_code,url]",
+          fields: "items[price_info,image,currency_code,url]",
         }).then((res) => res.json());
 
       return {
@@ -69,12 +71,13 @@ async function loader(
     }
     try {
       const response = await clientGuest
-        ["GET /rest/granado/V1/products-render-info"]({
+        ["GET /rest/:site/V1/products-render-info"]({
+          site,
           [KEY_FIELD]: "sku",
           [KEY_VALUE]: sku,
-          storeId: 21,
+          storeId: storeId,
           currencyCode: currencyCode,
-          field: "items[extension_attributes.stock_item]",
+          fields: "items[extension_attributes.stock_item]",
         }).then((res) => res.json());
       return response.items[0].extension_attributes?.stock_item;
     } catch (_error) {
@@ -83,7 +86,8 @@ async function loader(
   };
   const getCategoryName = async (categoryId: string) => {
     try {
-      return await clientAdmin["GET /rest/granado/V1/categories/:categoryId"]({
+      return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"]({
+        site,
         categoryId,
         fields: "name,position",
       }).then((res) => res.json());

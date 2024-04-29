@@ -1,7 +1,10 @@
 import { Categoria, FieldsFilter, MagentoProduct } from "./types.ts";
 
 interface searchParams {
-  [key: string]: string | number | FieldsFilter;
+  [key: string]: string | number | undefined | FieldsFilter;
+  currencyCode?: string;
+  storeId?: number;
+  fields?: string;
 }
 
 export interface API {
@@ -11,7 +14,7 @@ export interface API {
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-guest/tag/products-render-info */
-  "GET /rest/granado/V1/products-render-info": {
+  "GET /rest/:site/V1/products-render-info": {
     response: {
       items: MagentoProduct[];
     };
@@ -19,13 +22,13 @@ export interface API {
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/productssku#operation/GetV1ProductsSku */
-  "GET /rest/granado/V1/products/:sku": {
+  "GET /rest/:site/V1/products/:sku": {
     response: MagentoProduct;
     searchParams: searchParams;
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/products#operation/GetV1Products */
-  "GET /rest/granado/V1/products": {
+  "GET /rest/:site/V1/products": {
     response: {
       items: MagentoProduct[];
     };
@@ -33,7 +36,7 @@ export interface API {
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/categoriescategoryId#operation/GetV1CategoriesCategoryId */
-  "GET /rest/granado/V1/categories/:categoryId": {
+  "GET /rest/:site/V1/categories/:categoryId": {
     response: Categoria;
     searchParams: {
       categoryId: string;
