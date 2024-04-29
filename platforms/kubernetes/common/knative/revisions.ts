@@ -14,7 +14,7 @@ import { k8s } from "../../deps.ts";
 export interface UpdateRevision {
   ctx: AppContext;
   site: string;
-  revisionName: string;
+  revisionName: string | undefined;
 }
 
 export const allowScaleToZero = async ({
@@ -22,16 +22,15 @@ export const allowScaleToZero = async ({
   site,
   ctx,
 }: UpdateRevision) => {
+  if (!revisionName) {
+    return;
+  }
   const revision = {
     metadata: {
       name: revisionName,
       namespace: Namespace.forSite(site),
     },
   };
-
-  if (!revision) {
-    return;
-  }
 
   await upsertObject(
     ctx.kc,
@@ -60,7 +59,7 @@ export const getProdRevisionName = async ({
 }: {
   k8sApi: k8s.CustomObjectsApi;
   site: string;
-}) => {
+}): Promise<string | undefined> => {
   const prodRoute = await k8sApi
     .getNamespacedCustomObject(
       GROUP_SERVING_KNATIVE_DEV,
