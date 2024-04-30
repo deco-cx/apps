@@ -56,52 +56,53 @@ const pickVariant = (variants: LinxProduct[], variantId: number | null) => {
   return variants[0];
 };
 
-const toOffer = (variant: LinxProduct): Offer => {
+const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {  
+  const item = variant.Price ? variant : product;
   const priceSpecification: UnitPriceSpecification[] = [
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/ListPrice",
-      price: variant.Price?.ListPrice ?? variant.ListPrice ?? Infinity,
+      price: item.Price?.ListPrice ?? item.ListPrice ?? Infinity,
     },
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
-      price: variant.Price?.SalesPrice ?? variant.RetailPrice ?? Infinity,
-    },
-    {
-      "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/SalePrice",
-      priceComponentType: "https://schema.org/Installment",
-      name: variant.Price?.MaxInstallmentsNoInterest?.PaymentType,
-      description: variant.Price?.MaxInstallmentsNoInterest?.PaymentType,
-      billingDuration: variant.Price?.MaxInstallmentsNoInterest
-        ?.Installments,
-      billingIncrement: variant.Price?.MaxInstallmentsNoInterest
-        ?.InstallmentPrice,
-      price: variant.Price?.MaxInstallmentsNoInterest?.RetailPrice ?? Infinity,
+      price: item.Price?.SalesPrice ?? item.RetailPrice ?? Infinity,
     },
     {
       "@type": "UnitPriceSpecification",
       priceType: "https://schema.org/SalePrice",
       priceComponentType: "https://schema.org/Installment",
-      name: variant.Price?.BestInstallment?.PaymentType,
-      description: variant.Price?.BestInstallment?.PaymentType,
-      billingDuration: variant.Price?.BestInstallment
+      name: item.Price?.MaxInstallmentsNoInterest?.PaymentType,
+      description: item.Price?.MaxInstallmentsNoInterest?.PaymentType,
+      billingDuration: item.Price?.MaxInstallmentsNoInterest
         ?.Installments,
-      billingIncrement: variant.Price?.BestInstallment
+      billingIncrement: item.Price?.MaxInstallmentsNoInterest
         ?.InstallmentPrice,
-      price: variant.Price?.BestInstallment?.RetailPrice ?? Infinity,
+      price: item.Price?.MaxInstallmentsNoInterest?.RetailPrice ?? Infinity,
+    },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SalePrice",
+      priceComponentType: "https://schema.org/Installment",
+      name: item.Price?.BestInstallment?.PaymentType,
+      description: item.Price?.BestInstallment?.PaymentType,
+      billingDuration: item.Price?.BestInstallment
+        ?.Installments,
+      billingIncrement: item.Price?.BestInstallment
+        ?.InstallmentPrice,
+      price: item.Price?.BestInstallment?.RetailPrice ?? Infinity,
     },
   ];
 
   return {
     "@type": "Offer",
-    seller: variant?.Price?.BuyBox?.SellerName ?? undefined,
-    priceValidUntil: variant?.PromotionTo ?? undefined,
-    price: variant.Price?.SalesPrice ?? variant.RetailPrice ?? Infinity,
+    seller: item?.Price?.BuyBox?.SellerName ?? undefined,
+    priceValidUntil: item?.PromotionTo ?? undefined,
+    price: item.Price?.SalesPrice ?? item.RetailPrice ?? Infinity,
     priceSpecification,
     inventoryLevel: {},
-    availability: variant.Availability != "O"
+    availability: item.Availability != "O"
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
   };
@@ -122,13 +123,13 @@ export const toProduct = (
   const { currency, url, cdn } = options;
   // Linx API returns the SKU as the tail of Items[]
   const [_, ...variants] = product?.Items ?? [];
-  const variant = pickVariant(variants, variantId);
+  const variant = pickVariant(variants, variantId); 
 
   if (!variant) {
     console.info(product.ProductID);
-  }
+  } 
 
-  const offer = toOffer(variant);
+  const offer = toOffer(variant, product);
   const offers = offer ? [offer] : [];
 
   const skuOptions: PropertyValue[] = variant.SKUOptions?.map((option) => ({
