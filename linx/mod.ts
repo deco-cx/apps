@@ -56,12 +56,7 @@ export default function App(
     headers,
   });
 
-  const layer = createHttpClient<LayerAPI>({
-    base: `https://${account}.layer.core.dcg.com.br/`,
-    headers,
-  });
-
-  const state = { cdn, api, account, layer };
+  const state = { cdn, api, account };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 
