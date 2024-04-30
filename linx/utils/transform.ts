@@ -57,13 +57,7 @@ const pickVariant = (variants: LinxProduct[], variantId: number | null) => {
 };
 
 const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {  
-  let item;
-  if(variant.Price != null){ 
-    item = variant;
-  } 
-  else{ 
-    item = product;
-  }
+  const item = variant.Price ? variant : product;
   const priceSpecification: UnitPriceSpecification[] = [
     {
       "@type": "UnitPriceSpecification",
