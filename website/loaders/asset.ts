@@ -1,3 +1,4 @@
+import { shortcircuit } from "deco/engine/errors.ts";
 import { fetchSafe, STALE } from "../../utils/fetch.ts";
 
 interface Props {
@@ -8,7 +9,13 @@ interface Props {
 }
 
 const loader = async (props: Props) => {
-  const original = await fetchSafe(props.src, STALE);
+  const url = new URL(props.src);
+
+  if (url.protocol === "file:") {
+    shortcircuit(new Response("Forbidden", { status: 403 }));
+  }
+
+  const original = await fetchSafe(url.href, STALE);
 
   const response = new Response(original.clone().body, original);
   response.headers.set(
