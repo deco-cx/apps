@@ -20,10 +20,9 @@ export const toProduct = (
   product: MagentoProduct,
 ): Product => {
   const offers = toOffer(product);
-
   const sku = product.sku;
   const productID = product.id.toString();
-  const productPrice = product.price_info;
+  const productPrice = product.price_info
 
   return {
     "@type": "Product",
@@ -31,7 +30,7 @@ export const toProduct = (
     sku,
     url: product.url,
     name: product.name,
-    additionalProperty: product.custom_attributes.map((attr) => ({
+    additionalProperty: product.custom_attributes?.map((attr) => ({
       "@type": "PropertyValue",
       name: attr.attribute_code,
       value: String(attr.value),

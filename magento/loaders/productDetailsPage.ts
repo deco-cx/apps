@@ -28,35 +28,41 @@ async function loader(
 
   const getProduct = async (slug: string) => {
     try {
-      const { items } = await clientAdmin["GET /rest/:site/V1/products"]({
+      const queryParams = {
         site,
-        currencyCode: currencyCode,
+        currencyCode,
+        storeId,
         [KEY_FIELD]: URL_KEY,
         [KEY_VALUE]: slug,
+      };
+
+      const itemSku = await clientAdmin
+      ["GET /rest/:site/V1/products"]({
+        ...queryParams,
       }).then((res) => res.json());
-      console.log(items[0].sku);
-      console.log(await clientGuest
+
+      const [ { items }, stockInfo ] = await Promise.all([clientGuest
+        ["GET /rest/:site/V1/products-render-info"](queryParams).then((res) =>
+          res.json()
+        ), clientAdmin
         ["GET /rest/:site/V1/products/:sku"]({
+          sku: itemSku.items[0].sku,
           site,
-          sku: items[0].sku,
           storeId: storeId,
           currencyCode: currencyCode,
           fields: "extension_attributes[stock_item[item_id,qty]]",
-        }).then((res) => res.json()));
-      
-      const stockInfo = await clientGuest
-        ["GET /rest/:site/V1/products/:sku"]({
-          sku: items[0].sku,
-          site,
-          storeId: storeId,
-          currencyCode: currencyCode,
-          fields: "image,currency_code,url,extension_attributes[stock_item[item_id,qty]]",
-        }).then((res) => res.json());
-        console.log({stockInfo});
-        return {
-          ...items[0],
-          ...stockInfo
-        };
+        }).then((res) => res.json())])
+
+      return {
+        ...items[0],
+        sku: itemSku.items[0].sku,
+        custom_attributes: itemSku.items[0].custom_attributes,
+        extension_attributes: {
+          ...items[0].extension_attributes,
+          ...stockInfo.extension_attributes,
+          ...itemSku.items[0].extension_attributes,
+        },
+      };
     } catch (_error) {
       return null;
     }
@@ -76,18 +82,14 @@ async function loader(
   };
 
   const productMagento = await getProduct(slug);
-
-  // 404: product not found
   if (!productMagento) {
-    console.log("product not found");
+    console.error("product not found");
     return null;
   }
 
   const categoryLinks = productMagento.extension_attributes?.category_links;
 
-  const product = toProduct({
-    ...productMagento,
-  });
+  const product = toProduct(productMagento);
 
   const categoryName = categoryLinks.map(
     (category: { category_id: string }) => {

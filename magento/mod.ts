@@ -21,10 +21,10 @@ export interface Props {
   /** @title Magento store id */
   storeId: number;
 
-  /** 
+  /**
    * @title Currency Code
    * @description The currency code to be used in the requests: USD, BRL, EUR.
-    */
+   */
   currencyCode: string;
 }
 
@@ -42,7 +42,7 @@ export interface State extends PartialProps {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, site, storeId, apiKey,currencyCode } = props;
+  const { baseUrl, site, storeId, apiKey, currencyCode } = props;
 
   const clientGuest = createHttpClient<API>({
     base: baseUrl,
