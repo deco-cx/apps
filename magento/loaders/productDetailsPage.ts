@@ -1,7 +1,8 @@
 import type { ListItem, ProductDetailsPage } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
-import { KEY_FIELD, KEY_VALUE, URL_KEY } from "../utils/constants.ts";
+import { URL_KEY } from "../utils/constants.ts";
+import stringifySearchCriteria from "../utils/stringifySearchCriteria.ts";
 import { toBreadcrumbList, toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -35,12 +36,21 @@ async function loader(
 
   const getProduct = async (slug: string) => {
     try {
+      const searchCriteria = {
+        filterGroups: [
+          {
+            filters: [
+              { field: URL_KEY, value: slug },
+            ],
+          },
+        ],
+      };
+
       const queryParams = {
         site,
         currencyCode,
         storeId,
-        [KEY_FIELD]: URL_KEY,
-        [KEY_VALUE]: slug,
+        ...stringifySearchCriteria(searchCriteria),
       };
 
       const itemSku = await clientAdmin
