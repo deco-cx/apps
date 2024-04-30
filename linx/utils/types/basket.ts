@@ -1,5 +1,7 @@
+import { LinxError } from "./common.ts";
+
 export interface CartOperation {
-  Errors: unknown[];
+  Errors: LinxError[];
   IsValid: boolean;
   RefreshBasket: boolean;
   ResponseCallBack: ResponseCallBack;

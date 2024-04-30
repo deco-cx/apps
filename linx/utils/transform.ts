@@ -56,7 +56,7 @@ const pickVariant = (variants: LinxProduct[], variantId: number | null) => {
   return variants[0];
 };
 
-const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {  
+const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
   const item = variant.Price ? variant : product;
   const priceSpecification: UnitPriceSpecification[] = [
     {
@@ -123,11 +123,11 @@ export const toProduct = (
   const { currency, url, cdn } = options;
   // Linx API returns the SKU as the tail of Items[]
   const [_, ...variants] = product?.Items ?? [];
-  const variant = pickVariant(variants, variantId); 
+  const variant = pickVariant(variants, variantId);
 
   if (!variant) {
     console.info(product.ProductID);
-  } 
+  }
 
   const offer = toOffer(variant, product);
   const offers = offer ? [offer] : [];
