@@ -109,6 +109,15 @@ interface MagentoStock {
   is_decimal_divided?: boolean;
   stock_status_changed_auto?: number;
 }
+interface MediaEntry {
+  id: number;
+  media_type: string;
+  label: string | null;
+  position: number;
+  disabled: boolean;
+  types: string[];
+  file: string;
+}
 
 export interface MagentoProduct {
   id: number;
@@ -131,6 +140,7 @@ export interface MagentoProduct {
   price_info?: MagentoPriceInfo;
   currency_code?: string;
   images?: MagentoImage[];
+  media_gallery_entries?: MediaEntry[];
 }
 
 //Query params for the request

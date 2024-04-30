@@ -13,7 +13,7 @@ export interface Props {
   baseUrl: string;
 
   /** @title Magento api key */
-  apiKey: Secret;
+  apiKey: string;
 
   /** @title Magento store */
   site: string;
@@ -26,6 +26,13 @@ export interface Props {
    * @description The currency code to be used in the requests: USD, BRL, EUR.
    */
   currencyCode: string;
+
+  /**
+   * @title Images URL
+   * @description The base url of the images.
+   * @example https://www.store.com.br/media/catalog/product
+   */
+  imagesUrl: string;
 }
 
 type PartialProps = Omit<Props, "baseUrl">;
@@ -42,7 +49,7 @@ export interface State extends PartialProps {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, site, storeId, apiKey, currencyCode } = props;
+  const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl } = props;
 
   const clientGuest = createHttpClient<API>({
     base: baseUrl,
@@ -58,7 +65,15 @@ export default function App(props: Props): App<Manifest, State> {
 
   return {
     manifest,
-    state: { site, storeId, apiKey, currencyCode, clientGuest, clientAdmin },
+    state: {
+      site,
+      storeId,
+      apiKey,
+      currencyCode,
+      imagesUrl,
+      clientGuest,
+      clientAdmin,
+    },
   };
 }
 

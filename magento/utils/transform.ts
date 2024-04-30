@@ -1,5 +1,10 @@
-import { Offer, Product } from "../../commerce/types.ts";
-import { MagentoProduct } from "./client/types.ts";
+import {
+  ListItem,
+  Offer,
+  Product,
+  PropertyValue,
+} from "../../commerce/types.ts";
+import { MagentoCategory, MagentoProduct } from "./client/types.ts";
 import { IN_STOCK, OUT_OF_STOCK } from "./constants.ts";
 
 export const parseSlug = (slug: string) => {
@@ -17,12 +22,23 @@ export const parseSlug = (slug: string) => {
 };
 
 export const toProduct = (
-  product: MagentoProduct,
+  { product, options }: {
+    product: MagentoProduct;
+    options: { currencyCode?: string; imagesUrl?: string };
+  },
 ): Product => {
   const offers = toOffer(product);
   const sku = product.sku;
   const productID = product.id.toString();
-  const productPrice = product.price_info
+  const productPrice = product.price_info;
+
+  const additionalProperty: PropertyValue[] = product.custom_attributes?.map((
+    attr,
+  ) => ({
+    "@type": "PropertyValue",
+    name: attr.attribute_code,
+    value: String(attr.value),
+  }));
 
   return {
     "@type": "Product",
@@ -30,17 +46,34 @@ export const toProduct = (
     sku,
     url: product.url,
     name: product.name,
-    additionalProperty: product.custom_attributes?.map((attr) => ({
-      "@type": "PropertyValue",
-      name: attr.attribute_code,
-      value: String(attr.value),
-    })),
-    image: product.images?.map((img) => ({
-      "@type": "ImageObject" as const,
-      encodingFormat: "image",
-      alternateName: `${img.url}`,
-      url: img.url,
-    })),
+    gtin: sku,
+    isVariantOf: {
+      "@type": "ProductGroup",
+      productGroupID: productID,
+      url: product.url,
+      name: product.name,
+      model: "",
+      additionalProperty: additionalProperty,
+      hasVariant: [
+        {
+          "@type": "Product",
+          productID,
+          sku,
+          url: product.url,
+          name: product.name,
+          gtin: sku,
+          offers: {
+            "@type": "AggregateOffer",
+            highPrice: productPrice?.max_price ?? product.price!,
+            lowPrice: productPrice?.minimal_price ?? product.price!,
+            offerCount: offers.length,
+            offers: offers,
+          },
+        },
+      ],
+    },
+    additionalProperty: additionalProperty,
+    image: toImages(product, options.imagesUrl ?? ""),
     offers: {
       "@type": "AggregateOffer",
       highPrice: productPrice?.max_price ?? product.price!,
@@ -73,4 +106,57 @@ export const toOffer = (
     sku: sku,
   };
   return [offer];
+};
+
+export const toImages = (product: MagentoProduct, imageUrl: string) => {
+  if (imageUrl) {
+    return product.media_gallery_entries?.map((img) => ({
+      "@type": "ImageObject" as const,
+      encodingFormat: "image",
+      alternateName: `${img.file}`,
+      url: `${toURL(imageUrl)}${img.file}`,
+    }));
+  }
+
+  return product.images?.map((img) => ({
+    "@type": "ImageObject" as const,
+    encodingFormat: "image",
+    alternateName: `${img.label}`,
+    url: `${img.url}`,
+  }));
+};
+
+export const toURL = (src: string) =>
+  src.startsWith("//") ? `https:${src}` : src;
+
+export const toBreadcrumbList = (
+  categories: (MagentoCategory | null)[],
+  isBreadcrumbProductName: boolean,
+  product: Product,
+  url: URL,
+) => {
+  if (isBreadcrumbProductName && categories?.length === 0) {
+    return [
+      {
+        "@type": "ListItem",
+        name: product.name,
+        position: 1,
+        item: new URL(`/${product.name}`, url).href,
+      },
+    ];
+  }
+
+  const itemListElement = categories.map((category) => {
+    if (!category || !category.name || !category.position) {
+      return null;
+    }
+    return {
+      "@type": "ListItem",
+      name: category?.name,
+      position: category?.position,
+      item: new URL(`/${category?.name}`, url).href,
+    };
+  }).filter(Boolean) as ListItem<string>[];
+
+  return itemListElement;
 };

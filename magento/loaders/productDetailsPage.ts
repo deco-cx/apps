@@ -2,11 +2,11 @@ import type { ListItem, ProductDetailsPage } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { KEY_FIELD, KEY_VALUE, URL_KEY } from "../utils/constants.ts";
-import { toProduct } from "../utils/transform.ts";
+import { toBreadcrumbList, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
-  currencyCode?: string;
+  isBreadcrumbProductName?: boolean;
 }
 
 /**
@@ -19,8 +19,15 @@ async function loader(
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
-  const { slug } = props;
-  const { clientGuest, clientAdmin, site, storeId, currencyCode = "" } = ctx;
+  const { slug, isBreadcrumbProductName = false } = props;
+  const {
+    clientGuest,
+    clientAdmin,
+    site,
+    storeId,
+    currencyCode = "",
+    imagesUrl,
+  } = ctx;
 
   if (!slug) {
     return null;
@@ -37,21 +44,23 @@ async function loader(
       };
 
       const itemSku = await clientAdmin
-      ["GET /rest/:site/V1/products"]({
-        ...queryParams,
-      }).then((res) => res.json());
+        ["GET /rest/:site/V1/products"]({
+          ...queryParams,
+        }).then((res) => res.json());
 
-      const [ { items }, stockInfo ] = await Promise.all([clientGuest
-        ["GET /rest/:site/V1/products-render-info"](queryParams).then((res) =>
-          res.json()
-        ), clientAdmin
-        ["GET /rest/:site/V1/products/:sku"]({
-          sku: itemSku.items[0].sku,
-          site,
-          storeId: storeId,
-          currencyCode: currencyCode,
-          fields: "extension_attributes[stock_item[item_id,qty]]",
-        }).then((res) => res.json())])
+      const [{ items }, stockInfoAndImages] = await Promise.all([
+        clientGuest
+          ["GET /rest/:site/V1/products-render-info"](queryParams).then((res) =>
+            res.json()
+          ),
+        clientAdmin
+          ["GET /rest/:site/V1/products/:sku"]({
+            sku: itemSku.items[0].sku,
+            site,
+            storeId: storeId,
+            currencyCode: currencyCode,
+          }).then((res) => res.json()),
+      ]);
 
       return {
         ...items[0],
@@ -59,9 +68,10 @@ async function loader(
         custom_attributes: itemSku.items[0].custom_attributes,
         extension_attributes: {
           ...items[0].extension_attributes,
-          ...stockInfo.extension_attributes,
+          ...stockInfoAndImages.extension_attributes,
           ...itemSku.items[0].extension_attributes,
         },
+        media_gallery_entries: stockInfoAndImages.media_gallery_entries,
       };
     } catch (_error) {
       return null;
@@ -89,7 +99,10 @@ async function loader(
 
   const categoryLinks = productMagento.extension_attributes?.category_links;
 
-  const product = toProduct(productMagento);
+  const product = toProduct({
+    product: productMagento,
+    options: { imagesUrl },
+  });
 
   const categoryName = categoryLinks.map(
     (category: { category_id: string }) => {
@@ -97,24 +110,21 @@ async function loader(
     },
   );
 
-  const categories = await Promise.all(categoryName);
-  const itemListElement = categories.map((category) => {
-    if (!category || !category.name || !category.position) {
-      return null;
-    }
-    return {
-      "@type": "ListItem",
-      name: category?.name,
-      position: category?.position,
-      item: new URL(`/${category?.name}`, url).href,
-    };
-  }).filter(Boolean) as ListItem<string>[];
+  const categories = isBreadcrumbProductName
+    ? []
+    : await Promise.all(categoryName);
+  const itemListElement = toBreadcrumbList(
+    categories,
+    isBreadcrumbProductName,
+    product,
+    url,
+  );
 
   return {
     "@type": "ProductDetailsPage",
     breadcrumbList: {
       "@type": "BreadcrumbList",
-      itemListElement,
+      itemListElement: itemListElement as ListItem<string>[],
       numberOfItems: itemListElement.length,
     },
     product,
