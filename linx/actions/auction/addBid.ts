@@ -1,47 +1,38 @@
-import { getCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
 import { CartOperation } from "../../utils/types/basket.ts";
-import { LayerAPI } from "../../utils/client.ts";
 
 export interface Props {
-  ProductAuctionID: number;
+  productAuctionID: number;
   Amount: number;
   IsListening: boolean;
 }
-
-type AddBidResponse =
-  LayerAPI["POST /v1/Catalog/API.svc/web/SaveProductAuctionBid"]["response"];
 
 const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<AddBidResponse> => {
-  // const cookies = getCookies(req.headers);
-  // console.log({ cookies })
+): Promise<CartOperation> => {
+  const cookie = req.headers.get("cookie") ?? "";
 
-  // const session = cookies["_bc_hash"];
+  const response = await ctx.api["POST /Shopping/ProductAuction/AddBid"](
+    props,
+    {
+      headers: {
+        cookie,
+        "content-type": "application/x-www-form-urlencoded",
+        accept: "application/json",
+      },
+    },
+  );
 
-  const response = await ctx.layer
-    ["POST /v1/Catalog/API.svc/web/SaveProductAuctionBid"]({}, {
-      headers: req.headers,
-      body: props,
-    });
-  // const response = await ctx.api["POST /Shopping/ProductAuction/AddBid"]({}, {
-  //   headers: req.headers,
-  //   body: props,
-  // });
+  const data = await response.json();
 
-  console.log({ response });
-
-  if (response.body) {
-    Deno.writeFileSync(
-      "output.txt",
-      new TextEncoder().encode(await response.text()),
-    );
+  if (!data.IsValid) {
+    ctx.response.status = 400;
+    return data;
   }
 
-  return response.json();
+  return data;
 };
 
 export default action;

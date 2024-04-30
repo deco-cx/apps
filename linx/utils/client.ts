@@ -9,7 +9,6 @@ import { ProductListResponse } from "./types/productList.ts";
 import { CartOperation } from "./types/basket.ts";
 import { Props as AddProductProps } from "../actions/cart/addItem.ts";
 import { LoginResponse } from "./types/login.ts";
-import { LinxError } from "./types/common.ts";
 import { NewsletterResponse } from "./types/newsletterJSON.ts";
 
 export interface API {
@@ -74,7 +73,7 @@ export interface API {
 
   "POST /Shopping/ProductAuction/AddBid": {
     response: CartOperation;
-    body: {
+    searchParams: {
       productAuctionID: number;
       Amount: number;
       IsListening: boolean;
@@ -95,22 +94,6 @@ export interface API {
     response: ListBidsWebPage;
     searchParams: {
       ProductAuctionID: number;
-    };
-  };
-}
-
-export interface LayerAPI {
-  "POST /v1/Catalog/API.svc/web/SaveProductAuctionBid": {
-    response: {
-      IsValid: boolean;
-      Errors: LinxError[];
-      Warnings: string[];
-    };
-    body: {
-      ProductAuctionID: number;
-      Amount: number;
-      // CustomerName: string;
-      // CustomerState: string;
     };
   };
 }

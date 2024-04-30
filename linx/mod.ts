@@ -1,7 +1,7 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { API, LayerAPI } from "./utils/client.ts";
+import { API } from "./utils/client.ts";
 import { Secret } from "../website/loaders/secret.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
@@ -52,12 +52,7 @@ export default function App(
     headers,
   });
 
-  const layer = createHttpClient<LayerAPI>({
-    base: `https://${account}.layer.core.dcg.com.br/`,
-    headers,
-  });
-
-  const state = { cdn, api, account, layer };
+  const state = { cdn, api, account };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 
