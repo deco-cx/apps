@@ -1,5 +1,5 @@
 import { Offer, Product } from "../../../commerce/types.ts";
-import { MagentoProduct } from "../../utils/client/types.ts";
+import { MagentoProduct } from "../client/types.ts";
 
 export const productFromMagento: MagentoProduct = {
   id: 5891,

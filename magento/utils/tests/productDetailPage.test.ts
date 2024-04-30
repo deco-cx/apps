@@ -1,14 +1,14 @@
-import { toOffer, toProduct } from "../../utils/transform.ts";
 import { assertEquals } from "jsr:@std/assert";
+import { Offer, Product } from "../../../commerce/types.ts";
+import { toOffer, toProduct } from "../transform.ts";
 import {
   expectedProduct,
   outOfStockOffer,
   productFromMagento,
-} from "./pdpMocks.ts";
-import { Offer, Product } from "../../../commerce/types.ts";
+} from "../moks/product.ts";
 
 Deno.test("toProduct should convert Magento product to expected format", () => {
-  const product = toProduct(productFromMagento);
+  const product = toProduct({ product: productFromMagento, options: {} });
 
   assertEquals<Product>(
     product,
