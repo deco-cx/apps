@@ -643,6 +643,16 @@ export interface IProduct {
   selectedProperties: Array<{ key: string; value: string }>;
   releaseDate: string;
   origin?: string;
+  advertisement?: AdverTisement;
+}
+
+export interface AdverTisement {
+  "@type": "AdverTisement";
+  adId?: string;
+  campaignId?: string;
+  actionCost?: number;
+  adRequestId?: string;
+  adResponseId?: string;
 }
 
 export type Product = IProduct & {
