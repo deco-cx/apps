@@ -17,6 +17,7 @@ import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import { slugify } from "./slugify.ts";
 import type {
+  AdverTisement,
   Brand as BrandVTEX,
   Category,
   Facet as FacetVTEX,
@@ -414,6 +415,12 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
 
+  const otherProps: { [key: string]: AdverTisement } = {};
+
+  if (product.advertisement) {
+    otherProps.advertisement = product.advertisement;
+  }
+
   return {
     "@type": "Product",
     category: categoriesString,
@@ -441,6 +448,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     image: finalImages,
     video: finalVideos,
     offers: aggregateOffers(offers, priceCurrency),
+    ...otherProps,
   };
 };
 
