@@ -93,16 +93,6 @@ export interface ResourceRequirements {
 
 export type NodeSelector = Record<string, string>;
 
-export const NODE_LABELS_KEY = {
-  "DECO_EVENT": "deco.event",
-};
-
-export const NODE_LABELS_VALUES = {
-  [NODE_LABELS_KEY.DECO_EVENT]: {
-    "PRODUCT_HUNT": "product-hunt",
-  },
-};
-
 export interface SiteState {
   entrypoint?: string; // defaults to main.ts
   source?: Source;

@@ -27,6 +27,12 @@ interface ProductOptions {
   productPrice?: ProductPrice | null;
 }
 
+type TypeTags = (string | {
+  key: string;
+  value: string;
+  isProperty: boolean;
+})[];
+
 export const getProductCategoryTag = ({ tags }: ProductGroup) =>
   tags?.filter(({ type }) => type === "categoria")[0];
 
@@ -42,6 +48,8 @@ export const getSEOFromTag = (
   tags: Pick<SEO, "name" | "title" | "description">[],
   url: URL,
   seo: OpenAPI["GET /api/v2/seo_data"]["response"][0] | undefined,
+  hasTypeTags: boolean,
+  isSearchPage?: boolean,
 ): Seo => {
   const tag = tags.at(-1);
   const canonical = canonicalFromTags(tags, url);
@@ -51,9 +59,10 @@ export const getSEOFromTag = (
   }
 
   return {
-    title: seo?.title || tag?.title || "",
-    description: seo?.description || tag?.description || "",
+    title: isSearchPage ? "" : seo?.title || tag?.title || "",
+    description: isSearchPage ? "" : seo?.description || tag?.description || "",
     canonical: canonical.href,
+    noIndexing: hasTypeTags,
   };
 };
 
