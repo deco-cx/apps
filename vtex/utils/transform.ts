@@ -5,6 +5,7 @@ import type {
   Filter,
   FilterToggleValue,
   Offer,
+  PageType,
   Product,
   ProductDetailsPage,
   ProductGroup,
@@ -26,6 +27,7 @@ import type {
   LegacyItem as LegacySkuVTEX,
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
+  PageType as PageTypeVTEX,
   Product as ProductVTEX,
   ProductRating,
   ProductReviewData,
@@ -715,7 +717,10 @@ export const legacyFacetToFilter = (
     const link = new URL(`/${zipped.map(([, s]) => s).join("/")}`, url);
     link.searchParams.set("map", zipped.map(([m]) => m).join(","));
     if (behavior === "static") {
-      link.searchParams.set("fmap", url.searchParams.get("fmap") || mapSegments[0]);
+      link.searchParams.set(
+        "fmap",
+        url.searchParams.get("fmap") || mapSegments.join(","),
+      );
     }
     const currentQuery = url.searchParams.get("q");
     if (currentQuery) {
@@ -947,6 +952,7 @@ export const toReview = (
       aggregateRating: {
         "@type": "AggregateRating",
         reviewCount,
+        ratingCount: reviewCount,
         ratingValue: ratings[index]?.average || 0,
       },
       review: productReviews.map((_, reviewIndex) => ({
@@ -968,4 +974,36 @@ export const toReview = (
       })),
     };
   });
+};
+
+type ProductMap = Record<string, Product>;
+
+export const sortProducts = (
+  products: Product[],
+  orderOfIdsOrSkus: string[],
+  prop: "sku" | "inProductGroupWithID",
+) => {
+  const productMap: ProductMap = {};
+
+  products.forEach((product) => {
+    productMap[product[prop] || product["sku"]] = product;
+  });
+
+  return orderOfIdsOrSkus.map((id) => productMap[id]);
+};
+
+export const parsePageType = (p: PageTypeVTEX): PageType => {
+  const type = p.pageType;
+
+  // Search or Busca vazia
+  if (type === "FullText") {
+    return "Search";
+  }
+
+  // A page that vtex doesn't recognize
+  if (type === "NotFound") {
+    return "Unknown";
+  }
+
+  return type;
 };

@@ -3,8 +3,12 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 
 // deno-lint-ignore ban-types
 export type State = {};
+
 /**
- * @title Workflows
+ * @title Deco Workflows
+ * @description Build customized and automated tasks.
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/workflows/logo.png
  */
 export default function App(
   state: State,

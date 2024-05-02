@@ -58,6 +58,11 @@ export interface Header {
   value: string;
 }
 
+export interface TextReplace {
+  from: string;
+  to: string;
+}
+
 export interface Props {
   /**
    * @description the proxy url.
@@ -92,6 +97,8 @@ export interface Props {
   redirect?: "manual" | "follow";
 
   avoidAppendPath?: boolean;
+
+  replaces?: TextReplace[];
 }
 
 /**
@@ -106,6 +113,7 @@ export default function Proxy({
   includeScriptsToHead,
   redirect = "manual",
   avoidAppendPath,
+  replaces,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -135,14 +143,23 @@ export default function Proxy({
     headers.set("x-forwarded-host", url.host);
 
     for (const { key, value } of customHeaders) {
-      headers.set(key, value);
+      if (key === "cookie") {
+        const existingCookie = headers.get("cookie");
+        if (existingCookie) {
+          headers.set("cookie", `${existingCookie}; ${value}`);
+        } else {
+          headers.set("cookie", value);
+        }
+      } else {
+        headers.set(key, value);
+      }
     }
 
     const monitoring = isFreshCtx<DecoSiteState>(_ctx)
       ? _ctx?.state?.monitoring
       : undefined;
 
-    const fecthFunction = async () => {
+    const fetchFunction = async () => {
       try {
         return await fetch(to, {
           headers,
@@ -157,7 +174,7 @@ export default function Proxy({
       }
     };
 
-    const response = await fecthFunction();
+    const response = await fetchFunction();
 
     if (response.status >= 299 || response.status < 200) {
       await logClonedResponseBody(response, monitoring);
@@ -194,6 +211,7 @@ export default function Proxy({
 
             // Combine and encode the new chunk
             const newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
+
             controller.enqueue(new TextEncoder().encode(newChunkStr));
           } else {
             // If </head> not found, pass the chunk unchanged
@@ -223,8 +241,22 @@ export default function Proxy({
         );
       }
     }
+
+    const newBody = newBodyStream === null ? response.body : newBodyStream;
+
+    let text: undefined | string = undefined;
+
+    if (replaces && replaces.length > 0) {
+      if (response.ok) {
+        text = await new Response(newBody).text();
+        replaces.forEach(({ from, to }) => {
+          text = text?.replaceAll(from, to);
+        });
+      }
+    }
+
     return new Response(
-      newBodyStream === null ? response.body : newBodyStream,
+      text || newBody,
       {
         status: response.status,
         headers: responseHeaders,

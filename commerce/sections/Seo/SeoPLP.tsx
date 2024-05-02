@@ -22,7 +22,10 @@ function Section({ jsonLD, ...props }: Props) {
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
     : undefined;
 
-  const noIndexing = !jsonLD || !jsonLD.products.length;
+  const noIndexing = props.noIndexing ||
+    jsonLD?.seo?.noIndexing ||
+    !jsonLD ||
+    !jsonLD.products.length;
 
   return (
     <Seo

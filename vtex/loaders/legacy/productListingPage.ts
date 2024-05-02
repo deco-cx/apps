@@ -3,6 +3,7 @@ import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
+  getValidTypesFromPageTypes,
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
@@ -14,6 +15,7 @@ import {
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
+import { parsePageType } from "../../utils/transform.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
   LegacyFacet,
@@ -193,7 +195,9 @@ const loader = async (
   const _from = page * count;
   const _to = (page + 1) * count - 1;
 
-  const pageTypes = await pageTypesFromPathname(maybeTerm, ctx);
+  const allPageTypes = await pageTypesFromPathname(maybeTerm, ctx);
+
+  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
   const pageType = pageTypes.at(-1) || pageTypes[0];
 
   const missingParams = typeof maybeMap !== "string" || !maybeTerm;
@@ -378,6 +382,7 @@ const loader = async (
       currentPage,
       records: parseInt(_total, 10),
       recordPerPage: count,
+      pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
     seo: pageTypesToSeo(

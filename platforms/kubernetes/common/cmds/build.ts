@@ -254,12 +254,26 @@ async function build() {
       hasChange = true;
     }
 
-    if (denoJson.compilerOptions.jsx === "react-jsx") {
-      denoJson.compilerOptions.jsx = "precompile";
-      denoJson.compilerOptions.jsxImportSource = "preact";
+    // const freshVersion = denoJson.imports?.["$fresh/"];
+    // const minFreshVersion = "1.6.0";
+    // const preactVersion = denoJson.imports?.["preact"];
+    // const minPreactVersion = "10.19.1";
 
-      hasChange = true;
-    }
+    // if (
+    //   denoJson.compilerOptions.jsx === "react-jsx" && freshVersion &&
+    //   preactVersion
+    // ) {
+    //   if (
+    //     //https://github.com/denoland/fresh/pull/2035
+    //     gte(preactVersion, minPreactVersion) &&
+    //     gte(freshVersion, minFreshVersion)
+    //   ) {
+    //     denoJson.compilerOptions.jsx = "precompile";
+    //     denoJson.compilerOptions.jsxImportSource = "preact";
+
+    //     hasChange = true;
+    //   }
+    // }
 
     return { denoJson, hasChange };
   };
@@ -320,7 +334,12 @@ if [[ -f "$SOURCE_REMOTE_OUTPUT" ]]; then
     echo "Source already exists... skipping build"
     exit 0;
 fi
-[[ -f "$CACHE_REMOTE_OUTPUT" ]] && echo "restoring cache..." && tar xvf "$CACHE_REMOTE_OUTPUT" -C $CACHE_LOCAL_DIR && echo "cache successfully restored!"
+BASE_BUILD_CACHE=$CACHE_REMOTE_OUTPUT
+if [[ ! -f "$BASE_BUILD_CACHE" ]]; then
+    BASE_BUILD_CACHE=$BUILD_CACHE_FALLBACK
+fi
+
+[[ -f "$BASE_BUILD_CACHE" ]] && echo "restoring cache..." && tar xvf "$BASE_BUILD_CACHE" -C $CACHE_LOCAL_DIR && echo "cache successfully restored! from $BASE_BUILD_CACHE"
 
 deno run -A --unstable - << 'EOF'
 ${build};

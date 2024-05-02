@@ -3,8 +3,12 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 
 // deno-lint-ignore ban-types
 export type State = {};
+
 /**
- * @title weather
+ * @title Deco Weather
+ * @description Vary your content based on the current weather of your visitors.
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/weather/logo.png
  */
 export default function App(
   state: State,

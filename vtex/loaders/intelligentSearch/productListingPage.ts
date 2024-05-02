@@ -9,6 +9,7 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import {
+  getValidTypesFromPageTypes,
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
@@ -23,6 +24,7 @@ import { slugify } from "../../utils/slugify.ts";
 import {
   filtersFromURL,
   mergeFacets,
+  parsePageType,
   toFilter,
   toProduct,
 } from "../../utils/transform.ts";
@@ -290,7 +292,10 @@ const loader = async (
   }
 
   const pageTypesPromise = pageTypesFromPathname(pathToUse, ctx);
-  const pageTypes = await pageTypesPromise;
+  const allPageTypes = await pageTypesPromise;
+
+  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
@@ -342,7 +347,7 @@ const loader = async (
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];
   if (fullTextTerm) {
-    sendEvent({ type: "session.ping" }, req, ctx)
+    sendEvent({ type: "session.ping", url: url.href }, req, ctx)
       .then(() =>
         sendEvent(
           {
@@ -352,6 +357,7 @@ const loader = async (
             match: productsResult.recordsFiltered,
             operator: productsResult.operator,
             locale: segment?.payload?.cultureInfo ?? "pt-BR",
+            url: url.href,
           },
           req,
           ctx,
@@ -422,6 +428,7 @@ const loader = async (
       currentPage,
       records: recordsFiltered,
       recordPerPage: pagination.perPage,
+      pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
     seo: pageTypesToSeo(

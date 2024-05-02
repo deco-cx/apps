@@ -78,7 +78,9 @@ const variantsExt = async (
   const productsById = new Map<string, Product>();
   for (const batch of batched) {
     for (const product of batch || []) {
-      productsById.set(product.productID, product);
+      if (product) {
+        productsById.set(product.productID, product);
+      }
     }
   }
 
@@ -95,7 +97,7 @@ const reviewsExt = async (
 ): Promise<Product[]> => {
   const reviewPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/reviews"]({
-      productId: product.productID,
+      product_id: product.inProductGroupWithID,
     }).then((res) => res.json())
   );
 

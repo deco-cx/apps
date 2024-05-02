@@ -87,6 +87,7 @@ function Component({
 
       {/* No index, no follow */}
       {noIndexing && <meta name="robots" content="noindex, nofollow" />}
+      {!noIndexing && <meta name="robots" content="index, follow" />}
 
       {jsonLDs.map((json) => (
         <script
