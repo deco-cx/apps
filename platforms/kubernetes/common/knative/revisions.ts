@@ -49,7 +49,7 @@ export const allowScaleToZero = async ({
           },
         },
       };
-    }
+    },
   );
 };
 
@@ -66,7 +66,7 @@ export const getProdRevisionName = async ({
       VERSION_V1,
       Namespace.forSite(site),
       PLURAL_ROUTES,
-      Routes.prod(site)
+      Routes.prod(site),
     )
     .catch((err) => {
       logger.error(err);
