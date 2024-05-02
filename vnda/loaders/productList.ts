@@ -59,8 +59,12 @@ const productListLoader = async (
 
   if (validProducts.length === 0) return null;
 
-  return validProducts.map((product) => {
-    return toProduct(product, null, {
+  const sortedProducts = props.ids?.length > 0
+    ? props.ids.map((id) => validProducts.find((product) => product.id === id))
+    : validProducts;
+
+  return sortedProducts.map((product) => {
+    return toProduct(product!, null, {
       url,
       priceCurrency: "BRL",
     });
