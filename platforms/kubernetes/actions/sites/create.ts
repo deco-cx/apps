@@ -9,6 +9,8 @@ import { k8s } from "../../deps.ts";
 import { AppContext, PREVIEW_SERVICE_SCALING } from "../../mod.ts";
 import { DECO_SITES_PVC } from "../build.ts";
 
+const EFS_VOLUME_HANDLE_ID = Deno.env.get("EFS_VOLUME_HANDLE_ID") ?? "";
+
 export interface Props {
   site: string;
   lifecycle?: SiteLifecycle;
@@ -117,12 +119,26 @@ export default async function newSite(
   const [secretEnvVar] = await Promise.all([
     secretEnvVarPromise,
     ...setupPromises,
+    corev1Api.createPersistentVolume({
+      metadata: { name: `pv-${siteNs}` },
+      spec: {
+        accessModes: ["ReadWriteMany"],
+        storageClassName: EFS_SC,
+        persistentVolumeReclaimPolicy: "Retain",
+        capacity: { storage: "5Gi" },
+        csi: {
+          driver: "efs.csi.aws.com",
+          volumeHandle: EFS_VOLUME_HANDLE_ID,
+        },
+      },
+    }),
     corev1Api.createNamespacedPersistentVolumeClaim(siteNs, {
       metadata: { name: DECO_SITES_PVC, namespace: siteNs },
       spec: {
         accessModes: ["ReadWriteMany"],
         storageClassName: EFS_SC,
         resources: { requests: { storage: "5Gi" } }, // since this should be EFS the size doesn't matter.
+        volumeName: `pv-${siteNs}`,
       },
     }).catch(ignoreIfExists),
   ]);

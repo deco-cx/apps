@@ -31,7 +31,7 @@ type TypeTags = (string | {
   key: string;
   value: string;
   isProperty: boolean;
-})[]
+})[];
 
 export const getProductCategoryTag = ({ tags }: ProductGroup) =>
   tags?.filter(({ type }) => type === "categoria")[0];
@@ -49,11 +49,11 @@ export const getSEOFromTag = (
   url: URL,
   seo: OpenAPI["GET /api/v2/seo_data"]["response"][0] | undefined,
   hasTypeTags: boolean,
-  isSearchPage?: boolean
+  isSearchPage?: boolean,
 ): Seo => {
   const tag = tags.at(-1);
   const canonical = canonicalFromTags(tags, url);
-  
+
   if (url.searchParams.has("page")) {
     canonical.searchParams.set("page", url.searchParams.get("page")!);
   }
@@ -62,7 +62,7 @@ export const getSEOFromTag = (
     title: isSearchPage ? "" : seo?.title || tag?.title || "",
     description: isSearchPage ? "" : seo?.description || tag?.description || "",
     canonical: canonical.href,
-    noIndexing: hasTypeTags
+    noIndexing: hasTypeTags,
   };
 };
 
