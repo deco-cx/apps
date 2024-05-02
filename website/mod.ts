@@ -179,11 +179,6 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       routes: [
         {
           handler,
-          pathTemplate: "/",
-          highPriority: true,
-        },
-        {
-          handler,
           pathTemplate: "/*",
           highPriority: true,
         },
