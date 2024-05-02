@@ -6,6 +6,9 @@ import {
   PLURAL_REVISIONS,
   PLURAL_ROUTES,
   VERSION_V1,
+  GROUP_APPS,
+  PLURAL_POD_AUTOSCALERS,
+  VERSION_V1ALPHA1,
 } from "../../constants.ts";
 import { Routes } from "../../actions/deployments/rollout.ts";
 import { logger } from "deco/observability/otel/config.ts";
@@ -32,6 +35,13 @@ export const allowScaleToZero = async ({
     },
   };
 
+  const podAutoscaler = {
+    metadata: {
+      name: revisionName,
+      namespace: Namespace.forSite(site),
+    },
+  };
+
   await upsertObject(
     ctx.kc,
     revision,
@@ -50,6 +60,26 @@ export const allowScaleToZero = async ({
         },
       };
     },
+  );
+
+  await upsertObject(
+    ctx.kc,
+    podAutoscaler,
+    GROUP_APPS,
+    VERSION_V1ALPHA1,
+    PLURAL_POD_AUTOSCALERS,
+    (current) => {
+      return {
+        ...current,
+        metadata: {
+          ...current.metadata,
+          annotations: {
+            ...current.metadata.annotations,
+            "autoscaling.knative.dev/min-scale": "0",
+          },
+        },
+      };
+    }
   );
 };
 
