@@ -3,7 +3,7 @@ import type { RequestURLParam } from "../../website/functions/requestToParam.ts"
 import { AppContext } from "../mod.ts";
 import { URL_KEY } from "../utils/constants.ts";
 import stringifySearchCriteria from "../utils/stringifySearchCriteria.ts";
-import { toBreadcrumbList, toProduct } from "../utils/transform.ts";
+import { toBreadcrumbList, toProduct, toSeo } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -88,17 +88,24 @@ async function loader(
     }
   };
 
-  const getCategoryName = async (categoryId: string) => {
-    try {
-      return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"]({
-        site,
-        categoryId,
-        fields: "name,position",
-      }).then((res) => res.json());
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
+  const getCategoryNames = async (categoryLinks: { category_id: string }[]) => {
+    const getCategoryName = async (categoryId: string) => {
+      try {
+        return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"]({
+          site,
+          categoryId,
+          fields: "name,position",
+        }).then((res) => res.json());
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    };
+    
+    const categoryNamePromises = categoryLinks.map((category) =>
+      getCategoryName(category.category_id)
+    );
+    return (await Promise.all(categoryNamePromises)).filter(Boolean);
   };
 
   const productMagento = await getProduct(slug);
@@ -114,20 +121,11 @@ async function loader(
     options: { imagesUrl },
   });
 
-  const categoryName = categoryLinks.map(
-    (category: { category_id: string }) => {
-      return getCategoryName(category.category_id);
-    },
-  );
-
-  const categories = isBreadcrumbProductName
-    ? []
-    : await Promise.all(categoryName);
   const itemListElement = toBreadcrumbList(
-    categories,
+    isBreadcrumbProductName? [] : await getCategoryNames(categoryLinks),
     isBreadcrumbProductName,
     product,
-    url,
+    url
   );
 
   return {
@@ -138,11 +136,7 @@ async function loader(
       numberOfItems: itemListElement.length,
     },
     product,
-    seo: {
-      title: product.name ?? "",
-      description: product.description ?? "",
-      canonical: product.url ?? "",
-    },
+    seo: toSeo(productMagento.custom_attributes, product.url ?? ""),
   };
 }
 

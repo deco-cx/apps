@@ -3,8 +3,9 @@ import {
   Offer,
   Product,
   PropertyValue,
+  Seo,
 } from "../../commerce/types.ts";
-import { MagentoCategory, MagentoProduct } from "./client/types.ts";
+import { CustomAttribute, MagentoCategory, MagentoProduct } from "./client/types.ts";
 import { IN_STOCK, OUT_OF_STOCK } from "./constants.ts";
 
 export const toProduct = (
@@ -146,3 +147,15 @@ export const toBreadcrumbList = (
 
   return itemListElement;
 };
+
+export const toSeo = (custromAttributes: CustomAttribute[], productURL: string): Seo => {
+  const metaDescription = custromAttributes.find((attr) => attr.attribute_code === "meta_description")?.value as unknown as string;
+  const metaTitle = custromAttributes.find((attr) => attr.attribute_code === "meta_title")?.value as unknown as string;
+  const title = custromAttributes.find((attr) => attr.attribute_code === "title")?.value as unknown as string;
+
+  return {
+    title: title ?? metaTitle ?? "",
+    description: metaDescription ?? "",
+    canonical: productURL
+  }
+}
