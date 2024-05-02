@@ -69,7 +69,14 @@ async function build() {
     const hasFreshImport = denoJson?.imports?.["$fresh/"];
     return {
       buildArgs: hasFreshImport
-        ? ["run", "--node-modules-dir=false", "-A", "dev.ts", "build"]
+        ? [
+          "run",
+          "--deny-read=/deco-sites-sources",
+          "--node-modules-dir=false",
+          "-A",
+          "dev.ts",
+          "build",
+        ]
         : undefined,
     };
   };
