@@ -180,10 +180,12 @@ const getAbTestAudience = (abTesting: AbTesting) => {
         {
           handler,
           pathTemplate: "/",
+          highPriority: true,
         },
         {
           handler,
           pathTemplate: "/*",
+          highPriority: true,
         },
       ],
       matcher: abTesting.matcher,
@@ -220,9 +222,9 @@ export const onBeforeResolveProps = <
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
         : undefined,
-      abTesting : props.abTesting
-      ? asResolved(props.abTesting, true)
-      : undefined,
+      abTesting: props.abTesting
+        ? asResolved(props.abTesting, false)
+        : undefined,
       routes: props.routes.map(deferPropsResolve),
     };
     return newRoutes;
