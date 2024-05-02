@@ -11,7 +11,7 @@ export interface Props {
 }
 
 /**
- * @title VNDA Integration
+ * @title Magento Integration
  * @description Product Details Page loader
  */
 async function loader(
