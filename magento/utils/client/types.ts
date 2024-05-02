@@ -15,7 +15,7 @@ interface MagentoImage {
 
 export interface CustomAttribute {
   attribute_code: string;
-  value: string | number | string[];
+  value: string | string[];
 }
 
 export interface MagentoCategory {

@@ -101,7 +101,7 @@ async function loader(
         return null;
       }
     };
-    
+
     const categoryNamePromises = categoryLinks.map((category) =>
       getCategoryName(category.category_id)
     );
@@ -122,10 +122,10 @@ async function loader(
   });
 
   const itemListElement = toBreadcrumbList(
-    isBreadcrumbProductName? [] : await getCategoryNames(categoryLinks),
+    isBreadcrumbProductName ? [] : await getCategoryNames(categoryLinks),
     isBreadcrumbProductName,
     product,
-    url
+    url,
   );
 
   return {
