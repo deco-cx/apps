@@ -17,7 +17,7 @@ deno info $LOAD_CONFIG_ARG $HYPERVISOR_MAIN &> /dev/null
 if [[ $? -ne 0 ]]; then
   ${runCmd()}
 else
-  deno run -A $LOAD_CONFIG_ARG $HYPERVISOR_MAIN --build-cmd "deno task build" -- ${
+  deno run -A $LOAD_CONFIG_ARG $HYPERVISOR_MAIN --build-cmd "deno task build" --build-files "/_fresh/**" -- ${
   runCmd(true)
 }
 fi
