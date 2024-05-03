@@ -33,6 +33,7 @@ const loader = async (
       }
     }
   };
+
   const cartDetails = cartId ? await getCart(cartId) : await getCart("");
   if (cartDetails.id) {
     setCartCookie(ctx.response.headers, cartDetails.id.toString());
