@@ -1,4 +1,10 @@
-import { FieldsFilter, MagentoCategory, MagentoProduct } from "./types.ts";
+import {
+  CustomerAddress,
+  FieldsFilter,
+  MagentoCategory,
+  MagentoProduct,
+  ShippingMethod,
+} from "./types.ts";
 
 interface searchParams {
   [key: string]: string | number | undefined | FieldsFilter;
@@ -41,6 +47,14 @@ export interface API {
     searchParams: {
       categoryId: string;
       fields?: string;
+    };
+  };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-guest/tag/guest-cartscartIdestimate-shipping-methods */
+  "POST /V1/guest-carts/:cartId/estimate-shipping-methods": {
+    response: ShippingMethod[];
+    body: {
+      address: CustomerAddress;
     };
   };
 }
