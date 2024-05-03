@@ -103,6 +103,7 @@ export default function kubernetes(
           deploymentSlug: props.slug,
           deploymentId,
           labels: {
+            ...props.protected ? { protected: "true" } : {},
             deploymentId,
           },
         });

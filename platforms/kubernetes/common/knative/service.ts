@@ -1,13 +1,13 @@
 import { SourceBinder } from "../../actions/build.ts";
-import runScript from "../../common/cmds/run.ts";
 import hypervisorScript from "../../common/cmds/hypervisor.ts";
+import runScript from "../../common/cmds/run.ts";
 
+import { k8s } from "../../deps.ts";
 import {
   NodeSelector,
   ResourceRequirements,
   ServiceScaling,
 } from "../../loaders/siteState/get.ts";
-import { k8s } from "../../deps.ts";
 
 export interface EnvVar {
   name: string;
