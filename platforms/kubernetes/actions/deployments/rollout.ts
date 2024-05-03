@@ -32,7 +32,7 @@ export const Routes = {
 export default async function rollout(
   { site, deploymentId }: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ) {
   const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
   const previousProdRevisionName = await getProdRevisionName({ k8sApi, site });
@@ -47,7 +47,7 @@ export default async function rollout(
     }),
     GROUP_SERVING_KNATIVE_DEV,
     VERSION_V1,
-    PLURAL_ROUTES
+    PLURAL_ROUTES,
   );
 
   allowScaleToZero({ revisionName: previousProdRevisionName, site, ctx });
