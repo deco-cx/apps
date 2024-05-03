@@ -4,7 +4,11 @@ import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { pickSku } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
@@ -122,6 +126,34 @@ async function loader(
   return relatedProducts;
 }
 
-export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+
+  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+    return null;
+  }
+
+  const params = new URLSearchParams([
+    ["slug", props.slug ?? ""],
+    ["id", props.id ?? ""],
+    ["crossSelling", props.crossSelling],
+    ["count", (props.count ?? 0).toString()],
+    ["hideUnavailableItems", (props.hideUnavailableItems ?? false).toString()],
+  ]);
+
+  url.searchParams.forEach((value, key) => {
+    params.append(key, value);
+  });
+
+  params.sort();
+  params.set("segment", token);
+
+  url.search = params.toString();
+
+  return url.href;
+};
 
 export default loader;
