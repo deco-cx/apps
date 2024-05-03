@@ -3,10 +3,11 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/productDetailsPage.ts";
-
+import * as $$$1 from "./loaders/cart.ts";
 const manifest = {
   "loaders": {
     "magento/loaders/productDetailsPage.ts": $$$0,
+    "magento/loaders/cart.ts": $$$1,
   },
   "name": "magento",
   "baseUrl": import.meta.url,

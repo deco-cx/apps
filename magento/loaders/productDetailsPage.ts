@@ -22,7 +22,6 @@ async function loader(
   const url = new URL(req.url);
   const { slug, isBreadcrumbProductName = false } = props;
   const {
-    clientGuest,
     clientAdmin,
     site,
     storeId,
@@ -59,7 +58,7 @@ async function loader(
         }).then((res) => res.json());
 
       const [{ items }, stockInfoAndImages] = await Promise.all([
-        clientGuest
+        clientAdmin
           ["GET /rest/:site/V1/products-render-info"](queryParams).then((res) =>
             res.json()
           ),

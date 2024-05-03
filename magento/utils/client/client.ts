@@ -1,3 +1,4 @@
+import { Cart } from "./types.ts";
 import { FieldsFilter, MagentoCategory, MagentoProduct } from "./types.ts";
 
 interface searchParams {
@@ -42,5 +43,24 @@ export interface API {
       categoryId: string;
       fields?: string;
     };
+  };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/guest-carts#operation/PostV1Guestcarts */
+  "POST /rest/:site/V1/guest-carts": {
+    response: string;
+  };
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartId#operation/GetV1CartsCartId */
+  "GET /rest/:site/V1/carts/:cartId": {
+    response: Cart;
+  };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIditems#operation/GetV1CartsCartIdItems */
+  "GET /rest/:site/V1/carts/:cartId/items": {
+    response: Cart["items"];
+  };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/guest-cartscartId#operation/GetV1GuestcartsCartId */
+  "GET /rest/:site/V1/guest-carts/:cartId": {
+    response: Cart;
   };
 }
