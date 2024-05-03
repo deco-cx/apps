@@ -46,7 +46,7 @@ export default function productDetailsPage(
     } catch (error) {
       logger.error(`{ errorName: ${error.name},  
       errorMessage: ${error.message} }`);
-      return { ...productDetailsPage };
+      return productDetailsPage;
     }
   };
 }
