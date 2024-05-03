@@ -2,6 +2,7 @@ import { AppContext } from "../mod.ts";
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
 import { toReview } from "../utils/transform.ts";
+import { logger } from "deco/mod.ts";
 
 export interface Props {
   /**
@@ -25,16 +26,12 @@ export default function productDetailsPage(
       return null;
     }
 
-    if (!productDetailsPage.product.inProductGroupWithID) {
-      return { ...productDetailsPage };
-    }
-
     try {
       const reviews = await api["GET /:customer/:sku/summary"]({
         customer,
         page,
         pageSize,
-        sku: productDetailsPage.product.inProductGroupWithID,
+        sku: productDetailsPage.product.inProductGroupWithID as string,
       }).then((res) => res.json());
       const { aggregateRating, review } = toReview(reviews.reviews[0]);
 
@@ -47,7 +44,8 @@ export default function productDetailsPage(
         },
       };
     } catch (error) {
-      console.log(error);
+      logger.error(`{ errorName: ${error.name},  
+      errorMessage: ${error.message} }`);
       return { ...productDetailsPage };
     }
   };

@@ -1,5 +1,4 @@
-import type { PDPReview } from "./types.ts"
-
+import type { PDPReview } from "./types.ts";
 
 export interface API {
   "GET /:customer/:sku/summary": {
