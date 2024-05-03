@@ -6,7 +6,7 @@ import {
   PLURAL_REVISIONS,
   PLURAL_ROUTES,
   VERSION_V1,
-  GROUP_APPS,
+  GROUP_AUTOSCALING_KNATIVE_DEV,
   PLURAL_POD_AUTOSCALERS,
   VERSION_V1ALPHA1,
 } from "../../constants.ts";
@@ -66,7 +66,7 @@ export const allowScaleToZero = async ({
     upsertObject(
       ctx.kc,
       podAutoscaler,
-      GROUP_APPS,
+      GROUP_AUTOSCALING_KNATIVE_DEV,
       VERSION_V1ALPHA1,
       PLURAL_POD_AUTOSCALERS,
       (current) => {
