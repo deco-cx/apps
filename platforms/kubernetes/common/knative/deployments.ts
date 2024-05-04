@@ -16,8 +16,10 @@ export interface DeployOptions {
   site: string;
   siteNs: string;
   deploymentId: string;
+  deploymentSlug?: string;
   labels?: Record<string, string>;
   runnerImage: string;
+  hypervisor?: boolean;
 }
 
 const IMMUTABLE_ANNOTATIONS = ["serving.knative.dev/creator"];
@@ -26,12 +28,13 @@ interface DeployServiceOptions {
   service: ReturnType<typeof knativeServiceOf>;
   site: string;
   deploymentId: string;
+  deploymentSlug?: string;
   siteNs: string;
   revisionName: string;
   k8sApi: k8s.CustomObjectsApi;
 }
 const deployService = async (
-  { service, site, siteNs, deploymentId, revisionName, k8sApi }:
+  { service, site, siteNs, deploymentId, deploymentSlug, revisionName, k8sApi }:
     DeployServiceOptions,
   ctx: AppContext,
 ) => {
@@ -71,6 +74,34 @@ const deployService = async (
     revisionName,
     namespace: siteNs,
   };
+
+  const domains = [{
+    url: `https://${deploymentRoute}.${CONTROL_PLANE_DOMAIN}`,
+    production: false,
+  }];
+
+  const deploymentSlugRev = deploymentSlug
+    ? Routes.slug(site, deploymentSlug)
+    : undefined;
+
+  const slugRoute = deploymentSlugRev
+    ? upsertObject(
+      ctx.kc,
+      revisionRoute({
+        routeName: deploymentSlugRev,
+        revisionName,
+        namespace: siteNs,
+      }),
+      "serving.knative.dev",
+      "v1",
+      "routes",
+    ).then(() => {
+      return {
+        url: `https://${deploymentSlugRev}.${CONTROL_PLANE_DOMAIN}`,
+        production: false,
+      };
+    })
+    : Promise.resolve(undefined);
   await k8sApi.createNamespacedCustomObject(
     "serving.knative.dev",
     "v1",
@@ -88,11 +119,10 @@ const deployService = async (
   });
 
   await waitToBeReady(ctx.kc, revRoute);
+  await slugRoute.then((domain) => {
+    domain && domains.push(domain);
+  });
 
-  const domains = [{
-    url: `https://${deploymentRoute}.${CONTROL_PLANE_DOMAIN}`,
-    production: false,
-  }];
   return { id: deploymentId, domains };
 };
 
@@ -106,6 +136,8 @@ export const deployFromSource = async (
     siteNs,
     labels,
     runnerImage,
+    hypervisor,
+    deploymentSlug,
   }: DeployOptions,
   ctx: AppContext,
 ) => {
@@ -148,11 +180,15 @@ export const deployFromSource = async (
     resources: siteState.resources!,
     nodeAffinity: siteState.nodeAffinity,
     nodeSelector: siteState.nodeSelector,
+    volumeMounts: siteState.volumeMounts,
+    volumes: siteState.volumes,
+    hypervisor,
   });
 
   return deployService({
     service,
     site,
+    deploymentSlug,
     deploymentId,
     siteNs,
     revisionName,

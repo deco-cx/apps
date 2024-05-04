@@ -1,6 +1,3 @@
-import { Context } from "deco/deco.ts";
-import { Resolvable } from "deco/engine/core/resolver.ts";
-import { Release } from "deco/engine/releases/provider.ts";
 import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
 import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
 import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
@@ -16,36 +13,11 @@ import {
   WebhookEventName,
   Webhooks,
 } from "./deps.ts";
-import { storage } from "./fsStorage.ts";
 import { prEventHandler } from "./github/pr.ts";
 import { pushEventHandler } from "./github/push.ts";
-import { State as Resolvables } from "./loaders/state.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
 export const ANONYMOUS = "Anonymous";
-
-type SignalStringified<Data> = { __signal: Data };
-// deno-lint-ignore no-explicit-any
-type Layout = any;
-// deno-lint-ignore no-explicit-any
-type Tab = any;
-
-export interface Workspace {
-  name: string;
-  layout: Layout[];
-  tabs: Record<string, Tab>;
-}
-
-export interface BlockStore extends Release {
-  patch(
-    resolvables: Record<string, Resolvable>,
-  ): Promise<Record<string, Resolvable>>;
-  set(
-    resolvables: Record<string, Resolvable>,
-    reivsion?: string,
-  ): Promise<void>;
-  delete(id: string): Promise<void>;
-}
 
 export interface GithubEventListener<
   TEvents extends WebhookEventName = WebhookEventName,
@@ -59,38 +31,11 @@ export interface GithubEventListener<
 }
 
 export interface State {
-  storage: BlockStore;
-  release: () => Release;
   octokit: Octokit;
   webhooks?: Webhooks;
   githubEventListeners: GithubEventListener[];
   githubWebhookSecret?: string;
   platformAssignments: Record<string, PlatformName | undefined>;
-}
-
-export interface BlockState<TBlock = unknown> {
-  id: string;
-  site: string;
-  createdAt: Date;
-  resolveType: string;
-  value: TBlock | null;
-  createdBy: string;
-  revision: string;
-}
-
-export interface BlockMetadata {
-  id: string;
-  revision?: string;
-  archived: boolean;
-  type: string; // e.g: "account" | "matcher" | "page" | "section" | "loader";
-  module: string; // e.g: VTEXAccount.ts, LivePage.ts, Header.tsx
-  usedBy: Array<Pick<BlockMetadata, "id">>;
-  lastUpdated: {
-    at: number;
-    byEmail: string;
-    byUserId: string;
-  };
-  data: Resolvable;
 }
 
 export interface GithubProps {
@@ -113,7 +58,6 @@ export interface PlatformAssignment {
 }
 
 export interface Props {
-  resolvables?: Resolvables;
   github?: GithubProps;
   /**
    * @default null
@@ -124,7 +68,6 @@ export interface Props {
    */
   subhosting?: SubhostingProps | null;
   /** @description property used at deco admin  */
-  workspaces: SignalStringified<Workspace>[];
   platformAssignments?: PlatformAssignment[];
 }
 
@@ -133,7 +76,6 @@ export interface Props {
  */
 export default function App(
   {
-    resolvables,
     github,
     kubernetes,
     subhosting: subhostingProps,
@@ -159,11 +101,6 @@ export default function App(
         },
         {} as Record<string, PlatformName | undefined>,
       ),
-      storage,
-      release: () => {
-        const ctx = Context.active();
-        return ctx.release!;
-      },
       githubWebhookSecret,
       githubEventListeners: [
         ...github?.eventListeners ?? [],
@@ -179,7 +116,6 @@ export default function App(
         })
         : undefined,
     },
-    resolvables,
     dependencies: [k8sApp, subhostingApp],
   };
 }
