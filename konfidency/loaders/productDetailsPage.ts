@@ -1,8 +1,8 @@
-import { logger } from "deco/mod.ts";
+import { AppContext } from "../mod.ts";
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
-import { AppContext } from "../mod.ts";
 import { toReview } from "../utils/transform.ts";
+import { logger } from "deco/mod.ts";
 
 export interface Props {
   /**

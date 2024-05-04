@@ -21,9 +21,8 @@ export interface Props {
 
 export const Routes = {
   prod: (site: string) => `sites-${site}`,
-  slug: (site: string, slug: string) => `${Routes.prod(site)}-${slug}`,
   preview: (site: string, deploymentId: string) =>
-    Routes.slug(site, deploymentId),
+    `${Routes.prod(site)}-${deploymentId}`,
 };
 
 /**

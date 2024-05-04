@@ -15,7 +15,7 @@ export const pushEventHandler: GithubEventListener<"push"> = {
       owner,
       repo,
       commitSha,
-      "main",
+      true,
       req,
       ctx,
     );

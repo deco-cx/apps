@@ -10,13 +10,6 @@ export const prEventHandler: GithubEventListener<"pull_request"> = {
     const owner = event.repository.owner.login;
     const repo = event.repository.name;
     const commitSha = event.pull_request.head.sha;
-    await handleChange(
-      owner,
-      repo,
-      commitSha,
-      event.pull_request.head.ref,
-      req,
-      ctx,
-    );
+    await handleChange(owner, repo, commitSha, false, req, ctx);
   },
 };

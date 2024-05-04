@@ -1,4 +1,3 @@
-import { singleFlight } from "deco/engine/core/utils.ts";
 import { badRequest } from "deco/mod.ts";
 import { walk } from "../../../files/sdk.ts";
 import buildScript from "../common/cmds/build.ts";
@@ -352,7 +351,6 @@ export interface BuildResult {
   wait: (timeoutMs?: number) => Promise<BuildStatus>;
 }
 
-const sfBuild = singleFlight<void>();
 /**
  * Builds a specific commit repo and owner using the given builder image or getting from builder image default.
  */
@@ -378,12 +376,10 @@ export default async function build(
     sourceBinder: binder,
   });
 
-  await sfBuild.do(`${site}-${jobName}`, async () => {
-    await batchAPI.createNamespacedJob(
-      siteNs,
-      job,
-    ).catch(ignoreIfExists);
-  });
+  await batchAPI.createNamespacedJob(
+    siteNs,
+    job,
+  ).catch(ignoreIfExists);
 
   const getBuildStatusFn = () =>
     getBuildStatus(batchAPI, siteNs, job.metadata!.name!);

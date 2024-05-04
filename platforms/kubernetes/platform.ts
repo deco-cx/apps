@@ -98,12 +98,9 @@ export default function kubernetes(
 
         const deployment = await actions.deployments.create({
           site,
-          hypervisor: !production,
           siteState: deploymentState,
-          deploymentSlug: props.slug,
           deploymentId,
           labels: {
-            ...props.protected ? { protected: "true" } : {},
             deploymentId,
           },
         });

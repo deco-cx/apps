@@ -1,6 +1,6 @@
-import urlSlug from "npm:url-slug@4.0.1";
 import { AppContext } from "../mod.ts";
-import { controllerFor, controllerGroup } from "./statusController.ts";
+import { controllerFor, controllerGroup, noop } from "./statusController.ts";
+
 /**
  * Handles events from the given owner/repo/commit
  */
@@ -8,12 +8,10 @@ export const handleChange = async (
   owner: string,
   repo: string,
   commitSha: string,
-  ref: string,
+  production: boolean,
   req: Request,
   ctx: AppContext,
 ) => {
-  const production = ref === "main"; // FIXME (@mcandeia) hopefully people won't change their default branches
-  const refSlug = urlSlug.convert(ref);
   const { loaders } = ctx.invoke["deco-sites/admin"];
   const reqUrl = new URL(req.url);
   const site = reqUrl.searchParams.get("site") ?? repo;
@@ -22,21 +20,16 @@ export const handleChange = async (
       owner,
       repo,
       commitSha,
-      context: `Deco / site-${site} / commit`,
+      context: `(beta) Deco / site-${site} / preview`,
     }, ctx),
     production
       ? controllerFor({
         owner,
         repo,
         commitSha,
-        context: `Deco / site-${site} / prod`,
+        context: `(beta) Deco / site-${site} / prod`,
       }, ctx)
-      : controllerFor({
-        owner,
-        repo,
-        commitSha,
-        context: `Deco / site-${site} / ${refSlug}`,
-      }, ctx),
+      : noop,
   );
   try {
     const platform = await loaders.platforms.forSite({ site }).then((p) => p)
@@ -51,7 +44,6 @@ export const handleChange = async (
       mode: "repo",
       commitSha,
       owner,
-      slug: !production ? refSlug : undefined,
       repo,
       site,
       production,
