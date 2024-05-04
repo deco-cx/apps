@@ -115,6 +115,7 @@ export const knativeServiceOf = (
       template: {
         metadata: {
           name: revisionName,
+          labels,
           annotations: {
             ...metricToAnnotations(metric),
             "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
