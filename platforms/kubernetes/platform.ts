@@ -77,11 +77,15 @@ export default function kubernetes(
 
         let deploymentState = desiredState;
         if (!production) {
+          const scaling = {
+            ...deploymentState?.scaling ?? {},
+            ...PREVIEW_SERVICE_SCALING,
+          };
           deploymentState = {
             ...deploymentState ?? {},
             scaling: {
-              ...deploymentState?.scaling ?? {},
-              ...PREVIEW_SERVICE_SCALING,
+              ...scaling,
+              retentionPeriod: props.protected ? "30m" : scaling.retentionPeriod,
             },
             resources: {
               requests: {
