@@ -1,7 +1,16 @@
-import { baseRun, runCmd } from "./cmd.ts";
+import { beforeBaseRun, runCmd } from "./cmd.ts";
 
 const script = `
-${baseRun}
+${
+  beforeBaseRun(
+    `
+DEPLOYMENT_TAR=$(dirname $SOURCE_ASSET_PATH)/$DENO_DEPLOYMENT_ID.tar
+if [[ -f $DEPLOYMENT_TAR ]]; then
+  SOURCE_ASSET_PATH=$DEPLOYMENT_TAR
+fi
+`,
+  )
+}
 if [[ -f "./deno.jsonc" ]]; then
     LOAD_CONFIG_ARG="--config=deno.json"
 else
