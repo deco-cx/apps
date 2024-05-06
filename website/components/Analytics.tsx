@@ -58,9 +58,9 @@ export interface Props {
   dangerouslyRunOnMainThread?: boolean;
 
   /**
-   * @description run scripts on the secondary thread with Partytown. Recommended: False
+   * @description execute scripts within the service worker using Partytown, where script execution might encounter delays or potential non-execution. Recommended: False
    */
-  dangerouslyRunOnSecondaryThread?: boolean;
+  dangerouslyRunOnServiceWorker?: boolean;
 
   /**
    * @description define the name of event type sent to datalayer and registered analytics. Default: ecommerce
@@ -82,14 +82,14 @@ export default function Analytics({
   trackingIds,
   src,
   dangerouslyRunOnMainThread: _dangerouslyRunOnMainThread,
-  dangerouslyRunOnSecondaryThread = false,
+  dangerouslyRunOnServiceWorker = false,
   googleAnalyticsIds,
   preventForward,
   disableAutomaticEventPush,
 }: Props) {
   const isDeploy = !!context.isDeploy;
   const dangerouslyRunOnMainThread = _dangerouslyRunOnMainThread ??
-    !dangerouslyRunOnSecondaryThread;
+    !dangerouslyRunOnServiceWorker;
 
   return (
     <>
