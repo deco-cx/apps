@@ -157,6 +157,9 @@ export const createHttpClient = <T>({
           headers: processHeaders(headers),
           method,
           body,
+        }).then((res) => {
+          res.clone().json().then(console.log);
+          return res;
         });
       };
     },
