@@ -18,6 +18,7 @@ const paltformApps = [{
 
 const config = {
   apps: [
+    app("konfidency"),
     app("ai-assistants"),
     app("files"),
     app("openai"),
@@ -40,6 +41,7 @@ const config = {
     app("linx"),
     app("linx-impulse"),
     app("shopify"),
+    app("magento"),
     app("nuvemshop"),
     app("website"),
     app("commerce"),

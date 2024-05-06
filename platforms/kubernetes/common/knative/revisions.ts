@@ -2,12 +2,12 @@ import { RouteBody, upsertObject } from "../objects.ts";
 import { AppContext } from "../../mod.ts";
 import { Namespace } from "../../actions/sites/create.ts";
 import {
+  GROUP_AUTOSCALING_KNATIVE_DEV,
   GROUP_SERVING_KNATIVE_DEV,
+  PLURAL_POD_AUTOSCALERS,
   PLURAL_REVISIONS,
   PLURAL_ROUTES,
   VERSION_V1,
-  GROUP_AUTOSCALING_KNATIVE_DEV,
-  PLURAL_POD_AUTOSCALERS,
   VERSION_V1ALPHA1,
 } from "../../constants.ts";
 import { Routes } from "../../actions/deployments/rollout.ts";
@@ -61,7 +61,7 @@ export const allowScaleToZero = async ({
             },
           },
         };
-      }
+      },
     ),
     upsertObject(
       ctx.kc,
@@ -80,7 +80,7 @@ export const allowScaleToZero = async ({
             },
           },
         };
-      }
+      },
     ),
   ];
 
@@ -100,7 +100,7 @@ export const getProdRevisionName = async ({
       VERSION_V1,
       Namespace.forSite(site),
       PLURAL_ROUTES,
-      Routes.prod(site)
+      Routes.prod(site),
     )
     .catch((err) => {
       logger.error(err);

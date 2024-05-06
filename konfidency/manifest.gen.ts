@@ -2,15 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/productDetailsPage.ts";
+import * as $$$0 from "./loaders/productDetailsPage.ts";
 
 const manifest = {
   "loaders": {
-    "magento/loaders/cart.ts": $$$0,
-    "magento/loaders/productDetailsPage.ts": $$$1,
+    "konfidency/loaders/productDetailsPage.ts": $$$0,
   },
-  "name": "magento",
+  "name": "konfidency",
   "baseUrl": import.meta.url,
 };
 
