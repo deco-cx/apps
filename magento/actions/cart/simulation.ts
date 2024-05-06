@@ -1,13 +1,13 @@
 import { AppContext } from "../../mod.ts";
 import type {
-  CustomerAddress,
   ShippingMethod,
 } from "../../utils/client/types.ts";
 import { badRequest } from "deco/mod.ts";
 
 export interface Props {
   cartId: string;
-  address: CustomerAddress;
+  countryId: string;
+  postcode: string;
 }
 
 const action = async (
@@ -16,9 +16,9 @@ const action = async (
   ctx: AppContext,
 ): Promise<ShippingMethod[]> => {
   const { clientAdmin, site } = ctx;
-  const { cartId, address } = props;
+  const { cartId, countryId, postcode } = props;
 
-  if (!cartId || !address) {
+  if (!cartId || !countryId || !postcode) {
     badRequest({
       message: "could not find some props",
     });
@@ -29,7 +29,10 @@ const action = async (
       cartId,
     }, {
       body: {
-        address,
+        address: {
+          postcode,
+          countryId,
+        }
       },
     });
   return shippingMethod.json();
