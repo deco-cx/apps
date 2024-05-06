@@ -103,6 +103,8 @@ export interface SiteState {
   useServiceAccount?: boolean;
   scaling?: ServiceScaling;
   resources?: ResourceRequirements;
+  volumes?: k8s.V1Volume[];
+  volumeMounts?: k8s.V1VolumeMount[];
   domains?: Domain[];
   nodeSelector?: NodeSelector;
   nodeAffinity?: k8s.V1NodeAffinity;

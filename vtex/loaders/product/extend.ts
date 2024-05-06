@@ -154,5 +154,3 @@ export default async (
 
   return p;
 };
-
-export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
