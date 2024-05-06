@@ -49,6 +49,7 @@ export interface API {
   "POST /rest/:site/V1/guest-carts": {
     response: string;
   };
+
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartId#operation/GetV1CartsCartId */
   "GET /rest/:site/V1/carts/:cartId": {
     response: Cart;
@@ -62,5 +63,28 @@ export interface API {
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/guest-cartscartId#operation/GetV1GuestcartsCartId */
   "GET /rest/:site/V1/guest-carts/:cartId": {
     response: Cart;
+  };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */
+  "POST /rest/:site/V1/carts/:quoteId/items": {
+    response: string;
+    body: {
+      cartItem: {
+        qty: number;
+        quote_id: string;
+        sku: string;
+      };
+    };
+  };
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIditemsitemId#operation/PutV1CartsCartIdItemsItemId */
+  "PUT /rest/:site/V1/carts/:cartId/items/:itemId": {
+    response: string;
+    body: {
+      cartItem: {
+        qty: number;
+        quote_id: string;
+        sku: string;
+      };
+    };
   };
 }
