@@ -71,6 +71,7 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 | deco-sites/std    | An app for compatibility with deco-sites/std app, contains various blocks merged from e-commerce apps.                               | [manifest](/compat/std/manifest.gen.ts)    |
 | decohub           | The best place to find an app for your business case, here is where apps published by any developer in the deco ecosystem will live. | [manifest](/decohub/manifest.gen.ts)       |
 | implementation    | App for project implementation details.                                                                                              | [manifest](/implementation/manifest.gen.ts) |
+| Konfidency        | An app that uses extension block to add Aggregate Rating to products by integrating with the "[Konfidency](https://www.konfidency.com.br/)" provider.                                                                                                       | [manifest](/konfidency/manifest.gen.ts)    |
 | Linx              | The app for e-commerce that uses Linx as a platform.                                                                 	               | [manifest](/linx/manifest.gen.ts)        |
 | nuvemshop         | The app for e-commerce that uses Nuvemshop as a platform.                                            		                      		   | [manifest](/nuvemshop/manifest.gen.ts)   |
 | openai            | Connects to OpenAI services to generate AI-powered content.                                                                          | [manifest](/openai/manifest.gen.ts)      |
@@ -90,20 +91,21 @@ For more information, check out our documentation at [https://deco.cx/docs](http
 
 | Integrations                                                                                    | Home   | PLP   | PDP   | Cart   | Checkout proxy   | Order placed proxy   | My account proxy   |
 |:------------------------------------------------------------------------------------------------|:-------|:------|:------|:-------|:-----------------|:---------------------|:-------------------|
-| [VTEX](https://github.com/deco-cx/apps/blob/main/vtex/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
-| [VNDA](https://github.com/deco-cx/apps/blob/main/vnda/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
-| [Shopify](https://github.com/deco-cx/apps/blob/b072c1fdfab8d5f1647ed42f9dbaae618f28f05f/shopify/README.md) | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ⚠️                 |
-| [Linx](https://github.com/deco-cx/apps/blob/main/linx/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
-| Linx impulse                                                                                    | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
-| [Nuvemshop](https://github.com/deco-cx/apps/blob/main/nuvemshop/README.MD)                                   | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ⚠️                 |
-| [Wake](https://github.com/deco-cx/apps/blob/main/wake/README.md)                                        | ✅     | ✅    | ✅    | ✅     | ✅               | ✅                   | ✅                 |
+| [VTEX](https://github.com/deco-cx/apps/blob/main/vtex/README.md)                                           | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [VNDA](https://github.com/deco-cx/apps/blob/main/vnda/README.md)                                           | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Shopify](https://github.com/deco-cx/apps/blob/b072c1fdfab8d5f1647ed42f9dbaae618f28f05f/shopify/README.md) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ |
+| [Linx](https://github.com/deco-cx/apps/blob/main/linx/README.md)                                           | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Linx impulse                                                                                               | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Nuvemshop](https://github.com/deco-cx/apps/blob/main/nuvemshop/README.MD)                                 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ |
+| [Wake](https://github.com/deco-cx/apps/blob/main/wake/README.md)                                           | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Review Integrations - Status
 
 | Integrations                                                                                    | Extension PDP   | Extension ProductList   | Extension Listing Page   | Submit Review   |
 |:------------------------------------------------------------------------------------------------|:-------|:------|:------|:-------|
-| [Power Reviews](https://github.com/deco-cx/apps/blob/main/power-reviews/README.md)                                        | ✅     | ✅    | ✅    | ✅     |
-| [Verified Reviews](https://github.com/deco-cx/apps/blob/main/verified-reviews/README.md)                                        | ✅     | ✅    | 🔴    | 🔴     |
+| [Power Reviews](https://github.com/deco-cx/apps/blob/main/power-reviews/README.md)                         | ✅ | ✅ | ✅ | ✅ |
+| [Verified Reviews](https://github.com/deco-cx/apps/blob/main/verified-reviews/README.md)                   | ✅ | ✅ | ✅ | 🔴 |
+| [Konfidency](https://github.com/deco-cx/apps/blob/main/konfidency/README.md)                               | ✅ | 🔴 | 🔴 | 🔴 |
 
 
 #### Adding a new app to Deco Hub

@@ -9,7 +9,7 @@
     "std/": "https://deno.land/std@0.204.0/",
     "partytown/": "https://deno.land/x/partytown@0.4.8/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.25.1/",
-    "deco/": "https://denopkg.com/deco-cx/deco@1.62.3/"
+    "deco/": "https://denopkg.com/deco-cx/deco@1.63.0/"
   },
   "lock": false,
   "tasks": {
@@ -36,5 +36,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "version": "0.36.24"
+  "version": "0.38.2"
 }
