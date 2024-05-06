@@ -44,11 +44,13 @@ export const color = 0xFF6A3B;
 export default function App(
   { account, cdn, integrationToken }: State,
 ) {
+  const token = integrationToken.get();
+  console.log({ token });
   const headers = new Headers({
     "Accept": "application/json",
     "User-Agent":
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-    "Authorization": `Basic ${integrationToken.get()}`,
+    "Authorization": `Basic ${token}`,
   });
 
   const api = createHttpClient<API>({
