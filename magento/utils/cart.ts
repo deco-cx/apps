@@ -6,9 +6,10 @@ const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
 
 const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
-export const getCartCookie = (headers: Headers): string | undefined => {
+export const getCartCookie = (headers: Headers): string => {
   const cookies = getCookies(headers);
-  return cookies[CART_COOKIE];
+
+  return `${cookies[CART_COOKIE]}`;
 };
 
 export const setCartCookie = (headers: Headers, cartId: string) => {
