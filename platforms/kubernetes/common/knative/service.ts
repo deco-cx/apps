@@ -168,7 +168,6 @@ export const knativeServiceOf = (
                   name: "SOURCE_ASSET_PATH",
                   value: sourceBinder.sourceOutput,
                 },
-                { name: "APP_PORT", value: "8000" },
                 ...envVars ?? [],
                 // Add other environment variables as needed
               ],
