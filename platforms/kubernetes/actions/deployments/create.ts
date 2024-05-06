@@ -15,9 +15,11 @@ export interface Props {
   site: string;
   labels?: Record<string, string>;
   deploymentId: string;
+  deploymentSlug?: string;
   runnerImage?: string;
   siteState: SiteState;
   build?: boolean;
+  hypervisor?: boolean;
 }
 
 /**
@@ -29,9 +31,11 @@ export default function newDeployment(
     build = true,
     site,
     deploymentId,
+    deploymentSlug,
     labels,
     runnerImage,
     siteState: desiredState,
+    hypervisor,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -60,5 +64,7 @@ export default function newDeployment(
     siteNs,
     labels,
     runnerImage: runnerImg,
+    hypervisor,
+    deploymentSlug,
   }, ctx);
 }
