@@ -311,48 +311,7 @@ export interface ShippingMethod {
   price_incl_tax: number;
 }
 
-interface DiscountData {
-  amount?: number;
-  base_amount?: number;
-  original_amount?: number;
-  base_original_amount?: number;
-}
-
-interface Discount {
-  discount_data?: DiscountData;
-  rule_label?: string;
-  rule_id?: number;
-}
-
-interface ExtensionAttributes {
-  discounts?: Discount[];
-  gift_registry_id?: number;
-  pickup_location_code?: string;
-}
-
 export interface CustomerAddress {
   countryId: string;
   postcode: string;
-  id?: number;
-  region?: string;
-  region_id?: number;
-  region_code?: string;
-  street?: string[];
-  company?: string;
-  telephone?: string;
-  fax?: string;
-  city?: string;
-  firstname?: string;
-  lastname?: string;
-  middlename?: string;
-  prefix?: string;
-  suffix?: string;
-  vat_id?: string;
-  customer_id?: number;
-  email?: string;
-  same_as_billing?: number;
-  customer_address_id?: number;
-  save_in_address_book?: number;
-  extension_attributes?: ExtensionAttributes;
-  custom_attributes?: CustomAttribute[];
 }
