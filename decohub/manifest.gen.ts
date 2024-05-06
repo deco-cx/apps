@@ -19,12 +19,13 @@ import * as $$$$$$$$$$$13 from "./apps/shopify.ts";
 import * as $$$$$$$$$$$14 from "./apps/sourei.ts";
 import * as $$$$$$$$$$$15 from "./apps/typesense.ts";
 import * as $$$$$$$$$$$16 from "./apps/verified-reviews.ts";
-import * as $$$$$$$$$$$17 from "./apps/vnda.ts";
-import * as $$$$$$$$$$$18 from "./apps/vtex.ts";
-import * as $$$$$$$$$$$19 from "./apps/wake.ts";
-import * as $$$$$$$$$$$20 from "./apps/wap.ts";
-import * as $$$$$$$$$$$21 from "./apps/weather.ts";
-import * as $$$$$$$$$$$22 from "./apps/workflows.ts";
+import * as $$$$$$$$$$$17 from "./apps/vnda-to-algolia.ts";
+import * as $$$$$$$$$$$18 from "./apps/vnda.ts";
+import * as $$$$$$$$$$$19 from "./apps/vtex.ts";
+import * as $$$$$$$$$$$20 from "./apps/wake.ts";
+import * as $$$$$$$$$$$21 from "./apps/wap.ts";
+import * as $$$$$$$$$$$22 from "./apps/weather.ts";
+import * as $$$$$$$$$$$23 from "./apps/workflows.ts";
 
 const manifest = {
   "apps": {
@@ -45,12 +46,13 @@ const manifest = {
     "decohub/apps/sourei.ts": $$$$$$$$$$$14,
     "decohub/apps/typesense.ts": $$$$$$$$$$$15,
     "decohub/apps/verified-reviews.ts": $$$$$$$$$$$16,
-    "decohub/apps/vnda.ts": $$$$$$$$$$$17,
-    "decohub/apps/vtex.ts": $$$$$$$$$$$18,
-    "decohub/apps/wake.ts": $$$$$$$$$$$19,
-    "decohub/apps/wap.ts": $$$$$$$$$$$20,
-    "decohub/apps/weather.ts": $$$$$$$$$$$21,
-    "decohub/apps/workflows.ts": $$$$$$$$$$$22,
+    "decohub/apps/vnda-to-algolia.ts": $$$$$$$$$$$17,
+    "decohub/apps/vnda.ts": $$$$$$$$$$$18,
+    "decohub/apps/vtex.ts": $$$$$$$$$$$19,
+    "decohub/apps/wake.ts": $$$$$$$$$$$20,
+    "decohub/apps/wap.ts": $$$$$$$$$$$21,
+    "decohub/apps/weather.ts": $$$$$$$$$$$22,
+    "decohub/apps/workflows.ts": $$$$$$$$$$$23,
   },
   "name": "decohub",
   "baseUrl": import.meta.url,
