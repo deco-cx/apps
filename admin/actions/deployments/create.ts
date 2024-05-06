@@ -64,7 +64,7 @@ const runtimeTemplates: Record<
             content: `
 import { FreshContext } from "$fresh/server.ts";
 import { Page } from "deco/blocks/page.tsx";
-import { fromEndpoint } from "deco/engine/releases/fetcher.ts";
+import { fromEndpoint } from "deco/engine/decofile/fetcher.ts";
 import { contextProvider } from "deco/runtime/fresh/middlewares/1_contextProvider.ts";
 import {
   buildDecoState,

@@ -17,7 +17,9 @@ export interface PromoteOpts {
 export interface DeploymentBase {
   site: string;
   production?: boolean;
+  slug?: string;
   mode: string;
+  protected?: boolean;
 }
 export interface DeploymentFromRepo extends DeploymentBase {
   mode: "repo";
