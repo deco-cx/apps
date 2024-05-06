@@ -2,6 +2,7 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/cart/simulation.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
 
@@ -9,6 +10,9 @@ const manifest = {
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
     "magento/loaders/productDetailsPage.ts": $$$1,
+  },
+  "actions": {
+    "magento/actions/cart/simulation.ts": $$$$$$$$$0,
   },
   "name": "magento",
   "baseUrl": import.meta.url,

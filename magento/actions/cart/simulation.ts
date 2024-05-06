@@ -15,7 +15,7 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<ShippingMethod[]> => {
-  const { clientGuest } = ctx;
+  const { clientAdmin, site } = ctx;
   const { cartId, address } = props;
 
   if (!cartId || !address) {
@@ -23,8 +23,9 @@ const action = async (
       message: "could not find some props",
     });
   }
-  const shippingMethod = await clientGuest
-    ["POST /V1/guest-carts/:cartId/estimate-shipping-methods"]({
+  const shippingMethod = await clientAdmin
+    ["POST /rest/:site/V1/carts/:cartId/estimate-shipping-methods"]({
+      site,
       cartId,
     }, {
       body: {
