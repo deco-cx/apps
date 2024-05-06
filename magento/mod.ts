@@ -37,7 +37,6 @@ export interface Props {
 type PartialProps = Omit<Props, "baseUrl">;
 
 export interface State extends PartialProps {
-  clientGuest: ReturnType<typeof createHttpClient<API>>;
   clientAdmin: ReturnType<typeof createHttpClient<API>>;
 }
 
@@ -50,9 +49,6 @@ export interface State extends PartialProps {
 export default function App(props: Props): App<Manifest, State> {
   const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl } = props;
 
-  const clientGuest = createHttpClient<API>({
-    base: baseUrl,
-  });
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
     headers: new Headers(
@@ -70,7 +66,6 @@ export default function App(props: Props): App<Manifest, State> {
       apiKey,
       currencyCode,
       imagesUrl,
-      clientGuest,
       clientAdmin,
     },
   };
