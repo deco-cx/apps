@@ -52,8 +52,15 @@ export interface Props {
   src?: string;
   /**
    * @description run GTM directly on the main thread, without Partytown. This is useful for debugging purposes. Default: false
+   * @hide true
+   * @deprecated
    */
   dangerouslyRunOnMainThread?: boolean;
+
+  /**
+   * @description run scripts on the secondary thread with Partytown. Recommended: False
+   */
+  dangerouslyRunOnSecondaryThread?: boolean;
 
   /**
    * @description define the name of event type sent to datalayer and registered analytics. Default: ecommerce
@@ -74,12 +81,15 @@ export interface Props {
 export default function Analytics({
   trackingIds,
   src,
-  dangerouslyRunOnMainThread,
+  dangerouslyRunOnMainThread: _dangerouslyRunOnMainThread,
+  dangerouslyRunOnSecondaryThread = false,
   googleAnalyticsIds,
   preventForward,
   disableAutomaticEventPush,
 }: Props) {
   const isDeploy = !!context.isDeploy;
+  const dangerouslyRunOnMainThread = _dangerouslyRunOnMainThread ??
+    !dangerouslyRunOnSecondaryThread;
 
   return (
     <>
