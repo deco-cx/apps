@@ -158,12 +158,6 @@ export const knativeServiceOf = (
                   name: "DENO_DEPLOYMENT_ID",
                   value: deploymentId,
                 },
-                ...sourceBinder.cacheOutput
-                  ? [{
-                    name: "CACHE_PATH",
-                    value: sourceBinder.cacheOutput,
-                  }]
-                  : [],
                 {
                   name: "SOURCE_ASSET_PATH",
                   value: sourceBinder.sourceOutput,

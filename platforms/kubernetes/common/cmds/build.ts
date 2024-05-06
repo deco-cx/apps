@@ -25,15 +25,12 @@ async function build() {
       }
     }
   };
-  const cacheLocalDir = Deno.env.get("CACHE_LOCAL_DIR");
   const sourceLocalDir = Deno.env.get("SOURCE_LOCAL_DIR");
   const sourceProvider = Deno.env.get("SOURCE_PROVIDER"); // GITHUB or FILES
   const filesLocalPath = Deno.env.get("FILES_LOCAL_PATH"); // readonly path should be copied to a writable path.
   const gitRepository = Deno.env.get("GIT_REPO");
   const commitSha = Deno.env.get("COMMIT_SHA") ?? "main";
   const ghToken = Deno.env.get("GITHUB_TOKEN");
-
-  Deno.env.set("DENO_DIR", cacheLocalDir!);
 
   const runtimeDeps = [
     "https://denopkg.com/deco-sites/std/utils/worker.ts",
@@ -341,12 +338,6 @@ if [[ -f "$SOURCE_REMOTE_OUTPUT" ]]; then
     echo "Source already exists... skipping build"
     exit 0;
 fi
-BASE_BUILD_CACHE=$CACHE_REMOTE_OUTPUT
-if [[ ! -f "$BASE_BUILD_CACHE" ]]; then
-    BASE_BUILD_CACHE=$BUILD_CACHE_FALLBACK
-fi
-
-[[ -f "$BASE_BUILD_CACHE" ]] && echo "restoring cache..." && tar xvf "$BASE_BUILD_CACHE" -C $CACHE_LOCAL_DIR && echo "cache successfully restored! from $BASE_BUILD_CACHE"
 
 deno run -A --unstable - << 'EOF'
 ${build};
@@ -355,19 +346,10 @@ EOF
 
 echo "exporting the code result to a tar file..."
 
-mkdir -p $(dirname $CACHE_REMOTE_OUTPUT)
 mkdir -p $(dirname $SOURCE_REMOTE_OUTPUT)
 
 cd $SOURCE_LOCAL_DIR
-tar cvfh - . | cat > $SOURCE_REMOTE_OUTPUT &
-CODE_TAR_PID=$!
-echo "exporting the cache result to a tar file..."
-cd $CACHE_LOCAL_DIR
-tar cvfh - . | cat > $CACHE_REMOTE_OUTPUT &
-CACHE_TAR_PID=$!
-
-wait $CODE_TAR_PID
-wait $CACHE_TAR_PID
+tar cvfh - . | cat > $SOURCE_REMOTE_OUTPUT
 `;
 
 export default script;

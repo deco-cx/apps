@@ -4,16 +4,13 @@ export const beforeBaseRun = (beforeScript = "") => `
 #!/bin/bash
 
 ${beforeScript}
+BASE_DIR=$(dirname ${SOURCE_LOCAL_MOUNT_PATH})
 CODE_DIR=${SOURCE_LOCAL_MOUNT_PATH}
 start=$(date +%s)
 
-tar xvf $SOURCE_ASSET_PATH -C $CODE_DIR &
-SOURCE_TAR_PID=$!
-tar xvf $CACHE_PATH -C $DENO_DIR &
-CACHE_PATH_PID=$!
-
-wait $SOURCE_TAR_PID
-wait $CACHE_PATH_PID
+LOCAL_ASSET_PATH=$BASE_DIR/source.tar
+cp $SOURCE_ASSET_PATH $LOCAL_ASSET_PATH
+tar xvf $LOCAL_ASSET_PATH -C $CODE_DIR
 
 end=$(date +%s)
 

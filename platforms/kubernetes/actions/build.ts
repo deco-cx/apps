@@ -21,9 +21,7 @@ export interface Props {
   builderImage?: string;
 }
 
-const CACHE_FILE = "cache.tar";
 export const DECO_SITES_PVC = "deco-sites-sources";
-const START_CACHE = `deco-sites/start/${CACHE_FILE}`;
 
 interface BuildJobOpts {
   name: string;
@@ -44,7 +42,6 @@ export interface SourceBinder {
   labels?: Record<string, string>;
   mountPath: string;
   sourceOutput: string;
-  cacheOutput?: string;
   sourceId: string;
 }
 
@@ -136,7 +133,6 @@ export const SrcBinder = {
         mountPath: FILES_MOUNT_PATH,
       }],
       mountPath,
-      cacheOutput: `${mountPath}/${owner}/${CACHE_FILE}`,
       sourceOutput: `${mountPath}/${owner}/${repo}/${deploymentId}/source.tar`,
       envVars: [
         {
@@ -211,7 +207,6 @@ export const SrcBinder = {
         mountPath,
       }],
       mountPath,
-      cacheOutput: `${mountPath}/${owner}/${repo}/${CACHE_FILE}`,
       sourceOutput: `${mountPath}/${owner}/${repo}/${commitSha}/source.tar`,
     };
   },
@@ -225,7 +220,6 @@ const buildJobOf = (
     sourceBinder,
   }: BuildJobOpts,
 ): k8s.V1Job => {
-  const cacheLocalMountPath = "/cache";
   const esbuildCacheMountPath = "/esbuild-cache";
   return {
     apiVersion: "batch/v1",
@@ -244,9 +238,6 @@ const buildJobOf = (
       template: {
         spec: {
           volumes: [{
-            name: "cache-local",
-            emptyDir: {},
-          }, {
             name: "esbuild-cache",
             emptyDir: {},
           }, ...sourceBinder.volumes],
@@ -262,28 +253,12 @@ const buildJobOf = (
                   value: site,
                 },
                 {
-                  name: "CACHE_LOCAL_DIR",
-                  value: cacheLocalMountPath,
-                },
-                {
                   name: "SOURCE_REMOTE_OUTPUT",
                   value: sourceBinder.sourceOutput,
                 },
                 {
-                  name: "CACHE_REMOTE_OUTPUT",
-                  value: sourceBinder.cacheOutput,
-                },
-                {
-                  name: "DENO_DIR",
-                  value: cacheLocalMountPath,
-                },
-                {
                   name: "XDG_CACHE_HOME",
                   value: esbuildCacheMountPath,
-                },
-                {
-                  name: "BUILD_CACHE_FALLBACK",
-                  value: `${sourceBinder.mountPath}/${START_CACHE}`,
                 },
                 ...sourceBinder.envVars,
               ],
@@ -291,10 +266,6 @@ const buildJobOf = (
                 {
                   name: "esbuild-cache",
                   mountPath: esbuildCacheMountPath,
-                },
-                {
-                  name: "cache-local",
-                  mountPath: cacheLocalMountPath,
                 },
                 ...sourceBinder.volumeMounts,
               ],
