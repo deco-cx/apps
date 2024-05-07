@@ -15,6 +15,11 @@ export interface Props {
   title?: string;
   /** @title Description Override */
   description?: string;
+  /**
+   * @title Disable indexing
+   * @description In testing, you can use this to prevent search engines from indexing your site
+   */
+  noIndexing?: boolean;
 }
 
 /** @title Product details */
@@ -45,7 +50,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     : jsonLD?.breadcrumbList
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumbList)
     : undefined;
-  const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
+  const noIndexing = props.noIndexing || !jsonLD || jsonLD.seo?.noIndexing;
 
   if (omitVariants && jsonLD?.product.isVariantOf?.hasVariant) {
     jsonLD.product.isVariantOf.hasVariant = [];
