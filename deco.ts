@@ -18,8 +18,9 @@ const paltformApps = [{
 
 const config = {
   apps: [
-    app("konfidency"),
     app("ai-assistants"),
+    app("konfidency"),
+    app("vnda-to-algolia"),
     app("files"),
     app("openai"),
     app("brand-assistant"),
