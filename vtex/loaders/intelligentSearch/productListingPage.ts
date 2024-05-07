@@ -456,6 +456,13 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["fuzzy", props.fuzzy ?? ""],
     ["hideUnavailableItems", props.hideUnavailableItems?.toString() ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
+    [
+      "selectedFacets",
+      (props.selectedFacets ?? []).reduce(
+        (prev, curr) => [...prev, `${curr.key}:${curr.value}`],
+        [] as string[],
+      ).join("\\"),
+    ],
   ]);
 
   url.searchParams.forEach((value, key) => {
