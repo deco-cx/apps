@@ -24,27 +24,25 @@ export async function createCart(
   { clientAdmin, site }: AppContext,
   headers: Headers,
 ) {
-  const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
   const cartCookie = getCookies(headers)[CART_COOKIE];
-
-  if (customerCookie && cartCookie) {
+  const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
+  
+  if (!cartCookie && !customerCookie) {
+    const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
+      site,
+    }).then((res) => res.json());
+    const cart = await clientAdmin["GET /rest/:site/V1/guest-carts/:cartId"]({
+      cartId: tokenCart,
+      site,
+    }).then((res) => res.json());
+    return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
+      cartId: cart.id,
+      site,
+    }).then((res) => res.json());
+  } else {
     return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
       cartId: cartCookie,
       site,
     }).then((res) => res.json());
   }
-
-  const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
-    site,
-  }).then((res) => res.json());
-
-  const cart = await clientAdmin["GET /rest/:site/V1/guest-carts/:cartId"]({
-    cartId: tokenCart,
-    site,
-  }).then((res) => res.json());
-
-  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-    cartId: cart.id,
-    site,
-  }).then((res) => res.json());
 }
