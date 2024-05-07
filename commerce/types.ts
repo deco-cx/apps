@@ -260,6 +260,8 @@ export interface Offer extends Omit<Thing, "@type"> {
   seller?: string;
   /** Name of the seller */
   sellerName?: string;
+  /** Verify is seller default */
+  sellerDefault: boolean;
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku?: string;
   /** Used by some ecommerce sites to retrieve the sku of products that are part of the BuyAndWin promotion */

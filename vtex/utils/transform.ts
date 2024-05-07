@@ -553,7 +553,7 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
 };
 
 const toOffer = (
-  { commertialOffer: offer, sellerId, sellerName }: SellerVTEX,
+  { commertialOffer: offer, sellerId, sellerName, sellerDefault }: SellerVTEX,
 ): Offer => ({
   "@type": "Offer",
   price: offer.spotPrice ?? offer.Price,
@@ -563,6 +563,7 @@ const toOffer = (
   inventoryLevel: { value: offer.AvailableQuantity },
   giftSkuIds: offer.GiftSkuIds ?? [],
   teasers: offer.teasers ?? [],
+  sellerDefault,
   priceSpecification: [
     {
       "@type": "UnitPriceSpecification",
