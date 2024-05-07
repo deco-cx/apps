@@ -19,7 +19,7 @@ import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import { SEOSection } from "../components/Seo.tsx";
 
-const noIndexedDomains = ["decocdn", "deco.site"];
+const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
 /**
  * @title Sections
