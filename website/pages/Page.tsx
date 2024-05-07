@@ -102,7 +102,12 @@ function Page({
   devMode,
   seo,
   unindexedDomain,
-}: Props & { errorPage?: Page; devMode: boolean }): JSX.Element {
+  avoidRedirectingToEditor,
+}: Props & {
+  errorPage?: Page;
+  devMode: boolean;
+  avoidRedirectingToEditor?: boolean;
+}): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
@@ -130,7 +135,11 @@ function Page({
             )}
       >
         {seo && renderSection(seo)}
-        <LiveControls site={site} {...deco} />
+        <LiveControls
+          avoidRedirectingToEditor={avoidRedirectingToEditor}
+          site={site}
+          {...deco}
+        />
         <Events deco={deco} />
         {sections.map(renderSection)}
       </ErrorBoundary>
@@ -158,6 +167,7 @@ export const loader = async (
       : undefined,
     devMode,
     unindexedDomain,
+    avoidRedirectingToEditor: ctx.avoidRedirectingToEditor,
   };
 };
 

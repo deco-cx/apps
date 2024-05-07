@@ -13,12 +13,14 @@ interface Live {
   site: Site;
   flags: Flag[];
   play: boolean;
+  avoidRedirectingToEditor?: boolean;
 }
 
 interface Props {
   site: Site;
   page?: Page;
   flags?: Flag[];
+  avoidRedirectingToEditor?: boolean;
 }
 
 type EditorEvent = {
@@ -112,14 +114,18 @@ const snippet = (live: Live) => {
 
   /** Setup listeners */
 
+  if (!live.avoidRedirectingToEditor) {
+    document.body.addEventListener("keydown", onKeydown);
+  }
   // navigate to admin when user clicks ctrl+shift+e
-  document.body.addEventListener("keydown", onKeydown);
 
   // focus element when inside admin
   addEventListener("message", onMessage);
 };
 
-function LiveControls({ site, page, flags = [] }: Props) {
+function LiveControls(
+  { site, page, flags = [], avoidRedirectingToEditor }: Props,
+) {
   return (
     <Head>
       <script
@@ -129,6 +135,7 @@ function LiveControls({ site, page, flags = [] }: Props) {
           site,
           flags,
           play: !!context.play,
+          avoidRedirectingToEditor,
         })}
       />
       <script
