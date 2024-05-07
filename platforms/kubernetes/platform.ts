@@ -85,7 +85,9 @@ export default function kubernetes(
             ...deploymentState ?? {},
             scaling: {
               ...scaling,
-              retentionPeriod: props.protected ? "30m" : scaling.retentionPeriod,
+              retentionPeriod: props.protected
+                ? "30m"
+                : scaling.retentionPeriod,
             },
             resources: {
               requests: {
