@@ -19,6 +19,7 @@ const paltformApps = [{
 const config = {
   apps: [
     app("konfidency"),
+    app("mailchimp"),
     app("ai-assistants"),
     app("files"),
     app("openai"),
