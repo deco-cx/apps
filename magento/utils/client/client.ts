@@ -55,11 +55,6 @@ export interface API {
     response: Cart;
   };
 
-  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIditems#operation/GetV1CartsCartIdItems */
-  "GET /rest/:site/V1/carts/:cartId/items": {
-    response: Cart["items"];
-  };
-
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/guest-cartscartId#operation/GetV1GuestcartsCartId */
   "GET /rest/:site/V1/guest-carts/:cartId": {
     response: Cart;
