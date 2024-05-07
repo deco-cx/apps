@@ -64,7 +64,10 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
   if (props.configJsonLD?.removeVideos) {
     jsonLD?.products.forEach((product) => {
-      product.video = [];
+      product.video = undefined;
+      product.isVariantOf?.hasVariant.forEach((variant) => {
+        variant.video = undefined;
+      });
     });
   }
 

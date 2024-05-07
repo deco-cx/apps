@@ -2,17 +2,8 @@ import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
 import { ProductListingPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 
-export interface ConfigJsonLD {
-  /**
-   * @title Remove videos
-   * @description Remove product videos from structured data
-   */
-  removeVideos?: boolean;
-}
-
 export type Props = {
   jsonLD: ProductListingPage | null;
-  configJsonLD?: ConfigJsonLD;
 } & Partial<Omit<SeoProps, "jsonLDs">>;
 
 /**
@@ -38,7 +29,10 @@ function Section({ jsonLD, ...props }: Props) {
 
   if (props.configJsonLD?.removeVideos) {
     jsonLD?.products.forEach((product) => {
-      product.video = [];
+      product.video = undefined;
+      product.isVariantOf?.hasVariant.forEach((variant) => {
+        variant.video = undefined;
+      });
     });
   }
 
