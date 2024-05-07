@@ -1,11 +1,10 @@
-import { HttpError } from "../../../utils/http.ts";
+import type { AppContext } from "../../mod.ts";
 import cartLoader, { Cart } from "../../loaders/cart.ts";
-import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 
 export interface Props {
   qty: number;
-  quote_id: string;
+  quoteId: string;
   sku: string;
 }
 const action = async (
@@ -13,20 +12,14 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
+  const { qty, quoteId, sku } = props;
   const { clientAdmin } = ctx;
-
-  const { qty, sku, quote_id } = props;
-
   const cartId = getCartCookie(req.headers);
-
-  if (!cartId) {
-    throw new HttpError(400, "Missing cart cookie");
-  }
 
   const body = {
     "cartItem": {
       "qty": qty,
-      "quote_id": quote_id,
+      "quote_id": quoteId,
       "sku": sku,
     },
   };

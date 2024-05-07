@@ -6,18 +6,21 @@ const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
 
 const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
-export const getCartCookie = (headers: Headers): string => {
+export const getCartCookie = (headers: Headers, cartId?: string): string => {
   const cookies = getCookies(headers);
+  let cartCookie = encodeURIComponent(
+    decodeURIComponent(cookies[CART_COOKIE] || "").replace(/"/g, ""),
+  );
 
-  return `${cookies[CART_COOKIE]}`;
-};
+  if (cartId && !cookies[CART_COOKIE]) {
+    cartCookie = encodeURIComponent(`"${decodeURIComponent(cartId)}"`);
+    const cookie = `${CART_COOKIE}=${cartCookie}; Path=/; Expires=${
+      new Date(Date.now() + ONE_WEEK_MS).toUTCString()
+    }; SameSite=Lax`;
+    headers.append("Set-Cookie", cookie);
+  }
 
-export const setCartCookie = (headers: Headers, cartId: string) => {
-  const encodedCartId = encodeURIComponent(`"${decodeURIComponent(cartId)}"`);
-  const cookie = `${CART_COOKIE}=${encodedCartId}; Path=/; Expires=${
-    new Date(Date.now() + ONE_WEEK_MS).toUTCString()
-  }; SameSite=Lax`;
-  headers.append("Set-Cookie", cookie);
+  return cartCookie;
 };
 
 export async function createCart(
@@ -25,8 +28,9 @@ export async function createCart(
   headers: Headers,
 ) {
   const cartCookie = getCookies(headers)[CART_COOKIE];
+
   const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
-  
+
   if (!cartCookie && !customerCookie) {
     const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
       site,
