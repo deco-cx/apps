@@ -497,8 +497,7 @@ export interface Product extends Omit<Thing, "@type"> {
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
   isAccessoryOrSparePartFor?: ProductLeaf[];
   // The type is an optional property named "advertisement" to the code. This property is a string and is used to provide information about VTEX Ads, in search results and categories. This allows developers to customize their marketing strategies according to the specific needs and goals of the marketing team.
-  advertisement?: AdverTisement[];
-
+  advertisement?: AdverTisement;
   questions?: Question[];
 }
 
