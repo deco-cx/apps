@@ -18,16 +18,21 @@ export default function App(
   state: Props,
 ): App<Manifest, State> {
   const getToken = state?.apiKey?.get;
-  return {
-    manifest,
-    state: {
-      openAI: new OpenAI({
-        apiKey: typeof getToken === "function"
-          ? getToken() ?? undefined
-          : undefined,
-      }),
-    },
-  };
+  try {
+    const openAI = new OpenAI({
+      apiKey: typeof getToken === "function"
+        ? getToken() ?? undefined
+        : undefined,
+    });
+    return {
+      manifest,
+      state: {
+        openAI,
+      },
+    };
+  } catch {
+    throw new Error(`Failed to initialize OpenAI. Please check the API key.`);
+  }
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
