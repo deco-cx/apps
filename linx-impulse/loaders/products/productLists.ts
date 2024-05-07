@@ -220,7 +220,11 @@ const loader = async (
       salesChannel,
       showOnlyAvailable,
       productFormat: "complete",
-    }, { headers }).then((res) => res.json());
+    }, {
+      headers,
+      // TODO: This is a temporary fix for the async rendering issue (https://discord.com/channels/985687648595243068/1236027748674306078)
+      signal: new AbortController().signal,
+    }).then((res) => res.json());
 
   const reqOrigin = new URL(req.url).origin;
 
