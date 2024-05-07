@@ -1,11 +1,13 @@
 import { SourceBinder } from "../../actions/build.ts";
+import hypervisorScript from "../../common/cmds/hypervisor.ts";
 import runScript from "../../common/cmds/run.ts";
+
+import { k8s } from "../../deps.ts";
 import {
   NodeSelector,
   ResourceRequirements,
   ServiceScaling,
 } from "../../loaders/siteState/get.ts";
-import { k8s } from "../../deps.ts";
 
 export interface EnvVar {
   name: string;
@@ -13,6 +15,7 @@ export interface EnvVar {
 }
 
 export interface KnativeSerivceOpts {
+  hypervisor?: boolean;
   controlPlaneDomain: string;
   revisionName: string;
   site: string;
@@ -28,6 +31,8 @@ export interface KnativeSerivceOpts {
   runArgs?: string;
   nodeSelector?: NodeSelector;
   nodeAffinity?: k8s.V1NodeAffinity;
+  volumes?: k8s.V1Volume[];
+  volumeMounts?: k8s.V1VolumeMount[];
 }
 
 const typeToAttributes: Record<
@@ -89,6 +94,9 @@ export const knativeServiceOf = (
     resources,
     nodeSelector,
     nodeAffinity,
+    volumeMounts,
+    volumes,
+    hypervisor,
   }: KnativeSerivceOpts,
 ) => {
   return {
@@ -107,6 +115,7 @@ export const knativeServiceOf = (
       template: {
         metadata: {
           name: revisionName,
+          labels,
           annotations: {
             ...metricToAnnotations(metric),
             "autoscaling.knative.dev/initial-scale": `${initialScale ?? 0}`,
@@ -123,12 +132,12 @@ export const knativeServiceOf = (
           },
           nodeSelector,
           serviceAccountName,
-          volumes: sourceBinder.volumes,
+          volumes: [...sourceBinder.volumes, ...volumes ?? []],
           containers: [
             {
               name: "app",
               command: ["/bin/sh", "-c"],
-              args: [runScript],
+              args: [hypervisor ? hypervisorScript : runScript],
               resources,
               // TODO Inject default environment variables (e.g. OTEL_* configs)
               // envFrom: [
@@ -159,12 +168,14 @@ export const knativeServiceOf = (
                   name: "SOURCE_ASSET_PATH",
                   value: sourceBinder.sourceOutput,
                 },
-                { name: "APP_PORT", value: "8000" },
                 ...envVars ?? [],
                 // Add other environment variables as needed
               ],
               image: runnerImage,
-              volumeMounts: sourceBinder.volumeMounts,
+              volumeMounts: [
+                ...sourceBinder.volumeMounts,
+                ...volumeMounts ?? [],
+              ],
               ports: [{ name: "http1", containerPort: 8000 }],
             },
           ],

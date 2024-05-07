@@ -2,7 +2,11 @@ import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
@@ -96,6 +100,9 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 
 // deno-lint-ignore no-explicit-any
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
+
+// deno-lint-ignore no-explicit-any
+const isTermProps = (p: any): p is TermProps => typeof p.term === "string";
 
 const preferredSKU = (items: LegacyItem[], { props }: Props) => {
   const fetchedSkus = new Set((props as SkuIDProps).ids ?? []);
@@ -216,6 +223,58 @@ const loader = async (
   );
 };
 
-export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
+const getSearchParams = (props: Props) => {
+  if (isCollectionProps(props)) {
+    return [
+      ["collection", props.collection],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+    ];
+  }
+
+  if (isFQProps(props)) {
+    return [
+      ["fq", props.fq.join(",")],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+    ];
+  }
+
+  if (isTermProps(props)) {
+    return [
+      ["term", props.term ?? ""],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+    ];
+  }
+
+  return [];
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+  if (
+    url.searchParams.has("q") || !isAnonymous(ctx) || isSKUIDProps(props) ||
+    isProductIDProps(props)
+  ) {
+    return null;
+  }
+
+  const params = new URLSearchParams(getSearchParams(props));
+
+  url.searchParams.forEach((value, key) => {
+    params.append(key, value);
+  });
+
+  params.sort();
+  params.set("segment", token);
+
+  url.search = params.toString();
+
+  return url.href;
+};
 
 export default loader;

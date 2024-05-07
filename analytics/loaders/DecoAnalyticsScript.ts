@@ -1,7 +1,7 @@
-import { getFlagsFromRequest } from "../../utils/cookie.ts";
 import { Script } from "../../website/types.ts";
 import { AppContext } from "../mod.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { Flag } from "deco/types.ts";
 
 export type Props = {
   defer?: boolean;
@@ -17,7 +17,47 @@ declare global {
   }
 }
 
-const snippet = (flags: Record<string, string | boolean>) => {
+const snippet = () => {
+  const parseCookies = (cookieString: string) => {
+    const cookies: Record<string, string> = {};
+    cookieString.split(";").forEach((cookie) => {
+      const [key, value] = cookie.split("=").map((c) => c.trim());
+      cookies[key] = value;
+    });
+    return cookies;
+  };
+
+  const tryOrDefault = <R>(fn: () => R, defaultValue: R) => {
+    try {
+      return fn();
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  const getFlagsFromCookies = (cookies: Record<string, string>) => {
+    const flags: Flag[] = [];
+    const segment = cookies["deco_segment"]
+      ? tryOrDefault(
+        () => JSON.parse(decodeURIComponent(atob(cookies["deco_segment"]))),
+        {},
+      )
+      : {};
+
+    segment.active?.forEach((flag: string) =>
+      flags.push({ name: flag, value: true })
+    );
+    segment.inactiveDrawn?.forEach((flag: string) =>
+      flags.push({ name: flag, value: false })
+    );
+
+    return flags;
+  };
+
+  const _flags = getFlagsFromCookies(parseCookies(document.cookie));
+  const flags: Record<string, string | boolean> = {};
+  _flags.forEach((flag) => flags[flag.name] = flag.value);
+
   const trackPageview = () =>
     globalThis.window.plausible?.("pageview", { props: flags });
 
@@ -41,15 +81,11 @@ const loader = (
   _req: Request,
   _ctx: AppContext,
 ): Script => {
-  const transformReq = (req: Request) => {
+  const transformReq = () => {
     const dnsPrefetchLink =
       '<link rel="dns-prefetch" href="https://plausible.io/api/event" />';
     const preconnectLink =
       '<link rel="preconnect" href="https://plausible.io/api/event" crossorigin="anonymous" />';
-
-    const _flags = getFlagsFromRequest(req);
-    const flags: Record<string, string | boolean> = {};
-    _flags.forEach((flag) => flags[flag.name] = flag.value);
 
     // if you want to test it local, add ".local" to src
     // example: /script.manual.local.js
@@ -60,7 +96,7 @@ const loader = (
     } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.hash.js"></script>`;
 
     const flagsScript = `<script defer src="${
-      scriptAsDataURI(snippet, flags)
+      scriptAsDataURI(snippet)
     }"></script>`;
 
     return dnsPrefetchLink + preconnectLink + plausibleScript + flagsScript;
