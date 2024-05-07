@@ -8,7 +8,7 @@ const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
 export const getCartCookie = (headers: Headers): string | undefined => {
   const cookies = getCookies(headers);
-  return cookies[CART_COOKIE];
+  return decodeURIComponent(cookies[CART_COOKIE] || "").replace(/"/g, "");
 };
 
 export const setCartCookie = (headers: Headers, cartId: string) => {

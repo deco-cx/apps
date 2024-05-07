@@ -296,3 +296,22 @@ export interface Address {
   same_as_billing: number;
   save_in_address_book: number;
 }
+
+export interface ShippingMethod {
+  carrier_code: string;
+  method_code: string;
+  carrier_title: string;
+  method_title: string;
+  amount: number;
+  base_amount: number;
+  available: boolean;
+  extension_attributes: Record<string, string | string[] | number>;
+  error_message: string;
+  price_excl_tax: number;
+  price_incl_tax: number;
+}
+
+export interface CustomerAddress {
+  countryId: string;
+  postcode: string;
+}
