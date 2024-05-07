@@ -538,3 +538,6 @@ export const toProductListingPage = (
     filters: response.filters.map((f) => toFilter(f, new URL(url))),
   };
 };
+
+export const getTrackingImpressionFromImpressionUrl = (url: string) =>
+  new URL(url).searchParams.get("trackingImpression") ?? undefined;

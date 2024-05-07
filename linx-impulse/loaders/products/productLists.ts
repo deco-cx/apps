@@ -1,17 +1,20 @@
 import type {
   ProductDetailsPage,
-  ProductGroup,
   ProductListingPage,
 } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 import getSource from "../../utils/source.ts";
-import { toProduct } from "../../utils/transform.ts";
+import {
+  getTrackingImpressionFromImpressionUrl,
+  toProduct,
+} from "../../utils/transform.ts";
 import type {
   PageName,
   Position,
   RecommendationShelf,
 } from "../../utils/types/chaordic.ts";
+import type { LinxImpulseShelf } from "../../utils/types/linx.ts";
 
 interface BaseProps {
   /**
@@ -167,27 +170,19 @@ const generateParams = (
   }
 };
 
-function toProductGroup(
+function toLinxImpulseShelf(
   shelf: RecommendationShelf,
   position: Position,
   origin: string,
   cdn: string,
-): ProductGroup {
+): LinxImpulseShelf {
   return {
-    "@type": "ProductGroup" as const,
-    productGroupID: shelf.id,
-    identifier: shelf.feature,
-    additionalType: position,
-    additionalProperty: [
-      {
-        "@type": "PropertyValue",
-        name: "trackingImpression",
-        value: new URL(shelf.impressionUrl).searchParams.get(
-          "trackingImpression",
-        ) ?? "",
-      },
-    ],
-    hasVariant: shelf.displays[0].recommendations.map(
+    trackingImpression: getTrackingImpressionFromImpressionUrl(
+      shelf.impressionUrl,
+    ),
+    position,
+    feature: shelf.feature,
+    products: shelf.displays[0].recommendations.map(
       (p) => toProduct(p, origin, cdn),
     ),
   };
@@ -200,7 +195,7 @@ const loader = async (
   { props }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<ProductGroup[] | null> => {
+): Promise<LinxImpulseShelf[] | null> => {
   if (req.url.includes("_frsh")) {
     return null;
   }
@@ -227,15 +222,15 @@ const loader = async (
       productFormat: "complete",
     }, { headers }).then((res) => res.json());
 
+  const reqOrigin = new URL(req.url).origin;
+
   return [
-    ...top.map((shelf) =>
-      toProductGroup(shelf, "top", new URL(req.url).origin, cdn)
-    ),
+    ...top.map((shelf) => toLinxImpulseShelf(shelf, "top", reqOrigin, cdn)),
     ...middle.map((shelf) =>
-      toProductGroup(shelf, "middle", new URL(req.url).origin, cdn)
+      toLinxImpulseShelf(shelf, "middle", reqOrigin, cdn)
     ),
     ...bottom.map((shelf) =>
-      toProductGroup(shelf, "bottom", new URL(req.url).origin, cdn)
+      toLinxImpulseShelf(shelf, "bottom", reqOrigin, cdn)
     ),
   ];
 };

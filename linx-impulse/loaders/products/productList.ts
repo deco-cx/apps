@@ -1,17 +1,14 @@
-import type {
-  Product,
-  ProductGroup,
-  PropertyValue,
-} from "../../../commerce/types.ts";
+import type { Product, PropertyValue } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
-import { Feature, Position } from "../../utils/types/chaordic.ts";
+import type { Feature, Position } from "../../utils/types/chaordic.ts";
+import type { LinxImpulseShelf } from "../../utils/types/linx.ts";
 
 interface Props {
   /**
    * @title Shelves
    * @description Is mandatory to use a reusable loader, so the loader is not called more than once. If you don't use a reusable loader, your store analytics and performance will be affected. See more: https://deco.cx/docs/en/performance/loaders
    */
-  shelves: ProductGroup[] | null;
+  shelves: LinxImpulseShelf[] | null;
   /**
    * @title Feature
    * @description Search for a specific feature, if not informed or found, the first one will be used
@@ -40,17 +37,17 @@ function findShelf({ shelves, position, feature, index = 0 }: Props) {
     return shelves[index];
   }
 
-  return shelves.filter(({ additionalType, identifier }) => {
+  return shelves.filter((shelf) => {
     if (feature && position) {
-      return additionalType === position && identifier === feature;
+      return shelf.position === position && shelf.feature === feature;
     }
 
     if (feature) {
-      return identifier === feature;
+      return shelf.feature === feature;
     }
 
     if (position) {
-      return additionalType === position;
+      return shelf.position === position;
     }
 
     return false;
@@ -75,13 +72,11 @@ const loader = (
     return null;
   }
 
-  const products = shelf.hasVariant.map((product) => {
+  const products = shelf.products.map((product) => {
     const impressionProperty: PropertyValue = {
       "@type": "PropertyValue",
       name: "trackingImpression",
-      value: shelf.additionalProperty.find((p) =>
-        p.name === "trackingImpression"
-      )?.value,
+      value: shelf.trackingImpression,
     };
 
     if (Array.isArray(product.additionalProperty)) {
