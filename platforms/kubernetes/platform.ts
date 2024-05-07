@@ -77,11 +77,17 @@ export default function kubernetes(
 
         let deploymentState = desiredState;
         if (!production) {
+          const scaling = {
+            ...deploymentState?.scaling ?? {},
+            ...PREVIEW_SERVICE_SCALING,
+          };
           deploymentState = {
             ...deploymentState ?? {},
             scaling: {
-              ...deploymentState?.scaling ?? {},
-              ...PREVIEW_SERVICE_SCALING,
+              ...scaling,
+              retentionPeriod: props.protected
+                ? "30m"
+                : scaling.retentionPeriod,
             },
             resources: {
               requests: {
@@ -98,9 +104,12 @@ export default function kubernetes(
 
         const deployment = await actions.deployments.create({
           site,
+          hypervisor: !production,
           siteState: deploymentState,
+          deploymentSlug: props.slug,
           deploymentId,
           labels: {
+            ...props.protected ? { protected: "true" } : {},
             deploymentId,
           },
         });

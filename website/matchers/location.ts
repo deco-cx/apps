@@ -64,11 +64,16 @@ export default function MatchLocation(
   const regionCode = request.headers.get("cf-region-code") ?? undefined;
   const userLocation = { city, country, regionCode };
   const isLocationExcluded = excludeLocations?.some(
-    matchLocation(false, userLocation),
+    matchLocation(false, escaped(userLocation)),
   ) ?? false;
   if (isLocationExcluded) {
     return false;
   }
+
+  if (includeLocations?.length === 0) {
+    return true;
+  }
+
   return includeLocations?.some(matchLocation(true, escaped(userLocation))) ??
     true;
 }

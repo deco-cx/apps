@@ -2,6 +2,17 @@ import { revisionRoute } from "../../common/knative/route.ts";
 import { upsertObject } from "../../common/objects.ts";
 import { AppContext } from "../../mod.ts";
 import { Namespace } from "../sites/create.ts";
+import { k8s } from "../../deps.ts";
+
+import {
+  GROUP_SERVING_KNATIVE_DEV,
+  PLURAL_ROUTES,
+  VERSION_V1,
+} from "../../constants.ts";
+import {
+  allowScaleToZero,
+  getProdRevisionName,
+} from "../../common/knative/revisions.ts";
 
 export interface Props {
   site: string;
@@ -10,8 +21,9 @@ export interface Props {
 
 export const Routes = {
   prod: (site: string) => `sites-${site}`,
+  slug: (site: string, slug: string) => `${Routes.prod(site)}-${slug}`,
   preview: (site: string, deploymentId: string) =>
-    `${Routes.prod(site)}-${deploymentId}`,
+    Routes.slug(site, deploymentId),
 };
 
 /**
@@ -23,6 +35,9 @@ export default async function rollout(
   _req: Request,
   ctx: AppContext,
 ) {
+  const k8sApi = ctx.kc.makeApiClient(k8s.CustomObjectsApi);
+  const previousProdRevisionName = await getProdRevisionName({ k8sApi, site });
+
   const revisionName = `${site}-site-${deploymentId}`;
   await upsertObject(
     ctx.kc,
@@ -31,8 +46,10 @@ export default async function rollout(
       revisionName,
       namespace: Namespace.forSite(site),
     }),
-    "serving.knative.dev",
-    "v1",
-    "routes",
+    GROUP_SERVING_KNATIVE_DEV,
+    VERSION_V1,
+    PLURAL_ROUTES,
   );
+
+  allowScaleToZero({ revisionName: previousProdRevisionName, site, ctx });
 }
