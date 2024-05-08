@@ -109,6 +109,7 @@ interface MagentoStock {
   is_decimal_divided?: boolean;
   stock_status_changed_auto?: number;
 }
+
 interface MediaEntry {
   id: number;
   media_type: string;
