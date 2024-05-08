@@ -8,9 +8,10 @@ import * as $$$$$$$$$2 from "./actions/deployments/promote.ts";
 import * as $$$$$$$$$3 from "./actions/deployments/rollout.ts";
 import * as $$$$$$$$$4 from "./actions/domains/create.ts";
 import * as $$$$$$$$$5 from "./actions/domains/delete.ts";
-import * as $$$$$$$$$7 from "./actions/sites/create.ts";
-import * as $$$$$$$$$8 from "./actions/sites/delete.ts";
-import * as $$$$$$$$$6 from "./actions/siteState/upsert.ts";
+import * as $$$$$$$$$6 from "./actions/routes/delete.ts";
+import * as $$$$$$$$$8 from "./actions/sites/create.ts";
+import * as $$$$$$$$$9 from "./actions/sites/delete.ts";
+import * as $$$$$$$$$7 from "./actions/siteState/upsert.ts";
 import * as $$$0 from "./loaders/siteState/get.ts";
 
 const manifest = {
@@ -24,9 +25,10 @@ const manifest = {
     "kubernetes/actions/deployments/rollout.ts": $$$$$$$$$3,
     "kubernetes/actions/domains/create.ts": $$$$$$$$$4,
     "kubernetes/actions/domains/delete.ts": $$$$$$$$$5,
-    "kubernetes/actions/sites/create.ts": $$$$$$$$$7,
-    "kubernetes/actions/sites/delete.ts": $$$$$$$$$8,
-    "kubernetes/actions/siteState/upsert.ts": $$$$$$$$$6,
+    "kubernetes/actions/routes/delete.ts": $$$$$$$$$6,
+    "kubernetes/actions/sites/create.ts": $$$$$$$$$8,
+    "kubernetes/actions/sites/delete.ts": $$$$$$$$$9,
+    "kubernetes/actions/siteState/upsert.ts": $$$$$$$$$7,
   },
   "name": "kubernetes",
   "baseUrl": import.meta.url,

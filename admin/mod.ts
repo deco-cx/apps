@@ -1,4 +1,4 @@
-import type { App, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type { AppContext as AC, App, ManifestOf } from "deco/mod.ts";
 import { Manifest as AIAssistantManifest } from "../ai-assistants/manifest.gen.ts";
 import { Manifest as OpenAIManifest } from "../openai/manifest.gen.ts";
 import k8s, { Props as K8sProps } from "../platforms/kubernetes/mod.ts";
@@ -14,6 +14,7 @@ import {
   Webhooks,
 } from "./deps.ts";
 import { prEventHandler } from "./github/pr.ts";
+import { prCloseEventHandler } from "./github/prClose.ts";
 import { pushEventHandler } from "./github/push.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
@@ -106,6 +107,7 @@ export default function App(
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
         prEventHandler as GithubEventListener,
+        prCloseEventHandler as GithubEventListener,
       ],
       octokit: new Octokit({
         auth: githubAPIToken,
