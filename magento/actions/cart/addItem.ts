@@ -1,10 +1,9 @@
 import type { AppContext } from "../../mod.ts";
-import cartLoader, { Cart } from "../../loaders/cart.ts";
+import { Cart } from "../../loaders/cart.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 
 export interface Props {
   qty: number;
-  quoteId: string;
   sku: string;
 }
 const action = async (
@@ -12,14 +11,14 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
-  const { qty, quoteId, sku } = props;
+  const { qty, sku } = props;
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
 
   const body = {
     "cartItem": {
       "qty": qty,
-      "quote_id": quoteId,
+      "quote_id": cartId,
       "sku": sku,
     },
   };
@@ -29,7 +28,10 @@ const action = async (
     site: ctx.site,
   }, { body });
 
-  return cartLoader({}, req, ctx);
+  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
+    cartId: cartId,
+    site: ctx.site,
+  }).then((res) => res.json());
 };
 
 export default action;

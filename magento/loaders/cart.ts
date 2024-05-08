@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { API } from "../utils/client/client.ts";
-import { createCart, getCartCookie } from "../utils/cart.ts";
+import { createCart, getCartCookie, setCartCookie } from "../utils/cart.ts";
 
 export type Cart = API["GET /rest/:site/V1/carts/:cartId"]["response"];
 
@@ -37,7 +37,7 @@ const loader = async (
   const cartDetails = cartId ? await getCart(cartId) : await getCart("");
 
   if (cartDetails.id && !cartId) {
-    getCartCookie(ctx.response.headers, cartDetails.id.toString());
+    setCartCookie(ctx.response.headers, cartDetails.id.toString());
   }
 
   return cartDetails;

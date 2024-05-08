@@ -1,39 +1,40 @@
-import cartLoader, { Cart } from "../../loaders/cart.ts";
+import { Cart } from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 
 export interface Props {
   qty: number;
-  quoteId: string;
   itemId: string;
   sku: string;
 }
 
 const action = async (
-  { qty, quoteId, sku, itemId }: Props,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
+  const { qty, itemId, sku } = props;
   const { clientAdmin } = ctx;
-  const cartIdCookie = getCartCookie(req.headers);
+  const cartId = getCartCookie(req.headers);
 
-  if (qty > 0) {
-    const body = {
-      "cartItem": {
-        "qty": qty,
-        "quote_id": quoteId,
-        "sku": sku,
-      },
-    };
+  const body = {
+    "cartItem": {
+      "qty": qty,
+      "quote_id": cartId,
+      "sku": sku,
+    },
+  };
 
-    await clientAdmin["PUT /rest/:site/V1/carts/:cartId/items/:itemId"]({
-      site: ctx.site,
-      cartId: cartIdCookie,
-      itemId,
-    }, { body });
-  }
+  await clientAdmin["PUT /rest/:site/V1/carts/:cartId/items/:itemId"]({
+    itemId,
+    cartId: cartId,
+    site: ctx.site,
+  }, { body });
 
-  return cartLoader({}, req, ctx);
+  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
+    cartId: cartId,
+    site: ctx.site,
+  }).then((res) => res.json());
 };
 
 export default action;

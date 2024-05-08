@@ -6,21 +6,17 @@ const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
 
 const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
-export const getCartCookie = (headers: Headers, cartId?: string): string => {
+export const getCartCookie = (headers: Headers): string => {
   const cookies = getCookies(headers);
-  let cartCookie = encodeURIComponent(
-    decodeURIComponent(cookies[CART_COOKIE] || "").replace(/"/g, ""),
-  );
+  return decodeURIComponent(cookies[CART_COOKIE] || "").replace(/"/g, "");
+};
 
-  if (cartId && !cookies[CART_COOKIE]) {
-    cartCookie = encodeURIComponent(`"${decodeURIComponent(cartId)}"`);
-    const cookie = `${CART_COOKIE}=${cartCookie}; Path=/; Expires=${
-      new Date(Date.now() + ONE_WEEK_MS).toUTCString()
-    }; SameSite=Lax`;
-    headers.append("Set-Cookie", cookie);
-  }
-
-  return cartCookie;
+export const setCartCookie = (headers: Headers, cartId: string) => {
+  const encodedCartId = encodeURIComponent(`"${cartId}"`);
+  const cookie = `${CART_COOKIE}=${encodedCartId}; Path=/; Expires=${
+    new Date(Date.now() + ONE_WEEK_MS).toUTCString()
+  }; SameSite=Lax`;
+  headers.append("Set-Cookie", cookie);
 };
 
 export async function createCart(
