@@ -1,36 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
-import { AppContext } from "../mod.ts";
+import { AppContext, Extension } from "../mod.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
-
-type Extension =
-  | "ajax-header"
-  | "alpine-morph"
-  | "class-tools"
-  | "client-side-templates"
-  | "debug"
-  | "event-header"
-  | "head-support"
-  | "include-vals"
-  | "json-enc"
-  | "idiomorph"
-  | "loading-states"
-  | "method-override"
-  | "morphdom-swap"
-  | "multi-swap"
-  | "path-deps"
-  | "preload"
-  | "remove-me"
-  | "response-targets"
-  | "restored"
-  | "server-sent-events"
-  | "web-sockets"
-  | "path-params";
-
-interface Props {
-  version?: string;
-  cdn?: string;
-  extensions?: Extension[];
-}
+import { SectionProps } from "deco/mod.ts";
 
 const script = (extensions: Extension[]) => {
   if (extensions.length > 0) {
@@ -38,13 +9,7 @@ const script = (extensions: Extension[]) => {
   }
 };
 
-function Section(
-  {
-    version = "1.9.11",
-    cdn = "https://cdn.jsdelivr.net/npm",
-    extensions = [],
-  }: Props,
-) {
+function Section({ version, cdn, extensions }: SectionProps<typeof loader>) {
   return (
     <Head>
       <script
@@ -67,8 +32,8 @@ function Section(
   );
 }
 
-export const loader = (_: unknown, __: Request, ctx: AppContext) => {
-  return { version: ctx.version };
+export const loader = (_props: unknown, _req: Request, ctx: AppContext) => {
+  return { version: ctx.version!, cdn: ctx.cdn!, extensions: ctx.extensions! };
 };
 
 export default Section;
