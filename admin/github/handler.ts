@@ -17,26 +17,25 @@ export const handleChange = async (
   const { loaders } = ctx.invoke["deco-sites/admin"];
   const reqUrl = new URL(req.url);
   const site = reqUrl.searchParams.get("site") ?? repo;
-  const statusControllerGroup = controllerGroup(
-    controllerFor({
-      owner,
-      repo,
-      commitSha,
-      context: `Deco / site-${site} / commit`,
-    }, ctx),
-    production
-      ? controllerFor({
+  const controllers = production
+    ? [
+      controllerFor({
         owner,
         repo,
         commitSha,
         context: `Deco / site-${site} / prod`,
-      }, ctx)
-      : controllerFor({
+      }, ctx),
+    ]
+    : [
+      controllerFor({
         owner,
         repo,
         commitSha,
         context: `Deco / site-${site} / ${refSlug}`,
       }, ctx),
+    ];
+  const statusControllerGroup = controllerGroup(
+    ...controllers,
   );
   try {
     const platform = await loaders.platforms.forSite({ site }).then((p) => p)
