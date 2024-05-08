@@ -27,15 +27,6 @@ function Section({ jsonLD, ...props }: Props) {
     !jsonLD ||
     !jsonLD.products.length;
 
-  if (props.configJsonLD?.removeVideos) {
-    jsonLD?.products.forEach((product) => {
-      product.video = undefined;
-      product.isVariantOf?.hasVariant.forEach((variant) => {
-        variant.video = undefined;
-      });
-    });
-  }
-
   return (
     <Seo
       {...props}

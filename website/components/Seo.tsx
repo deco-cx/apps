@@ -9,14 +9,6 @@ export const renderTemplateString = (template: string, value: string) =>
 export type SEOSection = JSX.Element;
 export type OGType = "website" | "article";
 
-interface ConfigJsonLD {
-  /**
-   * @title Remove videos
-   * @description Remove product videos from structured data
-   */
-  removeVideos?: boolean;
-}
-
 export interface Props {
   title?: string;
   /**
@@ -47,8 +39,6 @@ export interface Props {
    * @description In testing, you can use this to prevent search engines from indexing your site
    */
   noIndexing?: boolean;
-
-  configJsonLD?: ConfigJsonLD;
 
   jsonLDs?: unknown[];
 }
