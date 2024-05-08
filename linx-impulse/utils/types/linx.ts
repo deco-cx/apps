@@ -1,5 +1,11 @@
-import type { ChaordicProduct, ChaordicSku } from "./chaordic.ts";
+import type {
+  ChaordicProduct,
+  ChaordicSku,
+  Feature,
+  Position,
+} from "./chaordic.ts";
 import type { ImpulseProduct, ImpulseSku } from "./impulse.ts";
+import type { Product as CommerceProduct } from "../../../commerce/types.ts";
 
 export type Source = "desktop" | "mobile" | "app";
 export type Product = ImpulseProduct | ChaordicProduct;
@@ -72,4 +78,11 @@ export interface Sort {
 export interface Banner {
   position: string;
   content: string;
+}
+
+export interface LinxImpulseShelf {
+  feature: Feature;
+  position: Position;
+  products: CommerceProduct[];
+  trackingImpression?: string | undefined;
 }

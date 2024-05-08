@@ -1,4 +1,3 @@
-import { shortcircuit } from "deco/engine/errors.ts";
 import { SrcBinder } from "../../actions/build.ts";
 import { Routes } from "../../actions/deployments/rollout.ts";
 import { k8s } from "../../deps.ts";
@@ -34,7 +33,7 @@ interface DeployServiceOptions {
   k8sApi: k8s.CustomObjectsApi;
 }
 const deployService = async (
-  { service, site, siteNs, deploymentId, deploymentSlug, revisionName, k8sApi }:
+  { service, site, siteNs, deploymentId, deploymentSlug, revisionName }:
     DeployServiceOptions,
   ctx: AppContext,
 ) => {
@@ -68,57 +67,37 @@ const deployService = async (
     throw err;
   });
 
-  const deploymentRoute = Routes.preview(site, deploymentId);
-  const revRoute = {
-    routeName: deploymentRoute,
-    revisionName,
-    namespace: siteNs,
-  };
-
-  const domains = [{
-    url: `https://${deploymentRoute}.${CONTROL_PLANE_DOMAIN}`,
-    production: false,
-  }];
+  const domains: { url: string; production: boolean }[] = [];
 
   const deploymentSlugRev = deploymentSlug
     ? Routes.slug(site, deploymentSlug)
     : undefined;
 
-  const slugRoute = deploymentSlugRev
+  const deploymentSlugRoute = deploymentSlugRev
+    ? {
+      routeName: deploymentSlugRev,
+      revisionName,
+      namespace: siteNs,
+    }
+    : undefined;
+
+  const slugRoute = deploymentSlugRoute
     ? upsertObject(
       ctx.kc,
-      revisionRoute({
-        routeName: deploymentSlugRev,
-        revisionName,
-        namespace: siteNs,
-      }),
+      revisionRoute(deploymentSlugRoute),
       "serving.knative.dev",
       "v1",
       "routes",
-    ).then(() => {
+    ).then(async () => {
+      await waitToBeReady(ctx.kc, deploymentSlugRoute);
+
       return {
         url: `https://${deploymentSlugRev}.${CONTROL_PLANE_DOMAIN}`,
         production: false,
       };
     })
     : Promise.resolve(undefined);
-  await k8sApi.createNamespacedCustomObject(
-    "serving.knative.dev",
-    "v1",
-    siteNs,
-    "routes",
-    revisionRoute(revRoute),
-  ).catch(ignoreIfExists).catch((err) => {
-    console.error("creating site route error", err);
-    shortcircuit(
-      new Response(
-        JSON.stringify({ message: "could not create deployment route" }),
-        { status: 500 },
-      ),
-    );
-  });
 
-  await waitToBeReady(ctx.kc, revRoute);
   await slugRoute.then((domain) => {
     domain && domains.push(domain);
   });

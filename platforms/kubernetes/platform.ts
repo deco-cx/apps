@@ -39,6 +39,9 @@ export default function kubernetes(
       promote: async (props) => {
         await actions.deployments.rollout(props);
       },
+      delete: async (props) => {
+        await actions.routes.delete(props);
+      },
       create: async (
         props,
       ) => {
@@ -85,7 +88,9 @@ export default function kubernetes(
             ...deploymentState ?? {},
             scaling: {
               ...scaling,
-              retentionPeriod: props.protected ? "30m" : scaling.retentionPeriod,
+              retentionPeriod: props.protected
+                ? "30m"
+                : scaling.retentionPeriod,
             },
             resources: {
               requests: {
