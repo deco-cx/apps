@@ -1,5 +1,11 @@
-import { Cart } from "./types.ts";
-import { FieldsFilter, MagentoCategory, MagentoProduct } from "./types.ts";
+import {
+  Cart,
+  CustomerAddress,
+  FieldsFilter,
+  MagentoCategory,
+  MagentoProduct,
+  ShippingMethod,
+} from "./types.ts";
 
 interface searchParams {
   [key: string]: string | number | undefined | FieldsFilter;
@@ -9,11 +15,6 @@ interface searchParams {
 }
 
 export interface API {
-  /** @docs https://developer.adobe.com/commerce/webapi/rest/quick-reference/ */
-  "POST /V1/guest-carts": {
-    response: string;
-  };
-
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-guest/tag/products-render-info */
   "GET /rest/:site/V1/products-render-info": {
     response: {
@@ -49,7 +50,6 @@ export interface API {
   "POST /rest/:site/V1/guest-carts": {
     response: string;
   };
-
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartId#operation/GetV1CartsCartId */
   "GET /rest/:site/V1/carts/:cartId": {
     response: Cart;
@@ -80,6 +80,13 @@ export interface API {
         quote_id: string;
         sku: string;
       };
+    };
+  };
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-guest/tag/guest-cartscartIdestimate-shipping-methods */
+  "POST /rest/:site/V1/carts/:cartId/estimate-shipping-methods": {
+    response: ShippingMethod[];
+    body: {
+      address: CustomerAddress;
     };
   };
 }

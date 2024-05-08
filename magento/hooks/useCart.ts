@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { Manifest } from "../manifest.gen.ts";
-import { invoke } from "../runtime.ts";
 import { Context, state as storeState } from "../hooks/context.ts";
+import { invoke } from "../runtime.ts";
 
 const { cart, loading } = storeState;
 
@@ -23,6 +23,7 @@ const state = {
   loading,
   addItem: enqueue("magento/actions/cart/addItem.ts"),
   updateItem: enqueue("magento/actions/cart/updateItem.ts"),
+  simulate: invoke.magento.actions.cart.simulation,
 };
 
 export const useCart = () => state;

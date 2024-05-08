@@ -3,7 +3,8 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$1 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$1 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$2 from "./actions/cart/updateItem.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
 
@@ -14,7 +15,8 @@ const manifest = {
   },
   "actions": {
     "magento/actions/cart/addItem.ts": $$$$$$$$$0,
-    "magento/actions/cart/updateItem.ts": $$$$$$$$$1,
+    "magento/actions/cart/simulation.ts": $$$$$$$$$1,
+    "magento/actions/cart/updateItem.ts": $$$$$$$$$2,
   },
   "name": "magento",
   "baseUrl": import.meta.url,
