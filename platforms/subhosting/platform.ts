@@ -1,6 +1,7 @@
 import {
   assertCreateIsFromFile,
   assertDeploymentIsFromFile,
+  DeleteDeploymentOpts,
   Platform,
 } from "../../admin/platform.ts";
 import { Project } from "./actions/projects/create.ts";
@@ -74,6 +75,9 @@ export default function subhosting(
       },
       update: (_props) => {
         throw new Error("not implemented");
+      },
+      delete: function (_opts: DeleteDeploymentOpts): Promise<void> {
+        throw new Error("Function not implemented.");
       },
     },
     domains: {

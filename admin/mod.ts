@@ -14,6 +14,7 @@ import {
   Webhooks,
 } from "./deps.ts";
 import { prEventHandler } from "./github/pr.ts";
+import { prCloseEventHandler } from "./github/prClose.ts";
 import { pushEventHandler } from "./github/push.ts";
 import manifest, { Manifest as AppManifest } from "./manifest.gen.ts";
 
@@ -106,6 +107,7 @@ export default function App(
         ...github?.eventListeners ?? [],
         pushEventHandler as GithubEventListener,
         prEventHandler as GithubEventListener,
+        prCloseEventHandler as GithubEventListener,
       ],
       octokit: new Octokit({
         auth: githubAPIToken,
