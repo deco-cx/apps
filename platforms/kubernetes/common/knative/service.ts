@@ -35,6 +35,7 @@ export interface KnativeSerivceOpts {
   volumeMounts?: k8s.V1VolumeMount[];
 }
 
+const APP_PORT = 8000;
 const typeToAttributes: Record<
   Required<ServiceScaling>["metric"]["type"],
   (metric: Required<ServiceScaling>["metric"]) => Record<string, string>
@@ -135,6 +136,12 @@ export const knativeServiceOf = (
           volumes: [...sourceBinder.volumes, ...volumes ?? []],
           containers: [
             {
+              readinessProbe: {
+                httpGet: {
+                  port: APP_PORT,
+                  path: "/live/_healthcheck",
+                },
+              },
               name: "app",
               command: ["/bin/sh", "-c"],
               args: [hypervisor ? hypervisorScript : runScript],
@@ -176,7 +183,7 @@ export const knativeServiceOf = (
                 ...sourceBinder.volumeMounts,
                 ...volumeMounts ?? [],
               ],
-              ports: [{ name: "http1", containerPort: 8000 }],
+              ports: [{ name: "http1", containerPort: APP_PORT }],
             },
           ],
         },
