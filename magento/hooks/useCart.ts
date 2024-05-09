@@ -23,6 +23,7 @@ const state = {
   loading,
   addItem: enqueue("magento/actions/cart/addItem.ts"),
   updateItem: enqueue("magento/actions/cart/updateItem.ts"),
+  removeItem: enqueue("magento/actions/cart/removeItem.ts"),
   simulate: invoke.magento.actions.cart.simulation,
 };
 

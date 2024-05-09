@@ -82,6 +82,10 @@ export interface API {
       };
     };
   };
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIditemsitemId#operation/DeleteV1CartsCartIdItemsItemId */
+  "DELETE /rest/:site/V1/carts/:cartId/items/:itemId": {
+    response: boolean;
+  };
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-guest/tag/guest-cartscartIdestimate-shipping-methods */
   "POST /rest/:site/V1/carts/:cartId/estimate-shipping-methods": {
     response: ShippingMethod[];
