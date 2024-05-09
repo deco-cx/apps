@@ -71,6 +71,7 @@ export default function Fresh(
       async () =>
         isDeferred<Page, BaseContext & { context: ConnInfo }>(freshConfig.page)
           ? await freshConfig.page({ context: ctx }, {
+            propagateOptions: true,
             hooks: {
               onPropsResolveStart: (
                 resolve,
