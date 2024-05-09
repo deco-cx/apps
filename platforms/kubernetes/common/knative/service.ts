@@ -9,10 +9,24 @@ import {
   ServiceScaling,
 } from "../../loaders/siteState/get.ts";
 
-export interface EnvVar {
+export interface EnvFieldRef {
+  fieldPath: string;
+}
+export interface EnvRef {
+  fieldRef: EnvFieldRef;
+}
+
+export interface InlineEnvVar {
   name: string;
   value: string;
 }
+
+export interface ReferenceEnvVar {
+  name: string;
+  valueFrom: EnvRef;
+}
+
+export type EnvVar = InlineEnvVar | ReferenceEnvVar;
 
 export interface KnativeSerivceOpts {
   hypervisor?: boolean;
