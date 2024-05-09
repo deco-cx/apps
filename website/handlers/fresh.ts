@@ -70,7 +70,25 @@ export default function Fresh(
       { signal: ctrl.signal },
       async () =>
         isDeferred<Page, BaseContext & { context: ConnInfo }>(freshConfig.page)
-          ? await freshConfig.page({ context: ctx })
+          ? await freshConfig.page({ context: ctx }, {
+            propagateOptions: true,
+            hooks: {
+              onPropsResolveStart: (
+                resolve,
+                _props,
+                resolver,
+              ) => {
+                let next = resolve;
+                if (resolver?.type === "matchers") { // matchers should not have a timeout.
+                  next = RequestContext.bind(
+                    { signal: undefined },
+                    resolve,
+                  );
+                }
+                return next();
+              },
+            },
+          })
           : freshConfig.page,
     );
 
