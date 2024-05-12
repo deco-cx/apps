@@ -9,7 +9,7 @@
     "std/": "https://deno.land/std@0.204.0/",
     "partytown/": "https://deno.land/x/partytown@0.4.8/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.25.1/",
-    "deco/": "https://denopkg.com/deco-cx/deco@1.63.0/"
+    "deco/": "https://denopkg.com/deco-cx/deco@1.65.8/"
   },
   "lock": false,
   "tasks": {
@@ -27,14 +27,10 @@
   "githooks": {
     "pre-commit": "check"
   },
-  "exclude": [
-    "static",
-    "README.md",
-    "**/README.md"
-  ],
+  "exclude": ["static", "README.md", "**/README.md"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "version": "0.38.6"
+  "version": "0.40.0"
 }
