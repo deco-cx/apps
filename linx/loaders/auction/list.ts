@@ -1,7 +1,7 @@
 import type { AppContext } from "../../../linx/mod.ts";
 import { nullOnNotFound } from "../../../utils/http.ts";
 import { isAuctionModel } from "../../utils/paths.ts";
-import {  toFilters, toAuction } from "../../utils/transform.ts";
+import { toAuction, toFilters } from "../../utils/transform.ts";
 import { AuctionListingPage } from "../../utils/types/auction.ts";
 
 /**
@@ -18,9 +18,7 @@ const loader = async (
   const url = new URL(req.url);
   const splat = `leilao.json?${url.searchParams.toString()}`;
 
-  const response = await api["GET /*splat"]({ splat }, {
-    headers: req.headers,
-  }).catch(nullOnNotFound);
+  const response = await api["GET /*splat"]({ splat }).catch(nullOnNotFound);
 
   if (response === null) {
     return null;
@@ -35,7 +33,7 @@ const loader = async (
   const products = auctions.Model.ProductAuctions.map((auction) =>
     toAuction(auction, { cdn })
   );
-  const facets = toFilters(auctions.Model.Grid.Facets,url);
+  const facets = toFilters(auctions.Model.Grid.Facets, url);
   const pageCount = auctions.Model.Grid.PageCount;
   const pageNumber = auctions.Model.Grid.PageNumber;
   const pageIndex = auctions.Model.Grid.PageIndex;
