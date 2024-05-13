@@ -123,9 +123,15 @@ export interface Domains {
   delete: (opts: DomainOpts) => Promise<void>;
 }
 
+export interface DeleteDeploymentOpts {
+  site: string;
+  slug: string; // for now we only support delete per slug.
+}
+
 export interface Deployments {
   promote: (opts: PromoteOpts) => Promise<void>;
   create: (opts: DeploymentOpts) => Promise<Deployment>;
+  delete: (opts: DeleteDeploymentOpts) => Promise<void>;
   update: (opts: UpdateDeploymentOpts) => Promise<Deployment>;
 }
 

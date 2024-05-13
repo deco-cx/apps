@@ -949,19 +949,15 @@ export const toReview = (
   reviews: ProductReviewData[],
 ): Product[] => {
   return products.map((p, index) => {
-    const reviewCount = ratings.reduce(
-      (acc, curr) => acc + (curr.totalCount || 0),
-      0,
-    );
-
+    const ratingsCount = ratings[index].totalCount || 0;
     const productReviews = reviews[index].data || [];
 
     return {
       ...p,
       aggregateRating: {
         "@type": "AggregateRating",
-        reviewCount,
-        ratingCount: reviewCount,
+        reviewCount: ratingsCount,
+        ratingCount: ratingsCount,
         ratingValue: ratings[index]?.average || 0,
       },
       review: productReviews.map((_, reviewIndex) => ({

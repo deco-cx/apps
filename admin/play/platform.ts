@@ -1,7 +1,7 @@
 import { DeploymentId } from "../../platforms/kubernetes/actions/deployments/create.ts";
 import kubernetes from "../../platforms/kubernetes/platform.ts";
 import { AppContext } from "../mod.ts";
-import { Platform } from "../platform.ts";
+import { DeleteDeploymentOpts, Platform } from "../platform.ts";
 
 export type Kubernetes = AppContext["invoke"]["kubernetes"];
 const siteName = "play";
@@ -46,6 +46,9 @@ export default function play(
       },
       update: (_props) => {
         throw new Error("not implemented");
+      },
+      delete: function (_opts: DeleteDeploymentOpts): Promise<void> {
+        throw new Error("Function not implemented.");
       },
     },
     domains: {
