@@ -18,6 +18,8 @@ const paltformApps = [{
 
 const config = {
   apps: [
+    app("resend"),
+    app("sqlite"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
