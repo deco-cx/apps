@@ -4,7 +4,7 @@ import { isFreshCtx } from "./fresh.ts";
 export interface RedirectConfig {
   to: string;
   type?: "permanent" | "temporary";
-  keepQueryParameters?: boolean;
+  discardQueryParameters?: boolean;
 }
 
 /**
