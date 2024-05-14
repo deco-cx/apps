@@ -9,7 +9,7 @@ export interface Redirect {
   from: string;
   to: string;
   type?: "temporary" | "permanent";
-  keepQueryParameters?: boolean;
+  discardQueryParameters?: boolean;
 }
 
 export interface Redirects {
@@ -60,7 +60,7 @@ const getRedirectFromFile = async (
 
       const type = findAndRemove(parts, REDIRECT_TYPE_ENUM) ??
         (forcePermanentRedirects ? "permanent" : "temporary");
-      const keepQueryParameters =
+      const discardQueryParameters =
         findAndRemove(parts, CONCATENATE_PARAMS_VALUES) === "true";
       const from = parts[0];
       const to = parts[1];
@@ -69,18 +69,20 @@ const getRedirectFromFile = async (
         from,
         to,
         type,
-        keepQueryParameters,
+        discardQueryParameters,
       ];
     })
     .filter(([from, to]) => from && to && from !== to)
-    .map(([from, to, type, keepQueryParameters]) => ({
+    .map(([from, to, type, discardQueryParameters]) => ({
       from: from as string,
       to: to as string,
       type: type as Redirect["type"],
-      keepQueryParameters: keepQueryParameters as boolean,
+      discardQueryParameters: discardQueryParameters as boolean,
     }));
 
-  return redirectsFromFiles.map(({ from, to, type, keepQueryParameters }) => ({
+  return redirectsFromFiles.map((
+    { from, to, type, discardQueryParameters },
+  ) => ({
     pathTemplate: from,
     isHref: true,
     handler: {
@@ -88,7 +90,7 @@ const getRedirectFromFile = async (
         __resolveType: "website/handlers/redirect.ts",
         to,
         type,
-        keepQueryParameters,
+        discardQueryParameters,
       },
     },
   }));
@@ -118,7 +120,7 @@ export default async function redirect({
   const redirectsFromFiles: Route[] = await routesMap.get(from)!;
 
   const routes: Route[] = (redirects || []).map((
-    { from, to, type, keepQueryParameters },
+    { from, to, type, discardQueryParameters },
   ) => ({
     pathTemplate: from,
     isHref: true,
@@ -127,7 +129,7 @@ export default async function redirect({
         __resolveType: "website/handlers/redirect.ts",
         to,
         type,
-        keepQueryParameters,
+        discardQueryParameters,
       },
     },
   }));

@@ -12,7 +12,7 @@ export interface RedirectConfig {
  * @description Redirect request to another url
  */
 export default function Redirect(
-  { to, type = "temporary", keepQueryParameters }: RedirectConfig,
+  { to, type = "temporary", discardQueryParameters }: RedirectConfig,
 ) {
   /** https://archive.is/kWvxu */
   const statusByRedirectType: Record<
