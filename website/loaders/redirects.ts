@@ -20,7 +20,7 @@ async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
         __resolveType: "website/handlers/redirect.ts",
         to: redirect.to,
         type: redirect.type,
-        keepQueryParameters: redirect.keepQueryParameters,
+        discardQueryParameters: redirect.discardQueryParameters,
       },
     },
   }));
