@@ -42,7 +42,7 @@ export default function Redirect(
      *
      * (Useful for tracking parameters e.g Google's gclid, utm_source...)
      */
-    const finalLocation = !queryString || !keepQueryParameters
+    const finalLocation = !queryString || discardQueryParameters
       ? location
       : location.includes("?")
       ? `${location}&${queryString}`
