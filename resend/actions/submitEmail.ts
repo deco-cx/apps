@@ -13,9 +13,9 @@ const action = async (
   ctx: AppContext,
 ): Promise<CreateEmailResponse> => {
   const { apiWrite, emailFrom, emailTo, subject } = ctx;
-  const emailFromDefault = `${emailFrom?.name ?? "Contact"} <${
+  const emailFromDefault = `${emailFrom?.name ?? "Contact"} ${
     emailFrom?.domain ?? "<onboarding@resend.dev>"
-  }>`;
+  }`;
 
   const response = await apiWrite["POST /emails"]({}, {
     body: {

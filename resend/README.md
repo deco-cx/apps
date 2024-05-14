@@ -90,5 +90,5 @@ Your setup is complete 🥳✉️
 
 ## Observations
 
-1. You can create your own email templates using [react-email components](https://react.email/docs/introduction#components) que são exportados do arquivo "apps/resend/utils/reactEmail.ts". If any component you need is not being exported, contribute!!
+1. You can create your own email templates using [react-email components](https://react.email/docs/introduction#components) that are exported from the file "apps/resend/utils/reactEmail.ts". If any component you need is not being exported, contribute!!
 2. Tailwind for email template is currently not supported
