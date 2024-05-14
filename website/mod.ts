@@ -102,6 +102,12 @@ export interface Props {
   firstByteThresholdMS?: boolean;
 
   /**
+   * @title Avoid redirecting to editor
+   * @description Disable going to editor when "." or "Ctrl + Shift + E" is pressed
+   */
+  avoidRedirectingToEditor?: boolean;
+
+  /**
    * @title AB Testing
    * @description A/B Testing configuration
    */

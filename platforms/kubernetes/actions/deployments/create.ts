@@ -7,6 +7,7 @@ import { AppContext } from "../../mod.ts";
 import { Namespace } from "../sites/create.ts";
 
 const uid = new ShortUniqueId({ length: 10, dictionary: "alpha_lower" });
+
 export const DeploymentId = {
   new: () => uid.randomUUID(),
 };
@@ -65,6 +66,6 @@ export default function newDeployment(
     labels,
     runnerImage: runnerImg,
     hypervisor,
-    deploymentSlug,
+    deploymentSlug: deploymentSlug ?? deploymentId,
   }, ctx);
 }
