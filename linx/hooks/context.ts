@@ -2,14 +2,17 @@ import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
 import type { CartResponse } from "../utils/types/basketJSON.ts";
+import { UserResponse } from "../utils/types/userJSON.ts";
 
 export interface Context {
   cart: CartResponse | null;
+  user: UserResponse | null;
 }
 
 const loading = signal<boolean>(true);
 const context = {
   cart: signal<CartResponse | null>(null),
+  user: signal<UserResponse | null>(null),
 };
 
 let queue = Promise.resolve();
@@ -24,19 +27,14 @@ const enqueue = (
 
   queue = queue.then(async () => {
     try {
-      const result = await cb(controller.signal);
-      const cart = result.cart ?? null;
+      const { user, cart } = await cb(controller.signal);
 
       if (controller.signal.aborted) {
         throw { name: "AbortError" };
       }
 
-      if (cart !== null) {
-        context.cart.value = {
-          ...context.cart.value,
-          ...cart,
-        };
-      }
+      context.cart.value = cart || context.cart.value;
+      context.user.value = user || context.user.value;
 
       loading.value = false;
     } catch (error) {
@@ -55,6 +53,7 @@ const enqueue = (
 const load = (signal: AbortSignal) =>
   invoke({
     cart: invoke.linx.loaders.cart(),
+    user: invoke.linx.loaders.user(),
   }, { signal });
 
 if (IS_BROWSER) {

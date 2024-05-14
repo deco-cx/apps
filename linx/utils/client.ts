@@ -10,6 +10,7 @@ import { CartOperation } from "./types/basket.ts";
 import { Props as AddProductProps } from "../actions/cart/addItem.ts";
 import { LoginResponse } from "./types/login.ts";
 import { NewsletterResponse } from "./types/newsletterJSON.ts";
+import { UserResponse } from "./types/userJSON.ts";
 
 export interface API {
   "GET /*splat": {
@@ -19,6 +20,10 @@ export interface API {
       | SuggestionsWebPage
       | AuctionWebPage
       | AuctionDetailWebPage;
+  };
+
+  "GET /Shopping/Shopper": {
+    response: UserResponse;
   };
 
   "GET /web-api/v1/Catalog/Products/:source/:id": {
