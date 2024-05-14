@@ -2,6 +2,8 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
+import { createGraphqlClient } from "../utils/graphql.ts";
+import { fetchSafe } from "../utils/fetch.ts";
 
 export interface Props {
   /**
@@ -38,6 +40,7 @@ type PartialProps = Omit<Props, "baseUrl">;
 
 export interface State extends PartialProps {
   clientAdmin: ReturnType<typeof createHttpClient<API>>;
+  clientGraphql: ReturnType<typeof createGraphqlClient>;
 }
 
 /**
@@ -51,11 +54,18 @@ export default function App(props: Props): App<Manifest, State> {
 
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
-    headers: new Headers(
-      {
-        "Authorization": `Bearer ${apiKey}`,
-      },
-    ),
+    headers: new Headers({
+      Authorization: `Bearer ${apiKey}`,
+    }),
+  });
+
+  const clientGraphql = createGraphqlClient({
+    fetcher: fetchSafe,
+    endpoint: `${baseUrl}/graphql`,
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    }),
   });
 
   return {
@@ -67,6 +77,7 @@ export default function App(props: Props): App<Manifest, State> {
       currencyCode,
       imagesUrl,
       clientAdmin,
+      clientGraphql,
     },
   };
 }
