@@ -21,6 +21,7 @@ import * as $$$8 from "./loaders/product/list.ts";
 import * as $$$9 from "./loaders/product/listingPage.ts";
 import * as $$$10 from "./loaders/product/suggestions.ts";
 import * as $$$11 from "./loaders/proxy.ts";
+import * as $$$12 from "./loaders/user.ts";
 
 const manifest = {
   "loaders": {
@@ -36,6 +37,7 @@ const manifest = {
     "linx/loaders/product/listingPage.ts": $$$9,
     "linx/loaders/product/suggestions.ts": $$$10,
     "linx/loaders/proxy.ts": $$$11,
+    "linx/loaders/user.ts": $$$12,
   },
   "handlers": {
     "linx/handlers/sitemap.ts": $$$$0,
