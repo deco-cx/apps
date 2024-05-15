@@ -1,4 +1,3 @@
-// import { JSX } from "preact/jsx-runtime";
 
 export const RESEND_ERROR_CODES_BY_KEY = {
   missing_required_field: 422,
