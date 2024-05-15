@@ -2,11 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/subscribe.ts";
+import * as $$$$$$$$$1 from "./actions/unsubscribe.ts";
 import * as $$$0 from "./loaders/listMember.ts";
 import * as $$$1 from "./loaders/lists.ts";
 import * as $$$2 from "./loaders/options/lists.ts";
-import * as $$$$$$$$$0 from "./actions/subscribe.ts";
-import * as $$$$$$$$$1 from "./actions/unsubscribe.ts";
 
 const manifest = {
   "loaders": {
