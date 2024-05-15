@@ -1,5 +1,6 @@
 //Leaf Elements
 export interface GraphQLProductLeaf {
+  //TODO: add complex elements
   canonical_url: string;
   country_of_manufacture: string;
   is_returnable?: string;
@@ -21,6 +22,7 @@ export interface GraphQLProductLeaf {
   uid?: string;
   url_key?: string;
   url_suffix?: string;
+  
 }
 
 export interface GraphQLProductQueryLeaf {
@@ -67,7 +69,7 @@ export interface SearchSuggestion {
   search?: string;
 }
 
-//Querys and Returns
+//Inputs and Returns
 export interface GraphQLProductShelf {
   products: GraphQLProductQueryLeaf;
 }
@@ -81,37 +83,18 @@ export interface GraphQLProductShelfInputs {
 }
 
 export interface GraphQLProductFilterInput {
-  activity: FilterEqualTypeInput;
-  category_gear: FilterEqualTypeInput;
-  category_id: FilterEqualTypeInput;
-  category_uid: FilterEqualTypeInput;
-  category_url_path: FilterEqualTypeInput;
-  climate: FilterEqualTypeInput;
-  collar: FilterEqualTypeInput;
-  color: FilterEqualTypeInput;
-  description: FilterMatchTypeInput;
-  eco_collection: FilterEqualTypeInput;
-  erin_recommends: FilterEqualTypeInput;
-  features_bags: FilterEqualTypeInput;
-  format: FilterEqualTypeInput;
-  gender: FilterEqualTypeInput;
-  material: FilterEqualTypeInput;
-  name: FilterMatchTypeInput;
-  new: FilterEqualTypeInput;
-  pattern: FilterEqualTypeInput;
-  performance_fabric: FilterEqualTypeInput;
-  price: FilterRangeTypeInput;
-  purpose: FilterEqualTypeInput;
-  sale: FilterEqualTypeInput;
-  short_description: FilterMatchTypeInput;
-  size: FilterEqualTypeInput;
-  sku: FilterEqualTypeInput;
-  sleeve: FilterEqualTypeInput;
-  strap_bags: FilterEqualTypeInput;
-  style_bags: FilterEqualTypeInput;
-  style_bottom: FilterEqualTypeInput;
-  style_general: FilterEqualTypeInput;
-  url_key: FilterEqualTypeInput;
+  tipo_de_pele?: FilterEqualTypeInput;
+  tipo_de_pelo?: FilterEqualTypeInput;
+  category_id?: FilterEqualTypeInput;
+  category_uid?: FilterEqualTypeInput;
+  familia_olfativa?: FilterEqualTypeInput;
+  fragancias?: FilterEqualTypeInput;
+  linha?: FilterEqualTypeInput;
+  marca?: FilterEqualTypeInput;
+  sku?: FilterEqualTypeInput;
+  url_key?: FilterEqualTypeInput;
+  volume?: FilterEqualTypeInput;
+  name?: FilterMatchTypeInput;
 }
 
 export interface FilterEqualTypeInput {
@@ -130,8 +113,8 @@ export interface FilterRangeTypeInput {
 }
 
 export interface GraphQLProductSortInput {
-  name: "ASC" | "DESC";
-  position: "ASC" | "DESC";
-  price: "ASC" | "DESC";
-  relevance: "ASC" | "DESC";
+  name?: "ASC" | "DESC";
+  position?: "ASC" | "DESC";
+  price?: "ASC" | "DESC";
+  relevance?: "ASC" | "DESC";
 }
