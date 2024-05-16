@@ -81,7 +81,7 @@ export default function Fresh(
                 let next = resolve;
                 if (resolver?.type === "matchers") { // matchers should not have a timeout.
                   next = RequestContext.bind(
-                    { signal: undefined },
+                    { signal: req.signal },
                     resolve,
                   );
                 }
