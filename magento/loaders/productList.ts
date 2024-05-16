@@ -62,15 +62,13 @@ export interface ProductSkuProps extends Omit<CommomProps, "filter"> {
   skus: Array<string>;
 }
 
-export interface CollectionProps extends CommomProps {
+export interface SegmentProps extends CommomProps {
   /** @title Linhas */
-  collections: Array<string>;
+  segments: Array<string>;
 }
 
-
-
 export interface Props {
-  props: TermProps | CategoryProps | ProductSkuProps | CollectionProps;
+  props: TermProps | CategoryProps | ProductSkuProps | SegmentProps;
 }
 
 const transformSort = ({
@@ -150,8 +148,8 @@ const fromProps = ({ props }: Props): GraphQLProductShelfInputs => {
     } as const;
   }
 
-  if (typeChecker<CollectionProps>(props as CollectionProps, "collections")) {
-    const { filter, collections } = props as CollectionProps;
+  if (typeChecker<SegmentProps>(props as SegmentProps, "segments")) {
+    const { filter, segments } = props as SegmentProps;
     return {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
@@ -159,7 +157,7 @@ const fromProps = ({ props }: Props): GraphQLProductShelfInputs => {
       filter: transformFilter({
         filter: filter?.concat({
           input: "linha",
-          values: collections,
+          values: segments,
         }),
       }),
     } as const;
@@ -186,11 +184,11 @@ async function loader(
       variables: { ...formatedProps },
       ...GetProduct,
     });
-    //TODO: toGraphQLProduct
+    //TODO(@aka-sacci-ccr): toGraphQLProduct
     console.log(data);
   } catch (error) {
     console.log(error);
-    return null
+    return null;
   }
 
   return null;
