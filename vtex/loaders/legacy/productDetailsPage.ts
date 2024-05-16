@@ -21,6 +21,11 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Indexing Skus
+   * @description Index of product pages with the `skuId` parameter
+   */
+  indexingSkus?: boolean;
 }
 
 /**
@@ -97,7 +102,7 @@ async function loader(
       title: product.productTitle,
       description: product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
-      noIndexing: !!skuId,
+      noIndexing: props.indexingSkus ? false : !!skuId,
     },
   };
 }

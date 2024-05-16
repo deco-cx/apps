@@ -25,6 +25,11 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Indexing Skus
+   * @description Index of product pages with the `skuId` parameter
+   */
+  indexingSkus?: boolean;
 }
 
 /**
@@ -129,13 +134,20 @@ const loader = async (
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
   });
 
+  const isPageProduct = pageType.pageType === "Product";
+
+  const seo = isPageProduct ? pageTypesToSeo([pageType], baseUrl) : null;
+
   return {
     ...page,
     product: props.similars
       ? await withIsSimilarTo(req, ctx, page.product)
       : page.product,
-    seo: pageType.pageType === "Product"
-      ? pageTypesToSeo([pageType], baseUrl)
+    seo: isPageProduct && seo
+      ? {
+        ...seo,
+        noIndexing: props.indexingSkus ? false : seo.noIndexing,
+      }
       : null,
   };
 };
