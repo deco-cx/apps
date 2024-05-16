@@ -2,11 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/submitEmail.ts";
+import * as $$$$$$$$$0 from "./actions/emails/send.ts";
 
 const manifest = {
   "actions": {
-    "resend/actions/submitEmail.ts": $$$$$$$$$0,
+    "resend/actions/emails/send.ts": $$$$$$$$$0,
   },
   "name": "resend",
   "baseUrl": import.meta.url,

@@ -1,14 +1,10 @@
-import { AppContext } from "../mod.ts";
-import { CreateEmailOptions, CreateEmailResponse } from "../utils/types.ts";
+import { AppContext } from "../../mod.ts";
+import { CreateEmailOptions, CreateEmailResponse } from "../../utils/types.ts";
 
-export interface Props {
-  payload: CreateEmailOptions;
-}
+export type Props = CreateEmailOptions;
 
 const action = async (
-  {
-    payload,
-  }: Props,
+  payload: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<CreateEmailResponse> => {

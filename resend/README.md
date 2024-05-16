@@ -65,14 +65,12 @@ Your setup is complete 🥳✉️
       const handleSubmit: JSX.GenericEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         
-        await invoke.resend.actions.submitEmail({
-          payload: {
-            to: "mw.marcowilliam@gmail.com", // receiver optional 
-            html: render(<StripeWelcomeEmail />, { // Convert your react email template when the action is triggered to HTML using render or pure HTML too
-              pretty: true, // 
-            }),
-            subject: "Formulário de contato | Resend App - Deco", // subject optional
-          },
+        await invoke.resend.actions.emails.send({
+          to: "mw.marcowilliam@gmail.com", // receiver optional 
+          html: render(<StripeWelcomeEmail />, { // Convert your react email template when the action is triggered to HTML using render or pure HTML too
+            pretty: true, // 
+          }),
+          subject: "Formulário de contato | Resend App - Deco", // subject optional
         });
       }
 
