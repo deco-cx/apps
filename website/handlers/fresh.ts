@@ -144,7 +144,6 @@ export default function Fresh(
             } finally {
               span.end();
               timing?.end();
-              req.signal.removeEventListener("abort", abortHandler);
             }
           },
         );
