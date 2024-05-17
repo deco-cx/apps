@@ -92,7 +92,7 @@ const state = {
   clearOrderformMessages: enqueue(
     "vtex/actions/cart/clearOrderformMessages.ts",
   ),
-  simulate: ("vtex/actions/cart/simulation.ts"),
+  simulate: enqueue("vtex/actions/cart/simulation.ts"),
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };
 
