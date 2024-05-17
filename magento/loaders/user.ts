@@ -1,6 +1,6 @@
 import { Person } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-import { getCartCookie } from "../utils/user.ts";
+import { getUserCookie, SESSION_COOKIE } from "../utils/user.ts";
 
 async function loader(
   _props: unknown,
@@ -9,15 +9,16 @@ async function loader(
 ): Promise<Person | null> {
   const { clientAdmin, site } = ctx;
 
-  const PHPSESSID = getCartCookie(req.headers);
+  const PHPSESSID = getUserCookie(req.headers);
 
   try {
     const response = await clientAdmin["GET /:site/customer/section/load"]({
       site,
       sections: "customer,carbono-customer",
-    }, { headers: new Headers({ Cookie: `PHPSESSID=${PHPSESSID}` }) }).then((
-      res,
-    ) => res.json());
+    }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${PHPSESSID}` }) })
+      .then((
+        res,
+      ) => res.json());
     const user = response["carbono-customer"];
     const customer = response.customer;
 
