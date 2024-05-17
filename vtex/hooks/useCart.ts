@@ -82,7 +82,7 @@ const state = {
   addItems: enqueue("vtex/actions/cart/addItems.ts"),
   addCouponsToCart: enqueue("vtex/actions/cart/updateCoupons.ts"),
   changePrice: enqueue("vtex/actions/cart/updateItemPrice.ts"),
-  getCartInstallments: invoke.vtex.actions.cart.getInstallment,
+  getCartInstallments: enqueue("vtex/actions/cart/getInstallment.ts"),
   ignoreProfileData: enqueue("vtex/actions/cart/updateProfile.ts"),
   removeAllPersonalData: enqueue("vtex/actions/cart/updateUser.ts"),
   addItemAttachment: enqueue("vtex/actions/cart/updateItemAttachment.ts"),
@@ -92,7 +92,7 @@ const state = {
   clearOrderformMessages: enqueue(
     "vtex/actions/cart/clearOrderformMessages.ts",
   ),
-  simulate: invoke.vtex.actions.cart.simulation,
+  simulate: ("vtex/actions/cart/simulation.ts"),
   mapItemsToAnalyticsItems: mapOrderFormItemsToAnalyticsItems,
 };
 
