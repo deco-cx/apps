@@ -1,3 +1,4 @@
+import { weakcache } from "deco/deps.ts";
 import { ResolveOptions } from "deco/engine/core/mod.ts";
 import {
   isDeferred,
@@ -150,10 +151,10 @@ const RouterId = {
     ).map((flag) => `${flag.name}@${flag.value}`).join("/");
   },
 };
-const routerCache: Record<
-  string,
-  { routes: Route[]; hrefRoutes: Record<string, Resolvable<Handler>> }
-> = {};
+
+const routerCache = new weakcache.WeakLRUCache({
+  cacheSize: 16, // up to 16 different routers stored here.
+});
 /**
  * @title Router
  * @description Route requests based on audience
@@ -203,8 +204,13 @@ export default function RoutesSelection(
       };
     };
     const routerId = `${RouterId.fromFlags(ctx.flags)}/${ctx.revision ?? ""}`;
-    routerCache[routerId] ??= prepareRoutes();
-    const { routes, hrefRoutes } = routerCache[routerId];
+    if (!routerCache.has(routerId)) {
+      routerCache.setValue(routerId, prepareRoutes());
+    }
+    const { routes, hrefRoutes }: {
+      routes: Route[];
+      hrefRoutes: Record<string, Resolvable<Handler>>;
+    } = routerCache.getValue(routerId);
     const server = router(
       routes,
       hrefRoutes,
