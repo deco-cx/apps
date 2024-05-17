@@ -6,10 +6,10 @@ import {
 } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import { FreshContext } from "deco/engine/manifest/manifest.ts";
-import { isFreshCtx } from "../handlers/fresh.ts";
 import { DecoSiteState, DecoState } from "deco/types.ts";
 import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
+import { isFreshCtx } from "../handlers/fresh.ts";
 import { AppContext } from "../mod.ts";
 
 export interface SelectionConfig {
@@ -143,7 +143,17 @@ export const buildRoutes = (
 export interface SelectionConfig {
   audiences: Routes[];
 }
-
+const RouterId = {
+  fromFlags: (flags: AppContext["flags"]): string => {
+    return flags.toSorted((flagA, flagB) =>
+      flagA.name.localeCompare(flagB.name)
+    ).map((flag) => `${flag.name}@${flag.value}`).join("/");
+  },
+};
+const routerCache: Record<
+  string,
+  { routes: Route[]; hrefRoutes: Record<string, Resolvable<Handler>> }
+> = {};
 /**
  * @title Router
  * @description Route requests based on audience
@@ -166,29 +176,37 @@ export default function RoutesSelection(
 
     const timing = monitoring?.timings.start("router");
 
-    const routesFromProps = Array.isArray(audiences) ? audiences : [];
-    // everyone should come first in the list given that we override the everyone value with the upcoming flags.
-    const [routes, hrefRoutes] = buildRoutes(
-      Array.isArray(ctx.routes)
-        ? [...ctx.routes, ...routesFromProps]
-        : routesFromProps,
-    );
-    // build the router from entries
-    const builtRoutes = Object.entries(routes).sort((
-      [routeStringA, { highPriority: highPriorityA }],
-      [routeStringB, { highPriority: highPriorityB }],
-    ) =>
-      (highPriorityB ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
-      rankRoute(routeStringB) -
-      ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
-        rankRoute(routeStringA))
-    );
-
+    const prepareRoutes = () => {
+      const routesFromProps = Array.isArray(audiences) ? audiences : [];
+      // everyone should come first in the list given that we override the everyone value with the upcoming flags.
+      const [routes, hrefRoutes] = buildRoutes(
+        Array.isArray(ctx.routes)
+          ? [...ctx.routes, ...routesFromProps]
+          : routesFromProps,
+      );
+      // build the router from entries
+      const builtRoutes = Object.entries(routes).sort((
+        [routeStringA, { highPriority: highPriorityA }],
+        [routeStringB, { highPriority: highPriorityB }],
+      ) =>
+        (highPriorityB ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
+        rankRoute(routeStringB) -
+        ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
+          rankRoute(routeStringA))
+      );
+      return {
+        routes: builtRoutes.map((route) => ({
+          pathTemplate: route[0],
+          handler: { value: route[1].func },
+        })),
+        hrefRoutes,
+      };
+    };
+    const routerId = RouterId.fromFlags(ctx.flags);
+    routerCache[routerId] ??= prepareRoutes();
+    const { routes, hrefRoutes } = routerCache[routerId];
     const server = router(
-      builtRoutes.map((route) => ({
-        pathTemplate: route[0],
-        handler: { value: route[1].func },
-      })),
+      routes,
       hrefRoutes,
       ctx.get,
       { monitoring },
