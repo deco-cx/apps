@@ -202,7 +202,7 @@ export default function RoutesSelection(
         hrefRoutes,
       };
     };
-    const routerId = RouterId.fromFlags(ctx.flags);
+    const routerId = `${RouterId.fromFlags(ctx.flags)}/${ctx.revision ?? ""}`;
     routerCache[routerId] ??= prepareRoutes();
     const { routes, hrefRoutes } = routerCache[routerId];
     const server = router(
