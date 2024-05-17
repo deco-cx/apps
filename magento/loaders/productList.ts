@@ -1,4 +1,4 @@
-import type { ProductDetailsPage } from "../../commerce/types.ts";
+import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
   GraphQLProductShelf,
@@ -8,6 +8,7 @@ import {
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
 import { typeChecker } from "../utils/utils.ts";
+import { toProductGraphQL } from "../utils/transform.ts";
 
 export interface CommomProps {
   /**
@@ -21,6 +22,12 @@ export interface CommomProps {
    * @default 1
    */
   currentPage: number;
+
+  /**
+   * @title Imagens por vitrine (max)
+   * @default 3
+   */
+  imagesQtd: number;
 
   /** @title Ordenação */
   sort?: {
@@ -40,7 +47,7 @@ export interface FilterProps {
   input: string;
   /**
    * @title Valores do filtro
-   * @description Caso o filtro for "name", apenas o primeiro valor informado será considerado
+   * TODO(aka-sacci-ccr): Mudar lógica dos fitros - Default Filters e Customizable filters
    */
   values: Array<string>;
 }
@@ -94,6 +101,7 @@ const transformFilter = ({
 };
 
 const transformFilterValue = ({ input, values }: FilterProps) => {
+  //TODO(aka-sacci-ccr): melhorar isso
   if (input === "name") {
     return {
       match: values[0],
@@ -170,28 +178,31 @@ const fromProps = ({ props }: Props): GraphQLProductShelfInputs => {
  * @title Magento Integration - Product Listing loader
  */
 async function loader(
-  props: Props,
-  _req: Request,
+  { props }: Props,
+  req: Request,
   ctx: AppContext
-): Promise<ProductDetailsPage | null> {
+): Promise<Product[] | null> {
   const { clientGraphql } = ctx;
-  const formatedProps = fromProps({ props: props.props });
+  const url = new URL(req.url);
+  const formatedProps = fromProps({ props });
   try {
-    const data = await clientGraphql.query<
+    const { products } = await clientGraphql.query<
       GraphQLProductShelf,
       GraphQLProductShelfInputs
     >({
       variables: { ...formatedProps },
       ...GetProduct,
     });
-    //TODO(@aka-sacci-ccr): toGraphQLProduct
-    console.log(data);
-  } catch (error) {
-    console.log(error);
+
+    if (!products.items || products.items?.length === 0) {
+      return null;
+    }
+
+    return products.items.map((p) => toProductGraphQL(p, url, props.imagesQtd));
+  } catch (e) {
+    console.log(e)
     return null;
   }
-
-  return null;
 }
 
 export default loader;

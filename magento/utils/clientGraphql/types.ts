@@ -1,6 +1,6 @@
 //Leaf Elements
 export interface GraphQLProductLeaf {
-  canonical_url: string;
+  canonical_url?: string;
   categories?: Array<Omit<GraphQLCategoryLeaf, "products">>;
   country_of_manufacture?: string;
   created_at?: string;
@@ -30,17 +30,7 @@ export interface GraphQLProductLeaf {
   thumbnail?: ProductImage;
   uid?: string;
   url_key?: string;
-  url_rewrites?: Array<UrlRewrite>
-}
-
-export interface GraphQLProductQueryLeaf {
-  total_count?: number;
-  items?: GraphQLProductLeaf[];
-  //TODO@aka-sacci-ccr): AGGREGGATION FILTER INPUT
-  aggreggations?: Aggreggation[];
-  page_info?: SearchResultPageInfo;
-  sort_fields?: SortFields;
-  suggestions?: SearchSuggestion[];
+  url_rewrites?: Array<UrlRewrite>;
 }
 
 export interface GraphQLCategoryLeaf {
@@ -92,10 +82,10 @@ export interface AggreggationOption {
 }
 
 export interface ProductImage {
-  disabled?: boolean;
-  label?: string;
-  position?: number;
-  url?: string;
+  disabled: boolean;
+  label: string;
+  position: number;
+  url: string;
 }
 
 export interface SearchResultPageInfo {
@@ -119,19 +109,19 @@ export interface SearchSuggestion {
 }
 
 export interface PriceRange {
-  maximum_price?: ProductPrice;
-  minimum_price?: ProductPrice;
+  maximum_price: ProductPrice;
+  minimum_price: ProductPrice;
 }
 
 export interface ProductPrice {
-  discount?: ProductDiscount;
-  final_price?: Money;
-  regular_price?: Money;
+  discount: ProductDiscount;
+  final_price: Money;
+  regular_price: Money;
 }
 
 export interface ProductDiscount {
-  amount_off?: number;
-  percent_off?: number;
+  amount_off: number;
+  percent_off: number;
 }
 
 export interface Money {
@@ -150,9 +140,26 @@ export interface HttpQueryParameter {
 }
 
 //Inputs and Returns
+
+export type GraphQLSimpleProduct = Required<
+  Pick<
+    GraphQLProductLeaf,
+    | "sku"
+    | "url_key"
+    | "uid"
+    | "media_gallery"
+    | "price_range"
+    | "stock_status"
+    | "canonical_url"
+    | "name"
+    | "only_x_left_in_stock"
+  >
+>;
+
 export interface GraphQLProductShelf {
-  //TODO(@aka-sacci-ccr): Pick so nos itens necessários
-  products: GraphQLProductQueryLeaf;
+  products: {
+    items?: GraphQLSimpleProduct[];
+  };
 }
 
 export interface GraphQLProductShelfInputs {
@@ -164,6 +171,7 @@ export interface GraphQLProductShelfInputs {
 }
 
 export interface GraphQLProductFilterInput {
+  //TODO(aka-sacci-ccr): Esses serao os filtros DEFAULT.
   tipo_de_pele?: FilterEqualTypeInput;
   tipo_de_pelo?: FilterEqualTypeInput;
   category_id?: FilterEqualTypeInput;
