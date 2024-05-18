@@ -101,4 +101,12 @@ export interface API {
       ProductAuctionID: number;
     };
   };
+
+  "POST /web-api/v1/Shopping/Basket/SetPostalCode": {
+    response: CartResponse;
+    body: {
+      BasketID: number;
+      PostalCode: string;
+    };
+  };
 }

@@ -1,5 +1,6 @@
 import type { AppContext } from "../../linx/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
+import { toLinxHeaders } from "../utils/headers.ts";
 import { toCart } from "../utils/transform.ts";
 import type { CartResponse } from "../utils/types/basketJSON.ts";
 
