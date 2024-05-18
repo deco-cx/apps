@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+import { toLinxHeaders } from "../../utils/headers.ts";
 import { toCart } from "../../utils/transform.ts";
 import { CartProduct } from "../../utils/types/basket.ts";
 import type { CartResponse } from "../../utils/types/basketJSON.ts";

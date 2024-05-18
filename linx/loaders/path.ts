@@ -36,7 +36,8 @@ async function loader(
    * TODO: Fix the /*splat route being called for images and other assets.
    */
   if (upstream.pathname.endsWith(".png")) {
-    throw new Error("imagem");
+    console.error("imagem");
+    return null;
   }
 
   const splat = `${upstream.pathname.slice(1)}.json`;
