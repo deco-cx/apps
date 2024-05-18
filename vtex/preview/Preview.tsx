@@ -138,7 +138,7 @@ function VtexSvg() {
   );
 }
 
-function GoLivePtBr(
+export function GoLivePtBr(
   { decoSite, withoutSubDomain, account }: {
     decoSite: string;
     withoutSubDomain: string;
