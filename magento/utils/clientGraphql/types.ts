@@ -1,7 +1,7 @@
 //Leaf Elements
-export interface GraphQLProductLeaf {
+export interface ProductLeafGraphQL {
   canonical_url?: string;
-  categories?: Array<Omit<GraphQLCategoryLeaf, "products">>;
+  categories?: Array<Omit<CategoryLeafGraphQL, "products">>;
   country_of_manufacture?: string;
   created_at?: string;
   description?: {
@@ -33,7 +33,7 @@ export interface GraphQLProductLeaf {
   url_rewrites?: Array<UrlRewrite>;
 }
 
-export interface GraphQLCategoryLeaf {
+export interface CategoryLeafGraphQL {
   automatic_sorting?: string;
   available_sort_by?: Array<string>;
   breadcrumbs?: Array<Breadcrumb>;
@@ -42,6 +42,7 @@ export interface GraphQLCategoryLeaf {
   id?: string;
   include_in_menu?: string;
   is_anchor?: string;
+  image?: string | null;
   uid?: string;
   path_in_store?: string;
   product_count?: number;
@@ -50,12 +51,15 @@ export interface GraphQLCategoryLeaf {
   url_key?: string;
   url_path?: string;
   url_suffix?: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  name?: string
 }
 
 export interface CategoryProducts {
   total_count?: number;
   page_info?: SearchResultPageInfo;
-  items?: Array<Omit<GraphQLProductLeaf, "category">>;
+  items?: Array<Omit<ProductLeafGraphQL, "category">>;
 }
 
 export interface Breadcrumb {
@@ -67,18 +71,18 @@ export interface Breadcrumb {
   category_url_path?: string;
 }
 
-export interface Aggreggation {
+export interface Aggregation {
   attribute_code?: string;
   count?: number;
   label?: string;
-  position?: number;
-  options?: AggreggationOption[];
+  position?: number | null;
+  options?: AggregationOption[];
 }
 
-export interface AggreggationOption {
-  count?: number;
-  label?: string;
-  value?: string;
+export interface AggregationOption {
+  count: number;
+  label: string;
+  value: string;
 }
 
 export interface ProductImage {
@@ -89,19 +93,19 @@ export interface ProductImage {
 }
 
 export interface SearchResultPageInfo {
-  current_page?: number;
-  page_size?: number;
-  total_pages?: number;
+  current_page: number;
+  page_size: number;
+  total_pages: number;
 }
 
 export interface SortFields {
   default?: string;
-  options?: SortField[];
+  options: SortField[];
 }
 
 export interface SortField {
-  label?: string;
-  value?: string;
+  label: string;
+  value: string;
 }
 
 export interface SearchSuggestion {
@@ -141,9 +145,9 @@ export interface HttpQueryParameter {
 
 //Inputs and Returns
 
-export type GraphQLSimpleProduct = Required<
+export type SimpleProductGraphQL = Required<
   Pick<
-    GraphQLProductLeaf,
+    ProductLeafGraphQL,
     | "sku"
     | "url_key"
     | "uid"
@@ -156,21 +160,41 @@ export type GraphQLSimpleProduct = Required<
   >
 >;
 
-export interface GraphQLProductShelf {
+export type SimpleCategoryGraphQL = Required<
+  Pick<CategoryLeafGraphQL, "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name">
+>;
+
+export interface ProductShelfGraphQL {
   products: {
-    items?: GraphQLSimpleProduct[];
+    items: SimpleProductGraphQL[];
   };
 }
 
-export interface GraphQLProductShelfInputs {
+export interface CategoryGraphQL {
+  categories: {
+    items: SimpleCategoryGraphQL[];
+  };
+}
+
+export interface ProductPLPGraphQL {
+  products: {
+    items: SimpleProductGraphQL[];
+    page_info: SearchResultPageInfo;
+    sort_fields: SortFields;
+    aggregations: Array<Required<Aggregation>>;
+    total_count: number
+  };
+}
+
+export interface ProductSearchInputs {
   search?: string;
   pageSize?: number;
   currentPage?: number;
-  filter?: GraphQLProductFilterInput;
-  sort?: GraphQLProductSortInput;
+  filter?: ProductFilterInput;
+  sort?: ProductSortInput;
 }
 
-export interface GraphQLProductFilterInput {
+export interface ProductFilterInput {
   //TODO(aka-sacci-ccr): Esses serao os filtros DEFAULT.
   tipo_de_pele?: FilterEqualTypeInput;
   tipo_de_pelo?: FilterEqualTypeInput;
@@ -201,7 +225,7 @@ export interface FilterRangeTypeInput {
   to?: string;
 }
 
-export interface GraphQLProductSortInput {
+export interface ProductSortInput {
   name?: "ASC" | "DESC";
   position?: "ASC" | "DESC";
   price?: "ASC" | "DESC";

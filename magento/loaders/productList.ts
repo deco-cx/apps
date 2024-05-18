@@ -1,10 +1,10 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
-  GraphQLProductShelf,
-  GraphQLProductShelfInputs,
-  GraphQLProductSortInput,
-  GraphQLProductFilterInput,
+  ProductShelfGraphQL,
+  ProductSearchInputs,
+  ProductSortInput,
+  ProductFilterInput,
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
 import { typeChecker } from "../utils/utils.ts";
@@ -22,12 +22,6 @@ export interface CommomProps {
    * @default 1
    */
   currentPage: number;
-
-  /**
-   * @title Imagens por vitrine (max)
-   * @default 3
-   */
-  imagesQtd: number;
 
   /** @title Ordenação */
   sort?: {
@@ -74,13 +68,16 @@ export interface SegmentProps extends CommomProps {
   segments: Array<string>;
 }
 
+/**
+ * @title Magento Integration - Product Lists
+ */
 export interface Props {
   props: TermProps | CategoryProps | ProductSkuProps | SegmentProps;
 }
 
 const transformSort = ({
   sort,
-}: Pick<CommomProps, "sort">): GraphQLProductSortInput | undefined => {
+}: Pick<CommomProps, "sort">): ProductSortInput | undefined => {
   if (!sort?.sortBy) {
     return undefined;
   }
@@ -91,8 +88,8 @@ const transformSort = ({
 
 const transformFilter = ({
   filter,
-}: Pick<CommomProps, "filter">): GraphQLProductFilterInput | undefined => {
-  return filter?.reduce<GraphQLProductFilterInput>((acc, f) => {
+}: Pick<CommomProps, "filter">): ProductFilterInput | undefined => {
+  return filter?.reduce<ProductFilterInput>((acc, f) => {
     return {
       ...acc,
       [f.input]: transformFilterValue(f),
@@ -110,7 +107,7 @@ const transformFilterValue = ({ input, values }: FilterProps) => {
   return values.length === 1 ? { eq: values[0] } : { in: values.map((v) => v) };
 };
 
-const fromProps = ({ props }: Props): GraphQLProductShelfInputs => {
+const fromProps = ({ props }: Props): ProductSearchInputs => {
   if (typeChecker<TermProps>(props as TermProps, "search")) {
     const { search, filter } = props as TermProps;
     return {
@@ -182,13 +179,13 @@ async function loader(
   req: Request,
   ctx: AppContext
 ): Promise<Product[] | null> {
-  const { clientGraphql } = ctx;
+  const { clientGraphql, imagesQtd } = ctx;
   const url = new URL(req.url);
   const formatedProps = fromProps({ props });
   try {
     const { products } = await clientGraphql.query<
-      GraphQLProductShelf,
-      GraphQLProductShelfInputs
+      ProductShelfGraphQL,
+      ProductSearchInputs
     >({
       variables: { ...formatedProps },
       ...GetProduct,
@@ -198,7 +195,7 @@ async function loader(
       return null;
     }
 
-    return products.items.map((p) => toProductGraphQL(p, url, props.imagesQtd));
+    return products.items.map((p) => toProductGraphQL(p, url, imagesQtd));
   } catch (e) {
     console.log(e)
     return null;

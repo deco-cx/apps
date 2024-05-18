@@ -34,6 +34,13 @@ export interface Props {
    * @example https://www.store.com.br/media/catalog/product
    */
   imagesUrl: string;
+
+  /**
+   * @title Imagens por vitrine (max)
+   * @description Quantidade máxima de imagens por vitrine
+   * @default 3
+   */
+  imagesQtd: number;
 }
 
 type PartialProps = Omit<Props, "baseUrl">;
@@ -50,7 +57,8 @@ export interface State extends PartialProps {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl } = props;
+  const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl, imagesQtd } =
+    props;
 
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
@@ -78,6 +86,7 @@ export default function App(props: Props): App<Manifest, State> {
       imagesUrl,
       clientAdmin,
       clientGraphql,
+      imagesQtd,
     },
   };
 }

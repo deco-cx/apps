@@ -1,24 +1,34 @@
 import {
   AggregateOffer,
+  Filter,
   ImageObject,
   ListItem,
   Offer,
+  PageInfo,
   Product,
+  ProductListingPage,
   PropertyValue,
   Seo,
+  SortOption,
+  FilterToggleValue,
 } from "../../commerce/types.ts";
 import {
   CustomAttribute,
   MagentoCategory,
   MagentoProduct,
 } from "./client/types.ts";
-import { ProductImage } from "./clientGraphql/types.ts";
-import { ProductPrice } from "./clientGraphql/types.ts";
 import {
-  GraphQLSimpleProduct,
-  PriceRange,
+  CategoryGraphQL,
+  ProductImage,
+  ProductPLPGraphQL,
+  SearchResultPageInfo as PageInfoGraphQL,
+  SortFields as SortFieldsGraphQL,
+  Aggregation as AggregationGraphQL,
+  AggregationOption as AggregationOptGraphQL,
 } from "./clientGraphql/types.ts";
-import { IN_STOCK, OUT_OF_STOCK } from "./constants.ts";
+import { ProductPrice } from "./clientGraphql/types.ts";
+import { SimpleProductGraphQL, PriceRange } from "./clientGraphql/types.ts";
+import { IN_STOCK, OUT_OF_STOCK, SORT_OPTIONS_ORDER } from "./constants.ts";
 
 export const toProduct = ({
   product,
@@ -203,7 +213,7 @@ export const toProductGraphQL = (
     price_range,
     stock_status,
     only_x_left_in_stock,
-  }: GraphQLSimpleProduct,
+  }: SimpleProductGraphQL,
   originURL: URL,
   imagesQtd: number
 ): Product => {
@@ -229,7 +239,7 @@ export const toProductGraphQL = (
         if (acc.length === imagesQtd) {
           return acc;
         }
-        return [...acc, toImageGraphQL(media)];
+        return [...acc, toImageGraphQL(media, name)];
       }, []),
     isVariantOf: {
       "@type": "ProductGroup",
@@ -254,10 +264,13 @@ export const toProductGraphQL = (
   };
 };
 
-export const toImageGraphQL = (media: ProductImage): ImageObject => ({
+export const toImageGraphQL = (
+  media: ProductImage,
+  name: string
+): ImageObject => ({
   "@type": "ImageObject" as const,
   encodingFormat: "image",
-  alternateName: `${media.label}`,
+  alternateName: media.label ?? name,
   url: media.url,
 });
 
@@ -288,3 +301,87 @@ export const toOfferGraphQL = (
   priceCurrency: minimum_price.final_price.currency ?? "BRL",
   priceSpecification: [],
 });
+
+export const toProductListingPageGraphQL = (
+  { products }: ProductPLPGraphQL,
+  { categories }: CategoryGraphQL,
+  originURL: URL,
+  imagesQtd: number
+): ProductListingPage => {
+  const category = categories.items[0];
+  const pagination = products.page_info;
+  
+  return {
+    "@type": "ProductListingPage",
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      numberOfItems: 0,
+      itemListElement: [],
+      additionalType: category.image ?? undefined
+    },
+    filters: toFilters(products.aggregations),
+    products: products.items.map((p) =>
+      toProductGraphQL(p, originURL, imagesQtd)
+    ),
+    pageInfo: toPageInfo(pagination, products.total_count),
+    sortOptions: toSortOptions(products.sort_fields),
+    seo: {
+      title:
+        category.meta_title ??
+        `${category.name} - ${
+          category?.breadcrumbs[0]?.category_name ?? "Granado"
+        }`,
+      description: category.meta_description ?? "",
+      canonical: "",
+    },
+  };
+};
+
+const toFilters = (aggregations: Required<AggregationGraphQL>[]): Filter[] =>
+  aggregations.reduce<Filter[]>((acc, agg) => {
+    if (agg.position === null) {
+      return acc;
+    }
+
+    return [
+      ...acc,
+      {
+        "@type": "FilterToggle",
+        label: agg.label,
+        key: agg.attribute_code,
+        values: agg.options.map((opt) => toFilterValues(opt)),
+        quantity: agg.count,
+      },
+    ];
+  }, []);
+
+const toFilterValues = (option: AggregationOptGraphQL): FilterToggleValue => ({
+  quantity: option.count,
+  label: option.label,
+  value: option.value,
+  selected: false,
+  url: "",
+});
+
+const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
+  SORT_OPTIONS_ORDER.reduce<SortOption[]>((acc, opt) => {
+    const option = options.find((v) => v.value === opt);
+    if (!option) {
+      return acc;
+    }
+    return [...acc, option];
+  }, []);
+const toPageInfo = (
+  { current_page, page_size, total_pages }: PageInfoGraphQL,
+  total: number
+): PageInfo => {
+  const hasNextPage = current_page < total_pages;
+  const hasPrevPage = current_page > 1;
+  return {
+    currentPage: current_page,
+    nextPage: hasNextPage ? `?p=${current_page + 1}` : undefined,
+    previousPage: hasPrevPage ? `?p=${current_page - 1}` : undefined,
+    recordPerPage: page_size,
+    records: total,
+  };
+};

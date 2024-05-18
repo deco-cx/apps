@@ -1,13 +1,22 @@
 import { gql } from "../../../utils/graphql.ts";
-//TODO(@aka-sacci-ccr): Colocar itens que serao retornados
 
-export const sortFields = gql`
-  fragment sortFields on SortFields {
-    default
-    options {
-      label
-      value
+//TODO (@aka-sacci-ccr): Tag de novidade
+//Fragments
+export const simpleProduct = gql`
+  fragment simpleProduct on ProductInterface {
+    name
+    sku
+    canonical_url
+    url_key
+    uid
+    media_gallery {
+      ...mediaGallery
     }
+    price_range {
+      ...priceRange
+    }
+    stock_status
+    only_x_left_in_stock
   }
 `;
 
@@ -53,25 +62,39 @@ export const mediaGallery = gql`
   }
 `;
 
-//TODO (@aka-sacci-ccr): Tag de novidade
-export const simpleProduct = gql`
-  fragment simpleProduct on ProductInterface {
-    name
-    sku
-    canonical_url
-    url_key
-    uid
-    media_gallery {
-      ...mediaGallery
+export const sortFields = gql`
+  fragment sortFields on SortFields {
+    default
+    options {
+      label
+      value
     }
-    price_range {
-      ...priceRange
-    }
-    stock_status
-    only_x_left_in_stock
   }
 `;
 
+export const aggregations = gql`
+  fragment aggregations on Aggregation {
+    attribute_code
+    count
+    label
+    options {
+      count
+      label
+      value
+    }
+    position
+  }
+`;
+
+export const pageInfo = gql`
+  fragment pageInfo on SearchResultPageInfo {
+    current_page
+    page_size
+    total_pages
+  }
+`;
+
+//Queries
 export const GetProduct = {
   fragments: [simpleProduct, priceRange, mediaGallery],
   query: gql`
@@ -91,6 +114,69 @@ export const GetProduct = {
       ) {
         items {
           ...simpleProduct
+        }
+      }
+    }
+  `,
+};
+
+export const GetCategoryUid = {
+  query: gql`
+    query GetCategoryUid($path: String) {
+      categories(filters: { url_path: { eq: $path } }) {
+        items {
+          uid
+          name
+          breadcrumbs {
+            category_level
+            category_name
+            category_uid
+            category_url_key
+            category_url_path
+          }
+          image
+          meta_title
+          meta_description
+        }
+      }
+    }
+  `,
+};
+
+export const GetPLPItems = {
+  fragments: [
+    simpleProduct,
+    priceRange,
+    mediaGallery,
+    sortFields,
+    aggregations,
+    pageInfo,
+  ],
+  query: gql`
+    query GetProduct(
+      $filter: ProductAttributeFilterInput
+      $sort: ProductAttributeSortInput
+      $pageSize: Int
+      $currentPage: Int
+    ) {
+      products(
+        filter: $filter
+        sort: $sort
+        pageSize: $pageSize
+        currentPage: $currentPage
+      ) {
+        total_count
+        items {
+          ...simpleProduct
+        }
+        sort_fields {
+          ...sortFields
+        }
+        page_info {
+          ...pageInfo
+        }
+        aggregations {
+          ...aggregations
         }
       }
     }
