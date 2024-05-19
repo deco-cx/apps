@@ -25,6 +25,7 @@ import {
   SortFields as SortFieldsGraphQL,
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
+  SimpleCategoryGraphQL,
 } from "./clientGraphql/types.ts";
 import { ProductPrice } from "./clientGraphql/types.ts";
 import { SimpleProductGraphQL, PriceRange } from "./clientGraphql/types.ts";
@@ -245,7 +246,7 @@ export const toProductGraphQL = (
       "@type": "ProductGroup",
       productGroupID: uid,
       url,
-      name: name,
+      name: name.trim(),
       additionalProperty: [],
       hasVariant: [
         {
@@ -310,14 +311,23 @@ export const toProductListingPageGraphQL = (
 ): ProductListingPage => {
   const category = categories.items[0];
   const pagination = products.page_info;
-  
+  const listElements = toItemElement(category, originURL)
+
   return {
     "@type": "ProductListingPage",
     breadcrumb: {
       "@type": "BreadcrumbList",
-      numberOfItems: 0,
-      itemListElement: [],
-      additionalType: category.image ?? undefined
+      numberOfItems: listElements.length,
+      itemListElement: listElements,
+      image: category.image
+        ? [
+            {
+              "@type": "ImageObject" as const,
+              url: category.image,
+              alternateName: category.name,
+            },
+          ]
+        : undefined,
     },
     filters: toFilters(products.aggregations),
     products: products.items.map((p) =>
@@ -326,15 +336,37 @@ export const toProductListingPageGraphQL = (
     pageInfo: toPageInfo(pagination, products.total_count),
     sortOptions: toSortOptions(products.sort_fields),
     seo: {
-      title:
-        category.meta_title ??
-        `${category.name} - ${
-          category?.breadcrumbs[0]?.category_name ?? "Granado"
-        }`,
+      title: category.meta_title ?? `${category.name}`,
       description: category.meta_description ?? "",
       canonical: "",
     },
   };
+};
+
+const toItemElement = (
+  category: SimpleCategoryGraphQL,
+  url: URL
+): ListItem[] => {
+  const { pathname, origin } = url;
+  const fromBreadcrumbs = category?.breadcrumbs?.map<ListItem>((item, i) => {
+    const urlKey = item.category_url_key ?? item.category_url_path!;
+    const position = pathname.indexOf(urlKey);
+    return {
+      "@type": "ListItem",
+      item: item.category_name!,
+      position: i + 1,
+      url: new URL(pathname.substring(0, position + urlKey.length), origin)
+        .href,
+    };
+  });
+
+  const fromCategory: ListItem = {
+    "@type": "ListItem",
+    item: category.name,
+    position: (fromBreadcrumbs?.length ?? 0) + 1,
+  };
+
+  return fromBreadcrumbs ? [...fromBreadcrumbs, fromCategory] : [fromCategory];
 };
 
 const toFilters = (aggregations: Required<AggregationGraphQL>[]): Filter[] =>

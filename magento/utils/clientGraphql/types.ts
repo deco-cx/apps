@@ -36,7 +36,7 @@ export interface ProductLeafGraphQL {
 export interface CategoryLeafGraphQL {
   automatic_sorting?: string;
   available_sort_by?: Array<string>;
-  breadcrumbs?: Array<Breadcrumb>;
+  breadcrumbs?: Array<Breadcrumb> | null;
   canonical_url?: string;
   display_mode?: string;
   id?: string;

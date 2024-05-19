@@ -9,22 +9,17 @@ import { GetPLPItems, GetCategoryUid } from "../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../utils/transform.ts";
 
 export interface Props {
-  categoryProps?: CategoryProps;
   /**
    * @title Tamanho do conjunto
    * @default 36
    */
   pageSize: number;
 
-  /**
-   * @title Indice do conjunto
-   * @default 1
-   */
-  currentPage: number;
+  categoryProps?: CategoryProps;
 }
 
 export interface CategoryProps {
-  categoryUrl: string;
+  categoryUrl?: string;
 }
 
 /**
@@ -37,18 +32,28 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { clientGraphql, imagesQtd } = ctx;
-  const { pageSize, currentPage } = props;
+  const { pageSize, categoryProps } = props;
+  const currentPage = url.searchParams.get("p") ?? 1;
+  //@TODO (aka-sacci_ccr): Como pegar os settings da pagina diretamente no loader?
+  const categoryUrl =
+    categoryProps?.categoryUrl ?? url.pathname.match(/\/granado\/(.+)/)?.[1];
 
+  if (!categoryUrl) {
+    return null;
+  }
+  
   try {
     const categoryGQL = await clientGraphql.query<
       CategoryGraphQL,
       { path: string }
     >({
-      variables: { path: "perfumaria/kits" },
+      variables: { path: categoryUrl },
       ...GetCategoryUid,
     });
-
-    if (!categoryGQL.categories.items || categoryGQL.categories.items?.length === 0) {
+    if (
+      !categoryGQL.categories.items ||
+      categoryGQL.categories.items?.length === 0
+    ) {
       return null;
     }
 
@@ -59,16 +64,24 @@ const loader = async (
       variables: {
         filter: { category_uid: { eq: categoryGQL.categories.items[0].uid } },
         pageSize,
-        currentPage,
+        currentPage: Number(currentPage),
       },
       ...GetPLPItems,
     });
 
-    if (!plpItemsGQL.products.items || plpItemsGQL.products.items?.length === 0) {
+    if (
+      !plpItemsGQL.products.items ||
+      plpItemsGQL.products.items?.length === 0
+    ) {
       return null;
     }
 
-    return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, url, imagesQtd)
+    return toProductListingPageGraphQL(
+      plpItemsGQL,
+      categoryGQL,
+      url,
+      imagesQtd
+    );
   } catch (e) {
     console.log(e);
     return null;
