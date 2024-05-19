@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+import { toLinxHeaders } from "../../utils/headers.ts";
 import type { CartResponse } from "../../utils/types/basketJSON.ts";
 
 export interface Props {
@@ -14,11 +15,11 @@ const action = async (
   const response = props.Quantity > 0
     ? await ctx.api["POST /web-api/v1/Shopping/Basket/UpdateBasketItem"]({}, {
       body: props,
-      headers: req.headers,
+      headers: toLinxHeaders(req.headers),
     }).then((res) => res.json())
     : await ctx.api["POST /web-api/v1/Shopping/Basket/RemoveBasketItem"]({}, {
       body: props,
-      headers: req.headers,
+      headers: toLinxHeaders(req.headers),
     }).then((res) => res.json());
 
   if (!response.IsValid) {

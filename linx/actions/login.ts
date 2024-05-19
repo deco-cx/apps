@@ -1,5 +1,6 @@
 import { proxySetCookie } from "../../utils/cookie.ts";
 import type { AppContext } from "../mod.ts";
+import { toLinxHeaders } from "../utils/headers.ts";
 import { LoginResponse } from "../utils/types/login.ts";
 
 export interface Props {
@@ -17,7 +18,7 @@ const action = async (
       Key: props.username,
       Password: props.password,
     },
-    headers: req.headers,
+    headers: toLinxHeaders(req.headers),
   });
 
   if (response === null || !response.ok) {
