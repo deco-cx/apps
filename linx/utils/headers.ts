@@ -1,24 +1,14 @@
-import { getCookies } from "std/http/cookie.ts";
-
-const COOKIES_TO_SEND = [
-  "lscid",
-  "tkt",
-  "_bc_hash",
-];
-
-/** */
+/**
+ * Some headers can cause the linx API to error, so we always filter
+ * only the necessary ones when proxying request headers to the linx API
+ */
 export function toLinxHeaders(inputHeaders: Headers): Headers {
   const headers = new Headers();
-  const inputCookies = getCookies(inputHeaders);
 
-  let outputCookies = "";
-  for (const [key, value] of Object.entries(inputCookies)) {
-    if (key in COOKIES_TO_SEND) {
-      outputCookies += `${key}=${value};`;
-    }
+  const inputCookies = inputHeaders.get("cookie");
+  if (inputCookies) {
+    headers.set("cookie", inputCookies);
   }
-
-  headers.set("cookie", outputCookies);
 
   return headers;
 }

@@ -16,7 +16,7 @@ const loader = async (
   const { api } = ctx;
 
   const response = await api["POST /web-api/v1/Shopping/Basket/Get"]({}, {
-    headers: req.headers,
+    headers: toLinxHeaders(req.headers),
     body: {},
   });
 

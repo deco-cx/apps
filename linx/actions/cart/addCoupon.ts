@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+import { toLinxHeaders } from "../../utils/headers.ts";
 import type { CartResponse } from "../../utils/types/basketJSON.ts";
 
 export interface Props {
@@ -14,7 +15,7 @@ const action = async (
     {},
     {
       body: props,
-      headers: req.headers,
+      headers: toLinxHeaders(req.headers),
     },
   ).then((res) => res.json());
 

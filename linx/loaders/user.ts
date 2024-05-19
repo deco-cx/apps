@@ -1,4 +1,5 @@
 import type { AppContext } from "../../linx/mod.ts";
+import { toLinxHeaders } from "../utils/headers.ts";
 import { UserResponse } from "../utils/types/userJSON.ts";
 
 /**
@@ -13,7 +14,7 @@ const loader = async (
   const { api } = ctx;
 
   const response = await api["GET /Shopping/Shopper"]({}, {
-    headers: req.headers,
+    headers: toLinxHeaders(req.headers),
   });
 
   if (response === null) {

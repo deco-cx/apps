@@ -21,7 +21,7 @@ const action = async (
     {},
     {
       body: props,
-      headers: req.headers,
+      headers: toLinxHeaders(req.headers),
     },
   ).then((res) => res.json());
 
