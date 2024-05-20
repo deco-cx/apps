@@ -87,4 +87,6 @@ export default function App(
   return app;
 }
 
-export const preview = previewFromMarkdown("./README.md");
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

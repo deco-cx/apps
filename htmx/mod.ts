@@ -56,4 +56,6 @@ export default function Site(state: Props): App<Manifest, Required<Props>> {
   };
 }
 
-export const preview = previewFromMarkdown("./README.md");
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

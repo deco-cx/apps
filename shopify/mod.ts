@@ -95,4 +95,6 @@ export default function App(props: Props): App<Manifest, State> {
   };
 }
 
-export const preview = previewFromMarkdown("./README.md");
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

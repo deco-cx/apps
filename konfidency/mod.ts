@@ -26,4 +26,6 @@ export default function App(
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
-export const preview = previewFromMarkdown("./README.md");
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);
