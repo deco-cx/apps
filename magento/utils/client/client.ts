@@ -5,6 +5,7 @@ import {
   MagentoCardPrices,
   MagentoCategory,
   MagentoProduct,
+  SetShipping,
   ShippingMethod,
   User,
 } from "./types.ts";
@@ -107,5 +108,10 @@ export interface API {
     searchParams: {
       sections: string;
     };
+  };
+
+  "POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote": {
+    response: [];
+    body: SetShipping;
   };
 }
