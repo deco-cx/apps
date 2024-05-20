@@ -9,13 +9,13 @@ async function loader(
 ): Promise<Person | null> {
   const { clientAdmin, site } = ctx;
 
-  const PHPSESSID = getUserCookie(req.headers);
+  const id = getUserCookie(req.headers);
 
   try {
     const response = await clientAdmin["GET /:site/customer/section/load"]({
       site,
       sections: "customer,carbono-customer",
-    }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${PHPSESSID}` }) })
+    }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) })
       .then((
         res,
       ) => res.json());
