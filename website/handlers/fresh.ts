@@ -33,7 +33,12 @@ export default function Fresh(
   freshConfig: FreshConfig,
   appContext: Pick<
     AppContext,
-    "monitoring" | "response" | "caching" | "firstByteThresholdMS" | "isBot"
+    | "monitoring"
+    | "response"
+    | "caching"
+    | "firstByteThresholdMS"
+    | "isBot"
+    | "flavor"
   >,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
@@ -117,11 +122,17 @@ export default function Fresh(
         const timing = appContext?.monitoring?.timings?.start?.(
           "render-to-string",
         );
+
+        const renderToString = RequestContext.bind(
+          { framework: appContext.flavor?.framework ?? "fresh" },
+          ctx.render,
+        );
+
         const response = await appContext.monitoring!.tracer.startActiveSpan(
           "render-to-string",
           async (span) => {
             try {
-              const response = await ctx.render({
+              const response = await renderToString({
                 page,
                 routerInfo: {
                   flags: ctx.state.flags,

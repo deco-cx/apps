@@ -2,11 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$0 from "./sections/htmx.tsx";
+import * as $$$$$$0 from "./sections/Deferred.tsx";
+import * as $$$$$$1 from "./sections/htmx.tsx";
 
 const manifest = {
   "sections": {
-    "htmx/sections/htmx.tsx": $$$$$$0,
+    "htmx/sections/Deferred.tsx": $$$$$$0,
+    "htmx/sections/htmx.tsx": $$$$$$1,
   },
   "name": "htmx",
   "baseUrl": import.meta.url,
