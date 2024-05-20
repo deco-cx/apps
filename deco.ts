@@ -12,6 +12,8 @@ const config = {
   apps: [
     app("anthropic"),
     app("resend"),
+    app("turso"),
+    app("records"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
