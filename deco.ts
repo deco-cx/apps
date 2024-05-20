@@ -10,6 +10,8 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("turso"),
+    app("records"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
