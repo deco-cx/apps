@@ -12,50 +12,49 @@ import { toProductGraphQL } from "../utils/transform.ts";
 
 export interface CommomProps {
   /**
-   * @title Tamanho do conjunto
+   * @title Set size
    * @default 8
    */
   pageSize: number;
 
   /**
-   * @title Indice do conjunto
+   * @title Set index
    * @default 1
    */
   currentPage: number;
 
-  /** @title Ordenação */
+  /** @title Sorting */
   sort?: {
-    /** @title Ordenar por */
+    /** @title Sort by */
     sortBy: "name" | "position" | "price" | "relevance";
 
-    /** @title Sequência */
+    /** @title Order by */
     order: "ASC" | "DESC";
   };
 
-  /** @title Filtro */
+  /** @title Filter */
   filter?: Array<FilterProps>;
 }
 
 export interface FilterProps {
-  /** @title Nome do filtro */
+  /** @title Filter Name */
   input: string;
   /**
-   * @title Valores do filtro
-   * TODO(aka-sacci-ccr): Mudar lógica dos fitros - Default Filters e Customizable filters
+   * @title Filter Values
    */
   values: Array<string>;
 }
 
 export interface TermProps extends CommomProps {
-  /** @title Termo */
+  /** @title Term */
   search: string;
 }
 
 export interface CategoryProps extends CommomProps {
-  /** @title IDs das Categorias */
+  /** @title Categories IDs */
   categories: Array<string>;
 
-  /** @title Usar Uid para mapear categorias */
+  /** @title Use Uid for mapping category */
   useCategoryUid: boolean;
 }
 
@@ -64,7 +63,7 @@ export interface ProductSkuProps extends Omit<CommomProps, "filter"> {
 }
 
 export interface SegmentProps extends CommomProps {
-  /** @title Linhas */
+  /** @title Segments */
   segments: Array<string>;
 }
 
@@ -98,7 +97,6 @@ const transformFilter = ({
 };
 
 const transformFilterValue = ({ input, values }: FilterProps) => {
-  //TODO(aka-sacci-ccr): melhorar isso
   if (input === "name") {
     return {
       match: values[0],
@@ -195,9 +193,9 @@ async function loader(
       return null;
     }
 
-    return products.items.map((p) => toProductGraphQL(p, url, imagesQtd));
-  } catch (e) {
-    console.log(e)
+    return products.items.map((product) => toProductGraphQL(product, url, imagesQtd));
+  } catch (error) {
+    console.log(error)
     return null;
   }
 }

@@ -195,7 +195,6 @@ export interface ProductSearchInputs {
 }
 
 export interface ProductFilterInput {
-  //TODO(aka-sacci-ccr): Esses serao os filtros DEFAULT.
   tipo_de_pele?: FilterEqualTypeInput;
   tipo_de_pelo?: FilterEqualTypeInput;
   category_id?: FilterEqualTypeInput;

@@ -10,7 +10,7 @@ import { toProductListingPageGraphQL } from "../utils/transform.ts";
 
 export interface Props {
   /**
-   * @title Tamanho do conjunto
+   * @title Set Size
    * @default 36
    */
   pageSize: number;
@@ -34,7 +34,6 @@ const loader = async (
   const { clientGraphql, imagesQtd } = ctx;
   const { pageSize, categoryProps } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
-  //@TODO (aka-sacci_ccr): Como pegar os settings da pagina diretamente no loader?
   const categoryUrl =
     categoryProps?.categoryUrl ?? url.pathname.match(/\/granado\/(.+)/)?.[1];
 
@@ -82,8 +81,8 @@ const loader = async (
       url,
       imagesQtd
     );
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
     return null;
   }
 };

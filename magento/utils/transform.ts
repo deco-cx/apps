@@ -218,8 +218,6 @@ export const toProductGraphQL = (
   originURL: URL,
   imagesQtd: number
 ): Product => {
-  //TODO(aka-sacci-ccr): additionalProperties com flags do produto!
-  //TODO(aka-sacci-ccr): Como coloco as dimensoes da imagem na URL da mesma?
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
     stock_status === "IN_STOCK",
@@ -330,8 +328,8 @@ export const toProductListingPageGraphQL = (
         : undefined,
     },
     filters: toFilters(products.aggregations),
-    products: products.items.map((p) =>
-      toProductGraphQL(p, originURL, imagesQtd)
+    products: products.items.map((product) =>
+      toProductGraphQL(product, originURL, imagesQtd)
     ),
     pageInfo: toPageInfo(pagination, products.total_count),
     sortOptions: toSortOptions(products.sort_fields),

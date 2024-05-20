@@ -1,6 +1,4 @@
 import { gql } from "../../../utils/graphql.ts";
-
-//TODO(aka-sacci-ccr): Tag de novidade
 //Fragments
 export const simpleProduct = gql`
   fragment simpleProduct on ProductInterface {
