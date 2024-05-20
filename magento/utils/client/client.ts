@@ -5,6 +5,7 @@ import {
   MagentoCategory,
   MagentoProduct,
   ShippingMethod,
+  User,
 } from "./types.ts";
 
 interface searchParams {
@@ -91,6 +92,13 @@ export interface API {
     response: ShippingMethod[];
     body: {
       address: CustomerAddress;
+    };
+  };
+
+  "GET /:site/customer/section/load": {
+    response: User;
+    searchParams: {
+      sections: string;
     };
   };
 }

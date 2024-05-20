@@ -316,3 +316,40 @@ export interface CustomerAddress {
   countryId: string;
   postcode: string;
 }
+
+export interface User {
+  customer?: Customer;
+  "carbono-customer"?: CarbonoCustomer;
+  cart?: CartUser;
+}
+
+export interface Customer {
+  data_id: number;
+  fullname?: string;
+  firstname?: string;
+}
+
+export interface CarbonoCustomer {
+  websiteId?: string;
+  email?: string;
+  customerId?: string;
+  data_id: number;
+}
+
+export interface CartUser {
+  summary_count: number;
+  subtotalAmount: number | null;
+  subtotal: string;
+  possible_onepage_checkout: boolean;
+  items: [];
+  isGuestCheckoutAllowed: boolean;
+  website_id: string;
+  storeId: string;
+  adyen_payment_methods: unknown[];
+  extra_actions: string;
+  cart_empty_message: string;
+  subtotal_incl_tax: string;
+  subtotal_excl_tax: string;
+  mpFSBCartTotal: unknown | null;
+  data_id: number;
+}
