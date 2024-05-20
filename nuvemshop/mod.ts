@@ -12,6 +12,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 
 import { ClientOf } from "../utils/http.ts";
+import PreviewNuvemshop from "./preview/index.tsx";
 
 export type App = ReturnType<typeof Nuvemshop>;
 export type AppContext = AC<App>;
@@ -93,3 +94,5 @@ export default function Nuvemshop(
 
   return app;
 }
+
+export const Preview = PreviewNuvemshop;

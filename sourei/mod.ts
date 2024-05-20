@@ -1,5 +1,6 @@
 import type { App } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 /**
  * @title Sourei
@@ -12,3 +13,5 @@ export default function App() {
 
   return app;
 }
+
+export const preview = previewFromMarkdown("./README.md");
