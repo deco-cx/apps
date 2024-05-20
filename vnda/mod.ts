@@ -5,6 +5,7 @@ import { OpenAPI } from "./utils/openapi/vnda.openapi.gen.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import type { AppMiddlewareContext as AMC } from "deco/mod.ts";
 import { middleware } from "./middleware.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppMiddlewareContext = AMC<ReturnType<typeof VNDA>>;
 
@@ -81,3 +82,7 @@ export default function VNDA(props: Props): App<Manifest, State> {
     middleware,
   };
 }
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

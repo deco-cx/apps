@@ -1,5 +1,6 @@
 import { App, FnContext } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -54,3 +55,7 @@ export default function Site(state: Props): App<Manifest, Required<Props>> {
     manifest,
   };
 }
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);
