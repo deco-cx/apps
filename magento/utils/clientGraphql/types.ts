@@ -53,7 +53,7 @@ export interface CategoryLeafGraphQL {
   url_suffix?: string;
   meta_title?: string | null;
   meta_description?: string | null;
-  name?: string;
+  name?: string
 }
 
 export interface CategoryProducts {
@@ -161,10 +161,7 @@ export type SimpleProductGraphQL = Required<
 >;
 
 export type SimpleCategoryGraphQL = Required<
-  Pick<
-    CategoryLeafGraphQL,
-    "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name"
-  >
+  Pick<CategoryLeafGraphQL, "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name">
 >;
 
 export interface ProductShelfGraphQL {
@@ -185,7 +182,7 @@ export interface ProductPLPGraphQL {
     page_info: SearchResultPageInfo;
     sort_fields: SortFields;
     aggregations: Array<Required<Aggregation>>;
-    total_count: number;
+    total_count: number
   };
 }
 
@@ -198,7 +195,9 @@ export interface ProductSearchInputs {
 }
 
 export interface ProductFilterInput {
-  tipo_de_pele?: FilterEqualTypeInput;
+  [key: string]: FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput,
+  //TODO(aka-sacci-ccr): Esses serao os filtros DEFAULT.
+  /* tipo_de_pele?: FilterEqualTypeInput;
   tipo_de_pelo?: FilterEqualTypeInput;
   category_id?: FilterEqualTypeInput;
   category_uid?: FilterEqualTypeInput;
@@ -209,7 +208,8 @@ export interface ProductFilterInput {
   sku?: FilterEqualTypeInput;
   url_key?: FilterEqualTypeInput;
   volume?: FilterEqualTypeInput;
-  name?: FilterMatchTypeInput;
+  name?: FilterMatchTypeInput; */
+  
 }
 
 export interface FilterEqualTypeInput {
@@ -218,18 +218,40 @@ export interface FilterEqualTypeInput {
 }
 
 export interface FilterMatchTypeInput {
-  match?: string;
+  match: string;
   match_type?: "FULL" | "PARTIAL";
 }
 
 export interface FilterRangeTypeInput {
-  from?: string;
-  to?: string;
+  from: string;
+  to: string;
 }
 
 export interface ProductSortInput {
-  name?: "ASC" | "DESC";
-  position?: "ASC" | "DESC";
-  price?: "ASC" | "DESC";
-  relevance?: "ASC" | "DESC";
+  [key: string]: "ASC" | "DESC";
+}
+
+export interface DefaultProductSortOption {
+  value: "name" | "position" | "price" | "relevance";
+}
+
+export interface CustomProductSortOption {
+  value: string;
+}
+
+export interface ProductSort {
+  /** @title Ordenar por */
+  sortBy: DefaultProductSortOption | CustomProductSortOption
+  /** @title Sequência */
+  order: "ASC" | "DESC";
+}
+
+export interface FiltersGraphQL {
+  value: string,
+  type: "EQUAL" | "MATCH" | "RANGE"
+}
+
+export interface FilterProps {
+  name: string,
+  type: FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput
 }

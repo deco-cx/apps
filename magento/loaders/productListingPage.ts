@@ -4,9 +4,12 @@ import {
   CategoryGraphQL,
   ProductPLPGraphQL,
   ProductSearchInputs,
+  ProductSort,
+  FilterProps
 } from "../utils/clientGraphql/types.ts";
-import { GetCategoryUid, GetPLPItems } from "../utils/clientGraphql/queries.ts";
+import { GetPLPItems, GetCategoryUid } from "../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../utils/transform.ts";
+import { transformFilterGraphQL, transformSortGraphQL } from "../utils/utils.ts";
 
 export interface Props {
   /**
@@ -20,7 +23,10 @@ export interface Props {
 
 export interface CategoryProps {
   categoryUrl?: string;
+  sortOptions?: ProductSort;
+  filters?: Array<FilterProps>
 }
+
 
 /**
  * @title Magento Integration - PLP
@@ -28,19 +34,32 @@ export interface CategoryProps {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
-  const { clientGraphql, imagesQtd } = ctx;
+  const { clientGraphql, imagesQtd, customFilters } = ctx;
   const { pageSize, categoryProps } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
-  const categoryUrl = categoryProps?.categoryUrl ??
-    url.pathname.match(/\/granado\/(.+)/)?.[1];
+  const sortFromUrl = url.searchParams.get("product_list_order");
+  const { sortBy, order } = categoryProps?.sortOptions ?? {
+    sortBy: sortFromUrl
+      ? {
+          value: sortFromUrl,
+        }
+      : undefined,
+    order: "ASC",
+  };
+  //TODO (aka-sacci_ccr): Como pegar os settings da pagina diretamente no loader?
+  const categoryUrl =
+    categoryProps?.categoryUrl ?? url.pathname.match(/\/granado\/(.+)/)?.[1];
+
 
   if (!categoryUrl) {
     return null;
   }
 
+  const test = transformFilterGraphQL(url, customFilters, categoryProps?.filters)
+  console.log(test)
   try {
     const categoryGQL = await clientGraphql.query<
       CategoryGraphQL,
@@ -64,6 +83,7 @@ const loader = async (
         filter: { category_uid: { eq: categoryGQL.categories.items[0].uid } },
         pageSize,
         currentPage: Number(currentPage),
+        sort: transformSortGraphQL({ sortBy: sortBy!, order }),
       },
       ...GetPLPItems,
     });
@@ -79,10 +99,10 @@ const loader = async (
       plpItemsGQL,
       categoryGQL,
       url,
-      imagesQtd,
+      imagesQtd
     );
-  } catch (error) {
-    console.log(error);
+  } catch (e) {
+    console.log(e);
     return null;
   }
 };

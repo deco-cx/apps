@@ -1,7 +1,6 @@
 import {
   AggregateOffer,
   Filter,
-  FilterToggleValue,
   ImageObject,
   ListItem,
   Offer,
@@ -11,6 +10,7 @@ import {
   PropertyValue,
   Seo,
   SortOption,
+  FilterToggleValue,
 } from "../../commerce/types.ts";
 import {
   CustomAttribute,
@@ -18,17 +18,17 @@ import {
   MagentoProduct,
 } from "./client/types.ts";
 import {
-  Aggregation as AggregationGraphQL,
-  AggregationOption as AggregationOptGraphQL,
   CategoryGraphQL,
   ProductImage,
   ProductPLPGraphQL,
   SearchResultPageInfo as PageInfoGraphQL,
-  SimpleCategoryGraphQL,
   SortFields as SortFieldsGraphQL,
+  Aggregation as AggregationGraphQL,
+  AggregationOption as AggregationOptGraphQL,
+  SimpleCategoryGraphQL,
 } from "./clientGraphql/types.ts";
 import { ProductPrice } from "./clientGraphql/types.ts";
-import { PriceRange, SimpleProductGraphQL } from "./clientGraphql/types.ts";
+import { SimpleProductGraphQL, PriceRange } from "./clientGraphql/types.ts";
 import { IN_STOCK, OUT_OF_STOCK, SORT_OPTIONS_ORDER } from "./constants.ts";
 
 export const toProduct = ({
@@ -48,7 +48,7 @@ export const toProduct = ({
       "@type": "PropertyValue",
       name: attr.attribute_code,
       value: String(attr.value),
-    }),
+    })
   );
 
   return {
@@ -147,7 +147,7 @@ export const toBreadcrumbList = (
   categories: (MagentoCategory | null)[],
   isBreadcrumbProductName: boolean,
   product: Product,
-  url: URL,
+  url: URL
 ) => {
   if (isBreadcrumbProductName && categories?.length === 0) {
     return [
@@ -179,11 +179,11 @@ export const toBreadcrumbList = (
 
 export const toSeo = (
   customAttributes: CustomAttribute[],
-  productURL: string,
+  productURL: string
 ): Seo => {
   const findAttribute = (attrCode: string): string => {
     const attribute = customAttributes.find(
-      (attr) => attr.attribute_code === attrCode,
+      (attr) => attr.attribute_code === attrCode
     );
     if (!attribute) return "";
     if (Array.isArray(attribute.value)) {
@@ -216,12 +216,14 @@ export const toProductGraphQL = (
     only_x_left_in_stock,
   }: SimpleProductGraphQL,
   originURL: URL,
-  imagesQtd: number,
+  imagesQtd: number
 ): Product => {
+  //TODO(aka-sacci-ccr): additionalProperties com flags do produto!
+  //TODO(aka-sacci-ccr): Como coloco as dimensoes da imagem na URL da mesma?
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
     stock_status === "IN_STOCK",
-    only_x_left_in_stock,
+    only_x_left_in_stock
   );
   const url = new URL(canonical_url ?? url_key, originURL.origin).href;
 
@@ -265,7 +267,7 @@ export const toProductGraphQL = (
 
 export const toImageGraphQL = (
   media: ProductImage,
-  name: string,
+  name: string
 ): ImageObject => ({
   "@type": "ImageObject" as const,
   encodingFormat: "image",
@@ -276,7 +278,7 @@ export const toImageGraphQL = (
 export const toAggOfferGraphQL = (
   { maximum_price, minimum_price }: PriceRange,
   inStock: boolean,
-  stockLeft?: number,
+  stockLeft?: number
 ): AggregateOffer => ({
   "@type": "AggregateOffer",
   highPrice: maximum_price.regular_price.value,
@@ -288,7 +290,7 @@ export const toAggOfferGraphQL = (
 export const toOfferGraphQL = (
   minimum_price: ProductPrice,
   inStock: boolean,
-  stockLeft?: number,
+  stockLeft?: number
 ): Offer => ({
   "@type": "Offer",
   availability: inStock ? IN_STOCK : OUT_OF_STOCK,
@@ -305,11 +307,11 @@ export const toProductListingPageGraphQL = (
   { products }: ProductPLPGraphQL,
   { categories }: CategoryGraphQL,
   originURL: URL,
-  imagesQtd: number,
+  imagesQtd: number
 ): ProductListingPage => {
   const category = categories.items[0];
   const pagination = products.page_info;
-  const listElements = toItemElement(category, originURL);
+  const listElements = toItemElement(category, originURL)
 
   return {
     "@type": "ProductListingPage",
@@ -319,19 +321,19 @@ export const toProductListingPageGraphQL = (
       itemListElement: listElements,
       image: category.image
         ? [
-          {
-            "@type": "ImageObject" as const,
-            url: category.image,
-            alternateName: category.name,
-          },
-        ]
+            {
+              "@type": "ImageObject" as const,
+              url: category.image,
+              alternateName: category.name,
+            },
+          ]
         : undefined,
     },
-    filters: toFilters(products.aggregations),
-    products: products.items.map((product) =>
-      toProductGraphQL(product, originURL, imagesQtd)
+    filters: toFilters(products.aggregations, originURL),
+    products: products.items.map((p) =>
+      toProductGraphQL(p, originURL, imagesQtd)
     ),
-    pageInfo: toPageInfo(pagination, products.total_count),
+    pageInfo: toPageInfo(pagination, products.total_count, originURL),
     sortOptions: toSortOptions(products.sort_fields),
     seo: {
       title: category.meta_title ?? `${category.name}`,
@@ -343,7 +345,7 @@ export const toProductListingPageGraphQL = (
 
 const toItemElement = (
   category: SimpleCategoryGraphQL,
-  url: URL,
+  url: URL
 ): ListItem[] => {
   const { pathname, origin } = url;
   const fromBreadcrumbs = category?.breadcrumbs?.map<ListItem>((item, i) => {
@@ -367,7 +369,7 @@ const toItemElement = (
   return fromBreadcrumbs ? [...fromBreadcrumbs, fromCategory] : [fromCategory];
 };
 
-const toFilters = (aggregations: Required<AggregationGraphQL>[]): Filter[] =>
+const toFilters = (aggregations: Required<AggregationGraphQL>[], _url: URL): Filter[] =>
   aggregations.reduce<Filter[]>((acc, agg) => {
     if (agg.position === null) {
       return acc;
@@ -401,16 +403,30 @@ const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
     }
     return [...acc, option];
   }, []);
+
 const toPageInfo = (
   { current_page, page_size, total_pages }: PageInfoGraphQL,
   total: number,
+  url: URL
 ): PageInfo => {
   const hasNextPage = current_page < total_pages;
   const hasPrevPage = current_page > 1;
+  const params = url.searchParams;
+  const nextPage = new URLSearchParams(params);
+  const previousPage = new URLSearchParams(params);
+
+  if (hasNextPage) {
+    nextPage.set("p", (current_page + 1).toString());
+  }
+
+  if (hasPrevPage) {
+    previousPage.set("p", (current_page - 1).toString());
+  }
+
   return {
     currentPage: current_page,
-    nextPage: hasNextPage ? `?p=${current_page + 1}` : undefined,
-    previousPage: hasPrevPage ? `?p=${current_page - 1}` : undefined,
+    nextPage: hasNextPage ? `?${nextPage}` : undefined,
+    previousPage: hasPrevPage ? `?${previousPage}`: undefined,
     recordPerPage: page_size,
     records: total,
   };

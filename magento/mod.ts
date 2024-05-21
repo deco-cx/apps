@@ -4,6 +4,7 @@ import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import { FiltersGraphQL } from "./utils/clientGraphql/types.ts";
 
 export interface Props {
   /**
@@ -41,6 +42,12 @@ export interface Props {
    * @default 3
    */
   imagesQtd: number;
+
+  /**
+   * @title Filtros Customizados
+   * @description Filtros próprios customizados da aplicação.
+   */
+  customFilters: Array<FiltersGraphQL>;
 }
 
 type PartialProps = Omit<Props, "baseUrl">;
@@ -57,8 +64,16 @@ export interface State extends PartialProps {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl, imagesQtd } =
-    props;
+  const {
+    baseUrl,
+    site,
+    storeId,
+    apiKey,
+    currencyCode,
+    imagesUrl,
+    imagesQtd,
+    customFilters = [],
+  } = props;
 
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
@@ -75,7 +90,6 @@ export default function App(props: Props): App<Manifest, State> {
       Authorization: `Bearer ${apiKey}`,
     }),
   });
-
   return {
     manifest,
     state: {
@@ -87,6 +101,7 @@ export default function App(props: Props): App<Manifest, State> {
       clientAdmin,
       clientGraphql,
       imagesQtd,
+      customFilters,
     },
   };
 }
