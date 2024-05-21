@@ -1,7 +1,7 @@
 //Leaf Elements
-export interface GraphQLProductLeaf {
-  canonical_url: string;
-  categories?: Array<Omit<GraphQLCategoryLeaf, "products">>;
+export interface ProductLeafGraphQL {
+  canonical_url?: string;
+  categories?: Array<Omit<CategoryLeafGraphQL, "products">>;
   country_of_manufacture?: string;
   created_at?: string;
   description?: {
@@ -30,28 +30,19 @@ export interface GraphQLProductLeaf {
   thumbnail?: ProductImage;
   uid?: string;
   url_key?: string;
-  url_rewrites?: Array<UrlRewrite>
+  url_rewrites?: Array<UrlRewrite>;
 }
 
-export interface GraphQLProductQueryLeaf {
-  total_count?: number;
-  items?: GraphQLProductLeaf[];
-  //TODO@aka-sacci-ccr): AGGREGGATION FILTER INPUT
-  aggreggations?: Aggreggation[];
-  page_info?: SearchResultPageInfo;
-  sort_fields?: SortFields;
-  suggestions?: SearchSuggestion[];
-}
-
-export interface GraphQLCategoryLeaf {
+export interface CategoryLeafGraphQL {
   automatic_sorting?: string;
   available_sort_by?: Array<string>;
-  breadcrumbs?: Array<Breadcrumb>;
+  breadcrumbs?: Array<Breadcrumb> | null;
   canonical_url?: string;
   display_mode?: string;
   id?: string;
   include_in_menu?: string;
   is_anchor?: string;
+  image?: string | null;
   uid?: string;
   path_in_store?: string;
   product_count?: number;
@@ -60,12 +51,15 @@ export interface GraphQLCategoryLeaf {
   url_key?: string;
   url_path?: string;
   url_suffix?: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  name?: string
 }
 
 export interface CategoryProducts {
   total_count?: number;
   page_info?: SearchResultPageInfo;
-  items?: Array<Omit<GraphQLProductLeaf, "category">>;
+  items?: Array<Omit<ProductLeafGraphQL, "category">>;
 }
 
 export interface Breadcrumb {
@@ -77,41 +71,41 @@ export interface Breadcrumb {
   category_url_path?: string;
 }
 
-export interface Aggreggation {
+export interface Aggregation {
   attribute_code?: string;
   count?: number;
   label?: string;
-  position?: number;
-  options?: AggreggationOption[];
+  position?: number | null;
+  options?: AggregationOption[];
 }
 
-export interface AggreggationOption {
-  count?: number;
-  label?: string;
-  value?: string;
+export interface AggregationOption {
+  count: number;
+  label: string;
+  value: string;
 }
 
 export interface ProductImage {
-  disabled?: boolean;
-  label?: string;
-  position?: number;
-  url?: string;
+  disabled: boolean;
+  label: string;
+  position: number;
+  url: string;
 }
 
 export interface SearchResultPageInfo {
-  current_page?: number;
-  page_size?: number;
-  total_pages?: number;
+  current_page: number;
+  page_size: number;
+  total_pages: number;
 }
 
 export interface SortFields {
   default?: string;
-  options?: SortField[];
+  options: SortField[];
 }
 
 export interface SortField {
-  label?: string;
-  value?: string;
+  label: string;
+  value: string;
 }
 
 export interface SearchSuggestion {
@@ -119,19 +113,19 @@ export interface SearchSuggestion {
 }
 
 export interface PriceRange {
-  maximum_price?: ProductPrice;
-  minimum_price?: ProductPrice;
+  maximum_price: ProductPrice;
+  minimum_price: ProductPrice;
 }
 
 export interface ProductPrice {
-  discount?: ProductDiscount;
-  final_price?: Money;
-  regular_price?: Money;
+  discount: ProductDiscount;
+  final_price: Money;
+  regular_price: Money;
 }
 
 export interface ProductDiscount {
-  amount_off?: number;
-  percent_off?: number;
+  amount_off: number;
+  percent_off: number;
 }
 
 export interface Money {
@@ -150,20 +144,57 @@ export interface HttpQueryParameter {
 }
 
 //Inputs and Returns
-export interface GraphQLProductShelf {
-  //TODO(@aka-sacci-ccr): Pick so nos itens necessários
-  products: GraphQLProductQueryLeaf;
+
+export type SimpleProductGraphQL = Required<
+  Pick<
+    ProductLeafGraphQL,
+    | "sku"
+    | "url_key"
+    | "uid"
+    | "media_gallery"
+    | "price_range"
+    | "stock_status"
+    | "canonical_url"
+    | "name"
+    | "only_x_left_in_stock"
+  >
+>;
+
+export type SimpleCategoryGraphQL = Required<
+  Pick<CategoryLeafGraphQL, "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name">
+>;
+
+export interface ProductShelfGraphQL {
+  products: {
+    items: SimpleProductGraphQL[];
+  };
 }
 
-export interface GraphQLProductShelfInputs {
+export interface CategoryGraphQL {
+  categories: {
+    items: SimpleCategoryGraphQL[];
+  };
+}
+
+export interface ProductPLPGraphQL {
+  products: {
+    items: SimpleProductGraphQL[];
+    page_info: SearchResultPageInfo;
+    sort_fields: SortFields;
+    aggregations: Array<Required<Aggregation>>;
+    total_count: number
+  };
+}
+
+export interface ProductSearchInputs {
   search?: string;
   pageSize?: number;
   currentPage?: number;
-  filter?: GraphQLProductFilterInput;
-  sort?: GraphQLProductSortInput;
+  filter?: ProductFilterInput;
+  sort?: ProductSortInput;
 }
 
-export interface GraphQLProductFilterInput {
+export interface ProductFilterInput {
   tipo_de_pele?: FilterEqualTypeInput;
   tipo_de_pelo?: FilterEqualTypeInput;
   category_id?: FilterEqualTypeInput;
@@ -193,7 +224,7 @@ export interface FilterRangeTypeInput {
   to?: string;
 }
 
-export interface GraphQLProductSortInput {
+export interface ProductSortInput {
   name?: "ASC" | "DESC";
   position?: "ASC" | "DESC";
   price?: "ASC" | "DESC";

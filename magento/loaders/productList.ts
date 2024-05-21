@@ -1,60 +1,60 @@
-import type { ProductDetailsPage } from "../../commerce/types.ts";
+import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
-  GraphQLProductShelf,
-  GraphQLProductShelfInputs,
-  GraphQLProductSortInput,
-  GraphQLProductFilterInput,
+  ProductShelfGraphQL,
+  ProductSearchInputs,
+  ProductSortInput,
+  ProductFilterInput,
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
 import { typeChecker } from "../utils/utils.ts";
+import { toProductGraphQL } from "../utils/transform.ts";
 
 export interface CommomProps {
   /**
-   * @title Tamanho do conjunto
+   * @title Set size
    * @default 8
    */
   pageSize: number;
 
   /**
-   * @title Indice do conjunto
+   * @title Set index
    * @default 1
    */
   currentPage: number;
 
-  /** @title Ordenação */
+  /** @title Sorting */
   sort?: {
-    /** @title Ordenar por */
+    /** @title Sort by */
     sortBy: "name" | "position" | "price" | "relevance";
 
-    /** @title Sequência */
+    /** @title Order by */
     order: "ASC" | "DESC";
   };
 
-  /** @title Filtro */
+  /** @title Filter */
   filter?: Array<FilterProps>;
 }
 
 export interface FilterProps {
-  /** @title Nome do filtro */
+  /** @title Filter Name */
   input: string;
   /**
-   * @title Valores do filtro
-   * @description Caso o filtro for "name", apenas o primeiro valor informado será considerado
+   * @title Filter Values
    */
   values: Array<string>;
 }
 
 export interface TermProps extends CommomProps {
-  /** @title Termo */
+  /** @title Term */
   search: string;
 }
 
 export interface CategoryProps extends CommomProps {
-  /** @title IDs das Categorias */
+  /** @title Categories IDs */
   categories: Array<string>;
 
-  /** @title Usar Uid para mapear categorias */
+  /** @title Use Uid for mapping category */
   useCategoryUid: boolean;
 }
 
@@ -63,17 +63,20 @@ export interface ProductSkuProps extends Omit<CommomProps, "filter"> {
 }
 
 export interface SegmentProps extends CommomProps {
-  /** @title Linhas */
+  /** @title Segments */
   segments: Array<string>;
 }
 
+/**
+ * @title Magento Integration - Product Lists
+ */
 export interface Props {
   props: TermProps | CategoryProps | ProductSkuProps | SegmentProps;
 }
 
 const transformSort = ({
   sort,
-}: Pick<CommomProps, "sort">): GraphQLProductSortInput | undefined => {
+}: Pick<CommomProps, "sort">): ProductSortInput | undefined => {
   if (!sort?.sortBy) {
     return undefined;
   }
@@ -84,8 +87,8 @@ const transformSort = ({
 
 const transformFilter = ({
   filter,
-}: Pick<CommomProps, "filter">): GraphQLProductFilterInput | undefined => {
-  return filter?.reduce<GraphQLProductFilterInput>((acc, f) => {
+}: Pick<CommomProps, "filter">): ProductFilterInput | undefined => {
+  return filter?.reduce<ProductFilterInput>((acc, f) => {
     return {
       ...acc,
       [f.input]: transformFilterValue(f),
@@ -102,7 +105,7 @@ const transformFilterValue = ({ input, values }: FilterProps) => {
   return values.length === 1 ? { eq: values[0] } : { in: values.map((v) => v) };
 };
 
-const fromProps = ({ props }: Props): GraphQLProductShelfInputs => {
+const fromProps = ({ props }: Props): ProductSearchInputs => {
   if (typeChecker<TermProps>(props as TermProps, "search")) {
     const { search, filter } = props as TermProps;
     return {
@@ -170,28 +173,31 @@ const fromProps = ({ props }: Props): GraphQLProductShelfInputs => {
  * @title Magento Integration - Product Listing loader
  */
 async function loader(
-  props: Props,
-  _req: Request,
+  { props }: Props,
+  req: Request,
   ctx: AppContext
-): Promise<ProductDetailsPage | null> {
-  const { clientGraphql } = ctx;
-  const formatedProps = fromProps({ props: props.props });
+): Promise<Product[] | null> {
+  const { clientGraphql, imagesQtd } = ctx;
+  const url = new URL(req.url);
+  const formatedProps = fromProps({ props });
   try {
-    const data = await clientGraphql.query<
-      GraphQLProductShelf,
-      GraphQLProductShelfInputs
+    const { products } = await clientGraphql.query<
+      ProductShelfGraphQL,
+      ProductSearchInputs
     >({
       variables: { ...formatedProps },
       ...GetProduct,
     });
-    //TODO(@aka-sacci-ccr): toGraphQLProduct
-    console.log(data);
+
+    if (!products.items || products.items?.length === 0) {
+      return null;
+    }
+
+    return products.items.map((product) => toProductGraphQL(product, url, imagesQtd));
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return null;
   }
-
-  return null;
 }
 
 export default loader;
