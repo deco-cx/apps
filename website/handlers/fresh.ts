@@ -165,7 +165,6 @@ export default function Fresh(
         status: 500,
       });
     } finally {
-      req.signal.removeEventListener("abort", abortHandler);
       if (firstByteThreshold) {
         clearTimeout(firstByteThreshold);
       }
