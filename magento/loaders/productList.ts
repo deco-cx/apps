@@ -1,10 +1,10 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
-  ProductShelfGraphQL,
-  ProductSearchInputs,
-  ProductSortInput,
   ProductFilterInput,
+  ProductSearchInputs,
+  ProductShelfGraphQL,
+  ProductSortInput,
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
 import { typeChecker } from "../utils/utils.ts";
@@ -175,7 +175,7 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
 async function loader(
   { props }: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[] | null> {
   const { clientGraphql, imagesQtd } = ctx;
   const url = new URL(req.url);
@@ -193,9 +193,11 @@ async function loader(
       return null;
     }
 
-    return products.items.map((product) => toProductGraphQL(product, url, imagesQtd));
+    return products.items.map((product) =>
+      toProductGraphQL(product, url, imagesQtd)
+    );
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return null;
   }
 }

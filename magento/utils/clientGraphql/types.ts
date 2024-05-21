@@ -53,7 +53,7 @@ export interface CategoryLeafGraphQL {
   url_suffix?: string;
   meta_title?: string | null;
   meta_description?: string | null;
-  name?: string
+  name?: string;
 }
 
 export interface CategoryProducts {
@@ -161,7 +161,10 @@ export type SimpleProductGraphQL = Required<
 >;
 
 export type SimpleCategoryGraphQL = Required<
-  Pick<CategoryLeafGraphQL, "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name">
+  Pick<
+    CategoryLeafGraphQL,
+    "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name"
+  >
 >;
 
 export interface ProductShelfGraphQL {
@@ -182,7 +185,7 @@ export interface ProductPLPGraphQL {
     page_info: SearchResultPageInfo;
     sort_fields: SortFields;
     aggregations: Array<Required<Aggregation>>;
-    total_count: number
+    total_count: number;
   };
 }
 

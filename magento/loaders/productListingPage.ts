@@ -5,7 +5,7 @@ import {
   ProductPLPGraphQL,
   ProductSearchInputs,
 } from "../utils/clientGraphql/types.ts";
-import { GetPLPItems, GetCategoryUid } from "../utils/clientGraphql/queries.ts";
+import { GetCategoryUid, GetPLPItems } from "../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../utils/transform.ts";
 
 export interface Props {
@@ -28,19 +28,19 @@ export interface CategoryProps {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { clientGraphql, imagesQtd } = ctx;
   const { pageSize, categoryProps } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
-  const categoryUrl =
-    categoryProps?.categoryUrl ?? url.pathname.match(/\/granado\/(.+)/)?.[1];
+  const categoryUrl = categoryProps?.categoryUrl ??
+    url.pathname.match(/\/granado\/(.+)/)?.[1];
 
   if (!categoryUrl) {
     return null;
   }
-  
+
   try {
     const categoryGQL = await clientGraphql.query<
       CategoryGraphQL,
@@ -79,7 +79,7 @@ const loader = async (
       plpItemsGQL,
       categoryGQL,
       url,
-      imagesQtd
+      imagesQtd,
     );
   } catch (error) {
     console.log(error);
