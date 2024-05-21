@@ -45,7 +45,6 @@ export default function App(
   { account, cdn, integrationToken }: State,
 ) {
   const token = integrationToken.get();
-  console.log({ token });
   const headers = new Headers({
     "Accept": "application/json",
     "User-Agent":
