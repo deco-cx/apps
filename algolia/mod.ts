@@ -3,6 +3,7 @@ import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
 import algolia from "npm:algoliasearch@4.20.0";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -74,3 +75,7 @@ export default function App(
 
   return app;
 }
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

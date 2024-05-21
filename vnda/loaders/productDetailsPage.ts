@@ -26,7 +26,14 @@ async function loader(
   if (!slug) return null;
 
   const variantId = url.searchParams.get("skuId") || null;
-  const { id } = parseSlug(slug);
+  const fromSlug = parseSlug(slug);
+
+  // 404: invalid slug
+  if (!fromSlug) {
+    return null;
+  }
+
+  const { id } = fromSlug;
 
   const getMaybeProduct = async (id: number) => {
     try {
@@ -35,7 +42,12 @@ async function loader(
         include_images: "true",
       }, STALE);
       return result.json();
-    } catch (_error) {
+    } catch (error) {
+      // Make async rendering work
+      if (error instanceof DOMException && error.name === "AbortError") {
+        throw error;
+      }
+
       return null;
     }
   };
@@ -50,7 +62,12 @@ async function loader(
           productId: id,
         }, STALE);
         return result.json();
-      } catch (_error) {
+      } catch (error) {
+        // Make async rendering work
+        if (error instanceof DOMException && error.name === "AbortError") {
+          throw error;
+        }
+
         return null;
       }
     }
