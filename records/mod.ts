@@ -1,7 +1,7 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import TursoApp, { Props as TursoProps } from "../turso/mod.ts";
-import { drizzle } from "npm:drizzle-orm@0.30.10/libsql";
+import { drizzle } from "https://esm.sh/drizzle-orm@0.30.10/libsql";
 
 export interface Props extends TursoProps {}
 
