@@ -19,7 +19,7 @@ const HOP_BY_HOP = [
 const noTrailingSlashes = (str: string) =>
   str.at(-1) === "/" ? str.slice(0, -1) : str;
 const sanitize = (str: string) => str.startsWith("/") ? str : `/${str}`;
-const removeCFHeaders = (headers: Headers) => {
+export const removeCFHeaders = (headers: Headers) => {
   headers.forEach((_value, key) => {
     if (key.startsWith("cf-")) {
       headers.delete(key);
