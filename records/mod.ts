@@ -1,6 +1,6 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import TursoApp, { Props as TursoProps } from "../turso/mod.ts";
+import tursoApp, { Props as TursoProps } from "../turso/mod.ts";
 
 export interface Props extends TursoProps {}
 
@@ -13,18 +13,19 @@ export interface Props extends TursoProps {}
 export default function Records(
   { url, authToken, ...state }: Props,
 ) {
-  const tursoApp = TursoApp({ url, authToken });
+  const tursoAppInstance = tursoApp({ url, authToken });
+  const sqlClient = tursoAppInstance.state.client;
 
   const appState = {
     ...state,
-    sqlClient: tursoApp.state.client,
+    sqlClient,
   };
 
-  const app: App<Manifest, typeof appState, [typeof tursoApp]> = {
+  const app: App<Manifest, typeof appState, [typeof tursoAppInstance]> = {
     manifest,
     state: appState,
     dependencies: [
-      tursoApp,
+      tursoAppInstance,
     ],
   };
 
