@@ -8,7 +8,7 @@ interface FilterGroup {
 }
 
 interface SearchCriteria {
-  [key: string]: FilterGroup[];
+  [key: string]: string | number | FilterGroup[];
 }
 
 type Path = string;
@@ -22,6 +22,7 @@ function traverse(data: TraverseObj, result: Record<Path, string>, path: Path) {
   } else if (typeof data === "object" && data !== null) {
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
+        // @ts-ignore recursive function
         traverse(data[key], result, `${path}[${key}]`);
       }
     }

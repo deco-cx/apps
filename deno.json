@@ -27,10 +27,14 @@
   "githooks": {
     "pre-commit": "check"
   },
-  "exclude": ["static", "README.md", "**/README.md"],
+  "exclude": [
+    "static",
+    "README.md",
+    "**/README.md"
+  ],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "version": "0.40.0"
+  "version": "0.40.1"
 }
