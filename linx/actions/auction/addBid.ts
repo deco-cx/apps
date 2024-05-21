@@ -27,11 +27,6 @@ const action = async (
 
   const data = await response.json();
 
-  if (!data.IsValid) {
-    ctx.response.status = 400;
-    return data;
-  }
-
   return data;
 };
 
