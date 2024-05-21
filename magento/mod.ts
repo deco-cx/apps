@@ -37,15 +37,15 @@ export interface Props {
   imagesUrl: string;
 
   /**
-   * @title Imagens por vitrine (max)
-   * @description Quantidade máxima de imagens por vitrine
+   * @title Images per shelf (max)
+   * @description Max images qtd per shelf
    * @default 3
    */
   imagesQtd: number;
 
   /**
-   * @title Filtros Customizados
-   * @description Filtros próprios customizados da aplicação.
+   * @title Custom Filters
+   * @description Application own filters
    */
   customFilters: Array<FiltersGraphQL>;
 }

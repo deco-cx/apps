@@ -196,20 +196,6 @@ export interface ProductSearchInputs {
 
 export interface ProductFilterInput {
   [key: string]: FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput,
-  //TODO(aka-sacci-ccr): Esses serao os filtros DEFAULT.
-  /* tipo_de_pele?: FilterEqualTypeInput;
-  tipo_de_pelo?: FilterEqualTypeInput;
-  category_id?: FilterEqualTypeInput;
-  category_uid?: FilterEqualTypeInput;
-  familia_olfativa?: FilterEqualTypeInput;
-  fragancias?: FilterEqualTypeInput;
-  linha?: FilterEqualTypeInput;
-  marca?: FilterEqualTypeInput;
-  sku?: FilterEqualTypeInput;
-  url_key?: FilterEqualTypeInput;
-  volume?: FilterEqualTypeInput;
-  name?: FilterMatchTypeInput; */
-  
 }
 
 export interface FilterEqualTypeInput {
@@ -253,5 +239,5 @@ export interface FiltersGraphQL {
 
 export interface FilterProps {
   name: string,
-  type: FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput
+  type: Omit<FilterEqualTypeInput, "eq"> | FilterMatchTypeInput | FilterRangeTypeInput
 }

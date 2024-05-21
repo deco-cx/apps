@@ -26,7 +26,9 @@ export interface Props {
 
 export interface CategoryProps {
   categoryUrl?: string;
+  /** @title Sorting */
   sortOptions?: ProductSort;
+  /** @title Filters */
   filters?: Array<FilterProps>;
 }
 
@@ -73,12 +75,6 @@ const loader = async (
       return null;
     }
 
-    const appliedFilters = transformFilterGraphQL(
-      url,
-      customFilters,
-      categoryProps?.filters
-    );
-
     const plpItemsGQL = await clientGraphql.query<
       ProductPLPGraphQL,
       Omit<ProductSearchInputs, "search">
@@ -86,7 +82,7 @@ const loader = async (
       variables: {
         filter: {
           category_uid: { eq: categoryGQL.categories.items[0].uid },
-          ...appliedFilters,
+          ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
         },
         pageSize,
         currentPage: Number(currentPage),
@@ -106,11 +102,10 @@ const loader = async (
       plpItemsGQL,
       categoryGQL,
       url,
-      imagesQtd,
-      appliedFilters
+      imagesQtd
     );
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
     return null;
   }
 };

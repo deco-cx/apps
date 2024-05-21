@@ -26,11 +26,15 @@ import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
   SimpleCategoryGraphQL,
-  ProductFilterInput,
 } from "./clientGraphql/types.ts";
 import { ProductPrice } from "./clientGraphql/types.ts";
 import { SimpleProductGraphQL, PriceRange } from "./clientGraphql/types.ts";
-import { IN_STOCK, OUT_OF_STOCK, SORT_OPTIONS_ORDER } from "./constants.ts";
+import {
+  IN_STOCK,
+  OUT_OF_STOCK,
+  SORT_OPTIONS_ORDER,
+  REMOVABLE_URL_SEARCHPARAMS,
+} from "./constants.ts";
 
 export const toProduct = ({
   product,
@@ -306,8 +310,7 @@ export const toProductListingPageGraphQL = (
   { products }: ProductPLPGraphQL,
   { categories }: CategoryGraphQL,
   originURL: URL,
-  imagesQtd: number,
-  appliedFilters?: ProductFilterInput
+  imagesQtd: number
 ): ProductListingPage => {
   const category = categories.items[0];
   const pagination = products.page_info;
@@ -329,7 +332,7 @@ export const toProductListingPageGraphQL = (
           ]
         : undefined,
     },
-    filters: toFilters(products.aggregations, originURL, appliedFilters),
+    filters: toFilters(products.aggregations, originURL),
     products: products.items.map((p) =>
       toProductGraphQL(p, originURL, imagesQtd)
     ),
@@ -371,10 +374,12 @@ const toItemElement = (
 
 const toFilters = (
   aggregations: Required<AggregationGraphQL>[],
-  url: URL,
-  appliedFilters?: ProductFilterInput
-): Filter[] =>
-  aggregations.reduce<Filter[]>((acc, agg) => {
+  originUrl: URL
+): Filter[] => {
+  const url = new URL(originUrl);
+  REMOVABLE_URL_SEARCHPARAMS.forEach((v) => url.searchParams.delete(v));
+
+  return aggregations.reduce<Filter[]>((acc, agg) => {
     if (agg.position === null) {
       return acc;
     }
@@ -385,26 +390,33 @@ const toFilters = (
         "@type": "FilterToggle",
         label: agg.label,
         key: agg.attribute_code,
-        values: agg.options.map((opt) => toFilterValues(opt, agg.attribute_code, url, appliedFilters)),
+        values: agg.options.map((opt) =>
+          toFilterValues(opt, agg.attribute_code, url)
+        ),
         quantity: agg.count,
       },
     ];
   }, []);
+};
 
 const toFilterValues = (
   option: AggregationOptGraphQL,
   attributeCode: string,
-  url: URL,
-  _appliedFilters?: ProductFilterInput
+  baseUrl: URL
 ): FilterToggleValue => {
-  const a = url;
-  a.searchParams.set(attributeCode, option.value);
+  const url = new URL(baseUrl);
+  const selected = baseUrl.searchParams.has(attributeCode, option.value);
+
+  selected
+    ? url.searchParams.delete(attributeCode)
+    : url.searchParams.set(attributeCode, option.value);
+
   return {
     quantity: option.count,
     label: option.label,
     value: option.value,
-    selected: false,
-    url: a.href,
+    selected: selected,
+    url: url.href,
   };
 };
 

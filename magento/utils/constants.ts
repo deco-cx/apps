@@ -47,5 +47,6 @@ export const DEFAULT_GRAPHQL_FILTERS: FiltersGraphQL[] = [
   { value: "style_bottom", type: "EQUAL" },
   { value: "style_general", type: "EQUAL" },
   { value: "url_key", type: "EQUAL" },
-  { value: "fragrancias", type: "EQUAL"}
 ];
+
+export const REMOVABLE_URL_SEARCHPARAMS = ["p", "product_list_order"]
