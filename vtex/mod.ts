@@ -160,3 +160,5 @@ export default function VTEX({
 
   return app;
 }
+
+export { PreviewVtex as Preview } from "./preview/Preview.tsx";

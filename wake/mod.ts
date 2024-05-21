@@ -6,6 +6,7 @@ import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
 import { CheckoutApi } from "./utils/client.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -98,3 +99,7 @@ export default function App(props: Props): App<Manifest, State> {
     manifest,
   };
 }
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

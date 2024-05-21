@@ -71,7 +71,7 @@ export const parseSlug = (slug: string) => {
   const id = Number(segments.at(-1));
 
   if (!id) {
-    throw new Error("Malformed slug. Expecting {slug}-{id} format");
+    return null;
   }
 
   return {

@@ -25,10 +25,16 @@ const action = async (
   };
 
   try {
-    await fetch(
-      `https://${account}.cdn.vnda.com.br/lista_de_espera`,
-      options,
-    ).then((res) => res.json());
+    await Promise.all([
+      fetch(
+        `https://${account}.cdn.vnda.com.br/lista_de_espera`,
+        options,
+      ).then((res) => res.json()),
+      fetch(
+        `https://${account}.cdn.vnda.com.br/webform`,
+        options,
+      ),
+    ]);
   } catch (error) {
     console.log(error);
   }

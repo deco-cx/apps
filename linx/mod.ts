@@ -2,6 +2,7 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -51,3 +52,7 @@ export default function App(
 
   return app;
 }
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);
