@@ -5,11 +5,14 @@ import {
   ProductPLPGraphQL,
   ProductSearchInputs,
   ProductSort,
-  FilterProps
+  FilterProps,
 } from "../utils/clientGraphql/types.ts";
 import { GetPLPItems, GetCategoryUid } from "../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../utils/transform.ts";
-import { transformFilterGraphQL, transformSortGraphQL } from "../utils/utils.ts";
+import {
+  transformFilterGraphQL,
+  transformSortGraphQL,
+} from "../utils/utils.ts";
 
 export interface Props {
   /**
@@ -24,9 +27,8 @@ export interface Props {
 export interface CategoryProps {
   categoryUrl?: string;
   sortOptions?: ProductSort;
-  filters?: Array<FilterProps>
+  filters?: Array<FilterProps>;
 }
-
 
 /**
  * @title Magento Integration - PLP
@@ -49,17 +51,13 @@ const loader = async (
       : undefined,
     order: "ASC",
   };
-  //TODO (aka-sacci_ccr): Como pegar os settings da pagina diretamente no loader?
   const categoryUrl =
     categoryProps?.categoryUrl ?? url.pathname.match(/\/granado\/(.+)/)?.[1];
-
 
   if (!categoryUrl) {
     return null;
   }
 
-  const test = transformFilterGraphQL(url, customFilters, categoryProps?.filters)
-  console.log(test)
   try {
     const categoryGQL = await clientGraphql.query<
       CategoryGraphQL,
@@ -75,12 +73,21 @@ const loader = async (
       return null;
     }
 
+    const appliedFilters = transformFilterGraphQL(
+      url,
+      customFilters,
+      categoryProps?.filters
+    );
+
     const plpItemsGQL = await clientGraphql.query<
       ProductPLPGraphQL,
       Omit<ProductSearchInputs, "search">
     >({
       variables: {
-        filter: { category_uid: { eq: categoryGQL.categories.items[0].uid } },
+        filter: {
+          category_uid: { eq: categoryGQL.categories.items[0].uid },
+          ...appliedFilters,
+        },
         pageSize,
         currentPage: Number(currentPage),
         sort: transformSortGraphQL({ sortBy: sortBy!, order }),
@@ -99,7 +106,8 @@ const loader = async (
       plpItemsGQL,
       categoryGQL,
       url,
-      imagesQtd
+      imagesQtd,
+      appliedFilters
     );
   } catch (e) {
     console.log(e);

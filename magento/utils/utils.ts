@@ -29,9 +29,14 @@ export const transformFilterGraphQL = (
   customFilters?: Array<FiltersGraphQL>,
   fromLoader?: Array<FilterProps>
 ): ProductFilterInput | undefined => {
-  const filtersFromLoader = fromLoader?.map<ProductFilterInput>((f) => ({
-    [f.name]: f.type,
-  })) ?? {};
+  const filtersFromLoader =
+    fromLoader?.reduce<ProductFilterInput>(
+      (acc, f) => ({
+        ...acc,
+        [f.name]: f.type,
+      }),
+      {}
+    ) ?? {};
 
   const filtersFromUrl = DEFAULT_GRAPHQL_FILTERS.concat(
     customFilters ?? []
@@ -42,12 +47,11 @@ export const transformFilterGraphQL = (
     }
     return {
       ...acc,
-
       [value]: transformFilterValueGraphQL(fromUrl, type),
     };
   }, {});
-
-  return {...filtersFromUrl, ...filtersFromLoader};
+  
+  return { ...filtersFromUrl, ...filtersFromLoader };
 };
 
 export const transformFilterValueGraphQL = (

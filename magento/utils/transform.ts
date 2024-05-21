@@ -26,6 +26,7 @@ import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
   SimpleCategoryGraphQL,
+  ProductFilterInput,
 } from "./clientGraphql/types.ts";
 import { ProductPrice } from "./clientGraphql/types.ts";
 import { SimpleProductGraphQL, PriceRange } from "./clientGraphql/types.ts";
@@ -218,8 +219,6 @@ export const toProductGraphQL = (
   originURL: URL,
   imagesQtd: number
 ): Product => {
-  //TODO(aka-sacci-ccr): additionalProperties com flags do produto!
-  //TODO(aka-sacci-ccr): Como coloco as dimensoes da imagem na URL da mesma?
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
     stock_status === "IN_STOCK",
@@ -307,11 +306,12 @@ export const toProductListingPageGraphQL = (
   { products }: ProductPLPGraphQL,
   { categories }: CategoryGraphQL,
   originURL: URL,
-  imagesQtd: number
+  imagesQtd: number,
+  appliedFilters?: ProductFilterInput
 ): ProductListingPage => {
   const category = categories.items[0];
   const pagination = products.page_info;
-  const listElements = toItemElement(category, originURL)
+  const listElements = toItemElement(category, originURL);
 
   return {
     "@type": "ProductListingPage",
@@ -329,7 +329,7 @@ export const toProductListingPageGraphQL = (
           ]
         : undefined,
     },
-    filters: toFilters(products.aggregations, originURL),
+    filters: toFilters(products.aggregations, originURL, appliedFilters),
     products: products.items.map((p) =>
       toProductGraphQL(p, originURL, imagesQtd)
     ),
@@ -369,7 +369,11 @@ const toItemElement = (
   return fromBreadcrumbs ? [...fromBreadcrumbs, fromCategory] : [fromCategory];
 };
 
-const toFilters = (aggregations: Required<AggregationGraphQL>[], _url: URL): Filter[] =>
+const toFilters = (
+  aggregations: Required<AggregationGraphQL>[],
+  url: URL,
+  appliedFilters?: ProductFilterInput
+): Filter[] =>
   aggregations.reduce<Filter[]>((acc, agg) => {
     if (agg.position === null) {
       return acc;
@@ -381,19 +385,28 @@ const toFilters = (aggregations: Required<AggregationGraphQL>[], _url: URL): Fil
         "@type": "FilterToggle",
         label: agg.label,
         key: agg.attribute_code,
-        values: agg.options.map((opt) => toFilterValues(opt)),
+        values: agg.options.map((opt) => toFilterValues(opt, agg.attribute_code, url, appliedFilters)),
         quantity: agg.count,
       },
     ];
   }, []);
 
-const toFilterValues = (option: AggregationOptGraphQL): FilterToggleValue => ({
-  quantity: option.count,
-  label: option.label,
-  value: option.value,
-  selected: false,
-  url: "",
-});
+const toFilterValues = (
+  option: AggregationOptGraphQL,
+  attributeCode: string,
+  url: URL,
+  _appliedFilters?: ProductFilterInput
+): FilterToggleValue => {
+  const a = url;
+  a.searchParams.set(attributeCode, option.value);
+  return {
+    quantity: option.count,
+    label: option.label,
+    value: option.value,
+    selected: false,
+    url: a.href,
+  };
+};
 
 const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
   SORT_OPTIONS_ORDER.reduce<SortOption[]>((acc, opt) => {
@@ -426,7 +439,7 @@ const toPageInfo = (
   return {
     currentPage: current_page,
     nextPage: hasNextPage ? `?${nextPage}` : undefined,
-    previousPage: hasPrevPage ? `?${previousPage}`: undefined,
+    previousPage: hasPrevPage ? `?${previousPage}` : undefined,
     recordPerPage: page_size,
     records: total,
   };
