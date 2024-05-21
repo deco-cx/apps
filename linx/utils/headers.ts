@@ -5,6 +5,9 @@ import { removeCFHeaders } from "../../website/handlers/proxy.ts";
  * only the necessary ones when proxying request headers to the linx API
  */
 export function toLinxHeaders(inputHeaders: Headers): Headers {
-  removeCFHeaders(inputHeaders);
-  return inputHeaders;
+  const headers = new Headers(inputHeaders);
+
+  removeCFHeaders(headers);
+
+  return headers;
 }
