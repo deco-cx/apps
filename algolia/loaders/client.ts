@@ -1,7 +1,7 @@
 import type { AppContext } from "../mod.ts";
+import type { SearchClient } from "https://esm.sh/algoliasearch@4.20.0";
 
-// deno-lint-ignore no-explicit-any
-export type AlgoliaClient = any;
+export type AlgoliaClient = SearchClient;
 
 export default function loader(
   _props: unknown,
