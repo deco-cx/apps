@@ -1,6 +1,5 @@
 import { getSetCookies } from "std/http/cookie.ts";
 import type { AppContext } from "../../mod.ts";
-import { LinxError } from "../../utils/types/common.ts";
 import { DeliveryGroup } from "../../utils/types/basketJSON.ts";
 
 export interface Props {
