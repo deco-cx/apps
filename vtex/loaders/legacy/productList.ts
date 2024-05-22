@@ -223,7 +223,7 @@ const loader = async (
   );
 };
 
-const getSearchParams = (props: Props) => {
+const getSearchParams = (props: Props["props"]) => {
   if (isCollectionProps(props)) {
     return [
       ["collection", props.collection],
@@ -253,7 +253,14 @@ const getSearchParams = (props: Props) => {
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+export const cacheKey = (
+  expandedProps: Props,
+  req: Request,
+  ctx: AppContext,
+) => {
+  const props = expandedProps.props ??
+    (expandedProps as unknown as Props["props"]);
+
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (

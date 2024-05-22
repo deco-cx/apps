@@ -61,6 +61,18 @@ export interface AbTesting {
   };
 }
 
+/** @titleBy framework */
+interface Fresh {
+  /** @default fresh */
+  framework: "fresh";
+}
+
+/** @titleBy framework */
+interface HTMX {
+  /** @default htmx */
+  framework: "htmx";
+}
+
 export interface Props {
   /**
    * @title Routes Map
@@ -112,6 +124,13 @@ export interface Props {
    * @description A/B Testing configuration
    */
   abTesting?: AbTesting;
+
+  /**
+   * @title Flavor
+   * @description The flavor of the website
+   * @default {"framework":"fresh"}
+   */
+  flavor?: Fresh | HTMX;
 }
 
 /**
