@@ -1,4 +1,4 @@
-import { FiltersGraphQL } from "../mod.ts"
+import { FiltersGraphQL } from "../mod.ts";
 export const URL_KEY = "url_key";
 
 export const IN_STOCK = "https://schema.org/InStock";
@@ -65,4 +65,3 @@ export const BASE_CURRENCY_CODE = "base_currency_code";
 //Fields products sku
 export const SKU = "sku";
 export const MEDIA_GALLERY_ENTRIES = "media_gallery_entries";
-

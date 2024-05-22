@@ -235,9 +235,9 @@ export interface CustomProductSortOption {
 
 // Shared Loader Props
 export interface ProductSort {
-  /** @title Ordenar por */
+  /** @title Order by */
   sortBy: DefaultProductSortOption | CustomProductSortOption;
-  /** @title Sequência */
+  /** @title Sequency */
   order: "ASC" | "DESC";
 }
 

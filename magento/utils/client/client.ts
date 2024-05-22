@@ -65,7 +65,9 @@ export interface API {
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIdtotals/ */
   "GET /rest/:site/V1/carts/:cartId/totals": {
     response: MagentoCardPrices;
-    fields: string;
+    searchParams: {
+      fields?: string;
+    }
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */

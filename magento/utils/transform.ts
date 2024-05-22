@@ -21,8 +21,8 @@ import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
   CategoryGraphQL,
-  ProductImage,
   PLPGraphQL,
+  ProductImage,
   SearchResultPageInfo as PageInfoGraphQL,
   SimpleCategoryGraphQL,
   SortFields as SortFieldsGraphQL,
@@ -222,13 +222,16 @@ export const toProductGraphQL = (
   }: SimpleProductGraphQL,
   originURL: URL,
   imagesQtd: number,
+  defaultPath?: string,
 ): Product => {
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
     stock_status === "IN_STOCK",
     only_x_left_in_stock,
   );
-  const url = new URL(canonical_url ?? url_key, originURL.origin).href;
+  const url =
+    new URL((defaultPath ?? "") + canonical_url ?? url_key, originURL.origin)
+      .href;
 
   return {
     "@type": "Product",
@@ -311,6 +314,7 @@ export const toProductListingPageGraphQL = (
   { categories }: CategoryGraphQL,
   originURL: URL,
   imagesQtd: number,
+  defaultPath?: string,
 ): ProductListingPage => {
   const category = categories.items[0];
   const pagination = products.page_info;
@@ -335,7 +339,7 @@ export const toProductListingPageGraphQL = (
     },
     filters: toFilters(products.aggregations, originURL),
     products: products.items.map((p) =>
-      toProductGraphQL(p, originURL, imagesQtd)
+      toProductGraphQL(p, originURL, imagesQtd, defaultPath)
     ),
     pageInfo: toPageInfo(pagination, products.total_count, originURL),
     sortOptions: toSortOptions(products.sort_fields),

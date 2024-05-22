@@ -16,7 +16,6 @@ import {
 import { RequestPathname } from "../functions/requestToPathname.ts";
 
 export interface Props {
-
   urlKey: RequestPathname;
 
   /**
@@ -25,7 +24,6 @@ export interface Props {
    */
   pageSize: number;
 
-  
   categoryProps?: CategoryProps;
 }
 
@@ -50,6 +48,7 @@ const loader = async (
   const { pageSize, categoryProps, urlKey } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
   const sortFromUrl = url.searchParams.get("product_list_order");
+  const defaultPath = url.pathname.substring(0, url.pathname.indexOf(urlKey));
 
   const { sortBy, order } = categoryProps?.sortOptions ?? {
     sortBy: sortFromUrl
@@ -59,7 +58,7 @@ const loader = async (
       : undefined,
     order: "ASC",
   };
-  const categoryUrl = categoryProps?.categoryUrl ?? urlKey
+  const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
 
   if (!categoryUrl) {
     return null;
@@ -99,7 +98,13 @@ const loader = async (
     return null;
   }
 
-  return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, url, imagesQtd);
+  return toProductListingPageGraphQL(
+    plpItemsGQL,
+    categoryGQL,
+    url,
+    imagesQtd,
+    defaultPath,
+  );
 };
 
 export default loader;
