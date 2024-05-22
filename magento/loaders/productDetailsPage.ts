@@ -1,12 +1,13 @@
 import type { ListItem, ProductDetailsPage } from "../../commerce/types.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+/* import type { RequestURLParam } from "../../website/functions/requestToParam.ts"; */
+import { RequestPathname } from "../functions/requestToPathname.ts";
 import { AppContext } from "../mod.ts";
 import { URL_KEY } from "../utils/constants.ts";
 import stringifySearchCriteria from "../utils/stringifySearchCriteria.ts";
 import { toBreadcrumbList, toProduct, toSeo } from "../utils/transform.ts";
 
 export interface Props {
-  slug: RequestURLParam;
+  slug: RequestPathname;
   isBreadcrumbProductName?: boolean;
 }
 
