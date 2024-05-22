@@ -1,8 +1,35 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import tursoApp, { Props as TursoProps } from "../turso/mod.ts";
+import { Secret } from "../website/loaders/secret.ts";
+import { createClient as createSQLClient } from "npm:@libsql/client@0.6.0/node";
 
-export interface Props extends TursoProps {}
+const getClientConfig = ({ authToken, url }: StorageConfig) => {
+  const isLocal = !authToken.get();
+  if (isLocal) {
+    return ({
+      url: `file://${Deno.cwd()}/sqlite.db`,
+      authToken: "",
+    });
+  }
+  return {
+    url,
+    authToken: authToken.get?.() ?? "",
+  };
+};
+
+interface StorageConfig {
+  /**
+   * @title Url
+   * @description database url with libsql protocol
+   */
+  url: string;
+  /**
+   * @description Database authentication token
+   */
+  authToken: Secret;
+}
+
+export interface Props extends StorageConfig {}
 
 /**
  * @title Deco Records
@@ -13,20 +40,16 @@ export interface Props extends TursoProps {}
 export default function Records(
   { url, authToken, ...state }: Props,
 ) {
-  const tursoAppInstance = tursoApp({ url, authToken });
-  const sqlClient = tursoAppInstance.state.client;
+  const sqlClient = createSQLClient(getClientConfig({ url, authToken }));
 
   const appState = {
     ...state,
     sqlClient,
   };
 
-  const app: App<Manifest, typeof appState, [typeof tursoAppInstance]> = {
+  const app: App<Manifest, typeof appState> = {
     manifest,
     state: appState,
-    dependencies: [
-      tursoAppInstance,
-    ],
   };
 
   return app;
