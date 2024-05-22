@@ -334,7 +334,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [], kitItems, videos } = sku;
+  const {
+    name,
+    ean,
+    itemId: skuId,
+    referenceId = [],
+    kitItems,
+  } = sku;
+
+  const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
