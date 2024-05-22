@@ -1,6 +1,8 @@
+import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
+import { isFreshCtx } from "./fresh.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -110,7 +112,13 @@ export default function Proxy({
     const headers = new Headers(req.headers);
     HOP_BY_HOP.forEach((h) => headers.delete(h));
 
+    if (isFreshCtx<DecoSiteState>(_ctx)) {
+      _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
+    }
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    if (isFreshCtx<DecoSiteState>(_ctx)) {
+      _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
+    }
 
     headers.set("origin", req.headers.get("origin") ?? url.origin);
     headers.set("host", hostToUse ?? to.host);
