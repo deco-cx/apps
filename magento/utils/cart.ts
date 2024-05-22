@@ -1,5 +1,7 @@
 import { getCookies } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
+import { Cart, MagentoCardPrices, MagentoProduct, MediaEntry } from "./client/types.ts";
+import { toURL } from "./transform.ts";
 
 const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -46,3 +48,36 @@ export async function createCart(
     }).then((res) => res.json());
   }
 }
+
+export const toCartItemsWithImages = (
+  cart: Cart,
+  prices: MagentoCardPrices,
+  productImages: MagentoProduct[],
+  imagesUrl: string,
+) => {
+  const productImagesMap = productImages.reduce((map, productImage) => {
+    map[productImage.sku] = productImage.media_gallery_entries || [];
+    return map;
+  }, {} as Record<string, MediaEntry[]>);
+
+  const itemsWithImages = cart.items.map((product) => {
+    const images = productImagesMap[product.sku]?.map((img) => ({
+      "@type": "ImageObject" as const,
+      encodingFormat: "image",
+      alternateName: img.file,
+      url: `${toURL(imagesUrl)}${img.file}`,
+    })) || [];
+
+    return {
+      ...product,
+      price_total: product.qty * product.price,
+      images,
+    };
+  });
+
+  return {
+    ...cart,
+    items: itemsWithImages,
+    totalizers: prices,
+  };
+};

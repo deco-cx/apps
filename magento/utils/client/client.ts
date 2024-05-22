@@ -2,6 +2,7 @@ import {
   Cart,
   CustomerAddress,
   FieldsFilter,
+  MagentoCardPrices,
   MagentoCategory,
   MagentoProduct,
   ShippingMethod,
@@ -59,6 +60,12 @@ export interface API {
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/guest-cartscartId#operation/GetV1GuestcartsCartId */
   "GET /rest/:site/V1/guest-carts/:cartId": {
     response: Cart;
+  };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIdtotals/ */
+  "GET /rest/:site/V1/carts/:cartId/totals": {
+    response: MagentoCardPrices;
+    fields: string;
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */
