@@ -35,6 +35,7 @@ const getPageInfo = ({ page, nbPages, recordPerPage, records, url }: {
     currentPage: page,
     records,
     recordPerPage,
+    totalPages: nbPages,
   };
 };
 
