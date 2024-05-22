@@ -305,6 +305,7 @@ interface TotalSegment {
     gw_items_base_price?: string;
     gw_card_price?: string;
     gw_card_base_price?: string;
+    //deno-lint-ignore no-explicit-any
     tax_grandtotal_details?: any[];
   };
   area?: string;
