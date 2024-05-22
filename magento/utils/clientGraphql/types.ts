@@ -38,6 +38,7 @@ export interface CategoryLeafGraphQL {
   available_sort_by?: Array<string>;
   breadcrumbs?: Array<Breadcrumb> | null;
   canonical_url?: string;
+  description?: string;
   display_mode?: string;
   id?: string;
   include_in_menu?: string;
@@ -138,13 +139,7 @@ export interface UrlRewrite {
   url?: string;
 }
 
-export interface HttpQueryParameter {
-  name?: string;
-  value?: string;
-}
-
-//Inputs and Returns
-
+//Returns
 export type SimpleProductGraphQL = Required<
   Pick<
     ProductLeafGraphQL,
@@ -163,7 +158,13 @@ export type SimpleProductGraphQL = Required<
 export type SimpleCategoryGraphQL = Required<
   Pick<
     CategoryLeafGraphQL,
-    "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name"
+    | "uid"
+    | "breadcrumbs"
+    | "image"
+    | "meta_title"
+    | "meta_description"
+    | "name"
+    | "description"
   >
 >;
 
@@ -179,7 +180,7 @@ export interface CategoryGraphQL {
   };
 }
 
-export interface ProductPLPGraphQL {
+export interface PLPGraphQL {
   products: {
     items: SimpleProductGraphQL[];
     page_info: SearchResultPageInfo;
@@ -189,6 +190,7 @@ export interface ProductPLPGraphQL {
   };
 }
 
+//Inputs - To query
 export interface ProductSearchInputs {
   search?: string;
   pageSize?: number;
@@ -198,18 +200,10 @@ export interface ProductSearchInputs {
 }
 
 export interface ProductFilterInput {
-  tipo_de_pele?: FilterEqualTypeInput;
-  tipo_de_pelo?: FilterEqualTypeInput;
-  category_id?: FilterEqualTypeInput;
-  category_uid?: FilterEqualTypeInput;
-  familia_olfativa?: FilterEqualTypeInput;
-  fragancias?: FilterEqualTypeInput;
-  linha?: FilterEqualTypeInput;
-  marca?: FilterEqualTypeInput;
-  sku?: FilterEqualTypeInput;
-  url_key?: FilterEqualTypeInput;
-  volume?: FilterEqualTypeInput;
-  name?: FilterMatchTypeInput;
+  [key: string]:
+    | FilterEqualTypeInput
+    | FilterMatchTypeInput
+    | FilterRangeTypeInput;
 }
 
 export interface FilterEqualTypeInput {
@@ -218,18 +212,39 @@ export interface FilterEqualTypeInput {
 }
 
 export interface FilterMatchTypeInput {
-  match?: string;
+  match: string;
   match_type?: "FULL" | "PARTIAL";
 }
 
 export interface FilterRangeTypeInput {
-  from?: string;
-  to?: string;
+  from: string;
+  to: string;
 }
 
 export interface ProductSortInput {
-  name?: "ASC" | "DESC";
-  position?: "ASC" | "DESC";
-  price?: "ASC" | "DESC";
-  relevance?: "ASC" | "DESC";
+  [key: string]: "ASC" | "DESC";
+}
+
+export interface DefaultProductSortOption {
+  value: "name" | "position" | "price" | "relevance";
+}
+
+export interface CustomProductSortOption {
+  value: string;
+}
+
+// Shared Loader Props
+export interface ProductSort {
+  /** @title Ordenar por */
+  sortBy: DefaultProductSortOption | CustomProductSortOption;
+  /** @title Sequência */
+  order: "ASC" | "DESC";
+}
+
+export interface FilterProps {
+  name: string;
+  type:
+    | Omit<FilterEqualTypeInput, "eq">
+    | FilterMatchTypeInput
+    | FilterRangeTypeInput;
 }

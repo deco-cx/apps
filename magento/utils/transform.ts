@@ -22,14 +22,19 @@ import {
   AggregationOption as AggregationOptGraphQL,
   CategoryGraphQL,
   ProductImage,
-  ProductPLPGraphQL,
+  PLPGraphQL,
   SearchResultPageInfo as PageInfoGraphQL,
   SimpleCategoryGraphQL,
   SortFields as SortFieldsGraphQL,
 } from "./clientGraphql/types.ts";
 import { ProductPrice } from "./clientGraphql/types.ts";
 import { PriceRange, SimpleProductGraphQL } from "./clientGraphql/types.ts";
-import { IN_STOCK, OUT_OF_STOCK, SORT_OPTIONS_ORDER } from "./constants.ts";
+import {
+  IN_STOCK,
+  OUT_OF_STOCK,
+  REMOVABLE_URL_SEARCHPARAMS,
+  SORT_OPTIONS_ORDER,
+} from "./constants.ts";
 
 export const toProduct = ({
   product,
@@ -302,7 +307,7 @@ export const toOfferGraphQL = (
 });
 
 export const toProductListingPageGraphQL = (
-  { products }: ProductPLPGraphQL,
+  { products }: PLPGraphQL,
   { categories }: CategoryGraphQL,
   originURL: URL,
   imagesQtd: number,
@@ -317,6 +322,7 @@ export const toProductListingPageGraphQL = (
       "@type": "BreadcrumbList",
       numberOfItems: listElements.length,
       itemListElement: listElements,
+      description: category.description,
       image: category.image
         ? [
           {
@@ -327,11 +333,11 @@ export const toProductListingPageGraphQL = (
         ]
         : undefined,
     },
-    filters: toFilters(products.aggregations),
-    products: products.items.map((product) =>
-      toProductGraphQL(product, originURL, imagesQtd)
+    filters: toFilters(products.aggregations, originURL),
+    products: products.items.map((p) =>
+      toProductGraphQL(p, originURL, imagesQtd)
     ),
-    pageInfo: toPageInfo(pagination, products.total_count),
+    pageInfo: toPageInfo(pagination, products.total_count, originURL),
     sortOptions: toSortOptions(products.sort_fields),
     seo: {
       title: category.meta_title ?? `${category.name}`,
@@ -367,8 +373,14 @@ const toItemElement = (
   return fromBreadcrumbs ? [...fromBreadcrumbs, fromCategory] : [fromCategory];
 };
 
-const toFilters = (aggregations: Required<AggregationGraphQL>[]): Filter[] =>
-  aggregations.reduce<Filter[]>((acc, agg) => {
+const toFilters = (
+  aggregations: Required<AggregationGraphQL>[],
+  originUrl: URL,
+): Filter[] => {
+  const url = new URL(originUrl);
+  REMOVABLE_URL_SEARCHPARAMS.forEach((v) => url.searchParams.delete(v));
+
+  return aggregations.reduce<Filter[]>((acc, agg) => {
     if (agg.position === null) {
       return acc;
     }
@@ -379,19 +391,35 @@ const toFilters = (aggregations: Required<AggregationGraphQL>[]): Filter[] =>
         "@type": "FilterToggle",
         label: agg.label,
         key: agg.attribute_code,
-        values: agg.options.map((opt) => toFilterValues(opt)),
+        values: agg.options.map((opt) =>
+          toFilterValues(opt, agg.attribute_code, url)
+        ),
         quantity: agg.count,
       },
     ];
   }, []);
+};
 
-const toFilterValues = (option: AggregationOptGraphQL): FilterToggleValue => ({
-  quantity: option.count,
-  label: option.label,
-  value: option.value,
-  selected: false,
-  url: "",
-});
+const toFilterValues = (
+  option: AggregationOptGraphQL,
+  attributeCode: string,
+  baseUrl: URL,
+): FilterToggleValue => {
+  const url = new URL(baseUrl);
+  const selected = baseUrl.searchParams.has(attributeCode, option.value);
+
+  selected
+    ? url.searchParams.delete(attributeCode)
+    : url.searchParams.set(attributeCode, option.value);
+
+  return {
+    quantity: option.count,
+    label: option.label,
+    value: option.value,
+    selected: selected,
+    url: url.href,
+  };
+};
 
 const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
   SORT_OPTIONS_ORDER.reduce<SortOption[]>((acc, opt) => {
@@ -401,16 +429,30 @@ const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
     }
     return [...acc, option];
   }, []);
+
 const toPageInfo = (
   { current_page, page_size, total_pages }: PageInfoGraphQL,
   total: number,
+  url: URL,
 ): PageInfo => {
   const hasNextPage = current_page < total_pages;
   const hasPrevPage = current_page > 1;
+  const params = url.searchParams;
+  const nextPage = new URLSearchParams(params);
+  const previousPage = new URLSearchParams(params);
+
+  if (hasNextPage) {
+    nextPage.set("p", (current_page + 1).toString());
+  }
+
+  if (hasPrevPage) {
+    previousPage.set("p", (current_page - 1).toString());
+  }
+
   return {
     currentPage: current_page,
-    nextPage: hasNextPage ? `?p=${current_page + 1}` : undefined,
-    previousPage: hasPrevPage ? `?p=${current_page - 1}` : undefined,
+    nextPage: hasNextPage ? `?${nextPage}` : undefined,
+    previousPage: hasPrevPage ? `?${previousPage}` : undefined,
     recordPerPage: page_size,
     records: total,
   };

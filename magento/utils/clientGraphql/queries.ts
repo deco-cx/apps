@@ -135,6 +135,7 @@ export const GetCategoryUid = {
           image
           meta_title
           meta_description
+          description
         }
       }
     }

@@ -4,10 +4,10 @@ import {
   ProductFilterInput,
   ProductSearchInputs,
   ProductShelfGraphQL,
-  ProductSortInput,
+  ProductSort,
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
-import { typeChecker } from "../utils/utils.ts";
+import { transformSortGraphQL, typeChecker } from "../utils/utilsGraphQL.ts";
 import { toProductGraphQL } from "../utils/transform.ts";
 
 export interface CommomProps {
@@ -24,13 +24,7 @@ export interface CommomProps {
   currentPage: number;
 
   /** @title Sorting */
-  sort?: {
-    /** @title Sort by */
-    sortBy: "name" | "position" | "price" | "relevance";
-
-    /** @title Order by */
-    order: "ASC" | "DESC";
-  };
+  sort?: ProductSort;
 
   /** @title Filter */
   filter?: Array<FilterProps>;
@@ -74,17 +68,6 @@ export interface Props {
   props: TermProps | CategoryProps | ProductSkuProps | SegmentProps;
 }
 
-const transformSort = ({
-  sort,
-}: Pick<CommomProps, "sort">): ProductSortInput | undefined => {
-  if (!sort?.sortBy) {
-    return undefined;
-  }
-  return {
-    [sort.sortBy]: sort?.order,
-  };
-};
-
 const transformFilter = ({
   filter,
 }: Pick<CommomProps, "filter">): ProductFilterInput | undefined => {
@@ -106,13 +89,14 @@ const transformFilterValue = ({ input, values }: FilterProps) => {
 };
 
 const fromProps = ({ props }: Props): ProductSearchInputs => {
+  const { sort } = props;
   if (typeChecker<TermProps>(props as TermProps, "search")) {
     const { search, filter } = props as TermProps;
     return {
       search,
       pageSize: props.pageSize,
       currentPage: props.currentPage,
-      sort: transformSort({ sort: props.sort }),
+      sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
       filter: transformFilter({ filter }),
     } as const;
   }
@@ -122,7 +106,7 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
     return {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
-      sort: transformSort({ sort: props.sort }),
+      sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
       filter: transformFilter({
         filter: filter?.concat([
           {
@@ -139,7 +123,7 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
     return {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
-      sort: transformSort({ sort: props.sort }),
+      sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
       filter: transformFilter({
         filter: [
           {
@@ -156,7 +140,7 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
     return {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
-      sort: transformSort({ sort: props.sort }),
+      sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
       filter: transformFilter({
         filter: filter?.concat({
           input: "linha",
@@ -193,11 +177,9 @@ async function loader(
       return null;
     }
 
-    return products.items.map((product) =>
-      toProductGraphQL(product, url, imagesQtd)
-    );
-  } catch (error) {
-    console.log(error);
+    return products.items.map((p) => toProductGraphQL(p, url, imagesQtd));
+  } catch (e) {
+    console.log(e);
     return null;
   }
 }

@@ -5,6 +5,11 @@ import { createHttpClient } from "../utils/http.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 
+export interface FiltersGraphQL {
+  value: string;
+  type: "EQUAL" | "MATCH" | "RANGE";
+}
+
 export interface Props {
   /**
    * @title Magento api url
@@ -36,11 +41,17 @@ export interface Props {
   imagesUrl: string;
 
   /**
-   * @title Imagens por vitrine (max)
-   * @description Quantidade máxima de imagens por vitrine
+   * @title Images per shelf (max)
+   * @description Max images qtd per shelf
    * @default 3
    */
   imagesQtd: number;
+
+  /**
+   * @title Custom Filters
+   * @description Application own filters
+   */
+  customFilters: Array<FiltersGraphQL>;
 }
 
 type PartialProps = Omit<Props, "baseUrl">;
@@ -57,8 +68,16 @@ export interface State extends PartialProps {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl, imagesQtd } =
-    props;
+  const {
+    baseUrl,
+    site,
+    storeId,
+    apiKey,
+    currencyCode,
+    imagesUrl,
+    imagesQtd,
+    customFilters = [],
+  } = props;
 
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
@@ -75,7 +94,6 @@ export default function App(props: Props): App<Manifest, State> {
       Authorization: `Bearer ${apiKey}`,
     }),
   });
-
   return {
     manifest,
     state: {
@@ -87,6 +105,7 @@ export default function App(props: Props): App<Manifest, State> {
       clientAdmin,
       clientGraphql,
       imagesQtd,
+      customFilters,
     },
   };
 }
