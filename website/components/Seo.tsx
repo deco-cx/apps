@@ -40,7 +40,8 @@ export interface Props {
    */
   noIndexing?: boolean;
 
-  jsonLDs?: unknown[];
+  // deno-lint-ignore no-explicit-any
+  jsonLDs?: any[];
 }
 
 function Component({
@@ -56,13 +57,22 @@ function Component({
   noIndexing,
   jsonLDs = [],
 }: Props) {
+  const [{ pageInfo = {}, seo = {} } = {}] = jsonLDs || [{}];
+  const currentPage = pageInfo?.currentPage;
+  const isDepartament = pageInfo?.pageTypes[0] === "Department" ||
+    pageInfo?.pageTypes[0] === "Search";
+  const isPageMoreThanOne = currentPage && currentPage > 1;
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
   const description = stripHTML(desc || "");
   const title = stripHTML(t);
+  const url = canonical;
 
   return (
     <Head>
-      <title>{renderTemplateString(titleTemplate, title)}</title>
+      <title>
+        {renderTemplateString(titleTemplate, title)}
+        {isDepartament && isPageMoreThanOne ? ` - Página ${currentPage}` : ""}
+      </title>
       <meta
         name="description"
         content={renderTemplateString(descriptionTemplate, description)}
@@ -83,7 +93,9 @@ function Component({
       <meta property="og:image" content={image} />
 
       {/* Link tags */}
-      {canonical && <link rel="canonical" href={canonical} />}
+      {canonical && (
+        <link rel="canonical" href={isDepartament ? seo?.canonical : url} />
+      )}
 
       {/* No index, no follow */}
       {noIndexing && <meta name="robots" content="noindex, nofollow" />}
