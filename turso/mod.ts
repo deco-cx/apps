@@ -36,7 +36,7 @@ export interface Props extends StorageConfig {
  * @title Turso
  * @description App for using turso https://turso.tech/
  * @category Tool
- * @logo todo
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/turso/logo.png
  */
 export default function Turso(
   { url, authToken, ...state }: Props,
