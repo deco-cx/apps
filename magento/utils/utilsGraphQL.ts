@@ -1,4 +1,4 @@
-import { FiltersGraphQL } from "./clientGraphql/types.ts";
+import { FiltersGraphQL } from "../mod.ts"
 import {
   FilterEqualTypeInput,
   FilterMatchTypeInput,

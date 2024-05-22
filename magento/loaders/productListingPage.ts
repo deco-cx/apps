@@ -3,7 +3,7 @@ import { AppContext } from "../mod.ts";
 import {
   CategoryGraphQL,
   FilterProps,
-  ProductPLPGraphQL,
+  PLPGraphQL,
   ProductSearchInputs,
   ProductSort,
 } from "../utils/clientGraphql/types.ts";
@@ -12,7 +12,7 @@ import { toProductListingPageGraphQL } from "../utils/transform.ts";
 import {
   transformFilterGraphQL,
   transformSortGraphQL,
-} from "../utils/utils.ts";
+} from "../utils/utilsGraphQL.ts";
 
 export interface Props {
   /**
@@ -38,7 +38,7 @@ export interface CategoryProps {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { clientGraphql, imagesQtd, customFilters } = ctx;
@@ -48,13 +48,13 @@ const loader = async (
   const { sortBy, order } = categoryProps?.sortOptions ?? {
     sortBy: sortFromUrl
       ? {
-          value: sortFromUrl,
-        }
+        value: sortFromUrl,
+      }
       : undefined,
     order: "ASC",
   };
-  const categoryUrl =
-    categoryProps?.categoryUrl ?? url.pathname.match(/\/granado\/(.+)/)?.[1];
+  const categoryUrl = categoryProps?.categoryUrl ??
+    url.pathname.match(/\/granado\/(.+)/)?.[1];
 
   if (!categoryUrl) {
     return null;
@@ -75,7 +75,7 @@ const loader = async (
   }
 
   const plpItemsGQL = await clientGraphql.query<
-    ProductPLPGraphQL,
+    PLPGraphQL,
     Omit<ProductSearchInputs, "search">
   >({
     variables: {

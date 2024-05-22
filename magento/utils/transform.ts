@@ -22,7 +22,7 @@ import {
   AggregationOption as AggregationOptGraphQL,
   CategoryGraphQL,
   ProductImage,
-  ProductPLPGraphQL,
+  PLPGraphQL,
   SearchResultPageInfo as PageInfoGraphQL,
   SimpleCategoryGraphQL,
   SortFields as SortFieldsGraphQL,
@@ -307,7 +307,7 @@ export const toOfferGraphQL = (
 });
 
 export const toProductListingPageGraphQL = (
-  { products }: ProductPLPGraphQL,
+  { products }: PLPGraphQL,
   { categories }: CategoryGraphQL,
   originURL: URL,
   imagesQtd: number,
@@ -322,6 +322,7 @@ export const toProductListingPageGraphQL = (
       "@type": "BreadcrumbList",
       numberOfItems: listElements.length,
       itemListElement: listElements,
+      description: category.description,
       image: category.image
         ? [
           {

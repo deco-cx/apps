@@ -4,7 +4,11 @@ import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
-import { FiltersGraphQL } from "./utils/clientGraphql/types.ts";
+
+export interface FiltersGraphQL {
+  value: string;
+  type: "EQUAL" | "MATCH" | "RANGE";
+}
 
 export interface Props {
   /**

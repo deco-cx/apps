@@ -7,7 +7,7 @@ import {
   ProductSort,
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
-import { transformSortGraphQL, typeChecker } from "../utils/utils.ts";
+import { transformSortGraphQL, typeChecker } from "../utils/utilsGraphQL.ts";
 import { toProductGraphQL } from "../utils/transform.ts";
 
 export interface CommomProps {
