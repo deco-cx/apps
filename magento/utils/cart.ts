@@ -1,6 +1,11 @@
 import { getCookies } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
-import { Cart, MagentoCardPrices, MagentoProduct, MediaEntry } from "./client/types.ts";
+import {
+  Cart,
+  MagentoCardPrices,
+  MagentoProduct,
+  MediaEntry,
+} from "./client/types.ts";
 import { toURL } from "./transform.ts";
 
 const CART_COOKIE = "dataservices_cart_id";

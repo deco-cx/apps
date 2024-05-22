@@ -305,7 +305,6 @@ interface TotalSegment {
     gw_items_base_price?: string;
     gw_card_price?: string;
     gw_card_base_price?: string;
-    tax_grandtotal_details?: any[];
   };
   area?: string;
 }
