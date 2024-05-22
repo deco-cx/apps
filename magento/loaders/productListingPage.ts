@@ -2,12 +2,12 @@ import type { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
   CategoryGraphQL,
+  FilterProps,
   ProductPLPGraphQL,
   ProductSearchInputs,
   ProductSort,
-  FilterProps,
 } from "../utils/clientGraphql/types.ts";
-import { GetPLPItems, GetCategoryUid } from "../utils/clientGraphql/queries.ts";
+import { GetCategoryUid, GetPLPItems } from "../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../utils/transform.ts";
 import {
   transformFilterGraphQL,
@@ -60,54 +60,41 @@ const loader = async (
     return null;
   }
 
-  try {
-    const categoryGQL = await clientGraphql.query<
-      CategoryGraphQL,
-      { path: string }
-    >({
-      variables: { path: categoryUrl },
-      ...GetCategoryUid,
-    });
-    if (
-      !categoryGQL.categories.items ||
-      categoryGQL.categories.items?.length === 0
-    ) {
-      return null;
-    }
-
-    const plpItemsGQL = await clientGraphql.query<
-      ProductPLPGraphQL,
-      Omit<ProductSearchInputs, "search">
-    >({
-      variables: {
-        filter: {
-          category_uid: { eq: categoryGQL.categories.items[0].uid },
-          ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
-        },
-        pageSize,
-        currentPage: Number(currentPage),
-        sort: transformSortGraphQL({ sortBy: sortBy!, order }),
-      },
-      ...GetPLPItems,
-    });
-
-    if (
-      !plpItemsGQL.products.items ||
-      plpItemsGQL.products.items?.length === 0
-    ) {
-      return null;
-    }
-
-    return toProductListingPageGraphQL(
-      plpItemsGQL,
-      categoryGQL,
-      url,
-      imagesQtd
-    );
-  } catch (error) {
-    console.log(error);
+  const categoryGQL = await clientGraphql.query<
+    CategoryGraphQL,
+    { path: string }
+  >({
+    variables: { path: categoryUrl },
+    ...GetCategoryUid,
+  });
+  if (
+    !categoryGQL.categories.items ||
+    categoryGQL.categories.items?.length === 0
+  ) {
     return null;
   }
+
+  const plpItemsGQL = await clientGraphql.query<
+    ProductPLPGraphQL,
+    Omit<ProductSearchInputs, "search">
+  >({
+    variables: {
+      filter: {
+        category_uid: { eq: categoryGQL.categories.items[0].uid },
+        ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
+      },
+      pageSize,
+      currentPage: Number(currentPage),
+      sort: transformSortGraphQL({ sortBy: sortBy!, order }),
+    },
+    ...GetPLPItems,
+  });
+
+  if (!plpItemsGQL.products.items || plpItemsGQL.products.items?.length === 0) {
+    return null;
+  }
+
+  return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, url, imagesQtd);
 };
 
 export default loader;

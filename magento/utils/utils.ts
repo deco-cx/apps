@@ -1,12 +1,12 @@
 import { FiltersGraphQL } from "./clientGraphql/types.ts";
 import {
+  FilterEqualTypeInput,
+  FilterMatchTypeInput,
   FilterProps,
+  FilterRangeTypeInput,
   ProductFilterInput,
   ProductSort,
   ProductSortInput,
-  FilterEqualTypeInput,
-  FilterMatchTypeInput,
-  FilterRangeTypeInput,
 } from "./clientGraphql/types.ts";
 import { DEFAULT_GRAPHQL_FILTERS } from "./constants.ts";
 
@@ -27,19 +27,18 @@ export const transformSortGraphQL = ({
 export const transformFilterGraphQL = (
   url: URL,
   customFilters?: Array<FiltersGraphQL>,
-  fromLoader?: Array<FilterProps>
+  fromLoader?: Array<FilterProps>,
 ): ProductFilterInput | undefined => {
-  const filtersFromLoader =
-    fromLoader?.reduce<ProductFilterInput>(
-      (acc, f) => ({
-        ...acc,
-        [f.name]: f.type,
-      }),
-      {}
-    ) ?? {};
+  const filtersFromLoader = fromLoader?.reduce<ProductFilterInput>(
+    (acc, f) => ({
+      ...acc,
+      [f.name]: f.type,
+    }),
+    {},
+  ) ?? {};
 
   const filtersFromUrl = DEFAULT_GRAPHQL_FILTERS.concat(
-    customFilters ?? []
+    customFilters ?? [],
   ).reduce<ProductFilterInput>((acc, { type, value }) => {
     const fromUrl = url.searchParams.get(value);
     if (!fromUrl) {
@@ -50,13 +49,13 @@ export const transformFilterGraphQL = (
       [value]: transformFilterValueGraphQL(fromUrl, type),
     };
   }, {});
-  
+
   return { ...filtersFromUrl, ...filtersFromLoader };
 };
 
 export const transformFilterValueGraphQL = (
   value: string,
-  type: "EQUAL" | "MATCH" | "RANGE"
+  type: "EQUAL" | "MATCH" | "RANGE",
 ): FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput => {
   if (type === "EQUAL") {
     return { eq: value } as FilterEqualTypeInput;

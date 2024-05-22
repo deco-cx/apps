@@ -53,7 +53,7 @@ export interface CategoryLeafGraphQL {
   url_suffix?: string;
   meta_title?: string | null;
   meta_description?: string | null;
-  name?: string
+  name?: string;
 }
 
 export interface CategoryProducts {
@@ -161,7 +161,10 @@ export type SimpleProductGraphQL = Required<
 >;
 
 export type SimpleCategoryGraphQL = Required<
-  Pick<CategoryLeafGraphQL, "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name">
+  Pick<
+    CategoryLeafGraphQL,
+    "uid" | "breadcrumbs" | "image" | "meta_title" | "meta_description" | "name"
+  >
 >;
 
 export interface ProductShelfGraphQL {
@@ -182,7 +185,7 @@ export interface ProductPLPGraphQL {
     page_info: SearchResultPageInfo;
     sort_fields: SortFields;
     aggregations: Array<Required<Aggregation>>;
-    total_count: number
+    total_count: number;
   };
 }
 
@@ -195,7 +198,10 @@ export interface ProductSearchInputs {
 }
 
 export interface ProductFilterInput {
-  [key: string]: FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput,
+  [key: string]:
+    | FilterEqualTypeInput
+    | FilterMatchTypeInput
+    | FilterRangeTypeInput;
 }
 
 export interface FilterEqualTypeInput {
@@ -227,17 +233,20 @@ export interface CustomProductSortOption {
 
 export interface ProductSort {
   /** @title Ordenar por */
-  sortBy: DefaultProductSortOption | CustomProductSortOption
+  sortBy: DefaultProductSortOption | CustomProductSortOption;
   /** @title Sequência */
   order: "ASC" | "DESC";
 }
 
 export interface FiltersGraphQL {
-  value: string,
-  type: "EQUAL" | "MATCH" | "RANGE"
+  value: string;
+  type: "EQUAL" | "MATCH" | "RANGE";
 }
 
 export interface FilterProps {
-  name: string,
-  type: Omit<FilterEqualTypeInput, "eq"> | FilterMatchTypeInput | FilterRangeTypeInput
+  name: string;
+  type:
+    | Omit<FilterEqualTypeInput, "eq">
+    | FilterMatchTypeInput
+    | FilterRangeTypeInput;
 }

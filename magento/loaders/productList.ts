@@ -24,7 +24,7 @@ export interface CommomProps {
   currentPage: number;
 
   /** @title Sorting */
-  sort?: ProductSort
+  sort?: ProductSort;
 
   /** @title Filter */
   filter?: Array<FilterProps>;
@@ -159,7 +159,7 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
 async function loader(
   { props }: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[] | null> {
   const { clientGraphql, imagesQtd } = ctx;
   const url = new URL(req.url);

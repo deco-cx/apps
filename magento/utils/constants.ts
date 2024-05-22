@@ -49,4 +49,4 @@ export const DEFAULT_GRAPHQL_FILTERS: FiltersGraphQL[] = [
   { value: "url_key", type: "EQUAL" },
 ];
 
-export const REMOVABLE_URL_SEARCHPARAMS = ["p", "product_list_order"]
+export const REMOVABLE_URL_SEARCHPARAMS = ["p", "product_list_order"];
