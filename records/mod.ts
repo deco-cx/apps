@@ -8,7 +8,7 @@ export interface Props extends TursoProps {}
  * @title Deco Records
  * @description Deco database for records
  * @category Tool
- * @logo todo
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/records/logo.png
  */
 export default function Records(
   { url, authToken, ...state }: Props,
