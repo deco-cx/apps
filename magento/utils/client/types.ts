@@ -110,7 +110,7 @@ interface MagentoStock {
   stock_status_changed_auto?: number;
 }
 
-interface MediaEntry {
+export interface MediaEntry {
   id: number;
   media_type: string;
   label: string | null;
@@ -261,6 +261,59 @@ export interface Cart {
       creator_type: string | null;
     };
   };
+}
+
+export interface MagentoCardPrices {
+  grand_total: number;
+  subtotal: number;
+  discount_amount: number;
+  base_discount_amount?: number;
+  shipping_amount: number;
+  base_shipping_amount?: number;
+  shipping_discount_amount?: number;
+  base_currency_code?: string;
+  coupon_code: string;
+  base_grand_total?: number;
+  base_subtotal?: number;
+  subtotal_with_discount?: number;
+  base_subtotal_with_discount?: number;
+  base_shipping_discount_amount?: number;
+  tax_amount?: number;
+  base_tax_amount?: number;
+  weee_tax_applied_amount?: number | null;
+  shipping_tax_amount?: number;
+  base_shipping_tax_amount?: number;
+  subtotal_incl_tax?: number;
+  shipping_incl_tax?: number;
+  base_shipping_incl_tax?: number;
+  quote_currency_code?: string;
+  items_qty?: number;
+  items?: MagentoProduct[];
+  total_segments?: TotalSegment[];
+  extension_attributes?: ExtensionAttributes;
+}
+
+interface TotalSegment {
+  code: string;
+  title: string;
+  value: number | null;
+  extension_attributes?: {
+    gw_item_ids?: number[];
+    gw_price?: string;
+    gw_base_price?: string;
+    gw_items_price?: string;
+    gw_items_base_price?: string;
+    gw_card_price?: string;
+    gw_card_base_price?: string;
+    tax_grandtotal_details?: any[];
+  };
+  area?: string;
+}
+
+interface ExtensionAttributes {
+  reward_points_balance: number;
+  reward_currency_amount: number;
+  base_reward_currency_amount: number;
 }
 
 export interface MagentoProductsCart {
