@@ -140,6 +140,7 @@ export default function Proxy({
     const response = await fetch(to, {
       headers,
       redirect,
+      signal: req.signal,
       method: req.method,
       body: req.body,
     });
