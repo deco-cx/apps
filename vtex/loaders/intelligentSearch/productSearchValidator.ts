@@ -2,6 +2,9 @@ import { AppContext } from "../../mod.ts";
 import { FacetsProps, Props } from "./productList.ts";
 import type { Product } from "../../../commerce/types.ts";
 
+/**
+ * @title VTEX Integration - Product Search Validator
+ */
 const loader = async (
   expandedProps: Props,
   _req: Request,

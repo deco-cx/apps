@@ -91,63 +91,59 @@ const loader = async (
 
   const sort = url.searchParams.get("sort") ?? "";
 
-  try {
-    if (isSearch) {
-      const data = await storefront.query<
-        QueryRoot,
-        QueryRootSearchArgs
-      >({
-        variables: {
-          ...(!endCursor && { first: count }),
-          ...(endCursor && { last: count }),
-          ...(startCursor && { after: startCursor }),
-          ...(endCursor && { before: endCursor }),
-          query: query,
-          productFilters: getFiltersByUrl(url),
-          ...searchSortShopify[sort],
-        },
-        ...SearchProducts,
-      });
+  if (isSearch) {
+    const data = await storefront.query<
+      QueryRoot,
+      QueryRootSearchArgs
+    >({
+      variables: {
+        ...(!endCursor && { first: count }),
+        ...(endCursor && { last: count }),
+        ...(startCursor && { after: startCursor }),
+        ...(endCursor && { before: endCursor }),
+        query: query,
+        productFilters: getFiltersByUrl(url),
+        ...searchSortShopify[sort],
+      },
+      ...SearchProducts,
+    });
 
-      shopifyProducts = data.search;
-      shopifyFilters = data.search?.productFilters;
-      records = data.search?.totalCount;
-      hasNextPage = Boolean(data?.search?.pageInfo.hasNextPage ?? false);
-      hasPreviousPage = Boolean(
-        data?.search?.pageInfo.hasPreviousPage ?? false,
-      );
-    } else {
-      // TODO: understand how accept more than one path
-      // example: /collections/first-collection/second-collection
-      const pathname = props.collectionName || url.pathname.split("/")[1];
+    shopifyProducts = data.search;
+    shopifyFilters = data.search?.productFilters;
+    records = data.search?.totalCount;
+    hasNextPage = Boolean(data?.search?.pageInfo.hasNextPage ?? false);
+    hasPreviousPage = Boolean(
+      data?.search?.pageInfo.hasPreviousPage ?? false,
+    );
+  } else {
+    // TODO: understand how accept more than one path
+    // example: /collections/first-collection/second-collection
+    const pathname = props.collectionName || url.pathname.split("/")[1];
 
-      const data = await storefront.query<
-        QueryRoot,
-        QueryRootCollectionArgs & CollectionProductsArgs
-      >({
-        variables: {
-          ...(!endCursor && { first: count }),
-          ...(endCursor && { last: count }),
-          ...(startCursor && { after: startCursor }),
-          ...(endCursor && { before: endCursor }),
-          handle: pathname,
-          filters: getFiltersByUrl(url),
-          ...sortShopify[sort],
-        },
-        ...ProductsByCollection,
-      });
+    const data = await storefront.query<
+      QueryRoot,
+      QueryRootCollectionArgs & CollectionProductsArgs
+    >({
+      variables: {
+        ...(!endCursor && { first: count }),
+        ...(endCursor && { last: count }),
+        ...(startCursor && { after: startCursor }),
+        ...(endCursor && { before: endCursor }),
+        handle: pathname,
+        filters: getFiltersByUrl(url),
+        ...sortShopify[sort],
+      },
+      ...ProductsByCollection,
+    });
 
-      shopifyProducts = data.collection?.products;
-      shopifyFilters = data.collection?.products?.filters;
-      hasNextPage = Boolean(
-        data?.collection?.products.pageInfo.hasNextPage ?? false,
-      );
-      hasPreviousPage = Boolean(
-        data?.collection?.products.pageInfo.hasPreviousPage ?? false,
-      );
-    }
-  } catch (e) {
-    console.log(e);
+    shopifyProducts = data.collection?.products;
+    shopifyFilters = data.collection?.products?.filters;
+    hasNextPage = Boolean(
+      data?.collection?.products.pageInfo.hasNextPage ?? false,
+    );
+    hasPreviousPage = Boolean(
+      data?.collection?.products.pageInfo.hasPreviousPage ?? false,
+    );
   }
 
   // Transform Shopify product format into schema.org's compatible format
