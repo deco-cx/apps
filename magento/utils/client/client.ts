@@ -67,7 +67,7 @@ export interface API {
     response: MagentoCardPrices;
     searchParams: {
       fields?: string;
-    }
+    };
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */
