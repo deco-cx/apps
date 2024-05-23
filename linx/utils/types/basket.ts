@@ -19,7 +19,7 @@ export interface ResponseCallBack {
 export interface Meta {
   PropertyMetadataID: number;
   PropertyName: string;
-  Value: number;
+  Value: string;
 }
 
 export interface CartProduct {

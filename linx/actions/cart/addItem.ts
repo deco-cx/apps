@@ -25,6 +25,29 @@ const action = async (
     },
   ).then((res) => res.json());
 
+  const metadatas = [];
+  for (const prod of props.Products) {
+    if (prod.Metas && prod.Metas.length > 0) {
+      const BasketItemID = response.Shopper.Basket.Items.find(
+        item => String(item.ProductID) === prod.ProductID
+      )?.BasketItemID;
+
+      metadatas.push(
+        ctx.api["POST /web-api/v1/Shopping/Basket/AddCustomMetadata"]({}, {
+          body: {
+            Metas: prod.Metas,
+            ProductID: prod.ProductID,
+            SkuID: prod.SkuID,
+            BasketItemID,
+          },
+          headers: toLinxHeaders(req.headers),
+        }),
+      );
+    }
+  }
+
+  await Promise.all(metadatas);
+
   if (!response.IsValid) {
     console.error("Could not add Item to cart: ", response.Errors);
     return null;
