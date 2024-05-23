@@ -2,11 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/sqlClient.ts";
+import * as $$$0 from "./loaders/drizzle.ts";
+import * as $$$1 from "./loaders/sqlClient.ts";
 
 const manifest = {
   "loaders": {
-    "records/loaders/sqlClient.ts": $$$0,
+    "records/loaders/drizzle.ts": $$$0,
+    "records/loaders/sqlClient.ts": $$$1,
   },
   "name": "records",
   "baseUrl": import.meta.url,
