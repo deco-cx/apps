@@ -1,13 +1,17 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
-  ProductFilterInput,
   ProductSearchInputs,
   ProductShelfGraphQL,
   ProductSort,
+  FilterProps,
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
-import { transformSortGraphQL, typeChecker } from "../utils/utilsGraphQL.ts";
+import {
+  transformSortGraphQL,
+  typeChecker,
+  filtersFromLoaderGraphQL,
+} from "../utils/utilsGraphQL.ts";
 import { toProductGraphQL } from "../utils/transform.ts";
 
 export interface CommomProps {
@@ -23,20 +27,16 @@ export interface CommomProps {
    */
   currentPage: number;
 
+  /**
+   * @title Default URL Path suffix
+   */
+  urlSuffix?: string;
+
   /** @title Sorting */
   sort?: ProductSort;
 
   /** @title Filter */
   filter?: Array<FilterProps>;
-}
-
-export interface FilterProps {
-  /** @title Filter Name */
-  input: string;
-  /**
-   * @title Filter Values
-   */
-  values: Array<string>;
 }
 
 export interface TermProps extends CommomProps {
@@ -56,39 +56,30 @@ export interface ProductSkuProps extends Omit<CommomProps, "filter"> {
   skus: Array<string>;
 }
 
-export interface SegmentProps extends CommomProps {
+export interface CustomProps extends Omit<CommomProps, "filter"> {
   /** @title Segments */
-  segments: Array<string>;
+  customProps: Array<FilterProps>;
 }
+
+export interface SuggestionsFromUrl extends CommomProps {}
 
 /**
- * @title Magento Integration - Product Lists
+ * @title Magento Integration - Product List
  */
 export interface Props {
-  props: TermProps | CategoryProps | ProductSkuProps | SegmentProps;
+  props:
+    | TermProps
+    | CategoryProps
+    | ProductSkuProps
+    | CustomProps
+    | SuggestionsFromUrl;
 }
 
-const transformFilter = ({
-  filter,
-}: Pick<CommomProps, "filter">): ProductFilterInput | undefined => {
-  return filter?.reduce<ProductFilterInput>((acc, f) => {
-    return {
-      ...acc,
-      [f.input]: transformFilterValue(f),
-    };
-  }, {});
-};
-
-const transformFilterValue = ({ input, values }: FilterProps) => {
-  if (input === "name") {
-    return {
-      match: values[0],
-    };
-  }
-  return values.length === 1 ? { eq: values[0] } : { in: values.map((v) => v) };
-};
-
-const fromProps = ({ props }: Props): ProductSearchInputs => {
+const fromProps = (
+  { props }: Props,
+  url: URL,
+  urlSuffix?: string
+): ProductSearchInputs => {
   const { sort } = props;
   if (typeChecker<TermProps>(props as TermProps, "search")) {
     const { search, filter } = props as TermProps;
@@ -97,7 +88,7 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
       sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
-      filter: transformFilter({ filter }),
+      filter: filtersFromLoaderGraphQL(filter),
     } as const;
   }
 
@@ -107,14 +98,16 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
       sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
-      filter: transformFilter({
-        filter: filter?.concat([
+      filter: filtersFromLoaderGraphQL(
+        filter?.concat([
           {
-            input: useCategoryUid ? "category_uid" : "category_id",
-            values: categories,
+            name: useCategoryUid ? "category_uid" : "category_id",
+            type: {
+              in: categories,
+            },
           },
-        ]),
-      }),
+        ])
+      ),
     } as const;
   }
 
@@ -124,29 +117,64 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
       sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
-      filter: transformFilter({
-        filter: [
-          {
-            input: "sku",
-            values: skus,
+      filter: filtersFromLoaderGraphQL([
+        {
+          name: "sku",
+          type: {
+            in: skus,
           },
-        ],
-      }),
+        },
+      ]),
     } as const;
   }
 
-  if (typeChecker<SegmentProps>(props as SegmentProps, "segments")) {
-    const { filter, segments } = props as SegmentProps;
+  if (typeChecker<CustomProps>(props as CustomProps, "customProps")) {
+    const { customProps } = props as CustomProps;
     return {
       pageSize: props.pageSize,
       currentPage: props.currentPage,
       sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
-      filter: transformFilter({
-        filter: filter?.concat({
-          input: "linha",
-          values: segments,
-        }),
-      }),
+      filter: filtersFromLoaderGraphQL(customProps),
+    } as const;
+  }
+
+  if (typeChecker<ProductSkuProps>(props as ProductSkuProps, "skus")) {
+    const { skus } = props as ProductSkuProps;
+    return {
+      pageSize: props.pageSize,
+      currentPage: props.currentPage,
+      sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
+      filter: filtersFromLoaderGraphQL([
+        {
+          name: "sku",
+          type: {
+            in: skus,
+          },
+        },
+      ]),
+    } as const;
+  }
+
+  if (
+    typeChecker<SuggestionsFromUrl>(props as SuggestionsFromUrl, "pageSize")
+  ) {
+    const { filter } = props as SuggestionsFromUrl;
+    const regex = new RegExp("/(" + (urlSuffix ?? "") + "/)", "g");
+    const slug = url.pathname.toString().replace(regex, "");
+    return {
+      pageSize: props.pageSize,
+      currentPage: props.currentPage,
+      sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
+      filter: slug
+        ? filtersFromLoaderGraphQL(
+            filter?.concat([
+              {
+                name: "url_key",
+                type: { in: [slug] },
+              },
+            ])
+          )
+        : undefined,
     } as const;
   }
 
@@ -159,29 +187,39 @@ const fromProps = ({ props }: Props): ProductSearchInputs => {
 async function loader(
   { props }: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product[] | null> {
   const { clientGraphql, imagesQtd } = ctx;
   const url = new URL(req.url);
-  const formatedProps = fromProps({ props });
-  try {
-    const { products } = await clientGraphql.query<
-      ProductShelfGraphQL,
-      ProductSearchInputs
-    >({
-      variables: { ...formatedProps },
-      ...GetProduct,
-    });
+  const { urlSuffix } = props;
+  const formatedProps = fromProps({ props }, url, urlSuffix);
 
-    if (!products.items || products.items?.length === 0) {
-      return null;
-    }
+  const { products } = await clientGraphql.query<
+    ProductShelfGraphQL,
+    ProductSearchInputs
+  >({
+    variables: { ...formatedProps },
+    ...GetProduct,
+  });
 
-    return products.items.map((p) => toProductGraphQL(p, url, imagesQtd));
-  } catch (e) {
-    console.log(e);
+  if (!products.items || products.items?.length === 0) {
     return null;
   }
+
+  return products.items.map((p) =>
+    toProductGraphQL(
+      p,
+      url,
+      imagesQtd,
+      urlSuffix ? formatUrlSuffix(urlSuffix) : undefined
+    )
+  );
 }
+
+const formatUrlSuffix = (str: string) => {
+  str = str.startsWith("/") ? str.slice(0, -1) : str;
+  str = str.endsWith("/") ? str : str + "/";
+  return str;
+};
 
 export default loader;

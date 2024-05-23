@@ -84,7 +84,7 @@ const loader = async (
   >({
     variables: {
       filter: {
-        category_uid: { eq: categoryGQL.categories.items[0].uid },
+        category_uid: { in: [categoryGQL.categories.items[0].uid] },
         ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
       },
       pageSize,

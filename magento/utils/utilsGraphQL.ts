@@ -27,18 +27,29 @@ export const transformSortGraphQL = ({
 export const transformFilterGraphQL = (
   url: URL,
   customFilters?: Array<FiltersGraphQL>,
-  fromLoader?: Array<FilterProps>,
-): ProductFilterInput | undefined => {
-  const filtersFromLoader = fromLoader?.reduce<ProductFilterInput>(
+  fromLoader?: Array<FilterProps>
+): ProductFilterInput | undefined => ({
+  ...filtersFromUrlGraphQL(url, customFilters),
+  ...filtersFromLoaderGraphQL(fromLoader),
+});
+
+export const filtersFromLoaderGraphQL = (
+  fromLoader?: Array<FilterProps>
+): ProductFilterInput | undefined =>
+  fromLoader?.reduce<ProductFilterInput>(
     (acc, f) => ({
       ...acc,
       [f.name]: f.type,
     }),
-    {},
+    {}
   ) ?? {};
 
-  const filtersFromUrl = DEFAULT_GRAPHQL_FILTERS.concat(
-    customFilters ?? [],
+export const filtersFromUrlGraphQL = (
+  url: URL,
+  customFilters?: Array<FiltersGraphQL>
+) =>
+  DEFAULT_GRAPHQL_FILTERS.concat(
+    customFilters ?? []
   ).reduce<ProductFilterInput>((acc, { type, value }) => {
     const fromUrl = url.searchParams.get(value);
     if (!fromUrl) {
@@ -50,12 +61,9 @@ export const transformFilterGraphQL = (
     };
   }, {});
 
-  return { ...filtersFromUrl, ...filtersFromLoader };
-};
-
 export const transformFilterValueGraphQL = (
   value: string,
-  type: "EQUAL" | "MATCH" | "RANGE",
+  type: "EQUAL" | "MATCH" | "RANGE"
 ): FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput => {
   if (type === "EQUAL") {
     return { eq: value } as FilterEqualTypeInput;

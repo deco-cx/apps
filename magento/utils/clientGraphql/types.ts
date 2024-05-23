@@ -207,7 +207,6 @@ export interface ProductFilterInput {
 }
 
 export interface FilterEqualTypeInput {
-  eq?: string;
   in?: string[];
 }
 
@@ -244,7 +243,7 @@ export interface ProductSort {
 export interface FilterProps {
   name: string;
   type:
-    | Omit<FilterEqualTypeInput, "eq">
+    | FilterEqualTypeInput
     | FilterMatchTypeInput
     | FilterRangeTypeInput;
 }
