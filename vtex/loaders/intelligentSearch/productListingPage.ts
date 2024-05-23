@@ -96,7 +96,7 @@ const ALLOWED_PARAMS = new Set([
 
 enum AdditionalParameters {
   showSponsered,
-  placement
+  placement,
 }
 
 export interface Props {
@@ -154,9 +154,9 @@ export interface Props {
    */
   pageHref?: string;
   aditionalFieldsInQuery?: {
-    label: string,
-    value: string
-  }[]
+    label: string;
+    value: string;
+  }[];
 }
 
 const searchArgsOf = (props: Props, url: URL) => {
@@ -293,11 +293,15 @@ const loader = async (
     ...args
   } = searchArgsOf(props, url);
 
-  const aditionalFieldsInQuery: {[key in keyof typeof AdditionalParameters | string]?: string | number | boolean} = {}
-  props.aditionalFieldsInQuery?.map(item => {
-    aditionalFieldsInQuery[item.label] = item.value
-  })
-
+  const aditionalFieldsInQuery: {
+    [key in keyof typeof AdditionalParameters | string]?:
+      | string
+      | number
+      | boolean;
+  } = {};
+  props.aditionalFieldsInQuery?.map((item) => {
+    aditionalFieldsInQuery[item.label] = item.value;
+  });
 
   let pathToUse = url.pathname;
 
@@ -329,8 +333,6 @@ const loader = async (
   }
 
   const params = withDefaultParams({ ...searchArgs, page });
-
-
 
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
@@ -411,8 +413,12 @@ const loader = async (
   const paramsToPersist = new URLSearchParams();
   searchArgs.query && paramsToPersist.set("q", searchArgs.query);
   searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
+
   const filters = facets
-    .filter((f) => !f.hidden)
+    .filter((f) => {
+      if (f.values.some((item) => item.selected) || !f.hidden) return true;
+      return false;
+    })
     .map(toFilter(selectedFacets, paramsToPersist));
 
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
