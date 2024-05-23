@@ -4,6 +4,7 @@ import { createGraphqlClient } from "../utils/graphql.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import getStateFromZip from "../commerce/utils/stateByZip.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -93,3 +94,7 @@ export default function App(props: Props): App<Manifest, State> {
     manifest,
   };
 }
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

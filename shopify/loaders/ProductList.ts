@@ -106,39 +106,35 @@ const loader = async (
     filters.push({ variantOption });
   });
 
-  try {
-    if (isQueryList(props)) {
-      const data = await storefront.query<
-        QueryRoot,
-        QueryRootSearchArgs
-      >({
-        variables: {
-          first: count,
-          query: props.query,
-          productFilters: filters,
-          ...searchSortShopify[sort],
-        },
-        ...SearchProducts,
-      });
-      shopifyProducts = data.search;
-    } else {
-      const data = await storefront.query<
-        QueryRoot,
-        QueryRootCollectionArgs & CollectionProductsArgs
-      >({
-        variables: {
-          first: count,
-          handle: props.collection,
-          filters,
-          ...sortShopify[sort],
-        },
-        ...ProductsByCollection,
-      });
+  if (isQueryList(props)) {
+    const data = await storefront.query<
+      QueryRoot,
+      QueryRootSearchArgs
+    >({
+      variables: {
+        first: count,
+        query: props.query,
+        productFilters: filters,
+        ...searchSortShopify[sort],
+      },
+      ...SearchProducts,
+    });
+    shopifyProducts = data.search;
+  } else {
+    const data = await storefront.query<
+      QueryRoot,
+      QueryRootCollectionArgs & CollectionProductsArgs
+    >({
+      variables: {
+        first: count,
+        handle: props.collection,
+        filters,
+        ...sortShopify[sort],
+      },
+      ...ProductsByCollection,
+    });
 
-      shopifyProducts = data.collection?.products;
-    }
-  } catch (e) {
-    console.log(e);
+    shopifyProducts = data.collection?.products;
   }
 
   // Transform Shopify product format into schema.org's compatible format
