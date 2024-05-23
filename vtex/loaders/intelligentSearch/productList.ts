@@ -20,10 +20,14 @@ import {
 } from "./productListingPage.ts";
 import { sortProducts } from "../../utils/transform.ts";
 
+/**
+ * @title Collection ID
+ */
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
   /**
-   * @title Collection ID (e.g.: 139)
+   * @title Collection ID
+   * @description (e.g.: 150)
    * @pattern \d*
    * @format dynamic-options
    * @options vtex/loaders/collections/list.ts
@@ -37,6 +41,9 @@ export interface CollectionProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Advanced Facets
+ */
 export interface FacetsProps extends CommonProps {
   /**
    * @description query to use on search
@@ -44,7 +51,8 @@ export interface FacetsProps extends CommonProps {
    */
   query: string;
   /**
-   * @title Facets string (e.g.: 'catergory-1/moda-feminina/category-2/calcados')
+   * @title Facets string
+   * @description (e.g.: 'catergory-1/moda-feminina/category-2/calcados')
    * @pattern \d*
    */
   facets: string;
@@ -56,6 +64,9 @@ export interface FacetsProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Keyword Search
+ */
 export interface QueryProps extends CommonProps {
   /**
    * @description query to use on search
@@ -79,6 +90,9 @@ export interface QueryProps extends CommonProps {
   fuzzy?: LabelledFuzzy;
 }
 
+/**
+ * @title Product IDs
+ */
 export interface ProductIDProps extends CommonProps {
   /**
    * @description SKU ids to retrieve
@@ -99,9 +113,15 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props = {
+/**
+ * @title Select products by
+ */
+export interface Props {
+  /**
+   * @title Select products by
+   */
   props: CollectionProps | QueryProps | ProductIDProps | FacetsProps;
-};
+}
 
 // deno-lint-ignore no-explicit-any
 const isCollectionList = (p: any): p is CollectionProps =>

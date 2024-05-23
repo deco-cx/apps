@@ -52,6 +52,16 @@ export interface Props {
    * @description Application own filters
    */
   customFilters: Array<FiltersGraphQL>;
+
+  /**
+   * @title Maximum number of installments
+   */
+  maxInstallments: number;
+
+  /**
+   * @title Minimum installment value
+   */
+  minInstallmentValue: number;
 }
 
 type PartialProps = Omit<Props, "baseUrl">;
@@ -77,6 +87,8 @@ export default function App(props: Props): App<Manifest, State> {
     imagesUrl,
     imagesQtd,
     customFilters = [],
+    maxInstallments,
+    minInstallmentValue,
   } = props;
 
   const clientAdmin = createHttpClient<API>({
@@ -106,6 +118,8 @@ export default function App(props: Props): App<Manifest, State> {
       clientGraphql,
       imagesQtd,
       customFilters,
+      maxInstallments,
+      minInstallmentValue,
     },
   };
 }

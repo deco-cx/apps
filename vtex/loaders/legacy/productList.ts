@@ -12,6 +12,9 @@ import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
 import { sortProducts } from "../../utils/transform.ts";
 
+/**
+ * @title Collection ID
+ */
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
   /**
@@ -29,6 +32,9 @@ export interface CollectionProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Keyword Search
+ */
 export interface TermProps extends CommonProps {
   /** @description term to use on search */
   term?: string;
@@ -40,6 +46,9 @@ export interface TermProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Advanced Facets
+ */
 export interface FQProps extends CommonProps {
   /** @description fq's */
   fq: string[];
@@ -53,6 +62,9 @@ export interface FQProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Product SKUs
+ */
 export interface SkuIDProps extends CommonProps {
   /**
    * @description SKU ids to retrieve
@@ -60,6 +72,9 @@ export interface SkuIDProps extends CommonProps {
   ids?: string[];
 }
 
+/**
+ * @title Product IDs
+ */
 export interface ProductIDProps extends CommonProps {
   /**
    * @description Product ids to retrieve
@@ -75,14 +90,17 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props = {
+export interface Props {
+  /**
+   * @title Select products by
+   */
   props:
     | CollectionProps
     | TermProps
     | ProductIDProps
     | SkuIDProps
     | FQProps;
-};
+}
 
 // deno-lint-ignore no-explicit-any
 const isCollectionProps = (p: any): p is CollectionProps =>
