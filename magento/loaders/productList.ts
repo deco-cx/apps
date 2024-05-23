@@ -57,7 +57,7 @@ export interface ProductSkuProps extends Omit<CommomProps, "filter"> {
 }
 
 export interface CustomProps extends Omit<CommomProps, "filter"> {
-  /** @title Segments */
+  /** @title Custom Props */
   customProps: Array<FilterProps>;
 }
 
@@ -169,8 +169,8 @@ const fromProps = (
         ? filtersFromLoaderGraphQL(
             filter?.concat([
               {
-                name: "url_key",
-                type: { in: [slug] },
+                name: "name",
+                type: { match: slug },
               },
             ])
           )
@@ -193,6 +193,7 @@ async function loader(
   const url = new URL(req.url);
   const { urlSuffix } = props;
   const formatedProps = fromProps({ props }, url, urlSuffix);
+  console.log(formatedProps)
 
   const { products } = await clientGraphql.query<
     ProductShelfGraphQL,

@@ -212,7 +212,6 @@ export interface FilterEqualTypeInput {
 
 export interface FilterMatchTypeInput {
   match: string;
-  match_type?: "FULL" | "PARTIAL";
 }
 
 export interface FilterRangeTypeInput {
