@@ -109,4 +109,18 @@ export interface API {
       PostalCode: string;
     };
   };
+
+  "POST /web-api/v1/Shopping/Basket/AddCustomMetadata": {
+    response: unknown;
+    body: {
+      BasketItemID?: number;
+      ProductID: string;
+      SkuID: string;
+      Metas: Array<{
+        PropertyMetadataID: number;
+        PropertyName: string;
+        Value: string;
+      }>;
+    };
+  };
 }
