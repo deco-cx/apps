@@ -11,6 +11,7 @@ import * as $$$$$$$$4 from "./flags/multivariate/message.ts";
 import * as $$$$$$$$5 from "./flags/multivariate/page.ts";
 import * as $$$$$$$$6 from "./flags/multivariate/section.ts";
 import * as $0 from "./functions/requestToParam.ts";
+import * as $1 from "./functions/requestToPathname.ts";
 import * as $$$$0 from "./handlers/fresh.ts";
 import * as $$$$1 from "./handlers/proxy.ts";
 import * as $$$$2 from "./handlers/redirect.ts";
@@ -53,6 +54,7 @@ import * as $$$$$$3 from "./sections/Seo/SeoV2.tsx";
 const manifest = {
   "functions": {
     "website/functions/requestToParam.ts": $0,
+    "website/functions/requestToPathname.ts": $1,
   },
   "loaders": {
     "website/loaders/asset.ts": $$$0,
