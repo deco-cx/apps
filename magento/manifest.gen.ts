@@ -8,8 +8,9 @@ import * as $$$$$$$$$2 from "./actions/cart/simulation.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
 import * as $0 from "./functions/requestToPathname.ts";
 import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/productDetailsPage.ts";
-import * as $$$2 from "./loaders/user.ts";
+import * as $$$1 from "./loaders/peoduct/detailsPage.ts";
+import * as $$$2 from "./loaders/peoduct/getId.ts";
+import * as $$$3 from "./loaders/user.ts";
 
 const manifest = {
   "functions": {
@@ -17,8 +18,9 @@ const manifest = {
   },
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
-    "magento/loaders/productDetailsPage.ts": $$$1,
-    "magento/loaders/user.ts": $$$2,
+    "magento/loaders/peoduct/detailsPage.ts": $$$1,
+    "magento/loaders/peoduct/getId.ts": $$$2,
+    "magento/loaders/user.ts": $$$3,
   },
   "actions": {
     "magento/actions/cart/addItem.ts": $$$$$$$$$0,

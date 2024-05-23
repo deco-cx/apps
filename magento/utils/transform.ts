@@ -28,7 +28,7 @@ export const toProduct = ({
   const offers = toOffer(
     product,
     options.minInstallmentValue,
-    options.maxInstallments
+    options.maxInstallments,
   );
   const sku = product.sku;
   const productID = product.id.toString();
@@ -39,7 +39,7 @@ export const toProduct = ({
       "@type": "PropertyValue",
       name: attr.attribute_code,
       value: String(attr.value),
-    })
+    }),
   );
 
   return {
@@ -89,7 +89,7 @@ export const toProduct = ({
 export const toOffer = (
   { price_info, extension_attributes, sku, currency_code }: MagentoProduct,
   minInstallmentValue: number,
-  maxInstallments: number
+  maxInstallments: number,
 ): Offer[] => {
   if (!price_info) {
     return [];
@@ -103,7 +103,7 @@ export const toOffer = (
     {
       length: Math.min(possibleInstallmentsQtd, maxInstallments),
     },
-    (_v, i) => +(final_price / (i + 1)).toFixed(2)
+    (_v, i) => +(final_price / (i + 1)).toFixed(2),
   );
 
   const priceSpecification: UnitPriceSpecification[] = [
@@ -174,7 +174,7 @@ export const toBreadcrumbList = (
   categories: (MagentoCategory | null)[],
   isBreadcrumbProductName: boolean,
   product: Product,
-  url: URL
+  url: URL,
 ) => {
   if (isBreadcrumbProductName && categories?.length === 0) {
     return [
@@ -206,11 +206,11 @@ export const toBreadcrumbList = (
 
 export const toSeo = (
   customAttributes: CustomAttribute[],
-  productURL: string
+  productURL: string,
 ): Seo => {
   const findAttribute = (attrCode: string): string | undefined => {
     const attribute = customAttributes.find(
-      (attr) => attr.attribute_code === attrCode
+      (attr) => attr.attribute_code === attrCode,
     );
     if (!attribute) return undefined;
     if (Array.isArray(attribute.value)) {

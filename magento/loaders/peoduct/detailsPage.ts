@@ -1,12 +1,17 @@
-import type { ListItem, ProductDetailsPage } from "../../commerce/types.ts";
-import { RequestPathname } from "../functions/requestToPathname.ts";
-import { AppContext } from "../mod.ts";
-import { URL_KEY } from "../utils/constants.ts";
-import stringifySearchCriteria from "../utils/stringifySearchCriteria.ts";
-import { toBreadcrumbList, toProduct, toSeo } from "../utils/transform.ts";
+import type { ListItem, ProductDetailsPage } from "../../../commerce/types.ts";
+import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
+import { AppContext } from "../../mod.ts";
+import { URL_KEY } from "../../utils/constants.ts";
+import stringifySearchCriteria from "../../utils/stringifySearchCriteria.ts";
+import { toBreadcrumbList, toProduct, toSeo } from "../../utils/transform.ts";
 
 export interface Props {
-  slug: RequestPathname;
+  slug: RequestURLParam;
+
+  /**
+   * @title The name of the product is Breadcrumb
+   * @description When activated, it returns the product name instead of the categories in Breadcrumb
+   */
   isBreadcrumbProductName?: boolean;
 }
 
@@ -14,10 +19,10 @@ export interface Props {
  * @title Magento Integration
  * @description Product Details Page loader
  */
-async function loader(
+export default async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, isBreadcrumbProductName = false } = props;
@@ -25,7 +30,7 @@ async function loader(
     clientAdmin,
     site,
     storeId,
-    currencyCode = "",
+    currencyCode = "BRL",
     imagesUrl,
     minInstallmentValue,
     maxInstallments,
@@ -58,7 +63,7 @@ async function loader(
 
       const [{ items }, stockInfoAndImages] = await Promise.all([
         clientAdmin["GET /rest/:site/V1/products-render-info"](
-          queryParams
+          queryParams,
         ).then((res) => res.json()),
         clientAdmin["GET /rest/:site/V1/products/:sku"]({
           sku: itemSku.items[0].sku,
@@ -121,7 +126,7 @@ async function loader(
     isBreadcrumbProductName ? [] : await getCategoryNames(categoryLinks),
     isBreadcrumbProductName,
     product,
-    url
+    url,
   );
 
   return {
@@ -135,5 +140,3 @@ async function loader(
     seo: toSeo(productMagento.custom_attributes, product.url ?? ""),
   };
 }
-
-export default loader;
