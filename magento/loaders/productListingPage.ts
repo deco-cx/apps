@@ -13,10 +13,11 @@ import {
   transformFilterGraphQL,
   transformSortGraphQL,
 } from "../utils/utilsGraphQL.ts";
-import { RequestPathname } from "../functions/requestToPathname.ts";
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+
 
 export interface Props {
-  urlKey: RequestPathname;
+  urlKey: RequestURLParam;
 
   /**
    * @title Set Size
