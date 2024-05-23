@@ -1,5 +1,4 @@
 import type { ListItem, ProductDetailsPage } from "../../commerce/types.ts";
-/* import type { RequestURLParam } from "../../website/functions/requestToParam.ts"; */
 import { RequestPathname } from "../functions/requestToPathname.ts";
 import { AppContext } from "../mod.ts";
 import { URL_KEY } from "../utils/constants.ts";
@@ -18,7 +17,7 @@ export interface Props {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, isBreadcrumbProductName = false } = props;
@@ -28,6 +27,8 @@ async function loader(
     storeId,
     currencyCode = "",
     imagesUrl,
+    minInstallmentValue,
+    maxInstallments,
   } = ctx;
 
   if (!slug) {
@@ -39,9 +40,7 @@ async function loader(
       const searchCriteria = {
         filterGroups: [
           {
-            filters: [
-              { field: URL_KEY, value: slug },
-            ],
+            filters: [{ field: URL_KEY, value: slug }],
           },
         ],
       };
@@ -53,23 +52,20 @@ async function loader(
         ...stringifySearchCriteria(searchCriteria),
       };
 
-      const itemSku = await clientAdmin
-        ["GET /rest/:site/V1/products"]({
-          ...queryParams,
-        }).then((res) => res.json());
+      const itemSku = await clientAdmin["GET /rest/:site/V1/products"]({
+        ...queryParams,
+      }).then((res) => res.json());
 
       const [{ items }, stockInfoAndImages] = await Promise.all([
-        clientAdmin
-          ["GET /rest/:site/V1/products-render-info"](queryParams).then((res) =>
-            res.json()
-          ),
-        clientAdmin
-          ["GET /rest/:site/V1/products/:sku"]({
-            sku: itemSku.items[0].sku,
-            site,
-            storeId: storeId,
-            currencyCode: currencyCode,
-          }).then((res) => res.json()),
+        clientAdmin["GET /rest/:site/V1/products-render-info"](
+          queryParams
+        ).then((res) => res.json()),
+        clientAdmin["GET /rest/:site/V1/products/:sku"]({
+          sku: itemSku.items[0].sku,
+          site,
+          storeId: storeId,
+          currencyCode: currencyCode,
+        }).then((res) => res.json()),
       ]);
 
       return {
@@ -118,14 +114,14 @@ async function loader(
 
   const product = toProduct({
     product: productMagento,
-    options: { imagesUrl },
+    options: { imagesUrl, minInstallmentValue, maxInstallments },
   });
 
   const itemListElement = toBreadcrumbList(
     isBreadcrumbProductName ? [] : await getCategoryNames(categoryLinks),
     isBreadcrumbProductName,
     product,
-    url,
+    url
   );
 
   return {

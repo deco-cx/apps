@@ -32,6 +32,15 @@ export interface Props {
    * @example https://www.store.com.br/media/catalog/product
    */
   imagesUrl: string;
+  /**
+   * @title Maximum number of installments
+   */
+  maxInstallments: number;
+
+  /**
+   * @title Minimum installment value
+   */
+  minInstallmentValue: number;
 }
 
 type PartialProps = Omit<Props, "baseUrl">;
@@ -47,7 +56,16 @@ export interface State extends PartialProps {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl } = props;
+  const {
+    baseUrl,
+    site,
+    storeId,
+    apiKey,
+    currencyCode,
+    imagesUrl,
+    maxInstallments,
+    minInstallmentValue,
+  } = props;
 
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
@@ -67,6 +85,8 @@ export default function App(props: Props): App<Manifest, State> {
       currencyCode,
       imagesUrl,
       clientAdmin,
+      maxInstallments,
+      minInstallmentValue,
     },
   };
 }
