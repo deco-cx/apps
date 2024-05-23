@@ -2,6 +2,7 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { createClient as createSQLClient } from "npm:@libsql/client@0.6.0/node";
+import { drizzle } from "https://esm.sh/drizzle-orm@0.30.10/libsql";
 
 const getClientConfig = ({ authToken, url }: StorageConfig) => {
   const isLocal = !authToken.get();
@@ -45,6 +46,7 @@ export default function Records(
   const appState = {
     ...state,
     sqlClient,
+    drizzle: drizzle(sqlClient),
   };
 
   const app: App<Manifest, typeof appState> = {
