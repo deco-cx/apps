@@ -443,7 +443,7 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
-  const url = new URL(req.url);
+  const url = new URL(props.pageHref || req.url);
   if (url.searchParams.has("q") || !isAnonymous(ctx)) {
     return null;
   }
