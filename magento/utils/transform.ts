@@ -94,59 +94,71 @@ export const toOffer = (
   if (!price_info) {
     return [];
   }
-
   const { final_price, max_price, max_regular_price } = price_info;
   const { stock_item } = extension_attributes;
-  const possibleInstallmentsQtd =
-    Math.floor(final_price / minInstallmentValue) || 1;
-  const installments = Array.from(
-    {
-      length: Math.min(possibleInstallmentsQtd, maxInstallments),
-    },
-    (_v, i) => +(final_price / (i + 1)).toFixed(2)
-  );
-
-  const priceSpecification: UnitPriceSpecification[] = [
-    {
-      "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/ListPrice",
-      price: max_price ?? max_regular_price,
-    },
-    {
-      "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/SalePrice",
-      price: final_price,
-    },
-    ...installments.map<UnitPriceSpecification>((value, i) => {
-      const [description, billingIncrement] = !i
-        ? ["À vista", final_price]
-        : [i + 1 + "x sem juros", value];
-      return {
-        "@type": "UnitPriceSpecification",
-        priceType: "https://schema.org/SalePrice",
-        priceComponentType: "https://schema.org/Installment",
-        description,
-        billingDuration: i + 1,
-        billingIncrement,
-        price: final_price,
-      };
-    }),
-  ];
-
+  const inStock = stock_item?.is_in_stock
+  const qtyStock = stock_item?.qty ?? 0
+  
   return [
     {
       "@type": "Offer",
-      availability: stock_item?.is_in_stock ? IN_STOCK : OUT_OF_STOCK,
+      availability: inStock ? IN_STOCK : OUT_OF_STOCK,
       inventoryLevel: {
-        value: stock_item?.qty ?? 0,
+        value: inStock ? qtyStock || 999 : 0
       },
       itemCondition: "https://schema.org/NewCondition",
       price: final_price,
       priceCurrency: currency_code,
-      priceSpecification,
+      priceSpecification: [
+        {
+          "@type": "UnitPriceSpecification",
+          priceType: "https://schema.org/ListPrice",
+          price: max_price ?? max_regular_price,
+        },
+        {
+          "@type": "UnitPriceSpecification",
+          priceType: "https://schema.org/SalePrice",
+          price: final_price,
+        },
+        ...calculateInstallments(
+          final_price,
+          minInstallmentValue,
+          maxInstallments
+        ),
+      ],
       sku: sku,
     },
   ];
+};
+
+const calculateInstallments = (
+  finalPrice: number,
+  minInstallmentValue: number,
+  maxInstallments: number
+): UnitPriceSpecification[] => {
+  const possibleInstallmentsCount =
+    Math.floor(finalPrice / minInstallmentValue) || 1;
+  const actualInstallmentsCount = Array.from(
+    {
+      length: Math.min(possibleInstallmentsCount, maxInstallments),
+    },
+    (_v, i) => +(finalPrice / (i + 1)).toFixed(2)
+  );
+
+  return actualInstallmentsCount.map<UnitPriceSpecification>((value, i) => {
+    const [description, billingIncrement] = !i
+      ? ["À vista", finalPrice]
+      : [i + 1 + "x sem juros", value];
+    return {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SalePrice",
+      priceComponentType: "https://schema.org/Installment",
+      description,
+      billingDuration: i + 1,
+      billingIncrement,
+      price: finalPrice,
+    };
+  });
 };
 
 export const toImages = (product: MagentoProduct, imageUrl: string) => {
@@ -208,11 +220,11 @@ export const toSeo = (
   customAttributes: CustomAttribute[],
   productURL: string
 ): Seo => {
-  const findAttribute = (attrCode: string): string | undefined => {
+  const findAttribute = (attrCode: string): string => {
     const attribute = customAttributes.find(
       (attr) => attr.attribute_code === attrCode
     );
-    if (!attribute) return undefined;
+    if (!attribute) return "";
     if (Array.isArray(attribute.value)) {
       return attribute.value.join(", ");
     }
@@ -224,8 +236,8 @@ export const toSeo = (
   const metaDescription = findAttribute("meta_description");
 
   return {
-    title: metaTitle ?? title ?? "",
-    description: metaDescription ?? "",
+    title: metaTitle || title || "",
+    description: metaDescription || "",
     canonical: productURL,
   };
 };
