@@ -33,7 +33,12 @@ export default function Fresh(
   freshConfig: FreshConfig,
   appContext: Pick<
     AppContext,
-    "monitoring" | "response" | "caching" | "firstByteThresholdMS" | "isBot"
+    | "monitoring"
+    | "response"
+    | "caching"
+    | "firstByteThresholdMS"
+    | "isBot"
+    | "flavor"
   >,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
@@ -66,95 +71,104 @@ export default function Fresh(
       ? delay === 1 ? ctrl.abort() : setTimeout(() => ctrl.abort(), delay)
       : undefined;
 
-    const getPage = RequestContext.bind(
-      { signal: ctrl.signal },
-      async () =>
-        isDeferred<Page, BaseContext & { context: ConnInfo }>(freshConfig.page)
-          ? await freshConfig.page({ context: ctx }, {
-            propagateOptions: true,
-            hooks: {
-              onPropsResolveStart: (
-                resolve,
-                _props,
-                resolver,
-              ) => {
-                let next = resolve;
-                if (resolver?.type === "matchers") { // matchers should not have a timeout.
-                  next = RequestContext.bind(
-                    { signal: undefined },
-                    resolve,
-                  );
-                }
-                return next();
+    try {
+      const getPage = RequestContext.bind(
+        { signal: ctrl.signal },
+        async () =>
+          isDeferred<Page, BaseContext & { context: ConnInfo }>(
+              freshConfig.page,
+            )
+            ? await freshConfig.page({ context: ctx }, {
+              propagateOptions: true,
+              hooks: {
+                onPropsResolveStart: (
+                  resolve,
+                  _props,
+                  resolver,
+                ) => {
+                  let next = resolve;
+                  if (resolver?.type === "matchers") { // matchers should not have a timeout.
+                    next = RequestContext.bind(
+                      { signal: req.signal },
+                      resolve,
+                    );
+                  }
+                  return next();
+                },
               },
-            },
-          })
-          : freshConfig.page,
-    );
-
-    const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
-      "load-data",
-      async (span) => {
-        try {
-          return await getPage();
-        } catch (e) {
-          span.recordException(e);
-          throw e;
-        } finally {
-          span.end();
-          timing?.end();
-        }
-      },
-    );
-
-    if (firstByteThreshold) {
-      clearTimeout(firstByteThreshold);
-    }
-
-    if (asJson !== null) {
-      return Response.json(page, { headers: allowCorsFor(req) });
-    }
-    if (isFreshCtx<DecoState>(ctx)) {
-      const timing = appContext?.monitoring?.timings?.start?.(
-        "render-to-string",
+            })
+            : freshConfig.page,
       );
-      const response = await appContext.monitoring!.tracer.startActiveSpan(
-        "render-to-string",
+
+      const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
+        "load-data",
         async (span) => {
           try {
-            const response = await ctx.render({
-              page,
-              routerInfo: {
-                flags: ctx.state.flags,
-                pagePath: ctx.state.pathTemplate,
-              },
-            });
-            const setCookies = getSetCookies(appContext.response.headers);
-            if (appContext?.caching?.enabled && setCookies.length === 0) {
-              appContext.response.headers.set(
-                "Cache-Control",
-                (appContext?.caching?.directives ?? []).map(({ name, value }) =>
-                  `${name}=${value}`
-                ).join(","),
-              );
-            }
-            return response;
-          } catch (err) {
-            span.recordException(err);
-            throw err;
+            return await getPage();
+          } catch (e) {
+            span.recordException(e);
+            throw e;
           } finally {
             span.end();
             timing?.end();
-            req.signal.removeEventListener("abort", abortHandler);
           }
         },
       );
 
-      return response;
+      if (asJson !== null) {
+        return Response.json(page, { headers: allowCorsFor(req) });
+      }
+      if (isFreshCtx<DecoState>(ctx)) {
+        const timing = appContext?.monitoring?.timings?.start?.(
+          "render-to-string",
+        );
+
+        const renderToString = RequestContext.bind(
+          { framework: appContext.flavor?.framework ?? "fresh" },
+          ctx.render,
+        );
+
+        const response = await appContext.monitoring!.tracer.startActiveSpan(
+          "render-to-string",
+          async (span) => {
+            try {
+              const response = await renderToString({
+                page,
+                routerInfo: {
+                  flags: ctx.state.flags,
+                  pagePath: ctx.state.pathTemplate,
+                },
+              });
+              const setCookies = getSetCookies(appContext.response.headers);
+              if (appContext?.caching?.enabled && setCookies.length === 0) {
+                appContext.response.headers.set(
+                  "Cache-Control",
+                  (appContext?.caching?.directives ?? []).map((
+                    { name, value },
+                  ) => `${name}=${value}`).join(","),
+                );
+              }
+              return response;
+            } catch (err) {
+              span.recordException(err);
+              throw err;
+            } finally {
+              span.end();
+              timing?.end();
+            }
+          },
+        );
+
+        return response;
+      }
+      return Response.json({ message: "Fresh is not being used" }, {
+        status: 500,
+      });
+    } finally {
+      if (firstByteThreshold) {
+        clearTimeout(firstByteThreshold);
+      }
     }
-    return Response.json({ message: "Fresh is not being used" }, {
-      status: 500,
-    });
   };
 }
 

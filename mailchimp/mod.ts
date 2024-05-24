@@ -3,6 +3,7 @@ import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client.ts";
 import { Secret } from "../website/loaders/secret.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type App = ReturnType<typeof Mailchimp>;
 export type AppContext = AC<App>;
@@ -38,3 +39,7 @@ export default function Mailchimp(props: Props) {
 
   return app;
 }
+
+export const preview = previewFromMarkdown(
+  new URL("README.md", import.meta.url),
+);

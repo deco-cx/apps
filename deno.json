@@ -8,8 +8,8 @@
     "@preact/signals-core": "https://esm.sh/@preact/signals-core@1.3.0",
     "std/": "https://deno.land/std@0.204.0/",
     "partytown/": "https://deno.land/x/partytown@0.4.8/",
-    "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.25.1/",
-    "deco/": "https://denopkg.com/deco-cx/deco@1.65.8/"
+    "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.26.2/",
+    "deco/": "https://denopkg.com/deco-cx/deco@1.67.1/"
   },
   "lock": false,
   "tasks": {
@@ -36,5 +36,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "version": "0.40.1"
+  "version": "0.43.1"
 }
