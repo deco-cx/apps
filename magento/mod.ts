@@ -43,9 +43,8 @@ export interface Props {
   minInstallmentValue: number;
 }
 
-type PartialProps = Omit<Props, "baseUrl">;
 
-export interface State extends PartialProps {
+export interface State extends Props {
   clientAdmin: ReturnType<typeof createHttpClient<API>>;
 }
 
@@ -87,6 +86,7 @@ export default function App(props: Props): App<Manifest, State> {
       clientAdmin,
       maxInstallments,
       minInstallmentValue,
+      baseUrl
     },
   };
 }

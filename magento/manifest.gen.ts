@@ -6,15 +6,21 @@ import * as $$$$$$$$$0 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$1 from "./actions/cart/removeItem.ts";
 import * as $$$$$$$$$2 from "./actions/cart/simulation.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
-import * as $$$2 from "./loaders/user.ts";
+import * as $$$2 from "./loaders/proxy.ts";
+import * as $$$3 from "./loaders/user.ts";
 
 const manifest = {
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
     "magento/loaders/productDetailsPage.ts": $$$1,
-    "magento/loaders/user.ts": $$$2,
+    "magento/loaders/proxy.ts": $$$2,
+    "magento/loaders/user.ts": $$$3,
+  },
+  "handlers": {
+    "magento/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "magento/actions/cart/addItem.ts": $$$$$$$$$0,
