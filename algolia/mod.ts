@@ -1,8 +1,9 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
-import algolia from "npm:algoliasearch@4.20.0";
+import algolia from "https://esm.sh/algoliasearch@4.20.0";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -47,7 +48,7 @@ export default function App(
     ? adminApiKey
     : adminApiKey?.get?.() ?? "";
 
-  const client = algolia.default(applicationId, stringAdminApiKey, {
+  const client = algolia(applicationId, stringAdminApiKey, {
     requester: createFetchRequester(), // Fetch makes it perform mutch better
   });
 
@@ -74,3 +75,7 @@ export default function App(
 
   return app;
 }
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);
