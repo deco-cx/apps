@@ -4,6 +4,7 @@ import { createHttpClient } from "../utils/http.ts";
 import { ResendApi } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export interface EmailFrom {
   name?: string;
@@ -78,3 +79,7 @@ export default function App(
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);
