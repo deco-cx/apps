@@ -11,8 +11,7 @@ export type ImageFlag = string;
  * @title Image Variants
  */
 export default function Message(
-    props: MultivariateProps<ImageFlag>,
-  ): MultivariateFlag<ImageFlag> {
-    return multivariate(props);
-  }
-  
+  props: MultivariateProps<ImageFlag>,
+): MultivariateFlag<ImageFlag> {
+  return multivariate(props);
+}
