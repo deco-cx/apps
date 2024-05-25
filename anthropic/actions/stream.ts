@@ -24,6 +24,23 @@ export interface Props {
    * Optional list of available functions (actions or loaders) that the AI Assistant can perform.
    */
   availableFunctions?: string[];
+  /**
+   * @description The model that will complete your prompt.
+   */
+  model?:
+    | "claude-3-opus-20240229"
+    | "claude-3-sonnet-20240229"
+    | "claude-3-haiku-20240307"
+    | "claude-2.1"
+    | "claude-2.0"
+    | "claude-instant-1.2";
+  /**
+   * @description The maximum number of tokens to generate.
+   *
+   * Different models have different maximum values for this parameter. See
+   * [models](https://docs.anthropic.com/en/docs/models-overview) for details.
+   */
+  max_tokens?: number;
 }
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
@@ -105,7 +122,13 @@ const getAppTools = async (
  * @description Sends messages to the Anthropic API for processing.
  */
 export default async function chat(
-  { system, messages, availableFunctions }: Props,
+  {
+    system,
+    messages,
+    availableFunctions,
+    model = "claude-3-sonnet-20240229",
+    max_tokens = 1024,
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
@@ -125,9 +148,9 @@ export default async function chat(
   const payload: Anthropic.Beta.Tools.MessageCreateParamsStreaming = {
     system,
     messages,
-    model: "claude-3-sonnet-20240229",
-    max_tokens: 1024,
-    temperature: 0,
+    model,
+    max_tokens,
+    temperature: 0.5,
     stream: true,
     tools,
     tool_choice: { type: "auto" },
