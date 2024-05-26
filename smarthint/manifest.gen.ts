@@ -2,11 +2,19 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/pageview.ts";
 import * as $$$0 from "./loaders/autocomplete.ts";
+import * as $$$1 from "./loaders/banners.ts";
+import * as $$$2 from "./loaders/productListingPage.ts";
 
 const manifest = {
   "loaders": {
     "smarthint/loaders/autocomplete.ts": $$$0,
+    "smarthint/loaders/banners.ts": $$$1,
+    "smarthint/loaders/productListingPage.ts": $$$2,
+  },
+  "actions": {
+    "smarthint/actions/pageview.ts": $$$$$$$$$0,
   },
   "name": "smarthint",
   "baseUrl": import.meta.url,

@@ -5628,11 +5628,481 @@
           }
         ],
         "responses": {
-          "undefined": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    },
+                    "Url": {
+                      "type": "string"
+                    },
+                    "Active": {
+                      "type": "boolean"
+                    },
+                    "SearchResult": {
+                      "type": "object",
+                      "properties": {
+                        "SearchId": {
+                          "type": "string"
+                        },
+                        "SearchTerm": {
+                          "type": "string"
+                        },
+                        "Key": {
+                          "type": "string"
+                        },
+                        "Anonymous": {
+                          "type": "string"
+                        },
+                        "Date": {
+                          "type": "string"
+                        },
+                        "SearchTime": {
+                          "type": "number"
+                        },
+                        "PosProcessTime": {
+                          "type": "number"
+                        },
+                        "TotalResult": {
+                          "type": "integer"
+                        },
+                        "Products": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "ProductId": {
+                                "type": "string"
+                              },
+                              "Title": {
+                                "type": "string"
+                              },
+                              "Mpn": {
+                                "type": "string"
+                              },
+                              "MpnFather": {
+                                "type": "string"
+                              },
+                              "Sku": {
+                                "type": "string"
+                              },
+                              "Description": {
+                                "type": "string"
+                              },
+                              "Price": {
+                                "type": "number"
+                              },
+                              "SalePrice": {
+                                "type": "number"
+                              },
+                              "PromotionDiscount": {
+                                "type": "number"
+                              },
+                              "Availability": {
+                                "type": "string"
+                              },
+                              "ProductType": {
+                                "type": "string"
+                              },
+                              "Link": {
+                                "type": "string"
+                              },
+                              "Installment": {
+                                "type": "integer"
+                              },
+                              "InstallmentAmount": {
+                                "type": "number"
+                              },
+                              "BankSlipPrice": {
+                                "type": "number"
+                              },
+                              "Gender": {
+                                "type": "string"
+                              },
+                              "Brand": {
+                                "type": "string"
+                              },
+                              "ReviewStars": {
+                                "type": "number"
+                              },
+                              "Categories": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "ImageLink": {
+                                "type": "string"
+                              },
+                              "AdicionalImageLink": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "Tags": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "CreatedDate": {
+                                "type": "string"
+                              },
+                              "OfferDate": {
+                                "type": "string"
+                              },
+                              "ProductFilters": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Key": {
+                                      "type": "string"
+                                    },
+                                    "Show": {
+                                      "type": "string"
+                                    },
+                                    "Visible": {
+                                      "type": "boolean"
+                                    },
+                                    "Value": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "Key": {
+                                            "type": "string"
+                                          },
+                                          "Show": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "Valeu": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "Key": {
+                                            "type": "string"
+                                          },
+                                          "Show": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "AditionalFeatures": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "ABC0987654321": {
+                                      "type": "string"
+                                    },
+                                    "0987654321ABC": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "Rules": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Value": {
+                                      "type": "string"
+                                    },
+                                    "Values": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "Name": {
+                                            "type": "string"
+                                          },
+                                          "ValueDouble": {
+                                            "type": "number"
+                                          },
+                                          "ValueString": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "StartDouble": {
+                                      "type": "integer"
+                                    },
+                                    "EndDouble": {
+                                      "type": "integer"
+                                    },
+                                    "StartDate": {
+                                      "type": "string"
+                                    },
+                                    "EndDate": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "Conditions": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "StartDouble": {
+                                      "type": "integer"
+                                    },
+                                    "EndDouble": {
+                                      "type": "integer"
+                                    },
+                                    "Validation": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "Values": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "Field": {
+                                            "type": "string"
+                                          },
+                                          "Name": {
+                                            "type": "string"
+                                          },
+                                          "ValueString": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "Value": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "Specifications": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Sku": {
+                                      "type": "string"
+                                    },
+                                    "SpecificationId": {
+                                      "type": "string"
+                                    },
+                                    "Availability": {
+                                      "type": "string"
+                                    },
+                                    "Changes": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "Name": {
+                                            "type": "string"
+                                          },
+                                          "ValueDouble": {
+                                            "type": "number"
+                                          },
+                                          "ValueInt": {
+                                            "type": "integer"
+                                          },
+                                          "ValueString": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "Variations": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "Name": {
+                                            "type": "string"
+                                          },
+                                          "Value": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "SellsCount": {
+                                "type": "integer"
+                              },
+                              "ViewsCount": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "Filters": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Key": {
+                                "type": "object",
+                                "properties": {
+                                  "Show": {
+                                    "type": "string"
+                                  },
+                                  "Value": {
+                                    "type": "string"
+                                  },
+                                  "Active": {
+                                    "type": "boolean"
+                                  },
+                                  "FieldSource": {
+                                    "type": "string"
+                                  },
+                                  "IsAscending": {
+                                    "type": "boolean"
+                                  },
+                                  "Sort": {
+                                    "type": "integer"
+                                  },
+                                  "MultiValue": {
+                                    "type": "boolean"
+                                  }
+                                }
+                              },
+                              "Value": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Quantity": {
+                                      "type": "integer"
+                                    },
+                                    "Index": {
+                                      "type": "integer"
+                                    },
+                                    "Show": {
+                                      "type": "string"
+                                    },
+                                    "Value": {
+                                      "type": "string"
+                                    },
+                                    "Checked": {
+                                      "type": "string"
+                                    },
+                                    "Active": {
+                                      "type": "boolean"
+                                    },
+                                    "IsAscending": {
+                                      "type": "boolean"
+                                    },
+                                    "Sort": {
+                                      "type": "integer"
+                                    },
+                                    "MultiValue": {
+                                      "type": "boolean"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "Sorts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Value": {
+                                "type": "integer"
+                              },
+                              "Field": {
+                                "type": "string"
+                              },
+                              "IsAscending": {
+                                "type": "boolean"
+                              },
+                              "Show": {
+                                "type": "string"
+                              },
+                              "Checked": {
+                                "type": "string"
+                              },
+                              "Active": {
+                                "type": "boolean"
+                              },
+                              "Sort": {
+                                "type": "integer"
+                              },
+                              "MultiValue": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "Suggest": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "IsRedirect": {
+                          "type": "boolean"
+                        },
+                        "urlRedirect": {
+                          "type": "string"
+                        },
+                        "QuantityFilterShow": {
+                          "type": "integer"
+                        },
+                        "QuantityFilterOptionShow": {
+                          "type": "integer"
+                        },
+                        "Success": {
+                          "type": "boolean"
+                        },
+                        "Banners": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "UrlBanner": {
+                                "type": "string"
+                              },
+                              "UrlRedirect": {
+                                "type": "string"
+                              },
+                              "BannerHtml": {
+                                "type": "string"
+                              },
+                              "Sequence": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "Name": "Nome do Hotsite",
@@ -6275,11 +6745,34 @@
           }
         ],
         "responses": {
-          "undefined": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Name": {
+                        "type": "string"
+                      },
+                      "UrlBanner": {
+                        "type": "string"
+                      },
+                      "UrlRedirect": {
+                        "type": "string"
+                      },
+                      "NewTab": {
+                        "type": "string"
+                      },
+                      "Sequence": {
+                        "type": "integer"
+                      },
+                      "BannerHtml": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 },
                 "example": [
                   {

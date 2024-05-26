@@ -34,7 +34,7 @@ const action = async (
     sizeProducts: String(sizeProducts),
     sizeTerms: String(sizeTerms),
     term: query,
-    anonymous: "1",
+    anonymous: "1", //TODO
   }).then((r) => r.json());
 
   const products = data.Products?.map((product) => toProduct(product));

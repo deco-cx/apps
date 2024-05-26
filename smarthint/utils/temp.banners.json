@@ -1,0 +1,26 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "Name": {
+        "type": "string"
+      },
+      "UrlBanner": {
+        "type": "string"
+      },
+      "UrlRedirect": {
+        "type": "string"
+      },
+      "NewTab": {
+        "type": "string"
+      },
+      "Sequence": {
+        "type": "integer"
+      },
+      "BannerHtml": {
+        "type": "string"
+      }
+    }
+  }
+}

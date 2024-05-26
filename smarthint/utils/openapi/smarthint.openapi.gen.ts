@@ -600,6 +600,149 @@ shcode?: string
 url?: string
 anonymous?: string
 }
+response: {
+Name?: string
+Url?: string
+Active?: boolean
+SearchResult?: {
+SearchId?: string
+SearchTerm?: string
+Key?: string
+Anonymous?: string
+Date?: string
+SearchTime?: number
+PosProcessTime?: number
+TotalResult?: number
+Products?: {
+ProductId?: string
+Title?: string
+Mpn?: string
+MpnFather?: string
+Sku?: string
+Description?: string
+Price?: number
+SalePrice?: number
+PromotionDiscount?: number
+Availability?: string
+ProductType?: string
+Link?: string
+Installment?: number
+InstallmentAmount?: number
+BankSlipPrice?: number
+Gender?: string
+Brand?: string
+ReviewStars?: number
+Categories?: string[]
+ImageLink?: string
+AdicionalImageLink?: string[]
+Tags?: string[]
+CreatedDate?: string
+OfferDate?: string
+ProductFilters?: {
+Key?: string
+Show?: string
+Visible?: boolean
+Value?: {
+Key?: string
+Show?: string
+}[]
+Valeu?: {
+Key?: string
+Show?: string
+}[]
+}[]
+AditionalFeatures?: {
+ABC0987654321?: string
+"0987654321ABC"?: string
+}[]
+Rules?: {
+Value?: string
+Values?: {
+Name?: string
+ValueDouble?: number
+ValueString?: string
+}[]
+StartDouble?: number
+EndDouble?: number
+StartDate?: string
+EndDate?: string
+}[]
+Conditions?: {
+StartDouble?: number
+EndDouble?: number
+Validation?: string[]
+Values?: {
+Field?: string
+Name?: string
+ValueString?: string
+}[]
+Value?: string
+}[]
+Specifications?: {
+Sku?: string
+SpecificationId?: string
+Availability?: string
+Changes?: {
+Name?: string
+ValueDouble?: number
+ValueInt?: number
+ValueString?: string
+}[]
+Variations?: {
+Name?: string
+Value?: string
+}[]
+}[]
+SellsCount?: number
+ViewsCount?: number
+}[]
+Filters?: {
+Key?: {
+Show?: string
+Value?: string
+Active?: boolean
+FieldSource?: string
+IsAscending?: boolean
+Sort?: number
+MultiValue?: boolean
+}
+Value?: {
+Quantity?: number
+Index?: number
+Show?: string
+Value?: string
+Checked?: string
+Active?: boolean
+IsAscending?: boolean
+Sort?: number
+MultiValue?: boolean
+}[]
+}[]
+Sorts?: {
+Value?: number
+Field?: string
+IsAscending?: boolean
+Show?: string
+Checked?: string
+Active?: boolean
+Sort?: number
+MultiValue?: boolean
+}[]
+Suggest?: string[]
+IsRedirect?: boolean
+urlRedirect?: string
+QuantityFilterShow?: number
+QuantityFilterOptionShow?: number
+Success?: boolean
+Banners?: {
+Name?: string
+UrlBanner?: string
+UrlRedirect?: string
+BannerHtml?: string
+Sequence?: number
+}[]
+}
+}
 }
 /**
  * Banners por Página
@@ -631,5 +774,13 @@ pagetype?: string
  */
 pageIdentifier?: string
 }
+response: {
+Name?: string
+UrlBanner?: string
+UrlRedirect?: string
+NewTab?: string
+Sequence?: number
+BannerHtml?: string
+}[]
 }
 }
