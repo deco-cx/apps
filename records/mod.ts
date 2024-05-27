@@ -5,7 +5,7 @@ import { createClient as createSQLClient } from "npm:@libsql/client@0.6.0/node";
 import { drizzle } from "https://esm.sh/drizzle-orm@0.30.10/libsql";
 
 const getClientConfig = ({ authToken, url }: StorageConfig) => {
-  const isLocal = !authToken.get();
+  const isLocal = !authToken?.get();
   if (isLocal) {
     return ({
       url: `file://${Deno.cwd()}/sqlite.db`,
@@ -14,7 +14,7 @@ const getClientConfig = ({ authToken, url }: StorageConfig) => {
   }
   return {
     url,
-    authToken: authToken.get?.() ?? "",
+    authToken: authToken?.get?.() ?? "",
   };
 };
 
