@@ -199,7 +199,7 @@ export interface Cart {
   updated_at: string;
   is_active: boolean;
   is_virtual: boolean;
-  items: MagentoProductsCart[];
+  items: Items[];
   items_count: number;
   items_qty: number;
   customer: {
@@ -261,34 +261,47 @@ export interface Cart {
       creator_type: string | null;
     };
   };
-  totalizers: MagentoCardPrices
+  totalizers: Totalizers;
+}
+
+export interface Totalizers {
+  grand_total: number;
+  subtotal: number;
+  discount_amount: number;
+  shipping_amount: number;
+  coupon_code?: string;
+  base_currency_code: string;
+  base_discount_amount: number;
+  base_shipping_amount: number;
+  base_subtotal: number;
+  shipping_discount_amount: number;
 }
 
 export interface MagentoCardPrices {
   grand_total: number;
   subtotal: number;
   discount_amount: number;
-  base_discount_amount?: number;
+  base_discount_amount: number;
   shipping_amount: number;
-  base_shipping_amount?: number;
-  shipping_discount_amount?: number;
-  base_currency_code?: string;
-  coupon_code: string;
-  base_grand_total?: number;
-  base_subtotal?: number;
-  subtotal_with_discount?: number;
-  base_subtotal_with_discount?: number;
-  base_shipping_discount_amount?: number;
-  tax_amount?: number;
-  base_tax_amount?: number;
-  weee_tax_applied_amount?: number | null;
-  shipping_tax_amount?: number;
-  base_shipping_tax_amount?: number;
-  subtotal_incl_tax?: number;
-  shipping_incl_tax?: number;
-  base_shipping_incl_tax?: number;
+  base_shipping_amount: number;
+  shipping_discount_amount: number;
+  base_currency_code: string;
+  coupon_code?: string;
+  base_grand_total: number;
+  base_subtotal: number;
+  subtotal_with_discount: number;
+  base_subtotal_with_discount: number;
+  base_shipping_discount_amount: number;
+  tax_amount: number;
+  base_tax_amount: number;
+  weee_tax_applied_amount: number | null;
+  shipping_tax_amount: number;
+  base_shipping_tax_amount: number;
+  subtotal_incl_tax: number;
+  shipping_incl_tax: number;
+  base_shipping_incl_tax: number;
   quote_currency_code?: string;
-  items_qty?: number;
+  items_qty: number;
   items?: MagentoProduct[];
   total_segments?: TotalSegment[];
   extension_attributes?: ExtensionAttributes;
@@ -324,6 +337,19 @@ export interface MagentoProductsCart {
   price: number;
   product_type: string;
   quote_id: string;
+}
+
+export interface Items {
+  item_id: number;
+  sku: string;
+  qty: number;
+  name: string;
+  price: number;
+  product_type: string;
+  quote_id: string;
+  url: string;
+  image: MediaEntry[];
+  price_total: number;
 }
 
 export interface ShippingAssignment {

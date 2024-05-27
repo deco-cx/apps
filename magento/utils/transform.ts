@@ -52,7 +52,7 @@ export const toProduct = ({
   const offers = toOffer(
     product,
     options.minInstallmentValue,
-    options.maxInstallments
+    options.maxInstallments,
   );
   const sku = product.sku;
   const productID = product.id.toString();
@@ -63,7 +63,7 @@ export const toProduct = ({
       "@type": "PropertyValue",
       name: attr.attribute_code,
       value: String(attr.value),
-    })
+    }),
   );
 
   return {
@@ -113,22 +113,22 @@ export const toProduct = ({
 export const toOffer = (
   { price_info, extension_attributes, sku, currency_code }: MagentoProduct,
   minInstallmentValue: number,
-  maxInstallments: number
+  maxInstallments: number,
 ): Offer[] => {
   if (!price_info) {
     return [];
   }
   const { final_price, max_price, max_regular_price } = price_info;
   const { stock_item } = extension_attributes;
-  const inStock = stock_item?.is_in_stock
-  const qtyStock = stock_item?.qty ?? 0
-  
+  const inStock = stock_item?.is_in_stock;
+  const qtyStock = stock_item?.qty ?? 0;
+
   return [
     {
       "@type": "Offer",
       availability: inStock ? IN_STOCK : OUT_OF_STOCK,
       inventoryLevel: {
-        value: inStock ? qtyStock || 999 : 0
+        value: inStock ? qtyStock || 999 : 0,
       },
       itemCondition: "https://schema.org/NewCondition",
       price: final_price,
@@ -147,7 +147,7 @@ export const toOffer = (
         ...calculateInstallments(
           final_price,
           minInstallmentValue,
-          maxInstallments
+          maxInstallments,
         ),
       ],
       sku: sku,
@@ -158,7 +158,7 @@ export const toOffer = (
 const calculateInstallments = (
   finalPrice: number,
   minInstallmentValue: number,
-  maxInstallments: number
+  maxInstallments: number,
 ): UnitPriceSpecification[] => {
   const possibleInstallmentsCount =
     Math.floor(finalPrice / minInstallmentValue) || 1;
@@ -166,7 +166,7 @@ const calculateInstallments = (
     {
       length: Math.min(possibleInstallmentsCount, maxInstallments),
     },
-    (_v, i) => +(finalPrice / (i + 1)).toFixed(2)
+    (_v, i) => +(finalPrice / (i + 1)).toFixed(2),
   );
 
   return actualInstallmentsCount.map<UnitPriceSpecification>((value, i) => {
@@ -210,7 +210,7 @@ export const toBreadcrumbList = (
   categories: (MagentoCategory | null)[],
   isBreadcrumbProductName: boolean,
   product: Product,
-  url: URL
+  url: URL,
 ) => {
   if (isBreadcrumbProductName && categories?.length === 0) {
     return [
@@ -242,11 +242,11 @@ export const toBreadcrumbList = (
 
 export const toSeo = (
   customAttributes: CustomAttribute[],
-  productURL: string
+  productURL: string,
 ): Seo => {
   const findAttribute = (attrCode: string): string => {
     const attribute = customAttributes.find(
-      (attr) => attr.attribute_code === attrCode
+      (attr) => attr.attribute_code === attrCode,
     );
     if (!attribute) return "";
     if (Array.isArray(attribute.value)) {
