@@ -21,6 +21,7 @@ const PATHS_TO_PROXY = [
   "/proxy/validate",
   "/proxy/validate/*",
   "/*/orders/*",
+  "/cdn-cgi/challenge-platform/*"
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
