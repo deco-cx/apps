@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("anthropic"),
     app("resend"),
     app("konfidency"),
     app("mailchimp"),
