@@ -27,13 +27,16 @@ export type Cart = API["GET /rest/:site/V1/carts/:cartId"]["response"];
  * @description Cart loader
  */
 const loader = async (
-  _props: unknown,
+  props: {
+    cartId?: string;
+  },
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
   const { clientAdmin, site, imagesUrl } = ctx;
-
-  const cartId = getCartCookie(req.headers);
+  const { cartId: cartIdProps } = props;
+  const url = new URL(req.url);
+  const cartId = cartIdProps ? getCartCookie(req.headers) : cartIdProps;
 
   const getCart = async (cartId: string): Promise<Cart> => {
     if (!cartId) {
@@ -69,12 +72,20 @@ const loader = async (
           return clientAdmin["GET /rest/:site/V1/products/:sku"]({
             sku: item.sku,
             site,
-            fields: [MEDIA_GALLERY_ENTRIES, SKU].join(","),
+            fields: [MEDIA_GALLERY_ENTRIES, SKU, "url", "custom_attributes"]
+              .join(","),
           }).then((res) => res.json());
         });
         const productImages = await Promise.all(productImagePromises);
 
-        return toCartItemsWithImages(cart, prices, productImages, imagesUrl);
+        return toCartItemsWithImages(
+          cart,
+          prices,
+          productImages,
+          imagesUrl,
+          url.origin,
+          site,
+        );
       } catch (_error) {
         return createCart(ctx, req.headers);
       }
