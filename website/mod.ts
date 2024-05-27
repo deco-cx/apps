@@ -123,7 +123,7 @@ export interface Props {
    * @title Flavor
    * @description The flavor of the website
    */
-  flavor: Flavor;
+  flavor?: Flavor;
 }
 
 /**
