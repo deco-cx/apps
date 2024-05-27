@@ -1,17 +1,13 @@
 export { onBeforeResolveProps } from "../../utils/multivariate.ts";
 import { MultivariateFlag } from "deco/blocks/flag.ts";
 import multivariate, { MultivariateProps } from "../../utils/multivariate.ts";
-
-/**
- * @format image-uri
- */
-export type ImageFlag = string;
+import { ImageWidget } from "../../../admin/widgets.ts";
 
 /**
  * @title Image Variants
  */
-export default function Message(
-  props: MultivariateProps<ImageFlag>,
-): MultivariateFlag<ImageFlag> {
+export default function Image(
+  props: MultivariateProps<ImageWidget>,
+): MultivariateFlag<ImageWidget> {
   return multivariate(props);
 }
