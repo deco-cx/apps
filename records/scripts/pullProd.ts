@@ -23,8 +23,12 @@ async function run() {
   );
 
   if (!response.ok) {
-    console.error("Could not connect to production database. Make sure your environment variables DATABASE_AUTH_TOKEN and DECO_SITE_NAME are up to date.");
-    console.log("Tip: You can copy a fresh DATABASE_AUTH_TOKEN variable from the Deco.cx admin.");
+    console.error(
+      "Could not connect to production database. Make sure your environment variables DATABASE_AUTH_TOKEN and DECO_SITE_NAME are up to date.",
+    );
+    console.log(
+      "Tip: You can copy a fresh DATABASE_AUTH_TOKEN variable from the Deco.cx admin.",
+    );
     throw error;
   }
 
