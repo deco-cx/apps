@@ -261,7 +261,7 @@ export interface Cart {
       creator_type: string | null;
     };
   };
-  totalizers: MagentoCardPrices
+  totalizers: MagentoCardPrices;
 }
 
 export interface MagentoCardPrices {
