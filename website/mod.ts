@@ -62,15 +62,9 @@ export interface AbTesting {
 }
 
 /** @titleBy framework */
-interface Fresh {
+interface Flavor {
   /** @default fresh */
-  framework: "fresh";
-}
-
-/** @titleBy framework */
-interface HTMX {
-  /** @default htmx */
-  framework: "htmx";
+  framework: "fresh" | "htmx";
 }
 
 export interface Props {
@@ -128,9 +122,8 @@ export interface Props {
   /**
    * @title Flavor
    * @description The flavor of the website
-   * @default {"framework":"fresh"}
    */
-  flavor?: Fresh | HTMX;
+  flavor: Flavor;
 }
 
 /**
