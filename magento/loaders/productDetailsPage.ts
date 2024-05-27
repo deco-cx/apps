@@ -17,7 +17,7 @@ export interface Props {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, isBreadcrumbProductName = false } = props;
@@ -58,7 +58,7 @@ async function loader(
 
       const [{ items }, stockInfoAndImages] = await Promise.all([
         clientAdmin["GET /rest/:site/V1/products-render-info"](
-          queryParams
+          queryParams,
         ).then((res) => res.json()),
         clientAdmin["GET /rest/:site/V1/products/:sku"]({
           sku: itemSku.items[0].sku,
@@ -121,7 +121,7 @@ async function loader(
     isBreadcrumbProductName ? [] : await getCategoryNames(categoryLinks),
     isBreadcrumbProductName,
     product,
-    url
+    url,
   );
 
   return {
