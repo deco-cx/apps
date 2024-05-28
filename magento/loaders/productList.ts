@@ -11,6 +11,7 @@ import {
   transformSortGraphQL,
   typeChecker,
   filtersFromLoaderGraphQL,
+  formatUrlSuffix,
 } from "../utils/utilsGraphQL.ts";
 import { toProductGraphQL } from "../utils/transform.ts";
 
@@ -26,11 +27,6 @@ export interface CommomProps {
    * @default 1
    */
   currentPage: number;
-
-  /**
-   * @title Default URL Path suffix
-   */
-  urlSuffix?: string;
 
   /** @title Sorting */
   sort?: ProductSort;
@@ -189,11 +185,9 @@ async function loader(
   req: Request,
   ctx: AppContext
 ): Promise<Product[] | null> {
-  const { clientGraphql, imagesQtd } = ctx;
+  const { clientGraphql, imagesQtd, site, useSuffix } = ctx;
   const url = new URL(req.url);
-  const { urlSuffix } = props;
-  const formatedProps = fromProps({ props }, url, urlSuffix);
-  console.log(formatedProps)
+  const formatedProps = fromProps({ props }, url, useSuffix ? site : undefined);
 
   const { products } = await clientGraphql.query<
     ProductShelfGraphQL,
@@ -212,15 +206,9 @@ async function loader(
       p,
       url,
       imagesQtd,
-      urlSuffix ? formatUrlSuffix(urlSuffix) : undefined
+      useSuffix ? formatUrlSuffix(site) : undefined
     )
   );
 }
-
-const formatUrlSuffix = (str: string) => {
-  str = str.startsWith("/") ? str.slice(0, -1) : str;
-  str = str.endsWith("/") ? str : str + "/";
-  return str;
-};
 
 export default loader;

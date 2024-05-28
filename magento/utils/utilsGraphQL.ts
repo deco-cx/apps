@@ -85,3 +85,9 @@ export const transformFilterValueGraphQL = (
 
   return {};
 };
+
+export const formatUrlSuffix = (str: string) => {
+  str = str.startsWith("/") ? str.slice(0, -1) : str;
+  str = str.endsWith("/") ? str : str + "/";
+  return str;
+};

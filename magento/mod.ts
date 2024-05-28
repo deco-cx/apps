@@ -48,6 +48,11 @@ export interface Props {
   imagesQtd: number;
 
   /**
+   * @title Use Magento store prop as URL path suffix in PDP
+   */
+  useSuffix: boolean;
+
+  /**
    * @title Custom Filters
    * @description Application own filters
    */
@@ -89,6 +94,7 @@ export default function App(props: Props): App<Manifest, State> {
     customFilters = [],
     maxInstallments,
     minInstallmentValue,
+    useSuffix
   } = props;
 
   const clientAdmin = createHttpClient<API>({
@@ -120,6 +126,7 @@ export default function App(props: Props): App<Manifest, State> {
       customFilters,
       maxInstallments,
       minInstallmentValue,
+      useSuffix
     },
   };
 }

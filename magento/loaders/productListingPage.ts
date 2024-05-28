@@ -10,11 +10,11 @@ import {
 import { GetCategoryUid, GetPLPItems } from "../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../utils/transform.ts";
 import {
+  formatUrlSuffix,
   transformFilterGraphQL,
   transformSortGraphQL,
 } from "../utils/utilsGraphQL.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
-
 
 export interface Props {
   urlKey: RequestURLParam;
@@ -42,20 +42,20 @@ export interface CategoryProps {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
-  const { clientGraphql, imagesQtd, customFilters } = ctx;
+  const { clientGraphql, imagesQtd, customFilters, site, useSuffix } = ctx;
   const { pageSize, categoryProps, urlKey } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
   const sortFromUrl = url.searchParams.get("product_list_order");
-  const defaultPath = url.pathname.substring(0, url.pathname.indexOf(urlKey));
+  const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
 
   const { sortBy, order } = categoryProps?.sortOptions ?? {
     sortBy: sortFromUrl
       ? {
-        value: sortFromUrl,
-      }
+          value: sortFromUrl,
+        }
       : undefined,
     order: "ASC",
   };
@@ -104,7 +104,7 @@ const loader = async (
     categoryGQL,
     url,
     imagesQtd,
-    defaultPath,
+    defaultPath
   );
 };
 
