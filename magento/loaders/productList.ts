@@ -5,6 +5,7 @@ import {
   ProductShelfGraphQL,
   ProductSort,
   FilterProps,
+  CustomFields,
 } from "../utils/clientGraphql/types.ts";
 import { GetProduct } from "../utils/clientGraphql/queries.ts";
 import {
@@ -12,6 +13,7 @@ import {
   typeChecker,
   filtersFromLoaderGraphQL,
   formatUrlSuffix,
+  getCustomFields,
 } from "../utils/utilsGraphQL.ts";
 import { toProductGraphQL } from "../utils/transform.ts";
 
@@ -27,6 +29,11 @@ export interface CommomProps {
    * @default 1
    */
   currentPage: number;
+
+  /**
+   * @title Include product custom attributes
+   */
+  customFields: CustomFields;
 
   /** @title Sorting */
   sort?: ProductSort;
@@ -186,15 +193,17 @@ async function loader(
   ctx: AppContext
 ): Promise<Product[] | null> {
   const { clientGraphql, imagesQtd, site, useSuffix } = ctx;
+  const { customFields } = props;
   const url = new URL(req.url);
   const formatedProps = fromProps({ props }, url, useSuffix ? site : undefined);
+  const customAttributes = getCustomFields(customFields, ctx.customAttributes);
 
   const { products } = await clientGraphql.query<
     ProductShelfGraphQL,
     ProductSearchInputs
   >({
     variables: { ...formatedProps },
-    ...GetProduct,
+    ...GetProduct(customAttributes),
   });
 
   if (!products.items || products.items?.length === 0) {
@@ -202,12 +211,12 @@ async function loader(
   }
 
   return products.items.map((p) =>
-    toProductGraphQL(
-      p,
-      url,
+    toProductGraphQL(p, {
+      originURL: url,
       imagesQtd,
-      useSuffix ? formatUrlSuffix(site) : undefined
-    )
+      defaultPath: useSuffix ? formatUrlSuffix(site) : undefined,
+      customAttributes,
+    })
   );
 }
 

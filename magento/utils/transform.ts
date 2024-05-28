@@ -52,7 +52,7 @@ export const toProduct = ({
   const offers = toOffer(
     product,
     options.minInstallmentValue,
-    options.maxInstallments,
+    options.maxInstallments
   );
   const sku = product.sku;
   const productID = product.id.toString();
@@ -63,7 +63,7 @@ export const toProduct = ({
       "@type": "PropertyValue",
       name: attr.attribute_code,
       value: String(attr.value),
-    }),
+    })
   );
 
   return {
@@ -113,7 +113,7 @@ export const toProduct = ({
 export const toOffer = (
   { price_info, extension_attributes, sku, currency_code }: MagentoProduct,
   minInstallmentValue: number,
-  maxInstallments: number,
+  maxInstallments: number
 ): Offer[] => {
   if (!price_info) {
     return [];
@@ -147,7 +147,7 @@ export const toOffer = (
         ...calculateInstallments(
           final_price,
           minInstallmentValue,
-          maxInstallments,
+          maxInstallments
         ),
       ],
       sku: sku,
@@ -158,7 +158,7 @@ export const toOffer = (
 const calculateInstallments = (
   finalPrice: number,
   minInstallmentValue: number,
-  maxInstallments: number,
+  maxInstallments: number
 ): UnitPriceSpecification[] => {
   const possibleInstallmentsCount =
     Math.floor(finalPrice / minInstallmentValue) || 1;
@@ -166,7 +166,7 @@ const calculateInstallments = (
     {
       length: Math.min(possibleInstallmentsCount, maxInstallments),
     },
-    (_v, i) => +(finalPrice / (i + 1)).toFixed(2),
+    (_v, i) => +(finalPrice / (i + 1)).toFixed(2)
   );
 
   return actualInstallmentsCount.map<UnitPriceSpecification>((value, i) => {
@@ -210,7 +210,7 @@ export const toBreadcrumbList = (
   categories: (MagentoCategory | null)[],
   isBreadcrumbProductName: boolean,
   product: Product,
-  url: URL,
+  url: URL
 ) => {
   if (isBreadcrumbProductName && categories?.length === 0) {
     return [
@@ -242,11 +242,11 @@ export const toBreadcrumbList = (
 
 export const toSeo = (
   customAttributes: CustomAttribute[],
-  productURL: string,
+  productURL: string
 ): Seo => {
   const findAttribute = (attrCode: string): string => {
     const attribute = customAttributes.find(
-      (attr) => attr.attribute_code === attrCode,
+      (attr) => attr.attribute_code === attrCode
     );
     if (!attribute) return "";
     if (Array.isArray(attribute.value)) {
@@ -267,37 +267,44 @@ export const toSeo = (
 };
 
 export const toProductGraphQL = (
-  {
-    sku,
-    uid,
-    canonical_url,
-    url_key,
-    name,
-    media_gallery,
+  product: SimpleProductGraphQL,
+  options: {
+    originURL: URL;
+    imagesQtd: number;
+    defaultPath?: string;
+    customAttributes?: Array<string>;
+  }
+): Product => {
+  const {
     price_range,
     stock_status,
     only_x_left_in_stock,
-  }: SimpleProductGraphQL,
-  originURL: URL,
-  imagesQtd: number,
-  defaultPath?: string
-): Product => {
+    uid,
+    sku,
+    name,
+    media_gallery,
+  } = product;
+  const { originURL, imagesQtd, defaultPath } = options;
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
     stock_status === "IN_STOCK",
     only_x_left_in_stock
   );
   const url = new URL(
-    (defaultPath ?? "") + canonical_url ?? url_key,
+    (defaultPath ?? "") + product.canonical_url ?? product.url_key,
     originURL.origin
   ).href;
+  const additionalProperty = toAddPropertiesGraphQL(
+    product,
+    options.customAttributes
+  );
 
   return {
     "@type": "Product",
     productID: uid,
     sku,
     url,
-    name: name,
+    name: name.trim(),
     gtin: sku,
     image: media_gallery
       .sort((a, b) => a.position - b.position)
@@ -312,7 +319,7 @@ export const toProductGraphQL = (
       productGroupID: uid,
       url,
       name: name.trim(),
-      additionalProperty: [],
+      additionalProperty,
       hasVariant: [
         {
           "@type": "Product",
@@ -325,10 +332,30 @@ export const toProductGraphQL = (
         },
       ],
     },
-    additionalProperty: [],
+    additionalProperty,
     offers: aggregateOffer,
   };
 };
+
+const toAddPropertiesGraphQL = (
+  product: SimpleProductGraphQL,
+  customAttributes?: Array<string>
+) =>
+  customAttributes?.reduce<PropertyValue[]>((acc, att) => {
+    const attributeOnProduct = product[att as keyof SimpleProductGraphQL];
+    if (!attributeOnProduct || attributeOnProduct.toString().length === 0) {
+      return acc;
+    }
+
+    return [
+      ...acc,
+      {
+        "@type": "PropertyValue",
+        name: att,
+        value: attributeOnProduct.toString(),
+      },
+    ];
+  }, []) ?? [];
 
 export const toImageGraphQL = (
   media: ProductImage,
@@ -371,10 +398,14 @@ export const toOfferGraphQL = (
 export const toProductListingPageGraphQL = (
   { products }: PLPGraphQL,
   { categories }: CategoryGraphQL,
-  originURL: URL,
-  imagesQtd: number,
-  defaultPath?: string
+  options: {
+    originURL: URL;
+    imagesQtd: number;
+    defaultPath?: string;
+    customAttributes?: Array<string>
+  }
 ): ProductListingPage => {
+  const { originURL, imagesQtd, defaultPath, customAttributes } = options;
   const category = categories.items[0];
   const pagination = products.page_info;
   const listElements = toItemElement(category, originURL);
@@ -398,7 +429,7 @@ export const toProductListingPageGraphQL = (
     },
     filters: toFilters(products.aggregations, originURL),
     products: products.items.map((p) =>
-      toProductGraphQL(p, originURL, imagesQtd, defaultPath)
+      toProductGraphQL(p, { originURL, imagesQtd, defaultPath, customAttributes })
     ),
     pageInfo: toPageInfo(pagination, products.total_count, originURL),
     sortOptions: toSortOptions(products.sort_fields),

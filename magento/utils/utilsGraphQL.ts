@@ -1,5 +1,6 @@
 import { FiltersGraphQL } from "../mod.ts";
 import {
+  CustomFields,
   FilterEqualTypeInput,
   FilterMatchTypeInput,
   FilterProps,
@@ -90,4 +91,19 @@ export const formatUrlSuffix = (str: string) => {
   str = str.startsWith("/") ? str.slice(0, -1) : str;
   str = str.endsWith("/") ? str : str + "/";
   return str;
+};
+
+export const getCustomFields = ({
+  active,
+  overrideList,
+}: CustomFields, customFiels?: Array<string>): Array<string> | undefined => {
+  if (!active) {
+    return undefined;
+  }
+
+  if (overrideList && overrideList.length > 0) {
+    return overrideList;
+  }
+
+  return customFiels
 };

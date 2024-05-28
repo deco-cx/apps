@@ -2,6 +2,7 @@ import type { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
   CategoryGraphQL,
+  CustomFields,
   FilterProps,
   PLPGraphQL,
   ProductSearchInputs,
@@ -11,6 +12,7 @@ import { GetCategoryUid, GetPLPItems } from "../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../utils/transform.ts";
 import {
   formatUrlSuffix,
+  getCustomFields,
   transformFilterGraphQL,
   transformSortGraphQL,
 } from "../utils/utilsGraphQL.ts";
@@ -24,6 +26,12 @@ export interface Props {
    * @default 36
    */
   pageSize: number;
+
+  /**
+   * @title Product custom attributes
+   * @default false
+   */
+  customFields: CustomFields
 
   categoryProps?: CategoryProps;
 }
@@ -46,10 +54,11 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { clientGraphql, imagesQtd, customFilters, site, useSuffix } = ctx;
-  const { pageSize, categoryProps, urlKey } = props;
+  const { pageSize, categoryProps, urlKey, customFields } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
   const sortFromUrl = url.searchParams.get("product_list_order");
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
+  const customAttributes = getCustomFields(customFields, ctx.customAttributes)
 
   const { sortBy, order } = categoryProps?.sortOptions ?? {
     sortBy: sortFromUrl
@@ -92,20 +101,19 @@ const loader = async (
       currentPage: Number(currentPage),
       sort: transformSortGraphQL({ sortBy: sortBy!, order }),
     },
-    ...GetPLPItems,
+    ...GetPLPItems(customAttributes),
   });
 
   if (!plpItemsGQL.products.items || plpItemsGQL.products.items?.length === 0) {
     return null;
   }
 
-  return toProductListingPageGraphQL(
-    plpItemsGQL,
-    categoryGQL,
-    url,
+  return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, {
+    originURL: url,
     imagesQtd,
-    defaultPath
-  );
+    defaultPath,
+    customAttributes
+  });
 };
 
 export default loader;

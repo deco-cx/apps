@@ -93,7 +93,7 @@ export const pageInfo = gql`
 `;
 
 //Queries
-export const GetProduct = {
+export const GetProduct = (extraProps?: Array<string>) => ({
   fragments: [simpleProduct, priceRange, mediaGallery],
   query: gql`
     query GetProduct(
@@ -112,11 +112,37 @@ export const GetProduct = {
       ) {
         items {
           ...simpleProduct
+          ${extraProps ? extraProps.join(`\n`) : `\n`}
         }
       }
     }
   `,
-};
+});
+
+export const GetExtraProps = (extraProps?: Array<string>) => ({
+  query: gql`
+query GetProduct(
+  $search: String
+  $filter: ProductAttributeFilterInput
+  $sort: ProductAttributeSortInput
+  $pageSize: Int
+  $currentPage: Int
+) {
+  products(
+    search: $search
+    filter: $filter
+    sort: $sort
+    pageSize: $pageSize
+    currentPage: $currentPage
+  ) {
+    items {
+      sku
+      ${extraProps ? extraProps.join(`\n`) : `\n`}
+    }
+  }
+}
+`,
+});
 
 export const GetCategoryUid = {
   query: gql`
@@ -142,7 +168,7 @@ export const GetCategoryUid = {
   `,
 };
 
-export const GetPLPItems = {
+export const GetPLPItems = (extraProps?: Array<string>) => ({
   fragments: [
     simpleProduct,
     priceRange,
@@ -167,6 +193,7 @@ export const GetPLPItems = {
         total_count
         items {
           ...simpleProduct
+          ${extraProps ? extraProps.join(`\n`) : `\n`}
         }
         sort_fields {
           ...sortFields
@@ -180,4 +207,4 @@ export const GetPLPItems = {
       }
     }
   `,
-};
+});

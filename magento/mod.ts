@@ -54,9 +54,15 @@ export interface Props {
 
   /**
    * @title Custom Filters
-   * @description Application own filters
+   * @description Applicate own filters
    */
   customFilters: Array<FiltersGraphQL>;
+
+  /**
+   * @title Custom Attributes on Product
+   * @description Inform the product own custom attributes
+   */
+  customAttributes?: Array<string>;
 
   /**
    * @title Maximum number of installments
@@ -94,7 +100,8 @@ export default function App(props: Props): App<Manifest, State> {
     customFilters = [],
     maxInstallments,
     minInstallmentValue,
-    useSuffix
+    useSuffix,
+    customAttributes
   } = props;
 
   const clientAdmin = createHttpClient<API>({
@@ -126,7 +133,8 @@ export default function App(props: Props): App<Manifest, State> {
       customFilters,
       maxInstallments,
       minInstallmentValue,
-      useSuffix
+      useSuffix,
+      customAttributes
     },
   };
 }
