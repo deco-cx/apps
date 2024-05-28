@@ -1,3 +1,9 @@
+import { createClient as createSQLClient } from "../deps.ts";
+import { getSQLClientConfig } from "../utils.ts";
+
+const START_MARKER = "BEGIN TRANSACTION";
+const END_MARKER = "COMMIT";
+
 const token = Deno.env.get("DATABASE_AUTH_TOKEN");
 const sitename = Deno.env.get("DECO_SITE_NAME");
 
@@ -5,9 +11,14 @@ const error = "Could not pull production database";
 
 async function run() {
   if (!token || !sitename) {
-    console.error(
-      "DATABASE_AUTH_TOKEN and DECO_SITE_NAME environment variables must be set in order to pull the production database.",
+    const link = `https://admin.deco.cx/sites/${
+      Deno.env.get("DECO_SITE_NAME")
+    }/spaces/Settings`;
+
+    console.log(
+      `Token not setted up. Open ${link} to get database credentials.`,
     );
+
     throw error;
   }
 
@@ -34,23 +45,26 @@ async function run() {
 
   const dumpQuery = await response.text();
 
-  const command = new Deno.Command("sqlite3", {
-    args: [
-      "sqlite.db <",
-      dumpQuery,
-    ],
-  });
+  const sqlClient = createSQLClient(
+    getSQLClientConfig({ url: "", authToken: { get: () => "" } }),
+  );
 
-  const { code, stderr, success } = await command.output();
+  const start = dumpQuery.indexOf(START_MARKER) + START_MARKER.length;
+  const end = dumpQuery.indexOf(END_MARKER);
+  const sliced = dumpQuery.slice(start, end);
 
-  if (!success) {
-    console.error("Could not run dump query against sqlite.db");
-    console.error(`Exit code: ${code}`);
-    console.error(`Process error: ${new TextDecoder().decode(stderr)}`);
-    return error;
+  await sqlClient.execute(sliced);
+
+  const select = await sqlClient.execute(`SELECT 
+        m.name as "tableName", p.name as "columnName", p.type as "columnType", p."notnull" as "notNull", p.dflt_value as "defaultValue", p.pk as pk
+        FROM sqlite_master AS m JOIN pragma_table_info(m.name) AS p
+        WHERE m.type = 'table' and m.tbl_name != 'sqlite_sequence' and m.tbl_name != 'sqlite_stat1' and m.tbl_name != '_litestream_seq' and m.tbl_name != '_litestream_lock' and m.tbl_name != 'libsql_wasm_func_table' and m.tbl_name != '_cf_KV';`);
+
+  if (select.rows.length > 0) {
+    return "Production data successfully written to local file sqlite.db";
+  } else {
+    return "Failed to dump database";
   }
-
-  return "Production data successfully written to local file sqlite.db";
 }
 
 run()
