@@ -1,13 +1,28 @@
 import { createClient as createSQLClient } from "../deps.ts";
 import { getSQLClientConfig } from "../utils.ts";
 
-const START_MARKER = "BEGIN TRANSACTION";
-const END_MARKER = "COMMIT";
+const PRAGMA = "PRAGMA foreign_keys=OFF";
+const BEGIN_TRANSACTION = "BEGIN TRANSACTION";
+const COMMIT = "COMMIT";
 
 const token = Deno.env.get("DATABASE_AUTH_TOKEN");
 const sitename = Deno.env.get("DECO_SITE_NAME");
 
 const error = "Could not pull production database";
+
+function extractStatements(sql: string) {
+  // Split the SQL string by semicolons to get individual statements
+  let statements = sql.split(";");
+
+  // Trim whitespace and filter out empty statements
+  statements = statements.map((stmt) => stmt.trim()).filter((stmt) =>
+    stmt.length > 0
+  );
+
+  return statements.filter((stmt) =>
+    !(stmt === BEGIN_TRANSACTION || stmt === COMMIT || stmt === PRAGMA)
+  );
+}
 
 async function run() {
   if (!token || !sitename) {
@@ -49,12 +64,9 @@ async function run() {
     getSQLClientConfig({ url: "", authToken: { get: () => "" } }),
   );
 
-  const start = dumpQuery.indexOf(START_MARKER) + START_MARKER.length;
-  const end = dumpQuery.indexOf(END_MARKER);
-  const sliced = dumpQuery.slice(start, end);
+  const sliced = extractStatements(dumpQuery);
 
-  await sqlClient.execute(sliced);
-
+  await sqlClient.batch(sliced, "write");
   const select = await sqlClient.execute(`SELECT 
         m.name as "tableName", p.name as "columnName", p.type as "columnType", p."notnull" as "notNull", p.dflt_value as "defaultValue", p.pk as pk
         FROM sqlite_master AS m JOIN pragma_table_info(m.name) AS p
