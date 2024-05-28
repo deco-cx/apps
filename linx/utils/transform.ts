@@ -102,7 +102,7 @@ const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
     price: item.Price?.SalesPrice ?? item.RetailPrice ?? Infinity,
     priceSpecification,
     inventoryLevel: {},
-    availability: item.Availability != "O"
+    availability: item.Availability != "O" && item.AvailabilityText != "Descontinuado"
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
   };
