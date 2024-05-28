@@ -21,7 +21,7 @@ export const getLocalSQLClientConfig = () => ({
 
 export const getSQLClientConfig = ({ authToken, url }: StorageConfig) => {
   const useProdDb = Deno.env.get("USE_PRODUCTION_DB");
-  const useLocalDB = useProdDb !== "1" ||
+  const useLocalDB = useProdDb !== undefined && useProdDb !== "1" ||
     useProdDb === undefined && !context.isDeploy;
 
   if (useLocalDB) {
