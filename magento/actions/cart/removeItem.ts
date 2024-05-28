@@ -22,7 +22,6 @@ const action = async (
 
   return await ctx.invoke(
     "magento/loaders/cart.ts",
-    { cartId },
   );
 };
 
