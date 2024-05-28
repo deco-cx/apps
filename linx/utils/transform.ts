@@ -201,6 +201,7 @@ export const toProduct = (
     "@type": "Product",
     productID: `${variant.ProductID}`,
     sku: `${variant.SKU}`,
+    identifier: `${product.SKU}`, 
     url: productURL.href,
     name: variant.Name,
     gtin: product.Uom,
