@@ -1,5 +1,4 @@
-import Script from "partytown/Script.tsx";
-import { ComponentProps } from "preact";
+import { type JSX } from "preact";
 import { Product } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
@@ -9,10 +8,11 @@ declare global {
     datalayer_product: any;
     shelfProductIds: string[];
     skuJson: ProductSKUJsonProps;
+    dataLayer: unknown[];
   }
 }
 
-type ScriptProps = ComponentProps<typeof Script>;
+type ScriptProps = JSX.HTMLAttributes<HTMLScriptElement>;
 
 function addVTEXPortalDataSnippet(accountName: string) {
   performance.mark("start-vtex-dl");
