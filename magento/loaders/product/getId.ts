@@ -4,13 +4,11 @@ import { AppContext } from "../../mod.ts";
 import { URL_KEY } from "../../utils/constants.ts";
 import stringifySearchCriteria from "../../utils/stringifySearchCriteria.ts";
 
-export interface Props {
+interface Props {
   slug: RequestURLParam;
 }
 
-interface ProductId {
-  id: string;
-}
+export type ProductId = Promise<string>
 
 export const cache = "stale-while-revalidate";
 
@@ -27,11 +25,8 @@ export default async function loader(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ProductId | null> {
+): ProductId {
   const { slug } = props;
-  if (!slug) {
-    return null;
-  }
 
   const {
     clientAdmin,
@@ -57,8 +52,5 @@ export default async function loader(
     STALE,
   ).then((res) => res.json());
 
-  if (!response?.items?.length) return null;
-  return {
-    id: response.items[0].id.toString(),
-  };
+  return response.items[0].id.toString()
 }

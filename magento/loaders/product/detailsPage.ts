@@ -7,11 +7,6 @@ import { toBreadcrumbList, toProduct, toSeo } from "../../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
-
-  /**
-   * @title The name of the product is Breadcrumb
-   * @description When activated, it returns the product name instead of the categories in Breadcrumb
-   */
   isBreadcrumbProductName?: boolean;
 }
 
