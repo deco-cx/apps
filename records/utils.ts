@@ -1,4 +1,6 @@
+import { context } from "deco/live.ts";
 import { Secret } from "../website/loaders/secret.ts";
+import { brightGreen, brightRed } from "std/fmt/colors.ts";
 
 export interface StorageConfig {
   /**
@@ -12,14 +14,35 @@ export interface StorageConfig {
   authToken: Secret;
 }
 
+export const getLocalSQLClientConfig = () => ({
+  url: `file://${Deno.cwd()}/sqlite.db`,
+  authToken: "",
+});
+
 export const getSQLClientConfig = ({ authToken, url }: StorageConfig) => {
-  const isLocal = !authToken?.get();
-  if (isLocal) {
-    return ({
-      url: `file://${Deno.cwd()}/sqlite.db`,
-      authToken: "",
-    });
+  const useProdDb = Deno.env.get("USE_PRODUCTION_DB");
+  const useLocalDB = useProdDb !== "1" ||
+    useProdDb === undefined && !context.isDeploy;
+
+  if (useLocalDB) {
+    console.log(
+      `You're using ${
+        brightGreen("local database on sqlite.db")
+      }.\nTo use production database add '${
+        brightGreen("USE_PRODUCTION_DB=1")
+      }' environment variable.\n`,
+    );
+    return getLocalSQLClientConfig();
   }
+
+  console.log(
+    `You're using ${
+      brightRed("production database")
+    }.\nTo use local database remove '${
+      brightRed("USE_PRODUCTION_DB")
+    }' environment variable.\n`,
+  );
+
   return {
     url,
     authToken: authToken?.get?.() ?? "",

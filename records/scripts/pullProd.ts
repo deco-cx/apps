@@ -1,5 +1,5 @@
 import { createClient as createSQLClient } from "../deps.ts";
-import { getSQLClientConfig } from "../utils.ts";
+import { getLocalSQLClientConfig } from "../utils.ts";
 
 const PRAGMA = "PRAGMA foreign_keys=OFF";
 const BEGIN_TRANSACTION = "BEGIN TRANSACTION";
@@ -61,7 +61,7 @@ async function run() {
   const dumpQuery = await response.text();
 
   const sqlClient = createSQLClient(
-    getSQLClientConfig({ url: "", authToken: { get: () => "" } }),
+    getLocalSQLClientConfig(),
   );
 
   const sliced = extractStatements(dumpQuery);
