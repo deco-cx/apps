@@ -8,13 +8,17 @@ import * as $$$$$$$$$2 from "./actions/cart/simulation.ts";
 import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
-import * as $$$2 from "./loaders/user.ts";
+import * as $$$2 from "./loaders/productList.ts";
+import * as $$$3 from "./loaders/productListingPage.ts";
+import * as $$$4 from "./loaders/user.ts";
 
 const manifest = {
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
     "magento/loaders/productDetailsPage.ts": $$$1,
-    "magento/loaders/user.ts": $$$2,
+    "magento/loaders/productList.ts": $$$2,
+    "magento/loaders/productListingPage.ts": $$$3,
+    "magento/loaders/user.ts": $$$4,
   },
   "actions": {
     "magento/actions/cart/addItem.ts": $$$$$$$$$0,
