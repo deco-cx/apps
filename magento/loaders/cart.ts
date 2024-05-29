@@ -27,16 +27,13 @@ export type Cart = API["GET /rest/:site/V1/carts/:cartId"]["response"];
  * @description Cart loader
  */
 const loader = async (
-  props: {
-    cartId?: string;
-  },
+  _props: undefined,
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
   const { clientAdmin, site, imagesUrl } = ctx;
-  const { cartId: cartIdProps } = props;
   const url = new URL(req.url);
-  const cartId = cartIdProps ? getCartCookie(req.headers) : cartIdProps;
+  const cartId = getCartCookie(req.headers);
 
   const getCart = async (cartId: string): Promise<Cart> => {
     if (!cartId) {
