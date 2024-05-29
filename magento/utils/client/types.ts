@@ -432,3 +432,8 @@ export interface CartUser {
   mpFSBCartTotal: unknown | null;
   data_id: number;
 }
+
+export interface NewsletterData {
+  sucess: boolean;
+  message: string;
+}
