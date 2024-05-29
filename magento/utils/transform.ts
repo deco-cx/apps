@@ -1,9 +1,16 @@
 import {
+  AggregateOffer,
+  Filter,
+  FilterToggleValue,
+  ImageObject,
   ListItem,
   Offer,
+  PageInfo,
   Product,
+  ProductListingPage,
   PropertyValue,
   Seo,
+  SortOption,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import {
@@ -11,7 +18,24 @@ import {
   MagentoCategory,
   MagentoProduct,
 } from "./client/types.ts";
-import { IN_STOCK, OUT_OF_STOCK } from "./constants.ts";
+import {
+  Aggregation as AggregationGraphQL,
+  AggregationOption as AggregationOptGraphQL,
+  CategoryGraphQL,
+  PLPGraphQL,
+  ProductImage,
+  SearchResultPageInfo as PageInfoGraphQL,
+  SimpleCategoryGraphQL,
+  SortFields as SortFieldsGraphQL,
+} from "./clientGraphql/types.ts";
+import { ProductPrice } from "./clientGraphql/types.ts";
+import { PriceRange, SimpleProductGraphQL } from "./clientGraphql/types.ts";
+import {
+  IN_STOCK,
+  OUT_OF_STOCK,
+  REMOVABLE_URL_SEARCHPARAMS,
+  SORT_OPTIONS_ORDER,
+} from "./constants.ts";
 
 export const toProduct = ({
   product,
@@ -97,56 +121,69 @@ export const toOffer = (
 
   const { final_price, max_price, max_regular_price } = price_info;
   const { stock_item } = extension_attributes;
-  const possibleInstallmentsQtd =
-    Math.floor(final_price / minInstallmentValue) || 1;
-  const installments = Array.from(
-    {
-      length: Math.min(possibleInstallmentsQtd, maxInstallments),
-    },
-    (_v, i) => +(final_price / (i + 1)).toFixed(2),
-  );
-
-  const priceSpecification: UnitPriceSpecification[] = [
-    {
-      "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/ListPrice",
-      price: max_price ?? max_regular_price,
-    },
-    {
-      "@type": "UnitPriceSpecification",
-      priceType: "https://schema.org/SalePrice",
-      price: final_price,
-    },
-    ...installments.map<UnitPriceSpecification>((value, i) => {
-      const [description, billingIncrement] = !i
-        ? ["À vista", final_price]
-        : [i + 1 + "x sem juros", value];
-      return {
-        "@type": "UnitPriceSpecification",
-        priceType: "https://schema.org/SalePrice",
-        priceComponentType: "https://schema.org/Installment",
-        description,
-        billingDuration: i + 1,
-        billingIncrement,
-        price: final_price,
-      };
-    }),
-  ];
+  const inStock = stock_item?.is_in_stock;
+  const qtyStock = stock_item?.qty ?? 0;
 
   return [
     {
       "@type": "Offer",
-      availability: stock_item?.is_in_stock ? IN_STOCK : OUT_OF_STOCK,
+      availability: inStock ? IN_STOCK : OUT_OF_STOCK,
       inventoryLevel: {
-        value: stock_item?.qty ?? 0,
+        value: inStock ? qtyStock || 999 : 0,
       },
       itemCondition: "https://schema.org/NewCondition",
       price: final_price,
       priceCurrency: currency_code,
-      priceSpecification,
+      priceSpecification: [
+        {
+          "@type": "UnitPriceSpecification",
+          priceType: "https://schema.org/ListPrice",
+          price: max_price ?? max_regular_price,
+        },
+        {
+          "@type": "UnitPriceSpecification",
+          priceType: "https://schema.org/SalePrice",
+          price: final_price,
+        },
+        ...calculateInstallments(
+          final_price,
+          minInstallmentValue,
+          maxInstallments,
+        ),
+      ],
       sku: sku,
     },
   ];
+};
+
+const calculateInstallments = (
+  finalPrice: number,
+  minInstallmentValue: number,
+  maxInstallments: number,
+): UnitPriceSpecification[] => {
+  const possibleInstallmentsCount =
+    Math.floor(finalPrice / minInstallmentValue) || 1;
+  const actualInstallmentsCount = Array.from(
+    {
+      length: Math.min(possibleInstallmentsCount, maxInstallments),
+    },
+    (_v, i) => +(finalPrice / (i + 1)).toFixed(2),
+  );
+
+  return actualInstallmentsCount.map<UnitPriceSpecification>((value, i) => {
+    const [description, billingIncrement] = !i
+      ? ["À vista", finalPrice]
+      : [i + 1 + "x sem juros", value];
+    return {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SalePrice",
+      priceComponentType: "https://schema.org/Installment",
+      description,
+      billingDuration: i + 1,
+      billingIncrement,
+      price: finalPrice,
+    };
+  });
 };
 
 export const toImages = (product: MagentoProduct, imageUrl: string) => {
@@ -227,5 +264,296 @@ export const toSeo = (
     title: metaTitle ?? title ?? "",
     description: metaDescription ?? "",
     canonical: productURL,
+  };
+};
+
+export const toProductGraphQL = (
+  product: SimpleProductGraphQL,
+  options: {
+    originURL: URL;
+    imagesQtd: number;
+    defaultPath?: string;
+    customAttributes?: Array<string>;
+  },
+): Product => {
+  const {
+    price_range,
+    stock_status,
+    only_x_left_in_stock,
+    uid,
+    sku,
+    name,
+    media_gallery,
+  } = product;
+  const { originURL, imagesQtd, defaultPath } = options;
+  const aggregateOffer = toAggOfferGraphQL(
+    price_range,
+    stock_status === "IN_STOCK",
+    only_x_left_in_stock,
+  );
+  const url = new URL(
+    (defaultPath ?? "") + product.canonical_url ?? product.url_key,
+    originURL.origin,
+  ).href;
+  const additionalProperty = toAddPropertiesGraphQL(
+    product,
+    options.customAttributes,
+  );
+
+  return {
+    "@type": "Product",
+    productID: uid,
+    sku,
+    url,
+    name: name.trim(),
+    gtin: sku,
+    image: media_gallery
+      .sort((a, b) => a.position - b.position)
+      .reduce<ImageObject[]>((acc, media) => {
+        if (acc.length === imagesQtd) {
+          return acc;
+        }
+        return [...acc, toImageGraphQL(media, name)];
+      }, []),
+    isVariantOf: {
+      "@type": "ProductGroup",
+      productGroupID: uid,
+      url,
+      name: name.trim(),
+      additionalProperty,
+      hasVariant: [
+        {
+          "@type": "Product",
+          productID: uid,
+          sku,
+          url,
+          name: name,
+          gtin: sku,
+          offers: aggregateOffer,
+        },
+      ],
+    },
+    additionalProperty,
+    offers: aggregateOffer,
+  };
+};
+
+const toAddPropertiesGraphQL = (
+  product: SimpleProductGraphQL,
+  customAttributes?: Array<string>,
+) =>
+  customAttributes?.reduce<PropertyValue[]>((acc, att) => {
+    const attributeOnProduct = product[att as keyof SimpleProductGraphQL];
+    if (!attributeOnProduct || attributeOnProduct.toString().length === 0) {
+      return acc;
+    }
+
+    return [
+      ...acc,
+      {
+        "@type": "PropertyValue",
+        name: att,
+        value: attributeOnProduct.toString(),
+      },
+    ];
+  }, []) ?? [];
+
+export const toImageGraphQL = (
+  media: ProductImage,
+  name: string,
+): ImageObject => ({
+  "@type": "ImageObject" as const,
+  encodingFormat: "image",
+  alternateName: media.label ?? name,
+  url: media.url,
+});
+
+export const toAggOfferGraphQL = (
+  { maximum_price, minimum_price }: PriceRange,
+  inStock: boolean,
+  stockLeft?: number,
+): AggregateOffer => ({
+  "@type": "AggregateOffer",
+  highPrice: maximum_price.regular_price.value,
+  lowPrice: minimum_price.final_price.value,
+  offerCount: 1,
+  offers: [toOfferGraphQL(minimum_price, inStock, stockLeft)],
+});
+
+export const toOfferGraphQL = (
+  minimum_price: ProductPrice,
+  inStock: boolean,
+  stockLeft?: number,
+): Offer => ({
+  "@type": "Offer",
+  availability: inStock ? IN_STOCK : OUT_OF_STOCK,
+  inventoryLevel: {
+    value: stockLeft ?? inStock ? 999 : 0,
+  },
+  itemCondition: "https://schema.org/NewCondition",
+  price: minimum_price.final_price.value,
+  priceCurrency: minimum_price.final_price.currency ?? "BRL",
+  priceSpecification: [],
+});
+
+export const toProductListingPageGraphQL = (
+  { products }: PLPGraphQL,
+  { categories }: CategoryGraphQL,
+  options: {
+    originURL: URL;
+    imagesQtd: number;
+    defaultPath?: string;
+    customAttributes?: Array<string>;
+  },
+): ProductListingPage => {
+  const { originURL, imagesQtd, defaultPath, customAttributes } = options;
+  const category = categories.items[0];
+  const pagination = products.page_info;
+  const listElements = toItemElement(category, originURL);
+
+  return {
+    "@type": "ProductListingPage",
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      numberOfItems: listElements.length,
+      itemListElement: listElements,
+      description: category.description,
+      image: category.image
+        ? [
+          {
+            "@type": "ImageObject" as const,
+            url: category.image,
+            alternateName: category.name,
+          },
+        ]
+        : undefined,
+    },
+    filters: toFilters(products.aggregations, originURL),
+    products: products.items.map((p) =>
+      toProductGraphQL(p, {
+        originURL,
+        imagesQtd,
+        defaultPath,
+        customAttributes,
+      })
+    ),
+    pageInfo: toPageInfo(pagination, products.total_count, originURL),
+    sortOptions: toSortOptions(products.sort_fields),
+    seo: {
+      title: category.meta_title ?? `${category.name}`,
+      description: category.meta_description ?? "",
+      canonical: "",
+    },
+  };
+};
+
+const toItemElement = (
+  category: SimpleCategoryGraphQL,
+  url: URL,
+): ListItem[] => {
+  const { pathname, origin } = url;
+  const fromBreadcrumbs = category?.breadcrumbs?.map<ListItem>((item, i) => {
+    const urlKey = item.category_url_key ?? item.category_url_path!;
+    const position = pathname.indexOf(urlKey);
+    return {
+      "@type": "ListItem",
+      item: item.category_name!,
+      position: i + 1,
+      url: new URL(pathname.substring(0, position + urlKey.length), origin)
+        .href,
+    };
+  });
+
+  const fromCategory: ListItem = {
+    "@type": "ListItem",
+    item: category.name,
+    position: (fromBreadcrumbs?.length ?? 0) + 1,
+  };
+
+  return fromBreadcrumbs ? [...fromBreadcrumbs, fromCategory] : [fromCategory];
+};
+
+const toFilters = (
+  aggregations: Required<AggregationGraphQL>[],
+  originUrl: URL,
+): Filter[] => {
+  const url = new URL(originUrl);
+  REMOVABLE_URL_SEARCHPARAMS.forEach((v) => url.searchParams.delete(v));
+
+  return aggregations.reduce<Filter[]>((acc, agg) => {
+    if (agg.position === null) {
+      return acc;
+    }
+
+    return [
+      ...acc,
+      {
+        "@type": "FilterToggle",
+        label: agg.label,
+        key: agg.attribute_code,
+        values: agg.options.map((opt) =>
+          toFilterValues(opt, agg.attribute_code, url)
+        ),
+        quantity: agg.count,
+      },
+    ];
+  }, []);
+};
+
+const toFilterValues = (
+  option: AggregationOptGraphQL,
+  attributeCode: string,
+  baseUrl: URL,
+): FilterToggleValue => {
+  const url = new URL(baseUrl);
+  const selected = baseUrl.searchParams.has(attributeCode, option.value);
+
+  selected
+    ? url.searchParams.delete(attributeCode)
+    : url.searchParams.set(attributeCode, option.value);
+
+  return {
+    quantity: option.count,
+    label: option.label,
+    value: option.value,
+    selected: selected,
+    url: url.href,
+  };
+};
+
+const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
+  SORT_OPTIONS_ORDER.reduce<SortOption[]>((acc, opt) => {
+    const option = options.find((v) => v.value === opt);
+    if (!option) {
+      return acc;
+    }
+    return [...acc, option];
+  }, []);
+
+const toPageInfo = (
+  { current_page, page_size, total_pages }: PageInfoGraphQL,
+  total: number,
+  url: URL,
+): PageInfo => {
+  const hasNextPage = current_page < total_pages;
+  const hasPrevPage = current_page > 1;
+  const params = url.searchParams;
+  const nextPage = new URLSearchParams(params);
+  const previousPage = new URLSearchParams(params);
+
+  if (hasNextPage) {
+    nextPage.set("p", (current_page + 1).toString());
+  }
+
+  if (hasPrevPage) {
+    previousPage.set("p", (current_page - 1).toString());
+  }
+
+  return {
+    currentPage: current_page,
+    nextPage: hasNextPage ? `?${nextPage}` : undefined,
+    previousPage: hasPrevPage ? `?${previousPage}` : undefined,
+    recordPerPage: page_size,
+    records: total,
   };
 };

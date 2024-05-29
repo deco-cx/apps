@@ -8,7 +8,7 @@ interface Props {
   slug: RequestURLParam;
 }
 
-export type ProductId = Promise<string>
+export type ProductId = Promise<string>;
 
 export const cache = "stale-while-revalidate";
 
@@ -52,5 +52,5 @@ export default async function loader(
     STALE,
   ).then((res) => res.json());
 
-  return response.items[0].id.toString()
+  return response.items[0].id.toString();
 }
