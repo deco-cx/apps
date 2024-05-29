@@ -1,5 +1,5 @@
-import type { ProductListingPage } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
+import type { ProductListingPage } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import {
   CategoryGraphQL,
   CustomFields,
@@ -7,16 +7,19 @@ import {
   PLPGraphQL,
   ProductSearchInputs,
   ProductSort,
-} from "../utils/clientGraphql/types.ts";
-import { GetCategoryUid, GetPLPItems } from "../utils/clientGraphql/queries.ts";
-import { toProductListingPageGraphQL } from "../utils/transform.ts";
+} from "../../utils/clientGraphql/types.ts";
+import {
+  GetCategoryUid,
+  GetPLPItems,
+} from "../../utils/clientGraphql/queries.ts";
+import { toProductListingPageGraphQL } from "../../utils/transform.ts";
 import {
   formatUrlSuffix,
   getCustomFields,
   transformFilterGraphQL,
   transformSortGraphQL,
-} from "../utils/utilsGraphQL.ts";
-import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+} from "../../utils/utilsGraphQL.ts";
+import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 
 export interface Props {
   urlKey: RequestURLParam;
@@ -31,7 +34,7 @@ export interface Props {
    * @title Product custom attributes
    * @default false
    */
-  customFields: CustomFields
+  customFields: CustomFields;
 
   categoryProps?: CategoryProps;
 }
@@ -50,7 +53,7 @@ export interface CategoryProps {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { clientGraphql, imagesQtd, customFilters, site, useSuffix } = ctx;
@@ -58,13 +61,13 @@ const loader = async (
   const currentPage = url.searchParams.get("p") ?? 1;
   const sortFromUrl = url.searchParams.get("product_list_order");
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
-  const customAttributes = getCustomFields(customFields, ctx.customAttributes)
+  const customAttributes = getCustomFields(customFields, ctx.customAttributes);
 
   const { sortBy, order } = categoryProps?.sortOptions ?? {
     sortBy: sortFromUrl
       ? {
-          value: sortFromUrl,
-        }
+        value: sortFromUrl,
+      }
       : undefined,
     order: "ASC",
   };
@@ -112,7 +115,7 @@ const loader = async (
     originURL: url,
     imagesQtd,
     defaultPath,
-    customAttributes
+    customAttributes,
   });
 };
 

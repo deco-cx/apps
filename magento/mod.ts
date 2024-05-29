@@ -101,7 +101,7 @@ export default function App(props: Props): App<Manifest, State> {
     maxInstallments,
     minInstallmentValue,
     useSuffix,
-    customAttributes
+    customAttributes,
   } = props;
 
   const clientAdmin = createHttpClient<API>({
@@ -134,7 +134,7 @@ export default function App(props: Props): App<Manifest, State> {
       maxInstallments,
       minInstallmentValue,
       useSuffix,
-      customAttributes
+      customAttributes,
     },
   };
 }
