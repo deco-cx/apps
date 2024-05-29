@@ -3,7 +3,7 @@ import { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
-  query: string;
+  query?: string;
   /**
    * @description limit of products to show
    */
@@ -28,7 +28,7 @@ const action = async (
 
   if (!query) return null;
 
-  const data = await api["GET /v:cluster/Search/GetSuggestionTerms"]({
+  const data = await api["GET /:cluster/Search/GetSuggestionTerms"]({
     cluster,
     shcode,
     sizeProducts: String(sizeProducts),
@@ -36,6 +36,10 @@ const action = async (
     term: query,
     anonymous: "1", //TODO
   }).then((r) => r.json());
+
+  if (!data) return null;
+
+  console.log(data.Terms)
 
   const products = data.Products?.map((product) => toProduct(product));
 

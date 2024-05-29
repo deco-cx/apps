@@ -106,14 +106,14 @@ export const toProduct = (product: any): Product => {
         name: "Categories",
         value: category,
       })),
-      ...product.AditionalFeatures.map((
-        { key: value }: Record<string, string>,
-      ) => ({
-        "@type": "PropertyValue",
-        name: "AditionalFeatures",
-        value,
-        alternateName: key,
-      })),
+      // ...product.AditionalFeatures.map((
+      //   { key: value }: Record<string, string>,
+      // ) => ({
+      //   "@type": "PropertyValue",
+      //   name: "AditionalFeatures",
+      //   value,
+      //   alternateName: key,
+      // })),
     ],
   };
 };

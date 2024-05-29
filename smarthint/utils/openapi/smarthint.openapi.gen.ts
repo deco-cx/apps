@@ -314,7 +314,7 @@ body: {
  * 
  * Caso você tenha cadastrado **RULES** ou **CONDITIONS** para os seus produtos, utilize da chamada para retornar estes valores segmentados, de acordo com o parâmetro atribuido.
  */
-"GET /v:cluster/Search/GetPrimarySearch": {
+"GET /:cluster/Search/GetPrimarySearch": {
 searchParams: {
 /**
  * SHCode - Código interno da SmartHint da Loja
@@ -369,11 +369,149 @@ filter?: string
  */
 condition?: string
 }
+response: {
+SearchId?: string
+SearchTerm?: string
+Key?: string
+Anonymous?: string
+Date?: string
+SearchTime?: number
+PosProcessTime?: number
+TotalResult?: number
+Products?: {
+ProductId?: string
+Title?: string
+Mpn?: string
+MpnFather?: string
+Sku?: string
+Description?: string
+Price?: number
+SalePrice?: number
+PromotionDiscount?: number
+Availability?: string
+ProductType?: string
+Link?: string
+Installment?: number
+InstallmentAmount?: number
+BankSlipPrice?: number
+Gender?: string
+Brand?: string
+ReviewStars?: number
+Categories?: string[]
+ImageLink?: string
+AdicionalImageLink?: string[]
+Tags?: string[]
+CreatedDate?: string
+OfferDate?: string
+ProductFilters?: {
+Key?: string
+Show?: string
+Visible?: boolean
+Value?: {
+Key?: string
+Show?: string
+}[]
+Valeu?: {
+Key?: string
+Show?: string
+}[]
+}[]
+AditionalFeatures?: {
+ABC0987654321?: string
+"0987654321ABC"?: string
+}[]
+Rules?: {
+Value?: string
+Values?: {
+Name?: string
+ValueDouble?: number
+ValueString?: string
+}[]
+StartDouble?: number
+EndDouble?: number
+StartDate?: string
+EndDate?: string
+}[]
+Conditions?: {
+StartDouble?: number
+EndDouble?: number
+Validation?: string[]
+Values?: {
+Field?: string
+Name?: string
+ValueString?: string
+}[]
+Value?: string
+}[]
+Specifications?: {
+Sku?: string
+SpecificationId?: string
+Availability?: string
+Changes?: {
+Name?: string
+ValueDouble?: number
+ValueInt?: number
+ValueString?: string
+}[]
+Variations?: {
+Name?: string
+Value?: string
+}[]
+}[]
+SellsCount?: number
+ViewsCount?: number
+}[]
+Filters?: {
+Key?: {
+Show?: string
+Value?: string
+Active?: boolean
+FieldSource?: string
+IsAscending?: boolean
+Sort?: number
+MultiValue?: boolean
+}
+Value?: {
+Quantity?: number
+Index?: number
+Show?: string
+Value?: string
+Checked?: string
+Active?: boolean
+IsAscending?: boolean
+Sort?: number
+MultiValue?: boolean
+}[]
+}[]
+Sorts?: {
+Value?: number
+Field?: string
+IsAscending?: boolean
+Show?: string
+Checked?: string
+Active?: boolean
+Sort?: number
+MultiValue?: boolean
+}[]
+Suggest?: string[]
+IsRedirect?: boolean
+urlRedirect?: string
+QuantityFilterShow?: number
+QuantityFilterOptionShow?: number
+Success?: boolean
+Banners?: {
+Name?: string
+UrlBanner?: string
+UrlRedirect?: string
+BannerHtml?: string
+Sequence?: number
+}[]
+}
 }
 /**
  * Com a chamada de Autocomplete, você poderá retornar os termos mais buscados dentro da sua Loja, ou utiliza-la para retornar termos complementares ao que o Comprador esta digitando.
  */
-"GET /v:cluster/Search/GetSuggestionTerms": {
+"GET /:cluster/Search/GetSuggestionTerms": {
 searchParams: {
 /**
  * SHCode - Código interno da SmartHint da Loja
@@ -590,11 +728,332 @@ products?: string
  */
 position?: string
 }
+response: {
+"smarthint-position"?: string
+recommendationsProducts?: {
+order?: number
+nameRecommendation?: string
+titleRecommendation?: string
+eventGoogleAnalytics?: string
+products?: {
+ProductId?: string
+Title?: string
+Mpn?: string
+MpnFather?: string
+Sku?: string
+Description?: string
+Price?: number
+SalePrice?: number
+PromotionDiscount?: number
+Availability?: string
+ProductType?: string
+Link?: string
+Installment?: number
+InstallmentAmount?: number
+BankSlipPrice?: number
+Gender?: string
+Brand?: string
+ReviewStars?: number
+Categories?: string[]
+ImageLink?: string
+AdicionalImageLink?: string[]
+Tags?: string[]
+CreatedDate?: string
+OfferDate?: string
+AditionalFeatures?: {
+ABC0987654321?: string
+"0987654321ABC"?: string
+}
+Rules?: {
+Value?: string
+Values?: {
+Name?: string
+ValueDouble?: number
+ValueString?: string
+}[]
+StartDouble?: number
+EndDouble?: number
+StartDate?: string
+EndDate?: string
+}[]
+Conditions?: {
+StartDouble?: number
+EndDouble?: number
+Validation?: string[]
+Values?: {
+Field?: string
+Name?: string
+ValueString?: string
+}[]
+Value?: string
+}[]
+Specifications?: {
+Sku?: string
+SpecificationId?: string
+Availability?: string
+Changes?: {
+Name?: string
+ValueDouble?: number
+ValueInt?: number
+ValueString?: string
+}[]
+Variations?: {
+Name?: string
+Value?: string
+}[]
+}[]
+SellsCount?: number
+ViewsCount?: number
+}[]
+}[]
+recommendationsPromotional?: {
+order?: number
+nameRecommendation?: string
+titleRecommendation?: string
+eventGoogleAnalytics?: string
+bannerUrl?: string
+bannerUrlClick?: string
+bannerHtml?: string
+positionBanner?: ("First" | "Last")
+hasTimer?: string
+startDateTime?: string
+endDateTime?: string
+products?: {
+ProductId?: string
+Title?: string
+Mpn?: string
+MpnFather?: string
+Sku?: string
+Description?: string
+Price?: number
+SalePrice?: number
+PromotionDiscount?: number
+Availability?: string
+ProductType?: string
+Link?: string
+Installment?: number
+InstallmentAmount?: number
+BankSlipPrice?: number
+Gender?: string
+Brand?: string
+ReviewStars?: number
+Categories?: string[]
+ImageLink?: string
+AdicionalImageLink?: string[]
+Tags?: string[]
+CreatedDate?: string
+OfferDate?: string
+AditionalFeatures?: {
+ABC0987654321?: string
+"0987654321ABC"?: string
+}
+Rules?: {
+Value?: string
+Values?: {
+Name?: string
+ValueDouble?: number
+ValueString?: string
+}[]
+StartDouble?: number
+EndDouble?: number
+StartDate?: string
+EndDate?: string
+}[]
+Conditions?: {
+StartDouble?: number
+EndDouble?: number
+Validation?: string[]
+Values?: {
+Field?: string
+Name?: string
+ValueString?: string
+}[]
+Value?: string
+}[]
+Specifications?: {
+Sku?: string
+SpecificationId?: string
+Availability?: string
+Changes?: {
+Name?: string
+ValueDouble?: number
+ValueInt?: number
+ValueString?: string
+}[]
+Variations?: {
+Name?: string
+Value?: string
+}[]
+}[]
+SellsCount?: number
+ViewsCount?: number
+}[]
+}[]
+recommendationsCombination?: {
+order?: number
+nameRecommendation?: string
+titleRecommendation?: string
+eventGoogleAnalytics?: string
+combos?: {
+order?: number
+titleCombo?: string
+bannerUrl?: string
+bannerUrlClick?: string
+bannerHtml?: string
+products?: {
+ProductId?: string
+Title?: string
+Mpn?: string
+MpnFather?: string
+Sku?: string
+Description?: string
+Price?: number
+SalePrice?: number
+PromotionDiscount?: number
+Availability?: string
+ProductType?: string
+Link?: string
+Installment?: number
+InstallmentAmount?: number
+BankSlipPrice?: number
+Gender?: string
+Brand?: string
+ReviewStars?: number
+Categories?: string[]
+ImageLink?: string
+AdicionalImageLink?: string[]
+Tags?: string[]
+CreatedDate?: string
+OfferDate?: string
+AditionalFeatures?: {
+ABC0987654321?: string
+"0987654321ABC"?: string
+}
+Rules?: {
+Value?: string
+Values?: {
+Name?: string
+ValueDouble?: number
+ValueString?: string
+}[]
+StartDouble?: number
+EndDouble?: number
+StartDate?: string
+EndDate?: string
+}[]
+Conditions?: {
+StartDouble?: number
+EndDouble?: number
+Validation?: string[]
+Values?: {
+Field?: string
+Name?: string
+ValueString?: string
+}[]
+Value?: string
+}[]
+Specifications?: {
+Sku?: string
+SpecificationId?: string
+Availability?: string
+Changes?: {
+Name?: string
+ValueDouble?: number
+ValueInt?: number
+ValueString?: string
+}[]
+Variations?: {
+Name?: string
+Value?: string
+}[]
+}[]
+SellsCount?: number
+ViewsCount?: number
+}[]
+}[]
+}[]
+recommendations?: {
+order?: number
+nameRecommendation?: string
+titleRecommendation?: string
+eventGoogleAnalytics?: string
+products?: {
+ProductId?: string
+Title?: string
+Mpn?: string
+MpnFather?: string
+Sku?: string
+Description?: string
+Price?: number
+SalePrice?: number
+PromotionDiscount?: number
+Availability?: string
+ProductType?: string
+Link?: string
+Installment?: number
+InstallmentAmount?: number
+BankSlipPrice?: number
+Gender?: string
+Brand?: string
+ReviewStars?: number
+Categories?: string[]
+ImageLink?: string
+AdicionalImageLink?: string[]
+Tags?: string[]
+CreatedDate?: string
+OfferDate?: string
+AditionalFeatures?: {
+ABC0987654321?: string
+"0987654321ABC"?: string
+}
+Rules?: {
+Value?: string
+Values?: {
+Name?: string
+ValueDouble?: number
+ValueString?: string
+}[]
+StartDouble?: number
+EndDouble?: number
+StartDate?: string
+EndDate?: string
+}[]
+Conditions?: {
+StartDouble?: number
+EndDouble?: number
+Validation?: string[]
+Values?: {
+Field?: string
+Name?: string
+ValueString?: string
+}[]
+Value?: string
+}[]
+Specifications?: {
+Sku?: string
+SpecificationId?: string
+Availability?: string
+Changes?: {
+Name?: string
+ValueDouble?: number
+ValueInt?: number
+ValueString?: string
+}[]
+Variations?: {
+Name?: string
+Value?: string
+}[]
+}[]
+SellsCount?: number
+ViewsCount?: number
+}[]
+}[]
+}[]
 }
 /**
  * Hotsite
  */
-"GET /v:cluster/hotsite": {
+"GET /:cluster/hotsite": {
 searchParams: {
 shcode?: string
 url?: string
@@ -747,7 +1206,7 @@ Sequence?: number
 /**
  * Banners por Página
  */
-"GET /v:cluster/banner/bannerByPage": {
+"GET /:cluster/banner/bannerByPage": {
 searchParams: {
 /**
  * SHCode - Código interno da SmartHint da Loja

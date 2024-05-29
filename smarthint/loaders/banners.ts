@@ -28,7 +28,7 @@ const action = async (
   const { api, shcode, cluster } = ctx;
   const { pageType, pageIdentifier, channel } = props;
 
-  const data = await api["GET /v:cluster/banner/bannerByPage"]({
+  const data = await api["GET /:cluster/banner/bannerByPage"]({
     cluster,
     shcode,
     channel,

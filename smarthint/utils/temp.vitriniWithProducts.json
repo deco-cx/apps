@@ -1,0 +1,1085 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "smarthint-position": {
+        "type": "string"
+      },
+      "recommendationsProducts": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "type": "integer"
+            },
+            "nameRecommendation": {
+              "type": "string"
+            },
+            "titleRecommendation": {
+              "type": "string"
+            },
+            "eventGoogleAnalytics": {
+              "type": "string"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ProductId": {
+                    "type": "string"
+                  },
+                  "Title": {
+                    "type": "string"
+                  },
+                  "Mpn": {
+                    "type": "string"
+                  },
+                  "MpnFather": {
+                    "type": "string"
+                  },
+                  "Sku": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "Price": {
+                    "type": "number"
+                  },
+                  "SalePrice": {
+                    "type": "number"
+                  },
+                  "PromotionDiscount": {
+                    "type": "number"
+                  },
+                  "Availability": {
+                    "type": "string"
+                  },
+                  "ProductType": {
+                    "type": "string"
+                  },
+                  "Link": {
+                    "type": "string"
+                  },
+                  "Installment": {
+                    "type": "integer"
+                  },
+                  "InstallmentAmount": {
+                    "type": "number"
+                  },
+                  "BankSlipPrice": {
+                    "type": "number"
+                  },
+                  "Gender": {
+                    "type": "string"
+                  },
+                  "Brand": {
+                    "type": "string"
+                  },
+                  "ReviewStars": {
+                    "type": "number"
+                  },
+                  "Categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "ImageLink": {
+                    "type": "string"
+                  },
+                  "AdicionalImageLink": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "Tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "CreatedDate": {
+                    "type": "string"
+                  },
+                  "OfferDate": {
+                    "type": "string"
+                  },
+                  "AditionalFeatures": {
+                    "type": "object",
+                    "properties": {
+                      "ABC0987654321": {
+                        "type": "string"
+                      },
+                      "0987654321ABC": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "Rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Value": {
+                          "type": "string"
+                        },
+                        "Values": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueDouble": {
+                                "type": "number"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "StartDouble": {
+                          "type": "integer"
+                        },
+                        "EndDouble": {
+                          "type": "integer"
+                        },
+                        "StartDate": {
+                          "type": "string"
+                        },
+                        "EndDate": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "Conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "StartDouble": {
+                          "type": "integer"
+                        },
+                        "EndDouble": {
+                          "type": "integer"
+                        },
+                        "Validation": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "Values": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Field": {
+                                "type": "string"
+                              },
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "Specifications": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Sku": {
+                          "type": "string"
+                        },
+                        "SpecificationId": {
+                          "type": "string"
+                        },
+                        "Availability": {
+                          "type": "string"
+                        },
+                        "Changes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueDouble": {
+                                "type": "number"
+                              },
+                              "ValueInt": {
+                                "type": "integer"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Variations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "Value": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "SellsCount": {
+                    "type": "integer"
+                  },
+                  "ViewsCount": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "recommendationsPromotional": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "type": "integer"
+            },
+            "nameRecommendation": {
+              "type": "string"
+            },
+            "titleRecommendation": {
+              "type": "string"
+            },
+            "eventGoogleAnalytics": {
+              "type": "string"
+            },
+            "bannerUrl": {
+              "type": "string"
+            },
+            "bannerUrlClick": {
+              "type": "string"
+            },
+            "bannerHtml": {
+              "type": "string"
+            },
+            "positionBanner": {
+              "type": "string",
+              "enum": ["First", "Last"]
+            },
+            "hasTimer": {
+              "type": "string"
+            },
+            "startDateTime": {
+              "type": "string"
+            },
+            "endDateTime": {
+              "type": "string"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ProductId": {
+                    "type": "string"
+                  },
+                  "Title": {
+                    "type": "string"
+                  },
+                  "Mpn": {
+                    "type": "string"
+                  },
+                  "MpnFather": {
+                    "type": "string"
+                  },
+                  "Sku": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "Price": {
+                    "type": "number"
+                  },
+                  "SalePrice": {
+                    "type": "number"
+                  },
+                  "PromotionDiscount": {
+                    "type": "number"
+                  },
+                  "Availability": {
+                    "type": "string"
+                  },
+                  "ProductType": {
+                    "type": "string"
+                  },
+                  "Link": {
+                    "type": "string"
+                  },
+                  "Installment": {
+                    "type": "integer"
+                  },
+                  "InstallmentAmount": {
+                    "type": "number"
+                  },
+                  "BankSlipPrice": {
+                    "type": "number"
+                  },
+                  "Gender": {
+                    "type": "string"
+                  },
+                  "Brand": {
+                    "type": "string"
+                  },
+                  "ReviewStars": {
+                    "type": "number"
+                  },
+                  "Categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "ImageLink": {
+                    "type": "string"
+                  },
+                  "AdicionalImageLink": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "Tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "CreatedDate": {
+                    "type": "string"
+                  },
+                  "OfferDate": {
+                    "type": "string"
+                  },
+                  "AditionalFeatures": {
+                    "type": "object",
+                    "properties": {
+                      "ABC0987654321": {
+                        "type": "string"
+                      },
+                      "0987654321ABC": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "Rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Value": {
+                          "type": "string"
+                        },
+                        "Values": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueDouble": {
+                                "type": "number"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "StartDouble": {
+                          "type": "integer"
+                        },
+                        "EndDouble": {
+                          "type": "integer"
+                        },
+                        "StartDate": {
+                          "type": "string"
+                        },
+                        "EndDate": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "Conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "StartDouble": {
+                          "type": "integer"
+                        },
+                        "EndDouble": {
+                          "type": "integer"
+                        },
+                        "Validation": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "Values": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Field": {
+                                "type": "string"
+                              },
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "Specifications": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Sku": {
+                          "type": "string"
+                        },
+                        "SpecificationId": {
+                          "type": "string"
+                        },
+                        "Availability": {
+                          "type": "string"
+                        },
+                        "Changes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueDouble": {
+                                "type": "number"
+                              },
+                              "ValueInt": {
+                                "type": "integer"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Variations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "Value": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "SellsCount": {
+                    "type": "integer"
+                  },
+                  "ViewsCount": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "recommendationsCombination": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "type": "integer"
+            },
+            "nameRecommendation": {
+              "type": "string"
+            },
+            "titleRecommendation": {
+              "type": "string"
+            },
+            "eventGoogleAnalytics": {
+              "type": "string"
+            },
+            "combos": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "integer"
+                  },
+                  "titleCombo": {
+                    "type": "string"
+                  },
+                  "bannerUrl": {
+                    "type": "string"
+                  },
+                  "bannerUrlClick": {
+                    "type": "string"
+                  },
+                  "bannerHtml": {
+                    "type": "string"
+                  },
+                  "products": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ProductId": {
+                          "type": "string"
+                        },
+                        "Title": {
+                          "type": "string"
+                        },
+                        "Mpn": {
+                          "type": "string"
+                        },
+                        "MpnFather": {
+                          "type": "string"
+                        },
+                        "Sku": {
+                          "type": "string"
+                        },
+                        "Description": {
+                          "type": "string"
+                        },
+                        "Price": {
+                          "type": "number"
+                        },
+                        "SalePrice": {
+                          "type": "number"
+                        },
+                        "PromotionDiscount": {
+                          "type": "number"
+                        },
+                        "Availability": {
+                          "type": "string"
+                        },
+                        "ProductType": {
+                          "type": "string"
+                        },
+                        "Link": {
+                          "type": "string"
+                        },
+                        "Installment": {
+                          "type": "integer"
+                        },
+                        "InstallmentAmount": {
+                          "type": "number"
+                        },
+                        "BankSlipPrice": {
+                          "type": "number"
+                        },
+                        "Gender": {
+                          "type": "string"
+                        },
+                        "Brand": {
+                          "type": "string"
+                        },
+                        "ReviewStars": {
+                          "type": "number"
+                        },
+                        "Categories": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "ImageLink": {
+                          "type": "string"
+                        },
+                        "AdicionalImageLink": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "Tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "CreatedDate": {
+                          "type": "string"
+                        },
+                        "OfferDate": {
+                          "type": "string"
+                        },
+                        "AditionalFeatures": {
+                          "type": "object",
+                          "properties": {
+                            "ABC0987654321": {
+                              "type": "string"
+                            },
+                            "0987654321ABC": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "Rules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Value": {
+                                "type": "string"
+                              },
+                              "Values": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Name": {
+                                      "type": "string"
+                                    },
+                                    "ValueDouble": {
+                                      "type": "number"
+                                    },
+                                    "ValueString": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "StartDouble": {
+                                "type": "integer"
+                              },
+                              "EndDouble": {
+                                "type": "integer"
+                              },
+                              "StartDate": {
+                                "type": "string"
+                              },
+                              "EndDate": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Conditions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "StartDouble": {
+                                "type": "integer"
+                              },
+                              "EndDouble": {
+                                "type": "integer"
+                              },
+                              "Validation": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "Values": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Field": {
+                                      "type": "string"
+                                    },
+                                    "Name": {
+                                      "type": "string"
+                                    },
+                                    "ValueString": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "Value": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Specifications": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Sku": {
+                                "type": "string"
+                              },
+                              "SpecificationId": {
+                                "type": "string"
+                              },
+                              "Availability": {
+                                "type": "string"
+                              },
+                              "Changes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Name": {
+                                      "type": "string"
+                                    },
+                                    "ValueDouble": {
+                                      "type": "number"
+                                    },
+                                    "ValueInt": {
+                                      "type": "integer"
+                                    },
+                                    "ValueString": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "Variations": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "Name": {
+                                      "type": "string"
+                                    },
+                                    "Value": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "SellsCount": {
+                          "type": "integer"
+                        },
+                        "ViewsCount": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "recommendations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "type": "integer"
+            },
+            "nameRecommendation": {
+              "type": "string"
+            },
+            "titleRecommendation": {
+              "type": "string"
+            },
+            "eventGoogleAnalytics": {
+              "type": "string"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ProductId": {
+                    "type": "string"
+                  },
+                  "Title": {
+                    "type": "string"
+                  },
+                  "Mpn": {
+                    "type": "string"
+                  },
+                  "MpnFather": {
+                    "type": "string"
+                  },
+                  "Sku": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "Price": {
+                    "type": "number"
+                  },
+                  "SalePrice": {
+                    "type": "number"
+                  },
+                  "PromotionDiscount": {
+                    "type": "number"
+                  },
+                  "Availability": {
+                    "type": "string"
+                  },
+                  "ProductType": {
+                    "type": "string"
+                  },
+                  "Link": {
+                    "type": "string"
+                  },
+                  "Installment": {
+                    "type": "integer"
+                  },
+                  "InstallmentAmount": {
+                    "type": "number"
+                  },
+                  "BankSlipPrice": {
+                    "type": "number"
+                  },
+                  "Gender": {
+                    "type": "string"
+                  },
+                  "Brand": {
+                    "type": "string"
+                  },
+                  "ReviewStars": {
+                    "type": "number"
+                  },
+                  "Categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "ImageLink": {
+                    "type": "string"
+                  },
+                  "AdicionalImageLink": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "Tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "CreatedDate": {
+                    "type": "string"
+                  },
+                  "OfferDate": {
+                    "type": "string"
+                  },
+                  "AditionalFeatures": {
+                    "type": "object",
+                    "properties": {
+                      "ABC0987654321": {
+                        "type": "string"
+                      },
+                      "0987654321ABC": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "Rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Value": {
+                          "type": "string"
+                        },
+                        "Values": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueDouble": {
+                                "type": "number"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "StartDouble": {
+                          "type": "integer"
+                        },
+                        "EndDouble": {
+                          "type": "integer"
+                        },
+                        "StartDate": {
+                          "type": "string"
+                        },
+                        "EndDate": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "Conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "StartDouble": {
+                          "type": "integer"
+                        },
+                        "EndDouble": {
+                          "type": "integer"
+                        },
+                        "Validation": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "Values": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Field": {
+                                "type": "string"
+                              },
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "Specifications": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Sku": {
+                          "type": "string"
+                        },
+                        "SpecificationId": {
+                          "type": "string"
+                        },
+                        "Availability": {
+                          "type": "string"
+                        },
+                        "Changes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "ValueDouble": {
+                                "type": "number"
+                              },
+                              "ValueInt": {
+                                "type": "integer"
+                              },
+                              "ValueString": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "Variations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "Name": {
+                                "type": "string"
+                              },
+                              "Value": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "SellsCount": {
+                    "type": "integer"
+                  },
+                  "ViewsCount": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

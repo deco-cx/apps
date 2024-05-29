@@ -6,12 +6,18 @@ import * as $$$$$$$$$0 from "./actions/pageview.ts";
 import * as $$$0 from "./loaders/autocomplete.ts";
 import * as $$$1 from "./loaders/banners.ts";
 import * as $$$2 from "./loaders/productListingPage.ts";
+import * as $$$3 from "./loaders/searchListPage.ts";
+import * as $$$4 from "./loaders/vitrines.ts";
+import * as $$$5 from "./loaders/vitrinesWithProducts.ts";
 
 const manifest = {
   "loaders": {
     "smarthint/loaders/autocomplete.ts": $$$0,
     "smarthint/loaders/banners.ts": $$$1,
     "smarthint/loaders/productListingPage.ts": $$$2,
+    "smarthint/loaders/searchListPage.ts": $$$3,
+    "smarthint/loaders/vitrines.ts": $$$4,
+    "smarthint/loaders/vitrinesWithProducts.ts": $$$5,
   },
   "actions": {
     "smarthint/actions/pageview.ts": $$$$$$$$$0,

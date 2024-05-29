@@ -5,9 +5,6 @@ import { createHttpClient } from "../utils/http.ts";
 import { OpenAPI } from "./utils/openapi/smarthint.openapi.gen.ts";
 
 export interface State {
-  // you can freely change this to accept new properties when installing this app
-  exampleProp: string;
-
   shcode: string;
 
   cluster: string;
