@@ -48,10 +48,23 @@ export default async function BlogPostList(
     ACCESSOR,
   );
 
+  const mostRecentPosts = posts.toSorted((a, b) => {
+    if (!a.date && !b.date) {
+      return 0; // If both posts don't have a date, consider them equal
+    }
+    if (!a.date) {
+      return 1; // If post a doesn't have a date, put it after post b
+    }
+    if (!b.date) {
+      return -1; // If post b doesn't have a date, put it after post a
+    }
+    return new Date(b.date).getTime() - new Date(a.date).getTime(); // Sort by date in descending order
+  });
+
   const page = props.page ?? 1;
   const startIndex = (page - 1) * props.count;
   const endIndex = startIndex + props.count;
-  const paginatedPosts = posts.slice(startIndex, endIndex);
+  const paginatedPosts = mostRecentPosts.slice(startIndex, endIndex);
 
   return paginatedPosts.length > 0 ? paginatedPosts : null;
 }
