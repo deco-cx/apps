@@ -5,6 +5,7 @@ import {
   MagentoCardPrices,
   MagentoCategory,
   MagentoProduct,
+  NewsletterData,
   ShippingMethod,
   User,
 } from "./types.ts";
@@ -108,6 +109,14 @@ export interface API {
     response: User;
     searchParams: {
       sections: string;
+    };
+  };
+
+  "POST /rest/:site/V1/newsletter/subscribed": {
+    response: NewsletterData;
+    body: {
+      email: string;
+      store_id: number;
     };
   };
 }
