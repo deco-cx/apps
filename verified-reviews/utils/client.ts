@@ -91,16 +91,16 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
 
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
   const reviews = ({
-    productId,
+    productsIds,
     count = 5,
     offset = 0,
     order = "date_desc",
   }: PaginationOptions & {
-    productId: string;
+    productsIds: string[];
   }) => {
     const payload = {
       query: "reviews",
-      product: productId,
+      product: productsIds,
       idWebsite: idWebsite,
       plateforme: "br",
       offset: offset,
@@ -115,17 +115,17 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
   };
 
   const fullReview = async ({
-    productId,
+    productsIds,
     count = 5,
     offset = 0,
     order,
   }: PaginationOptions & {
-    productId: string;
+    productsIds: string[];
   }): Promise<VerifiedReviewsFullReview> => {
     try {
       const response = await Promise.all([
-        rating({ productId }),
-        reviews({ productId, count, offset, order }),
+        ratings({ productsIds }),
+        reviews({ productsIds, count, offset, order }),
       ]);
 
       const [responseRating, responseReview] = response.flat() as [
@@ -134,10 +134,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       ];
 
       return {
-        aggregateRating: getRatingProduct({
-          ratings: responseRating,
-          productId,
-        }),
+        aggregateRating: getRatingProduct(responseRating),
         review: responseReview ? responseReview.reviews?.map(toReview) : [],
       };
     } catch (error) {

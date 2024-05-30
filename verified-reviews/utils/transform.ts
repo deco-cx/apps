@@ -4,24 +4,34 @@ import {
 } from "../../commerce/types.ts";
 import { Ratings, Review } from "./types.ts";
 
-export const getRatingProduct = ({
-  ratings,
-  productId,
-}: {
-  ratings: Ratings | undefined;
-  productId: string;
-}): AggregateRating | undefined => {
-  const rating = ratings?.[productId]?.[0];
-  if (!rating) {
+export const getRatingProduct = (
+  ratings: Ratings | undefined,
+): AggregateRating | undefined => {
+  if (!ratings) {
     return undefined;
   }
 
-  return {
+  let weightedRating = 0;
+  let totalRatings = 0;
+
+  Object.entries(ratings ?? {}).forEach(([_, [rating]]) => {
+    const count = Number(rating.count);
+    const value = Number(parseFloat(rating.rate).toFixed(1));
+
+    totalRatings += count;
+    weightedRating += count * value;
+  });
+
+  const aggregateRating: AggregateRating = {
     "@type": "AggregateRating",
-    ratingCount: Number(rating.count),
-    ratingValue: Number(parseFloat(rating.rate).toFixed(1)),
-    reviewCount: Number(rating.count),
+    ratingCount: totalRatings,
+    reviewCount: totalRatings,
+    ratingValue: totalRatings > 0
+      ? Number((weightedRating / totalRatings).toFixed(1))
+      : 0,
   };
+
+  return aggregateRating;
 };
 
 export const toReview = (review: Review): CommerceReview => ({
