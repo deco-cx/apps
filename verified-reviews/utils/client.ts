@@ -1,8 +1,12 @@
-import { fetchAPI } from "../../utils/fetch.ts";
-import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
-import { Product } from "../../commerce/types.ts";
-import { ConfigVerifiedReviews } from "../mod.ts";
 import { context } from "deco/live.ts";
+
+import { fetchAPI } from "../../utils/fetch.ts";
+import { Product } from "../../commerce/types.ts";
+
+import { ConfigVerifiedReviews } from "../mod.ts";
+
+import { getRatingProduct, toReview } from "./transform.ts";
+import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
 
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
 
@@ -11,10 +15,10 @@ export interface PaginationOptions {
   offset?: number;
   order?:
     | "date_desc"
-    | "date_ASC"
-    | "rate_DESC"
-    | "rate_ASC"
-    | "helpfulrating_DESC";
+    | "date_asc"
+    | "rate_desc"
+    | "rate_asc"
+    | "most_helpful";
 }
 
 const MessageError = {
@@ -104,7 +108,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       order: order,
     };
 
-    return fetchAPI<Reviews>(`${baseUrl}`, {
+    return fetchAPI<Reviews[]>(`${baseUrl}`, {
       method: "POST",
       body: JSON.stringify(payload),
     });
@@ -114,13 +118,14 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     productId,
     count = 5,
     offset = 0,
+    order,
   }: PaginationOptions & {
     productId: string;
   }): Promise<VerifiedReviewsFullReview> => {
     try {
       const response = await Promise.all([
         rating({ productId }),
-        reviews({ productId, count, offset }),
+        reviews({ productId, count, offset, order }),
       ]);
 
       const [responseRating, responseReview] = response.flat() as [
@@ -128,34 +133,12 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
         Reviews | null,
       ];
 
-      const currentRating = responseRating?.[productId]?.[0];
       return {
-        aggregateRating: currentRating
-          ? {
-            "@type": "AggregateRating",
-            ratingValue: Number(parseFloat(currentRating.rate).toFixed(1)),
-            reviewCount: Number(currentRating.count),
-          }
-          : undefined,
-        review: responseReview
-          ? responseReview.reviews?.map((item) => ({
-            "@type": "Review",
-            author: [
-              {
-                "@type": "Author",
-                name: `${item.firstname} ${item.lastname}`,
-              },
-            ],
-            datePublished: item.review_date,
-            reviewBody: item.review,
-            reviewRating: {
-              "@type": "AggregateRating",
-              ratingValue: Number(item.rate),
-              // this api does not support multiple reviews
-              reviewCount: 1,
-            },
-          }))
-          : [],
+        aggregateRating: getRatingProduct({
+          ratings: responseRating,
+          productId,
+        }),
+        review: responseReview ? responseReview.reviews?.map(toReview) : [],
       };
     } catch (error) {
       if (context.isDeploy) {
