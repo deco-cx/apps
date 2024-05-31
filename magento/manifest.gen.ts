@@ -2,11 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$1 from "./actions/cart/removeItem.ts";
-import * as $$$$$$$$$2 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
-import * as $$$$$$$$$4 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$0 from "./actions/cart/addCoupon.ts";
+import * as $$$$$$$$$1 from "./actions/cart/addItem.ts";
+import * as $$$$$$$$$2 from "./actions/cart/removeCoupon.ts";
+import * as $$$$$$$$$3 from "./actions/cart/removeItem.ts";
+import * as $$$$$$$$$4 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$5 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$6 from "./actions/newsletter/subscribe.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
 import * as $$$2 from "./loaders/productList.ts";
@@ -22,11 +24,13 @@ const manifest = {
     "magento/loaders/user.ts": $$$4,
   },
   "actions": {
-    "magento/actions/cart/addItem.ts": $$$$$$$$$0,
-    "magento/actions/cart/removeItem.ts": $$$$$$$$$1,
-    "magento/actions/cart/simulation.ts": $$$$$$$$$2,
-    "magento/actions/cart/updateItem.ts": $$$$$$$$$3,
-    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$4,
+    "magento/actions/cart/addCoupon.ts": $$$$$$$$$0,
+    "magento/actions/cart/addItem.ts": $$$$$$$$$1,
+    "magento/actions/cart/removeCoupon.ts": $$$$$$$$$2,
+    "magento/actions/cart/removeItem.ts": $$$$$$$$$3,
+    "magento/actions/cart/simulation.ts": $$$$$$$$$4,
+    "magento/actions/cart/updateItem.ts": $$$$$$$$$5,
+    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$6,
   },
   "name": "magento",
   "baseUrl": import.meta.url,
