@@ -101,7 +101,7 @@ export const toProduct = (product: any): Product => {
         name: "Tag",
         value: tag,
       })),
-      ...product.Categories.map((category: string) => ({
+      ...product.Categories.map((category: string) => ({  
         "@type": "PropertyValue",
         name: "Categories",
         value: category,

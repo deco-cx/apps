@@ -7,7 +7,7 @@ import { redirect } from "deco/mod.ts";
  * @title Smarthint Integration
  * @description Product List Page
  */
-const action = async (
+const loader = async (
   _props: unknown,
   req: Request,
   ctx: AppContext,
@@ -48,4 +48,4 @@ const action = async (
   };
 };
 
-export default action;
+export default loader;

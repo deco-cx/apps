@@ -20,7 +20,7 @@ export interface Props {
  * @title Smarthint Integration
  * @description Autocomplete Loader
  */
-const action = async (
+const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
@@ -39,4 +39,4 @@ const action = async (
   return data;
 };
 
-export default action;
+export default loader;

@@ -18,7 +18,7 @@ export interface Props {
  * @title Smarthint Integration
  * @description Autocomplete Loader
  */
-const action = async (
+const loader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
@@ -39,8 +39,6 @@ const action = async (
 
   if (!data) return null;
 
-  console.log(data.Terms)
-
   const products = data.Products?.map((product) => toProduct(product));
 
   return {
@@ -53,4 +51,4 @@ const action = async (
   };
 };
 
-export default action;
+export default loader;

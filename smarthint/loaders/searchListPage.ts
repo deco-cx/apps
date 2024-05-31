@@ -3,47 +3,50 @@ import { AppContext } from "../mod.ts";
 import { toFilters, toProduct, toSortOption } from "../utils/transform.ts";
 import { redirect } from "deco/mod.ts";
 
-export type SearchSort = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 
+export type SearchSort = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-export type RuleType = 'valuedouble'|'valuedate'|'valuestring'
-
+export type RuleType = "valuedouble" | "valuedate" | "valuestring";
 
 export interface Filter {
-  field: string,
-  value: string 
+  field: string;
+  value: string;
 }
 
 export interface Props {
-  term: string,
-  size: number
-  searchSort: SearchSort
-  rule: string,
-  from: number,
-  ruletype?: RuleType
-  filter: Filter[]
-  condition:  {
-    field: string,
-    value: string
-    validation: string
-  }
+  term: string;
+  size: number;
+  searchSort: SearchSort;
+  rule: string;
+  from: number;
+  ruletype?: RuleType;
+  filter: Filter[];
+  condition: {
+    field: string;
+    value: string;
+    validation: string;
+  };
 }
 
 /**
  * @title Smarthint Integration
  * @description Product List Page
  */
-const action = async (
+const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const { api, shcode, cluster } = ctx;
-  const { term,condition,filter,from,rule,searchSort,size,ruletype} =props
+  const { term, condition, filter, from, rule, searchSort, size, ruletype } =
+    props;
 
   const url = new URL(req.url);
 
-  const filterString = filter.map(filterItem => `${filterItem.field}:${filterItem.value}`).join('&')
-  const conditionString = `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`
+  const filterString = filter.map((filterItem) =>
+    `${filterItem.field}:${filterItem.value}`
+  ).join("&");
+  const conditionString =
+    `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`;
 
   const data = await api["GET /:cluster/Search/GetPrimarySearch"]({
     cluster,
@@ -55,8 +58,8 @@ const action = async (
     ruletype,
     rule,
     from: String(from),
-    filter:filterString ,
-    condition: conditionString
+    filter: filterString,
+    condition: conditionString,
   }).then((r) => r.json());
 
   if (data?.IsRedirect) {
@@ -66,8 +69,7 @@ const action = async (
     );
   }
 
-  const products =
-    data?.Products?.map((product) => toProduct(product)) ?? [];
+  const products = data?.Products?.map((product) => toProduct(product)) ?? [];
 
   const sortOptions = toSortOption(data?.Sorts ?? []);
 
@@ -84,4 +86,4 @@ const action = async (
   };
 };
 
-export default action;
+export default loader;

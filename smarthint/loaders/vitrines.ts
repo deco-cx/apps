@@ -6,31 +6,40 @@ import { Filter } from "./searchListPage.ts";
 import { PageType } from "../utils/typings.ts";
 
 export interface Props {
-  filter: Filter[]
-  categories: string
-  products: string
-  position: string
-  pageIdentifier: string
-  pagetype: PageType,
-  channel: string
+  filter: Filter[];
+  categories: string;
+  products: string;
+  position: string;
+  pageIdentifier: string;
+  pagetype: PageType;
+  channel: string;
 }
-
 
 /**
  * @title Smarthint Integration
  * @description Product List Page
  */
-const action = async (
+const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const { api, shcode } = ctx;
-  const {categories,filter,pageIdentifier,position,products: productsParam,pagetype, channel} = props
+  const {
+    categories,
+    filter,
+    pageIdentifier,
+    position,
+    products: productsParam,
+    pagetype,
+    channel,
+  } = props;
 
   const url = new URL(req.url);
 
-  const filterString = filter.map(filterItem => `${filterItem.field}:${filterItem.value}`).join('&')
+  const filterString = filter.map((filterItem) =>
+    `${filterItem.field}:${filterItem.value}`
+  ).join("&");
 
   const data = await api["GET /recommendationByPage"]({
     shCode: shcode,
@@ -41,7 +50,7 @@ const action = async (
     pageIdentifier,
     pagetype,
     position,
-    products: productsParam
+    products: productsParam,
   }).then((r) => r.json());
 
   if (data.SearchResult?.IsRedirect) {
@@ -69,4 +78,4 @@ const action = async (
   };
 };
 
-export default action;
+export default loader;
