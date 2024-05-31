@@ -729,13 +729,13 @@ products?: string
 position?: string
 }
 response: {
-"smarthint-position"?: string
-recommendationsProducts?: {
-order?: number
-nameRecommendation?: string
-titleRecommendation?: string
-eventGoogleAnalytics?: string
-products?: {
+SmartHintPosition?: string
+RecommendationsProducts?: {
+Order?: number
+NameRecommendation?: string
+TitleRecommendation?: string
+EventGoogleAnalytics?: string
+Products?: {
 ProductId?: string
 Title?: string
 Mpn?: string
@@ -806,19 +806,19 @@ SellsCount?: number
 ViewsCount?: number
 }[]
 }[]
-recommendationsPromotional?: {
-order?: number
-nameRecommendation?: string
-titleRecommendation?: string
-eventGoogleAnalytics?: string
-bannerUrl?: string
-bannerUrlClick?: string
-bannerHtml?: string
-positionBanner?: ("First" | "Last")
-hasTimer?: string
-startDateTime?: string
-endDateTime?: string
-products?: {
+RecommendationsPromotional?: {
+Order?: number
+NameRecommendation?: string
+TitleRecommendation?: string
+EventGoogleAnalytics?: string
+BannerUrl?: string
+BannerUrlClick?: string
+BannerHtml?: string
+PositionBanner?: ("First" | "Last")
+HasTimer?: string
+StartDateTime?: string
+EndDateTime?: string
+Products?: {
 ProductId?: string
 Title?: string
 Mpn?: string
@@ -889,18 +889,18 @@ SellsCount?: number
 ViewsCount?: number
 }[]
 }[]
-recommendationsCombination?: {
-order?: number
-nameRecommendation?: string
-titleRecommendation?: string
-eventGoogleAnalytics?: string
+RecommendationsCombination?: {
+Order?: number
+NameRecommendation?: string
+TitleRecommendation?: string
+EventGoogleAnalytics?: string
 combos?: {
-order?: number
+Order?: number
 titleCombo?: string
 bannerUrl?: string
 bannerUrlClick?: string
 bannerHtml?: string
-products?: {
+Products?: {
 ProductId?: string
 Title?: string
 Mpn?: string
@@ -972,12 +972,12 @@ ViewsCount?: number
 }[]
 }[]
 }[]
-recommendations?: {
-order?: number
-nameRecommendation?: string
-titleRecommendation?: string
-eventGoogleAnalytics?: string
-products?: {
+Recommendations?: {
+Order?: number
+NameRecommendation?: string
+TitleRecommendation?: string
+EventGoogleAnalytics?: string
+Products?: {
 ProductId?: string
 Title?: string
 Mpn?: string

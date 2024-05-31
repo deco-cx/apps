@@ -15,12 +15,12 @@ export interface Filter {
 export interface Props {
   term: string;
   size: number;
-  searchSort: SearchSort;
-  rule: string;
-  from: number;
+  searchSort?: SearchSort;
+  rule?: string;
+  from?: number;
   ruletype?: RuleType;
-  filter: Filter[];
-  condition: {
+  filter?: Filter[];
+  condition?: {
     field: string;
     value: string;
     validation: string;
@@ -37,16 +37,21 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const { api, shcode, cluster } = ctx;
-  const { term, condition, filter, from, rule, searchSort, size, ruletype } =
+  const { term, condition, filter = [], from: fromParam, rule, searchSort, size, ruletype } =
     props;
 
   const url = new URL(req.url);
 
-  const filterString = filter.map((filterItem) =>
+  const filterString = filter.length ? filter.map((filterItem) =>
     `${filterItem.field}:${filterItem.value}`
-  ).join("&");
-  const conditionString =
-    `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`;
+  ).join("&") : undefined;
+
+  const conditionString = condition ?
+    `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`: undefined;
+
+  const page = Number(url.searchParams.get("page")) ?? 1
+
+  const from = fromParam ?? page <= 1 ? 0 : (page - 1) * size;
 
   const data = await api["GET /:cluster/Search/GetPrimarySearch"]({
     cluster,
@@ -62,6 +67,8 @@ const loader = async (
     condition: conditionString,
   }).then((r) => r.json());
 
+  console.log (data.TotalResult)
+
   if (data?.IsRedirect) {
     redirect(
       new URL(data?.urlRedirect!, url.origin)
@@ -75,6 +82,12 @@ const loader = async (
 
   const filters = toFilters(data?.Filters ?? []);
 
+  // const hasNextPage = Boolean(
+  //   (data?.TotalResult ?? 0) /
+  //       (size) >
+  //     (data?.result?.productsByOffset?.page ?? 0),
+  // );
+
   return {
     "@type": "ProductListingPage",
     products: products,
@@ -82,6 +95,11 @@ const loader = async (
     filters,
     pageInfo: {
       records: data?.TotalResult,
+      recordPerPage: size,
+      currentPage: page,
+      pageTypes: [
+        "Search"
+      ]
     },
   };
 };

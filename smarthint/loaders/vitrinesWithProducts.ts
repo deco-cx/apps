@@ -1,23 +1,29 @@
 import { AppContext } from "../mod.ts";
-import { toFilters, toProduct, toSortOption } from "../utils/transform.ts";
-import { redirect } from "deco/mod.ts";
+import { toProduct } from "../utils/transform.ts";
 import { Filter } from "./searchListPage.ts";
 import { PageType } from "../utils/typings.ts";
 import { Product } from "../../commerce/types.ts";
+import { getUserHash } from "../utils/parseHeaders.ts";
 
 export interface Props {
   filter?: Filter[];
   categories?: string;
+  /**
+   * @hide
+   */
   products?: string[];
-  position?: string;
-  pageIdentifier?: string;
-  pagetype?: PageType;
+  position: string;
+  pagetype: PageType;
+  /**
+   * @default padrao
+   */
   channel?: string;
 }
 
 export interface SmarthintPosition {
   titleRecommendation?: string;
   eventGoogleAnalytics?: string;
+  nameRecommendation?: string;
   products?: Product[];
   bannerUrl?: string;
   bannerUrlClick?: string;
@@ -34,32 +40,38 @@ export interface SmarthintPosition {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<SmarthintPosition[] | null> => {
   const { recs, shcode } = ctx;
   const {
     categories,
     filter = [],
-    pageIdentifier,
     position,
     products: productsParam = [],
-    pagetype = 'home',
+    pagetype = "home",
     channel,
   } = props;
 
+  const url = new URL(req.url)
 
-  const filterString = filter.length ? filter.map((filterItem) =>
-    `${filterItem.field}:${filterItem.value}`
-  ).join("&"): undefined
+  const anonymous = getUserHash(req.headers)
+  
+  const pageIdentifier = url.hostname == 'localhost' ? '' : new URL(url.origin, url.pathname)?.href
 
-  const productsString = productsParam.length ? productsParam.map((productId) =>
-    `productid:${productId}`
-  ).join("&"): undefined
+  const filterString = filter.length
+    ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
+      .join("&")
+    : undefined;
+
+  const productsString = productsParam.length
+    ? productsParam.map((productId) => `productid:${productId}`).join("&")
+    : undefined;
+
 
   const data = await recs["GET /recommendationByPage/withProducts"]({
     shcode,
-    anonymous: "1", //TODO,
+    anonymous, 
     categories,
     channel,
     filter: filterString,
@@ -69,32 +81,35 @@ const loader = async (
     products: productsString,
   }).then((r) => r.json());
 
+  console.log({data})
+
   const positionItem = data.find((item) =>
-    item["smarthint-position"] == position
+    Number(item.SmartHintPosition) == Number(position)
   );
 
   if (!positionItem) return null;
 
   const {
-    recommendationsProducts = [],
-    recommendationsPromotional = [],
-    recommendationsCombination = [],
-    recommendations = [],
+    RecommendationsProducts = [],
+    RecommendationsPromotional = [],
+    RecommendationsCombination = [],
+    Recommendations = [],
   } = positionItem;
 
   const allItems = [
-    ...recommendationsProducts,
-    ...recommendationsPromotional,
-    ...recommendationsCombination,
-    ...recommendations,
+    ...RecommendationsProducts,
+    ...RecommendationsPromotional,
+    ...RecommendationsCombination,
+    ...Recommendations,
   ];
 
-  const sortedItem = allItems.toSorted((a, b) => a.order! - b.order!);
+  const sortedItem = allItems.toSorted((a, b) => a.Order! - b.Order!);
 
   return sortedItem.map((item) => ({
-    eventGoogleAnalytics: item.eventGoogleAnalytics,
-    titleRecommendation: item.titleRecommendation,
-    products: item.products?.map((product) => toProduct(product)) ?? [],
+    eventGoogleAnalytics: item.EventGoogleAnalytics,
+    titleRecommendation: item.TitleRecommendation,
+    nameRecommendation: item.NameRecommendation,
+    products: item.Products?.map((product) => toProduct(product)) ?? [],
   }));
 };
 

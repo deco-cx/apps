@@ -29,13 +29,13 @@ export default function App(
   const recs = createHttpClient<OpenAPI>({
     base: "https://recs.smarthint.co",
     fetcher: fetchSafe,
-    headers: headers,
+    headers: headers
   });
 
   const state = {
     ...props,
     api,
-    recs
+    recs,
   };
 
   return { manifest, state };

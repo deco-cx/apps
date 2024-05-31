@@ -1,22 +1,30 @@
 import {
   Filter,
   FilterToggleValue,
+  ItemAvailability,
   Product,
   SortOption,
 } from "../../commerce/types.ts";
 
+const AvailabilityMap: Record<string,ItemAvailability> = {
+  'in stock': "https://schema.org/InStock",
+  'out of stock': "https://schema.org/OutOfStock"
+}
+
 export const toProduct = (product: any): Product => {
+
+  console.log(product.Availability  )
   return {
     "@type": "Product",
     productID: product.ProductId,
     name: product.Title,
     sku: product.Sku,
     description: product.Description,
-    url: product.Link,
+    url: `https:${product.Link}`,
     brand: {
       "@type": "Brand",
       name: product.Brand,
-    },
+    },  
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: product.ReviewStars,
@@ -39,8 +47,8 @@ export const toProduct = (product: any): Product => {
       offerCount: 4, //TODO
       offers: [{
         "@type": "Offer",
-        availability: product.Availability,
-        price: product.SalePrice,
+        availability: AvailabilityMap[product.Availability], // TODO fix data
+        price: product.SalePrice, 
         inventoryLevel: {
           value: 1000, //TODO
         },
@@ -101,7 +109,7 @@ export const toProduct = (product: any): Product => {
         name: "Tag",
         value: tag,
       })),
-      ...product.Categories.map((category: string) => ({  
+      ...product.Categories.map((category: string) => ({
         "@type": "PropertyValue",
         name: "Categories",
         value: category,

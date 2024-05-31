@@ -10,7 +10,7 @@ export interface Props {
   sizeProducts?: number;
   /**
    * @description limit of terms to show
-   */
+   */ 
   sizeTerms?: number;
 }
 
@@ -36,6 +36,8 @@ const loader = async (
     term: query,
     anonymous: "1", //TODO
   }).then((r) => r.json());
+
+  console.log(data)
 
   if (!data) return null;
 

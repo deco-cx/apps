@@ -4,27 +4,27 @@
   "items": {
     "type": "object",
     "properties": {
-      "smarthint-position": {
+      "SmartHintPosition": {
         "type": "string"
       },
-      "recommendationsProducts": {
+      "RecommendationsProducts": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
-            "order": {
+            "Order": {
               "type": "integer"
             },
-            "nameRecommendation": {
+            "NameRecommendation": {
               "type": "string"
             },
-            "titleRecommendation": {
+            "TitleRecommendation": {
               "type": "string"
             },
-            "eventGoogleAnalytics": {
+            "EventGoogleAnalytics": {
               "type": "string"
             },
-            "products": {
+            "Products": {
               "type": "array",
               "items": {
                 "type": "object",
@@ -264,46 +264,46 @@
           }
         }
       },
-      "recommendationsPromotional": {
+      "RecommendationsPromotional": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
-            "order": {
+            "Order": {
               "type": "integer"
             },
-            "nameRecommendation": {
+            "NameRecommendation": {
               "type": "string"
             },
-            "titleRecommendation": {
+            "TitleRecommendation": {
               "type": "string"
             },
-            "eventGoogleAnalytics": {
+            "EventGoogleAnalytics": {
               "type": "string"
             },
-            "bannerUrl": {
+            "BannerUrl": {
               "type": "string"
             },
-            "bannerUrlClick": {
+            "BannerUrlClick": {
               "type": "string"
             },
-            "bannerHtml": {
+            "BannerHtml": {
               "type": "string"
             },
-            "positionBanner": {
+            "PositionBanner": {
               "type": "string",
               "enum": ["First", "Last"]
             },
-            "hasTimer": {
+            "HasTimer": {
               "type": "string"
             },
-            "startDateTime": {
+            "StartDateTime": {
               "type": "string"
             },
-            "endDateTime": {
+            "EndDateTime": {
               "type": "string"
             },
-            "products": {
+            "Products": {
               "type": "array",
               "items": {
                 "type": "object",
@@ -543,21 +543,21 @@
           }
         }
       },
-      "recommendationsCombination": {
+      "RecommendationsCombination": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
-            "order": {
+            "Order": {
               "type": "integer"
             },
-            "nameRecommendation": {
+            "NameRecommendation": {
               "type": "string"
             },
-            "titleRecommendation": {
+            "TitleRecommendation": {
               "type": "string"
             },
-            "eventGoogleAnalytics": {
+            "EventGoogleAnalytics": {
               "type": "string"
             },
             "combos": {
@@ -565,7 +565,7 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "order": {
+                  "Order": {
                     "type": "integer"
                   },
                   "titleCombo": {
@@ -580,7 +580,7 @@
                   "bannerHtml": {
                     "type": "string"
                   },
-                  "products": {
+                  "Products": {
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -823,24 +823,24 @@
           }
         }
       },
-      "recommendations": {
+      "Recommendations": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
-            "order": {
+            "Order": {
               "type": "integer"
             },
-            "nameRecommendation": {
+            "NameRecommendation": {
               "type": "string"
             },
-            "titleRecommendation": {
+            "TitleRecommendation": {
               "type": "string"
             },
-            "eventGoogleAnalytics": {
+            "EventGoogleAnalytics": {
               "type": "string"
             },
-            "products": {
+            "Products": {
               "type": "array",
               "items": {
                 "type": "object",
