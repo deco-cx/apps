@@ -1,4 +1,5 @@
 import type { ListItem, ProductDetailsPage } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { URL_KEY } from "../utils/constants.ts";
@@ -10,8 +11,15 @@ export interface Props {
   isBreadcrumbProductName?: boolean;
 }
 
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+  return `${url.href}${props.slug}${props.isBreadcrumbProductName}-products-render-info-categories-product`;
+};
+
 /**
- * @title Magento Integration
+ * @title Magento Integration - Product Details Page
  * @description Product Details Page loader
  */
 async function loader(
@@ -36,66 +44,58 @@ async function loader(
   }
 
   const getProduct = async (slug: string) => {
-    try {
-      const searchCriteria = {
-        filterGroups: [
-          {
-            filters: [{ field: URL_KEY, value: slug }],
-          },
-        ],
-      };
-
-      const queryParams = {
-        site,
-        currencyCode,
-        storeId,
-        ...stringifySearchCriteria(searchCriteria),
-      };
-
-      const itemSku = await clientAdmin["GET /rest/:site/V1/products"]({
-        ...queryParams,
-      }).then((res) => res.json());
-
-      const [{ items }, stockInfoAndImages] = await Promise.all([
-        clientAdmin["GET /rest/:site/V1/products-render-info"](
-          queryParams,
-        ).then((res) => res.json()),
-        clientAdmin["GET /rest/:site/V1/products/:sku"]({
-          sku: itemSku.items[0].sku,
-          site,
-          storeId: storeId,
-          currencyCode: currencyCode,
-        }).then((res) => res.json()),
-      ]);
-
-      return {
-        ...items[0],
-        sku: itemSku.items[0].sku,
-        custom_attributes: itemSku.items[0].custom_attributes,
-        extension_attributes: {
-          ...items[0].extension_attributes,
-          ...stockInfoAndImages.extension_attributes,
-          ...itemSku.items[0].extension_attributes,
+    const searchCriteria = {
+      filterGroups: [
+        {
+          filters: [{ field: URL_KEY, value: slug }],
         },
-        media_gallery_entries: stockInfoAndImages.media_gallery_entries,
-      };
-    } catch (_error) {
-      return null;
-    }
+      ],
+    };
+
+    const queryParams = {
+      site,
+      currencyCode,
+      storeId,
+      ...stringifySearchCriteria(searchCriteria),
+    };
+
+    const itemSku = await clientAdmin["GET /rest/:site/V1/products"]({
+      ...queryParams,
+    }, STALE).then((res) => res.json());
+
+    const [{ items }, stockInfoAndImages] = await Promise.all([
+      clientAdmin["GET /rest/:site/V1/products-render-info"](
+        queryParams,
+        STALE,
+      ).then((res) => res.json()),
+      clientAdmin["GET /rest/:site/V1/products/:sku"]({
+        sku: itemSku.items[0].sku,
+        site,
+        storeId: storeId,
+        currencyCode: currencyCode,
+      }, STALE).then((res) => res.json()),
+    ]);
+
+    return {
+      ...items[0],
+      sku: itemSku.items[0].sku,
+      custom_attributes: itemSku.items[0].custom_attributes,
+      extension_attributes: {
+        ...items[0].extension_attributes,
+        ...stockInfoAndImages.extension_attributes,
+        ...itemSku.items[0].extension_attributes,
+      },
+      media_gallery_entries: stockInfoAndImages.media_gallery_entries,
+    };
   };
 
   const getCategoryNames = async (categoryLinks: { category_id: string }[]) => {
     const getCategoryName = async (categoryId: string) => {
-      try {
-        return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"]({
-          site,
-          categoryId,
-          fields: "name,position",
-        }).then((res) => res.json());
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
+      return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"]({
+        site,
+        categoryId,
+        fields: "name,position",
+      }, STALE).then((res) => res.json());
     };
 
     const categoryNamePromises = categoryLinks.map((category) =>
