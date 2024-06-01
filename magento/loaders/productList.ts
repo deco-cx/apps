@@ -16,6 +16,7 @@ import {
   getCustomFields,
 } from "../utils/utilsGraphQL.ts";
 import { toProductGraphQL } from "../utils/transform.ts";
+import { STALE } from "../../utils/fetch.ts";
 
 export interface CommomProps {
   /**
@@ -201,10 +202,13 @@ async function loader(
   const { products } = await clientGraphql.query<
     ProductShelfGraphQL,
     ProductSearchInputs
-  >({
-    variables: { ...formatedProps },
-    ...GetProduct(customAttributes),
-  });
+  >(
+    {
+      variables: { ...formatedProps },
+      ...GetProduct(customAttributes),
+    },
+    STALE
+  );
 
   if (!products.items || products.items?.length === 0) {
     return null;
@@ -219,5 +223,13 @@ async function loader(
     })
   );
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+  const inputs = fromProps(props, url);
+  return `${JSON.stringify(inputs)}-SHELVES`;
+};
 
 export default loader;

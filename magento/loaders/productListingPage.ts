@@ -17,6 +17,7 @@ import {
   transformSortGraphQL,
 } from "../utils/utilsGraphQL.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { STALE } from "../../utils/fetch.ts";
 
 export interface Props {
   urlKey: RequestURLParam;
@@ -31,7 +32,7 @@ export interface Props {
    * @title Product custom attributes
    * @default false
    */
-  customFields: CustomFields
+  customFields: CustomFields;
 
   categoryProps?: CategoryProps;
 }
@@ -58,62 +59,90 @@ const loader = async (
   const currentPage = url.searchParams.get("p") ?? 1;
   const sortFromUrl = url.searchParams.get("product_list_order");
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
-  const customAttributes = getCustomFields(customFields, ctx.customAttributes)
+  const customAttributes = getCustomFields(customFields, ctx.customAttributes);
 
-  const { sortBy, order } = categoryProps?.sortOptions ?? {
-    sortBy: sortFromUrl
-      ? {
+  const { sortBy, order } = sortFromUrl
+    ? {
+        sortBy: {
           value: sortFromUrl,
-        }
-      : undefined,
-    order: "ASC",
-  };
+        },
+        order: "ASC",
+      }
+    : categoryProps?.sortOptions ?? { sortBy: undefined, order: "ASC" };
   const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
 
   if (!categoryUrl) {
     return null;
   }
 
-  const categoryGQL = await clientGraphql.query<
-    CategoryGraphQL,
-    { path: string }
-  >({
-    variables: { path: categoryUrl },
-    ...GetCategoryUid,
-  });
-  if (
-    !categoryGQL.categories.items ||
-    categoryGQL.categories.items?.length === 0
-  ) {
-    return null;
-  }
-
-  const plpItemsGQL = await clientGraphql.query<
-    PLPGraphQL,
-    Omit<ProductSearchInputs, "search">
-  >({
-    variables: {
-      filter: {
-        category_uid: { in: [categoryGQL.categories.items[0].uid] },
-        ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
+  try {
+    const categoryGQL = await clientGraphql.query<
+      CategoryGraphQL,
+      { path: string }
+    >(
+      {
+        variables: { path: categoryUrl },
+        ...GetCategoryUid,
       },
-      pageSize,
-      currentPage: Number(currentPage),
-      sort: transformSortGraphQL({ sortBy: sortBy!, order }),
-    },
-    ...GetPLPItems(customAttributes),
-  });
+      STALE
+    );
+    if (
+      !categoryGQL.categories.items ||
+      categoryGQL.categories.items?.length === 0
+    ) {
+      return null;
+    }
 
-  if (!plpItemsGQL.products.items || plpItemsGQL.products.items?.length === 0) {
+    const plpItemsGQL = await clientGraphql.query<
+      PLPGraphQL,
+      Omit<ProductSearchInputs, "search">
+    >(
+      {
+        variables: {
+          filter: {
+            category_uid: { in: [categoryGQL.categories.items[0].uid] },
+            ...transformFilterGraphQL(
+              url,
+              customFilters,
+              categoryProps?.filters
+            ),
+          },
+          pageSize,
+          currentPage: Number(currentPage),
+          sort: transformSortGraphQL({
+            sortBy: sortBy!,
+            order: order as "ASC" | "DESC",
+          }),
+        },
+        ...GetPLPItems(customAttributes),
+      },
+      STALE
+    );
+
+    if (
+      !plpItemsGQL.products.items ||
+      plpItemsGQL.products.items?.length === 0
+    ) {
+      return null;
+    }
+
+    return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, {
+      originURL: url,
+      imagesQtd,
+      defaultPath,
+      customAttributes,
+    });
+  } catch (e) {
+    console.log(e);
     return null;
   }
+};
 
-  return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, {
-    originURL: url,
-    imagesQtd,
-    defaultPath,
-    customAttributes
-  });
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (_props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+  return `${url.href}/PLP`;
 };
 
 export default loader;
