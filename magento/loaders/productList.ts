@@ -67,9 +67,6 @@ export interface CustomProps extends Omit<CommomProps, "filter"> {
 
 export interface SuggestionsFromUrl extends CommomProps {}
 
-/**
- * @title Magento Integration - Product List
- */
 export interface Props {
   props:
     | TermProps
@@ -186,7 +183,7 @@ const fromProps = (
 };
 
 /**
- * @title Magento Integration - Product Listing loader
+ * @title Magento Integration - Product Shelves
  */
 async function loader(
   { props }: Props,

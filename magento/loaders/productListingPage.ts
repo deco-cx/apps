@@ -46,7 +46,7 @@ export interface CategoryProps {
 }
 
 /**
- * @title Magento Integration - PLP
+ * @title Magento Integration - Product Listing Page
  */
 const loader = async (
   props: Props,
@@ -142,7 +142,7 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (_props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(req.url);
-  return `${url.href}/PLP`;
+  return `${url.href}-PLP`;
 };
 
 export default loader;
