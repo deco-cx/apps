@@ -12,6 +12,7 @@ const config = {
   apps: [
     app("smarthint"),
     app("ra-trustvox"),
+    app("checkout"),
     app("anthropic"),
     app("resend"),
     app("emailjs"),
