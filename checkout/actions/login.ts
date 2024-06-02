@@ -22,7 +22,14 @@ export default async function (
   if (customerAuthenticatedLogin) {
     setCookie(response.headers, {
       name: "customerAccessToken",
+      path: "/",
       value: customerAuthenticatedLogin.token as string,
+      expires: new Date(customerAuthenticatedLogin.validUntil),
+    });
+    setCookie(response.headers, {
+      name: "customerAccessTokenExpires",
+      path: "/",
+      value: customerAuthenticatedLogin.validUntil,
       expires: new Date(customerAuthenticatedLogin.validUntil),
     });
   }

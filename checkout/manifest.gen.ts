@@ -2,15 +2,31 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/login.ts";
-import * as $$$$$$$$$1 from "./actions/signupCompany.ts";
-import * as $$$$$$$$$2 from "./actions/signupPerson.ts";
+import * as $$$$$$$$$0 from "./actions/createAddress.ts";
+import * as $$$$$$$$$1 from "./actions/createCheckout.ts";
+import * as $$$$$$$$$2 from "./actions/deleteAddress.ts";
+import * as $$$$$$$$$3 from "./actions/login.ts";
+import * as $$$$$$$$$4 from "./actions/logout.ts";
+import * as $$$$$$$$$5 from "./actions/signupCompany.ts";
+import * as $$$$$$$$$6 from "./actions/signupPerson.ts";
+import * as $$$$$$$$$7 from "./actions/updateAddress.ts";
+import * as $$$0 from "./loaders/getUser.ts";
+import * as $$$1 from "./loaders/getUserAddress.ts";
 
 const manifest = {
+  "loaders": {
+    "checkout/loaders/getUser.ts": $$$0,
+    "checkout/loaders/getUserAddress.ts": $$$1,
+  },
   "actions": {
-    "checkout/actions/login.ts": $$$$$$$$$0,
-    "checkout/actions/signupCompany.ts": $$$$$$$$$1,
-    "checkout/actions/signupPerson.ts": $$$$$$$$$2,
+    "checkout/actions/createAddress.ts": $$$$$$$$$0,
+    "checkout/actions/createCheckout.ts": $$$$$$$$$1,
+    "checkout/actions/deleteAddress.ts": $$$$$$$$$2,
+    "checkout/actions/login.ts": $$$$$$$$$3,
+    "checkout/actions/logout.ts": $$$$$$$$$4,
+    "checkout/actions/signupCompany.ts": $$$$$$$$$5,
+    "checkout/actions/signupPerson.ts": $$$$$$$$$6,
+    "checkout/actions/updateAddress.ts": $$$$$$$$$7,
   },
   "name": "checkout",
   "baseUrl": import.meta.url,

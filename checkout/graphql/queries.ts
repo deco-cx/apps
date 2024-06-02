@@ -841,3 +841,100 @@ export const CustomerAuthenticatedLogin = {
     }
   }`,
 };
+
+export const CustomerAddressCreate = {
+  query: gql`mutation customerAddressCreate(
+     $customerAccessToken: String!,
+     $address: CreateCustomerAddressInput!,
+    ) {
+      customerAddressCreate(
+        customerAccessToken: $customerAccessToken,
+        address: $address,
+      ) {
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        state
+        street
+        referencePoint
+      }
+    }`,
+};
+
+export const CustomerAddressRemove = {
+  query:
+    gql`mutation customerAddressRemove($customerAccessToken: String!, $id: ID!) {
+      customerAddressRemove(customerAccessToken: $customerAccessToken, id: $id) {
+        isSuccess
+      }
+    }`,
+};
+
+export const CustomerAddressUpdate = {
+  query: gql`mutation customerAddressUpdate(
+     $id: ID!,
+     $customerAccessToken: String!,
+     $address: UpdateCustomerAddressInput!,
+    ) {
+      customerAddressUpdate(
+        customerAccessToken: $customerAccessToken,
+        address: $address,
+        id: $id
+      ) {
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        state
+        street
+        referencePoint
+      }
+    }`,
+};
+
+export const GetUserAddress = {
+  fragments: [Customer],
+  query: gql`query GetUserAddress($customerAccessToken: String) {
+    customer(customerAccessToken: $customerAccessToken) {
+      ...Customer,
+      addresses {
+        address
+        address2
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        referencePoint
+        state
+        street
+      }
+    }
+  }`,
+};
+
+export const createCheckout = {
+  query: gql`mutation createCheckout($products: [CheckoutProductItemInput]!) {
+      createCheckout(products: $products) {
+        checkoutId
+      }
+    }`,
+};

@@ -4888,3 +4888,42 @@ export type CustomerAuthenticatedLoginMutationVariables = Exact<{
 
 
 export type CustomerAuthenticatedLoginMutation = { customerAuthenticatedLogin?: { isMaster: boolean, token?: string | null, type?: LoginType | null, validUntil: any } | null };
+
+export type CustomerAddressCreateMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  address: CreateCustomerAddressInput;
+}>;
+
+
+export type CustomerAddressCreateMutation = { customerAddressCreate?: { addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, state?: string | null, street?: string | null, referencePoint?: string | null } | null };
+
+export type CustomerAddressRemoveMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CustomerAddressRemoveMutation = { customerAddressRemove?: { isSuccess: boolean } | null };
+
+export type CustomerAddressUpdateMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  customerAccessToken: Scalars['String']['input'];
+  address: UpdateCustomerAddressInput;
+}>;
+
+
+export type CustomerAddressUpdateMutation = { customerAddressUpdate?: { addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, state?: string | null, street?: string | null, referencePoint?: string | null } | null };
+
+export type GetUserAddressQueryVariables = Exact<{
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetUserAddressQuery = { customer?: { id?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, addresses?: Array<{ address?: string | null, address2?: string | null, addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null> | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
+
+export type CreateCheckoutMutationVariables = Exact<{
+  products: Array<InputMaybe<CheckoutProductItemInput>> | InputMaybe<CheckoutProductItemInput>;
+}>;
+
+
+export type CreateCheckoutMutation = { createCheckout?: { checkoutId: any } | null };
