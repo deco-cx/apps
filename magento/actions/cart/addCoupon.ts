@@ -13,18 +13,18 @@ const action = async (
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
 
-  try{
+  try {
     await clientAdmin["PUT /rest/:site/V1/carts/:cartId/coupons/:couponCode"]({
       cartId,
       site: ctx.site,
       couponCode: couponCode.toLowerCase(),
-    }).then((res) => res.json())
-  }catch(error){
-    if(error.status === 404){
-      return "Invalid or applied coupon code"
+    }).then((res) => res.json());
+  } catch (error) {
+    if (error.status === 404) {
+      return "Invalid or applied coupon code";
     }
-}
-  return true
+  }
+  return true;
 };
 
 export default action;

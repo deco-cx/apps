@@ -15,7 +15,7 @@ const action = async (
     site: ctx.site,
   });
 
-  return await cart(undefined, req, ctx)
+  return await cart(undefined, req, ctx);
 };
 
 export default action;
