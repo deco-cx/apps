@@ -61,6 +61,7 @@ async function loader(
     const itemSku = await clientAdmin["GET /rest/:site/V1/products"]({
       ...queryParams,
     }, STALE).then((res) => res.json());
+    if(!itemSku.items.length) return null
 
     const [{ items }, stockInfoAndImages] = await Promise.all([
       clientAdmin["GET /rest/:site/V1/products-render-info"](
