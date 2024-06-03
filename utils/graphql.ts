@@ -35,7 +35,6 @@ interface GraphQLQueryProps<V> {
 export const gql = (query: TemplateStringsArray, ...fragments: string[]) =>
   query.reduce((a, c, i) => `${a}${fragments[i - 1]}${c}`);
 
-
 export const createGraphqlClient = ({
   endpoint,
   ...rest
@@ -69,9 +68,7 @@ export const createGraphqlClient = ({
         url,
       });
 
-      const [searchParams, body] = key.startsWith("POST")
-        ? [{}, { body: props, ...init }]
-        : [{ ...props }, { ...init }];
+      const { searchParams, body } = getParamsAndBody({ key, props, init });
 
       const { data, errors } = await http[key as any](searchParams, {
         ...body,
@@ -82,6 +79,59 @@ export const createGraphqlClient = ({
       }
 
       return data as D;
+    },
+  };
+};
+
+const getParamsAndBody = ({
+  key,
+  props,
+  init,
+}: ReturnType<typeof getMethodAndProps> & { init?: DecoRequestInit }) => {
+  if (key.startsWith("POST")) {
+    return { searchParams: {}, body: { body: props, ...init } };
+  }
+  return { searchParams: { ...props }, body: { ...init } };
+};
+
+const getMethodAndProps = <V>({
+  query,
+  fragments,
+  url,
+  operationName,
+  variables,
+}: GraphQLQueryProps<V> & { url: URL }) => {
+  const fullQuery = joinQueryArgs({
+    query,
+    fragments,
+  });
+  const stringfiedVariables = stringfyVariables<V>({ variables });
+  const minifiedQuery = minifyString(fullQuery);
+  const postMethodBool = isPostMethodRequired(
+    url.href,
+    minifiedQuery,
+    stringfiedVariables,
+    operationName
+  );
+
+  const { key, executableQuery, executableVariables } = postMethodBool
+    ? {
+        key: `POST ${url.pathname}`,
+        executableQuery: fullQuery,
+        executableVariables: variables,
+      }
+    : {
+        key: `GET ${url.pathname}`,
+        executableQuery: minifiedQuery,
+        executableVariables: stringfiedVariables,
+      };
+
+  return {
+    key,
+    props: {
+      query: executableQuery,
+      variables: executableVariables,
+      operationName,
     },
   };
 };
@@ -126,37 +176,4 @@ const isPostMethodRequired = (
     variables
   )}&operationname=${operationName}`;
   return urlLength.length + decoCacheArgLength > 2000;
-};
-
-const getMethodAndProps = <V>({
-  query,
-  fragments,
-  url,
-  operationName,
-  variables,
-}: GraphQLQueryProps<V> & { url: URL }) => {
-  const fullQuery = joinQueryArgs({
-    query,
-    fragments,
-  });
-  const stringfiedVariables = stringfyVariables<V>({ variables });
-  const minifiedQuery = minifyString(fullQuery);
-
-  const [key, executableQuery, executableVariables] = isPostMethodRequired(
-    url.href,
-    minifiedQuery,
-    stringfiedVariables,
-    operationName
-  )
-    ? [`POST ${url.pathname}`, fullQuery, variables]
-    : [`GET ${url.pathname}`, minifiedQuery, stringfiedVariables];
-
-  return {
-    key,
-    props: {
-      query: executableQuery,
-      variables: executableVariables,
-      operationName,
-    },
-  };
 };

@@ -60,89 +60,98 @@ const loader = async (
   const sortFromUrl = url.searchParams.get("product_list_order");
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
-
-  const { sortBy, order } = sortFromUrl
-    ? {
-        sortBy: {
-          value: sortFromUrl,
-        },
-        order: "ASC",
-      }
-    : categoryProps?.sortOptions ?? { sortBy: undefined, order: "ASC" };
+  const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
   const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
 
   if (!categoryUrl) {
     return null;
   }
 
-  try {
-    const categoryGQL = await clientGraphql.query<
-      CategoryGraphQL,
-      { path: string }
-    >(
-      {
-        variables: { path: categoryUrl },
-        ...GetCategoryUid,
-      },
-      STALE
-    );
-    if (
-      !categoryGQL.categories.items ||
-      categoryGQL.categories.items?.length === 0
-    ) {
-      return null;
-    }
+  const { categories } = await clientGraphql.query<
+    CategoryGraphQL,
+    { path: string }
+  >(
+    {
+      variables: { path: categoryUrl },
+      ...GetCategoryUid,
+    },
+    STALE
+  );
+  if (!categories.items || categories.items?.length === 0) {
+    return null;
+  }
 
-    const plpItemsGQL = await clientGraphql.query<
-      PLPGraphQL,
-      Omit<ProductSearchInputs, "search">
-    >(
-      {
-        variables: {
-          filter: {
-            category_uid: { in: [categoryGQL.categories.items[0].uid] },
-            ...transformFilterGraphQL(
-              url,
-              customFilters,
-              categoryProps?.filters
-            ),
-          },
-          pageSize,
-          currentPage: Number(currentPage),
-          sort: transformSortGraphQL({
-            sortBy: sortBy!,
-            order: order as "ASC" | "DESC",
-          }),
+  const { products } = await clientGraphql.query<
+    PLPGraphQL,
+    Omit<ProductSearchInputs, "search">
+  >(
+    {
+      variables: {
+        filter: {
+          category_uid: { in: [categories.items[0].uid] },
+          ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
         },
-        ...GetPLPItems(customAttributes),
+        pageSize,
+        currentPage: Number(currentPage),
+        sort: transformSortGraphQL({
+          sortBy: sortBy!,
+          order: order as "ASC" | "DESC",
+        }),
       },
-      STALE
-    );
+      ...GetPLPItems(customAttributes),
+    },
+    STALE
+  );
 
-    if (
-      !plpItemsGQL.products.items ||
-      plpItemsGQL.products.items?.length === 0
-    ) {
-      return null;
-    }
+  if (!products.items || products.items?.length === 0) {
+    return null;
+  }
 
-    return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, {
+  return toProductListingPageGraphQL(
+    { products },
+    { categories },
+    {
       originURL: url,
       imagesQtd,
       defaultPath,
       customAttributes,
-    });
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
+    }
+  );
 };
+
+const getSortOptions = (sortFromUrl: string | null, props?: CategoryProps) =>
+  sortFromUrl
+    ? {
+        sortBy: {
+          value: sortFromUrl,
+        },
+        order: "ASC",
+      }
+    : props?.sortOptions ?? { sortBy: undefined, order: "ASC" };
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (_props: Props, req: Request, _ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
-  return `${url.href}-PLP`;
+  const { customFields, pageSize, categoryProps, urlKey } = props;
+  const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
+  const customAttributes = getCustomFields(customFields, ["ALL"]);
+  const sortFromUrl = url.searchParams.get("product_list_order");
+  const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
+  const transformedFilters = transformFilterGraphQL(
+    url,
+    ctx.customFilters,
+    categoryProps?.filters
+  );
+  const a = `${
+    url.origin
+  }-category:${categoryUrl}-customAtt:${customAttributes?.join("|") ?? "NONE"}-sortBy:${
+    sortBy?.value
+  }-order:${order}-size:${pageSize}-filters:${JSON.stringify(
+    transformedFilters
+  )}-PLP`;
+  console.log(a);
+  return a;
 };
 
 export default loader;
