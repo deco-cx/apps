@@ -1,6 +1,7 @@
 import { Person } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-import { getUserCookie, SESSION_COOKIE } from "../utils/user.ts";
+import { SESSION_COOKIE } from "../utils/constants.ts";
+import { getUserCookie } from "../utils/user.ts";
 
 async function loader(
   _props: unknown,
