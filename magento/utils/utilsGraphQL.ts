@@ -28,29 +28,29 @@ export const transformSortGraphQL = ({
 export const transformFilterGraphQL = (
   url: URL,
   customFilters?: Array<FiltersGraphQL>,
-  fromLoader?: Array<FilterProps>
+  fromLoader?: Array<FilterProps>,
 ): ProductFilterInput | undefined => ({
   ...filtersFromUrlGraphQL(url, customFilters),
   ...filtersFromLoaderGraphQL(fromLoader),
 });
 
 export const filtersFromLoaderGraphQL = (
-  fromLoader?: Array<FilterProps>
+  fromLoader?: Array<FilterProps>,
 ): ProductFilterInput | undefined =>
   fromLoader?.reduce<ProductFilterInput>(
     (acc, f) => ({
       ...acc,
       [f.name]: f.type,
     }),
-    {}
+    {},
   ) ?? {};
 
 export const filtersFromUrlGraphQL = (
   url: URL,
-  customFilters?: Array<FiltersGraphQL>
+  customFilters?: Array<FiltersGraphQL>,
 ) =>
   DEFAULT_GRAPHQL_FILTERS.concat(
-    customFilters ?? []
+    customFilters ?? [],
   ).reduce<ProductFilterInput>((acc, { type, value }) => {
     const fromUrl = url.searchParams.get(value);
     if (!fromUrl) {
@@ -64,7 +64,7 @@ export const filtersFromUrlGraphQL = (
 
 export const transformFilterValueGraphQL = (
   value: string,
-  type: "EQUAL" | "MATCH" | "RANGE"
+  type: "EQUAL" | "MATCH" | "RANGE",
 ): FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput => {
   if (type === "EQUAL") {
     return { eq: value } as FilterEqualTypeInput;
@@ -105,5 +105,5 @@ export const getCustomFields = ({
     return overrideList;
   }
 
-  return customFiels
+  return customFiels;
 };

@@ -1,21 +1,21 @@
-import type { Product } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
+import type { Product } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import {
+  CustomFields,
+  FilterProps,
   ProductSearchInputs,
   ProductShelfGraphQL,
   ProductSort,
-  FilterProps,
-  CustomFields,
-} from "../utils/clientGraphql/types.ts";
-import { GetProduct } from "../utils/clientGraphql/queries.ts";
+} from "../../utils/clientGraphql/types.ts";
+import { GetProduct } from "../../utils/clientGraphql/queries.ts";
 import {
-  transformSortGraphQL,
-  typeChecker,
   filtersFromLoaderGraphQL,
   formatUrlSuffix,
   getCustomFields,
-} from "../utils/utilsGraphQL.ts";
-import { toProductGraphQL } from "../utils/transform.ts";
+  transformSortGraphQL,
+  typeChecker,
+} from "../../utils/utilsGraphQL.ts";
+import { toProductGraphQL } from "../../utils/transform.ts";
 
 export interface CommomProps {
   /**
@@ -81,7 +81,7 @@ export interface Props {
 const fromProps = (
   { props }: Props,
   url: URL,
-  urlSuffix?: string
+  urlSuffix?: string,
 ): ProductSearchInputs => {
   const { sort } = props;
   if (typeChecker<TermProps>(props as TermProps, "search")) {
@@ -109,7 +109,7 @@ const fromProps = (
               in: categories,
             },
           },
-        ])
+        ]),
       ),
     } as const;
   }
@@ -170,13 +170,13 @@ const fromProps = (
       sort: transformSortGraphQL({ sortBy: sort?.sortBy, order: sort?.order }),
       filter: slug
         ? filtersFromLoaderGraphQL(
-            filter?.concat([
-              {
-                name: "name",
-                type: { match: slug },
-              },
-            ])
-          )
+          filter?.concat([
+            {
+              name: "name",
+              type: { match: slug },
+            },
+          ]),
+        )
         : undefined,
     } as const;
   }
@@ -190,7 +190,7 @@ const fromProps = (
 async function loader(
   { props }: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[] | null> {
   const { clientGraphql, imagesQtd, site, useSuffix } = ctx;
   const { customFields } = props;
