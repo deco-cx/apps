@@ -7,10 +7,12 @@ import * as $$$$$$$$0 from "./flags/audience.ts";
 import * as $$$$$$$$1 from "./flags/everyone.ts";
 import * as $$$$$$$$2 from "./flags/flag.ts";
 import * as $$$$$$$$3 from "./flags/multivariate.ts";
-import * as $$$$$$$$4 from "./flags/multivariate/message.ts";
-import * as $$$$$$$$5 from "./flags/multivariate/page.ts";
-import * as $$$$$$$$6 from "./flags/multivariate/section.ts";
+import * as $$$$$$$$4 from "./flags/multivariate/image.ts";
+import * as $$$$$$$$5 from "./flags/multivariate/message.ts";
+import * as $$$$$$$$6 from "./flags/multivariate/page.ts";
+import * as $$$$$$$$7 from "./flags/multivariate/section.ts";
 import * as $0 from "./functions/requestToParam.ts";
+import * as $1 from "./functions/requestToPathname.ts";
 import * as $$$$0 from "./handlers/fresh.ts";
 import * as $$$$1 from "./handlers/proxy.ts";
 import * as $$$$2 from "./handlers/redirect.ts";
@@ -53,6 +55,7 @@ import * as $$$$$$3 from "./sections/Seo/SeoV2.tsx";
 const manifest = {
   "functions": {
     "website/functions/requestToParam.ts": $0,
+    "website/functions/requestToPathname.ts": $1,
   },
   "loaders": {
     "website/loaders/asset.ts": $$$0,
@@ -107,9 +110,10 @@ const manifest = {
     "website/flags/everyone.ts": $$$$$$$$1,
     "website/flags/flag.ts": $$$$$$$$2,
     "website/flags/multivariate.ts": $$$$$$$$3,
-    "website/flags/multivariate/message.ts": $$$$$$$$4,
-    "website/flags/multivariate/page.ts": $$$$$$$$5,
-    "website/flags/multivariate/section.ts": $$$$$$$$6,
+    "website/flags/multivariate/image.ts": $$$$$$$$4,
+    "website/flags/multivariate/message.ts": $$$$$$$$5,
+    "website/flags/multivariate/page.ts": $$$$$$$$6,
+    "website/flags/multivariate/section.ts": $$$$$$$$7,
   },
   "actions": {
     "website/actions/secrets/encrypt.ts": $$$$$$$$$0,

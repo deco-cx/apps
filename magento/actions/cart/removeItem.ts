@@ -20,10 +20,9 @@ const action = async (
     itemId,
   }, {});
 
-  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-    cartId: cartId,
-    site: ctx.site,
-  }).then((res) => res.json());
+  return await ctx.invoke(
+    "magento/loaders/cart.ts",
+  );
 };
 
 export default action;

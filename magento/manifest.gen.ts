@@ -7,15 +7,30 @@ import * as $$$$$$$$$1 from "./actions/cart/removeItem.ts";
 import * as $$$$$$$$$2 from "./actions/cart/setSimulation.ts";
 import * as $$$$$$$$$3 from "./actions/cart/simulation.ts";
 import * as $$$$$$$$$4 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$5 from "./actions/newsletter/subscribe.ts";
+import * as $0 from "./functions/requestToPathname.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
-import * as $$$2 from "./loaders/user.ts";
+import * as $$$2 from "./loaders/productList.ts";
+import * as $$$3 from "./loaders/productListingPage.ts";
+import * as $$$4 from "./loaders/proxy.ts";
+import * as $$$5 from "./loaders/user.ts";
 
 const manifest = {
+  "functions": {
+    "magento/functions/requestToPathname.ts": $0,
+  },
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
     "magento/loaders/productDetailsPage.ts": $$$1,
-    "magento/loaders/user.ts": $$$2,
+    "magento/loaders/productList.ts": $$$2,
+    "magento/loaders/productListingPage.ts": $$$3,
+    "magento/loaders/proxy.ts": $$$4,
+    "magento/loaders/user.ts": $$$5,
+  },
+  "handlers": {
+    "magento/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "magento/actions/cart/addItem.ts": $$$$$$$$$0,
@@ -23,6 +38,7 @@ const manifest = {
     "magento/actions/cart/setSimulation.ts": $$$$$$$$$2,
     "magento/actions/cart/simulation.ts": $$$$$$$$$3,
     "magento/actions/cart/updateItem.ts": $$$$$$$$$4,
+    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$5,
   },
   "name": "magento",
   "baseUrl": import.meta.url,

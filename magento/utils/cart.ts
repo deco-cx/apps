@@ -1,11 +1,6 @@
 import { getCookies } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
-import {
-  Cart,
-  MagentoCardPrices,
-  MagentoProduct,
-  MediaEntry,
-} from "./client/types.ts";
+import { Cart, MagentoCardPrices, MagentoProduct } from "./client/types.ts";
 import { toURL } from "./transform.ts";
 
 const CART_COOKIE = "dataservices_cart_id";
@@ -57,32 +52,54 @@ export async function createCart(
 export const toCartItemsWithImages = (
   cart: Cart,
   prices: MagentoCardPrices,
-  productImages: MagentoProduct[],
+  productMagento: MagentoProduct[],
   imagesUrl: string,
+  url: string,
+  site: string,
 ) => {
-  const productImagesMap = productImages.reduce((map, productImage) => {
-    map[productImage.sku] = productImage.media_gallery_entries || [];
+  const productImagesMap = productMagento.reduce((map, productImage) => {
+    map[productImage.sku] = productImage || [];
     return map;
-  }, {} as Record<string, MediaEntry[]>);
+  }, {} as Record<string, MagentoProduct>);
 
   const itemsWithImages = cart.items.map((product) => {
-    const images = productImagesMap[product.sku]?.map((img) => ({
-      "@type": "ImageObject" as const,
-      encodingFormat: "image",
-      alternateName: img.file,
-      url: `${toURL(imagesUrl)}${img.file}`,
-    })) || [];
+    const images = productImagesMap[product.sku].media_gallery_entries;
+    const productData = productImagesMap[product.sku];
+    const firstImage = images?.[0]
+      ? {
+        "@type": "ImageObject" as const,
+        encodingFormat: "image",
+        alternateName: images[0].file,
+        url: `${toURL(imagesUrl)}${images[0].file}`,
+      }
+      : null;
+
+    const urlKey = productData.custom_attributes.find((item) =>
+      item.attribute_code === "url_key"
+    )?.value;
 
     return {
       ...product,
       price_total: product.qty * product.price,
-      images,
+      images: firstImage ? [firstImage] : [],
+      url: `${url}/${site}/${urlKey}`,
     };
   });
 
   return {
     ...cart,
     items: itemsWithImages,
-    totalizers: prices,
+    totalizers: {
+      grand_total: prices.grand_total,
+      subtotal: prices.subtotal,
+      discount_amount: prices.discount_amount,
+      shipping_amount: prices.shipping_amount,
+      shipping_discount_amount: prices.shipping_discount_amount,
+      base_currency_code: prices?.base_currency_code,
+      base_discount_amount: prices.base_discount_amount,
+      base_shipping_amount: prices.base_shipping_amount,
+      base_subtotal: prices.base_subtotal,
+      coupon_code: prices.coupon_code,
+    },
   };
 };

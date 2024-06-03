@@ -5,7 +5,7 @@ import {
   MagentoCardPrices,
   MagentoCategory,
   MagentoProduct,
-  SetShipping,
+  NewsletterData,
   ShippingMethod,
   User,
 } from "./types.ts";
@@ -67,7 +67,7 @@ export interface API {
   "GET /rest/:site/V1/carts/:cartId/totals": {
     response: MagentoCardPrices;
     searchParams: {
-      fields: string;
+      fields?: string;
     };
   };
 
@@ -112,8 +112,11 @@ export interface API {
     };
   };
 
-  "POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote": {
-    response: [];
-    body: SetShipping;
+  "POST /rest/:site/V1/newsletter/subscribed": {
+    response: NewsletterData;
+    body: {
+      email: string;
+      store_id: number;
+    };
   };
 }

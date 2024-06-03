@@ -2,6 +2,13 @@ import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
+import { createGraphqlClient } from "../utils/graphql.ts";
+import { fetchSafe } from "../utils/fetch.ts";
+
+export interface FiltersGraphQL {
+  value: string;
+  type: "EQUAL" | "MATCH" | "RANGE";
+}
 
 export interface Props {
   /**
@@ -32,12 +39,45 @@ export interface Props {
    * @example https://www.store.com.br/media/catalog/product
    */
   imagesUrl: string;
+
+  /**
+   * @title Images per shelf (max)
+   * @description Max images qtd per shelf
+   * @default 3
+   */
+  imagesQtd: number;
+
+  /**
+   * @title Use Magento store prop as URL path suffix in PDP
+   */
+  useSuffix: boolean;
+
+  /**
+   * @title Custom Filters
+   * @description Applicate own filters
+   */
+  customFilters: Array<FiltersGraphQL>;
+
+  /**
+   * @title Custom Attributes on Product
+   * @description Inform the product own custom attributes
+   */
+  customAttributes?: Array<string>;
+
+  /**
+   * @title Maximum number of installments
+   */
+  maxInstallments: number;
+
+  /**
+   * @title Minimum installment value
+   */
+  minInstallmentValue: number;
 }
 
-type PartialProps = Omit<Props, "baseUrl">;
-
-export interface State extends PartialProps {
+export interface State extends Props {
   clientAdmin: ReturnType<typeof createHttpClient<API>>;
+  clientGraphql: ReturnType<typeof createGraphqlClient>;
 }
 
 /**
@@ -47,27 +87,29 @@ export interface State extends PartialProps {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, site, storeId, apiKey, currencyCode, imagesUrl } = props;
+  const {
+    baseUrl,
+    apiKey,
+  } = props;
 
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
-    headers: new Headers(
-      {
-        "Authorization": `Bearer ${apiKey}`,
-      },
-    ),
+    headers: new Headers({
+      Authorization: `Bearer ${apiKey}`,
+    }),
   });
 
+  const clientGraphql = createGraphqlClient({
+    fetcher: fetchSafe,
+    endpoint: `${baseUrl}/graphql`,
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    }),
+  });
   return {
     manifest,
-    state: {
-      site,
-      storeId,
-      apiKey,
-      currencyCode,
-      imagesUrl,
-      clientAdmin,
-    },
+    state: { ...props, clientAdmin, clientGraphql },
   };
 }
 
