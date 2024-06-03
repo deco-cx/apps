@@ -6,31 +6,43 @@ import * as $$$$$$$$$0 from "./actions/cart/addCoupon.ts";
 import * as $$$$$$$$$1 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$2 from "./actions/cart/removeCoupon.ts";
 import * as $$$$$$$$$3 from "./actions/cart/removeItem.ts";
-import * as $$$$$$$$$4 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$5 from "./actions/cart/updateItem.ts";
-import * as $$$$$$$$$6 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$4 from "./actions/cart/setSimulation.ts";
+import * as $$$$$$$$$5 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$6 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$7 from "./actions/newsletter/subscribe.ts";
+import * as $0 from "./functions/requestToPathname.ts";
+import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/productDetailsPage.ts";
 import * as $$$2 from "./loaders/productList.ts";
 import * as $$$3 from "./loaders/productListingPage.ts";
-import * as $$$4 from "./loaders/user.ts";
+import * as $$$4 from "./loaders/proxy.ts";
+import * as $$$5 from "./loaders/user.ts";
 
 const manifest = {
+  "functions": {
+    "magento/functions/requestToPathname.ts": $0,
+  },
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
     "magento/loaders/productDetailsPage.ts": $$$1,
     "magento/loaders/productList.ts": $$$2,
     "magento/loaders/productListingPage.ts": $$$3,
-    "magento/loaders/user.ts": $$$4,
+    "magento/loaders/proxy.ts": $$$4,
+    "magento/loaders/user.ts": $$$5,
+  },
+  "handlers": {
+    "magento/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "magento/actions/cart/addCoupon.ts": $$$$$$$$$0,
     "magento/actions/cart/addItem.ts": $$$$$$$$$1,
     "magento/actions/cart/removeCoupon.ts": $$$$$$$$$2,
     "magento/actions/cart/removeItem.ts": $$$$$$$$$3,
-    "magento/actions/cart/simulation.ts": $$$$$$$$$4,
-    "magento/actions/cart/updateItem.ts": $$$$$$$$$5,
-    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$6,
+    "magento/actions/cart/setSimulation.ts": $$$$$$$$$4,
+    "magento/actions/cart/simulation.ts": $$$$$$$$$5,
+    "magento/actions/cart/updateItem.ts": $$$$$$$$$6,
+    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$7,
   },
   "name": "magento",
   "baseUrl": import.meta.url,

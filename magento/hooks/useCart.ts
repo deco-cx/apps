@@ -27,6 +27,7 @@ const state = {
   addCoupon: enqueue("magento/actions/cart/addCoupon.ts"),
   removeCoupon: enqueue("magento/actions/cart/removeCoupon.ts"),
   simulate: invoke.magento.actions.cart.simulation,
+  setSimulate: enqueue("magento/actions/cart/setSimulation.ts"),
 };
 
 export const useCart = () => state;
