@@ -348,7 +348,7 @@ export interface Items {
   product_type: string;
   quote_id: string;
   url: string;
-  image: MediaEntry[];
+  images: MediaEntry[];
   price_total: number;
 }
 
