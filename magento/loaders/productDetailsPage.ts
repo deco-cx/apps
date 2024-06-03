@@ -14,8 +14,7 @@ export interface Props {
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
-  const url = new URL(req.url);
-  return `${url.href}${props.slug}${props.isBreadcrumbProductName}-products-render-info-categories-product`;
+  return `${req.url}${props.isBreadcrumbProductName}-PDP-products-render-info`;
 };
 
 /**
