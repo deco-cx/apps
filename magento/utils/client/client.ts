@@ -84,7 +84,7 @@ export interface API {
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */
-  "POST /rest/:site/V1/carts/:cartId/coupons/:couponCode": {
+  "PUT /rest/:site/V1/carts/:cartId/coupons/:couponCode": {
     response: boolean;
   };
 

@@ -1,9 +1,9 @@
 import type { AppContext } from "../../mod.ts";
-import { Cart } from "../../loaders/cart.ts";
+import cart, { Cart } from "../../loaders/cart.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 
 const action = async (
-  _props: unknown,
+  _props: undefined,
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
@@ -15,10 +15,7 @@ const action = async (
     site: ctx.site,
   });
 
-  return await ctx.invoke(
-    "magento/loaders/cart.ts",
-  );
+  return await cart(undefined, req, ctx)
 };
 
 export default action;
-``;
