@@ -25,6 +25,7 @@ const state = {
   updateItem: enqueue("magento/actions/cart/updateItem.ts"),
   removeItem: enqueue("magento/actions/cart/removeItem.ts"),
   simulate: invoke.magento.actions.cart.simulation,
+  setSimulate: enqueue("magento/actions/cart/setSimulation.ts"),
 };
 
 export const useCart = () => state;

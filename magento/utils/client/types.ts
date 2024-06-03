@@ -415,6 +415,15 @@ export interface CarbonoCustomer {
   data_id: number;
 }
 
+export interface MinicartImprovements {
+  coupon_code: string | null;
+  country_id: string;
+  api_base_url: string;
+  is_logged_in: boolean;
+  quote_id: string;
+  base_url: string;
+}
+
 export interface CartUser {
   summary_count: number;
   subtotalAmount: number | null;
@@ -431,6 +440,16 @@ export interface CartUser {
   subtotal_excl_tax: string;
   mpFSBCartTotal: unknown | null;
   data_id: number;
+  minicart_improvements: MinicartImprovements;
+}
+
+export interface SetShipping {
+  countryId?: string;
+  quoteId?: string;
+  postcode: string;
+  isLoggedIn?: boolean;
+  methodCode: string;
+  carrierCode: string;
 }
 
 export interface NewsletterData {
