@@ -82,6 +82,17 @@ export interface API {
       };
     };
   };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */
+  "PUT /rest/:site/V1/carts/:cartId/coupons/:couponCode": {
+    response: boolean;
+  };
+
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */
+  "DELETE /rest/:site/V1/carts/:cartId/coupons": {
+    response: boolean;
+  };
+
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIditemsitemId#operation/PutV1CartsCartIdItemsItemId */
   "PUT /rest/:site/V1/carts/:cartId/items/:itemId": {
     response: string;

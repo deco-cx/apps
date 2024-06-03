@@ -75,9 +75,7 @@ export interface Props {
   minInstallmentValue: number;
 }
 
-type PartialProps = Omit<Props, "baseUrl">;
-
-export interface State extends PartialProps {
+export interface State extends Props {
   clientAdmin: ReturnType<typeof createHttpClient<API>>;
   clientGraphql: ReturnType<typeof createGraphqlClient>;
 }
@@ -91,17 +89,7 @@ export interface State extends PartialProps {
 export default function App(props: Props): App<Manifest, State> {
   const {
     baseUrl,
-    site,
-    storeId,
     apiKey,
-    currencyCode,
-    imagesUrl,
-    imagesQtd,
-    customFilters = [],
-    maxInstallments,
-    minInstallmentValue,
-    useSuffix,
-    customAttributes,
   } = props;
 
   const clientAdmin = createHttpClient<API>({
@@ -121,21 +109,7 @@ export default function App(props: Props): App<Manifest, State> {
   });
   return {
     manifest,
-    state: {
-      site,
-      storeId,
-      apiKey,
-      currencyCode,
-      imagesUrl,
-      clientAdmin,
-      clientGraphql,
-      imagesQtd,
-      customFilters,
-      maxInstallments,
-      minInstallmentValue,
-      useSuffix,
-      customAttributes,
-    },
+    state: { ...props, clientAdmin, clientGraphql },
   };
 }
 
