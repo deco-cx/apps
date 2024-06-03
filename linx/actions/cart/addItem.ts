@@ -29,7 +29,7 @@ const action = async (
   for (const prod of props.Products) {
     if (prod.Metas && prod.Metas.length > 0) {
       const BasketItemID = response.Shopper.Basket.Items.find(
-        item => String(item.ProductID) === prod.ProductID
+        (item) => String(item.ProductID) === prod.ProductID,
       )?.BasketItemID;
 
       metadatas.push(

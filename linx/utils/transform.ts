@@ -102,9 +102,10 @@ const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
     price: item.Price?.SalesPrice ?? item.RetailPrice ?? Infinity,
     priceSpecification,
     inventoryLevel: {},
-    availability: item.Availability != "O" && item.AvailabilityText != "Descontinuado"
-      ? "https://schema.org/InStock"
-      : "https://schema.org/OutOfStock",
+    availability:
+      item.Availability != "O" && item.AvailabilityText != "Descontinuado"
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
   };
 };
 
@@ -201,7 +202,7 @@ export const toProduct = (
     "@type": "Product",
     productID: `${variant.ProductID}`,
     sku: `${variant.SKU}`,
-    identifier: `${product.SKU}`, 
+    identifier: `${product.SKU}`,
     url: productURL.href,
     name: variant.Name,
     gtin: product.Uom,

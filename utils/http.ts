@@ -1,5 +1,6 @@
 import { RequestInit } from "deco/runtime/fetch/mod.ts";
 import { fetchSafe } from "./fetch.ts";
+import { Debug } from "./debug.ts";
 
 const HTTP_VERBS = new Set(
   [
@@ -151,6 +152,13 @@ export const createHttpClient = <T>({
         isJSON && headers.set("content-type", "application/json");
 
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
+
+        Debug.enabled() && Debug.saveRequestCurl(url.href, {
+          ...init,
+          headers,
+          method,
+          body,
+        });
 
         return fetcher(url.href, {
           ...init,
