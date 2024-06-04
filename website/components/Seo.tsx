@@ -58,10 +58,13 @@ function Component({
   jsonLDs = [],
 }: Props) {
   const [{ pageInfo = {}, seo = {} } = {}] = jsonLDs || [{}];
-  const currentPage = pageInfo?.currentPage;
-  const isDepartament = pageInfo?.pageTypes[0] === "Department" ||
-    pageInfo?.pageTypes[0] === "Search";
+
+  
+  const currentPage = pageInfo?.currentPage ?? false;
+  const isDepartament = (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") ||
+    (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Search");
   const isPageMoreThanOne = currentPage && currentPage > 1;
+
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
   const description = stripHTML(desc || "");
   const title = stripHTML(t);
