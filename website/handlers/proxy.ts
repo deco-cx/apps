@@ -105,7 +105,8 @@ export default function Proxy({
       ? url.pathname.replace(basePath, "")
       : url.pathname;
 
-    const to = new URL(
+    const debugTo = url.searchParams.get("debugTo");
+    const to = debugTo ? new URL(debugTo) : new URL(
       `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}?${qs}`,
     );
 
