@@ -6,6 +6,7 @@ import {
   MagentoCategory,
   MagentoProduct,
   NewsletterData,
+  SetShipping,
   ShippingMethod,
   User,
 } from "./types.ts";
@@ -130,4 +131,9 @@ export interface API {
       store_id: number;
     };
   };
+
+  "POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote": {
+    response: [];
+    body: SetShipping;
+  }
 }

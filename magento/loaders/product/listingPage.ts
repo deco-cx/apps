@@ -14,11 +14,13 @@ import {
 } from "../../utils/clientGraphql/queries.ts";
 import { toProductListingPageGraphQL } from "../../utils/transform.ts";
 import {
+  filtersFromLoaderGraphQL,
   formatUrlSuffix,
   getCustomFields,
   transformFilterGraphQL,
   transformSortGraphQL,
 } from "../../utils/utilsGraphQL.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 
 export interface Props {
@@ -48,12 +50,12 @@ export interface CategoryProps {
 }
 
 /**
- * @title Magento Integration - PLP
+ * @title Magento Integration - Product Listing Page
  */
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const { clientGraphql, imagesQtd, customFilters, site, useSuffix } = ctx;
@@ -62,61 +64,92 @@ const loader = async (
   const sortFromUrl = url.searchParams.get("product_list_order");
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
-
-  const { sortBy, order } = categoryProps?.sortOptions ?? {
-    sortBy: sortFromUrl
-      ? {
-        value: sortFromUrl,
-      }
-      : undefined,
-    order: "ASC",
-  };
+  const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
   const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
 
   if (!categoryUrl) {
     return null;
   }
 
-  const categoryGQL = await clientGraphql.query<
+  const { categories } = await clientGraphql.query<
     CategoryGraphQL,
     { path: string }
-  >({
-    variables: { path: categoryUrl },
-    ...GetCategoryUid,
-  });
-  if (
-    !categoryGQL.categories.items ||
-    categoryGQL.categories.items?.length === 0
-  ) {
+  >(
+    {
+      variables: { path: categoryUrl },
+      ...GetCategoryUid,
+    },
+    STALE
+  );
+  if (!categories.items || categories.items?.length === 0) {
     return null;
   }
 
-  const plpItemsGQL = await clientGraphql.query<
+  const { products } = await clientGraphql.query<
     PLPGraphQL,
     Omit<ProductSearchInputs, "search">
-  >({
-    variables: {
-      filter: {
-        category_uid: { in: [categoryGQL.categories.items[0].uid] },
-        ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
+  >(
+    {
+      variables: {
+        filter: {
+          category_uid: { in: [categories.items[0].uid] },
+          ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
+        },
+        pageSize,
+        currentPage: Number(currentPage),
+        sort: transformSortGraphQL({
+          sortBy: sortBy!,
+          order: order as "ASC" | "DESC",
+        }),
       },
-      pageSize,
-      currentPage: Number(currentPage),
-      sort: transformSortGraphQL({ sortBy: sortBy!, order }),
+      ...GetPLPItems(customAttributes),
     },
-    ...GetPLPItems(customAttributes),
-  });
+    STALE
+  );
 
-  if (!plpItemsGQL.products.items || plpItemsGQL.products.items?.length === 0) {
+  if (!products.items || products.items?.length === 0) {
     return null;
   }
 
-  return toProductListingPageGraphQL(plpItemsGQL, categoryGQL, {
-    originURL: url,
-    imagesQtd,
-    defaultPath,
-    customAttributes,
-  });
+  return toProductListingPageGraphQL(
+    { products },
+    { categories },
+    {
+      originURL: url,
+      imagesQtd,
+      defaultPath,
+      customAttributes,
+    }
+  );
+};
+
+const getSortOptions = (sortFromUrl: string | null, props?: CategoryProps) =>
+  sortFromUrl
+    ? {
+        sortBy: {
+          value: sortFromUrl,
+        },
+        order: "ASC",
+      }
+    : props?.sortOptions ?? { sortBy: undefined, order: "ASC" };
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+  const { customFields, pageSize, categoryProps, urlKey } = props;
+  const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
+  const customAttributes = getCustomFields(customFields, ["ALL"]);
+  const sortFromUrl = url.searchParams.get("product_list_order");
+  const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
+  const filtersFromProps = filtersFromLoaderGraphQL(categoryProps?.filters);
+  return `${url.href}-category:${categoryUrl}-customAtt:${
+    customAttributes?.join("|") ?? "NONE"
+  }-sortBy:${
+    sortBy?.value
+  }-order:${order}-size:${pageSize}-filtersFromProps:${JSON.stringify(
+    filtersFromProps
+  )}-PLP`;
 };
 
 export default loader;
