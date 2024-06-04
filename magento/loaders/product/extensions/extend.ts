@@ -1,5 +1,8 @@
 import { Product } from "../../../../commerce/types.ts";
+import { STALE } from "../../../../utils/fetch.ts";
 import { AppContext } from "../../../mod.ts";
+import { ReviewsAmastyAPI } from "../../../utils/clientCustom/types.ts";
+import { toReviewAmasty } from "../../../utils/transform.ts";
 
 export interface Props {
   reviews?: ExtensionProps;
@@ -8,29 +11,37 @@ export interface Props {
 
 interface ExtensionProps {
   active: boolean;
+  /**
+   * @title Path of the REST API
+   */
   path: string;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  return `${req.url}-reviews:${props.reviews?.active ?? false}-amastyExtensions`;
+};
+
 
 const reviewsExt = async (
   products: Product[],
   path: string,
   ctx: AppContext
 ): Promise<Product[]> => {
-  const reviewPromise = await products.map(
-    async (product) =>
-      await ctx.clientCustom["GET /rest/:reviewUrl/:productId"]({
-        reviewUrl: path,
+  const reviewPromise = products.map<Promise<ReviewsAmastyAPI>>(
+    (product) =>
+      ctx.clientCustom["GET /rest/:reviewUrl/:productId"]({
+        reviewUrl: sanitizePath(path),
         productId: product!.productID,
-      }).then((res) => res.json())
+      }, STALE).then((res) => res.json())
   );
 
   const reviewsPromise = Promise.all(reviewPromise);
 
   const [reviews] = await Promise.all([reviewsPromise]);
 
-  console.log(reviews)
-  //transform in review
-  return products;
+  return toReviewAmasty(products, reviews);
 };
 
 export default async (
@@ -46,3 +57,5 @@ export default async (
 
   return p;
 };
+
+const sanitizePath = (path: string) => path.replace(/^\/?(rest\/)?/, "");
