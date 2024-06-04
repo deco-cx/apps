@@ -13,6 +13,7 @@ const config = {
     app("anthropic"),
     app("resend"),
     app("konfidency"),
+    app("discord-bot"),
     app("mailchimp"),
     app("ai-assistants"),
     app("files"),
