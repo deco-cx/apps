@@ -14,11 +14,13 @@ import * as $0 from "./functions/requestToPathname.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/product/detailsPage.ts";
-import * as $$$2 from "./loaders/product/getId.ts";
-import * as $$$3 from "./loaders/product/list.ts";
-import * as $$$4 from "./loaders/product/listingPage.ts";
-import * as $$$5 from "./loaders/proxy.ts";
-import * as $$$6 from "./loaders/user.ts";
+import * as $$$2 from "./loaders/product/extensions/amasty/detailsPage.ts";
+import * as $$$3 from "./loaders/product/extensions/extend.ts";
+import * as $$$4 from "./loaders/product/getId.ts";
+import * as $$$5 from "./loaders/product/list.ts";
+import * as $$$6 from "./loaders/product/listingPage.ts";
+import * as $$$7 from "./loaders/proxy.ts";
+import * as $$$8 from "./loaders/user.ts";
 
 const manifest = {
   "functions": {
@@ -27,11 +29,13 @@ const manifest = {
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
     "magento/loaders/product/detailsPage.ts": $$$1,
-    "magento/loaders/product/getId.ts": $$$2,
-    "magento/loaders/product/list.ts": $$$3,
-    "magento/loaders/product/listingPage.ts": $$$4,
-    "magento/loaders/proxy.ts": $$$5,
-    "magento/loaders/user.ts": $$$6,
+    "magento/loaders/product/extensions/amasty/detailsPage.ts": $$$2,
+    "magento/loaders/product/extensions/extend.ts": $$$3,
+    "magento/loaders/product/getId.ts": $$$4,
+    "magento/loaders/product/list.ts": $$$5,
+    "magento/loaders/product/listingPage.ts": $$$6,
+    "magento/loaders/proxy.ts": $$$7,
+    "magento/loaders/user.ts": $$$8,
   },
   "handlers": {
     "magento/handlers/sitemap.ts": $$$$0,

@@ -4,6 +4,7 @@ import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import { CustomAPI } from "./utils/clientCustom/client.ts";
 
 export interface FiltersGraphQL {
   value: string;
@@ -78,6 +79,7 @@ export interface Props {
 export interface State extends Props {
   clientAdmin: ReturnType<typeof createHttpClient<API>>;
   clientGraphql: ReturnType<typeof createGraphqlClient>;
+  clientCustom: ReturnType<typeof createHttpClient<CustomAPI>>
 }
 
 /**
@@ -99,6 +101,13 @@ export default function App(props: Props): App<Manifest, State> {
     }),
   });
 
+  const clientCustom = createHttpClient<CustomAPI>({
+    base: baseUrl,
+    headers: new Headers({
+      Authorization: `Bearer ${apiKey}`,
+    }),
+  });
+
   const clientGraphql = createGraphqlClient({
     fetcher: fetchSafe,
     endpoint: `${baseUrl}/graphql`,
@@ -109,7 +118,7 @@ export default function App(props: Props): App<Manifest, State> {
   });
   return {
     manifest,
-    state: { ...props, clientAdmin, clientGraphql },
+    state: { ...props, clientAdmin, clientGraphql, clientCustom },
   };
 }
 
