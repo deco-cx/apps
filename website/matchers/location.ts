@@ -1,9 +1,31 @@
 import { MatchContext } from "deco/blocks/matcher.ts";
+import { MapWidget } from "../../admin/widgets.ts";
+import { haversine } from "../utils/location.ts";
+
+
+export interface Coordinate {
+  latitude: number;
+  longitude: number;
+  radius?: number;
+}
+
+/**
+ * @title Map
+ */
+export interface Map {
+
+  /**
+   * @title Area selection
+   * @example -7.27820,-35.97630,2000
+   */
+  coordinates?: MapWidget;
+}
 
 /**
  * @title {{{city}}} {{{regionCode}}} {{{country}}}
  */
 export interface Location {
+
   /**
    * @title City
    * @example São Paulo
@@ -25,26 +47,44 @@ export interface Props {
   /**
    * @title Include Locations
    */
-  includeLocations?: Location[];
+  includeLocations?: Location[] | Map[];
   /**
    * @title Exclude Locations
    */
-  excludeLocations?: Location[];
+  excludeLocations?: Location[] | Map[];
 }
 
 const matchLocation =
-  (defaultNotMatched = true, source: Location) => (target: Location) => {
-    if (!target.regionCode && !target.city && !target.country) {
+  (defaultNotMatched = true, source: Location | Map) =>
+  (target: Location | Map) => {
+    if (
+      !target.regionCode &&
+      !target.city &&
+      !target.country &&
+      !target.coordinates
+    ) {
       return defaultNotMatched;
     }
+
     let result = !target.regionCode || target.regionCode === source.regionCode;
+    result &&=
+      !source.coordinates ||
+      !target.coordinates ||
+      haversine(source.coordinates, target.coordinates) <=
+        Number(target.coordinates.split(",")[2]);
     result &&= !target.city || target.city === source.city;
     result &&= !target.country || target.country === source.country;
     return result;
   };
 
-const escaped = ({ city, country, regionCode }: Location): Location => {
+const escaped = ({
+  city,
+  country,
+  regionCode,
+  coordinates,
+}: Location): Location => {
   return {
+    coordinates,
     regionCode,
     city: city ? decodeURIComponent(escape(city)) : city,
     country: country ? decodeURIComponent(escape(country)) : country,
@@ -57,15 +97,18 @@ const escaped = ({ city, country, regionCode }: Location): Location => {
  */
 export default function MatchLocation(
   { includeLocations, excludeLocations }: Props,
-  { request }: MatchContext,
+  { request }: MatchContext
 ) {
   const city = request.headers.get("cf-ipcity") ?? undefined;
   const country = request.headers.get("cf-ipcountry") ?? undefined;
   const regionCode = request.headers.get("cf-region-code") ?? undefined;
-  const userLocation = { city, country, regionCode };
-  const isLocationExcluded = excludeLocations?.some(
-    matchLocation(false, escaped(userLocation)),
-  ) ?? false;
+  const latitude = request.headers.get("cf-iplatitude") ?? undefined;
+  const longitude = request.headers.get("cf-iplongitude") ?? undefined;
+  const coordinates = latitude ? `${latitude},${longitude}` : undefined;
+  const userLocation = { city, country, regionCode, coordinates };
+  const isLocationExcluded =
+    excludeLocations?.some(matchLocation(false, escaped(userLocation))) ??
+    false;
   if (isLocationExcluded) {
     return false;
   }
@@ -74,6 +117,9 @@ export default function MatchLocation(
     return true;
   }
 
-  return includeLocations?.some(matchLocation(true, escaped(userLocation))) ??
-    true;
+  return (
+    includeLocations?.some(matchLocation(true, escaped(userLocation))) ?? true
+  );
 }
+
+
