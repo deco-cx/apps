@@ -67,9 +67,7 @@ export const createGraphqlClient = ({
         operationName,
         url,
       });
-
       const { searchParams, body } = getParamsAndBody({ key, props, init });
-
       const { data, errors } = await http[key as any](searchParams, {
         ...body,
       }).then((res) => res.json());
@@ -81,17 +79,6 @@ export const createGraphqlClient = ({
       return data as D;
     },
   };
-};
-
-const getParamsAndBody = ({
-  key,
-  props,
-  init,
-}: ReturnType<typeof getMethodAndProps> & { init?: DecoRequestInit }) => {
-  if (key.startsWith("POST")) {
-    return { searchParams: {}, body: { body: props, ...init } };
-  }
-  return { searchParams: { ...props }, body: { ...init } };
 };
 
 const getMethodAndProps = <V>({
@@ -134,6 +121,17 @@ const getMethodAndProps = <V>({
       operationName,
     },
   };
+};
+
+const getParamsAndBody = ({
+  key,
+  props,
+  init,
+}: ReturnType<typeof getMethodAndProps> & { init?: DecoRequestInit }) => {
+  if (key.startsWith("POST")) {
+    return { searchParams: {}, body: { body: props, ...init } };
+  }
+  return { searchParams: { ...props }, body: { ...init } };
 };
 
 const minifyString = (s: string): string => {

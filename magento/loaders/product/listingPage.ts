@@ -1,5 +1,5 @@
-import type { ProductListingPage } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
+import type { ProductListingPage } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import {
   CategoryGraphQL,
   CustomFields,
@@ -7,17 +7,21 @@ import {
   PLPGraphQL,
   ProductSearchInputs,
   ProductSort,
-} from "../utils/clientGraphql/types.ts";
-import { GetCategoryUid, GetPLPItems } from "../utils/clientGraphql/queries.ts";
-import { toProductListingPageGraphQL } from "../utils/transform.ts";
+} from "../../utils/clientGraphql/types.ts";
 import {
+  GetCategoryUid,
+  GetPLPItems,
+} from "../../utils/clientGraphql/queries.ts";
+import { toProductListingPageGraphQL } from "../../utils/transform.ts";
+import {
+  filtersFromLoaderGraphQL,
   formatUrlSuffix,
   getCustomFields,
   transformFilterGraphQL,
   transformSortGraphQL,
-} from "../utils/utilsGraphQL.ts";
-import { RequestURLParam } from "../../website/functions/requestToParam.ts";
-import { STALE } from "../../utils/fetch.ts";
+} from "../../utils/utilsGraphQL.ts";
+import { STALE } from "../../../utils/fetch.ts";
+import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 
 export interface Props {
   urlKey: RequestURLParam;
@@ -131,27 +135,21 @@ const getSortOptions = (sortFromUrl: string | null, props?: CategoryProps) =>
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(req.url);
   const { customFields, pageSize, categoryProps, urlKey } = props;
   const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
   const customAttributes = getCustomFields(customFields, ["ALL"]);
   const sortFromUrl = url.searchParams.get("product_list_order");
   const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
-  const transformedFilters = transformFilterGraphQL(
-    url,
-    ctx.customFilters,
-    categoryProps?.filters
-  );
-  const a = `${
-    url.origin
-  }-category:${categoryUrl}-customAtt:${customAttributes?.join("|") ?? "NONE"}-sortBy:${
+  const filtersFromProps = filtersFromLoaderGraphQL(categoryProps?.filters);
+  return `${url.href}-category:${categoryUrl}-customAtt:${
+    customAttributes?.join("|") ?? "NONE"
+  }-sortBy:${
     sortBy?.value
-  }-order:${order}-size:${pageSize}-filters:${JSON.stringify(
-    transformedFilters
+  }-order:${order}-size:${pageSize}-filtersFromProps:${JSON.stringify(
+    filtersFromProps
   )}-PLP`;
-  console.log(a);
-  return a;
 };
 
 export default loader;
