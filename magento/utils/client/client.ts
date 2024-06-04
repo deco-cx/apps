@@ -7,7 +7,9 @@ import {
   MagentoProduct,
   NewsletterData,
   ShippingMethod,
+  Success,
   User,
+  WishListReponse,
 } from "./types.ts";
 
 interface searchParams {
@@ -128,6 +130,20 @@ export interface API {
     body: {
       email: string;
       store_id: number;
+    };
+  };
+
+  "POST /:site/wishlist/index/add/": {
+    response: WishListReponse;
+    body: {
+      product: string;
+    };
+  };
+
+  "POST /:site/wishlist/index/remove/": {
+    response: Success;
+    body: {
+      product: string;
     };
   };
 }
