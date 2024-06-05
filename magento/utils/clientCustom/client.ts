@@ -1,5 +1,7 @@
 import {
     ReviewsAmastyAPI,
+    SubmitReviewAmastyAPI,
+    SubmitReviewAmastyBody,
   } from "./types.ts";
   
   
@@ -11,5 +13,13 @@ import {
         productId: string
       };
     };
+    
+    "POST /rest/:reviewUrl": {
+      response: SubmitReviewAmastyAPI
+      searchParams: {
+        reviewUrl: string,
+      };
+      body: SubmitReviewAmastyBody
+    }
 
   }

@@ -19,3 +19,24 @@ export interface ReviewAmasty {
 export interface Summary {
   reviews_count: number;
 }
+
+export interface SubmitReviewAmastyAPI {
+  success: boolean
+  message: string
+  reviews: ReviewAmasty[] | null
+  summary: Summary | null
+}
+
+export interface SubmitReviewAmastyBody {
+  product_id: number
+  customer_id: number
+  store_id: string
+  nickname: string
+  title: string
+  detail: string
+  ratings: Ratings
+}
+
+export interface Ratings {
+  [key: string]: string
+}
