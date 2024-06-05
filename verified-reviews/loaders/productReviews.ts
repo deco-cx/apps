@@ -21,12 +21,13 @@ export default async function productReviews(
     return null;
   }
 
-  const [reviewsResponse] = await client.reviews({
+  const reviewsResponse = await client.reviews({
     productId: config.productId,
     count: config?.count,
     offset: config?.offset,
     order: config?.order,
   });
 
-  return reviewsResponse?.reviews?.map(toReview) ?? [];
+  const reviews = reviewsResponse?.[0];
+  return reviews?.reviews?.map(toReview) ?? [];
 }
