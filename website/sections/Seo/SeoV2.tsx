@@ -32,12 +32,6 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
       : descriptionTemplate,
     _description ?? appDescription,
   );
-  console.log({
-    description,
-    descriptionTemplate,
-    appDescription,
-    _description,
-  });
   return { ...seoSiteProps, ...seoProps, title, description };
 }
 
