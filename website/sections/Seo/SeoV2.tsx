@@ -14,7 +14,6 @@ type Props = Pick<
 >;
 
 export function loader(props: Props, _req: Request, ctx: AppContext) {
-  console.log(props);
   const {
     titleTemplate = "",
     descriptionTemplate = "",
