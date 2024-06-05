@@ -16,6 +16,7 @@ import {
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
+import { LegacyProduct } from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
@@ -108,6 +109,11 @@ const loader = async (
     return null;
   }
 
+  const res = await vcsDeprecated['GET /api/catalog_system/pub/products/search/:term?']({
+    fq: [`skuId:${skuId}`]
+  });
+
+  const [legacyProduct] = (await res.json()) as LegacyProduct[];
   const sku = pickSku(product, skuId?.toString());
 
   let kitItems: VTEXProduct[] = [];
@@ -146,7 +152,9 @@ const loader = async (
     seo: isPageProduct && seo
       ? {
         ...seo,
-        noIndexing: props.indexingSkus ? false : seo.noIndexing,
+        noIndexing: props.indexingSkus ? false : seo.noIndexing,      
+        legacyProductTitle: legacyProduct.productTitle,
+        legacyDescritionMetaTag: legacyProduct.metaTagDescription  
       }
       : null,
   };
