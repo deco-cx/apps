@@ -1,17 +1,37 @@
 import { AppContext } from "../../mod.ts";
+import { SubmitReviewAmastyAPI } from "../../utils/clientCustom/types.ts";
+import { Ratings as RatingsAPI } from "../../utils/clientCustom/types.ts";
 
 export interface Props {
+  /**
+   * @title Path of the REST API
+   */
+  path: string;
   product_id: number;
   customer_id: number;
   nickname: string;
   title: string;
   detail: string;
-  ratings: { [key: string]: string };
-  path: string;
+  ratings: Array<Ratings>;
 }
 
-const loader = async (props: Props, _req: Request, ctx: AppContext) =>
-  await ctx.clientCustom["POST /rest/:reviewUrl"](
+interface Ratings {
+  key: string;
+  value: string;
+}
+
+const loader = async (
+  props: Props,
+  _req: Request,
+  ctx: AppContext
+): Promise<SubmitReviewAmastyAPI> => {
+  const { clientCustom } = ctx;
+  const ratings = props.ratings.reduce<RatingsAPI>((acc, rating) => {
+    acc[`${rating.key}`] = rating.value;
+    return acc;
+  }, {});
+
+  return await clientCustom["POST /rest/:reviewUrl"](
     {
       reviewUrl: props.path.replace(/^\/?(rest\/)?/, ""),
     },
@@ -22,10 +42,11 @@ const loader = async (props: Props, _req: Request, ctx: AppContext) =>
         nickname: props.nickname,
         title: props.title,
         detail: props.detail,
-        ratings: props.ratings,
+        ratings,
         store_id: `${ctx.storeId}`,
       },
     }
-  );
+  ).then((r) => r.json());
+};
 
-  export default loader
+export default loader;
