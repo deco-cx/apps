@@ -1,6 +1,7 @@
 import type { AppContext } from "../../mod.ts";
 import { getUserCookie, SESSION_COOKIE } from "../../utils/user.ts";
 import { Wishlist } from "../../utils/client/types.ts";
+import wishlistLoader from "../../loaders/wishlist.ts";
 
 export interface Props {
   itemId: string;
@@ -20,7 +21,7 @@ const action = async (
       body: { product: itemId },
       headers,
     }).then((res) => res.json());
-    if (success) return ctx.invoke("magento/loaders/wishlist.ts");
+    if (success) return wishlistLoader(null, req, ctx);
 
     return null;
   } catch (error) {
