@@ -20,7 +20,7 @@ import {
   transformFilterGraphQL,
   transformSortGraphQL,
 } from "../../utils/utilsGraphQL.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 
 export interface Props {
@@ -58,7 +58,14 @@ const loader = async (
   ctx: AppContext
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
-  const { clientGraphql, imagesQtd, customFilters, site, useSuffix } = ctx;
+  const {
+    clientGraphql,
+    imagesQtd,
+    customFilters,
+    site,
+    useSuffix,
+    enableCache,
+  } = ctx;
   const { pageSize, categoryProps, urlKey, customFields } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
   const sortFromUrl = url.searchParams.get("product_list_order");
@@ -66,6 +73,7 @@ const loader = async (
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
   const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
   const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
+  const STALE = enableCache ? DecoStale : undefined;
 
   if (!categoryUrl) {
     return null;
