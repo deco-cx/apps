@@ -109,8 +109,12 @@ const loader = async (
     return null;
   }
 
+
+  const legacyQuery = skuId
+  ? `skuId:${skuId}`
+  : `productId:${productId}`
   const res = await vcsDeprecated['GET /api/catalog_system/pub/products/search/:term?']({
-    fq: [`productId:${productId}`]
+    fq: [legacyQuery]
   });
 
   const [legacyProduct] = (await res.json()) as LegacyProduct[];
