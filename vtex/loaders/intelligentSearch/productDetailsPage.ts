@@ -76,7 +76,7 @@ const loader = async (
     ).then((res) => res.json());
 
   const url = new URL(baseUrl);
-  const skuId = url.searchParams.get("skuId");
+  const skuId = url.searchParams.get("skuId") || url.searchParams.get("idsku");
   const productId = !skuId && getProductID(await pageTypePromise);
 
   /**
@@ -110,7 +110,7 @@ const loader = async (
   }
 
   const res = await vcsDeprecated['GET /api/catalog_system/pub/products/search/:term?']({
-    fq: [`skuId:${skuId}`]
+    fq: [`productId:${productId}`]
   });
 
   const [legacyProduct] = (await res.json()) as LegacyProduct[];
