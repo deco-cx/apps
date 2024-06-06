@@ -603,6 +603,8 @@ export interface Seo {
   description: string;
   canonical: string;
   noIndexing?: boolean;
+  legacyProductTitle?: string
+  legacyDescritionMetaTag?: string
 }
 
 export interface Search {
