@@ -1,5 +1,5 @@
 import type { ListItem, ProductDetailsPage } from "../../../commerce/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { URL_KEY } from "../../utils/constants.ts";
@@ -24,7 +24,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, isBreadcrumbProductName = false } = props;
@@ -36,7 +36,9 @@ async function loader(
     imagesUrl,
     minInstallmentValue,
     maxInstallments,
+    enableCache,
   } = ctx;
+  const STALE = enableCache ? DecoStale : undefined;
 
   if (!slug) {
     return null;
@@ -58,22 +60,28 @@ async function loader(
       ...stringifySearchCriteria(searchCriteria),
     };
 
-    const itemSku = await clientAdmin["GET /rest/:site/V1/products"]({
-      ...queryParams,
-    }, STALE).then((res) => res.json());
-    if(!itemSku.items.length) return null
+    const itemSku = await clientAdmin["GET /rest/:site/V1/products"](
+      {
+        ...queryParams,
+      },
+      STALE
+    ).then((res) => res.json());
+    if (!itemSku.items.length) return null;
 
     const [{ items }, stockInfoAndImages] = await Promise.all([
       clientAdmin["GET /rest/:site/V1/products-render-info"](
         queryParams,
-        STALE,
+        STALE
       ).then((res) => res.json()),
-      clientAdmin["GET /rest/:site/V1/products/:sku"]({
-        sku: itemSku.items[0].sku,
-        site,
-        storeId: storeId,
-        currencyCode: currencyCode,
-      }, STALE).then((res) => res.json()),
+      clientAdmin["GET /rest/:site/V1/products/:sku"](
+        {
+          sku: itemSku.items[0].sku,
+          site,
+          storeId: storeId,
+          currencyCode: currencyCode,
+        },
+        STALE
+      ).then((res) => res.json()),
     ]);
 
     return {
@@ -91,11 +99,14 @@ async function loader(
 
   const getCategoryNames = async (categoryLinks: { category_id: string }[]) => {
     const getCategoryName = async (categoryId: string) => {
-      return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"]({
-        site,
-        categoryId,
-        fields: "name,position",
-      }, STALE).then((res) => res.json());
+      return await clientAdmin["GET /rest/:site/V1/categories/:categoryId"](
+        {
+          site,
+          categoryId,
+          fields: "name,position",
+        },
+        STALE
+      ).then((res) => res.json());
     };
 
     const categoryNamePromises = categoryLinks.map((category) =>
@@ -121,7 +132,7 @@ async function loader(
     isBreadcrumbProductName ? [] : await getCategoryNames(categoryLinks),
     isBreadcrumbProductName,
     product,
-    url,
+    url
   );
 
   return {

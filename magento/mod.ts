@@ -73,6 +73,12 @@ export interface Props {
    * @title Minimum installment value
    */
   minInstallmentValue: number;
+
+  /**
+   * @title Enale Cache in APIs (Deco Stale)
+   * @default true
+   */
+  enableCache: boolean
 }
 
 export interface State extends Props {
