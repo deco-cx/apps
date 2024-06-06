@@ -14,7 +14,7 @@ const loader =
     ctx: AppContext
   ): ExtensionOf<ProductDetailsPage | null> =>
   async (page: ProductDetailsPage | null) => {
-    if (page == null) {
+    if (!page) {
       return page;
     }
 

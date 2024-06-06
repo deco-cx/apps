@@ -1,12 +1,16 @@
 import { Product } from "../../../../commerce/types.ts";
 import { STALE } from "../../../../utils/fetch.ts";
 import { AppContext } from "../../../mod.ts";
-import { ReviewsAmastyAPI } from "../../../utils/client/types.ts";
 import { toReviewAmasty } from "../../../utils/transform.ts";
 
 export interface Props {
-  reviews?: ExtensionProps;
+  reviews?: ReviewProps;
   products: Product[];
+}
+
+interface ReviewProps extends ExtensionProps {
+  maxRatingValue: number;
+  minRatingValue: number;
 }
 
 interface ExtensionProps {
@@ -20,30 +24,36 @@ interface ExtensionProps {
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
-  return `${req.url}-reviews:${props.reviews?.active ?? false}-amastyExtensions`;
+  return `${req.url}-reviews:${
+    props.reviews?.active ?? false
+  }-amastyExtensions`;
 };
-
 
 const reviewsExt = async (
   products: Product[],
-  path: string,
+  props: ReviewProps,
   ctx: AppContext
 ): Promise<Product[]> => {
-  const reviewPromise = products.map<Promise<ReviewsAmastyAPI>>(
-    (product) =>
-      ctx.clientAdmin["GET /rest/:reviewUrl/:productId"]({
-        reviewUrl: sanitizePath(path),
-        productId: product!.productID,
-      }, STALE).then((res) => res.json())
+  const { maxRatingValue, minRatingValue } = props;
+
+  const reviews = await Promise.all(
+    products.map(
+      async (product) =>
+        await ctx.clientAdmin["GET /rest/:reviewUrl/:productId"](
+          {
+            reviewUrl: sanitizePath(props.path),
+            productId: product!.productID,
+          },
+          STALE
+        ).then((review) => review.json())
+    )
   );
 
-  const reviewsPromise = Promise.all(reviewPromise);
-
-  const [reviews] = await Promise.all([reviewsPromise]);
-
-  return toReviewAmasty(products, reviews);
+  return toReviewAmasty(products, reviews, {
+    maxRatingValue,
+    minRatingValue,
+  });
 };
-
 export default async (
   { products, reviews }: Props,
   _req: Request,
@@ -52,7 +62,7 @@ export default async (
   let newProducts = products;
 
   if (reviews?.active) {
-    newProducts = await reviewsExt(newProducts, reviews.path, ctx);
+    newProducts = await reviewsExt(newProducts, reviews, ctx);
   }
 
   return newProducts;
