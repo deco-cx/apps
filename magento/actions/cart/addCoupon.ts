@@ -21,9 +21,7 @@ const action = async (
       couponCode: couponCode.toLowerCase(),
     }).then((res) => res.json());
   } catch (error) {
-    if (error.status === 404) {
-      return "Invalid or applied coupon code";
-    }
+    return error
   }
   return await cart(undefined, req, ctx);
 };
