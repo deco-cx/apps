@@ -1,6 +1,4 @@
-import { ComponentChildren } from "preact";
 import { Head } from "$fresh/runtime.ts";
-import { asset } from "$fresh/runtime.ts";
 
 type Props = {
   error?: string;
