@@ -317,7 +317,7 @@ export const toReviewAmasty = (
         reviewCount: reviews_count,
         bestRating: ratingProps.maxRatingValue,
         worstRating: ratingProps.minRatingValue,
-        ratingValue: Number((totalRating / reviews_count).toFixed()),
+        ratingValue: Number((totalRating / reviews_count).toFixed(2)),
       },
     };
   });

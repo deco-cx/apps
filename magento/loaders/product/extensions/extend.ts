@@ -59,13 +59,11 @@ export default async (
   _req: Request,
   ctx: AppContext
 ): Promise<Product[]> => {
-  let newProducts = products;
-
   if (reviews?.active) {
-    newProducts = await reviewsExt(newProducts, reviews, ctx);
+    return await reviewsExt(products, reviews, ctx);
   }
 
-  return newProducts;
+  return products;
 };
 
 const sanitizePath = (path: string) => path.replace(/^\/?(rest\/)?/, "");
