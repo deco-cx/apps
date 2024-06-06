@@ -1,6 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import { getUserCookie, SESSION_COOKIE } from "../../utils/user.ts";
-import { ITEM_NOT_FOUND, ITEM_REMOVE } from "../../utils/constants.ts";
+import { Wishlist } from "../../utils/client/types.ts";
 
 export interface Props {
   itemId: string;
@@ -9,7 +9,7 @@ const action = async (
   { itemId }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<typeof ITEM_REMOVE | typeof ITEM_NOT_FOUND> => {
+): Promise<Wishlist | null> => {
   try {
     const { clientAdmin, site } = ctx;
     const id = getUserCookie(req.headers);
@@ -20,12 +20,12 @@ const action = async (
       body: { product: itemId },
       headers,
     }).then((res) => res.json());
-    if (success) return ITEM_REMOVE;
+    if (success) return ctx.invoke("magento/loaders/wishlist.ts");
 
-    return ITEM_NOT_FOUND;
+    return null;
   } catch (error) {
     console.log(error);
-    return ITEM_NOT_FOUND;
+    return null;
   }
 };
 

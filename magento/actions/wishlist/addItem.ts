@@ -1,6 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import { getUserCookie, SESSION_COOKIE } from "../../utils/user.ts";
-import { ITEM_ADD, ITEM_NOT_FOUND } from "../../utils/constants.ts";
+import { Wishlist } from "../../utils/client/types.ts";
 
 export interface Props {
   productId: string;
@@ -9,7 +9,7 @@ const action = async (
   { productId }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<typeof ITEM_NOT_FOUND | typeof ITEM_ADD> => {
+): Promise<Wishlist | null> => {
   try {
     const { clientAdmin, site } = ctx;
     const id = getUserCookie(req.headers);
@@ -20,11 +20,11 @@ const action = async (
       body: { product: productId },
       headers,
     }).then((res) => res.json());
-    if (success) return ITEM_ADD;
-    return ITEM_NOT_FOUND;
+    if (success) return ctx.invoke("magento/loaders/wishlist.ts");
+    return null;
   } catch (error) {
     console.log(error);
-    return ITEM_NOT_FOUND;
+    return null;
   }
 };
 
