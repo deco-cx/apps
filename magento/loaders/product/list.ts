@@ -190,7 +190,7 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> {
-  const { clientGraphql, imagesQtd, site, useSuffix } = ctx;
+  const { clientGraphql, imagesQtd, site, useSuffix, enableCache } = ctx;
   const { customFields } = props;
   const url = new URL(req.url);
   const formatedProps = fromProps({ props }, url, useSuffix ? site : undefined);
@@ -204,7 +204,7 @@ async function loader(
       variables: { ...formatedProps },
       ...GetProduct(customAttributes),
     },
-    STALE
+    enableCache ? STALE : undefined
   );
 
   if (!products.items || products.items?.length === 0) {
