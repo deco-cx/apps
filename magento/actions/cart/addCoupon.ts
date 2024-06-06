@@ -1,3 +1,4 @@
+import cart, { Cart } from "../../loaders/cart.ts";
 import type { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 
@@ -8,7 +9,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<boolean | string> => {
+): Promise<Cart | string> => {
   const { couponCode } = props;
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
@@ -24,7 +25,7 @@ const action = async (
       return "Invalid or applied coupon code";
     }
   }
-  return true;
+  return await cart(undefined, req, ctx);
 };
 
 export default action;

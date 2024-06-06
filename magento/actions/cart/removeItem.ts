@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
-import { Cart } from "../../loaders/cart.ts";
+import cart, { Cart } from "../../loaders/cart.ts";
 
 export interface Props {
   itemId: string;
@@ -20,9 +20,7 @@ const action = async (
     itemId,
   }, {});
 
-  return await ctx.invoke(
-    "magento/loaders/cart.ts",
-  );
+  return await cart(undefined, req, ctx);
 };
 
 export default action;
