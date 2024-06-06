@@ -6,8 +6,11 @@ import {
   MagentoCategory,
   MagentoProduct,
   NewsletterData,
+  ReviewsAmastyAPI,
   SetShipping,
   ShippingMethod,
+  SubmitReviewAmastyAPI,
+  SubmitReviewAmastyBody,
   User,
 } from "./types.ts";
 
@@ -135,5 +138,21 @@ export interface API {
   "POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote": {
     response: [];
     body: SetShipping;
+  }
+
+  "GET /rest/:reviewUrl/:productId": {
+    response: ReviewsAmastyAPI
+    searchParams: {
+      reviewUrl: string,
+      productId: string
+    };
+  };
+  
+  "POST /rest/:reviewUrl": {
+    response: SubmitReviewAmastyAPI
+    searchParams: {
+      reviewUrl: string,
+    };
+    body: SubmitReviewAmastyBody
   }
 }

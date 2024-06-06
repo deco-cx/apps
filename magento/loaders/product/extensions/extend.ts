@@ -1,7 +1,7 @@
 import { Product } from "../../../../commerce/types.ts";
 import { STALE } from "../../../../utils/fetch.ts";
 import { AppContext } from "../../../mod.ts";
-import { ReviewsAmastyAPI } from "../../../utils/clientCustom/types.ts";
+import { ReviewsAmastyAPI } from "../../../utils/client/types.ts";
 import { toReviewAmasty } from "../../../utils/transform.ts";
 
 export interface Props {
@@ -31,7 +31,7 @@ const reviewsExt = async (
 ): Promise<Product[]> => {
   const reviewPromise = products.map<Promise<ReviewsAmastyAPI>>(
     (product) =>
-      ctx.clientCustom["GET /rest/:reviewUrl/:productId"]({
+      ctx.clientAdmin["GET /rest/:reviewUrl/:productId"]({
         reviewUrl: sanitizePath(path),
         productId: product!.productID,
       }, STALE).then((res) => res.json())
@@ -49,13 +49,13 @@ export default async (
   _req: Request,
   ctx: AppContext
 ): Promise<Product[]> => {
-  let p = products;
+  let newProducts = products;
 
   if (reviews?.active) {
-    p = await reviewsExt(p, reviews.path, ctx);
+    newProducts = await reviewsExt(newProducts, reviews.path, ctx);
   }
 
-  return p;
+  return newProducts;
 };
 
 const sanitizePath = (path: string) => path.replace(/^\/?(rest\/)?/, "");

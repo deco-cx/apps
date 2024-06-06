@@ -66,3 +66,6 @@ export const BASE_CURRENCY_CODE = "base_currency_code";
 export const SKU = "sku";
 export const MEDIA_GALLERY_ENTRIES = "media_gallery_entries";
 export const COUNTRY_ID = "BR";
+
+export const MAX_RATING_VALUE = 5
+export const MIN_RATING_VALUE = 1 

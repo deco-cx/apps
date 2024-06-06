@@ -18,8 +18,8 @@ import {
   CustomAttribute,
   MagentoCategory,
   MagentoProduct,
+  ReviewsAmastyAPI,
 } from "./client/types.ts";
-import { ReviewsAmastyAPI } from "./clientCustom/types.ts";
 import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
@@ -34,6 +34,8 @@ import { ProductPrice } from "./clientGraphql/types.ts";
 import { PriceRange, SimpleProductGraphQL } from "./clientGraphql/types.ts";
 import {
   IN_STOCK,
+  MAX_RATING_VALUE,
+  MIN_RATING_VALUE,
   OUT_OF_STOCK,
   REMOVABLE_URL_SEARCHPARAMS,
   SORT_OPTIONS_ORDER,
@@ -279,29 +281,42 @@ export const toReviewAmasty = (
       return product;
     }
 
+    const review = reviews.map<Review>((review) => ({
+      "@type": "Review",
+      id: `${review.review_id}`,
+      reviewHeadline: review.title,
+      reviewBody: review.detail,
+      author: [
+        {
+          "@type": "Author",
+          name: review.nickname,
+          verifiedBuyer: review.verified_buyer,
+        },
+      ],
+      datePublished: review.created_at.replace(" ", "T"),
+      additionalType: `${review.review_stars_percentage}`,
+      reviewRating: {
+        "@type": "AggregateRating",
+        ratingValue: review.review_stars,
+        reviewCount: 1,
+      },
+    }));
+
+    const totalRating = review.reduce(
+      (acc, r) => acc + Number(r.reviewRating?.ratingValue),
+      0
+    );
+
     return {
       ...product,
-      review: reviews.map<Review>((review) => ({
-        "@type": "Review",
-        id: `${review.review_id}`,
-        reviewHeadline: review.title,
-        reviewBody: review.detail,
-        author: [
-          {
-            "@type": "Author",
-            name: review.nickname,
-            verifiedBuyer: review.verified_buyer,
-          },
-        ],
-        datePublished: review.created_at.replace(" ", "T"),
-        reviewRating: {
-          "@type": "AggregateRating",
-          ratingCount: reviews_count,
-          reviewCount: reviews_count,
-          ratingValue: review.review_stars,
-        },
-        additionalType: `${review.review_stars_percentage}`,
-      })),
+      review,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        reviewCount: reviews_count,
+        bestRating: MAX_RATING_VALUE,
+        worstRating: MIN_RATING_VALUE,
+        ratingValue: totalRating / reviews_count,
+      },
     };
   });
 

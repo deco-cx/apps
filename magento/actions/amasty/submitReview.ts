@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
-import { SubmitReviewAmastyAPI } from "../../utils/clientCustom/types.ts";
-import { Ratings as RatingsAPI } from "../../utils/clientCustom/types.ts";
+import { SubmitReviewAmastyAPI } from "../../utils/client/types.ts";
+import { Ratings as RatingsAPI } from "../../utils/client/types.ts";
 
 export interface Props {
   /**
@@ -25,13 +25,13 @@ const loader = async (
   _req: Request,
   ctx: AppContext
 ): Promise<SubmitReviewAmastyAPI> => {
-  const { clientCustom } = ctx;
+  const { clientAdmin } = ctx;
   const ratings = props.ratings.reduce<RatingsAPI>((acc, rating) => {
     acc[`${rating.key}`] = rating.value;
     return acc;
   }, {});
 
-  return await clientCustom["POST /rest/:reviewUrl"](
+  return await clientAdmin["POST /rest/:reviewUrl"](
     {
       reviewUrl: props.path.replace(/^\/?(rest\/)?/, ""),
     },
