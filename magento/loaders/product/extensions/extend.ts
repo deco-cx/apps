@@ -1,5 +1,5 @@
 import { Product } from "../../../../commerce/types.ts";
-import { STALE } from "../../../../utils/fetch.ts";
+import { STALE as DecoStale} from "../../../../utils/fetch.ts";
 import { AppContext } from "../../../mod.ts";
 import { toReviewAmasty } from "../../../utils/transform.ts";
 
@@ -35,6 +35,7 @@ const reviewsExt = async (
   ctx: AppContext
 ): Promise<Product[]> => {
   const { maxRatingValue, minRatingValue } = props;
+  const STALE = ctx.enableCache ? DecoStale : undefined
 
   const reviews = await Promise.all(
     products.map(
