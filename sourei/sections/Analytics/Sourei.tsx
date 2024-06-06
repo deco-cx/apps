@@ -31,7 +31,7 @@ const snippet = () => {
 
   const rounded = (n: number) => Number(n.toFixed(2));
 
-  const fixId = ({ item_id, item_group_id, item_url, ...rest }: any) =>
+  const fixId = ({ item_id, item_group_id, _item_url, ...rest }: any) =>
     item_group_id
       ? { item_id: `${item_group_id}_${item_id}`, ...rest }
       : { item_id, ...rest };
