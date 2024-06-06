@@ -9,6 +9,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import { Page } from "deco/blocks/page.tsx";
 import { TextReplace } from "./handlers/proxy.ts";
 import { Script } from "./types.ts";
+import { Matcher } from "deco/blocks/matcher.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -42,22 +43,15 @@ export interface AbTesting {
    * @description The name of the A/B test, it will be appear at cookie
    */
   name?: string;
+  matcher?: Matcher;
   /**
    * @description The url to run the A/B test against, eg: secure.mywebsite.com.br
    */
   urlToRunAgainst?: string;
   /**
-   * @description The url to split the traffic, main url, eg: www.mywebsite.com.br
-   */
-  urlToSplit?: string;
-  /**
    * @description Strings to replace in the response, for example, to replace absolute urls at HTML
    */
   replaces?: TextReplace[];
-  /**
-   * @description The percentage of traffic to run the A/B test, 0.5 = 50%
-   */
-  percentage?: number;
   /**
    * @title Scripts to include
    * @description Scripts to include in the head of the page proxied
@@ -65,6 +59,18 @@ export interface AbTesting {
   includeScriptsToHead?: {
     includes?: Script[];
   };
+}
+
+/** @titleBy framework */
+interface Fresh {
+  /** @default fresh */
+  framework: "fresh";
+}
+
+/** @titleBy framework */
+interface HTMX {
+  /** @default htmx */
+  framework: "htmx";
 }
 
 export interface Props {
@@ -108,10 +114,22 @@ export interface Props {
   firstByteThresholdMS?: boolean;
 
   /**
+   * @title Avoid redirecting to editor
+   * @description Disable going to editor when "." or "Ctrl + Shift + E" is pressed
+   */
+  avoidRedirectingToEditor?: boolean;
+
+  /**
    * @title AB Testing
    * @description A/B Testing configuration
    */
   abTesting?: AbTesting;
+
+  /**
+   * @title Flavor
+   * @description The flavor of the website
+   */
+  flavor?: Fresh | HTMX;
 }
 
 /**
@@ -178,20 +196,6 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       replaces: abTesting.replaces,
     },
   };
-  const matcher = {
-    "op": "and",
-    "matchers": [
-      {
-        "includes": abTesting.urlToSplit,
-        "__resolveType": "website/matchers/host.ts",
-      },
-      {
-        "traffic": abTesting.percentage,
-        "__resolveType": "website/matchers/random.ts",
-      },
-    ],
-    "__resolveType": "website/matchers/multi.ts",
-  };
 
   if (abTesting.enabled) {
     return [{
@@ -199,14 +203,11 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       routes: [
         {
           handler,
-          pathTemplate: "/",
-        },
-        {
-          handler,
           pathTemplate: "/*",
+          highPriority: true,
         },
       ],
-      matcher,
+      matcher: abTesting.matcher,
       __resolveType: "website/flags/audience.ts",
     }];
   }
@@ -230,7 +231,7 @@ const deferPropsResolve = (routes: Routes): Routes => {
 };
 
 export const onBeforeResolveProps = <
-  T extends { routes?: Routes[]; errorPage?: Page },
+  T extends { routes?: Routes[]; errorPage?: Page; abTesting: AbTesting },
 >(
   props: T,
 ): T => {
@@ -239,6 +240,9 @@ export const onBeforeResolveProps = <
       ...props,
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
+        : undefined,
+      abTesting: props.abTesting
+        ? asResolved(props.abTesting, false)
         : undefined,
       routes: props.routes.map(deferPropsResolve),
     };

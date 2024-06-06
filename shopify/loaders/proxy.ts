@@ -5,6 +5,7 @@ import { withDigestCookie } from "../utils/password.ts";
 const PATHS_TO_PROXY = [
   "/checkout",
   "/checkouts/*",
+  "/*/checkouts/*",
   "/cart",
   "/cart/*",
   "/account",

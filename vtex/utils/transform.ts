@@ -334,7 +334,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [], kitItems, videos } = sku;
+  const {
+    name,
+    ean,
+    itemId: skuId,
+    referenceId = [],
+    kitItems,
+  } = sku;
+
+  const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
@@ -940,19 +948,15 @@ export const toReview = (
   reviews: ProductReviewData[],
 ): Product[] => {
   return products.map((p, index) => {
-    const reviewCount = ratings.reduce(
-      (acc, curr) => acc + (curr.totalCount || 0),
-      0,
-    );
-
+    const ratingsCount = ratings[index].totalCount || 0;
     const productReviews = reviews[index].data || [];
 
     return {
       ...p,
       aggregateRating: {
         "@type": "AggregateRating",
-        reviewCount,
-        ratingCount: reviewCount,
+        reviewCount: ratingsCount,
+        ratingCount: ratingsCount,
         ratingValue: ratings[index]?.average || 0,
       },
       review: productReviews.map((_, reviewIndex) => ({

@@ -8,16 +8,12 @@ const compatibilityApps = [{
   name: "deco-sites/std",
 }];
 
-const paltformApps = [{
-  dir: "./platforms/kubernetes",
-  name: "kubernetes",
-}, {
-  dir: "./platforms/subhosting",
-  name: "deno-subhosting",
-}];
-
 const config = {
   apps: [
+    app("anthropic"),
+    app("resend"),
+    app("konfidency"),
+    app("mailchimp"),
     app("ai-assistants"),
     app("files"),
     app("openai"),
@@ -25,10 +21,6 @@ const config = {
     app("implementation"),
     app("weather"),
     app("blog"),
-    {
-      dir: "admin",
-      name: "deco-sites/admin",
-    },
     app("analytics"),
     app("sourei"),
     app("typesense"),
@@ -50,7 +42,6 @@ const config = {
     app("decohub"),
     app("htmx"),
     ...compatibilityApps,
-    ...paltformApps,
   ],
 };
 
