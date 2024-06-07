@@ -1,9 +1,9 @@
+import cart from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 import { Cart, SetShipping } from "../../utils/client/types.ts";
 import { COUNTRY_ID, SESSION_COOKIE } from "../../utils/constants.ts";
 import { getUserCookie } from "../../utils/user.ts";
-
 
 export type Props = Omit<SetShipping, "isLoggedIn" | "quoteId" | "countryId">;
 
@@ -17,16 +17,16 @@ const action = async (
   const id = getUserCookie(req.headers);
   const cartId = getCartCookie(req.headers);
 
-  const { cart } = await clientAdmin["GET /:site/customer/section/load"]({
+  const { cart: cartResponse } = await clientAdmin["GET /:site/customer/section/load"]({
     site,
     sections: "cart",
   }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) }).then((
     res,
   ) => res.json());
 
-  const isLoggedIn = cart?.minicart_improvements?.is_logged_in ?? false;
+  const isLoggedIn = cartResponse?.minicart_improvements?.is_logged_in ?? false;
   const quoteId = cartId ?? "";
-  const countryId = cart?.minicart_improvements?.country_id ?? COUNTRY_ID;
+  const countryId = cartResponse?.minicart_improvements?.country_id ?? COUNTRY_ID;
 
   clientAdmin
     ["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"]({

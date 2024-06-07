@@ -82,7 +82,7 @@ const loader = async (
           imagesUrl,
           url.origin,
           site,
-        );
+        ) as unknown as Cart
       } catch (_error) {
         return createCart(ctx, req.headers);
       }
