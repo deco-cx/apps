@@ -8,7 +8,9 @@ import {
   NewsletterData,
   SetShipping,
   ShippingMethod,
+  Success,
   User,
+  WishListReponse,
 } from "./types.ts";
 
 interface searchParams {
@@ -135,5 +137,19 @@ export interface API {
   "POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote": {
     response: [];
     body: SetShipping;
-  }
+  };
+
+  "POST /:site/wishlist/index/add/": {
+    response: WishListReponse;
+    body: {
+      product: string;
+    };
+  };
+
+  "POST /:site/wishlist/index/remove/": {
+    response: Success;
+    body: {
+      product: string;
+    };
+  };
 }

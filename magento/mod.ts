@@ -78,7 +78,7 @@ export interface Props {
    * @title Enale Cache in APIs (Deco Stale)
    * @default true
    */
-  enableCache: boolean
+  enableCache: boolean;
 }
 
 export interface State extends Props {

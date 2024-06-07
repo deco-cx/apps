@@ -55,7 +55,7 @@ export interface CategoryProps {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
   const {
@@ -87,7 +87,7 @@ const loader = async (
       variables: { path: categoryUrl },
       ...GetCategoryUid,
     },
-    STALE
+    STALE,
   );
   if (!categories.items || categories.items?.length === 0) {
     return null;
@@ -112,7 +112,7 @@ const loader = async (
       },
       ...GetPLPItems(customAttributes),
     },
-    STALE
+    STALE,
   );
 
   if (!products.items || products.items?.length === 0) {
@@ -127,18 +127,18 @@ const loader = async (
       imagesQtd,
       defaultPath,
       customAttributes,
-    }
+    },
   );
 };
 
 const getSortOptions = (sortFromUrl: string | null, props?: CategoryProps) =>
   sortFromUrl
     ? {
-        sortBy: {
-          value: sortFromUrl,
-        },
-        order: "ASC",
-      }
+      sortBy: {
+        value: sortFromUrl,
+      },
+      order: "ASC",
+    }
     : props?.sortOptions ?? { sortBy: undefined, order: "ASC" };
 
 export const cache = "stale-while-revalidate";
@@ -153,11 +153,11 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const filtersFromProps = filtersFromLoaderGraphQL(categoryProps?.filters);
   return `${url.href}-category:${categoryUrl}-customAtt:${
     customAttributes?.join("|") ?? "NONE"
-  }-sortBy:${
-    sortBy?.value
-  }-order:${order}-size:${pageSize}-filtersFromProps:${JSON.stringify(
-    filtersFromProps
-  )}-PLP`;
+  }-sortBy:${sortBy?.value}-order:${order}-size:${pageSize}-filtersFromProps:${
+    JSON.stringify(
+      filtersFromProps,
+    )
+  }-PLP`;
 };
 
 export default loader;
