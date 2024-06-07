@@ -49,7 +49,6 @@ export default function App(
     subject = "Contato via app resend",
   }: State,
 ): App<Manifest, State> {
-  if (!apiKey) throw new Error("Missing apiKey for resend");
   const apiKeyToken = typeof apiKey === "string"
     ? apiKey
     : apiKey?.get?.() ?? "";
