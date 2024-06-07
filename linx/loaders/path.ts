@@ -46,12 +46,34 @@ async function loader(
     fc: params.fc || props.fc || "false",
   };
 
+  const isSearch = upstream.searchParams.has("t");
+
   const response = await ctx.api["GET /*splat"](
     { splat, ...params, ...props, ...defaults },
-    STALE,
-  ).then((res) => res.json()).catch(nullOnNotFound);
+    isSearch ? {
+      redirect: "manual",
+    } : STALE,
+  );
 
-  return response;
+  if (response.status === 301) {
+    const redirectUrlRaw = response.headers.get("location");
+
+    if (!redirectUrlRaw) {
+      return null;
+    }
+
+    const redirectUrl = new URL(redirectUrlRaw);
+    const redirectTo = `${redirectUrl.pathname.slice(1)}.json`;
+
+    const redirectResponse = await ctx.api["GET /*splat"](
+      { splat: redirectTo, ...params, ...props, ...defaults },
+      STALE,
+    ).then(res => res.json()).catch(nullOnNotFound);
+
+    return redirectResponse;
+  }
+
+  return response.json();
 }
 
 export default loader;
