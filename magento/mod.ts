@@ -105,6 +105,7 @@ export default function App(props: Props): App<Manifest, State> {
     }),
   });
 
+
   const clientGraphql = createGraphqlClient({
     fetcher: fetchSafe,
     endpoint: `${baseUrl}/graphql`,
