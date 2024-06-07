@@ -1,7 +1,9 @@
-import { getCookies } from "std/http/cookie.ts";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import { Cart, MagentoCardPrices, MagentoProduct } from "./client/types.ts";
 import { toURL } from "./transform.ts";
+import { SESSION_COOKIE } from "./constants.ts";
+import { generateUniqueIdentifier } from "./hash.ts";
 
 const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -28,6 +30,17 @@ export async function createCart(
   const cartCookie = getCookies(headers)[CART_COOKIE];
 
   const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
+
+  const sessionCookie = getCookies(headers)[SESSION_COOKIE];
+
+  if (!sessionCookie) {
+    setCookie(headers, {
+      path: "/",
+      maxAge: ONE_WEEK_MS,
+      name: SESSION_COOKIE,
+      value: (await generateUniqueIdentifier()).hash,
+    });
+  }
 
   if (!cartCookie && !customerCookie) {
     const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({

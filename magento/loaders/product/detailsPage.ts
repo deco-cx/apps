@@ -24,7 +24,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, isBreadcrumbProductName = false } = props;
@@ -64,14 +64,14 @@ async function loader(
       {
         ...queryParams,
       },
-      STALE
+      STALE,
     ).then((res) => res.json());
     if (!itemSku.items.length) return null;
 
     const [{ items }, stockInfoAndImages] = await Promise.all([
       clientAdmin["GET /rest/:site/V1/products-render-info"](
         queryParams,
-        STALE
+        STALE,
       ).then((res) => res.json()),
       clientAdmin["GET /rest/:site/V1/products/:sku"](
         {
@@ -80,7 +80,7 @@ async function loader(
           storeId: storeId,
           currencyCode: currencyCode,
         },
-        STALE
+        STALE,
       ).then((res) => res.json()),
     ]);
 
@@ -105,7 +105,7 @@ async function loader(
           categoryId,
           fields: "name,position",
         },
-        STALE
+        STALE,
       ).then((res) => res.json());
     };
 
@@ -132,7 +132,7 @@ async function loader(
     isBreadcrumbProductName ? [] : await getCategoryNames(categoryLinks),
     isBreadcrumbProductName,
     product,
-    url
+    url,
   );
 
   return {

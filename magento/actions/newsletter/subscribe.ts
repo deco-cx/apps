@@ -15,7 +15,7 @@ interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<NewsletterData | null> => {
   const { storeId, clientAdmin, site } = ctx;
 
@@ -28,11 +28,11 @@ const loader = async (
 
   const result = await clientAdmin["POST /rest/:site/V1/newsletter/subscribed"](
     { site },
-    { body }
+    { body },
   ).then((res) => res.json());
 
   if (!result || result.sucess === false) {
-    return null
+    return null;
   }
 
   return result;

@@ -21,7 +21,7 @@ const action = async (
       couponCode: couponCode.toLowerCase(),
     }).then((res) => res.json());
   } catch (error) {
-    return error
+    return error;
   }
   return await cart(undefined, req, ctx);
 };

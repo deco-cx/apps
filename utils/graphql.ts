@@ -58,7 +58,7 @@ export const createGraphqlClient = ({
         variables,
         operationName,
       }: GraphQLQueryProps<V>,
-      init?: DecoRequestInit
+      init?: DecoRequestInit,
     ): Promise<D> => {
       const { key, props } = getMethodAndProps<V>({
         query,
@@ -98,20 +98,20 @@ const getMethodAndProps = <V>({
     url.href,
     minifiedQuery,
     stringfiedVariables,
-    operationName
+    operationName,
   );
 
   const { key, executableQuery, executableVariables } = postMethodBool
     ? {
-        key: `POST ${url.pathname}`,
-        executableQuery: fullQuery,
-        executableVariables: variables,
-      }
+      key: `POST ${url.pathname}`,
+      executableQuery: fullQuery,
+      executableVariables: variables,
+    }
     : {
-        key: `GET ${url.pathname}`,
-        executableQuery: minifiedQuery,
-        executableVariables: stringfiedVariables,
-      };
+      key: `GET ${url.pathname}`,
+      executableQuery: minifiedQuery,
+      executableVariables: stringfiedVariables,
+    };
 
   return {
     key,
@@ -137,7 +137,7 @@ const getParamsAndBody = ({
 const minifyString = (s: string): string => {
   s = s.replace(
     /\{([^{}]*)\}/g,
-    (_, p1) => `{${p1.replace(/\s+/g, " ").trim()}}`
+    (_, p1) => `{${p1.replace(/\s+/g, " ").trim()}}`,
   );
   s = s
     .replace(/[\r\n]+/g, " ")
@@ -164,14 +164,16 @@ const isPostMethodRequired = (
   href: string,
   query: string,
   variables: string,
-  operationName?: string
+  operationName?: string,
 ): boolean => {
   if (query.startsWith("mutation")) {
     return true;
   }
 
-  const urlLength = `${href}?query=${encodeURI(query)}&variables=${encodeURI(
-    variables
-  )}&operationname=${operationName}`;
+  const urlLength = `${href}?query=${encodeURI(query)}&variables=${
+    encodeURI(
+      variables,
+    )
+  }&operationname=${operationName}`;
   return urlLength.length + decoCacheArgLength > 2000;
 };

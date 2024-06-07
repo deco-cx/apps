@@ -11,6 +11,8 @@ import * as $$$$$$$$$5 from "./actions/cart/setSimulation.ts";
 import * as $$$$$$$$$6 from "./actions/cart/simulation.ts";
 import * as $$$$$$$$$7 from "./actions/cart/updateItem.ts";
 import * as $$$$$$$$$8 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$9 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$10 from "./actions/wishlist/removeItem.ts";
 import * as $0 from "./functions/requestToPathname.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
@@ -22,6 +24,7 @@ import * as $$$5 from "./loaders/product/list.ts";
 import * as $$$6 from "./loaders/product/listingPage.ts";
 import * as $$$7 from "./loaders/proxy.ts";
 import * as $$$8 from "./loaders/user.ts";
+import * as $$$9 from "./loaders/wishlist.ts";
 
 const manifest = {
   "functions": {
@@ -37,6 +40,7 @@ const manifest = {
     "magento/loaders/product/listingPage.ts": $$$6,
     "magento/loaders/proxy.ts": $$$7,
     "magento/loaders/user.ts": $$$8,
+    "magento/loaders/wishlist.ts": $$$9,
   },
   "handlers": {
     "magento/handlers/sitemap.ts": $$$$0,
@@ -51,6 +55,8 @@ const manifest = {
     "magento/actions/cart/simulation.ts": $$$$$$$$$6,
     "magento/actions/cart/updateItem.ts": $$$$$$$$$7,
     "magento/actions/newsletter/subscribe.ts": $$$$$$$$$8,
+    "magento/actions/wishlist/addItem.ts": $$$$$$$$$9,
+    "magento/actions/wishlist/removeItem.ts": $$$$$$$$$10,
   },
   "name": "magento",
   "baseUrl": import.meta.url,

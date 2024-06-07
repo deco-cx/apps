@@ -15,8 +15,7 @@ import {
 } from "../../utils/utilsGraphQL.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { toProductGraphQL } from "../../utils/transform.ts";
-import { typeChecker, transformSortGraphQL } from "../../utils/utilsGraphQL.ts";
-
+import { transformSortGraphQL, typeChecker } from "../../utils/utilsGraphQL.ts";
 
 export interface CommomProps {
   /**
@@ -204,7 +203,7 @@ async function loader(
       variables: { ...formatedProps },
       ...GetProduct(customAttributes),
     },
-    enableCache ? STALE : undefined
+    enableCache ? STALE : undefined,
   );
 
   if (!products.items || products.items?.length === 0) {

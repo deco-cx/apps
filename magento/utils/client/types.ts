@@ -400,6 +400,35 @@ export interface User {
   customer?: Customer;
   "carbono-customer"?: CarbonoCustomer;
   cart?: CartUser;
+  wishlist?: Wishlist;
+}
+
+export interface Wishlist {
+  counter: string;
+  items: Item[];
+  counter_number: number;
+  data_id: number;
+}
+
+export interface Item {
+  image: Image;
+  product_sku: string;
+  product_id: string;
+  product_url: string;
+  product_name: string;
+  product_price: string;
+  product_is_saleable_and_visible: boolean;
+  product_has_required_options: boolean;
+  add_to_cart_params: string;
+  delete_item_params: string;
+}
+
+export interface Image {
+  template: string;
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
 }
 
 export interface Customer {
@@ -457,6 +486,19 @@ export interface NewsletterData {
   message: string;
 }
 
+export interface Success {
+  success: boolean;
+  wishist: string;
+  message: string;
+}
+
+export interface Error {
+  success: boolean;
+  error: string;
+}
+
+export type WishListReponse = Success | Error;
+
 //Custom Interfaces
 export interface ReviewsAmastyAPI {
   success: boolean;
@@ -481,22 +523,22 @@ export interface Summary {
 }
 
 export interface SubmitReviewAmastyAPI {
-  success: boolean
-  message: string
-  reviews: ReviewAmasty[] | null
-  summary: Summary | null
+  success: boolean;
+  message: string;
+  reviews: ReviewAmasty[] | null;
+  summary: Summary | null;
 }
 
 export interface SubmitReviewAmastyBody {
-  product_id: number
-  customer_id: number
-  store_id: string
-  nickname: string
-  title: string
-  detail: string
-  ratings: Ratings
+  product_id: number;
+  customer_id: number;
+  store_id: string;
+  nickname: string;
+  title: string;
+  detail: string;
+  ratings: Ratings;
 }
 
 export interface Ratings {
-  [key: string]: string
+  [key: string]: string;
 }

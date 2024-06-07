@@ -65,6 +65,7 @@ export const BASE_CURRENCY_CODE = "base_currency_code";
 //Fields products sku
 export const SKU = "sku";
 export const MEDIA_GALLERY_ENTRIES = "media_gallery_entries";
+export const SESSION_COOKIE = "PHPSESSID";
 export const COUNTRY_ID = "BR";
 
 export const MAX_RATING_VALUE = 5
