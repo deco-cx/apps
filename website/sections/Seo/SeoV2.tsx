@@ -22,12 +22,16 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     ...seoSiteProps
   } = ctx.seo ?? {};
   const { title: _title, description: _description, ...seoProps } = props;
-  const title = renderTemplateString(titleTemplate, _title ?? appTitle);
+  const title = renderTemplateString(
+    (titleTemplate ?? "").trim().length === 0 ? "%s" : titleTemplate,
+    _title ?? appTitle,
+  );
   const description = renderTemplateString(
-    descriptionTemplate,
+    (descriptionTemplate ?? "").trim().length === 0
+      ? "%s"
+      : descriptionTemplate,
     _description ?? appDescription,
   );
-
   return { ...seoSiteProps, ...seoProps, title, description };
 }
 

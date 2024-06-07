@@ -8,7 +8,6 @@ function SlackArticle(props: PreviewItem & SeoProps) {
     title,
     description,
     image,
-    type,
     width,
     height,
     canonical = "https://www.example.com",
