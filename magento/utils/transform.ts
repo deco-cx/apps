@@ -34,6 +34,8 @@ import { ProductPrice } from "./clientGraphql/types.ts";
 import { PriceRange, SimpleProductGraphQL } from "./clientGraphql/types.ts";
 import {
   IN_STOCK,
+  MAX_RATING_VALUE,
+  MIN_RATING_VALUE,
   OUT_OF_STOCK,
   REMOVABLE_URL_SEARCHPARAMS,
   SORT_OPTIONS_ORDER,
@@ -271,10 +273,6 @@ export const toSeo = (
 export const toReviewAmasty = (
   products: Product[],
   productReviews: ReviewsAmastyAPI[],
-  ratingProps: {
-    maxRatingValue: number;
-    minRatingValue: number;
-  }
 ): Product[] =>
   products.map((product, i) => {
     const { reviews, success, summary } = productReviews[i];
@@ -315,8 +313,8 @@ export const toReviewAmasty = (
       aggregateRating: {
         "@type": "AggregateRating",
         reviewCount: reviews_count,
-        bestRating: ratingProps.maxRatingValue,
-        worstRating: ratingProps.minRatingValue,
+        bestRating: MAX_RATING_VALUE,
+        worstRating: MIN_RATING_VALUE,
         ratingValue: Number((totalRating / reviews_count).toFixed(2)),
       },
     };

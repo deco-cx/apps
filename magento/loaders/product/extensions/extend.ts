@@ -34,7 +34,6 @@ const reviewsExt = async (
   props: ReviewProps,
   ctx: AppContext
 ): Promise<Product[]> => {
-  const { maxRatingValue, minRatingValue } = props;
   const STALE = ctx.enableCache ? DecoStale : undefined
 
   const reviews = await Promise.all(
@@ -50,10 +49,7 @@ const reviewsExt = async (
     )
   );
 
-  return toReviewAmasty(products, reviews, {
-    maxRatingValue,
-    minRatingValue,
-  });
+  return toReviewAmasty(products, reviews);
 };
 export default async (
   { products, reviews }: Props,
