@@ -272,7 +272,7 @@ export const toSeo = (
 
 export const toReviewAmasty = (
   products: Product[],
-  productReviews: ReviewsAmastyAPI[],
+  productReviews: ReviewsAmastyAPI[]
 ): Product[] =>
   products.map((product, i) => {
     const { reviews, success, summary } = productReviews[i];
@@ -352,10 +352,11 @@ export const toProductGraphQL = (
     product,
     options.customAttributes
   );
+  const productID = atob(uid)
 
   return {
     "@type": "Product",
-    productID: uid,
+    productID,
     sku,
     url,
     name: name.trim(),
@@ -377,7 +378,7 @@ export const toProductGraphQL = (
       hasVariant: [
         {
           "@type": "Product",
-          productID: uid,
+          productID,
           sku,
           url,
           name: name,

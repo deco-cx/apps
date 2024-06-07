@@ -13,6 +13,7 @@ interface ExtensionProps {
   active: boolean;
   /**
    * @title Path of the REST API
+   * @description The partial path of the API. ex: /all/V1/custom/review
    */
   path: string;
 }
@@ -22,7 +23,7 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   return `${req.url}-reviews:${
     props.reviews?.active ?? false
-  }-amastyExtensions`;
+  }|url:${props.reviews?.path ?? false}-amastyExtensions`;
 };
 
 const reviewsExt = async (

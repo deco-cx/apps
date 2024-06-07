@@ -5,6 +5,7 @@ import { Ratings as RatingsAPI } from "../../utils/client/types.ts";
 export interface Props {
   /**
    * @title Path of the REST API
+   * @description The partial path of the API. ex: /all/V1/custom/review
    */
   path: string;
   product_id: number;

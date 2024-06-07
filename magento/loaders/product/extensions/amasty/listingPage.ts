@@ -1,10 +1,10 @@
 import { AppContext } from "../../../../mod.ts";
 import extend, { Props } from "../extend.ts";
-import { ProductDetailsPage } from "../../../../../commerce/types.ts";
+import { ProductListingPage } from "../../../../../commerce/types.ts";
 import { ExtensionOf } from "../../../../../website/loaders/extension.ts";
 
 /**
- * @title Magento Extension - Details Page
+ * @title Magento Extension - Listing Page
  * @description Add extra data to your loader. This may harm performance
  */
 const loader =
@@ -12,21 +12,21 @@ const loader =
     props: Omit<Props, "products">,
     req: Request,
     ctx: AppContext
-  ): ExtensionOf<ProductDetailsPage | null> =>
-  async (page: ProductDetailsPage | null) => {
+  ): ExtensionOf<ProductListingPage | null> =>
+  async (page: ProductListingPage | null) => {
     if (!page) {
       return page;
     }
 
     const products = await extend(
-      { products: [page.product], ...props },
+      { products: page.products, ...props },
       req,
       ctx
     );
 
     return {
       ...page,
-      product: products[0],
+      products,
     };
   };
 
