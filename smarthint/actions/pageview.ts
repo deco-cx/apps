@@ -20,7 +20,7 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<null> => {
-  const { api, shcode } = ctx;
+  const { recs, shcode } = ctx;
   const {
     shippingPrice,
     shippingTime,
@@ -33,7 +33,9 @@ const action = async (
 
   const url = new URL(req.url);
 
-  await api["GET /track/pageView"]({
+  console.log("pageview action");
+
+  await recs["GET /track/pageView"]({
     url: req.url,
     date,
     origin: url.origin,

@@ -1,14 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { PageType } from "../utils/typings.ts";
-
-export interface Banner {
-  Name?: string;
-  UrlBanner?: string;
-  UrlRedirect?: string;
-  NewTab?: string;
-  Sequence?: number;
-  BannerHtml?: string;
-}
+import { Banner, PageType } from "../utils/typings.ts";
 
 export interface Props {
   pageType: PageType;

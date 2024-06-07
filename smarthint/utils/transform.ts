@@ -2,18 +2,22 @@ import {
   Filter,
   FilterToggleValue,
   ItemAvailability,
+  OfferItemCondition,
   Product,
+  ProductLeaf,
   SortOption,
 } from "../../commerce/types.ts";
 
-const AvailabilityMap: Record<string,ItemAvailability> = {
-  'in stock': "https://schema.org/InStock",
-  'out of stock': "https://schema.org/OutOfStock"
-}
+const AvailabilityMap: Record<string, ItemAvailability> = {
+  "in stock": "https://schema.org/InStock",
+  "out of stock": "https://schema.org/OutOfStock",
+};
+
+const ConditionMap: Record<string, OfferItemCondition> = {
+  "New": "https://schema.org/NewCondition",
+};
 
 export const toProduct = (product: any): Product => {
-
-  console.log(product.Availability  )
   return {
     "@type": "Product",
     productID: product.ProductId,
@@ -24,7 +28,7 @@ export const toProduct = (product: any): Product => {
     brand: {
       "@type": "Brand",
       name: product.Brand,
-    },  
+    },
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: product.ReviewStars,
@@ -48,10 +52,11 @@ export const toProduct = (product: any): Product => {
       offers: [{
         "@type": "Offer",
         availability: AvailabilityMap[product.Availability], // TODO fix data
-        price: product.SalePrice, 
+        price: product.SalePrice,
         inventoryLevel: {
           value: 1000, //TODO
         },
+        itemCondition: ConditionMap[product.Condition],
         priceSpecification: [
           {
             "@type": "UnitPriceSpecification",
@@ -123,17 +128,33 @@ export const toProduct = (product: any): Product => {
       //   alternateName: key,
       // })),
     ],
+    isVariantOf: {
+      "@type": "ProductGroup",
+      additionalProperty: [],
+      productGroupID: product.ProductId,
+      hasVariant: product.Specifications.map((specification): ProductLeaf => ({
+        "@type": "Product",
+        productID: specification.SpecificationId,
+        sku: specification.Sku,
+        additionalProperty: specification.Variations?.map((variation) => ({
+          "@type": "PropertyValue",
+          name: "Tamanho",
+          value: variation?.ValueInt ?? variation?.ValueDouble ??
+            variation?.ValueString,
+        })),
+      })),
+    },
   };
 };
 
 export const toSortOption = (sorts: any[]): SortOption[] => {
   return sorts.map((sort) => ({
     label: sort.Show,
-    value: sort.Field,
+    value: sort.Value,
   }));
 };
 
-export const toFilters = (filters: any[]): Filter[] => {
+export const toFilters = (filters: any[], url: URL): Filter[] => {
   return filters.map((filter) => ({
     "@type": "FilterToggle" as const,
     key: filter.Key.Value,
@@ -142,12 +163,20 @@ export const toFilters = (filters: any[]): Filter[] => {
       (acc: number, value: any) => acc + value.Quantity,
       0,
     ),
-    values: filter.Value.map((value: any): FilterToggleValue => ({
-      label: value.Show,
-      quantity: value.Quantity,
-      selected: value.Checked,
-      value: value.Value,
-      url: "", //TODO
-    })),
+    values: filter.Value.map((value: any): FilterToggleValue => {
+      const filterUrl = new URL(url);
+      filterUrl.searchParams.append(
+        "filter",
+        `${filter.Key.Value}:${value.Value}`,
+      );
+
+      return ({
+        label: value.Show,
+        quantity: value.Quantity,
+        selected: value.Checked,
+        value: value.Value,
+        url: filterUrl.href,
+      });
+    }),
   }));
 };

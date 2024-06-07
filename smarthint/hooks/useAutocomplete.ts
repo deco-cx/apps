@@ -29,7 +29,7 @@ const setSearch = debounce(
 );
 
 const state = {
-  setSearch: (query: string, sizeProducts?: number, sizeTerms?: number) => {
+  setSearch: (query?: string, sizeProducts?: number, sizeTerms?: number) => {
     loading.value = true;
     setSearch(query, sizeProducts, sizeTerms);
   },

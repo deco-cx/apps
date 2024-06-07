@@ -35,15 +35,27 @@ const loader = async (
 
   const sortOptions = toSortOption(data.SearchResult?.Sorts ?? []);
 
-  const filters = toFilters(data.SearchResult?.Filters ?? []);
+  const filters = toFilters(data.SearchResult?.Filters ?? [], url);
 
   return {
     "@type": "ProductListingPage",
     products: products,
     sortOptions,
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [],
+      numberOfItems: 0,
+    },
     filters,
     pageInfo: {
       records: data.SearchResult?.TotalResult,
+      recordPerPage: data.SearchResult?.TotalResult,
+      nextPage: undefined,
+      previousPage: undefined,
+      currentPage: 0,
+      pageTypes: [
+        "Cluster",
+      ],
     },
   };
 };

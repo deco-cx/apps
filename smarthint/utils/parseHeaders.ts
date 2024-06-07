@@ -9,10 +9,9 @@ export const getClientIP = (headers: Headers) => {
   return xForwardedFor;
 };
 
-
 export const getUserHash = (headers: Headers) => {
-  const clientIp = getClientIP(headers) ?? ''
-  const date = new Date()
+  const clientIp = getClientIP(headers) ?? "";
+  const date = new Date();
 
-  return hash(`${clientIp}${date.toISOString()}`)
-}
+  return hash(`${clientIp}${date.toISOString()}`);
+};

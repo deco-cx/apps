@@ -3,18 +3,19 @@ import { getUserHash } from "../utils/parseHeaders.ts";
 import { PageType } from "../utils/typings.ts";
 
 export interface Props {
-  shippingPrice: number;
-  shippingTime: number;
+  shippingPrice?: number;
+  shippingTime?: number;
   pageType: PageType;
-  date: string;
-  elapsedTime: number;
+  date?: string;
+  elapsedTime?: number;
   productPrice: number;
-  session: string;
-  clickFeature: string,
-  term: string,
-  locationRecs: string,
-  position: number,
-  productId: string
+  session?: string;
+  clickFeature: string;
+  term: string;
+  position: number;
+  productId: string;
+  clickProduct: string;
+  positionRecommendation: string;
 }
 
 /**
@@ -34,16 +35,17 @@ const action = async (
     date,
     productPrice,
     session,
-    locationRecs,
     clickFeature,
     term,
     position,
-    productId
+    productId,
+    positionRecommendation,
+    clickProduct,
   } = props;
 
   const url = new URL(req.url);
 
-  const anonymous = getUserHash(req.headers)
+  const anonymous = getUserHash(req.headers);
 
   await recs["GET /track/click"]({
     date,
@@ -52,15 +54,15 @@ const action = async (
     session,
     pageType,
     term,
-    locationRecs,
     position: String(position),
     productId,
     productPrice: String(productPrice),
     shippingTime: String(shippingTime),
     shippingPrice: String(shippingPrice),
     anonymousConsumer: anonymous,
-    clickProduct: url.href,
-    clickFeature
+    clickProduct,
+    clickFeature,
+    locationRecs: positionRecommendation,
   }).then((r) => r.json());
 
   return null;

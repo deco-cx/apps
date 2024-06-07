@@ -6,7 +6,13 @@ import { Product } from "../../commerce/types.ts";
 import { getUserHash } from "../utils/parseHeaders.ts";
 
 export interface Props {
+  /**
+   * @hide
+   */
   filter?: Filter[];
+  /**
+   * @hide
+   */
   categories?: string;
   /**
    * @hide
@@ -53,11 +59,13 @@ const loader = async (
     channel,
   } = props;
 
-  const url = new URL(req.url)
+  const url = new URL(req.url);
 
-  const anonymous = getUserHash(req.headers)
-  
-  const pageIdentifier = url.hostname == 'localhost' ? '' : new URL(url.origin, url.pathname)?.href
+  const anonymous = getUserHash(req.headers);
+
+  const pageIdentifier = url.hostname == "localhost"
+    ? ""
+    : new URL(url.origin, url.pathname)?.href;
 
   const filterString = filter.length
     ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
@@ -68,10 +76,9 @@ const loader = async (
     ? productsParam.map((productId) => `productid:${productId}`).join("&")
     : undefined;
 
-
   const data = await recs["GET /recommendationByPage/withProducts"]({
     shcode,
-    anonymous, 
+    anonymous,
     categories,
     channel,
     filter: filterString,
@@ -81,7 +88,7 @@ const loader = async (
     products: productsString,
   }).then((r) => r.json());
 
-  console.log({data})
+  console.log({ data });
 
   const positionItem = data.find((item) =>
     Number(item.SmartHintPosition) == Number(position)

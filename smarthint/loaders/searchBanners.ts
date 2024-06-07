@@ -1,7 +1,5 @@
-import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-import { toFilters, toProduct, toSortOption } from "../utils/transform.ts";
-import { redirect } from "deco/mod.ts";
+import { Banner } from "../utils/typings.ts";
 
 export type SearchSort = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
@@ -38,7 +36,7 @@ const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<ProductListingPage | null> => {
+): Promise<Banner[] | null> => {
   const { api, shcode, cluster } = ctx;
   const {
     term: termProp,
@@ -88,56 +86,9 @@ const loader = async (
     condition: conditionString,
   }).then((r) => r.json());
 
-  if (data?.IsRedirect) {
-    redirect(
-      new URL(data?.urlRedirect!, url.origin)
-        .href,
-    );
-  }
+  if (!data.Banners) return null;
 
-  const products = data?.Products?.map((product) => toProduct(product)) ?? [];
-
-  const sortOptions = toSortOption(data?.Sorts ?? []);
-
-  const pageFilters = toFilters(data?.Filters ?? [], url);
-
-  const hasNextPage = (data?.TotalResult ?? 0) > size;
-  const hasPreviousPage = from > 0 && (data?.TotalResult ?? 0) > size;
-
-  const nextPage = new URLSearchParams(url.searchParams);
-  const previousPage = new URLSearchParams(url.searchParams);
-
-  console.log({ page, from });
-
-  if (hasNextPage) {
-    nextPage.set("page", (page + 1).toString());
-  }
-
-  if (hasPreviousPage) {
-    previousPage.set("page", (page - 1).toString());
-  }
-
-  return {
-    "@type": "ProductListingPage",
-    products: products,
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [],
-      numberOfItems: 0,
-    },
-    sortOptions,
-    filters: pageFilters,
-    pageInfo: {
-      records: data?.TotalResult,
-      recordPerPage: size,
-      nextPage: hasNextPage ? `?${nextPage}` : undefined,
-      previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
-      currentPage: page,
-      pageTypes: [
-        "Search",
-      ],
-    },
-  };
+  return data.Banners;
 };
 
 export default loader;
