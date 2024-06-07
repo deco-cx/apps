@@ -2,8 +2,8 @@ import cart from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 import { Cart, SetShipping } from "../../utils/client/types.ts";
-import { COUNTRY_ID } from "../../utils/constants.ts";
-import { getUserCookie, SESSION_COOKIE } from "../../utils/user.ts";
+import { COUNTRY_ID, SESSION_COOKIE } from "../../utils/constants.ts";
+import { getUserCookie } from "../../utils/user.ts";
 
 export type Props = Omit<SetShipping, "isLoggedIn" | "quoteId" | "countryId">;
 
