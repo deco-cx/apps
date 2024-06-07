@@ -203,9 +203,13 @@ export interface Props {
 export const loader = (props: Props, req: Request, ctx: AppContext) => {
   const { shcode } = ctx;
 
-  const tempurl = new URL(req.url);
+  const tempurl = new URL(
+    "https://deco-sites-prohall--smarthint.deno.dev/smarthint/home",
+  );
   tempurl.host = "www.lojaprohall.com.br";
   tempurl.port = "";
+
+  console.log(tempurl);
 
   return {
     shcode,

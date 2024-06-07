@@ -65,7 +65,7 @@ const loader = async (
 
   const pageIdentifier = url.hostname == "localhost"
     ? ""
-    : new URL(url.origin, url.pathname)?.href;
+    : new URL(url.pathname, url.origin)?.href;
 
   const filterString = filter.length
     ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
