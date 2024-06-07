@@ -2,6 +2,7 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import { Cart, MagentoCardPrices, MagentoProduct } from "./client/types.ts";
 import { toURL } from "./transform.ts";
+import { ImageObject } from "../../commerce/types.ts";
 import { SESSION_COOKIE } from "./constants.ts";
 import { generateUniqueIdentifier } from "./hash.ts";
 
@@ -84,7 +85,7 @@ export const toCartItemsWithImages = (
         encodingFormat: "image",
         alternateName: images[0].file,
         url: `${toURL(imagesUrl)}${images[0].file}`,
-      }
+      } as ImageObject
       : null;
 
     const urlKey = productData.custom_attributes.find((item) =>
