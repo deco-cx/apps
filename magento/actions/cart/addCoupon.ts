@@ -6,11 +6,17 @@ import { getCartCookie } from "../../utils/cart.ts";
 export interface Props {
   couponCode: string;
 }
+
+interface ErrorAddCoupon {
+    message: string;
+    status: number;
+}
+
 const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart | string> => {
+): Promise<Cart | ErrorAddCoupon> => {
   const { couponCode } = props;
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
@@ -22,7 +28,10 @@ const action = async (
     });
   } catch (error) {
     if (error instanceof HttpError) {
-      return JSON.parse(error.message).message;
+      return {
+        message: JSON.parse(error.message).message,
+        status: error.status,
+      }
     }
     return error;
   }
