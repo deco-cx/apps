@@ -1,4 +1,4 @@
-import { Cart } from "../../loaders/cart.ts";
+import cart, { Cart } from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 
@@ -31,9 +31,7 @@ const action = async (
     site: ctx.site,
   }, { body });
 
-  return await ctx.invoke(
-    "magento/loaders/cart.ts",
-  );
+  return await cart(undefined, req, ctx);
 };
 
 export default action;

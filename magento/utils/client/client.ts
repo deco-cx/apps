@@ -6,6 +6,7 @@ import {
   MagentoCategory,
   MagentoProduct,
   NewsletterData,
+  SetShipping,
   ShippingMethod,
   Success,
   User,
@@ -131,6 +132,11 @@ export interface API {
       email: string;
       store_id: number;
     };
+  };
+
+  "POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote": {
+    response: [];
+    body: SetShipping;
   };
 
   "POST /:site/wishlist/index/add/": {

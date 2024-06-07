@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
-import { SetShipping } from "../../utils/client/types.ts";
+import { Cart, SetShipping } from "../../utils/client/types.ts";
 import { COUNTRY_ID } from "../../utils/constants.ts";
 import { getUserCookie, SESSION_COOKIE } from "../../utils/user.ts";
 
@@ -10,7 +10,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-) => {
+): Promise<Cart> => {
   const { clientAdmin, site } = ctx;
 
   const id = getUserCookie(req.headers);
@@ -27,7 +27,7 @@ const action = async (
   const quoteId = cartId ?? "";
   const countryId = cart?.minicart_improvements?.country_id ?? COUNTRY_ID;
 
-  return clientAdmin
+  clientAdmin
     ["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"]({
       site,
       site2: site,
@@ -35,6 +35,8 @@ const action = async (
       headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }),
       body: { ...props, isLoggedIn, quoteId, countryId },
     });
+
+  return await cart(undefined, req, ctx);
 };
 
 export default action;

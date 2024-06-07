@@ -12,10 +12,10 @@ import {
   filtersFromLoaderGraphQL,
   formatUrlSuffix,
   getCustomFields,
-  transformSortGraphQL,
-  typeChecker,
 } from "../../utils/utilsGraphQL.ts";
+import { STALE } from "../../../utils/fetch.ts";
 import { toProductGraphQL } from "../../utils/transform.ts";
+import { transformSortGraphQL, typeChecker } from "../../utils/utilsGraphQL.ts";
 
 export interface CommomProps {
   /**
@@ -66,9 +66,6 @@ export interface CustomProps extends Omit<CommomProps, "filter"> {
 
 export interface SuggestionsFromUrl extends CommomProps {}
 
-/**
- * @title Magento Integration - Product List
- */
 export interface Props {
   props:
     | TermProps
@@ -185,14 +182,14 @@ const fromProps = (
 };
 
 /**
- * @title Magento Integration - Product Listing loader
+ * @title Magento Integration - Product Shelves
  */
 async function loader(
   { props }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> {
-  const { clientGraphql, imagesQtd, site, useSuffix } = ctx;
+  const { clientGraphql, imagesQtd, site, useSuffix, enableCache } = ctx;
   const { customFields } = props;
   const url = new URL(req.url);
   const formatedProps = fromProps({ props }, url, useSuffix ? site : undefined);
@@ -201,10 +198,13 @@ async function loader(
   const { products } = await clientGraphql.query<
     ProductShelfGraphQL,
     ProductSearchInputs
-  >({
-    variables: { ...formatedProps },
-    ...GetProduct(customAttributes),
-  });
+  >(
+    {
+      variables: { ...formatedProps },
+      ...GetProduct(customAttributes),
+    },
+    enableCache ? STALE : undefined,
+  );
 
   if (!products.items || products.items?.length === 0) {
     return null;
@@ -219,5 +219,13 @@ async function loader(
     })
   );
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+  const inputs = fromProps(props, url);
+  return `${JSON.stringify(inputs)}-SHELVES`;
+};
 
 export default loader;

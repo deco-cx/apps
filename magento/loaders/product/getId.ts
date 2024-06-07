@@ -28,12 +28,7 @@ export default async function loader(
 ): ProductId {
   const { slug } = props;
 
-  const {
-    clientAdmin,
-    site,
-    storeId,
-    currencyCode = "BRL",
-  } = ctx;
+  const { clientAdmin, site, storeId, currencyCode = "BRL", enableCache } = ctx;
 
   const response = await clientAdmin["GET /rest/:site/V1/products-render-info"](
     {
@@ -49,7 +44,7 @@ export default async function loader(
         ],
       }),
     },
-    STALE,
+    enableCache ? STALE : undefined,
   ).then((res) => res.json());
 
   return response.items[0].id.toString();
