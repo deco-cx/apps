@@ -99,7 +99,7 @@ const snippet = (live: Live) => {
   };
 
   //@ts-ignore: "DomInspector not available"
-  const inspector = typeof DomInspector !== "undefined" &&
+  const _inspector = typeof DomInspector !== "undefined" &&
     //@ts-ignore: "DomInspector not available"
     new DomInspector(document.body, {
       outline: "1px dashed #2fd080",
