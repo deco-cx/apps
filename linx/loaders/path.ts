@@ -1,3 +1,4 @@
+import { redirect } from "deco/mod.ts";
 import { STALE } from "../../utils/fetch.ts";
 import { nullOnNotFound } from "../../utils/http.ts";
 import type { AppContext } from "../mod.ts";
@@ -63,14 +64,7 @@ async function loader(
     }
 
     const redirectUrl = new URL(redirectUrlRaw);
-    const redirectTo = `${redirectUrl.pathname.slice(1)}.json`;
-
-    const redirectResponse = await ctx.api["GET /*splat"](
-      { splat: redirectTo, ...params, ...props, ...defaults },
-      STALE,
-    ).then(res => res.json()).catch(nullOnNotFound);
-
-    return redirectResponse;
+    throw redirect(redirectUrl);
   }
 
   return response.json();
