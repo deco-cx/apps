@@ -4,14 +4,10 @@ import { AppContext } from "../../../mod.ts";
 import { toReviewAmasty } from "../../../utils/transform.ts";
 
 export interface Props {
-  reviews?: ReviewProps;
+  reviews?: ExtensionProps;
   products: Product[];
 }
 
-interface ReviewProps extends ExtensionProps {
-  maxRatingValue: number;
-  minRatingValue: number;
-}
 
 interface ExtensionProps {
   active: boolean;
@@ -31,7 +27,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 
 const reviewsExt = async (
   products: Product[],
-  props: ReviewProps,
+  props: ExtensionProps,
   ctx: AppContext
 ): Promise<Product[]> => {
   const STALE = ctx.enableCache ? DecoStale : undefined
