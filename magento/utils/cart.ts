@@ -2,6 +2,7 @@ import { getCookies } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import { Cart, MagentoCardPrices, MagentoProduct } from "./client/types.ts";
 import { toURL } from "./transform.ts";
+import { ImageObject } from "../../commerce/types.ts";
 
 const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -71,7 +72,7 @@ export const toCartItemsWithImages = (
         encodingFormat: "image",
         alternateName: images[0].file,
         url: `${toURL(imagesUrl)}${images[0].file}`,
-      }
+      } as ImageObject
       : null;
 
     const urlKey = productData.custom_attributes.find((item) =>
