@@ -1,6 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { Wishlist } from "../utils/client/types.ts";
-import { getUserCookie, SESSION_COOKIE } from "../utils/user.ts";
+import { getUserCookie } from "../utils/user.ts";
+import { SESSION_COOKIE } from "../utils/constants.ts";
 
 export default async function loader(
   _props: unknown,

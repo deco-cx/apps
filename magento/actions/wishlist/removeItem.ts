@@ -1,7 +1,8 @@
 import type { AppContext } from "../../mod.ts";
-import { getUserCookie, SESSION_COOKIE } from "../../utils/user.ts";
+import { getUserCookie } from "../../utils/user.ts";
 import { Wishlist } from "../../utils/client/types.ts";
 import wishlistLoader from "../../loaders/wishlist.ts";
+import { SESSION_COOKIE } from "../../utils/constants.ts";
 
 export interface Props {
   itemId: string;
