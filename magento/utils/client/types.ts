@@ -348,7 +348,7 @@ export interface Items {
   product_type: string;
   quote_id: string;
   url: string;
-  image: MediaEntry[];
+  images: MediaEntry[];
   price_total: number;
 }
 
@@ -400,6 +400,35 @@ export interface User {
   customer?: Customer;
   "carbono-customer"?: CarbonoCustomer;
   cart?: CartUser;
+  wishlist?: Wishlist;
+}
+
+export interface Wishlist {
+  counter: string;
+  items: Item[];
+  counter_number: number;
+  data_id: number;
+}
+
+export interface Item {
+  image: Image;
+  product_sku: string;
+  product_id: string;
+  product_url: string;
+  product_name: string;
+  product_price: string;
+  product_is_saleable_and_visible: boolean;
+  product_has_required_options: boolean;
+  add_to_cart_params: string;
+  delete_item_params: string;
+}
+
+export interface Image {
+  template: string;
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
 }
 
 export interface Customer {
@@ -413,6 +442,15 @@ export interface CarbonoCustomer {
   email?: string;
   customerId?: string;
   data_id: number;
+}
+
+export interface MinicartImprovements {
+  coupon_code: string | null;
+  country_id: string;
+  api_base_url: string;
+  is_logged_in: boolean;
+  quote_id: string;
+  base_url: string;
 }
 
 export interface CartUser {
@@ -431,9 +469,32 @@ export interface CartUser {
   subtotal_excl_tax: string;
   mpFSBCartTotal: unknown | null;
   data_id: number;
+  minicart_improvements: MinicartImprovements;
+}
+
+export interface SetShipping {
+  countryId?: string;
+  quoteId?: string;
+  postcode: string;
+  isLoggedIn?: boolean;
+  methodCode: string;
+  carrierCode: string;
 }
 
 export interface NewsletterData {
   sucess: boolean;
   message: string;
 }
+
+export interface Success {
+  success: boolean;
+  wishist: string;
+  message: string;
+}
+
+export interface Error {
+  success: boolean;
+  error: string;
+}
+
+export type WishListReponse = Success | Error;

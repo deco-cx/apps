@@ -52,7 +52,7 @@ export const toProduct = ({
   const offers = toOffer(
     product,
     options.minInstallmentValue,
-    options.maxInstallments
+    options.maxInstallments,
   );
   const sku = product.sku;
   const productID = product.id.toString();
@@ -63,7 +63,7 @@ export const toProduct = ({
       "@type": "PropertyValue",
       name: attr.attribute_code,
       value: String(attr.value),
-    })
+    }),
   );
 
   return {
@@ -113,7 +113,7 @@ export const toProduct = ({
 export const toOffer = (
   { price_info, extension_attributes, sku, currency_code }: MagentoProduct,
   minInstallmentValue: number,
-  maxInstallments: number
+  maxInstallments: number,
 ): Offer[] => {
   if (!price_info) {
     return [];
@@ -147,7 +147,7 @@ export const toOffer = (
         ...calculateInstallments(
           final_price,
           minInstallmentValue,
-          maxInstallments
+          maxInstallments,
         ),
       ],
       sku: sku,
@@ -158,7 +158,7 @@ export const toOffer = (
 const calculateInstallments = (
   finalPrice: number,
   minInstallmentValue: number,
-  maxInstallments: number
+  maxInstallments: number,
 ): UnitPriceSpecification[] => {
   const possibleInstallmentsCount =
     Math.floor(finalPrice / minInstallmentValue) || 1;
@@ -166,7 +166,7 @@ const calculateInstallments = (
     {
       length: Math.min(possibleInstallmentsCount, maxInstallments),
     },
-    (_v, i) => +(finalPrice / (i + 1)).toFixed(2)
+    (_v, i) => +(finalPrice / (i + 1)).toFixed(2),
   );
 
   return actualInstallmentsCount.map<UnitPriceSpecification>((value, i) => {
@@ -210,7 +210,7 @@ export const toBreadcrumbList = (
   categories: (MagentoCategory | null)[],
   isBreadcrumbProductName: boolean,
   product: Product,
-  url: URL
+  url: URL,
 ) => {
   if (isBreadcrumbProductName && categories?.length === 0) {
     return [
@@ -242,11 +242,11 @@ export const toBreadcrumbList = (
 
 export const toSeo = (
   customAttributes: CustomAttribute[],
-  productURL: string
+  productURL: string,
 ): Seo => {
   const findAttribute = (attrCode: string): string => {
     const attribute = customAttributes.find(
-      (attr) => attr.attribute_code === attrCode
+      (attr) => attr.attribute_code === attrCode,
     );
     if (!attribute) return "";
     if (Array.isArray(attribute.value)) {
@@ -273,7 +273,7 @@ export const toProductGraphQL = (
     imagesQtd: number;
     defaultPath?: string;
     customAttributes?: Array<string>;
-  }
+  },
 ): Product => {
   const {
     price_range,
@@ -288,15 +288,15 @@ export const toProductGraphQL = (
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
     stock_status === "IN_STOCK",
-    only_x_left_in_stock
+    only_x_left_in_stock,
   );
   const url = new URL(
     (defaultPath ?? "") + product.canonical_url ?? product.url_key,
-    originURL.origin
+    originURL.origin,
   ).href;
   const additionalProperty = toAddPropertiesGraphQL(
     product,
-    options.customAttributes
+    options.customAttributes,
   );
 
   return {
@@ -339,7 +339,7 @@ export const toProductGraphQL = (
 
 const toAddPropertiesGraphQL = (
   product: SimpleProductGraphQL,
-  customAttributes?: Array<string>
+  customAttributes?: Array<string>,
 ) =>
   customAttributes?.reduce<PropertyValue[]>((acc, att) => {
     const attributeOnProduct = product[att as keyof SimpleProductGraphQL];
@@ -359,7 +359,7 @@ const toAddPropertiesGraphQL = (
 
 export const toImageGraphQL = (
   media: ProductImage,
-  name: string
+  name: string,
 ): ImageObject => ({
   "@type": "ImageObject" as const,
   encodingFormat: "image",
@@ -370,7 +370,7 @@ export const toImageGraphQL = (
 export const toAggOfferGraphQL = (
   { maximum_price, minimum_price }: PriceRange,
   inStock: boolean,
-  stockLeft?: number
+  stockLeft?: number,
 ): AggregateOffer => ({
   "@type": "AggregateOffer",
   highPrice: maximum_price.regular_price.value,
@@ -382,7 +382,7 @@ export const toAggOfferGraphQL = (
 export const toOfferGraphQL = (
   minimum_price: ProductPrice,
   inStock: boolean,
-  stockLeft?: number
+  stockLeft?: number,
 ): Offer => ({
   "@type": "Offer",
   availability: inStock ? IN_STOCK : OUT_OF_STOCK,
@@ -402,8 +402,8 @@ export const toProductListingPageGraphQL = (
     originURL: URL;
     imagesQtd: number;
     defaultPath?: string;
-    customAttributes?: Array<string>
-  }
+    customAttributes?: Array<string>;
+  },
 ): ProductListingPage => {
   const { originURL, imagesQtd, defaultPath, customAttributes } = options;
   const category = categories.items[0];
@@ -419,17 +419,22 @@ export const toProductListingPageGraphQL = (
       description: category.description,
       image: category.image
         ? [
-            {
-              "@type": "ImageObject" as const,
-              url: category.image,
-              alternateName: category.name,
-            },
-          ]
+          {
+            "@type": "ImageObject" as const,
+            url: category.image,
+            alternateName: category.name,
+          },
+        ]
         : undefined,
     },
     filters: toFilters(products.aggregations, originURL),
     products: products.items.map((p) =>
-      toProductGraphQL(p, { originURL, imagesQtd, defaultPath, customAttributes })
+      toProductGraphQL(p, {
+        originURL,
+        imagesQtd,
+        defaultPath,
+        customAttributes,
+      })
     ),
     pageInfo: toPageInfo(pagination, products.total_count, originURL),
     sortOptions: toSortOptions(products.sort_fields),
@@ -443,7 +448,7 @@ export const toProductListingPageGraphQL = (
 
 const toItemElement = (
   category: SimpleCategoryGraphQL,
-  url: URL
+  url: URL,
 ): ListItem[] => {
   const { pathname, origin } = url;
   const fromBreadcrumbs = category?.breadcrumbs?.map<ListItem>((item, i) => {
@@ -469,7 +474,7 @@ const toItemElement = (
 
 const toFilters = (
   aggregations: Required<AggregationGraphQL>[],
-  originUrl: URL
+  originUrl: URL,
 ): Filter[] => {
   const url = new URL(originUrl);
   REMOVABLE_URL_SEARCHPARAMS.forEach((v) => url.searchParams.delete(v));
@@ -497,7 +502,7 @@ const toFilters = (
 const toFilterValues = (
   option: AggregationOptGraphQL,
   attributeCode: string,
-  baseUrl: URL
+  baseUrl: URL,
 ): FilterToggleValue => {
   const url = new URL(baseUrl);
   const selected = baseUrl.searchParams.has(attributeCode, option.value);
@@ -527,7 +532,7 @@ const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
 const toPageInfo = (
   { current_page, page_size, total_pages }: PageInfoGraphQL,
   total: number,
-  url: URL
+  url: URL,
 ): PageInfo => {
   const hasNextPage = current_page < total_pages;
   const hasPrevPage = current_page > 1;

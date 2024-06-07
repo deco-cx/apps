@@ -2,14 +2,17 @@ import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
 import type { Cart } from "../loaders/cart.ts";
+import { Wishlist } from "../utils/client/types.ts";
 
 export interface Context {
   cart: Cart;
+  wishlist: Wishlist | null;
 }
 
 const loading = signal<boolean>(true);
 const context = {
   cart: signal<Cart | null>(null),
+  wishlist: signal<Wishlist | null>(null),
 };
 
 let queue = Promise.resolve();
@@ -24,13 +27,14 @@ const enqueue = (
 
   queue = queue.then(async () => {
     try {
-      const { cart } = await cb(controller.signal);
+      const { cart, wishlist } = await cb(controller.signal);
 
       if (controller.signal.aborted) {
         throw { name: "AbortError" };
       }
 
       context.cart.value = cart || context.cart.value;
+      context.wishlist.value = wishlist || context.wishlist.value;
 
       loading.value = false;
     } catch (error) {
@@ -49,6 +53,7 @@ const enqueue = (
 const load = (signal: AbortSignal) =>
   invoke({
     cart: invoke.magento.loaders.cart(),
+    wishlist: invoke.magento.loaders.wishlist(),
   }, { signal });
 
 if (IS_BROWSER) {

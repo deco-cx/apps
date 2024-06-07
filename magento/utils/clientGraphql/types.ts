@@ -248,11 +248,11 @@ export interface FilterProps {
 }
 
 export interface CustomFields {
-  /** 
-   * @description Search for global custom fields defined in App settings 
+  /**
+   * @description Search for global custom fields defined in App settings
    * @default false
-   * */ 
-  active: boolean
-  /** @description Will override global custom fields defined in App settings */ 
-  overrideList?: string[]
+   */
+  active: boolean;
+  /** @description Will override global custom fields defined in App settings */
+  overrideList?: string[];
 }

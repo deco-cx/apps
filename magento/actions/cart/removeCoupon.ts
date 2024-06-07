@@ -2,31 +2,18 @@ import type { AppContext } from "../../mod.ts";
 import cart, { Cart } from "../../loaders/cart.ts";
 import { getCartCookie } from "../../utils/cart.ts";
 
-export interface Props {
-  qty: number;
-  sku: string;
-}
 const action = async (
-  props: Props,
+  _props: undefined,
   req: Request,
   ctx: AppContext,
 ): Promise<Cart> => {
-  const { qty, sku } = props;
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
 
-  const body = {
-    "cartItem": {
-      "qty": qty,
-      "quote_id": cartId,
-      "sku": sku,
-    },
-  };
-
-  await clientAdmin["POST /rest/:site/V1/carts/:quoteId/items"]({
-    quoteId: cartId,
+  await clientAdmin["DELETE /rest/:site/V1/carts/:cartId/coupons"]({
+    cartId,
     site: ctx.site,
-  }, { body });
+  });
 
   return await cart(undefined, req, ctx);
 };
