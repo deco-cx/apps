@@ -3,8 +3,8 @@ import { parseHeaders } from "../utils/parseHeaders.ts";
 import type {
   CustomerCreateMutation,
   CustomerCreateMutationVariables,
-} from "../graphql/storefront.graphql.gen.ts";
-import { CustomerCreate } from "../graphql/queries.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
+import { CustomerCreate } from "../utils/graphql/queries.ts";
 
 // https://wakecommerce.readme.io/docs/storefront-api-customercreate
 export default async function (
@@ -42,11 +42,11 @@ interface Props {
    */
   addressNumber: string;
   /**
-   * Data de nascimento (DD/MM/AAAA)
+   * Data de nascimento DD/MM/AAAA
    */
   birthDate: Date | string;
   /**
-   * CEP
+   * CEP com pontuação 00000-000
    */
   cep: string;
   /**
@@ -54,7 +54,7 @@ interface Props {
    */
   city: string;
   /**
-   * CPF
+   * CPF com pontuação 000.000.000-00
    */
   cpf: string;
   /**
@@ -94,7 +94,7 @@ interface Props {
    */
   primaryPhoneAreaCode: string;
   /**
-   * Telefone principal do cliente (xxxxx-xxxx)
+   * Telefone principal do cliente com pontuação xxxxx-xxxx
    */
   primaryPhoneNumber: string;
   /**
@@ -114,7 +114,7 @@ interface Props {
    */
   secondaryPhoneAreaCode?: string;
   /**
-   * Telefone secundário do cliente (xxxxx-xxxx)
+   * Telefone secundário do cliente com pontuação xxxxx-xxxx
    */
   secondaryPhoneNumber?: string;
   /**

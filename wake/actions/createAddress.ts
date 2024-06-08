@@ -3,8 +3,8 @@ import { parseHeaders } from "../utils/parseHeaders.ts";
 import type {
   CustomerAddressCreateMutation,
   CustomerAddressCreateMutationVariables,
-} from "../graphql/storefront.graphql.gen.ts";
-import { CustomerAddressCreate } from "../../checkout/graphql/queries.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
+import { CustomerAddressCreate } from "../utils/graphql/queries.ts";
 import getCustomerAcessToken from "../utils/getCustomerAcessToken.ts";
 
 // https://wakecommerce.readme.io/docs/customeraddresscreate

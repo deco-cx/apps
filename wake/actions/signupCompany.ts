@@ -1,8 +1,8 @@
-import { CustomerCreate } from "../graphql/queries.ts";
+import { CustomerCreate } from "../utils/graphql/queries.ts";
 import type {
   CustomerCreateMutation,
   CustomerCreateMutationVariables,
-} from "../graphql/storefront.graphql.gen.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
 import type { AppContext } from "../mod.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
 
@@ -42,7 +42,7 @@ interface Props {
    */
   addressNumber: string;
   /**
-   * CEP
+   * CEP com pontuação 00000-000
    */
   cep: string;
   /**
@@ -50,7 +50,7 @@ interface Props {
    */
   city: string;
   /**
-   * CNPJ
+   * CNPJ com pontuação 00.000.000/0000-00
    */
   cnpj: string;
   /**
@@ -86,7 +86,7 @@ interface Props {
    */
   primaryPhoneAreaCode: string;
   /**
-   * Telefone principal do cliente (xxxxx-xxxx)
+   * Telefone principal do cliente com pontuação xxxxx-xxxx
    */
   primaryPhoneNumber: string;
   /**
@@ -106,7 +106,7 @@ interface Props {
    */
   secondaryPhoneAreaCode?: string;
   /**
-   * Telefone secundário do cliente (xxxxx-xxxx)
+   * Telefone secundário do cliente com pontuação xxxxx-xxxx
    */
   secondaryPhoneNumber?: string;
   /**

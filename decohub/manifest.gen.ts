@@ -8,30 +8,29 @@ import * as $$$$$$$$$$$2 from "./apps/analytics.ts";
 import * as $$$$$$$$$$$3 from "./apps/anthropic.ts";
 import * as $$$$$$$$$$$4 from "./apps/blog.ts";
 import * as $$$$$$$$$$$5 from "./apps/brand-assistant.ts";
-import * as $$$$$$$$$$$6 from "./apps/checkout.ts";
-import * as $$$$$$$$$$$7 from "./apps/crux.ts";
-import * as $$$$$$$$$$$8 from "./apps/emailjs.ts";
-import * as $$$$$$$$$$$9 from "./apps/htmx.ts";
-import * as $$$$$$$$$$$10 from "./apps/implementation.ts";
-import * as $$$$$$$$$$$11 from "./apps/konfidency.ts";
-import * as $$$$$$$$$$$12 from "./apps/linx-impulse.ts";
-import * as $$$$$$$$$$$13 from "./apps/linx.ts";
-import * as $$$$$$$$$$$14 from "./apps/mailchimp.ts";
-import * as $$$$$$$$$$$15 from "./apps/nuvemshop.ts";
-import * as $$$$$$$$$$$16 from "./apps/power-reviews.ts";
-import * as $$$$$$$$$$$17 from "./apps/ra-trustvox.ts";
-import * as $$$$$$$$$$$18 from "./apps/resend.ts";
-import * as $$$$$$$$$$$19 from "./apps/shopify.ts";
-import * as $$$$$$$$$$$20 from "./apps/smarthint.ts";
-import * as $$$$$$$$$$$21 from "./apps/sourei.ts";
-import * as $$$$$$$$$$$22 from "./apps/typesense.ts";
-import * as $$$$$$$$$$$23 from "./apps/verified-reviews.ts";
-import * as $$$$$$$$$$$24 from "./apps/vnda.ts";
-import * as $$$$$$$$$$$25 from "./apps/vtex.ts";
-import * as $$$$$$$$$$$26 from "./apps/wake.ts";
-import * as $$$$$$$$$$$27 from "./apps/wap.ts";
-import * as $$$$$$$$$$$28 from "./apps/weather.ts";
-import * as $$$$$$$$$$$29 from "./apps/workflows.ts";
+import * as $$$$$$$$$$$6 from "./apps/crux.ts";
+import * as $$$$$$$$$$$7 from "./apps/emailjs.ts";
+import * as $$$$$$$$$$$8 from "./apps/htmx.ts";
+import * as $$$$$$$$$$$9 from "./apps/implementation.ts";
+import * as $$$$$$$$$$$10 from "./apps/konfidency.ts";
+import * as $$$$$$$$$$$11 from "./apps/linx-impulse.ts";
+import * as $$$$$$$$$$$12 from "./apps/linx.ts";
+import * as $$$$$$$$$$$13 from "./apps/mailchimp.ts";
+import * as $$$$$$$$$$$14 from "./apps/nuvemshop.ts";
+import * as $$$$$$$$$$$15 from "./apps/power-reviews.ts";
+import * as $$$$$$$$$$$16 from "./apps/ra-trustvox.ts";
+import * as $$$$$$$$$$$17 from "./apps/resend.ts";
+import * as $$$$$$$$$$$18 from "./apps/shopify.ts";
+import * as $$$$$$$$$$$19 from "./apps/smarthint.ts";
+import * as $$$$$$$$$$$20 from "./apps/sourei.ts";
+import * as $$$$$$$$$$$21 from "./apps/typesense.ts";
+import * as $$$$$$$$$$$22 from "./apps/verified-reviews.ts";
+import * as $$$$$$$$$$$23 from "./apps/vnda.ts";
+import * as $$$$$$$$$$$24 from "./apps/vtex.ts";
+import * as $$$$$$$$$$$25 from "./apps/wake.ts";
+import * as $$$$$$$$$$$26 from "./apps/wap.ts";
+import * as $$$$$$$$$$$27 from "./apps/weather.ts";
+import * as $$$$$$$$$$$28 from "./apps/workflows.ts";
 
 const manifest = {
   "apps": {
@@ -41,30 +40,29 @@ const manifest = {
     "decohub/apps/anthropic.ts": $$$$$$$$$$$3,
     "decohub/apps/blog.ts": $$$$$$$$$$$4,
     "decohub/apps/brand-assistant.ts": $$$$$$$$$$$5,
-    "decohub/apps/checkout.ts": $$$$$$$$$$$6,
-    "decohub/apps/crux.ts": $$$$$$$$$$$7,
-    "decohub/apps/emailjs.ts": $$$$$$$$$$$8,
-    "decohub/apps/htmx.ts": $$$$$$$$$$$9,
-    "decohub/apps/implementation.ts": $$$$$$$$$$$10,
-    "decohub/apps/konfidency.ts": $$$$$$$$$$$11,
-    "decohub/apps/linx-impulse.ts": $$$$$$$$$$$12,
-    "decohub/apps/linx.ts": $$$$$$$$$$$13,
-    "decohub/apps/mailchimp.ts": $$$$$$$$$$$14,
-    "decohub/apps/nuvemshop.ts": $$$$$$$$$$$15,
-    "decohub/apps/power-reviews.ts": $$$$$$$$$$$16,
-    "decohub/apps/ra-trustvox.ts": $$$$$$$$$$$17,
-    "decohub/apps/resend.ts": $$$$$$$$$$$18,
-    "decohub/apps/shopify.ts": $$$$$$$$$$$19,
-    "decohub/apps/smarthint.ts": $$$$$$$$$$$20,
-    "decohub/apps/sourei.ts": $$$$$$$$$$$21,
-    "decohub/apps/typesense.ts": $$$$$$$$$$$22,
-    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$23,
-    "decohub/apps/vnda.ts": $$$$$$$$$$$24,
-    "decohub/apps/vtex.ts": $$$$$$$$$$$25,
-    "decohub/apps/wake.ts": $$$$$$$$$$$26,
-    "decohub/apps/wap.ts": $$$$$$$$$$$27,
-    "decohub/apps/weather.ts": $$$$$$$$$$$28,
-    "decohub/apps/workflows.ts": $$$$$$$$$$$29,
+    "decohub/apps/crux.ts": $$$$$$$$$$$6,
+    "decohub/apps/emailjs.ts": $$$$$$$$$$$7,
+    "decohub/apps/htmx.ts": $$$$$$$$$$$8,
+    "decohub/apps/implementation.ts": $$$$$$$$$$$9,
+    "decohub/apps/konfidency.ts": $$$$$$$$$$$10,
+    "decohub/apps/linx-impulse.ts": $$$$$$$$$$$11,
+    "decohub/apps/linx.ts": $$$$$$$$$$$12,
+    "decohub/apps/mailchimp.ts": $$$$$$$$$$$13,
+    "decohub/apps/nuvemshop.ts": $$$$$$$$$$$14,
+    "decohub/apps/power-reviews.ts": $$$$$$$$$$$15,
+    "decohub/apps/ra-trustvox.ts": $$$$$$$$$$$16,
+    "decohub/apps/resend.ts": $$$$$$$$$$$17,
+    "decohub/apps/shopify.ts": $$$$$$$$$$$18,
+    "decohub/apps/smarthint.ts": $$$$$$$$$$$19,
+    "decohub/apps/sourei.ts": $$$$$$$$$$$20,
+    "decohub/apps/typesense.ts": $$$$$$$$$$$21,
+    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$22,
+    "decohub/apps/vnda.ts": $$$$$$$$$$$23,
+    "decohub/apps/vtex.ts": $$$$$$$$$$$24,
+    "decohub/apps/wake.ts": $$$$$$$$$$$25,
+    "decohub/apps/wap.ts": $$$$$$$$$$$26,
+    "decohub/apps/weather.ts": $$$$$$$$$$$27,
+    "decohub/apps/workflows.ts": $$$$$$$$$$$28,
   },
   "name": "decohub",
   "baseUrl": import.meta.url,

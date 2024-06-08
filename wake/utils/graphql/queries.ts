@@ -1312,3 +1312,121 @@ export const CustomerCreate = {
     }
   }`,
 };
+
+export const CustomerAuthenticatedLogin = {
+  query:
+    gql`mutation customerAuthenticatedLogin($input: String!, $pass: String!) {
+    customerAuthenticatedLogin(input:{input: $input, password: $pass}) {
+      isMaster
+      token
+      type
+      validUntil
+    }
+  }`,
+};
+
+export const CustomerAddressCreate = {
+  query: gql`mutation customerAddressCreate(
+     $customerAccessToken: String!,
+     $address: CreateCustomerAddressInput!,
+    ) {
+      customerAddressCreate(
+        customerAccessToken: $customerAccessToken,
+        address: $address,
+      ) {
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        state
+        street
+        referencePoint
+      }
+    }`,
+};
+
+export const CustomerAddressRemove = {
+  query:
+    gql`mutation customerAddressRemove($customerAccessToken: String!, $id: ID!) {
+      customerAddressRemove(customerAccessToken: $customerAccessToken, id: $id) {
+        isSuccess
+      }
+    }`,
+};
+
+export const CustomerAddressUpdate = {
+  query: gql`mutation customerAddressUpdate(
+     $id: ID!,
+     $customerAccessToken: String!,
+     $address: UpdateCustomerAddressInput!,
+    ) {
+      customerAddressUpdate(
+        customerAccessToken: $customerAccessToken,
+        address: $address,
+        id: $id
+      ) {
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        state
+        street
+        referencePoint
+      }
+    }`,
+};
+
+export const GetUserAddresses = {
+  fragments: [Customer],
+  query: gql`query GetUserAddresses($customerAccessToken: String) {
+    customer(customerAccessToken: $customerAccessToken) {
+      ...Customer,
+      addresses {
+        address
+        address2
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        referencePoint
+        state
+        street
+      }
+    }
+  }`,
+};
+
+export const CreateCheckout = {
+  query: gql`mutation createCheckout($products: [CheckoutProductItemInput]!) {
+      createCheckout(products: $products) {
+        checkoutId
+      }
+    }`,
+};
+
+export const CheckoutCustomerAssociate = {
+  query:
+    gql`mutation checkoutCustomerAssociate($checkoutId: Uuid!, $customerAccessToken: String!) {
+      checkoutCustomerAssociate(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) {
+        checkoutId
+      }
+    }`,
+};

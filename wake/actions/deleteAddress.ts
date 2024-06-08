@@ -3,8 +3,8 @@ import { parseHeaders } from "../utils/parseHeaders.ts";
 import type {
   CustomerAddressRemoveMutation,
   CustomerAddressRemoveMutationVariables,
-} from "../graphql/storefront.graphql.gen.ts";
-import { CustomerAddressRemove } from "../graphql/queries.ts";
+} from "../utils/graphql/storefront.graphql.gen.ts";
+import { CustomerAddressRemove } from "../utils/graphql/queries.ts";
 import getCustomerAcessToken from "../utils/getCustomerAcessToken.ts";
 
 // https://wakecommerce.readme.io/docs/customeraddressremove
