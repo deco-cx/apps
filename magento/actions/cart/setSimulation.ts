@@ -11,22 +11,24 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart> => {
+): Promise<Cart | null> => {
   const { clientAdmin, site } = ctx;
 
   const id = getUserCookie(req.headers);
   const cartId = getCartCookie(req.headers);
 
-  const { cart: cartResponse } = await clientAdmin["GET /:site/customer/section/load"]({
-    site,
-    sections: "cart",
-  }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) }).then((
-    res,
-  ) => res.json());
+  const { cart: cartResponse } = await clientAdmin
+    ["GET /:site/customer/section/load"]({
+      site,
+      sections: "cart",
+    }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) }).then((
+      res,
+    ) => res.json());
 
   const isLoggedIn = cartResponse?.minicart_improvements?.is_logged_in ?? false;
   const quoteId = cartId ?? "";
-  const countryId = cartResponse?.minicart_improvements?.country_id ?? COUNTRY_ID;
+  const countryId = cartResponse?.minicart_improvements?.country_id ??
+    COUNTRY_ID;
 
   clientAdmin
     ["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"]({

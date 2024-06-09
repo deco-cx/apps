@@ -1,18 +1,29 @@
 import type { AppContext } from "../../mod.ts";
 import cart, { Cart } from "../../loaders/cart.ts";
-import { getCartCookie } from "../../utils/cart.ts";
+import {
+  createCart,
+  getCartCookie,
+  postNewItem,
+  setCartCookie,
+} from "../../utils/cart.ts";
 
 export interface Props {
   qty: number;
   sku: string;
 }
+
+/**
+ * @title Magento Integration - Add item to cart
+ * @description Add item action
+ */
 const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart> => {
+): Promise<Cart | null> => {
   const { qty, sku } = props;
-  const { clientAdmin } = ctx;
+  const { clientAdmin, cartConfigs } = ctx;
+  const { createCartOnAddItem } = cartConfigs;
   const cartId = getCartCookie(req.headers);
 
   const body = {
@@ -23,11 +34,16 @@ const action = async (
     },
   };
 
-  await clientAdmin["POST /rest/:site/V1/carts/:quoteId/items"]({
-    quoteId: cartId,
-    site: ctx.site,
-  }, { body });
+  if (createCartOnAddItem && !cartId) {
+    const newCartId = (await createCart(ctx, req.headers)).id.toString()
+    if (!newCartId.length) return null;
+    body.cartItem.quote_id = newCartId;
+    await postNewItem(ctx.site, newCartId, body, clientAdmin);
+    setCartCookie(req.headers, newCartId);
+    return await cart(undefined, req, ctx);
+  }
 
+  await postNewItem(ctx.site, cartId, body, clientAdmin);
   return await cart(undefined, req, ctx);
 };
 

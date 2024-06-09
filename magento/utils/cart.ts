@@ -13,7 +13,19 @@ const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
 export const getCartCookie = (headers: Headers): string => {
   const cookies = getCookies(headers);
-  return decodeURIComponent(cookies[CART_COOKIE] || "").replace(/"/g, "");
+  if (cookies.length) {
+    return decodeURIComponent(cookies[CART_COOKIE] || "").replace(/"/g, "");
+  }
+
+  const setCookieHeader = headers.get("Set-Cookie");
+  if (setCookieHeader) {
+    const match = setCookieHeader.match(new RegExp(`${CART_COOKIE}=([^;]+)`));
+    if (match && match[1]) {
+      return decodeURIComponent(match[1]).replace(/"/g, "");
+    }
+  }
+
+  return "";
 };
 
 export const setCartCookie = (headers: Headers, cartId: string) => {
@@ -29,9 +41,7 @@ export async function createCart(
   headers: Headers,
 ) {
   const cartCookie = getCookies(headers)[CART_COOKIE];
-
   const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
-
   const sessionCookie = getCookies(headers)[SESSION_COOKIE];
 
   if (!sessionCookie) {
@@ -47,12 +57,14 @@ export async function createCart(
     const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
       site,
     }).then((res) => res.json());
+
     const cart = await clientAdmin["GET /rest/:site/V1/guest-carts/:cartId"]({
       cartId: tokenCart,
       site,
     }).then((res) => res.json());
+
     return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-      cartId: cart.id,
+      cartId: cart?.id,
       site,
     }).then((res) => res.json());
   } else {
@@ -63,6 +75,24 @@ export async function createCart(
   }
 }
 
+export async function postNewItem(
+  site: string,
+  cartId: string,
+  body: {
+    cartItem: {
+      qty: number;
+      quote_id: string;
+      sku: string;
+    };
+  },
+  clientAdmin: AppContext["clientAdmin"],
+): Promise<void> {
+  await clientAdmin["POST /rest/:site/V1/carts/:quoteId/items"]({
+    quoteId: cartId,
+    site: site,
+  }, { body });
+}
+
 export const toCartItemsWithImages = (
   cart: Cart,
   prices: MagentoCardPrices,
@@ -70,6 +100,7 @@ export const toCartItemsWithImages = (
   imagesUrl: string,
   url: string,
   site: string,
+  contProductImageInCart: number,
 ) => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
     map[productImage.sku] = productImage || [];
@@ -79,14 +110,14 @@ export const toCartItemsWithImages = (
   const itemsWithImages = cart.items.map((product) => {
     const images = productImagesMap[product.sku].media_gallery_entries;
     const productData = productImagesMap[product.sku];
-    const firstImage = images?.[0]
-      ? {
+    const selectedImages = images?.slice(0, contProductImageInCart).map(
+      (image) => ({
         "@type": "ImageObject" as const,
         encodingFormat: "image",
-        alternateName: images[0].file,
-        url: `${toURL(imagesUrl)}${images[0].file}`,
-      } as ImageObject
-      : null;
+        alternateName: image.file,
+        url: `${toURL(imagesUrl)}${image.file}`,
+      } as ImageObject),
+    );
 
     const urlKey = productData.custom_attributes.find((item) =>
       item.attribute_code === "url_key"
@@ -95,7 +126,7 @@ export const toCartItemsWithImages = (
     return {
       ...product,
       price_total: product.qty * product.price,
-      images: firstImage ? [firstImage] : [],
+      images: selectedImages,
       url: `${url}/${site}/${urlKey}`,
     };
   });
