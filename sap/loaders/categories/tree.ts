@@ -1,13 +1,14 @@
 import type { SiteNavigationElement } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
+import { FieldsList } from "../../utils/client/types.ts";
 
 export interface Props {
   /**
    * @description Response configuration. This is the list of fields that should be returned in the response body. Examples: BASIC, DEFAULT, FULL
    *  @default DEFAULT
    */
-  fields?: "BASIC" | "DEFAULT" | "FULL";
+  fields?: FieldsList;
 }
 
 const loader = async (

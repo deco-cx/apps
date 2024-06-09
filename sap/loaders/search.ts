@@ -41,7 +41,7 @@ export interface Props {
 const searchLoader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<SearchResponse> => {
   const { api } = ctx;
   const {
@@ -57,7 +57,7 @@ const searchLoader = async (
   const facetsQuery = facets
     .reduce(
       (prev, curr) => [...prev, `${curr.key}:${curr.value}`],
-      [] as string[]
+      [] as string[],
     )
     .join(":");
 
@@ -65,7 +65,7 @@ const searchLoader = async (
 
   const data: SearchResponse = await api["GET /products/search"](
     { currentPage, fields, query, pageSize, searchQueryContext },
-    STALE
+    STALE,
   ).then((res) => res.json());
 
   return data;
