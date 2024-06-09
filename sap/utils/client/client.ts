@@ -1,15 +1,12 @@
-import { Catalogs, Product, Sort } from "./types.ts";
+import { Catalogs, FieldsList, SearchResponse, Sort } from "./types.ts";
 
 export interface API {
-  /**
-   * @docs https://fakestoreapi.com/docs#p-all
-   * @docs https://fakestoreapi.com/docs#p-limit
-   * @docs https://fakestoreapi.com/docs#p-sort
-   */
-  "GET /products": {
-    response: Product[];
+  "GET /products/search": {
+    response: SearchResponse;
     searchParams: {
-      limit?: number;
+      currentPage?: number;
+      fields?: FieldsList;
+      pageSize?: number;
       sort?: Sort;
     };
   };
@@ -19,7 +16,7 @@ export interface API {
       catalogs: Catalogs;
     };
     searchParams: {
-      fields?: "BASIC" | "DEFAULT" | "FULL";
+      fields?: FieldsList;
     };
   };
 }
