@@ -18,15 +18,16 @@ export const getCartCookie = (headers: Headers): string => {
 
 export const setCartCookie = (headers: Headers, cartId: string) => {
   const encodedCartId = encodeURIComponent(`"${cartId}"`);
-  const cookie = `${CART_COOKIE}=${encodedCartId}; Path=/; Expires=${
-    new Date(Date.now() + ONE_WEEK_MS).toUTCString()
-  }; SameSite=Lax`;
+  const cookie = `${CART_COOKIE}=${encodedCartId}; Path=/; Expires=${new Date(
+    Date.now() + ONE_WEEK_MS
+  ).toUTCString()}; SameSite=Lax`;
   headers.append("Set-Cookie", cookie);
 };
 
 export async function createCart(
   { clientAdmin, site }: AppContext,
   headers: Headers,
+  forceNewCart = false
 ) {
   const cartCookie = getCookies(headers)[CART_COOKIE];
 
@@ -43,25 +44,32 @@ export async function createCart(
     });
   }
 
-  if (!cartCookie && !customerCookie) {
-    const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
-      site,
-    }).then((res) => res.json());
-    const cart = await clientAdmin["GET /rest/:site/V1/guest-carts/:cartId"]({
-      cartId: tokenCart,
-      site,
-    }).then((res) => res.json());
-    return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-      cartId: cart.id,
-      site,
-    }).then((res) => res.json());
-  } else {
-    return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-      cartId: cartCookie,
-      site,
-    }).then((res) => res.json());
+  if ((!cartCookie && !customerCookie) || forceNewCart) {
+    return createNewCart({ clientAdmin, site });
   }
+
+  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
+    cartId: cartCookie,
+    site,
+  }).then((res) => res.json());
 }
+
+const createNewCart = async ({
+  clientAdmin,
+  site,
+}: Pick<AppContext, "clientAdmin" | "site">) => {
+  const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
+    site,
+  }).then((res) => res.json());
+  const cart = await clientAdmin["GET /rest/:site/V1/guest-carts/:cartId"]({
+    cartId: tokenCart,
+    site,
+  }).then((res) => res.json());
+  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
+    cartId: cart.id,
+    site,
+  }).then((res) => res.json());
+};
 
 export const toCartItemsWithImages = (
   cart: Cart,
@@ -69,7 +77,7 @@ export const toCartItemsWithImages = (
   productMagento: MagentoProduct[],
   imagesUrl: string,
   url: string,
-  site: string,
+  site: string
 ) => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
     map[productImage.sku] = productImage || [];
@@ -80,16 +88,16 @@ export const toCartItemsWithImages = (
     const images = productImagesMap[product.sku].media_gallery_entries;
     const productData = productImagesMap[product.sku];
     const firstImage = images?.[0]
-      ? {
-        "@type": "ImageObject" as const,
-        encodingFormat: "image",
-        alternateName: images[0].file,
-        url: `${toURL(imagesUrl)}${images[0].file}`,
-      } as ImageObject
+      ? ({
+          "@type": "ImageObject" as const,
+          encodingFormat: "image",
+          alternateName: images[0].file,
+          url: `${toURL(imagesUrl)}${images[0].file}`,
+        } as ImageObject)
       : null;
 
-    const urlKey = productData.custom_attributes.find((item) =>
-      item.attribute_code === "url_key"
+    const urlKey = productData.custom_attributes.find(
+      (item) => item.attribute_code === "url_key"
     )?.value;
 
     return {
