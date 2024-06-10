@@ -9,6 +9,7 @@ export type PageType =
   | "checkout"
   | "notFound"
   | "product"
+  | "general"
   | "Others";
 
 export type ComplexPageType =
@@ -21,6 +22,7 @@ export type ComplexPageType =
   | Checkout
   | NotFound
   | Product
+  | General
   | Others;
 
 export interface Category {
@@ -92,6 +94,13 @@ export interface Others {
    * @default other
    */
   type?: "others";
+}
+
+export interface General {
+  /**
+   * @default general
+   */
+  type?: "general";
 }
 
 export interface Banner {
