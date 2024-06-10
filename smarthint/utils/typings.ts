@@ -27,80 +27,80 @@ export type ComplexPageType =
 
 export interface Category {
   /**
-   * @default category
+   * @hide true
    */
-  type?: "category";
+  readonly type: "category";
 }
 
 export interface Search {
   /**
-   * @default search
+   * @hide true
    */
-  type?: "search";
+  readonly type: "search";
 }
 
 export interface SearchWithResult {
   /**
-   * @default searchWithResult
+   * @hide true
    */
-  type?: "searchWithResult";
+  readonly type: "searchWithResult";
 }
 
 export interface Home {
   /**
-   * @default home
+   * @hide true
    */
-  type?: "home";
+  readonly type: "home";
 }
 
 export interface Cart {
   /**
-   * @default cart
+   * @hide true
    */
-  type?: "cart";
+  readonly type: "cart";
 }
 
 export interface EmptyCart {
   /**
-   * @default emptycart
+   * @hide true
    */
-  type?: "emptycart";
+  readonly type: "emptycart";
 }
 
 export interface Checkout {
   /**
-   * @default checkout
+   * @hide true
    */
-  type?: "checkout";
+  readonly type: "checkout";
 }
 
 export interface NotFound {
   /**
-   * @default notfound
+   * @hide true
    */
-  type?: "notfound";
+  readonly type: "notfound";
 }
 
 export interface Product {
   /**
-   * @default product
+   * @hide true
    */
-  type?: "product";
+  readonly type: "product";
   page: ProductDetailsPage | null;
 }
 
 export interface Others {
   /**
-   * @default other
+   * @hide true
    */
-  type?: "others";
+  readonly type: "others";
 }
 
 export interface General {
   /**
-   * @default general
+   * @hide true
    */
-  type?: "general";
+  readonly type: "general";
 }
 
 export interface Banner {
