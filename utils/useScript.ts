@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 /**
  * By importing this file, you will get a `wasm` module added to your server
  * while it's booting. If it fails to load, your server will hang indefinitely.
@@ -8,11 +9,13 @@
 import initSwc, {
   transformSync,
 } from "https://cdn.jsdelivr.net/npm/@swc/wasm-web/wasm-web.js";
-import { LRU } from "../../utils/lru.ts";
+import { LRU } from "./lru.ts";
 
 await initSwc(
   "https://cdn.jsdelivr.net/npm/@swc/wasm-web@1.5.25/wasm-web_bg.wasm",
 );
+
+const verbose = !!Deno.env.get("SCRIPT_MINIFICATION_DEBUG");
 
 const cache = LRU(100);
 
@@ -30,16 +33,17 @@ const minify = (js: string) => {
 
   cache.set(js, code);
 
-  console.log(
-    `[htmx]: ${duration}ms minifiying script ${
-      js.slice(0, 38).replace(/(\n|\s)+/g, " ")
-    }...`,
-  );
+  if (verbose) {
+    console.log(
+      `[script-minification]: ${duration}ms minifiying script ${
+        js.slice(0, 38).replace(/(\n|\s)+/g, " ")
+      }...`,
+    );
+  }
 
   return code;
 };
 
-// deno-lint-ignore no-explicit-any
 export function useScript<T extends (...args: any[]) => any>(
   fn: T,
   ...params: Parameters<T>
@@ -48,4 +52,11 @@ export function useScript<T extends (...args: any[]) => any>(
   const minified = cache.get(javascript) || minify(javascript);
 
   return `(${minified})(${params.map((p) => JSON.stringify(p)).join(", ")})`;
+}
+
+export function useScriptAsDataURI<T extends (...args: any[]) => any>(
+  fn: T,
+  ...params: Parameters<T>
+) {
+  return `data:text/javascript,${encodeURIComponent(useScript(fn, ...params))}`;
 }
