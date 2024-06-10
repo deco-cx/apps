@@ -2,18 +2,13 @@ import { MatchContext } from "deco/blocks/matcher.ts";
 import { MapWidget } from "../../admin/widgets.ts";
 import { haversine } from "../utils/location.ts";
 
-
 export interface Coordinate {
   latitude: number;
   longitude: number;
   radius?: number;
 }
 
-/**
- * @title Map
- */
 export interface Map {
-
   /**
    * @title Area selection
    * @example -7.27820,-35.97630,2000
@@ -21,11 +16,7 @@ export interface Map {
   coordinates?: MapWidget;
 }
 
-/**
- * @title {{{city}}} {{{regionCode}}} {{{country}}}
- */
 export interface Location {
-
   /**
    * @title City
    * @example São Paulo
@@ -47,16 +38,41 @@ export interface Props {
   /**
    * @title Include Locations
    */
-  includeLocations?: Location[] | Map[];
+  includeLocations?: (Location | Map)[];
   /**
    * @title Exclude Locations
    */
-  excludeLocations?: Location[] | Map[];
+  excludeLocations?: (Location | Map)[];
 }
 
+export interface MapLocation {
+  /**
+     * @title City
+     * @example São Paulo
+     */
+  city?: string;
+  /**
+   * @title Region Code
+   * @example SP
+   */
+  regionCode?: string;
+  /**
+   * @title Country
+   * @example BR
+   */
+  country?: string;
+
+  /**
+   * @title Area selection
+   * @example -7.27820,-35.97630,2000
+   */
+  coordinates?: MapWidget;
+}
+
+
 const matchLocation =
-  (defaultNotMatched = true, source: Location | Map) =>
-  (target: Location | Map) => {
+  (defaultNotMatched = true, source: MapLocation) =>
+  (target: MapLocation) => {
     if (
       !target.regionCode &&
       !target.city &&
@@ -72,6 +88,7 @@ const matchLocation =
       !target.coordinates ||
       haversine(source.coordinates, target.coordinates) <=
         Number(target.coordinates.split(",")[2]);
+
     result &&= !target.city || target.city === source.city;
     result &&= !target.country || target.country === source.country;
     return result;
@@ -82,7 +99,7 @@ const escaped = ({
   country,
   regionCode,
   coordinates,
-}: Location): Location => {
+}: MapLocation): MapLocation => {
   return {
     coordinates,
     regionCode,
@@ -121,5 +138,3 @@ export default function MatchLocation(
     includeLocations?.some(matchLocation(true, escaped(userLocation))) ?? true
   );
 }
-
-
