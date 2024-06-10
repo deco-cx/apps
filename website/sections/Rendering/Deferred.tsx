@@ -97,4 +97,15 @@ const Deferred = (props: Props) => {
   );
 };
 
+export const onBeforeResolveProps = (props: Props) => {
+  if (!props.display) {
+    return {
+      ...props,
+      sections: [],
+    };
+  }
+
+  return props;
+};
+
 export default Deferred;
