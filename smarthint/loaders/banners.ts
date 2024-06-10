@@ -3,7 +3,10 @@ import { Banner, PageType } from "../utils/typings.ts";
 
 export interface Props {
   pageType: PageType;
-  pageIdentifier: string;
+  /**
+   * @hide
+   */
+  pageIdentifier?: string;
   channel: string;
 }
 
@@ -13,11 +16,17 @@ export interface Props {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<Banner[] | null> => {
   const { api, shcode, cluster } = ctx;
-  const { pageType, pageIdentifier, channel } = props;
+  const { pageType, pageIdentifier: pageIdentifierProp, channel } = props;
+
+  const url = new URL(req.url);
+
+  const pageIdentifier = pageIdentifierProp ?? url.hostname == "localhost"
+    ? ""
+    : new URL(url.pathname, url.origin)?.href.replace("/smarthint", ""); // todo remove
 
   const data = await api["GET /:cluster/banner/bannerByPage"]({
     cluster,

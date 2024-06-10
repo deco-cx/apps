@@ -1,9 +1,16 @@
 import { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 import { Filter } from "./searchListPage.ts";
-import { PageType } from "../utils/typings.ts";
-import { Product } from "../../commerce/types.ts";
+import { ComplexPageType } from "../utils/typings.ts";
+import { Product, ProductListingPage } from "../../commerce/types.ts";
 import { getUserHash } from "../utils/parseHeaders.ts";
+
+/**
+ * @title Product
+ */
+export interface Teste {
+  page: ProductListingPage;
+}
 
 export interface Props {
   /**
@@ -19,7 +26,7 @@ export interface Props {
    */
   products?: string[];
   position: string;
-  pagetype: PageType;
+  pagetype: ComplexPageType;
   /**
    * @default padrao
    */
@@ -55,7 +62,7 @@ const loader = async (
     filter = [],
     position,
     products: productsParam = [],
-    pagetype = "home",
+    pagetype,
     channel,
   } = props;
 
@@ -65,7 +72,7 @@ const loader = async (
 
   const pageIdentifier = url.hostname == "localhost"
     ? ""
-    : new URL(url.pathname, url.origin)?.href;
+    : new URL(url.pathname, url.origin)?.href.replace("/smarthint", ""); // todo remove
 
   const filterString = filter.length
     ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
@@ -74,7 +81,12 @@ const loader = async (
 
   const productsString = productsParam.length
     ? productsParam.map((productId) => `productid:${productId}`).join("&")
+    : pagetype.type == "product" && pagetype.page
+    ? `productId:${(pagetype.page.product.isVariantOf?.productGroupID ??
+      pagetype.page.product.productID)}`
     : undefined;
+
+  console.log(pagetype);
 
   const data = await recs["GET /recommendationByPage/withProducts"]({
     shcode,
@@ -83,7 +95,7 @@ const loader = async (
     channel,
     filter: filterString,
     pageIdentifier,
-    pagetype,
+    pagetype: pagetype.type,
     position,
     products: productsString,
   }).then((r) => r.json());

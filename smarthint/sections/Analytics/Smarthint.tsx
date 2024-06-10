@@ -1,4 +1,3 @@
-import { SelectItemEvent } from "../../../commerce/types.ts";
 import { scriptAsDataURI } from "../../../utils/dataURI.ts";
 import { AppContext } from "../../mod.ts";
 import { Props as ClickProps } from "../../actions/click.ts";
@@ -12,8 +11,9 @@ declare global {
   }
 }
 
-const listner = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
-  console.log({ url });
+const listener = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
+  const SESSION_COOKIE = "SH_SESSION";
+
   const click = (
     {
       productId,
@@ -31,7 +31,7 @@ const listner = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
     const date = new Date().toLocaleString().replace(",", "");
     const origin = new URL(url).origin;
 
-    const session = getCookie("SH_SESSION") ?? "";
+    const session = getCookie(SESSION_COOKIE) ?? "";
 
     clickUrl.searchParams.set("clickFeature", clickFeature);
     clickUrl.searchParams.set("shcode", shcode);
@@ -57,26 +57,11 @@ const listner = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
       clickUrl.searchParams.set("shippingTime", String(shippingTime));
     }
 
-    console.log("smarthint", clickUrl);
-
     fetch(clickUrl);
   };
 
   const setup = () => {
-    console.log("smarthint");
-
     globalThis.window.smarthint = { click };
-
-    globalThis.window.DECO.events.subscribe((event) => {
-      // console.log(event?.name)
-
-      // if(isSelectItemEvent(event)){
-      //   click({
-      //     productId: event.params.items[0].item_group_id,
-      //     position: event.params.items[0].index
-      //   })
-      // }
-    });
   };
 
   function getCookie(name: string): string | null {
@@ -150,21 +135,20 @@ const listner = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
   }
 
   function setupSession() {
-    const sessionValue = getCookie("SH_SESSION") ?? createUserToken();
+    const sessionValue = getCookie(SESSION_COOKIE) ?? createUserToken();
 
-    setupCookieResetOnInteraction("SH_SESSION", sessionValue, 30 * 60 * 1000);
+    setupCookieResetOnInteraction(SESSION_COOKIE, sessionValue, 30 * 60 * 1000);
   }
 
   const pageView = () => {
     globalThis.window.addEventListener("load", () => {
-      console.log("pageview call");
       const pageUrl = new URL(url);
       const origin = pageUrl.origin;
       const date = new Date().toLocaleString().replace(",", "");
 
       const pageViewUrl = new URL("https://recs.smarthint.co/track/pageView");
 
-      const session = getCookie("SH_SESSION") ?? "";
+      const session = getCookie(SESSION_COOKIE) ?? "";
 
       pageViewUrl.searchParams.set("shcode", shcode);
       pageViewUrl.searchParams.set("url", pageUrl.href);
@@ -189,7 +173,7 @@ function Analytics(props: ReturnType<typeof loader>) {
     <script
       defer
       src={scriptAsDataURI(
-        listner,
+        listener,
         props,
       )}
     />
@@ -203,17 +187,9 @@ export interface Props {
 export const loader = (props: Props, req: Request, ctx: AppContext) => {
   const { shcode } = ctx;
 
-  const tempurl = new URL(
-    "https://deco-sites-prohall--smarthint.deno.dev/smarthint/home",
-  );
-  tempurl.host = "www.lojaprohall.com.br";
-  tempurl.port = "";
-
-  console.log(tempurl);
-
   return {
     shcode,
-    url: tempurl.href,
+    url: req.url,
     pageType: props.pageType,
   };
 };

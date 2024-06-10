@@ -6,6 +6,7 @@ import {
   Product,
   ProductLeaf,
   SortOption,
+  UnitPriceSpecification,
 } from "../../commerce/types.ts";
 
 const AvailabilityMap: Record<string, ItemAvailability> = {
@@ -18,9 +19,198 @@ const ConditionMap: Record<string, OfferItemCondition> = {
 };
 
 export const toProduct = (product: any): Product => {
+  const priceSpecification: UnitPriceSpecification[] = [];
+
+  priceSpecification.push({
+    "@type": "UnitPriceSpecification" as const,
+    priceType: "https://schema.org/ListPrice" as const,
+    price: product.Price,
+  });
+  if (product.HasSalePrice) {
+    priceSpecification.push({
+      "@type": "UnitPriceSpecification" as const,
+      priceType: "https://schema.org/SalePrice" as const,
+      price: product.SalePrice,
+    });
+  }
+  if (product.HasBankSlipPrice) {
+    priceSpecification.push({
+      "@type": "UnitPriceSpecification" as const,
+      priceType: "https://schema.org/InvoicePrice" as const,
+      price: product.BankSlipPrice,
+    });
+  }
+  if (product.HasInstallment) {
+    priceSpecification.push({
+      "@type": "UnitPriceSpecification" as const,
+      priceType: "https://schema.org/SalePrice" as const,
+      priceComponentType: "https://schema.org/Installment",
+      billingDuration: product.Installment,
+      billingIncrement: product.InstallmentAmount,
+      price: product.Installment * product.InstallmentAmount,
+    });
+  }
+  if (product.HasSecondInstallment) {
+    priceSpecification.push({
+      "@type": "UnitPriceSpecification" as const,
+      priceType: "https://schema.org/SalePrice" as const,
+      priceComponentType: "https://schema.org/Installment",
+      billingDuration: product.SecondInstallment,
+      billingIncrement: product.SecondInstallmentAmount,
+      price: product.SecondInstallment * product.SecondInstallmentAmount,
+    });
+  }
+
+  const additionalProperty = [];
+
+  if (product.Gender) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "Gender",
+      value: product.Gender,
+    });
+  }
+  if (product.Mpn) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "Mpn",
+      value: product.Mpn,
+    });
+  }
+  if (product.MpnFather) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "MpnFather",
+      value: product.MpnFather,
+    });
+  }
+  if (product.Score) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "Score",
+      value: product.Score,
+    });
+  }
+  if (product.SellsCount) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "SellsCount",
+      value: product.SellsCount,
+    });
+  }
+  if (product.ViewsCount) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "ViewsCount",
+      value: product.ViewsCount,
+    });
+  }
+  if (product.HasPromotion) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "HasPromotion",
+      value: product.HasPromotion,
+    });
+  }
+  if (product.FirstCategory) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "FirstCategory",
+      value: product.FirstCategory,
+    });
+  }
+  if (product.LastCategory) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "LastCategory",
+      value: product.LastCategory,
+    });
+  }
+  if (product.PurchasePercentage) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "PurchasePercentage",
+      value: product.PurchasePercentage,
+    });
+  }
+  if (product.CustomWeight) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "CustomWeight",
+      value: product.CustomWeight,
+    });
+  }
+  if (product.LowerPrice) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "LowerPrice",
+      value: product.LowerPrice,
+    });
+  }
+  if (product.isHighlightProduct) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "isHighlightProduct",
+      value: product.isHighlightProduct,
+    });
+  }
+  if (product.LowerPriceDate) {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "LowerPriceDate",
+      value: product.LowerPriceDate,
+    });
+  }
+  product.Tags.map((tag: string) => {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "Tag",
+      value: tag,
+    });
+  });
+  product.Categories.map((category: string) => {
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "Categories",
+      value: category,
+    });
+  });
+
+  const firstAvailable =
+    product.Specifications.find((specification) =>
+      specification.availability == "in stock"
+    ) ?? 0;
+
+  const offers = {
+    "@type": "AggregateOffer" as const,
+    highPrice: product.Price,
+    lowPrice: product.HasSalePrice ? product.SalePrice : product.Price,
+    offerCount: priceSpecification.length,
+    offers: [
+      {
+        "@type": "Offer" as const,
+        availability: AvailabilityMap[firstAvailable.availability],
+        price: product.SalePrice,
+        inventoryLevel: {
+          value: 1000, //TODO
+        },
+        itemCondition: ConditionMap[product.Condition],
+        priceSpecification,
+      },
+    ],
+  };
+
+  const aggregateRating = product.ReviewStars > 0
+    ? {
+      "@type": "AggregateRating" as const,
+      ratingValue: product.ReviewStars,
+    }
+    : undefined;
+
   return {
     "@type": "Product",
-    productID: product.ProductId,
+    productID: firstAvailable.specificationId,
+    inProductGroupWithID: product.ProductId,
     name: product.Title,
     sku: product.Sku,
     description: product.Description,
@@ -29,105 +219,30 @@ export const toProduct = (product: any): Product => {
       "@type": "Brand",
       name: product.Brand,
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: product.ReviewStars,
-    },
+    aggregateRating,
     category: product.ProductType,
     image: [
       {
         "@type": "ImageObject",
         url: product.ImageLink,
       },
+      {
+        "@type": "ImageObject",
+        name: "SecondImageLink",
+        url: product.SecondImageLink,
+      },
       ...product.AdicionalImageLink?.map((image: string) => ({
         "@type": "ImageObject",
         url: image,
       })),
+      {
+        "@type": "ImageObject",
+        name: "ImageLinkSmall",
+        url: product.ImageLinkSmall,
+      },
     ],
-    offers: {
-      "@type": "AggregateOffer",
-      highPrice: product.Price,
-      lowPrice: product.SalePrice,
-      offerCount: 4, //TODO
-      offers: [{
-        "@type": "Offer",
-        availability: AvailabilityMap[product.Availability], // TODO fix data
-        price: product.SalePrice,
-        inventoryLevel: {
-          value: 1000, //TODO
-        },
-        itemCondition: ConditionMap[product.Condition],
-        priceSpecification: [
-          {
-            "@type": "UnitPriceSpecification",
-            priceType: "https://schema.org/ListPrice",
-            price: product.Price,
-          },
-          {
-            "@type": "UnitPriceSpecification",
-            priceType: "https://schema.org/SalePrice",
-            price: product.SalePrice,
-          },
-          {
-            "@type": "UnitPriceSpecification",
-            priceType: "https://schema.org/InvoicePrice",
-            price: product.BankSlipPrice,
-          },
-          {
-            "@type": "UnitPriceSpecification",
-            priceType: "https://schema.org/SalePrice",
-            billingIncrement: product.InstallmentAmount,
-            price: product.BankSlipPrice,
-            billingDuration: product.Installment,
-          },
-        ],
-      }],
-    },
-    additionalProperty: [
-      {
-        "@type": "PropertyValue",
-        name: "Gender",
-        value: product.Gender,
-      },
-      {
-        "@type": "PropertyValue",
-        name: "Mpn",
-        value: product.Mpn,
-      },
-      {
-        "@type": "PropertyValue",
-        name: "MpnFather",
-        value: product.MpnFather,
-      },
-      {
-        "@type": "PropertyValue",
-        name: "SellsCount",
-        value: product.SellsCount,
-      },
-      {
-        "@type": "PropertyValue",
-        name: "ViewsCount",
-        value: product.ViewsCount,
-      },
-      ...product.Tags.map((tag: string) => ({
-        "@type": "PropertyValue",
-        name: "Tag",
-        value: tag,
-      })),
-      ...product.Categories.map((category: string) => ({
-        "@type": "PropertyValue",
-        name: "Categories",
-        value: category,
-      })),
-      // ...product.AditionalFeatures.map((
-      //   { key: value }: Record<string, string>,
-      // ) => ({
-      //   "@type": "PropertyValue",
-      //   name: "AditionalFeatures",
-      //   value,
-      //   alternateName: key,
-      // })),
-    ],
+    offers,
+    additionalProperty,
     isVariantOf: {
       "@type": "ProductGroup",
       additionalProperty: [],
@@ -137,11 +252,18 @@ export const toProduct = (product: any): Product => {
         productID: specification.SpecificationId,
         sku: specification.Sku,
         additionalProperty: specification.Variations?.map((variation) => ({
-          "@type": "PropertyValue",
+          "@type": "PropertyValue" as const,
           name: "Tamanho",
           value: variation?.ValueInt ?? variation?.ValueDouble ??
             variation?.ValueString,
         })),
+        offers: {
+          ...offers,
+          offers: [{
+            ...offers.offers[0],
+            availability: AvailabilityMap[specification.availability],
+          }],
+        },
       })),
     },
   };
