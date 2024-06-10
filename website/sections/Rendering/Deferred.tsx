@@ -1,4 +1,4 @@
-import type { Section, SectionProps } from "deco/blocks/section.ts";
+import type { Section } from "deco/blocks/section.ts";
 import { usePartialSection } from "deco/hooks/usePartialSection.ts";
 import { useId } from "preact/hooks";
 import { scriptAsDataURI } from "../../../utils/dataURI.ts";
@@ -95,6 +95,17 @@ const Deferred = (props: Props) => {
       />
     </>
   );
+};
+
+export const onBeforeResolveProps = (props: Props) => {
+  if (!props.display) {
+    return {
+      ...props,
+      sections: [],
+    };
+  }
+
+  return props;
 };
 
 export default Deferred;

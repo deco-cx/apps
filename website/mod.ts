@@ -128,7 +128,6 @@ export interface Props {
   /**
    * @title Flavor
    * @description The flavor of the website
-   * @default {"framework":"fresh"}
    */
   flavor?: Fresh | HTMX;
 }

@@ -32,7 +32,7 @@ export const fromSavedAESKey = async (
 ): Promise<AESKey> => {
   const importedKey = await crypto.subtle.importKey(
     "raw",
-    key.buffer,
+    key.buffer as ArrayBuffer,
     "AES-CBC",
     true,
     ["encrypt", "decrypt"],
