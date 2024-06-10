@@ -1,6 +1,5 @@
 import type { Section } from "deco/blocks/section.ts";
 import { useSection } from "deco/hooks/useSection.ts";
-import { AppContext } from "../mod.ts";
 
 /**
  * @titleBy type
@@ -60,11 +59,15 @@ const Deferred = (props: Props) => {
   );
 };
 
-export const loader = (props: Props, _req: Request, ctx: AppContext) => {
-  return {
-    ...props,
-    loading: ctx.isBot ? "eager" : props.loading,
-  };
+export const onBeforeResolveProps = (props: Props) => {
+  if (props.loading === "lazy") {
+    return {
+      ...props,
+      sections: [],
+    };
+  }
+
+  return props;
 };
 
 export default Deferred;
