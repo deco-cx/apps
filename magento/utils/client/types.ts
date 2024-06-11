@@ -1,3 +1,5 @@
+import { ImageObject } from "../../../commerce/types.ts";
+
 export interface CategoryLink {
   position: number;
   category_id: string;
@@ -498,6 +500,37 @@ export interface Error {
 }
 
 export type WishListReponse = Success | Error;
+
+export interface CartWithImages extends Omit<Cart, "items" | "totalizers"> {
+  items: Array<CartWithImagesItems>;
+  totalizers: CartWithImagesTotalizers;
+}
+
+export interface CartWithImagesItems {
+  price_total: number;
+  images: ImageObject[];
+  url: string;
+  item_id: number;
+  sku: string;
+  qty: number;
+  name: string;
+  price: number;
+  product_type: string;
+  quote_id: string;
+}
+
+interface CartWithImagesTotalizers {
+  grand_total: number;
+  subtotal: number;
+  discount_amount: number;
+  shipping_amount: number;
+  shipping_discount_amount: number;
+  base_currency_code: string;
+  base_discount_amount: number;
+  base_shipping_amount: number;
+  base_subtotal: number;
+  coupon_code: string | undefined;
+}
 
 //Custom Interfaces
 export interface ReviewsAmastyAPI {

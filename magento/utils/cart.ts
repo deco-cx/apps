@@ -1,6 +1,12 @@
 import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
-import { Cart, MagentoCardPrices, MagentoProduct } from "./client/types.ts";
+import {
+  Cart,
+  CartWithImages,
+  CartWithImagesItems,
+  MagentoCardPrices,
+  MagentoProduct,
+} from "./client/types.ts";
 import { toURL } from "./transform.ts";
 import { ImageObject } from "../../commerce/types.ts";
 import { SESSION_COOKIE } from "./constants.ts";
@@ -78,13 +84,13 @@ export const toCartItemsWithImages = (
   imagesUrl: string,
   url: string,
   site: string
-) => {
+): CartWithImages => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
     map[productImage.sku] = productImage || [];
     return map;
   }, {} as Record<string, MagentoProduct>);
 
-  const itemsWithImages = cart.items.map((product) => {
+  const itemsWithImages = cart.items.map<CartWithImagesItems>((product) => {
     const images = productImagesMap[product.sku].media_gallery_entries;
     const productData = productImagesMap[product.sku];
     const firstImage = images?.[0]
