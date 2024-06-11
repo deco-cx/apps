@@ -34,6 +34,7 @@ const loader = async (
   const { clientAdmin, site, imagesUrl } = ctx;
   const url = new URL(req.url);
   const cartId = getCartCookie(req.headers);
+  const forceNewCart = true;
 
   const getCart = async (cartId: string): Promise<Cart> => {
     if (!cartId) {
@@ -88,8 +89,7 @@ const loader = async (
           site
         ) as unknown as Cart;
       } catch (_error) {
-        console.log(_error)
-        return createCart(ctx, req.headers, true);
+        return createCart(ctx, req.headers, forceNewCart);
       }
     }
   };
