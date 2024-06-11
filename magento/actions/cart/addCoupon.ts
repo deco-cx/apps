@@ -29,6 +29,7 @@ const action = async (
   } catch (error) {
     if (error instanceof HttpError) {
       return {
+        ...await cart(undefined, req, ctx),
         message: JSON.parse(error.message).message,
         status: error.status,
       }
