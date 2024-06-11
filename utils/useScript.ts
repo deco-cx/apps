@@ -7,41 +7,55 @@
  */
 
 import initSwc, {
-  transformSync,
-} from "https://cdn.jsdelivr.net/npm/@swc/wasm-web/wasm-web.js";
+  transform,
+} from "https://cdn.jsdelivr.net/npm/@swc/wasm-web@1.5.25/wasm-web.js";
 import { LRU } from "./lru.ts";
 
-await initSwc(
+const swcPromise = initSwc(
   "https://cdn.jsdelivr.net/npm/@swc/wasm-web@1.5.25/wasm-web_bg.wasm",
 );
 
 const verbose = !!Deno.env.get("SCRIPT_MINIFICATION_DEBUG");
 
-const cache = LRU(100);
+const cache = LRU<string, string | Promise<string | null>>(100);
 
-const minify = (js: string) => {
+const timings = (js: string) => {
   const start = performance.now();
 
-  const code = transformSync(js, {
-    minify: true,
-    jsc: {
-      target: "esnext",
-      minify: { mangle: true, format: { comments: false } },
-    },
-  }, undefined).code.replace(/;$/, "");
-  const duration = performance.now() - start;
-
-  cache.set(js, code);
-
-  if (verbose) {
+  return () => {
+    const duration = performance.now() - start;
     console.log(
       `[script-minification]: ${duration}ms minifiying script ${
         js.slice(0, 38).replace(/(\n|\s)+/g, " ")
       }...`,
     );
-  }
+  };
+};
 
-  return code;
+const minify = async (js: string) => {
+  try {
+    await swcPromise;
+
+    const log = verbose ? timings(js) : null;
+
+    const result = await transform(js, {
+      minify: true,
+      jsc: {
+        target: "esnext",
+        minify: { mangle: true, format: { comments: false } },
+      },
+    }, undefined);
+
+    const code = result.code.replace(/;$/, "") as string;
+
+    log?.();
+
+    return code;
+  } catch (error) {
+    console.error({ error });
+
+    return null;
+  }
 };
 
 export function useScript<T extends (...args: any[]) => any>(
@@ -49,7 +63,21 @@ export function useScript<T extends (...args: any[]) => any>(
   ...params: Parameters<T>
 ) {
   const javascript = fn.toString();
-  const minified = cache.get(javascript) || minify(javascript);
+  const cached = cache.get(javascript) || minify(javascript);
+
+  if (typeof cached === "object") {
+    cache.set(javascript, cached);
+
+    cached.then((minified) => {
+      if (minified === null) {
+        cache.delete(javascript);
+      } else {
+        cache.set(javascript, minified);
+      }
+    });
+  }
+
+  const minified = typeof cached === "string" ? cached : javascript;
 
   return `(${minified})(${params.map((p) => JSON.stringify(p)).join(", ")})`;
 }

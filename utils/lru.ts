@@ -20,5 +20,8 @@ export const LRU = <K, T>(max: number) => {
       }
       cache.set(key, value);
     },
+    delete: (key: K) => {
+      cache.delete(key);
+    },
   };
 };
