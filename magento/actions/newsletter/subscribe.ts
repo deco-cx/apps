@@ -31,7 +31,7 @@ const loader = async (
     { body },
   ).then((res) => res.json());
 
-  if (!result || result.sucess === false) {
+  if (!result || result.success === false) {
     return null;
   }
 

@@ -484,7 +484,7 @@ export interface SetShipping {
 }
 
 export interface NewsletterData {
-  sucess: boolean;
+  success: boolean;
   message: string;
 }
 
