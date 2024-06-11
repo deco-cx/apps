@@ -29,11 +29,12 @@ export type Cart = API["GET /rest/:site/V1/carts/:cartId"]["response"];
 const loader = async (
   _props: undefined,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Cart> => {
   const { clientAdmin, site, imagesUrl } = ctx;
   const url = new URL(req.url);
   const cartId = getCartCookie(req.headers);
+  const forceNewCart = true;
 
   const getCart = async (cartId: string): Promise<Cart> => {
     if (!cartId) {
@@ -62,15 +63,19 @@ const loader = async (
           }),
         ]);
 
-        const cart = await resultCart.json() as Cart;
+        const cart = (await resultCart.json()) as Cart;
         const prices = await resultPricesCarts.json();
 
         const productImagePromises = cart.items.map((item) => {
           return clientAdmin["GET /rest/:site/V1/products/:sku"]({
             sku: item.sku,
             site,
-            fields: [MEDIA_GALLERY_ENTRIES, SKU, "url", "custom_attributes"]
-              .join(","),
+            fields: [
+              MEDIA_GALLERY_ENTRIES,
+              SKU,
+              "url",
+              "custom_attributes",
+            ].join(","),
           }).then((res) => res.json());
         });
         const productImages = await Promise.all(productImagePromises);
@@ -81,10 +86,10 @@ const loader = async (
           productImages,
           imagesUrl,
           url.origin,
-          site,
-        ) as unknown as Cart
+          site
+        ) as unknown as Cart;
       } catch (_error) {
-        return createCart(ctx, req.headers);
+        return createCart(ctx, req.headers, forceNewCart);
       }
     }
   };
