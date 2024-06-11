@@ -4,7 +4,7 @@ import type { Flag, Site } from "deco/types.ts";
 import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
 import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
 import { Page } from "../../commerce/types.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../utils/useScript.ts";
 
 const IS_LOCALHOST = context.deploymentId === undefined;
 
@@ -130,7 +130,7 @@ function LiveControls(
     <Head>
       <script
         defer
-        src={scriptAsDataURI(snippet, {
+        src={useScriptAsDataURI(snippet, {
           page,
           site,
           flags,

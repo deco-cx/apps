@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
 import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../utils/useScript.ts";
 import { Flag } from "deco/types.ts";
 
 type EventHandler = (event?: AnalyticsEvent) => void | Promise<void>;
@@ -91,7 +91,7 @@ function Events({ deco }: { deco: Deco }) {
       <script
         defer
         id="deco-events"
-        src={scriptAsDataURI(snippet, { deco, segmentCookie: DECO_SEGMENT })}
+        src={useScriptAsDataURI(snippet, { deco, segmentCookie: DECO_SEGMENT })}
       />
     </Head>
   );
