@@ -83,6 +83,10 @@ export interface SearchResponse {
   sorts: SearchSort[];
 }
 
+export interface ProductListResponse extends SearchResponse {
+  categoryCode: string;
+}
+
 export interface Brand {
   id: string;
   name: string;
@@ -106,4 +110,8 @@ export interface Catalogs {
   id: string;
   name: string;
   url: string;
+}
+
+export interface CatalogsResponse {
+  catalogs: Catalogs;
 }
