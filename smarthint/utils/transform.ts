@@ -272,7 +272,7 @@ export const toProduct = (product: any): Product => {
 export const toSortOption = (sorts: any[]): SortOption[] => {
   return sorts.map((sort) => ({
     label: sort.Show,
-    value: sort.Value,
+    value: String(sort.Value),
   }));
 };
 

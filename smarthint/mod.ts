@@ -9,8 +9,14 @@ export interface State {
 
   cluster: string;
 }
+
+// TODO fix image path
+
 /**
- * @title smarthint
+ * @title Smarthint
+ * @description Loaders and actions for adding Smarthint to your website.
+ * @category Search
+ * @logo https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png
  */
 export default function App(
   props: State,
@@ -19,7 +25,6 @@ export default function App(
   headers.set("accept", "application/json");
   headers.set("content-type", "application/json");
   headers.set("Cache-Control", "no-cache");
-  // headers.set("Authorization", "wapstore");
 
   const api = createHttpClient<OpenAPI>({
     base: "https://searches.smarthint.co/",

@@ -1,6 +1,7 @@
 import { Suggestion } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 
 export interface Props {
   query?: string;
@@ -15,35 +16,38 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration
+ * @title Smarthint Integration - Autocomplete / Sugestão
  * @description Autocomplete Loader
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
   const { api, shcode, cluster } = ctx;
   const { query, sizeProducts, sizeTerms } = props;
+  const anonymous = getSessionCookie(req.headers);
 
   const data = await api["GET /:cluster/Search/GetSuggestionTerms"]({
     cluster,
     shcode,
-    sizeProducts: String(sizeProducts),
-    sizeTerms: String(sizeTerms),
+    sizeProducts: sizeProducts ? String(sizeProducts) : undefined,
+    sizeTerms: sizeProducts ? String(sizeTerms) : undefined,
     term: query,
-    anonymous: "1", //TODO
+    anonymous,
   }).then((r) => r.json());
 
   if (!data) return null;
 
   const products = data.Products?.map((product) => toProduct(product));
 
+  console.log(data.Terms);
+
   return {
     products: products,
     searches: data.Terms?.map((termItem) => ({
       term: termItem.TermSuggestion!,
-      href: termItem.UrlSearch!,
+      href: `/s?busca=${termItem.TermSuggestion}`,
       hits: termItem.Order,
     })),
   };

@@ -1,5 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { Banner } from "../utils/typings.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 
 export type SearchSort = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
@@ -29,7 +30,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration
+ * @title Smarthint Integration - Search Banners
  * @description Product List Page
  */
 const loader = async (
@@ -50,6 +51,7 @@ const loader = async (
   } = props;
 
   const url = new URL(req.url);
+  const anonymous = getSessionCookie(req.headers);
 
   const sort = url.searchParams.get("sort") ??
     url.searchParams.get("searchSort") ?? searchSort;
@@ -75,7 +77,7 @@ const loader = async (
   const data = await api["GET /:cluster/Search/GetPrimarySearch"]({
     cluster,
     shcode,
-    anonymous: "1", //TODO
+    anonymous,
     term,
     size: String(size),
     searchSort: String(sort),

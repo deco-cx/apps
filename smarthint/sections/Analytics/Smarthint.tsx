@@ -2,6 +2,7 @@ import { scriptAsDataURI } from "../../../utils/dataURI.ts";
 import { AppContext } from "../../mod.ts";
 import { Props as ClickProps } from "../../actions/click.ts";
 import { PageType } from "../../utils/typings.ts";
+import { ANONYMOUS_COOKIE, SESSION_COOKIE } from "../../utils/getSession.ts";
 
 declare global {
   interface Window {
@@ -11,12 +12,14 @@ declare global {
   }
 }
 
-const listener = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
-  const SESSION_COOKIE = "SH_SESSION";
-
+const listener = (
+  { shcode, url, pageType, SESSION_COOKIE, ANONYMOUS_COOKIE }: ReturnType<
+    typeof loader
+  >,
+) => {
   const click = (
     {
-      productId,
+      productGroupID,
       position,
       clickFeature,
       term,
@@ -29,24 +32,27 @@ const listener = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
   ) => {
     const clickUrl = new URL("https://recs.smarthint.co/track/click");
     const date = new Date().toLocaleString().replace(",", "");
-    const origin = new URL(url).origin;
-
+    const pageUrl = new URL(url);
+    const origin = pageUrl.origin;
+    const pathTerm = pageUrl.searchParams.get("busca") ||
+      pageUrl.searchParams.get("q");
     const session = getCookie(SESSION_COOKIE) ?? "";
+    const anonymousConsumer = getCookie(ANONYMOUS_COOKIE) ?? "";
 
     clickUrl.searchParams.set("clickFeature", clickFeature);
     clickUrl.searchParams.set("shcode", shcode);
     clickUrl.searchParams.set("clickProduct", clickProduct);
-    clickUrl.searchParams.set("productId", productId);
+    clickUrl.searchParams.set("productId", productGroupID);
     clickUrl.searchParams.set("locationRecs", positionRecommendation);
     clickUrl.searchParams.set("position", String(position));
     clickUrl.searchParams.set("origin", origin);
     clickUrl.searchParams.set("date", date);
     clickUrl.searchParams.set("pagetype", pageType);
     clickUrl.searchParams.set("productPrice", String(productPrice));
-    clickUrl.searchParams.set("anonymousConsumer", "1");
+    clickUrl.searchParams.set("anonymousConsumer", anonymousConsumer);
     clickUrl.searchParams.set("session", session);
 
-    if (term) clickUrl.searchParams.set("term", term);
+    if (term || pathTerm) clickUrl.searchParams.set("term", term ?? pathTerm);
     if (shippingPrice) {
       clickUrl.searchParams.set("shippingPrice", String(shippingPrice));
     }
@@ -140,8 +146,19 @@ const listener = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
     setupCookieResetOnInteraction(SESSION_COOKIE, sessionValue, 30 * 60 * 1000);
   }
 
+  function setupAnonymous() {
+    const anonymousValue = getCookie(ANONYMOUS_COOKIE) ?? createUserToken();
+
+    setupCookieResetOnInteraction(
+      ANONYMOUS_COOKIE,
+      anonymousValue,
+      30 * 60 * 1000,
+    );
+  }
+
   const pageView = () => {
     globalThis.window.addEventListener("load", () => {
+      console.log(url);
       const pageUrl = new URL(url);
       const origin = pageUrl.origin;
       const date = new Date().toLocaleString().replace(",", "");
@@ -149,6 +166,7 @@ const listener = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
       const pageViewUrl = new URL("https://recs.smarthint.co/track/pageView");
 
       const session = getCookie(SESSION_COOKIE) ?? "";
+      const anonymousConsumer = getCookie(ANONYMOUS_COOKIE) ?? "";
 
       pageViewUrl.searchParams.set("shcode", shcode);
       pageViewUrl.searchParams.set("url", pageUrl.href);
@@ -157,7 +175,7 @@ const listener = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
       pageViewUrl.searchParams.set("elapsedTime", "0");
       pageViewUrl.searchParams.set("date", date);
       pageViewUrl.searchParams.set("session", session);
-      pageViewUrl.searchParams.set("anonymousConsumer", "1");
+      pageViewUrl.searchParams.set("anonymousConsumer", anonymousConsumer);
 
       fetch(pageViewUrl);
     });
@@ -165,6 +183,7 @@ const listener = ({ shcode, url, pageType }: ReturnType<typeof loader>) => {
 
   setup();
   setupSession();
+  setupAnonymous();
   pageView();
 };
 
@@ -187,10 +206,16 @@ export interface Props {
 export const loader = (props: Props, req: Request, ctx: AppContext) => {
   const { shcode } = ctx;
 
+  const tempUrl = new URL(req.url);
+  tempUrl.hostname = "www.lojaprohall.com.br";
+  tempUrl.port = "";
+
   return {
     shcode,
-    url: req.url,
+    url: tempUrl.href,
     pageType: props.pageType,
+    SESSION_COOKIE,
+    ANONYMOUS_COOKIE,
   };
 };
 

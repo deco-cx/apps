@@ -2,6 +2,7 @@ import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { toFilters, toProduct, toSortOption } from "../utils/transform.ts";
 import { redirect } from "deco/mod.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 
 export type SearchSort = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
@@ -31,7 +32,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration
+ * @title Smarthint Integration - Busca
  * @description Product List Page
  */
 const loader = async (
@@ -52,6 +53,7 @@ const loader = async (
   } = props;
 
   const url = new URL(req.url);
+  const anonymous = getSessionCookie(req.headers);
 
   const sort = url.searchParams.get("sort") ??
     url.searchParams.get("searchSort") ?? searchSort;
@@ -77,7 +79,7 @@ const loader = async (
   const data = await api["GET /:cluster/Search/GetPrimarySearch"]({
     cluster,
     shcode,
-    anonymous: "1", //TODO
+    anonymous,
     term,
     size: String(size),
     searchSort: String(sort),

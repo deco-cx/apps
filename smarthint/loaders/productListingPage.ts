@@ -2,9 +2,10 @@ import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { toFilters, toProduct, toSortOption } from "../utils/transform.ts";
 import { redirect } from "deco/mod.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 
 /**
- * @title Smarthint Integration
+ * @title Smarthint Integration - Hotsite
  * @description Product List Page
  */
 const loader = async (
@@ -15,11 +16,12 @@ const loader = async (
   const { api, shcode, cluster } = ctx;
 
   const url = new URL(req.url);
+  const anonymous = getSessionCookie(req.headers);
 
   const data = await api["GET /:cluster/hotsite"]({
     cluster,
     shcode,
-    anonymous: "1", //TODO
+    anonymous,
     url: url.pathname,
   }).then((r) => r.json());
 

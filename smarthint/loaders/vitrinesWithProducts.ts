@@ -3,7 +3,7 @@ import { toProduct } from "../utils/transform.ts";
 import { Filter } from "./searchListPage.ts";
 import { ComplexPageType } from "../utils/typings.ts";
 import { Product, ProductListingPage } from "../../commerce/types.ts";
-import { getUserHash } from "../utils/parseHeaders.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 
 /**
  * @title Product
@@ -68,7 +68,7 @@ const loader = async (
 
   const url = new URL(req.url);
 
-  const anonymous = getUserHash(req.headers);
+  const anonymous = getSessionCookie(req.headers);
 
   const pageIdentifier = url.hostname == "localhost"
     ? ""

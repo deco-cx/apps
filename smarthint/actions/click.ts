@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { getUserHash } from "../utils/parseHeaders.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 import { PageType } from "../utils/typings.ts";
 
 export interface Props {
@@ -13,7 +13,7 @@ export interface Props {
   clickFeature: string;
   term: string;
   position: number;
-  productId: string;
+  productGroupID: string;
   clickProduct: string;
   positionRecommendation: string;
 }
@@ -38,14 +38,13 @@ const action = async (
     clickFeature,
     term,
     position,
-    productId,
+    productGroupID,
     positionRecommendation,
     clickProduct,
   } = props;
 
   const url = new URL(req.url);
-
-  const anonymous = getUserHash(req.headers);
+  const anonymous = getSessionCookie(req.headers);
 
   await recs["GET /track/click"]({
     date,
@@ -55,7 +54,7 @@ const action = async (
     pageType,
     term,
     position: String(position),
-    productId,
+    productId: productGroupID,
     productPrice: String(productPrice),
     shippingTime: String(shippingTime),
     shippingPrice: String(shippingPrice),
