@@ -27,8 +27,8 @@ empowering non technical users to interact and act upon their headless commerce.
 
 1. Install via decohub
 2. Fill the necessary fields:
+ - shcode
  - cluster
- - sh-code
 
 🎉 Your Smarthint setup is complete. You should now see Smarthint
 loaders/actions available for your sections.

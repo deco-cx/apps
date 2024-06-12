@@ -1,1 +1,1 @@
-export { default } from "../../smarthint/mod.ts";
+export { default, preview } from "../../smarthint/mod.ts";

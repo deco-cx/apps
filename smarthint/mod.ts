@@ -3,14 +3,18 @@ import manifest from "./manifest.gen.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { OpenAPI } from "./utils/openapi/smarthint.openapi.gen.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export interface State {
+  /**
+   * @description SH-XXXXX
+   */
   shcode: string;
-
+  /**
+   * @description vX
+   */
   cluster: string;
 }
-
-// TODO fix image path
 
 /**
  * @title Smarthint
@@ -47,3 +51,9 @@ export default function App(
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);
+
+// TODO fix image path
