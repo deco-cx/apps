@@ -23,9 +23,13 @@ interface Props {
 
   /** @description Full text search query */
   term?: string;
+
+  indexName?: string;
+
+  objectIds?: string[];
 }
 
-const indexName: Indices = "products";
+const INDEX_NAME: Indices = "products";
 
 /**
  * @title Algolia Integration
@@ -36,21 +40,23 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const { client } = ctx;
+  const { indexName = INDEX_NAME } = props;
+
+  const objectIdsArray = props.objectIds?.map((id) => `objectID:${id}`) ?? [];
 
   const { results } = await client.search([{
     indexName,
     query: props.term ?? "",
     params: {
       hitsPerPage: props.hitsPerPage ?? 12,
-      facetFilters: JSON.parse(props.facetFilters ?? "[]"),
+      facetFilters: [...JSON.parse(props.facetFilters ?? "[]"), [...objectIdsArray]],
       clickAnalytics: true,
     },
-  }]);
+  }]);  
 
   const { hits: products, queryID } = results[0] as SearchResponse<
     IndexedProduct
   >;
-
   return resolveProducts(products, client, {
     url: req.url,
     queryID,
