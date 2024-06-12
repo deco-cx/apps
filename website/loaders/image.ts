@@ -5,13 +5,31 @@ import { engine as cloudflare } from "../utils/image/engines/cloudflare/engine.t
 import { engine as deco } from "../utils/image/engines/deco/engine.ts";
 import { engine as passThrough } from "../utils/image/engines/passThrough/engine.ts";
 import { engine as wasm } from "../utils/image/engines/wasm/engine.ts";
+import type { Engine } from "../utils/image/engine.ts";
 
-const ENGINES = [
+const ENGINES_MAP: { [key: string]: Engine } = {
+  passThrough,
+  wasm,
+  cloudflare,
+  deco,
+};
+
+const PREFERED_ENGINE =
+  ENGINES_MAP[Deno.env.get("IMAGES_ENGINE") ?? "passThrough"] ?? passThrough;
+
+const AVAILABLE_ENGINES = [
   passThrough,
   wasm,
   cloudflare,
   deco,
 ];
+
+const ENGINES = [
+  PREFERED_ENGINE,
+  ...AVAILABLE_ENGINES.filter((e) => e !== PREFERED_ENGINE),
+];
+
+console.log(PREFERED_ENGINE);
 
 function assert(expr: unknown, msg = ""): asserts expr {
   if (!expr) {
@@ -57,7 +75,6 @@ const handler = async (
     const engine = ENGINES.find((e) => e.accepts(params.src)) ?? passThrough;
 
     const response = await engine.resolve(params, preferredMediaType, req);
-
     response.headers.set("x-img-engine", engine.name);
     response.headers.set("x-cache", "MISS");
     response.headers.set("vary", "Accept");
