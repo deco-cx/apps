@@ -141,6 +141,28 @@ export const toProduct = (
     additionalType: "skuOptions",
   }));
 
+  const prodOptions: PropertyValue[] = product.Options.map(option => {
+    return option.Values.map(optValue => {
+      const imagePath = optValue.ImagePath 
+        ? `/Custom/Content/Swatches${optValue.ImagePath}`
+        : null;
+      const url = imagePath
+        ? new URL(imagePath, cdn).href
+        : "";
+
+      return {
+        "@type": "PropertyValue" as const,
+        name: option.Label,
+        value: optValue.Value,
+        image: [{
+          "@type": "ImageObject" as const,
+          url,
+        }],
+        additionalType: "prodOptions",
+      }
+    });
+  }).flat();
+
   const metadatas: PropertyValue[] = product.ExtendedMetadatas?.map((item) => ({
     "@type": "PropertyValue" as const,
     name: item.Alias,
@@ -161,6 +183,7 @@ export const toProduct = (
     ...skuOptions,
     ...metadatas,
     ...descriptions,
+    ...prodOptions,
   ];
 
   const hasVariant = level < 1
