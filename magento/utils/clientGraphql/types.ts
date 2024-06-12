@@ -174,6 +174,12 @@ export interface ProductShelfGraphQL {
   };
 }
 
+export interface ProductDetailsGraphQL {
+  products: {
+    items: SimpleProductGraphQL[];
+  };
+}
+
 export interface CategoryGraphQL {
   categories: {
     items: SimpleCategoryGraphQL[];
@@ -197,6 +203,17 @@ export interface ProductSearchInputs {
   currentPage?: number;
   filter?: ProductFilterInput;
   sort?: ProductSortInput;
+}
+
+export interface ProductDetailsInputs {
+  search: string;
+  pageSize: 1;
+  currentPage: 1;
+  filter: {
+    url_key: {
+      eq: string;
+    };
+  };
 }
 
 export interface ProductFilterInput {
@@ -241,10 +258,7 @@ export interface ProductSort {
 
 export interface FilterProps {
   name: string;
-  type:
-    | FilterEqualTypeInput
-    | FilterMatchTypeInput
-    | FilterRangeTypeInput;
+  type: FilterEqualTypeInput | FilterMatchTypeInput | FilterRangeTypeInput;
 }
 
 export interface CustomFields {
