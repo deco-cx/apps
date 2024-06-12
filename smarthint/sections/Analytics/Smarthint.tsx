@@ -187,6 +187,9 @@ const listener = (
   pageView();
 };
 
+/**
+ * @title Smarthint Tracking
+ */
 function Analytics(props: ReturnType<typeof loader>) {
   return (
     <script
@@ -200,6 +203,9 @@ function Analytics(props: ReturnType<typeof loader>) {
 }
 
 export interface Props {
+  /**
+   * @description Type of page you are setting up.
+   */
   pageType: PageType;
 }
 

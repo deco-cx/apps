@@ -2,6 +2,9 @@ import { AppContext } from "../mod.ts";
 import { Banner, PageType } from "../utils/typings.ts";
 
 export interface Props {
+  /**
+   * @description Type of page you are setting up.
+   */
   pageType: PageType;
   /**
    * @hide

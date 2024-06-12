@@ -16,7 +16,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration - Autocomplete / Sugestão
+ * @title Smarthint Integration - Autocomplete / Suggestion
  * @description Autocomplete Loader
  */
 const loader = async (

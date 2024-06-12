@@ -5,6 +5,9 @@ import { PageType } from "../utils/typings.ts";
 export interface Props {
   shippingPrice?: number;
   shippingTime?: number;
+  /**
+   * @description Type of page you are setting up.
+   */
   pageType: PageType;
   date?: string;
   elapsedTime?: number;

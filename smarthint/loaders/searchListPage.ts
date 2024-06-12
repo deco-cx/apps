@@ -18,12 +18,33 @@ export interface Props {
    * @hide
    */
   term?: string;
+  /**
+   * @description Number of products that must be returned per page
+   */
   size: number;
+  /**
+   * @hide
+   */
   searchSort?: SearchSort;
-  rule?: string;
-  from?: number;
-  ruletype?: RuleType;
+  /**
+   * @hide
+   */
   filter?: Filter[];
+  /**
+   * @hide
+   */
+  from?: number;
+  /**
+   * @hide
+   */
+  rule?: string;
+  /**
+   * @hide
+   */
+  ruletype?: RuleType;
+  /**
+   * @hide
+   */
   condition?: {
     field?: string;
     value?: string;
@@ -32,7 +53,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration - Busca
+ * @title Smarthint Integration - Search
  * @description Product List Page
  */
 const loader = async (
@@ -72,7 +93,8 @@ const loader = async (
 
   const from = fromParam ?? page <= 1 ? 0 : (page - 1) * size;
 
-  const term = termProp ?? url.searchParams.get("busca");
+  const term = termProp ?? url.searchParams.get("busca") ??
+    url.searchParams.get("q");
 
   if (!term) return null;
 

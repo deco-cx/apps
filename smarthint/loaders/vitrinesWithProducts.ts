@@ -2,15 +2,8 @@ import { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 import { Filter } from "./searchListPage.ts";
 import { ComplexPageType } from "../utils/typings.ts";
-import { Product, ProductListingPage } from "../../commerce/types.ts";
+import { Product } from "../../commerce/types.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
-
-/**
- * @title Product
- */
-export interface Teste {
-  page: ProductListingPage;
-}
 
 export interface Props {
   /**
@@ -25,7 +18,13 @@ export interface Props {
    * @hide
    */
   products?: string[];
+  /**
+   * @description Your recommendations are divided by positions, defining which position of the recommendations according to your desire. All recommendations configured in the Admin Panel will be returned.
+   */
   position: string;
+  /**
+   * @description Type of page you are setting up.
+   */
   pagetype: ComplexPageType;
   /**
    * @default padrao
