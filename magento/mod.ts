@@ -79,6 +79,25 @@ export interface Props {
    * @default true
    */
   enableCache: boolean;
+
+  /**
+   * @title Cart Configs
+   */
+  cartConfigs: CartConfigs;
+}
+
+interface CartConfigs {
+  /**
+   * @title Enable create Cart on add item fist time
+   * @default false
+   */
+  createCartOnAddItem: boolean;
+
+  /**
+   * @title Count Product Image in Cart
+   * @default 1
+   */
+  countProductImageInCart: number;
 }
 
 export interface State extends Props {

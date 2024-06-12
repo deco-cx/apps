@@ -8,15 +8,15 @@ export interface Props {
 }
 
 interface ErrorAddCoupon {
-    message: string;
-    status: number;
+  message: string;
+  status: number;
 }
 
 const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart | ErrorAddCoupon> => {
+): Promise<Cart | ErrorAddCoupon | null> => {
   const { couponCode } = props;
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
@@ -32,7 +32,7 @@ const action = async (
         ...await cart(undefined, req, ctx),
         message: JSON.parse(error.message).message,
         status: error.status,
-      }
+      };
     }
     return error;
   }
