@@ -162,7 +162,7 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
         priceSpecification: offer.priceSpecification.map(removeType),
       })),
     }),
-    image: product.image?.map(removeType),
+    image: product.image?.map(removeType) || product.pictures.normal,
     objectID: product.productID,
     groupFacets: normalize(groupFacets),
     facets: normalize(facets),
@@ -213,7 +213,12 @@ export const fromIndex = (
   image: product.image?.map((img) => ({
     ...img,
     "@type": "ImageObject",
-  })),
+  })) || [
+    {
+      "@type": "ImageObject",
+      url: product.pictures?.normal,
+    },
+  ],
   isSimilarTo: product.isSimilarTo && product.isSimilarTo.map((similar) => ({
     ...similar,
     "@type": "Product",
