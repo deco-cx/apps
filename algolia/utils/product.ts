@@ -164,6 +164,7 @@ export const toIndex = ({ isVariantOf, ...product }: Product) => {
     }),
     image: product.image?.map(removeType) || product.pictures.normal,
     objectID: product.productID,
+    productID: product.productID,
     groupFacets: normalize(groupFacets),
     facets: normalize(facets),
     available: availability > 3,
@@ -188,6 +189,7 @@ export const fromIndex = (
   ...product,
   "@type": "Product",
   url: withAnalyticsInfo(url, opts),
+  productID: _oid,
   offers: product.offers && {
     ...product.offers,
     "@type": "AggregateOffer",

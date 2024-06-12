@@ -31,6 +31,19 @@ interface Props {
 
 const INDEX_NAME: Indices = "products";
 
+type ProductMap = Record<string, Product>;
+
+function sortProducts(products: Product[], objectIds: string[]) {
+
+  const productMap: ProductMap = {};
+
+  products.forEach((product) => {
+    productMap[product.productID] = product;
+  });
+
+  return objectIds.map((id) => productMap[id]);
+}
+
 /**
  * @title Algolia Integration
  */
@@ -40,28 +53,35 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const { client } = ctx;
-  const { indexName = INDEX_NAME } = props;
+  const { indexName = INDEX_NAME, objectIds } = props;
 
-  const objectIdsArray = props.objectIds?.map((id) => `objectID:${id}`) ?? [];
+  const objectIdsArray = objectIds?.map((id) => `objectID:${id}`) ?? [];
 
   const { results } = await client.search([{
     indexName,
     query: props.term ?? "",
     params: {
       hitsPerPage: props.hitsPerPage ?? 12,
-      facetFilters: [...JSON.parse(props.facetFilters ?? "[]"), [...objectIdsArray]],
+      facetFilters: [...JSON.parse(props.facetFilters ?? "[]"), [
+        ...objectIdsArray,
+      ]],
       clickAnalytics: true,
     },
-  }]);  
+  }]);
 
   const { hits: products, queryID } = results[0] as SearchResponse<
     IndexedProduct
   >;
-  return resolveProducts(products, client, {
+
+  const transformedProducts = await resolveProducts(products, client, {
     url: req.url,
     queryID,
     indexName,
   });
+  
+  const newProductsSorted = (objectIds && objectIds?.length > 0) ? sortProducts(transformedProducts, objectIds) : transformedProducts;
+  
+  return newProductsSorted;
 };
 
 export default loader;
