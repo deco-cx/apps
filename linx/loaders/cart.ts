@@ -29,12 +29,18 @@ const loader = async (
   ctx: AppContext,
 ): Promise<CartResponse | null> => {
   const { api } = ctx;
-  const BasketID = getBasketHint(req.headers);
+
+  const cookies = getCookies(req.headers);
+
+  for (const [a, b] of Object.entries(cookies)) {
+    console.log(
+      a, b
+    );
+  }
+
   const response = await api["POST /web-api/v1/Shopping/Basket/Get"]({}, {
     headers: toLinxHeaders(req.headers),
-    body: {
-      BasketID,
-    },
+    body: {},
   });
 
   if (response === null) {
@@ -48,13 +54,6 @@ const loader = async (
   if (!cart) {
     throw new Error("Could not retrieve Basket");
   }
-
-  const basketId = String(cart.Shopper.Basket.BasketID);
-  setCookie(ctx.response.headers, {
-    name: DECO_LINX_BASKET_COOKIE,
-    value: basketId,
-    domain: new URL(req.url).hostname,
-  });
 
   return toCart(cart, ctx);
 };
