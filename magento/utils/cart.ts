@@ -2,8 +2,8 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import {
   Cart,
-  CartWithImages,
-  CartWithImagesItems,
+  CartFromAPI,
+  ItemsWithDecoImage,
   MagentoCardPrices,
   MagentoProduct,
 } from "./client/types.ts";
@@ -54,10 +54,16 @@ export async function createCart(
     return createNewCart({ clientAdmin, site });
   }
 
-  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
+  const cart = await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
     cartId: cartCookie,
     site,
   }).then((res) => res.json());
+
+  return {
+    ...cart,
+    // deno-lint-ignore no-unused-vars
+    items: cart.items.map(({ images, ...rest }) => rest),
+  };
 }
 
 const createNewCart = async ({
@@ -78,19 +84,19 @@ const createNewCart = async ({
 };
 
 export const toCartItemsWithImages = (
-  cart: Cart,
+  cart: CartFromAPI,
   prices: MagentoCardPrices,
   productMagento: MagentoProduct[],
   imagesUrl: string,
   url: string,
   site: string
-): CartWithImages => {
+): Cart => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
     map[productImage.sku] = productImage || [];
     return map;
   }, {} as Record<string, MagentoProduct>);
 
-  const itemsWithImages = cart.items.map<CartWithImagesItems>((product) => {
+  const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
     const images = productImagesMap[product.sku].media_gallery_entries;
     const productData = productImagesMap[product.sku];
     const firstImage = images?.[0]

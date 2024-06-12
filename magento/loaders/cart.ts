@@ -1,5 +1,4 @@
 import { AppContext } from "../mod.ts";
-import { API } from "../utils/client/client.ts";
 import {
   createCart,
   getCartCookie,
@@ -19,8 +18,9 @@ import {
   SKU,
   SUBTOTAL,
 } from "../utils/constants.ts";
+import { CartFromAPI, Cart as CartFromDeco } from "../utils/client/types.ts";
 
-export type Cart = API["GET /rest/:site/V1/carts/:cartId"]["response"];
+export type Cart = CartFromDeco
 
 /**
  * @title Magento Integration
@@ -63,7 +63,7 @@ const loader = async (
           }),
         ]);
 
-        const cart = (await resultCart.json()) as Cart;
+        const cart = (await resultCart.json()) as CartFromAPI;
         const prices = await resultPricesCarts.json();
 
         const productImagePromises = cart.items.map((item) => {
@@ -87,7 +87,7 @@ const loader = async (
           imagesUrl,
           url.origin,
           site
-        ) as unknown as Cart;
+        );
       } catch (_error) {
         return createCart(ctx, req.headers, forceNewCart);
       }
