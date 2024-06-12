@@ -29,8 +29,6 @@ const ENGINES = [
   ...AVAILABLE_ENGINES.filter((e) => e !== PREFERED_ENGINE),
 ];
 
-console.log(PREFERED_ENGINE);
-
 function assert(expr: unknown, msg = ""): asserts expr {
   if (!expr) {
     throw new HttpError(400, msg);
