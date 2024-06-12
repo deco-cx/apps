@@ -1,6 +1,6 @@
 import { type JSX } from "preact";
 import { Product } from "../../commerce/types.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../utils/useScript.ts";
 
 declare global {
   interface Window {
@@ -122,7 +122,7 @@ export function AddVTEXPortalData({
       {...props}
       id="datalayer-portal-compat"
       defer
-      src={scriptAsDataURI(addVTEXPortalDataSnippet, accountName)}
+      src={useScriptAsDataURI(addVTEXPortalDataSnippet, accountName)}
     />
   );
 }
@@ -176,7 +176,7 @@ export function ProductDetailsTemplate({
     <script
       {...props}
       defer
-      src={scriptAsDataURI((t) => {
+      src={useScriptAsDataURI((t) => {
         globalThis.window.datalayer_product = t;
       }, template)}
     />
@@ -194,7 +194,7 @@ export function ProductInfo({ product, ...props }: ProductInfoProps) {
       {...props}
       defer
       data-product-info
-      src={scriptAsDataURI((t) => {
+      src={useScriptAsDataURI((t) => {
         globalThis.window.shelfProductIds = globalThis.window.shelfProductIds ||
           [];
         globalThis.window.shelfProductIds.push(t);
@@ -211,7 +211,7 @@ export function ProductSKUJson({ product, ...props }: ProductSKUJsonProps) {
     <script
       {...props}
       defer
-      src={scriptAsDataURI((p) => {
+      src={useScriptAsDataURI((p) => {
         globalThis.window.skuJson = p;
       }, product)}
     />

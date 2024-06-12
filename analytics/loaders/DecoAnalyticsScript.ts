@@ -1,6 +1,6 @@
 import { Script } from "../../website/types.ts";
 import { AppContext } from "../mod.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../utils/useScript.ts";
 import { Flag } from "deco/types.ts";
 
 export type Props = {
@@ -96,7 +96,7 @@ const loader = (
     } data-api="https://plausible.io/api/event" src="https://plausible.io/js/script.manual.hash.js"></script>`;
 
     const flagsScript = `<script defer src="${
-      scriptAsDataURI(snippet)
+      useScriptAsDataURI(snippet)
     }"></script>`;
 
     return dnsPrefetchLink + preconnectLink + plausibleScript + flagsScript;

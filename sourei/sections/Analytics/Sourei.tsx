@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Head } from "$fresh/runtime.ts";
-import { scriptAsDataURI } from "../../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 
 interface Props {
   /**
@@ -86,7 +86,11 @@ function Section({
           async={loading === "async"}
           type={loading === "module" ? "module" : "text/javascript"}
         />
-        <script src={scriptAsDataURI(snippet)} defer type="text/javascript" />
+        <script
+          src={useScriptAsDataURI(snippet)}
+          defer
+          type="text/javascript"
+        />
       </Head>
 
       {/* Body */}

@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../utils/useScript.ts";
 
 export interface Props {
   /**
@@ -96,7 +96,7 @@ function Component({ exclude, domain }: Props) {
         data-api="https://plausible.io/api/event"
         src="https://plausible.io/js/script.manual.js"
       />
-      <script defer src={scriptAsDataURI(snippet)} />
+      <script defer src={useScriptAsDataURI(snippet)} />
     </Head>
   );
 }

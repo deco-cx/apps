@@ -1,7 +1,7 @@
 import type { Section } from "deco/blocks/section.ts";
 import { usePartialSection } from "deco/hooks/usePartialSection.ts";
 import { useId } from "preact/hooks";
-import { scriptAsDataURI } from "../../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 
 /** @titleBy type */
 interface Scroll {
@@ -86,7 +86,7 @@ const Deferred = (props: Props) => {
       />
       <script
         defer
-        src={scriptAsDataURI(
+        src={useScriptAsDataURI(
           script,
           buttonId,
           behavior?.type || "intersection",

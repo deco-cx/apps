@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import { context } from "deco/live.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../utils/useScript.ts";
 
 interface Hosted {
   trackingId: string;
@@ -149,7 +149,7 @@ export default function Analytics({
       )}
 
       {disableAutomaticEventPush !== true && (
-        <script defer id="analytics-script" src={scriptAsDataURI(snippet)} />
+        <script defer id="analytics-script" src={useScriptAsDataURI(snippet)} />
       )}
     </>
   );
