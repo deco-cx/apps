@@ -34,7 +34,6 @@ const INDEX_NAME: Indices = "products";
 type ProductMap = Record<string, Product>;
 
 function sortProducts(products: Product[], objectIds: string[]) {
-
   const productMap: ProductMap = {};
 
   products.forEach((product) => {
@@ -78,9 +77,11 @@ const loader = async (
     queryID,
     indexName,
   });
-  
-  const newProductsSorted = (objectIds && objectIds?.length > 0) ? sortProducts(transformedProducts, objectIds) : transformedProducts;
-  
+
+  const newProductsSorted = (objectIds && objectIds?.length > 0)
+    ? sortProducts(transformedProducts, objectIds)
+    : transformedProducts;
+
   return newProductsSorted;
 };
 
