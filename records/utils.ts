@@ -14,8 +14,10 @@ export interface StorageConfig {
   authToken: Secret;
 }
 
+export const getLocalDbFilename = () => `${Deno.cwd()}/sqlite.db`;
+
 export const getLocalSQLClientConfig = () => ({
-  url: `file://${Deno.cwd()}/sqlite.db`,
+  url: `file://${getLocalDbFilename()}`,
   authToken: "",
 });
 

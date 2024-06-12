@@ -1,3 +1,5 @@
+import { ImageObject } from "../../../commerce/types.ts";
+
 export interface CategoryLink {
   position: number;
   category_id: string;
@@ -482,7 +484,7 @@ export interface SetShipping {
 }
 
 export interface NewsletterData {
-  sucess: boolean;
+  success: boolean;
   message: string;
 }
 
@@ -498,3 +500,78 @@ export interface Error {
 }
 
 export type WishListReponse = Success | Error;
+
+export interface CartWithImages extends Omit<Cart, "items" | "totalizers"> {
+  items: Array<CartWithImagesItems>;
+  totalizers: CartWithImagesTotalizers;
+}
+
+export interface CartWithImagesItems {
+  price_total: number;
+  images: ImageObject[];
+  url: string;
+  item_id: number;
+  sku: string;
+  qty: number;
+  name: string;
+  price: number;
+  product_type: string;
+  quote_id: string;
+}
+
+interface CartWithImagesTotalizers {
+  grand_total: number;
+  subtotal: number;
+  discount_amount: number;
+  shipping_amount: number;
+  shipping_discount_amount: number;
+  base_currency_code: string;
+  base_discount_amount: number;
+  base_shipping_amount: number;
+  base_subtotal: number;
+  coupon_code: string | undefined;
+}
+
+//Custom Interfaces
+export interface ReviewsAmastyAPI {
+  success: boolean;
+  message: string;
+  reviews: ReviewAmasty[];
+  summary: Summary;
+}
+
+export interface ReviewAmasty {
+  review_id: number;
+  title: string;
+  detail: string;
+  nickname: string;
+  created_at: string;
+  verified_buyer: boolean;
+  review_stars: number;
+  review_stars_percentage: number;
+}
+
+export interface Summary {
+  reviews_count: number;
+}
+
+export interface SubmitReviewAmastyAPI {
+  success: boolean;
+  message: string;
+  reviews: ReviewAmasty[] | null;
+  summary: Summary | null;
+}
+
+export interface SubmitReviewAmastyBody {
+  product_id: number;
+  customer_id: number;
+  store_id: string;
+  nickname: string;
+  title: string;
+  detail: string;
+  ratings: Ratings;
+}
+
+export interface Ratings {
+  [key: string]: string;
+}

@@ -6,8 +6,11 @@ import {
   MagentoCategory,
   MagentoProduct,
   NewsletterData,
+  ReviewsAmastyAPI,
   SetShipping,
   ShippingMethod,
+  SubmitReviewAmastyAPI,
+  SubmitReviewAmastyBody,
   Success,
   User,
   WishListReponse,
@@ -151,5 +154,21 @@ export interface API {
     body: {
       product: string;
     };
+  };
+
+  "GET /rest/:reviewUrl/:productId": {
+    response: ReviewsAmastyAPI;
+    searchParams: {
+      reviewUrl: string;
+      productId: string;
+    };
+  };
+
+  "POST /rest/:reviewUrl": {
+    response: SubmitReviewAmastyAPI;
+    searchParams: {
+      reviewUrl: string;
+    };
+    body: SubmitReviewAmastyBody;
   };
 }
