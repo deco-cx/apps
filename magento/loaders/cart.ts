@@ -38,9 +38,10 @@ const loader = async (
 
   const getCart = async (cartId: string): Promise<Cart | null> => {
     if (!createCartOnAddItem && !cartId) {
-      return await createCart(ctx, req.headers);
+      return await createCart(ctx, req.headers, true);
     }
     if (createCartOnAddItem && !cartId) return null;
+
     try {
       const [resultPricesCarts, resultCart] = await Promise.all([
         clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({

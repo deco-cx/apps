@@ -19,7 +19,7 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Cart | null> => {
   const { qty, sku } = props;
   const { clientAdmin, cartConfigs } = ctx;
@@ -27,28 +27,30 @@ const action = async (
   const cartId = getCartCookie(req.headers);
 
   const body = {
-    "cartItem": {
-      "qty": qty,
-      "quote_id": cartId,
-      "sku": sku,
+    cartItem: {
+      qty: qty,
+      quote_id: cartId,
+      sku: sku,
     },
   };
 
-  try{
+  try {
     if (createCartOnAddItem && !cartId) {
-      const newCartId = (await createCart(ctx, req.headers)).id.toString()
+      const newCartId = (await createCart(ctx, req.headers)).id.toString();
+      console.log({newCartId})
       if (!newCartId.length) return null;
       body.cartItem.quote_id = newCartId;
       await postNewItem(ctx.site, newCartId, body, clientAdmin);
-      setCartCookie(req.headers, newCartId);
+      const newHeaders = new Headers(req.headers);
+      setCartCookie(newHeaders, newCartId);
       return await cart(undefined, req, ctx);
     }
-  
+
     await postNewItem(ctx.site, cartId, body, clientAdmin);
-    return await cart(undefined, req, ctx)
-  }catch(error){
-    throw error
-  };
+    return await cart(undefined, req, ctx);
+  } catch (error) {
+    throw error;
+  }
 };
 
 export default action;
