@@ -1,6 +1,6 @@
 import { getCookies, setCookie } from "std/http/cookie.ts";
 
-const CART_COOKIE = "carrinho-id";
+export const CART_COOKIE = "carrinho-id";
 
 const TEN_DAYS_MS = 10 * 24 * 3600 * 1_000;
 

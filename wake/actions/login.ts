@@ -7,7 +7,9 @@ import type {
     CustomerAuthenticatedLoginMutationVariables,
 } from '../utils/graphql/storefront.graphql.gen.ts'
 import { CheckoutCustomerAssociate, CustomerAuthenticatedLogin } from '../utils/graphql/queries.ts'
-import { getCookies, setCookie } from 'std/http/cookie.ts'
+import { setCookie } from 'std/http/cookie.ts'
+import { getCartCookie } from 'apps/wake/utils/cart.ts'
+import { setUserCookie } from 'apps/wake/utils/user.ts'
 
 export default async function (
     props: Props,
@@ -22,25 +24,18 @@ export default async function (
     >({ variables: props, ...CustomerAuthenticatedLogin }, { headers })
 
     if (customerAuthenticatedLogin) {
-        setCookie(response.headers, {
-            name: 'customerAccessToken',
-            path: '/',
-            value: customerAuthenticatedLogin.token as string,
-            expires: new Date(customerAuthenticatedLogin.validUntil),
-        })
-        setCookie(response.headers, {
-            name: 'customerAccessTokenExpires',
-            path: '/',
-            value: customerAuthenticatedLogin.validUntil,
-            expires: new Date(customerAuthenticatedLogin.validUntil),
-        })
+        setUserCookie(
+            response.headers,
+            customerAuthenticatedLogin.token as string,
+            new Date(customerAuthenticatedLogin.validUntil),
+        )
 
         // associate account to checkout
         await storefront.query<CheckoutCustomerAssociateMutation, CheckoutCustomerAssociateMutationVariables>(
             {
                 variables: {
                     customerAccessToken: customerAuthenticatedLogin.token as string,
-                    checkoutId: getCookies(req.headers).checkout,
+                    checkoutId: getCartCookie(req.headers),
                 },
                 ...CheckoutCustomerAssociate,
             },

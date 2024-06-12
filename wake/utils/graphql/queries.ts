@@ -1325,6 +1325,15 @@ export const CustomerAuthenticatedLogin = {
   }`,
 };
 
+export const CustomerAccessTokenRenew = {
+  query: gql`mutation customerAccessTokenRenew($customerAccessToken: String!) {
+    customerAccessTokenRenew(customerAccessToken: $customerAccessToken) {
+      token
+      validUntil
+    }
+  }`,
+};
+
 export const CustomerAddressCreate = {
   query: gql`mutation customerAddressCreate(
      $customerAccessToken: String!,
@@ -1429,4 +1438,22 @@ export const CheckoutCustomerAssociate = {
         checkoutId
       }
     }`,
+};
+
+export const PaymentMethods = {
+  query: gql`query paymentMethods($checkoutId: Uuid!) {
+    paymentMethods(checkoutId: $checkoutId) {
+      id
+      name
+      imageUrl
+    }
+  }`,
+};
+
+export const GetCheckoutCoupon = {
+  query: gql`query GetCheckoutCoupon($checkoutId: String!) {
+    checkout(checkoutId: $checkoutId) {
+      coupon
+    }
+  }`,
 };

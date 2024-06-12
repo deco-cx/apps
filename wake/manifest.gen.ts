@@ -24,8 +24,8 @@ import * as $$$$$$$$$18 from "./actions/wishlist/addProduct.ts";
 import * as $$$$$$$$$19 from "./actions/wishlist/removeProduct.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/getUser.ts";
-import * as $$$2 from "./loaders/getUserAddresses.ts";
+import * as $$$1 from "./loaders/checkoutCoupon.ts";
+import * as $$$2 from "./loaders/paymentMethods.ts";
 import * as $$$3 from "./loaders/productDetailsPage.ts";
 import * as $$$4 from "./loaders/productList.ts";
 import * as $$$5 from "./loaders/productListingPage.ts";
@@ -33,14 +33,16 @@ import * as $$$6 from "./loaders/proxy.ts";
 import * as $$$7 from "./loaders/recommendations.ts";
 import * as $$$8 from "./loaders/shop.ts";
 import * as $$$9 from "./loaders/suggestion.ts";
-import * as $$$10 from "./loaders/user.ts";
-import * as $$$11 from "./loaders/wishlist.ts";
+import * as $$$10 from "./loaders/useCustomCheckout.ts";
+import * as $$$11 from "./loaders/user.ts";
+import * as $$$12 from "./loaders/userAddresses.ts";
+import * as $$$13 from "./loaders/wishlist.ts";
 
 const manifest = {
   "loaders": {
     "wake/loaders/cart.ts": $$$0,
-    "wake/loaders/getUser.ts": $$$1,
-    "wake/loaders/getUserAddresses.ts": $$$2,
+    "wake/loaders/checkoutCoupon.ts": $$$1,
+    "wake/loaders/paymentMethods.ts": $$$2,
     "wake/loaders/productDetailsPage.ts": $$$3,
     "wake/loaders/productList.ts": $$$4,
     "wake/loaders/productListingPage.ts": $$$5,
@@ -48,8 +50,10 @@ const manifest = {
     "wake/loaders/recommendations.ts": $$$7,
     "wake/loaders/shop.ts": $$$8,
     "wake/loaders/suggestion.ts": $$$9,
-    "wake/loaders/user.ts": $$$10,
-    "wake/loaders/wishlist.ts": $$$11,
+    "wake/loaders/useCustomCheckout.ts": $$$10,
+    "wake/loaders/user.ts": $$$11,
+    "wake/loaders/userAddresses.ts": $$$12,
+    "wake/loaders/wishlist.ts": $$$13,
   },
   "handlers": {
     "wake/handlers/sitemap.ts": $$$$0,

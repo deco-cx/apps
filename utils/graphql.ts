@@ -48,11 +48,15 @@ export const createGraphqlClient = (
       },
       init?: RequestInit,
     ): Promise<D> => {
-      console.log(JSON.stringify({
-        query: [query, ...fragments].join("\n"),
-        variables: variables as any,
-        operationName,
-      }, null, 2));
+      // console.log(JSON.stringify(
+      //   {
+      //     query: [query, ...fragments].join("\n"),
+      //     variables: variables as any,
+      //     operationName,
+      //   },
+      //   null,
+      //   2,
+      // ));
       const { data, errors } = await http[key as any]({}, {
         ...init,
         body: {

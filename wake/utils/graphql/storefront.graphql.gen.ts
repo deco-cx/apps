@@ -5147,6 +5147,13 @@ export type CustomerAuthenticatedLoginMutationVariables = Exact<{
 
 export type CustomerAuthenticatedLoginMutation = { customerAuthenticatedLogin?: { isMaster: boolean, token?: string | null, type?: LoginType | null, validUntil: any } | null };
 
+export type CustomerAccessTokenRenewMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type CustomerAccessTokenRenewMutation = { customerAccessTokenRenew?: { token?: string | null, validUntil: any } | null };
+
 export type CustomerAddressCreateMutationVariables = Exact<{
   customerAccessToken: Scalars['String']['input'];
   address: CreateCustomerAddressInput;
@@ -5193,3 +5200,17 @@ export type CheckoutCustomerAssociateMutationVariables = Exact<{
 
 
 export type CheckoutCustomerAssociateMutation = { checkoutCustomerAssociate?: { checkoutId: any } | null };
+
+export type PaymentMethodsQueryVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+}>;
+
+
+export type PaymentMethodsQuery = { paymentMethods?: Array<{ id?: string | null, name?: string | null, imageUrl?: string | null } | null> | null };
+
+export type GetCheckoutCouponQueryVariables = Exact<{
+  checkoutId: Scalars['String']['input'];
+}>;
+
+
+export type GetCheckoutCouponQuery = { checkout?: { coupon?: string | null } | null };
