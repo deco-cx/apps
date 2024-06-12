@@ -2,8 +2,6 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import {
   Cart,
-  CartWithImages,
-  CartWithImagesItems,
   MagentoCardPrices,
   MagentoProduct,
 } from "./client/types.ts";
@@ -94,17 +92,17 @@ export const toCartItemsWithImages = (
   imagesUrl: string,
   url: string,
   site: string,
-  contProductImageInCart: number,
+  countProductImageInCart: number,
 ) => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
     map[productImage.sku] = productImage || [];
     return map;
   }, {} as Record<string, MagentoProduct>);
 
-  const itemsWithImages = cart.items.map<CartWithImagesItems>((product) => {
+  const itemsWithImages = cart.items.map((product) => {
     const images = productImagesMap[product.sku].media_gallery_entries;
     const productData = productImagesMap[product.sku];
-    const selectedImages = images?.slice(0, contProductImageInCart).map(
+    const selectedImages = images?.slice(0, countProductImageInCart).map(
       (image) => ({
         "@type": "ImageObject" as const,
         encodingFormat: "image",
@@ -142,3 +140,21 @@ export const toCartItemsWithImages = (
     },
   };
 };
+
+export async function postNewItem(
+  site: string,
+  cartId: string,
+  body: {
+    cartItem: {
+      qty: number;
+      quote_id: string;
+      sku: string;
+    };
+  },
+  clientAdmin: AppContext["clientAdmin"],
+): Promise<void> {
+  await clientAdmin["POST /rest/:site/V1/carts/:quoteId/items"]({
+    quoteId: cartId,
+    site: site,
+  }, { body });
+} 

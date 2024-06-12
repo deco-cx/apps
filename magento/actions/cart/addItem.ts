@@ -34,17 +34,21 @@ const action = async (
     },
   };
 
-  if (createCartOnAddItem && !cartId) {
-    const newCartId = (await createCart(ctx, req.headers)).id.toString()
-    if (!newCartId.length) return null;
-    body.cartItem.quote_id = newCartId;
-    await postNewItem(ctx.site, newCartId, body, clientAdmin);
-    setCartCookie(req.headers, newCartId);
-    return await cart(undefined, req, ctx);
-  }
-
-  await postNewItem(ctx.site, cartId, body, clientAdmin);
-  return await cart(undefined, req, ctx);
+  try{
+    if (createCartOnAddItem && !cartId) {
+      const newCartId = (await createCart(ctx, req.headers)).id.toString()
+      if (!newCartId.length) return null;
+      body.cartItem.quote_id = newCartId;
+      await postNewItem(ctx.site, newCartId, body, clientAdmin);
+      setCartCookie(req.headers, newCartId);
+      return await cart(undefined, req, ctx);
+    }
+  
+    await postNewItem(ctx.site, cartId, body, clientAdmin);
+    return await cart(undefined, req, ctx)
+  }catch(error){
+    throw error
+  };
 };
 
 export default action;

@@ -94,10 +94,10 @@ interface CartConfigs {
   createCartOnAddItem: boolean;
 
   /**
-   * @title Cont Product Image in Cart
+   * @title Count Product Image in Cart
    * @default 1
    */
-  contProductImageInCart: number;
+  countProductImageInCart: number;
 }
 
 export interface State extends Props {

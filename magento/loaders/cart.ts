@@ -31,7 +31,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site, imagesUrl, cartConfigs } = ctx;
-  const { contProductImageInCart, createCartOnAddItem } = cartConfigs;
+  const { countProductImageInCart, createCartOnAddItem } = cartConfigs;
   const url = new URL(req.url);
   const cartId = getCartCookie(req.headers);
   const forceNewCart = true;
@@ -83,8 +83,8 @@ const loader = async (
         productImages,
         imagesUrl,
         url.origin,
-        site
-        contProductImageInCart,
+        site,
+        countProductImageInCart,
       ) as unknown as Cart;;
     } catch (_error) {
       return createCart(ctx, req.headers, forceNewCart);
