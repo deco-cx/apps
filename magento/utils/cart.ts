@@ -41,7 +41,7 @@ export const setCartCookie = (headers: Headers, cartId: string) => {
 };
 
 export async function createCart(
-  { clientAdmin, site }: AppContext,
+  { clientAdmin, site, response }: AppContext,
   headers: Headers,
   forceNewCart = false
 ) {
@@ -59,7 +59,9 @@ export async function createCart(
   }
 
   if ((!cartCookie && !customerCookie) || forceNewCart) {
-    return createNewCart({ clientAdmin, site });
+     const newCart = await createNewCart({ clientAdmin, site });
+    setCartCookie(response.headers, newCart.id.toString())
+    return
   }
 
   return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
