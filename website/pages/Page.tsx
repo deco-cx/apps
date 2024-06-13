@@ -170,7 +170,7 @@ export const loader = async (
   // To cache at cloudflare. https://developers.cloudflare.com/cache/advanced-configuration/early-hints/#generate-early-hints
   ctx.response.headers.append(
     "link",
-    `<${cssHref}>; rel=preload`,
+    `<${cssHref}>; rel=preload; as=style`,
   );
 
   // sections.forEach((section) => {
