@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { asset, Head } from "$fresh/runtime.ts";
 import { Section } from "deco/blocks/section.ts";
 import { ComponentMetadata } from "deco/engine/block.ts";
 import { Context } from "deco/live.ts";
@@ -160,33 +160,39 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
-  sections.forEach((section) => {
-    const params = new URLSearchParams([
-      ["props", JSON.stringify(section.props)],
-      ["href", req.url],
-      ["pathTemplate", "/"],
-      ["renderSalt", `${crypto.randomUUID()}`],
-      ["framework", ctx.flavor?.framework ?? ""],
-    ]);
+  const revision = await Context.active().release?.revision();
+  ctx.response.headers.append(
+    "link",
+    `<${asset("/styles.css?revision=" + revision)}>; rel=prefetch`,
+  );
 
-    const props = section.props;
-
-    if ((props as any)?.__resolveType === undefined) {
-      params.set(
-        "resolveChain",
-        JSON.stringify(
-          FieldResolver.minify(
-            section.metadata?.resolveChain.slice(0, -1) ?? [],
-          ),
-        ),
-      );
-    }
-
-    ctx.response.headers.append(
-      "link",
-      `</deco/render?${params}>; rel="prefetch"`,
-    );
-  });
+  // sections.forEach((section) => {
+  //   const params = new URLSearchParams([
+  //     ["props", JSON.stringify(section.props)],
+  //     ["href", req.url],
+  //     ["pathTemplate", "/"],
+  //     ["renderSalt", `${crypto.randomUUID()}`],
+  //     ["framework", ctx.flavor?.framework ?? "fresh"],
+  //   ]);
+  //
+  //   const props = section.props;
+  //
+  //   if ((props as any)?.__resolveType === undefined) {
+  //     params.set(
+  //       "resolveChain",
+  //       JSON.stringify(
+  //         FieldResolver.minify(
+  //           section.metadata?.resolveChain.slice(0, -1) ?? [],
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //
+  //   ctx.response.headers.append(
+  //     "link",
+  //     `</deco/render?${params}>; rel="preload"; as="fetch"`,
+  //   );
+  // });
 
   return {
     ...restProps,
