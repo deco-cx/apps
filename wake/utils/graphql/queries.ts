@@ -1457,3 +1457,81 @@ export const GetCheckoutCoupon = {
     }
   }`,
 };
+
+export const CheckoutAddressAssociate = {
+  query:
+    gql`mutation checkoutAddressAssociate($customerAccessToken: String!, $addressId: ID!, $checkoutId: Uuid!) {
+    checkoutAddressAssociate(
+      customerAccessToken: $customerAccessToken
+      addressId: $addressId
+      checkoutId: $checkoutId
+    ) {
+      cep
+      checkoutId
+      url
+      updateDate
+    }
+  }`,
+};
+
+export const GetSelectedAddress = {
+  query:
+    gql`query GetSelectedAddress($checkoutId: String!, $customerAccessToken: String!) {
+    checkout(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) {
+      selectedAddress {
+        addressNumber
+        cep
+        city
+        id
+        neighborhood
+        referencePoint
+        state
+        street
+      }
+    }
+  }`,
+};
+
+export const CheckoutSelectShippingQuote = {
+  query:
+    gql`mutation checkoutSelectShippingQuote($checkoutId: Uuid!, $shippingQuoteId: Uuid!) {
+    checkoutSelectShippingQuote(
+      checkoutId: $checkoutId
+      shippingQuoteId: $shippingQuoteId
+    ) {
+      cep
+      checkoutId
+      shippingFee
+      selectedShipping {
+        deadline
+        name
+        shippingQuoteId
+        type
+        value
+      }
+    }
+  }`,
+};
+
+export const GetSelectedShipping = {
+  query:
+    gql`query GetSelectedShipping($checkoutId: String!, $customerAccessToken: String!) {
+    checkout(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) {
+      selectedShipping {
+        deadline
+        deadlineInHours
+        deliverySchedule {
+          date
+          endDateTime
+          endTime
+          startDateTime
+          startTime
+        }
+        name
+        shippingQuoteId
+        type
+        value
+      }
+    }
+  }`,
+};

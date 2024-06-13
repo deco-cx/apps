@@ -17,6 +17,8 @@ export default async function (
     const headers = parseHeaders(req.headers)
     const customerAccessToken = ensureCustomerToken(await authenticate(req, ctx))
 
+    if (!customerAccessToken) return null
+
     const { customerAddressUpdate } = await ctx.storefront.query<
         CustomerAddressUpdateMutation,
         CustomerAddressUpdateMutationVariables

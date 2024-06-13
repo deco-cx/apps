@@ -1,5 +1,5 @@
 export default function (token: string | undefined) {
-    if (!token) throw new Error('No checkout cookie')
+  if (!token) console.error("No checkout cookie");
 
-    return token
+  return token;
 }

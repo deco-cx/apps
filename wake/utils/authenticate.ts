@@ -15,10 +15,8 @@ const authenticate = async (req: Request, ctx: AppContext): Promise<string | nul
         const headers = parseHeaders(req.headers)
         const cookies = getCookies(req.headers)
         const customerToken = cookies.customerToken
-        const customerTokenHasNOTexpired = cookies.customerTokenHasNOTexpired
 
         if (!customerToken) return null
-        if (customerTokenHasNOTexpired) return customerToken
 
         const { customerAccessTokenRenew } = await ctx.storefront.query<
             CustomerAccessTokenRenewMutation,
@@ -34,12 +32,9 @@ const authenticate = async (req: Request, ctx: AppContext): Promise<string | nul
         if (!customerAccessTokenRenew) return null
 
         const newCustomerToken = customerAccessTokenRenew.token
-        const newCustomerTokenExpires = customerAccessTokenRenew.validUntil
-
         if (!newCustomerToken) return null
 
-        setUserCookie(ctx.response.headers, newCustomerToken, new Date(newCustomerTokenExpires))
-
+        setUserCookie(ctx.response.headers, newCustomerToken, new Date(customerAccessTokenRenew.validUntil))
         return newCustomerToken
     }
 
@@ -48,7 +43,12 @@ const authenticate = async (req: Request, ctx: AppContext): Promise<string | nul
 
     if (useCustomCheckout) return loginCookie
 
-    const data = await checkoutApi['GET /api/Login/Get']({}, { headers: req.headers }).then(r => r.json())
+    const data = await checkoutApi['GET /api/Login/Get'](
+        {},
+        {
+            headers: req.headers,
+        },
+    ).then(r => r.json())
     if (!data?.CustomerAccessToken) return null
 
     return data?.CustomerAccessToken

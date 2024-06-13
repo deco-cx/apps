@@ -5,11 +5,7 @@ import type { PaymentMethodsQuery, PaymentMethodsQueryVariables } from '../utils
 import { parseHeaders } from '../utils/parseHeaders.ts'
 
 // https://wakecommerce.readme.io/docs/paymentmethods
-export default async function (
-    _props: object,
-    req: Request,
-    ctx: AppContext,
-): Promise<NonNullable<PaymentMethodsQuery['paymentMethods']>> {
+export default async function (_props: object, req: Request, ctx: AppContext) {
     const headers = parseHeaders(req.headers)
     const checkoutId = getCartCookie(req.headers)
 
@@ -21,5 +17,5 @@ export default async function (
         { headers },
     )
 
-    return paymentMethods?.filter(i => i) || []
+    return paymentMethods?.filter((i): i is NonNullable<typeof i> => !!i) || []
 }

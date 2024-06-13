@@ -5214,3 +5214,36 @@ export type GetCheckoutCouponQueryVariables = Exact<{
 
 
 export type GetCheckoutCouponQuery = { checkout?: { coupon?: string | null } | null };
+
+export type CheckoutAddressAssociateMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  addressId: Scalars['ID']['input'];
+  checkoutId: Scalars['Uuid']['input'];
+}>;
+
+
+export type CheckoutAddressAssociateMutation = { checkoutAddressAssociate?: { cep?: number | null, checkoutId: any, url?: string | null, updateDate: any } | null };
+
+export type GetSelectedAddressQueryVariables = Exact<{
+  checkoutId: Scalars['String']['input'];
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type GetSelectedAddressQuery = { checkout?: { selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null } | null };
+
+export type CheckoutSelectShippingQuoteMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  shippingQuoteId: Scalars['Uuid']['input'];
+}>;
+
+
+export type CheckoutSelectShippingQuoteMutation = { checkoutSelectShippingQuote?: { cep?: number | null, checkoutId: any, shippingFee: any, selectedShipping?: { deadline: number, name?: string | null, shippingQuoteId: any, type?: string | null, value: number } | null } | null };
+
+export type GetSelectedShippingQueryVariables = Exact<{
+  checkoutId: Scalars['String']['input'];
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type GetSelectedShippingQuery = { checkout?: { selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null } | null };

@@ -15,12 +15,6 @@ export const setUserCookie = (headers: Headers, token: string, expires: Date): v
         name: 'customerToken',
         path: '/',
         value: token as string,
-        expires: _1_YEAR,
-    })
-    setCookie(headers, {
-        name: 'customerTokenHasNOTexpired',
-        path: '/',
-        value: '_',
         expires,
     })
 }
