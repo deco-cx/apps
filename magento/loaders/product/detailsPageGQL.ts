@@ -8,7 +8,7 @@ import {
   ProductDetailsInputs,
 } from "../../utils/clientGraphql/types.ts";
 import { getCustomFields } from "../../utils/utilsGraphQL.ts";
-import { GetProduct } from "../../utils/clientGraphql/queries.ts";
+import { GetCompleteProduct } from "../../utils/clientGraphql/queries.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -50,16 +50,13 @@ async function loader(
       variables: {
         search: slug,
         filter: { url_key: { eq: slug } },
-        pageSize: 1,
-        currentPage: 1,
       },
-      ...GetProduct(customAttributes),
+      ...GetCompleteProduct(customAttributes),
     },
     enableCache ? STALE : undefined
   );
 
   console.log(products);
-
   return null;
 }
 

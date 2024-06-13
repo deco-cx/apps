@@ -207,8 +207,6 @@ export interface ProductSearchInputs {
 
 export interface ProductDetailsInputs {
   search: string;
-  pageSize: 1;
-  currentPage: 1;
   filter: {
     url_key: {
       eq: string;

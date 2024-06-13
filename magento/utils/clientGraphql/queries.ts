@@ -18,6 +18,50 @@ export const simpleProduct = gql`
   }
 `;
 
+export const completeProduct = gql`
+  fragment completeProduct on ProductInterface {
+    attribute_set_id
+    canonical_url
+    category_ids
+    como_usar__phebo
+    country_of_manufacture
+    created_at
+    description
+    gift_message_available
+    google_product_category
+    id
+    media_gallery {
+      ...mediaGallery
+    }
+    meta_description
+    meta_keyword
+    meta_title
+    name
+    new_from_date
+    new_to_date
+    only_x_left_in_stock
+    options_container
+    price_range {
+      ...priceRange
+    }
+    short_description {
+      html
+    }
+    sku
+    special_from_date
+    special_price
+    special_to_date
+    staged
+    stock_status
+    __typename
+    uid
+    updated_at
+    url_key
+    url_path
+    url_suffix
+  }
+`;
+
 export const priceRange = gql`
   fragment priceRange on PriceRange {
     maximum_price {
@@ -112,6 +156,28 @@ export const GetProduct = (extraProps?: Array<string>) => ({
       ) {
         items {
           ...simpleProduct
+          ${extraProps ? extraProps.join(`\n`) : `\n`}
+        }
+      }
+    }
+  `,
+});
+
+export const GetCompleteProduct = (extraProps?: Array<string>) => ({
+  fragments: [completeProduct, priceRange, mediaGallery],
+  query: gql`
+    query GetProduct(
+      $search: String
+      $filter: ProductAttributeFilterInput
+    ) {
+      products(
+        search: $search
+        filter: $filter
+        pageSize: 1
+        currentPage: 1
+      ) {
+        items {
+          ...completeProduct
           ${extraProps ? extraProps.join(`\n`) : `\n`}
         }
       }
