@@ -215,6 +215,7 @@ export const loader = (props: Props, req: Request, ctx: AppContext) => {
   const tempUrl = new URL(req.url);
   tempUrl.hostname = "www.lojaprohall.com.br";
   tempUrl.port = "";
+  tempUrl.pathname = tempUrl.pathname.replace('/smarthint', '')
 
   return {
     shcode,

@@ -70,9 +70,9 @@ const loader = async (
 
   const anonymous = getSessionCookie(req.headers);
 
-  const pageIdentifier = url.hostname == "localhost"
-    ? ""
-    : new URL(url.pathname, url.origin)?.href.replace("/smarthint", ""); // todo remove
+  const pageIdentifier = 
+  // url.hostname == "localhost" ? "": 
+  new URL(url.pathname, 'https://www.lojaprohall.com.br')?.href.replace("/smarthint", ""); // todo remove & fix origin
 
   const filterString = filter.length
     ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
