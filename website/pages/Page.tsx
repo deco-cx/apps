@@ -182,7 +182,10 @@ export const loader = async (
       );
     }
 
-    ctx.response.headers.append("link", `/deco/render?${params}`);
+    ctx.response.headers.append(
+      "link",
+      `</deco/render?${params}>; rel="prefetch"`,
+    );
   });
 
   return {
