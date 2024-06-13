@@ -18,7 +18,6 @@ import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import { SEOSection } from "../components/Seo.tsx";
-import { FieldResolver } from "deco/engine/core/resolver.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
