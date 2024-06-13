@@ -31,7 +31,10 @@ const action = async (
       await postNewItem(ctx.site, cartId, body, clientAdmin);
       return cart(undefined, req, ctx);
     } catch (error) {
-      return handleCartError(error);
+      return {
+        ...(await cart(undefined, req, ctx)),
+        ...handleCartError(error),
+      };
     }
   };
 
@@ -39,7 +42,7 @@ const action = async (
     cartItem: {
       qty: qty,
       quote_id: cartId,
-      sku: sku,
+      sku,
     },
   };
 
