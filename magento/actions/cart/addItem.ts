@@ -1,11 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import cart, { Cart } from "../../loaders/cart.ts";
-import {
-  createCart,
-  getCartCookie,
-  postNewItem,
-  setCartCookie,
-} from "../../utils/cart.ts";
+import { createCart, getCartCookie, postNewItem } from "../../utils/cart.ts";
 
 export interface Props {
   qty: number;
@@ -35,16 +30,19 @@ const action = async (
   };
 
   if (createCartOnAddItem && !cartId) {
-    const newCartId = (await createCart(ctx, req.headers))?.id.toString();
-    if (!newCartId?.length) return null;
+    const newCartId = (await createCart(ctx, req.headers, true))?.id.toString();
+    if (!newCartId?.length) {
+      return null;
+    }
     body.cartItem.quote_id = newCartId;
+    const headers = new Headers(req.headers);
+    headers.set("cookie", ctx.response.headers.getSetCookie()[0]);
     await postNewItem(ctx.site, newCartId, body, clientAdmin);
-    setCartCookie(ctx.response.headers, newCartId);
-    return await cart(undefined, req, ctx);
+    return cart(undefined, { ...req, headers, url: req.url }, ctx);
   }
 
   await postNewItem(ctx.site, cartId, body, clientAdmin);
-  return await cart(undefined, req, ctx);
+  return cart(undefined, req, ctx);
 };
 
 export default action;
