@@ -161,9 +161,16 @@ export const loader = async (
   );
 
   const revision = await Context.active().release?.revision();
+  const cssHref = asset("/styles.css?revision=" + revision);
   ctx.response.headers.append(
     "link",
-    `<${asset("/styles.css?revision=" + revision)}>; rel=prefetch`,
+    `<${cssHref}>; rel=prefetch`,
+  );
+
+  // To cache at cloudflare. https://developers.cloudflare.com/cache/advanced-configuration/early-hints/#generate-early-hints
+  ctx.response.headers.append(
+    "link",
+    `<${cssHref}>; rel=preload`,
   );
 
   // sections.forEach((section) => {
