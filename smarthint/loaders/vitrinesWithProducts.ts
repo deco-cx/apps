@@ -36,7 +36,7 @@ export interface SmarthintPosition {
   titleRecommendation?: string;
   eventGoogleAnalytics?: string;
   nameRecommendation?: string;
-  products?: Product[];
+  products: Product[] | null;
   bannerUrl?: string;
   bannerUrlClick?: string;
   bannerHtml?: string;
@@ -130,7 +130,8 @@ const loader = async (
     eventGoogleAnalytics: item.EventGoogleAnalytics,
     titleRecommendation: item.TitleRecommendation,
     nameRecommendation: item.NameRecommendation,
-    products: item.Products?.map((product) => toProduct(product)) ?? [],
+    position,
+    products: item.Products?.map((product) => toProduct(product)) || null,
   }));
 };
 
