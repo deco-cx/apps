@@ -6,7 +6,7 @@ const action = async (
   _props: undefined,
   req: Request,
   ctx: AppContext,
-): Promise<Cart> => {
+): Promise<Cart | null> => {
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
 

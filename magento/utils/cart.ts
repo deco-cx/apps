@@ -1,7 +1,6 @@
 import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import {
-  Cart,
   CartFromAPI,
   ItemsWithDecoImage,
   MagentoCardPrices,
@@ -11,6 +10,7 @@ import { toURL } from "./transform.ts";
 import { ImageObject } from "../../commerce/types.ts";
 import { SESSION_COOKIE } from "./constants.ts";
 import { generateUniqueIdentifier } from "./hash.ts";
+import { Cart } from "../loaders/cart.ts";
 
 const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -19,7 +19,23 @@ const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
 export const getCartCookie = (headers: Headers): string => {
   const cookies = getCookies(headers);
-  return decodeURIComponent(cookies[CART_COOKIE] || "").replace(/"/g, "");
+  const cartCookie = cookies[CART_COOKIE];
+  if (cookies && cartCookie) {
+    const decodedCookie = decodeURIComponent(cartCookie || "").replace(
+      /"/g,
+      ""
+    );
+    return decodedCookie;
+  }
+
+  const setCookieHeader = headers.get("Set-Cookie");
+  if (setCookieHeader) {
+    const match = setCookieHeader.match(new RegExp(`${CART_COOKIE}=([^;]+)`));
+    if (match && match[1]) {
+      return decodeURIComponent(match[1]).replace(/"/g, "");
+    }
+  }
+  return "";
 };
 
 export const setCartCookie = (headers: Headers, cartId: string) => {
@@ -31,14 +47,12 @@ export const setCartCookie = (headers: Headers, cartId: string) => {
 };
 
 export async function createCart(
-  { clientAdmin, site }: AppContext,
+  { clientAdmin, site, response }: AppContext,
   headers: Headers,
   forceNewCart = false
 ) {
-  const cartCookie = getCookies(headers)[CART_COOKIE];
-
+  const cartCookie = getCartCookie(headers);
   const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
-
   const sessionCookie = getCookies(headers)[SESSION_COOKIE];
 
   if (!sessionCookie) {
@@ -51,7 +65,9 @@ export async function createCart(
   }
 
   if ((!cartCookie && !customerCookie) || forceNewCart) {
-    return createNewCart({ clientAdmin, site });
+    const newCart = await createNewCart({ clientAdmin, site });
+    setCartCookie(response.headers, newCart.id.toString());
+    return newCart;
   }
 
   const cart = await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
@@ -89,7 +105,8 @@ export const toCartItemsWithImages = (
   productMagento: MagentoProduct[],
   imagesUrl: string,
   url: string,
-  site: string
+  site: string,
+  countProductImageInCart: number
 ): Cart => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
     map[productImage.sku] = productImage || [];
@@ -99,14 +116,15 @@ export const toCartItemsWithImages = (
   const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
     const images = productImagesMap[product.sku].media_gallery_entries;
     const productData = productImagesMap[product.sku];
-    const firstImage = images?.[0]
-      ? ({
+    const selectedImages = images?.slice(0, countProductImageInCart).map(
+      (image) =>
+        ({
           "@type": "ImageObject" as const,
           encodingFormat: "image",
-          alternateName: images[0].file,
-          url: `${toURL(imagesUrl)}${images[0].file}`,
+          alternateName: image.file,
+          url: `${toURL(imagesUrl)}${image.file}`,
         } as ImageObject)
-      : null;
+    );
 
     const urlKey = productData.custom_attributes.find(
       (item) => item.attribute_code === "url_key"
@@ -115,7 +133,7 @@ export const toCartItemsWithImages = (
     return {
       ...product,
       price_total: product.qty * product.price,
-      images: firstImage ? [firstImage] : [],
+      images: selectedImages,
       url: `${url}/${site}/${urlKey}`,
     };
   });
@@ -137,3 +155,24 @@ export const toCartItemsWithImages = (
     },
   };
 };
+
+export async function postNewItem(
+  site: string,
+  cartId: string,
+  body: {
+    cartItem: {
+      qty: number;
+      quote_id: string;
+      sku: string;
+    };
+  },
+  clientAdmin: AppContext["clientAdmin"]
+): Promise<void> {
+  await clientAdmin["POST /rest/:site/V1/carts/:quoteId/items"](
+    {
+      quoteId: cartId,
+      site: site,
+    },
+    { body }
+  );
+}

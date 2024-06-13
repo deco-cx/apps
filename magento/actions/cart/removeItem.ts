@@ -10,7 +10,7 @@ const action = async (
   { itemId }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart> => {
+): Promise<Cart | null> => {
   const { clientAdmin, site } = ctx;
   const cartId = getCartCookie(req.headers);
 
