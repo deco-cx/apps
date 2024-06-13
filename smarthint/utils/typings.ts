@@ -1,4 +1,7 @@
-import { ProductDetailsPage } from "../../commerce/types.ts";
+import {
+  ProductDetailsPage,
+  ProductListingPage,
+} from "../../commerce/types.ts";
 export type PageType =
   | "category"
   | "search"
@@ -30,6 +33,7 @@ export interface Category {
    * @hide true
    */
   readonly type: "category";
+  page: ProductListingPage | null;
 }
 
 export interface Search {

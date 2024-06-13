@@ -4,13 +4,16 @@ import { toProduct } from "../utils/transform.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 
 export interface Props {
+  /**
+   * @hide
+   */
   query?: string;
   /**
-   * @description limit of products to show
+   * @description number of terms that should be returned in autocomplete
    */
   sizeProducts?: number;
   /**
-   * @description limit of terms to show
+   * @description number of products that should be returned in autocomplete
    */
   sizeTerms?: number;
 }
@@ -40,8 +43,6 @@ const loader = async (
   if (!data) return null;
 
   const products = data.Products?.map((product) => toProduct(product));
-
-  console.log(data.Terms);
 
   return {
     products: products,

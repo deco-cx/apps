@@ -363,7 +363,7 @@ ruletype?: string
 /**
  * Filtros sobre a busca realizada pelo Comprador
  */
-filter?: string
+filter?: (string | string[])
 /**
  * Caso existam condições especiais para os Produtos, este deverá enviado
  */

@@ -7,18 +7,19 @@ import { previewFromMarkdown } from "../utils/preview.ts";
 
 export interface State {
   /**
-   * @description SH-XXXXX
+   * @description Your SmartHint Code. Get this information in your Admin Panel. (SH-XXXXX)
    */
   shcode: string;
   /**
-   * @description vX
+   * @description Your SmartHint Cluster. Get this information in your Admin Panel. (vX)
+ vX
    */
   cluster: string;
 }
 
 /**
  * @title Smarthint
- * @description Loaders and actions for adding Smarthint to your website.
+ * @description Smart search and product recommendation to improve your eCommerce customer experience.
  * @category Search
  * @logo https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png
  */

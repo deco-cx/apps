@@ -292,10 +292,12 @@ export const toFilters = (filters: any[], url: URL): Filter[] => {
         `${filter.Key.Value}:${value.Value}`,
       );
 
+      filterUrl.searchParams.delete("page");
+
       return ({
         label: value.Show,
         quantity: value.Quantity,
-        selected: value.Checked,
+        selected: Boolean(value.Checked),
         value: value.Value,
         url: filterUrl.href,
       });

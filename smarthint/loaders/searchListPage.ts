@@ -53,7 +53,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration - Search
+ * @title Smarthint Search
  * @description Product List Page
  */
 const loader = async (
@@ -108,7 +108,7 @@ const loader = async (
     ruletype,
     rule,
     from: String(from),
-    filter: filters?.join("&"),
+    filter: filters,
     condition: conditionString,
   }).then((r) => r.json());
 

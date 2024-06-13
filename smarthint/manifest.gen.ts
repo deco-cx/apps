@@ -10,7 +10,7 @@ import * as $$$2 from "./loaders/productListingPage.ts";
 import * as $$$3 from "./loaders/searchBanners.ts";
 import * as $$$4 from "./loaders/searchListPage.ts";
 import * as $$$5 from "./loaders/vitrinesWithProducts.ts";
-import * as $$$$$$0 from "./sections/Analytics/Smarthint.tsx";
+import * as $$$$$$0 from "./sections/Analytics/SmarthintTracking.tsx";
 
 const manifest = {
   "loaders": {
@@ -22,7 +22,7 @@ const manifest = {
     "smarthint/loaders/vitrinesWithProducts.ts": $$$5,
   },
   "sections": {
-    "smarthint/sections/Analytics/Smarthint.tsx": $$$$$$0,
+    "smarthint/sections/Analytics/SmarthintTracking.tsx": $$$$$$0,
   },
   "actions": {
     "smarthint/actions/click.ts": $$$$$$$$$0,

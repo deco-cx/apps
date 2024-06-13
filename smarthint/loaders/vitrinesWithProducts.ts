@@ -57,7 +57,7 @@ const loader = async (
 ): Promise<SmarthintPosition[] | null> => {
   const { recs, shcode } = ctx;
   const {
-    categories,
+    categories: categoriesParam,
     filter = [],
     position,
     products: productsParam = [],
@@ -85,7 +85,12 @@ const loader = async (
       pagetype.page.product.productID)}`
     : undefined;
 
-  console.log(pagetype);
+  const categories = categoriesParam ??
+    (pagetype.type == "category" && pagetype.page
+      ? pagetype.page?.breadcrumb.itemListElement.map((item) => item.name).join(
+        " > ",
+      )
+      : undefined);
 
   const data = await recs["GET /recommendationByPage/withProducts"]({
     shcode,
@@ -98,8 +103,6 @@ const loader = async (
     position,
     products: productsString,
   }).then((r) => r.json());
-
-  console.log({ data });
 
   const positionItem = data.find((item) =>
     Number(item.SmartHintPosition) == Number(position)

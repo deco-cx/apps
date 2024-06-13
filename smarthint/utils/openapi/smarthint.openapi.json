@@ -1395,7 +1395,17 @@
             "name": "filter",
             "in": "query",
             "schema": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             },
             "description": "Filtros sobre a busca realizada pelo Comprador",
             "example": "{campoFiltro}:{valorFiltro}"
