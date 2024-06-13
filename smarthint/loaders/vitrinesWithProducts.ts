@@ -44,6 +44,7 @@ export interface SmarthintPosition {
   hasTimer: boolean;
   startDateTime: string;
   endDateTime: string;
+  position: string;
 }
 
 /**
