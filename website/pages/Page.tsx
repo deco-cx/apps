@@ -18,6 +18,7 @@ import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import { SEOSection } from "../components/Seo.tsx";
+import { FieldResolver } from "deco/engine/core/resolver.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -158,6 +159,31 @@ export const loader = async (
   const unindexedDomain = noIndexedDomains.some((domain) =>
     url.origin.includes(domain)
   );
+
+  sections.forEach((section) => {
+    const params = new URLSearchParams([
+      ["props", JSON.stringify(section.props)],
+      ["href", req.url],
+      ["pathTemplate", "/"],
+      ["renderSalt", `${crypto.randomUUID()}`],
+      ["framework", ctx.flavor?.framework ?? ""],
+    ]);
+
+    const props = section.props;
+
+    if ((props as any)?.__resolveType === undefined) {
+      params.set(
+        "resolveChain",
+        JSON.stringify(
+          FieldResolver.minify(
+            section.metadata?.resolveChain.slice(0, -1) ?? [],
+          ),
+        ),
+      );
+    }
+
+    ctx.response.headers.append("link", `/deco/render?${params}`);
+  });
 
   return {
     ...restProps,
