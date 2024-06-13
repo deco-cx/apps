@@ -11,6 +11,7 @@ import { ImageObject } from "../../commerce/types.ts";
 import { SESSION_COOKIE } from "./constants.ts";
 import { generateUniqueIdentifier } from "./hash.ts";
 import { Cart } from "../loaders/cart.ts";
+import { HttpError } from "../../utils/http.ts";
 
 const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -176,3 +177,16 @@ export async function postNewItem(
     { body }
   );
 }
+
+export const handleCartError = (
+  // deno-lint-ignore no-explicit-any
+  error: any
+) => {
+  if (error instanceof HttpError) {
+    return {
+      message: JSON.parse(error.message).message,
+      status: error.status,
+    };
+  }
+  return error;
+};
