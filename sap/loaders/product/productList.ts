@@ -35,7 +35,7 @@ export interface Props {
  * @title SAP Integration
  * @description Product List loader
  */
-const searchLoader = async (
+const productListLoader = async (
   props: Props,
   _req: Request,
   ctx: AppContext
@@ -61,4 +61,4 @@ const searchLoader = async (
   return data;
 };
 
-export default searchLoader;
+export default productListLoader;

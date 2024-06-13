@@ -14,6 +14,7 @@ export interface Facet {
 }
 
 export interface VariantOptionQualifier {
+  name?: string;
   qualifier: string;
   value: string;
   image?: {
@@ -33,6 +34,16 @@ export interface VariantOption {
   variantOptionQualifiers: VariantOptionQualifier[];
 }
 
+export interface PriceBaseData {
+  currencyIso: string;
+  value: number;
+}
+
+export interface ProductPriceData extends PriceBaseData {
+  formattedValue: string;
+  priceType: string;
+}
+
 export interface Product {
   availableForPickup: boolean;
   averageRating: number;
@@ -41,13 +52,11 @@ export interface Product {
   configurable: boolean;
   firstVariantImage: string;
   name: string;
-  price: {
-    currencyIso: string;
-    formattedValue: string;
-    priceType: string;
-    value: number;
+  price: ProductPriceData;
+  priceRange?: {
+    maxPrice: PriceBaseData;
+    minPrice: PriceBaseData;
   };
-  // priceRange: {}
   stock: {
     isValueRounded: boolean;
     stockLevelStatus: string;
@@ -85,6 +94,51 @@ export interface SearchResponse {
 
 export interface ProductListResponse extends SearchResponse {
   categoryCode: string;
+}
+
+export interface ProductDetailsOption {
+  code: string;
+  priceData: PriceBaseData;
+  stock: {
+    isValueRounded: false;
+    stockLevel: number;
+  };
+  url: string;
+  variantOptionQualifiers: VariantOptionQualifier[];
+}
+
+export interface ProductDetailsBaseOption {
+  options: ProductDetailsOption[];
+  selected: ProductDetailsOption & { variantType: string };
+  variantType: string;
+}
+
+export interface ProductDetailsResponse {
+  baseOptions: ProductDetailsBaseOption[];
+  baseProduct: string;
+  categories: {
+    code: string;
+    name: string;
+  }[];
+  code: string;
+  configurable: boolean;
+  description: string;
+  multidimensional: boolean;
+  name: string;
+  numberOfReviews: number;
+  price: ProductPriceData;
+  priceRange: {
+    maxPrice: PriceBaseData;
+    minPrice: PriceBaseData;
+  };
+  purchasable: boolean;
+  stock: {
+    isValueRounded: boolean;
+    stockLevel: number;
+    stockLevelStatus: string;
+  };
+  summary: string;
+  url: string;
 }
 
 export interface Brand {
