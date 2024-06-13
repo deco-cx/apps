@@ -135,12 +135,6 @@ export default function App(props: Props): App<Manifest, State> {
       ...props,
       clientAdmin,
       clientGraphql,
-      ...{
-        cartConfigs: {
-          createCartOnAddItem: true,
-          countProductImageInCart: 1,
-        },
-      },
     },
   };
 }

@@ -38,7 +38,7 @@ const loader = async (
 
   const getCart = async (cartId: string): Promise<Cart | null> => {
     if (!createCartOnAddItem && !cartId) {
-      return await createCart(ctx, req.headers, true) as unknown as Cart
+      return await createCart(ctx, req.headers, forceNewCart) as unknown as Cart
     }
     if (createCartOnAddItem && !cartId) return null;
 
