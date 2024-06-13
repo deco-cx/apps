@@ -6,7 +6,7 @@ import {
   ViewItemEvent,
   ViewItemListEvent,
 } from "../../../commerce/types.ts";
-import { scriptAsDataURI } from "../../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 import { AppContext } from "../../mod.ts";
 
 declare global {
@@ -188,7 +188,7 @@ function Analytics({
   return (
     <script
       defer
-      src={scriptAsDataURI(
+      src={useScriptAsDataURI(
         setupAndListen,
         applicationId,
         searchApiKey,
