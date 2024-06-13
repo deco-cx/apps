@@ -244,6 +244,7 @@ export const toProduct = (
       description: product.ShortDescription,
       image: groupImages,
       productGroupID: product.ProductID.toString(),
+      identifier: `${product.IntegrationID}`,
       additionalProperty: [],
       hasVariant,
     },
