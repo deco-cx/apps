@@ -1,5 +1,5 @@
 import {
-  Cart,
+  CartFromAPI,
   CustomerAddress,
   FieldsFilter,
   MagentoCardPrices,
@@ -61,12 +61,12 @@ export interface API {
   };
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartId#operation/GetV1CartsCartId */
   "GET /rest/:site/V1/carts/:cartId": {
-    response: Cart;
+    response: CartFromAPI;
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/guest-cartscartId#operation/GetV1GuestcartsCartId */
   "GET /rest/:site/V1/guest-carts/:cartId": {
-    response: Cart;
+    response: CartFromAPI;
   };
 
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIdtotals/ */

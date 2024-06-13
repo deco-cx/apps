@@ -1,5 +1,4 @@
 import { AppContext } from "../mod.ts";
-import { API } from "../utils/client/client.ts";
 import {
   createCart,
   getCartCookie,
@@ -18,8 +17,9 @@ import {
   SKU,
   SUBTOTAL,
 } from "../utils/constants.ts";
+import { Cart as CartFromDeco } from "../utils/client/types.ts";
 
-export type Cart = API["GET /rest/:site/V1/carts/:cartId"]["response"];
+export type Cart = CartFromDeco
 
 /**
  * @title Magento Integration - Cart
@@ -38,10 +38,9 @@ const loader = async (
 
   const getCart = async (cartId: string): Promise<Cart | null> => {
     if (!createCartOnAddItem && !cartId) {
-      return await createCart(ctx, req.headers, forceNewCart) as unknown as Cart
+      return await createCart(ctx, req.headers, forceNewCart)
     }
     if (createCartOnAddItem && !cartId) return null;
-
     try {
       const [resultPricesCarts, resultCart] = await Promise.all([
         clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
@@ -65,7 +64,7 @@ const loader = async (
         }),
       ]);
 
-      const cart = await resultCart.json() as Cart;
+      const cart = await resultCart.json();
       const prices = await resultPricesCarts.json();
 
       const productImagePromises = cart.items.map((item) => {
@@ -86,9 +85,9 @@ const loader = async (
         url.origin,
         site,
         countProductImageInCart,
-      ) as unknown as Cart;;
+      ) as unknown as Cart;
     } catch (_error) {
-      return createCart(ctx, req.headers, forceNewCart) as unknown as Cart
+      return createCart(ctx, req.headers, forceNewCart)
     }
   };
 
