@@ -4,9 +4,7 @@ export interface ProductLeafGraphQL {
   categories?: Array<Omit<CategoryLeafGraphQL, "products">>;
   country_of_manufacture?: string;
   created_at?: string;
-  description?: {
-    html: string;
-  };
+  description?: string;
   gift_message_available?: string;
   image?: ProductImage;
   is_returnable?: string;
@@ -28,7 +26,9 @@ export interface ProductLeafGraphQL {
   stock_status?: "IN_STOCK" | "OUT_OF_STOCK";
   swatch_image?: string;
   thumbnail?: ProductImage;
+  __typename?: string;
   uid?: string;
+  updated_at?: string;
   url_key?: string;
   url_rewrites?: Array<UrlRewrite>;
 }
@@ -55,6 +55,7 @@ export interface CategoryLeafGraphQL {
   meta_title?: string | null;
   meta_description?: string | null;
   name?: string;
+  position?: number;
 }
 
 export interface CategoryProducts {
@@ -155,6 +156,31 @@ export type SimpleProductGraphQL = Required<
   >
 >;
 
+export type CompleteProductGraphQL = SimpleProductGraphQL &
+  Pick<
+    ProductLeafGraphQL,
+    | "image"
+    | "small_image"
+    | "thumbnail"
+    | "swatch_image"
+    | "description"
+    | "country_of_manufacture"
+    | "created_at"
+    | "gift_message_available"
+    | "is_returnable"
+    | "options_container"
+    | "staged"
+    | "stock_status"
+    | "__typename"
+    | "updated_at"
+    | "meta_title"
+    | "meta_keyword"
+    | "meta_description"
+  > & {
+    categories?: Array<
+      Pick<CategoryLeafGraphQL, "name" | "url_key" | "position">
+    >;
+  };
 export type SimpleCategoryGraphQL = Required<
   Pick<
     CategoryLeafGraphQL,
@@ -176,7 +202,7 @@ export interface ProductShelfGraphQL {
 
 export interface ProductDetailsGraphQL {
   products: {
-    items: SimpleProductGraphQL[];
+    items: CompleteProductGraphQL[];
   };
 }
 

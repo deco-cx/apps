@@ -163,7 +163,10 @@ export const GetProduct = (extraProps?: Array<string>) => ({
   `,
 });
 
-export const GetCompleteProduct = (extraProps?: Array<string>) => ({
+export const GetCompleteProduct = (
+  extraProps?: Array<string>,
+  useCategoriesBreadcrumb?: boolean
+) => ({
   fragments: [completeProduct, priceRange, mediaGallery],
   query: gql`
     query GetProduct(
@@ -179,6 +182,11 @@ export const GetCompleteProduct = (extraProps?: Array<string>) => ({
         items {
           ...completeProduct
           ${extraProps ? extraProps.join(`\n`) : `\n`}
+          ${
+            useCategoriesBreadcrumb
+              ? `categories { name \n url_key \n position }`
+              : ""
+          }
         }
       }
     }

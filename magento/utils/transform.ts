@@ -29,6 +29,7 @@ import {
   SearchResultPageInfo as PageInfoGraphQL,
   SimpleCategoryGraphQL,
   SortFields as SortFieldsGraphQL,
+  CompleteProductGraphQL,
 } from "./clientGraphql/types.ts";
 import { ProductPrice } from "./clientGraphql/types.ts";
 import { PriceRange, SimpleProductGraphQL } from "./clientGraphql/types.ts";
@@ -321,7 +322,7 @@ export const toReviewAmasty = (
   });
 
 export const toProductGraphQL = (
-  product: SimpleProductGraphQL,
+  product: SimpleProductGraphQL | CompleteProductGraphQL,
   options: {
     originURL: URL;
     imagesQtd: number;

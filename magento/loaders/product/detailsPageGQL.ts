@@ -1,4 +1,4 @@
-import type { ProductDetailsPage } from "../../../commerce/types.ts";
+import type { ListItem, ProductDetailsPage } from "../../../commerce/types.ts";
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
@@ -7,8 +7,9 @@ import {
   ProductDetailsGraphQL,
   ProductDetailsInputs,
 } from "../../utils/clientGraphql/types.ts";
-import { getCustomFields } from "../../utils/utilsGraphQL.ts";
+import { formatUrlSuffix, getCustomFields } from "../../utils/utilsGraphQL.ts";
 import { GetCompleteProduct } from "../../utils/clientGraphql/queries.ts";
+import { toProductGraphQL } from "../../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -16,12 +17,16 @@ export interface Props {
    * @title Product custom attributes
    */
   customFields: CustomFields;
+  isBreadcrumbProductName?: boolean;
 }
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (_props: Props, req: Request, _ctx: AppContext) => {
-  return `${req.url}-PDP-GQL`;
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const customAttributes = getCustomFields(props.customFields, ["ALL"]);
+  return `${req.url}-customAtt:${
+    customAttributes?.join("|") ?? "NONE"
+  }-breadcrumbName:${props.isBreadcrumbProductName ?? false}-PDP-GQL`;
 };
 
 /**
@@ -30,17 +35,15 @@ export const cacheKey = (_props: Props, req: Request, _ctx: AppContext) => {
  */
 async function loader(
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext
 ): Promise<ProductDetailsPage | null> {
-  //const url = new URL(req.url);
-  const { slug, customFields } = props;
-  const {
-    clientGraphql,
-    enableCache,
-  } = ctx;
+  const url = new URL(req.url);
+  const { slug, customFields, isBreadcrumbProductName } = props;
+  const { clientGraphql, enableCache, useSuffix, site } = ctx;
   const STALE = enableCache ? DecoStale : undefined;
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
+  const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
 
   const { products } = await clientGraphql.query<
     ProductDetailsGraphQL,
@@ -51,13 +54,52 @@ async function loader(
         search: slug,
         filter: { url_key: { eq: slug } },
       },
-      ...GetCompleteProduct(customAttributes),
+      ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
     },
     enableCache ? STALE : undefined
   );
 
-  console.log(products);
-  return null;
+  const productCanonicalUrl = new URL(
+    (defaultPath ?? "") + products.items[0].canonical_url,
+    url.origin
+  );
+
+  const productListElement = {
+    "@type": "ListItem",
+    item: productCanonicalUrl.href,
+    position: 1,
+    name: products.items[0].name,
+  } as ListItem;
+
+  const itemListElement: ListItem[] = isBreadcrumbProductName
+    ? [productListElement]
+    : products.items[0].categories?.map(
+        ({ position, url_key, name }) =>
+          ({
+            "@type": "ListItem",
+            item: new URL((defaultPath ?? "") + url_key, url.origin).href,
+            position,
+            name,
+          } as ListItem)
+      ) ?? [productListElement];
+
+  return {
+    "@type": "ProductDetailsPage",
+    breadcrumbList: {
+      "@type": "BreadcrumbList",
+      itemListElement,
+      numberOfItems: itemListElement.length,
+    },
+    product: toProductGraphQL(products.items[0], {
+      originURL: url,
+      imagesQtd: 999,
+    }),
+    seo: {
+      title: products.items[0].meta_title!,
+      description: products.items[0].meta_description ?? "",
+      canonical: productCanonicalUrl.href,
+    },
+  };
 }
 
-export default loader
+export default loader;
