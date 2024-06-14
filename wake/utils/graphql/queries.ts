@@ -859,7 +859,95 @@ fragment SingleProductPart on SingleProduct {
     stamp
     title
   }
- 
+}
+`;
+
+const CheckoutCloseFields = gql`
+fragment CheckoutCloseFields on Checkout {
+  checkoutId
+  completed
+  orders {
+    adjustments {
+      name
+      type
+      value
+    }
+    date
+    discountValue
+    interestValue
+    orderId
+    orderStatus
+    products {
+      adjustments {
+        name
+        additionalInformation
+        type
+        value
+      }
+      attributes {
+        name
+        value
+      }
+      imageUrl
+      name
+      productVariantId
+      quantity
+      value
+    }
+    shippingValue
+    totalValue
+    delivery {
+      address {
+        address
+        cep
+        city
+        complement
+        name
+        isPickupStore
+        neighborhood
+        pickupStoreText
+      }
+      cost
+      deliveryTime
+      name
+    }
+    dispatchTimeText
+    payment {
+      invoice {
+        digitableLine
+        paymentLink
+      }
+      name
+      pix {
+        qrCode
+        qrCodeExpirationDate
+        qrCodeUrl
+      }
+    }
+  }
+}
+`;
+
+const SelectPayment = gql`
+fragment SelectPayment on Checkout {
+  checkoutId
+  total
+  subtotal
+  selectedPaymentMethod {
+    id
+    installments {
+      adjustment
+      number
+      total
+      value
+    }
+    selectedInstallment {
+      adjustment
+      number
+      total
+      value
+    }
+  }
 }
 `;
 
@@ -1533,5 +1621,64 @@ export const GetSelectedShipping = {
         value
       }
     }
+  }`,
+};
+
+export const CheckoutComplete = {
+  fragments: [CheckoutCloseFields],
+  query: gql`mutation checkoutComplete(
+    $checkoutId: Uuid!
+    $paymentData: String!
+    $comments: String
+    $customerAccessToken: String
+  ) {
+    checkoutComplete(
+      checkoutId: $checkoutId
+      paymentData: $paymentData
+      comments: $comments
+      customerAccessToken: $customerAccessToken
+    ) {
+      ...CheckoutCloseFields
+    }
+  }`,
+};
+
+export const CheckoutSelectPaymentMethod = {
+  fragments: [SelectPayment],
+  query:
+    gql`mutation checkoutSelectPaymentMethod($checkoutId: Uuid!, $paymentMethodId: ID!) {
+    checkoutSelectPaymentMethod(
+      checkoutId: $checkoutId
+      paymentMethodId: $paymentMethodId
+    ) {
+      ...SelectPayment
+    }
+  }`,
+};
+
+export const CalculatePrices = {
+  query:
+    gql`query calculatePrices($partnerAccessToken: String!, $products: [CalculatePricesProductsInput]!) {
+    calculatePrices(partnerAccessToken: $partnerAccessToken, products: $products) {
+      bestInstallment {
+        displayName
+        name
+      }
+      discountPercentage
+      discounted
+      installmentPlans {
+        displayName
+        name
+        installments{
+          discount
+          fees
+          number
+          value
+        }
+      }
+      listPrice
+      multiplicationFactor
+      price
+    } 
   }`,
 };

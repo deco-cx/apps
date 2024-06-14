@@ -32,10 +32,5 @@ export default async function (
         { headers },
     )
 
-    console.log(checkout, {
-        customerAccessToken,
-        checkoutId,
-    })
-
     return checkout?.selectedShipping ?? null
 }
