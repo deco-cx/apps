@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
-import { AppContext, Extension } from "../mod.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
 import { SectionProps } from "deco/mod.ts";
+import { useScript } from "../../utils/useScript.ts";
+import { AppContext, Extension } from "../mod.ts";
 
 const script = (extensions: Extension[]) => {
   if (extensions.length > 0) {
@@ -13,8 +13,7 @@ function Section({ version, cdn, extensions }: SectionProps<typeof loader>) {
   return (
     <Head>
       <script
-        defer
-        src={scriptAsDataURI(script, extensions)}
+        dangerouslySetInnerHTML={{ __html: useScript(script, extensions) }}
       />
       <script
         defer
