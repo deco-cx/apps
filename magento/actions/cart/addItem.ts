@@ -1,6 +1,11 @@
 import type { AppContext } from "../../mod.ts";
 import cart, { Cart } from "../../loaders/cart.ts";
-import { createCart, getCartCookie, postNewItem } from "../../utils/cart.ts";
+import {
+  createCart,
+  getCartCookie,
+  handleCartError,
+  postNewItem,
+} from "../../utils/cart.ts";
 
 export interface Props {
   qty: number;
@@ -21,11 +26,23 @@ const action = async (
   const { createCartOnAddItem } = cartConfigs;
   const cartId = getCartCookie(req.headers);
 
+  const addItemToCart = async (req: Request, cartId: string) => {
+    try {
+      await postNewItem(ctx.site, cartId, body, clientAdmin);
+      return cart(undefined, req, ctx);
+    } catch (error) {
+      return {
+        ...(await cart(undefined, req, ctx)),
+        ...handleCartError(error),
+      };
+    }
+  };
+
   const body = {
     cartItem: {
       qty: qty,
       quote_id: cartId,
-      sku: sku,
+      sku,
     },
   };
 
@@ -37,12 +54,11 @@ const action = async (
     body.cartItem.quote_id = newCartId;
     const headers = new Headers(req.headers);
     headers.set("cookie", ctx.response.headers.getSetCookie()[0]);
-    await postNewItem(ctx.site, newCartId, body, clientAdmin);
-    return cart(undefined, { ...req, headers, url: req.url }, ctx);
+    const newReq = { ...req, headers, url: req.url };
+    return addItemToCart(newReq, newCartId);
   }
 
-  await postNewItem(ctx.site, cartId, body, clientAdmin);
-  return cart(undefined, req, ctx);
+  return addItemToCart(req, cartId);
 };
 
 export default action;
