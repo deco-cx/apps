@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "std/http/cookie.ts";
+import { getCookies } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import {
   CartFromAPI,
@@ -8,8 +8,6 @@ import {
 } from "./client/types.ts";
 import { toURL } from "./transform.ts";
 import { ImageObject } from "../../commerce/types.ts";
-import { SESSION_COOKIE } from "./constants.ts";
-import { generateUniqueIdentifier } from "./hash.ts";
 import { Cart } from "../loaders/cart.ts";
 import { HttpError } from "../../utils/http.ts";
 
@@ -54,16 +52,6 @@ export async function createCart(
 ) {
   const cartCookie = getCartCookie(headers);
   const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
-  const sessionCookie = getCookies(headers)[SESSION_COOKIE];
-
-  if (!sessionCookie) {
-    setCookie(headers, {
-      path: "/",
-      maxAge: ONE_WEEK_MS,
-      name: SESSION_COOKIE,
-      value: (await generateUniqueIdentifier()).hash,
-    });
-  }
 
   if ((!cartCookie && !customerCookie) || forceNewCart) {
     const newCart = await createNewCart({ clientAdmin, site });

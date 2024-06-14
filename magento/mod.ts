@@ -1,9 +1,14 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type {
+  App,
+  AppContext as AC,
+  AppMiddlewareContext as AMC,
+} from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import { middleware } from "./middleware.ts";
 
 export interface FiltersGraphQL {
   value: string;
@@ -136,7 +141,9 @@ export default function App(props: Props): App<Manifest, State> {
       clientAdmin,
       clientGraphql,
     },
+    middleware
   };
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
+export type AppMiddlewareContext = AMC<App>;
