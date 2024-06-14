@@ -21,15 +21,17 @@ const buildProxyRoutes = ({
   includeSiteMap,
   generateDecoSiteMap,
   excludePathsFromDecoSiteMap,
+  prodUrl,
 }: {
   extraPaths: string[];
   includeSiteMap?: string[];
   generateDecoSiteMap?: boolean;
   ctx: AppContext;
   excludePathsFromDecoSiteMap: string[];
+  prodUrl: URL;
 }) => {
   const publicUrl = new URL(
-    ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
+    ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`
   );
 
   try {
@@ -43,28 +45,34 @@ const buildProxyRoutes = ({
           __resolveType: "website/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
+          customHeaders: [
+            {
+              key: "x-forwarded-for",
+              value: prodUrl.href,
+            },
+          ],
         },
       },
     });
     const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
-      routeFromPath,
+      routeFromPath
     );
 
     const [include, routes] = generateDecoSiteMap
       ? [
-        [...(includeSiteMap ?? []), decoSiteMapUrl],
-        [
-          {
-            pathTemplate: decoSiteMapUrl,
-            handler: {
-              value: {
-                excludePaths: excludePathsFromDecoSiteMap,
-                __resolveType: "website/handlers/sitemap.ts",
+          [...(includeSiteMap ?? []), decoSiteMapUrl],
+          [
+            {
+              pathTemplate: decoSiteMapUrl,
+              handler: {
+                value: {
+                  excludePaths: excludePathsFromDecoSiteMap,
+                  __resolveType: "website/handlers/sitemap.ts",
+                },
               },
             },
-          },
-        ],
-      ]
+          ],
+        ]
       : [includeSiteMap, []];
 
     return [
@@ -121,15 +129,17 @@ function loader(
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
   }: Props,
-  _req: Request,
-  ctx: AppContext,
+  req: Request,
+  ctx: AppContext
 ): Route[] {
+  const prodUrl = new URL(req.url);
   return buildProxyRoutes({
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
     includeSiteMap,
     extraPaths: extraPathsToProxy,
     ctx,
+    prodUrl,
   });
 }
 
