@@ -79,6 +79,25 @@ export interface Props {
    * @default true
    */
   enableCache: boolean;
+
+  /**
+   * @title Cart Configs
+   */
+  cartConfigs: CartConfigs;
+}
+
+interface CartConfigs {
+  /**
+   * @title Enable create Cart on add item fist time
+   * @default false
+   */
+  createCartOnAddItem: boolean;
+
+  /**
+   * @title Count Product Image in Cart
+   * @default 1
+   */
+  countProductImageInCart: number;
 }
 
 export interface State extends Props {
@@ -93,10 +112,7 @@ export interface State extends Props {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const {
-    baseUrl,
-    apiKey,
-  } = props;
+  const { baseUrl, apiKey } = props;
 
   const clientAdmin = createHttpClient<API>({
     base: baseUrl,
@@ -104,7 +120,6 @@ export default function App(props: Props): App<Manifest, State> {
       Authorization: `Bearer ${apiKey}`,
     }),
   });
-
 
   const clientGraphql = createGraphqlClient({
     fetcher: fetchSafe,
@@ -116,7 +131,11 @@ export default function App(props: Props): App<Manifest, State> {
   });
   return {
     manifest,
-    state: { ...props, clientAdmin, clientGraphql },
+    state: {
+      ...props,
+      clientAdmin,
+      clientGraphql,
+    },
   };
 }
 

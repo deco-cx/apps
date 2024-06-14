@@ -195,7 +195,7 @@ export interface ProductSearchResult {
   total_count: number;
 }
 
-export interface Cart {
+export interface CartFromAPI {
   id: number;
   created_at: string;
   updated_at: string;
@@ -264,6 +264,12 @@ export interface Cart {
     };
   };
   totalizers: Totalizers;
+  message?: string;
+  status?: number;
+}
+
+export interface Cart extends Omit<CartFromAPI, "items"> {
+  items: ItemsWithDecoImage[];
 }
 
 export interface Totalizers {
@@ -350,8 +356,12 @@ export interface Items {
   product_type: string;
   quote_id: string;
   url: string;
-  images: MediaEntry[];
+  images?: MediaEntry[];
   price_total: number;
+}
+
+export interface ItemsWithDecoImage extends Omit<Items, "images"> {
+  images?: ImageObject[];
 }
 
 export interface ShippingAssignment {
