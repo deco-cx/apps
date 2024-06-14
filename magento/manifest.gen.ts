@@ -14,7 +14,8 @@ import * as $$$$$$$$$8 from "./actions/newsletter/subscribe.ts";
 import * as $$$$$$$$$9 from "./actions/wishlist/addItem.ts";
 import * as $$$$$$$$$10 from "./actions/wishlist/removeItem.ts";
 import * as $0 from "./functions/requestToPathname.ts";
-import * as $$$$0 from "./handlers/sitemap.ts";
+import * as $$$$0 from "./handlers/proxy.ts";
+import * as $$$$1 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/product/detailsPage.ts";
 import * as $$$2 from "./loaders/product/extensions/amasty/detailsPage.ts";
@@ -47,7 +48,8 @@ const manifest = {
     "magento/loaders/wishlist.ts": $$$11,
   },
   "handlers": {
-    "magento/handlers/sitemap.ts": $$$$0,
+    "magento/handlers/proxy.ts": $$$$0,
+    "magento/handlers/sitemap.ts": $$$$1,
   },
   "actions": {
     "magento/actions/amasty/submitReview.ts": $$$$$$$$$0,

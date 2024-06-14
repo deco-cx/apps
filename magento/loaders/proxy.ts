@@ -42,7 +42,7 @@ const buildProxyRoutes = ({
       pathTemplate,
       handler: {
         value: {
-          __resolveType: "website/handlers/proxy.ts",
+          __resolveType: "magento/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
           customHeaders: [
