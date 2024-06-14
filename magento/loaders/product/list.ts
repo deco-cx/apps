@@ -189,7 +189,15 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Product[] | null> {
-  const { clientGraphql, imagesQtd, site, useSuffix, enableCache } = ctx;
+  const {
+    clientGraphql,
+    imagesQtd,
+    site,
+    useSuffix,
+    enableCache,
+    minInstallmentValue,
+    maxInstallments,
+  } = ctx;
   const { customFields } = props;
   const url = new URL(req.url);
   const formatedProps = fromProps({ props }, url, useSuffix ? site : undefined);
@@ -216,6 +224,8 @@ async function loader(
       imagesQtd,
       defaultPath: useSuffix ? formatUrlSuffix(site) : undefined,
       customAttributes,
+      minInstallmentValue,
+      maxInstallments,
     })
   );
 }

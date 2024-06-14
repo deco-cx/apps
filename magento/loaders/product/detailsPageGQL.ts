@@ -36,11 +36,18 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, customFields, isBreadcrumbProductName } = props;
-  const { clientGraphql, enableCache, useSuffix, site } = ctx;
+  const {
+    clientGraphql,
+    enableCache,
+    useSuffix,
+    site,
+    minInstallmentValue,
+    maxInstallments,
+  } = ctx;
   const STALE = enableCache ? DecoStale : undefined;
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
@@ -56,12 +63,12 @@ async function loader(
       },
       ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
     },
-    enableCache ? STALE : undefined
+    enableCache ? STALE : undefined,
   );
 
   const productCanonicalUrl = new URL(
     (defaultPath ?? "") + products.items[0].canonical_url,
-    url.origin
+    url.origin,
   );
 
   const productListElement = {
@@ -74,14 +81,13 @@ async function loader(
   const itemListElement: ListItem[] = isBreadcrumbProductName
     ? [productListElement]
     : products.items[0].categories?.map(
-        ({ position, url_key, name }) =>
-          ({
-            "@type": "ListItem",
-            item: new URL((defaultPath ?? "") + url_key, url.origin).href,
-            position,
-            name,
-          } as ListItem)
-      ) ?? [productListElement];
+      ({ position, url_key, name }) => ({
+        "@type": "ListItem",
+        item: new URL((defaultPath ?? "") + url_key, url.origin).href,
+        position,
+        name,
+      } as ListItem),
+    ) ?? [productListElement];
 
   return {
     "@type": "ProductDetailsPage",
@@ -93,6 +99,9 @@ async function loader(
     product: toProductGraphQL(products.items[0], {
       originURL: url,
       imagesQtd: 999,
+      customAttributes,
+      minInstallmentValue,
+      maxInstallments,
     }),
     seo: {
       title: products.items[0].meta_title!,

@@ -65,6 +65,8 @@ const loader = async (
     site,
     useSuffix,
     enableCache,
+    maxInstallments,
+    minInstallmentValue,
   } = ctx;
   const { pageSize, categoryProps, urlKey, customFields } = props;
   const currentPage = url.searchParams.get("p") ?? 1;
@@ -127,6 +129,8 @@ const loader = async (
       imagesQtd,
       defaultPath,
       customAttributes,
+      maxInstallments,
+      minInstallmentValue,
     },
   );
 };
