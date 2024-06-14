@@ -2,6 +2,7 @@ import { fetchSafe } from "../../../utils/fetch.ts";
 import { Font } from "../../components/Theme.tsx";
 import type { Manifest } from "../../manifest.gen.ts";
 import { hashStringSync } from "../../../utils/shortHash.ts";
+import { AppContext } from "../../mod.ts";
 
 interface Props {
   fonts: GoogleFont[];
@@ -37,7 +38,7 @@ interface GoogleFont {
   variations: FontVariation[];
 }
 
-const ASSET_LOADER_PATH =
+const _ASSET_LOADER_PATH =
   "/live/invoke/website/loaders/asset.ts" satisfies `/live/invoke/${keyof Manifest[
     "loaders"
   ]}`;
@@ -86,6 +87,19 @@ const getFontVariations = (variations: FontVariation[]) => {
   return `:${hasItalic ? "ital," : ""}wght@${variants.join(";")}`;
 };
 
+const _extractFontFaceUrls = (stylesheet: string) => {
+  const urlPattern = /url\(([^)]+)\)/g;
+  const urls = [];
+  let match;
+
+  while ((match = urlPattern.exec(stylesheet)) !== null) {
+    // Remove the surrounding quotes if they exist
+    urls.push(match[1].replace(/['"]/g, ""));
+  }
+
+  return urls;
+};
+
 const NEW_BROWSER_KEY = {
   "User-Agent":
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
@@ -95,7 +109,11 @@ const OLD_BROWSER_KEY = {
   "User-Agent": "deco-cx/1.0",
 };
 
-const loader = async (props: Props, _req: Request): Promise<Font> => {
+const loader = async (
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<Font> => {
   const { fonts = [] } = props;
   const url = new URL("https://fonts.googleapis.com/css2?display=swap");
 
@@ -124,10 +142,24 @@ const loader = async (props: Props, _req: Request): Promise<Font> => {
     fetchSafe(url, { headers: NEW_BROWSER_KEY }).then((res) => res.text()),
   ]);
 
-  const styleSheet = sheets.join("\n").replaceAll(
-    "https://",
-    `${ASSET_LOADER_PATH}?src=https://`,
-  );
+  const styleSheet = sheets.join("\n");
+  // .replaceAll(
+  //   "https://",
+  //   `${ASSET_LOADER_PATH}?src=https://`,
+  // );
+
+  // const fontsUrls = extractFontFaceUrls(sheets[1]);
+  //
+  // fontsUrls.forEach((url) => {
+  //   ctx.response.headers.append(
+  //     "link",
+  //     `<${ASSET_LOADER_PATH}?src=${url}>; rel="preload"; as="font"; type="font/woff2"`,
+  //   );
+  // });
+
+  console.log("font \n\n", ctx.response.headers.get("link"));
+  // console.log({ l: ctx.response.headers.get("link"), fontsUrls });
+
   return {
     family: Object.keys(reduced).join(", "),
     styleSheet,
