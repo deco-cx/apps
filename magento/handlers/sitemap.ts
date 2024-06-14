@@ -51,7 +51,7 @@ export default function Sitemap({ include }: Props, appCtx: AppContext) {
       customHeaders: [
         {
           key: "x-forwarded-for",
-          value: prodUrl.href,
+          value: prodUrl.origin,
         },
       ],
     })(req, ctx);

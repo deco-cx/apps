@@ -48,7 +48,7 @@ const buildProxyRoutes = ({
           customHeaders: [
             {
               key: "x-forwarded-for",
-              value: prodUrl.href,
+              value: prodUrl.origin,
             },
           ],
         },
