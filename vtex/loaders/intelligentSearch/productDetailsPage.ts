@@ -157,8 +157,8 @@ const loader = async (
       ? {
         ...seo,
         noIndexing: props.indexingSkus ? false : seo.noIndexing,      
-        legacyProductTitle: legacyProduct.productTitle,
-        legacyDescritionMetaTag: legacyProduct.metaTagDescription  
+        legacyProductTitle: legacyProduct?.productTitle || "",
+        legacyDescritionMetaTag: legacyProduct?.metaTagDescription || ""  
       }
       : null,
   };
