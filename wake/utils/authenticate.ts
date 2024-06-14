@@ -34,7 +34,12 @@ const authenticate = async (req: Request, ctx: AppContext): Promise<string | nul
         const newCustomerToken = customerAccessTokenRenew.token
         if (!newCustomerToken) return null
 
-        setUserCookie(ctx.response.headers, newCustomerToken, new Date(customerAccessTokenRenew.validUntil))
+        setUserCookie(
+            ctx.response.headers,
+            newCustomerToken,
+            cookies['fbits-login'],
+            new Date(customerAccessTokenRenew.validUntil),
+        )
         return newCustomerToken
     }
 

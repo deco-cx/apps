@@ -5149,7 +5149,7 @@ export type CustomerAuthenticatedLoginMutationVariables = Exact<{
 }>;
 
 
-export type CustomerAuthenticatedLoginMutation = { customerAuthenticatedLogin?: { isMaster: boolean, token?: string | null, type?: LoginType | null, validUntil: any } | null };
+export type CustomerAuthenticatedLoginMutation = { customerAuthenticatedLogin?: { isMaster: boolean, token?: string | null, legacyToken?: string | null, type?: LoginType | null, validUntil: any } | null };
 
 export type CustomerAccessTokenRenewMutationVariables = Exact<{
   customerAccessToken: Scalars['String']['input'];

@@ -1407,6 +1407,7 @@ export const CustomerAuthenticatedLogin = {
     customerAuthenticatedLogin(input:{input: $input, password: $pass}) {
       isMaster
       token
+      legacyToken
       type
       validUntil
     }
