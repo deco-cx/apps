@@ -1,6 +1,7 @@
 import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppMiddlewareContext } from "./mod.ts";
 import { SESSION_COOKIE } from "./utils/constants.ts";
+import { generateUniqueIdentifier } from "./utils/hash.ts";
 
 export interface Cookie {
   name: string;
@@ -42,7 +43,7 @@ function parseCookieString(cookieString: string) {
 export const middleware = async (
   _props: unknown,
   req: Request,
-  ctx: AppMiddlewareContext
+  ctx: AppMiddlewareContext,
 ) => {
   const ctxMiddleware = ctx;
   const sessionCookie = getCookies(req.headers)[SESSION_COOKIE];
@@ -51,13 +52,21 @@ export const middleware = async (
   }
   const request = await fetch(`${ctxMiddleware.baseUrl}/V1`);
   const cookies = request.headers.getSetCookie();
-  console.log(cookies)
   if (cookies) {
-    cookies.forEach((cookie) => {
+    cookies.forEach((cookie, index) => {
       setCookie(ctx.response.headers, {
         ...parseCookieString(cookie),
         path: "/",
       });
+
+      if (index === 0) {
+        setCookie(ctx.response.headers, {
+          ...parseCookieString(cookie),
+          path: "/",
+          name: 'form_key',
+          value: generateUniqueIdentifier()
+        });
+      }
     });
   }
 

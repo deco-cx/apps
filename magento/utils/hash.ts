@@ -9,10 +9,9 @@ export async function sha256Hash(input: string) {
   }).join("");
 }
 
-export async function generateUniqueIdentifier() {
+export function generateUniqueIdentifier() {
   const timestamp = new Date().getTime();
   const randomComponent = Math.floor(Math.random() * 1000000);
   const inputForHash = `${timestamp}${randomComponent}`;
-  const sha256 = await sha256Hash(inputForHash);
-  return { hash: sha256, timestamp };
+  return atob(inputForHash)
 }
