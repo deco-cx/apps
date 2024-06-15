@@ -139,10 +139,11 @@ async function loader(
       customAttributes,
       minInstallmentValue,
       maxInstallments,
+      defaultPath,
     }),
     seo: {
-      title: products.items[0].meta_title!,
-      description: products.items[0].meta_description ?? "",
+      title: products.items[0].meta_title!.trim(),
+      description: products.items[0].meta_description?.trim() ?? "",
       canonical: productCanonicalUrl.href,
     },
   };
