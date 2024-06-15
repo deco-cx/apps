@@ -476,7 +476,18 @@ export const toOfferGraphQL = (
   itemCondition: "https://schema.org/NewCondition",
   price: minimum_price.final_price.value,
   priceCurrency: minimum_price.final_price.currency ?? "BRL",
-  priceSpecification: [...calculateInstallments(
+  priceSpecification: [
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/ListPrice",
+      price: minimum_price.regular_price.value,
+    },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SalePrice",
+      price: minimum_price.final_price.value,
+    },
+    ...calculateInstallments(
     minimum_price.final_price.value,
     minInstallmentValue,
     maxInstallments,
