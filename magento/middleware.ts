@@ -63,8 +63,8 @@ export const middleware = async (
         setCookie(ctx.response.headers, {
           ...parseCookieString(cookie),
           path: "/",
-          name: 'form_key',
-          value: generateUniqueIdentifier()
+          name: "form_key",
+          value: generateUniqueIdentifier().replace(/=/g, ""),
         });
       }
     });

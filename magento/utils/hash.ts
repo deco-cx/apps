@@ -13,5 +13,5 @@ export function generateUniqueIdentifier() {
   const timestamp = new Date().getTime();
   const randomComponent = Math.floor(Math.random() * 1000000);
   const inputForHash = `${timestamp}${randomComponent}`;
-  return atob(inputForHash)
+  return btoa(inputForHash)
 }
