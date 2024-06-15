@@ -26,6 +26,7 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
+  console.log(ctx);
   const url = new URL(req.url);
   const { slug, isBreadcrumbProductName = false } = props;
   const {

@@ -24,6 +24,7 @@ import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
   CategoryGraphQL,
+  CompleteProductGraphQL,
   PLPGraphQL,
   ProductImage,
   SearchResultPageInfo as PageInfoGraphQL,
@@ -321,12 +322,14 @@ export const toReviewAmasty = (
   });
 
 export const toProductGraphQL = (
-  product: SimpleProductGraphQL,
+  product: SimpleProductGraphQL | CompleteProductGraphQL,
   options: {
     originURL: URL;
     imagesQtd: number;
     defaultPath?: string;
     customAttributes?: Array<string>;
+    minInstallmentValue: number;
+    maxInstallments: number;
   },
 ): Product => {
   const {
@@ -338,11 +341,21 @@ export const toProductGraphQL = (
     name,
     media_gallery,
   } = product;
-  const { originURL, imagesQtd, defaultPath } = options;
+  const {
+    originURL,
+    imagesQtd,
+    defaultPath,
+    minInstallmentValue,
+    maxInstallments,
+  } = options;
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
-    stock_status === "IN_STOCK",
-    only_x_left_in_stock,
+    {
+      inStock: stock_status === "IN_STOCK",
+      stockLeft: only_x_left_in_stock,
+      minInstallmentValue,
+      maxInstallments,
+    },
   );
   const url = new URL(
     (defaultPath ?? "") + product.canonical_url ?? product.url_key,
@@ -361,7 +374,8 @@ export const toProductGraphQL = (
     url,
     name: name.trim(),
     gtin: sku,
-    image: media_gallery
+    // deno-lint-ignore no-explicit-any
+    image: (media_gallery as any[])
       .sort((a, b) => a.position - b.position)
       .reduce<ImageObject[]>((acc, media) => {
         if (acc.length === imagesQtd) {
@@ -371,7 +385,7 @@ export const toProductGraphQL = (
       }, []),
     isVariantOf: {
       "@type": "ProductGroup",
-      productGroupID: uid,
+      productGroupID: productID,
       url,
       name: name.trim(),
       additionalProperty,
@@ -422,22 +436,38 @@ export const toImageGraphQL = (
   url: media.url,
 });
 
+export interface Options {
+  inStock: boolean;
+  stockLeft?: number;
+  minInstallmentValue: number;
+  maxInstallments: number;
+}
+export interface ToOfferProps extends Options {
+  minimum_price: ProductPrice;
+}
+
 export const toAggOfferGraphQL = (
   { maximum_price, minimum_price }: PriceRange,
-  inStock: boolean,
-  stockLeft?: number,
+  { inStock, stockLeft, minInstallmentValue, maxInstallments }: Options,
 ): AggregateOffer => ({
   "@type": "AggregateOffer",
   highPrice: maximum_price.regular_price.value,
   lowPrice: minimum_price.final_price.value,
   offerCount: 1,
-  offers: [toOfferGraphQL(minimum_price, inStock, stockLeft)],
+  offers: [
+    toOfferGraphQL({
+      minimum_price,
+      inStock,
+      stockLeft,
+      minInstallmentValue,
+      maxInstallments,
+    }),
+  ],
 });
 
 export const toOfferGraphQL = (
-  minimum_price: ProductPrice,
-  inStock: boolean,
-  stockLeft?: number,
+  { minimum_price, inStock, stockLeft, maxInstallments, minInstallmentValue }:
+    ToOfferProps,
 ): Offer => ({
   "@type": "Offer",
   availability: inStock ? IN_STOCK : OUT_OF_STOCK,
@@ -447,7 +477,23 @@ export const toOfferGraphQL = (
   itemCondition: "https://schema.org/NewCondition",
   price: minimum_price.final_price.value,
   priceCurrency: minimum_price.final_price.currency ?? "BRL",
-  priceSpecification: [],
+  priceSpecification: [
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/ListPrice",
+      price: minimum_price.regular_price.value,
+    },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SalePrice",
+      price: minimum_price.final_price.value,
+    },
+    ...calculateInstallments(
+      minimum_price.final_price.value,
+      minInstallmentValue,
+      maxInstallments,
+    ),
+  ],
 });
 
 export const toProductListingPageGraphQL = (
@@ -458,9 +504,18 @@ export const toProductListingPageGraphQL = (
     imagesQtd: number;
     defaultPath?: string;
     customAttributes?: Array<string>;
+    minInstallmentValue: number;
+    maxInstallments: number;
   },
 ): ProductListingPage => {
-  const { originURL, imagesQtd, defaultPath, customAttributes } = options;
+  const {
+    originURL,
+    imagesQtd,
+    defaultPath,
+    customAttributes,
+    minInstallmentValue,
+    maxInstallments,
+  } = options;
   const category = categories.items[0];
   const pagination = products.page_info;
   const listElements = toItemElement(category, originURL);
@@ -489,6 +544,8 @@ export const toProductListingPageGraphQL = (
         imagesQtd,
         defaultPath,
         customAttributes,
+        maxInstallments,
+        minInstallmentValue,
       })
     ),
     pageInfo: toPageInfo(pagination, products.total_count, originURL),
