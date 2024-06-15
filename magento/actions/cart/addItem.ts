@@ -28,7 +28,7 @@ const action = async (
 
   const addItemToCart = async (req: Request, cartId: string) => {
     try {
-      await postNewItem(ctx.site, cartId, body, clientAdmin);
+      await postNewItem(ctx.site, cartId, body, clientAdmin, req.headers);
       return cart(undefined, req, ctx);
     } catch (error) {
       return {

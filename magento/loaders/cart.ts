@@ -19,7 +19,7 @@ import {
 } from "../utils/constants.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
 
-export type Cart = CartFromDeco
+export type Cart = CartFromDeco;
 
 /**
  * @title Magento Integration - Cart
@@ -38,7 +38,7 @@ const loader = async (
 
   const getCart = async (cartId: string): Promise<Cart | null> => {
     if (!createCartOnAddItem && !cartId) {
-      return await createCart(ctx, req.headers, forceNewCart)
+      return await createCart(ctx, req.headers, forceNewCart);
     }
     if (createCartOnAddItem && !cartId) return null;
     try {
@@ -87,7 +87,7 @@ const loader = async (
         countProductImageInCart,
       ) as unknown as Cart;
     } catch (_error) {
-      return createCart(ctx, req.headers, forceNewCart)
+      return createCart(ctx, req.headers, forceNewCart);
     }
   };
 

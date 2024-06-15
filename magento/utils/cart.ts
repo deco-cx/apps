@@ -22,7 +22,7 @@ export const getCartCookie = (headers: Headers): string => {
   if (cookies && cartCookie) {
     const decodedCookie = decodeURIComponent(cartCookie || "").replace(
       /"/g,
-      ""
+      "",
     );
     return decodedCookie;
   }
@@ -39,22 +39,24 @@ export const getCartCookie = (headers: Headers): string => {
 
 export const setCartCookie = (headers: Headers, cartId: string) => {
   const encodedCartId = encodeURIComponent(`"${cartId}"`);
-  const cookie = `${CART_COOKIE}=${encodedCartId}; Path=/; Expires=${new Date(
-    Date.now() + ONE_WEEK_MS
-  ).toUTCString()}; SameSite=Lax`;
+  const cookie = `${CART_COOKIE}=${encodedCartId}; Path=/; Expires=${
+    new Date(
+      Date.now() + ONE_WEEK_MS,
+    ).toUTCString()
+  }; SameSite=Lax`;
   headers.append("Set-Cookie", cookie);
 };
 
 export async function createCart(
   { clientAdmin, site, response }: AppContext,
   headers: Headers,
-  forceNewCart = false
+  forceNewCart = false,
 ) {
   const cartCookie = getCartCookie(headers);
   const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
 
   if ((!cartCookie && !customerCookie) || forceNewCart) {
-    const newCart = await createNewCart({ clientAdmin, site });
+    const newCart = await createNewCart({ clientAdmin, site }, headers);
     setCartCookie(response.headers, newCart.id.toString());
     return newCart;
   }
@@ -74,10 +76,10 @@ export async function createCart(
 const createNewCart = async ({
   clientAdmin,
   site,
-}: Pick<AppContext, "clientAdmin" | "site">) => {
+}: Pick<AppContext, "clientAdmin" | "site">, headers: Headers) => {
   const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
     site,
-  }).then((res) => res.json());
+  }, { headers }).then((res) => res.json());
   const cart = await clientAdmin["GET /rest/:site/V1/guest-carts/:cartId"]({
     cartId: tokenCart,
     site,
@@ -95,7 +97,7 @@ export const toCartItemsWithImages = (
   imagesUrl: string,
   url: string,
   site: string,
-  countProductImageInCart: number
+  countProductImageInCart: number,
 ): Cart => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
     map[productImage.sku] = productImage || [];
@@ -106,17 +108,16 @@ export const toCartItemsWithImages = (
     const images = productImagesMap[product.sku].media_gallery_entries;
     const productData = productImagesMap[product.sku];
     const selectedImages = images?.slice(0, countProductImageInCart).map(
-      (image) =>
-        ({
-          "@type": "ImageObject" as const,
-          encodingFormat: "image",
-          alternateName: image.file,
-          url: `${toURL(imagesUrl)}${image.file}`,
-        } as ImageObject)
+      (image) => ({
+        "@type": "ImageObject" as const,
+        encodingFormat: "image",
+        alternateName: image.file,
+        url: `${toURL(imagesUrl)}${image.file}`,
+      } as ImageObject),
     );
 
     const urlKey = productData.custom_attributes.find(
-      (item) => item.attribute_code === "url_key"
+      (item) => item.attribute_code === "url_key",
     )?.value;
 
     return {
@@ -155,20 +156,21 @@ export async function postNewItem(
       sku: string;
     };
   },
-  clientAdmin: AppContext["clientAdmin"]
+  clientAdmin: AppContext["clientAdmin"],
+  headers: Headers
 ): Promise<void> {
   await clientAdmin["POST /rest/:site/V1/carts/:quoteId/items"](
     {
       quoteId: cartId,
       site: site,
     },
-    { body }
+    { body, headers },
   );
 }
 
 export const handleCartError = (
   // deno-lint-ignore no-explicit-any
-  error: any
+  error: any,
 ) => {
   if (error instanceof HttpError) {
     return {
