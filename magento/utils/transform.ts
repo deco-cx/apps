@@ -24,6 +24,7 @@ import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
   CategoryGraphQL,
+  CompleteProductGraphQL,
   PLPGraphQL,
   ProductImage,
   SearchResultPageInfo as PageInfoGraphQL,
@@ -56,7 +57,7 @@ export const toProduct = ({
   const offers = toOffer(
     product,
     options.minInstallmentValue,
-    options.maxInstallments
+    options.maxInstallments,
   );
   const sku = product.sku;
   const productID = product.id.toString();
@@ -67,7 +68,7 @@ export const toProduct = ({
       "@type": "PropertyValue",
       name: attr.attribute_code,
       value: String(attr.value),
-    })
+    }),
   );
 
   return {
@@ -117,7 +118,7 @@ export const toProduct = ({
 export const toOffer = (
   { price_info, extension_attributes, sku, currency_code }: MagentoProduct,
   minInstallmentValue: number,
-  maxInstallments: number
+  maxInstallments: number,
 ): Offer[] => {
   if (!price_info) {
     return [];
@@ -151,7 +152,7 @@ export const toOffer = (
         ...calculateInstallments(
           final_price,
           minInstallmentValue,
-          maxInstallments
+          maxInstallments,
         ),
       ],
       sku: sku,
@@ -162,7 +163,7 @@ export const toOffer = (
 const calculateInstallments = (
   finalPrice: number,
   minInstallmentValue: number,
-  maxInstallments: number
+  maxInstallments: number,
 ): UnitPriceSpecification[] => {
   const possibleInstallmentsCount =
     Math.floor(finalPrice / minInstallmentValue) || 1;
@@ -170,7 +171,7 @@ const calculateInstallments = (
     {
       length: Math.min(possibleInstallmentsCount, maxInstallments),
     },
-    (_v, i) => +(finalPrice / (i + 1)).toFixed(2)
+    (_v, i) => +(finalPrice / (i + 1)).toFixed(2),
   );
 
   return actualInstallmentsCount.map<UnitPriceSpecification>((value, i) => {
@@ -214,7 +215,7 @@ export const toBreadcrumbList = (
   categories: (MagentoCategory | null)[],
   isBreadcrumbProductName: boolean,
   product: Product,
-  url: URL
+  url: URL,
 ) => {
   if (isBreadcrumbProductName && categories?.length === 0) {
     return [
@@ -246,11 +247,11 @@ export const toBreadcrumbList = (
 
 export const toSeo = (
   customAttributes: CustomAttribute[],
-  productURL: string
+  productURL: string,
 ): Seo => {
   const findAttribute = (attrCode: string): string => {
     const attribute = customAttributes.find(
-      (attr) => attr.attribute_code === attrCode
+      (attr) => attr.attribute_code === attrCode,
     );
     if (!attribute) return "";
     if (Array.isArray(attribute.value)) {
@@ -272,7 +273,7 @@ export const toSeo = (
 
 export const toReviewAmasty = (
   products: Product[],
-  productReviews: ReviewsAmastyAPI[]
+  productReviews: ReviewsAmastyAPI[],
 ): Product[] =>
   products.map((product, i) => {
     const { reviews, success, summary } = productReviews[i];
@@ -304,7 +305,7 @@ export const toReviewAmasty = (
 
     const totalRating = review.reduce(
       (acc, r) => acc + Number(r.reviewRating?.ratingValue),
-      0
+      0,
     );
 
     return {
@@ -321,13 +322,15 @@ export const toReviewAmasty = (
   });
 
 export const toProductGraphQL = (
-  product: SimpleProductGraphQL,
+  product: SimpleProductGraphQL | CompleteProductGraphQL,
   options: {
     originURL: URL;
     imagesQtd: number;
     defaultPath?: string;
     customAttributes?: Array<string>;
-  }
+    minInstallmentValue: number;
+    maxInstallments: number;
+  },
 ): Product => {
   const {
     price_range,
@@ -338,21 +341,31 @@ export const toProductGraphQL = (
     name,
     media_gallery,
   } = product;
-  const { originURL, imagesQtd, defaultPath } = options;
+  const {
+    originURL,
+    imagesQtd,
+    defaultPath,
+    minInstallmentValue,
+    maxInstallments,
+  } = options;
   const aggregateOffer = toAggOfferGraphQL(
     price_range,
-    stock_status === "IN_STOCK",
-    only_x_left_in_stock
+    {
+      inStock: stock_status === "IN_STOCK",
+      stockLeft: only_x_left_in_stock,
+      minInstallmentValue,
+      maxInstallments,
+    },
   );
   const url = new URL(
     (defaultPath ?? "") + product.canonical_url ?? product.url_key,
-    originURL.origin
+    originURL.origin,
   ).href;
   const additionalProperty = toAddPropertiesGraphQL(
     product,
-    options.customAttributes
+    options.customAttributes,
   );
-  const productID = atob(uid)
+  const productID = atob(uid);
 
   return {
     "@type": "Product",
@@ -371,7 +384,7 @@ export const toProductGraphQL = (
       }, []),
     isVariantOf: {
       "@type": "ProductGroup",
-      productGroupID: uid,
+      productGroupID: productID,
       url,
       name: name.trim(),
       additionalProperty,
@@ -394,7 +407,7 @@ export const toProductGraphQL = (
 
 const toAddPropertiesGraphQL = (
   product: SimpleProductGraphQL,
-  customAttributes?: Array<string>
+  customAttributes?: Array<string>,
 ) =>
   customAttributes?.reduce<PropertyValue[]>((acc, att) => {
     const attributeOnProduct = product[att as keyof SimpleProductGraphQL];
@@ -414,7 +427,7 @@ const toAddPropertiesGraphQL = (
 
 export const toImageGraphQL = (
   media: ProductImage,
-  name: string
+  name: string,
 ): ImageObject => ({
   "@type": "ImageObject" as const,
   encodingFormat: "image",
@@ -422,22 +435,38 @@ export const toImageGraphQL = (
   url: media.url,
 });
 
+export interface Options {
+  inStock: boolean;
+  stockLeft?: number;
+  minInstallmentValue: number;
+  maxInstallments: number;
+}
+export interface ToOfferProps extends Options {
+  minimum_price: ProductPrice;
+}
+
 export const toAggOfferGraphQL = (
   { maximum_price, minimum_price }: PriceRange,
-  inStock: boolean,
-  stockLeft?: number
+  { inStock, stockLeft, minInstallmentValue, maxInstallments }: Options,
 ): AggregateOffer => ({
   "@type": "AggregateOffer",
   highPrice: maximum_price.regular_price.value,
   lowPrice: minimum_price.final_price.value,
   offerCount: 1,
-  offers: [toOfferGraphQL(minimum_price, inStock, stockLeft)],
+  offers: [
+    toOfferGraphQL({
+      minimum_price,
+      inStock,
+      stockLeft,
+      minInstallmentValue,
+      maxInstallments,
+    }),
+  ],
 });
 
 export const toOfferGraphQL = (
-  minimum_price: ProductPrice,
-  inStock: boolean,
-  stockLeft?: number
+  { minimum_price, inStock, stockLeft, maxInstallments, minInstallmentValue }:
+    ToOfferProps,
 ): Offer => ({
   "@type": "Offer",
   availability: inStock ? IN_STOCK : OUT_OF_STOCK,
@@ -447,7 +476,22 @@ export const toOfferGraphQL = (
   itemCondition: "https://schema.org/NewCondition",
   price: minimum_price.final_price.value,
   priceCurrency: minimum_price.final_price.currency ?? "BRL",
-  priceSpecification: [],
+  priceSpecification: [
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/ListPrice",
+      price: minimum_price.regular_price.value,
+    },
+    {
+      "@type": "UnitPriceSpecification",
+      priceType: "https://schema.org/SalePrice",
+      price: minimum_price.final_price.value,
+    },
+    ...calculateInstallments(
+    minimum_price.final_price.value,
+    minInstallmentValue,
+    maxInstallments,
+  )],
 });
 
 export const toProductListingPageGraphQL = (
@@ -458,9 +502,18 @@ export const toProductListingPageGraphQL = (
     imagesQtd: number;
     defaultPath?: string;
     customAttributes?: Array<string>;
-  }
+    minInstallmentValue: number;
+    maxInstallments: number;
+  },
 ): ProductListingPage => {
-  const { originURL, imagesQtd, defaultPath, customAttributes } = options;
+  const {
+    originURL,
+    imagesQtd,
+    defaultPath,
+    customAttributes,
+    minInstallmentValue,
+    maxInstallments,
+  } = options;
   const category = categories.items[0];
   const pagination = products.page_info;
   const listElements = toItemElement(category, originURL);
@@ -474,12 +527,12 @@ export const toProductListingPageGraphQL = (
       description: category.description,
       image: category.image
         ? [
-            {
-              "@type": "ImageObject" as const,
-              url: category.image,
-              alternateName: category.name,
-            },
-          ]
+          {
+            "@type": "ImageObject" as const,
+            url: category.image,
+            alternateName: category.name,
+          },
+        ]
         : undefined,
     },
     filters: toFilters(products.aggregations, originURL),
@@ -489,6 +542,8 @@ export const toProductListingPageGraphQL = (
         imagesQtd,
         defaultPath,
         customAttributes,
+        maxInstallments,
+        minInstallmentValue,
       })
     ),
     pageInfo: toPageInfo(pagination, products.total_count, originURL),
@@ -503,7 +558,7 @@ export const toProductListingPageGraphQL = (
 
 const toItemElement = (
   category: SimpleCategoryGraphQL,
-  url: URL
+  url: URL,
 ): ListItem[] => {
   const { pathname, origin } = url;
   const fromBreadcrumbs = category?.breadcrumbs?.map<ListItem>((item, i) => {
@@ -529,7 +584,7 @@ const toItemElement = (
 
 const toFilters = (
   aggregations: Required<AggregationGraphQL>[],
-  originUrl: URL
+  originUrl: URL,
 ): Filter[] => {
   const url = new URL(originUrl);
   REMOVABLE_URL_SEARCHPARAMS.forEach((v) => url.searchParams.delete(v));
@@ -557,7 +612,7 @@ const toFilters = (
 const toFilterValues = (
   option: AggregationOptGraphQL,
   attributeCode: string,
-  baseUrl: URL
+  baseUrl: URL,
 ): FilterToggleValue => {
   const url = new URL(baseUrl);
   const selected = baseUrl.searchParams.has(attributeCode, option.value);
@@ -587,7 +642,7 @@ const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
 const toPageInfo = (
   { current_page, page_size, total_pages }: PageInfoGraphQL,
   total: number,
-  url: URL
+  url: URL,
 ): PageInfo => {
   const hasNextPage = current_page < total_pages;
   const hasPrevPage = current_page > 1;
