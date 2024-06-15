@@ -1,8 +1,4 @@
-import type {
-  App,
-  AppContext as AC,
-  AppMiddlewareContext as AMC,
-} from "deco/mod.ts";
+import type { App, AppMiddlewareContext as AMC, FnContext } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
@@ -141,9 +137,9 @@ export default function App(props: Props): App<Manifest, State> {
       clientAdmin,
       clientGraphql,
     },
-    middleware
+    middleware,
   };
 }
 
-export type AppContext = AC<ReturnType<typeof App>>;
-export type AppMiddlewareContext = AMC<App>;
+export type AppContext = FnContext<State, Manifest>;
+export type AppMiddlewareContext = AMC<ReturnType<typeof App>>;
