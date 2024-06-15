@@ -64,6 +64,7 @@ export const middleware = async (
           ...parseCookieString(cookie),
           path: "/",
           name: "form_key",
+          expires: undefined,
           value: generateUniqueIdentifier().replace(/=/g, ""),
         });
       }
