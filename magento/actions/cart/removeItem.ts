@@ -9,7 +9,7 @@ export interface Props {
 const action = async (
   { itemId }: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site } = ctx;
   const cartId = getCartCookie(req.headers);
@@ -21,7 +21,7 @@ const action = async (
         cartId: cartId,
         itemId,
       },
-      {}
+      {},
     );
   } catch (error) {
     return {

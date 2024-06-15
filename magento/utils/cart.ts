@@ -157,7 +157,7 @@ export async function postNewItem(
     };
   },
   clientAdmin: AppContext["clientAdmin"],
-  headers: Headers
+  headers: Headers,
 ): Promise<void> {
   await clientAdmin["POST /rest/:site/V1/carts/:quoteId/items"](
     {

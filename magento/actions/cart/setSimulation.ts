@@ -10,7 +10,7 @@ export type Props = Omit<SetShipping, "isLoggedIn" | "quoteId" | "countryId">;
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site } = ctx;
 
@@ -25,14 +25,14 @@ const action = async (
         site,
         sections: "cart",
       },
-      { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) }
+      { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) },
     ).then((res) => res.json());
 
-    const isLoggedIn =
-      cartResponse?.minicart_improvements?.is_logged_in ?? false;
+    const isLoggedIn = cartResponse?.minicart_improvements?.is_logged_in ??
+      false;
     const quoteId = cartId ?? "";
-    const countryId =
-      cartResponse?.minicart_improvements?.country_id ?? COUNTRY_ID;
+    const countryId = cartResponse?.minicart_improvements?.country_id ??
+      COUNTRY_ID;
 
     clientAdmin["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"](
       {
@@ -42,7 +42,7 @@ const action = async (
       {
         headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }),
         body: { ...props, isLoggedIn, quoteId, countryId },
-      }
+      },
     );
   } catch (error) {
     return {

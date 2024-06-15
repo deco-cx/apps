@@ -7,27 +7,26 @@ import { ExtensionOf } from "../../../../../website/loaders/extension.ts";
  * @title Magento Extension - Listing Page
  * @description Add extra data to your loader. This may harm performance
  */
-const loader =
-  (
-    props: Omit<Props, "products">,
-    req: Request,
-    ctx: AppContext
-  ): ExtensionOf<ProductListingPage | null> =>
-  async (page: ProductListingPage | null) => {
-    if (!page) {
-      return page;
-    }
+const loader = (
+  props: Omit<Props, "products">,
+  req: Request,
+  ctx: AppContext,
+): ExtensionOf<ProductListingPage | null> =>
+async (page: ProductListingPage | null) => {
+  if (!page) {
+    return page;
+  }
 
-    const products = await extend(
-      { products: page.products, ...props },
-      req,
-      ctx
-    );
+  const products = await extend(
+    { products: page.products, ...props },
+    req,
+    ctx,
+  );
 
-    return {
-      ...page,
-      products,
-    };
+  return {
+    ...page,
+    products,
   };
+};
 
 export default loader;

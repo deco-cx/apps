@@ -19,7 +19,7 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Cart | null> => {
   const { qty, sku } = props;
   const { clientAdmin, cartConfigs } = ctx;

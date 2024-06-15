@@ -5,7 +5,7 @@ import { getCartCookie, handleCartError } from "../../utils/cart.ts";
 const action = async (
   _props: undefined,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);

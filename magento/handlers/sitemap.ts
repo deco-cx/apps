@@ -8,22 +8,21 @@ const xmlHeader =
 const includeSiteMaps = (
   currentXML: string,
   origin: string,
-  includes?: string[]
+  includes?: string[],
 ) => {
-  const siteMapIncludeTags =
-    includes?.map(
-      (include) => `
+  const siteMapIncludeTags = includes?.map(
+    (include) => `
   <sitemap>
     <loc>${include.startsWith("/") ? `${origin}${include}` : include}</loc>
     <lastmod>${new Date().toISOString().substring(0, 10)}</lastmod>
-  </sitemap>`
-    ) ?? [];
+  </sitemap>`,
+  ) ?? [];
 
   return siteMapIncludeTags.length > 0
     ? currentXML.replace(
-        xmlHeader,
-        `${xmlHeader}\n${siteMapIncludeTags.join("\n")}`
-      )
+      xmlHeader,
+      `${xmlHeader}\n${siteMapIncludeTags.join("\n")}`,
+    )
     : currentXML;
 };
 
@@ -43,7 +42,7 @@ export default function Sitemap({ include }: Props, appCtx: AppContext) {
     const publicUrl = new URL(
       appCtx.baseUrl?.startsWith("http")
         ? appCtx.baseUrl
-        : `https://${appCtx.baseUrl}`
+        : `https://${appCtx.baseUrl}`,
     );
 
     const response = await Proxy({
@@ -66,12 +65,12 @@ export default function Sitemap({ include }: Props, appCtx: AppContext) {
       includeSiteMaps(
         text.replaceAll(publicUrl.href, `${reqUrl.origin}/`),
         reqUrl.origin,
-        include
+        include,
       ),
       {
         headers: response.headers,
         status: response.status,
-      }
+      },
     );
   };
 }

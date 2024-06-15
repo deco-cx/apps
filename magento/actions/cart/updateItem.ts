@@ -11,7 +11,7 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Cart | null> => {
   const { qty, itemId, sku } = props;
   const { clientAdmin } = ctx;
@@ -32,7 +32,7 @@ const action = async (
         cartId: cartId,
         site: ctx.site,
       },
-      { body }
+      { body },
     );
   } catch (error) {
     return {

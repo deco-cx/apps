@@ -101,13 +101,12 @@ export default function Proxy({
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
     const qs = url.searchParams.toString();
-    const path =
-      basePath && basePath.length > 0
-        ? url.pathname.replace(basePath, "")
-        : url.pathname;
+    const path = basePath && basePath.length > 0
+      ? url.pathname.replace(basePath, "")
+      : url.pathname;
 
     const to = new URL(
-      `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}?${qs}`
+      `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}?${qs}`,
     );
 
     const headers = new Headers(req.headers);
@@ -170,8 +169,9 @@ export default function Proxy({
             // Prepare scripts to insert
             let scriptsInsert = "";
             for (const script of includeScriptsToHead?.includes ?? []) {
-              scriptsInsert +=
-                typeof script.src === "string" ? script.src : script.src(req);
+              scriptsInsert += typeof script.src === "string"
+                ? script.src
+                : script.src(req);
             }
 
             // Combine and encode the new chunk

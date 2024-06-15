@@ -18,7 +18,7 @@ const context = {
 let queue = Promise.resolve();
 let abort = () => {};
 const enqueue = (
-  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>
+  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>,
 ) => {
   abort();
 
@@ -60,7 +60,7 @@ const load = (signal: AbortSignal) =>
       cart: invoke.magento.loaders.cart(),
       wishlist: invoke.magento.loaders.wishlist(),
     },
-    { signal }
+    { signal },
   );
 
 if (IS_BROWSER) {
@@ -68,7 +68,7 @@ if (IS_BROWSER) {
 
   document.addEventListener(
     "visibilitychange",
-    () => document.visibilityState === "visible" && enqueue(load)
+    () => document.visibilityState === "visible" && enqueue(load),
   );
 }
 

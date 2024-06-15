@@ -1,5 +1,5 @@
 import { Product } from "../../../../commerce/types.ts";
-import { STALE as DecoStale} from "../../../../utils/fetch.ts";
+import { STALE as DecoStale } from "../../../../utils/fetch.ts";
 import { AppContext } from "../../../mod.ts";
 import { toReviewAmasty } from "../../../utils/transform.ts";
 
@@ -7,7 +7,6 @@ export interface Props {
   reviews?: ExtensionProps;
   products: Product[];
 }
-
 
 interface ExtensionProps {
   active: boolean;
@@ -21,17 +20,17 @@ interface ExtensionProps {
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
-  return `${req.url}-reviews:${
-    props.reviews?.active ?? false
-  }|url:${props.reviews?.path ?? false}-amastyExtensions`;
+  return `${req.url}-reviews:${props.reviews?.active ?? false}|url:${
+    props.reviews?.path ?? false
+  }-amastyExtensions`;
 };
 
 const reviewsExt = async (
   products: Product[],
   props: ExtensionProps,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[]> => {
-  const STALE = ctx.enableCache ? DecoStale : undefined
+  const STALE = ctx.enableCache ? DecoStale : undefined;
 
   const reviews = await Promise.all(
     products.map(
@@ -41,9 +40,9 @@ const reviewsExt = async (
             reviewUrl: sanitizePath(props.path),
             productId: product!.productID,
           },
-          STALE
-        ).then((review) => review.json())
-    )
+          STALE,
+        ).then((review) => review.json()),
+    ),
   );
 
   return toReviewAmasty(products, reviews);
@@ -51,7 +50,7 @@ const reviewsExt = async (
 export default async (
   { products, reviews }: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[]> => {
   if (reviews?.active) {
     return await reviewsExt(products, reviews, ctx);

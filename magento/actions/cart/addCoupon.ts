@@ -14,7 +14,7 @@ interface ErrorAddCoupon {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Cart | ErrorAddCoupon | null> => {
   const { couponCode } = props;
   const { clientAdmin } = ctx;

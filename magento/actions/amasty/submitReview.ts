@@ -24,7 +24,7 @@ interface Ratings {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<SubmitReviewAmastyAPI> => {
   const { clientAdmin } = ctx;
   const ratings = props.ratings.reduce<RatingsAPI>((acc, rating) => {
@@ -46,7 +46,7 @@ const loader = async (
         ratings,
         store_id: `${ctx.storeId}`,
       },
-    }
+    },
   ).then((r) => r.json());
 };
 

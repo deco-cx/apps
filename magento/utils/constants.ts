@@ -68,5 +68,5 @@ export const MEDIA_GALLERY_ENTRIES = "media_gallery_entries";
 export const SESSION_COOKIE = "PHPSESSID";
 export const COUNTRY_ID = "BR";
 
-export const MAX_RATING_VALUE = 5
-export const MIN_RATING_VALUE = 1 
+export const MAX_RATING_VALUE = 5;
+export const MIN_RATING_VALUE = 1;

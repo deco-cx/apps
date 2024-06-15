@@ -31,7 +31,7 @@ const buildProxyRoutes = ({
   prodUrl: URL;
 }) => {
   const publicUrl = new URL(
-    ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`
+    ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
   );
 
   try {
@@ -55,24 +55,24 @@ const buildProxyRoutes = ({
       },
     });
     const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
-      routeFromPath
+      routeFromPath,
     );
 
     const [include, routes] = generateDecoSiteMap
       ? [
-          [...(includeSiteMap ?? []), decoSiteMapUrl],
-          [
-            {
-              pathTemplate: decoSiteMapUrl,
-              handler: {
-                value: {
-                  excludePaths: excludePathsFromDecoSiteMap,
-                  __resolveType: "website/handlers/sitemap.ts",
-                },
+        [...(includeSiteMap ?? []), decoSiteMapUrl],
+        [
+          {
+            pathTemplate: decoSiteMapUrl,
+            handler: {
+              value: {
+                excludePaths: excludePathsFromDecoSiteMap,
+                __resolveType: "website/handlers/sitemap.ts",
               },
             },
-          ],
-        ]
+          },
+        ],
+      ]
       : [includeSiteMap, []];
 
     return [
@@ -130,7 +130,7 @@ function loader(
     excludePathsFromDecoSiteMap = [],
   }: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Route[] {
   const prodUrl = new URL(req.url);
   return buildProxyRoutes({
