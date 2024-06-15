@@ -10,6 +10,8 @@ import {
 import { formatUrlSuffix, getCustomFields } from "../../utils/utilsGraphQL.ts";
 import { GetCompleteProduct } from "../../utils/clientGraphql/queries.ts";
 import { toProductGraphQL } from "../../utils/transform.ts";
+import { URL_KEY } from "../../utils/constants.ts";
+import stringifySearchCriteria from "../../utils/stringifySearchCriteria.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -36,7 +38,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, customFields, isBreadcrumbProductName } = props;
@@ -47,28 +49,62 @@ async function loader(
     site,
     minInstallmentValue,
     maxInstallments,
+    currencyCode,
+    storeId,
+    clientAdmin,
   } = ctx;
   const STALE = enableCache ? DecoStale : undefined;
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
 
-  const { products } = await clientGraphql.query<
-    ProductDetailsGraphQL,
-    ProductDetailsInputs
-  >(
-    {
-      variables: {
-        search: slug,
-        filter: { url_key: { eq: slug } },
+  const getProductSku = async () => {
+    const searchCriteria = {
+      filterGroups: [
+        {
+          filters: [{ field: URL_KEY, value: slug }],
+        },
+      ],
+    };
+
+    const queryParams = {
+      site,
+      currencyCode,
+      storeId,
+      ...stringifySearchCriteria(searchCriteria),
+    };
+
+    const itemSku = await clientAdmin["GET /rest/:site/V1/products"](
+      {
+        ...queryParams,
       },
-      ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
-    },
-    enableCache ? STALE : undefined,
-  );
+      STALE
+    ).then((res) => res.json());
+    if (!itemSku.items.length) return null;
+    return itemSku.items[0].sku;
+  };
+
+  const getFullProduct = async (sku: string) =>
+    await clientGraphql.query<ProductDetailsGraphQL, ProductDetailsInputs>(
+      {
+        variables: {
+          filter: { sku: { eq: sku } },
+        },
+        ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
+      },
+      STALE
+    );
+
+  const sku = await getProductSku();
+
+  if (!sku) {
+    console.log("product not found");
+    return null;
+  }
+  const { products } = await getFullProduct(sku);
 
   const productCanonicalUrl = new URL(
     (defaultPath ?? "") + products.items[0].canonical_url,
-    url.origin,
+    url.origin
   );
 
   const productListElement = {
@@ -81,13 +117,14 @@ async function loader(
   const itemListElement: ListItem[] = isBreadcrumbProductName
     ? [productListElement]
     : products.items[0].categories?.map(
-      ({ position, url_key, name }) => ({
-        "@type": "ListItem",
-        item: new URL((defaultPath ?? "") + url_key, url.origin).href,
-        position,
-        name,
-      } as ListItem),
-    ) ?? [productListElement];
+        ({ position, url_key, name }) =>
+          ({
+            "@type": "ListItem",
+            item: new URL((defaultPath ?? "") + url_key, url.origin).href,
+            position,
+            name,
+          } as ListItem)
+      ) ?? [productListElement];
 
   return {
     "@type": "ProductDetailsPage",

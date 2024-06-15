@@ -234,9 +234,8 @@ export interface ProductSearchInputs {
 }
 
 export interface ProductDetailsInputs {
-  search: string;
   filter: {
-    url_key: {
+    sku: {
       eq: string;
     };
   };
