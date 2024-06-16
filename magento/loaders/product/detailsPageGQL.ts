@@ -38,7 +38,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, customFields, isBreadcrumbProductName } = props;
@@ -77,7 +77,7 @@ async function loader(
       {
         ...queryParams,
       },
-      STALE
+      STALE,
     ).then((res) => res.json());
     if (!itemSku.items.length) return null;
     return itemSku.items[0].sku;
@@ -91,7 +91,7 @@ async function loader(
         },
         ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
       },
-      STALE
+      STALE,
     );
 
   const sku = await getProductSku();
@@ -104,7 +104,7 @@ async function loader(
 
   const productCanonicalUrl = new URL(
     (defaultPath ?? "") + products.items[0].canonical_url,
-    url.origin
+    url.origin,
   );
 
   const productListElement = {
@@ -117,14 +117,13 @@ async function loader(
   const itemListElement: ListItem[] = isBreadcrumbProductName
     ? [productListElement]
     : products.items[0].categories?.map(
-        ({ position, url_key, name }) =>
-          ({
-            "@type": "ListItem",
-            item: new URL((defaultPath ?? "") + url_key, url.origin).href,
-            position,
-            name,
-          } as ListItem)
-      ) ?? [productListElement];
+      ({ position, url_key, name }) => ({
+        "@type": "ListItem",
+        item: new URL((defaultPath ?? "") + url_key, url.origin).href,
+        position,
+        name,
+      } as ListItem),
+    ) ?? [productListElement];
 
   return {
     "@type": "ProductDetailsPage",
