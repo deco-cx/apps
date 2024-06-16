@@ -1,9 +1,9 @@
 import { AppContext } from "../mod.ts";
 import {
-  createCart,
   getCartCookie,
-  toCartItemsWithImages,
+  toCartItemsWithImages
 } from "../utils/cart.ts";
+import { Cart as CartFromDeco } from "../utils/client/types.ts";
 import {
   BASE_CURRENCY_CODE,
   BASE_DISCOUNT_AMOUNT,
@@ -17,80 +17,73 @@ import {
   SKU,
   SUBTOTAL,
 } from "../utils/constants.ts";
-import { Cart as CartFromDeco } from "../utils/client/types.ts";
 
 export type Cart = CartFromDeco;
+
+interface Props {
+  cartId?: string;
+}
 
 /**
  * @title Magento Integration - Cart
  * @description Cart loader
  */
 const loader = async (
-  _props: undefined,
+  { cartId: _cartId }: Props = { cartId: undefined },
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site, imagesUrl, cartConfigs } = ctx;
-  const { countProductImageInCart, createCartOnAddItem } = cartConfigs;
+  const { countProductImageInCart } = cartConfigs;
   const url = new URL(req.url);
-  const cartId = getCartCookie(req.headers);
-  const forceNewCart = true;
+  const cartId = _cartId ?? getCartCookie(req.headers);
+  console.log({ cartId });
 
-  const getCart = async (cartId: string): Promise<Cart | null> => {
-    if (!createCartOnAddItem && !cartId) {
-      return await createCart(ctx, req.headers, forceNewCart);
-    }
-    if (createCartOnAddItem && !cartId) return null;
-    try {
-      const [resultPricesCarts, resultCart] = await Promise.all([
-        clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
-          cartId,
-          site,
-          fields: [
-            GRAND_TOTAL,
-            SUBTOTAL,
-            DISCOUNT_AMOUNT,
-            BASE_DISCOUNT_AMOUNT,
-            SHIPPING_AMOUNT,
-            BASE_SHIPPING_AMOUNT,
-            SHIPPING_DISCOUNT_AMOUNT,
-            COUPON_CODE,
-            BASE_CURRENCY_CODE,
-          ].join(","),
-        }),
-        clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-          cartId,
-          site,
-        }),
-      ]);
+  if (!cartId) return null;
 
-      const cart = await resultCart.json();
-      const prices = await resultPricesCarts.json();
+  const [resultPricesCarts, resultCart] = await Promise.all([
+    clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
+      cartId,
+      site,
+      fields: [
+        GRAND_TOTAL,
+        SUBTOTAL,
+        DISCOUNT_AMOUNT,
+        BASE_DISCOUNT_AMOUNT,
+        SHIPPING_AMOUNT,
+        BASE_SHIPPING_AMOUNT,
+        SHIPPING_DISCOUNT_AMOUNT,
+        COUPON_CODE,
+        BASE_CURRENCY_CODE,
+      ].join(","),
+    }),
+    clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
+      cartId,
+      site,
+    }),
+  ]);
 
-      const productImagePromises = cart.items.map((item) => {
-        return clientAdmin["GET /rest/:site/V1/products/:sku"]({
-          sku: item.sku,
-          site,
-          fields: [MEDIA_GALLERY_ENTRIES, SKU, "url", "custom_attributes"]
-            .join(","),
-        }).then((res) => res.json());
-      });
-      const productImages = await Promise.all(productImagePromises);
+  const cart = await resultCart.json();
+  const prices = await resultPricesCarts.json();
 
-      return toCartItemsWithImages(
-        cart,
-        prices,
-        productImages,
-        imagesUrl,
-        url.origin,
-        site,
-        countProductImageInCart,
-      ) as unknown as Cart;
-    } catch (_error) {
-      return createCart(ctx, req.headers, forceNewCart);
-    }
-  };
+  const productImagePromises = cart.items.map((item) => {
+    return clientAdmin["GET /rest/:site/V1/products/:sku"]({
+      sku: item.sku,
+      site,
+      fields: [MEDIA_GALLERY_ENTRIES, SKU, "url", "custom_attributes"]
+        .join(","),
+    }).then((res) => res.json());
+  });
+  const productImages = await Promise.all(productImagePromises);
 
-  return await getCart(cartId);
+  return toCartItemsWithImages(
+    cart,
+    prices,
+    productImages,
+    imagesUrl,
+    url.origin,
+    site,
+    countProductImageInCart,
+  ) as unknown as Cart;
 };
 export default loader;

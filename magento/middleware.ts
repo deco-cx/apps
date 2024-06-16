@@ -12,7 +12,7 @@ export interface Cookie {
   httpOnly?: boolean;
 }
 
-function parseCookieString(cookieString: string) {
+export const parseCookieString = (cookieString: string, isLocal: boolean) => {
   const parts = cookieString.split(";").map((part) => part.trim());
   const cookieAttributes: Cookie = { name: "", value: "" };
 
@@ -26,7 +26,9 @@ function parseCookieString(cookieString: string) {
     const attributeKey = key.trim().toLowerCase();
     const attributeValue = val ? decodeURIComponent(val.trim()) : true;
     if (attributeKey === "domain") {
-      cookieAttributes.domain = attributeValue as string;
+      cookieAttributes.domain = isLocal
+        ? "localhost"
+        : attributeValue as string;
     }
     if (attributeKey === "expires") {
       cookieAttributes.expires = Date.parse(attributeValue as string);
@@ -38,7 +40,7 @@ function parseCookieString(cookieString: string) {
   }
 
   return cookieAttributes;
-}
+};
 
 export const middleware = async (
   _props: unknown,
@@ -47,6 +49,7 @@ export const middleware = async (
 ) => {
   const ctxMiddleware = ctx;
   const sessionCookie = getCookies(req.headers)[SESSION_COOKIE];
+
   if (sessionCookie) {
     return ctxMiddleware.next!();
   }
@@ -55,13 +58,13 @@ export const middleware = async (
   if (cookies) {
     cookies.forEach((cookie, index) => {
       setCookie(ctx.response.headers, {
-        ...parseCookieString(cookie),
+        ...parseCookieString(cookie, req.url.includes("localhost")),
         path: "/",
       });
 
       if (index === 0) {
         setCookie(ctx.response.headers, {
-          ...parseCookieString(cookie),
+          ...parseCookieString(cookie, req.url.includes("localhost")),
           path: "/",
           name: "form_key",
           expires: undefined,

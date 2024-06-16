@@ -1,4 +1,7 @@
 import { getCookies } from "std/http/cookie.ts";
+import { ImageObject } from "../../commerce/types.ts";
+import { HttpError } from "../../utils/http.ts";
+import { Cart } from "../loaders/cart.ts";
 import { AppContext } from "../mod.ts";
 import {
   CartFromAPI,
@@ -7,9 +10,6 @@ import {
   MagentoProduct,
 } from "./client/types.ts";
 import { toURL } from "./transform.ts";
-import { ImageObject } from "../../commerce/types.ts";
-import { Cart } from "../loaders/cart.ts";
-import { HttpError } from "../../utils/http.ts";
 
 const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";

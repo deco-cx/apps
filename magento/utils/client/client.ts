@@ -171,4 +171,14 @@ export interface API {
     };
     body: SubmitReviewAmastyBody;
   };
+
+  "POST /:site/checkout/cart/add/uenc/:uenc/product/:productId": {
+    response: unknown;
+    body: {
+      product: string;
+      uenc?: string;
+      form_key: string;
+      qty: number;
+    };
+  };
 }

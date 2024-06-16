@@ -1,11 +1,9 @@
-import type { AppContext } from "../../mod.ts";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 import cart, { Cart } from "../../loaders/cart.ts";
-import {
-  createCart,
-  getCartCookie,
-  handleCartError,
-  postNewItem,
-} from "../../utils/cart.ts";
+import { parseCookieString } from "../../middleware.ts";
+import type { AppContext } from "../../mod.ts";
+import { handleCartError } from "../../utils/cart.ts";
+import { FORM_KEY_COOKIE } from "../../utils/constants.ts";
 
 export interface Props {
   qty: number;
@@ -22,43 +20,60 @@ const action = async (
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { qty, sku } = props;
-  const { clientAdmin, cartConfigs } = ctx;
-  const { createCartOnAddItem } = cartConfigs;
-  const cartId = getCartCookie(req.headers);
+  const { headers, url } = req;
+  const { site, baseUrl } = ctx;
+  const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
+  const newHeaders = new Headers();
 
-  const addItemToCart = async (req: Request, cartId: string) => {
-    try {
-      await postNewItem(ctx.site, cartId, body, clientAdmin, req.headers);
-      return cart(undefined, req, ctx);
-    } catch (error) {
-      return {
-        ...(await cart(undefined, req, ctx)),
-        ...handleCartError(error),
-      };
-    }
-  };
+  const requestCookies = headers.get("Cookie");
 
-  const body = {
-    cartItem: {
-      qty: qty,
-      quote_id: cartId,
-      sku,
-    },
-  };
-
-  if (createCartOnAddItem && !cartId) {
-    const newCartId = (await createCart(ctx, req.headers, true))?.id.toString();
-    if (!newCartId?.length) {
-      return null;
-    }
-    body.cartItem.quote_id = newCartId;
-    const headers = new Headers(req.headers);
-    headers.set("cookie", ctx.response.headers.getSetCookie()[0]);
-    const newReq = { ...req, headers, url: req.url };
-    return addItemToCart(newReq, newCartId);
+  if (requestCookies) {
+    newHeaders.append("Cookie", requestCookies);
   }
+  newHeaders.append("Origin", baseUrl);
+  newHeaders.append("Referer", url);
+  newHeaders.append("X-Requested-With", "XMLHttpRequest");
+  newHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-  return addItemToCart(req, cartId);
+  const urlencoded = new URLSearchParams();
+  urlencoded.append("product", sku);
+  urlencoded.append("form_key", formKey);
+  urlencoded.append("qty", String(qty));
+
+  try {
+    const { headers: fetchHeaders } = await fetch(
+      `${baseUrl}/${site}/checkout/cart/add/uenc/${
+        btoa(url).replace(/=/g, "~")
+      }/product/${sku}`,
+      {
+        method: "POST",
+        headers: newHeaders,
+        body: urlencoded,
+      },
+    );
+
+    let cartId;
+    const cookies = fetchHeaders.getSetCookie();
+    cookies.forEach((cookie) => {
+      const parsed = parseCookieString(cookie, url.includes("localhost"));
+
+      if (parsed.name === "dataservices_cart_id") {
+        cartId = parsed.value.replace(/%22/g, "");
+      }
+
+      setCookie(ctx.response.headers, {
+        ...parsed,
+        path: "/",
+      });
+    });
+
+    return await cart({ cartId }, req, ctx);
+  } catch (error) {
+    return {
+      ...(await cart(undefined, req, ctx)),
+      ...handleCartError(error),
+    };
+  }
 };
 
 export default action;
