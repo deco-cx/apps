@@ -34,16 +34,17 @@ const action = async (
     const countryId = cartResponse?.minicart_improvements?.country_id ??
       COUNTRY_ID;
 
-    clientAdmin["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"](
-      {
-        site,
-        site2: site,
-      },
-      {
-        headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }),
-        body: { ...props, isLoggedIn, quoteId, countryId },
-      },
-    );
+    await clientAdmin
+      ["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"](
+        {
+          site,
+          site2: site,
+        },
+        {
+          headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }),
+          body: { ...props, isLoggedIn, quoteId, countryId },
+        },
+      );
   } catch (error) {
     return {
       ...(await cart(undefined, req, ctx)),
