@@ -1,8 +1,5 @@
 import { AppContext } from "../mod.ts";
-import {
-  getCartCookie,
-  toCartItemsWithImages
-} from "../utils/cart.ts";
+import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
 import {
   BASE_CURRENCY_CODE,
