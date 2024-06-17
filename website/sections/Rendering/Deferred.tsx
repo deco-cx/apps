@@ -2,6 +2,7 @@ import type { Section } from "deco/blocks/section.ts";
 import { usePartialSection } from "deco/hooks/usePartialSection.ts";
 import { useId } from "preact/hooks";
 import { useScriptAsDataURI } from "../../../utils/useScript.ts";
+import { AppContext } from "../../mod.ts";
 
 /** @titleBy type */
 interface Scroll {
@@ -60,7 +61,11 @@ const script = (
   }
 };
 
-const Deferred = (props: Props) => {
+export const loader = (props: Props, _req: Request, ctx: AppContext) => {
+  return { ...props, isBot: ctx.isBot }
+}
+
+const Deferred = (props: ReturnType<typeof loader>) => {
   const { sections, display, behavior } = props;
   const sectionID = useId();
   const buttonId = `deffered-${sectionID}`;
