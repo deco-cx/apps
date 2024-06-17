@@ -114,6 +114,8 @@ export interface PropertyValue extends Omit<Thing, "@type"> {
   value?: string;
   /** A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement. */
   valueReference?: string;
+  /** A complement to the product name, information that is defined directly in the Vtex cms when registering the product*/
+  complementName?: string;
 }
 
 export interface AggregateRating {
@@ -487,8 +489,6 @@ export interface Product extends Omit<Thing, "@type"> {
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
   isAccessoryOrSparePartFor?: ProductLeaf[];
-  /** A complement to the product name, information that is defined directly in the Vtex cms when registering the product*/
-  complementName?: string;
 
   questions?: Question[];
 }
