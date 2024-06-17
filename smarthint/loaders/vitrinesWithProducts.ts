@@ -1,7 +1,6 @@
 import { AppContext } from "../mod.ts";
-import { toProduct } from "../utils/transform.ts";
-import { Filter } from "./searchListPage.ts";
-import { ComplexPageType } from "../utils/typings.ts";
+import { getFilterParam, toProduct } from "../utils/transform.ts";
+import { ComplexPageType, Filter, PageType } from "../utils/typings.ts";
 import { Product } from "../../commerce/types.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 
@@ -47,6 +46,34 @@ export interface SmarthintPosition {
   position: string;
 }
 
+function getProductParam(pagetype: ComplexPageType, productsParam: string[]) {
+  if (productsParam.length) {
+    return productsParam.map((productId) => `productid:${productId}`).join("&");
+  }
+
+  if (pagetype.type == "product" && pagetype.page) {
+    return `productId:${(pagetype.page.product.isVariantOf?.productGroupID ??
+      pagetype.page.product.productID)}`;
+  }
+
+  return;
+}
+
+function getCategoriesParam(
+  pagetype: ComplexPageType,
+  categoriesParam?: string,
+) {
+  if (categoriesParam) return categoriesParam;
+
+  if (pagetype.type == "category" && pagetype.page) {
+    pagetype.page?.breadcrumb.itemListElement.map((item) => item.name).join(
+      " > ",
+    );
+  }
+
+  return;
+}
+
 /**
  * @title Smarthint Integration
  * @description Product List Page
@@ -63,42 +90,32 @@ const loader = async (
     position,
     products: productsParam = [],
     pagetype,
-    channel,
+    channel = "padrao",
   } = props;
 
   const url = new URL(req.url);
 
   const anonymous = getSessionCookie(req.headers);
 
-  const pageIdentifier = 
-  // url.hostname == "localhost" ? "": 
-  new URL(url.pathname, 'https://www.lojaprohall.com.br')?.href.replace("/smarthint", ""); // todo remove & fix origin
+  const pageIdentifier =
+    // url.hostname == "localhost" ? "":
+    new URL(url.pathname, "https://www.lojaprohall.com.br")?.href.replace(
+      "/smarthint",
+      "",
+    ); // todo remove & fix origin
 
-  const filterString = filter.length
-    ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
-      .join("&")
-    : undefined;
+  const filters = getFilterParam(url, filter);
 
-  const productsString = productsParam.length
-    ? productsParam.map((productId) => `productid:${productId}`).join("&")
-    : pagetype.type == "product" && pagetype.page
-    ? `productId:${(pagetype.page.product.isVariantOf?.productGroupID ??
-      pagetype.page.product.productID)}`
-    : undefined;
+  const productsString = getProductParam(pagetype, productsParam);
 
-  const categories = categoriesParam ??
-    (pagetype.type == "category" && pagetype.page
-      ? pagetype.page?.breadcrumb.itemListElement.map((item) => item.name).join(
-        " > ",
-      )
-      : undefined);
+  const categories = getCategoriesParam(pagetype, categoriesParam);
 
   const data = await recs["GET /recommendationByPage/withProducts"]({
     shcode,
     anonymous,
     categories,
     channel,
-    filter: filterString,
+    filter: filters,
     pageIdentifier,
     pagetype: pagetype.type,
     position,

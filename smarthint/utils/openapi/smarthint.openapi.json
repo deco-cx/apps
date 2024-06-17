@@ -1341,7 +1341,7 @@
             "name": "from",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number"
             },
             "description": "Valor a ser retornado a partir do SPOT (Produto)",
             "example": "{spotProduto}"
@@ -1350,7 +1350,7 @@
             "name": "size",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number"
             },
             "description": "Quantidade de Produtos que deverá ser apresetnado por página",
             "example": "{produtosPorPagina}"
@@ -1368,7 +1368,7 @@
             "name": "searchSort",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number"
             },
             "description": "Por padrão, a SmartHint já devolve os produtos da busca pela relevância calculada pela nossa Inteligência Artificial, entretanto, caso o Comprador realize a troca da ordenação para mais vendidos, por exemplo, é necessário realizar a chamada da busca com a ordenação desejada, abaixo, segue os IDs de cada uma das ordenações possíveis:\n- 0 - Relevância\n- 1 - Menor Preço\n- 2 - Maior Preço\n- 3 - Alfabética A-Z\n- 4 - Alfabética Z-A\n- 5 - Mais Recentes\n- 6 - Mais Vendidos\n- 7 - Mais Vistos\n- 8 - Maior Desconto",
             "example": "{sort}"
@@ -1525,6 +1525,9 @@
                             }
                           },
                           "ImageLink": {
+                            "type": "string"
+                          },
+                          "SecondImageLink": {
                             "type": "string"
                           },
                           "AdicionalImageLink": {
@@ -2374,7 +2377,7 @@
             "name": "sizeTerms",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number"
             },
             "description": "Quantidade de termos que deverá ser retornado. Quando o mesmo não for enviado, iremos retornar a quanitdade cadastrar no painel administrativo",
             "example": "{5}"
@@ -2383,7 +2386,7 @@
             "name": "sizeProducts",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number"
             },
             "description": "Quantidade de produtos que deverá ser retornado.\nQuando o mesmo não for enviado, iremos apresentar a mesma quantidade informada em sizeTerms.\n",
             "example": "{3}"
@@ -2482,6 +2485,9 @@
                             }
                           },
                           "ImageLink": {
+                            "type": "string"
+                          },
+                          "SecondImageLink": {
                             "type": "string"
                           },
                           "AdicionalImageLink": {
@@ -3276,7 +3282,17 @@
             "name": "filter",
             "in": "query",
             "schema": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             },
             "description": "Filtros sobre a recomendação, realizada através do productFilters enviados no Produto",
             "example": "{campoFiltro}:{valorFiltro}"
@@ -3404,6 +3420,9 @@
                                     }
                                   },
                                   "ImageLink": {
+                                    "type": "string"
+                                  },
+                                  "SecondImageLink": {
                                     "type": "string"
                                   },
                                   "AdicionalImageLink": {
@@ -3685,6 +3704,9 @@
                                   "ImageLink": {
                                     "type": "string"
                                   },
+                                  "SecondImageLink": {
+                                    "type": "string"
+                                  },
                                   "AdicionalImageLink": {
                                     "type": "array",
                                     "items": {
@@ -3962,6 +3984,9 @@
                                         "ImageLink": {
                                           "type": "string"
                                         },
+                                        "SecondImageLink": {
+                                          "type": "string"
+                                        },
                                         "AdicionalImageLink": {
                                           "type": "array",
                                           "items": {
@@ -4220,6 +4245,9 @@
                                     }
                                   },
                                   "ImageLink": {
+                                    "type": "string"
+                                  },
+                                  "SecondImageLink": {
                                     "type": "string"
                                   },
                                   "AdicionalImageLink": {
@@ -7172,6 +7200,52 @@
               "type": "string"
             },
             "required": true
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Valor a ser retornado a partir do SPOT (Produto)",
+            "example": "{spotProduto}"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Quantidade de Produtos que deverá ser apresetnado por página",
+            "example": "{produtosPorPagina}"
+          },
+          {
+            "name": "searchSort",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Por padrão, a SmartHint já devolve os produtos da busca pela relevância calculada pela nossa Inteligência Artificial, entretanto, caso o Comprador realize a troca da ordenação para mais vendidos, por exemplo, é necessário realizar a chamada da busca com a ordenação desejada, abaixo, segue os IDs de cada uma das ordenações possíveis:\n- 0 - Relevância\n- 1 - Menor Preço\n- 2 - Maior Preço\n- 3 - Alfabética A-Z\n- 4 - Alfabética Z-A\n- 5 - Mais Recentes\n- 6 - Mais Vendidos\n- 7 - Mais Vistos\n- 8 - Maior Desconto",
+            "example": "{sort}"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "description": "Filtros sobre a busca realizada pelo Comprador",
+            "example": "{campoFiltro}:{valorFiltro}"
           }
         ],
         "responses": {
@@ -7243,6 +7317,9 @@
                               "Price": {
                                 "type": "number"
                               },
+                              "HasSalePrice": {
+                                "type": "boolean"
+                              },
                               "SalePrice": {
                                 "type": "number"
                               },
@@ -7258,11 +7335,26 @@
                               "Link": {
                                 "type": "string"
                               },
+                              "HasInstallment": {
+                                "type": "boolean"
+                              },
                               "Installment": {
                                 "type": "integer"
                               },
                               "InstallmentAmount": {
                                 "type": "number"
+                              },
+                              "HasSecondInstallment": {
+                                "type": "boolean"
+                              },
+                              "SecondInstallment": {
+                                "type": "integer"
+                              },
+                              "SecondInstallmentAmount": {
+                                "type": "number"
+                              },
+                              "HasBankSlipPrice": {
+                                "type": "boolean"
                               },
                               "BankSlipPrice": {
                                 "type": "number"
@@ -7447,13 +7539,13 @@
                                 "items": {
                                   "type": "object",
                                   "properties": {
-                                    "Sku": {
+                                    "sku": {
                                       "type": "string"
                                     },
-                                    "SpecificationId": {
+                                    "specificationId": {
                                       "type": "string"
                                     },
-                                    "Availability": {
+                                    "availability": {
                                       "type": "string"
                                     },
                                     "Changes": {
@@ -7476,7 +7568,7 @@
                                         }
                                       }
                                     },
-                                    "Variations": {
+                                    "variations": {
                                       "type": "array",
                                       "items": {
                                         "type": "object",
@@ -7498,6 +7590,15 @@
                               },
                               "ViewsCount": {
                                 "type": "integer"
+                              },
+                              "StockDate": {
+                                "type": "string"
+                              },
+                              "isHighlightProduct": {
+                                "type": "boolean"
+                              },
+                              "AvailabilityPercentage": {
+                                "type": "number"
                               }
                             }
                           }

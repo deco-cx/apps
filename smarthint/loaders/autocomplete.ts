@@ -34,8 +34,8 @@ const loader = async (
   const data = await api["GET /:cluster/Search/GetSuggestionTerms"]({
     cluster,
     shcode,
-    sizeProducts: sizeProducts ? String(sizeProducts) : undefined,
-    sizeTerms: sizeProducts ? String(sizeTerms) : undefined,
+    sizeProducts: sizeProducts,
+    sizeTerms: sizeTerms,
     term: query,
     anonymous,
   }).then((r) => r.json());

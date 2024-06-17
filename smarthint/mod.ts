@@ -12,9 +12,12 @@ export interface State {
   shcode: string;
   /**
    * @description Your SmartHint Cluster. Get this information in your Admin Panel. (vX)
- vX
    */
   cluster: string;
+  /**
+   * @title Public store URL
+   */
+  publicUrl: string;
 }
 
 /**

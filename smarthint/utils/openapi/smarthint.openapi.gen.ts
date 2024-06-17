@@ -327,11 +327,11 @@ term?: string
 /**
  * Valor a ser retornado a partir do SPOT (Produto)
  */
-from?: string
+from?: number
 /**
  * Quantidade de Produtos que deverá ser apresetnado por página
  */
-size?: string
+size?: number
 /**
  * Deve ser uma string que identifica o cliente, sempre que esse cliente utilizar o aplicativo, esse identificador deve possuir o mesmo valor. Recomendamos que seja um valor que não possua características pessoais do cliente, como por exemplo CPF, e-mail, nome, o ideal é que seja um ID interno ou algum hash gerado a partir de alguma dessas informações. Essa informação será enviada nas requisições para identificar a interação do cliente com a SmartHint e gerar dados sobre navegação e compras para os modelos de IA.
  */
@@ -348,7 +348,7 @@ anonymous?: string
  * - 7 - Mais Vistos
  * - 8 - Maior Desconto
  */
-searchSort?: string
+searchSort?: number
 /**
  * Caso existam Regras para a apresentação de produtos, este deverá ser enviado
  */
@@ -399,6 +399,7 @@ Brand?: string
 ReviewStars?: number
 Categories?: string[]
 ImageLink?: string
+SecondImageLink?: string
 AdicionalImageLink?: string[]
 Tags?: string[]
 CreatedDate?: string
@@ -525,13 +526,13 @@ term?: string
 /**
  * Quantidade de termos que deverá ser retornado. Quando o mesmo não for enviado, iremos retornar a quanitdade cadastrar no painel administrativo
  */
-sizeTerms?: string
+sizeTerms?: number
 /**
  * Quantidade de produtos que deverá ser retornado.
  * Quando o mesmo não for enviado, iremos apresentar a mesma quantidade informada em sizeTerms.
  * 
  */
-sizeProducts?: string
+sizeProducts?: number
 /**
  * Deve ser uma string que identifica o cliente, sempre que esse cliente utilizar o aplicativo, esse identificador deve possuir o mesmo valor. Recomendamos que seja um valor que não possua características pessoais do cliente, como por exemplo CPF, e-mail, nome, o ideal é que seja um ID interno ou algum hash gerado a partir de alguma dessas informações. Essa informação será enviada nas requisições para identificar a interação do cliente com a SmartHint e gerar dados sobre navegação e compras para os modelos de IA.
  */
@@ -560,6 +561,7 @@ Brand?: string
 ReviewStars?: number
 Categories?: string[]
 ImageLink?: string
+SecondImageLink?: string
 AdicionalImageLink?: string[]
 Tags?: string[]
 CreatedDate?: string
@@ -711,7 +713,7 @@ anonymous?: string
 /**
  * Filtros sobre a recomendação, realizada através do productFilters enviados no Produto
  */
-filter?: string
+filter?: (string | string[])
 /**
  * Listagem das últimas categorias visitadas pelo cliente. O envio deverá ser realizado neste formato:
  * categories=category
@@ -756,6 +758,7 @@ Brand?: string
 ReviewStars?: number
 Categories?: string[]
 ImageLink?: string
+SecondImageLink?: string
 AdicionalImageLink?: string[]
 Tags?: string[]
 CreatedDate?: string
@@ -839,6 +842,7 @@ Brand?: string
 ReviewStars?: number
 Categories?: string[]
 ImageLink?: string
+SecondImageLink?: string
 AdicionalImageLink?: string[]
 Tags?: string[]
 CreatedDate?: string
@@ -921,6 +925,7 @@ Brand?: string
 ReviewStars?: number
 Categories?: string[]
 ImageLink?: string
+SecondImageLink?: string
 AdicionalImageLink?: string[]
 Tags?: string[]
 CreatedDate?: string
@@ -998,6 +1003,7 @@ Brand?: string
 ReviewStars?: number
 Categories?: string[]
 ImageLink?: string
+SecondImageLink?: string
 AdicionalImageLink?: string[]
 Tags?: string[]
 CreatedDate?: string
@@ -1058,6 +1064,31 @@ searchParams: {
 shcode?: string
 url?: string
 anonymous?: string
+/**
+ * Valor a ser retornado a partir do SPOT (Produto)
+ */
+from?: number
+/**
+ * Quantidade de Produtos que deverá ser apresetnado por página
+ */
+size?: number
+/**
+ * Por padrão, a SmartHint já devolve os produtos da busca pela relevância calculada pela nossa Inteligência Artificial, entretanto, caso o Comprador realize a troca da ordenação para mais vendidos, por exemplo, é necessário realizar a chamada da busca com a ordenação desejada, abaixo, segue os IDs de cada uma das ordenações possíveis:
+ * - 0 - Relevância
+ * - 1 - Menor Preço
+ * - 2 - Maior Preço
+ * - 3 - Alfabética A-Z
+ * - 4 - Alfabética Z-A
+ * - 5 - Mais Recentes
+ * - 6 - Mais Vendidos
+ * - 7 - Mais Vistos
+ * - 8 - Maior Desconto
+ */
+searchSort?: number
+/**
+ * Filtros sobre a busca realizada pelo Comprador
+ */
+filter?: (string | string[])
 }
 response: {
 Name?: string
@@ -1080,13 +1111,19 @@ MpnFather?: string
 Sku?: string
 Description?: string
 Price?: number
+HasSalePrice?: boolean
 SalePrice?: number
 PromotionDiscount?: number
 Availability?: string
 ProductType?: string
 Link?: string
+HasInstallment?: boolean
 Installment?: number
 InstallmentAmount?: number
+HasSecondInstallment?: boolean
+SecondInstallment?: number
+SecondInstallmentAmount?: number
+HasBankSlipPrice?: boolean
 BankSlipPrice?: number
 Gender?: string
 Brand?: string
@@ -1138,22 +1175,25 @@ ValueString?: string
 Value?: string
 }[]
 Specifications?: {
-Sku?: string
-SpecificationId?: string
-Availability?: string
+sku?: string
+specificationId?: string
+availability?: string
 Changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
 ValueString?: string
 }[]
-Variations?: {
+variations?: {
 Name?: string
 Value?: string
 }[]
 }[]
 SellsCount?: number
 ViewsCount?: number
+StockDate?: string
+isHighlightProduct?: boolean
+AvailabilityPercentage?: number
 }[]
 Filters?: {
 Key?: {

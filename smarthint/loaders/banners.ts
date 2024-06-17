@@ -10,11 +10,14 @@ export interface Props {
    * @hide
    */
   pageIdentifier?: string;
+  /**
+   * @default padrao
+   */
   channel: string;
 }
 
 /**
- * @title Smarthint Integration - Banners
+ * @title Smarthint Integration - Banners By Page
  * @description Autocomplete Loader
  */
 const loader = async (
@@ -23,19 +26,18 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Banner[] | null> => {
   const { api, shcode, cluster } = ctx;
-  const { pageType, pageIdentifier: pageIdentifierProp, channel } = props;
+  const { pageType, pageIdentifier: pageIdentifierProp, channel = "padrao" } =
+    props;
 
   const url = new URL(req.url);
 
-  const pageIdentifier = pageIdentifierProp ?? url.hostname == "localhost"
-    ? ""
-    : new URL(url.pathname, url.origin)?.href.replace("/smarthint", ""); // todo remove
+  const pageIdentifier = pageIdentifierProp ?? url.pathname;
 
   const data = await api["GET /:cluster/banner/bannerByPage"]({
     cluster,
     shcode,
     channel,
-    pageIdentifier,
+    pageIdentifier: pageIdentifier.replace("/", ""),
     pagetype: pageType,
   }).then((r) => r.json());
 

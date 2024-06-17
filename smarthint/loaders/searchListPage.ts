@@ -1,17 +1,19 @@
 import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-import { toFilters, toProduct, toSortOption } from "../utils/transform.ts";
+import {
+  getFilterParam,
+  getPaginationInfo,
+  getSortParam,
+  resolvePage,
+  toFilters,
+  toProduct,
+  toSortOption,
+} from "../utils/transform.ts";
 import { redirect } from "deco/mod.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
-
-export type SearchSort = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+import { Filter, SearchSort } from "../utils/typings.ts";
 
 export type RuleType = "valuedouble" | "valuedate" | "valuestring";
-
-export interface Filter {
-  field: string;
-  value: string;
-}
 
 export interface Props {
   /**
@@ -76,22 +78,16 @@ const loader = async (
   const url = new URL(req.url);
   const anonymous = getSessionCookie(req.headers);
 
-  const sort = url.searchParams.get("sort") ??
-    url.searchParams.get("searchSort") ?? searchSort;
+  const sort = getSortParam(url, searchSort);
 
-  const filters = url.searchParams.getAll("filter").length
-    ? url.searchParams.getAll("filter")
-    : filter.length
-    ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
-    : undefined;
+  const filters = getFilterParam(url, filter);
 
-  const conditionString = condition
-    ? `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`
-    : undefined;
+  const conditionString =
+    condition?.field && condition.value && condition.validation
+      ? `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`
+      : undefined;
 
-  const page = Number(url.searchParams.get("page") ?? 1);
-
-  const from = fromParam ?? page <= 1 ? 0 : (page - 1) * size;
+  const { page, from } = resolvePage(url, size, fromParam);
 
   const term = termProp ?? url.searchParams.get("busca") ??
     url.searchParams.get("q");
@@ -103,11 +99,11 @@ const loader = async (
     shcode,
     anonymous,
     term,
-    size: String(size),
-    searchSort: String(sort),
+    size: size,
+    searchSort: Number(sort),
     ruletype,
     rule,
-    from: String(from),
+    from: from,
     filter: filters,
     condition: conditionString,
   }).then((r) => r.json());
@@ -125,21 +121,13 @@ const loader = async (
 
   const pageFilters = toFilters(data?.Filters ?? [], url);
 
-  const hasNextPage = (data?.TotalResult ?? 0) > size;
-  const hasPreviousPage = from > 0 && (data?.TotalResult ?? 0) > size;
-
-  const nextPage = new URLSearchParams(url.searchParams);
-  const previousPage = new URLSearchParams(url.searchParams);
-
-  console.log({ page, from });
-
-  if (hasNextPage) {
-    nextPage.set("page", (page + 1).toString());
-  }
-
-  if (hasPreviousPage) {
-    previousPage.set("page", (page - 1).toString());
-  }
+  const { nextPage, previousPage } = getPaginationInfo(
+    url,
+    size,
+    from,
+    page,
+    data.TotalResult,
+  );
 
   return {
     "@type": "ProductListingPage",
@@ -154,8 +142,8 @@ const loader = async (
     pageInfo: {
       records: data?.TotalResult,
       recordPerPage: size,
-      nextPage: hasNextPage ? `?${nextPage}` : undefined,
-      previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
+      nextPage: nextPage,
+      previousPage: previousPage,
       currentPage: page,
       pageTypes: [
         "Search",

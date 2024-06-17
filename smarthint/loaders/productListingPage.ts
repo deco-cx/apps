@@ -1,9 +1,17 @@
 import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
-import { toFilters, toProduct, toSortOption } from "../utils/transform.ts";
+import {
+  getFilterParam,
+  getPaginationInfo,
+  getSortParam,
+  resolvePage,
+  toFilters,
+  toProduct,
+  toSortOption,
+} from "../utils/transform.ts";
 import { redirect } from "deco/mod.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
-import { Filter, SearchSort } from "./searchListPage.ts";
+import { Filter, SearchSort } from "../utils/typings.ts";
 
 export interface Props {
   /**
@@ -38,17 +46,11 @@ const loader = async (
 
   const url = new URL(req.url);
 
-  const page = Number(url.searchParams.get("page") ?? 1);
-  const from = fromParam ?? page <= 1 ? 0 : (page - 1) * size;
+  const { page, from } = resolvePage(url, size, fromParam);
 
-  const sort = url.searchParams.get("sort") ??
-    url.searchParams.get("searchSort") ?? searchSort;
+  const sort = getSortParam(url, searchSort);
 
-  const filters = url.searchParams.getAll("filter").length
-    ? url.searchParams.getAll("filter")
-    : filter.length
-    ? filter.map((filterItem) => `${filterItem.field}:${filterItem.value}`)
-    : undefined;
+  const filters = getFilterParam(url, filter);
 
   const anonymous = getSessionCookie(req.headers);
 
@@ -59,7 +61,7 @@ const loader = async (
     url: url.pathname.replace("/", ""),
     size,
     from,
-    searchSort: String(sort),
+    searchSort: Number(sort),
     filter: filters,
   }).then((r) => r.json());
 
@@ -77,20 +79,13 @@ const loader = async (
 
   const resultFilters = toFilters(data.SearchResult?.Filters ?? [], url);
 
-  const hasNextPage = (data?.SearchResult?.TotalResult ?? 0) > size;
-  const hasPreviousPage = from > 0 &&
-    (data?.SearchResult?.TotalResult ?? 0) > size;
-
-  const nextPage = new URLSearchParams(url.searchParams);
-  const previousPage = new URLSearchParams(url.searchParams);
-
-  if (hasNextPage) {
-    nextPage.set("page", (page + 1).toString());
-  }
-
-  if (hasPreviousPage) {
-    previousPage.set("page", (page - 1).toString());
-  }
+  const { nextPage, previousPage } = getPaginationInfo(
+    url,
+    size,
+    from,
+    page,
+    data?.SearchResult?.TotalResult,
+  );
 
   return {
     "@type": "ProductListingPage",
@@ -105,8 +100,8 @@ const loader = async (
     pageInfo: {
       records: data?.SearchResult?.TotalResult,
       recordPerPage: size,
-      nextPage: hasNextPage ? `?${nextPage}` : undefined,
-      previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
+      nextPage: nextPage,
+      previousPage: previousPage,
       currentPage: page,
       pageTypes: [
         "Cluster",

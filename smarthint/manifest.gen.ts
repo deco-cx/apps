@@ -4,20 +4,20 @@
 
 import * as $$$$$$$$$0 from "./actions/click.ts";
 import * as $$$$$$$$$1 from "./actions/pageview.ts";
-import * as $$$0 from "./loaders/autocomplete.ts";
-import * as $$$1 from "./loaders/banners.ts";
-import * as $$$2 from "./loaders/productListingPage.ts";
-import * as $$$3 from "./loaders/searchBanners.ts";
+import * as $$$1 from "./loaders/autocomplete.ts";
+import * as $$$2 from "./loaders/banners.ts";
+import * as $$$0 from "./loaders/PLPBanners.ts";
+import * as $$$3 from "./loaders/productListingPage.ts";
 import * as $$$4 from "./loaders/searchListPage.ts";
 import * as $$$5 from "./loaders/vitrinesWithProducts.ts";
 import * as $$$$$$0 from "./sections/Analytics/SmarthintTracking.tsx";
 
 const manifest = {
   "loaders": {
-    "smarthint/loaders/autocomplete.ts": $$$0,
-    "smarthint/loaders/banners.ts": $$$1,
-    "smarthint/loaders/productListingPage.ts": $$$2,
-    "smarthint/loaders/searchBanners.ts": $$$3,
+    "smarthint/loaders/autocomplete.ts": $$$1,
+    "smarthint/loaders/banners.ts": $$$2,
+    "smarthint/loaders/PLPBanners.ts": $$$0,
+    "smarthint/loaders/productListingPage.ts": $$$3,
     "smarthint/loaders/searchListPage.ts": $$$4,
     "smarthint/loaders/vitrinesWithProducts.ts": $$$5,
   },
