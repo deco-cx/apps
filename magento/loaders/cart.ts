@@ -34,7 +34,6 @@ const loader = async (
   const { countProductImageInCart } = cartConfigs;
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
-  console.log({ cartId });
 
   if (!cartId) return null;
 
