@@ -33,7 +33,7 @@ export interface RecommendationShelf {
   id: string;
   title: string;
   name: string;
-  feature: string;
+  feature: Feature;
   impressionUrl: string;
   displays: RecommendationDisplay[];
 }

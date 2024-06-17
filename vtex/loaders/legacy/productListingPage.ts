@@ -397,7 +397,7 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
-  const url = new URL(req.url);
+  const url = new URL(props.pageHref || req.url);
 
   if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
     return null;
@@ -413,6 +413,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["ft", props.ft ?? ""],
     ["map", props.map ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
+    ["ignoreCaseSelected", (props.ignoreCaseSelected ?? false).toString()],
   ]);
 
   url.searchParams.forEach((value, key) => {

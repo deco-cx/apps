@@ -2,12 +2,19 @@ import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import {
+  getSegmentFromBag,
+  isAnonymous,
+  withSegmentCookie,
+} from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
 import { sortProducts } from "../../utils/transform.ts";
 
+/**
+ * @title Collection ID
+ */
 export interface CollectionProps extends CommonProps {
   // TODO: pattern property isn't being handled by RJSF
   /**
@@ -25,6 +32,9 @@ export interface CollectionProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Keyword Search
+ */
 export interface TermProps extends CommonProps {
   /** @description term to use on search */
   term?: string;
@@ -36,6 +46,9 @@ export interface TermProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Advanced Facets
+ */
 export interface FQProps extends CommonProps {
   /** @description fq's */
   fq: string[];
@@ -49,6 +62,9 @@ export interface FQProps extends CommonProps {
   count: number;
 }
 
+/**
+ * @title Product SKUs
+ */
 export interface SkuIDProps extends CommonProps {
   /**
    * @description SKU ids to retrieve
@@ -56,6 +72,9 @@ export interface SkuIDProps extends CommonProps {
   ids?: string[];
 }
 
+/**
+ * @title Product IDs
+ */
 export interface ProductIDProps extends CommonProps {
   /**
    * @description Product ids to retrieve
@@ -71,14 +90,17 @@ export interface CommonProps {
   similars?: boolean;
 }
 
-export type Props = {
+export interface Props {
+  /**
+   * @title Select products by
+   */
   props:
     | CollectionProps
     | TermProps
     | ProductIDProps
     | SkuIDProps
     | FQProps;
-};
+}
 
 // deno-lint-ignore no-explicit-any
 const isCollectionProps = (p: any): p is CollectionProps =>
@@ -96,6 +118,9 @@ const isProductIDProps = (p: any): p is ProductIDProps =>
 
 // deno-lint-ignore no-explicit-any
 const isFQProps = (p: any): p is FQProps => isValidArrayProp(p.fq);
+
+// deno-lint-ignore no-explicit-any
+const isTermProps = (p: any): p is TermProps => typeof p.term === "string";
 
 const preferredSKU = (items: LegacyItem[], { props }: Props) => {
   const fetchedSkus = new Set((props as SkuIDProps).ids ?? []);
@@ -216,6 +241,65 @@ const loader = async (
   );
 };
 
-export { cache, cacheKey } from "../../utils/cacheBySegment.ts";
+const getSearchParams = (props: Props["props"]) => {
+  if (isCollectionProps(props)) {
+    return [
+      ["collection", props.collection],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+    ];
+  }
+
+  if (isFQProps(props)) {
+    return [
+      ["fq", props.fq.join(",")],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+    ];
+  }
+
+  if (isTermProps(props)) {
+    return [
+      ["term", props.term ?? ""],
+      ["count", (props.count || 12).toString()],
+      ["sort", props.sort || ""],
+    ];
+  }
+
+  return [];
+};
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (
+  expandedProps: Props,
+  req: Request,
+  ctx: AppContext,
+) => {
+  const props = expandedProps.props ??
+    (expandedProps as unknown as Props["props"]);
+
+  const { token } = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+  if (
+    url.searchParams.has("q") || !isAnonymous(ctx) || isSKUIDProps(props) ||
+    isProductIDProps(props)
+  ) {
+    return null;
+  }
+
+  const params = new URLSearchParams(getSearchParams(props));
+
+  url.searchParams.forEach((value, key) => {
+    params.append(key, value);
+  });
+
+  params.sort();
+  params.set("segment", token);
+
+  url.search = params.toString();
+
+  return url.href;
+};
 
 export default loader;
