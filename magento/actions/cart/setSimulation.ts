@@ -34,7 +34,7 @@ const action = async (
     const countryId = cartResponse?.minicart_improvements?.country_id ??
       COUNTRY_ID;
 
-    clientAdmin["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"](
+    await clientAdmin["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"](
       {
         site,
         site2: site,
