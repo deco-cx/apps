@@ -57,14 +57,13 @@ function Component({
   noIndexing,
   jsonLDs = [],
 }: Props) {
-
-  if(!jsonLDs) return <></>;
+  if (!jsonLDs) return <></>;
 
   const [{ pageInfo = {}, seo = {} } = {}] = jsonLDs || [{}];
 
-  
   const currentPage = pageInfo?.currentPage ?? false;
-  const isDepartament = (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") ||
+  const isDepartament =
+    (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") ||
     (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Search");
   const isPageMoreThanOne = currentPage && currentPage > 1;
 

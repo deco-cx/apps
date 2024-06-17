@@ -3,7 +3,7 @@ import {
   AnalyticsItem,
   SelectItemEvent,
 } from "../../../commerce/types.ts";
-import { scriptAsDataURI } from "../../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 import { AppContext } from "../../mod.ts";
 import { SectionProps } from "deco/blocks/section.ts";
 import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
@@ -105,7 +105,7 @@ export default function VtexAnalytics(
     <script
       type="text/javascript"
       defer
-      src={scriptAsDataURI(snippet, account, agent, cookies)}
+      src={useScriptAsDataURI(snippet, account, agent, cookies)}
     />
   );
 }

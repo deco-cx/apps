@@ -24,9 +24,9 @@ export type Extension =
   | "remove-me"
   | "response-targets"
   | "restored"
-  | "server-sent-events"
   | "web-sockets"
-  | "path-params";
+  | "path-params"
+  | "sse";
 
 export interface Props {
   /** @default 1.9.11 */

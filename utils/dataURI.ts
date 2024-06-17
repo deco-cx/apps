@@ -1,3 +1,5 @@
+let once = true;
+
 // Avoid throwing DOM Exception:
 // The string to be encoded contains characters outside of the Latin1 range.
 const btoaSafe = (x: string) =>
@@ -7,12 +9,20 @@ const btoaSafe = (x: string) =>
 export const scriptAsDataURI = <T extends (...args: any[]) => any>(
   fn: T,
   ...params: Parameters<T>
-) =>
-  dataURI(
+) => {
+  if (once) {
+    once = false;
+    console.warn(
+      `scriptAsDataURI is deprecated and will soon be removed. Use import { useScriptAsDataURI } from 'apps/hooks/useScript.ts' instead.`,
+    );
+  }
+
+  return dataURI(
     "text/javascript",
     true,
     `(${fn})(${params.map((p) => JSON.stringify(p)).join(", ")})`,
   );
+};
 
 export const dataURI = (
   contentType: "text/javascript",
