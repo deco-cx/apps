@@ -3,6 +3,7 @@ import { usePartialSection } from "deco/hooks/usePartialSection.ts";
 import { useId } from "preact/hooks";
 import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 import { AppContext } from "../../mod.ts";
+import { isBot } from "deco/utils/userAgent.ts";
 
 /** @titleBy type */
 interface Scroll {
@@ -62,18 +63,18 @@ const script = (
 };
 
 export const loader = (props: Props, _req: Request, ctx: AppContext) => {
-  return { ...props, isBot: ctx.isBot }
-}
+  return { ...props, isBot: ctx.isBot };
+};
 
 const Deferred = (props: ReturnType<typeof loader>) => {
-  const { sections, display, behavior } = props;
+  const { sections, display, behavior, isBot } = props;
   const sectionID = useId();
   const buttonId = `deffered-${sectionID}`;
   const partial = usePartialSection<typeof Deferred>({
     props: { display: true },
   });
 
-  if (display) {
+  if (display || isBot) {
     return (
       <>
         {sections.map(({ Component, props }) => <Component {...props} />)}
