@@ -57,6 +57,9 @@ function Component({
   noIndexing,
   jsonLDs = [],
 }: Props) {
+
+  if(!jsonLDs) return <></>;
+
   const [{ pageInfo = {}, seo = {} } = {}] = jsonLDs || [{}];
 
   
