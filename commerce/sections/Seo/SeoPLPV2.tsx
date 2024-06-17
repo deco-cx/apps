@@ -16,6 +16,11 @@ export interface Props {
   description?: string;
   /** @hide true */
   canonical?: string;
+  /**
+   * @title Disable indexing
+   * @description In testing, you can use this to prevent search engines from indexing your site
+   */
+  noIndexing?: boolean;
 }
 
 /** @title Product listing */
@@ -43,7 +48,9 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
     : undefined;
 
-  const noIndexing = !jsonLD || !jsonLD.products.length ||
+  const noIndexing = props.noIndexing ||
+    !jsonLD ||
+    !jsonLD.products.length ||
     jsonLD.seo?.noIndexing;
 
   return {
