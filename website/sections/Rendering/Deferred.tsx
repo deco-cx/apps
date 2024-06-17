@@ -3,7 +3,6 @@ import { usePartialSection } from "deco/hooks/usePartialSection.ts";
 import { useId } from "preact/hooks";
 import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 import { AppContext } from "../../mod.ts";
-import { isBot } from "deco/utils/userAgent.ts";
 
 /** @titleBy type */
 interface Scroll {
