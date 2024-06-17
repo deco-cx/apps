@@ -150,6 +150,8 @@ export const toProduct = (
         ? new URL(imagePath, cdn).href
         : "";
 
+      const color = optValue.Color ? optValue.Color : "";
+
       return {
         "@type": "PropertyValue" as const,
         name: option.Label,
@@ -158,6 +160,7 @@ export const toProduct = (
           "@type": "ImageObject" as const,
           url,
         }],
+        color: color,
         additionalType: "prodOptions",
       }
     });
