@@ -16,6 +16,7 @@ export interface State {
   cluster: string;
   /**
    * @title Public store URL
+   * @description Ex: www.mystore.com.br
    */
   publicUrl: string;
 }
@@ -45,8 +46,15 @@ export default function App(
     headers: headers,
   });
 
+  const publicUrl = (new URL(
+    props.publicUrl?.startsWith("http")
+      ? props.publicUrl
+      : `https://${props.publicUrl}`,
+  )).origin;
+
   const state = {
     ...props,
+    publicUrl,
     api,
     recs,
   };

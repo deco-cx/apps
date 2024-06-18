@@ -83,7 +83,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<SmarthintPosition[] | null> => {
-  const { recs, shcode } = ctx;
+  const { recs, shcode, publicUrl } = ctx;
   const {
     categories: categoriesParam,
     filter = [],
@@ -97,12 +97,15 @@ const loader = async (
 
   const anonymous = getSessionCookie(req.headers);
 
-  const pageIdentifier =
-    // url.hostname == "localhost" ? "":
-    new URL(url.pathname, "https://www.lojaprohall.com.br")?.href.replace(
-      "/smarthint",
-      "",
-    ); // todo remove & fix origin
+  // to work in localhost
+  const origin = (new URL(
+    publicUrl?.startsWith("http") ? publicUrl : `https://${publicUrl}`,
+  )).origin;
+
+  const pageIdentifier = new URL(url.pathname, origin)?.href.replace(
+    "/smarthint",
+    "",
+  ); // todo remove replace
 
   const filters = getFilterParam(url, filter);
 

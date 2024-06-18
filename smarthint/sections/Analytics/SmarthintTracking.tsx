@@ -210,12 +210,14 @@ export interface Props {
 }
 
 export const loader = (props: Props, req: Request, ctx: AppContext) => {
-  const { shcode } = ctx;
+  const { shcode, publicUrl } = ctx;
+
+  const prodURL = new URL(publicUrl);
 
   const tempUrl = new URL(req.url);
-  tempUrl.hostname = "www.lojaprohall.com.br";
+  tempUrl.host = prodURL.host;
   tempUrl.port = "";
-  tempUrl.pathname = tempUrl.pathname.replace("/smarthint", "");
+  tempUrl.pathname = tempUrl.pathname.replace("/smarthint", ""); // TODO Remove
 
   return {
     shcode,
