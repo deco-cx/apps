@@ -237,6 +237,62 @@
         }
       }
     },
+    "/api/dataentities/CL/search?email={email}&_fields=document": {
+      "get": {
+        "summary": "Retrive User Document By CL Data Entity Name",
+        "description": "Retrieves user document information.",
+        "operationId": "RetriveUserDocumentByCLDataEntityName",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "Describes the type of the content being sent.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "HTTP Client Negotiation _Accept_ Header. Indicates the types of responses the client can understand.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "document": "12345678900"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
     "/api/catalog/pvt/product/{productId}": {
       "get": {
         "tags": [

@@ -129,6 +129,14 @@ DocumentId?: string
 }
 }
 /**
+ * Retrieves user document information.
+ */
+"GET /api/dataentities/CL/search?email=:email&_fields=document": {
+response: {
+[k: string]: any
+}
+}
+/**
  * Retrieves a specific Product by its ID. This information is exactly what is needed to create a new Product. 
  * > 📘 Onboarding guide 
  * >
