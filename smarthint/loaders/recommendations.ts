@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { getFilterParam, toProduct } from "../utils/transform.ts";
-import { ComplexPageType, Filter, PageType } from "../utils/typings.ts";
+import { ComplexPageType, Filter } from "../utils/typings.ts";
 import { Product } from "../../commerce/types.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 
@@ -76,7 +76,7 @@ function getCategoriesParam(
 
 /**
  * @title Smarthint Integration
- * @description Product List Page
+ * @description Recommendations
  */
 const loader = async (
   props: Props,
@@ -97,12 +97,7 @@ const loader = async (
 
   const anonymous = getSessionCookie(req.headers);
 
-  // to work in localhost
-  const origin = (new URL(
-    publicUrl?.startsWith("http") ? publicUrl : `https://${publicUrl}`,
-  )).origin;
-
-  const pageIdentifier = new URL(url.pathname, origin)?.href.replace(
+  const pageIdentifier = new URL(url.pathname, publicUrl)?.href.replace(
     "/smarthint",
     "",
   ); // todo remove replace

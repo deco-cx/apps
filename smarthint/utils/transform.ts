@@ -342,7 +342,7 @@ export const getPaginationInfo = (
   page: number,
   TotalResult: number = 0,
 ) => {
-  const hasNextPage = TotalResult > size;
+  const hasNextPage = TotalResult > (size * page);
   const hasPreviousPage = from > 0 && TotalResult > size;
 
   const nextPage = new URLSearchParams(url.searchParams);
