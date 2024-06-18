@@ -12,8 +12,13 @@ import {
 import { redirect } from "deco/mod.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 import { Filter, SearchSort } from "../utils/typings.ts";
+import { RuleType } from "./PLPBanners.ts";
 
 export interface Props {
+  /**
+   * @hide
+   */
+  term?: string;
   /**
    * @description Number of products that must be returned per page
    */
@@ -21,7 +26,7 @@ export interface Props {
   /**
    * @hide
    */
-  from?: number;
+  searchSort?: SearchSort;
   /**
    * @hide
    */
@@ -29,11 +34,27 @@ export interface Props {
   /**
    * @hide
    */
-  searchSort?: SearchSort;
+  from?: number;
+  /**
+   * @hide
+   */
+  rule?: string;
+  /**
+   * @hide
+   */
+  ruletype?: RuleType;
+  /**
+   * @hide
+   */
+  condition?: {
+    field?: string;
+    value?: string;
+    validation?: string;
+  };
 }
 
 /**
- * @title Smarthint Integration - Hotsite
+ * @title Smarthint Integration - Product List Page
  * @description Product List Page
  */
 const loader = async (
@@ -42,7 +63,16 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   const { api, shcode, cluster } = ctx;
-  const { size = 12, from: fromParam = 0, filter = [], searchSort } = props;
+  const {
+    size = 12,
+    from: fromParam = 0,
+    filter = [],
+    searchSort,
+    term: termProp,
+    condition,
+    rule,
+    ruletype,
+  } = props;
 
   const url = new URL(req.url);
 
@@ -54,37 +84,58 @@ const loader = async (
 
   const anonymous = getSessionCookie(req.headers);
 
-  const data = await api["GET /:cluster/hotsite"]({
+  const term = termProp ?? url.searchParams.get("busca") ??
+    url.searchParams.get("q");
+
+  const conditionString =
+    condition?.field && condition.value && condition.validation
+      ? `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`
+      : undefined;
+
+  const commonParams = {
     cluster,
     shcode,
     anonymous,
-    url: url.pathname.replace("/", ""),
     size,
-    from,
     searchSort: Number(sort),
+    ruletype,
+    rule,
+    from,
     filter: filters,
-  }).then((r) => r.json());
+    condition: conditionString,
+  };
 
-  if (data.SearchResult?.IsRedirect) {
+  const data = term
+    ? await api["GET /:cluster/Search/GetPrimarySearch"]({
+      ...commonParams,
+      term,
+    }).then((r) => r.json())
+    : await api["GET /:cluster/hotsite"]({
+      ...commonParams,
+      url: url.pathname.replace("/", ""),
+    }).then((r) => r.json()).then((result) => result.SearchResult);
+
+  if (!data) return null;
+
+  if (data.IsRedirect) {
     redirect(
-      new URL(data.SearchResult?.urlRedirect!, url.origin)
+      new URL(data?.urlRedirect!, url.origin)
         .href,
     );
   }
 
-  const products =
-    data.SearchResult?.Products?.map((product) => toProduct(product)) ?? [];
+  const products = data?.Products?.map((product) => toProduct(product)) ?? [];
 
-  const sortOptions = toSortOption(data.SearchResult?.Sorts ?? []);
+  const sortOptions = toSortOption(data?.Sorts ?? []);
 
-  const resultFilters = toFilters(data.SearchResult?.Filters ?? [], url);
+  const resultFilters = toFilters(data?.Filters ?? [], url);
 
   const { nextPage, previousPage } = getPaginationInfo(
     url,
     size,
     from,
     page,
-    data?.SearchResult?.TotalResult,
+    data?.TotalResult,
   );
 
   return {
@@ -98,13 +149,13 @@ const loader = async (
     },
     filters: resultFilters,
     pageInfo: {
-      records: data?.SearchResult?.TotalResult,
+      records: data?.TotalResult,
       recordPerPage: size,
       nextPage: nextPage,
       previousPage: previousPage,
       currentPage: page,
       pageTypes: [
-        "Cluster",
+        term ? "Search" : "Collection",
       ],
     },
   };
