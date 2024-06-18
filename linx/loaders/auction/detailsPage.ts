@@ -25,11 +25,16 @@ const loader = async (
     return null;
   }
 
-  const auction = await response.json();
+  let auction: any;
+  try {
+    auction = await response.json();
+  } catch (error) { 
+    auction = null;
+  }
 
   if (!auction || !isAuctionDetailModel(auction)) {
-    throw new Error("Auction detail page returned another model than Auction");
-  }
+    return null;
+  }  
 
   return toAuctionDetail(auction.Model, { cdn });
 };
