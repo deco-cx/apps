@@ -1,7 +1,9 @@
 import { AppContext } from "../mod.ts";
-import { Banner, Filter, SearchSort } from "../utils/typings.ts";
+import { Banner, FilterProp, SearchSort } from "../utils/typings.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 import { getFilterParam, getSortParam } from "../utils/transform.ts";
+import { ProductListingPage } from "../../commerce/types.ts";
+import { getCategoriesParam } from "./recommendations.ts";
 
 export type RuleType = "valuedouble" | "valuedate" | "valuestring";
 
@@ -17,7 +19,7 @@ export interface Props {
   /**
    * @hide
    */
-  filter?: Filter[];
+  filter?: FilterProp[];
   /**
    * @hide
    */
@@ -34,6 +36,10 @@ export interface Props {
     value?: string;
     validation?: string;
   };
+  /**
+   * @description if its a category page setup your store (VTEX,Wake,Shopify,etc) loader here
+   */
+  page?: ProductListingPage | null;
 }
 
 /**
@@ -53,6 +59,7 @@ const loader = async (
     rule,
     searchSort,
     ruletype,
+    page: storePageLoader,
   } = props;
 
   const url = new URL(req.url);
@@ -61,6 +68,10 @@ const loader = async (
   const sort = getSortParam(url, searchSort);
 
   const filters = getFilterParam(url, filter);
+
+  const categories = storePageLoader
+    ? getCategoriesParam({ type: "category", page: storePageLoader })
+    : undefined;
 
   const conditionString =
     condition?.field && condition.value && condition.validation
@@ -87,6 +98,7 @@ const loader = async (
     ? await api["GET /:cluster/Search/GetPrimarySearch"]({
       ...commonParams,
       term,
+      categories,
     }).then((r) => r.json())
     : await api["GET /:cluster/hotsite"]({
       ...commonParams,

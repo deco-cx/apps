@@ -2,6 +2,7 @@ import { Suggestion } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
+import { SHProduct } from "../utils/typings.ts";
 
 export interface Props {
   /**
@@ -42,7 +43,9 @@ const loader = async (
 
   if (!data) return null;
 
-  const products = data.Products?.map((product) => toProduct(product));
+  const products = data.Products?.map((product) =>
+    toProduct(product as SHProduct)
+  );
 
   return {
     products: products,

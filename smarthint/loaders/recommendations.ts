@@ -1,14 +1,17 @@
 import { AppContext } from "../mod.ts";
-import { getFilterParam, toProduct } from "../utils/transform.ts";
-import { ComplexPageType, Filter } from "../utils/typings.ts";
-import { Product } from "../../commerce/types.ts";
+import { getFilterParam, toRecommendation } from "../utils/transform.ts";
+import {
+  ComplexPageType,
+  FilterProp,
+  SmarthintRecommendation,
+} from "../utils/typings.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 
 export interface Props {
   /**
    * @hide
    */
-  filter?: Filter[];
+  filter?: FilterProp[];
   /**
    * @hide
    */
@@ -31,21 +34,6 @@ export interface Props {
   channel?: string;
 }
 
-export interface SmarthintPosition {
-  titleRecommendation?: string;
-  eventGoogleAnalytics?: string;
-  nameRecommendation?: string;
-  products: Product[] | null;
-  bannerUrl?: string;
-  bannerUrlClick?: string;
-  bannerHtml?: string;
-  positionBanner?: "First" | "Last";
-  hasTimer: boolean;
-  startDateTime: string;
-  endDateTime: string;
-  position: string;
-}
-
 function getProductParam(pagetype: ComplexPageType, productsParam: string[]) {
   if (productsParam.length) {
     return productsParam.map((productId) => `productid:${productId}`).join("&");
@@ -59,16 +47,17 @@ function getProductParam(pagetype: ComplexPageType, productsParam: string[]) {
   return;
 }
 
-function getCategoriesParam(
+export function getCategoriesParam(
   pagetype: ComplexPageType,
   categoriesParam?: string,
 ) {
   if (categoriesParam) return categoriesParam;
 
   if (pagetype.type == "category" && pagetype.page) {
-    pagetype.page?.breadcrumb.itemListElement.map((item) => item.name).join(
-      " > ",
-    );
+    return pagetype.page.breadcrumb.itemListElement.map((item) => item.name)
+      .join(
+        " > ",
+      );
   }
 
   return;
@@ -82,7 +71,7 @@ const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<SmarthintPosition[] | null> => {
+): Promise<SmarthintRecommendation[] | null> => {
   const { recs, shcode, publicUrl } = ctx;
   const {
     categories: categoriesParam,
@@ -126,29 +115,33 @@ const loader = async (
 
   if (!positionItem) return null;
 
-  const {
-    RecommendationsProducts = [],
-    RecommendationsPromotional = [],
-    RecommendationsCombination = [],
-    Recommendations = [],
-  } = positionItem;
+  const RecommendationsProducts =
+    positionItem.RecommendationsProducts?.map((item) =>
+      toRecommendation(item, position, "RecommendationsProducts")
+    ) ?? [];
+  const RecommendationsPromotional =
+    positionItem.RecommendationsProducts?.map((item) =>
+      toRecommendation(item, position, "RecommendationsPromotional")
+    ) ?? [];
+  const RecommendationsCombination =
+    positionItem.RecommendationsProducts?.map((item) =>
+      toRecommendation(item, position, "RecommendationsCombination")
+    ) ?? [];
+  const Recommendations =
+    positionItem.RecommendationsProducts?.map((item) =>
+      toRecommendation(item, position, "Recommendations")
+    ) ?? [];
 
-  const allItems = [
+  const allItems: SmarthintRecommendation[] = [
     ...RecommendationsProducts,
     ...RecommendationsPromotional,
     ...RecommendationsCombination,
     ...Recommendations,
   ];
 
-  const sortedItem = allItems.toSorted((a, b) => a.Order! - b.Order!);
+  const sortedItem = allItems.toSorted((a, b) => a.order! - b.order!);
 
-  return sortedItem.map((item) => ({
-    eventGoogleAnalytics: item.EventGoogleAnalytics,
-    titleRecommendation: item.TitleRecommendation,
-    nameRecommendation: item.NameRecommendation,
-    position,
-    products: item.Products?.map((product) => toProduct(product)) || null,
-  }));
+  return sortedItem;
 };
 
 export default loader;

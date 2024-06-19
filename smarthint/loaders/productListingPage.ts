@@ -11,8 +11,9 @@ import {
 } from "../utils/transform.ts";
 import { redirect } from "deco/mod.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
-import { Filter, SearchSort } from "../utils/typings.ts";
+import { FilterProp, SearchSort, SHProduct } from "../utils/typings.ts";
 import { RuleType } from "./PLPBanners.ts";
+import { getCategoriesParam } from "./recommendations.ts";
 
 export interface Props {
   /**
@@ -30,7 +31,7 @@ export interface Props {
   /**
    * @hide
    */
-  filter?: Filter[];
+  filter?: FilterProp[];
   /**
    * @hide
    */
@@ -51,6 +52,10 @@ export interface Props {
     value?: string;
     validation?: string;
   };
+  /**
+   * @description if its a category page setup your store (VTEX,Wake,Shopify,etc) loader here
+   */
+  page?: ProductListingPage | null;
 }
 
 /**
@@ -72,6 +77,7 @@ const loader = async (
     condition,
     rule,
     ruletype,
+    page: storePageLoader,
   } = props;
 
   const url = new URL(req.url);
@@ -84,8 +90,12 @@ const loader = async (
 
   const anonymous = getSessionCookie(req.headers);
 
+  const categories = storePageLoader
+    ? getCategoriesParam({ type: "category", page: storePageLoader })
+    : undefined;
+
   const term = termProp ?? url.searchParams.get("busca") ??
-    url.searchParams.get("q");
+    url.searchParams.get("q") ?? undefined;
 
   const conditionString =
     condition?.field && condition.value && condition.validation
@@ -105,10 +115,11 @@ const loader = async (
     condition: conditionString,
   };
 
-  const data = term
+  const data = term || categories
     ? await api["GET /:cluster/Search/GetPrimarySearch"]({
       ...commonParams,
       term,
+      categories,
     }).then((r) => r.json())
     : await api["GET /:cluster/hotsite"]({
       ...commonParams,
@@ -124,7 +135,8 @@ const loader = async (
     );
   }
 
-  const products = data?.Products?.map((product) => toProduct(product)) ?? [];
+  const products =
+    data?.Products?.map((product) => toProduct(product as SHProduct)) ?? [];
 
   const sortOptions = toSortOption(data?.Sorts ?? []);
 

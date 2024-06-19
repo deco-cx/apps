@@ -192,7 +192,7 @@
                         "Value": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                       },
                       {
-                        "Key": "0987654321ABC",
+                        "Key": "A0987654321ABC",
                         "Value": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                       }
                     ],
@@ -272,10 +272,10 @@
                     ],
                     "Specifications": [
                       {
-                        "Sku": "ABC-12345678-C",
-                        "SpecificationId": "1234567890",
-                        "Availability": "out of stock",
-                        "Changes": [
+                        "sku": "ABC-12345678-C",
+                        "specificationId": "1234567890",
+                        "availability": "out of stock",
+                        "changes": [
                           {
                             "Name": "Price",
                             "ValueDouble": 123.9
@@ -289,7 +289,7 @@
                             "ValueString": "Produto de Teste"
                           }
                         ],
-                        "Variations": [
+                        "variations": [
                           {
                             "Name": "tamanho",
                             "Value": "G"
@@ -301,10 +301,10 @@
                         ]
                       },
                       {
-                        "Sku": "ABC-12345678-D",
-                        "SpecificationId": "1234567890",
-                        "Availability": "out of stock",
-                        "Variations": [
+                        "sku": "ABC-12345678-D",
+                        "specificationId": "1234567890",
+                        "availability": "out of stock",
+                        "variations": [
                           {
                             "Name": "tamanho",
                             "Value": "M"
@@ -444,7 +444,7 @@
                         "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                       },
                       {
-                        "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                        "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                       }
                     ],
                     "Rules": [
@@ -523,10 +523,10 @@
                     ],
                     "Specifications": [
                       {
-                        "Sku": "ABC-12345678-C",
-                        "SpecificationId": "1234567890",
-                        "Availability": "out of stock",
-                        "Changes": [
+                        "sku": "ABC-12345678-C",
+                        "specificationId": "1234567890",
+                        "availability": "out of stock",
+                        "changes": [
                           {
                             "Name": "Price",
                             "ValueDouble": 123.9
@@ -540,7 +540,7 @@
                             "ValueString": "Produto de Teste"
                           }
                         ],
-                        "Variations": [
+                        "variations": [
                           {
                             "Name": "tamanho",
                             "Value": "G"
@@ -552,10 +552,10 @@
                         ]
                       },
                       {
-                        "Sku": "ABC-12345678-C",
-                        "SpecificationId": "1234567890",
-                        "Availability": "out of stock",
-                        "Variations": [
+                        "sku": "ABC-12345678-C",
+                        "specificationId": "1234567890",
+                        "availability": "out of stock",
+                        "variations": [
                           {
                             "Name": "tamanho",
                             "Value": "M"
@@ -713,7 +713,7 @@
                           "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         },
                         {
-                          "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                          "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         }
                       ],
                       "Rules": [
@@ -792,10 +792,10 @@
                       ],
                       "Specifications": [
                         {
-                          "Sku": "ABC-12345678-C",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Changes": [
+                          "sku": "ABC-12345678-C",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "changes": [
                             {
                               "Name": "Price",
                               "ValueDouble": 123.9
@@ -809,7 +809,7 @@
                               "ValueString": "Produto de Teste"
                             }
                           ],
-                          "Variations": [
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "G"
@@ -821,10 +821,10 @@
                           ]
                         },
                         {
-                          "Sku": "ABC-12345678-C",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Variations": [
+                          "sku": "ABC-12345678-C",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "M"
@@ -1426,6 +1426,15 @@
               "type": "string"
             },
             "required": true
+          },
+          {
+            "name": "categories",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Listagem das últimas categorias visitadas pelo cliente. O envio deverá ser realizado neste formato:\ncategories=category",
+            "example": "{categories}"
           }
         ],
         "responses": {
@@ -1596,15 +1605,7 @@
                           "AditionalFeatures": {
                             "type": "array",
                             "items": {
-                              "type": "object",
-                              "properties": {
-                                "ABC0987654321": {
-                                  "type": "string"
-                                },
-                                "0987654321ABC": {
-                                  "type": "string"
-                                }
-                              }
+                              "type": "object"
                             }
                           },
                           "Rules": {
@@ -1692,16 +1693,16 @@
                             "items": {
                               "type": "object",
                               "properties": {
-                                "Sku": {
+                                "sku": {
                                   "type": "string"
                                 },
-                                "SpecificationId": {
+                                "specificationId": {
                                   "type": "string"
                                 },
-                                "Availability": {
+                                "availability": {
                                   "type": "string"
                                 },
-                                "Changes": {
+                                "changes": {
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1721,7 +1722,7 @@
                                     }
                                   }
                                 },
-                                "Variations": {
+                                "variations": {
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -1943,7 +1944,7 @@
                       "OfferDate": "0001-01-01T00:00:00",
                       "AditionalFeatures": {
                         "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                        "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                        "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                       },
                       "Rules": [
                         {
@@ -2021,10 +2022,10 @@
                       ],
                       "Specifications": [
                         {
-                          "Sku": "ABC-12345678-C",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Changes": [
+                          "sku": "ABC-12345678-C",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "changes": [
                             {
                               "Name": "Price",
                               "ValueDouble": 123.9
@@ -2038,7 +2039,7 @@
                               "ValueString": "Produto de Teste"
                             }
                           ],
-                          "Variations": [
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "G"
@@ -2050,10 +2051,10 @@
                           ]
                         },
                         {
-                          "Sku": "ABC-12345678-D",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Variations": [
+                          "sku": "ABC-12345678-D",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "M"
@@ -2110,7 +2111,7 @@
                           "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         },
                         {
-                          "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                          "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         }
                       ],
                       "Rules": [
@@ -2189,10 +2190,10 @@
                       ],
                       "Specifications": [
                         {
-                          "Sku": "ABC-12345678-C",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Changes": [
+                          "sku": "ABC-12345678-C",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "changes": [
                             {
                               "Name": "Price",
                               "ValueDouble": 123.9
@@ -2206,7 +2207,7 @@
                               "ValueString": "Produto de Teste"
                             }
                           ],
-                          "Variations": [
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "G"
@@ -2218,10 +2219,10 @@
                           ]
                         },
                         {
-                          "Sku": "ABC-12345678-D",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Variations": [
+                          "sku": "ABC-12345678-D",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "M"
@@ -2599,16 +2600,16 @@
                             "items": {
                               "type": "object",
                               "properties": {
-                                "Sku": {
+                                "sku": {
                                   "type": "string"
                                 },
-                                "SpecificationId": {
+                                "specificationId": {
                                   "type": "string"
                                 },
-                                "Availability": {
+                                "availability": {
                                   "type": "string"
                                 },
-                                "Changes": {
+                                "changes": {
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2628,7 +2629,7 @@
                                     }
                                   }
                                 },
-                                "Variations": {
+                                "variations": {
                                   "type": "array",
                                   "items": {
                                     "type": "object",
@@ -2721,7 +2722,7 @@
                           "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         },
                         {
-                          "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                          "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         }
                       ],
                       "Rules": [
@@ -2800,10 +2801,10 @@
                       ],
                       "Specifications": [
                         {
-                          "Sku": "ABC-12345678-C",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Changes": [
+                          "sku": "ABC-12345678-C",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "changes": [
                             {
                               "Name": "Price",
                               "ValueDouble": 123.9
@@ -2817,7 +2818,7 @@
                               "ValueString": "Produto de Teste"
                             }
                           ],
-                          "Variations": [
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "G"
@@ -2829,10 +2830,10 @@
                           ]
                         },
                         {
-                          "Sku": "ABC-12345678-D",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Variations": [
+                          "sku": "ABC-12345678-D",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "M"
@@ -2889,7 +2890,7 @@
                           "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         },
                         {
-                          "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                          "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                         }
                       ],
                       "Rules": [
@@ -2968,10 +2969,10 @@
                       ],
                       "Specifications": [
                         {
-                          "Sku": "ABC-12345678-C",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Changes": [
+                          "sku": "ABC-12345678-C",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "changes": [
                             {
                               "Name": "Price",
                               "ValueDouble": 123.9
@@ -2985,7 +2986,7 @@
                               "ValueString": "Produto de Teste"
                             }
                           ],
-                          "Variations": [
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "G"
@@ -2997,10 +2998,10 @@
                           ]
                         },
                         {
-                          "Sku": "ABC-12345678-D",
-                          "SpecificationId": "1234567890",
-                          "Availability": "out of stock",
-                          "Variations": [
+                          "sku": "ABC-12345678-D",
+                          "specificationId": "1234567890",
+                          "availability": "out of stock",
+                          "variations": [
                             {
                               "Name": "tamanho",
                               "Value": "M"
@@ -3444,15 +3445,7 @@
                                     "type": "string"
                                   },
                                   "AditionalFeatures": {
-                                    "type": "object",
-                                    "properties": {
-                                      "ABC0987654321": {
-                                        "type": "string"
-                                      },
-                                      "0987654321ABC": {
-                                        "type": "string"
-                                      }
-                                    }
+                                    "type": "object"
                                   },
                                   "Rules": {
                                     "type": "array",
@@ -3539,16 +3532,16 @@
                                     "items": {
                                       "type": "object",
                                       "properties": {
-                                        "Sku": {
+                                        "sku": {
                                           "type": "string"
                                         },
-                                        "SpecificationId": {
+                                        "specificationId": {
                                           "type": "string"
                                         },
-                                        "Availability": {
+                                        "availability": {
                                           "type": "string"
                                         },
-                                        "Changes": {
+                                        "changes": {
                                           "type": "array",
                                           "items": {
                                             "type": "object",
@@ -3568,7 +3561,7 @@
                                             }
                                           }
                                         },
-                                        "Variations": {
+                                        "variations": {
                                           "type": "array",
                                           "items": {
                                             "type": "object",
@@ -3726,15 +3719,7 @@
                                     "type": "string"
                                   },
                                   "AditionalFeatures": {
-                                    "type": "object",
-                                    "properties": {
-                                      "ABC0987654321": {
-                                        "type": "string"
-                                      },
-                                      "0987654321ABC": {
-                                        "type": "string"
-                                      }
-                                    }
+                                    "type": "object"
                                   },
                                   "Rules": {
                                     "type": "array",
@@ -3821,16 +3806,16 @@
                                     "items": {
                                       "type": "object",
                                       "properties": {
-                                        "Sku": {
+                                        "sku": {
                                           "type": "string"
                                         },
-                                        "SpecificationId": {
+                                        "specificationId": {
                                           "type": "string"
                                         },
-                                        "Availability": {
+                                        "availability": {
                                           "type": "string"
                                         },
-                                        "Changes": {
+                                        "changes": {
                                           "type": "array",
                                           "items": {
                                             "type": "object",
@@ -3850,7 +3835,7 @@
                                             }
                                           }
                                         },
-                                        "Variations": {
+                                        "variations": {
                                           "type": "array",
                                           "items": {
                                             "type": "object",
@@ -4006,15 +3991,7 @@
                                           "type": "string"
                                         },
                                         "AditionalFeatures": {
-                                          "type": "object",
-                                          "properties": {
-                                            "ABC0987654321": {
-                                              "type": "string"
-                                            },
-                                            "0987654321ABC": {
-                                              "type": "string"
-                                            }
-                                          }
+                                          "type": "object"
                                         },
                                         "Rules": {
                                           "type": "array",
@@ -4101,16 +4078,16 @@
                                           "items": {
                                             "type": "object",
                                             "properties": {
-                                              "Sku": {
+                                              "sku": {
                                                 "type": "string"
                                               },
-                                              "SpecificationId": {
+                                              "specificationId": {
                                                 "type": "string"
                                               },
-                                              "Availability": {
+                                              "availability": {
                                                 "type": "string"
                                               },
-                                              "Changes": {
+                                              "changes": {
                                                 "type": "array",
                                                 "items": {
                                                   "type": "object",
@@ -4130,7 +4107,7 @@
                                                   }
                                                 }
                                               },
-                                              "Variations": {
+                                              "variations": {
                                                 "type": "array",
                                                 "items": {
                                                   "type": "object",
@@ -4269,15 +4246,7 @@
                                     "type": "string"
                                   },
                                   "AditionalFeatures": {
-                                    "type": "object",
-                                    "properties": {
-                                      "ABC0987654321": {
-                                        "type": "string"
-                                      },
-                                      "0987654321ABC": {
-                                        "type": "string"
-                                      }
-                                    }
+                                    "type": "object"
                                   },
                                   "Rules": {
                                     "type": "array",
@@ -4364,16 +4333,16 @@
                                     "items": {
                                       "type": "object",
                                       "properties": {
-                                        "Sku": {
+                                        "sku": {
                                           "type": "string"
                                         },
-                                        "SpecificationId": {
+                                        "specificationId": {
                                           "type": "string"
                                         },
-                                        "Availability": {
+                                        "availability": {
                                           "type": "string"
                                         },
-                                        "Changes": {
+                                        "changes": {
                                           "type": "array",
                                           "items": {
                                             "type": "object",
@@ -4393,7 +4362,7 @@
                                             }
                                           }
                                         },
-                                        "Variations": {
+                                        "variations": {
                                           "type": "array",
                                           "items": {
                                             "type": "object",
@@ -4474,7 +4443,7 @@
                             "OfferDate": "0001-01-01T00:00:00",
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -4552,10 +4521,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -4569,7 +4538,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -4581,10 +4550,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -4638,7 +4607,7 @@
                             "ViewsCount": 0,
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -4716,10 +4685,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -4733,7 +4702,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -4745,10 +4714,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -4808,7 +4777,7 @@
                             "OfferDate": "0001-01-01T00:00:00",
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -4886,10 +4855,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -4903,7 +4872,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -4915,10 +4884,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -4972,7 +4941,7 @@
                             "ViewsCount": 0,
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -5050,10 +5019,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -5067,7 +5036,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -5079,10 +5048,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -5151,7 +5120,7 @@
                             "OfferDate": "0001-01-01T00:00:00",
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -5229,10 +5198,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -5246,7 +5215,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -5258,10 +5227,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -5315,7 +5284,7 @@
                             "ViewsCount": 0,
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -5393,10 +5362,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -5410,7 +5379,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -5422,10 +5391,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -5489,7 +5458,7 @@
                             "OfferDate": "0001-01-01T00:00:00",
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -5567,10 +5536,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -5584,7 +5553,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -5596,10 +5565,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -5653,7 +5622,7 @@
                             "ViewsCount": 0,
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -5731,10 +5700,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -5748,7 +5717,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -5760,10 +5729,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -5832,7 +5801,7 @@
                                 "OfferDate": "0001-01-01T00:00:00",
                                 "AditionalFeatures": {
                                   "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                                  "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                                  "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                                 },
                                 "Rules": [
                                   {
@@ -5910,10 +5879,10 @@
                                 ],
                                 "Specifications": [
                                   {
-                                    "Sku": "ABC-12345678-C",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Changes": [
+                                    "sku": "ABC-12345678-C",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "changes": [
                                       {
                                         "Name": "Price",
                                         "ValueDouble": 123.9
@@ -5927,7 +5896,7 @@
                                         "ValueString": "Produto de Teste"
                                       }
                                     ],
-                                    "Variations": [
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "G"
@@ -5939,10 +5908,10 @@
                                     ]
                                   },
                                   {
-                                    "Sku": "ABC-12345678-D",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Variations": [
+                                    "sku": "ABC-12345678-D",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "M"
@@ -5996,7 +5965,7 @@
                                 "ViewsCount": 0,
                                 "AditionalFeatures": {
                                   "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                                  "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                                  "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                                 },
                                 "Rules": [
                                   {
@@ -6074,10 +6043,10 @@
                                 ],
                                 "Specifications": [
                                   {
-                                    "Sku": "ABC-12345678-C",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Changes": [
+                                    "sku": "ABC-12345678-C",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "changes": [
                                       {
                                         "Name": "Price",
                                         "ValueDouble": 123.9
@@ -6091,7 +6060,7 @@
                                         "ValueString": "Produto de Teste"
                                       }
                                     ],
-                                    "Variations": [
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "G"
@@ -6103,10 +6072,10 @@
                                     ]
                                   },
                                   {
-                                    "Sku": "ABC-12345678-D",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Variations": [
+                                    "sku": "ABC-12345678-D",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "M"
@@ -6175,7 +6144,7 @@
                                 "OfferDate": "0001-01-01T00:00:00",
                                 "AditionalFeatures": {
                                   "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                                  "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                                  "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                                 },
                                 "Rules": [
                                   {
@@ -6253,10 +6222,10 @@
                                 ],
                                 "Specifications": [
                                   {
-                                    "Sku": "ABC-12345678-C",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Changes": [
+                                    "sku": "ABC-12345678-C",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "changes": [
                                       {
                                         "Name": "Price",
                                         "ValueDouble": 123.9
@@ -6270,7 +6239,7 @@
                                         "ValueString": "Produto de Teste"
                                       }
                                     ],
-                                    "Variations": [
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "G"
@@ -6282,10 +6251,10 @@
                                     ]
                                   },
                                   {
-                                    "Sku": "ABC-12345678-D",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Variations": [
+                                    "sku": "ABC-12345678-D",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "M"
@@ -6339,7 +6308,7 @@
                                 "ViewsCount": 0,
                                 "AditionalFeatures": {
                                   "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                                  "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                                  "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                                 },
                                 "Rules": [
                                   {
@@ -6417,10 +6386,10 @@
                                 ],
                                 "Specifications": [
                                   {
-                                    "Sku": "ABC-12345678-C",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Changes": [
+                                    "sku": "ABC-12345678-C",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "changes": [
                                       {
                                         "Name": "Price",
                                         "ValueDouble": 123.9
@@ -6434,7 +6403,7 @@
                                         "ValueString": "Produto de Teste"
                                       }
                                     ],
-                                    "Variations": [
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "G"
@@ -6446,10 +6415,10 @@
                                     ]
                                   },
                                   {
-                                    "Sku": "ABC-12345678-D",
-                                    "SpecificationId": "1234567890",
-                                    "Availability": "out of stock",
-                                    "Variations": [
+                                    "sku": "ABC-12345678-D",
+                                    "specificationId": "1234567890",
+                                    "availability": "out of stock",
+                                    "variations": [
                                       {
                                         "Name": "tamanho",
                                         "Value": "M"
@@ -6516,7 +6485,7 @@
                             "OfferDate": "0001-01-01T00:00:00",
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -6594,10 +6563,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -6611,7 +6580,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -6623,10 +6592,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -6680,7 +6649,7 @@
                             "ViewsCount": 0,
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -6758,10 +6727,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -6775,7 +6744,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -6787,10 +6756,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -6850,7 +6819,7 @@
                             "OfferDate": "0001-01-01T00:00:00",
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -6928,10 +6897,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -6945,7 +6914,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -6957,10 +6926,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -7014,7 +6983,7 @@
                             "ViewsCount": 0,
                             "AditionalFeatures": {
                               "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1",
-                              "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                              "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                             },
                             "Rules": [
                               {
@@ -7092,10 +7061,10 @@
                             ],
                             "Specifications": [
                               {
-                                "Sku": "ABC-12345678-C",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Changes": [
+                                "sku": "ABC-12345678-C",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "changes": [
                                   {
                                     "Name": "Price",
                                     "ValueDouble": 123.9
@@ -7109,7 +7078,7 @@
                                     "ValueString": "Produto de Teste"
                                   }
                                 ],
-                                "Variations": [
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "G"
@@ -7121,10 +7090,10 @@
                                 ]
                               },
                               {
-                                "Sku": "ABC-12345678-D",
-                                "SpecificationId": "1234567890",
-                                "Availability": "out of stock",
-                                "Variations": [
+                                "sku": "ABC-12345678-D",
+                                "specificationId": "1234567890",
+                                "availability": "out of stock",
+                                "variations": [
                                   {
                                     "Name": "tamanho",
                                     "Value": "M"
@@ -7443,15 +7412,7 @@
                               "AditionalFeatures": {
                                 "type": "array",
                                 "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "ABC0987654321": {
-                                      "type": "string"
-                                    },
-                                    "0987654321ABC": {
-                                      "type": "string"
-                                    }
-                                  }
+                                  "type": "object"
                                 }
                               },
                               "Rules": {
@@ -7548,7 +7509,7 @@
                                     "availability": {
                                       "type": "string"
                                     },
-                                    "Changes": {
+                                    "changes": {
                                       "type": "array",
                                       "items": {
                                         "type": "object",
@@ -7870,7 +7831,7 @@
                             "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                           },
                           {
-                            "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                            "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                           }
                         ],
                         "Rules": [
@@ -7949,10 +7910,10 @@
                         ],
                         "Specifications": [
                           {
-                            "Sku": "ABC-12345678-C",
-                            "SpecificationId": "1234567890",
-                            "Availability": "out of stock",
-                            "Changes": [
+                            "sku": "ABC-12345678-C",
+                            "specificationId": "1234567890",
+                            "availability": "out of stock",
+                            "changes": [
                               {
                                 "Name": "Price",
                                 "ValueDouble": 123.9
@@ -7966,7 +7927,7 @@
                                 "ValueString": "Produto de Teste"
                               }
                             ],
-                            "Variations": [
+                            "variations": [
                               {
                                 "Name": "tamanho",
                                 "Value": "G"
@@ -7978,10 +7939,10 @@
                             ]
                           },
                           {
-                            "Sku": "ABC-12345678-D",
-                            "SpecificationId": "1234567890",
-                            "Availability": "out of stock",
-                            "Variations": [
+                            "sku": "ABC-12345678-D",
+                            "specificationId": "1234567890",
+                            "availability": "out of stock",
+                            "variations": [
                               {
                                 "Name": "tamanho",
                                 "Value": "M"
@@ -8100,7 +8061,7 @@
                             "ABC0987654321": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                           },
                           {
-                            "0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
+                            "A0987654321ABC": "https://www.minhaloja.com.br/checkout/cart/add?sku=1234&qty=1"
                           }
                         ],
                         "Rules": [
@@ -8179,10 +8140,10 @@
                         ],
                         "Specifications": [
                           {
-                            "Sku": "ABC-12345678-C",
-                            "SpecificationId": "1234567890",
-                            "Availability": "out of stock",
-                            "Changes": [
+                            "sku": "ABC-12345678-C",
+                            "specificationId": "1234567890",
+                            "availability": "out of stock",
+                            "changes": [
                               {
                                 "Name": "Price",
                                 "ValueDouble": 123.9
@@ -8196,7 +8157,7 @@
                                 "ValueString": "Produto de Teste"
                               }
                             ],
-                            "Variations": [
+                            "variations": [
                               {
                                 "Name": "tamanho",
                                 "Value": "G"
@@ -8208,10 +8169,10 @@
                             ]
                           },
                           {
-                            "Sku": "ABC-12345678-D",
-                            "SpecificationId": "1234567890",
-                            "Availability": "out of stock",
-                            "Variations": [
+                            "sku": "ABC-12345678-D",
+                            "specificationId": "1234567890",
+                            "availability": "out of stock",
+                            "variations": [
                               {
                                 "Name": "tamanho",
                                 "Value": "M"

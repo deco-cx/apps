@@ -9,10 +9,14 @@ import {
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import {
-  Filter as SHFilterParam,
+  FilterProp,
+  Recommendations,
+  RecommendationsCombination,
+  RecommendationsPromotional,
   SHFilter,
   SHProduct,
   SHSort,
+  SmarthintRecommendation,
 } from "./typings.ts";
 
 const AvailabilityMap: Record<string, ItemAvailability> = {
@@ -94,28 +98,28 @@ export const toProduct = (product: SHProduct): Product => {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "Score",
-      value: product.Score,
+      value: String(product.Score),
     });
   }
   if (product.SellsCount) {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "SellsCount",
-      value: product.SellsCount,
+      value: String(product.SellsCount),
     });
   }
   if (product.ViewsCount) {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "ViewsCount",
-      value: product.ViewsCount,
+      value: String(product.ViewsCount),
     });
   }
   if (product.HasPromotion) {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "HasPromotion",
-      value: product.HasPromotion,
+      value: String(product.HasPromotion),
     });
   }
   if (product.FirstCategory) {
@@ -136,28 +140,28 @@ export const toProduct = (product: SHProduct): Product => {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "PurchasePercentage",
-      value: product.PurchasePercentage,
+      value: String(product.PurchasePercentage),
     });
   }
   if (product.CustomWeight) {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "CustomWeight",
-      value: product.CustomWeight,
+      value: String(product.CustomWeight),
     });
   }
   if (product.LowerPrice) {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "LowerPrice",
-      value: product.LowerPrice,
+      value: String(product.LowerPrice),
     });
   }
   if (product.isHighlightProduct) {
     additionalProperty.push({
       "@type": "PropertyValue" as const,
       name: "isHighlightProduct",
-      value: product.isHighlightProduct,
+      value: String(product.isHighlightProduct),
     });
   }
   if (product.LowerPriceDate) {
@@ -189,19 +193,19 @@ export const toProduct = (product: SHProduct): Product => {
 
   const offers = {
     "@type": "AggregateOffer" as const,
-    highPrice: product.Price,
-    lowPrice: product.HasSalePrice ? product.SalePrice : product.Price,
+    highPrice: product.Price ?? 0,
+    lowPrice: (product.HasSalePrice ? product.SalePrice : product.Price) ?? 0,
     offerCount: priceSpecification.length,
     offers: [
       {
         "@type": "Offer" as const,
         availability:
           AvailabilityMap[firstAvailable?.availability ?? "out of stock"],
-        price: product.SalePrice,
+        price: product.SalePrice ?? 0,
         inventoryLevel: {
           value: 1000, //TODO
         },
-        itemCondition: ConditionMap[product.Condition],
+        itemCondition: ConditionMap[product.Condition || "new"],
         priceSpecification,
       },
     ],
@@ -213,6 +217,8 @@ export const toProduct = (product: SHProduct): Product => {
       ratingValue: product.ReviewStars,
     }
     : undefined;
+
+  const specifications = product.Specifications ?? [];
 
   return {
     "@type": "Product",
@@ -253,22 +259,22 @@ export const toProduct = (product: SHProduct): Product => {
     isVariantOf: {
       "@type": "ProductGroup",
       additionalProperty: [],
-      productGroupID: product.ProductId,
-      hasVariant: product.Specifications.map((specification): ProductLeaf => ({
+      productGroupID: product.ProductId!,
+      hasVariant: specifications?.map((specification): ProductLeaf => ({
         "@type": "Product",
-        productID: specification.SpecificationId,
-        sku: specification.Sku,
-        additionalProperty: specification.Variations?.map((variation) => ({
+        productID: specification.specificationId!,
+        sku: specification.sku!,
+        additionalProperty: specification.variations?.map((variation) => ({
           "@type": "PropertyValue" as const,
           name: "Tamanho",
-          value: variation?.ValueInt ?? variation?.ValueDouble ??
-            variation?.ValueString,
+          value: variation.Value,
         })),
         offers: {
           ...offers,
           offers: [{
             ...offers.offers[0],
-            availability: AvailabilityMap[specification.availability],
+            availability:
+              AvailabilityMap[specification.availability || "out of stock"],
           }],
         },
       })),
@@ -289,10 +295,10 @@ export const toFilters = (filters: SHFilter[], url: URL): Filter[] => {
     key: filter.Key!.Value!,
     label: filter.Key!.Show!,
     quantity: filter.Value?.reduce(
-      (acc: number, value: any) => acc + value.Quantity,
+      (acc, value) => acc + (value.Quantity ?? 0),
       0,
     ) ?? 0,
-    values: filter.Value?.map((value: any): FilterToggleValue => {
+    values: filter.Value?.map((value): FilterToggleValue => {
       const filterUrl = new URL(url);
       filterUrl.searchParams.append(
         "filter",
@@ -302,10 +308,10 @@ export const toFilters = (filters: SHFilter[], url: URL): Filter[] => {
       filterUrl.searchParams.delete("page");
 
       return ({
-        label: value.Show,
-        quantity: value.Quantity,
+        label: value.Show!,
+        quantity: value.Quantity!,
         selected: Boolean(value.Checked),
-        value: value.Value,
+        value: value.Value!,
         url: filterUrl.href,
       });
     }) ?? [],
@@ -319,7 +325,7 @@ export const getSortParam = (url: URL, sortParam?: number) => {
 
 export const getFilterParam = (
   url?: URL,
-  filterParam: SHFilterParam[] = [],
+  filterParam: FilterProp[] = [],
 ) => {
   return url?.searchParams.getAll("filter").length
     ? url.searchParams.getAll("filter")
@@ -360,4 +366,75 @@ export const getPaginationInfo = (
     nextPage: hasNextPage ? `?${nextPage}` : undefined,
     previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
   };
+};
+
+export const toRecommendation = (
+  item:
+    | RecommendationsPromotional
+    | RecommendationsCombination
+    | Recommendations,
+  position: string,
+  type:
+    | "RecommendationsProducts"
+    | "RecommendationsCombination"
+    | "RecommendationsPromotional"
+    | "Recommendations",
+) => {
+  const recommendations: SmarthintRecommendation = {
+    "@type": type,
+    order: item.Order,
+    eventGoogleAnalytics: item.EventGoogleAnalytics,
+    titleRecommendation: item.TitleRecommendation,
+    nameRecommendation: item.NameRecommendation,
+    position,
+    products: null,
+  };
+
+  if (type === "RecommendationsPromotional") {
+    recommendations.bannerHtml =
+      (item as RecommendationsPromotional).BannerHtml;
+    recommendations.bannerUrl = (item as RecommendationsPromotional).BannerUrl;
+    recommendations.bannerUrlClick =
+      (item as RecommendationsPromotional).BannerUrlClick;
+    recommendations.endDateTime =
+      (item as RecommendationsPromotional).EndDateTime;
+    recommendations.hasTimer = (item as RecommendationsPromotional).HasTimer;
+    recommendations.positionBanner =
+      (item as RecommendationsPromotional).PositionBanner;
+    recommendations.startDateTime =
+      (item as RecommendationsPromotional).StartDateTime;
+  }
+
+  if (type === "Recommendations") {
+    recommendations.products =
+      (item as Recommendations).Products?.map((product) =>
+        toProduct(product)
+      ) || null;
+  }
+
+  if (type === "RecommendationsPromotional") {
+    recommendations.bannerHtml =
+      (item as RecommendationsPromotional).BannerHtml;
+    recommendations.bannerUrl = (item as RecommendationsPromotional).BannerUrl;
+    recommendations.bannerUrlClick =
+      (item as RecommendationsPromotional).BannerUrlClick;
+    recommendations.endDateTime =
+      (item as RecommendationsPromotional).EndDateTime;
+    recommendations.hasTimer = (item as RecommendationsPromotional).HasTimer;
+    recommendations.positionBanner =
+      (item as RecommendationsPromotional).PositionBanner;
+    recommendations.startDateTime =
+      (item as RecommendationsPromotional).StartDateTime;
+  }
+
+  if (type === "RecommendationsCombination") {
+    recommendations.combos = (item as RecommendationsCombination).Combos?.map((
+      combo,
+    ) => ({
+      ...combo,
+      products: combo.Products?.map((product) => toProduct(product)) || null,
+    }));
+  }
+
+  return recommendations;
 };

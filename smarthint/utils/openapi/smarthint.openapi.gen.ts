@@ -368,6 +368,11 @@ filter?: (string | string[])
  * Caso existam condições especiais para os Produtos, este deverá enviado
  */
 condition?: string
+/**
+ * Listagem das últimas categorias visitadas pelo cliente. O envio deverá ser realizado neste formato:
+ * categories=category
+ */
+categories?: string
 }
 response: {
 SearchId?: string
@@ -418,8 +423,7 @@ Show?: string
 }[]
 }[]
 AditionalFeatures?: {
-ABC0987654321?: string
-"0987654321ABC"?: string
+
 }[]
 Rules?: {
 Value?: string
@@ -445,16 +449,16 @@ ValueString?: string
 Value?: string
 }[]
 Specifications?: {
-Sku?: string
-SpecificationId?: string
-Availability?: string
-Changes?: {
+sku?: string
+specificationId?: string
+availability?: string
+changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
 ValueString?: string
 }[]
-Variations?: {
+variations?: {
 Name?: string
 Value?: string
 }[]
@@ -593,16 +597,16 @@ ValueString?: string
 Value?: string
 }[]
 Specifications?: {
-Sku?: string
-SpecificationId?: string
-Availability?: string
-Changes?: {
+sku?: string
+specificationId?: string
+availability?: string
+changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
 ValueString?: string
 }[]
-Variations?: {
+variations?: {
 Name?: string
 Value?: string
 }[]
@@ -764,8 +768,7 @@ Tags?: string[]
 CreatedDate?: string
 OfferDate?: string
 AditionalFeatures?: {
-ABC0987654321?: string
-"0987654321ABC"?: string
+
 }
 Rules?: {
 Value?: string
@@ -791,16 +794,16 @@ ValueString?: string
 Value?: string
 }[]
 Specifications?: {
-Sku?: string
-SpecificationId?: string
-Availability?: string
-Changes?: {
+sku?: string
+specificationId?: string
+availability?: string
+changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
 ValueString?: string
 }[]
-Variations?: {
+variations?: {
 Name?: string
 Value?: string
 }[]
@@ -848,8 +851,7 @@ Tags?: string[]
 CreatedDate?: string
 OfferDate?: string
 AditionalFeatures?: {
-ABC0987654321?: string
-"0987654321ABC"?: string
+
 }
 Rules?: {
 Value?: string
@@ -875,16 +877,16 @@ ValueString?: string
 Value?: string
 }[]
 Specifications?: {
-Sku?: string
-SpecificationId?: string
-Availability?: string
-Changes?: {
+sku?: string
+specificationId?: string
+availability?: string
+changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
 ValueString?: string
 }[]
-Variations?: {
+variations?: {
 Name?: string
 Value?: string
 }[]
@@ -931,8 +933,7 @@ Tags?: string[]
 CreatedDate?: string
 OfferDate?: string
 AditionalFeatures?: {
-ABC0987654321?: string
-"0987654321ABC"?: string
+
 }
 Rules?: {
 Value?: string
@@ -958,16 +959,16 @@ ValueString?: string
 Value?: string
 }[]
 Specifications?: {
-Sku?: string
-SpecificationId?: string
-Availability?: string
-Changes?: {
+sku?: string
+specificationId?: string
+availability?: string
+changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
 ValueString?: string
 }[]
-Variations?: {
+variations?: {
 Name?: string
 Value?: string
 }[]
@@ -1009,8 +1010,7 @@ Tags?: string[]
 CreatedDate?: string
 OfferDate?: string
 AditionalFeatures?: {
-ABC0987654321?: string
-"0987654321ABC"?: string
+
 }
 Rules?: {
 Value?: string
@@ -1036,16 +1036,16 @@ ValueString?: string
 Value?: string
 }[]
 Specifications?: {
-Sku?: string
-SpecificationId?: string
-Availability?: string
-Changes?: {
+sku?: string
+specificationId?: string
+availability?: string
+changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
 ValueString?: string
 }[]
-Variations?: {
+variations?: {
 Name?: string
 Value?: string
 }[]
@@ -1148,8 +1148,7 @@ Show?: string
 }[]
 }[]
 AditionalFeatures?: {
-ABC0987654321?: string
-"0987654321ABC"?: string
+
 }[]
 Rules?: {
 Value?: string
@@ -1178,7 +1177,7 @@ Specifications?: {
 sku?: string
 specificationId?: string
 availability?: string
-Changes?: {
+changes?: {
 Name?: string
 ValueDouble?: number
 ValueInt?: number
