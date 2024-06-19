@@ -5,6 +5,7 @@ import { createHttpClient } from "../utils/http.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { middleware } from "./middleware.ts";
+import { Secret } from "../website/loaders/secret.ts";
 
 export interface FiltersGraphQL {
   value: string;
@@ -20,7 +21,7 @@ export interface APIConfig {
   baseUrl: string;
 
   /** @title Magento api key */
-  apiKey: string;
+  apiKey: Secret;
 
   /** @title Magento store */
   site: string;
@@ -155,13 +156,17 @@ export default function App(props: Props): App<Manifest, State> {
     imagesConfig,
     productCustomProps,
     pricingConfig,
-    cartConfigs
+    cartConfigs,
   } = props;
+
+  const { apiKey } = apiConfig;
+
+  const secretKey = typeof apiKey === "string" ? apiKey : apiKey?.get() ?? "";
 
   const clientAdmin = createHttpClient<API>({
     base: apiConfig.baseUrl,
     headers: new Headers({
-      Authorization: `Bearer ${apiConfig.apiKey}`,
+      Authorization: `Bearer ${secretKey}`,
     }),
   });
 
@@ -170,7 +175,7 @@ export default function App(props: Props): App<Manifest, State> {
     endpoint: `${apiConfig.baseUrl}/graphql`,
     headers: new Headers({
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiConfig.apiKey}`,
+      Authorization: `Bearer ${secretKey}`,
     }),
   });
   return {
