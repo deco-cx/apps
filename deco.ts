@@ -11,6 +11,8 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("smarthint"),
+    app("anthropic"),
+    app("resend"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
