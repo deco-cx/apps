@@ -76,7 +76,10 @@ export default function Analtyics({
           {googleAnalyticsIds?.map((trackingId) => (
             <GTAG trackingId={trackingId.trim()} />
           ))}
-          {src && <GoogleTagManager src={src} trackingId={trackingId} />}
+          {/*  Drop this in next major to only have trackingId or trackingId and src */}
+          {src && !trackingIds?.length && (
+            <GoogleTagManager src={src} trackingId={trackingId} />
+          )}
         </>
       )}
 
