@@ -231,21 +231,21 @@ const toAdditionalPropertiesComplementName = <
   return product.items.map((item) =>
     toAdditionalComplementName({
       name: "complementName",
-      complementName: item.complementName || "",
+      value: item.complementName || "",
     })
   );
 };
 
 export const toAdditionalComplementName = ({
   name,
-  complementName,
+  value,
 }: {
   name: string;
-  complementName: string;
+  value: string;
 }): PropertyValue => ({
   "@type": "PropertyValue",
   name,
-  complementName,
+  value,
 });
 
 const toAdditionalPropertyClusters = <

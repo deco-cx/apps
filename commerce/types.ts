@@ -114,8 +114,6 @@ export interface PropertyValue extends Omit<Thing, "@type"> {
   value?: string;
   /** A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement. */
   valueReference?: string;
-  /** A complement to the product name, information that is defined directly in the Vtex cms when registering the product*/
-  complementName?: string;
 }
 
 export interface AggregateRating {
