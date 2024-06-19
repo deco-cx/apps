@@ -1,9 +1,11 @@
+import { ProductDetailsPage } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import type { AppContext } from "../../mod.ts";
 import {
   FieldsList,
   ProductDetailsResponse,
 } from "../../utils/client/types.ts";
+import { convertCategoriesToBreadcrumb, convertProductData } from "../../utils/transform.ts";
 
 export interface Props {
   /**
@@ -23,7 +25,7 @@ const productDetailsLoader = async (
   props: Props,
   _req: Request,
   ctx: AppContext
-): Promise<ProductDetailsResponse> => {
+): Promise<ProductDetailsPage> => {
   const { api } = ctx;
   const { productCode } = props;
 
@@ -31,7 +33,14 @@ const productDetailsLoader = async (
     "GET /orgProducts/:productCode"
   ]({ productCode }, STALE).then((res) => res.json());
 
-  return data;
+  const breadcrumbList = convertCategoriesToBreadcrumb(data.categories)
+  const product = convertProductData(data)
+
+  return {
+    "@type": "ProductDetailsPage",
+    breadcrumbList,
+    product,
+  };
 };
 
 export default productDetailsLoader;

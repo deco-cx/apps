@@ -1,3 +1,4 @@
+import { ProductListingPage } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import type { AppContext } from "../../mod.ts";
 import {
@@ -6,6 +7,7 @@ import {
   ProductListResponse,
   Sort,
 } from "../../utils/client/types.ts";
+import { convertBreadcrumb, convertFacetsToFilters, convertProductData, getPreviousNextPagination } from "../../utils/transform.ts";
 
 export interface Props {
   /** @description The category ID. */
@@ -28,7 +30,7 @@ export interface Props {
    * @description Sorting method applied to the return results.
    *  @default relevance
    */
-  sort?: Sort;
+  sort: Sort;
 }
 
 /**
@@ -39,7 +41,7 @@ const productListLoader = async (
   props: Props,
   _req: Request,
   ctx: AppContext
-): Promise<ProductListResponse> => {
+): Promise<ProductListingPage> => {
   const { api } = ctx;
   const { categoryId, currentPage, facets, fields, pageSize, sort } = props;
 
@@ -58,7 +60,24 @@ const productListLoader = async (
     res.json()
   );
 
-  return data;
+  const products = data.products.map(convertProductData)
+  const breadcrumb = convertBreadcrumb(data.breadcrumbs)
+  const filters = convertFacetsToFilters(data.facets)
+  const [previousPage, nextPage] = getPreviousNextPagination(data.pagination)
+
+  return {
+    "@type": "ProductListingPage",
+    breadcrumb,
+    filters,
+    products,
+    pageInfo: {
+      currentPage: data.pagination.currentPage,
+      nextPage,
+      previousPage,
+      pageTypes: ["Category", "SubCategory", "Collection"], // TODO: Filter these types.
+    },
+    sortOptions: [{ value: sort, label: sort }],
+  };
 };
 
 export default productListLoader;

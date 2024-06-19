@@ -4,7 +4,7 @@ import {
   SearchResponse,
 } from "./types.ts";
 import { Props as SearchProps } from "../../loaders/search.ts";
-import { Props as ProductListProps } from "../../loaders/product/productList.ts";
+import { Props as ProductListingPageProps } from "../../loaders/product/productListingPage.ts";
 import { Props as CatalogsProps } from "../../loaders/categories/tree.ts";
 
 export interface API {
@@ -15,7 +15,7 @@ export interface API {
 
   "GET /categories/:categoryId/products": {
     response: ProductListResponse;
-    searchParams: ProductListProps;
+    searchParams: ProductListingPageProps;
   };
 
   "GET /catalogs?:fields": {
