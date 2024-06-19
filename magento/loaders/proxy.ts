@@ -1,34 +1,50 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 
-const PATHS_TO_PROXY = [
+const PAGE_PATHS_TO_PROXY = [
   "/customer/*",
+  "/customer",
+  "/checkout/cart",
   "/checkout/*",
   "/checkout",
   "/sales/*",
   "/wishlist",
   "/wishlist/*",
-  "/customer/*",
   "/vault/*",
   "/catalogsearch/*",
   "/catalog/*",
+];
+
+const ASSETS_PATHS_TO_PROXY = [
+  "/static",
+  "/static/*",
+  "/icon-v2-192x192.png",
+  "/icon-v2-256x256.png",
+  "/icon-v2-384x384.png",
+  "/icon-v2-512x512.png",
+  "/media/*",
+  "/rest/*",
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = ({
   ctx,
-  extraPaths,
+  extraPagePaths,
   includeSiteMap,
   generateDecoSiteMap,
   excludePathsFromDecoSiteMap,
   prodUrl,
+  pathsWithoutSuffix,
+  suffix,
 }: {
-  extraPaths: string[];
+  extraPagePaths: string[];
   includeSiteMap?: string[];
   generateDecoSiteMap?: boolean;
   ctx: AppContext;
   excludePathsFromDecoSiteMap: string[];
   prodUrl: URL;
+  pathsWithoutSuffix: string[];
+  suffix: string;
 }) => {
   const publicUrl = new URL(
     ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
@@ -38,8 +54,8 @@ const buildProxyRoutes = ({
     const urlToProxy = publicUrl.href;
     const hostToUse = publicUrl.hostname;
 
-    const routeFromPath = (pathTemplate: string): Route => ({
-      pathTemplate,
+    const routeFromPath = (pathTemplate: string, useSuffix = false): Route => ({
+      pathTemplate: useSuffix ? suffix + pathTemplate : pathTemplate,
       handler: {
         value: {
           __resolveType: "magento/handlers/proxy.ts",
@@ -54,9 +70,12 @@ const buildProxyRoutes = ({
         },
       },
     });
-    const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
-      routeFromPath,
-    );
+    const suffixedRoutes = [...PAGE_PATHS_TO_PROXY, ...extraPagePaths].map((
+      route,
+    ) => routeFromPath(route, true));
+
+    const nonSuffixedRoutes = [...ASSETS_PATHS_TO_PROXY, ...pathsWithoutSuffix]
+      .map((route) => routeFromPath(route, false));
 
     const [include, routes] = generateDecoSiteMap
       ? [
@@ -94,7 +113,8 @@ const buildProxyRoutes = ({
           },
         },
       },
-      ...routesFromPaths,
+      ...suffixedRoutes,
+      ...nonSuffixedRoutes,
     ];
   } catch (e) {
     console.log("Error in Magento Proxies");
@@ -104,7 +124,18 @@ const buildProxyRoutes = ({
 };
 
 export interface Props {
+  /**
+   * @description Extra content. Use "Suffix" field to bulk changes
+   */
   extraPathsToProxy?: string[];
+  /**
+   * @description Use a suffix to compose the proxies paths
+   */
+  suffix?: string;
+  /**
+   * @description Paths of extra content - ignoring the "suffix" field
+   */
+  pathsWithoutSuffix?: string[];
   /**
    * @title Other site maps to include
    */
@@ -128,6 +159,8 @@ function loader(
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
+    pathsWithoutSuffix = [],
+    suffix = "",
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -137,9 +170,11 @@ function loader(
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
     includeSiteMap,
-    extraPaths: extraPathsToProxy,
+    extraPagePaths: extraPathsToProxy,
     ctx,
     prodUrl,
+    pathsWithoutSuffix: pathsWithoutSuffix,
+    suffix,
   });
 }
 
