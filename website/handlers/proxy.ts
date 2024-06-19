@@ -159,6 +159,9 @@ export default function Proxy({
       ? _ctx?.state?.monitoring
       : undefined;
 
+    headers.forEach((value, key) => {
+      console.log("proxy sending header", key, value);
+    });
     const fetchFunction = async () => {
       try {
         return await fetch(to, {
