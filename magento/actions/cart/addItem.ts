@@ -2,12 +2,14 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import cart, { Cart } from "../../loaders/cart.ts";
 import { parseCookieString } from "../../middleware.ts";
 import type { AppContext } from "../../mod.ts";
-import { handleCartError } from "../../utils/cart.ts";
+import { getCartCookie, handleCartError } from "../../utils/cart.ts";
 import { FORM_KEY_COOKIE } from "../../utils/constants.ts";
+import addItem_old from "./addItemToCart.ts";
 
 export interface Props {
   qty: number;
   sku: string;
+  productId: string;
 }
 
 /**
@@ -19,11 +21,16 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { qty, sku } = props;
+  const { qty, productId } = props;
   const { headers, url } = req;
   const { site, baseUrl } = ctx;
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
+  const cartId = getCartCookie(headers);
   const newHeaders = new Headers();
+
+  if (cartId?.length) {
+    return await addItem_old(props, req, ctx);
+  }
 
   const requestCookies = headers.get("Cookie");
 
@@ -36,7 +43,7 @@ const action = async (
   newHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
   const urlencoded = new URLSearchParams();
-  urlencoded.append("product", sku);
+  urlencoded.append("product", productId);
   urlencoded.append("form_key", formKey);
   urlencoded.append("qty", String(qty));
 
@@ -44,7 +51,7 @@ const action = async (
     const { headers: fetchHeaders } = await fetch(
       `${baseUrl}/${site}/checkout/cart/add/uenc/${
         btoa(url).replace(/=/g, "~")
-      }/product/${sku}`,
+      }/product/${productId}`,
       {
         method: "POST",
         headers: newHeaders,
