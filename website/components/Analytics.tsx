@@ -17,10 +17,20 @@ const isOnPremises = (props: TagManagerProps): props is OnPremises =>
   Boolean((props as any).src);
 
 export function GoogleTagManager(props: TagManagerProps) {
-  const id = isOnPremises(props) ? props.src : props.trackingId;
-  const src = isOnPremises(props)
+  const _isOnPremises = isOnPremises(props);
+  const hasTrackingId = "trackingId" in props;
+  const id = _isOnPremises ? props.src : props.trackingId;
+  const hostname = _isOnPremises
     ? props.src
-    : `https://www.googletagmanager.com/gtm.js?id=${props.trackingId}`;
+    : "https://www.googletagmanager.com";
+  const src = new URL(
+    `/gtm.js?id=${hasTrackingId ? props.trackingId : ""}`,
+    hostname,
+  );
+  const noscript = new URL(
+    `/ns.html?id=${hasTrackingId ? props.trackingId : ""}`,
+    hostname,
+  );
 
   return (
     <>
@@ -31,14 +41,14 @@ export function GoogleTagManager(props: TagManagerProps) {
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s);j.async=true;j.src=i;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer', '${src}');`,
+})(window,document,'script','dataLayer', '${src.href}');`,
           }}
         />
       </Head>
 
       <noscript>
         <iframe
-          src="https://www.googletagmanager.com/ns.html?id=GTM-KVXHNCM"
+          src={noscript.href}
           height="0"
           width="0"
           style="display:none;visibility:hidden"
