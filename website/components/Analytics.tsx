@@ -2,22 +2,18 @@ import { Head } from "$fresh/runtime.ts";
 import { context } from "deco/live.ts";
 import { useScriptAsDataURI } from "../../utils/useScript.ts";
 
-interface Hosted {
+export const getGTMIdFromSrc = (src: string | undefined) => {
+  const trackingId = src ? new URL(src).searchParams.get("id") : undefined;
+  return trackingId;
+};
+
+interface TagManagerProps {
   trackingId: string;
+  src?: string;
 }
-
-interface OnPremises {
-  src: string;
-}
-
-type TagManagerProps = Hosted | OnPremises;
-
-const isOnPremises = (props: TagManagerProps): props is OnPremises =>
-  // deno-lint-ignore no-explicit-any
-  Boolean((props as any).src);
 
 export function GoogleTagManager(props: TagManagerProps) {
-  const _isOnPremises = isOnPremises(props);
+  const _isOnPremises = !!props.src;
   const hasTrackingId = "trackingId" in props;
   const id = _isOnPremises ? props.src : props.trackingId;
   const hostname = _isOnPremises
@@ -59,7 +55,7 @@ j=d.createElement(s);j.async=true;j.src=i;f.parentNode.insertBefore(j,f);
   );
 }
 
-export function GTAG({ trackingId }: Hosted) {
+export function GTAG({ trackingId }: Pick<TagManagerProps, "trackingId">) {
   return (
     <Head>
       <script
@@ -125,7 +121,7 @@ export interface Props {
   googleAnalyticsIds?: string[];
 
   /**
-   * @description custom url for serving google tag manager. Set either this url or the tracking id
+   * @description custom url for serving google tag manager.
    */
   src?: string;
 
@@ -142,6 +138,10 @@ export default function Analytics({
   disableAutomaticEventPush,
 }: Props) {
   const isDeploy = !!context.isDeploy;
+  // Prevent breacking change. Drop this in next major to only have
+  // src: https://hostname
+  // trackingId: GTM-ID
+  const trackingId = getGTMIdFromSrc(src) ?? "";
 
   return (
     <>
@@ -149,12 +149,12 @@ export default function Analytics({
       {isDeploy && (
         <>
           {trackingIds?.map((trackingId) => (
-            <GoogleTagManager trackingId={trackingId.trim()} />
+            <GoogleTagManager src={src} trackingId={trackingId.trim()} />
           ))}
           {googleAnalyticsIds?.map((trackingId) => (
             <GTAG trackingId={trackingId.trim()} />
           ))}
-          {src && <GoogleTagManager src={src} />}
+          {src && <GoogleTagManager src={src} trackingId={trackingId} />}
         </>
       )}
 
