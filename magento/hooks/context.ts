@@ -38,6 +38,7 @@ const enqueue = (
 
       loading.value = false;
     } catch (error) {
+      console.log(error)
       if (error.name === "AbortError") return;
 
       if (error.name === "SyntaxError") {

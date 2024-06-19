@@ -76,6 +76,7 @@ const action = async (
 
     return await cart({ cartId }, req, ctx);
   } catch (error) {
+    console.error(error);
     return {
       ...(await cart(undefined, req, ctx)),
       ...handleCartError(error),

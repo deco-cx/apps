@@ -26,6 +26,7 @@ const action = async (
       couponCode: couponCode,
     });
   } catch (error) {
+    console.error(error);
     return {
       ...(await cart(undefined, req, ctx)),
       ...handleCartError(error),
