@@ -129,9 +129,12 @@ DocumentId?: string
 }
 }
 /**
- * Retrieves user document information.
+ * Retrieves documents' information, while choosing which fields will be returned and filtering documents by specific fields.
  */
-"GET /api/dataentities/CL/search?email=:email&_fields=document": {
+"GET /api/dataentities/:dataEntityName/search": {
+searchParams: {
+params?: string
+}
 response: {
 [k: string]: any
 }

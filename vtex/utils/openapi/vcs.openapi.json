@@ -237,11 +237,11 @@
         }
       }
     },
-    "/api/dataentities/CL/search?email={email}&_fields=document": {
+    "/api/dataentities/{dataEntityName}/search": {
       "get": {
-        "summary": "Retrive User Document By CL Data Entity Name",
-        "description": "Retrieves user document information.",
-        "operationId": "RetriveUserDocumentByCLDataEntityName",
+        "summary": "Retrive Docs Information By Data Entity Name",
+        "description": "Retrieves documents' information, while choosing which fields will be returned and filtering documents by specific fields.",
+        "operationId": "RetrieveDocsInformationByDataEntityName",
         "parameters": [
           {
             "name": "Content-Type",
@@ -266,9 +266,17 @@
             }
           },
           {
-            "name": "email",
+            "name": "dataEntityName",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -282,8 +290,11 @@
                 "schema": {
                   "example": [
                     {
-                      "document": "12345678900"
-                    }
+                      "id": "b818cbda-e489-11e6-94f4-0ac138d2d42e",
+                      "accountId": "14af940d-9300-4279-9355-61d44c2ff879",
+                      "accountName": "apiexamples",
+                      "dataEntityId": "Newsletter"
+                      }
                   ]
                 }
               }
