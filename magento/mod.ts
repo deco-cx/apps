@@ -11,7 +11,7 @@ export interface FiltersGraphQL {
   type: "EQUAL" | "MATCH" | "RANGE";
 }
 
-export interface Props {
+export interface APIConfig {
   /**
    * @title Magento api url
    * @description The base url of the Magento API, If you have stores, put the name of the store at the end.
@@ -35,6 +35,19 @@ export interface Props {
   currencyCode: string;
 
   /**
+   * @title Enale Cache in APIs (Deco Stale)
+   * @default true
+   */
+  enableCache: boolean;
+
+  /**
+   * @title Use Magento store prop as URL path suffix in PDP
+   */
+  useSuffix: boolean;
+}
+
+export interface ImagesConfig {
+  /**
    * @title Images URL
    * @description The base url of the images.
    * @example https://www.store.com.br/media/catalog/product
@@ -47,12 +60,9 @@ export interface Props {
    * @default 3
    */
   imagesQtd: number;
+}
 
-  /**
-   * @title Use Magento store prop as URL path suffix in PDP
-   */
-  useSuffix: boolean;
-
+export interface CustomProps {
   /**
    * @title Custom Filters
    * @description Applicate own filters
@@ -64,7 +74,9 @@ export interface Props {
    * @description Inform the product own custom attributes
    */
   customAttributes?: Array<string>;
+}
 
+export interface PricingConfig {
   /**
    * @title Maximum number of installments
    */
@@ -74,17 +86,6 @@ export interface Props {
    * @title Minimum installment value
    */
   minInstallmentValue: number;
-
-  /**
-   * @title Enale Cache in APIs (Deco Stale)
-   * @default true
-   */
-  enableCache: boolean;
-
-  /**
-   * @title Cart Configs
-   */
-  cartConfigs: CartConfigs;
 }
 
 interface CartConfigs {
@@ -101,10 +102,46 @@ interface CartConfigs {
   countProductImageInCart: number;
 }
 
-export interface State extends Props {
-  clientAdmin: ReturnType<typeof createHttpClient<API>>;
-  clientGraphql: ReturnType<typeof createGraphqlClient>;
+export interface Props {
+  /**
+   * @title API config
+   * @description Full API Props
+   */
+  apiConfig: APIConfig;
+
+  /**
+   * @title Images config
+   * @description Images config in PDP, PLP and shelves
+   */
+  imagesConfig: ImagesConfig;
+
+  /**
+   * @title Custom Props
+   * @description Use your ow props in product
+   */
+  productCustomProps: CustomProps;
+
+  /**
+   * @title Pricing config in product
+   */
+  pricingConfig: PricingConfig;
+
+  /**
+   * @title Cart Configs
+   */
+  cartConfigs: CartConfigs;
 }
+
+export type State =
+  & {
+    clientAdmin: ReturnType<typeof createHttpClient<API>>;
+    clientGraphql: ReturnType<typeof createGraphqlClient>;
+    cartConfigs: CartConfigs;
+  }
+  & APIConfig
+  & ImagesConfig
+  & CustomProps
+  & PricingConfig;
 
 /**
  * @title Magento
@@ -113,27 +150,37 @@ export interface State extends Props {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, apiKey } = props;
+  const {
+    apiConfig,
+    imagesConfig,
+    productCustomProps,
+    pricingConfig,
+    cartConfigs
+  } = props;
 
   const clientAdmin = createHttpClient<API>({
-    base: baseUrl,
+    base: apiConfig.baseUrl,
     headers: new Headers({
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiConfig.apiKey}`,
     }),
   });
 
   const clientGraphql = createGraphqlClient({
     fetcher: fetchSafe,
-    endpoint: `${baseUrl}/graphql`,
+    endpoint: `${apiConfig.baseUrl}/graphql`,
     headers: new Headers({
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiConfig.apiKey}`,
     }),
   });
   return {
     manifest,
     state: {
-      ...props,
+      ...apiConfig,
+      ...imagesConfig,
+      ...productCustomProps,
+      ...pricingConfig,
+      cartConfigs,
       clientAdmin,
       clientGraphql,
     },

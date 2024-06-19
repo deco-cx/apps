@@ -4,15 +4,16 @@
 
 import * as $$$$$$$$$0 from "./actions/amasty/submitReview.ts";
 import * as $$$$$$$$$1 from "./actions/cart/addCoupon.ts";
+import * as $$$$$$$$$3 from "./actions/cart/addItem_old.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$3 from "./actions/cart/removeCoupon.ts";
-import * as $$$$$$$$$4 from "./actions/cart/removeItem.ts";
-import * as $$$$$$$$$5 from "./actions/cart/setSimulation.ts";
-import * as $$$$$$$$$6 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$7 from "./actions/cart/updateItem.ts";
-import * as $$$$$$$$$8 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$9 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$10 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$4 from "./actions/cart/removeCoupon.ts";
+import * as $$$$$$$$$5 from "./actions/cart/removeItem.ts";
+import * as $$$$$$$$$6 from "./actions/cart/setSimulation.ts";
+import * as $$$$$$$$$7 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$8 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$9 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$10 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$11 from "./actions/wishlist/removeItem.ts";
 import * as $0 from "./functions/requestToPathname.ts";
 import * as $$$$0 from "./handlers/proxy.ts";
 import * as $$$$1 from "./handlers/sitemap.ts";
@@ -56,15 +57,16 @@ const manifest = {
   "actions": {
     "magento/actions/amasty/submitReview.ts": $$$$$$$$$0,
     "magento/actions/cart/addCoupon.ts": $$$$$$$$$1,
+    "magento/actions/cart/addItem_old.ts": $$$$$$$$$3,
     "magento/actions/cart/addItem.ts": $$$$$$$$$2,
-    "magento/actions/cart/removeCoupon.ts": $$$$$$$$$3,
-    "magento/actions/cart/removeItem.ts": $$$$$$$$$4,
-    "magento/actions/cart/setSimulation.ts": $$$$$$$$$5,
-    "magento/actions/cart/simulation.ts": $$$$$$$$$6,
-    "magento/actions/cart/updateItem.ts": $$$$$$$$$7,
-    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$8,
-    "magento/actions/wishlist/addItem.ts": $$$$$$$$$9,
-    "magento/actions/wishlist/removeItem.ts": $$$$$$$$$10,
+    "magento/actions/cart/removeCoupon.ts": $$$$$$$$$4,
+    "magento/actions/cart/removeItem.ts": $$$$$$$$$5,
+    "magento/actions/cart/setSimulation.ts": $$$$$$$$$6,
+    "magento/actions/cart/simulation.ts": $$$$$$$$$7,
+    "magento/actions/cart/updateItem.ts": $$$$$$$$$8,
+    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$9,
+    "magento/actions/wishlist/addItem.ts": $$$$$$$$$10,
+    "magento/actions/wishlist/removeItem.ts": $$$$$$$$$11,
   },
   "name": "magento",
   "baseUrl": import.meta.url,
