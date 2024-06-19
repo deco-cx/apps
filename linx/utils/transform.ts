@@ -141,6 +141,14 @@ export const toProduct = (
     additionalType: "skuOptions",
   }));
 
+  const productVideo: PropertyValue[] = product?.Medias?.filter((option) => option.MediaType === "Video").map((option) => ({
+    "@type": "PropertyValue" as const,
+    name: option.Title || "",
+    value: option.Url || "",
+    propertyID: option.VariationPath,
+    additionalType: "productVideo",
+  }));
+
   const prodOptions: PropertyValue[] = product.Options.map(option => {
     return option.Values.map(optValue => {
       const imagePath = optValue.ImagePath 
@@ -187,6 +195,7 @@ export const toProduct = (
     ...metadatas,
     ...descriptions,
     ...prodOptions,
+    ...productVideo, 
   ];
 
   const hasVariant = level < 1
