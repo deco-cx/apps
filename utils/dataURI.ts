@@ -13,7 +13,7 @@ export const scriptAsDataURI = <T extends (...args: any[]) => any>(
   if (once) {
     once = false;
     console.warn(
-      `scriptAsDataURI is deprecated and will soon be removed. Use import { useScriptAsDataURI } from 'apps/hooks/useScript.ts' instead.`,
+      `scriptAsDataURI is deprecated and will soon be removed. Use import { useScriptAsDataURI } from 'deco/hooks/useScript.ts' instead.`,
     );
   }
 
