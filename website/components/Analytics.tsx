@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { context } from "deco/live.ts";
-import { useScriptAsDataURI } from "../../utils/useScript.ts";
 
 export const getGTMIdFromSrc = (src: string | undefined) => {
   const trackingId = src ? new URL(src).searchParams.get("id") : undefined;
