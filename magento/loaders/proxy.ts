@@ -1,6 +1,11 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 
+interface RedirectRouteProps {
+  enableRedirectRoutes?: boolean;
+  subdomain?: string;
+}
+
 const PAGE_PATHS_TO_PROXY = [
   "/sales/*",
   "/wishlist",
@@ -39,7 +44,7 @@ const buildProxyRoutes = ({
   prodUrl,
   pathsWithoutSuffix,
   suffix,
-  enableRedirectRoutes,
+  redirectRoutesProps,
 }: {
   extraPagePaths: string[];
   includeSiteMap?: string[];
@@ -49,11 +54,13 @@ const buildProxyRoutes = ({
   prodUrl: URL;
   pathsWithoutSuffix: string[];
   suffix: string;
-  enableRedirectRoutes: boolean;
+  redirectRoutesProps: RedirectRouteProps;
 }) => {
   const publicUrl = new URL(
     ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
   );
+
+  const { enableRedirectRoutes, subdomain } = redirectRoutesProps;
 
   try {
     const urlToProxy = publicUrl.href;
@@ -79,15 +86,16 @@ const buildProxyRoutes = ({
 
     const redirectFromPath = (
       pathTemplate: string,
+      useSuffix: boolean,
     ): Route => ({
-      pathTemplate,
+      pathTemplate: useSuffix ? suffix + pathTemplate : pathTemplate,
       handler: {
         value: {
-          __resolveType: "website/handlers/redirect.ts",
-          to: `https://checkout.${
+          __resolveType: "magento/handlers/redirect.ts",
+          to: `https://${subdomain ?? "secure"}.${
             hostToUse.slice(firstDotIndex + 1)
-          }${suffix}${pathTemplate}`,
-          type: "permanent",
+          }`,
+          type: "temporary",
         },
       },
     });
@@ -99,9 +107,13 @@ const buildProxyRoutes = ({
     const nonSuffixedRoutes = [...ASSETS_PATHS_TO_PROXY, ...pathsWithoutSuffix]
       .map((route) => routeFromPath(route, false));
 
-    const checkoutRoutes = enableRedirectRoutes
-      ? CHECKOUT_PATHS_TO_PROXY.map(redirectFromPath)
+    const suffixedCheckoutRoutes = enableRedirectRoutes
+      ? CHECKOUT_PATHS_TO_PROXY.map((path) => redirectFromPath(path, true))
       : CHECKOUT_PATHS_TO_PROXY.map((path) => routeFromPath(path, true));
+
+    const nonSuffixedCheckoutRoutes = enableRedirectRoutes
+      ? CHECKOUT_PATHS_TO_PROXY.map((path) => redirectFromPath(path, false))
+      : CHECKOUT_PATHS_TO_PROXY.map((path) => routeFromPath(path, false));
 
     const [include, routes] = generateDecoSiteMap
       ? [
@@ -139,7 +151,8 @@ const buildProxyRoutes = ({
           },
         },
       },
-      ...checkoutRoutes,
+      ...suffixedCheckoutRoutes,
+      ...nonSuffixedCheckoutRoutes,
       ...suffixedRoutes,
       ...nonSuffixedRoutes,
     ];
@@ -166,7 +179,7 @@ export interface Props {
   /**
    * @title Redirect the checkout and customer routes to a "checkout.mypublicurl" domain
    */
-  enableRedirectRoutes?: boolean;
+  redirectRoutesProps: RedirectRouteProps;
   /**
    * @title Other site maps to include
    */
@@ -192,7 +205,7 @@ function loader(
     excludePathsFromDecoSiteMap = [],
     pathsWithoutSuffix = [],
     suffix = "",
-    enableRedirectRoutes = false,
+    redirectRoutesProps,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -207,7 +220,7 @@ function loader(
     prodUrl,
     pathsWithoutSuffix: pathsWithoutSuffix,
     suffix,
-    enableRedirectRoutes,
+    redirectRoutesProps,
   });
 }
 

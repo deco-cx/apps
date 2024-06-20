@@ -16,7 +16,8 @@ import * as $$$$$$$$$10 from "./actions/wishlist/addItem.ts";
 import * as $$$$$$$$$11 from "./actions/wishlist/removeItem.ts";
 import * as $0 from "./functions/requestToPathname.ts";
 import * as $$$$0 from "./handlers/proxy.ts";
-import * as $$$$1 from "./handlers/sitemap.ts";
+import * as $$$$1 from "./handlers/redirect.ts";
+import * as $$$$2 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/product/detailsPage.ts";
 import * as $$$2 from "./loaders/product/detailsPageGQL.ts";
@@ -52,7 +53,8 @@ const manifest = {
   },
   "handlers": {
     "magento/handlers/proxy.ts": $$$$0,
-    "magento/handlers/sitemap.ts": $$$$1,
+    "magento/handlers/redirect.ts": $$$$1,
+    "magento/handlers/sitemap.ts": $$$$2,
   },
   "actions": {
     "magento/actions/amasty/submitReview.ts": $$$$$$$$$0,
