@@ -4,7 +4,6 @@ import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
 import { Monitoring } from "deco/engine/core/resolver.ts";
-import { fetchToCurl } from "jsr:@viktor/fetch-to-curl";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -84,6 +83,8 @@ export interface Props {
    * @description custom headers
    */
   customHeaders?: Header[];
+
+  transformHeaders?: (headers: Headers) => Headers;
   /**
    * @description Scripts to be included in the head of the html
    */
@@ -111,6 +112,7 @@ export default function Proxy({
   basePath,
   host: hostToUse,
   customHeaders = [],
+  transformHeaders = (h) => h,
   includeScriptsToHead,
   redirect = "manual",
   avoidAppendPath,
@@ -160,20 +162,12 @@ export default function Proxy({
       ? _ctx?.state?.monitoring
       : undefined;
 
-    headers.forEach((value, key) => {
-      console.log("proxy sending header", key, value);
-    });
+    const headersTransformed = transformHeaders(new Headers(headers));
 
-    console.log("CURL", fetchToCurl(to, {
-      headers,
-      redirect,
-      method: req.method,
-      body: req.body,
-    }));
     const fetchFunction = async () => {
       try {
         return await fetch(to, {
-          headers,
+          headers: headersTransformed,
           redirect,
           method: req.method,
           body: req.body,
