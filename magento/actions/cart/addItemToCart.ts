@@ -22,12 +22,12 @@ const action = async (
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { qty, sku } = props;
-  const { clientAdmin, site } = ctx;
+  const { clientAdmin } = ctx;
   const cartId = getCartCookie(req.headers);
 
   try {
     await postNewItem(
-      site,
+      ctx.site,
       cartId,
       {
         cartItem: {
@@ -39,16 +39,13 @@ const action = async (
       clientAdmin,
       req.headers,
     );
-  } catch (_error) {
-    throw new Error(`via client admin, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
-  }
-
-  try {
     return await cart(undefined, req, ctx);
-  } catch (_error) {
-    throw new Error(`via loader cart cart, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
+  } catch (error) {
+    return {
+      ...(await cart(undefined, req, ctx)),
+      ...handleCartError(error),
+    };
   }
-    
 };
 
 export default action;
