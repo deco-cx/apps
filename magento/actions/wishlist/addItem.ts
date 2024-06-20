@@ -23,8 +23,7 @@ const action = async (
     }).then((res) => res.json());
     if (success) return wishlistLoader(null, req, ctx);
     return null;
-  } catch (error) {
-    console.log(error);
+  } catch (_error) {
     return null;
   }
 };

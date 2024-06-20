@@ -48,20 +48,28 @@ export const middleware = async (
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
-  const {next, baseUrl, clientAdmin, site, cartConfigs: {changeCardIdAfterCheckout} } = ctx;
+  const {
+    next,
+    baseUrl,
+    clientAdmin,
+    site,
+    cartConfigs: { changeCardIdAfterCheckout },
+  } = ctx;
   const sessionCookie = getCookies(req.headers)[SESSION_COOKIE];
-  const cartId = getCartCookie(req.headers)
+  const cartId = getCartCookie(req.headers);
 
-  if (cartId.length, sessionCookie, changeCardIdAfterCheckout) {
+  if (cartId.length && sessionCookie && changeCardIdAfterCheckout) {
     const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
       site,
-      sections: "cart"
-    }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${sessionCookie}` }) }).then((res) => res.json())
-    const quoteId = sectionCart?.cart?.minicart_improvements?.quote_id
-    if(!quoteId) return
-   if(quoteId !== cartId){
-    setCartCookie(ctx.response.headers, quoteId)
-  }
+      sections: "cart",
+    }, {
+      headers: new Headers({ Cookie: `${SESSION_COOKIE}=${sessionCookie}` }),
+    }).then((res) => res.json());
+    const quoteId = sectionCart?.cart?.minicart_improvements?.quote_id;
+    if (!quoteId) return;
+    if (quoteId !== cartId) {
+      setCartCookie(ctx.response.headers, quoteId);
+    }
   }
 
   if (sessionCookie) {
