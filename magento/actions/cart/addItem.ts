@@ -25,12 +25,12 @@ const action = async (
   const { headers, url } = req;
   const { site, baseUrl } = ctx;
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
-  const cartId = getCartCookie(headers);
+  //const cartId = getCartCookie(headers);
   const newHeaders = new Headers();
 
-  if (cartId?.length) {
-    return await addItem_old(props, req, ctx);
-  }
+  // if (cartId?.length) {
+  //   return await addItem_old(props, req, ctx);
+  // }
   console.log("adicionando item no carinho pela action nova")
 
   const requestCookies = headers.get("Cookie");
