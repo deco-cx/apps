@@ -10,13 +10,14 @@ interface User {
   lastName?: string;
   profilePicture?: string;
   gender?: string;
+  document?: string;
 }
 
 async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<Person | null> {
+): Promise<Person & { document?: string } | null> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
@@ -25,7 +26,7 @@ async function loader(
   }
 
   const query =
-    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender }}";
+    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document }}";
 
   try {
     const { profile: user } = await io.query<{ profile: User }, null>(
@@ -38,6 +39,7 @@ async function loader(
       email: user.email,
       givenName: user.firstName,
       familyName: user.lastName,
+      document: user.document,
       gender: user.gender === "f"
         ? "https://schema.org/Female"
         : "https://schema.org/Male",
