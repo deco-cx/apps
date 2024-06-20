@@ -23,41 +23,27 @@ const action = async (
 ): Promise<Cart | null> => {
   console.log("adicionando item no carinho pela action antigo")
   const { qty, sku } = props;
-  const { clientAdmin, baseUrl, site } = ctx;
+  const { clientAdmin, site } = ctx;
   const cartId = getCartCookie(req.headers);
 
-  // try {
-  //   await postNewItem(
-  //     site,
-  //     cartId,
-  //     {
-  //       cartItem: {
-  //         qty: qty,
-  //         quote_id: cartId,
-  //         sku,
-  //       },
-  //     },
-  //     clientAdmin,
-  //     req.headers,
-  //   );
-  // } catch (_error) {
-  //   throw new Error(`via client admin, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
-  // }
   try {
-   return await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
-      method: "POST",
-      headers: req.headers,
-      body: JSON.stringify({
+    await postNewItem(
+      site,
+      cartId,
+      {
         cartItem: {
           qty: qty,
           quote_id: cartId,
           sku,
         },
-      }),
-    }) as unknown as Cart
+      },
+      clientAdmin,
+      req.headers,
+    );
   } catch (_error) {
-    throw new Error(`via fetch, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
+    throw new Error(`via client admin, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
   }
+
   try {
     return await cart(undefined, req, ctx);
   } catch (_error) {
