@@ -44,7 +44,7 @@ const action = async (
   //   throw new Error(`via client admin, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
   // }
   try {
-    await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
+   return await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
       method: "POST",
       headers: req.headers,
       body: JSON.stringify({
@@ -54,7 +54,7 @@ const action = async (
           sku,
         },
       }),
-    });
+    }) as unknown as Cart
   } catch (_error) {
     throw new Error(`via fetch, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
   }
