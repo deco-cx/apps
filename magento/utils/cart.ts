@@ -172,6 +172,7 @@ export const handleCartError = (
   // deno-lint-ignore no-explicit-any
   error: any,
 ) => {
+  console.log("entrou no handleCartError")
   if (error instanceof HttpError) {
     return {
       message: JSON.parse(error.message).message,

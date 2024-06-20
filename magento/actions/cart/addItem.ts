@@ -31,6 +31,7 @@ const action = async (
   if (cartId?.length) {
     return await addItem_old(props, req, ctx);
   }
+  console.log("adicionando item no carinho pela action nova")
 
   const requestCookies = headers.get("Cookie");
 

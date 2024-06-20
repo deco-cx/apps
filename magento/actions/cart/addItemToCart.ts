@@ -21,13 +21,14 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
+  console.log("adicionando item no carinho pela action antigo")
   const { qty, sku } = props;
-  const { clientAdmin } = ctx;
+  const { clientAdmin, baseUrl, site } = ctx;
   const cartId = getCartCookie(req.headers);
 
   try {
     await postNewItem(
-      ctx.site,
+      site,
       cartId,
       {
         cartItem: {
@@ -39,8 +40,21 @@ const action = async (
       clientAdmin,
       req.headers,
     );
-    return cart(undefined, req, ctx);
+    const request = await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
+      method: "POST",
+      headers: req.headers,
+      body: JSON.stringify({
+        cartItem: {
+          qty: qty,
+          quote_id: cartId,
+          sku,
+        },
+      }),
+    });
+    console.log(request)
+    return await cart(undefined, req, ctx);
   } catch (error) {
+    console.error(error)
     return {
       ...(await cart(undefined, req, ctx)),
       ...handleCartError(error),
