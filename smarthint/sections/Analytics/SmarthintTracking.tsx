@@ -1,8 +1,8 @@
-import { scriptAsDataURI } from "../../../utils/dataURI.ts";
 import { AppContext } from "../../mod.ts";
 import { Props as ClickProps } from "../../actions/click.ts";
 import { PageType } from "../../utils/typings.ts";
 import { ANONYMOUS_COOKIE, SESSION_COOKIE } from "../../utils/getSession.ts";
+import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 
 declare global {
   interface Window {
@@ -12,24 +12,24 @@ declare global {
   }
 }
 
-const listener = (
-  { shcode, url, pageType, SESSION_COOKIE, ANONYMOUS_COOKIE }: ReturnType<
-    typeof loader
-  >,
-) => {
-  const click = (
-    {
-      productGroupID,
-      position,
-      clickFeature,
-      term,
-      positionRecommendation,
-      productPrice,
-      shippingPrice,
-      shippingTime,
-      clickProduct,
-    }: ClickProps,
-  ) => {
+const listener = ({
+  shcode,
+  url,
+  pageType,
+  SESSION_COOKIE,
+  ANONYMOUS_COOKIE,
+}: ReturnType<typeof loader>) => {
+  const click = ({
+    productGroupID,
+    position,
+    clickFeature,
+    term,
+    positionRecommendation,
+    productPrice,
+    shippingPrice,
+    shippingTime,
+    clickProduct,
+  }: ClickProps) => {
     const clickUrl = new URL("https://recs.smarthint.co/track/click");
     const date = new Date().toLocaleString().replace(",", "");
     const pageUrl = new URL(url);
@@ -71,13 +71,15 @@ const listener = (
   };
 
   function getCookie(name: string): string | null {
-    const nameEQ = name + "=";
-    const ca = document.cookie.split(";");
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i];
-      while (c.charAt(0) === " ") c = c.substring(1, c.length);
-      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    const cookies = document.cookie.split(";");
+
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + "=")) {
+        return cookie.substring(name.length + 1);
+      }
     }
+
     return null;
   }
 
@@ -158,7 +160,6 @@ const listener = (
 
   const pageView = () => {
     globalThis.window.addEventListener("load", () => {
-      console.log(url);
       const pageUrl = new URL(url);
       const origin = pageUrl.origin;
       const date = new Date().toLocaleString().replace(",", "");
@@ -191,15 +192,7 @@ const listener = (
  * @title Smarthint Tracking
  */
 function Analytics(props: ReturnType<typeof loader>) {
-  return (
-    <script
-      defer
-      src={scriptAsDataURI(
-        listener,
-        props,
-      )}
-    />
-  );
+  return <script defer src={useScriptAsDataURI(listener, props)} />;
 }
 
 export interface Props {

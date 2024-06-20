@@ -1,4 +1,5 @@
 import { AppContext } from "../mod.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 import { PageType } from "../utils/typings.ts";
 
 export interface Props {
@@ -11,7 +12,6 @@ export interface Props {
   date: string;
   elapsedTime: number;
   productPrice: number;
-  session: string;
 }
 
 /**
@@ -31,12 +31,10 @@ const action = async (
     date,
     elapsedTime,
     productPrice,
-    session,
   } = props;
 
   const url = new URL(req.url);
-
-  console.log("pageview action");
+  const { anonymous, session } = getSessionCookie(req.headers);
 
   await recs["GET /track/pageView"]({
     url: req.url,
@@ -49,7 +47,7 @@ const action = async (
     productPrice: String(productPrice),
     shippingTime: String(shippingTime),
     shippingPrice: String(shippingPrice),
-    anonymousConsumer: "1", //TODO
+    anonymousConsumer: anonymous,
   }).then((r) => r.json());
 
   return null;

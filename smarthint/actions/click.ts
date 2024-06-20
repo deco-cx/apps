@@ -12,7 +12,6 @@ export interface Props {
   date?: string;
   elapsedTime?: number;
   productPrice: number;
-  session?: string;
   clickFeature: string;
   term: string;
   position: number;
@@ -37,7 +36,6 @@ const action = async (
     pageType,
     date,
     productPrice,
-    session,
     clickFeature,
     term,
     position,
@@ -47,7 +45,7 @@ const action = async (
   } = props;
 
   const url = new URL(req.url);
-  const anonymous = getSessionCookie(req.headers);
+  const { anonymous, session } = getSessionCookie(req.headers);
 
   await recs["GET /track/click"]({
     date,
