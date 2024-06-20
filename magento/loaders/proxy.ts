@@ -2,11 +2,6 @@ import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 
 const PAGE_PATHS_TO_PROXY = [
-  "/customer/*",
-  "/customer",
-  "/checkout/cart",
-  "/checkout/*",
-  "/checkout",
   "/sales/*",
   "/wishlist",
   "/wishlist/*",
@@ -27,6 +22,14 @@ const ASSETS_PATHS_TO_PROXY = [
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
+const CHECKOUT_PATHS_TO_PROXY = [
+  "/checkout/cart",
+  "/checkout/*",
+  "/checkout",
+  "/customer/*",
+  "/customer",
+];
+
 const buildProxyRoutes = ({
   ctx,
   extraPagePaths,
@@ -36,6 +39,7 @@ const buildProxyRoutes = ({
   prodUrl,
   pathsWithoutSuffix,
   suffix,
+  enableRedirectRoutes,
 }: {
   extraPagePaths: string[];
   includeSiteMap?: string[];
@@ -45,6 +49,7 @@ const buildProxyRoutes = ({
   prodUrl: URL;
   pathsWithoutSuffix: string[];
   suffix: string;
+  enableRedirectRoutes: boolean;
 }) => {
   const publicUrl = new URL(
     ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
@@ -53,6 +58,7 @@ const buildProxyRoutes = ({
   try {
     const urlToProxy = publicUrl.href;
     const hostToUse = publicUrl.hostname;
+    const firstDotIndex = hostToUse.indexOf(".");
 
     const routeFromPath = (pathTemplate: string, useSuffix = false): Route => ({
       pathTemplate: useSuffix ? suffix + pathTemplate : pathTemplate,
@@ -70,12 +76,32 @@ const buildProxyRoutes = ({
         },
       },
     });
+
+    const redirectFromPath = (
+      pathTemplate: string,
+    ): Route => ({
+      pathTemplate,
+      handler: {
+        value: {
+          __resolveType: "website/handlers/redirect.ts",
+          to: `https://checkout.${
+            hostToUse.slice(firstDotIndex + 1)
+          }${suffix}${pathTemplate}`,
+          type: "permanent",
+        },
+      },
+    });
+
     const suffixedRoutes = [...PAGE_PATHS_TO_PROXY, ...extraPagePaths].map((
       route,
     ) => routeFromPath(route, true));
 
     const nonSuffixedRoutes = [...ASSETS_PATHS_TO_PROXY, ...pathsWithoutSuffix]
       .map((route) => routeFromPath(route, false));
+
+    const checkoutRoutes = enableRedirectRoutes
+      ? CHECKOUT_PATHS_TO_PROXY.map(redirectFromPath)
+      : CHECKOUT_PATHS_TO_PROXY.map((path) => routeFromPath(path, true));
 
     const [include, routes] = generateDecoSiteMap
       ? [
@@ -113,6 +139,7 @@ const buildProxyRoutes = ({
           },
         },
       },
+      ...checkoutRoutes,
       ...suffixedRoutes,
       ...nonSuffixedRoutes,
     ];
@@ -136,6 +163,10 @@ export interface Props {
    * @description Paths of extra content - ignoring the "suffix" field
    */
   pathsWithoutSuffix?: string[];
+  /**
+   * @title Redirect the checkout and customer routes to a "checkout.mypublicurl" domain
+   */
+  enableRedirectRoutes?: boolean;
   /**
    * @title Other site maps to include
    */
@@ -161,6 +192,7 @@ function loader(
     excludePathsFromDecoSiteMap = [],
     pathsWithoutSuffix = [],
     suffix = "",
+    enableRedirectRoutes = false,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -175,6 +207,7 @@ function loader(
     prodUrl,
     pathsWithoutSuffix: pathsWithoutSuffix,
     suffix,
+    enableRedirectRoutes,
   });
 }
 
