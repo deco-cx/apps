@@ -5,8 +5,8 @@ import type {
     CustomerAddressRemoveMutationVariables,
 } from '../utils/graphql/storefront.graphql.gen.ts'
 import { CustomerAddressRemove } from '../utils/graphql/queries.ts'
-import authenticate from 'apps/wake/utils/authenticate.ts'
-import ensureCustomerToken from 'apps/wake/utils/ensureCustomerToken.ts'
+import authenticate from '../utils/authenticate.ts'
+import ensureCustomerToken from '../utils/ensureCustomerToken.ts'
 
 // https://wakecommerce.readme.io/docs/customeraddressremove
 export default async function (

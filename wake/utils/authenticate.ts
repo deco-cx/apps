@@ -4,9 +4,9 @@ import { getUserCookie, setUserCookie } from '../utils/user.ts'
 import type {
     CustomerAccessTokenRenewMutation,
     CustomerAccessTokenRenewMutationVariables,
-} from 'apps/wake/utils/graphql/storefront.graphql.gen.ts'
-import { CustomerAccessTokenRenew } from 'apps/wake/utils/graphql/queries.ts'
-import { parseHeaders } from 'apps/wake/utils/parseHeaders.ts'
+} from '../utils/graphql/storefront.graphql.gen.ts'
+import { CustomerAccessTokenRenew } from '../utils/graphql/queries.ts'
+import { parseHeaders } from '../utils/parseHeaders.ts'
 
 const authenticate = async (req: Request, ctx: AppContext): Promise<string | null> => {
     const { checkoutApi, useCustomCheckout } = ctx

@@ -11,20 +11,16 @@ import type {
 
 export interface Context {
     cart: Partial<CheckoutFragment>
-    user: Person | null
+    user: (Person & { cpf: string | null }) | null
     wishlist: WishlistReducedProductFragment[] | null
-    selectedShipping: Awaited<ReturnType<typeof invoke.wake.loaders.selectedShipping>>
-    selectedAddress: Awaited<ReturnType<typeof invoke.wake.loaders.selectedAddress>>
 }
 
 const loading = signal<boolean>(true)
 const context = {
     cart: signal<Partial<CheckoutFragment>>({}),
-    user: signal<Person | null>(null),
+    user: signal<(Person & { cpf: string | null }) | null>(null),
     wishlist: signal<WishlistReducedProductFragment[] | null>(null),
     shop: signal<ShopQuery['shop'] | null>(null),
-    selectedShipping: signal<Awaited<ReturnType<typeof invoke.wake.loaders.selectedShipping>>>(null),
-    selectedAddress: signal<Awaited<ReturnType<typeof invoke.wake.loaders.selectedAddress>>>(null),
 }
 
 let queue2 = Promise.resolve()
@@ -40,7 +36,7 @@ const enqueue = (cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partia
 
     queue = queue.then(async () => {
         try {
-            const { cart, user, wishlist, selectedShipping, selectedAddress } = await cb(controller.signal)
+            const { cart, user, wishlist } = await cb(controller.signal)
 
             if (controller.signal.aborted) {
                 throw { name: 'AbortError' }
@@ -49,8 +45,6 @@ const enqueue = (cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partia
             context.cart.value = { ...context.cart.value, ...cart }
             context.user.value = user || context.user.value
             context.wishlist.value = wishlist || context.wishlist.value
-            context.selectedShipping.value = selectedShipping || context.selectedShipping.value
-            context.selectedAddress.value = selectedAddress || context.selectedAddress.value
 
             loading.value = false
         } catch (error) {
@@ -120,8 +114,6 @@ const load = (signal: AbortSignal) =>
             cart: invoke.wake.loaders.cart(),
             user: invoke.wake.loaders.user(),
             wishlist: invoke.wake.loaders.wishlist(),
-            selectedShipping: invoke.wake.loaders.selectedShipping(),
-            selectedAddress: invoke.wake.loaders.selectedAddress(),
         },
         { signal },
     )

@@ -1,7 +1,7 @@
-import { Suggestion } from "../../commerce/types.ts";
-import { AppContext } from "../mod.ts";
+import type { Suggestion } from "../../commerce/types.ts";
+import type { AppContext } from "../mod.ts";
 import { Autocomplete } from "../utils/graphql/queries.ts";
-import {
+import type {
   AutocompleteQuery,
   AutocompleteQueryVariables,
   ProductFragment,

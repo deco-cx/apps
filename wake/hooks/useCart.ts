@@ -2,8 +2,8 @@
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import { CheckoutFragment } from "../utils/graphql/storefront.graphql.gen.ts";
-import { Context, state as storeState } from "./context.ts";
+import type { CheckoutFragment } from "../utils/graphql/storefront.graphql.gen.ts";
+import { type Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
 

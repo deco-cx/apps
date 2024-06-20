@@ -4921,7 +4921,7 @@ export type NewsletterNodeFragment = { email?: string | null, name?: string | nu
 
 export type ShippingQuoteFragment = { id?: string | null, type?: string | null, name?: string | null, value: number, deadline: number, shippingQuoteId: any, deliverySchedules?: Array<{ date: any, periods?: Array<{ end?: string | null, id: any, start?: string | null } | null> | null } | null> | null, products?: Array<{ productVariantId: number, value: number } | null> | null };
 
-export type CustomerFragment = { id?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null };
+export type CustomerFragment = { id?: string | null, cpf?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null };
 
 export type WishlistReducedProductFragment = { productId?: any | null, productName?: string | null };
 
@@ -4935,6 +4935,7 @@ export type GetProductQuery = { product?: { mainVariant?: boolean | null, produc
 
 export type GetCartQueryVariables = Exact<{
   checkoutId: Scalars['String']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -5066,7 +5067,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { customer?: { id?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
+export type GetUserQuery = { customer?: { id?: string | null, cpf?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
 
 export type GetWislistQueryVariables = Exact<{
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
@@ -5188,7 +5189,7 @@ export type GetUserAddressesQueryVariables = Exact<{
 }>;
 
 
-export type GetUserAddressesQuery = { customer?: { id?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, addresses?: Array<{ address?: string | null, address2?: string | null, addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null> | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
+export type GetUserAddressesQuery = { customer?: { id?: string | null, cpf?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, addresses?: Array<{ address?: string | null, address2?: string | null, addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null> | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
 
 export type CreateCheckoutMutationVariables = Exact<{
   products: Array<InputMaybe<CheckoutProductItemInput>> | InputMaybe<CheckoutProductItemInput>;

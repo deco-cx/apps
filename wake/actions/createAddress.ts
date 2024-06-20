@@ -5,8 +5,8 @@ import type {
     CustomerAddressCreateMutationVariables,
 } from '../utils/graphql/storefront.graphql.gen.ts'
 import { CustomerAddressCreate } from '../utils/graphql/queries.ts'
-import authenticate from 'apps/wake/utils/authenticate.ts'
-import ensureCustomerToken from 'apps/wake/utils/ensureCustomerToken.ts'
+import authenticate from '../utils/authenticate.ts'
+import ensureCustomerToken from '../utils/ensureCustomerToken.ts'
 
 // https://wakecommerce.readme.io/docs/customeraddresscreate
 export default async function (

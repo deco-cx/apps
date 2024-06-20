@@ -3,9 +3,9 @@ import { fetchSafe } from '../utils/fetch.ts'
 import { createGraphqlClient } from '../utils/graphql.ts'
 import { createHttpClient } from '../utils/http.ts'
 import type { Secret } from '../website/loaders/secret.ts'
-import manifest, { Manifest } from './manifest.gen.ts'
-import { OpenAPI } from './utils/openapi/wake.openapi.gen.ts'
-import { CheckoutApi } from './utils/client.ts'
+import manifest, { type Manifest } from './manifest.gen.ts'
+import type { OpenAPI } from './utils/openapi/wake.openapi.gen.ts'
+import type { CheckoutApi } from './utils/client.ts'
 import { previewFromMarkdown } from '../utils/preview.ts'
 
 export type AppContext = FnContext<State, Manifest>

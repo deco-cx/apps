@@ -1,6 +1,6 @@
 import type { AppContext } from "../mod.ts";
 import { Shop } from "../utils/graphql/queries.ts";
-import {
+import type {
   ShopQuery,
   ShopQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";

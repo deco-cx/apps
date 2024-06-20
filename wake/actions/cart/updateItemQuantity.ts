@@ -1,8 +1,13 @@
 import { HttpError } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import { RemoveItemFromCart } from "../../utils/graphql/queries.ts";
 import {
+  AddItemToCart,
+  RemoveItemFromCart,
+} from "../../utils/graphql/queries.ts";
+import type {
+  AddItemToCartMutation,
+  AddItemToCartMutationVariables,
   CheckoutFragment,
   RemoveItemFromCartMutation,
   RemoveItemFromCartMutationVariables,

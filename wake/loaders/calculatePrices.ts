@@ -1,6 +1,3 @@
-import authenticate from 'apps/wake/utils/authenticate.ts'
-import { getCartCookie } from 'apps/wake/utils/cart.ts'
-import ensureCustomerToken from 'apps/wake/utils/ensureCustomerToken.ts'
 import type { AppContext } from '../mod.ts'
 import { CalculatePrices } from '../utils/graphql/queries.ts'
 import type { CalculatePricesQuery, CalculatePricesQueryVariables } from '../utils/graphql/storefront.graphql.gen.ts'
@@ -25,7 +22,7 @@ export default async function (
         { headers },
     )
 
-    return calculatePrices
+    return calculatePrices || null
 }
 
 type Props = {

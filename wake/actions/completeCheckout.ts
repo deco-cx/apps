@@ -1,8 +1,8 @@
-import authenticate from 'apps/wake/utils/authenticate.ts'
-import { getCartCookie } from 'apps/wake/utils/cart.ts'
-import ensureCustomerToken from 'apps/wake/utils/ensureCustomerToken.ts'
+import authenticate from '../utils/authenticate.ts'
+import { getCartCookie } from '../utils/cart.ts'
+import ensureCustomerToken from '../utils/ensureCustomerToken.ts'
 import type { AppContext } from '../mod.ts'
-import { CheckoutAddressAssociate } from '../utils/graphql/queries.ts'
+import { CheckoutComplete } from '../utils/graphql/queries.ts'
 import type {
     CheckoutCompleteMutation,
     CheckoutCompleteMutationVariables,
@@ -27,12 +27,12 @@ export default async function (
     >(
         {
             variables: {
-                paymentData: props.paymentData,
+                paymentData: new URLSearchParams(props.paymentData).toString(),
                 comments: props.comments,
                 customerAccessToken,
                 checkoutId,
             },
-            ...CheckoutAddressAssociate,
+            ...CheckoutComplete,
         },
         { headers },
     )
@@ -44,7 +44,7 @@ interface Props {
     /**
      * Informações adicionais de pagamento
      */
-    paymentData: string
+    paymentData: Record<string, string>
     /**
      * Comentários
      */

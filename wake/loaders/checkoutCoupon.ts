@@ -1,5 +1,5 @@
-import { getCartCookie } from "apps/wake/utils/cart.ts";
-import ensureCheckout from "apps/wake/utils/ensureCheckout.ts";
+import { getCartCookie } from "../utils/cart.ts";
+import ensureCheckout from "../utils/ensureCheckout.ts";
 import type { AppContext } from "../mod.ts";
 import { GetCheckoutCoupon } from "../utils/graphql/queries.ts";
 import type {

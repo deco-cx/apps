@@ -1,4 +1,4 @@
-import { getCartCookie } from 'apps/wake/utils/cart.ts'
+import { getCartCookie } from '../utils/cart.ts'
 import type { AppContext } from '../mod.ts'
 import { CheckoutSelectPaymentMethod } from '../utils/graphql/queries.ts'
 import type {

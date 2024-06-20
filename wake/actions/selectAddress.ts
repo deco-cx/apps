@@ -5,9 +5,9 @@ import type {
     CheckoutAddressAssociateMutationVariables,
 } from '../utils/graphql/storefront.graphql.gen.ts'
 import { CheckoutAddressAssociate } from '../utils/graphql/queries.ts'
-import authenticate from 'apps/wake/utils/authenticate.ts'
-import ensureCustomerToken from 'apps/wake/utils/ensureCustomerToken.ts'
-import { getCartCookie } from 'apps/wake/utils/cart.ts'
+import authenticate from '../utils/authenticate.ts'
+import ensureCustomerToken from '../utils/ensureCustomerToken.ts'
+import { getCartCookie } from '../utils/cart.ts'
 
 // https://wakecommerce.readme.io/docs/storefront-api-checkoutaddressassociate
 export default async function (

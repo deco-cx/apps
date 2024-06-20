@@ -1,5 +1,5 @@
-import { Route } from "../../website/flags/audience.ts";
-import { AppContext } from "../mod.ts";
+import type { Route } from "../../website/flags/audience.ts";
+import type { AppContext } from "../mod.ts";
 
 const PATHS_TO_PROXY = [
   ["/checkout", "/checkout"],

@@ -1,7 +1,7 @@
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import authenticate from "../utils/authenticate.ts";
 import { GetWishlist } from "../utils/graphql/queries.ts";
-import {
+import type {
   GetWislistQuery,
   GetWislistQueryVariables,
   WishlistReducedProductFragment,

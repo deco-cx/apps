@@ -1005,6 +1005,7 @@ const ShippingQuote = gql`
 export const Customer = gql`
   fragment Customer on Customer {
     id
+    cpf
     email
     gender
     customerId
@@ -1038,8 +1039,9 @@ export const GetProduct = {
 
 export const GetCart = {
   fragments: [Checkout],
-  query: gql`query GetCart($checkoutId: String!) { 
-    checkout(checkoutId: $checkoutId) { ...Checkout } 
+  query:
+    gql`query GetCart($checkoutId: String!, $customerAccessToken: String) { 
+    checkout(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) { ...Checkout } 
   }`,
 };
 

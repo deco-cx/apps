@@ -1,10 +1,10 @@
 import type { ProductListingPage } from '../../commerce/types.ts'
-import { SortOption } from '../../commerce/types.ts'
+import type { SortOption } from '../../commerce/types.ts'
 import { capitalize } from '../../utils/capitalize.ts'
 import type { AppContext } from '../mod.ts'
 import { getVariations, MAXIMUM_REQUEST_QUANTITY } from '../utils/getVariations.ts'
 import { GetURL, Hotsite, Search } from '../utils/graphql/queries.ts'
-import {
+import type {
     GetUrlQuery,
     GetUrlQueryVariables,
     HotsiteQuery,
@@ -17,7 +17,7 @@ import {
 } from '../utils/graphql/storefront.graphql.gen.ts'
 import { parseHeaders } from '../utils/parseHeaders.ts'
 import { FILTER_PARAM, toBreadcrumbList, toFilters, toProduct } from '../utils/transform.ts'
-import { Filters } from './productList.ts'
+import type { Filters } from './productList.ts'
 
 export type Sort =
     | 'NAME:ASC'
