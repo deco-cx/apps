@@ -12,6 +12,20 @@ const PATHS_TO_PROXY = [
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
+const linxProxyFailingHeaders = [
+  "x-b3-sampled",
+  "x-b3-spanid",
+  "x-b3-traceid",
+  "x-envoy-attempt-count",
+];
+
+const removeFailingHeaders = (headers: Headers) => {
+  for (const header of linxProxyFailingHeaders) {
+    headers.delete(header);
+  }
+  return headers;
+}
+
 const buildProxyRoutes = (
   {
     ctx: { account },
@@ -50,6 +64,7 @@ const buildProxyRoutes = (
           host: hostToUse,
           redirect: "follow",
           includeScriptsToHead,
+          transformHeaders: removeFailingHeaders,
         },
       },
     });
