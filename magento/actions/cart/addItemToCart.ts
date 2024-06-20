@@ -41,7 +41,7 @@ const action = async (
       req.headers,
     );
   } catch (_error) {
-    throw new Error(`via client admin`);
+    throw new Error(`via client admin, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
   }
   try {
     await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
@@ -56,12 +56,12 @@ const action = async (
       }),
     });
   } catch (_error) {
-    throw new Error(`via fetch`);
+    throw new Error(`via fetch, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
   }
   try {
     return await cart(undefined, req, ctx);
   } catch (_error) {
-    throw new Error(`via loader cart cart`);
+    throw new Error(`via loader cart cart, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
   }
     
 };
