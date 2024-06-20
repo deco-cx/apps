@@ -54,6 +54,7 @@ const action = async (
     console.log(request)
     return await cart(undefined, req, ctx);
   } catch (error) {
+    console.error(error)
     return {
       ...(await cart(undefined, req, ctx)),
       ...handleCartError(error),
