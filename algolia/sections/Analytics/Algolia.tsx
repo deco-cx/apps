@@ -1,4 +1,5 @@
 import { SectionProps } from "deco/blocks/section.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import insights from "npm:search-insights@2.9.0";
 import {
   AddToCartEvent,
@@ -6,7 +7,6 @@ import {
   ViewItemEvent,
   ViewItemListEvent,
 } from "../../../commerce/types.ts";
-import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 import { AppContext } from "../../mod.ts";
 
 declare global {
