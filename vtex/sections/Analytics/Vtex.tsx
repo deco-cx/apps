@@ -1,11 +1,11 @@
+import { SectionProps } from "deco/blocks/section.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import {
   AddToCartEvent,
   AnalyticsItem,
   SelectItemEvent,
 } from "../../../commerce/types.ts";
-import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 import { AppContext } from "../../mod.ts";
-import { SectionProps } from "deco/blocks/section.ts";
 import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
 import { SPEvent } from "../../utils/types.ts";
 
