@@ -59,24 +59,19 @@ export const middleware = async (
   const cartId = getCartCookie(req.headers);
 
   if (cartId.length && sessionCookie && changeCardIdAfterCheckout) {
-    try{
       const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
         site,
-        sections: "cart",
+        sections: "cart,customer",
       }, {
         headers: new Headers({ Cookie: `${SESSION_COOKIE}=${sessionCookie}` }),
       }).then((res) => res.json());
-      
-      const { customer, cart } = sectionCart
-      const { quote_id: quoteId, is_logged_in: isLoggedIn } = cart?.minicart_improvements!
 
-      if (!quoteId || !isLoggedIn || !customer) return next!();
+      const { customer, cart } = sectionCart
+      if (!cart?.minicart_improvements?.quote_id || !cart?.minicart_improvements?.is_logged_in || !customer?.firstname) return next!();
+      const quoteId = cart.minicart_improvements.quote_id
       if (quoteId !== cartId) {
         setCartCookie(ctx.response.headers, quoteId);
       }
-    } catch(e){
-      console.log(e)
-    }
   }
 
   if (sessionCookie) {
