@@ -2,6 +2,7 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppMiddlewareContext } from "./mod.ts";
 import { SESSION_COOKIE } from "./utils/constants.ts";
 import { generateUniqueIdentifier } from "./utils/hash.ts";
+import { getCartCookie, setCartCookie } from "./utils/cart.ts";
 
 export interface Cookie {
   name: string;
@@ -47,13 +48,26 @@ export const middleware = async (
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
-  const ctxMiddleware = ctx;
+  const {next, baseUrl, clientAdmin, site, cartConfigs: {changeCardIdAfterCheckout} } = ctx;
   const sessionCookie = getCookies(req.headers)[SESSION_COOKIE];
+  const cartId = getCartCookie(req.headers)
+
+  if (cartId.length, sessionCookie, changeCardIdAfterCheckout) {
+    const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
+      site,
+      sections: "cart"
+    }, { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${sessionCookie}` }) }).then((res) => res.json())
+    const quoteId = sectionCart?.cart?.minicart_improvements?.quote_id
+    if(!quoteId) return
+   if(quoteId !== cartId){
+    setCartCookie(ctx.response.headers, quoteId)
+  }
+  }
 
   if (sessionCookie) {
-    return ctxMiddleware.next!();
+    return next!();
   }
-  const request = await fetch(`${ctxMiddleware.baseUrl}/V1`);
+  const request = await fetch(`${baseUrl}/V1`);
   const cookies = request.headers.getSetCookie();
   if (cookies) {
     cookies.forEach((cookie, index) => {
@@ -74,5 +88,5 @@ export const middleware = async (
     });
   }
 
-  return ctxMiddleware.next!();
+  return next!();
 };

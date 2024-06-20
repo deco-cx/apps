@@ -21,7 +21,6 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  console.log("adicionando item no carinho pela action antigo")
   const { qty, sku } = props;
   const { clientAdmin, site } = ctx;
   const cartId = getCartCookie(req.headers);
