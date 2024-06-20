@@ -38,10 +38,14 @@ const enqueue = (
 
       loading.value = false;
     } catch (error) {
-      throw new Error(error);
-      if (error.name === "AbortError") return;
+      console.log(error)
+      if (error.name === "AbortError") {
+        loading.value = false;
+        return
+      }
 
       if (error.name === "SyntaxError") {
+        loading.value = false;
         throw new Error(error);
       }
 
