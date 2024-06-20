@@ -26,23 +26,23 @@ const action = async (
   const { clientAdmin, baseUrl, site } = ctx;
   const cartId = getCartCookie(req.headers);
 
-  try {
-    await postNewItem(
-      site,
-      cartId,
-      {
-        cartItem: {
-          qty: qty,
-          quote_id: cartId,
-          sku,
-        },
-      },
-      clientAdmin,
-      req.headers,
-    );
-  } catch (_error) {
-    throw new Error(`via client admin, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
-  }
+  // try {
+  //   await postNewItem(
+  //     site,
+  //     cartId,
+  //     {
+  //       cartItem: {
+  //         qty: qty,
+  //         quote_id: cartId,
+  //         sku,
+  //       },
+  //     },
+  //     clientAdmin,
+  //     req.headers,
+  //   );
+  // } catch (_error) {
+  //   throw new Error(`via client admin, cartId ${cartId}, sku: ${sku}, qty: ${qty}, error: ${_error}`);
+  // }
   try {
     await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
       method: "POST",
