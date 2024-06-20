@@ -40,7 +40,11 @@ const action = async (
       clientAdmin,
       req.headers,
     );
-    const request = await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
+  } catch (_error) {
+    throw new Error(`via client admin`);
+  }
+  try {
+    await fetch(`${baseUrl}/rest/${site}/V1/carts/${cartId}/items`, {
       method: "POST",
       headers: req.headers,
       body: JSON.stringify({
@@ -51,15 +55,15 @@ const action = async (
         },
       }),
     });
-    console.log(request)
-    return await cart(undefined, req, ctx);
-  } catch (error) {
-    console.error(error)
-    return {
-      ...(await cart(undefined, req, ctx)),
-      ...handleCartError(error),
-    };
+  } catch (_error) {
+    throw new Error(`via fetch`);
   }
+  try {
+    return await cart(undefined, req, ctx);
+  } catch (_error) {
+    throw new Error(`via loader cart cart`);
+  }
+    
 };
 
 export default action;
