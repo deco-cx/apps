@@ -60,8 +60,6 @@ export const middleware = async (
   const cartId = getCartCookie(req.headers);
 
   if (cartId.length && sessionCookie && changeCardIdAfterCheckout) {
-    console.log('MAGENTO - Entrou na mudança de cookie')
-    console.log('MAGENTO - ', req.headers.get("Cookie"))
     const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
       site,
       sections: "cart,carbono-customer",
@@ -70,22 +68,16 @@ export const middleware = async (
         "Cookie": req.headers.get("Cookie") ?? "",
       },
     }).then((res) => res.json());
-    console.log('MAGENTO - ', JSON.stringify(sectionCart.cart))
 
     if (
       !sectionCart?.cart?.minicart_improvements?.quote_id ||
       Number.isNaN(Number(sectionCart?.cart?.minicart_improvements?.quote_id))
     ) {
-      console.log('MAGENTO - Usuário não logado')
       return next!();
     }
 
     const quoteId = sectionCart?.cart?.minicart_improvements.quote_id;
     if (quoteId !== cartId) {
-      console.log('MAGENTO - ', sectionCart?.['carbono-customer']?.email)
-      console.log('MAGENTO - ', sectionCart?.cart?.minicart_improvements.quote_id)
-      console.log('MAGENTO - ', JSON.stringify(sectionCart?.cart?.items))
-      console.log('MAGENTO - Mudando cookie...')
       setCookie(ctx.response.headers, {
         name: CART_COOKIE,
         value: `%22${quoteId}%22`,
@@ -102,7 +94,7 @@ export const middleware = async (
 
   const request = await fetch(`${baseUrl}/granado/customer/section/load/?sections=customer`);
   const cookies = request.headers.getSetCookie();
-  if (cookies) {
+  if (cookies && !ctx.response.headers.getSetCookie().length) {
     cookies.forEach((cookie, index) => {
       setCookie(ctx.response.headers, {
         ...parseCookieString(cookie, req.url.includes("localhost")),
