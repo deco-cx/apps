@@ -63,7 +63,9 @@ export const middleware = async (
         site,
         sections: "cart,customer",
       }, {
-        headers: new Headers({ Cookie: `${SESSION_COOKIE}=${sessionCookie}` }),
+        headers: {
+          "Cookie": req.headers.get("Cookie") ?? "",
+        },
       }).then((res) => res.json());
 
       const { customer, cart } = sectionCart
