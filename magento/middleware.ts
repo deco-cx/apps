@@ -59,21 +59,23 @@ export const middleware = async (
   const cartId = getCartCookie(req.headers);
 
   if (cartId.length && sessionCookie && changeCardIdAfterCheckout) {
-      const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
-        site,
-        sections: "cart,customer",
-      }, {
-        headers: {
-          "Cookie": req.headers.get("Cookie") ?? "",
-        },
-      }).then((res) => res.json());
+    const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
+      site,
+      sections: "cart,customer",
+    }, {
+      headers: {
+        "Cookie": req.headers.get("Cookie") ?? "",
+      },
+    }).then((res) => res.json());
 
-      const { customer, cart } = sectionCart
-      if (!cart?.minicart_improvements?.quote_id || !customer?.firstname) return next!();
-      const quoteId = cart.minicart_improvements.quote_id
-      if (quoteId !== cartId) {
-        setCartCookie(ctx.response.headers, quoteId);
-      }
+    const { customer, cart } = sectionCart;
+    if (!cart?.minicart_improvements?.quote_id || !customer?.firstname) {
+      return next!();
+    }
+    const quoteId = cart.minicart_improvements.quote_id;
+    if (quoteId !== cartId) {
+      setCartCookie(ctx.response.headers, quoteId);
+    }
   }
 
   if (sessionCookie) {
