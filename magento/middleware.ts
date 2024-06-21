@@ -2,7 +2,8 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppMiddlewareContext } from "./mod.ts";
 import { SESSION_COOKIE } from "./utils/constants.ts";
 import { generateUniqueIdentifier } from "./utils/hash.ts";
-import { getCartCookie, setCartCookie } from "./utils/cart.ts";
+import { CART_COOKIE, getCartCookie, setCartCookie } from "./utils/cart.ts";
+import stringifySearchCriteria from "./utils/stringifySearchCriteria.ts";
 
 export interface Cookie {
   name: string;
@@ -59,28 +60,46 @@ export const middleware = async (
   const cartId = getCartCookie(req.headers);
 
   if (cartId.length && sessionCookie && changeCardIdAfterCheckout) {
+    console.log('MAGENTO - Entrou na mudança de cookie')
+    console.log('MAGENTO - ', req.headers.get("Cookie"))
     const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
       site,
-      sections: "cart,customer",
+      sections: "cart,carbono-customer",
     }, {
       headers: {
         "Cookie": req.headers.get("Cookie") ?? "",
       },
     }).then((res) => res.json());
+    console.log('MAGENTO - ', JSON.stringify(sectionCart.cart))
 
-    const { cart } = sectionCart;
-    if (!cart?.minicart_improvements?.quote_id || Number.isNaN(Number(cart?.minicart_improvements?.quote_id))) {
+    if (
+      !sectionCart?.cart?.minicart_improvements?.quote_id ||
+      Number.isNaN(Number(sectionCart?.cart?.minicart_improvements?.quote_id))
+    ) {
+      console.log('MAGENTO - Usuário não logado')
       return next!();
     }
-    const quoteId = cart?.minicart_improvements.quote_id;
+
+    const quoteId = sectionCart?.cart?.minicart_improvements.quote_id;
     if (quoteId !== cartId) {
-      setCartCookie(ctx.response.headers, quoteId ?? "");
+      console.log('MAGENTO - ', sectionCart?.['carbono-customer']?.email)
+      console.log('MAGENTO - ', sectionCart?.cart?.minicart_improvements.quote_id)
+      console.log('MAGENTO - ', JSON.stringify(sectionCart?.cart?.items))
+      console.log('MAGENTO - Mudando cookie...')
+      setCookie(ctx.response.headers, {
+        name: CART_COOKIE,
+        value: `%22${quoteId}%22`,
+        path: "/",
+        expires: undefined,
+        domain: new URL(req.url).hostname.replace(/deco|www/, '')
+      });
     }
   }
 
   if (sessionCookie) {
     return next!();
   }
+
   const request = await fetch(`${baseUrl}/V1`);
   const cookies = request.headers.getSetCookie();
   if (cookies) {
