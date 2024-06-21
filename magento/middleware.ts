@@ -69,12 +69,12 @@ export const middleware = async (
     }).then((res) => res.json());
 
     const { customer, cart } = sectionCart;
-    if (!cart?.minicart_improvements?.quote_id || !customer?.firstname) {
+    if (!customer?.firstname) {
       return next!();
     }
-    const quoteId = cart.minicart_improvements.quote_id;
+    const quoteId = cart?.minicart_improvements.quote_id;
     if (quoteId !== cartId) {
-      setCartCookie(ctx.response.headers, quoteId);
+      setCartCookie(ctx.response.headers, quoteId ?? "");
     }
   }
 
