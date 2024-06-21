@@ -67,6 +67,12 @@ const action = async (
 
       if (parsed.name === "dataservices_cart_id") {
         cartId = parsed.value.replace(/%22/g, "");
+        setCookie(ctx.response.headers, {
+          ...parsed,
+          path: "/",
+          unparsed: ['Priority=High']
+        });
+        return
       }
 
       setCookie(ctx.response.headers, {

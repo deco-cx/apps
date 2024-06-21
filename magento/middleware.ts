@@ -83,7 +83,7 @@ export const middleware = async (
         value: `%22${quoteId}%22`,
         path: "/",
         expires: undefined,
-        domain: new URL(req.url).hostname.replace(/deco|www/, '')
+        domain: new URL(req.url).hostname.replace(/deco|www/, ""),
       });
     }
   }
@@ -92,7 +92,15 @@ export const middleware = async (
     return next!();
   }
 
-  const request = await fetch(`${baseUrl}/granado/customer/section/load/?sections=customer`);
+  const request = await fetch(
+    `${baseUrl}/granado/customer/section/load/?sections=customer`,
+    {
+      headers: {
+        Cookie: req.headers.get("Cookie") ?? "",
+      },
+    },
+  );
+
   const cookies = request.headers.getSetCookie();
   if (cookies && !ctx.response.headers.getSetCookie().length) {
     cookies.forEach((cookie, index) => {
