@@ -369,7 +369,7 @@ export const toProductGraphQL = (
     productID,
     sku,
     url,
-    name: name.trim(),
+    name: name?.trim() ?? "",
     gtin: sku,
     // deno-lint-ignore no-explicit-any
     image: (media_gallery as any[])
@@ -384,7 +384,7 @@ export const toProductGraphQL = (
       "@type": "ProductGroup",
       productGroupID: productID,
       url,
-      name: name.trim(),
+      name: name?.trim() ?? "",
       additionalProperty,
       hasVariant: [
         {
