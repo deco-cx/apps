@@ -9,8 +9,19 @@ declare global {
 }
 
 export interface Props {
+  /**
+   * @ignore
+   */
   storeId: string;
+
+  /**
+   * @ignore
+   */
   numberOfReviewsInStoreCarousel?: number
+
+  /**
+   * @ignore
+   */
   enableStaging?: boolean;
 }
 

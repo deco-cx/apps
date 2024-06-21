@@ -11,13 +11,20 @@ declare global {
 
 export interface Props {
   page: ProductDetailsPage | null;
+
+  /**
+   * @ignore
+   */
+  storeId: string;
+
+  /**
+   * @ignore
+   */
+  enableStaging?: boolean;
 }
 
 export default function ProductReviews(props: Props) {
-  const { storeId, enableStaging = false } = (props as unknown) as {
-    storeId: string;
-    enableStaging: boolean;
-  };
+  const { storeId, enableStaging = false } = props;
   const scriptUrl = enableStaging
     ? "https://static.trustvox.com.br/trustvox-sincero-staging/sincero.js"
     : "https://static.trustvox.com.br/sincero/sincero.js";
