@@ -67,6 +67,9 @@ export const middleware = async (
       }).then((res) => res.json());
 
       const { customer, cart } = sectionCart
+      console.log(!cart?.minicart_improvements?.quote_id)
+      console.log(!cart?.minicart_improvements?.is_logged_in)
+      console.log(!customer?.firstname)
       if (!cart?.minicart_improvements?.quote_id || !cart?.minicart_improvements?.is_logged_in || !customer?.firstname) return next!();
       const quoteId = cart.minicart_improvements.quote_id
       if (quoteId !== cartId) {
