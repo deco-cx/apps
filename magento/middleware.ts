@@ -19,7 +19,7 @@ export const parseCookieString = (cookieString: string, isLocal: boolean) => {
   const cookieAttributes: Cookie = { name: "", value: "" };
 
   const [name, value] = parts[0].split("=");
-  cookieAttributes.name = name.trim();
+  cookieAttributes.name = name?.trim();
   cookieAttributes.value = value ? value : "";
 
   for (let i = 1; i < parts.length; i++) {
@@ -100,7 +100,7 @@ export const middleware = async (
     return next!();
   }
 
-  const request = await fetch(`${baseUrl}/V1`);
+  const request = await fetch(`${baseUrl}/granado/customer/section/load/?sections=customer`);
   const cookies = request.headers.getSetCookie();
   if (cookies) {
     cookies.forEach((cookie, index) => {

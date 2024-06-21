@@ -355,7 +355,7 @@ export const toProductGraphQL = (
     maxInstallments,
   });
   const url = new URL(
-    (defaultPath ?? "") + product.url_key || product.canonical_url,
+    (defaultPath ?? "") + product.url_key || product?.canonical_url,
     originURL.origin,
   ).href;
   const additionalProperty = toAddPropertiesGraphQL(
@@ -369,7 +369,7 @@ export const toProductGraphQL = (
     productID,
     sku,
     url,
-    name: name.trim(),
+    name: name?.trim() ?? "",
     gtin: sku,
     // deno-lint-ignore no-explicit-any
     image: (media_gallery as any[])
@@ -384,7 +384,7 @@ export const toProductGraphQL = (
       "@type": "ProductGroup",
       productGroupID: productID,
       url,
-      name: name.trim(),
+      name: name?.trim() ?? "",
       additionalProperty,
       hasVariant: [
         {
@@ -552,7 +552,7 @@ export const toProductListingPageGraphQL = (
     sortOptions: toSortOptions(products.sort_fields),
     seo: {
       title: category.meta_title ?? `${category.name}`,
-      description: category.meta_description ?? "",
+      description: category?.meta_description ?? "",
       canonical: "",
     },
   };

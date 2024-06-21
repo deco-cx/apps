@@ -103,7 +103,7 @@ async function loader(
   const { products } = await getFullProduct(sku);
 
   const productCanonicalUrl = new URL(
-    (defaultPath ?? "") + products.items[0].canonical_url,
+    (defaultPath ?? "") + products.items[0]?.canonical_url ?? "",
     url.origin,
   );
 
@@ -111,7 +111,7 @@ async function loader(
     "@type": "ListItem",
     item: productCanonicalUrl.href,
     position: 1,
-    name: products.items[0].name,
+    name: products.items[0]?.name ?? "",
   } as ListItem;
 
   const itemListElement: ListItem[] = isBreadcrumbProductName
@@ -141,7 +141,7 @@ async function loader(
       defaultPath,
     }),
     seo: {
-      title: products.items[0].meta_title!.trim(),
+      title: products.items[0].meta_title?.trim() ?? "",
       description: products.items[0].meta_description?.trim() ?? "",
       canonical: productCanonicalUrl.href,
     },
