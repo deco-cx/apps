@@ -958,7 +958,6 @@ fragment SingleProduct on SingleProduct {
     productId
   } 
 }
-
 `;
 
 const RestockAlertNode = gql`

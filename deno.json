@@ -37,7 +37,7 @@
   },
   "lock": false,
   "tasks": {
-    "check": "echo 1",
+    "check": "deno fmt && deno lint && deno check **/mod.ts",
     "release": "deno eval 'import \"deco/scripts/release.ts\"'",
     "start": "deno run -A ./scripts/start.ts",
     "bundle": "deno eval 'import \"deco/scripts/apps/bundle.ts\"'",
