@@ -27,12 +27,29 @@ export interface Props {
  * @title RA Trustvox
  * @description RA trustvox reviews.
  * @category Review
- * @logo https://site.trustvox.com.br/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fsite-trustvox%2Fico_trustvox_82c48cf982%2Fico_trustvox_82c48cf982.png&w=48&q=75
+ * @logo https://raw.githubusercontent.com/trustvox/deco-apps/enhancement/trustvox-app/ra-trustvox/ra-trustvox.png
  */
 export default function RATrustvox(
   state: Props,
 ): App<Manifest, Props> {
-  return { manifest, state };
+  return {
+    manifest: {
+      ...manifest,
+      sections: {
+        ...manifest.sections,
+        "ra-trustvox/sections/ProductReviews.tsx": {
+          ...manifest.sections["ra-trustvox/sections/ProductReviews.tsx"],
+          default: (props) =>
+            manifest.sections["ra-trustvox/sections/ProductReviews.tsx"]
+              .default({
+                ...state,
+                ...props,
+              }),
+        },
+      },
+    },
+    state,
+  };
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
