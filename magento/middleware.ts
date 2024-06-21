@@ -100,7 +100,7 @@ export const middleware = async (
     return next!();
   }
 
-  const request = await fetch(`${baseUrl}/V1`);
+  const request = await fetch(`${baseUrl}/granado/customer/section/load/?sections=customer`);
   const cookies = request.headers.getSetCookie();
   if (cookies) {
     cookies.forEach((cookie, index) => {
