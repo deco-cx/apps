@@ -141,20 +141,21 @@ export interface UrlRewrite {
 }
 
 //Returns
-export type SimpleProductGraphQL = Required<
-  Pick<
-    ProductLeafGraphQL,
-    | "sku"
-    | "url_key"
-    | "uid"
-    | "media_gallery"
-    | "price_range"
-    | "stock_status"
-    | "canonical_url"
-    | "name"
-    | "only_x_left_in_stock"
+export type SimpleProductGraphQL =
+  & Required<
+    Pick<
+      ProductLeafGraphQL,
+      | "sku"
+      | "url_key"
+      | "uid"
+      | "media_gallery"
+      | "stock_status"
+      | "canonical_url"
+      | "name"
+      | "only_x_left_in_stock"
+    >
   >
->;
+  & Pick<ProductLeafGraphQL, "price_range">;
 
 export type CompleteProductGraphQL =
   & SimpleProductGraphQL

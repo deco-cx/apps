@@ -47,8 +47,8 @@ const buildProxyRoutes = ({
   generateDecoSiteMap,
   excludePathsFromDecoSiteMap,
   prodUrl,
-  pathsWithoutSuffix,
-  suffix,
+  pathsWithoutPrefix,
+  prefix,
   redirectRoutesProps,
 }: {
   extraPagePaths: string[];
@@ -57,8 +57,8 @@ const buildProxyRoutes = ({
   ctx: AppContext;
   excludePathsFromDecoSiteMap: string[];
   prodUrl: URL;
-  pathsWithoutSuffix: string[];
-  suffix: string;
+  pathsWithoutPrefix: string[];
+  prefix: string;
   redirectRoutesProps: RedirectRouteProps;
 }) => {
   const publicUrl = new URL(
@@ -72,8 +72,8 @@ const buildProxyRoutes = ({
     const hostToUse = publicUrl.hostname;
     const firstDotIndex = hostToUse.indexOf(".");
 
-    const routeFromPath = (pathTemplate: string, useSuffix = false): Route => ({
-      pathTemplate: useSuffix ? suffix + pathTemplate : pathTemplate,
+    const routeFromPath = (pathTemplate: string, usePrefix = false): Route => ({
+      pathTemplate: usePrefix ? prefix + pathTemplate : pathTemplate,
       handler: {
         value: {
           __resolveType: "magento/handlers/proxy.ts",
@@ -91,9 +91,9 @@ const buildProxyRoutes = ({
 
     const redirectFromPath = (
       pathTemplate: string,
-      useSuffix: boolean,
+      usePrefix: boolean,
     ): Route => ({
-      pathTemplate: useSuffix ? suffix + pathTemplate : pathTemplate,
+      pathTemplate: usePrefix ? prefix + pathTemplate : pathTemplate,
       handler: {
         value: {
           __resolveType: "magento/handlers/redirect.ts",
@@ -109,7 +109,7 @@ const buildProxyRoutes = ({
       route,
     ) => routeFromPath(route, true));
 
-    const nonSuffixedRoutes = [...ASSETS_PATHS_TO_PROXY, ...pathsWithoutSuffix]
+    const nonSuffixedRoutes = [...ASSETS_PATHS_TO_PROXY, ...pathsWithoutPrefix]
       .map((route) => routeFromPath(route, false));
 
     const suffixedCheckoutRoutes = enableRedirectRoutes
@@ -174,15 +174,15 @@ export interface Props {
    */
   extraPathsToProxy?: string[];
   /**
-   * @description Use a suffix to compose the proxies paths
+   * @description Use a prefix to compose the proxies paths
    */
-  suffix?: string;
+  prefix?: string;
   /**
-   * @description Paths of extra content - ignoring the "suffix" field
+   * @description Paths of extra content - ignoring the "prefix" field
    */
-  pathsWithoutSuffix?: string[];
+  pathsWithoutPrefix?: string[];
   /**
-   * @title Redirect the checkout and customer routes to a "checkout.mypublicurl" domain
+   * @description Redirect the checkout and customer routes to a "checkout.mypublicurl" domain
    */
   redirectRoutesProps: RedirectRouteProps;
   /**
@@ -208,8 +208,8 @@ function loader(
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
-    pathsWithoutSuffix = [],
-    suffix = "",
+    pathsWithoutPrefix = [],
+    prefix = "",
     redirectRoutesProps,
   }: Props,
   req: Request,
@@ -223,8 +223,8 @@ function loader(
     extraPagePaths: extraPathsToProxy,
     ctx,
     prodUrl,
-    pathsWithoutSuffix: pathsWithoutSuffix,
-    suffix,
+    pathsWithoutPrefix,
+    prefix,
     redirectRoutesProps,
   });
 }
