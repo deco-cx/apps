@@ -68,8 +68,8 @@ export const middleware = async (
       },
     }).then((res) => res.json());
 
-    const { customer, cart } = sectionCart;
-    if (!customer?.firstname) {
+    const { cart } = sectionCart;
+    if (!cart?.minicart_improvements?.quote_id || Number.isNaN(Number(cart?.minicart_improvements?.quote_id))) {
       return next!();
     }
     const quoteId = cart?.minicart_improvements.quote_id;
