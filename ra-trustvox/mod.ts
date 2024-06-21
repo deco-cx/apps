@@ -46,6 +46,15 @@ export default function RATrustvox(
                 ...props,
               }),
         },
+        "ra-trustvox/sections/StoreReviewsCarousel.tsx": {
+          ...manifest.sections["ra-trustvox/sections/StoreReviewsCarousel.tsx"],
+          default: (props) =>
+            manifest.sections["ra-trustvox/sections/StoreReviewsCarousel.tsx"]
+              .default({
+                ...state,
+                ...props,
+              }),
+        },
       },
     },
     state,

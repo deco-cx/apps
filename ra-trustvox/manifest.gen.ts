@@ -3,10 +3,12 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$0 from "./sections/ProductReviews.tsx";
+import * as $$$$$$1 from "./sections/StoreReviewsCarousel.tsx";
 
 const manifest = {
   "sections": {
     "ra-trustvox/sections/ProductReviews.tsx": $$$$$$0,
+    "ra-trustvox/sections/StoreReviewsCarousel.tsx": $$$$$$1,
   },
   "name": "ra-trustvox",
   "baseUrl": import.meta.url,
