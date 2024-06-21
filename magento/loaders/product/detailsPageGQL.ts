@@ -103,7 +103,7 @@ async function loader(
   const { products } = await getFullProduct(sku);
 
   const productCanonicalUrl = new URL(
-    (defaultPath ?? "") + products.items[0].canonical_url,
+    (defaultPath ?? "") + products.items[0]?.canonical_url ?? "",
     url.origin,
   );
 

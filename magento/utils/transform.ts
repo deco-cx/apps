@@ -355,7 +355,7 @@ export const toProductGraphQL = (
     maxInstallments,
   });
   const url = new URL(
-    (defaultPath ?? "") + product.url_key || product.canonical_url,
+    (defaultPath ?? "") + product.url_key || product?.canonical_url,
     originURL.origin,
   ).href;
   const additionalProperty = toAddPropertiesGraphQL(
