@@ -111,7 +111,7 @@ async function loader(
     "@type": "ListItem",
     item: productCanonicalUrl.href,
     position: 1,
-    name: products.items[0].name,
+    name: products.items[0]?.name ?? "",
   } as ListItem;
 
   const itemListElement: ListItem[] = isBreadcrumbProductName

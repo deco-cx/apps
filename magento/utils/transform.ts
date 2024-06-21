@@ -552,7 +552,7 @@ export const toProductListingPageGraphQL = (
     sortOptions: toSortOptions(products.sort_fields),
     seo: {
       title: category.meta_title ?? `${category.name}`,
-      description: category.meta_description ?? "",
+      description: category?.meta_description ?? "",
       canonical: "",
     },
   };
