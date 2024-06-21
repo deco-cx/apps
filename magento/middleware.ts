@@ -2,8 +2,7 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppMiddlewareContext } from "./mod.ts";
 import { SESSION_COOKIE } from "./utils/constants.ts";
 import { generateUniqueIdentifier } from "./utils/hash.ts";
-import { CART_COOKIE, getCartCookie, setCartCookie } from "./utils/cart.ts";
-import stringifySearchCriteria from "./utils/stringifySearchCriteria.ts";
+import { CART_COOKIE, getCartCookie } from "./utils/cart.ts";
 
 export interface Cookie {
   name: string;

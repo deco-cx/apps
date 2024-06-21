@@ -141,7 +141,8 @@ async function loader(
       defaultPath,
     }),
     seo: {
-      title: products.items[0].meta_title?.trim() ?? "",
+      title: products.items[0].meta_title?.trim() ??
+        products.items[0].name.trim() ?? "",
       description: products.items[0].meta_description?.trim() ?? "",
       canonical: productCanonicalUrl.href,
     },
