@@ -28,11 +28,16 @@ const ASSETS_PATHS_TO_PROXY = [
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const CHECKOUT_PATHS_TO_PROXY = [
-  "/checkout/cart",
   "/checkout/*",
   "/checkout",
   "/customer/*",
   "/customer",
+  "/wishlist/*",
+  "/wishlist",
+  "/sales/*",
+  "/sales",
+  "/vault/*",
+  "/vault",
 ];
 
 const buildProxyRoutes = ({
