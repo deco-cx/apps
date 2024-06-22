@@ -9,12 +9,15 @@ import {
   COUPON_CODE,
   DISCOUNT_AMOUNT,
   GRAND_TOTAL,
-  MEDIA_GALLERY_ENTRIES,
   SHIPPING_AMOUNT,
   SHIPPING_DISCOUNT_AMOUNT,
-  SKU,
   SUBTOTAL,
 } from "../utils/constants.ts";
+import {
+  ProductImagesInputs,
+  ProductWithImagesGraphQL,
+} from "../utils/clientGraphql/types.ts";
+import { GetProductImages } from "../utils/clientGraphql/queries.ts";
 
 export type Cart = CartFromDeco;
 
@@ -31,14 +34,16 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { clientAdmin, site, imagesUrl, cartConfigs } = ctx;
+  const { clientAdmin, site, imagesUrl, cartConfigs, clientGraphql } = ctx;
   const { countProductImageInCart } = cartConfigs;
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
 
   if (!cartId) return null;
   logger.info(
-    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${JSON.stringify(ctx.response.headers).toString}, REQ-Header: ${JSON.stringify(req.headers).toString}`,
+    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${
+      JSON.stringify(ctx.response.headers).toString
+    }, REQ-Header: ${JSON.stringify(req.headers).toString}`,
   );
   const [resultPricesCarts, resultCart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
@@ -65,24 +70,27 @@ const loader = async (
   const cart = await resultCart.json();
   const prices = await resultPricesCarts.json();
 
-  const productImagePromises = cart.items.map((item) => {
-    return clientAdmin["GET /rest/:site/V1/products/:sku"]({
-      sku: item.sku,
-      site,
-      fields: [MEDIA_GALLERY_ENTRIES, SKU, "url", "custom_attributes"]
-        .join(","),
-    }).then((res) => res.json());
-  });
-  const productImages = await Promise.all(productImagePromises);
+  const { products } = await clientGraphql.query<
+    ProductWithImagesGraphQL,
+    ProductImagesInputs
+  >(
+    {
+      variables: {
+        filter: { sku: { in: cart.items.map(({ sku }) => sku) } },
+        pageSize: cart.items.length,
+      },
+      ...GetProductImages,
+    },
+  );
 
   return toCartItemsWithImages(
     cart,
     prices,
-    productImages,
+    products,
     imagesUrl,
     url.origin,
     site,
     countProductImageInCart,
-  ) as unknown as Cart;
+  );
 };
 export default loader;

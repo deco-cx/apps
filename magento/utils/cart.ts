@@ -7,9 +7,10 @@ import {
   CartFromAPI,
   ItemsWithDecoImage,
   MagentoCardPrices,
-  MagentoProduct,
+  //MagentoProduct,
 } from "./client/types.ts";
-import { toURL } from "./transform.ts";
+//import { toURL } from "./transform.ts";
+import { ProductWithImagesGraphQL } from "./clientGraphql/types.ts";
 
 export const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -93,32 +94,27 @@ const createNewCart = async ({
 export const toCartItemsWithImages = (
   cart: CartFromAPI,
   prices: MagentoCardPrices,
-  productMagento: MagentoProduct[],
+  { items }: ProductWithImagesGraphQL["products"],
   imagesUrl: string,
   url: string,
   site: string,
   countProductImageInCart: number,
 ): Cart => {
-  const productImagesMap = productMagento.reduce((map, productImage) => {
-    map[productImage.sku] = productImage || [];
-    return map;
-  }, {} as Record<string, MagentoProduct>);
 
+  console.log(imagesUrl)
   const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
-    const images = productImagesMap[product.sku].media_gallery_entries;
-    const productData = productImagesMap[product.sku];
+    const productData = items.find(({ sku }) => sku === product.sku)
+    const images = productData?.media_gallery;
     const selectedImages = images?.slice(0, countProductImageInCart).map(
       (image) => ({
         "@type": "ImageObject" as const,
         encodingFormat: "image",
-        alternateName: image.file,
-        url: `${toURL(imagesUrl)}${image.file}`,
+        alternateName: product.name,
+        url: image.url,
       } as ImageObject),
     );
 
-    const urlKey = productData.custom_attributes.find(
-      (item) => item.attribute_code === "url_key",
-    )?.value;
+    const urlKey = productData?.url_key
 
     return {
       ...product,
