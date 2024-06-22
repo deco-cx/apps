@@ -100,33 +100,33 @@ export const toCartItemsWithImages = (
   countProductImageInCart: number,
 ): Cart => {
   const productImagesMap = productMagento.reduce((map, productImage) => {
-    map[productImage.sku] = productImage || [];
+    map[productImage.sku] = productImage;
     return map;
   }, {} as Record<string, MagentoProduct>);
 
-  const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
-    const images = productImagesMap[product.sku].media_gallery_entries;
+  const itemsWithImages = cart.items.reduce<ItemsWithDecoImage[]>((acc, product) => {
     const productData = productImagesMap[product.sku];
-    const selectedImages = images?.slice(0, countProductImageInCart).map(
-      (image) => ({
-        "@type": "ImageObject" as const,
-        encodingFormat: "image",
-        alternateName: image.file,
-        url: `${toURL(imagesUrl)}${image.file}`,
-      } as ImageObject),
-    );
+    const images = productData?.media_gallery_entries || [];
+    const selectedImages = images.slice(0, countProductImageInCart).map((image) => ({
+      "@type": "ImageObject" as const,
+      encodingFormat: "image",
+      alternateName: image.file,
+      url: `${toURL(imagesUrl)}${image.file}`,
+    }));
 
-    const urlKey = productData.custom_attributes.find(
+    const urlKey = productData?.custom_attributes.find(
       (item) => item.attribute_code === "url_key",
     )?.value;
 
-    return {
+    acc.push({
       ...product,
       price_total: product.qty * product.price,
       images: selectedImages,
-      url: `${url}/${site}/${urlKey}`,
-    };
-  });
+      url: urlKey ? `${url}/${site}/${urlKey}` : `${url}/${site}`,
+    });
+
+    return acc;
+  }, []);
 
   return {
     ...cart,
@@ -137,7 +137,7 @@ export const toCartItemsWithImages = (
       discount_amount: prices.discount_amount,
       shipping_amount: prices.shipping_amount,
       shipping_discount_amount: prices.shipping_discount_amount,
-      base_currency_code: prices?.base_currency_code,
+      base_currency_code: prices.base_currency_code,
       base_discount_amount: prices.base_discount_amount,
       base_shipping_amount: prices.base_shipping_amount,
       base_subtotal: prices.base_subtotal,

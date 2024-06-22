@@ -36,10 +36,10 @@ const loader = async (
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
 
-  if (!cartId) return null;
-  logger.info(
-    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${JSON.stringify(ctx.response.headers).toString}, REQ-Header: ${JSON.stringify(req.headers).toString}`,
-  );
+  if (!cartId) {
+    return null;
+  }
+
   const [resultPricesCarts, resultCart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
       cartId,
@@ -75,7 +75,7 @@ const loader = async (
   });
   const productImages = await Promise.all(productImagePromises);
 
-  return toCartItemsWithImages(
+return toCartItemsWithImages(
     cart,
     prices,
     productImages,
