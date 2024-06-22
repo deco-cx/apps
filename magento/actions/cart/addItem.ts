@@ -34,12 +34,8 @@ const action = async (
   const { site, baseUrl } = ctx;
 
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
-  // const cartId = getCartCookie(headers);
-  const newHeaders = new Headers();
 
-  // if (cartId.length) {
-  //   return await addItem_old(props, req, ctx);
-  // }
+  const newHeaders = new Headers();
 
   const requestCookies = headers.get("Cookie");
 
