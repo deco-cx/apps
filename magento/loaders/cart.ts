@@ -37,8 +37,8 @@ const loader = async (
   const cartId = _cartId ?? getCartCookie(req.headers);
 
   if (!cartId) return null;
-  logger.error(
-    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${JSON.stringify(ctx.response.headers)}, REQ-Header: ${JSON.stringify(req.headers)}`,
+  logger.info(
+    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${JSON.stringify(ctx.response.headers).toString}, REQ-Header: ${JSON.stringify(req.headers).toString}`,
   );
   const [resultPricesCarts, resultCart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
