@@ -368,11 +368,6 @@ filter?: (string | string[])
  * Caso existam condições especiais para os Produtos, este deverá enviado
  */
 condition?: string
-/**
- * Listagem das últimas categorias visitadas pelo cliente. O envio deverá ser realizado neste formato:
- * categories=category
- */
-categories?: string
 }
 response: {
 SearchId?: string

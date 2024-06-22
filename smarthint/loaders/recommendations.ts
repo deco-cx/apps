@@ -84,7 +84,7 @@ const loader = async (
 
   const url = new URL(req.url);
 
-  const anonymous = getSessionCookie(req.headers);
+  const { anonymous } = getSessionCookie(req.headers);
 
   const pageIdentifier = new URL(url.pathname, publicUrl)?.href.replace(
     "/smarthint",

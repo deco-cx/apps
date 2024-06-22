@@ -2,7 +2,7 @@ import { AppContext } from "../../mod.ts";
 import { Props as ClickProps } from "../../actions/click.ts";
 import { PageType } from "../../utils/typings.ts";
 import { ANONYMOUS_COOKIE, SESSION_COOKIE } from "../../utils/getSession.ts";
-import { useScriptAsDataURI } from "../../../utils/useScript.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 
 declare global {
   interface Window {

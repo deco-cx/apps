@@ -1426,15 +1426,6 @@
               "type": "string"
             },
             "required": true
-          },
-          {
-            "name": "categories",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Listagem das últimas categorias visitadas pelo cliente. O envio deverá ser realizado neste formato:\ncategories=category",
-            "example": "{categories}"
           }
         ],
         "responses": {

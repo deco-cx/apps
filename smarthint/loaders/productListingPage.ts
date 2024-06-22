@@ -86,13 +86,15 @@ const loader = async (
 
   const sort = getSortParam(url, searchSort);
 
-  const filters = getFilterParam(url, filter);
+  const filters = getFilterParam(url, filter) ?? [];
 
-  const anonymous = getSessionCookie(req.headers);
+  const { anonymous } = getSessionCookie(req.headers);
 
   const categories = storePageLoader
     ? getCategoriesParam({ type: "category", page: storePageLoader })
     : undefined;
+
+  const categoriesFilter = categories ? [`categories:${categories}`] : [];
 
   const term = termProp ?? url.searchParams.get("busca") ??
     url.searchParams.get("q") ?? undefined;
@@ -111,7 +113,7 @@ const loader = async (
     ruletype,
     rule,
     from,
-    filter: filters,
+    filter: [...filters, ...categoriesFilter],
     condition: conditionString,
   };
 
@@ -119,7 +121,6 @@ const loader = async (
     ? await api["GET /:cluster/Search/GetPrimarySearch"]({
       ...commonParams,
       term,
-      categories,
     }).then((r) => r.json())
     : await api["GET /:cluster/hotsite"]({
       ...commonParams,

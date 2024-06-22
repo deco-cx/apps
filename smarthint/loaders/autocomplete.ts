@@ -30,7 +30,7 @@ const loader = async (
 ): Promise<Suggestion | null> => {
   const { api, shcode, cluster } = ctx;
   const { query, sizeProducts, sizeTerms } = props;
-  const anonymous = getSessionCookie(req.headers);
+  const { anonymous } = getSessionCookie(req.headers);
 
   const data = await api["GET /:cluster/Search/GetSuggestionTerms"]({
     cluster,
