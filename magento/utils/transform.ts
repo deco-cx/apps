@@ -348,14 +348,14 @@ export const toProductGraphQL = (
     minInstallmentValue,
     maxInstallments,
   } = options;
-  const aggregateOffer = toAggOfferGraphQL(price_range, {
+  const aggregateOffer = toAggOfferGraphQL({
     inStock: stock_status === "IN_STOCK",
     stockLeft: only_x_left_in_stock,
     minInstallmentValue,
     maxInstallments,
-  });
+  }, price_range);
   const url = new URL(
-    (defaultPath ?? "") + product.url_key || product.canonical_url,
+    (defaultPath ?? "") + product.url_key || product?.canonical_url,
     originURL.origin,
   ).href;
   const additionalProperty = toAddPropertiesGraphQL(
@@ -369,7 +369,7 @@ export const toProductGraphQL = (
     productID,
     sku,
     url,
-    name: name.trim(),
+    name: name?.trim() ?? "",
     gtin: sku,
     // deno-lint-ignore no-explicit-any
     image: (media_gallery as any[])
@@ -384,7 +384,7 @@ export const toProductGraphQL = (
       "@type": "ProductGroup",
       productGroupID: productID,
       url,
-      name: name.trim(),
+      name: name?.trim() ?? "",
       additionalProperty,
       hasVariant: [
         {
@@ -444,23 +444,25 @@ export interface ToOfferProps extends Options {
 }
 
 export const toAggOfferGraphQL = (
-  { maximum_price, minimum_price }: PriceRange,
   { inStock, stockLeft, minInstallmentValue, maxInstallments }: Options,
-): AggregateOffer => ({
-  "@type": "AggregateOffer",
-  highPrice: maximum_price.regular_price.value,
-  lowPrice: minimum_price.final_price.value,
-  offerCount: 1,
-  offers: [
-    toOfferGraphQL({
-      minimum_price,
-      inStock,
-      stockLeft,
-      minInstallmentValue,
-      maxInstallments,
-    }),
-  ],
-});
+  priceRange?: PriceRange,
+): AggregateOffer => {
+  return {
+    "@type": "AggregateOffer",
+    highPrice: priceRange?.maximum_price.regular_price.value ?? 0,
+    lowPrice: priceRange?.minimum_price.final_price.value ?? 0,
+    offerCount: 1,
+    offers: priceRange
+      ? [toOfferGraphQL({
+        minimum_price: priceRange.minimum_price,
+        inStock,
+        stockLeft,
+        minInstallmentValue,
+        maxInstallments,
+      })]
+      : [],
+  };
+};
 
 export const toOfferGraphQL = ({
   minimum_price,
@@ -551,9 +553,9 @@ export const toProductListingPageGraphQL = (
     pageInfo: toPageInfo(pagination, products.total_count, originURL),
     sortOptions: toSortOptions(products.sort_fields),
     seo: {
-      title: category.meta_title ?? `${category.name}`,
-      description: category.meta_description ?? "",
-      canonical: "",
+      title: category.meta_title?.trim() ?? category.name.trim() ?? "",
+      description: category?.meta_description ?? "",
+      canonical: originURL.href,
     },
   };
 };

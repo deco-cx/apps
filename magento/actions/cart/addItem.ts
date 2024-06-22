@@ -2,13 +2,23 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import cart, { Cart } from "../../loaders/cart.ts";
 import { parseCookieString } from "../../middleware.ts";
 import type { AppContext } from "../../mod.ts";
-import { handleCartError } from "../../utils/cart.ts";
-import { FORM_KEY_COOKIE } from "../../utils/constants.ts";
+import { getCartCookie, handleCartError } from "../../utils/cart.ts";
+import { FORM_KEY_COOKIE, SESSION_COOKIE } from "../../utils/constants.ts";
+import { logger } from "deco/mod.ts";
 
 export interface Props {
   qty: number;
   sku: string;
+  productId: string;
 }
+
+const logCookies = (headers: Headers) => {
+  logger.info(
+    `{ cart: ${getCartCookie(headers)}, phpssid: ${
+      getCookies(headers)[SESSION_COOKIE] ?? ""
+    } }`,
+  );
+};
 
 /**
  * @title Magento Integration - Add item to cart
@@ -19,11 +29,17 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { qty, sku } = props;
+  const { qty, productId } = props;
   const { headers, url } = req;
   const { site, baseUrl } = ctx;
+
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
+  // const cartId = getCartCookie(headers);
   const newHeaders = new Headers();
+
+  // if (cartId.length) {
+  //   return await addItem_old(props, req, ctx);
+  // }
 
   const requestCookies = headers.get("Cookie");
 
@@ -36,7 +52,7 @@ const action = async (
   newHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
   const urlencoded = new URLSearchParams();
-  urlencoded.append("product", sku);
+  urlencoded.append("product", productId);
   urlencoded.append("form_key", formKey);
   urlencoded.append("qty", String(qty));
 
@@ -44,7 +60,7 @@ const action = async (
     const { headers: fetchHeaders } = await fetch(
       `${baseUrl}/${site}/checkout/cart/add/uenc/${
         btoa(url).replace(/=/g, "~")
-      }/product/${sku}`,
+      }/product/${productId}`,
       {
         method: "POST",
         headers: newHeaders,
@@ -59,6 +75,13 @@ const action = async (
 
       if (parsed.name === "dataservices_cart_id") {
         cartId = parsed.value.replace(/%22/g, "");
+        setCookie(ctx.response.headers, {
+          ...parsed,
+          path: "/",
+          unparsed: ["Priority=High"],
+        });
+        logCookies(headers)
+        return;
       }
 
       setCookie(ctx.response.headers, {
@@ -67,8 +90,12 @@ const action = async (
       });
     });
 
+    logCookies(headers)
+
     return await cart({ cartId }, req, ctx);
   } catch (error) {
+    logCookies(headers)
+    console.error(error);
     return {
       ...(await cart(undefined, req, ctx)),
       ...handleCartError(error),

@@ -165,12 +165,12 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
           Preview: (props) =>
             manifest.pages["website/pages/Page.tsx"].Preview({
               ...props,
-              sections: [...global ?? [], ...props.sections],
+              sections: [...(global ?? []), ...(props.sections ?? [])],
             }),
           default: (props) =>
             manifest.pages["website/pages/Page.tsx"].default({
               ...props,
-              sections: [...global ?? [], ...props.sections],
+              sections: [...(global ?? []), ...(props.sections ?? [])],
             }),
         },
       },

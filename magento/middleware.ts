@@ -2,6 +2,7 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppMiddlewareContext } from "./mod.ts";
 import { SESSION_COOKIE } from "./utils/constants.ts";
 import { generateUniqueIdentifier } from "./utils/hash.ts";
+import { CART_COOKIE, getCartCookie } from "./utils/cart.ts";
 
 export interface Cookie {
   name: string;
@@ -17,7 +18,7 @@ export const parseCookieString = (cookieString: string, isLocal: boolean) => {
   const cookieAttributes: Cookie = { name: "", value: "" };
 
   const [name, value] = parts[0].split("=");
-  cookieAttributes.name = name.trim();
+  cookieAttributes.name = name?.trim();
   cookieAttributes.value = value ? value : "";
 
   for (let i = 1; i < parts.length; i++) {
@@ -47,15 +48,60 @@ export const middleware = async (
   req: Request,
   ctx: AppMiddlewareContext,
 ) => {
-  const ctxMiddleware = ctx;
+  const {
+    next,
+    baseUrl,
+    clientAdmin,
+    site,
+    cartConfigs: { changeCardIdAfterCheckout },
+  } = ctx;
   const sessionCookie = getCookies(req.headers)[SESSION_COOKIE];
+  const cartId = getCartCookie(req.headers);
+
+  if (cartId.length && sessionCookie && changeCardIdAfterCheckout) {
+    const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
+      site,
+      sections: "cart,carbono-customer",
+    }, {
+      headers: {
+        "Cookie": req.headers.get("Cookie") ?? "",
+      },
+    }).then((res) => res.json());
+
+    if (
+      !sectionCart?.cart?.minicart_improvements?.quote_id ||
+      Number.isNaN(Number(sectionCart?.cart?.minicart_improvements?.quote_id))
+    ) {
+      return next!();
+    }
+
+    const quoteId = sectionCart?.cart?.minicart_improvements.quote_id;
+    if (quoteId !== cartId) {
+      setCookie(ctx.response.headers, {
+        name: CART_COOKIE,
+        value: `%22${quoteId}%22`,
+        path: "/",
+        expires: undefined,
+        domain: new URL(req.url).hostname.replace(/deco|www/, ""),
+      });
+    }
+  }
 
   if (sessionCookie) {
-    return ctxMiddleware.next!();
+    return next!();
   }
-  const request = await fetch(`${ctxMiddleware.baseUrl}/V1`);
+
+  const request = await fetch(
+    `${baseUrl}/granado/customer/section/load/?sections=customer`,
+    {
+      headers: {
+        Cookie: req.headers.get("Cookie") ?? "",
+      },
+    },
+  );
+
   const cookies = request.headers.getSetCookie();
-  if (cookies) {
+  if (cookies && !ctx.response.headers.getSetCookie().length) {
     cookies.forEach((cookie, index) => {
       setCookie(ctx.response.headers, {
         ...parseCookieString(cookie, req.url.includes("localhost")),
@@ -74,5 +120,5 @@ export const middleware = async (
     });
   }
 
-  return ctxMiddleware.next!();
+  return next!();
 };

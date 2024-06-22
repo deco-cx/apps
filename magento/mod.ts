@@ -101,6 +101,13 @@ interface CartConfigs {
    * @default 1
    */
   countProductImageInCart: number;
+
+  /**
+   * @title Change card ID after checkout
+   * @description During checkout, the cartId may change without being updated in the cookie. When activating this option, each loader or action called on the page will check that the cartId does not have a different cookie than the checkout cartId. For greater efficiency, we recommend implementing a script on the front end to perform this validation and disabling this option on the back end.
+   * @default false
+   */
+  changeCardIdAfterCheckout: boolean;
 }
 
 export interface Props {

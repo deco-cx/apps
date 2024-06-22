@@ -1,45 +1,79 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 
-const PATHS_TO_PROXY = [
-  "/customer/*",
-  "/checkout/*",
-  "/checkout",
+interface RedirectRouteProps {
+  enableRedirectRoutes?: boolean;
+  subdomain?: string;
+}
+
+const PAGE_PATHS_TO_PROXY = [
   "/sales/*",
   "/wishlist",
   "/wishlist/*",
-  "/customer/*",
   "/vault/*",
   "/catalogsearch/*",
   "/catalog/*",
 ];
+
+const ASSETS_PATHS_TO_PROXY = [
+  "/static",
+  "/static/*",
+  "/icon-v2-192x192.png",
+  "/icon-v2-256x256.png",
+  "/icon-v2-384x384.png",
+  "/icon-v2-512x512.png",
+  "/media/*",
+  "/rest/*",
+];
 const decoSiteMapUrl = "/sitemap/deco.xml";
+
+const CHECKOUT_PATHS_TO_PROXY = [
+  "/checkout/*",
+  "/checkout",
+  "/customer/*",
+  "/customer",
+  "/wishlist/*",
+  "/wishlist",
+  "/sales/*",
+  "/sales",
+  "/vault/*",
+  "/vault",
+];
 
 const buildProxyRoutes = ({
   ctx,
-  extraPaths,
+  extraPagePaths,
   includeSiteMap,
   generateDecoSiteMap,
   excludePathsFromDecoSiteMap,
   prodUrl,
+  pathsWithoutPrefix,
+  prefix,
+  redirectRoutesProps,
 }: {
-  extraPaths: string[];
+  extraPagePaths: string[];
   includeSiteMap?: string[];
   generateDecoSiteMap?: boolean;
   ctx: AppContext;
   excludePathsFromDecoSiteMap: string[];
   prodUrl: URL;
+  pathsWithoutPrefix: string[];
+  prefix: string;
+  redirectRoutesProps: RedirectRouteProps;
 }) => {
   const publicUrl = new URL(
     ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
   );
 
+  const { enableRedirectRoutes, subdomain } = redirectRoutesProps;
+
   try {
     const urlToProxy = publicUrl.href;
     const hostToUse = publicUrl.hostname;
+    const firstDotIndex = hostToUse.indexOf(".");
 
-    const routeFromPath = (pathTemplate: string): Route => ({
-      pathTemplate,
+    const routeFromPath = (pathTemplate: string, usePrefix = false): Route => ({
+      pathTemplate: usePrefix ? prefix + pathTemplate : pathTemplate,
       handler: {
         value: {
           __resolveType: "magento/handlers/proxy.ts",
@@ -54,9 +88,37 @@ const buildProxyRoutes = ({
         },
       },
     });
-    const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
-      routeFromPath,
-    );
+
+    const redirectFromPath = (
+      pathTemplate: string,
+      usePrefix: boolean,
+    ): Route => ({
+      pathTemplate: usePrefix ? prefix + pathTemplate : pathTemplate,
+      handler: {
+        value: {
+          __resolveType: "magento/handlers/redirect.ts",
+          to: `https://${subdomain ?? "secure"}.${
+            hostToUse.slice(firstDotIndex + 1)
+          }`,
+          type: "temporary",
+        },
+      },
+    });
+
+    const suffixedRoutes = [...PAGE_PATHS_TO_PROXY, ...extraPagePaths].map((
+      route,
+    ) => routeFromPath(route, true));
+
+    const nonSuffixedRoutes = [...ASSETS_PATHS_TO_PROXY, ...pathsWithoutPrefix]
+      .map((route) => routeFromPath(route, false));
+
+    const suffixedCheckoutRoutes = enableRedirectRoutes
+      ? CHECKOUT_PATHS_TO_PROXY.map((path) => redirectFromPath(path, true))
+      : CHECKOUT_PATHS_TO_PROXY.map((path) => routeFromPath(path, true));
+
+    const nonSuffixedCheckoutRoutes = enableRedirectRoutes
+      ? CHECKOUT_PATHS_TO_PROXY.map((path) => redirectFromPath(path, false))
+      : CHECKOUT_PATHS_TO_PROXY.map((path) => routeFromPath(path, false));
 
     const [include, routes] = generateDecoSiteMap
       ? [
@@ -94,7 +156,10 @@ const buildProxyRoutes = ({
           },
         },
       },
-      ...routesFromPaths,
+      ...suffixedCheckoutRoutes,
+      ...nonSuffixedCheckoutRoutes,
+      ...suffixedRoutes,
+      ...nonSuffixedRoutes,
     ];
   } catch (e) {
     console.log("Error in Magento Proxies");
@@ -104,7 +169,22 @@ const buildProxyRoutes = ({
 };
 
 export interface Props {
+  /**
+   * @description Extra content. Use "Suffix" field to bulk changes
+   */
   extraPathsToProxy?: string[];
+  /**
+   * @description Use a prefix to compose the proxies paths
+   */
+  prefix?: string;
+  /**
+   * @description Paths of extra content - ignoring the "prefix" field
+   */
+  pathsWithoutPrefix?: string[];
+  /**
+   * @description Redirect the checkout and customer routes to a "checkout.mypublicurl" domain
+   */
+  redirectRoutesProps: RedirectRouteProps;
   /**
    * @title Other site maps to include
    */
@@ -128,6 +208,9 @@ function loader(
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
+    pathsWithoutPrefix = [],
+    prefix = "",
+    redirectRoutesProps,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -137,9 +220,12 @@ function loader(
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
     includeSiteMap,
-    extraPaths: extraPathsToProxy,
+    extraPagePaths: extraPathsToProxy,
     ctx,
     prodUrl,
+    pathsWithoutPrefix,
+    prefix,
+    redirectRoutesProps,
   });
 }
 

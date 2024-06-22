@@ -11,7 +11,7 @@ import {
 } from "./client/types.ts";
 import { toURL } from "./transform.ts";
 
-const CART_COOKIE = "dataservices_cart_id";
+export const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
 
 const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
