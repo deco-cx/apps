@@ -12,6 +12,14 @@ export interface Props {
   productId: string;
 }
 
+const logCookies = (headers: Headers) => {
+  logger.info(
+    `{ cart: ${getCartCookie(headers)}, phpssid: ${
+      getCookies(headers)[SESSION_COOKIE] ?? ""
+    } }`,
+  );
+};
+
 /**
  * @title Magento Integration - Add item to cart
  * @description Add item action
@@ -24,12 +32,6 @@ const action = async (
   const { qty, productId } = props;
   const { headers, url } = req;
   const { site, baseUrl } = ctx;
-
-  logger.error(
-    `{ cart: ${getCartCookie(headers)}, phpssid: ${
-      getCookies(headers)[SESSION_COOKIE] ?? ""
-    } }`,
-  );
 
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
   // const cartId = getCartCookie(headers);
@@ -78,6 +80,7 @@ const action = async (
           path: "/",
           unparsed: ["Priority=High"],
         });
+        logCookies(headers)
         return;
       }
 
@@ -87,8 +90,11 @@ const action = async (
       });
     });
 
+    logCookies(headers)
+
     return await cart({ cartId }, req, ctx);
   } catch (error) {
+    logCookies(headers)
     console.error(error);
     return {
       ...(await cart(undefined, req, ctx)),
