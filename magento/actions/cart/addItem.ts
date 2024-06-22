@@ -3,8 +3,8 @@ import cart, { Cart } from "../../loaders/cart.ts";
 import { parseCookieString } from "../../middleware.ts";
 import type { AppContext } from "../../mod.ts";
 import { getCartCookie, handleCartError } from "../../utils/cart.ts";
-import { FORM_KEY_COOKIE } from "../../utils/constants.ts";
-import addItem_old from "./addItemToCart.ts";
+import { FORM_KEY_COOKIE, SESSION_COOKIE } from "../../utils/constants.ts";
+import { logger } from "deco/mod.ts";
 
 export interface Props {
   qty: number;
@@ -24,6 +24,12 @@ const action = async (
   const { qty, productId } = props;
   const { headers, url } = req;
   const { site, baseUrl } = ctx;
+
+  logger.error(
+    `{ cart: ${getCartCookie(headers)}, phpssid: ${
+      getCookies(headers)[SESSION_COOKIE] ?? ""
+    } }`,
+  );
 
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
   // const cartId = getCartCookie(headers);
@@ -70,9 +76,9 @@ const action = async (
         setCookie(ctx.response.headers, {
           ...parsed,
           path: "/",
-          unparsed: ['Priority=High']
+          unparsed: ["Priority=High"],
         });
-        return
+        return;
       }
 
       setCookie(ctx.response.headers, {
