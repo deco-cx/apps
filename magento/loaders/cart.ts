@@ -38,7 +38,7 @@ const loader = async (
 
   if (!cartId) return null;
   logger.error(
-    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${ctx.response.headers}, REQ-Header: ${req.headers}`,
+    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${JSON.stringify(ctx.response.headers)}, REQ-Header: ${JSON.stringify(req.headers)}`,
   );
   const [resultPricesCarts, resultCart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
