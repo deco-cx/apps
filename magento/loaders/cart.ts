@@ -1,3 +1,4 @@
+import { logger } from "deco/mod.ts";
 import { AppContext } from "../mod.ts";
 import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
@@ -36,7 +37,9 @@ const loader = async (
   const cartId = _cartId ?? getCartCookie(req.headers);
 
   if (!cartId) return null;
-
+  logger.error(
+    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${ctx.response.headers}, REQ-Header: ${req.headers}`,
+  );
   const [resultPricesCarts, resultCart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
       cartId,
