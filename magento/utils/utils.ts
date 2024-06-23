@@ -22,3 +22,8 @@ export const proxySetCookie = (
     setCookie(to, newCookie);
   }
 };
+
+export function extractLastPart(slug: string) {
+  const path = slug.split('/');
+  return path[path.length - 1];
+}
