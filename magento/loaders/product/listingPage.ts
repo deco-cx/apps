@@ -75,7 +75,7 @@ const loader = async (
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
   const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
-  const categoryUrl = categoryProps?.categoryUrl ?? extractLastPart(urlKey);
+  const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
   const STALE = enableCache ? DecoStale : undefined;
 
   if (!categoryUrl) {
