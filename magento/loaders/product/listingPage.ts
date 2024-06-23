@@ -22,6 +22,7 @@ import {
 } from "../../utils/utilsGraphQL.ts";
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
+import { extractLastPart } from "../../utils/utils.ts";
 
 export interface Props {
   urlKey: RequestURLParam;
@@ -86,7 +87,7 @@ const loader = async (
     { path: string }
   >(
     {
-      variables: { path: categoryUrl },
+      variables: { path: extractLastPart(categoryUrl) },
       ...GetCategoryUid,
     },
     STALE,
