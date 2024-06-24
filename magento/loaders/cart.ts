@@ -1,4 +1,3 @@
-import { logger } from "deco/mod.ts";
 import { AppContext } from "../mod.ts";
 import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
@@ -39,12 +38,10 @@ const loader = async (
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
 
-  if (!cartId) return null;
-  logger.info(
-    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${
-      JSON.stringify(ctx.response.headers).toString
-    }, REQ-Header: ${JSON.stringify(req.headers).toString}`,
-  );
+  if (!cartId) {
+    return null;
+  }
+
   const [resultPricesCarts, resultCart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
       cartId,
@@ -67,9 +64,10 @@ const loader = async (
     }),
   ]);
 
-  const cart = await resultCart.json();
-  const prices = await resultPricesCarts.json();
-
+  const [cart, prices] = await Promise.all([
+    resultCart.json(),
+    resultPricesCarts.json(),
+  ]);
   const { products } = await clientGraphql.query<
     ProductWithImagesGraphQL,
     ProductImagesInputs
