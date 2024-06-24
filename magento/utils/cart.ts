@@ -95,26 +95,27 @@ export const toCartItemsWithImages = (
   cart: CartFromAPI,
   prices: MagentoCardPrices,
   { items }: ProductWithImagesGraphQL["products"],
-  imagesUrl: string,
   url: string,
   site: string,
   countProductImageInCart: number,
 ): Cart => {
-
-  console.log(imagesUrl)
   const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
-    const productData = items.find(({ sku }) => sku === product.sku)
+    const productData = items.find(({ sku }) => sku === product.sku);
     const images = productData?.media_gallery;
-    const selectedImages = images?.slice(0, countProductImageInCart).map(
-      (image) => ({
-        "@type": "ImageObject" as const,
-        encodingFormat: "image",
-        alternateName: product.name,
-        url: image.url,
-      } as ImageObject),
-    );
+    const selectedImages = images?.sort((a, b) => a.position - b.position)
+      .reduce<ImageObject[]>((acc, media) => {
+        if (acc.length === countProductImageInCart) {
+          return acc;
+        }
+        return [...acc, {
+          "@type": "ImageObject" as const,
+          encodingFormat: "image",
+          alternateName: product.name,
+          url: media.url,
+        }];
+      }, []);
 
-    const urlKey = productData?.url_key
+    const urlKey = productData?.url_key;
 
     return {
       ...product,

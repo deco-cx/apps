@@ -33,7 +33,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { clientAdmin, site, imagesUrl, cartConfigs, clientGraphql } = ctx;
+  const { clientAdmin, site, cartConfigs, clientGraphql } = ctx;
   const { countProductImageInCart } = cartConfigs;
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
@@ -85,7 +85,6 @@ const loader = async (
     cart,
     prices,
     products,
-    imagesUrl,
     url.origin,
     site,
     countProductImageInCart,
