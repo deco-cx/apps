@@ -1,7 +1,7 @@
 import { getCookies } from "std/http/cookie.ts";
 
-export const SESSION_COOKIE = "SmartHint_Session";
-export const ANONYMOUS_COOKIE = "SmartHint_AnonymousConsumer";
+export const SESSION_COOKIE = "SmartHint-Session";
+export const ANONYMOUS_COOKIE = "SmartHint-AnonymousConsumer";
 
 export const getSessionCookie = (headers: Headers) => {
   const cookies = getCookies(headers);
