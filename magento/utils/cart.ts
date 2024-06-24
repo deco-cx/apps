@@ -7,9 +7,10 @@ import {
   CartFromAPI,
   ItemsWithDecoImage,
   MagentoCardPrices,
-  MagentoProduct,
+  //MagentoProduct,
 } from "./client/types.ts";
-import { toURL } from "./transform.ts";
+//import { toURL } from "./transform.ts";
+import { ProductWithImagesGraphQL } from "./clientGraphql/types.ts";
 
 export const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -93,40 +94,36 @@ const createNewCart = async ({
 export const toCartItemsWithImages = (
   cart: CartFromAPI,
   prices: MagentoCardPrices,
-  productMagento: MagentoProduct[],
-  imagesUrl: string,
+  { items }: ProductWithImagesGraphQL["products"],
   url: string,
   site: string,
   countProductImageInCart: number,
 ): Cart => {
-  const productImagesMap = productMagento.reduce((map, productImage) => {
-    map[productImage.sku] = productImage;
-    return map;
-  }, {} as Record<string, MagentoProduct>);
+  const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
+    const productData = items.find(({ sku }) => sku === product.sku);
+    const images = productData?.media_gallery;
+    const selectedImages = images?.sort((a, b) => a.position - b.position)
+      .reduce<ImageObject[]>((acc, media) => {
+        if (acc.length === countProductImageInCart) {
+          return acc;
+        }
+        return [...acc, {
+          "@type": "ImageObject" as const,
+          encodingFormat: "image",
+          alternateName: product.name,
+          url: media.url,
+        }];
+      }, []);
 
-  const itemsWithImages = cart.items.reduce<ItemsWithDecoImage[]>((acc, product) => {
-    const productData = productImagesMap[product.sku];
-    const images = productData?.media_gallery_entries || [];
-    const selectedImages = images.slice(0, countProductImageInCart).map((image) => ({
-      "@type": "ImageObject" as const,
-      encodingFormat: "image",
-      alternateName: image.file,
-      url: `${toURL(imagesUrl)}${image.file}`,
-    }));
+    const urlKey = productData?.url_key;
 
-    const urlKey = productData?.custom_attributes.find(
-      (item) => item.attribute_code === "url_key",
-    )?.value;
-
-    acc.push({
+    return {
       ...product,
       price_total: product.qty * product.price,
       images: selectedImages,
-      url: urlKey ? `${url}/${site}/${urlKey}` : `${url}/${site}`,
-    });
-
-    return acc;
-  }, []);
+      url: `${url}/${site}/${urlKey}`,
+    };
+  });
 
   return {
     ...cart,
@@ -137,7 +134,7 @@ export const toCartItemsWithImages = (
       discount_amount: prices.discount_amount,
       shipping_amount: prices.shipping_amount,
       shipping_discount_amount: prices.shipping_discount_amount,
-      base_currency_code: prices.base_currency_code,
+      base_currency_code: prices?.base_currency_code,
       base_discount_amount: prices.base_discount_amount,
       base_shipping_amount: prices.base_shipping_amount,
       base_subtotal: prices.base_subtotal,

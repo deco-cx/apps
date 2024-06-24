@@ -280,3 +280,28 @@ export const GetPLPItems = (extraProps?: Array<string>) => ({
     }
   `,
 });
+
+export const GetProductImages = {
+  fragments: [mediaGallery],
+  query: gql`
+    query GetProduct(
+      $filter: ProductAttributeFilterInput
+      $pageSize: Int
+    ) {
+      products(
+        filter: $filter
+        pageSize: $pageSize
+        currentPage: 1
+      ) {
+        items {
+          name
+          sku
+          url_key
+          media_gallery {
+            ...mediaGallery
+          }
+        }
+      }
+    }
+  `,
+};
