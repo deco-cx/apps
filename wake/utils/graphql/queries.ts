@@ -1005,6 +1005,7 @@ export const Customer = gql`
   fragment Customer on Customer {
     id
     cpf
+    phoneNumber
     email
     gender
     customerId
@@ -1682,5 +1683,30 @@ export const CalculatePrices = {
       multiplicationFactor
       price
     } 
+  }`,
+};
+
+export const CheckoutSelectInstallment = {
+  fragments: [Checkout],
+  query: gql`mutation checkoutSelectInstallment(
+    $checkoutId: Uuid!
+    $selectedPaymentMethodId: Uuid!
+    $installmentNumber: Int!
+  ) {
+    checkoutSelectInstallment(
+      checkoutId: $checkoutId
+      selectedPaymentMethodId: $selectedPaymentMethodId
+      installmentNumber: $installmentNumber
+    ) {
+      ...Checkout
+    }
+  }`,
+};
+
+export const CheckoutClone = {
+  query: gql`mutation checkoutClone($checkoutId: Uuid!) {
+    checkoutClone(checkoutId: $checkoutId) {
+      checkoutId
+    }
   }`,
 };

@@ -44,7 +44,7 @@ interface Props {
   /**
    * Informações adicionais de pagamento
    */
-  paymentData: Record<string, string>;
+  paymentData?: Record<string, string>;
   /**
    * Comentários
    */
