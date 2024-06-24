@@ -38,7 +38,7 @@ const loader = async (
     return null;
   }
 
-  const [resultPricesCarts, resultCart] = await Promise.all([
+  const [prices, cart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
       cartId,
       site,
@@ -53,17 +53,13 @@ const loader = async (
         COUPON_CODE,
         BASE_CURRENCY_CODE,
       ].join(","),
-    }),
+    }).then((c) => c.json()),
     clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
       cartId,
       site,
-    }),
+    }).then((c) => c.json()),
   ]);
 
-  const [cart, prices] = await Promise.all([
-    resultCart.json(),
-    resultPricesCarts.json(),
-  ]);
 
   if (cart.items.length === 0) {
     return toCartItemsWithImages(
