@@ -15,11 +15,22 @@ declare global {
 
 const listener = ({
   shcode,
-  url,
-  pageType,
+  pagesPathPattern,
+  publicUrl,
   SESSION_COOKIE,
   ANONYMOUS_COOKIE,
 }: ReturnType<typeof loader>) => {
+  const prodURL = new URL(publicUrl);
+
+  const url = new URL(window.location.href);
+  url.host = prodURL.host;
+  url.port = "";
+
+  const pageType =
+    pagesPathPattern.find(({ page }) =>
+      new URLPattern({ pathname: page }).test(url.href)
+    )?.pageType ?? "others";
+
   const click = ({
     productGroupID,
     position,
@@ -212,25 +223,15 @@ export interface Props {
   pages: Page[];
 }
 
-export const loader = (props: Props, req: Request, ctx: AppContext) => {
+export const loader = (props: Props, _req: Request, ctx: AppContext) => {
   const { shcode, publicUrl } = ctx;
-
-  const prodURL = new URL(publicUrl);
-
-  const tempUrl = new URL(req.url);
-  tempUrl.host = prodURL.host;
-  tempUrl.port = "";
 
   const pagesSorted = sortPagesPattern(props.pages);
 
-  const page = pagesSorted.find(({ page }) =>
-    new URLPattern({ pathname: page }).test(req.url)
-  );
-
   return {
     shcode,
-    url: tempUrl.href,
-    pageType: page?.pageType ?? "others",
+    publicUrl,
+    pagesPathPattern: pagesSorted,
     SESSION_COOKIE,
     ANONYMOUS_COOKIE,
   };
