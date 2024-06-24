@@ -62,10 +62,16 @@ const load = (signal: AbortSignal) =>
 if (IS_BROWSER) {
   enqueue(load);
 
-  document.addEventListener(
-    "visibilitychange",
-    () => document.visibilityState === "visible" && enqueue(load),
-  );
+  const reloadPage = await invoke.magento.loaders.idleAction().then((
+    { reloadPage },
+  ) => reloadPage);
+
+  if (reloadPage) {
+    document.addEventListener(
+      "visibilitychange",
+      () => document.visibilityState === "visible" && enqueue(load),
+    );
+  }
 }
 
 export const state = {

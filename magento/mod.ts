@@ -106,6 +106,13 @@ interface CartConfigs {
    * @default false
    */
   changeCardIdAfterCheckout: boolean;
+
+  /**
+   * @title Update cart after an IDLE
+   * @description After a visibilityChange event, reload the cart.
+   * @default true
+   */
+  idleAction: boolean;
 }
 
 export interface State extends Props {
