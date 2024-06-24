@@ -12,11 +12,7 @@ import {
   SHIPPING_DISCOUNT_AMOUNT,
   SUBTOTAL,
 } from "../utils/constants.ts";
-import {
-  ProductImagesInputs,
-  ProductWithImagesGraphQL,
-} from "../utils/clientGraphql/types.ts";
-import { GetProductImages } from "../utils/clientGraphql/queries.ts";
+import getImages from "./product/images.ts";
 
 export type Cart = CartFromDeco;
 
@@ -33,7 +29,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { clientAdmin, site, cartConfigs, clientGraphql } = ctx;
+  const { clientAdmin, site, cartConfigs } = ctx;
   const { countProductImageInCart } = cartConfigs;
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
@@ -68,18 +64,21 @@ const loader = async (
     resultCart.json(),
     resultPricesCarts.json(),
   ]);
-  const { products } = await clientGraphql.query<
-    ProductWithImagesGraphQL,
-    ProductImagesInputs
-  >(
-    {
-      variables: {
-        filter: { sku: { in: cart.items.map(({ sku }) => sku) } },
-        pageSize: cart.items.length,
+
+  if (cart.items.length === 0) {
+    return toCartItemsWithImages(
+      cart,
+      prices,
+      {
+        items: [],
       },
-      ...GetProductImages,
-    },
-  );
+      url.origin,
+      site,
+      countProductImageInCart,
+    );
+  }
+
+  const { products } = await getImages({ cart }, req, ctx);
 
   return toCartItemsWithImages(
     cart,

@@ -26,11 +26,12 @@ import * as $$$4 from "./loaders/product/extensions/amasty/list.ts";
 import * as $$$5 from "./loaders/product/extensions/amasty/listingPage.ts";
 import * as $$$6 from "./loaders/product/extensions/extend.ts";
 import * as $$$7 from "./loaders/product/getId.ts";
-import * as $$$8 from "./loaders/product/list.ts";
-import * as $$$9 from "./loaders/product/listingPage.ts";
-import * as $$$10 from "./loaders/proxy.ts";
-import * as $$$11 from "./loaders/user.ts";
-import * as $$$12 from "./loaders/wishlist.ts";
+import * as $$$8 from "./loaders/product/images.ts";
+import * as $$$9 from "./loaders/product/list.ts";
+import * as $$$10 from "./loaders/product/listingPage.ts";
+import * as $$$11 from "./loaders/proxy.ts";
+import * as $$$12 from "./loaders/user.ts";
+import * as $$$13 from "./loaders/wishlist.ts";
 
 const manifest = {
   "functions": {
@@ -45,11 +46,12 @@ const manifest = {
     "magento/loaders/product/extensions/amasty/listingPage.ts": $$$5,
     "magento/loaders/product/extensions/extend.ts": $$$6,
     "magento/loaders/product/getId.ts": $$$7,
-    "magento/loaders/product/list.ts": $$$8,
-    "magento/loaders/product/listingPage.ts": $$$9,
-    "magento/loaders/proxy.ts": $$$10,
-    "magento/loaders/user.ts": $$$11,
-    "magento/loaders/wishlist.ts": $$$12,
+    "magento/loaders/product/images.ts": $$$8,
+    "magento/loaders/product/list.ts": $$$9,
+    "magento/loaders/product/listingPage.ts": $$$10,
+    "magento/loaders/proxy.ts": $$$11,
+    "magento/loaders/user.ts": $$$12,
+    "magento/loaders/wishlist.ts": $$$13,
   },
   "handlers": {
     "magento/handlers/proxy.ts": $$$$0,
