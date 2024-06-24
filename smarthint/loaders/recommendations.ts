@@ -86,10 +86,7 @@ const loader = async (
 
   const { anonymous } = getSessionCookie(req.headers);
 
-  const pageIdentifier = new URL(url.pathname, publicUrl)?.href.replace(
-    "/smarthint",
-    "",
-  ); // todo remove replace
+  const pageIdentifier = new URL(url.pathname, publicUrl)?.href;
 
   const filters = getFilterParam(url, filter);
 

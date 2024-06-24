@@ -220,7 +220,6 @@ export const loader = (props: Props, req: Request, ctx: AppContext) => {
   const tempUrl = new URL(req.url);
   tempUrl.host = prodURL.host;
   tempUrl.port = "";
-  tempUrl.pathname = tempUrl.pathname.replace("/smarthint", ""); // TODO Remove
 
   const pagesSorted = sortPagesPattern(props.pages);
 
