@@ -3,6 +3,7 @@ import { Props as ClickProps } from "../../actions/click.ts";
 import { PageType } from "../../utils/typings.ts";
 import { ANONYMOUS_COOKIE, SESSION_COOKIE } from "../../utils/getSession.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { sortPagesPattern } from "../../utils/sortPagesPattern.ts";
 
 declare global {
   interface Window {
@@ -195,11 +196,20 @@ function Analytics(props: ReturnType<typeof loader>) {
   return <script defer src={useScriptAsDataURI(listener, props)} />;
 }
 
-export interface Props {
+/**
+ * @title {{{page}}}
+ */
+export interface Page {
   /**
-   * @description Type of page you are setting up.
+   * @format dynamic-options
+   * @options website/loaders/options/routes.ts
    */
+  page: string;
   pageType: PageType;
+}
+
+export interface Props {
+  pages: Page[];
 }
 
 export const loader = (props: Props, req: Request, ctx: AppContext) => {
@@ -212,10 +222,16 @@ export const loader = (props: Props, req: Request, ctx: AppContext) => {
   tempUrl.port = "";
   tempUrl.pathname = tempUrl.pathname.replace("/smarthint", ""); // TODO Remove
 
+  const pagesSorted = sortPagesPattern(props.pages);
+
+  const page = pagesSorted.find(({ page }) =>
+    new URLPattern({ pathname: page }).test(req.url)
+  );
+
   return {
     shcode,
     url: tempUrl.href,
-    pageType: props.pageType,
+    pageType: page?.pageType ?? "others",
     SESSION_COOKIE,
     ANONYMOUS_COOKIE,
   };

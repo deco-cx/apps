@@ -34,6 +34,9 @@ export interface Category {
    * @hide true
    */
   readonly type: "category";
+  /**
+   * @description your native platform (Vtex,Linx,ect) category page loader
+   */
   page: ProductListingPage | null;
 }
 
@@ -94,6 +97,9 @@ export interface ProductPageType {
    * @hide true
    */
   readonly type: "product";
+  /**
+   * @description Product page loader
+   */
   page: ProductDetailsPage | null;
 }
 
