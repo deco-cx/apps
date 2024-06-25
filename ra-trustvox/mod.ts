@@ -1,7 +1,7 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
-export interface Props {
+export interface State {
   /**
    * @title Store ID
    * @description Store ID available on the Trustvox dashboard.
@@ -23,7 +23,7 @@ export interface Props {
   enableStaging?: boolean;
 }
 
-export let state: Props;
+export let state: State;
 
 /**
  * @title RA Trustvox
@@ -32,8 +32,8 @@ export let state: Props;
  * @logo https://raw.githubusercontent.com/trustvox/deco-apps/enhancement/trustvox-app/ra-trustvox/ra-trustvox.png
  */
 export default function RATrustvox(
-  props: Props,
-): App<Manifest, Props> {
+  props: State,
+): App<Manifest, State> {
   state = props;
 
   return { manifest, state };
