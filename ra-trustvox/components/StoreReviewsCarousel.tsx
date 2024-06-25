@@ -1,4 +1,5 @@
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { state } from '../mod.ts'
 
 declare global {
   interface Window {
@@ -8,25 +9,8 @@ declare global {
   }
 }
 
-export interface Props {
-  /**
-   * @ignore
-   */
-  storeId: string;
-
-  /**
-   * @ignore
-   */
-  numberOfReviewsInStoreCarousel?: number
-
-  /**
-   * @ignore
-   */
-  enableStaging?: boolean;
-}
-
-export default function StoreReviewsCarousel(props: Props) {
-  const { storeId, numberOfReviewsInStoreCarousel, enableStaging = false } = props 
+export default function StoreReviewsCarousel() {
+  const { storeId, numberOfReviewsInStoreCarousel, enableStaging = false } = state 
   const scriptUrl = enableStaging
     ? "https://storage.googleapis.com/trustvox-colt-staging/colt.min.js"
     : "https://colt.trustvox.com.br/colt.min.js";

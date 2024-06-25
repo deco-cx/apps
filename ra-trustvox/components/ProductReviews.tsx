@@ -1,5 +1,6 @@
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
+import { state } from '../mod.ts'
 
 declare global {
   interface Window {
@@ -11,25 +12,14 @@ declare global {
 
 export interface Props {
   page: ProductDetailsPage | null;
-
-  /**
-   * @ignore
-   */
-  storeId: string;
-
-  /**
-   * @ignore
-   */
-  enableStaging?: boolean;
 }
 
-export default function ProductReviews(props: Props) {
-  const { storeId, enableStaging = false } = props;
+export default function ProductReviews({ page }: Props) {
+  const { storeId, enableStaging = false } = state;
   const scriptUrl = enableStaging
     ? "https://static.trustvox.com.br/trustvox-sincero-staging/sincero.js"
     : "https://static.trustvox.com.br/sincero/sincero.js";
 
-  const { page } = props;
   const productId = page?.product?.productID;
   const productName = page?.product?.name;
   const productImage = page?.product?.image?.[0]?.url;

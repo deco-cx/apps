@@ -36,33 +36,7 @@ export default function RATrustvox(
 ): App<Manifest, Props> {
   state = props;
 
-  return {
-    manifest: {
-      ...manifest,
-      sections: {
-        ...manifest.sections,
-        "ra-trustvox/sections/ProductReviews.tsx": {
-          ...manifest.sections["ra-trustvox/sections/ProductReviews.tsx"],
-          default: (props) =>
-            manifest.sections["ra-trustvox/sections/ProductReviews.tsx"]
-              .default({
-                ...state,
-                ...props,
-              }),
-        },
-        "ra-trustvox/sections/StoreReviewsCarousel.tsx": {
-          ...manifest.sections["ra-trustvox/sections/StoreReviewsCarousel.tsx"],
-          default: (props) =>
-            manifest.sections["ra-trustvox/sections/StoreReviewsCarousel.tsx"]
-              .default({
-                ...state,
-                ...props,
-              }),
-        },
-      },
-    },
-    state,
-  };
+  return { manifest, state };
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
