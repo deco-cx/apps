@@ -23,6 +23,8 @@ export interface Props {
   enableStaging?: boolean;
 }
 
+export let state: Props;
+
 /**
  * @title RA Trustvox
  * @description RA trustvox reviews.
@@ -30,8 +32,10 @@ export interface Props {
  * @logo https://raw.githubusercontent.com/trustvox/deco-apps/enhancement/trustvox-app/ra-trustvox/ra-trustvox.png
  */
 export default function RATrustvox(
-  state: Props,
+  props: Props,
 ): App<Manifest, Props> {
+  state = props;
+
   return {
     manifest: {
       ...manifest,
