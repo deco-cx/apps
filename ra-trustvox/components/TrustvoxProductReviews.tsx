@@ -1,6 +1,6 @@
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
-import { state } from '../mod.ts'
+import { state } from "../mod.ts";
 
 declare global {
   interface Window {
@@ -55,7 +55,10 @@ export default function TrustvoxProductReviews({ page }: Props) {
         src={scriptUrl}
       />
 
-      <div id="trustvox-reviews" class="w-full mx-auto flex items-center justify-center">
+      <div
+        id="trustvox-reviews"
+        class="w-full mx-auto flex items-center justify-center"
+      >
         <div id="_trustvox_widget" />
       </div>
     </>

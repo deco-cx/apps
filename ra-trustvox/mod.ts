@@ -39,4 +39,4 @@ export default function RATrustvox(
   return { manifest, state };
 }
 
-export type AppContext = AC<ReturnType<typeof App>>;
+export type AppContext = AC<ReturnType<typeof RATrustvox>>;

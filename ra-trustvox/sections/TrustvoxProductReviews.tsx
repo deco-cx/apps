@@ -1,1 +1,1 @@
-export { default } from "../components/TrustvoxProductReviews.tsx"
+export { default } from "../components/TrustvoxProductReviews.tsx";

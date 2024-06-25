@@ -22,10 +22,10 @@ export default function TrustvoxShelfRate({ productId }: Props) {
           }
         `}
       </style>
-      <div 
-        class="trustvox-shelf-container" 
+      <div
+        class="trustvox-shelf-container"
         data-trustvox-product-code={productId}
       />
     </>
-  )
+  );
 }

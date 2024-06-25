@@ -1,1 +1,1 @@
-export { default } from "../components/TrustvoxStoreReviewsCarousel.tsx"
+export { default } from "../components/TrustvoxStoreReviewsCarousel.tsx";
