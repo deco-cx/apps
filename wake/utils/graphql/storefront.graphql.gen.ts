@@ -5229,14 +5229,6 @@ export type CheckoutAddressAssociateMutationVariables = Exact<{
 
 export type CheckoutAddressAssociateMutation = { checkoutAddressAssociate?: { cep?: number | null, checkoutId: any, url?: string | null, updateDate: any } | null };
 
-export type GetSelectedAddressQueryVariables = Exact<{
-  checkoutId: Scalars['String']['input'];
-  customerAccessToken: Scalars['String']['input'];
-}>;
-
-
-export type GetSelectedAddressQuery = { checkout?: { selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null } | null };
-
 export type CheckoutSelectShippingQuoteMutationVariables = Exact<{
   checkoutId: Scalars['Uuid']['input'];
   shippingQuoteId: Scalars['Uuid']['input'];

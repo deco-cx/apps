@@ -1565,24 +1565,6 @@ export const CheckoutAddressAssociate = {
   }`,
 };
 
-export const GetSelectedAddress = {
-  query:
-    gql`query GetSelectedAddress($checkoutId: String!, $customerAccessToken: String!) {
-    checkout(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) {
-      selectedAddress {
-        addressNumber
-        cep
-        city
-        id
-        neighborhood
-        referencePoint
-        state
-        street
-      }
-    }
-  }`,
-};
-
 export const CheckoutSelectShippingQuote = {
   query:
     gql`mutation checkoutSelectShippingQuote($checkoutId: Uuid!, $shippingQuoteId: Uuid!) {
