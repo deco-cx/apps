@@ -6,27 +6,37 @@ import {
   FieldsList,
   ProductListResponse,
   Sort,
-} from "../../utils/client/types.ts";
+} from "../../utils/types.ts";
 import { convertBreadcrumb, convertFacetsToFilters, convertProductData, getPreviousNextPagination } from "../../utils/transform.ts";
 
 export interface Props {
-  /** @description The category ID. */
+  /**
+   * @description The category ID.
+   * @hide true
+   */
   categoryId: string;
   /**
    * @description The current result page requested.
+   * @hide true
    *  @default 0
    */
   currentPage?: number;
   /** @description The selected facets used in the search. */
   facets: Facet[];
   /**
+   * @title Fields
    * @description Response configuration. This is the list of fields that should be returned in the response body. Examples: BASIC, DEFAULT, FULL
    *  @default DEFAULT
    */
   fields?: FieldsList;
-  /** @description The number of results returned per page. */
+  /**
+   * @title Items per page
+   * @description The number of results returned per page.
+   *  @default 12
+   */
   pageSize?: number;
   /**
+   * @title Sorting
    * @description Sorting method applied to the return results.
    *  @default relevance
    */

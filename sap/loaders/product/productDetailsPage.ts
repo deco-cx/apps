@@ -4,7 +4,7 @@ import type { AppContext } from "../../mod.ts";
 import {
   FieldsList,
   ProductDetailsResponse,
-} from "../../utils/client/types.ts";
+} from "../../utils/types.ts";
 import { convertCategoriesToBreadcrumb, convertProductData } from "../../utils/transform.ts";
 
 export interface Props {

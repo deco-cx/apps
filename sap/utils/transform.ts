@@ -1,5 +1,5 @@
 import type { SiteNavigationElement, Product as CommerceProduct, ImageObject, BreadcrumbList, ListItem, Filter } from "../../commerce/types.ts";
-import { Breadcrumb, Category, FacetResponse, Pagination, Product } from "./client/types.ts";
+import { Breadcrumb, Category, FacetResponse, Pagination, Product } from "./types.ts";
 
 function nodeToNavbar(node: Category): SiteNavigationElement {
   const url = new URL(node.url, "https://example.com");

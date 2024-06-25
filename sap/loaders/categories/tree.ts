@@ -1,7 +1,7 @@
 import type { SiteNavigationElement } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
-import { FieldsList } from "../../utils/client/types.ts";
+import { FieldsList } from "../../utils/types.ts";
 
 export interface Props {
   /**
@@ -9,6 +9,10 @@ export interface Props {
    *  @default DEFAULT
    */
   fields?: FieldsList;
+  /**
+   * @description Filter when it's needed to retrieve only brands, collections or categories. Examples: categories, brands, collections
+   */
+  categoryType?: "default" | "categories" | "brands" | "collections";
 }
 
 const loader = async (
@@ -17,19 +21,22 @@ const loader = async (
   ctx: AppContext,
 ): Promise<SiteNavigationElement[] | null> => {
   const { api } = ctx;
-  const { fields = "DEFAULT" } = props;
+  const { categoryType, fields } = props;
 
   const data = await api["GET /catalogs?:fields"]({ fields }, STALE).then(
     (res) => res.json(),
   );
 
-  const tree = data.catalogs[0].catalogVersions
+  let tree = data.catalogs[0].catalogVersions
     .find((version) => {
       version.id == "Online";
     })
-    .categories.find((category) => {
-      category.id === "categories";
+
+  if (categoryType && categoryType !== "default") {
+    tree = tree.categories.find((category) => {
+      category.id === categoryType;
     });
+  }
 
   return tree;
 };
