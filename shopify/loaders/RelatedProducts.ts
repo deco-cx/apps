@@ -38,39 +38,33 @@ const loader = async (
   const maybeSkuId = Number(splitted[splitted.length - 1]);
   const handle = splitted.slice(0, maybeSkuId ? -1 : undefined).join("-");
 
-  try {
-    const query = await storefront.query<
-      GetProductQuery,
-      GetProductQueryVariables
-    >({
-      variables: { handle },
-      ...GetProduct,
-    });
+  const query = await storefront.query<
+    GetProductQuery,
+    GetProductQueryVariables
+  >({
+    variables: { handle },
+    ...GetProduct,
+  });
 
-    if (!query?.product) {
-      return [];
-    }
-
-    const data = await storefront.query<
-      ProductRecommendationsQuery,
-      ProductRecommendationsQueryVariables
-    >({
-      variables: { productId: query.product.id },
-      ...ProductRecommendations,
-    });
-
-    if (!data?.productRecommendations) {
-      return [];
-    }
-
-    return data.productRecommendations.map((p) =>
-      toProduct(p, p.variants.nodes[0], new URL(req.url))
-    ).slice(0, count);
-  } catch (error) {
-    console.error(error);
+  if (!query?.product) {
+    return [];
   }
 
-  return [];
+  const data = await storefront.query<
+    ProductRecommendationsQuery,
+    ProductRecommendationsQueryVariables
+  >({
+    variables: { productId: query.product.id },
+    ...ProductRecommendations,
+  });
+
+  if (!data?.productRecommendations) {
+    return [];
+  }
+
+  return data.productRecommendations.map((p) =>
+    toProduct(p, p.variants.nodes[0], new URL(req.url))
+  ).slice(0, count);
 };
 
 export default loader;

@@ -1,7 +1,6 @@
-import Script from "partytown/Script.tsx";
-import { ComponentProps } from "preact";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { type JSX } from "preact";
 import { Product } from "../../commerce/types.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 declare global {
   interface Window {
@@ -9,10 +8,11 @@ declare global {
     datalayer_product: any;
     shelfProductIds: string[];
     skuJson: ProductSKUJsonProps;
+    dataLayer: unknown[];
   }
 }
 
-type ScriptProps = ComponentProps<typeof Script>;
+type ScriptProps = JSX.HTMLAttributes<HTMLScriptElement>;
 
 function addVTEXPortalDataSnippet(accountName: string) {
   performance.mark("start-vtex-dl");
@@ -122,7 +122,7 @@ export function AddVTEXPortalData({
       {...props}
       id="datalayer-portal-compat"
       defer
-      src={scriptAsDataURI(addVTEXPortalDataSnippet, accountName)}
+      src={useScriptAsDataURI(addVTEXPortalDataSnippet, accountName)}
     />
   );
 }
@@ -176,7 +176,7 @@ export function ProductDetailsTemplate({
     <script
       {...props}
       defer
-      src={scriptAsDataURI((t) => {
+      src={useScriptAsDataURI((t) => {
         globalThis.window.datalayer_product = t;
       }, template)}
     />
@@ -194,7 +194,7 @@ export function ProductInfo({ product, ...props }: ProductInfoProps) {
       {...props}
       defer
       data-product-info
-      src={scriptAsDataURI((t) => {
+      src={useScriptAsDataURI((t) => {
         globalThis.window.shelfProductIds = globalThis.window.shelfProductIds ||
           [];
         globalThis.window.shelfProductIds.push(t);
@@ -211,7 +211,7 @@ export function ProductSKUJson({ product, ...props }: ProductSKUJsonProps) {
     <script
       {...props}
       defer
-      src={scriptAsDataURI((p) => {
+      src={useScriptAsDataURI((p) => {
         globalThis.window.skuJson = p;
       }, product)}
     />

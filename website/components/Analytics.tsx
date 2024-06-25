@@ -1,8 +1,80 @@
+import { Head } from "$fresh/runtime.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { context } from "deco/live.ts";
-import Script from "partytown/Script.tsx";
-import GoogleTagScript from "partytown/integrations/GTAG.tsx";
-import GoogleTagManager from "partytown/integrations/GTM.tsx";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
+
+export const getGTMIdFromSrc = (src: string | undefined) => {
+  const trackingId = src ? new URL(src).searchParams.get("id") : undefined;
+  return trackingId;
+};
+
+interface TagManagerProps {
+  trackingId: string;
+  src?: string;
+}
+
+export function GoogleTagManager(props: TagManagerProps) {
+  const _isOnPremises = !!props.src;
+  const hasTrackingId = "trackingId" in props;
+  const id = _isOnPremises ? props.src : props.trackingId;
+  const hostname = _isOnPremises
+    ? props.src
+    : "https://www.googletagmanager.com";
+  const src = new URL(
+    `/gtm.js?id=${hasTrackingId ? props.trackingId : ""}`,
+    hostname,
+  );
+  const noscript = new URL(
+    `/ns.html?id=${hasTrackingId ? props.trackingId : ""}`,
+    hostname,
+  );
+
+  return (
+    <>
+      <Head>
+        <script
+          id={`gtm-script-${id}`}
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s);j.async=true;j.src=i;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer', '${src.href}');`,
+          }}
+        />
+      </Head>
+
+      <noscript>
+        <iframe
+          src={noscript.href}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+        >
+        </iframe>
+      </noscript>
+    </>
+  );
+}
+
+export function GTAG({ trackingId }: Pick<TagManagerProps, "trackingId">) {
+  return (
+    <Head>
+      <script
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${trackingId}`}
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.dataLayer = window.dataLayer || [];
+function gtag() {
+  dataLayer.push(arguments);
+}
+gtag("js", new Date());
+gtag("config", '${trackingId}');`,
+        }}
+      />
+    </Head>
+  );
+}
 
 /**
  * This function handles all ecommerce analytics events.
@@ -40,37 +112,18 @@ export interface Props {
    * @description google tag manager container id. For more info: https://developers.google.com/tag-platform/tag-manager/web#standard_web_page_installation .
    */
   trackingIds?: string[];
+
   /**
    * @title GA Measurement Ids
    * @label measurement id
    * @description the google analytics property measurement id. For more info: https://support.google.com/analytics/answer/9539598
    */
   googleAnalyticsIds?: string[];
+
   /**
-   * @description custom url for serving google tag manager. Set either this url or the tracking id
+   * @description custom url for serving google tag manager.
    */
   src?: string;
-  /**
-   * @description run GTM directly on the main thread, without Partytown. This is useful for debugging purposes. Default: false
-   * @hide true
-   * @deprecated
-   */
-  dangerouslyRunOnMainThread?: boolean;
-
-  /**
-   * @description execute scripts within the service worker using Partytown, where script execution might encounter delays or potential non-execution. Recommended: False
-   */
-  dangerouslyRunOnServiceWorker?: boolean;
-
-  /**
-   * @description define the name of event type sent to datalayer and registered analytics. Default: ecommerce
-   */
-  analyticsType?: string;
-
-  /**
-   * @description prevent dataLayer being forward into partytown worker
-   */
-  preventForward?: boolean;
 
   /**
    * @description Disable forwarding events into dataLayer
@@ -81,56 +134,35 @@ export interface Props {
 export default function Analytics({
   trackingIds,
   src,
-  dangerouslyRunOnMainThread: _dangerouslyRunOnMainThread,
-  dangerouslyRunOnServiceWorker = false,
   googleAnalyticsIds,
-  preventForward,
   disableAutomaticEventPush,
 }: Props) {
   const isDeploy = !!context.isDeploy;
-  const dangerouslyRunOnMainThread = _dangerouslyRunOnMainThread ??
-    !dangerouslyRunOnServiceWorker;
+  // Prevent breacking change. Drop this in next major to only have
+  // src: https://hostname
+  // trackingId: GTM-ID
+  const trackingId = getGTMIdFromSrc(src) ?? "";
 
   return (
     <>
-      {/* TODO: Add debug from query string @author Igor Brasileiro */}
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}
-      {isDeploy &&
-        trackingIds &&
-        trackingIds.map((trackingId) => (
-          <GoogleTagManager
-            trackingId={trackingId.trim()}
-            dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-            preventForward={preventForward}
-          />
-        ))}
-      {isDeploy &&
-        googleAnalyticsIds &&
-        googleAnalyticsIds.map((trackingId) => (
-          <GoogleTagScript
-            trackingId={trackingId.trim()}
-            dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-            preventForward={preventForward}
-          />
-        ))}
-      {isDeploy && src && (
-        <GoogleTagManager
-          src={src}
-          dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-          preventForward={preventForward}
-        />
+      {isDeploy && (
+        <>
+          {trackingIds?.map((trackingId) => (
+            <GoogleTagManager src={src} trackingId={trackingId.trim()} />
+          ))}
+          {googleAnalyticsIds?.map((trackingId) => (
+            <GTAG trackingId={trackingId.trim()} />
+          ))}
+          {/*  Drop this in next major to only have trackingId or trackingId and src */}
+          {src && !trackingIds?.length && (
+            <GoogleTagManager src={src} trackingId={trackingId} />
+          )}
+        </>
       )}
 
-      <Script
-        dangerouslySetInnerHTML={{
-          // add all globals variables here
-          __html:
-            `debugGlobals = () => { console.table([["datalayer", dataLayer]]); }`,
-        }}
-        forward={["debugGlobals"]}
-      />
       {disableAutomaticEventPush !== true && (
-        <script defer id="analytics-script" src={scriptAsDataURI(snippet)} />
+        <script defer id="analytics-script" src={useScriptAsDataURI(snippet)} />
       )}
     </>
   );

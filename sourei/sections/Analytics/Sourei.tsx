@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Head } from "$fresh/runtime.ts";
-import { scriptAsDataURI } from "../../../utils/dataURI.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 
 interface Props {
   /**
@@ -31,7 +31,7 @@ const snippet = () => {
 
   const rounded = (n: number) => Number(n.toFixed(2));
 
-  const fixId = ({ item_id, item_group_id, item_url, ...rest }: any) =>
+  const fixId = ({ item_id, item_group_id, _item_url, ...rest }: any) =>
     item_group_id
       ? { item_id: `${item_group_id}_${item_id}`, ...rest }
       : { item_id, ...rest };
@@ -86,7 +86,11 @@ function Section({
           async={loading === "async"}
           type={loading === "module" ? "module" : "text/javascript"}
         />
-        <script src={scriptAsDataURI(snippet)} defer type="text/javascript" />
+        <script
+          src={useScriptAsDataURI(snippet)}
+          defer
+          type="text/javascript"
+        />
       </Head>
 
       {/* Body */}

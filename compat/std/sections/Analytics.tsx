@@ -1,8 +1,10 @@
 import { context } from "deco/live.ts";
-import Script from "partytown/Script.tsx";
-import GoogleTagScript from "partytown/integrations/GTAG.tsx";
-import GoogleTagManager from "partytown/integrations/GTM.tsx";
 import { AnalyticsEvent } from "../../../commerce/types.ts";
+import {
+  getGTMIdFromSrc,
+  GoogleTagManager,
+  GTAG,
+} from "../../../website/components/Analytics.tsx";
 
 declare global {
   interface Window {
@@ -38,64 +40,49 @@ export interface Props {
    * @description google tag manager container id. For more info: https://developers.google.com/tag-platform/tag-manager/web#standard_web_page_installation .
    */
   trackingIds?: string[];
+
   /**
    * @title GA Measurement Ids
    * @label measurement id
    * @description the google analytics property measurement id. For more info: https://support.google.com/analytics/answer/9539598
    */
   googleAnalyticsIds?: string[];
+
   /**
    * @description custom url for serving google tag manager. Set either this url or the tracking id
    */
   src?: string;
-  /**
-   * @description run GTM directly on the main thread, without Partytown. This is useful for debugging purposes. Default: false
-   */
-  dangerouslyRunOnMainThread?: boolean;
 }
 
 export default function Analtyics({
-  trackingIds,
   src,
-  dangerouslyRunOnMainThread,
+  trackingIds,
   googleAnalyticsIds,
 }: Props) {
   const isDeploy = !!context.isDeploy;
+  // Prevent breacking change. Drop this in next major to only have
+  // src: https://hostname
+  // trackingId: GTM-ID
+  const trackingId = getGTMIdFromSrc(src) ?? "";
+
   return (
     <>
-      {/* TODO: Add debug from query string @author Igor Brasileiro */}
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}
-      {isDeploy &&
-        trackingIds &&
-        trackingIds.map((trackingId) => (
-          <GoogleTagManager
-            trackingId={trackingId.trim()}
-            dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-          />
-        ))}
-      {isDeploy &&
-        googleAnalyticsIds &&
-        googleAnalyticsIds.map((trackingId) => (
-          <GoogleTagScript
-            trackingId={trackingId.trim()}
-            dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-          />
-        ))}
-      {isDeploy && src && (
-        <GoogleTagManager
-          src={src}
-          dangerouslyRunOnMainThread={dangerouslyRunOnMainThread}
-        />
+      {isDeploy && (
+        <>
+          {trackingIds?.map((trackingId) => (
+            <GoogleTagManager trackingId={trackingId.trim()} />
+          ))}
+          {googleAnalyticsIds?.map((trackingId) => (
+            <GTAG trackingId={trackingId.trim()} />
+          ))}
+          {/*  Drop this in next major to only have trackingId or trackingId and src */}
+          {src && !trackingIds?.length && (
+            <GoogleTagManager src={src} trackingId={trackingId} />
+          )}
+        </>
       )}
 
-      <Script
-        dangerouslySetInnerHTML={{
-          // add all globals variables here
-          __html:
-            `debugGlobals = () => { console.table([["datalayer", dataLayer]]); }`,
-        }}
-        forward={["debugGlobals"]}
-      />
       <script
         type="module"
         id="analytics-script"

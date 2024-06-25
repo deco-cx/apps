@@ -334,7 +334,15 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     releaseDate,
     items,
   } = product;
-  const { name, ean, itemId: skuId, referenceId = [], kitItems, videos } = sku;
+  const {
+    name,
+    ean,
+    itemId: skuId,
+    referenceId = [],
+    kitItems,
+  } = sku;
+
+  const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
@@ -486,16 +494,21 @@ const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
     );
   }) ?? [];
 
-const toProductGroupAdditionalProperties = ({ properties = [] }: ProductVTEX) =>
-  properties.flatMap(({ name, values }) =>
-    values.map(
-      (value) =>
-        ({
-          "@type": "PropertyValue",
-          name,
-          value,
-          valueReference: "PROPERTY" as string,
-        }) as const,
+const toProductGroupAdditionalProperties = (
+  { specificationGroups = [] }: ProductVTEX,
+) =>
+  specificationGroups.flatMap(({ name: groupName, specifications }) =>
+    specifications.flatMap(({ name, values }) =>
+      values.map(
+        (value) =>
+          ({
+            "@type": "PropertyValue",
+            name,
+            value,
+            propertyID: groupName,
+            valueReference: "PROPERTY" as string,
+          }) as const,
+      )
     )
   );
 
