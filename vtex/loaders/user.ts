@@ -10,7 +10,7 @@ interface User {
   lastName?: string;
   profilePicture?: string;
   gender?: string;
-  taxID?: string;
+  document?: string;
 }
 
 async function loader(
@@ -39,7 +39,7 @@ async function loader(
       email: user.email,
       givenName: user.firstName,
       familyName: user.lastName,
-      taxID: user?.taxID?.replace(/[^\d]/g, ""),
+      taxID: user?.document?.replace(/[^\d]/g, ""),
       gender: user.gender === "f"
         ? "https://schema.org/Female"
         : "https://schema.org/Male",
