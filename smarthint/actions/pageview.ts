@@ -22,7 +22,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<null> => {
+): Promise<void> => {
   const { recs, shcode } = ctx;
   const {
     shippingPrice,
@@ -48,9 +48,7 @@ const action = async (
     shippingTime: String(shippingTime),
     shippingPrice: String(shippingPrice),
     anonymousConsumer: anonymous,
-  }).then((r) => r.json());
-
-  return null;
+  });
 };
 
 export default action;

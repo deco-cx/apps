@@ -28,7 +28,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<null> => {
+): Promise<void> => {
   const { recs, shcode } = ctx;
   const {
     shippingPrice,
@@ -63,9 +63,7 @@ const action = async (
     clickProduct,
     clickFeature,
     locationRecs: positionRecommendation,
-  }).then((r) => r.json());
-
-  return null;
+  });
 };
 
 export default action;
