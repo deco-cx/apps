@@ -23,6 +23,7 @@ import {
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { extractLastPart } from "../../utils/utils.ts";
+//import { logger } from "deco/mod.ts";
 
 export interface Props {
   urlKey: RequestURLParam;
@@ -146,22 +147,33 @@ const getSortOptions = (sortFromUrl: string | null, props?: CategoryProps) =>
     }
     : props?.sortOptions ?? { sortBy: undefined, order: "ASC" };
 
+const sortSearchParams = (url: URL) => {
+  const paramsArray = Array.from(url.searchParams.entries());
+  paramsArray.sort((a, b) => a[0].localeCompare(b[0]));
+  const sortedParams = paramsArray.map(([key, value]) => {
+    const sortedValue = value.split("_").sort((a, b) => a.localeCompare(b))
+      .join("_");
+    return `${key}=${sortedValue}`;
+  });
+  return sortedParams.join("&");
+};
+
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(req.url);
   const { customFields, pageSize, categoryProps, urlKey } = props;
   const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
-  const customAttributes = getCustomFields(customFields, ["ALL"]);
+  const customAttributes = getCustomFields(customFields, ["ALL"])?.join("|") ??
+    "NONE";
   const sortFromUrl = url.searchParams.get("product_list_order");
   const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
-  const filtersFromProps = filtersFromLoaderGraphQL(categoryProps?.filters);
-  return `${url.href}-category:${categoryUrl}-customAtt:${
-    customAttributes?.join("|") ?? "NONE"
-  }-sortBy:${sortBy?.value}-order:${order}-size:${pageSize}-filtersFromProps:${
-    JSON.stringify(
-      filtersFromProps,
-    )
+  const filtersFromProps = JSON.stringify(
+    filtersFromLoaderGraphQL(categoryProps?.filters),
+  );
+
+  return `category:${categoryUrl}-customAtt:${customAttributes}-sortBy:${sortBy?.value}-order:${order}-size:${pageSize}-filters:${filtersFromProps}/${
+    sortSearchParams(url)
   }-PLP`;
 };
 
