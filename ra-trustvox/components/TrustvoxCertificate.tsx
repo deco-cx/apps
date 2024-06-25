@@ -1,6 +1,6 @@
 import { state } from '../mod.ts'
 
-export default function StoreReviewsCarousel() {
+export default function TrustvoxCertificate() {
   const { enableStaging = false } = state 
   const scriptUrl = enableStaging
     ? "https://storage.googleapis.com/trustvox-certificate-widget-staging/widget.js"

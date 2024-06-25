@@ -14,7 +14,7 @@ export interface Props {
   page: ProductDetailsPage | null;
 }
 
-export default function ProductReviews({ page }: Props) {
+export default function TrustvoxProductReviews({ page }: Props) {
   const { storeId, enableStaging = false } = state;
   const scriptUrl = enableStaging
     ? "https://static.trustvox.com.br/trustvox-sincero-staging/sincero.js"
@@ -24,7 +24,7 @@ export default function ProductReviews({ page }: Props) {
   const productName = page?.product?.name;
   const productImage = page?.product?.image?.[0]?.url;
 
-  function setupProductReviews(
+  function setupTrustvoxProductReviews(
     storeId: string,
     productId?: string,
     productName?: string,
@@ -42,7 +42,7 @@ export default function ProductReviews({ page }: Props) {
       <script
         defer
         src={scriptAsDataURI(
-          setupProductReviews,
+          setupTrustvoxProductReviews,
           storeId,
           productId,
           productName,

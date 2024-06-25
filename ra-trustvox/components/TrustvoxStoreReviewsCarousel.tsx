@@ -9,13 +9,13 @@ declare global {
   }
 }
 
-export default function StoreReviewsCarousel() {
+export default function TrustvoxStoreReviewsCarousel() {
   const { storeId, numberOfReviewsInStoreCarousel, enableStaging = false } = state 
   const scriptUrl = enableStaging
     ? "https://storage.googleapis.com/trustvox-colt-staging/colt.min.js"
     : "https://colt.trustvox.com.br/colt.min.js";
 
-    function setupStoreReviewsCarousel(
+    function setupTrustvoxStoreReviewsCarousel(
       storeId: string,
       numberOfReviewsInStoreCarousel?: number
     ) {
@@ -29,7 +29,7 @@ export default function StoreReviewsCarousel() {
         <script
           defer
           src={scriptAsDataURI(
-            setupStoreReviewsCarousel,
+            setupTrustvoxStoreReviewsCarousel,
             storeId,
             numberOfReviewsInStoreCarousel
           )}

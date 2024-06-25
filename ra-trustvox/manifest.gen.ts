@@ -2,13 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$0 from "./sections/ProductReviews.tsx";
-import * as $$$$$$1 from "./sections/StoreReviewsCarousel.tsx";
+import * as $$$$$$0 from "./sections/TrustvoxProductReviews.tsx";
+import * as $$$$$$1 from "./sections/TrustvoxStoreReviewsCarousel.tsx";
 
 const manifest = {
   "sections": {
-    "ra-trustvox/sections/ProductReviews.tsx": $$$$$$0,
-    "ra-trustvox/sections/StoreReviewsCarousel.tsx": $$$$$$1,
+    "ra-trustvox/sections/TrustvoxProductReviews.tsx": $$$$$$0,
+    "ra-trustvox/sections/TrustvoxStoreReviewsCarousel.tsx": $$$$$$1,
   },
   "name": "ra-trustvox",
   "baseUrl": import.meta.url,
