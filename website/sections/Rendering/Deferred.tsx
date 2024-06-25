@@ -1,7 +1,7 @@
 import type { Section } from "deco/blocks/section.ts";
 import { usePartialSection } from "deco/hooks/usePartialSection.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { useId } from "preact/hooks";
-import { useScriptAsDataURI } from "../../../utils/useScript.ts";
 
 /** @titleBy type */
 interface Scroll {
