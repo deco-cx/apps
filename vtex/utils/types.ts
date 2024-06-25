@@ -725,8 +725,9 @@ export interface Installment {
   Name: string;
 }
 
-export type LegacyItem = Omit<Item, "variations"> & {
+export type LegacyItem = Omit<Item, "variations" | "videos"> & {
   variations: string[];
+  Videos: string[];
 } & Record<string, string[]>;
 
 export interface Item {

@@ -1,10 +1,10 @@
 import { Head } from "$fresh/runtime.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { context } from "deco/live.ts";
 import type { Flag, Site } from "deco/types.ts";
 import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
 import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
 import { Page } from "../../commerce/types.ts";
-import { scriptAsDataURI } from "../../utils/dataURI.ts";
 
 const IS_LOCALHOST = context.deploymentId === undefined;
 
@@ -99,7 +99,7 @@ const snippet = (live: Live) => {
   };
 
   //@ts-ignore: "DomInspector not available"
-  const inspector = typeof DomInspector !== "undefined" &&
+  const _inspector = typeof DomInspector !== "undefined" &&
     //@ts-ignore: "DomInspector not available"
     new DomInspector(document.body, {
       outline: "1px dashed #2fd080",
@@ -130,7 +130,7 @@ function LiveControls(
     <Head>
       <script
         defer
-        src={scriptAsDataURI(snippet, {
+        src={useScriptAsDataURI(snippet, {
           page,
           site,
           flags,

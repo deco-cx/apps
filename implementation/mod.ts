@@ -1,5 +1,6 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type Agency =
   | "2B Digital"
@@ -58,3 +59,7 @@ export default function App(
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
+
+export const preview = previewFromMarkdown(
+  new URL("./README.md", import.meta.url),
+);

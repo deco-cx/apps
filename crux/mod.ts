@@ -1,4 +1,5 @@
 import manifest, { Manifest } from "./manifest.gen.ts";
+import PreviewCrux from "./preview/Preview.tsx";
 import type { App as A } from "deco/mod.ts";
 
 export type App = ReturnType<typeof CRUX>;
@@ -23,3 +24,5 @@ export default function CRUX(state: State): A<Manifest, State> {
     manifest,
   };
 }
+
+export const Preview = PreviewCrux;
