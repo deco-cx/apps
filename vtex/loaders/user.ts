@@ -10,14 +10,14 @@ interface User {
   lastName?: string;
   profilePicture?: string;
   gender?: string;
-  document?: string;
+  taxID?: string;
 }
 
 async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<Person & { document?: string } | null> {
+): Promise<Person | null> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
@@ -39,7 +39,7 @@ async function loader(
       email: user.email,
       givenName: user.firstName,
       familyName: user.lastName,
-      document: user.document,
+      taxID: user?.taxID?.replace(/[^\d]/g, ""),
       gender: user.gender === "f"
         ? "https://schema.org/Female"
         : "https://schema.org/Male",
