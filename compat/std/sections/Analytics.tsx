@@ -1,6 +1,7 @@
 import { context } from "deco/live.ts";
 import { AnalyticsEvent } from "../../../commerce/types.ts";
 import {
+  getGTMIdFromSrc,
   GoogleTagManager,
   GTAG,
 } from "../../../website/components/Analytics.tsx";
@@ -59,6 +60,11 @@ export default function Analtyics({
   googleAnalyticsIds,
 }: Props) {
   const isDeploy = !!context.isDeploy;
+  // Prevent breacking change. Drop this in next major to only have
+  // src: https://hostname
+  // trackingId: GTM-ID
+  const trackingId = getGTMIdFromSrc(src) ?? "";
+
   return (
     <>
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}
@@ -70,7 +76,10 @@ export default function Analtyics({
           {googleAnalyticsIds?.map((trackingId) => (
             <GTAG trackingId={trackingId.trim()} />
           ))}
-          {src && <GoogleTagManager src={src} />}
+          {/*  Drop this in next major to only have trackingId or trackingId and src */}
+          {src && !trackingIds?.length && (
+            <GoogleTagManager src={src} trackingId={trackingId} />
+          )}
         </>
       )}
 
