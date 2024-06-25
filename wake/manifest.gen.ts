@@ -2,48 +2,50 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/cart/addCoupon.ts";
-import * as $$$$$$$$$1 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$3 from "./actions/cart/removeCoupon.ts";
-import * as $$$$$$$$$4 from "./actions/cart/updateItemQuantity.ts";
-import * as $$$$$$$$$5 from "./actions/cloneCheckout.ts";
-import * as $$$$$$$$$6 from "./actions/completeCheckout.ts";
-import * as $$$$$$$$$7 from "./actions/createAddress.ts";
-import * as $$$$$$$$$8 from "./actions/createCheckout.ts";
-import * as $$$$$$$$$9 from "./actions/deleteAddress.ts";
-import * as $$$$$$$$$10 from "./actions/login.ts";
-import * as $$$$$$$$$11 from "./actions/logout.ts";
-import * as $$$$$$$$$12 from "./actions/newsletter/register.ts";
-import * as $$$$$$$$$13 from "./actions/notifyme.ts";
-import * as $$$$$$$$$14 from "./actions/review/create.ts";
-import * as $$$$$$$$$15 from "./actions/selectAddress.ts";
-import * as $$$$$$$$$16 from "./actions/selectInstallment.ts";
-import * as $$$$$$$$$17 from "./actions/selectPayment.ts";
-import * as $$$$$$$$$18 from "./actions/selectShipping.ts";
-import * as $$$$$$$$$19 from "./actions/shippingSimulation.ts";
-import * as $$$$$$$$$20 from "./actions/signupCompany.ts";
-import * as $$$$$$$$$21 from "./actions/signupPerson.ts";
-import * as $$$$$$$$$22 from "./actions/submmitForm.ts";
-import * as $$$$$$$$$23 from "./actions/updateAddress.ts";
-import * as $$$$$$$$$24 from "./actions/wishlist/addProduct.ts";
-import * as $$$$$$$$$25 from "./actions/wishlist/removeProduct.ts";
+import * as $$$$$$$$$0 from "./actions/associateCheckout.ts";
+import * as $$$$$$$$$1 from "./actions/cart/addCoupon.ts";
+import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
+import * as $$$$$$$$$3 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$4 from "./actions/cart/removeCoupon.ts";
+import * as $$$$$$$$$5 from "./actions/cart/updateItemQuantity.ts";
+import * as $$$$$$$$$6 from "./actions/cloneCheckout.ts";
+import * as $$$$$$$$$7 from "./actions/completeCheckout.ts";
+import * as $$$$$$$$$8 from "./actions/createAddress.ts";
+import * as $$$$$$$$$9 from "./actions/createCheckout.ts";
+import * as $$$$$$$$$10 from "./actions/deleteAddress.ts";
+import * as $$$$$$$$$11 from "./actions/login.ts";
+import * as $$$$$$$$$12 from "./actions/logout.ts";
+import * as $$$$$$$$$13 from "./actions/newsletter/register.ts";
+import * as $$$$$$$$$14 from "./actions/notifyme.ts";
+import * as $$$$$$$$$15 from "./actions/review/create.ts";
+import * as $$$$$$$$$16 from "./actions/selectAddress.ts";
+import * as $$$$$$$$$17 from "./actions/selectInstallment.ts";
+import * as $$$$$$$$$18 from "./actions/selectPayment.ts";
+import * as $$$$$$$$$19 from "./actions/selectShipping.ts";
+import * as $$$$$$$$$20 from "./actions/shippingSimulation.ts";
+import * as $$$$$$$$$21 from "./actions/signupCompany.ts";
+import * as $$$$$$$$$22 from "./actions/signupPerson.ts";
+import * as $$$$$$$$$23 from "./actions/submmitForm.ts";
+import * as $$$$$$$$$24 from "./actions/updateAddress.ts";
+import * as $$$$$$$$$25 from "./actions/wishlist/addProduct.ts";
+import * as $$$$$$$$$26 from "./actions/wishlist/removeProduct.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/calculatePrices.ts";
 import * as $$$1 from "./loaders/cart.ts";
 import * as $$$2 from "./loaders/checkoutCoupon.ts";
 import * as $$$3 from "./loaders/paymentMethods.ts";
-import * as $$$4 from "./loaders/productDetailsPage.ts";
-import * as $$$5 from "./loaders/productList.ts";
-import * as $$$6 from "./loaders/productListingPage.ts";
-import * as $$$7 from "./loaders/proxy.ts";
-import * as $$$8 from "./loaders/recommendations.ts";
-import * as $$$9 from "./loaders/shop.ts";
-import * as $$$10 from "./loaders/suggestion.ts";
-import * as $$$11 from "./loaders/useCustomCheckout.ts";
-import * as $$$12 from "./loaders/user.ts";
-import * as $$$13 from "./loaders/userAddresses.ts";
-import * as $$$14 from "./loaders/wishlist.ts";
+import * as $$$4 from "./loaders/productCustomizations.ts";
+import * as $$$5 from "./loaders/productDetailsPage.ts";
+import * as $$$6 from "./loaders/productList.ts";
+import * as $$$7 from "./loaders/productListingPage.ts";
+import * as $$$8 from "./loaders/proxy.ts";
+import * as $$$9 from "./loaders/recommendations.ts";
+import * as $$$10 from "./loaders/shop.ts";
+import * as $$$11 from "./loaders/suggestion.ts";
+import * as $$$12 from "./loaders/useCustomCheckout.ts";
+import * as $$$13 from "./loaders/user.ts";
+import * as $$$14 from "./loaders/userAddresses.ts";
+import * as $$$15 from "./loaders/wishlist.ts";
 
 const manifest = {
   "loaders": {
@@ -51,48 +53,50 @@ const manifest = {
     "wake/loaders/cart.ts": $$$1,
     "wake/loaders/checkoutCoupon.ts": $$$2,
     "wake/loaders/paymentMethods.ts": $$$3,
-    "wake/loaders/productDetailsPage.ts": $$$4,
-    "wake/loaders/productList.ts": $$$5,
-    "wake/loaders/productListingPage.ts": $$$6,
-    "wake/loaders/proxy.ts": $$$7,
-    "wake/loaders/recommendations.ts": $$$8,
-    "wake/loaders/shop.ts": $$$9,
-    "wake/loaders/suggestion.ts": $$$10,
-    "wake/loaders/useCustomCheckout.ts": $$$11,
-    "wake/loaders/user.ts": $$$12,
-    "wake/loaders/userAddresses.ts": $$$13,
-    "wake/loaders/wishlist.ts": $$$14,
+    "wake/loaders/productCustomizations.ts": $$$4,
+    "wake/loaders/productDetailsPage.ts": $$$5,
+    "wake/loaders/productList.ts": $$$6,
+    "wake/loaders/productListingPage.ts": $$$7,
+    "wake/loaders/proxy.ts": $$$8,
+    "wake/loaders/recommendations.ts": $$$9,
+    "wake/loaders/shop.ts": $$$10,
+    "wake/loaders/suggestion.ts": $$$11,
+    "wake/loaders/useCustomCheckout.ts": $$$12,
+    "wake/loaders/user.ts": $$$13,
+    "wake/loaders/userAddresses.ts": $$$14,
+    "wake/loaders/wishlist.ts": $$$15,
   },
   "handlers": {
     "wake/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
-    "wake/actions/cart/addCoupon.ts": $$$$$$$$$0,
-    "wake/actions/cart/addItem.ts": $$$$$$$$$1,
-    "wake/actions/cart/addItems.ts": $$$$$$$$$2,
-    "wake/actions/cart/removeCoupon.ts": $$$$$$$$$3,
-    "wake/actions/cart/updateItemQuantity.ts": $$$$$$$$$4,
-    "wake/actions/cloneCheckout.ts": $$$$$$$$$5,
-    "wake/actions/completeCheckout.ts": $$$$$$$$$6,
-    "wake/actions/createAddress.ts": $$$$$$$$$7,
-    "wake/actions/createCheckout.ts": $$$$$$$$$8,
-    "wake/actions/deleteAddress.ts": $$$$$$$$$9,
-    "wake/actions/login.ts": $$$$$$$$$10,
-    "wake/actions/logout.ts": $$$$$$$$$11,
-    "wake/actions/newsletter/register.ts": $$$$$$$$$12,
-    "wake/actions/notifyme.ts": $$$$$$$$$13,
-    "wake/actions/review/create.ts": $$$$$$$$$14,
-    "wake/actions/selectAddress.ts": $$$$$$$$$15,
-    "wake/actions/selectInstallment.ts": $$$$$$$$$16,
-    "wake/actions/selectPayment.ts": $$$$$$$$$17,
-    "wake/actions/selectShipping.ts": $$$$$$$$$18,
-    "wake/actions/shippingSimulation.ts": $$$$$$$$$19,
-    "wake/actions/signupCompany.ts": $$$$$$$$$20,
-    "wake/actions/signupPerson.ts": $$$$$$$$$21,
-    "wake/actions/submmitForm.ts": $$$$$$$$$22,
-    "wake/actions/updateAddress.ts": $$$$$$$$$23,
-    "wake/actions/wishlist/addProduct.ts": $$$$$$$$$24,
-    "wake/actions/wishlist/removeProduct.ts": $$$$$$$$$25,
+    "wake/actions/associateCheckout.ts": $$$$$$$$$0,
+    "wake/actions/cart/addCoupon.ts": $$$$$$$$$1,
+    "wake/actions/cart/addItem.ts": $$$$$$$$$2,
+    "wake/actions/cart/addItems.ts": $$$$$$$$$3,
+    "wake/actions/cart/removeCoupon.ts": $$$$$$$$$4,
+    "wake/actions/cart/updateItemQuantity.ts": $$$$$$$$$5,
+    "wake/actions/cloneCheckout.ts": $$$$$$$$$6,
+    "wake/actions/completeCheckout.ts": $$$$$$$$$7,
+    "wake/actions/createAddress.ts": $$$$$$$$$8,
+    "wake/actions/createCheckout.ts": $$$$$$$$$9,
+    "wake/actions/deleteAddress.ts": $$$$$$$$$10,
+    "wake/actions/login.ts": $$$$$$$$$11,
+    "wake/actions/logout.ts": $$$$$$$$$12,
+    "wake/actions/newsletter/register.ts": $$$$$$$$$13,
+    "wake/actions/notifyme.ts": $$$$$$$$$14,
+    "wake/actions/review/create.ts": $$$$$$$$$15,
+    "wake/actions/selectAddress.ts": $$$$$$$$$16,
+    "wake/actions/selectInstallment.ts": $$$$$$$$$17,
+    "wake/actions/selectPayment.ts": $$$$$$$$$18,
+    "wake/actions/selectShipping.ts": $$$$$$$$$19,
+    "wake/actions/shippingSimulation.ts": $$$$$$$$$20,
+    "wake/actions/signupCompany.ts": $$$$$$$$$21,
+    "wake/actions/signupPerson.ts": $$$$$$$$$22,
+    "wake/actions/submmitForm.ts": $$$$$$$$$23,
+    "wake/actions/updateAddress.ts": $$$$$$$$$24,
+    "wake/actions/wishlist/addProduct.ts": $$$$$$$$$25,
+    "wake/actions/wishlist/removeProduct.ts": $$$$$$$$$26,
   },
   "name": "wake",
   "baseUrl": import.meta.url,

@@ -1704,9 +1704,31 @@ export const CheckoutSelectInstallment = {
 };
 
 export const CheckoutClone = {
-  query: gql`mutation checkoutClone($checkoutId: Uuid!) {
-    checkoutClone(checkoutId: $checkoutId) {
+  query: gql`mutation checkoutClone($checkoutId: Uuid!, $copyUser: Boolean) {
+    checkoutClone(checkoutId: $checkoutId, copyUser: $copyUser) {
       checkoutId
     }
   }`,
+};
+
+export const GetProductCustomizations = {
+  query: gql`query GetProductCustomizations($productId: Long!) {
+    product(productId: $productId) {
+      productName
+      productId
+      productVariantId
+      customizations {
+        customizationId
+        cost
+        name
+        type
+        values
+        order
+        groupName
+        maxLength
+        id
+      }
+    }
+  }
+  `,
 };

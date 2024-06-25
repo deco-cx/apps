@@ -15,6 +15,7 @@ export default async function (props: object, req: Request, ctx: AppContext) {
         {
             variables: {
                 checkoutId,
+                copyUser: true,
             },
             ...CheckoutClone,
         },
