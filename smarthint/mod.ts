@@ -22,7 +22,7 @@ export interface State {
 }
 
 /**
- * @title Smarthint
+ * @title SmartHint
  * @description Smart search and product recommendation to improve your eCommerce customer experience.
  * @category Search
  * @logo https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png
