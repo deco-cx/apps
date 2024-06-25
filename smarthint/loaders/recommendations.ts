@@ -114,19 +114,19 @@ const loader = async (
 
   const RecommendationsProducts =
     positionItem.RecommendationsProducts?.map((item) =>
-      toRecommendation(item, position, "RecommendationsProducts")
+      toRecommendation(item, position, "RecommendationsProducts", categories)
     ) ?? [];
   const RecommendationsPromotional =
     positionItem.RecommendationsProducts?.map((item) =>
-      toRecommendation(item, position, "RecommendationsPromotional")
+      toRecommendation(item, position, "RecommendationsPromotional", categories)
     ) ?? [];
   const RecommendationsCombination =
     positionItem.RecommendationsProducts?.map((item) =>
-      toRecommendation(item, position, "RecommendationsCombination")
+      toRecommendation(item, position, "RecommendationsCombination", categories)
     ) ?? [];
   const Recommendations =
     positionItem.RecommendationsProducts?.map((item) =>
-      toRecommendation(item, position, "Recommendations")
+      toRecommendation(item, position, "Recommendations", categories)
     ) ?? [];
 
   const allItems: SmarthintRecommendation[] = [

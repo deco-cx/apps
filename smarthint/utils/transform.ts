@@ -379,14 +379,17 @@ export const toRecommendation = (
     | "RecommendationsCombination"
     | "RecommendationsPromotional"
     | "Recommendations",
+  categories?: string,
 ) => {
   const recommendations: SmarthintRecommendation = {
     "@type": type,
     order: item.Order,
+
     eventGoogleAnalytics: item.EventGoogleAnalytics,
     titleRecommendation: item.TitleRecommendation,
     nameRecommendation: item.NameRecommendation,
     position,
+    categories,
     products: null,
   };
 

@@ -426,6 +426,7 @@ export interface SmarthintRecommendation {
   position?: string;
   combos?: ComboRecommendationItem[];
   order?: number;
+  categories?: string;
 }
 
 export interface ComboRecommendationItem {
