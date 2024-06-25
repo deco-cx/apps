@@ -223,31 +223,6 @@ export const toAdditionalPropertyCategory = ({
   value,
 });
 
-const toAdditionalPropertiesComplementName = <
-  P extends LegacyProductVTEX | ProductVTEX,
->(
-  product: P,
-): Product["additionalProperty"] => {
-  return product.items.map((item) =>
-    toAdditionalComplementName({
-      name: "complementName",
-      value: item.complementName || "",
-    })
-  );
-};
-
-export const toAdditionalComplementName = ({
-  name,
-  value,
-}: {
-  name: string;
-  value: string;
-}): PropertyValue => ({
-  "@type": "PropertyValue",
-  name,
-  value,
-});
-
 const toAdditionalPropertyClusters = <
   P extends LegacyProductVTEX | ProductVTEX,
 >(
@@ -441,14 +416,11 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
 
   const categoryAdditionalProperties = toAdditionalPropertyCategories(product);
   const clusterAdditionalProperties = toAdditionalPropertyClusters(product);
-  const complementNameAdditionalProperties =
-    toAdditionalPropertiesComplementName(product);
 
   const additionalProperty = specificationsAdditionalProperty
     .concat(categoryAdditionalProperties ?? [])
     .concat(clusterAdditionalProperties ?? [])
-    .concat(referenceIdAdditionalProperty ?? [])
-    .concat(complementNameAdditionalProperties ?? []);
+    .concat(referenceIdAdditionalProperty ?? []);
 
   return {
     "@type": "Product",
@@ -456,6 +428,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     productID: skuId,
     url: getProductURL(baseUrl, product, sku.itemId).href,
     name,
+    alternateName: sku.complementName,
     description,
     brand: {
       "@type": "Brand",
