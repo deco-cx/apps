@@ -5,6 +5,8 @@ import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
 import { Monitoring } from "deco/engine/core/resolver.ts";
 import { fetchToCurl } from "jsr:@viktor/fetch-to-curl";
+import { removeFailingHeaders } from "../../linx/loaders/proxy.ts";
+import { transform } from "deco/deps.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -163,11 +165,12 @@ export default function Proxy({
       ? _ctx?.state?.monitoring
       : undefined;
 
-    const headersTransformed = transformHeaders(new Headers(headers));
+      console.log(transformHeaders)
+    const headersTransformed = removeFailingHeaders(new Headers(headers));
 
     const fetchFunction = async () => {
       try {
-        const curl = await fetchToCurl(to, {
+        const curl = fetchToCurl(to, {
           headers: headersTransformed,
           redirect,
           method: req.method,

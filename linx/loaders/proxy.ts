@@ -19,7 +19,7 @@ const linxProxyFailingHeaders = [
   "x-envoy-attempt-count",
 ];
 
-const removeFailingHeaders = (headers: Headers) => {
+export const removeFailingHeaders = (headers: Headers) => {
   for (const header of linxProxyFailingHeaders) {
     headers.delete(header);
   }
