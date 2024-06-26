@@ -180,6 +180,30 @@ fragment Checkout on Checkout {
 			number
 		}
 	}
+	selectedShippingGroups {
+		distributionCenter {
+			id
+			sellerName
+		}
+		products {
+			productVariantId
+		}
+		selectedShipping {
+			deadline
+			deadlineInHours
+			deliverySchedule {
+				date
+				endDateTime
+				endTime
+				startDateTime
+				startTime
+			}
+			name
+			shippingQuoteId
+			type
+			value
+		}
+	}
 	orders {
 		adjustments {
 			name
