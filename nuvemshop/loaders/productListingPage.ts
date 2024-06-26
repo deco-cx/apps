@@ -62,7 +62,12 @@ async function loader(
       sort_by: "price-ascending",
     });
     result = await response.json();
-  } catch {
+  } catch (error) {
+    // Make async rendering work
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw error;
+    }
+
     result = [];
   }
 
