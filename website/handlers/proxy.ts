@@ -166,6 +166,14 @@ export default function Proxy({
 
     const fetchFunction = async () => {
       try {
+        const curl = await fetch(to, {
+          headers: headersTransformed,
+          redirect,
+          method: req.method,
+          body: req.body,
+        });
+        console.log(curl);
+
         return await fetch(to, {
           headers: headersTransformed,
           redirect,
