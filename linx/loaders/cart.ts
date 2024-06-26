@@ -4,7 +4,6 @@ import { toLinxHeaders } from "../utils/headers.ts";
 import { toCart } from "../utils/transform.ts";
 import type { CartResponse } from "../utils/types/basketJSON.ts";
 
-
 /**
  * @title Linx Integration
  * @description Cart loader
@@ -25,13 +24,13 @@ const loader = async (
     return null;
   }
 
-  proxySetCookie(response.headers, ctx.response.headers, req.url);
-
   const cart = await response.json();
 
   if (!cart) {
     throw new Error("Could not retrieve Basket");
   }
+
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   return toCart(cart, ctx);
 };

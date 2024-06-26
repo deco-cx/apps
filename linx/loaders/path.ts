@@ -51,9 +51,11 @@ async function loader(
 
   const response = await ctx.api["GET /*splat"](
     { splat, ...params, ...props, ...defaults },
-    isSearch ? {
-      redirect: "manual",
-    } : STALE,
+    isSearch
+      ? {
+        redirect: "manual",
+      }
+      : STALE,
   );
 
   if (response.status === 301) {
