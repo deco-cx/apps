@@ -141,14 +141,12 @@ export const toProduct = (
     additionalType: "skuOptions",
   }));
 
-  const prodOptions: PropertyValue[] = product.Options.map(option => {
-    return option.Values.map(optValue => {
-      const imagePath = optValue.ImagePath 
+  const prodOptions: PropertyValue[] = product.Options.map((option) => {
+    return option.Values.map((optValue) => {
+      const imagePath = optValue.ImagePath
         ? `/Custom/Content/Swatches${optValue.ImagePath}`
         : null;
-      const url = imagePath
-        ? new URL(imagePath, cdn).href
-        : "";
+      const url = imagePath ? new URL(imagePath, cdn).href : "";
 
       const color = optValue.Color ? optValue.Color : "";
 
@@ -162,7 +160,7 @@ export const toProduct = (
         }],
         color: color,
         additionalType: "prodOptions",
-      }
+      };
     });
   }).flat();
 
