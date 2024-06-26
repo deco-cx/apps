@@ -194,6 +194,8 @@ export type SimpleCategoryGraphQL = Required<
     | "meta_description"
     | "name"
     | "description"
+    | "url_key"
+    | "url_path"
   >
 >;
 
