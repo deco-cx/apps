@@ -23,7 +23,6 @@ import {
 import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
-  CategoryGraphQL,
   CompleteProductGraphQL,
   PLPGraphQL,
   ProductImage,
@@ -500,7 +499,7 @@ export const toOfferGraphQL = ({
 
 export const toProductListingPageGraphQL = (
   { products }: PLPGraphQL,
-  { categories }: CategoryGraphQL,
+  category: SimpleCategoryGraphQL,
   options: {
     originURL: URL;
     imagesQtd: number;
@@ -518,7 +517,6 @@ export const toProductListingPageGraphQL = (
     minInstallmentValue,
     maxInstallments,
   } = options;
-  const category = categories.items[0];
   const pagination = products.page_info;
   const listElements = toItemElement(category, originURL);
 
