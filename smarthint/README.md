@@ -16,11 +16,10 @@
 </p>
 
 <p align="center">
-Through artificial intelligence, data analysis, and consumer behavior within the online store, our technology identifies interests and personalizes the entire online experience for users, enhancing factors such as competitiveness, customer loyalty, and sales growth.
-  
-This app wraps Smarthint API into a comprehensive set of loaders/actions
-empowering non technical users to interact and act upon their headless commerce.
+SmartHint is an e-commerce search and recommendation system that uses artificial intelligence to elevate the online shopping experience.
+It consists of smart search, pages of departaments/categories and recommendation showcases.
 
+To access the SmartHint account data or register, go to the [admin panel](https://admin.smarthint.co/)
 </p>
 
 ## Installation
