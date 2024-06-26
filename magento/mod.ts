@@ -126,7 +126,7 @@ interface Features {
    * @description ONLY ENABLE THIS OPTION IF YOU KNOWN WHAT YOU'RE DOING
    * @default false
    */
-  dangerouslyDontReturnCartAfterAction: boolean;
+  dangerouslyDontReturnCartAfterAction: true;
 }
 
 export interface State extends Props {
