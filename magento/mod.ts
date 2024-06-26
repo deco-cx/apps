@@ -85,6 +85,11 @@ export interface Props {
    * @title Cart Configs
    */
   cartConfigs: CartConfigs;
+
+  /**
+   * @title Teste
+   */
+  features: Features;
 }
 
 interface CartConfigs {
@@ -113,6 +118,15 @@ interface CartConfigs {
    * @default true
    */
   idleAction: boolean;
+}
+
+interface Features {
+  /**
+   * @title DANGEROUSLY return null after any cart action
+   * @description ONLY ENABLE THIS OPTION IF YOU KNOWN WHAT YOU'RE DOING
+   * @default false
+   */
+  dangerouslyReturnNullAfterCartActions: boolean;
 }
 
 export interface State extends Props {
