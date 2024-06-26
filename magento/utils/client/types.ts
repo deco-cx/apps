@@ -585,3 +585,7 @@ export interface SubmitReviewAmastyBody {
 export interface Ratings {
   [key: string]: string;
 }
+
+export interface OverrideFeatures {
+  dangerouslyDontReturnCart?: boolean
+}

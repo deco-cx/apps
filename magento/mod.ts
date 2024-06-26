@@ -87,7 +87,7 @@ export interface Props {
   cartConfigs: CartConfigs;
 
   /**
-   * @title Teste
+   * @title Features
    */
   features: Features;
 }
@@ -122,11 +122,11 @@ interface CartConfigs {
 
 interface Features {
   /**
-   * @title DANGEROUSLY return null after any cart action
+   * @title DANGEROUSLY Dont use cart loader after any cart action
    * @description ONLY ENABLE THIS OPTION IF YOU KNOWN WHAT YOU'RE DOING
    * @default false
    */
-  dangerouslyReturnNullAfterCartActions: boolean;
+  dangerouslyDontReturnCartAfterAction: boolean;
 }
 
 export interface State extends Props {

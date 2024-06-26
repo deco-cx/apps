@@ -1,13 +1,20 @@
 import type { AppContext } from "../../mod.ts";
-import cart, { Cart } from "../../loaders/cart.ts";
-import { getCartCookie, handleCartError } from "../../utils/cart.ts";
+import { Cart } from "../../loaders/cart.ts";
+import { getCartCookie, handleCartActions } from "../../utils/cart.ts";
+import { OverrideFeatures } from "../../utils/client/types.ts";
+
+type Props = OverrideFeatures;
 
 const action = async (
-  _props: undefined,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { clientAdmin } = ctx;
+  const { clientAdmin, features } = ctx;
+  const { dangerouslyDontReturnCart } = props;
+  const dontReturnCart = dangerouslyDontReturnCart ??
+    features.dangerouslyDontReturnCartAfterAction;
+
   const cartId = getCartCookie(req.headers);
 
   try {
@@ -16,13 +23,17 @@ const action = async (
       site: ctx.site,
     });
   } catch (error) {
-    return {
-      ...(await cart(undefined, req, ctx)),
-      ...handleCartError(error),
-    };
+    return handleCartActions(dontReturnCart, {
+      req,
+      ctx,
+      error,
+    });
   }
 
-  return await cart(undefined, req, ctx);
+  return handleCartActions(dontReturnCart, {
+    req,
+    ctx,
+  });
 };
 
 export default action;

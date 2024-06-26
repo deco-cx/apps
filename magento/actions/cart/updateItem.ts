@@ -1,8 +1,9 @@
-import cart, { Cart } from "../../loaders/cart.ts";
+import { Cart } from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
-import { getCartCookie, handleCartError } from "../../utils/cart.ts";
+import { getCartCookie, handleCartActions } from "../../utils/cart.ts";
+import { OverrideFeatures } from "../../utils/client/types.ts";
 
-export interface Props {
+export interface Props extends OverrideFeatures {
   qty: number;
   itemId: string;
   sku: string;
@@ -13,8 +14,11 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { qty, itemId, sku } = props;
-  const { clientAdmin } = ctx;
+  const { qty, itemId, sku, dangerouslyDontReturnCart } = props;
+  const { clientAdmin, features } = ctx;
+  const dontReturnCart = dangerouslyDontReturnCart ??
+    features.dangerouslyDontReturnCartAfterAction;
+
   const cartId = getCartCookie(req.headers);
 
   const body = {
@@ -35,13 +39,17 @@ const action = async (
       { body },
     );
   } catch (error) {
-    return {
-      ...(await cart(undefined, req, ctx)),
-      ...handleCartError(error),
-    };
+    return handleCartActions(dontReturnCart, {
+      req,
+      ctx,
+      error,
+    });
   }
 
-  return await cart(undefined, req, ctx);
+  return handleCartActions(dontReturnCart, {
+    req,
+    ctx,
+  });
 };
 
 export default action;
