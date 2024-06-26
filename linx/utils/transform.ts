@@ -5,6 +5,7 @@ import {
   Product,
   ProductDetailsPage,
   PropertyValue,
+  VideoObject,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
@@ -141,6 +142,14 @@ export const toProduct = (
     additionalType: "skuOptions",
   }));
 
+  const productVideo: VideoObject[] = product?.Medias?.filter((option) => option.MediaType === "Video").map((option) => ({
+    "@type": "PropertyValue" as const,
+    name: option.Title || "",
+    value: option.Url || "",
+    propertyID: option.VariationPath,
+    additionalType: "productVideo",
+  }));
+
   const prodOptions: PropertyValue[] = product.Options.map((option) => {
     return option.Values.map((optValue) => {
       const imagePath = optValue.ImagePath
@@ -237,6 +246,7 @@ export const toProduct = (
       logo: product.BrandImageUrl ?? undefined,
     },
     additionalProperty,
+    video: productVideo,
     image,
     isVariantOf: {
       "@type": "ProductGroup",
