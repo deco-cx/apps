@@ -181,7 +181,7 @@ export type CompleteProductGraphQL =
   >
   & {
     categories?: Array<
-      Pick<CategoryLeafGraphQL, "name" | "url_key" | "position">
+      Pick<CategoryLeafGraphQL, "name" | "url_key" | "position" | "url_path">
     >;
   };
 export type SimpleCategoryGraphQL = Required<

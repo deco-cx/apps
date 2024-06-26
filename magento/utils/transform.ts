@@ -566,7 +566,7 @@ const toItemElement = (
 ): ListItem[] => {
   const { pathname, origin } = url;
   const fromBreadcrumbs = category?.breadcrumbs?.map<ListItem>((item, i) => {
-    const urlKey = item.category_url_key ?? item.category_url_path!;
+    const urlKey = item.category_url_path ?? item.category_url_key!;
     const position = pathname.indexOf(urlKey);
     return {
       "@type": "ListItem",
