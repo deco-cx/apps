@@ -117,9 +117,10 @@ async function loader(
   const itemListElement: ListItem[] = isBreadcrumbProductName
     ? [productListElement]
     : products.items[0].categories?.map(
-      ({ position, url_key, name }) => ({
+      ({ position, url_path, url_key, name }) => ({
         "@type": "ListItem",
-        item: new URL((defaultPath ?? "") + url_key, url.origin).href,
+        item:
+          new URL((defaultPath ?? "") + (url_path ?? url_key), url.origin).href,
         position,
         name,
       } as ListItem),

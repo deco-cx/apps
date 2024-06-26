@@ -22,7 +22,6 @@ import {
 } from "../../utils/utilsGraphQL.ts";
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
-import { extractLastPart } from "../../utils/utils.ts";
 //import { logger } from "deco/mod.ts";
 
 export interface Props {
@@ -88,7 +87,7 @@ const loader = async (
     { path: string }
   >(
     {
-      variables: { path: extractLastPart(categoryUrl) },
+      variables: { path: categoryUrl },
       ...GetCategoryUid,
     },
     STALE,
