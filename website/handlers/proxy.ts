@@ -4,6 +4,7 @@ import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
 import { Monitoring } from "deco/engine/core/resolver.ts";
+import { fetchToCurl } from "jsr:@viktor/fetch-to-curl";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -166,7 +167,7 @@ export default function Proxy({
 
     const fetchFunction = async () => {
       try {
-        const curl = await fetch(to, {
+        const curl = await fetchToCurl(to, {
           headers: headersTransformed,
           redirect,
           method: req.method,
