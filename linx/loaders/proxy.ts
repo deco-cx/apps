@@ -19,13 +19,6 @@ const linxProxyFailingHeaders = [
   "x-envoy-attempt-count",
 ];
 
-export const removeFailingHeaders = (headers: Headers) => {
-  for (const header of linxProxyFailingHeaders) {
-    headers.delete(header);
-  }
-  return headers;
-}
-
 const buildProxyRoutes = (
   {
     ctx: { account },
@@ -64,7 +57,7 @@ const buildProxyRoutes = (
           host: hostToUse,
           redirect: "follow",
           includeScriptsToHead,
-          transformHeaders: removeFailingHeaders,
+          excludeHeaders: linxProxyFailingHeaders,
         },
       },
     });
