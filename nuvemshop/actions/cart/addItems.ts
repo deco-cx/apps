@@ -13,7 +13,7 @@ const action = async (
   { quantity, itemId, add_to_cart_enhanced = "1", attributes }: AddItemProps,
   req: Request,
   ctx: AppContext,
-): Promise<UpdateCartResponse | null> => {
+): Promise<UpdateCartResponse["cart"] | null> => {
   const { publicUrl } = ctx;
 
   const myHeaders = new Headers();

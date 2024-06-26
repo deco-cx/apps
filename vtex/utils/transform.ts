@@ -428,6 +428,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     productID: skuId,
     url: getProductURL(baseUrl, product, sku.itemId).href,
     name,
+    alternateName: sku.complementName,
     description,
     brand: {
       "@type": "Brand",
