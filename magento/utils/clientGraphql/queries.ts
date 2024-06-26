@@ -183,7 +183,9 @@ export const GetCompleteProduct = (
           ...completeProduct
           ${extraProps ? extraProps.join(`\n`) : `\n`}
           ${
-    useCategoriesBreadcrumb ? `categories { name \n url_key \n position \n url_path }` : ""
+    useCategoriesBreadcrumb
+      ? `categories { name \n url_key \n position \n url_path }`
+      : ""
   }
         }
       }
@@ -219,10 +221,12 @@ query GetProduct(
 export const GetCategoryUid = {
   query: gql`
     query GetCategoryUid($path: String) {
-      categories(filters: { url_path: { eq: $path } }) {
+      categories(filters: { url_key: { eq: $path } }) {
         items {
           uid
           name
+          url_key
+          url_path
           breadcrumbs {
             category_level
             category_name

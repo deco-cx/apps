@@ -22,6 +22,7 @@ import {
 } from "../../utils/utilsGraphQL.ts";
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
+import { extractInitialPath, extractLastPath } from "../../utils/utils.ts";
 //import { logger } from "deco/mod.ts";
 
 export interface Props {
@@ -87,12 +88,21 @@ const loader = async (
     { path: string }
   >(
     {
-      variables: { path: categoryUrl },
+      variables: { path: extractLastPath(categoryUrl) },
       ...GetCategoryUid,
     },
     STALE,
   );
+
   if (!categories.items || categories.items?.length === 0) {
+    return null;
+  }
+
+  const categoryItem = categories.items.find((i) =>
+    i.url_path.startsWith(extractInitialPath(categoryUrl))
+  );
+
+  if (!categoryItem) {
     return null;
   }
 
@@ -103,7 +113,7 @@ const loader = async (
     {
       variables: {
         filter: {
-          category_uid: { in: [categories.items[0].uid] },
+          category_uid: { in: [categoryItem.uid] },
           ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
         },
         pageSize,
@@ -124,7 +134,7 @@ const loader = async (
 
   return toProductListingPageGraphQL(
     { products },
-    { categories },
+    categoryItem,
     {
       originURL: url,
       imagesQtd,

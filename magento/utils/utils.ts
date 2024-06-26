@@ -23,7 +23,11 @@ export const proxySetCookie = (
   }
 };
 
-export function extractLastPart(slug: string) {
-  const path = slug.split('/');
+export function extractLastPath(slug: string) {
+  const path = slug.split("/");
   return path[path.length - 1];
+}
+
+export function extractInitialPath(slug: string) {
+  return slug.replace(/\/[^\/]*$/, "");
 }
