@@ -249,7 +249,7 @@ export interface ProductSearchInputs {
 
 export interface ProductDetailsInputs {
   filter: {
-    sku: {
+    url_key: {
       eq: string;
     };
   };

@@ -10,8 +10,6 @@ import {
 import { formatUrlSuffix, getCustomFields } from "../../utils/utilsGraphQL.ts";
 import { GetCompleteProduct } from "../../utils/clientGraphql/queries.ts";
 import { toProductGraphQL } from "../../utils/transform.ts";
-import { URL_KEY } from "../../utils/constants.ts";
-import stringifySearchCriteria from "../../utils/stringifySearchCriteria.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -49,61 +47,32 @@ async function loader(
     site,
     minInstallmentValue,
     maxInstallments,
-    currencyCode,
-    storeId,
-    clientAdmin,
   } = ctx;
   const STALE = enableCache ? DecoStale : undefined;
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
 
-  const getProductSku = async () => {
-    const searchCriteria = {
-      filterGroups: [
-        {
-          filters: [{ field: URL_KEY, value: slug }],
-        },
-      ],
-    };
-
-    const queryParams = {
-      site,
-      currencyCode,
-      storeId,
-      ...stringifySearchCriteria(searchCriteria),
-    };
-
-    const itemSku = await clientAdmin["GET /rest/:site/V1/products"](
-      {
-        ...queryParams,
+  const { products } = await clientGraphql.query<
+    ProductDetailsGraphQL,
+    ProductDetailsInputs
+  >(
+    {
+      variables: {
+        filter: { url_key: { eq: slug } },
       },
-      STALE,
-    ).then((res) => res.json());
-    if (!itemSku.items.length) return null;
-    return itemSku.items[0].sku;
-  };
+      ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
+    },
+    STALE,
+  );
 
-  const getFullProduct = async (sku: string) =>
-    await clientGraphql.query<ProductDetailsGraphQL, ProductDetailsInputs>(
-      {
-        variables: {
-          filter: { sku: { eq: sku } },
-        },
-        ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
-      },
-      STALE,
-    );
+  const product = products.items.find((p) => p.url_key === slug);
 
-  const sku = await getProductSku();
-
-  if (!sku) {
-    console.log("product not found");
+  if (!product) {
     return null;
   }
-  const { products } = await getFullProduct(sku);
 
   const productCanonicalUrl = new URL(
-    (defaultPath ?? "") + products.items[0]?.canonical_url ?? "",
+    (defaultPath ?? "") + product?.canonical_url ?? "",
     url.origin,
   );
 
@@ -111,12 +80,12 @@ async function loader(
     "@type": "ListItem",
     item: productCanonicalUrl.href,
     position: 1,
-    name: products.items[0]?.name ?? "",
+    name: product?.name ?? "",
   } as ListItem;
 
   const itemListElement: ListItem[] = isBreadcrumbProductName
     ? [productListElement]
-    : products.items[0].categories?.map(
+    : product.categories?.map(
       ({ position, url_path, url_key, name }) => ({
         "@type": "ListItem",
         item:
@@ -133,7 +102,7 @@ async function loader(
       itemListElement,
       numberOfItems: itemListElement.length,
     },
-    product: toProductGraphQL(products.items[0], {
+    product: toProductGraphQL(product, {
       originURL: url,
       imagesQtd: 999,
       customAttributes,
@@ -142,9 +111,9 @@ async function loader(
       defaultPath,
     }),
     seo: {
-      title: products.items[0].meta_title?.trim() ??
-        products.items[0].name.trim() ?? "",
-      description: products.items[0].meta_description?.trim() ?? "",
+      title: product.meta_title?.trim() ??
+        product.name.trim() ?? "",
+      description: product.meta_description?.trim() ?? "",
       canonical: productCanonicalUrl.href,
     },
   };
