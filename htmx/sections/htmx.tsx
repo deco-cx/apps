@@ -5,7 +5,14 @@ import { AppContext, Extension } from "../mod.ts";
 
 const script = (extensions: Extension[]) => {
   if (extensions.length > 0) {
-    document.body.setAttribute("hx-ext", extensions.join(","));
+    if (document.readyState === "complete") {
+      document.body.setAttribute("hx-ext", extensions.join(","));
+      return;
+    }
+
+    globalThis.onload = () => {
+      document.body.setAttribute("hx-ext", extensions.join(","));
+    };
   }
 };
 
