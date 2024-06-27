@@ -112,21 +112,28 @@ interface CartConfigs {
    */
   changeCardIdAfterCheckout: boolean;
 
-  /**
-   * @title Update cart after an IDLE
-   * @description After a visibilityChange event, reload the cart.
-   * @default true
-   */
-  idleAction: boolean;
 }
 
-interface Features {
+export interface Features {
   /**
-   * @title DANGEROUSLY Dont use cart loader after any cart action
-   * @description ONLY ENABLE THIS OPTION IF YOU KNOWN WHAT YOU'RE DOING
+   * @title DANGEROUSLY Don`t invoke loaders after cart action
+   * @description When called, the action will return just an success statement
    * @default false
    */
   dangerouslyDontReturnCartAfterAction: true;
+
+  /**
+   * @title DANGEROUSLY Disable OnVisibilityChange Update
+   * @description After an idle, the store state will not be updated
+   * @default false
+   */
+  dangerouslyDisableOnVisibilityChangeUpdate: boolean;
+  /**
+   * @title DANGEROUSLY Disable onLoad Update
+   * @description After a page load/refresh, the store state will not be updated
+   * @default false
+   */
+  dangerouslyDisableOnLoadUpdate: boolean;
 }
 
 export interface State extends Props {

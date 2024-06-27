@@ -19,7 +19,7 @@ import * as $$$$0 from "./handlers/proxy.ts";
 import * as $$$$1 from "./handlers/redirect.ts";
 import * as $$$$2 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/idleAction.ts";
+import * as $$$1 from "./loaders/features.ts";
 import * as $$$2 from "./loaders/product/detailsPage.ts";
 import * as $$$3 from "./loaders/product/detailsPageGQL.ts";
 import * as $$$4 from "./loaders/product/extensions/amasty/detailsPage.ts";
@@ -40,7 +40,7 @@ const manifest = {
   },
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
-    "magento/loaders/idleAction.ts": $$$1,
+    "magento/loaders/features.ts": $$$1,
     "magento/loaders/product/detailsPage.ts": $$$2,
     "magento/loaders/product/detailsPageGQL.ts": $$$3,
     "magento/loaders/product/extensions/amasty/detailsPage.ts": $$$4,
