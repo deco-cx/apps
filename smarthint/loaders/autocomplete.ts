@@ -51,7 +51,7 @@ const loader = async (
     products: products,
     searches: data.Terms?.map((termItem) => ({
       term: termItem.TermSuggestion!,
-      href: `/s?busca=${termItem.TermSuggestion}`,
+      href: `/s?q=${termItem.TermSuggestion}`,
       hits: termItem.Order,
     })),
   };
