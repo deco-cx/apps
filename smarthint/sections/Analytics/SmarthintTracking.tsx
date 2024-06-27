@@ -201,7 +201,7 @@ const listener = ({
 };
 
 /**
- * @title Smarthint Tracking
+ * @title SmartHint Tracking
  */
 function Analytics(props: ReturnType<typeof loader>) {
   return <script defer src={useScriptAsDataURI(listener, props)} />;

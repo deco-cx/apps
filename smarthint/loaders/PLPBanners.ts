@@ -38,12 +38,13 @@ export interface Props {
   };
   /**
    * @description if its a category page setup your store (VTEX,Wake,Shopify,etc) loader here
+   * @default null
    */
   page?: ProductListingPage | null;
 }
 
 /**
- * @title Smarthint Integration - PLP Banners
+ * @title SmartHint Integration - PLP Banners
  * @description Product List Page
  */
 const loader = async (

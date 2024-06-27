@@ -20,7 +20,7 @@ const manifest = {
     "smarthint/loaders/recommendations.ts": $$$4,
   },
   "sections": {
-    "smarthint/sections/Analytics/SmarthintTracking.tsx": $$$$$$0,
+    "smarthint/sections/Analytics/SmartHintTracking.tsx": $$$$$$0,
   },
   "actions": {
     "smarthint/actions/click.ts": $$$$$$$$$0,

@@ -16,7 +16,7 @@ export const SmarthintSendEventOnClick = ({
 
         if (!elem) {
           return console.warn(
-            `Smarthint - Could not find element ${id}.Click event will not be send. This will cause loss in analytics`,
+            `SmartHint - Could not find element ${id}.Click event will not be send. This will cause loss in analytics`,
           );
         }
 

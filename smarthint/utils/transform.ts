@@ -1,5 +1,6 @@
 import {
   Filter,
+  FilterRangeValue,
   FilterToggleValue,
   ItemAvailability,
   OfferItemCondition,
@@ -290,32 +291,54 @@ export const toSortOption = (sorts: SHSort[]): SortOption[] => {
 };
 
 export const toFilters = (filters: SHFilter[], url: URL): Filter[] => {
-  return filters.map((filter) => ({
-    "@type": "FilterToggle" as const,
-    key: filter.Key!.Value!,
-    label: filter.Key!.Show!,
-    quantity: filter.Value?.reduce(
-      (acc, value) => acc + (value.Quantity ?? 0),
-      0,
-    ) ?? 0,
-    values: filter.Value?.map((value): FilterToggleValue => {
-      const filterUrl = new URL(url);
-      filterUrl.searchParams.append(
-        "filter",
-        `${filter.Key!.Value}:${value.Value}`,
-      );
+  const priceFilter = filters.find((filter) =>
+    filter.Key?.Value === "finalPrice"
+  );
 
-      filterUrl.searchParams.delete("page");
+  const priceRangeFilter = priceFilter
+    ? [{
+      "@type": "FilterRange" as const,
+      key: priceFilter.Key!.Value!,
+      label: priceFilter.Key!.Show!,
+      values: priceFilter.Value!.reduce((acc, value): FilterRangeValue => {
+        const [min, max] = value.Value!.split(":").map(Number);
+        if (acc.min > min) acc.min = min;
+        if (acc.max < max) acc.max = max;
+        return acc;
+      }, { min: Number.MAX_SAFE_INTEGER, max: Number.MIN_SAFE_INTEGER }),
+    }]
+    : [];
 
-      return ({
-        label: value.Show!,
-        quantity: value.Quantity!,
-        selected: Boolean(value.Checked),
-        value: value.Value!,
-        url: filterUrl.href,
-      });
-    }) ?? [],
-  }));
+  const toggleFilters = filters.map((filter): Filter => {
+    return ({
+      "@type": "FilterToggle" as const,
+      key: filter.Key!.Value!,
+      label: filter.Key!.Show!,
+      quantity: filter.Value?.reduce(
+        (acc, value) => acc + (value.Quantity ?? 0),
+        0,
+      ) ?? 0,
+      values: filter.Value?.map((value): FilterToggleValue => {
+        const filterUrl = new URL(url);
+        filterUrl.searchParams.append(
+          "filter",
+          `${filter.Key!.Value}:${value.Value}`,
+        );
+
+        filterUrl.searchParams.delete("page");
+
+        return ({
+          label: value.Show!,
+          quantity: value.Quantity!,
+          selected: Boolean(value.Checked),
+          value: value.Value!,
+          url: filterUrl.href,
+        });
+      }) ?? [],
+    });
+  });
+
+  return [...toggleFilters, ...priceRangeFilter];
 };
 
 export const getSortParam = (url: URL, sortParam?: number) => {

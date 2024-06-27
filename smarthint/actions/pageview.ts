@@ -15,7 +15,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration
+ * @title SmartHint Integration
  * @description Pageview Event
  */
 const action = async (

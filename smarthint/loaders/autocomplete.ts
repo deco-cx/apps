@@ -20,7 +20,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration - Autocomplete / Suggestion
+ * @title SmartHint Integration - Autocomplete / Suggestion
  * @description Autocomplete Loader
  */
 const loader = async (

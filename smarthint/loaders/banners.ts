@@ -17,7 +17,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration - Banners By Page
+ * @title SmartHint Integration - Banners By Page
  * @description Autocomplete Loader
  */
 const loader = async (

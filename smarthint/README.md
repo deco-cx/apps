@@ -1,7 +1,7 @@
 <h1>
   <p align="center">
     <a href="https://www.smarthint.co/">
-      <img alt="Smarthint" src="https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png" width="125" />
+      <img alt="SmartHint" src="https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png" width="125" />
     </a>
   </p>
 </h1>
@@ -12,12 +12,12 @@
   </strong>
 </p>
 <p align="center">
-  Loaders and actions for adding Smarthint to your website.
+  Loaders and actions for adding SmartHint to your website.
 </p>
 
 <p align="center">
 SmartHint is an e-commerce search and recommendation system that uses artificial intelligence to elevate the online shopping experience.
-It consists of smart search, pages of departaments/categories and recommendation showcases.
+It consists of smart search, pages of departments/categories and recommendation showcases.
 
 To access the SmartHint account data or register, go to the [admin panel](https://admin.smarthint.co/)
 </p>
@@ -29,7 +29,7 @@ To access the SmartHint account data or register, go to the [admin panel](https:
   - shcode
   - cluster
 
-🎉 Your Smarthint setup is complete. You should now see Smarthint
+🎉 Your SmartHint setup is complete. You should now see SmartHint
 loaders/actions available for your sections.
 
 ## Admin setup
@@ -37,7 +37,7 @@ loaders/actions available for your sections.
 <details>
   <summary>Admin setup</summary>
   <ul> 
-    <li>3. Add SmarthintTracking section on Global Section in your site configs</li>
+    <li>3. Add SmartHintTracking section on Global Section in your site configs</li>
     <li>4. Configure autocomplete/search on pages that has a searchbar</li>
     <li>5. Configure the SearchResult and Seo section on your Search/Hotsite/Category pages</li>
   </ul>
@@ -51,8 +51,8 @@ loaders/actions available for your sections.
   <ul> 
     <li>1. Create a section that receive <code>SmarthintRecommendation[] | null</code> and render your Shelf Sections</li>
     <li>2. Create a section that receive <code>Banner[] | null</code> To render Search/Hotsite/Category banners</li>
-    <li>3. If your store use the <code>useAutocomplete</code> as search function, change to the smarthint one</li>
-    <li>4. Call the <code>&lt;SmarthintSendEventOnClick></code> on your Product Card component on Smarthint shelves or Smarthint Search/Hotsite/Category pages
+    <li>3. If your store use the <code>useAutocomplete</code> as search function, change to the SmartHint one</li>
+    <li>4. Call the <code>&lt;SmarthintSendEventOnClick></code> on your Product Card component on SmartHint shelves or SmartHint Search/Hotsite/Category pages
       <ul>
         <details>
           <summary>Analytics Props</summary>

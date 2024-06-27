@@ -64,7 +64,7 @@ export function getCategoriesParam(
 }
 
 /**
- * @title Smarthint Integration
+ * @title SmartHint Integration
  * @description Recommendations
  */
 const loader = async (

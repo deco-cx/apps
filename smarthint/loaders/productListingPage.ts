@@ -59,7 +59,7 @@ export interface Props {
 }
 
 /**
- * @title Smarthint Integration - Product List Page
+ * @title SmartHint Integration - Product List Page
  * @description Product List Page
  */
 const loader = async (
