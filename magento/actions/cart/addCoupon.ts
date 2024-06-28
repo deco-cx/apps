@@ -20,10 +20,10 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | ErrorAddCoupon | null> => {
-  const { couponCode, dangerouslyDontReturnCart } = props;
+  const { couponCode, dangerouslyOverrideReturnNull } = props;
   const { clientAdmin, features } = ctx;
-  const dontReturnCart = dangerouslyDontReturnCart ??
-    features.dangerouslyDontReturnCartAfterAction;
+  const dontReturnCart = dangerouslyOverrideReturnNull ??
+    features.dangerouslyReturnNullAfterAction;
 
   const cartId = getCartCookie(req.headers);
   try {

@@ -14,10 +14,10 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { qty, itemId, sku, dangerouslyDontReturnCart } = props;
+  const { qty, itemId, sku, dangerouslyOverrideReturnNull } = props;
   const { clientAdmin, features } = ctx;
-  const dontReturnCart = dangerouslyDontReturnCart ??
-    features.dangerouslyDontReturnCartAfterAction;
+  const dontReturnCart = dangerouslyOverrideReturnNull ??
+    features.dangerouslyReturnNullAfterAction;
 
   const cartId = getCartCookie(req.headers);
 

@@ -116,11 +116,11 @@ interface CartConfigs {
 
 export interface Features {
   /**
-   * @title DANGEROUSLY Don`t invoke loaders after cart action
+   * @title DANGEROUSLY Return null after cart action
    * @description When called, the action will return just an success statement
    * @default false
    */
-  dangerouslyDontReturnCartAfterAction: boolean;
+  dangerouslyReturnNullAfterAction: boolean;
 
   /**
    * @title DANGEROUSLY Disable OnVisibilityChange Update

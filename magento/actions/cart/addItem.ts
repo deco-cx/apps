@@ -22,11 +22,11 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { qty, productId, dangerouslyDontReturnCart } = props;
+  const { qty, productId, dangerouslyOverrideReturnNull } = props;
   const { headers, url } = req;
   const { site, baseUrl, features } = ctx;
-  const dontReturnCart = dangerouslyDontReturnCart ??
-    features.dangerouslyDontReturnCartAfterAction;
+  const dontReturnCart = dangerouslyOverrideReturnNull ??
+    features.dangerouslyReturnNullAfterAction;
 
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
 

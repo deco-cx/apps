@@ -8,13 +8,13 @@ export interface Props extends OverrideFeatures {
 }
 
 const action = async (
-  { itemId, dangerouslyDontReturnCart }: Props,
+  { itemId, dangerouslyOverrideReturnNull }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site, features } = ctx;
-  const dontReturnCart = dangerouslyDontReturnCart ??
-    features.dangerouslyDontReturnCartAfterAction;
+  const dontReturnCart = dangerouslyOverrideReturnNull ??
+    features.dangerouslyReturnNullAfterAction;
 
   const cartId = getCartCookie(req.headers);
 

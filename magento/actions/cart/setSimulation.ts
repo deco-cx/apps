@@ -13,9 +13,9 @@ const action = async (
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site, features } = ctx;
-  const { dangerouslyDontReturnCart } = props;
-  const dontReturnCart = dangerouslyDontReturnCart ??
-    features.dangerouslyDontReturnCartAfterAction;
+  const { dangerouslyOverrideReturnNull } = props;
+  const dontReturnCart = dangerouslyOverrideReturnNull ??
+    features.dangerouslyReturnNullAfterAction;
 
   const id = getUserCookie(req.headers);
   const cartId = getCartCookie(req.headers);

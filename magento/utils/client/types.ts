@@ -587,5 +587,8 @@ export interface Ratings {
 }
 
 export interface OverrideFeatures {
-  dangerouslyDontReturnCart?: boolean
+  /**
+   * @description Use this prop will result in override the behaviour after an action. 
+   */
+  dangerouslyOverrideReturnNull?: boolean
 }
