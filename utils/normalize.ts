@@ -1,6 +1,7 @@
 export const removeScriptChars = (str: string): string => {
   const removedPlus = str.replace(/\+/g, "").replaceAll(" ", "");
-  const normalized = removedPlus.normalize("NFD").replace(
+  const removedBrackets = removedPlus.replace(/[\[\]{}()<>]/g, "");
+  const normalized = removedBrackets.normalize("NFD").replace(
     /[\u0300-\u036f]/g,
     "",
   );
