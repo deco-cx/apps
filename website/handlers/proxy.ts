@@ -5,6 +5,7 @@ import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
 import { Monitoring } from "deco/engine/core/resolver.ts";
 import { fetchToCurl } from "jsr:@viktor/fetch-to-curl";
+import { linxProxyFailingHeaders } from "../../linx/utils/headers.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -85,8 +86,6 @@ export interface Props {
    */
   customHeaders?: Header[];
 
-  excludeHeaders?: string[];
-
   /**
    * @description Scripts to be included in the head of the html
    */
@@ -114,7 +113,6 @@ export default function Proxy({
   basePath,
   host: hostToUse,
   customHeaders = [],
-  excludeHeaders = [],
   includeScriptsToHead,
   redirect = "manual",
   avoidAppendPath,
@@ -160,13 +158,7 @@ export default function Proxy({
       }
     }
 
-    console.log({
-      excludeHeaders,
-    });
-    for (const key of excludeHeaders) {
-      console.log({
-        "excludeHeaders.key": key,
-      });
+    for (const key of linxProxyFailingHeaders) {
       headers.delete(key);
     }
 
