@@ -160,7 +160,13 @@ export default function Proxy({
       }
     }
 
+    console.log({
+      excludeHeaders,
+    });
     for (const key of excludeHeaders) {
+      console.log({
+        "excludeHeaders.key": key,
+      });
       headers.delete(key);
     }
 
