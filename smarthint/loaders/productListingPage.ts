@@ -75,8 +75,6 @@ const loader = async (
     ruletype,
   } = props;
 
-  console.log(categoryTree);
-
   const url = new URL(req.url);
 
   const { page, from } = resolvePage(url, size, fromParam);

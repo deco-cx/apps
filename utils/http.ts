@@ -150,7 +150,6 @@ export const createHttpClient = <T>({
 
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
 
-        console.log(url.href);
         return fetcher(url.href, {
           ...init,
           headers,
