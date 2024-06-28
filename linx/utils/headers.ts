@@ -5,6 +5,7 @@ export const linxProxyFailingHeaders = [
   "x-b3-spanid",
   "x-b3-traceid",
   "x-envoy-attempt-count",
+  "k-proxy-request",
 ];
 
 const linxApiFailingHeaders = [
@@ -12,7 +13,6 @@ const linxApiFailingHeaders = [
   "host",
   "origin",
   "referer",
-  "k-proxy-request",
 ];
 
 /**
