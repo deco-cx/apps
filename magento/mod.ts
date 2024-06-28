@@ -120,7 +120,7 @@ export interface Features {
    * @description When called, the action will return just an success statement
    * @default false
    */
-  dangerouslyDontReturnCartAfterAction: true;
+  dangerouslyDontReturnCartAfterAction: boolean;
 
   /**
    * @title DANGEROUSLY Disable OnVisibilityChange Update
