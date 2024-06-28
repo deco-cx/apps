@@ -1,6 +1,7 @@
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
+import { removeDirtyCookies } from "../../utils/normalize.ts";
 import { Script } from "../types.ts";
 import { isFreshCtx } from "./fresh.ts";
 
@@ -116,6 +117,8 @@ export default function Proxy({
       _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    removeDirtyCookies(headers); // remove only brackets
+
     if (isFreshCtx<DecoSiteState>(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
     }

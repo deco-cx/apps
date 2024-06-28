@@ -70,12 +70,14 @@ export type ClientOf<T> = {
 export interface HttpClientOptions {
   base: string;
   headers?: Headers;
+  processHeaders?: (headers?: Headers) => Headers | undefined;
   fetcher?: typeof fetch;
 }
 
 export const createHttpClient = <T>({
   base: maybeBase,
   headers: defaultHeaders,
+  processHeaders = (headers?: Headers) => headers,
   fetcher = fetchSafe,
 }: HttpClientOptions): ClientOf<T> => {
   // Base should always endwith / so when concatenating with path we get the right URL
@@ -152,7 +154,7 @@ export const createHttpClient = <T>({
 
         return fetcher(url.href, {
           ...init,
-          headers,
+          headers: processHeaders(headers),
           method,
           body,
         });
