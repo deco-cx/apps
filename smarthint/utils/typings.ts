@@ -1,8 +1,4 @@
-import {
-  Product,
-  ProductDetailsPage,
-  ProductListingPage,
-} from "../../commerce/types.ts";
+import { Product, ProductDetailsPage } from "../../commerce/types.ts";
 export type PageType =
   | "category"
   | "search"
@@ -34,10 +30,6 @@ export interface Category {
    * @hide true
    */
   readonly type: "category";
-  /**
-   * @description your native platform (Vtex,Linx,ect) category page loader
-   */
-  page: ProductListingPage | null;
 }
 
 export interface Search {

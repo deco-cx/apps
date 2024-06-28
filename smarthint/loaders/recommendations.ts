@@ -6,6 +6,7 @@ import {
   SmarthintRecommendation,
 } from "../utils/typings.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
+import { Category } from "../../commerce/types.ts";
 
 export interface Props {
   /**
@@ -47,20 +48,62 @@ function getProductParam(pagetype: ComplexPageType, productsParam: string[]) {
   return;
 }
 
-export function getCategoriesParam(
-  pagetype: ComplexPageType,
-  categoriesParam?: string,
-) {
+export const buildCategoryParam = ({
+  segments,
+  path = "",
+  categoryList,
+  names = [],
+  url,
+}: {
+  segments: string[];
+  path?: string;
+  categoryList: Category[];
+  names?: string[];
+  url: URL;
+}): string | undefined => {
+  if (segments.length === 0) return names.join(" > ");
+
+  const [segment, ...restSegments] = segments;
+  const newPath = `${path}/${segment}`;
+
+  const matchedCategory = categoryList.find((category) => {
+    const categoryUrl = new URL(category.url, url.origin);
+    return categoryUrl.pathname === newPath;
+  });
+
+  if (!matchedCategory) return;
+
+  return buildCategoryParam({
+    segments: restSegments,
+    path: newPath,
+    categoryList: matchedCategory.children || [],
+    names: [...names, matchedCategory.name],
+    url,
+  });
+};
+
+export function getCategoriesParam({
+  categoriesParam,
+  categoryTree,
+  url,
+}: {
+  categoriesParam?: string;
+  url: URL;
+  categoryTree?: Category | Category[];
+}): string | undefined {
   if (categoriesParam) return categoriesParam;
+  if (!categoryTree) return;
 
-  if (pagetype.type == "category" && pagetype.page) {
-    return pagetype.page.breadcrumb.itemListElement.map((item) => item.name)
-      .join(
-        " > ",
-      );
-  }
+  const categoryTreeList = Array.isArray(categoryTree)
+    ? categoryTree
+    : [categoryTree];
+  const urlSegments = url.pathname.split("/").filter(Boolean);
 
-  return;
+  return buildCategoryParam({
+    segments: urlSegments,
+    categoryList: categoryTreeList,
+    url,
+  });
 }
 
 /**
@@ -72,7 +115,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<SmarthintRecommendation[] | null> => {
-  const { recs, shcode, publicUrl } = ctx;
+  const { recs, shcode, publicUrl, categoryTree } = ctx;
   const {
     categories: categoriesParam,
     filter = [],
@@ -92,7 +135,11 @@ const loader = async (
 
   const productsString = getProductParam(pagetype, productsParam);
 
-  const categories = getCategoriesParam(pagetype, categoriesParam);
+  const categories = getCategoriesParam({
+    categoriesParam,
+    categoryTree,
+    url,
+  });
 
   const data = await recs["GET /recommendationByPage/withProducts"]({
     shcode,

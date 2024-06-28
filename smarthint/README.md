@@ -24,10 +24,13 @@ To access the SmartHint account data or register, go to the [admin panel](https:
 
 ## Installation
 
-1. Install via decohub
-2. Fill the necessary fields:
+- Install via decohub
+- Fill the necessary fields:
   - shcode
   - cluster
+  - Public store URL
+- Fill the optional fields (If you will use SmartHint to load category page results)
+  - Category Tree (You can use a your platform category loader or fill it manually)
 
 🎉 Your SmartHint setup is complete. You should now see SmartHint
 loaders/actions available for your sections.
@@ -37,7 +40,7 @@ loaders/actions available for your sections.
 <details>
   <summary>Admin setup</summary>
   <ul> 
-    <li>3. Add SmartHintTracking section on Global Section in your site configs</li>
+    <li>3. Add SmarthintTracking section on Global Section in your site configs</li>
     <li>4. Configure autocomplete/search on pages that has a searchbar</li>
     <li>5. Configure the SearchResult and Seo section on your Search/Hotsite/Category pages</li>
   </ul>

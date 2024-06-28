@@ -14,6 +14,10 @@ export interface Category {
    */
   name: string;
   /**
+   * @title The Category Url
+   */
+  url: string;
+  /**
    * @title Sub categories
    * @description Store's sub categories
    */

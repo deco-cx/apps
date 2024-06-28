@@ -52,10 +52,6 @@ export interface Props {
     value?: string;
     validation?: string;
   };
-  /**
-   * @description if its a category page setup your store (VTEX,Wake,Shopify,etc) loader here
-   */
-  page?: ProductListingPage | null;
 }
 
 /**
@@ -67,7 +63,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const { api, shcode, cluster } = ctx;
+  const { api, shcode, cluster, categoryTree } = ctx;
   const {
     size = 12,
     from: fromParam = 0,
@@ -77,8 +73,9 @@ const loader = async (
     condition,
     rule,
     ruletype,
-    page: storePageLoader,
   } = props;
+
+  console.log(categoryTree);
 
   const url = new URL(req.url);
 
@@ -90,8 +87,8 @@ const loader = async (
 
   const { anonymous } = getSessionCookie(req.headers);
 
-  const categories = storePageLoader
-    ? getCategoriesParam({ type: "category", page: storePageLoader })
+  const categories = categoryTree
+    ? getCategoriesParam({ categoryTree, url })
     : undefined;
 
   const categoriesFilter = categories ? [`categories:${categories}`] : [];

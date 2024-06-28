@@ -4,6 +4,7 @@ import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { OpenAPI } from "./utils/openapi/smarthint.openapi.gen.ts";
 import { previewFromMarkdown } from "../utils/preview.ts";
+import { Category } from "../commerce/types.ts";
 
 export interface State {
   /**
@@ -19,6 +20,10 @@ export interface State {
    * @description Ex: www.mystore.com.br
    */
   publicUrl: string;
+  /**
+   * @description This prop is required to use SmartHint to category result
+   */
+  categoryTree?: Category | Category[];
 }
 
 /**

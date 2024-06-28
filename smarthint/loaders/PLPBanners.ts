@@ -2,7 +2,6 @@ import { AppContext } from "../mod.ts";
 import { Banner, FilterProp, SearchSort } from "../utils/typings.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 import { getFilterParam, getSortParam } from "../utils/transform.ts";
-import { ProductListingPage } from "../../commerce/types.ts";
 import { getCategoriesParam } from "./recommendations.ts";
 
 export type RuleType = "valuedouble" | "valuedate" | "valuestring";
@@ -36,11 +35,6 @@ export interface Props {
     value?: string;
     validation?: string;
   };
-  /**
-   * @description if its a category page setup your store (VTEX,Wake,Shopify,etc) loader here
-   * @default null
-   */
-  page?: ProductListingPage | null;
 }
 
 /**
@@ -52,7 +46,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Banner[] | null> => {
-  const { api, shcode, cluster } = ctx;
+  const { api, shcode, cluster, categoryTree } = ctx;
   const {
     term: termProp,
     condition,
@@ -60,7 +54,6 @@ const loader = async (
     rule,
     searchSort,
     ruletype,
-    page: storePageLoader,
   } = props;
 
   const url = new URL(req.url);
@@ -70,8 +63,8 @@ const loader = async (
 
   const filters = getFilterParam(url, filter) ?? [];
 
-  const categories = storePageLoader
-    ? getCategoriesParam({ type: "category", page: storePageLoader })
+  const categories = categoryTree
+    ? getCategoriesParam({ categoryTree, url })
     : undefined;
 
   const categoriesFilter = categories ? [`categories:${categories}`] : [];
