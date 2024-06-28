@@ -1,6 +1,7 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import { Script } from "../../website/types.ts";
+import { linxProxyFailingHeaders } from "../utils/headers.ts";
 
 const PATHS_TO_PROXY = [
   "/login",
@@ -11,13 +12,6 @@ const PATHS_TO_PROXY = [
   "/painel-do-cliente/*",
 ];
 const decoSiteMapUrl = "/sitemap/deco.xml";
-
-const linxProxyFailingHeaders = [
-  "x-b3-sampled",
-  "x-b3-spanid",
-  "x-b3-traceid",
-  "x-envoy-attempt-count",
-];
 
 const buildProxyRoutes = (
   {
