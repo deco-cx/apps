@@ -10,7 +10,7 @@ export const removeScriptChars = (str: string): string => {
 
 export const removeNonLatin1Chars = (str: string): string => {
   // deno-lint-ignore no-control-regex
-  const latin1Regex = /[^\x00-\xFF]|[\"\']/g;
+  const latin1Regex = /[^\x00-\x7F]|[\"\']/g;
   return str.replace(latin1Regex, "");
 };
 
