@@ -7,6 +7,14 @@ export const linxProxyFailingHeaders = [
   "x-envoy-attempt-count",
 ];
 
+const linxApiFailingHeaders = [
+  "forwarded",
+  "host",
+  "origin",
+  "referer",
+  "k-proxy-request",
+];
+
 /**
  * Some headers can cause the linx API to error, so we always filter
  * only the necessary ones when proxying request headers to the linx API
@@ -17,6 +25,10 @@ export function toLinxHeaders(inputHeaders: Headers): Headers {
   removeCFHeaders(headers);
 
   for (const header of linxProxyFailingHeaders) {
+    headers.delete(header);
+  }
+
+  for (const header of linxApiFailingHeaders) {
     headers.delete(header);
   }
 
