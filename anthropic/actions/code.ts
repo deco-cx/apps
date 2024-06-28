@@ -14,6 +14,7 @@ export interface Props {
    * @description The model that will complete your prompt.
    */
   model?:
+    | "claude-3-5-sonnet-20240620"
     | "claude-3-opus-20240229"
     | "claude-3-sonnet-20240229"
     | "claude-3-haiku-20240307"
@@ -37,7 +38,7 @@ export default async function chat(
     max_tokens = 4096,
   }: Props,
   _req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ) {
   if (!messages) {
     return shortcircuit(new Response("No messages provided", { status: 400 }));
