@@ -38,7 +38,7 @@ export default async function chat(
     max_tokens = 4096,
   }: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ) {
   if (!messages) {
     return shortcircuit(new Response("No messages provided", { status: 400 }));
