@@ -1,6 +1,7 @@
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
+import { removeNonAscChars } from "../../utils/normalize.ts";
 import { Script } from "../types.ts";
 import { isFreshCtx } from "./fresh.ts";
 
@@ -24,6 +25,17 @@ const removeCFHeaders = (headers: Headers) => {
       headers.delete(key);
     }
   });
+};
+const removeDirtyCookies = (headers: Headers) => {
+  const existingCookie = removeNonAscChars(headers.get("cookie") || "");
+  // remove only brackets
+  const removedBrackets = existingCookie?.replace(/[\[\]]/g, "").normalize(
+    "NFD",
+  ).replace(
+    /[\u0300-\u036f]/g,
+    "",
+  );
+  headers.set("cookie", `${removedBrackets}`);
 };
 
 /**
@@ -116,6 +128,8 @@ export default function Proxy({
       _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    removeDirtyCookies(headers); // remove only brackets
+
     if (isFreshCtx<DecoSiteState>(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
     }

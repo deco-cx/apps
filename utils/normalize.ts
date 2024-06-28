@@ -13,3 +13,9 @@ export const removeNonLatin1Chars = (str: string): string => {
   const latin1Regex = /[^\x00-\xFF]|[\"\']/g;
   return str.replace(latin1Regex, "");
 };
+
+export const removeNonAscChars = (str: string): string => {
+  // deno-lint-ignore no-control-regex
+  const latin1Regex = /[^\x00-\x7F]|[\"\']/g;
+  return str.replace(latin1Regex, "");
+};
