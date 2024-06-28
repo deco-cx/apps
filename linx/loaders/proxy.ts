@@ -1,7 +1,6 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import { Script } from "../../website/types.ts";
-import { linxProxyFailingHeaders } from "../utils/headers.ts";
 
 const PATHS_TO_PROXY = [
   "/login",
@@ -51,7 +50,6 @@ const buildProxyRoutes = (
           host: hostToUse,
           redirect: "follow",
           includeScriptsToHead,
-          excludeHeaders: linxProxyFailingHeaders,
         },
       },
     });
