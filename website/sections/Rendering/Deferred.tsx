@@ -7,7 +7,7 @@ import { AppContext } from "../../mod.ts";
 import { shouldForceRender } from "../../../utils/deferred.ts";
 
 /** @titleBy type */
-interface Scroll {
+export interface Scroll {
   type: "scroll";
   /**
    * @title Delay MS
@@ -17,7 +17,7 @@ interface Scroll {
 }
 
 /** @titleBy type */
-interface Intersection {
+export interface Intersection {
   type: "intersection";
   /**
    * @title Root Margin
