@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { SearchClient } from "https://esm.sh/algoliasearch@4.20.0";
+import type { SearchClient } from "https://esm.sh/algoliasearch@4.24.0";
 
 export type AlgoliaClient = SearchClient;
 
