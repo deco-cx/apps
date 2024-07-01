@@ -1,7 +1,7 @@
 import { ImportMap } from "deco/blocks/app.ts";
 import { decoManifestBuilder } from "deco/engine/manifest/manifestGen.ts";
-import { createCache } from "https://deno.land/x/deno_cache@0.6.3/mod.ts";
-import { build, initialize } from "https://deno.land/x/esbuild@v0.20.2/wasm.js";
+import { createCache } from "https://deno.land/x/deno_cache@0.7.1/mod.ts";
+import { build, initialize } from "https://deno.land/x/esbuild@v0.22.0/wasm.js";
 import {
   resolveImportMap,
   resolveModuleSpecifier,
