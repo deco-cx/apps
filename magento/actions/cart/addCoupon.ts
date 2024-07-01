@@ -1,8 +1,12 @@
-import cart, { Cart } from "../../loaders/cart.ts";
+import { Cart } from "../../loaders/cart.ts";
 import type { AppContext } from "../../mod.ts";
-import { getCartCookie, handleCartError } from "../../utils/cart.ts";
+import {
+  getCartCookie,
+  handleCartActions,
+} from "../../utils/cart.ts";
+import { OverrideFeatures } from "../../utils/client/types.ts";
 
-export interface Props {
+export interface Props extends OverrideFeatures {
   couponCode: string;
 }
 
@@ -16,8 +20,11 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | ErrorAddCoupon | null> => {
-  const { couponCode } = props;
-  const { clientAdmin } = ctx;
+  const { couponCode, dangerouslyOverrideReturnNull } = props;
+  const { clientAdmin, features } = ctx;
+  const dontReturnCart = dangerouslyOverrideReturnNull ??
+    features.dangerouslyReturnNullAfterAction;
+
   const cartId = getCartCookie(req.headers);
   try {
     await clientAdmin["PUT /rest/:site/V1/carts/:cartId/coupons/:couponCode"]({
@@ -27,13 +34,16 @@ const action = async (
     });
   } catch (error) {
     console.error(error);
-    return {
-      ...(await cart(undefined, req, ctx)),
-      ...handleCartError(error),
-    };
+    return handleCartActions(dontReturnCart, {
+      req,
+      ctx,
+      error,
+    });
   }
 
-  return await cart(undefined, req, ctx);
+  return handleCartActions(dontReturnCart, {
+    req,
+    ctx,
+  });
 };
-
 export default action;

@@ -60,13 +60,15 @@ const load = (signal: AbortSignal) =>
   );
 
 if (IS_BROWSER) {
-  enqueue(load);
+  const features = await invoke.magento.loaders.features().then((
+    feats,
+  ) => feats);
 
-  const reloadPage = await invoke.magento.loaders.idleAction().then((
-    { reloadPage },
-  ) => reloadPage);
+  if (!features.dangerouslyDisableOnLoadUpdate) {
+    enqueue(load);
+  }
 
-  if (reloadPage) {
+  if (!features.dangerouslyDisableOnVisibilityChangeUpdate) {
     document.addEventListener(
       "visibilitychange",
       () => document.visibilityState === "visible" && enqueue(load),

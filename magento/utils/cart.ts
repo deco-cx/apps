@@ -1,7 +1,7 @@
 import { getCookies } from "std/http/cookie.ts";
 import { ImageObject } from "../../commerce/types.ts";
 import { HttpError } from "../../utils/http.ts";
-import { Cart } from "../loaders/cart.ts";
+import cart, { Cart } from "../loaders/cart.ts";
 import { AppContext } from "../mod.ts";
 import {
   CartFromAPI,
@@ -177,3 +177,23 @@ export const handleCartError = (
   }
   return error;
 };
+
+export async function handleCartActions(dontReturnCart: boolean, settings: {
+  req: Request;
+  ctx: AppContext;
+  // deno-lint-ignore no-explicit-any
+  error?: any;
+  cartId?: string;
+}) {
+  const { error, cartId } = settings;
+  const handledError = error ? handleCartError(error) as Cart : undefined;
+
+  if (dontReturnCart) {
+    return handledError ?? null;
+  }
+
+  return {
+    ...(await cart({ cartId }, settings.req, settings.ctx)),
+    ...handledError,
+  } as Cart;
+}

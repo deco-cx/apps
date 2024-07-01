@@ -585,3 +585,10 @@ export interface SubmitReviewAmastyBody {
 export interface Ratings {
   [key: string]: string;
 }
+
+export interface OverrideFeatures {
+  /**
+   * @description Use this prop will result in override the behaviour after an action. 
+   */
+  dangerouslyOverrideReturnNull?: boolean
+}

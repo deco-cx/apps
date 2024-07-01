@@ -85,6 +85,11 @@ export interface Props {
    * @title Cart Configs
    */
   cartConfigs: CartConfigs;
+
+  /**
+   * @title Features
+   */
+  features: Features;
 }
 
 interface CartConfigs {
@@ -107,12 +112,28 @@ interface CartConfigs {
    */
   changeCardIdAfterCheckout: boolean;
 
+}
+
+export interface Features {
   /**
-   * @title Update cart after an IDLE
-   * @description After a visibilityChange event, reload the cart.
-   * @default true
+   * @title DANGEROUSLY Return null after cart action
+   * @description When called, the action will return just an success statement
+   * @default false
    */
-  idleAction: boolean;
+  dangerouslyReturnNullAfterAction: boolean;
+
+  /**
+   * @title DANGEROUSLY Disable OnVisibilityChange Update
+   * @description After an idle, the store state will not be updated
+   * @default false
+   */
+  dangerouslyDisableOnVisibilityChangeUpdate: boolean;
+  /**
+   * @title DANGEROUSLY Disable onLoad Update
+   * @description After a page load/refresh, the store state will not be updated
+   * @default false
+   */
+  dangerouslyDisableOnLoadUpdate: boolean;
 }
 
 export interface State extends Props {
