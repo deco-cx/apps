@@ -4,7 +4,7 @@ import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { useId } from "preact/hooks";
 
 /** @titleBy type */
-interface Scroll {
+export interface Scroll {
   type: "scroll";
   /**
    * @title Delay MS
@@ -14,7 +14,7 @@ interface Scroll {
 }
 
 /** @titleBy type */
-interface Intersection {
+export interface Intersection {
   type: "intersection";
   /**
    * @title Root Margin
