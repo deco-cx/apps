@@ -46,6 +46,11 @@ export const fetchSafe = async (
     return response;
   }
 
+  if (response.status === 400) {
+    console.log((input as Request)?.headers ?? "no headers");
+    console.log(input);
+  }
+
   throw new HttpError(response.status, `${await response.text()}`);
 };
 
