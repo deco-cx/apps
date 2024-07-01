@@ -11,25 +11,22 @@ import { __DECO_FBT } from "../../handlers/fresh.ts";
 
 type DeferredSection = () => Promise<Section>;
 
-interface PartialDeferredProps
-  extends Omit<BasePartialDeferredProps, "sections"> {
-  section: Section | null;
-}
+type PartialDeferredProps = Omit<BasePartialDeferredProps, "sections">;
+type HTMXDeferredProps = Omit<BaseHTMXDeferredProps, "sections">;
+
 const isPartial = (
   props: SectionProps,
-): props is PartialDeferredProps & { framework: "fresh" } =>
+): props is PartialDeferredProps & { framework: "fresh"; section: Section } =>
   props.framework === "fresh";
-
-interface HTMXDeferredProps extends Omit<BaseHTMXDeferredProps, "sections"> {
-  section: Section | null;
-}
 
 const isHtmx = (
   props: SectionProps,
-): props is HTMXDeferredProps & { framework: "htmx" } =>
+): props is HTMXDeferredProps & { framework: "htmx"; section: Section } =>
   props.framework === "htmx";
 
-type Props = PartialDeferredProps | HTMXDeferredProps;
+interface Props extends HTMXDeferredProps, PartialDeferredProps {
+  section: Section;
+}
 
 export const loader = async (props: Props, _req: Request, ctx: AppContext) => {
   const isPartialDisplayTrue = "display" in props && props.display === true;
