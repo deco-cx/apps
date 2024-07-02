@@ -18,6 +18,7 @@ import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import { SEOSection } from "../components/Seo.tsx";
+import Clickhouse from "../components/Clickhouse.tsx";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -103,7 +104,7 @@ function Page({
   seo,
   unindexedDomain,
   avoidRedirectingToEditor,
-  sendToClickHouse
+  sendToClickHouse,
 }: Props & {
   errorPage?: Page;
   devMode: boolean;
@@ -142,12 +143,10 @@ function Page({
           site={site}
           {...deco}
         />
-        <Events 
-          deco={deco} 
-          sendToClickHouse={sendToClickHouse} 
-          siteId={site.id}
-          siteName={site.name}
-        />
+        <Events deco={deco} />
+        {sendToClickHouse && (
+          <Clickhouse siteId={site.id} siteName={site.name} />
+        )}
         {sections.map(renderSection)}
       </ErrorBoundary>
     </>
