@@ -60,9 +60,21 @@ const snippet = (
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event) return;
 
-    const { name } = event;
+    const { name, params } = event;
 
     if (name === "deco") return;
+
+    const values = { ...props };
+    for (const key in params) {
+      // @ts-expect-error somehow typescript bugs
+      const value = params[key];
+
+      if (value !== null && value !== undefined) {
+        values[key] = truncate(
+          typeof value !== "object" ? value : JSON.stringify(value),
+        );
+      }
+    }
 
     // Funções auxiliares para capturar informações dinâmicas
     function getDeviceType() {
@@ -163,8 +175,8 @@ const snippet = (
       pathname: globalThis.window.location.pathname,
       navigation_from: globalThis.window.navigation.activation.from,
       entry_meta: {
-        key: Object.keys(props),
-        value: Object.values(props),
+        key: Object.keys(values),
+        value: Object.values(values),
       },
 
       utm_medium: getUrlParam("utm_medium"),
