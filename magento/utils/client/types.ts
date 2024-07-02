@@ -586,9 +586,16 @@ export interface Ratings {
   [key: string]: string;
 }
 
+export interface LiveloPoints {
+  phrase: string;
+  points: number;
+  factor: number;
+  message?: string;
+}
+
 export interface OverrideFeatures {
   /**
-   * @description Use this prop will result in override the behaviour after an action. 
+   * @description Use this prop will result in override the behaviour after an action.
    */
-  dangerouslyOverrideReturnNull?: boolean
+  dangerouslyOverrideReturnNull?: boolean;
 }
