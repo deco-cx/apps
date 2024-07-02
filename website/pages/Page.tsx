@@ -103,10 +103,12 @@ function Page({
   seo,
   unindexedDomain,
   avoidRedirectingToEditor,
+  sendToClickHouse
 }: Props & {
   errorPage?: Page;
   devMode: boolean;
   avoidRedirectingToEditor?: boolean;
+  sendToClickHouse?: boolean;
 }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -140,7 +142,12 @@ function Page({
           site={site}
           {...deco}
         />
-        <Events deco={deco} />
+        <Events 
+          deco={deco} 
+          sendToClickHouse={sendToClickHouse} 
+          siteId={site.id}
+          siteName={site.name}
+        />
         {sections.map(renderSection)}
       </ErrorBoundary>
     </>
@@ -168,6 +175,7 @@ export const loader = async (
     devMode,
     unindexedDomain,
     avoidRedirectingToEditor: ctx.avoidRedirectingToEditor,
+    sendToClickHouse: ctx.sendToClickHouse,
   };
 };
 
