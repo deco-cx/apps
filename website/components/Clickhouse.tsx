@@ -1,26 +1,8 @@
 import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-import { type AnalyticsEvent } from "../../commerce/types.ts";
-
-type EventHandler = (event?: AnalyticsEvent) => void | Promise<void>;
-
-interface EventsAPI {
-  dispatch: (event: unknown) => void;
-  subscribe: (
-    handler: EventHandler,
-    options?: AddEventListenerOptions | boolean,
-  ) => () => void;
-}
 
 declare global {
   interface Window {
-    DECO_ANALYTICS: Record<
-      string,
-      // deno-lint-ignore no-explicit-any
-      (action: string, eventType: string, props?: any) => void
-    >;
-    DECO_SITES_STD: { sendAnalyticsEvent: (event: unknown) => void };
-    DECO: { events: EventsAPI };
     navigation: {
       activation: {
         from: string;

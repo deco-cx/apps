@@ -91,10 +91,7 @@ function Events({ deco }: { deco: Deco }) {
       <script
         defer
         id="deco-events"
-        src={useScriptAsDataURI(snippet, {
-          deco,
-          segmentCookie: DECO_SEGMENT,
-        })}
+        src={useScriptAsDataURI(snippet, { deco, segmentCookie: DECO_SEGMENT })}
       />
     </Head>
   );
