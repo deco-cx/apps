@@ -489,24 +489,25 @@ const toBreadcrumbList = (
 const legacyToProductGroupAdditionalProperties = (
   product: LegacyProductVTEX,
 ) => {
-  const test = product.allSpecificationsGroups?.map((v) => {
-    const a = (product as unknown as Record<string, string[]>)[v];
-    return a.map((b) => ({ name: b, isFrom: v }));
-  })?.flat();
+  const groups = product.allSpecificationsGroups ?? [];
+  const specifications = product.allSpecifications ?? [];
 
-  const ret = product.allSpecifications?.flatMap((name) => {
-    const values = (product as unknown as Record<string, string[]>)[name];
+  const groupMappings = groups.flatMap((group) => {
+    const groupValues = (product as unknown as Record<string, string[]>)[group];
+    return groupValues.map((value) => ({ name: value, isFrom: group }));
+  });
 
+  return specifications.flatMap((spec) => {
+    const values = (product as unknown as Record<string, string[]>)[spec];
     return values.map((value) =>
       toAdditionalPropertySpecification({
-        name,
+        name: spec,
         value,
-        additionalType: test?.find((t) => t.name === name)?.isFrom,
+        additionalType: groupMappings.find((mapping) => mapping.name === spec)
+          ?.isFrom,
       })
     );
-  }) ?? [];
-
-  return ret;
+  });
 };
 
 const toProductGroupAdditionalProperties = (
