@@ -1,4 +1,4 @@
-import AWS from "https://esm.sh/aws-sdk@2.1585.0";
+import AWS from "https://esm.sh/aws-sdk@2.1652.0";
 import { asResolved, isDeferred } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
 import type { App, AppContext as AC } from "deco/mod.ts";
