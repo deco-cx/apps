@@ -486,14 +486,29 @@ const toBreadcrumbList = (
   };
 };
 
-const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
-  product.allSpecifications?.flatMap((name) => {
-    const values = (product as unknown as Record<string, string[]>)[name];
+const legacyToProductGroupAdditionalProperties = (
+  product: LegacyProductVTEX,
+) => {
+  const groups = product.allSpecificationsGroups ?? [];
+  const specifications = product.allSpecifications ?? [];
 
+  const groupMappings = groups.flatMap((group) => {
+    const groupValues = (product as unknown as Record<string, string[]>)[group];
+    return groupValues.map((value) => ({ name: value, isFrom: group }));
+  });
+
+  return specifications.flatMap((spec) => {
+    const values = (product as unknown as Record<string, string[]>)[spec];
     return values.map((value) =>
-      toAdditionalPropertySpecification({ name, value })
+      toAdditionalPropertySpecification({
+        name: spec,
+        value,
+        additionalType: groupMappings.find((mapping) => mapping.name === spec)
+          ?.isFrom,
+      })
     );
-  }) ?? [];
+  });
+};
 
 const toProductGroupAdditionalProperties = (
   { specificationGroups = [] }: ProductVTEX,
@@ -522,16 +537,19 @@ export const toAdditionalPropertySpecification = ({
   name,
   value,
   propertyID,
+  additionalType,
 }: {
   name: string;
   value: string;
   propertyID?: string;
+  additionalType?: string;
 }): PropertyValue => ({
   "@type": "PropertyValue",
   name,
   value,
   propertyID,
   valueReference: "SPECIFICATION",
+  additionalType,
 });
 
 const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {

@@ -58,7 +58,6 @@ async function loader(
       { ...params, slug: lowercaseSlug },
       { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json());
-
   if (response && !Array.isArray(response)) {
     throw new Error(
       `Error while fetching VTEX data ${JSON.stringify(response)}`,
