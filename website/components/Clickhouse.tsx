@@ -21,6 +21,8 @@ const snippet = (
     siteName?: string;
   },
 ) => {
+  const props: Record<string, string> = {};
+
   const trackPageview = () =>
     globalThis.window.DECO.events.dispatch({
       name: "pageview",
@@ -36,6 +38,24 @@ const snippet = (
     };
     addEventListener("popstate", trackPageview);
   }
+
+  const truncate = (str: string) => `${str}`.slice(0, 990);
+
+  globalThis.window.DECO.events.subscribe((event) => {
+    if (!event || event.name !== "deco") return;
+
+    if (event.params) {
+      const { flags, page } = event.params;
+      if (Array.isArray(flags)) {
+        for (const flag of flags) {
+          props[flag.name] = truncate(flag.value.toString());
+        }
+      }
+      props["pageId"] = truncate(`${page.id}`);
+    }
+
+    trackPageview();
+  })();
 
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event) return;
@@ -143,9 +163,9 @@ const snippet = (
       pathname: globalThis.window.location.pathname,
       navigation_from: globalThis.window.navigation.activation.from,
       entry_meta: {
-        key: ["key"],
-        value: ["value"],
-      }, // fill with flags
+        key: Object.keys(props),
+        value: Object.values(props),
+      },
 
       utm_medium: getUrlParam("utm_medium"),
       utm_source: getUrlParam("utm_source"),
