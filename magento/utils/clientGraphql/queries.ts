@@ -165,7 +165,7 @@ export const GetProduct = (extraProps?: Array<string>) => ({
 
 export const GetCompleteProduct = (
   extraProps?: Array<string>,
-  useCategoriesBreadcrumb?: boolean,
+  isBreadcrumbProductName?: boolean,
 ) => ({
   fragments: [completeProduct, priceRange, mediaGallery],
   query: gql`
@@ -183,9 +183,9 @@ export const GetCompleteProduct = (
           ...completeProduct
           ${extraProps ? extraProps.join(`\n`) : `\n`}
           ${
-    useCategoriesBreadcrumb
-      ? `categories { name \n url_key \n position \n url_path }`
-      : ""
+    isBreadcrumbProductName
+      ? ""
+      : `categories { name \n url_key \n position \n url_path }`
   }
         }
       }
