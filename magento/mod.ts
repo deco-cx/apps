@@ -94,12 +94,6 @@ export interface Props {
 
 interface CartConfigs {
   /**
-   * @title Enable create Cart on add item fist time
-   * @default false
-   */
-  createCartOnAddItem: boolean;
-
-  /**
    * @title Count Product Image in Cart
    * @default 1
    */
@@ -111,7 +105,6 @@ interface CartConfigs {
    * @default false
    */
   changeCardIdAfterCheckout: boolean;
-
 }
 
 export interface Features {
