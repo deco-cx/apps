@@ -123,4 +123,11 @@ export interface API {
       }>;
     };
   };
+
+  "POST /web-api/v1/Shopping/Basket/CheckoutRedirect": {
+    response: unknown;
+    body: {
+      BasketID?: number;
+    };
+  }
 }

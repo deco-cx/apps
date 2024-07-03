@@ -1,19 +1,16 @@
-import { getCookies } from "std/http/cookie.ts";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 import type { AppContext } from "../../linx/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { toLinxHeaders } from "../utils/headers.ts";
 import { toCart } from "../utils/transform.ts";
 import type { CartResponse } from "../utils/types/basketJSON.ts";
 
-function shouldCreateLinxSession(headers: Headers): boolean {
-  return true;
-  // const cookies = getCookies(headers);
-  // if (!cookies) {
-  //   return true;
-  // }
-
-  // const hasSession = Boolean(cookies["tkt"]) && Boolean(cookies["lcsid"]);
-  // return !hasSession;
+export function getLinxBasketId(headers: Headers): number | undefined {
+  const cookies = getCookies(headers);
+  if (!cookies) {
+    return undefined;
+  }
+  return Number(cookies["linx-basket"]);
 }
 
 /**
@@ -27,9 +24,13 @@ const loader = async (
 ): Promise<CartResponse | null> => {
   const { api } = ctx;
 
+  const BasketID = getLinxBasketId(req.headers);
+
   const response = await api["POST /web-api/v1/Shopping/Basket/Get"]({}, {
     headers: toLinxHeaders(req.headers),
-    body: {},
+    body: {
+      BasketID,
+    },
   });
 
   if (response === null) {
@@ -42,9 +43,12 @@ const loader = async (
     throw new Error("Could not retrieve Basket");
   }
 
-  if (shouldCreateLinxSession(req.headers)) {
-    proxySetCookie(response.headers, ctx.response.headers, req.url);
-  }
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+
+  setCookie(ctx.response.headers, {
+    name: "linx-basket", 
+    value: String(cart.Shopper.Basket.BasketID), 
+  });
 
   return toCart(cart, ctx);
 };
