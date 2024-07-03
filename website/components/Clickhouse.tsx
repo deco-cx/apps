@@ -11,6 +11,47 @@ declare global {
   }
 }
 
+interface Event {
+  hostname: string;
+  site_id: string | number;
+  site_name: string;
+  user_id?: string;
+  session_id?: string;
+  event_name: string;
+  start_time: string;
+  timestamp?: string;
+  pathname: string;
+  navigation_from: string;
+  entry_meta: {
+    key: string[];
+    value: string[];
+  };
+  utm_medium?: string | null;
+  utm_source?: string | null;
+  utm_campaign?: string | null;
+  utm_content?: string | null;
+  utm_term?: string | null;
+  referrer: string;
+  referrer_source?: string;
+  ip_city?: string;
+  ip_continent?: string;
+  ip_country?: string;
+  ip_region?: string;
+  ip_region_code?: string;
+  ip_timezone?: string;
+  ip_lat?: string;
+  ip_long?: string;
+  screen_size: string;
+  device: string;
+  operating_system: string;
+  operating_system_version: string;
+  browser: string;
+  browser_version: string;
+}
+
+const SERVICE_ENDPOINT =
+  "https://juggler.deco.site/live/invoke/site/actions/sendEvent.ts";
+
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
@@ -163,22 +204,22 @@ const snippet = (
       return "other";
     }
 
-    const mock = {
+    const mock: Event = {
       hostname: globalThis.window.location.origin,
-      site_id: siteId,
-      site_name: siteName,
+      site_id: siteId || "",
+      site_name: siteName || "",
       user_id: undefined, // get server side
       session_id: undefined, // get server side
       event_name: name,
       start_time: new Date().toISOString(),
       timestamp: undefined, // get server side
-      pathname: globalThis.window.location.pathname,
+      pathname: globalThis.window.location.pathname +
+        (window.location.hash ?? ""),
       navigation_from: globalThis.window.navigation.activation.from,
       entry_meta: {
         key: Object.keys(values),
         value: Object.values(values),
       },
-
       utm_medium: getUrlParam("utm_medium"),
       utm_source: getUrlParam("utm_source"),
       utm_campaign: getUrlParam("utm_campaign"),
@@ -207,7 +248,7 @@ const snippet = (
     };
 
     fetch(
-      "https://juggler.deco.site/live/invoke/site/actions/sendEvent.ts",
+      SERVICE_ENDPOINT,
       {
         method: "POST",
         headers: {
