@@ -497,13 +497,13 @@ const legacyToProductGroupAdditionalProperties = (
     return groupValues.map((value) => ({ name: value, isFrom: group }));
   });
 
-  return specifications.flatMap((spec) => {
-    const values = (product as unknown as Record<string, string[]>)[spec];
+  return specifications.flatMap((name) => {
+    const values = (product as unknown as Record<string, string[]>)[name];
     return values.map((value) =>
       toAdditionalPropertySpecification({
-        name: spec,
+        name,
         value,
-        additionalType: groupMappings.find((mapping) => mapping.name === spec)
+        propertyID: groupMappings.find((mapping) => mapping.name === name)
           ?.isFrom,
       })
     );
@@ -537,19 +537,16 @@ export const toAdditionalPropertySpecification = ({
   name,
   value,
   propertyID,
-  additionalType,
 }: {
   name: string;
   value: string;
   propertyID?: string;
-  additionalType?: string;
 }): PropertyValue => ({
   "@type": "PropertyValue",
   name,
   value,
   propertyID,
   valueReference: "SPECIFICATION",
-  additionalType,
 });
 
 const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
