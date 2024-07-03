@@ -16,8 +16,15 @@ export default function ProductDetailsExt(
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (_props: unknown, req: Request, _ctx: AppContext) => {
+export const cacheKey = (
+    props: Props<ProductDetailsPage | null>,
+    req: Request,
+    _ctx: AppContext,
+) => {
     const url = new URL(req.url);
-    const key = `${url.pathname}-pdpExtension`
-    return key;
+    const sku = props.data?.product.sku;
+    const addProps = props.data?.product.additionalProperty?.map((p) =>
+        JSON.stringify(p)
+    );
+    return `${url.pathname}-${sku}-${addProps}-pdpExtension`;
 };

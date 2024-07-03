@@ -31,3 +31,14 @@ export function extractLastPath(slug: string) {
 export function extractInitialPath(slug: string) {
   return slug.replace(/\/[^\/]*$/, "");
 }
+
+export const sortSearchParams = (url: URL) => {
+  const paramsArray = Array.from(url.searchParams.entries());
+  paramsArray.sort((a, b) => a[0].localeCompare(b[0]));
+  const sortedParams = paramsArray.map(([key, value]) => {
+    const sortedValue = value.split("_").sort((a, b) => a.localeCompare(b))
+      .join("_");
+    return `${key}=${sortedValue}`;
+  });
+  return sortedParams.join("&");
+};

@@ -1,9 +1,8 @@
 import { AppContext } from "../../../mod.ts";
-import { ProductDetailsPage } from "../../../../commerce/types.ts";
+import { ProductListingPage } from "../../../../commerce/types.ts";
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
 import { liveloExt, reviewsExt } from "../../../utils/extensionsUtils.ts";
 import { ExtensionProps } from "../../../utils/client/types.ts";
-
 
 export interface Props {
     reviews?: ExtensionProps;
@@ -11,36 +10,32 @@ export interface Props {
 }
 
 /**
- * @title Magento Extension - Product Details Page
+ * @title Magento Extension - Product Listing Page
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (
     { reviews, liveloPoints }: Props,
     _req: Request,
     ctx: AppContext,
-): ExtensionOf<ProductDetailsPage | null> =>
-async (page: ProductDetailsPage | null) => {
+): ExtensionOf<ProductListingPage | null> =>
+async (page: ProductListingPage | null) => {
     if (!page) {
         return page;
     }
 
-    let product = page.product;
+    let p = page.products;
 
     if (reviews?.active) {
-        product = await reviewsExt([product], reviews.path, ctx).then((p) =>
-            p[0]
-        );
+        p = await reviewsExt(p, reviews.path, ctx);
     }
 
     if (liveloPoints?.active) {
-        product = await liveloExt([product], liveloPoints.path, ctx).then((p) =>
-            p[0]
-        );
+        p = await liveloExt(p, liveloPoints.path, ctx);
     }
 
     return {
         ...page,
-        product,
+        products: p,
     };
 };
 

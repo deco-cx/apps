@@ -599,3 +599,12 @@ export interface OverrideFeatures {
    */
   dangerouslyOverrideReturnNull?: boolean;
 }
+
+export interface ExtensionProps {
+  active: boolean;
+  /**
+   * @title Path of the REST API
+   * @description The partial path of the API. ex: /all/V1/custom/review
+   */
+  path: string;
+}
