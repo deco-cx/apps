@@ -46,7 +46,10 @@ export const fetchSafe = async (
     return response;
   }
 
-  if (init?.redirect === "manual" && response.status === 301) {
+  const isManual = init?.redirect === "manual";
+  const isRedirect = response.status === 301 || response.status === 302;
+
+  if (isManual && isRedirect) {
     return response;
   }
 
