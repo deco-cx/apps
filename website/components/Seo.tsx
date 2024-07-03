@@ -72,6 +72,9 @@ function Component({
   const title = stripHTML(t);
   const url = canonical;
 
+  const matchUrl = seo ? seo.canonical.match(/page=(?:100|[1-9][0-9]?)/) : "";
+  const processedSeoCanonicalUrl = matchUrl ? seo.canonical.replace(/page=(?:100|[1-9][0-9]?)/, matchUrl[0].split('=').join("")) : seo.canonical
+
   return (
     <Head>
       <title>
@@ -99,7 +102,7 @@ function Component({
 
       {/* Link tags */}
       {canonical && (
-        <link rel="canonical" href={isDepartament ? seo?.canonical : url} />
+        <link rel="canonical" href={isDepartament ? processedSeoCanonicalUrl : url} />
       )}
 
       {/* No index, no follow */}

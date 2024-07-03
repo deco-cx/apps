@@ -439,7 +439,7 @@ const loader = async (
     const pageCurrentExist = url.pathname.match(PAGE_REGEX);
     return pageCurrentExist
       ? url.pathname.replace(PAGE_REGEX, `page${paramnPage + value}`)
-      : `${url.pathname}/page${paramnPage + 1}?${currentSearchParams}`;
+      : `${url.pathname}/page${paramnPage + 1}${currentSearchParams ?? "?" + currentSearchParams }`;
   };
 
   return {
