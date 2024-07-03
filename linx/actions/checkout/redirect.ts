@@ -20,6 +20,7 @@ export default async function redirect(
   ctx: AppContext
 ): Promise<{ location: Location } | null> {
   const { api } = ctx;
+  const requestHost = new URL(req.url).hostname;
 
   const BasketID = getLinxBasketId(req.headers);
 
@@ -42,12 +43,14 @@ export default async function redirect(
   }
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
-  // setCookie(ctx.response.headers, {
-  //   name: "lcsid",
-  //   value: "",
-  //   expires: new Date(0),
-  //   domain: req.headers.get("host") ?? undefined,
-  // });
+
+  setCookie(ctx.response.headers, {
+    name: "lcsid",
+    value: "",
+    expires: new Date(0),
+    domain: requestHost ?? undefined,
+    path: "/",
+  });
 
   const url = new URL(location);
 
