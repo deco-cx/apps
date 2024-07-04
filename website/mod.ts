@@ -130,6 +130,13 @@ export interface Props {
    * @description The flavor of the website
    */
   flavor?: Fresh | HTMX;
+
+  // We are hiding this prop because it is in testing phase
+  // after that, probably we will remove this prop and default will be true
+  /**
+   * @hide true
+   */
+  sendToClickHouse?: boolean;
 }
 
 /**

@@ -67,6 +67,7 @@ const buildProxyRoutes = (
           url: urlToProxy,
           host: hostToUse,
           includeScriptsToHead,
+          removeDirtyCookies: true,
         },
       },
     });
