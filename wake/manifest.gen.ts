@@ -14,21 +14,24 @@ import * as $$$$$$$$$8 from "./actions/createAddress.ts";
 import * as $$$$$$$$$9 from "./actions/createCheckout.ts";
 import * as $$$$$$$$$10 from "./actions/deleteAddress.ts";
 import * as $$$$$$$$$11 from "./actions/login.ts";
-import * as $$$$$$$$$12 from "./actions/logout.ts";
-import * as $$$$$$$$$13 from "./actions/newsletter/register.ts";
-import * as $$$$$$$$$14 from "./actions/notifyme.ts";
-import * as $$$$$$$$$15 from "./actions/review/create.ts";
-import * as $$$$$$$$$16 from "./actions/selectAddress.ts";
-import * as $$$$$$$$$17 from "./actions/selectInstallment.ts";
-import * as $$$$$$$$$18 from "./actions/selectPayment.ts";
-import * as $$$$$$$$$19 from "./actions/selectShipping.ts";
-import * as $$$$$$$$$20 from "./actions/shippingSimulation.ts";
-import * as $$$$$$$$$21 from "./actions/signupCompany.ts";
-import * as $$$$$$$$$22 from "./actions/signupPerson.ts";
-import * as $$$$$$$$$23 from "./actions/submmitForm.ts";
-import * as $$$$$$$$$24 from "./actions/updateAddress.ts";
-import * as $$$$$$$$$25 from "./actions/wishlist/addProduct.ts";
-import * as $$$$$$$$$26 from "./actions/wishlist/removeProduct.ts";
+import * as $$$$$$$$$12 from "./actions/loginGoogle.ts";
+import * as $$$$$$$$$13 from "./actions/logout.ts";
+import * as $$$$$$$$$14 from "./actions/newsletter/register.ts";
+import * as $$$$$$$$$15 from "./actions/notifyme.ts";
+import * as $$$$$$$$$16 from "./actions/review/create.ts";
+import * as $$$$$$$$$17 from "./actions/selectAddress.ts";
+import * as $$$$$$$$$18 from "./actions/selectInstallment.ts";
+import * as $$$$$$$$$19 from "./actions/selectPayment.ts";
+import * as $$$$$$$$$20 from "./actions/selectShipping.ts";
+import * as $$$$$$$$$21 from "./actions/shippingSimulation.ts";
+import * as $$$$$$$$$22 from "./actions/signupCompany.ts";
+import * as $$$$$$$$$23 from "./actions/signupPartialCompany.ts";
+import * as $$$$$$$$$24 from "./actions/signupPartialPerson.ts";
+import * as $$$$$$$$$25 from "./actions/signupPerson.ts";
+import * as $$$$$$$$$26 from "./actions/submmitForm.ts";
+import * as $$$$$$$$$27 from "./actions/updateAddress.ts";
+import * as $$$$$$$$$28 from "./actions/wishlist/addProduct.ts";
+import * as $$$$$$$$$29 from "./actions/wishlist/removeProduct.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/calculatePrices.ts";
 import * as $$$1 from "./loaders/cart.ts";
@@ -82,21 +85,24 @@ const manifest = {
     "wake/actions/createCheckout.ts": $$$$$$$$$9,
     "wake/actions/deleteAddress.ts": $$$$$$$$$10,
     "wake/actions/login.ts": $$$$$$$$$11,
-    "wake/actions/logout.ts": $$$$$$$$$12,
-    "wake/actions/newsletter/register.ts": $$$$$$$$$13,
-    "wake/actions/notifyme.ts": $$$$$$$$$14,
-    "wake/actions/review/create.ts": $$$$$$$$$15,
-    "wake/actions/selectAddress.ts": $$$$$$$$$16,
-    "wake/actions/selectInstallment.ts": $$$$$$$$$17,
-    "wake/actions/selectPayment.ts": $$$$$$$$$18,
-    "wake/actions/selectShipping.ts": $$$$$$$$$19,
-    "wake/actions/shippingSimulation.ts": $$$$$$$$$20,
-    "wake/actions/signupCompany.ts": $$$$$$$$$21,
-    "wake/actions/signupPerson.ts": $$$$$$$$$22,
-    "wake/actions/submmitForm.ts": $$$$$$$$$23,
-    "wake/actions/updateAddress.ts": $$$$$$$$$24,
-    "wake/actions/wishlist/addProduct.ts": $$$$$$$$$25,
-    "wake/actions/wishlist/removeProduct.ts": $$$$$$$$$26,
+    "wake/actions/loginGoogle.ts": $$$$$$$$$12,
+    "wake/actions/logout.ts": $$$$$$$$$13,
+    "wake/actions/newsletter/register.ts": $$$$$$$$$14,
+    "wake/actions/notifyme.ts": $$$$$$$$$15,
+    "wake/actions/review/create.ts": $$$$$$$$$16,
+    "wake/actions/selectAddress.ts": $$$$$$$$$17,
+    "wake/actions/selectInstallment.ts": $$$$$$$$$18,
+    "wake/actions/selectPayment.ts": $$$$$$$$$19,
+    "wake/actions/selectShipping.ts": $$$$$$$$$20,
+    "wake/actions/shippingSimulation.ts": $$$$$$$$$21,
+    "wake/actions/signupCompany.ts": $$$$$$$$$22,
+    "wake/actions/signupPartialCompany.ts": $$$$$$$$$23,
+    "wake/actions/signupPartialPerson.ts": $$$$$$$$$24,
+    "wake/actions/signupPerson.ts": $$$$$$$$$25,
+    "wake/actions/submmitForm.ts": $$$$$$$$$26,
+    "wake/actions/updateAddress.ts": $$$$$$$$$27,
+    "wake/actions/wishlist/addProduct.ts": $$$$$$$$$28,
+    "wake/actions/wishlist/removeProduct.ts": $$$$$$$$$29,
   },
   "name": "wake",
   "baseUrl": import.meta.url,

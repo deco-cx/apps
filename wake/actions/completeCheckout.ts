@@ -1,4 +1,4 @@
-import { setCookie } from "std/http/cookie.ts";
+import { deleteCookie, setCookie } from "std/http/cookie.ts";
 import type { AppContext } from "../mod.ts";
 import authenticate from "../utils/authenticate.ts";
 import { CART_COOKIE, getCartCookie } from "../utils/cart.ts";
@@ -9,18 +9,13 @@ import type {
   CheckoutCompleteMutationVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import ensureCheckout from "../utils/ensureCheckout.ts";
 
 // https://wakecommerce.readme.io/docs/checkoutcomplete
-export default async function (
-  props: Props,
-  req: Request,
-  ctx: AppContext,
-): Promise<CheckoutCompleteMutation["checkoutComplete"]> {
+export default async function (props: Props, req: Request, ctx: AppContext) {
   const headers = parseHeaders(req.headers);
   const customerAccessToken = ensureCustomerToken(await authenticate(req, ctx));
-  const checkoutId = getCartCookie(req.headers);
-
-  if (!customerAccessToken) return null;
+  const checkoutId = ensureCheckout(getCartCookie(req.headers));
 
   const { checkoutComplete } = await ctx.storefront.query<
     CheckoutCompleteMutation,
@@ -38,12 +33,7 @@ export default async function (
     { headers },
   );
 
-  setCookie(ctx.response.headers, {
-    name: CART_COOKIE,
-    value: "",
-    path: "/",
-    expires: new Date(0),
-  });
+  deleteCookie(ctx.response.headers, CART_COOKIE, { path: "/" });
 }
 
 interface Props {

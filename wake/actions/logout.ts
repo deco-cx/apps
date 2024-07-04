@@ -7,7 +7,7 @@ export default function (
   _req: Request,
   { response }: AppContext,
 ) {
-  deleteCookie(response.headers, "customerToken");
-  deleteCookie(response.headers, "fbits-login");
-  deleteCookie(response.headers, CART_COOKIE);
+  deleteCookie(response.headers, "customerToken", { path: "/" });
+  deleteCookie(response.headers, "fbits-login", { path: "/" });
+  deleteCookie(response.headers, CART_COOKIE, { path: "/" });
 }

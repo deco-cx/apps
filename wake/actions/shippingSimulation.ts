@@ -7,6 +7,7 @@ import type {
 import { getCartCookie } from "../utils/cart.ts";
 import { HttpError } from "../../utils/http.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import ensureCheckout from "../utils/ensureCheckout.ts";
 
 export interface Props {
   cep?: string;
@@ -57,7 +58,7 @@ const action = async (
   const { storefront } = ctx;
 
   const headers = parseHeaders(req.headers);
-  const cartId = getCartCookie(req.headers);
+  const cartId = ensureCheckout(getCartCookie(req.headers));
   const simulationParams = buildSimulationParams(props, cartId);
 
   const data = await storefront.query<

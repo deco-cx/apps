@@ -1,5 +1,6 @@
 import type { AppContext } from "../mod.ts";
 import { getCartCookie } from "../utils/cart.ts";
+import ensureCheckout from "../utils/ensureCheckout.ts";
 import { CheckoutSelectInstallment } from "../utils/graphql/queries.ts";
 import type {
   CheckoutSelectInstallmentMutation,
@@ -14,7 +15,7 @@ export default async function (
   ctx: AppContext,
 ): Promise<CheckoutSelectInstallmentMutation["checkoutSelectInstallment"]> {
   const headers = parseHeaders(req.headers);
-  const checkoutId = getCartCookie(req.headers);
+  const checkoutId = ensureCheckout(getCartCookie(req.headers));
 
   const { checkoutSelectInstallment } = await ctx.storefront.query<
     CheckoutSelectInstallmentMutation,

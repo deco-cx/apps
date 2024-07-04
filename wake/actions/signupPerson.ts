@@ -70,10 +70,6 @@ interface Props {
    */
   gender: "MALE" | "FEMALE";
   /**
-   * Isento de inscrição estadual
-   */
-  isStateRegistrationExempt?: boolean;
-  /**
    * Bairro
    */
   neighborhood: string;
@@ -121,8 +117,4 @@ interface Props {
    * Estado do endereço
    */
   state: string;
-  /**
-   * Inscrição estadual da empresa
-   */
-  stateRegistration?: string;
 }

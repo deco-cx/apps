@@ -6,11 +6,12 @@ import type {
   CheckoutSelectShippingQuoteMutationVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import ensureCheckout from "../utils/ensureCheckout.ts";
 
 // https://wakecommerce.readme.io/docs/storefront-api-checkoutselectshippingquote
 export default async function (props: Props, req: Request, ctx: AppContext) {
   const headers = parseHeaders(req.headers);
-  const checkoutId = getCartCookie(req.headers);
+  const checkoutId = ensureCheckout(getCartCookie(req.headers));
 
   await ctx.storefront.query<
     CheckoutSelectShippingQuoteMutation,

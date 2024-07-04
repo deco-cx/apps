@@ -1714,3 +1714,31 @@ export const GetProductCustomizations = {
   }
   `,
 };
+
+export const CustomerSocialLoginGoogle = {
+  query: gql`mutation customerSocialLoginGoogle($userCredential: String!) {
+    customerSocialLoginGoogle(userCredential: $userCredential) {
+      isMaster
+      token
+      legacyToken
+      type
+      validUntil
+    }
+  }
+  `,
+};
+
+export const CustomerCompletePartialRegistration = {
+  query:
+    gql`mutation CompleteRegistration($customerAccessToken: String!, $input: CustomerSimpleCreateInputGraphInput!) {
+    customerCompletePartialRegistration(
+      customerAccessToken: $customerAccessToken
+      input: $input) {
+        isMaster
+        token
+        legacyToken
+        type
+        validUntil
+    }
+  }`,
+};

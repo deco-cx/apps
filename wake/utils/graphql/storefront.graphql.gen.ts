@@ -5294,3 +5294,18 @@ export type GetProductCustomizationsQueryVariables = Exact<{
 
 
 export type GetProductCustomizationsQuery = { product?: { productName?: string | null, productId?: any | null, productVariantId?: any | null, customizations?: Array<{ customizationId: any, cost: any, name?: string | null, type?: string | null, values?: Array<string | null> | null, order: number, groupName?: string | null, maxLength: number, id?: string | null } | null> | null } | null };
+
+export type CustomerSocialLoginGoogleMutationVariables = Exact<{
+  userCredential: Scalars['String']['input'];
+}>;
+
+
+export type CustomerSocialLoginGoogleMutation = { customerSocialLoginGoogle?: { isMaster: boolean, token?: string | null, legacyToken?: string | null, type?: LoginType | null, validUntil: any } | null };
+
+export type CompleteRegistrationMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  input: CustomerSimpleCreateInputGraphInput;
+}>;
+
+
+export type CompleteRegistrationMutation = { customerCompletePartialRegistration?: { isMaster: boolean, token?: string | null, legacyToken?: string | null, type?: LoginType | null, validUntil: any } | null };
