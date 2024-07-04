@@ -16,6 +16,7 @@ import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import { removeDirtyCookies } from "../utils/normalize.ts";
 
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
@@ -112,29 +113,35 @@ export default function VTEX({
 
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
+    processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const my = createHttpClient<MY>({
     base: `https://${account}.myvtex.com/`,
+    processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const vcsDeprecated = createHttpClient<VTEXCommerceStable>({
     base: `https://${account}.vtexcommercestable.com.br`,
+    processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const io = createGraphqlClient({
     endpoint:
       `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+    processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
   const vcs = createHttpClient<VCS>({
     base: `https://${account}.vtexcommercestable.com.br`,
     fetcher: fetchSafe,
+    processHeaders: removeDirtyCookies,
     headers: headers,
   });
   const api = createHttpClient<API>({
     base: `https://api.vtex.com/${account}`,
     fetcher: fetchSafe,
+    processHeaders: removeDirtyCookies,
     headers: headers,
   });
 
