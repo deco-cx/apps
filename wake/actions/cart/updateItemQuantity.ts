@@ -48,7 +48,7 @@ const removeFromCart = (
     RemoveItemFromCartMutationVariables
   >({
     variables: {
-      input: { id: cartId, products: [{ ...props, quantity: 1e6 }] },
+      input: { id: cartId, products: [{ ...props }] },
     },
     ...RemoveItemFromCart,
   }, { headers });
@@ -65,18 +65,28 @@ const action = async (
     throw new HttpError(400, "Missing cart cookie");
   }
 
-  let data = await removeFromCart(props, cartId, ctx, headers);
+  const cart = await ctx.invoke.wake.loaders.cart(props, req)
+  const item = cart.products?.find(item => item?.productVariantId === props.productVariantId)
+  const quantityItem = item?.quantity ?? 0
+  const quantity = props.quantity - quantityItem
 
-  if (props.quantity > 0) {
-    data = await addToCart(props, cartId, ctx, headers);
+  let checkout
+
+  if (props.quantity > 0 && quantity > 0) {
+    checkout = await ctx.invoke.wake.actions.cart.addItem({...props, quantity})
+  } else {
+    const data = await removeFromCart({...props, quantity:quantity*-1}, cartId, ctx, headers);
+    checkout = data.checkout
   }
 
-  const checkoutId = data.checkout?.checkoutId;
+  const checkoutId = checkout?.checkoutId;
 
   if (cartId !== checkoutId) {
     setCartCookie(ctx.response.headers, checkoutId);
   }
-  return data.checkout ?? {};
+
+
+  return checkout ?? {};
 };
 
 export default action;
