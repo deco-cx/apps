@@ -490,21 +490,22 @@ const legacyToProductGroupAdditionalProperties = (
   product: LegacyProductVTEX,
 ) => {
   const groups = product.allSpecificationsGroups ?? [];
-  const specifications = product.allSpecifications ?? [];
+  const allSpecifications = product.allSpecifications ?? [];
 
-  const groupMappings = groups.flatMap((group) => {
-    const groupValues = (product as unknown as Record<string, string[]>)[group];
-    return groupValues.map((value) => ({ name: value, isFrom: group }));
+  const specByGroup : Record<string, string> = {}
+
+  groups.forEach((group) => {
+    const groupSpecs = (product as unknown as Record<string, string[]>)[group];
+    groupSpecs.forEach((specName) => {specByGroup[specName] = group})
   });
 
-  return specifications.flatMap((name) => {
+  return allSpecifications.flatMap((name) => {
     const values = (product as unknown as Record<string, string[]>)[name];
     return values.map((value) =>
       toAdditionalPropertySpecification({
         name,
         value,
-        propertyID: groupMappings.find((mapping) => mapping.name === name)
-          ?.isFrom,
+        propertyID: specByGroup[name]
       })
     );
   });
