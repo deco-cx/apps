@@ -19,20 +19,26 @@ import * as $$$$0 from "./handlers/proxy.ts";
 import * as $$$$1 from "./handlers/redirect.ts";
 import * as $$$$2 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/features.ts";
-import * as $$$2 from "./loaders/product/detailsPage.ts";
-import * as $$$3 from "./loaders/product/detailsPageGQL.ts";
-import * as $$$4 from "./loaders/product/extensions/amasty/detailsPage.ts";
-import * as $$$5 from "./loaders/product/extensions/amasty/list.ts";
-import * as $$$6 from "./loaders/product/extensions/amasty/listingPage.ts";
-import * as $$$7 from "./loaders/product/extensions/extend.ts";
-import * as $$$8 from "./loaders/product/getId.ts";
-import * as $$$9 from "./loaders/product/images.ts";
-import * as $$$10 from "./loaders/product/list.ts";
-import * as $$$11 from "./loaders/product/listingPage.ts";
-import * as $$$12 from "./loaders/proxy.ts";
-import * as $$$13 from "./loaders/user.ts";
-import * as $$$14 from "./loaders/wishlist.ts";
+import * as $$$1 from "./loaders/extensions/productDetailsPage.ts";
+import * as $$$2 from "./loaders/extensions/productList.ts";
+import * as $$$3 from "./loaders/extensions/productListingPage.ts";
+import * as $$$4 from "./loaders/features.ts";
+import * as $$$5 from "./loaders/product/detailsPage.ts";
+import * as $$$6 from "./loaders/product/detailsPageGQL.ts";
+import * as $$$7 from "./loaders/product/extensions/amasty/detailsPage.ts";
+import * as $$$8 from "./loaders/product/extensions/amasty/list.ts";
+import * as $$$9 from "./loaders/product/extensions/amasty/listingPage.ts";
+import * as $$$10 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$11 from "./loaders/product/extensions/extend.ts";
+import * as $$$12 from "./loaders/product/extensions/list.ts";
+import * as $$$13 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$14 from "./loaders/product/getId.ts";
+import * as $$$15 from "./loaders/product/images.ts";
+import * as $$$16 from "./loaders/product/list.ts";
+import * as $$$17 from "./loaders/product/listingPage.ts";
+import * as $$$18 from "./loaders/proxy.ts";
+import * as $$$19 from "./loaders/user.ts";
+import * as $$$20 from "./loaders/wishlist.ts";
 
 const manifest = {
   "functions": {
@@ -40,20 +46,26 @@ const manifest = {
   },
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
-    "magento/loaders/features.ts": $$$1,
-    "magento/loaders/product/detailsPage.ts": $$$2,
-    "magento/loaders/product/detailsPageGQL.ts": $$$3,
-    "magento/loaders/product/extensions/amasty/detailsPage.ts": $$$4,
-    "magento/loaders/product/extensions/amasty/list.ts": $$$5,
-    "magento/loaders/product/extensions/amasty/listingPage.ts": $$$6,
-    "magento/loaders/product/extensions/extend.ts": $$$7,
-    "magento/loaders/product/getId.ts": $$$8,
-    "magento/loaders/product/images.ts": $$$9,
-    "magento/loaders/product/list.ts": $$$10,
-    "magento/loaders/product/listingPage.ts": $$$11,
-    "magento/loaders/proxy.ts": $$$12,
-    "magento/loaders/user.ts": $$$13,
-    "magento/loaders/wishlist.ts": $$$14,
+    "magento/loaders/extensions/productDetailsPage.ts": $$$1,
+    "magento/loaders/extensions/productList.ts": $$$2,
+    "magento/loaders/extensions/productListingPage.ts": $$$3,
+    "magento/loaders/features.ts": $$$4,
+    "magento/loaders/product/detailsPage.ts": $$$5,
+    "magento/loaders/product/detailsPageGQL.ts": $$$6,
+    "magento/loaders/product/extensions/amasty/detailsPage.ts": $$$7,
+    "magento/loaders/product/extensions/amasty/list.ts": $$$8,
+    "magento/loaders/product/extensions/amasty/listingPage.ts": $$$9,
+    "magento/loaders/product/extensions/detailsPage.ts": $$$10,
+    "magento/loaders/product/extensions/extend.ts": $$$11,
+    "magento/loaders/product/extensions/list.ts": $$$12,
+    "magento/loaders/product/extensions/listingPage.ts": $$$13,
+    "magento/loaders/product/getId.ts": $$$14,
+    "magento/loaders/product/images.ts": $$$15,
+    "magento/loaders/product/list.ts": $$$16,
+    "magento/loaders/product/listingPage.ts": $$$17,
+    "magento/loaders/proxy.ts": $$$18,
+    "magento/loaders/user.ts": $$$19,
+    "magento/loaders/wishlist.ts": $$$20,
   },
   "handlers": {
     "magento/handlers/proxy.ts": $$$$0,

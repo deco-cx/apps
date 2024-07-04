@@ -16,6 +16,7 @@ import {
 } from "../../commerce/types.ts";
 import {
   CustomAttribute,
+  LiveloPoints,
   MagentoCategory,
   MagentoProduct,
   ReviewsAmastyAPI,
@@ -319,6 +320,33 @@ export const toReviewAmasty = (
       },
     };
   });
+
+export const toLiveloPoints = (
+  products: Product[],
+  liveloPoints: LiveloPoints[],
+): Product[] => {
+  return products.map((product, i) => {
+    const { message, factor, phrase, points } = liveloPoints[i];
+
+    if (message) {
+      return product;
+    }
+
+    const { additionalProperty, ...rest } = product;
+    additionalProperty?.push({
+      "@type": "PropertyValue",
+      propertyID: "LIVELOPOINTS",
+      name: phrase,
+      value: `${points}`,
+      valueReference: `${factor}`,
+    });
+
+    return {
+      ...rest,
+      additionalProperty,
+    };
+  });
+};
 
 export const toProductGraphQL = (
   product: SimpleProductGraphQL | CompleteProductGraphQL,

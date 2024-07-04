@@ -2,6 +2,7 @@ import {
   CartFromAPI,
   CustomerAddress,
   FieldsFilter,
+  LiveloPoints,
   MagentoCardPrices,
   MagentoCategory,
   MagentoProduct,
@@ -180,5 +181,13 @@ export interface API {
       form_key: string;
       qty: number;
     };
+  };
+
+  "GET /rest/:liveloUrl/:productId": {
+    searchParams: {
+      liveloUrl: string;
+      productId: string;
+    };
+    response: LiveloPoints;
   };
 }

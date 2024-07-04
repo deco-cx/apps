@@ -22,7 +22,11 @@ import {
 } from "../../utils/utilsGraphQL.ts";
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
-import { extractInitialPath, extractLastPath } from "../../utils/utils.ts";
+import {
+  extractInitialPath,
+  extractLastPath,
+  sortSearchParams,
+} from "../../utils/utils.ts";
 //import { logger } from "deco/mod.ts";
 
 export interface Props {
@@ -155,17 +159,6 @@ const getSortOptions = (sortFromUrl: string | null, props?: CategoryProps) =>
       order: "ASC",
     }
     : props?.sortOptions ?? { sortBy: undefined, order: "ASC" };
-
-const sortSearchParams = (url: URL) => {
-  const paramsArray = Array.from(url.searchParams.entries());
-  paramsArray.sort((a, b) => a[0].localeCompare(b[0]));
-  const sortedParams = paramsArray.map(([key, value]) => {
-    const sortedValue = value.split("_").sort((a, b) => a.localeCompare(b))
-      .join("_");
-    return `${key}=${sortedValue}`;
-  });
-  return sortedParams.join("&");
-};
 
 export const cache = "stale-while-revalidate";
 
