@@ -55,7 +55,10 @@ const loader = async (
     }
 
     return viewList.data?.slice(count * page, count * (page + 1)) ?? [];
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw error;
+    }
     return [];
   }
 };

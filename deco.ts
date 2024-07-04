@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("smarthint"),
     app("anthropic"),
     app("resend"),
     app("konfidency"),

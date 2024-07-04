@@ -18,3 +18,8 @@ export type VideoWidget = string;
  * @options website/loaders/options/routes.ts
  */
 export type SiteRoute = string;
+
+/**
+ * @format map
+ */
+export type MapWidget = string;
