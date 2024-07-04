@@ -49,7 +49,7 @@ interface Event {
   browser_version: string;
 }
 
-const SERVICE_ENDPOINT =
+const SERVICE_ENDPOINT = Deno.env.get("EVENT_COLLECTOR") ??
   "https://juggler.deco.site/live/invoke/site/actions/sendEvent.ts";
 
 /**
