@@ -17,7 +17,7 @@ export default async function (
   {
     customerSocialLoginGoogle:
       CustomerSocialLoginGoogleMutation["customerSocialLoginGoogle"];
-    logged: boolean;
+    hasAccount: boolean;
   } | null
 > {
   const headers = parseHeaders(req.headers);
@@ -37,8 +37,6 @@ export default async function (
 
   if (!token) throw new Error("No google token found");
 
-  console.log(customerSocialLoginGoogle);
-
   if (customerSocialLoginGoogle?.type === "NEW") {
     setCookie(response.headers, {
       name: "partialCustomerToken",
@@ -55,14 +53,12 @@ export default async function (
       new Date(customerSocialLoginGoogle.validUntil),
     );
   } else {
-    throw new Error(
-      `Not implemented type: ${customerSocialLoginGoogle?.type}`,
-    );
+    throw new Error(`Not implemented type: ${customerSocialLoginGoogle?.type}`);
   }
 
   return {
     customerSocialLoginGoogle,
-    logged: customerSocialLoginGoogle?.type === "AUTHENTICATED",
+    hasAccount: customerSocialLoginGoogle?.type === "AUTHENTICATED",
   };
 }
 
