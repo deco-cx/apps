@@ -3,6 +3,7 @@ import { AppMiddlewareContext } from "./mod.ts";
 import { SESSION_COOKIE } from "./utils/constants.ts";
 import { generateUniqueIdentifier } from "./utils/hash.ts";
 import { CART_COOKIE, getCartCookie } from "./utils/cart.ts";
+import { logger } from "deco/observability/otel/config.ts";
 
 export interface Cookie {
   name: string;
@@ -102,7 +103,7 @@ export const middleware = async (
   );
 
   const cookies = request.headers.getSetCookie();
-  console.error("LOAD SET COOKIES " + JSON.stringify(cookies));
+  logger.info("LOAD SET COOKIES " + JSON.stringify(cookies));
   if (cookies && !ctx.response.headers.getSetCookie().length) {
     cookies.forEach((cookie, index) => {
       setCookie(ctx.response.headers, {
