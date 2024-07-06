@@ -59,7 +59,6 @@ export const middleware = async (
   const cartId = getCartCookie(req.headers);
 
   if (cartId.length && sessionCookie && changeCardIdAfterCheckout) {
-    console.log("GET /:site/customer/section/load");
     const sectionCart = await clientAdmin["GET /:site/customer/section/load"]({
       site,
       sections: "cart,carbono-customer",
@@ -92,8 +91,7 @@ export const middleware = async (
   if (sessionCookie) {
     return next!();
   }
-
-  console.log("GET /:site/customer/section/load");
+  
   const request = await fetch(
     `${baseUrl}/granado/customer/section/load/?sections=customer`,
     {
