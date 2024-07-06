@@ -5,8 +5,8 @@ import { liveloExt, reviewsExt } from "../../../utils/extensionsUtils.ts";
 import { ExtensionProps } from "../../../utils/client/types.ts";
 
 export interface Props {
-    reviews?: ExtensionProps;
-    liveloPoints?: ExtensionProps;
+  reviews?: ExtensionProps;
+  liveloPoints?: ExtensionProps;
 }
 
 /**
@@ -14,26 +14,26 @@ export interface Props {
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (
-    { reviews, liveloPoints }: Props,
-    _req: Request,
-    ctx: AppContext,
+  { reviews, liveloPoints }: Props,
+  _req: Request,
+  ctx: AppContext,
 ): ExtensionOf<Product[] | null> =>
 async (products: Product[] | null) => {
-    if (!products || !Array.isArray(products)) {
-        return products;
-    }
+  if (!products || !Array.isArray(products)) {
+    return products;
+  }
 
-    let p = products;
+  let p = products;
 
-    if (reviews?.active) {
-        p = await reviewsExt(p, reviews.path, ctx);
-    }
+  if (reviews?.active) {
+    p = await reviewsExt(p, reviews.path, ctx);
+  }
 
-    if (liveloPoints?.active) {
-        p = await liveloExt(p, liveloPoints.path, ctx);
-    }
+  if (liveloPoints?.active) {
+    p = await liveloExt(p, liveloPoints.path, ctx);
+  }
 
-    return p;
+  return p;
 };
 
 export default loader;

@@ -1,14 +1,14 @@
 import { AppContext, Features } from "../mod.ts";
 
 //To avoid selection
-type Feats = Features
+type Feats = Features;
 
 function loader(
-    _props: unknown,
-    _req: Request,
-    ctx: AppContext,
+  _props: unknown,
+  _req: Request,
+  ctx: AppContext,
 ): Feats {
-    return ctx.features;
+  return ctx.features;
 }
 
 export default loader;

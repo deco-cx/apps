@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";

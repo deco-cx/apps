@@ -1,9 +1,6 @@
 import { Cart } from "../../loaders/cart.ts";
 import type { AppContext } from "../../mod.ts";
-import {
-  getCartCookie,
-  handleCartActions,
-} from "../../utils/cart.ts";
+import { getCartCookie, handleCartActions } from "../../utils/cart.ts";
 import { OverrideFeatures } from "../../utils/client/types.ts";
 
 export interface Props extends OverrideFeatures {

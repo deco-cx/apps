@@ -60,7 +60,6 @@ const loader = async (
     }).then((c) => c.json()),
   ]);
 
-
   if (cart.items.length === 0) {
     return toCartItemsWithImages(
       cart,
