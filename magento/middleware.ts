@@ -91,7 +91,7 @@ export const middleware = async (
   if (sessionCookie) {
     return next!();
   }
-  
+
   const request = await fetch(
     `${baseUrl}/granado/customer/section/load/?sections=customer`,
     {
