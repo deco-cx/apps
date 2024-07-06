@@ -98,6 +98,8 @@ export const middleware = async (
     {
       headers: {
         Cookie: req.headers.get("Cookie") ?? "",
+        Referer: baseUrl,
+        Origin: baseUrl,
       },
     },
   );
