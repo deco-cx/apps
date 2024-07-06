@@ -94,10 +94,9 @@ export const middleware = async (
   }
 
   const request = await fetch(
-    `${baseUrl}/granado/customer/section/load/?sections=customer`,
+    `${baseUrl}/granado/customer/section/load/`,
     {
       headers: {
-        Cookie: req.headers.get("Cookie") ?? "",
         Referer: baseUrl,
         Origin: baseUrl,
       },
@@ -105,7 +104,7 @@ export const middleware = async (
   );
 
   const cookies = request.headers.getSetCookie();
-  logger.info("LOAD SET COOKIES " + JSON.stringify(cookies));
+  logger.info("LOAD SET COOKIES ", cookies);
   if (cookies && !ctx.response.headers.getSetCookie().length) {
     cookies.forEach((cookie, index) => {
       setCookie(ctx.response.headers, {
