@@ -3,7 +3,6 @@ import { AppMiddlewareContext } from "./mod.ts";
 import { SESSION_COOKIE } from "./utils/constants.ts";
 import { generateUniqueIdentifier } from "./utils/hash.ts";
 import { CART_COOKIE, getCartCookie } from "./utils/cart.ts";
-import { logger } from "deco/observability/otel/config.ts";
 
 export interface Cookie {
   name: string;
@@ -94,17 +93,15 @@ export const middleware = async (
   }
 
   const request = await fetch(
-    `${baseUrl}/granado/customer/section/load/`,
+    `${baseUrl}/granado/customer/section/load/?sections=customer`,
     {
       headers: {
-        Referer: baseUrl,
-        Origin: baseUrl,
+        Cookie: req.headers.get("Cookie") ?? "",
       },
     },
   );
 
   const cookies = request.headers.getSetCookie();
-  logger.info("LOAD SET COOKIES ", cookies);
   if (cookies && !ctx.response.headers.getSetCookie().length) {
     cookies.forEach((cookie, index) => {
       setCookie(ctx.response.headers, {
