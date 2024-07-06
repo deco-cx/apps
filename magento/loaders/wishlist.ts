@@ -11,6 +11,7 @@ export default async function loader(
   const { clientAdmin, site } = ctx;
   const id = getUserCookie(req.headers);
   const headers = new Headers({ Cookie: `${SESSION_COOKIE}=${id}` });
+  
   const { wishlist } = await clientAdmin["GET /:site/customer/section/load"]({
     sections: "wishlist",
     site,

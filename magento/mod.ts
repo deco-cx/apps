@@ -127,6 +127,12 @@ export interface Features {
    * @default false
    */
   dangerouslyDisableOnLoadUpdate: boolean;
+  /**
+   * @title DANGEROUSLY Disable Wishlist
+   * @description After a page load/refresh, the wishlist state will not be updated
+   * @default false
+   */
+  dangerouslyDisableWishlist: boolean;
 }
 
 export interface State extends Props {

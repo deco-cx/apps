@@ -50,11 +50,13 @@ const enqueue = (
   return queue;
 };
 
-const load = (signal: AbortSignal) =>
+const load = (signal: AbortSignal, disableWishlist: boolean) =>
   invoke(
     {
       cart: invoke.magento.loaders.cart(),
-      wishlist: invoke.magento.loaders.wishlist(),
+      ...(!disableWishlist
+        ? { wishlist: invoke.magento.loaders.wishlist() }
+        : null),
     },
     { signal },
   );
@@ -65,13 +67,19 @@ if (IS_BROWSER) {
   ) => feats);
 
   if (!features.dangerouslyDisableOnLoadUpdate) {
-    enqueue(load);
+    enqueue((signal) =>
+      load(signal, features.dangerouslyDisableWishlist) as any
+    );
   }
 
   if (!features.dangerouslyDisableOnVisibilityChangeUpdate) {
     document.addEventListener(
       "visibilitychange",
-      () => document.visibilityState === "visible" && enqueue(load),
+      () =>
+        document.visibilityState === "visible" &&
+        enqueue((signal) =>
+          load(signal, features.dangerouslyDisableWishlist) as any
+        ),
     );
   }
 }
