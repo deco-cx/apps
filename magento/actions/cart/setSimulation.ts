@@ -5,7 +5,7 @@ import { Cart, SetShipping } from "../../utils/client/types.ts";
 import { COUNTRY_ID, SESSION_COOKIE } from "../../utils/constants.ts";
 import { getUserCookie } from "../../utils/user.ts";
 
-export type Props = Omit<SetShipping, "isLoggedIn" | "quoteId" | "countryId">;
+export type Props = Omit<SetShipping, "quoteId">;
 
 const action = async (
   props: Props & OverrideFeatures,
@@ -13,7 +13,11 @@ const action = async (
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site, features } = ctx;
-  const { dangerouslyOverrideReturnNull } = props;
+  const {
+    dangerouslyOverrideReturnNull,
+    countryId = COUNTRY_ID,
+    isLoggedIn = false,
+  } = props;
   const dontReturnCart = dangerouslyOverrideReturnNull ??
     features.dangerouslyReturnNullAfterAction;
 
@@ -21,21 +25,7 @@ const action = async (
   const cartId = getCartCookie(req.headers);
 
   try {
-    const { cart: cartResponse } = await clientAdmin[
-      "GET /:site/customer/section/load"
-    ](
-      {
-        site,
-        sections: "cart",
-      },
-      { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) },
-    ).then((res) => res.json());
-
-    const isLoggedIn = cartResponse?.minicart_improvements?.is_logged_in ??
-      false;
     const quoteId = cartId ?? "";
-    const countryId = cartResponse?.minicart_improvements?.country_id ??
-      COUNTRY_ID;
 
     await clientAdmin
       ["POST /:site/rest/:site2/V1/digitalhub/set-shipping-to-quote"](
