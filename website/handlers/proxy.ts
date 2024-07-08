@@ -66,6 +66,7 @@ export interface Props {
    * @description custom headers
    */
   customHeaders?: Header[];
+
   /**
    * @description Scripts to be included in the head of the html
    */
