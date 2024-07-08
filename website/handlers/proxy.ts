@@ -4,6 +4,8 @@ import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { Script } from "../types.ts";
 import { Monitoring } from "deco/engine/core/resolver.ts";
+import { fetchToCurl } from "jsr:@viktor/fetch-to-curl";
+import { linxProxyFailingHeaders } from "../../linx/utils/headers.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -83,6 +85,7 @@ export interface Props {
    * @description custom headers
    */
   customHeaders?: Header[];
+
   /**
    * @description Scripts to be included in the head of the html
    */
@@ -155,12 +158,23 @@ export default function Proxy({
       }
     }
 
+    for (const key of linxProxyFailingHeaders) {
+      headers.delete(key);
+    }
+
     const monitoring = isFreshCtx<DecoSiteState>(_ctx)
       ? _ctx?.state?.monitoring
       : undefined;
 
     const fetchFunction = async () => {
       try {
+        const curl = fetchToCurl(to, { 
+          headers,
+          redirect,
+          method: req.method,
+          body: req.body,
+        });
+        console.log(curl);
         return await fetch(to, {
           headers,
           redirect,
