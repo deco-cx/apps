@@ -1,4 +1,9 @@
-import type { App, AppMiddlewareContext as AMC, FnContext } from "deco/mod.ts";
+import {
+  type App,
+  type AppMiddlewareContext as AMC,
+  type FnContext,
+  logger,
+} from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";
@@ -197,6 +202,7 @@ export default function App(props: Props): App<Manifest, State> {
   const { apiKey } = apiConfig;
 
   const secretKey = typeof apiKey === "string" ? apiKey : apiKey?.get() ?? "";
+  logger.info(`magento_key: ${secretKey}`);
 
   const clientAdmin = createHttpClient<API>({
     base: apiConfig.baseUrl,
