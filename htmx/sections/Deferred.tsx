@@ -1,5 +1,8 @@
 import type { Section } from "deco/blocks/section.ts";
 import { useSection } from "deco/hooks/useSection.ts";
+import { asResolved, isDeferred } from "deco/mod.ts";
+import { AppContext } from "../mod.ts";
+import { shouldForceRender } from "../../utils/deferred.ts";
 
 /**
  * @titleBy type
@@ -59,15 +62,28 @@ const Deferred = (props: Props) => {
   );
 };
 
-export const onBeforeResolveProps = (props: Props) => {
-  if (props.loading === "lazy") {
-    return {
-      ...props,
-      sections: [],
-    };
+export const loader = async (props: Props, req: Request, ctx: AppContext) => {
+  const url = new URL(req.url);
+  const shouldRender = props.loading === "eager" ||
+    shouldForceRender({ ctx, searchParams: url.searchParams });
+  console.log("HERE WE GO");
+  if (shouldRender) {
+    const sections = isDeferred(props.sections)
+      ? await props.sections()
+      : props.sections;
+    return { ...props, sections, loading: "eager" };
   }
 
-  return props;
+  return { ...props, sections: [] };
+};
+
+const DEFERRED = true;
+
+export const onBeforeResolveProps = (props: Props) => {
+  return {
+    ...props,
+    sections: asResolved(props.sections, DEFERRED),
+  };
 };
 
 export default Deferred;
