@@ -16,6 +16,7 @@ import {
 } from "../../commerce/types.ts";
 import {
   CustomAttribute,
+  LiveloPoints,
   MagentoCategory,
   MagentoProduct,
   ReviewsAmastyAPI,
@@ -23,7 +24,6 @@ import {
 import {
   Aggregation as AggregationGraphQL,
   AggregationOption as AggregationOptGraphQL,
-  CategoryGraphQL,
   CompleteProductGraphQL,
   PLPGraphQL,
   ProductImage,
@@ -321,6 +321,33 @@ export const toReviewAmasty = (
     };
   });
 
+export const toLiveloPoints = (
+  products: Product[],
+  liveloPoints: LiveloPoints[],
+): Product[] => {
+  return products.map((product, i) => {
+    const { message, factor, phrase, points } = liveloPoints[i];
+
+    if (message) {
+      return product;
+    }
+
+    const { additionalProperty, ...rest } = product;
+    additionalProperty?.push({
+      "@type": "PropertyValue",
+      propertyID: "LIVELOPOINTS",
+      name: phrase,
+      value: `${points}`,
+      valueReference: `${factor}`,
+    });
+
+    return {
+      ...rest,
+      additionalProperty,
+    };
+  });
+};
+
 export const toProductGraphQL = (
   product: SimpleProductGraphQL | CompleteProductGraphQL,
   options: {
@@ -500,7 +527,7 @@ export const toOfferGraphQL = ({
 
 export const toProductListingPageGraphQL = (
   { products }: PLPGraphQL,
-  { categories }: CategoryGraphQL,
+  category: SimpleCategoryGraphQL,
   options: {
     originURL: URL;
     imagesQtd: number;
@@ -518,7 +545,6 @@ export const toProductListingPageGraphQL = (
     minInstallmentValue,
     maxInstallments,
   } = options;
-  const category = categories.items[0];
   const pagination = products.page_info;
   const listElements = toItemElement(category, originURL);
 
@@ -566,7 +592,7 @@ const toItemElement = (
 ): ListItem[] => {
   const { pathname, origin } = url;
   const fromBreadcrumbs = category?.breadcrumbs?.map<ListItem>((item, i) => {
-    const urlKey = item.category_url_key ?? item.category_url_path!;
+    const urlKey = item.category_url_path ?? item.category_url_key!;
     const position = pathname.indexOf(urlKey);
     return {
       "@type": "ListItem",

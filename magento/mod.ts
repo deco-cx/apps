@@ -91,23 +91,44 @@ export interface PricingConfig {
 
 interface CartConfigs {
   /**
-   * @title Enable create Cart on add item fist time
-   * @default false
-   */
-  createCartOnAddItem: boolean;
-
-  /**
    * @title Count Product Image in Cart
    * @default 1
    */
   countProductImageInCart: number;
-
   /**
    * @title Change card ID after checkout
    * @description During checkout, the cartId may change without being updated in the cookie. When activating this option, each loader or action called on the page will check that the cartId does not have a different cookie than the checkout cartId. For greater efficiency, we recommend implementing a script on the front end to perform this validation and disabling this option on the back end.
    * @default false
    */
   changeCardIdAfterCheckout: boolean;
+}
+
+export interface Features {
+  /**
+   * @title DANGEROUSLY Return null after cart action
+   * @description When called, the action will return just an success statement
+   * @default false
+   */
+  dangerouslyReturnNullAfterAction: boolean;
+
+  /**
+   * @title DANGEROUSLY Disable OnVisibilityChange Update
+   * @description After an idle, the store state will not be updated
+   * @default false
+   */
+  dangerouslyDisableOnVisibilityChangeUpdate: boolean;
+  /**
+   * @title DANGEROUSLY Disable onLoad Update
+   * @description After a page load/refresh, the store state will not be updated
+   * @default false
+   */
+  dangerouslyDisableOnLoadUpdate: boolean;
+  /**
+   * @title DANGEROUSLY Disable Wishlist
+   * @description After a page load/refresh, the wishlist state will not be updated
+   * @default false
+   */
+  dangerouslyDisableWishlist: boolean;
 }
 
 export interface Props {
@@ -138,6 +159,11 @@ export interface Props {
    * @title Cart Configs
    */
   cartConfigs: CartConfigs;
+
+  /**
+   * @title Features
+   */
+  features: Features;
 }
 
 export type State =
@@ -145,6 +171,7 @@ export type State =
     clientAdmin: ReturnType<typeof createHttpClient<API>>;
     clientGraphql: ReturnType<typeof createGraphqlClient>;
     cartConfigs: CartConfigs;
+    features: Features;
   }
   & APIConfig
   & ImagesConfig
@@ -164,6 +191,7 @@ export default function App(props: Props): App<Manifest, State> {
     productCustomProps,
     pricingConfig,
     cartConfigs,
+    features,
   } = props;
 
   const { apiKey } = apiConfig;
@@ -192,6 +220,7 @@ export default function App(props: Props): App<Manifest, State> {
       ...imagesConfig,
       ...productCustomProps,
       ...pricingConfig,
+      features,
       cartConfigs,
       clientAdmin,
       clientGraphql,

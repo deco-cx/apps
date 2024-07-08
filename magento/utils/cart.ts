@@ -1,15 +1,16 @@
 import { getCookies } from "std/http/cookie.ts";
 import { ImageObject } from "../../commerce/types.ts";
 import { HttpError } from "../../utils/http.ts";
-import { Cart } from "../loaders/cart.ts";
+import cart, { Cart } from "../loaders/cart.ts";
 import { AppContext } from "../mod.ts";
 import {
   CartFromAPI,
   ItemsWithDecoImage,
   MagentoCardPrices,
-  MagentoProduct,
+  //MagentoProduct,
 } from "./client/types.ts";
-import { toURL } from "./transform.ts";
+//import { toURL } from "./transform.ts";
+import { ProductWithImagesGraphQL } from "./clientGraphql/types.ts";
 
 export const CART_COOKIE = "dataservices_cart_id";
 const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
@@ -93,32 +94,28 @@ const createNewCart = async ({
 export const toCartItemsWithImages = (
   cart: CartFromAPI,
   prices: MagentoCardPrices,
-  productMagento: MagentoProduct[],
-  imagesUrl: string,
+  { items }: ProductWithImagesGraphQL["products"],
   url: string,
   site: string,
   countProductImageInCart: number,
 ): Cart => {
-  const productImagesMap = productMagento.reduce((map, productImage) => {
-    map[productImage.sku] = productImage || [];
-    return map;
-  }, {} as Record<string, MagentoProduct>);
-
   const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
-    const images = productImagesMap[product.sku].media_gallery_entries;
-    const productData = productImagesMap[product.sku];
-    const selectedImages = images?.slice(0, countProductImageInCart).map(
-      (image) => ({
-        "@type": "ImageObject" as const,
-        encodingFormat: "image",
-        alternateName: image.file,
-        url: `${toURL(imagesUrl)}${image.file}`,
-      } as ImageObject),
-    );
+    const productData = items.find(({ sku }) => sku === product.sku);
+    const images = productData?.media_gallery;
+    const selectedImages = images?.sort((a, b) => a.position - b.position)
+      .reduce<ImageObject[]>((acc, media) => {
+        if (acc.length === countProductImageInCart) {
+          return acc;
+        }
+        return [...acc, {
+          "@type": "ImageObject" as const,
+          encodingFormat: "image",
+          alternateName: product.name,
+          url: media.url,
+        }];
+      }, []);
 
-    const urlKey = productData.custom_attributes.find(
-      (item) => item.attribute_code === "url_key",
-    )?.value;
+    const urlKey = productData?.url_key;
 
     return {
       ...product,
@@ -180,3 +177,23 @@ export const handleCartError = (
   }
   return error;
 };
+
+export async function handleCartActions(dontReturnCart: boolean, settings: {
+  req: Request;
+  ctx: AppContext;
+  // deno-lint-ignore no-explicit-any
+  error?: any;
+  cartId?: string;
+}) {
+  const { error, cartId } = settings;
+  const handledError = error ? handleCartError(error) as Cart : undefined;
+
+  if (dontReturnCart) {
+    return handledError ?? null;
+  }
+
+  return {
+    ...(await cart({ cartId }, settings.req, settings.ctx)),
+    ...handledError,
+  } as Cart;
+}

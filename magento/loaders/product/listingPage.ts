@@ -22,6 +22,12 @@ import {
 } from "../../utils/utilsGraphQL.ts";
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
+import {
+  extractInitialPath,
+  extractLastPath,
+  sortSearchParams,
+} from "../../utils/utils.ts";
+//import { logger } from "deco/mod.ts";
 
 export interface Props {
   urlKey: RequestURLParam;
@@ -86,12 +92,21 @@ const loader = async (
     { path: string }
   >(
     {
-      variables: { path: categoryUrl },
+      variables: { path: extractLastPath(categoryUrl) },
       ...GetCategoryUid,
     },
     STALE,
   );
+
   if (!categories.items || categories.items?.length === 0) {
+    return null;
+  }
+
+  const categoryItem = categories.items.find((i) =>
+    i.url_path.startsWith(extractInitialPath(categoryUrl))
+  );
+
+  if (!categoryItem) {
     return null;
   }
 
@@ -102,7 +117,7 @@ const loader = async (
     {
       variables: {
         filter: {
-          category_uid: { in: [categories.items[0].uid] },
+          category_uid: { in: [categoryItem.uid] },
           ...transformFilterGraphQL(url, customFilters, categoryProps?.filters),
         },
         pageSize,
@@ -123,7 +138,7 @@ const loader = async (
 
   return toProductListingPageGraphQL(
     { products },
-    { categories },
+    categoryItem,
     {
       originURL: url,
       imagesQtd,
@@ -151,16 +166,16 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
   const url = new URL(req.url);
   const { customFields, pageSize, categoryProps, urlKey } = props;
   const categoryUrl = categoryProps?.categoryUrl ?? urlKey;
-  const customAttributes = getCustomFields(customFields, ["ALL"]);
+  const customAttributes = getCustomFields(customFields, ["ALL"])?.join("|") ??
+    "NONE";
   const sortFromUrl = url.searchParams.get("product_list_order");
   const { sortBy, order } = getSortOptions(sortFromUrl, categoryProps);
-  const filtersFromProps = filtersFromLoaderGraphQL(categoryProps?.filters);
-  return `${url.href}-category:${categoryUrl}-customAtt:${
-    customAttributes?.join("|") ?? "NONE"
-  }-sortBy:${sortBy?.value}-order:${order}-size:${pageSize}-filtersFromProps:${
-    JSON.stringify(
-      filtersFromProps,
-    )
+  const filtersFromProps = JSON.stringify(
+    filtersFromLoaderGraphQL(categoryProps?.filters),
+  );
+
+  return `category:${categoryUrl}-customAtt:${customAttributes}-sortBy:${sortBy?.value}-order:${order}-size:${pageSize}-filters:${filtersFromProps}/${
+    sortSearchParams(url)
   }-PLP`;
 };
 

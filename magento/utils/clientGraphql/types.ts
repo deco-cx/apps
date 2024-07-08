@@ -181,7 +181,7 @@ export type CompleteProductGraphQL =
   >
   & {
     categories?: Array<
-      Pick<CategoryLeafGraphQL, "name" | "url_key" | "position">
+      Pick<CategoryLeafGraphQL, "name" | "url_key" | "position" | "url_path">
     >;
   };
 export type SimpleCategoryGraphQL = Required<
@@ -194,7 +194,14 @@ export type SimpleCategoryGraphQL = Required<
     | "meta_description"
     | "name"
     | "description"
+    | "url_key"
+    | "url_path"
   >
+>;
+
+export type ProductWithImages = Pick<
+  ProductLeafGraphQL,
+  "media_gallery" | "name" | "sku" | "url_key"
 >;
 
 export interface ProductShelfGraphQL {
@@ -206,6 +213,12 @@ export interface ProductShelfGraphQL {
 export interface ProductDetailsGraphQL {
   products: {
     items: CompleteProductGraphQL[];
+  };
+}
+
+export interface ProductWithImagesGraphQL {
+  products: {
+    items: ProductWithImages[];
   };
 }
 
@@ -236,10 +249,19 @@ export interface ProductSearchInputs {
 
 export interface ProductDetailsInputs {
   filter: {
-    sku: {
+    url_key: {
       eq: string;
     };
   };
+}
+
+export interface ProductImagesInputs {
+  filter: {
+    sku: {
+      in: Array<string>;
+    };
+  };
+  pageSize?: number;
 }
 
 export interface ProductFilterInput {

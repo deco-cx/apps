@@ -1,4 +1,3 @@
-import { logger } from "deco/mod.ts";
 import { AppContext } from "../mod.ts";
 import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
@@ -9,12 +8,11 @@ import {
   COUPON_CODE,
   DISCOUNT_AMOUNT,
   GRAND_TOTAL,
-  MEDIA_GALLERY_ENTRIES,
   SHIPPING_AMOUNT,
   SHIPPING_DISCOUNT_AMOUNT,
-  SKU,
   SUBTOTAL,
 } from "../utils/constants.ts";
+import getImages from "./product/images.ts";
 
 export type Cart = CartFromDeco;
 
@@ -31,16 +29,16 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { clientAdmin, site, imagesUrl, cartConfigs } = ctx;
+  const { clientAdmin, site, cartConfigs } = ctx;
   const { countProductImageInCart } = cartConfigs;
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
 
-  if (!cartId) return null;
-  logger.info(
-    `URL: ${url}, CartID: ${cartId}, CTX-HEADER: ${JSON.stringify(ctx.response.headers).toString}, REQ-Header: ${JSON.stringify(req.headers).toString}`,
-  );
-  const [resultPricesCarts, resultCart] = await Promise.all([
+  if (!cartId) {
+    return null;
+  }
+
+  const [prices, cart] = await Promise.all([
     clientAdmin["GET /rest/:site/V1/carts/:cartId/totals"]({
       cartId,
       site,
@@ -55,34 +53,35 @@ const loader = async (
         COUPON_CODE,
         BASE_CURRENCY_CODE,
       ].join(","),
-    }),
+    }).then((c) => c.json()),
     clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
       cartId,
       site,
-    }),
+    }).then((c) => c.json()),
   ]);
 
-  const cart = await resultCart.json();
-  const prices = await resultPricesCarts.json();
-
-  const productImagePromises = cart.items.map((item) => {
-    return clientAdmin["GET /rest/:site/V1/products/:sku"]({
-      sku: item.sku,
+  if (cart.items.length === 0) {
+    return toCartItemsWithImages(
+      cart,
+      prices,
+      {
+        items: [],
+      },
+      url.origin,
       site,
-      fields: [MEDIA_GALLERY_ENTRIES, SKU, "url", "custom_attributes"]
-        .join(","),
-    }).then((res) => res.json());
-  });
-  const productImages = await Promise.all(productImagePromises);
+      countProductImageInCart,
+    );
+  }
+
+  const { products } = await getImages({ cart }, req, ctx);
 
   return toCartItemsWithImages(
     cart,
     prices,
-    productImages,
-    imagesUrl,
+    products,
     url.origin,
     site,
     countProductImageInCart,
-  ) as unknown as Cart;
+  );
 };
 export default loader;

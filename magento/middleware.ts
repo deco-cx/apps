@@ -81,6 +81,7 @@ export const middleware = async (
         name: CART_COOKIE,
         value: `%22${quoteId}%22`,
         path: "/",
+        unparsed: ["Priority=High"],
         expires: undefined,
         domain: new URL(req.url).hostname.replace(/deco|www/, ""),
       });
@@ -106,6 +107,7 @@ export const middleware = async (
       setCookie(ctx.response.headers, {
         ...parseCookieString(cookie, req.url.includes("localhost")),
         path: "/",
+        unparsed: ["Priority=High"],
       });
 
       if (index === 0) {
@@ -114,6 +116,7 @@ export const middleware = async (
           path: "/",
           name: "form_key",
           expires: undefined,
+          unparsed: ["Priority=High"],
           value: generateUniqueIdentifier().replace(/=/g, ""),
         });
       }

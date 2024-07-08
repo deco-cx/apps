@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
@@ -50,22 +51,38 @@ const enqueue = (
   return queue;
 };
 
-const load = (signal: AbortSignal) =>
+const load = (signal: AbortSignal, disableWishlist: boolean) =>
   invoke(
     {
       cart: invoke.magento.loaders.cart(),
-      wishlist: invoke.magento.loaders.wishlist(),
+      ...(!disableWishlist
+        ? { wishlist: invoke.magento.loaders.wishlist() }
+        : null),
     },
     { signal },
   );
 
 if (IS_BROWSER) {
-  enqueue(load);
+  const features = await invoke.magento.loaders.features().then((
+    feats,
+  ) => feats);
 
-  document.addEventListener(
-    "visibilitychange",
-    () => document.visibilityState === "visible" && enqueue(load),
-  );
+  if (!features.dangerouslyDisableOnLoadUpdate) {
+    enqueue((signal) =>
+      load(signal, features.dangerouslyDisableWishlist) as any
+    );
+  }
+
+  if (!features.dangerouslyDisableOnVisibilityChangeUpdate) {
+    document.addEventListener(
+      "visibilitychange",
+      () =>
+        document.visibilityState === "visible" &&
+        enqueue((signal) =>
+          load(signal, features.dangerouslyDisableWishlist) as any
+        ),
+    );
+  }
 }
 
 export const state = {
