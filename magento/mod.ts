@@ -5,13 +5,14 @@ import { createHttpClient } from "../utils/http.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { middleware } from "./middleware.ts";
+import { Secret } from "../website/loaders/secret.ts";
 
 export interface FiltersGraphQL {
   value: string;
   type: "EQUAL" | "MATCH" | "RANGE";
 }
 
-export interface Props {
+export interface APIConfig {
   /**
    * @title Magento api url
    * @description The base url of the Magento API, If you have stores, put the name of the store at the end.
@@ -20,7 +21,7 @@ export interface Props {
   baseUrl: string;
 
   /** @title Magento api key */
-  apiKey: string;
+  apiKey: Secret;
 
   /** @title Magento store */
   site: string;
@@ -35,6 +36,19 @@ export interface Props {
   currencyCode: string;
 
   /**
+   * @title Enale Cache in APIs (Deco Stale)
+   * @default true
+   */
+  enableCache: boolean;
+
+  /**
+   * @title Use Magento store prop as URL path suffix in PDP
+   */
+  useSuffix: boolean;
+}
+
+export interface ImagesConfig {
+  /**
    * @title Images URL
    * @description The base url of the images.
    * @example https://www.store.com.br/media/catalog/product
@@ -47,12 +61,9 @@ export interface Props {
    * @default 3
    */
   imagesQtd: number;
+}
 
-  /**
-   * @title Use Magento store prop as URL path suffix in PDP
-   */
-  useSuffix: boolean;
-
+export interface CustomProps {
   /**
    * @title Custom Filters
    * @description Applicate own filters
@@ -64,7 +75,9 @@ export interface Props {
    * @description Inform the product own custom attributes
    */
   customAttributes?: Array<string>;
+}
 
+export interface PricingConfig {
   /**
    * @title Maximum number of installments
    */
@@ -74,22 +87,6 @@ export interface Props {
    * @title Minimum installment value
    */
   minInstallmentValue: number;
-
-  /**
-   * @title Enale Cache in APIs (Deco Stale)
-   * @default true
-   */
-  enableCache: boolean;
-
-  /**
-   * @title Cart Configs
-   */
-  cartConfigs: CartConfigs;
-
-  /**
-   * @title Features
-   */
-  features: Features;
 }
 
 interface CartConfigs {
@@ -98,7 +95,6 @@ interface CartConfigs {
    * @default 1
    */
   countProductImageInCart: number;
-
   /**
    * @title Change card ID after checkout
    * @description During checkout, the cartId may change without being updated in the cookie. When activating this option, each loader or action called on the page will check that the cartId does not have a different cookie than the checkout cartId. For greater efficiency, we recommend implementing a script on the front end to perform this validation and disabling this option on the back end.
@@ -135,10 +131,52 @@ export interface Features {
   dangerouslyDisableWishlist: boolean;
 }
 
-export interface State extends Props {
-  clientAdmin: ReturnType<typeof createHttpClient<API>>;
-  clientGraphql: ReturnType<typeof createGraphqlClient>;
+export interface Props {
+  /**
+   * @title API config
+   * @description Full API Props
+   */
+  apiConfig: APIConfig;
+
+  /**
+   * @title Images config
+   * @description Images config in PDP, PLP and shelves
+   */
+  imagesConfig: ImagesConfig;
+
+  /**
+   * @title Custom Props
+   * @description Use your ow props in product
+   */
+  productCustomProps: CustomProps;
+
+  /**
+   * @title Pricing config in product
+   */
+  pricingConfig: PricingConfig;
+
+  /**
+   * @title Cart Configs
+   */
+  cartConfigs: CartConfigs;
+
+  /**
+   * @title Features
+   */
+  features: Features;
 }
+
+export type State =
+  & {
+    clientAdmin: ReturnType<typeof createHttpClient<API>>;
+    clientGraphql: ReturnType<typeof createGraphqlClient>;
+    cartConfigs: CartConfigs;
+    features: Features;
+  }
+  & APIConfig
+  & ImagesConfig
+  & CustomProps
+  & PricingConfig;
 
 /**
  * @title Magento
@@ -147,27 +185,43 @@ export interface State extends Props {
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { baseUrl, apiKey } = props;
+  const {
+    apiConfig,
+    imagesConfig,
+    productCustomProps,
+    pricingConfig,
+    cartConfigs,
+    features,
+  } = props;
+
+  const { apiKey } = apiConfig;
+
+  const secretKey = typeof apiKey === "string" ? apiKey : apiKey?.get() ?? "";
 
   const clientAdmin = createHttpClient<API>({
-    base: baseUrl,
+    base: apiConfig.baseUrl,
     headers: new Headers({
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${secretKey}`,
     }),
   });
 
   const clientGraphql = createGraphqlClient({
     fetcher: fetchSafe,
-    endpoint: `${baseUrl}/graphql`,
+    endpoint: `${apiConfig.baseUrl}/graphql`,
     headers: new Headers({
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${secretKey}`,
     }),
   });
   return {
     manifest,
     state: {
-      ...props,
+      ...apiConfig,
+      ...imagesConfig,
+      ...productCustomProps,
+      ...pricingConfig,
+      features,
+      cartConfigs,
       clientAdmin,
       clientGraphql,
     },
