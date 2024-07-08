@@ -1,6 +1,11 @@
 import { AppContext } from "../mod.ts";
-import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
-import { Cart as CartFromDeco } from "../utils/client/types.ts";
+import {
+  getCartCookie,
+  getCartImages,
+  toCartItemsWithImages,
+} from "../utils/cart.ts";
+import { Cart as CartFromDeco, CartFromAPI } from "../utils/client/types.ts";
+import { ProductWithImages } from "../utils/clientGraphql/types.ts";
 import {
   BASE_CURRENCY_CODE,
   BASE_DISCOUNT_AMOUNT,
@@ -12,12 +17,18 @@ import {
   SHIPPING_DISCOUNT_AMOUNT,
   SUBTOTAL,
 } from "../utils/constants.ts";
-import getImages from "./product/images.ts";
 
 export type Cart = CartFromDeco;
 
+export const IMAGES_CACHE_NAME = "product-images-cache";
+
 interface Props {
   cartId?: string;
+}
+
+interface HandledImages {
+  cachedImages: ProductWithImages[];
+  nonCachedImagesSkus: string[];
 }
 
 /**
@@ -73,15 +84,83 @@ const loader = async (
     );
   }
 
-  const { products } = await getImages({ cart }, req, ctx);
+  const { cachedImages, nonCachedImagesSkus } = await handleCachedImages(
+    cart,
+    url,
+  );
+  const nonCachedImages = await handleNonCachedImages(
+    { ctx, url },
+    nonCachedImagesSkus,
+  );
 
   return toCartItemsWithImages(
     cart,
     prices,
-    products,
+    {
+      items: [...cachedImages, ...nonCachedImages],
+    },
     url.origin,
     site,
     countProductImageInCart,
   );
 };
 export default loader;
+
+const handleCachedImages = async (
+  { items }: CartFromAPI,
+  url: URL,
+): Promise<HandledImages> => {
+  const cachedImages: ProductWithImages[] = [];
+  const nonCachedImagesSkus: string[] = [];
+  const promises = items.map(async ({ sku }) => {
+    const image = await getCachedImages(sku, url);
+    if (image) {
+      cachedImages.push(image);
+      return;
+    }
+    nonCachedImagesSkus.push(sku);
+  });
+
+  await Promise.all(promises);
+
+  return {
+    cachedImages,
+    nonCachedImagesSkus,
+  };
+};
+
+const handleNonCachedImages = async (
+  options: { ctx: AppContext; url: URL },
+  skus?: string[],
+) => {
+  if (!skus || skus.length === 0) {
+    return [];
+  }
+  const { items } = (await getCartImages(skus, options.ctx)).products;
+  for (const i in items) {
+    putImageInCache(items[i], options.url);
+  }
+
+  return items;
+};
+
+const getCachedImages = async (
+  sku: string,
+  url: URL,
+): Promise<ProductWithImages | null> => {
+  const cacheKey = new URL(`images-${sku}`, url.origin);
+  const cache = await caches.open(IMAGES_CACHE_NAME);
+  const cachedResponse = await cache.match(cacheKey);
+
+  if (cachedResponse) {
+    return await cachedResponse.json() as ProductWithImages;
+  }
+  return null;
+};
+
+const putImageInCache = async (images: ProductWithImages, url: URL) => {
+  const cacheKey = new URL(`images-${images.sku}`, url.origin);
+  const cache = await caches.open(IMAGES_CACHE_NAME);
+  const responseToCache = new Response(JSON.stringify(images));
+  await cache.put(cacheKey, responseToCache);
+};
