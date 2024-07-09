@@ -72,8 +72,12 @@ function Component({
   const title = stripHTML(t);
   const url = canonical;
 
-  const matchUrl = seo ? seo.canonical.match(/page=(?:100|[1-9][0-9]?)/) : "";
-  const processedSeoCanonicalUrl = matchUrl ? seo.canonical.replace(/page=(?:100|[1-9][0-9]?)/, matchUrl[0].split('=').join("")) : seo.canonical
+
+
+  const PAGE_REGEX = /\?page=([1-9]|[1-4][0-9]|50)/;
+  const matchUrl = seo && isDepartament? seo.canonical.match(PAGE_REGEX) : "";
+  const processedSeoCanonicalUrl = matchUrl ? seo.canonical.replace(PAGE_REGEX, "/page" + matchUrl[1]) : seo.canonical;
+
 
   return (
     <Head>
