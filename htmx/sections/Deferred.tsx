@@ -66,7 +66,6 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
   const shouldRender = props.loading === "eager" ||
     shouldForceRender({ ctx, searchParams: url.searchParams });
-  console.log("HERE WE GO");
   if (shouldRender) {
     const sections = isDeferred(props.sections)
       ? await props.sections()
