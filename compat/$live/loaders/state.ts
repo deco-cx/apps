@@ -5,7 +5,6 @@ import { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
 import { Resolvable } from "deco/engine/core/resolver.ts";
 import { Apps, LoaderContext } from "deco/mod.ts";
-import { MiddlewareConfig } from "deco/runtime/fresh/middlewares/3_main.ts";
 
 /**
  * @titleBy key
@@ -27,7 +26,7 @@ export default async function StateLoader(
   { state, apps }: Props,
   _req: Request,
   { get }: LoaderContext,
-): Promise<MiddlewareConfig> {
+): Promise<unknown> {
   const mState: Promise<[string, Resolvable]>[] = [];
 
   for (const { key, value } of state) {
