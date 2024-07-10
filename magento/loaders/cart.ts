@@ -1,3 +1,6 @@
+import {
+  default as extend,
+} from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
 import {
   getCartCookie,
@@ -24,6 +27,7 @@ export const IMAGES_CACHE_NAME = "product-images-cache";
 
 interface Props {
   cartId?: string;
+  disableExtensions?: boolean;
 }
 
 interface HandledImages {
@@ -36,12 +40,15 @@ interface HandledImages {
  * @description Cart loader
  */
 const loader = async (
-  { cartId: _cartId }: Props = { cartId: undefined },
+  { cartId: _cartId, disableExtensions }: Props = {
+    cartId: undefined,
+    disableExtensions: false,
+  },
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site, cartConfigs } = ctx;
-  const { countProductImageInCart } = cartConfigs;
+  const { countProductImageInCart, extensions } = cartConfigs;
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
 
@@ -92,7 +99,7 @@ const loader = async (
     { skus: nonCachedImagesSkus, url, ctx },
   );
 
-  return toCartItemsWithImages(
+  const cartWithImages = toCartItemsWithImages(
     cart,
     prices,
     {
@@ -102,7 +109,14 @@ const loader = async (
     site,
     countProductImageInCart,
   );
+
+  if (extensions && !disableExtensions) {
+    return await extend<Cart | null>({ data: cartWithImages, extensions });
+  }
+
+  return cartWithImages;
 };
+
 export default loader;
 
 const handleCachedImages = async (

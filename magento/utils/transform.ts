@@ -39,7 +39,6 @@ import {
   MIN_RATING_VALUE,
   OUT_OF_STOCK,
   REMOVABLE_URL_SEARCHPARAMS,
-  SORT_OPTIONS_ORDER,
 } from "./constants.ts";
 
 export const toProduct = ({
@@ -661,13 +660,10 @@ const toFilterValues = (
 };
 
 const toSortOptions = ({ options }: SortFieldsGraphQL): SortOption[] =>
-  SORT_OPTIONS_ORDER.reduce<SortOption[]>((acc, opt) => {
-    const option = options.find((v) => v.value === opt);
-    if (!option) {
-      return acc;
-    }
-    return [...acc, option];
-  }, []);
+  options.map(({ label, value }) => ({
+    label: label || value,
+    value,
+  }));
 
 const toPageInfo = (
   { current_page, page_size, total_pages }: PageInfoGraphQL,
