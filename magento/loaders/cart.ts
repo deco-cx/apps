@@ -89,8 +89,7 @@ const loader = async (
     url,
   );
   const nonCachedImages = await handleNonCachedImages(
-    { ctx, url },
-    nonCachedImagesSkus,
+    { skus: nonCachedImagesSkus, url, ctx },
   );
 
   return toCartItemsWithImages(
@@ -130,15 +129,16 @@ const handleCachedImages = async (
 };
 
 const handleNonCachedImages = async (
-  options: { ctx: AppContext; url: URL },
-  skus?: string[],
+  { skus, url, ctx }: { skus?: string[]; url: URL; ctx: AppContext },
 ) => {
   if (!skus || skus.length === 0) {
     return [];
   }
-  const { items } = (await getCartImages(skus, options.ctx)).products;
+  //Get images from API
+  const { items } = (await getCartImages(skus, ctx)).products;
+
   for (const i in items) {
-    putImageInCache(items[i], options.url);
+    putImageInCache(items[i], url);
   }
 
   return items;
