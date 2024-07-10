@@ -4,17 +4,6 @@ export const URL_KEY = "url_key";
 export const IN_STOCK = "https://schema.org/InStock";
 export const OUT_OF_STOCK = "https://schema.org/OutOfStock";
 
-export const SORT_OPTIONS_ORDER = [
-  "position",
-  "name",
-  "price",
-  "best_seller",
-  "top_rated",
-  "created_at",
-  "most_viewed",
-  "review_count",
-];
-
 export const DEFAULT_GRAPHQL_FILTERS: FiltersGraphQL[] = [
   { value: "activity", type: "EQUAL" },
   { value: "category_gear", type: "EQUAL" },
