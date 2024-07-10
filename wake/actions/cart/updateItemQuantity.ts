@@ -75,7 +75,7 @@ const action = async (
   if (props.quantity > 0 && quantity > 0) {
     checkout = await ctx.invoke.wake.actions.cart.addItem({...props, quantity})
   } else {
-    const data = await removeFromCart({...props, quantity:quantity*-1}, cartId, ctx, headers);
+    const data = await removeFromCart({...props, quantity:-quantity}, cartId, ctx, headers);
     checkout = data.checkout
   }
 
