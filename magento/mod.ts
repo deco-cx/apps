@@ -18,19 +18,19 @@ export interface FiltersGraphQL {
 
 export interface APIConfig {
   /**
-   * @title Magento api url
-   * @description The base url of the Magento API, If you have stores, put the name of the store at the end.
+   * @title Magento API URL
+   * @description The base URL of the Magento API, If you have stores, put the name of the store at the end.
    * @example https://magento.com/rest/store1 or https://magento.com/rest
    */
   baseUrl: string;
 
-  /** @title Magento api key */
+  /** @title Magento API key */
   apiKey: Secret;
 
   /** @title Magento store */
   site: string;
 
-  /** @title Magento store id */
+  /** @title Magento store ID */
   storeId: number;
 
   /**
@@ -46,7 +46,7 @@ export interface APIConfig {
   enableCache: boolean;
 
   /**
-   * @title Use Magento store prop as URL path suffix in PDP
+   * @title Use "Magento store" prop as URL path suffix in details pages
    */
   useSuffix: boolean;
 }
@@ -61,7 +61,7 @@ export interface ImagesConfig {
 
   /**
    * @title Images per shelf (max)
-   * @description Max images qtd per shelf
+   * @description Max images quantity per shelf
    * @default 3
    */
   imagesQtd: number;
@@ -70,13 +70,13 @@ export interface ImagesConfig {
 export interface CustomProps {
   /**
    * @title Custom Filters
-   * @description Applicate own filters
+   * @description Store custom filters
    */
   customFilters: Array<FiltersGraphQL>;
 
   /**
-   * @title Custom Attributes on Product
-   * @description Inform the product own custom attributes
+   * @title Custom Attributes 
+   * @description Inform the product custom attributes
    */
   customAttributes?: Array<string>;
 }
@@ -95,7 +95,7 @@ export interface PricingConfig {
 
 interface CartConfigs {
   /**
-   * @title Count Product Image in Cart
+   * @title Images per product in cart
    * @default 1
    */
   countProductImageInCart: number;
@@ -150,7 +150,7 @@ export interface Props {
 
   /**
    * @title Custom Props
-   * @description Use your ow props in product
+   * @description Use custom properties in products query
    */
   productCustomProps: CustomProps;
 
@@ -166,6 +166,8 @@ export interface Props {
 
   /**
    * @title Features
+   * @description DANGEROUSLY ZONE. Do not change any setting, unless you are sure.
+
    */
   features: Features;
 }
