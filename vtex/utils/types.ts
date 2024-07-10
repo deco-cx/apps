@@ -656,6 +656,7 @@ export type LegacyProduct = IProduct & {
   productTitle: string;
   items: LegacyItem[];
   allSpecifications: string[];
+  allSpecificationsGroups?: string[]
 };
 
 export type LegacyFacets = {
@@ -725,8 +726,9 @@ export interface Installment {
   Name: string;
 }
 
-export type LegacyItem = Omit<Item, "variations"> & {
+export type LegacyItem = Omit<Item, "variations" | "videos"> & {
   variations: string[];
+  Videos: string[];
 } & Record<string, string[]>;
 
 export interface Item {

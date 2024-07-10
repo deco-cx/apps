@@ -1,9 +1,9 @@
-import { isFreshCtx } from "../handlers/fresh.ts";
 import { DecoSiteState } from "deco/mod.ts";
 import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
+import { removeDirtyCookies as removeDirtyCookiesFn } from "../../utils/normalize.ts";
 import { Script } from "../types.ts";
-import { Monitoring } from "deco/engine/core/resolver.ts";
+import { isFreshCtx } from "./fresh.ts";
 
 const HOP_BY_HOP = [
   "Keep-Alive",
@@ -26,23 +26,6 @@ const removeCFHeaders = (headers: Headers) => {
     }
   });
 };
-
-async function logClonedResponseBody(
-  response: Response,
-  monitoring: Monitoring | undefined,
-): Promise<void> {
-  if (!response.body) {
-    return;
-  }
-
-  const clonedResponse = response.clone();
-  const text = await clonedResponse.text();
-
-  monitoring?.rootSpan?.setAttribute?.(
-    "proxy.error",
-    `${response.statusText}, body = ${text}`,
-  );
-}
 
 /**
  * @title {{{key}}} - {{{value}}}
@@ -99,6 +82,12 @@ export interface Props {
   avoidAppendPath?: boolean;
 
   replaces?: TextReplace[];
+
+  /**
+   * @description remove cookies that have non-ASCII characters and some symbols
+   * @default false
+   */
+  removeDirtyCookies?: boolean;
 }
 
 /**
@@ -114,6 +103,7 @@ export default function Proxy({
   redirect = "manual",
   avoidAppendPath,
   replaces,
+  removeDirtyCookies = false,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -134,6 +124,10 @@ export default function Proxy({
       _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    if (removeDirtyCookies) {
+      removeDirtyCookiesFn(headers);
+    }
+
     if (isFreshCtx<DecoSiteState>(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
     }
@@ -155,30 +149,13 @@ export default function Proxy({
       }
     }
 
-    const monitoring = isFreshCtx<DecoSiteState>(_ctx)
-      ? _ctx?.state?.monitoring
-      : undefined;
-
-    const fetchFunction = async () => {
-      try {
-        return await fetch(to, {
-          headers,
-          redirect,
-          method: req.method,
-          body: req.body,
-        });
-      } catch (err) {
-        monitoring?.rootSpan?.setAttribute?.("proxy.exception", err.message);
-
-        throw err;
-      }
-    };
-
-    const response = await fetchFunction();
-
-    if (response.status >= 299 || response.status < 200) {
-      await logClonedResponseBody(response, monitoring);
-    }
+    const response = await fetch(to, {
+      headers,
+      redirect,
+      signal: req.signal,
+      method: req.method,
+      body: req.body,
+    });
 
     const contentType = response.headers.get("Content-Type");
 

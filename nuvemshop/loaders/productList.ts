@@ -35,7 +35,12 @@ async function loader(
       per_page: props.limit || 10,
     });
     result = await response.json();
-  } catch {
+  } catch (error) {
+    // Make async rendering work
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw error;
+    }
+
     result = [];
   }
 

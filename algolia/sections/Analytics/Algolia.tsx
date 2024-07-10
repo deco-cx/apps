@@ -1,4 +1,5 @@
 import { SectionProps } from "deco/blocks/section.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import insights from "npm:search-insights@2.9.0";
 import {
   AddToCartEvent,
@@ -6,7 +7,6 @@ import {
   ViewItemEvent,
   ViewItemListEvent,
 } from "../../../commerce/types.ts";
-import { scriptAsDataURI } from "../../../utils/dataURI.ts";
 import { AppContext } from "../../mod.ts";
 
 declare global {
@@ -188,7 +188,7 @@ function Analytics({
   return (
     <script
       defer
-      src={scriptAsDataURI(
+      src={useScriptAsDataURI(
         setupAndListen,
         applicationId,
         searchApiKey,

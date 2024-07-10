@@ -1,4 +1,4 @@
-import { SearchClient } from "npm:algoliasearch@4.20.0";
+import { SearchClient } from "https://esm.sh/algoliasearch@4.20.0";
 import {
   ItemAvailability,
   Product,

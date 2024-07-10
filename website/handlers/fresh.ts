@@ -12,6 +12,8 @@ import { getSetCookies } from "std/http/cookie.ts";
 import { ConnInfo } from "std/http/server.ts";
 import { AppContext } from "../mod.ts";
 
+export const __DECO_FBT = "__decoFBT";
+
 /**
  * @title Fresh Config
  */
@@ -33,7 +35,12 @@ export default function Fresh(
   freshConfig: FreshConfig,
   appContext: Pick<
     AppContext,
-    "monitoring" | "response" | "caching" | "firstByteThresholdMS" | "isBot"
+    | "monitoring"
+    | "response"
+    | "caching"
+    | "firstByteThresholdMS"
+    | "isBot"
+    | "flavor"
   >,
 ) {
   return async (req: Request, ctx: ConnInfo) => {
@@ -45,7 +52,7 @@ export default function Fresh(
     const asJson = url.searchParams.get("asJson");
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
     const delay = Number(
-      url.searchParams.get("__decoFBT") ?? delayFromProps,
+      url.searchParams.get(__DECO_FBT) ?? delayFromProps,
     );
 
     /** Controller to abort third party fetch (loaders) */
@@ -117,11 +124,17 @@ export default function Fresh(
         const timing = appContext?.monitoring?.timings?.start?.(
           "render-to-string",
         );
+
+        const renderToString = RequestContext.bind(
+          { framework: appContext.flavor?.framework ?? "fresh" },
+          ctx.render,
+        );
+
         const response = await appContext.monitoring!.tracer.startActiveSpan(
           "render-to-string",
           async (span) => {
             try {
-              const response = await ctx.render({
+              const response = await renderToString({
                 page,
                 routerInfo: {
                   flags: ctx.state.flags,
@@ -154,7 +167,6 @@ export default function Fresh(
         status: 500,
       });
     } finally {
-      req.signal.removeEventListener("abort", abortHandler);
       if (firstByteThreshold) {
         clearTimeout(firstByteThreshold);
       }
