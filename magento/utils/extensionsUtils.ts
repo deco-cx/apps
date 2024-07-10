@@ -1,5 +1,6 @@
 import { Product } from "../../commerce/types.ts";
 import { STALE as DecoStale } from "../../utils/fetch.ts";
+import { Cart } from "../loaders/cart.ts";
 import { AppContext } from "../mod.ts";
 import { toLiveloPoints, toReviewAmasty } from "./transform.ts";
 
@@ -47,6 +48,22 @@ export const liveloExt = async (
   );
 
   return toLiveloPoints(products, liveloPoints);
+};
+
+export const liveloCartExt = async (
+  cart: Cart,
+  path: string,
+  ctx: AppContext,
+): Promise<Cart | null> => {
+  const livelo = await ctx.clientAdmin["GET /rest/:liveloUrl/:cartId"]({
+    liveloUrl: sanitizePath(path),
+    cartId: `${cart.id}`,
+  }).then((points) => points.json());
+
+  return {
+    ...cart,
+    livelo,
+  };
 };
 
 const sanitizePath = (path: string) => path.replace(/^\/?(rest\/)?/, "");
