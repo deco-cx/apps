@@ -2,12 +2,9 @@ import { HttpError } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
 import {
-  AddItemToCart,
   RemoveItemFromCart,
 } from "../../utils/graphql/queries.ts";
 import {
-  AddItemToCartMutation,
-  AddItemToCartMutationVariables,
   CheckoutFragment,
   RemoveItemFromCartMutation,
   RemoveItemFromCartMutationVariables,
@@ -20,22 +17,6 @@ export interface Props {
   customization?: { customizationId: number; value: string }[];
   subscription?: { subscriptionGroupId: number; recurringTypeId: number };
 }
-
-const addToCart = (
-  props: Props,
-  cartId: string,
-  ctx: AppContext,
-  headers: Headers,
-) =>
-  ctx.storefront.query<
-    AddItemToCartMutation,
-    AddItemToCartMutationVariables
-  >({
-    variables: {
-      input: { id: cartId, products: [props] },
-    },
-    ...AddItemToCart,
-  }, { headers });
 
 const removeFromCart = (
   props: Props,
@@ -64,6 +45,13 @@ const action = async (
   if (!cartId) {
     throw new HttpError(400, "Missing cart cookie");
   }
+
+  /* 
+  * get cart
+  * find the current product on cart
+  * the current amount
+  * calculate the difference between the current item amount and requested new amount 
+  */
 
   const cart = await ctx.invoke.wake.loaders.cart(props, req)
   const item = cart.products?.find(item => item?.productVariantId === props.productVariantId)
