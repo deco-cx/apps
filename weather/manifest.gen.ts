@@ -4,10 +4,14 @@
 
 import * as $$$0 from "./loaders/temperature.ts";
 import * as $$$$$$$0 from "./matchers/temperature.ts";
+import * as $$$$$$0 from "./sections/WhatsTheTemperature.tsx";
 
 const manifest = {
   "loaders": {
     "weather/loaders/temperature.ts": $$$0,
+  },
+  "sections": {
+    "weather/sections/WhatsTheTemperature.tsx": $$$$$$0,
   },
   "matchers": {
     "weather/matchers/temperature.ts": $$$$$$$0,
