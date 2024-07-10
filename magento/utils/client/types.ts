@@ -266,6 +266,7 @@ export interface CartFromAPI {
   totalizers: Totalizers;
   message?: string;
   status?: number;
+  livelo?: LiveloPoints
 }
 
 export interface Cart extends Omit<CartFromAPI, "items"> {

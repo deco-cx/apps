@@ -10,6 +10,8 @@ import { createGraphqlClient } from "../utils/graphql.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { middleware } from "./middleware.ts";
 import { Secret } from "../website/loaders/secret.ts";
+import { ExtensionOf } from "../website/loaders/extension.ts";
+import { Cart } from "./loaders/cart.ts";
 
 export interface FiltersGraphQL {
   value: string;
@@ -105,6 +107,11 @@ interface CartConfigs {
    * @default false
    */
   changeCardIdAfterCheckout: boolean;
+  /**
+   * @title Cart extensions
+   * @description Extend the cart invoke directly.
+   */
+  extensions: ExtensionOf<Cart | null>[];
 }
 
 export interface Features {
