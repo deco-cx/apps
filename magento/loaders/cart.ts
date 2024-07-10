@@ -1,3 +1,4 @@
+import { ExtensionOf } from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
 import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
@@ -18,6 +19,7 @@ export type Cart = CartFromDeco;
 
 interface Props {
   cartId?: string;
+  disableExtensions?: boolean;
 }
 
 /**
@@ -25,12 +27,15 @@ interface Props {
  * @description Cart loader
  */
 const loader = async (
-  { cartId: _cartId }: Props = { cartId: undefined },
+  { cartId: _cartId, disableExtensions }: Props = {
+    cartId: undefined,
+    disableExtensions: false,
+  },
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { clientAdmin, site, cartConfigs } = ctx;
-  const { countProductImageInCart } = cartConfigs;
+  const { countProductImageInCart, extensions } = cartConfigs;
   const url = new URL(req.url);
   const cartId = _cartId ?? getCartCookie(req.headers);
 
@@ -75,7 +80,7 @@ const loader = async (
 
   const { products } = await getImages({ cart }, req, ctx);
 
-  return toCartItemsWithImages(
+  const cartWithImages = toCartItemsWithImages(
     cart,
     prices,
     products,
@@ -83,5 +88,24 @@ const loader = async (
     site,
     countProductImageInCart,
   );
+
+  if (extensions && !disableExtensions) {
+    return extend(cartWithImages, extensions);
+  }
+
+  return cartWithImages;
 };
+
+const extend = async (
+  cart: Cart,
+  extensions: ExtensionOf<CartFromDeco | null>[],
+) => {
+  let c = cart;
+
+  for (const i in extensions) {
+    c = await extensions[i](c) as Cart;
+  }
+  return c;
+};
+
 export default loader;

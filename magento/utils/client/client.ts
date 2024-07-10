@@ -190,4 +190,12 @@ export interface API {
     };
     response: LiveloPoints;
   };
+
+  "GET /rest/:liveloUrl/:cartId": {
+    searchParams: {
+      liveloUrl: string;
+      cartId: string;
+    };
+    response: LiveloPoints;
+  };
 }
