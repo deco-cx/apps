@@ -1,7 +1,10 @@
 import type { Section } from "deco/blocks/section.ts";
 import { usePartialSection } from "deco/hooks/usePartialSection.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { asResolved, isDeferred } from "deco/mod.ts";
 import { useId } from "preact/hooks";
+import { AppContext } from "../../mod.ts";
+import { shouldForceRender } from "../../../utils/deferred.ts";
 
 /** @titleBy type */
 interface Scroll {
@@ -97,15 +100,32 @@ const Deferred = (props: Props) => {
   );
 };
 
-export const onBeforeResolveProps = (props: Props) => {
-  if (!props.display) {
+export const loader = async (props: Props, req: Request, ctx: AppContext) => {
+  const url = new URL(req.url);
+  const shouldRender = props.display === true ||
+    shouldForceRender({ ctx, searchParams: url.searchParams });
+
+  if (shouldRender) {
+    const sections = isDeferred(props.sections)
+      ? await props.sections()
+      : props.sections;
     return {
       ...props,
-      sections: [],
+      display: true,
+      sections,
     };
   }
 
-  return props;
+  return { ...props, sections: [] };
+};
+
+const DEFERRED = true;
+
+export const onBeforeResolveProps = (props: Props) => {
+  return {
+    ...props,
+    sections: asResolved(props.sections, DEFERRED),
+  };
 };
 
 export default Deferred;
