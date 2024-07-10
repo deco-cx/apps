@@ -11,6 +11,7 @@ import { Props as AddProductProps } from "../actions/cart/addItem.ts";
 import { LoginResponse } from "./types/login.ts";
 import { NewsletterResponse } from "./types/newsletterJSON.ts";
 import { UserResponse } from "./types/userJSON.ts";
+import { AddToWishlistResponse } from "./types/wishlistJSON.ts";
 
 export interface API {
   "GET /*splat": {
@@ -130,4 +131,15 @@ export interface API {
       BasketID?: number;
     };
   }
+
+  "POST /Profile/Wishlist/AddProductToWishlist": {
+    response: AddToWishlistResponse;
+    searchParams: {
+      WishlistID: number;
+      WebSiteID?: number;
+      ProductID: number;
+      Quantity: number;
+      SkuID: number;
+    };
+  };
 }
