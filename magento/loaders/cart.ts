@@ -1,4 +1,6 @@
-import { ExtensionOf } from "../../website/loaders/extension.ts";
+import {
+  default as extend,
+} from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
 import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
@@ -90,22 +92,10 @@ const loader = async (
   );
 
   if (extensions && !disableExtensions) {
-    return extend(cartWithImages, extensions);
+    return await extend<Cart | null>({ data: cartWithImages, extensions });
   }
 
   return cartWithImages;
-};
-
-const extend = async (
-  cart: Cart,
-  extensions: ExtensionOf<CartFromDeco | null>[],
-) => {
-  let c = cart;
-
-  for (const i in extensions) {
-    c = await extensions[i](c) as Cart;
-  }
-  return c;
 };
 
 export default loader;
