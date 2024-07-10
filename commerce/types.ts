@@ -14,6 +14,10 @@ export interface Category {
    */
   name: string;
   /**
+   * @title The Category Url
+   */
+  url: string;
+  /**
    * @title Sub categories
    * @description Store's sub categories
    */
@@ -378,6 +382,8 @@ export interface Person extends Omit<Thing, "@type"> {
   gender?: "https://schema.org/Male" | "https://schema.org/Female";
   /** An image of the item. This can be a URL or a fully described ImageObject. **/
   image?: ImageObject[];
+  /** The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain. */
+  taxID?: string;
 }
 
 // NON SCHEMA.ORG Compliant. Should be removed ASAP

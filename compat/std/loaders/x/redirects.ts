@@ -12,17 +12,19 @@ export interface Redirect {
    */
   to: string;
   type?: "temporary" | "permanent";
+  /**
+   * @title Discard query parameters
+   */
+  discardQueryParameters?: boolean;
 }
 
 export interface Redirects {
   redirects: Redirect[];
 }
 
-export default function redirect(
-  { redirects }: Redirects,
-): Route[] {
+export default function redirect({ redirects }: Redirects): Route[] {
   const routes: Route[] = (redirects || []).map((
-    { from, to, type },
+    { from, to, type, discardQueryParameters },
   ) => ({
     pathTemplate: from,
     isHref: true,
@@ -31,6 +33,7 @@ export default function redirect(
         __resolveType: "website/handlers/redirect.ts",
         to,
         type,
+        discardQueryParameters,
       },
     },
   }));

@@ -146,6 +146,10 @@ export default function App(
 ): App<Manifest, State, [ReturnType<typeof openai>]> {
   const openAIApp = openai(state);
   const assistantsAPI = openAIApp.state.openAI.beta.assistants;
+  // Sets assistantId only if state.assistants exists
+  const assistantId = (state.assistants?.[0] ?? null) !== null
+    ? state.assistantId
+    : "";
   return {
     manifest,
     state: {
@@ -170,9 +174,7 @@ export default function App(
         {},
       ),
       instructions: `${state.instructions ?? ""}`,
-      assistant: assistantsAPI.retrieve(
-        state.assistantId,
-      ),
+      assistant: assistantsAPI.retrieve(assistantId),
       s3: new AWS.S3({
         region: state.assistantAwsProps?.assistantBucketRegion.get?.() ??
           Deno.env.get("ASSISTANT_BUCKET_REGION"),

@@ -7,9 +7,7 @@ const isHref = (from: string) =>
   from.startsWith("http") || (!from?.includes("*") && !from?.includes("/:"));
 
 async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
-  const allRedirects = await ctx.get<
-    RedirectProps[]
-  >({
+  const allRedirects = await ctx.get<RedirectProps[]>({
     resolveType: "website/loaders/redirect.ts",
     __resolveType: defaults["resolveTypeSelector"].name,
   });
@@ -22,6 +20,7 @@ async function getAllRedirects(ctx: AppContext): Promise<Route[]> {
         __resolveType: "website/handlers/redirect.ts",
         to: redirect.to,
         type: redirect.type,
+        discardQueryParameters: redirect.discardQueryParameters,
       },
     },
   }));
@@ -36,9 +35,7 @@ export default async function Redirects(
   _req: Request,
   ctx: AppContext,
 ): Promise<Route[]> {
-  const allRedirects = await ctx.get<
-    Route[]
-  >({
+  const allRedirects = await ctx.get<Route[]>({
     key: "getAllRedirects",
     func: () => getAllRedirects(ctx),
     __resolveType: defaults["once"].name,
