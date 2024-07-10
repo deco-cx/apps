@@ -48,7 +48,7 @@ const removeFromCart = (
     RemoveItemFromCartMutationVariables
   >({
     variables: {
-      input: { id: cartId, products: [{ ...props }] },
+      input: { id: cartId, products: [props] },
     },
     ...RemoveItemFromCart,
   }, { headers });
