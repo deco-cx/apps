@@ -15,9 +15,6 @@ import {
 import { GetProductImages } from "./clientGraphql/queries.ts";
 
 export const CART_COOKIE = "dataservices_cart_id";
-const CART_CUSTOMER_COOKIE = "dataservices_customer_id";
-
-const ONE_WEEK_MS = 7 * 24 * 3600 * 1_000;
 
 export const getCartCookie = (headers: Headers): string => {
   const cookies = getCookies(headers);
@@ -38,59 +35,6 @@ export const getCartCookie = (headers: Headers): string => {
     }
   }
   return "";
-};
-
-export const setCartCookie = (headers: Headers, cartId: string) => {
-  const encodedCartId = encodeURIComponent(`"${cartId}"`);
-  const cookie = `${CART_COOKIE}=${encodedCartId}; Path=/; Expires=${
-    new Date(
-      Date.now() + ONE_WEEK_MS,
-    ).toUTCString()
-  }; SameSite=Lax`;
-  headers.append("Set-Cookie", cookie);
-};
-
-export async function createCart(
-  { clientAdmin, site, response }: AppContext,
-  headers: Headers,
-  forceNewCart = false,
-) {
-  const cartCookie = getCartCookie(headers);
-  const customerCookie = getCookies(headers)[CART_CUSTOMER_COOKIE];
-
-  if ((!cartCookie && !customerCookie) || forceNewCart) {
-    const newCart = await createNewCart({ clientAdmin, site }, headers);
-    setCartCookie(response.headers, newCart.id.toString());
-    return newCart;
-  }
-
-  const cart = await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-    cartId: cartCookie,
-    site,
-  }).then((res) => res.json());
-
-  return {
-    ...cart,
-    // deno-lint-ignore no-unused-vars
-    items: cart.items.map(({ images, ...rest }) => rest),
-  };
-}
-
-const createNewCart = async ({
-  clientAdmin,
-  site,
-}: Pick<AppContext, "clientAdmin" | "site">, headers: Headers) => {
-  const tokenCart = await clientAdmin["POST /rest/:site/V1/guest-carts"]({
-    site,
-  }, { headers }).then((res) => res.json());
-  const cart = await clientAdmin["GET /rest/:site/V1/guest-carts/:cartId"]({
-    cartId: tokenCart,
-    site,
-  }).then((res) => res.json());
-  return await clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
-    cartId: cart.id,
-    site,
-  }).then((res) => res.json());
 };
 
 export const toCartItemsWithImages = (

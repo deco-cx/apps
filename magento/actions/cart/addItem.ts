@@ -50,7 +50,7 @@ const action = async (
   try {
     const fetchResult = await fetch(
       `${baseUrl}/${site}/checkout/cart/add/uenc/${
-        btoa(url).replace(/=/g, "~")
+        btoa(baseUrl).replace(/=/g, "~")
       }/product/${productId}`,
       {
         method: "POST",
@@ -76,6 +76,8 @@ const action = async (
         cartId = parsed.value.replace(/%22/g, "");
         setCookie(ctx.response.headers, {
           ...parsed,
+          httpOnly: true,
+          secure: true,
           path: "/",
           unparsed: ["Priority=High"],
         });
