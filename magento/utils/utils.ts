@@ -1,5 +1,6 @@
 import { getSetCookies, setCookie } from "std/http/cookie.ts";
 import { SESSION_COOKIE } from "./constants.ts";
+import { Features } from "../mod.ts";
 
 export const proxySetCookie = (
   from: Headers,
@@ -42,3 +43,22 @@ export const sortSearchParams = (url: URL) => {
   });
   return sortedParams.join("&");
 };
+
+export function decodeFeatures(stringfiedSession: string | null): Features {
+  try {
+    if (!stringfiedSession) {
+      throw new Error("Features not found");
+    }
+    const decoded = atob  (stringfiedSession);
+    const features = JSON.parse(decoded) as Features;
+    return features;
+  } catch (error) {
+    console.error("error in features decode: " + error);
+    return {
+      dangerouslyDisableOnLoadUpdate: false,
+      dangerouslyDisableOnVisibilityChangeUpdate: false,
+      dangerouslyDisableWishlist: false,
+      dangerouslyReturnNullAfterAction: false,
+    };
+  }
+}

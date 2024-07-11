@@ -4,6 +4,8 @@ import { signal } from "@preact/signals";
 import { invoke } from "../runtime.ts";
 import type { Cart } from "../loaders/cart.ts";
 import { Wishlist } from "../utils/client/types.ts";
+import { SESSION_STORAGE_KEY } from "../utils/constants.ts";
+import { decodeFeatures } from "../utils/utils.ts";
 
 export interface Context {
   cart: Cart;
@@ -63,17 +65,16 @@ const load = (signal: AbortSignal, disableWishlist: boolean) =>
   );
 
 if (IS_BROWSER) {
-  const features = await invoke.magento.loaders.features().then((
-    feats,
-  ) => feats);
+  const sessionFeatures = sessionStorage.getItem(SESSION_STORAGE_KEY);
+  const features = decodeFeatures(sessionFeatures);
 
-  if (!features.dangerouslyDisableOnLoadUpdate) {
+  if (features.dangerouslyDisableOnLoadUpdate) {
     enqueue((signal) =>
       load(signal, features.dangerouslyDisableWishlist) as any
     );
   }
 
-  if (!features.dangerouslyDisableOnVisibilityChangeUpdate) {
+  if (features.dangerouslyDisableOnVisibilityChangeUpdate) {
     document.addEventListener(
       "visibilitychange",
       () =>

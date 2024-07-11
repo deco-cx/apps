@@ -36,6 +36,7 @@ import * as $$$16 from "./loaders/product/listingPage.ts";
 import * as $$$17 from "./loaders/proxy.ts";
 import * as $$$18 from "./loaders/user.ts";
 import * as $$$19 from "./loaders/wishlist.ts";
+import * as $$$$$$0 from "./sections/Features/Magento.tsx";
 
 const manifest = {
   "loaders": {
@@ -64,6 +65,9 @@ const manifest = {
     "magento/handlers/proxy.ts": $$$$0,
     "magento/handlers/redirect.ts": $$$$1,
     "magento/handlers/sitemap.ts": $$$$2,
+  },
+  "sections": {
+    "magento/sections/Features/Magento.tsx": $$$$$$0,
   },
   "actions": {
     "magento/actions/amasty/submitReview.ts": $$$$$$$$$0,

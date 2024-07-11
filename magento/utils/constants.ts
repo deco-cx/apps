@@ -4,6 +4,8 @@ export const URL_KEY = "url_key";
 export const IN_STOCK = "https://schema.org/InStock";
 export const OUT_OF_STOCK = "https://schema.org/OutOfStock";
 
+export const SESSION_STORAGE_KEY = "ZmVhdHVyZXNfbWFnZW50b19hcHBz"; //"features_magento_apps" in base64
+
 export const DEFAULT_GRAPHQL_FILTERS: FiltersGraphQL[] = [
   { value: "activity", type: "EQUAL" },
   { value: "category_gear", type: "EQUAL" },
