@@ -1,7 +1,6 @@
-import {
-  default as extend,
-} from "../../website/loaders/extension.ts";
+import { default as extend } from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
+import { handleCartImages } from "../utils/cache.ts";
 import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
 import {
@@ -15,7 +14,6 @@ import {
   SHIPPING_DISCOUNT_AMOUNT,
   SUBTOTAL,
 } from "../utils/constants.ts";
-import getImages from "./product/images.ts";
 
 export type Cart = CartFromDeco;
 
@@ -60,11 +58,11 @@ const loader = async (
         COUPON_CODE,
         BASE_CURRENCY_CODE,
       ].join(","),
-    }).then((c) => c.json()),
+    }).then((totalizers) => totalizers.json()),
     clientAdmin["GET /rest/:site/V1/carts/:cartId"]({
       cartId,
       site,
-    }).then((c) => c.json()),
+    }).then((items) => items.json()),
   ]);
 
   if (cart.items.length === 0) {
@@ -80,12 +78,12 @@ const loader = async (
     );
   }
 
-  const { products } = await getImages({ cart }, req, ctx);
+  const productsImages = await handleCartImages(cart, url, ctx);
 
   const cartWithImages = toCartItemsWithImages(
     cart,
     prices,
-    products,
+    productsImages,
     url.origin,
     site,
     countProductImageInCart,

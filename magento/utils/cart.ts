@@ -7,10 +7,12 @@ import {
   CartFromAPI,
   ItemsWithDecoImage,
   MagentoCardPrices,
-  //MagentoProduct,
 } from "./client/types.ts";
-//import { toURL } from "./transform.ts";
-import { ProductWithImagesGraphQL } from "./clientGraphql/types.ts";
+import {
+  ProductImagesInputs,
+  ProductWithImagesGraphQL,
+} from "./clientGraphql/types.ts";
+import { GetProductImages } from "./clientGraphql/queries.ts";
 
 export const CART_COOKIE = "dataservices_cart_id";
 
@@ -140,4 +142,22 @@ export async function handleCartActions(dontReturnCart: boolean, settings: {
     ...(await cart({ cartId }, settings.req, settings.ctx)),
     ...handledError,
   } as Cart;
+}
+
+export async function getCartImages(
+  skus: Array<string>,
+  ctx: AppContext,
+) {
+  return await ctx.clientGraphql.query<
+    ProductWithImagesGraphQL,
+    ProductImagesInputs
+  >(
+    {
+      variables: {
+        filter: { sku: { in: skus.map((sku) => sku) } },
+        pageSize: skus.length,
+      },
+      ...GetProductImages,
+    },
+  );
 }
