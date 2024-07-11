@@ -485,6 +485,8 @@ export interface Product extends Omit<Thing, "@type"> {
   productID: string;
   /** The date of production of the item, e.g. vehicle. */
   productionDate?: string;
+  /** The available date of the item. */
+  availableDate?: string;
   /** The release date of a product or product model. This can be used to distinguish the exact variant of a product. */
   releaseDate?: string;
   /** A review of the item. */

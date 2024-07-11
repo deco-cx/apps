@@ -656,7 +656,7 @@ export type LegacyProduct = IProduct & {
   productTitle: string;
   items: LegacyItem[];
   allSpecifications: string[];
-  allSpecificationsGroups?: string[]
+  allSpecificationsGroups?: string[];
 };
 
 export type LegacyFacets = {
@@ -737,6 +737,7 @@ export interface Item {
   nameComplete: string;
   complementName: string;
   ean: string;
+  estimatedDateArrival: string;
   referenceId?: Array<{ Key: string; Value: string }>;
   measurementUnit: string;
   unitMultiplier: number;
