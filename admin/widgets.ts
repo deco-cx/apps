@@ -38,22 +38,22 @@ export type RichText = string;
  * @format color-input
  * @default #000000
  */
-export type ColorInput = string;
+export type Color = string;
 
 /**
  * @format code
  * @language css
  */
-export type CSSCode = string;
+export type CSS = string;
 
 /**
  * @format code
  * @language typescript
  */
-export type TypescriptCode = string;
+export type TypeScript = string;
 
 /**
  * @format code
  * @language json
  */
-export type JSONCode = string;
+export type Json = string;
