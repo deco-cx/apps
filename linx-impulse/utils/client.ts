@@ -85,6 +85,9 @@ export interface LinxAPI {
       productFormat?: ProductFormat;
       userId?: string;
       source?: Source;
+      ranking?: string;
+      p?: string;
+      topsearch?: string;
     };
   };
 
@@ -101,11 +104,14 @@ export interface LinxAPI {
       filter?: string[];
       apiKey: string;
       origin?: string;
+      ranking?: string;
       deviceId: string;
       salesChannel?: string;
       productFormat?: ProductFormat;
       userId?: string;
       source?: Source;
+      p?: string;
+      topsearch?: string;
     };
   };
 
@@ -125,6 +131,7 @@ export interface LinxAPI {
       productFormat?: ProductFormat;
       userId?: string;
       source?: Source;
+      ranking?: string;
     };
   };
 }
