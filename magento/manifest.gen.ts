@@ -5,16 +5,14 @@
 import * as $$$$$$$$$0 from "./actions/amasty/submitReview.ts";
 import * as $$$$$$$$$1 from "./actions/cart/addCoupon.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$3 from "./actions/cart/addItemToCart.ts";
-import * as $$$$$$$$$4 from "./actions/cart/removeCoupon.ts";
-import * as $$$$$$$$$5 from "./actions/cart/removeItem.ts";
-import * as $$$$$$$$$6 from "./actions/cart/setSimulation.ts";
-import * as $$$$$$$$$7 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$8 from "./actions/cart/updateItem.ts";
-import * as $$$$$$$$$9 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$10 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$11 from "./actions/wishlist/removeItem.ts";
-import * as $0 from "./functions/requestToPathname.ts";
+import * as $$$$$$$$$3 from "./actions/cart/removeCoupon.ts";
+import * as $$$$$$$$$4 from "./actions/cart/removeItem.ts";
+import * as $$$$$$$$$5 from "./actions/cart/setSimulation.ts";
+import * as $$$$$$$$$6 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$7 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$8 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$9 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$10 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/proxy.ts";
 import * as $$$$1 from "./handlers/redirect.ts";
 import * as $$$$2 from "./handlers/sitemap.ts";
@@ -33,18 +31,13 @@ import * as $$$11 from "./loaders/product/extensions/detailsPage.ts";
 import * as $$$12 from "./loaders/product/extensions/extend.ts";
 import * as $$$13 from "./loaders/product/extensions/list.ts";
 import * as $$$14 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$15 from "./loaders/product/getId.ts";
-import * as $$$16 from "./loaders/product/images.ts";
-import * as $$$17 from "./loaders/product/list.ts";
-import * as $$$18 from "./loaders/product/listingPage.ts";
-import * as $$$19 from "./loaders/proxy.ts";
-import * as $$$20 from "./loaders/user.ts";
-import * as $$$21 from "./loaders/wishlist.ts";
+import * as $$$15 from "./loaders/product/list.ts";
+import * as $$$16 from "./loaders/product/listingPage.ts";
+import * as $$$17 from "./loaders/proxy.ts";
+import * as $$$18 from "./loaders/user.ts";
+import * as $$$19 from "./loaders/wishlist.ts";
 
 const manifest = {
-  "functions": {
-    "magento/functions/requestToPathname.ts": $0,
-  },
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
     "magento/loaders/extensions/cart/cart.ts": $$$1,
@@ -61,13 +54,11 @@ const manifest = {
     "magento/loaders/product/extensions/extend.ts": $$$12,
     "magento/loaders/product/extensions/list.ts": $$$13,
     "magento/loaders/product/extensions/listingPage.ts": $$$14,
-    "magento/loaders/product/getId.ts": $$$15,
-    "magento/loaders/product/images.ts": $$$16,
-    "magento/loaders/product/list.ts": $$$17,
-    "magento/loaders/product/listingPage.ts": $$$18,
-    "magento/loaders/proxy.ts": $$$19,
-    "magento/loaders/user.ts": $$$20,
-    "magento/loaders/wishlist.ts": $$$21,
+    "magento/loaders/product/list.ts": $$$15,
+    "magento/loaders/product/listingPage.ts": $$$16,
+    "magento/loaders/proxy.ts": $$$17,
+    "magento/loaders/user.ts": $$$18,
+    "magento/loaders/wishlist.ts": $$$19,
   },
   "handlers": {
     "magento/handlers/proxy.ts": $$$$0,
@@ -78,15 +69,14 @@ const manifest = {
     "magento/actions/amasty/submitReview.ts": $$$$$$$$$0,
     "magento/actions/cart/addCoupon.ts": $$$$$$$$$1,
     "magento/actions/cart/addItem.ts": $$$$$$$$$2,
-    "magento/actions/cart/addItemToCart.ts": $$$$$$$$$3,
-    "magento/actions/cart/removeCoupon.ts": $$$$$$$$$4,
-    "magento/actions/cart/removeItem.ts": $$$$$$$$$5,
-    "magento/actions/cart/setSimulation.ts": $$$$$$$$$6,
-    "magento/actions/cart/simulation.ts": $$$$$$$$$7,
-    "magento/actions/cart/updateItem.ts": $$$$$$$$$8,
-    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$9,
-    "magento/actions/wishlist/addItem.ts": $$$$$$$$$10,
-    "magento/actions/wishlist/removeItem.ts": $$$$$$$$$11,
+    "magento/actions/cart/removeCoupon.ts": $$$$$$$$$3,
+    "magento/actions/cart/removeItem.ts": $$$$$$$$$4,
+    "magento/actions/cart/setSimulation.ts": $$$$$$$$$5,
+    "magento/actions/cart/simulation.ts": $$$$$$$$$6,
+    "magento/actions/cart/updateItem.ts": $$$$$$$$$7,
+    "magento/actions/newsletter/subscribe.ts": $$$$$$$$$8,
+    "magento/actions/wishlist/addItem.ts": $$$$$$$$$9,
+    "magento/actions/wishlist/removeItem.ts": $$$$$$$$$10,
   },
   "name": "magento",
   "baseUrl": import.meta.url,

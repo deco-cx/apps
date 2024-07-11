@@ -7,6 +7,10 @@ import { getUserCookie } from "../../utils/user.ts";
 
 export type Props = Omit<SetShipping, "quoteId">;
 
+/**
+ * @title Magento Integration - Set Shipping Simulation
+ * @description Set a shipping simulation to a cart
+ */
 const action = async (
   props: Props & OverrideFeatures,
   req: Request,

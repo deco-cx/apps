@@ -5,6 +5,10 @@ import { OverrideFeatures } from "../../utils/client/types.ts";
 
 type Props = OverrideFeatures;
 
+/**
+ * @title Magento Integration - Remove coupon
+ * @description Remove coupon action
+ */
 const action = async (
   props: Props,
   req: Request,

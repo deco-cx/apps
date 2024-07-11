@@ -7,6 +7,10 @@ export interface Props extends OverrideFeatures {
   itemId: string;
 }
 
+/**
+ * @title Magento Integration - Remove Item
+ * @description Remove item action
+ */
 const action = async (
   { itemId, dangerouslyOverrideReturnNull }: Props,
   req: Request,

@@ -7,6 +7,11 @@ import { SESSION_COOKIE } from "../../utils/constants.ts";
 export interface Props {
   itemId: string;
 }
+
+/**
+ * @title Magento Integration - Remove item from Wishlist
+ * @description Remove from wishlist action
+ */
 const action = async (
   { itemId }: Props,
   req: Request,

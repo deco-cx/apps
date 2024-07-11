@@ -12,10 +12,10 @@ import {
   filtersFromLoaderGraphQL,
   formatUrlSuffix,
   getCustomFields,
-} from "../../utils/utilsGraphQL.ts";
+} from "../../utils/graphql.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { toProductGraphQL } from "../../utils/transform.ts";
-import { transformSortGraphQL, typeChecker } from "../../utils/utilsGraphQL.ts";
+import { transformSortGraphQL, typeChecker } from "../../utils/graphql.ts";
 
 export interface CommomProps {
   /**
@@ -35,10 +35,10 @@ export interface CommomProps {
    */
   customFields: CustomFields;
 
-  /** @title Sorting */
+  /** @title Sort options */
   sort?: ProductSort;
 
-  /** @title Filter */
+  /** @title Filters */
   filter?: Array<FilterProps>;
 }
 
@@ -51,11 +51,15 @@ export interface CategoryProps extends CommomProps {
   /** @title Categories IDs */
   categories: Array<string>;
 
-  /** @title Use Uid for mapping category */
+  /**
+   * @title Use "category_uid" instead of "category_id"
+   * @description If enabled, the "Categories IDs" fiels must be in Base64.
+   */
   useCategoryUid: boolean;
 }
 
 export interface ProductSkuProps extends Omit<CommomProps, "filter"> {
+  /** @title SKUs */
   skus: Array<string>;
 }
 
@@ -64,7 +68,7 @@ export interface CustomProps extends Omit<CommomProps, "filter"> {
   customProps: Array<FilterProps>;
 }
 
-export interface SuggestionsFromUrl extends CommomProps {}
+export type SuggestionsFromUrl = CommomProps;
 
 export interface Props {
   props:
@@ -183,6 +187,7 @@ const fromProps = (
 
 /**
  * @title Magento Integration - Product Shelves
+ * @description Product Shelves loader
  */
 async function loader(
   { props }: Props,

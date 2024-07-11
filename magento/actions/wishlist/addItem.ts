@@ -6,6 +6,10 @@ import { SESSION_COOKIE } from "../../utils/constants.ts";
 export interface Props {
   productId: string;
 }
+/**
+ * @title Magento Integration - Add item to Wishlist
+ * @description Add to wishlist action
+ */
 const action = async (
   { productId }: Props,
   req: Request,

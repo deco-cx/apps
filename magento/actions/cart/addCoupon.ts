@@ -12,6 +12,10 @@ interface ErrorAddCoupon {
   status: number;
 }
 
+/**
+ * @title Magento Integration - Add coupon
+ * @description Add coupon action
+ */
 const action = async (
   props: Props,
   req: Request,

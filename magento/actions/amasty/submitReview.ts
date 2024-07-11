@@ -21,6 +21,10 @@ interface Ratings {
   value: string;
 }
 
+/**
+ * @title Magento Integration - Submit review
+ * @description Submit review action
+ */
 const loader = async (
   props: Props,
   _req: Request,

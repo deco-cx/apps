@@ -1,7 +1,7 @@
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../mod.ts";
 import { ExtensionProps } from "../../../utils/client/types.ts";
-import { liveloCartExt } from "../../../utils/extensionsUtils.ts";
+import { liveloCartExt } from "../../../utils/extension.ts";
 import { Cart } from "../../cart.ts";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * @title Magento Extension - Cart
+ * @title Magento ExtensionOf - Cart
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (

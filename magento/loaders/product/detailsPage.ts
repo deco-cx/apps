@@ -8,6 +8,9 @@ import { toBreadcrumbList, toProduct, toSeo } from "../../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
+  /**
+   * @description Use product name as breadcrumb, ignoring categories
+   */
   isBreadcrumbProductName?: boolean;
 }
 

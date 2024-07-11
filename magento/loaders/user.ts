@@ -3,6 +3,10 @@ import { AppContext } from "../mod.ts";
 import { SESSION_COOKIE } from "../utils/constants.ts";
 import { getUserCookie } from "../utils/user.ts";
 
+/**
+ * @title Magento Integration - User
+ * @description Get user loader
+ */
 async function loader(
   _props: unknown,
   req: Request,

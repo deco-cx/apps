@@ -19,7 +19,7 @@ import {
   getCustomFields,
   transformFilterGraphQL,
   transformSortGraphQL,
-} from "../../utils/utilsGraphQL.ts";
+} from "../../utils/graphql.ts";
 import { STALE as DecoStale } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import {
@@ -49,7 +49,7 @@ export interface Props {
 
 export interface CategoryProps {
   categoryUrl?: string;
-  /** @title Sorting */
+  /** @title Sort Options */
   sortOptions?: ProductSort;
   /** @title Filters */
   filters?: Array<FilterProps>;
@@ -57,6 +57,7 @@ export interface CategoryProps {
 
 /**
  * @title Magento Integration - Product Listing Page
+ * @description Product Listing Page loader
  */
 const loader = async (
   props: Props,

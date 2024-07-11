@@ -1,7 +1,7 @@
 import { AppContext } from "../../../mod.ts";
 import { Product } from "../../../../commerce/types.ts";
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
-import { liveloExt, reviewsExt } from "../../../utils/extensionsUtils.ts";
+import { liveloExt, reviewsExt } from "../../../utils/extension.ts";
 import { ExtensionProps } from "../../../utils/client/types.ts";
 
 export interface Props {
@@ -10,7 +10,7 @@ export interface Props {
 }
 
 /**
- * @title Magento Extension - Product List
+ * @title Magento ExtensionOf - Product List
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (

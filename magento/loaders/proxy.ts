@@ -170,7 +170,7 @@ const buildProxyRoutes = ({
 
 export interface Props {
   /**
-   * @description Extra content. Use "Suffix" field to bulk changes
+   * @description Extra content. Use "Prefix" field to bulk changes
    */
   extraPathsToProxy?: string[];
   /**

@@ -7,6 +7,10 @@ export interface Props {
   postcode: string;
 }
 
+/**
+ * @title Magento Integration - Shipping Simulations
+ * @description Get Shipping Simulations of a cart
+ */
 const action = async (
   props: Props,
   req: Request,

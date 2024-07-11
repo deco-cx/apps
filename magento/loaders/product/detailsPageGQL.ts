@@ -7,7 +7,7 @@ import {
   ProductDetailsGraphQL,
   ProductDetailsInputs,
 } from "../../utils/clientGraphql/types.ts";
-import { formatUrlSuffix, getCustomFields } from "../../utils/utilsGraphQL.ts";
+import { formatUrlSuffix, getCustomFields } from "../../utils/graphql.ts";
 import { GetCompleteProduct } from "../../utils/clientGraphql/queries.ts";
 import { toProductGraphQL } from "../../utils/transform.ts";
 
@@ -17,6 +17,9 @@ export interface Props {
    * @title Product custom attributes
    */
   customFields: CustomFields;
+  /**
+   * @description Use product name as breadcrumb, ignoring categories
+   */
   isBreadcrumbProductName?: boolean;
 }
 

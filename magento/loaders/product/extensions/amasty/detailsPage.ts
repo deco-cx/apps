@@ -4,7 +4,7 @@ import { ProductDetailsPage } from "../../../../../commerce/types.ts";
 import { ExtensionOf } from "../../../../../website/loaders/extension.ts";
 
 /**
- * @title Magento Extension - Details Page
+ * @title Magento ExtensionOf - Details Page
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (

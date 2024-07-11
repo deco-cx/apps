@@ -9,6 +9,10 @@ export interface Props extends OverrideFeatures {
   sku: string;
 }
 
+/**
+ * @title Magento Integration - Update item
+ * @description Update item quantity
+ */
 const action = async (
   props: Props,
   req: Request,

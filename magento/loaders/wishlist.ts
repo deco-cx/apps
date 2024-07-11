@@ -3,6 +3,10 @@ import { Wishlist } from "../utils/client/types.ts";
 import { getUserCookie } from "../utils/user.ts";
 import { SESSION_COOKIE } from "../utils/constants.ts";
 
+/**
+ * @title Magento Integration - Wishlist
+ * @description Get wishlist loader
+ */
 export default async function loader(
   _props: unknown,
   req: Request,
