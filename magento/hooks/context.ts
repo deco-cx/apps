@@ -67,14 +67,16 @@ const load = (signal: AbortSignal, disableWishlist: boolean) =>
 if (IS_BROWSER) {
   const sessionFeatures = sessionStorage.getItem(SESSION_STORAGE_KEY);
   const features = decodeFeatures(sessionFeatures);
+  console.log(features);
 
-  if (features.dangerouslyDisableOnLoadUpdate) {
+  if (!features.dangerouslyDisableOnLoadUpdate) {
+    console.log("ativou o onload")
     enqueue((signal) =>
       load(signal, features.dangerouslyDisableWishlist) as any
     );
   }
 
-  if (features.dangerouslyDisableOnVisibilityChangeUpdate) {
+  if (!features.dangerouslyDisableOnVisibilityChangeUpdate) {
     document.addEventListener(
       "visibilitychange",
       () =>
