@@ -93,7 +93,7 @@ export const middleware = async (
   }
 
   const request = await fetch(
-    `${baseUrl}/granado/customer/section/load/?sections=customer`,
+    `${baseUrl}/customer/section/load/?sections=customer`,
     {
       headers: {
         Cookie: req.headers.get("Cookie") ?? "",
