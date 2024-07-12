@@ -343,7 +343,6 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     estimatedDateArrival,
   } = sku;
 
-  const availableDate = estimatedDateArrival ?? undefined;
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
@@ -424,6 +423,12 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
 
+  estimatedDateArrival && additionalProperty.push({
+    "@type": "PropertyValue",
+    name: "Estimated Date Arrival",
+    value: estimatedDateArrival,
+  });
+
   return {
     "@type": "Product",
     category: categoriesString,
@@ -450,7 +455,6 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     additionalProperty,
     isVariantOf,
     image: finalImages,
-    availableDate,
     video: finalVideos,
     offers: aggregateOffers(offers, priceCurrency),
   };
