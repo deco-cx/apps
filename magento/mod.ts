@@ -77,7 +77,7 @@ export interface CustomProps {
   customFilters: Array<FiltersGraphQL>;
 
   /**
-   * @title Custom Attributes 
+   * @title Custom Attributes
    * @description Inform the product custom attributes
    */
   customAttributes?: Array<string>;
@@ -174,7 +174,6 @@ export interface Props {
   /**
    * @title Features
    * @description DANGEROUSLY ZONE. Do not change any setting, unless you are sure.
-
    */
   features: Features;
 }
@@ -197,6 +196,8 @@ export type State =
  * @category Ecommmerce
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
+export type AppType = ReturnType<typeof App>;
+
 export default function App(props: Props): App<Manifest, State> {
   const {
     apiConfig,
@@ -244,3 +245,5 @@ export default function App(props: Props): App<Manifest, State> {
 
 export type AppContext = FnContext<State, Manifest>;
 export type AppMiddlewareContext = AMC<ReturnType<typeof App>>;
+
+export { PreviewMagento as Preview } from "./preview/Preview.tsx";

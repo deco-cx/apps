@@ -1,7 +1,7 @@
 <h1>
   <p align="center">
     <a href="https://developer.adobe.com/commerce/docs/">
-      Magento
+      Magento Platform Ecommerce Solution
     </a>
   </p>
 </h1>
@@ -23,6 +23,7 @@ Magento, by Adobe, is a PHP-based eCommerce platform offering robust customizati
 
 - Install via decohub
 - Fill the necessary fields
+- Only fill the "dangerously" fields (located on "Features" section) if you REALLY SURE about what are you doing. 
 
 # Settings in Magento
 
