@@ -34,6 +34,67 @@ export interface DeleteProductsFromWishlistResponse {
   Warnings: string[]
 }
 
+export interface SearchWishlistResponse {
+  Page: Page
+  Result: Result[]
+  IsValid: boolean
+  Errors: Error[]
+  Warnings: string[]
+}
+
+export interface Page {
+  Index: number
+  PageCount: number
+  RecordCount: number
+  PageSize: number
+  ErrorMessage: string
+}
+
+export interface Result {
+  Email: string
+  CPF: string
+  MetadataValues: MetadataValue3[]
+  WishlistProducts: WishlistProduct[]
+  WishlistID: number
+  Hash: string
+  CustomerID: number
+  Name: string
+  Description: string
+  PrivacyType: string
+  Password: string
+  IsActive: boolean
+  CreatedDate: string
+  ModifiedDate: string
+  DeliveryAddressID: number
+  EndPurchaseDate: string
+  PurchasingBehavior: string
+  WishlistDefinitionID: number
+}
+
+export interface MetadataValue3 {
+  PropertyMetadataID: number
+  PropertyName: string
+  PropertyGroup: string
+  InputType: string
+  Value: Value
+  SerializedValue: string
+  SerializedBlobValue: string
+  IntegrationID: string
+  FormattedValue: string
+  DisplayName: string
+}
+
+export interface Value {}
+
+export interface WishlistProduct {
+  WishlistProductID: number
+  ProductID: number
+  SkuID: number
+  QuantityDesired: number
+  QuantityReceived: number
+  Balance: number
+}
+
 export interface Error {
   Key: string
   ErrorMessage: string

@@ -2,10 +2,24 @@ import {
   AddProductsToWishlistResponse,
   SaveWishlistResponse,
   DeleteWishlistResponse,
-  DeleteProductsFromWishlistResponse
+  DeleteProductsFromWishlistResponse,
+  SearchWishlistResponse
 } from "./types/wishlistJSON.ts";
 
 export interface LayerAPI {
+  "POST /v1/Profile/API.svc/web/SearchWishlist": {
+    response: SearchWishlistResponse,
+    body: {
+      Page: {
+        PageIndex: number
+        PageSize: number
+      }
+      Where: string
+      WhereMetadata: string
+      OrderBy: string
+    }
+  }
+
   "POST /v1/Profile/API.svc/web/SaveWishlist": {
     response: SaveWishlistResponse;
     body: {

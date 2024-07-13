@@ -10,6 +10,10 @@ import * as $$$$$$$$$4 from "./actions/cart/updateItem.ts";
 import * as $$$$$$$$$5 from "./actions/checkout/redirect.ts";
 import * as $$$$$$$$$6 from "./actions/login.ts";
 import * as $$$$$$$$$7 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$8 from "./actions/wishlist/addProduct.ts";
+import * as $$$$$$$$$9 from "./actions/wishlist/createList.ts";
+import * as $$$$$$$$$10 from "./actions/wishlist/deleteList.ts";
+import * as $$$$$$$$$11 from "./actions/wishlist/deleteProduct.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$1 from "./loaders/auction/detailsPage.ts";
 import * as $$$2 from "./loaders/auction/list.ts";
@@ -24,6 +28,7 @@ import * as $$$9 from "./loaders/product/listingPage.ts";
 import * as $$$10 from "./loaders/product/suggestions.ts";
 import * as $$$11 from "./loaders/proxy.ts";
 import * as $$$12 from "./loaders/user.ts";
+import * as $$$13 from "./loaders/wishlist/search.ts";
 
 const manifest = {
   "loaders": {
@@ -40,6 +45,7 @@ const manifest = {
     "linx/loaders/product/suggestions.ts": $$$10,
     "linx/loaders/proxy.ts": $$$11,
     "linx/loaders/user.ts": $$$12,
+    "linx/loaders/wishlist/search.ts": $$$13,
   },
   "handlers": {
     "linx/handlers/sitemap.ts": $$$$0,
@@ -53,6 +59,10 @@ const manifest = {
     "linx/actions/checkout/redirect.ts": $$$$$$$$$5,
     "linx/actions/login.ts": $$$$$$$$$6,
     "linx/actions/newsletter/subscribe.ts": $$$$$$$$$7,
+    "linx/actions/wishlist/addProduct.ts": $$$$$$$$$8,
+    "linx/actions/wishlist/createList.ts": $$$$$$$$$9,
+    "linx/actions/wishlist/deleteList.ts": $$$$$$$$$10,
+    "linx/actions/wishlist/deleteProduct.ts": $$$$$$$$$11,
   },
   "name": "linx",
   "baseUrl": import.meta.url,
