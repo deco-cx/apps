@@ -2,16 +2,25 @@ import { nullOnNotFound } from "../../../utils/http.ts";
 import type { AppContext } from "../../mod.ts";
 
 export interface Props {
-  WishlistID: number
-  CustomerID: number
-  WishlistProducts: {
-    ProductID: number
-    SkuID: number
-    WebSiteID: number
-    Quantity: number
-    QuantityReceived: number
-    NestedItens: string
+  ExtendedProperties: {
+    Name: string
+    Value: unknown
+    Values: unknown[]
   }[]
+  WishlistID: number
+  Hash: string
+  CustomerID: number
+  Name: string
+  Description: string
+  PrivacyType: string
+  Password: string
+  IsActive: boolean
+  CreatedDate: string
+  ModifiedDate: string
+  DeliveryAddressID: number
+  EndPurchaseDate: string
+  PurchasingBehavior: string
+  WishlistDefinitionID: number
 }
 
 const action = async (
@@ -21,7 +30,7 @@ const action = async (
 ): Promise<unknown | null> => {
   const { layer } = ctx;
 
-  const response = await layer["POST /v1/Profile/API.svc/web/AddProductsToWishlist"](
+  const response = await layer["POST /v1/Profile/API.svc/web/SaveWishlist"](
     {},
     {
       body: props,
