@@ -1,9 +1,7 @@
 import { HttpError } from "../../../utils/http.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
-import {
-  RemoveItemFromCart,
-} from "../../utils/graphql/queries.ts";
+import { RemoveItemFromCart } from "../../utils/graphql/queries.ts";
 import {
   CheckoutFragment,
   RemoveItemFromCartMutation,
@@ -46,25 +44,35 @@ const action = async (
     throw new HttpError(400, "Missing cart cookie");
   }
 
-  /* 
-  * get cart
-  * find the current product on cart
-  * the current amount
-  * calculate the difference between the current item amount and requested new amount 
-  */
+  /*
+   * get cart
+   * find the current product on cart
+   * the current amount
+   * calculate the difference between the current item amount and requested new amount
+   */
 
-  const cart = await ctx.invoke.wake.loaders.cart(props, req)
-  const item = cart.products?.find(item => item?.productVariantId === props.productVariantId)
-  const quantityItem = item?.quantity ?? 0
-  const quantity = props.quantity - quantityItem
+  const cart = await ctx.invoke.wake.loaders.cart(props, req);
+  const item = cart.products?.find((item) =>
+    item?.productVariantId === props.productVariantId
+  );
+  const quantityItem = item?.quantity ?? 0;
+  const quantity = props.quantity - quantityItem;
 
-  let checkout
+  let checkout;
 
   if (props.quantity > 0 && quantity > 0) {
-    checkout = await ctx.invoke.wake.actions.cart.addItem({...props, quantity})
+    checkout = await ctx.invoke.wake.actions.cart.addItem({
+      ...props,
+      quantity,
+    });
   } else {
-    const data = await removeFromCart({...props, quantity:-quantity}, cartId, ctx, headers);
-    checkout = data.checkout
+    const data = await removeFromCart(
+      { ...props, quantity: -quantity },
+      cartId,
+      ctx,
+      headers,
+    );
+    checkout = data.checkout;
   }
 
   const checkoutId = checkout?.checkoutId;
@@ -72,7 +80,6 @@ const action = async (
   if (cartId !== checkoutId) {
     setCartCookie(ctx.response.headers, checkoutId);
   }
-
 
   return checkout ?? {};
 };
