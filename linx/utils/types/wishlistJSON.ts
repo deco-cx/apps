@@ -27,6 +27,13 @@ export interface AddProductsToWishlistResponse {
   Warnings: string[]
 }
 
+export interface DeleteProductsFromWishlistResponse {
+  DeletedWishlistProductIDs: number[]
+  IsValid: boolean
+  Errors: Error[]
+  Warnings: string[]
+}
+
 export interface Error {
   Key: string
   ErrorMessage: string

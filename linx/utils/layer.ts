@@ -1,7 +1,8 @@
 import {
   AddProductsToWishlistResponse,
   SaveWishlistResponse,
-  DeleteWishlistResponse
+  DeleteWishlistResponse,
+  DeleteProductsFromWishlistResponse
 } from "./types/wishlistJSON.ts";
 
 export interface LayerAPI {
@@ -51,6 +52,15 @@ export interface LayerAPI {
     response: DeleteWishlistResponse,
     body: {
       WishlistID: number
+    }
+  };
+
+  "POST /v1/Profile/API.svc/web/DeleteProductsFromWishlist": {
+    response: DeleteProductsFromWishlistResponse,
+    body: {
+      WishlistID: number
+      CustomerID: number
+      WishlistProductIDs: number[]
     }
   }
 }
