@@ -12,6 +12,14 @@ export interface SaveWishlistResponse {
   Warnings: string[]
 }
 
+export interface DeleteWishlistResponse {
+  WishlistID: number
+  Name: string
+  IsValid: boolean
+  Errors: Error[]
+  Warnings: string[]
+}
+
 export interface AddProductsToWishlistResponse {
   SavedWishlistProductIDs: number[]
   IsValid: boolean
