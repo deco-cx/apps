@@ -3,7 +3,8 @@ import {
   SaveWishlistResponse,
   DeleteWishlistResponse,
   DeleteProductsFromWishlistResponse,
-  SearchWishlistResponse
+  SearchWishlistResponse,
+  ShareWishlistResponse
 } from "./types/wishlistJSON.ts";
 
 export interface LayerAPI {
@@ -17,6 +18,16 @@ export interface LayerAPI {
       Where: string
       WhereMetadata: string
       OrderBy: string
+    }
+  }
+
+  "POST	/v1/Profile/API.svc/web/ShareWishlist": {
+    response: ShareWishlistResponse,
+    body: {
+      WishlistID: number
+      WebSiteID: number
+      Recipients: string
+      Message: string
     }
   }
 
@@ -43,7 +54,7 @@ export interface LayerAPI {
       PurchasingBehavior: string
       WishlistDefinitionID: number
     };
-  };
+  }
 
 
   "POST /v1/Profile/API.svc/web/AddProductsToWishlist": {
@@ -60,14 +71,14 @@ export interface LayerAPI {
         NestedItens: string
       }[]
     }
-  };
+  }
 
   "POST /v1/Profile/API.svc/web/DeleteWishlist": {
     response: DeleteWishlistResponse,
     body: {
       WishlistID: number
     }
-  };
+  }
 
   "POST /v1/Profile/API.svc/web/DeleteProductsFromWishlist": {
     response: DeleteProductsFromWishlistResponse,

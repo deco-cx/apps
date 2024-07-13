@@ -14,6 +14,7 @@ import * as $$$$$$$$$8 from "./actions/wishlist/addProduct.ts";
 import * as $$$$$$$$$9 from "./actions/wishlist/createList.ts";
 import * as $$$$$$$$$10 from "./actions/wishlist/deleteList.ts";
 import * as $$$$$$$$$11 from "./actions/wishlist/deleteProduct.ts";
+import * as $$$$$$$$$12 from "./actions/wishlist/shareWishlist.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$1 from "./loaders/auction/detailsPage.ts";
 import * as $$$2 from "./loaders/auction/list.ts";
@@ -63,6 +64,7 @@ const manifest = {
     "linx/actions/wishlist/createList.ts": $$$$$$$$$9,
     "linx/actions/wishlist/deleteList.ts": $$$$$$$$$10,
     "linx/actions/wishlist/deleteProduct.ts": $$$$$$$$$11,
+    "linx/actions/wishlist/shareWishlist.ts": $$$$$$$$$12,
   },
   "name": "linx",
   "baseUrl": import.meta.url,

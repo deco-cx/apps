@@ -42,6 +42,12 @@ export interface SearchWishlistResponse {
   Warnings: string[]
 }
 
+export interface ShareWishlistResponse {
+  IsValid: boolean
+  Errors: Error[]
+  Warnings: string[]
+}
+
 export interface Page {
   Index: number
   PageCount: number
