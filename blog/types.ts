@@ -18,7 +18,7 @@ export interface Category {
 }
 
 export interface BlogPost {
-  name: string,
+  name: string;
   title: string;
   excerpt: string;
   image?: ImageWidget;

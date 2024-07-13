@@ -18,7 +18,7 @@ export async function getRecordsByPath<T>(
     const name = (item.name as string).split(path)[1]?.replace("/", "");
     return {
       ...item[accessor],
-      name
-    }
+      name,
+    };
   });
 }
