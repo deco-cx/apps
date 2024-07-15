@@ -15,9 +15,9 @@ export interface LayerAPI {
         PageIndex: number
         PageSize: number
       }
-      Where: string
-      WhereMetadata: string
-      OrderBy: string
+      Where?: string
+      WhereMetadata?: string
+      OrderBy?: string
     }
   }
 
@@ -34,25 +34,25 @@ export interface LayerAPI {
   "POST /v1/Profile/API.svc/web/SaveWishlist": {
     response: SaveWishlistResponse;
     body: {
-      ExtendedProperties: {
+      ExtendedProperties?: {
         Name: string
         Value: unknown
         Values: unknown[]
       }[]
-      WishlistID: number
-      Hash: string
+      WishlistID?: number
       CustomerID: number
+      IsActive: boolean
       Name: string
       Description: string
-      PrivacyType: string
-      Password: string
-      IsActive: boolean
-      CreatedDate: string
-      ModifiedDate: string
-      DeliveryAddressID: number
-      EndPurchaseDate: string
-      PurchasingBehavior: string
-      WishlistDefinitionID: number
+      PrivacyType: '0 - Public' | '2 - Private'
+      Hash?: string
+      Password?: string
+      CreatedDate?: string
+      ModifiedDate?: string
+      DeliveryAddressID?: number
+      EndPurchaseDate?: string
+      PurchasingBehavior?: string
+      WishlistDefinitionID?: number
     };
   }
 
@@ -64,11 +64,11 @@ export interface LayerAPI {
       CustomerID: number
       WishlistProducts: {
         ProductID: number
-        SkuID: number
-        WebSiteID: number
-        Quantity: number
-        QuantityReceived: number
-        NestedItens: string
+        SkuID?: number
+        WebSiteID?: number
+        Quantity?: number
+        QuantityReceived?: number
+        NestedItens?: string
       }[]
     }
   }

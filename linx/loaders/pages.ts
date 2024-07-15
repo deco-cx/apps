@@ -26,6 +26,9 @@ const PROXY_PATHS = [
   "/cadastro/*",
   "/Custom/*",
   "/custom/*",
+  "/login",
+  "/painel-do-cliente",
+  "/painel-do-cliente/*"
 ];
 
 /**

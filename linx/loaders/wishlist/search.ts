@@ -3,13 +3,12 @@ import type { AppContext } from "../../../linx/mod.ts";
 import { toLinxHeaders } from "../../utils/headers.ts";
 
 export interface Props {
+  CustomerID: number
   Page: {
     PageIndex: number
     PageSize: number
   }
-  Where: string
-  WhereMetadata: string
-  OrderBy: string
+  OrderBy?: string
 }
 
 /**
@@ -17,14 +16,18 @@ export interface Props {
  * @description Search Wishlist loader
  */
 const loader = async (
-  props: Props,
+  { CustomerID, ...props }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<SearchWishlistResponse | null> => {
   const { layer } = ctx;
 
+
   const response = await layer["POST /v1/Profile/API.svc/web/SearchWishlist"]({}, {
-    body: props,
+    body: {
+      ...props,
+      Where: `CustomerID == ${CustomerID}`
+    },
     headers: toLinxHeaders(req.headers),
   });
 

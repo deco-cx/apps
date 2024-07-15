@@ -142,3 +142,13 @@ export interface Error {
   HelpEntry: string
   TechnicalMessage: string
 }
+
+
+export interface WishlistItem {
+  ProductID: number
+  SkuID: number
+  WebSiteID: number
+  Quantity: number
+  QuantityReceived: number
+  NestedItens: string
+}

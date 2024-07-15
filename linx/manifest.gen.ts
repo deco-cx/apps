@@ -10,10 +10,10 @@ import * as $$$$$$$$$4 from "./actions/cart/updateItem.ts";
 import * as $$$$$$$$$5 from "./actions/checkout/redirect.ts";
 import * as $$$$$$$$$6 from "./actions/login.ts";
 import * as $$$$$$$$$7 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$8 from "./actions/wishlist/addProduct.ts";
-import * as $$$$$$$$$9 from "./actions/wishlist/createList.ts";
-import * as $$$$$$$$$10 from "./actions/wishlist/deleteList.ts";
-import * as $$$$$$$$$11 from "./actions/wishlist/deleteProduct.ts";
+import * as $$$$$$$$$8 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$9 from "./actions/wishlist/createWishlist.ts";
+import * as $$$$$$$$$10 from "./actions/wishlist/deleteWishlist.ts";
+import * as $$$$$$$$$11 from "./actions/wishlist/removeItem.ts";
 import * as $$$$$$$$$12 from "./actions/wishlist/shareWishlist.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$1 from "./loaders/auction/detailsPage.ts";
@@ -60,10 +60,10 @@ const manifest = {
     "linx/actions/checkout/redirect.ts": $$$$$$$$$5,
     "linx/actions/login.ts": $$$$$$$$$6,
     "linx/actions/newsletter/subscribe.ts": $$$$$$$$$7,
-    "linx/actions/wishlist/addProduct.ts": $$$$$$$$$8,
-    "linx/actions/wishlist/createList.ts": $$$$$$$$$9,
-    "linx/actions/wishlist/deleteList.ts": $$$$$$$$$10,
-    "linx/actions/wishlist/deleteProduct.ts": $$$$$$$$$11,
+    "linx/actions/wishlist/addItem.ts": $$$$$$$$$8,
+    "linx/actions/wishlist/createWishlist.ts": $$$$$$$$$9,
+    "linx/actions/wishlist/deleteWishlist.ts": $$$$$$$$$10,
+    "linx/actions/wishlist/removeItem.ts": $$$$$$$$$11,
     "linx/actions/wishlist/shareWishlist.ts": $$$$$$$$$12,
   },
   "name": "linx",

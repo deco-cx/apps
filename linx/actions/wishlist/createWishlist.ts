@@ -2,25 +2,25 @@ import { nullOnNotFound } from "../../../utils/http.ts";
 import type { AppContext } from "../../mod.ts";
 
 export interface Props {
-  ExtendedProperties: {
+  ExtendedProperties?: {
     Name: string
     Value: unknown
     Values: unknown[]
   }[]
-  WishlistID: number
-  Hash: string
+  WishlistID?: number
   CustomerID: number
+  IsActive: boolean
   Name: string
   Description: string
-  PrivacyType: string
-  Password: string
-  IsActive: boolean
-  CreatedDate: string
-  ModifiedDate: string
-  DeliveryAddressID: number
-  EndPurchaseDate: string
-  PurchasingBehavior: string
-  WishlistDefinitionID: number
+  PrivacyType: '0 - Public' | '2 - Private'
+  Hash?: string
+  Password?: string
+  CreatedDate?: string
+  ModifiedDate?: string
+  DeliveryAddressID?: number
+  EndPurchaseDate?: string
+  PurchasingBehavior?: string
+  WishlistDefinitionID?: number
 }
 
 const action = async (

@@ -6,11 +6,11 @@ export interface Props {
   CustomerID: number
   WishlistProducts: {
     ProductID: number
-    SkuID: number
-    WebSiteID: number
-    Quantity: number
-    QuantityReceived: number
-    NestedItens: string
+    SkuID?: number
+    WebSiteID?: number
+    Quantity?: number
+    QuantityReceived?: number
+    NestedItens?: string
   }[]
 }
 
