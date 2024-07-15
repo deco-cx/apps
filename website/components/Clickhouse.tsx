@@ -280,7 +280,7 @@ function Clickhouse(
         src={useScriptAsDataURI(snippet, {
           siteId,
           siteName,
-          serviceEndpoint: SERVICE_ENDPOINT
+          serviceEndpoint: SERVICE_ENDPOINT,
         })}
       />
     </Head>
