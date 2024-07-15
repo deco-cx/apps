@@ -24,7 +24,7 @@ export type Extension =
   | "remove-me"
   | "response-targets"
   | "restored"
-  | "web-sockets"
+  | "ws"
   | "path-params"
   | "sse";
 
