@@ -101,12 +101,12 @@ export default function Proxy({
   host: hostToUse,
   customHeaders = [],
   includeScriptsToHead,
-  redirect = "manual",
   avoidAppendPath,
   replaces,
   removeDirtyCookies = false,
 }: Props): Handler {
   return async (req, _ctx) => {
+    const redirect = "manual";
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
     const qs = url.searchParams.toString();
