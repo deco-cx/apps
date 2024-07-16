@@ -11,7 +11,7 @@ export interface Scroll {
   type: "scroll";
   /**
    * @title Delay MS
-   * @description Delay (in milliseconds) to wait after the scroll event is fired
+   * @description Delay (in milliseconds) to wait after the scroll event is fired. If value is 0, it will trigger when page load
    */
   payload: number;
 }
@@ -44,9 +44,16 @@ const script = (
   }
 
   if (type === "scroll") {
+    const timeout = Number(payload || 200);
+    const instant = timeout === 0;
+    const triggerRender = () => setTimeout(() => element.click(), timeout);
+
+    if (instant && document.readyState === "complete") triggerRender();
+    else if (instant) addEventListener("DOMContentLoaded", triggerRender);
+
     addEventListener(
       "scroll",
-      () => setTimeout(() => element.click(), Number(payload) || 200),
+      triggerRender,
       { once: true },
     );
   }
