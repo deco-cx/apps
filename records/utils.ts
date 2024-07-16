@@ -18,7 +18,7 @@ export interface StorageConfig {
 export const getLocalDbFilename = () => join(Deno.cwd(), 'sqlite.db');
 
 export const getLocalSQLClientConfig = () => ({
-  url: new URL(`file://${getLocalDbFilename()}`),
+  url: new URL(`file://${getLocalDbFilename()}`).href,
   authToken: "",
 });
 
