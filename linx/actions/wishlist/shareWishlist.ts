@@ -15,7 +15,7 @@ const action = async (
 ): Promise<unknown | null> => {
   const { layer } = ctx;
 
-  const response = await layer["POST	/v1/Profile/API.svc/web/ShareWishlist"](
+  const response = await layer["POST /v1/Profile/API.svg/web/ShareWishlist"](
     {},
     {
       body: props,

@@ -3,7 +3,6 @@ import type { AppContext } from "../../mod.ts";
 
 export interface Props {
   WishlistID: number
-  CustomerID: number
   WishlistProducts: {
     ProductID: number
     SkuID?: number
@@ -21,10 +20,25 @@ const action = async (
 ): Promise<unknown | null> => {
   const { layer } = ctx;
 
+  const user = await ctx.invoke.linx.loaders.user();
+
+  if (!user) {
+    return null;
+  }
+
+  const { CustomerID } = user;
+
+  if (!CustomerID) {
+    return null;
+  }
+
   const response = await layer["POST /v1/Profile/API.svc/web/AddProductsToWishlist"](
     {},
     {
-      body: props,
+      body: {
+        ...props,
+        CustomerID,
+      },
     }
   );
 

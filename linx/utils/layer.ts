@@ -21,7 +21,7 @@ export interface LayerAPI {
     }
   }
 
-  "POST	/v1/Profile/API.svc/web/ShareWishlist": {
+  "POST /v1/Profile/API.svg/web/ShareWishlist": {
     response: ShareWishlistResponse,
     body: {
       WishlistID: number
