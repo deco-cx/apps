@@ -11,6 +11,7 @@ const isHtmx = (
 
 type Trigger = "load" | "intersect";
 interface Props {
+  /** @label hidden */
   section: Section;
   trigger?: Trigger;
 }
