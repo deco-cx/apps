@@ -5,7 +5,7 @@ import { liveloCartExt } from "../../../utils/extension.ts";
 import { Cart } from "../../cart.ts";
 
 /**
- * @title Magento ExtensionOf - Cart
+ * @title Magento ExtensionOf Cart - Livelo Points
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (
