@@ -500,11 +500,13 @@ const legacyToProductGroupAdditionalProperties = (
   const groups = product.allSpecificationsGroups ?? [];
   const allSpecifications = product.allSpecifications ?? [];
 
-  const specByGroup : Record<string, string> = {}
+  const specByGroup: Record<string, string> = {};
 
   groups.forEach((group) => {
     const groupSpecs = (product as unknown as Record<string, string[]>)[group];
-    groupSpecs.forEach((specName) => {specByGroup[specName] = group})
+    groupSpecs.forEach((specName) => {
+      specByGroup[specName] = group;
+    });
   });
 
   return allSpecifications.flatMap((name) => {
@@ -513,7 +515,7 @@ const legacyToProductGroupAdditionalProperties = (
       toAdditionalPropertySpecification({
         name,
         value,
-        propertyID: specByGroup[name]
+        propertyID: specByGroup[name],
       })
     );
   });
