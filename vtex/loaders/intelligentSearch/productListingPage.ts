@@ -41,12 +41,12 @@ import { redirect } from "deco/mod.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
-
 /**
  * VTEX Intelligent Search doesn't support pagination above 50 pages.
  *
  * We're now showing results for the last page so the page doesn't crash
  */
+const PAGE_REGEX = /page([1-9]\d*)/;
 const VTEX_MAX_PAGES = 50;
 
 const sortOptions = [
@@ -96,7 +96,7 @@ const ALLOWED_PARAMS = new Set([
 
 enum AdditionalParameters {
   showSponsered,
-  placement
+  placement,
 }
 
 export interface Props {
@@ -154,9 +154,9 @@ export interface Props {
    */
   pageHref?: string;
   aditionalFieldsInQuery?: {
-    label: string,
-    value: string
-  }[]
+    label: string;
+    value: string;
+  }[];
 }
 
 const searchArgsOf = (props: Props, url: URL) => {
@@ -285,19 +285,28 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(props.pageHref || baseUrl);
+
+  const lastParamn = url.pathname.split("/").pop();
+
+  const matchParamPage = lastParamn?.match(PAGE_REGEX);
+  const paramnPage = matchParamPage ? Number(matchParamPage[1]!) : 1;
+
   const segment = getSegmentFromBag(ctx);
-  const currentPageoffset = props.pageOffset ?? 1;
   const {
     selectedFacets: baseSelectedFacets,
     page,
     ...args
   } = searchArgsOf(props, url);
 
-  const aditionalFieldsInQuery: {[key in keyof typeof AdditionalParameters | string]?: string | number | boolean} = {}
-  props.aditionalFieldsInQuery?.map(item => {
-    aditionalFieldsInQuery[item.label] = item.value
-  })
-
+  const aditionalFieldsInQuery: {
+    [key in keyof typeof AdditionalParameters | string]?:
+      | string
+      | number
+      | boolean;
+  } = {};
+  props.aditionalFieldsInQuery?.map((item) => {
+    aditionalFieldsInQuery[item.label] = item.value;
+  });
 
   let pathToUse = url.pathname;
 
@@ -330,8 +339,6 @@ const loader = async (
 
   const params = withDefaultParams({ ...searchArgs, page });
 
-
-
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated[
@@ -340,6 +347,7 @@ const loader = async (
       {
         ...aditionalFieldsInQuery,
         ...params,
+        page: paramnPage,
         facets: toPath(selected),
       },
       { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
@@ -348,6 +356,7 @@ const loader = async (
       {
         ...params,
         ...aditionalFieldsInQuery,
+        page: paramnPage,
         facets: toPath(fselected),
       },
       { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined },
@@ -390,6 +399,7 @@ const loader = async (
     pagination,
     recordsFiltered,
   } = productsResult;
+
   const facets = selectPriceFacet(facetsResult.facets, selectedFacets);
 
   // Transform VTEX product format into schema.org's compatible format
@@ -411,26 +421,26 @@ const loader = async (
   const paramsToPersist = new URLSearchParams();
   searchArgs.query && paramsToPersist.set("q", searchArgs.query);
   searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
+
   const filters = facets
-    .filter((f) => !f.hidden)
+    .filter((f) => {
+      if (f.values.some((item) => item.selected) || !f.hidden) return true;
+      return false;
+    })
     .map(toFilter(selectedFacets, paramsToPersist));
 
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
 
   const hasNextPage = Boolean(pagination.next.proxyUrl);
-  const hasPreviousPage = page > 0;
-  const nextPage = new URLSearchParams(url.searchParams);
-  const previousPage = new URLSearchParams(url.searchParams);
+  const hasPreviousPage = paramnPage > 1;
+  const currentSearchParams = new URLSearchParams(url.searchParams);
 
-  if (hasNextPage) {
-    nextPage.set("page", (page + currentPageoffset + 1).toString());
-  }
-
-  if (hasPreviousPage) {
-    previousPage.set("page", (page + currentPageoffset - 1).toString());
-  }
-
-  const currentPage = page + currentPageoffset;
+  const getPageUrl = (value: number) => {
+    const pageCurrentExist = url.pathname.match(PAGE_REGEX);
+    return pageCurrentExist
+      ? url.pathname.replace(PAGE_REGEX, `page${paramnPage + value}`)
+      : `${url.pathname}/page${paramnPage + 1}${currentSearchParams.toString() ? "?" + currentSearchParams.toString() : " "}   `;
+  };
 
   return {
     "@type": "ProductListingPage",
@@ -442,18 +452,19 @@ const loader = async (
     filters,
     products,
     pageInfo: {
-      nextPage: hasNextPage ? `?${nextPage}` : undefined,
-      previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
-      currentPage,
+      nextPage: hasNextPage ? getPageUrl(1) : undefined,
+      previousPage: hasPreviousPage ? getPageUrl(-1) : undefined,
+      currentPage: paramnPage,
       records: recordsFiltered,
       recordPerPage: pagination.perPage,
+      pagination,
       pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
     seo: pageTypesToSeo(
       pageTypes,
       baseUrl,
-      hasPreviousPage ? currentPage : undefined,
+      hasPreviousPage ? paramnPage : undefined,
     ),
   };
 };
@@ -462,7 +473,7 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   const { token } = getSegmentFromBag(ctx);
-  const url = new URL(req.url);
+  const url = new URL(props.pageHref || req.url);
   if (url.searchParams.has("q") || !isAnonymous(ctx)) {
     return null;
   }

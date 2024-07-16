@@ -16,6 +16,7 @@ import {
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
+import { LegacyProduct } from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
@@ -75,7 +76,7 @@ const loader = async (
     ).then((res) => res.json());
 
   const url = new URL(baseUrl);
-  const skuId = url.searchParams.get("skuId");
+  const skuId = url.searchParams.get("skuId") || url.searchParams.get("idsku");
   const productId = !skuId && getProductID(await pageTypePromise);
 
   /**
@@ -108,6 +109,13 @@ const loader = async (
     return null;
   }
 
+  const legacyQuery = skuId ? `skuId:${skuId}` : `productId:${productId}`;
+  const res = await vcsDeprecated
+    ["GET /api/catalog_system/pub/products/search/:term?"]({
+      fq: [legacyQuery],
+    });
+
+  const [legacyProduct] = (await res.json()) as LegacyProduct[];
   const sku = pickSku(product, skuId?.toString());
 
   let kitItems: VTEXProduct[] = [];
@@ -147,6 +155,8 @@ const loader = async (
       ? {
         ...seo,
         noIndexing: props.indexingSkus ? false : seo.noIndexing,
+        legacyProductTitle: legacyProduct?.productTitle || "",
+        legacyDescritionMetaTag: legacyProduct?.metaTagDescription || "",
       }
       : null,
   };

@@ -57,15 +57,21 @@ function Component({
   noIndexing,
   jsonLDs = [],
 }: Props) {
+ 
   const [{ pageInfo = {}, seo = {} } = {}] = jsonLDs || [{}];
-  const currentPage = pageInfo?.currentPage;
-  const isDepartament = pageInfo?.pageTypes[0] === "Department" ||
-    pageInfo?.pageTypes[0] === "Search";
+
+  const currentPage = pageInfo?.currentPage ?? false;
+  const isDepartament = jsonLDs[0] ? (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Department") || (pageInfo?.pageTypes && pageInfo?.pageTypes[0] === "Search") : null;
   const isPageMoreThanOne = currentPage && currentPage > 1;
+
   const twitterCard = type === "website" ? "summary" : "summary_large_image";
   const description = stripHTML(desc || "");
   const title = stripHTML(t);
   const url = canonical;
+
+  const PAGE_REGEX = /\?page=([1-9]|[1-4][0-9]|50)/;
+  const matchUrl = seo && isDepartament? seo.canonical.match(PAGE_REGEX) : "";
+  const processedSeoCanonicalUrl = matchUrl ? seo.canonical.replace(PAGE_REGEX, "/page" + matchUrl[1]) : seo.canonical;
 
   return (
     <Head>
@@ -94,20 +100,19 @@ function Component({
 
       {/* Link tags */}
       {canonical && (
-        <link rel="canonical" href={isDepartament ? seo?.canonical : url} />
+        <link rel="canonical" href={isDepartament ? processedSeoCanonicalUrl : url} />
       )}
 
       {/* No index, no follow */}
       {noIndexing && <meta name="robots" content="noindex, nofollow" />}
       {!noIndexing && <meta name="robots" content="index, follow" />}
 
-      {jsonLDs.map((json) => (
+      {jsonLDs[0] && jsonLDs.map((json) => (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              // @ts-expect-error Trust me, I'm an engineer
               ...json,
             }),
           }}

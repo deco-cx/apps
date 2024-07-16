@@ -1,4 +1,5 @@
 import { type Flag } from "deco/types.ts";
+import { Pagination } from "deco/deps.ts";
 
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export declare type WithContext<T extends Things> = T & {
@@ -13,6 +14,10 @@ export interface Category {
    * @title The Category Name
    */
   name: string;
+  /**
+   * @title The Category Url
+   */
+  url: string;
   /**
    * @title Sub categories
    * @description Store's sub categories
@@ -380,6 +385,8 @@ export interface Person extends Omit<Thing, "@type"> {
   gender?: "https://schema.org/Male" | "https://schema.org/Female";
   /** An image of the item. This can be a URL or a fully described ImageObject. **/
   image?: ImageObject[];
+  /** The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain. */
+  taxID?: string;
 }
 
 // NON SCHEMA.ORG Compliant. Should be removed ASAP
@@ -568,6 +575,22 @@ export interface ProductDetailsPage {
   seo?: Seo | null;
 }
 
+export interface PaginationInfo {
+  count: number;
+  current: Page;
+  before: Page[];
+  after: Page[];
+  perPage: number;
+  next: Page;
+  previous: Page;
+  first: Page;
+  last: Page;
+}
+
+export interface Page {
+  index: number;
+  proxyUrl: string;
+}
 export type PageType =
   | "Brand"
   | "Category"
@@ -586,6 +609,7 @@ export interface PageInfo {
   records?: number | undefined;
   recordPerPage?: number | undefined;
   pageTypes?: PageType[];
+  pagination: PaginationInfo;
 }
 
 export interface ProductListingPage {
@@ -603,6 +627,8 @@ export interface Seo {
   description: string;
   canonical: string;
   noIndexing?: boolean;
+  legacyProductTitle?: string;
+  legacyDescritionMetaTag?: string;
 }
 
 export interface Search {
