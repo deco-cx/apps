@@ -36,5 +36,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "version": "0.48.0"
+  "version": "0.48.5"
 }
