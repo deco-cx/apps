@@ -172,7 +172,6 @@ export default async function chat(
   });
 
   if (!response.ok) {
-    console.error("Failed to send messages to Anthropic API:", response.text());
     return shortcircuit(
       new Response(await response.text(), { status: response.status }),
     );
