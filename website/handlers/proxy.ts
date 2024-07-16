@@ -115,10 +115,10 @@ export default function Proxy({
   customHeaders = [],
   includeScriptsToHead,
   avoidAppendPath,
+  redirect = "manual",
   replaces,
 }: Props): Handler {
   return async (req, _ctx) => {
-    const redirect = "manual";
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
     const qs = url.searchParams.toString();
@@ -166,7 +166,6 @@ export default function Proxy({
       ? _ctx?.state?.monitoring
       : undefined;
 
-    console.log("redirect", redirect);
     const fetchFunction = async () => {
       try {
         const curl = fetchToCurl(to, { 
