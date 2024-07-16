@@ -4,6 +4,7 @@ import HTMXDefered from "../../../htmx/sections/Deferred.tsx";
 import type { AppContext } from "../../mod.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { __DECO_FBT } from "../../handlers/fresh.ts";
+import { shouldForceRender } from "../../../utils/deferred.ts";
 
 const isHtmx = (
   props: SectionProps,
@@ -14,19 +15,35 @@ interface Props {
   /** @label hidden */
   section: Section;
   trigger?: Trigger;
+
+  /**
+   * @description fresh/Deferred.tsx props
+   * @hide true
+   */
+  display?: boolean;
+  /**
+   * @description htmx/Deferred.tsx prop
+   * @hide true
+   */
+  loading?: "eager";
 }
 
 export const loader = async (props: Props, _req: Request, ctx: AppContext) => {
-  const isPartialDisplayTrue = "display" in props && props.display === true;
-  const isHtmx = "loading" in props && props.loading === "eager";
+  const isFreshSyncRender = "display" in props && props.display === true;
+  const isHtmxSyncRender = "loading" in props && props.loading === "eager";
   const url = new URL(_req.url);
-  const disableFBT = url.searchParams.get(__DECO_FBT) === "0";
-  const disableDefer = isPartialDisplayTrue || isHtmx || disableFBT ||
-    ctx.isBot;
+  const _shouldForceRender = shouldForceRender({
+    ctx,
+    searchParams: url.searchParams,
+  });
+  const shouldRender = isFreshSyncRender || isHtmxSyncRender ||
+    _shouldForceRender;
   const framework = ctx.flavor?.framework || "fresh";
 
-  if (disableDefer && isDeferred(props.section)) {
-    const section = await props.section() as Section | null;
+  if (shouldRender) {
+    const section = isDeferred<Section>(props.section)
+      ? await props.section()
+      : props.section;
     return { ...props, framework, section };
   }
 
