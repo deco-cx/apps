@@ -57,9 +57,10 @@ const SERVICE_ENDPOINT = Deno.env.get("EVENT_COLLECTOR") ??
  * Add another ecommerce analytics modules here.
  */
 const snippet = (
-  { siteId, siteName }: {
+  { siteId, siteName, serviceEndpoint }: {
     siteId?: number;
     siteName?: string;
+    serviceEndpoint: string;
   },
 ) => {
   const props: Record<string, string> = {};
@@ -248,7 +249,7 @@ const snippet = (
     };
 
     fetch(
-      SERVICE_ENDPOINT,
+      serviceEndpoint,
       {
         method: "POST",
         headers: {
@@ -279,6 +280,7 @@ function Clickhouse(
         src={useScriptAsDataURI(snippet, {
           siteId,
           siteName,
+          serviceEndpoint: SERVICE_ENDPOINT,
         })}
       />
     </Head>
