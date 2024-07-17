@@ -1,15 +1,15 @@
 import "./utils/unhandledRejection.ts";
 
+import { Matcher } from "deco/blocks/matcher.ts";
+import { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
 import type { App, FnContext } from "deco/mod.ts";
 import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { Page } from "deco/blocks/page.tsx";
 import { TextReplace } from "./handlers/proxy.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import { Script } from "./types.ts";
-import { Matcher } from "deco/blocks/matcher.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -79,20 +79,23 @@ export interface Props {
    */
   routes?: Routes[];
 
-  /** @title Seo */
-  seo?: Omit<
-    Seo,
-    "jsonLDs" | "canonical"
-  >;
-  /**
-   * @title Theme
-   */
-  theme?: Section;
   /**
    * @title Global Sections
-   * @description These sections will be included on all website/pages/Page.ts
+   * @description These sections run once on the start of the website and will be included on the start of each page
    */
   global?: Section[];
+
+  /**
+   * @title Start Sections
+   * @description These sections run every time a page is loaded and will be included on the start of each page
+   */
+  startSections?: Section[];
+
+  /**
+   * @title End Sections
+   * @description These sections run every time a page is loaded and will be included on the end of each page
+   */
+  endSections?: Section[];
 
   /**
    * @title Error Page
@@ -130,6 +133,17 @@ export interface Props {
    * @description The flavor of the website
    */
   flavor?: Fresh | HTMX;
+
+  /** @title Seo */
+  seo?: Omit<
+    Seo,
+    "jsonLDs" | "canonical"
+  >;
+
+  /**
+   * @title Theme
+   */
+  theme?: Section;
 
   // We are hiding this prop because it is in testing phase
   // after that, probably we will remove this prop and default will be true
@@ -238,7 +252,13 @@ const deferPropsResolve = (routes: Routes): Routes => {
 };
 
 export const onBeforeResolveProps = <
-  T extends { routes?: Routes[]; errorPage?: Page; abTesting: AbTesting },
+  T extends {
+    routes?: Routes[];
+    errorPage?: Page;
+    abTesting: AbTesting;
+    startSections: Section[];
+    endSections: Section[];
+  },
 >(
   props: T,
 ): T => {
@@ -250,6 +270,12 @@ export const onBeforeResolveProps = <
         : undefined,
       abTesting: props.abTesting
         ? asResolved(props.abTesting, false)
+        : undefined,
+      startSections: props.startSections
+        ? asResolved(props.startSections, true)
+        : undefined,
+      endSections: props.endSections
+        ? asResolved(props.endSections, true)
         : undefined,
       routes: props.routes.map(deferPropsResolve),
     };

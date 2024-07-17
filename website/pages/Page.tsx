@@ -1,24 +1,22 @@
 import { Head } from "$fresh/runtime.ts";
+import type { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
-import { ComponentMetadata } from "deco/engine/block.ts";
+import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
+import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
+import { isDeferred } from "deco/mod.ts";
+import { logger } from "deco/observability/otel/config.ts";
 import {
   usePageContext as useDecoPageContext,
   useRouterContext,
 } from "deco/runtime/fresh/routes/entrypoint.tsx";
-import { JSX } from "preact";
+import { Component, JSX } from "preact";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import Clickhouse from "../components/Clickhouse.tsx";
 import Events from "../components/Events.tsx";
+import { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
 import { AppContext } from "../mod.ts";
-import type { Page } from "deco/blocks/page.tsx";
-import { Component } from "preact";
-import { ComponentFunc } from "deco/engine/block.ts";
-import { HttpError } from "deco/engine/errors.ts";
-import { logger } from "deco/observability/otel/config.ts";
-import { isDeferred } from "deco/mod.ts";
-import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import { SEOSection } from "../components/Seo.tsx";
-import Clickhouse from "../components/Clickhouse.tsx";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -46,6 +44,10 @@ export interface Props {
   /** @hide true */
   seo?: Section<SEOSection>;
   sections: Sections;
+  /** @hide true */
+  startSections?: Sections;
+  /** @hide true */
+  endSections?: Sections;
   /** @hide true */
   unindexedDomain?: boolean;
 }
@@ -99,6 +101,8 @@ const useDeco = () => {
  */
 function Page({
   sections,
+  startSections,
+  endSections,
   errorPage,
   devMode,
   seo,
@@ -114,6 +118,8 @@ function Page({
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
+
+  console.log("onPage", endSections);
 
   return (
     <>
@@ -147,7 +153,9 @@ function Page({
         {sendToClickHouse && (
           <Clickhouse siteId={site.id} siteName={site.name} />
         )}
+        {startSections?.map(renderSection)}
         {sections.map(renderSection)}
+        {endSections?.map(renderSection)}
       </ErrorBoundary>
     </>
   );
@@ -168,6 +176,12 @@ export const loader = async (
   return {
     ...restProps,
     sections,
+    startSections: isDeferred<Page>(ctx.startSections)
+      ? await ctx.startSections()
+      : undefined,
+    endSections: isDeferred<Page>(ctx.endSections)
+      ? await ctx.endSections()
+      : undefined,
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
