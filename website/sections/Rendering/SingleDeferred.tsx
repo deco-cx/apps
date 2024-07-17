@@ -14,12 +14,9 @@ const isHtmx = (
   props: SectionProps,
 ): props is SectionProps & { framework: "htmx" } => props.framework === "htmx";
 
-type Trigger = "load" | "intersect";
 interface Props {
   /** @label hidden */
   section: Section;
-  trigger?: Trigger;
-
   /**
    * @description fresh/Deferred.tsx props
    * @hide true
