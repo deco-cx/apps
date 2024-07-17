@@ -119,8 +119,6 @@ function Page({
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
 
-  console.log("onPage", endSections);
-
   return (
     <>
       {unindexedDomain && (
