@@ -437,9 +437,10 @@ const loader = async (
 
   const getPageUrl = (value: number) => {
     const pageCurrentExist = url.pathname.match(PAGE_REGEX);
+    const queryParamns = currentSearchParams.toString() ? "?" + currentSearchParams.toString() : ""
     return pageCurrentExist
-      ? url.pathname.replace(PAGE_REGEX, `page${paramnPage + value}`)
-      : `${url.pathname}/page${paramnPage + 1}${currentSearchParams.toString() ? "?" + currentSearchParams.toString() : " "}   `;
+      ? `${url.pathname.replace(PAGE_REGEX, `page${paramnPage + value}`)}${queryParamns} `
+      : `${url.pathname}/page${paramnPage + 1}${queryParamns}   `;
   };
 
   return {
