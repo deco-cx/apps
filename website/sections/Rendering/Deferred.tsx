@@ -9,9 +9,22 @@ import { shouldForceRender } from "../../../utils/deferred.ts";
 /** @titleBy type */
 export interface Scroll {
   type: "scroll";
+
   /**
+   * @hide true
    * @title Delay MS
-   * @description Delay (in milliseconds) to wait after the scroll event is fired. If value is 0, it will trigger when page load
+   * @description Delay (in milliseconds) to wait after the scroll event is fired.
+   */
+  payload: number;
+}
+
+interface Load {
+  type: "load";
+
+  /**
+   * @hide true
+   * @title Delay MS
+   * @description Delay (in milliseconds) to wait after the DOMContentLoaded event is fired. If value is 0, it will trigger when page load
    */
   payload: number;
 }
@@ -29,12 +42,12 @@ export interface Intersection {
 export interface Props {
   sections: Section[];
   display?: boolean;
-  behavior?: Scroll | Intersection;
+  behavior?: Scroll | Intersection | Load;
 }
 
 const script = (
   id: string,
-  type: "scroll" | "intersection",
+  type: "scroll" | "intersection" | "load",
   payload: string,
 ) => {
   const element = document.getElementById(id);
@@ -43,17 +56,24 @@ const script = (
     return;
   }
 
-  if (type === "scroll") {
+  const triggerRender = (timeout: number) => () => {
+    setTimeout(() => element.click(), timeout);
+  };
+
+  if (type === "load") {
     const timeout = Number(payload || 200);
     const instant = timeout === 0;
-    const triggerRender = () => setTimeout(() => element.click(), timeout);
 
-    if (instant && document.readyState === "complete") triggerRender();
-    else if (instant) addEventListener("DOMContentLoaded", triggerRender);
+    if (instant || document.readyState === "complete") triggerRender(timeout);
+    else {
+      addEventListener("DOMContentLoaded", triggerRender(timeout));
+    }
+  }
 
+  if (type === "scroll") {
     addEventListener(
       "scroll",
-      triggerRender,
+      triggerRender(Number(payload) ?? 200),
       { once: true },
     );
   }

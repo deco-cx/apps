@@ -10,6 +10,8 @@ import { shouldForceRender } from "../../utils/deferred.ts";
  */
 interface Load {
   type: "load";
+  /** @hide true */
+  delay?: number;
 }
 
 /**
@@ -51,10 +53,15 @@ const Deferred = (props: Props) => {
     props: { loading: "eager" },
   });
 
+  const triggerList: (string | number)[] = [trigger?.type ?? "load", "once"];
+  if (trigger?.type === "load" && trigger.delay !== undefined) {
+    triggerList.push(`${trigger.delay}ms`);
+  }
+
   return (
     <div
       hx-get={href}
-      hx-trigger={`${trigger?.type ?? "load"} once`}
+      hx-trigger={triggerList.join(" ")}
       hx-target="closest section"
       hx-swap="outerHTML"
       style={{ height: "100vh" }}

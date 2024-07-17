@@ -5,6 +5,10 @@ import type { AppContext } from "../../mod.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { __DECO_FBT } from "../../handlers/fresh.ts";
 import { shouldForceRender } from "../../../utils/deferred.ts";
+import { useContext } from "preact/hooks";
+import { SectionContext } from "deco/components/section.tsx";
+
+const useSectionContext = () => useContext(SectionContext);
 
 const isHtmx = (
   props: SectionProps,
@@ -53,6 +57,10 @@ export const loader = async (props: Props, _req: Request, ctx: AppContext) => {
 type SectionProps = Awaited<ReturnType<typeof loader>>;
 
 function SingleDeferred(props: SectionProps) {
+  const ctx = useSectionContext();
+  const idxOrNaN = Number(ctx?.resolveChain.at(-2)?.value);
+  const delay = 25 * Math.min(Number.isNaN(idxOrNaN) ? 1 : idxOrNaN, 10);
+
   if (isHtmx(props)) {
     return (
       <HTMXDefered
@@ -60,6 +68,7 @@ function SingleDeferred(props: SectionProps) {
         loading={props.section ? "eager" : "lazy"}
         trigger={{
           type: "load",
+          delay,
         }}
       />
     );
@@ -70,8 +79,8 @@ function SingleDeferred(props: SectionProps) {
       sections={props.section ? [props.section] : []}
       display={props.section ? true : false}
       behavior={{
-        type: "scroll",
-        payload: 0,
+        type: "load",
+        payload: delay,
       }}
     />
   );
@@ -80,7 +89,10 @@ function SingleDeferred(props: SectionProps) {
 const DEFERRED = true;
 
 export const onBeforeResolveProps = (props: Props) => {
-  return { ...props, section: asResolved(props.section, DEFERRED) };
+  return {
+    ...props,
+    section: asResolved(props.section, DEFERRED),
+  };
 };
 
 export default SingleDeferred;
