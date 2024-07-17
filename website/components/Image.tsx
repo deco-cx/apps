@@ -29,20 +29,88 @@ const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-export const getOptimizedMediaUrl = ({
-  originalSrc,
-  width,
-  height,
-  factor,
-  fit = "cover",
-}: {
+const ENABLE_IMAGE_OPTIMIZATION =
+  Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+
+interface OptimizationOptions {
   originalSrc: string;
   width: number;
   height?: number;
   factor: number;
-  fit?: FitOptions;
-}) => {
-  if (originalSrc.startsWith("data:")) return originalSrc;
+  fit: FitOptions;
+}
+
+const optmizeVNDA = (opts: OptimizationOptions) => {
+  const { width, height, originalSrc } = opts;
+  const src = new URL(originalSrc);
+
+  const [replaceStr] = /\/\d*x\d*/g.exec(src.pathname) ?? [""];
+  const pathname = src.pathname.replace(replaceStr, "");
+
+  const url = new URL(
+    `/${width}x${height}${pathname}${src.search}`,
+    src.origin,
+  );
+
+  return url.href;
+};
+
+const optmizeShopify = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const url = new URL(originalSrc);
+  url.searchParams.set("width", `${width}`);
+  url.searchParams.set("height", `${height}`);
+  url.searchParams.set("crop", "center");
+
+  return url.href;
+};
+
+const optimizeVTEX = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height } = opts;
+
+  const src = new URL(originalSrc);
+
+  const [slash, arquivos, ids, id, ...rest] = src.pathname.split("/");
+
+  src.pathname = [slash, arquivos, ids, `${id}-${width}-${height}`, ...rest]
+    .join("/");
+
+  return src.href;
+};
+
+export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
+  const { originalSrc, width, height, factor, fit } = opts;
+
+  if (originalSrc.startsWith("data:")) {
+    return originalSrc;
+  }
+
+  if (!ENABLE_IMAGE_OPTIMIZATION) {
+    if (originalSrc.startsWith("https://cdn.vnda.")) {
+      return optmizeVNDA(opts);
+    }
+
+    if (originalSrc.startsWith("https://cdn.shopify.com")) {
+      return optmizeShopify(opts);
+    }
+
+    if (
+      /(vteximg.com.br|vtexassets.com)\/arquivos\/ids\/\d+/.test(originalSrc)
+    ) {
+      return optimizeVTEX(opts);
+    }
+
+    if (
+      !originalSrc.startsWith(
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
+      )
+    ) {
+      console.warn(
+        `The following image ${originalSrc} requires automatic image optimization, but it's currently disabled. This may incur in additional costs. Please contact deco.cx for more information.`,
+      );
+    }
+  }
 
   const params = new URLSearchParams();
 
@@ -55,23 +123,30 @@ export const getOptimizedMediaUrl = ({
 };
 
 export const getSrcSet = (
-  src: string,
+  originalSrc: string,
   width: number,
   height?: number,
   fit?: FitOptions,
-) =>
-  FACTORS.map(
-    (factor) =>
-      `${
-        getOptimizedMediaUrl({
-          originalSrc: src,
-          width,
-          height,
-          factor,
-          fit,
-        })
-      } ${Math.trunc(factor * width)}w`,
-  ).join(", ");
+) => {
+  const srcSet = [];
+
+  for (let it = 0; it < FACTORS.length; it++) {
+    const factor = FACTORS[it];
+    const src = getOptimizedMediaUrl({
+      originalSrc,
+      width,
+      height,
+      factor,
+      fit: fit || "cover",
+    });
+
+    if (src) {
+      srcSet.push(`${src} ${Math.trunc(factor * width)}w`);
+    }
+  }
+
+  return srcSet.length > 0 ? srcSet.join(", ") : undefined;
+};
 
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   const { preload, loading = "lazy" } = props;
@@ -83,7 +158,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
   }
 
   const srcSet = getSrcSet(props.src, props.width, props.height, props.fit);
-  const linkProps = {
+  const linkProps = srcSet && {
     imagesrcset: srcSet,
     imagesizes: props.sizes,
     fetchpriority: props.fetchPriority,
