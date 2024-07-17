@@ -86,37 +86,40 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     return originalSrc;
   }
 
-  if (
-    ENABLE_IMAGE_OPTIMIZATION ||
-    originalSrc.startsWith("https://ozksgdmyrqcxcwhnbepg.supabase.co/storage")
-  ) {
-    const params = new URLSearchParams();
+  if (!ENABLE_IMAGE_OPTIMIZATION) {
+    if (originalSrc.startsWith("https://cdn.vnda.")) {
+      return optmizeVNDA(opts);
+    }
 
-    params.set("src", originalSrc);
-    params.set("fit", fit);
-    params.set("width", `${Math.trunc(factor * width)}`);
-    height && params.set("height", `${Math.trunc(factor * height)}`);
+    if (originalSrc.startsWith("https://cdn.shopify.com")) {
+      return optmizeShopify(opts);
+    }
 
-    return `${PATH}?${params}`;
+    if (
+      /(vteximg.com.br|vtexassets.com)\/arquivos\/ids\/\d+/.test(originalSrc)
+    ) {
+      return optimizeVTEX(opts);
+    }
+
+    if (
+      !originalSrc.startsWith(
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
+      )
+    ) {
+      console.warn(
+        `The following image ${originalSrc} requires automatic image optimization, but it's currently disabled. This may incur in additional costs. Please contact deco.cx for more information.`,
+      );
+    }
   }
 
-  if (originalSrc.startsWith("https://cdn.vnda.")) {
-    return optmizeVNDA(opts);
-  }
+  const params = new URLSearchParams();
 
-  if (originalSrc.startsWith("https://cdn.shopify.com")) {
-    return optmizeShopify(opts);
-  }
+  params.set("src", originalSrc);
+  params.set("fit", fit);
+  params.set("width", `${Math.trunc(factor * width)}`);
+  height && params.set("height", `${Math.trunc(factor * height)}`);
 
-  if (/(vteximg.com.br|vtexassets.com)\/arquivos\/ids\/\d+/.test(originalSrc)) {
-    return optimizeVTEX(opts);
-  }
-
-  console.warn(
-    `Image optimization is disabled. To enable please contact deco.cx. The following image will not be optimized: ${originalSrc}`,
-  );
-
-  return null;
+  return `${PATH}?${params}`;
 };
 
 export const getSrcSet = (
