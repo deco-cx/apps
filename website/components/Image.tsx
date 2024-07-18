@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 import { Manifest } from "../manifest.gen.ts";
@@ -29,10 +29,11 @@ const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-// TODO @gimenes: This addded Deno. on the browser. We should
-// fix this and have a way to correctly feature flag it in the browser
-const ENABLE_IMAGE_OPTIMIZATION = true; //!IS_BROWSER &&
-// Deno.env.get("IMAGE_OPTIMIZATION") !== "false";
+const isImageOptmizationEnabled = () =>
+  IS_BROWSER
+    // deno-lint-ignore no-explicit-any
+    ? (globalThis as any).DECO?.flags?.enableImageOptimization
+    : Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
 
 interface OptimizationOptions {
   originalSrc: string;
@@ -73,9 +74,10 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
 
   const src = new URL(originalSrc);
 
-  const [slash, arquivos, ids, id, ...rest] = src.pathname.split("/");
+  const [slash, arquivos, ids, rawId, ...rest] = src.pathname.split("/");
+  const [trueId, _w, _h] = rawId.split("-");
 
-  src.pathname = [slash, arquivos, ids, `${id}-${width}-${height}`, ...rest]
+  src.pathname = [slash, arquivos, ids, `${trueId}-${width}-${height}`, ...rest]
     .join("/");
 
   return src.href;
@@ -88,7 +90,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     return originalSrc;
   }
 
-  if (!ENABLE_IMAGE_OPTIMIZATION) {
+  if (!isImageOptmizationEnabled()) {
     if (originalSrc.startsWith("https://cdn.vnda.")) {
       return optmizeVNDA(opts);
     }
