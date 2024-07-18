@@ -136,16 +136,19 @@ export const getSrcSet = (
 
   for (let it = 0; it < FACTORS.length; it++) {
     const factor = FACTORS[it];
+    const w = factor * width;
+    const h = height && factor * height;
+
     const src = getOptimizedMediaUrl({
       originalSrc,
-      width,
-      height,
+      width: w,
+      height: h,
       factor,
       fit: fit || "cover",
     });
 
     if (src) {
-      srcSet.push(`${src} ${Math.trunc(factor * width)}w`);
+      srcSet.push(`${src} ${Math.trunc(w)}w`);
     }
   }
 
