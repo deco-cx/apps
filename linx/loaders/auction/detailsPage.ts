@@ -25,16 +25,17 @@ const loader = async (
     return null;
   }
 
+  // deno-lint-ignore no-explicit-any
   let auction: any;
   try {
     auction = await response.json();
-  } catch (error) { 
+  } catch (_error) {
     auction = null;
   }
 
   if (!auction || !isAuctionDetailModel(auction)) {
     return null;
-  }  
+  }
 
   return toAuctionDetail(auction.Model, { cdn });
 };

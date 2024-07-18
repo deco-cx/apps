@@ -1,6 +1,5 @@
 import { redirect } from "deco/mod.ts";
 import { STALE } from "../../utils/fetch.ts";
-import { nullOnNotFound } from "../../utils/http.ts";
 import type { AppContext } from "../mod.ts";
 import type { API } from "../utils/client.ts";
 

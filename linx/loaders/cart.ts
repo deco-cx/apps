@@ -46,8 +46,8 @@ const loader = async (
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
   setCookie(ctx.response.headers, {
-    name: "linx-basket", 
-    value: String(cart.Shopper.Basket.BasketID), 
+    name: "linx-basket",
+    value: String(cart.Shopper.Basket.BasketID),
   });
 
   return toCart(cart, ctx);

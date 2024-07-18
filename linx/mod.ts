@@ -4,6 +4,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import { previewFromMarkdown } from "../utils/preview.ts";
 import { API } from "./utils/client.ts";
 import { Secret } from "../website/loaders/secret.ts";
+import { LayerAPI } from "./utils/layer.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -58,7 +59,12 @@ export default function App(
     headers,
   });
 
-  const state = { cdn, api, account };
+  const layer = createHttpClient<LayerAPI>({
+    base: `https://${account}.layer.core.dcg.com.br/`,
+    headers,
+  });
+
+  const state = { cdn, api, layer, account };
 
   const app: App<Manifest, typeof state> = { manifest, state };
 
