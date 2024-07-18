@@ -1,5 +1,4 @@
 import { Head } from "$fresh/runtime.ts";
-import type { Page } from "deco/blocks/page.tsx";
 import { Section, SectionProps } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
@@ -17,6 +16,21 @@ import Events from "../components/Events.tsx";
 import { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
 import { AppContext } from "../mod.ts";
+import type { Page } from "deco/blocks/page.tsx";
+import { Component } from "preact";
+import { ComponentFunc } from "deco/engine/block.ts";
+import { HttpError } from "deco/engine/errors.ts";
+import { logger } from "deco/observability/otel/config.ts";
+import { isDeferred } from "deco/mod.ts";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import { SEOSection } from "../components/Seo.tsx";
+import Clickhouse, {
+  generateSessionId,
+  generateUserId,
+  SESSION_COOKIE_NAME,
+  UID_COOKIE_NAME,
+} from "../components/Clickhouse.tsx";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -103,7 +117,16 @@ function Page({
   unindexedDomain,
   avoidRedirectingToEditor,
   sendToClickHouse,
-}: SectionProps<typeof loader>): JSX.Element {
+  userId,
+  sessionId,
+}: Props & {
+  errorPage?: Page;
+  devMode: boolean;
+  avoidRedirectingToEditor?: boolean;
+  sendToClickHouse?: boolean;
+  userId: string;
+  sessionId: string;
+}): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
@@ -138,7 +161,12 @@ function Page({
         />
         <Events deco={deco} />
         {sendToClickHouse && (
-          <Clickhouse siteId={site.id} siteName={site.name} />
+          <Clickhouse
+            siteId={site.id}
+            siteName={site.name}
+            userId={userId}
+            sessionId={sessionId}
+          />
         )}
         {sections.map(renderSection)}
       </ErrorBoundary>
@@ -164,6 +192,9 @@ export const loader = async (
     }),
   );
 
+  const userId = generateUserId();
+  const sessionId = generateSessionId();
+
   return {
     ...restProps,
     sections: [...global, ...sections],
@@ -174,6 +205,8 @@ export const loader = async (
     unindexedDomain,
     avoidRedirectingToEditor: ctx.avoidRedirectingToEditor,
     sendToClickHouse: ctx.sendToClickHouse,
+    userId,
+    sessionId,
   };
 };
 
