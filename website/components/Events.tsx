@@ -14,6 +14,10 @@ interface EventsAPI {
   ) => () => void;
 }
 
+interface FeatureFlags {
+  enableImageOptimization: boolean;
+}
+
 declare global {
   interface Window {
     DECO_ANALYTICS: Record<
@@ -22,16 +26,23 @@ declare global {
       (action: string, eventType: string, props?: any) => void
     >;
     DECO_SITES_STD: { sendAnalyticsEvent: (event: unknown) => void };
-    DECO: { events: EventsAPI };
+    DECO: { events: EventsAPI; featureFlags: FeatureFlags };
   }
 }
+
+const ENABLE_IMAGE_OPTIMIZATION =
+  Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
 
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
 const snippet = (
-  { deco: { page }, segmentCookie }: { deco: Deco; segmentCookie: string },
+  { deco: { page }, segmentCookie, featureFlags }: {
+    deco: Deco;
+    segmentCookie: string;
+    featureFlags: FeatureFlags;
+  },
 ) => {
   const cookie = document.cookie;
   const out: Record<string, string> = {};
@@ -82,6 +93,7 @@ const snippet = (
   globalThis.window.DECO = {
     ...globalThis.window.DECO,
     events: { dispatch, subscribe },
+    featureFlags,
   };
 };
 
@@ -91,7 +103,13 @@ function Events({ deco }: { deco: Deco }) {
       <script
         defer
         id="deco-events"
-        src={useScriptAsDataURI(snippet, { deco, segmentCookie: DECO_SEGMENT })}
+        src={useScriptAsDataURI(snippet, {
+          deco,
+          segmentCookie: DECO_SEGMENT,
+          featureFlags: {
+            enableImageOptimization: ENABLE_IMAGE_OPTIMIZATION,
+          },
+        })}
       />
     </Head>
   );

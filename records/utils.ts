@@ -15,7 +15,7 @@ export interface StorageConfig {
   authToken: Secret;
 }
 
-export const getLocalDbFilename = () => join(Deno.cwd(), 'sqlite.db');
+export const getLocalDbFilename = () => join(Deno.cwd(), "sqlite.db");
 
 export const getLocalSQLClientConfig = () => ({
   url: new URL(`file://${getLocalDbFilename()}`).href,
