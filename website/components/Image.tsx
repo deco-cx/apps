@@ -1,4 +1,4 @@
-import { Head, IS_BROWSER } from "$fresh/runtime.ts";
+import { Head } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 import { Manifest } from "../manifest.gen.ts";
@@ -29,8 +29,10 @@ const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-const ENABLE_IMAGE_OPTIMIZATION = !IS_BROWSER &&
-  Deno.env.get("IMAGE_OPTIMIZATION") !== "false";
+// TODO @gimenes: This addded Deno. on the browser. We should
+// fix this and have a way to correctly feature flag it in the browser
+const ENABLE_IMAGE_OPTIMIZATION = true; //!IS_BROWSER &&
+// Deno.env.get("IMAGE_OPTIMIZATION") !== "false";
 
 interface OptimizationOptions {
   originalSrc: string;
