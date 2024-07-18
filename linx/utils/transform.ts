@@ -31,7 +31,7 @@ import {
 } from "./types/suggestionsJSON.ts";
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
-import { Product as LinxProductGetByIdJSON } from "./types/getByIdJSON.ts";
+import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList

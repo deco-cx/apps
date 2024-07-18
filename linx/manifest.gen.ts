@@ -24,8 +24,8 @@ import * as $$$3 from "./loaders/cart.ts";
 import * as $$$4 from "./loaders/page.ts";
 import * as $$$5 from "./loaders/pages.ts";
 import * as $$$6 from "./loaders/path.ts";
-import * as $$$7 from "./loaders/product/detailsPage.ts";
-import * as $$$8 from "./loaders/product/getById.ts";
+import * as $$$7 from "./loaders/product/byId.ts";
+import * as $$$8 from "./loaders/product/detailsPage.ts";
 import * as $$$9 from "./loaders/product/list.ts";
 import * as $$$10 from "./loaders/product/listingPage.ts";
 import * as $$$11 from "./loaders/product/suggestions.ts";
@@ -42,8 +42,8 @@ const manifest = {
     "linx/loaders/page.ts": $$$4,
     "linx/loaders/pages.ts": $$$5,
     "linx/loaders/path.ts": $$$6,
-    "linx/loaders/product/detailsPage.ts": $$$7,
-    "linx/loaders/product/getById.ts": $$$8,
+    "linx/loaders/product/byId.ts": $$$7,
+    "linx/loaders/product/detailsPage.ts": $$$8,
     "linx/loaders/product/list.ts": $$$9,
     "linx/loaders/product/listingPage.ts": $$$10,
     "linx/loaders/product/suggestions.ts": $$$11,
