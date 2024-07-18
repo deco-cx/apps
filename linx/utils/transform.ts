@@ -5,8 +5,8 @@ import {
   Product,
   ProductDetailsPage,
   PropertyValue,
-  VideoObject,
   UnitPriceSpecification,
+  VideoObject,
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { CartResponse } from "./types/basketJSON.ts";
@@ -31,12 +31,14 @@ import {
 } from "./types/suggestionsJSON.ts";
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
+import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
   | LinxProductGroupProductJSON
   | LinxProductGroupGridProductsJSON
-  | LinxSuggestionProductGroupJSON;
+  | LinxSuggestionProductGroupJSON
+  | LinxProductGetByIdJSON;
 type LinxProduct =
   | LinxProductFromList
   | LinxProductFromJSON
@@ -142,7 +144,9 @@ export const toProduct = (
     additionalType: "skuOptions",
   }));
 
-  const productVideo: VideoObject[] = product?.Medias?.filter((option) => option.MediaType === "Video").map((option) => ({
+  const productVideo: VideoObject[] = product?.Medias?.filter((option) =>
+    option.MediaType === "Video"
+  ).map((option) => ({
     "@type": "PropertyValue" as const,
     name: option.Title || "",
     value: option.Url || "",

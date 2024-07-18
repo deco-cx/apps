@@ -4,7 +4,6 @@ import { getLinxBasketId } from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { toLinxHeaders } from "../../utils/headers.ts";
 
-
 type Location = {
   href: string;
   origin: string;
@@ -12,25 +11,26 @@ type Location = {
   pathname: string;
   search: string;
   full: string;
-}
+};
 
 export default async function redirect(
-  _props: unknown, 
-  req: Request, 
-  ctx: AppContext
+  _props: unknown,
+  req: Request,
+  ctx: AppContext,
 ): Promise<{ location: Location } | null> {
   const { api } = ctx;
   const requestHost = new URL(req.url).hostname;
 
   const BasketID = getLinxBasketId(req.headers);
 
-  const response = await api["POST /web-api/v1/Shopping/Basket/CheckoutRedirect"]({}, {
-    headers: toLinxHeaders(req.headers),
-    body: {
-      BasketID,
-    },
-    redirect: "manual",
-  });
+  const response = await api
+    ["POST /web-api/v1/Shopping/Basket/CheckoutRedirect"]({}, {
+      headers: toLinxHeaders(req.headers),
+      body: {
+        BasketID,
+      },
+      redirect: "manual",
+    });
 
   if (response === null) {
     return null;
@@ -54,7 +54,7 @@ export default async function redirect(
 
   const url = new URL(location);
 
-  return { 
+  return {
     location: {
       href: url.href,
       origin: url.origin,
@@ -64,4 +64,4 @@ export default async function redirect(
       full: location,
     },
   };
-};
+}
