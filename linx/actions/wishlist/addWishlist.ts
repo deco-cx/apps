@@ -11,7 +11,7 @@ export interface Props {
   IsActive: boolean;
   Name: string;
   Description: string;
-  PrivacyType: "0 - Public" | "2 - Private";
+  PrivacyType?: "0 - Public" | "2 - Private";
   Hash?: string;
   Password?: string;
   CreatedDate?: string;
