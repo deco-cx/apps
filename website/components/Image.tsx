@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head, IS_BROWSER } from "$fresh/runtime.ts";
 import type { JSX } from "preact";
 import { forwardRef } from "preact/compat";
 import { Manifest } from "../manifest.gen.ts";
@@ -29,8 +29,8 @@ const FACTORS = [1, 2];
 
 type FitOptions = "contain" | "cover";
 
-const ENABLE_IMAGE_OPTIMIZATION =
-  Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
+const ENABLE_IMAGE_OPTIMIZATION = !IS_BROWSER &&
+  Deno.env.get("IMAGE_OPTIMIZATION") !== "false";
 
 interface OptimizationOptions {
   originalSrc: string;
