@@ -84,7 +84,7 @@ const optimizeVTEX = (opts: OptimizationOptions) => {
 };
 
 export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
-  const { originalSrc, width, height, factor, fit } = opts;
+  const { originalSrc, width, height, fit } = opts;
 
   if (originalSrc.startsWith("data:")) {
     return originalSrc;
@@ -120,8 +120,8 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
 
   params.set("src", originalSrc);
   params.set("fit", fit);
-  params.set("width", `${Math.trunc(factor * width)}`);
-  height && params.set("height", `${Math.trunc(factor * height)}`);
+  params.set("width", `${width}`);
+  height && params.set("height", `${height}`);
 
   return `${PATH}?${params}`;
 };
@@ -136,8 +136,8 @@ export const getSrcSet = (
 
   for (let it = 0; it < FACTORS.length; it++) {
     const factor = FACTORS[it];
-    const w = factor * width;
-    const h = height && factor * height;
+    const w = Math.trunc(factor * width);
+    const h = height && Math.trunc(factor * height);
 
     const src = getOptimizedMediaUrl({
       originalSrc,
@@ -148,7 +148,7 @@ export const getSrcSet = (
     });
 
     if (src) {
-      srcSet.push(`${src} ${Math.trunc(w)}w`);
+      srcSet.push(`${src} ${w}w`);
     }
   }
 
