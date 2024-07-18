@@ -32,7 +32,7 @@ type FitOptions = "contain" | "cover";
 const isImageOptmizationEnabled = () =>
   IS_BROWSER
     // deno-lint-ignore no-explicit-any
-    ? (globalThis as any).DECO?.flags?.enableImageOptimization
+    ? (globalThis as any).DECO?.featureFlags?.enableImageOptimization
     : Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
 
 interface OptimizationOptions {

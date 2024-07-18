@@ -14,7 +14,7 @@ interface EventsAPI {
   ) => () => void;
 }
 
-interface Flags {
+interface FeatureFlags {
   enableImageOptimization: boolean;
 }
 
@@ -26,7 +26,7 @@ declare global {
       (action: string, eventType: string, props?: any) => void
     >;
     DECO_SITES_STD: { sendAnalyticsEvent: (event: unknown) => void };
-    DECO: { events: EventsAPI; flags: Flags };
+    DECO: { events: EventsAPI; featureFlags: FeatureFlags };
   }
 }
 
@@ -38,10 +38,10 @@ const ENABLE_IMAGE_OPTIMIZATION =
  * Add another ecommerce analytics modules here.
  */
 const snippet = (
-  { deco: { page }, segmentCookie, flags: internalFlags }: {
+  { deco: { page }, segmentCookie, featureFlags }: {
     deco: Deco;
     segmentCookie: string;
-    flags: Flags;
+    featureFlags: FeatureFlags;
   },
 ) => {
   const cookie = document.cookie;
@@ -93,7 +93,7 @@ const snippet = (
   globalThis.window.DECO = {
     ...globalThis.window.DECO,
     events: { dispatch, subscribe },
-    flags: internalFlags,
+    featureFlags,
   };
 };
 
@@ -106,7 +106,7 @@ function Events({ deco }: { deco: Deco }) {
         src={useScriptAsDataURI(snippet, {
           deco,
           segmentCookie: DECO_SEGMENT,
-          flags: {
+          featureFlags: {
             enableImageOptimization: ENABLE_IMAGE_OPTIMIZATION,
           },
         })}
