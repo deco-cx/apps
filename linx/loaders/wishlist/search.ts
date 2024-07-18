@@ -4,10 +4,10 @@ import { toLinxHeaders } from "../../utils/headers.ts";
 
 export interface Props {
   Page?: {
-    PageIndex: number
-    PageSize: number
-  }
-  OrderBy?: string
+    PageIndex: number;
+    PageSize: number;
+  };
+  OrderBy?: string;
 }
 
 const defaultProps = {
@@ -39,14 +39,17 @@ const loader = async (
     return null;
   }
 
-  const response = await layer["POST /v1/Profile/API.svc/web/SearchWishlist"]({}, {
-    body: {
-      ...defaultProps,
-      ...props,
-      Where: `CustomerID == ${CustomerID}`,
+  const response = await layer["POST /v1/Profile/API.svc/web/SearchWishlist"](
+    {},
+    {
+      body: {
+        ...defaultProps,
+        ...props,
+        Where: `CustomerID == ${CustomerID}`,
+      },
+      headers: toLinxHeaders(req.headers),
     },
-    headers: toLinxHeaders(req.headers),
-  });
+  );
 
   if (response === null) {
     return null;

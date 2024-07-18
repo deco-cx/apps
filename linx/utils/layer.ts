@@ -1,91 +1,90 @@
 import {
   AddProductsToWishlistResponse,
-  SaveWishlistResponse,
-  DeleteWishlistResponse,
   DeleteProductsFromWishlistResponse,
+  DeleteWishlistResponse,
+  SaveWishlistResponse,
   SearchWishlistResponse,
-  ShareWishlistResponse
+  ShareWishlistResponse,
 } from "./types/wishlistJSON.ts";
 
 export interface LayerAPI {
   "POST /v1/Profile/API.svc/web/SearchWishlist": {
-    response: SearchWishlistResponse,
+    response: SearchWishlistResponse;
     body: {
       Page: {
-        PageIndex: number
-        PageSize: number
-      }
-      Where?: string
-      WhereMetadata?: string
-      OrderBy?: string
-    }
-  }
+        PageIndex: number;
+        PageSize: number;
+      };
+      Where?: string;
+      WhereMetadata?: string;
+      OrderBy?: string;
+    };
+  };
 
   "POST /v1/Profile/API.svg/web/ShareWishlist": {
-    response: ShareWishlistResponse,
+    response: ShareWishlistResponse;
     body: {
-      WishlistID: number
-      WebSiteID: number
-      Recipients: string
-      Message: string
-    }
-  }
+      WishlistID: number;
+      WebSiteID?: number;
+      Recipients: string;
+      Message: string;
+    };
+  };
 
   "POST /v1/Profile/API.svc/web/SaveWishlist": {
     response: SaveWishlistResponse;
     body: {
       ExtendedProperties?: {
-        Name: string
-        Value: unknown
-        Values: unknown[]
-      }[]
-      WishlistID?: number
-      CustomerID: number
-      IsActive: boolean
-      Name: string
-      Description: string
-      PrivacyType: '0 - Public' | '2 - Private'
-      Hash?: string
-      Password?: string
-      CreatedDate?: string
-      ModifiedDate?: string
-      DeliveryAddressID?: number
-      EndPurchaseDate?: string
-      PurchasingBehavior?: string
-      WishlistDefinitionID?: number
+        Name: string;
+        Value: unknown;
+        Values: unknown[];
+      }[];
+      WishlistID?: number;
+      CustomerID: number;
+      IsActive: boolean;
+      Name: string;
+      Description: string;
+      PrivacyType: "0 - Public" | "2 - Private";
+      Hash?: string;
+      Password?: string;
+      CreatedDate?: string;
+      ModifiedDate?: string;
+      DeliveryAddressID?: number;
+      EndPurchaseDate?: string;
+      PurchasingBehavior?: string;
+      WishlistDefinitionID?: number;
     };
-  }
-
+  };
 
   "POST /v1/Profile/API.svc/web/AddProductsToWishlist": {
-    response: AddProductsToWishlistResponse,
+    response: AddProductsToWishlistResponse;
     body: {
-      WishlistID: number
-      CustomerID: number
+      WishlistID: number;
+      CustomerID: number;
       WishlistProducts: {
-        ProductID: number
-        SkuID?: number
-        WebSiteID?: number
-        Quantity?: number
-        QuantityReceived?: number
-        NestedItens?: string
-      }[]
-    }
-  }
+        ProductID: number;
+        SkuID?: number;
+        WebSiteID?: number;
+        Quantity?: number;
+        QuantityReceived?: number;
+        NestedItens?: string;
+      }[];
+    };
+  };
 
   "POST /v1/Profile/API.svc/web/DeleteWishlist": {
-    response: DeleteWishlistResponse,
+    response: DeleteWishlistResponse;
     body: {
-      WishlistID: number
-    }
-  }
+      WishlistID: number;
+    };
+  };
 
   "POST /v1/Profile/API.svc/web/DeleteProductsFromWishlist": {
-    response: DeleteProductsFromWishlistResponse,
+    response: DeleteProductsFromWishlistResponse;
     body: {
-      WishlistID: number
-      CustomerID: number
-      WishlistProductIDs: number[]
-    }
-  }
+      WishlistID: number;
+      CustomerID: number;
+      WishlistProductIDs: number[];
+    };
+  };
 }
