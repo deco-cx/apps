@@ -1,23 +1,24 @@
 import { nullOnNotFound } from "../../../utils/http.ts";
 import type { AppContext } from "../../mod.ts";
+import { AddProductsToWishlistResponse } from "../../utils/types/wishlistJSON.ts";
 
 export interface Props {
-  WishlistID: number
+  WishlistID: number;
   WishlistProducts: {
-    ProductID: number
-    SkuID?: number
-    WebSiteID?: number
-    Quantity?: number
-    QuantityReceived?: number
-    NestedItens?: string
-  }[]
+    ProductID: number;
+    SkuID?: number;
+    Quantity?: number;
+    QuantityReceived?: number;
+    NestedItens?: string;
+    WebSiteID: number;
+  }[];
 }
 
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<unknown | null> => {
+): Promise<AddProductsToWishlistResponse | null> => {
   const { layer } = ctx;
 
   const user = await ctx.invoke.linx.loaders.user();
@@ -32,15 +33,16 @@ const action = async (
     return null;
   }
 
-  const response = await layer["POST /v1/Profile/API.svc/web/AddProductsToWishlist"](
-    {},
-    {
-      body: {
-        ...props,
-        CustomerID,
+  const response = await layer
+    ["POST /v1/Profile/API.svc/web/AddProductsToWishlist"](
+      {},
+      {
+        body: {
+          ...props,
+          CustomerID,
+        },
       },
-    }
-  );
+    );
 
   const data = await response.json().catch(nullOnNotFound);
 

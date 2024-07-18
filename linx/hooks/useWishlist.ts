@@ -22,10 +22,10 @@ const state = {
   wishlist,
   loading,
   addItem: enqueue("linx/actions/wishlist/addItem.ts"),
-  createWishlist: enqueue("linx/actions/wishlist/createWishlist.ts"),
-  updateWishlist: enqueue("linx/actions/wishlist/createWishlist.ts"),
-  deleteWishlist: enqueue("linx/actions/wishlist/deleteWishlist.ts"),
   removeItem: enqueue("linx/actions/wishlist/removeItem.ts"),
+  addWishlist: enqueue("linx/actions/wishlist/addWishlist.ts"),
+  updateWishlist: enqueue("linx/actions/wishlist/updateWishlist.ts"),
+  removeWishlist: enqueue("linx/actions/wishlist/removeWishlist.ts"),
   shareWishlist: enqueue("linx/actions/wishlist/shareWishlist.ts"),
 };
 
