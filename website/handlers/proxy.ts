@@ -114,8 +114,8 @@ export default function Proxy({
   host: hostToUse,
   customHeaders = [],
   includeScriptsToHead,
-  redirect = "manual",
   avoidAppendPath,
+  redirect = "manual",
   replaces,
 }: Props): Handler {
   return async (req, _ctx) => {
