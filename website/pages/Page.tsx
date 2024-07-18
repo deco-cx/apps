@@ -45,10 +45,6 @@ export interface Props {
   seo?: Section<SEOSection>;
   sections: Sections;
   /** @hide true */
-  startSections?: Sections;
-  /** @hide true */
-  endSections?: Sections;
-  /** @hide true */
   unindexedDomain?: boolean;
 }
 
@@ -114,6 +110,8 @@ function Page({
   devMode: boolean;
   avoidRedirectingToEditor?: boolean;
   sendToClickHouse?: boolean;
+  startSections?: Section[];
+  endSections?: Section[];
 }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -190,7 +188,9 @@ export const loader = async (
   };
 };
 
-export function Preview(props: Props) {
+export function Preview(
+  props: Props & { startSections?: Section[]; endSections?: Section[] },
+) {
   const { sections, startSections, endSections, seo } = props;
   const deco = useDeco();
 
