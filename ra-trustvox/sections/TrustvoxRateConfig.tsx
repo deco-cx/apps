@@ -1,5 +1,6 @@
+import { SectionProps } from "deco/blocks/section.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
-import { state } from "../mod.ts";
+import { AppContext } from "../mod.ts";
 
 declare global {
   interface Window {
@@ -9,8 +10,9 @@ declare global {
   }
 }
 
-export default function TrustvoxRateConfig() {
-  const { storeId, enableStaging = false } = state;
+export default function TrustvoxRateConfig(
+  { storeId, enableStaging }: SectionProps<typeof loader>,
+) {
   const scriptUrl = enableStaging
     ? "https://storage.googleapis.com/trustvox-rate-staging/widget.js"
     : "https://rate.trustvox.com.br/widget.js";
@@ -41,3 +43,10 @@ export default function TrustvoxRateConfig() {
     </>
   );
 }
+
+export const loader = (_props: unknown, _req: Request, ctx: AppContext) => {
+  return {
+    storeId: ctx.storeId,
+    enableStaging: ctx.enableStaging,
+  };
+};
