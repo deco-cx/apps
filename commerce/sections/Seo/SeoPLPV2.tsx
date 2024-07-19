@@ -33,7 +33,8 @@ export interface Props {
 }
 
 /** @title Product listing */
-export function loader(props: Props, _req: Request, ctx: AppContext) {
+export function loader(_props: Props, _req: Request, ctx: AppContext) {
+  const props = _props as Partial<Props>;
   const {
     titleTemplate = "",
     descriptionTemplate = "",
@@ -43,11 +44,11 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
   const title = renderTemplateString(
     titleTemplate,
-    titleProp || jsonLD?.seo?.title || "",
+    titleProp || jsonLD?.seo?.title || ctx.seo?.title || "",
   );
   const description = renderTemplateString(
     descriptionTemplate,
-    descriptionProp || jsonLD?.seo?.description || "",
+    descriptionProp || jsonLD?.seo?.description || ctx.seo?.description || "",
   );
   const canonical = props.canonical
     ? props.canonical
@@ -83,6 +84,10 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
 function Section(props: Props): SEOSection {
   return <Seo {...props} />;
+}
+
+export function LoadingFallback(props: unknown) {
+  return <Seo {...props as Partial<Props>} />;
 }
 
 export { default as Preview } from "../../../website/components/_seo/Preview.tsx";
