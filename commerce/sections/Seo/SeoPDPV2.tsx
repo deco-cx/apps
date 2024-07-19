@@ -72,8 +72,8 @@ function Section(props: Props): SEOSection {
   return <Seo {...props} />;
 }
 
-export function LoadingFallback(props: unknown) {
-  return <Seo {...props as Partial<Props>} />;
+export function LoadingFallback(props: Partial<Props>) {
+  return <Seo {...props} />;
 }
 
 export { default as Preview } from "../../../website/components/_seo/Preview.tsx";
