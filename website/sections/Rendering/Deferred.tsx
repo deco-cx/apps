@@ -4,12 +4,7 @@ import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { useId } from "preact/hooks";
 import { AppContext } from "../../mod.ts";
-import { shouldForceRender } from "../../../utils/deferred.ts";
-import { ComponentFunc } from "deco/engine/block.ts";
-
-const renderSection = ({ Component, props }: Section) => (
-  <Component {...props} />
-);
+import { renderSection, shouldForceRender } from "../../../utils/deferred.tsx";
 
 /** @titleBy type */
 export interface Scroll {
@@ -130,13 +125,7 @@ const Deferred = (props: Props) => {
           behavior?.payload.toString() || "",
         )}
       />
-      {props.fallbacks?.map((s) =>
-        renderSection({
-          ...s,
-          Component: (s as unknown as { LoadingFallback: ComponentFunc })
-            .LoadingFallback,
-        })
-      )}
+      {props.fallbacks?.map(renderSection)}
     </>
   );
 };
@@ -165,6 +154,7 @@ const DEFERRED = true;
 export const onBeforeResolveProps = (props: Props) => {
   return {
     ...props,
+    fallback: null,
     sections: asResolved(props.sections, DEFERRED),
   };
 };

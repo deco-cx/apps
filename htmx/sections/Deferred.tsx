@@ -2,7 +2,7 @@ import type { Section } from "deco/blocks/section.ts";
 import { useSection } from "deco/hooks/useSection.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { AppContext } from "../mod.ts";
-import { shouldForceRender } from "../../utils/deferred.ts";
+import { renderSection, shouldForceRender } from "../../utils/deferred.tsx";
 
 /**
  * @titleBy type
@@ -34,6 +34,8 @@ interface Intersect {
 
 export interface Props {
   sections: Section[];
+  /** @hide true */
+  fallbacks?: Section[];
   trigger?: Load | Revealed | Intersect;
   loading?: "lazy" | "eager";
 }
@@ -44,7 +46,7 @@ const Deferred = (props: Props) => {
   if (loading === "eager") {
     return (
       <>
-        {sections.map(({ Component, props }) => <Component {...props} />)}
+        {sections.map(renderSection)}
       </>
     );
   }
@@ -59,13 +61,16 @@ const Deferred = (props: Props) => {
   }
 
   return (
-    <div
-      hx-get={href}
-      hx-trigger={triggerList.join(" ")}
-      hx-target="closest section"
-      hx-swap="outerHTML"
-      style={{ height: "100vh" }}
-    />
+    <>
+      <div
+        hx-get={href}
+        hx-trigger={triggerList.join(" ")}
+        hx-target="closest section"
+        hx-swap="outerHTML"
+        style={{ height: "100vh" }}
+      />
+      {props.fallbacks?.map(renderSection)}
+    </>
   );
 };
 
@@ -88,6 +93,7 @@ const DEFERRED = true;
 export const onBeforeResolveProps = (props: Props) => {
   return {
     ...props,
+    fallback: null,
     sections: asResolved(props.sections, DEFERRED),
   };
 };

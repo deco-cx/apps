@@ -4,9 +4,10 @@ import HTMXDefered from "../../../htmx/sections/Deferred.tsx";
 import type { AppContext } from "../../mod.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { __DECO_FBT } from "../../handlers/fresh.ts";
-import { shouldForceRender } from "../../../utils/deferred.ts";
+import { shouldForceRender } from "../../../utils/deferred.tsx";
 import { useContext } from "preact/hooks";
 import { SectionContext } from "deco/components/section.tsx";
+import { RequestContext } from "deco/deco.ts";
 
 const useSectionContext = () => useContext(SectionContext);
 
@@ -53,24 +54,32 @@ export const loader = async (
   }
 
   // How to improve it
-  const fallback = "fallback" in props && await ctx.get(props.fallback);
+  const abortControler = new AbortController();
+  abortControler.abort();
+  const section = isDeferred<Section>(props.section)
+    ? await RequestContext.bind(
+      { signal: abortControler.signal },
+      props.section,
+    )()
+    : props.section;
 
-  return { ...props, framework, section: null, fallback };
+  return { ...props, framework, section: null, fallback: section };
 };
 
-type SectionProps = Awaited<ReturnType<typeof loader>> & {
-  fallback: Section;
-};
+type SectionProps = Awaited<ReturnType<typeof loader>>;
 
 function SingleDeferred(props: SectionProps) {
   const ctx = useSectionContext();
   const idxOrNaN = Number(ctx?.resolveChain.at(-2)?.value);
   const delay = 25 * (Math.min(Number.isNaN(idxOrNaN) ? 1 : idxOrNaN, 10) || 1);
+  const sections = props.section ? [props.section] : [];
+  const fallbacks = props.fallback ? [props.fallback] : undefined;
 
   if (isHtmx(props)) {
     return (
       <HTMXDefered
-        sections={props.section ? [props.section] : []}
+        sections={sections}
+        fallbacks={fallbacks}
         loading={props.section ? "eager" : "lazy"}
         trigger={{
           type: "load",
@@ -83,12 +92,12 @@ function SingleDeferred(props: SectionProps) {
   return (
     <PartialDefered
       sections={props.section ? [props.section] : []}
+      fallbacks={props.fallback ? [props.fallback] : undefined}
       display={props.section ? true : false}
       behavior={{
         type: "load",
         payload: delay,
       }}
-      fallbacks={[props.fallback]}
     />
   );
 }
@@ -96,27 +105,9 @@ function SingleDeferred(props: SectionProps) {
 const DEFERRED = true;
 
 export const onBeforeResolveProps = (props: Props) => {
-  // fazer recursivo
-  const propsWithoutResolvable = Object.entries(props.section).reduce(
-    (newProps, [pKey, pValue]) => {
-      if (Array.isArray(pValue)) {
-        const hasResolvable = pValue.some((item) =>
-          typeof item === "object" && !!item.__resolveType
-        );
-        if (hasResolvable) return newProps;
-      }
-      if (typeof pValue === "object" && pValue.__resolveType) return newProps;
-
-      newProps[pKey] = pValue;
-      return newProps;
-    },
-    {} as Record<string, unknown>,
-  );
-
   return {
     ...props,
     section: asResolved(props.section, DEFERRED),
-    fallback: propsWithoutResolvable,
   };
 };
 
