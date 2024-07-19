@@ -1,6 +1,6 @@
 import type { Section } from "deco/blocks/section.ts";
-import PartialDefered from "./Deferred.tsx";
-import HTMXDefered from "../../../htmx/sections/Deferred.tsx";
+import PartialDeferred from "./Deferred.tsx";
+import HTMXDeferred from "../../../htmx/sections/Deferred.tsx";
 import type { AppContext } from "../../mod.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { __DECO_FBT } from "../../handlers/fresh.ts";
@@ -77,7 +77,7 @@ function SingleDeferred(props: SectionProps) {
 
   if (isHtmx(props)) {
     return (
-      <HTMXDefered
+      <HTMXDeferred
         sections={sections}
         fallbacks={fallbacks}
         loading={props.section ? "eager" : "lazy"}
@@ -90,7 +90,7 @@ function SingleDeferred(props: SectionProps) {
   }
 
   return (
-    <PartialDefered
+    <PartialDeferred
       sections={props.section ? [props.section] : []}
       fallbacks={props.fallback ? [props.fallback] : undefined}
       display={props.section ? true : false}
