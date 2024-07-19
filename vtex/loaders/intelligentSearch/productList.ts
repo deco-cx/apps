@@ -13,7 +13,7 @@ import {
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
-import type { Item, ProductID, Sort } from "../../utils/types.ts";
+import type { Item, Sort } from "../../utils/types.ts";
 import {
   LabelledFuzzy,
   mapLabelledFuzzyToFuzzy,
@@ -89,6 +89,12 @@ export interface QueryProps extends CommonProps {
    */
   fuzzy?: LabelledFuzzy;
 }
+
+/**
+ * @format dynamic-options
+ * @options vtex/loaders/options/productIdByTerm.ts
+ */
+type ProductID = string;
 
 /**
  * @title Product IDs
