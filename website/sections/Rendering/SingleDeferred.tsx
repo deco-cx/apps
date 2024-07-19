@@ -30,7 +30,7 @@ interface Props {
 }
 
 export const loader = async (
-  props: ReturnType<typeof onBeforeResolveProps>,
+  props: Props,
   _req: Request,
   ctx: AppContext,
 ) => {
@@ -53,7 +53,7 @@ export const loader = async (
   }
 
   // How to improve it
-  const fallback = await ctx.get(props.fallback);
+  const fallback = "fallback" in props && await ctx.get(props.fallback);
 
   return { ...props, framework, section: null, fallback };
 };
