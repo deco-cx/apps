@@ -115,6 +115,7 @@ const Deferred = (props: Props) => {
         id={buttonId}
         data-deferred
         aria-label={`Deferred Section - ${sectionID}`}
+        style={{ display: "none" }}
       />
       <script
         defer

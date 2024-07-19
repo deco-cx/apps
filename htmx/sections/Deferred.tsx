@@ -67,7 +67,10 @@ const Deferred = (props: Props) => {
         hx-trigger={triggerList.join(" ")}
         hx-target="closest section"
         hx-swap="outerHTML"
-        style={{ height: "100vh" }}
+        style={{
+          height: "100vh",
+          display: props.fallbacks?.length ? "none" : undefined,
+        }}
       />
       {props.fallbacks?.map(renderSection)}
     </>
