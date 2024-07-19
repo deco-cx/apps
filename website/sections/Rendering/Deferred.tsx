@@ -5,6 +5,11 @@ import { asResolved, isDeferred } from "deco/mod.ts";
 import { useId } from "preact/hooks";
 import { AppContext } from "../../mod.ts";
 import { shouldForceRender } from "../../../utils/deferred.ts";
+import { ComponentFunc } from "deco/engine/block.ts";
+
+const renderSection = ({ Component, props }: Section) => (
+  <Component {...props} />
+);
 
 /** @titleBy type */
 export interface Scroll {
@@ -43,6 +48,8 @@ export interface Props {
   sections: Section[];
   display?: boolean;
   behavior?: Scroll | Intersection | Load;
+  /** @hide true */
+  fallbacks?: Section[];
 }
 
 const script = (
@@ -101,7 +108,7 @@ const Deferred = (props: Props) => {
   if (display) {
     return (
       <>
-        {sections.map(({ Component, props }) => <Component {...props} />)}
+        {sections.map(renderSection)}
       </>
     );
   }
@@ -123,6 +130,13 @@ const Deferred = (props: Props) => {
           behavior?.payload.toString() || "",
         )}
       />
+      {props.fallbacks?.map((s) =>
+        renderSection({
+          ...s,
+          Component: (s as unknown as { LoadingFallback: ComponentFunc })
+            .LoadingFallback,
+        })
+      )}
     </>
   );
 };

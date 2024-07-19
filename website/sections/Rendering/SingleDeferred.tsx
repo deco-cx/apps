@@ -29,7 +29,11 @@ interface Props {
   loading?: "eager";
 }
 
-export const loader = async (props: Props, _req: Request, ctx: AppContext) => {
+export const loader = async (
+  props: ReturnType<typeof onBeforeResolveProps>,
+  _req: Request,
+  ctx: AppContext,
+) => {
   const isFreshSyncRender = "display" in props && props.display === true;
   const isHtmxSyncRender = "loading" in props && props.loading === "eager";
   const url = new URL(_req.url);
@@ -45,18 +49,23 @@ export const loader = async (props: Props, _req: Request, ctx: AppContext) => {
     const section = isDeferred<Section>(props.section)
       ? await props.section()
       : props.section;
-    return { ...props, framework, section };
+    return { ...props, framework, section, fallback: null };
   }
 
-  return { ...props, framework, section: null };
+  // How to improve it
+  const fallback = await ctx.get(props.fallback);
+
+  return { ...props, framework, section: null, fallback };
 };
 
-type SectionProps = Awaited<ReturnType<typeof loader>>;
+type SectionProps = Awaited<ReturnType<typeof loader>> & {
+  fallback: Section;
+};
 
 function SingleDeferred(props: SectionProps) {
   const ctx = useSectionContext();
   const idxOrNaN = Number(ctx?.resolveChain.at(-2)?.value);
-  const delay = 25 * Math.min(Number.isNaN(idxOrNaN) ? 1 : idxOrNaN, 10);
+  const delay = 25 * (Math.min(Number.isNaN(idxOrNaN) ? 1 : idxOrNaN, 10) || 1);
 
   if (isHtmx(props)) {
     return (
@@ -79,6 +88,7 @@ function SingleDeferred(props: SectionProps) {
         type: "load",
         payload: delay,
       }}
+      fallbacks={[props.fallback]}
     />
   );
 }
@@ -86,9 +96,27 @@ function SingleDeferred(props: SectionProps) {
 const DEFERRED = true;
 
 export const onBeforeResolveProps = (props: Props) => {
+  // fazer recursivo
+  const propsWithoutResolvable = Object.entries(props.section).reduce(
+    (newProps, [pKey, pValue]) => {
+      if (Array.isArray(pValue)) {
+        const hasResolvable = pValue.some((item) =>
+          typeof item === "object" && !!item.__resolveType
+        );
+        if (hasResolvable) return newProps;
+      }
+      if (typeof pValue === "object" && pValue.__resolveType) return newProps;
+
+      newProps[pKey] = pValue;
+      return newProps;
+    },
+    {} as Record<string, unknown>,
+  );
+
   return {
     ...props,
     section: asResolved(props.section, DEFERRED),
+    fallback: propsWithoutResolvable,
   };
 };
 
