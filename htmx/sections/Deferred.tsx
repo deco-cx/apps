@@ -10,8 +10,6 @@ import { renderSection, shouldForceRender } from "../../utils/deferred.tsx";
  */
 interface Load {
   type: "load";
-  /** @hide true */
-  delay?: number;
 }
 
 /**
@@ -34,8 +32,6 @@ interface Intersect {
 
 export interface Props {
   sections: Section[];
-  /** @hide true */
-  fallbacks?: Section[];
   trigger?: Load | Revealed | Intersect;
   loading?: "lazy" | "eager";
 }
@@ -56,9 +52,6 @@ const Deferred = (props: Props) => {
   });
 
   const triggerList: (string | number)[] = [trigger?.type ?? "load", "once"];
-  if (trigger?.type === "load" && trigger.delay !== undefined) {
-    triggerList.push(`${trigger.delay}ms`);
-  }
 
   return (
     <>
@@ -67,12 +60,8 @@ const Deferred = (props: Props) => {
         hx-trigger={triggerList.join(" ")}
         hx-target="closest section"
         hx-swap="outerHTML transition:true"
-        style={{
-          height: "100vh",
-          display: props.fallbacks?.length ? "none" : undefined,
-        }}
+        style={{ height: "100vh" }}
       />
-      {props.fallbacks?.map(renderSection)}
     </>
   );
 };

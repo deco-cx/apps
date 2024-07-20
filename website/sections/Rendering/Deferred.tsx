@@ -18,17 +18,6 @@ export interface Scroll {
   payload: number;
 }
 
-interface Load {
-  type: "load";
-
-  /**
-   * @hide true
-   * @title Delay MS
-   * @description Delay (in milliseconds) to wait after the DOMContentLoaded event is fired. If value is 0, it will trigger when page load
-   */
-  payload: number;
-}
-
 /** @titleBy type */
 export interface Intersection {
   type: "intersection";
@@ -42,14 +31,12 @@ export interface Intersection {
 export interface Props {
   sections: Section[];
   display?: boolean;
-  behavior?: Scroll | Intersection | Load;
-  /** @hide true */
-  fallbacks?: Section[];
+  behavior?: Scroll | Intersection;
 }
 
 const script = (
   id: string,
-  type: "scroll" | "intersection" | "load",
+  type: "scroll" | "intersection",
   payload: string,
 ) => {
   const element = document.getElementById(id);
@@ -61,16 +48,6 @@ const script = (
   const triggerRender = (timeout: number) => () => {
     setTimeout(() => element.click(), timeout);
   };
-
-  if (type === "load") {
-    const timeout = Number(payload || 200);
-    const instant = timeout === 0;
-
-    if (instant || document.readyState === "complete") triggerRender(timeout);
-    else {
-      addEventListener("DOMContentLoaded", triggerRender(timeout));
-    }
-  }
 
   if (type === "scroll") {
     addEventListener(
@@ -126,7 +103,6 @@ const Deferred = (props: Props) => {
           behavior?.payload.toString() || "",
         )}
       />
-      {props.fallbacks?.map(renderSection)}
     </>
   );
 };
