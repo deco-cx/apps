@@ -48,9 +48,8 @@ import * as $$$$$$$14 from "./matchers/userAgent.ts";
 import * as $$$$$0 from "./pages/Page.tsx";
 import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
 import * as $$$$$$1 from "./sections/Rendering/Deferred.tsx";
-import * as $$$$$$2 from "./sections/Rendering/SingleDeferred.tsx";
-import * as $$$$$$3 from "./sections/Seo/Seo.tsx";
-import * as $$$$$$4 from "./sections/Seo/SeoV2.tsx";
+import * as $$$$$$2 from "./sections/Seo/Seo.tsx";
+import * as $$$$$$3 from "./sections/Seo/SeoV2.tsx";
 
 const manifest = {
   "functions": {
@@ -84,9 +83,8 @@ const manifest = {
   "sections": {
     "website/sections/Analytics/Analytics.tsx": $$$$$$0,
     "website/sections/Rendering/Deferred.tsx": $$$$$$1,
-    "website/sections/Rendering/SingleDeferred.tsx": $$$$$$2,
-    "website/sections/Seo/Seo.tsx": $$$$$$3,
-    "website/sections/Seo/SeoV2.tsx": $$$$$$4,
+    "website/sections/Seo/Seo.tsx": $$$$$$2,
+    "website/sections/Seo/SeoV2.tsx": $$$$$$3,
   },
   "matchers": {
     "website/matchers/always.ts": $$$$$$$0,

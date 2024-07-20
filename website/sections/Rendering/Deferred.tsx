@@ -4,33 +4,20 @@ import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { useId } from "preact/hooks";
 import { AppContext } from "../../mod.ts";
-import { renderSection, shouldForceRender } from "../../../utils/deferred.tsx";
+import { shouldForceRender } from "../../../utils/deferred.ts";
 
 /** @titleBy type */
-export interface Scroll {
+interface Scroll {
   type: "scroll";
-
   /**
-   * @hide true
    * @title Delay MS
-   * @description Delay (in milliseconds) to wait after the scroll event is fired.
-   */
-  payload: number;
-}
-
-interface Load {
-  type: "load";
-
-  /**
-   * @hide true
-   * @title Delay MS
-   * @description Delay (in milliseconds) to wait after the DOMContentLoaded event is fired. If value is 0, it will trigger when page load
+   * @description Delay (in milliseconds) to wait after the scroll event is fired
    */
   payload: number;
 }
 
 /** @titleBy type */
-export interface Intersection {
+interface Intersection {
   type: "intersection";
   /**
    * @title Root Margin
@@ -42,14 +29,12 @@ export interface Intersection {
 export interface Props {
   sections: Section[];
   display?: boolean;
-  behavior?: Scroll | Intersection | Load;
-  /** @hide true */
-  fallbacks?: Section[];
+  behavior?: Scroll | Intersection;
 }
 
 const script = (
   id: string,
-  type: "scroll" | "intersection" | "load",
+  type: "scroll" | "intersection",
   payload: string,
 ) => {
   const element = document.getElementById(id);
@@ -58,24 +43,10 @@ const script = (
     return;
   }
 
-  const triggerRender = (timeout: number) => () => {
-    setTimeout(() => element.click(), timeout);
-  };
-
-  if (type === "load") {
-    const timeout = Number(payload || 200);
-    const instant = timeout === 0;
-
-    if (instant || document.readyState === "complete") triggerRender(timeout);
-    else {
-      addEventListener("DOMContentLoaded", triggerRender(timeout));
-    }
-  }
-
   if (type === "scroll") {
     addEventListener(
       "scroll",
-      triggerRender(Number(payload) ?? 200),
+      () => setTimeout(() => element.click(), Number(payload) || 200),
       { once: true },
     );
   }
@@ -103,7 +74,7 @@ const Deferred = (props: Props) => {
   if (display) {
     return (
       <>
-        {sections.map(renderSection)}
+        {sections.map(({ Component, props }) => <Component {...props} />)}
       </>
     );
   }
@@ -125,7 +96,6 @@ const Deferred = (props: Props) => {
           behavior?.payload.toString() || "",
         )}
       />
-      {props.fallbacks?.map(renderSection)}
     </>
   );
 };
@@ -154,7 +124,6 @@ const DEFERRED = true;
 export const onBeforeResolveProps = (props: Props) => {
   return {
     ...props,
-    fallback: null,
     sections: asResolved(props.sections, DEFERRED),
   };
 };

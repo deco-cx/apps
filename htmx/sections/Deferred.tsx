@@ -2,7 +2,7 @@ import type { Section } from "deco/blocks/section.ts";
 import { useSection } from "deco/hooks/useSection.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { AppContext } from "../mod.ts";
-import { renderSection, shouldForceRender } from "../../utils/deferred.tsx";
+import { shouldForceRender } from "../../utils/deferred.ts";
 
 /**
  * @titleBy type
@@ -10,8 +10,6 @@ import { renderSection, shouldForceRender } from "../../utils/deferred.tsx";
  */
 interface Load {
   type: "load";
-  /** @hide true */
-  delay?: number;
 }
 
 /**
@@ -34,8 +32,6 @@ interface Intersect {
 
 export interface Props {
   sections: Section[];
-  /** @hide true */
-  fallbacks?: Section[];
   trigger?: Load | Revealed | Intersect;
   loading?: "lazy" | "eager";
 }
@@ -46,7 +42,7 @@ const Deferred = (props: Props) => {
   if (loading === "eager") {
     return (
       <>
-        {sections.map(renderSection)}
+        {sections.map(({ Component, props }) => <Component {...props} />)}
       </>
     );
   }
@@ -55,22 +51,14 @@ const Deferred = (props: Props) => {
     props: { loading: "eager" },
   });
 
-  const triggerList: (string | number)[] = [trigger?.type ?? "load", "once"];
-  if (trigger?.type === "load" && trigger.delay !== undefined) {
-    triggerList.push(`${trigger.delay}ms`);
-  }
-
   return (
-    <>
-      <div
-        hx-get={href}
-        hx-trigger={triggerList.join(" ")}
-        hx-target="closest section"
-        hx-swap="outerHTML"
-        style={{ height: "100vh" }}
-      />
-      {props.fallbacks?.map(renderSection)}
-    </>
+    <div
+      hx-get={href}
+      hx-trigger={`${trigger?.type ?? "load"} once`}
+      hx-target="closest section"
+      hx-swap="outerHTML"
+      style={{ height: "100vh" }}
+    />
   );
 };
 
@@ -93,7 +81,6 @@ const DEFERRED = true;
 export const onBeforeResolveProps = (props: Props) => {
   return {
     ...props,
-    fallback: null,
     sections: asResolved(props.sections, DEFERRED),
   };
 };
