@@ -1,15 +1,12 @@
 import type { Section } from "deco/blocks/section.ts";
-import PartialDeferred from "./Deferred.tsx";
-import HTMXDeferred from "../../../htmx/sections/Deferred.tsx";
-import type { AppContext } from "../../mod.ts";
-import { asResolved, isDeferred } from "deco/mod.ts";
-import { __DECO_FBT } from "../../handlers/fresh.ts";
-import { shouldForceRender } from "../../../utils/deferred.tsx";
-import { useContext } from "preact/hooks";
 import { SectionContext } from "deco/components/section.tsx";
 import { RequestContext } from "deco/deco.ts";
-
-const useSectionContext = () => useContext(SectionContext);
+import { asResolved, isDeferred } from "deco/mod.ts";
+import { useContext } from "preact/hooks";
+import HTMXDeferred from "../../../htmx/sections/Deferred.tsx";
+import { shouldForceRender } from "../../../utils/deferred.tsx";
+import type { AppContext } from "../../mod.ts";
+import PartialDeferred from "./Deferred.tsx";
 
 const isHtmx = (
   props: SectionProps,
@@ -69,45 +66,41 @@ export const loader = async (
 type SectionProps = Awaited<ReturnType<typeof loader>>;
 
 function SingleDeferred(props: SectionProps) {
-  const ctx = useSectionContext();
+  const ctx = useContext(SectionContext)!;
   const idxOrNaN = Number(ctx?.resolveChain.at(-2)?.value);
   const delay = 25 * (Math.min(Number.isNaN(idxOrNaN) ? 1 : idxOrNaN, 10) || 1);
   const sections = props.section ? [props.section] : [];
   const fallbacks = props.fallback ? [props.fallback] : undefined;
 
-  if (isHtmx(props)) {
-    return (
-      <HTMXDeferred
-        sections={sections}
-        fallbacks={fallbacks}
-        loading={props.section ? "eager" : "lazy"}
-        trigger={{
-          type: "load",
-          delay,
-        }}
-      />
-    );
-  }
-
   return (
-    <PartialDeferred
-      sections={props.section ? [props.section] : []}
-      fallbacks={props.fallback ? [props.fallback] : undefined}
-      display={props.section ? true : false}
-      behavior={{
-        type: "load",
-        payload: delay,
-      }}
-    />
+    <SectionContext.Provider
+      value={{ ...ctx, loading: props.fallback ? "lazy" : "eager" }}
+    >
+      {isHtmx(props)
+        ? (
+          <HTMXDeferred
+            sections={sections}
+            fallbacks={fallbacks}
+            loading={props.section ? "eager" : "lazy"}
+            trigger={{ type: "load", delay }}
+          />
+        )
+        : (
+          <PartialDeferred
+            sections={props.section ? [props.section] : []}
+            fallbacks={props.fallback ? [props.fallback] : undefined}
+            display={props.section ? true : false}
+            behavior={{ type: "load", payload: delay }}
+          />
+        )}
+    </SectionContext.Provider>
   );
 }
-
-const DEFERRED = true;
 
 export const onBeforeResolveProps = (props: Props) => {
   return {
     ...props,
-    section: asResolved(props.section, DEFERRED),
+    section: asResolved(props.section, true),
   };
 };
 
