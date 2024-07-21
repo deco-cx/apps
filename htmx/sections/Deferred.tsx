@@ -57,7 +57,7 @@ const Deferred = (props: Props) => {
 
   const triggerList: (string | number)[] = [trigger?.type ?? "load", "once"];
   if (trigger?.type === "load" && trigger.delay !== undefined) {
-    triggerList.push(`${trigger.delay}ms`);
+    triggerList.push(`delay:${trigger.delay}ms`);
   }
 
   return (
