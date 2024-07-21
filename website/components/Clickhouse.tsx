@@ -51,16 +51,28 @@ interface Event {
 
 const SERVICE_ENDPOINT = Deno.env.get("EVENT_COLLECTOR") ??
   "https://juggler.deco.site/live/invoke/site/actions/sendEvent.ts";
+export const UID_COOKIE_NAME = "deco_user_id";
+export const SESSION_COOKIE_NAME = "deco_session_id";
+
+export const generateUserId = () => {
+  return "";
+};
+
+export const generateSessionId = () => {
+  return "";
+};
 
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
 const snippet = (
-  { siteId, siteName, serviceEndpoint }: {
+  { siteId, siteName, serviceEndpoint, userId, sessionId }: {
     siteId?: number;
     siteName?: string;
     serviceEndpoint: string;
+    userId: string;
+    sessionId: string;
   },
 ) => {
   const props: Record<string, string> = {};
@@ -209,8 +221,8 @@ const snippet = (
       hostname: globalThis.window.location.origin,
       site_id: siteId || "",
       site_name: siteName || "",
-      user_id: undefined, // get server side
-      session_id: undefined, // get server side
+      user_id: userId, // get server side
+      session_id: sessionId, // get server side
       event_name: name,
       start_time: new Date().toISOString(),
       timestamp: undefined, // get server side
@@ -267,9 +279,11 @@ const snippet = (
 };
 
 function Clickhouse(
-  { siteId, siteName }: {
+  { siteId, siteName, userId, sessionId }: {
     siteId?: number;
     siteName?: string;
+    userId: string;
+    sessionId: string;
   },
 ) {
   return (
@@ -281,6 +295,8 @@ function Clickhouse(
           siteId,
           siteName,
           serviceEndpoint: SERVICE_ENDPOINT,
+          userId,
+          sessionId,
         })}
       />
     </Head>

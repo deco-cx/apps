@@ -18,7 +18,13 @@ import { logger } from "deco/observability/otel/config.ts";
 import { isDeferred } from "deco/mod.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import { SEOSection } from "../components/Seo.tsx";
-import Clickhouse from "../components/Clickhouse.tsx";
+import Clickhouse, {
+  generateSessionId,
+  generateUserId,
+  SESSION_COOKIE_NAME,
+  UID_COOKIE_NAME,
+} from "../components/Clickhouse.tsx";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -105,11 +111,15 @@ function Page({
   unindexedDomain,
   avoidRedirectingToEditor,
   sendToClickHouse,
+  userId,
+  sessionId,
 }: Props & {
   errorPage?: Page;
   devMode: boolean;
   avoidRedirectingToEditor?: boolean;
   sendToClickHouse?: boolean;
+  userId: string;
+  sessionId: string;
 }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -145,7 +155,12 @@ function Page({
         />
         <Events deco={deco} />
         {sendToClickHouse && (
-          <Clickhouse siteId={site.id} siteName={site.name} />
+          <Clickhouse
+            siteId={site.id}
+            siteName={site.name}
+            userId={userId}
+            sessionId={sessionId}
+          />
         )}
         {sections.map(renderSection)}
       </ErrorBoundary>
@@ -165,6 +180,36 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
+  const cookies = getCookies(req.headers);
+  let userId = cookies[UID_COOKIE_NAME];
+  let sessionId = cookies[SESSION_COOKIE_NAME];
+
+  const day = 1000 * 60 * 60 * 24;
+
+  if (!userId) {
+    userId = generateUserId();
+    setCookie(ctx.response.headers, {
+      value: userId,
+      name: UID_COOKIE_NAME,
+      path: "/",
+      secure: true,
+      httpOnly: true,
+      expires: new Date(Date.now() + day * 365), // 1 year
+    });
+  }
+
+  if (!sessionId) {
+    sessionId = generateSessionId();
+    setCookie(ctx.response.headers, {
+      value: sessionId,
+      name: SESSION_COOKIE_NAME,
+      path: "/",
+      secure: true,
+      httpOnly: true,
+      expires: new Date(Date.now() + day * 7), // seven days
+    });
+  }
+
   return {
     ...restProps,
     sections,
@@ -175,6 +220,8 @@ export const loader = async (
     unindexedDomain,
     avoidRedirectingToEditor: ctx.avoidRedirectingToEditor,
     sendToClickHouse: ctx.sendToClickHouse,
+    userId,
+    sessionId,
   };
 };
 
