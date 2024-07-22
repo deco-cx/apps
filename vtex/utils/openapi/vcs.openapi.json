@@ -33756,6 +33756,155 @@
                       }
                     }
                   ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paging": {
+                      "description": "Paging.",
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "description": "Page number.",
+                          "type": "integer"
+                        },
+                        "pageSize": {
+                          "description": "Page size.",
+                          "type": "integer"
+                        },
+                        "total": {
+                          "description": "Total pages.",
+                          "type": "integer"
+                        },
+                        "pages": {
+                          "description": "Pages.",
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "items": {
+                      "description": "Items.",
+                      "type": "array",
+                      "items": {
+                        "description": "Item information.",
+                        "type": "object",
+                        "properties": {
+                          "distance": {
+                            "description": "Distance.",
+                            "type": "integer"
+                          },
+                          "pickupPoint": {
+                            "description": "Pickup point.",
+                            "type": "object",
+                            "properties": {
+                              "friendlyName": {
+                                "description": "Friendly name.",
+                                "type": "string"
+                              },
+                              "address": {
+                                "description": "Address.",
+                                "type": "object",
+                                "properties": {
+                                  "addressType": {
+                                    "description": "Address type.",
+                                    "type": "string"
+                                  },
+                                  "receiverName": {
+                                    "description": "Receiver name.",
+                                    "type": "string"
+                                  },
+                                  "addressId": {
+                                    "description": "Address ID.",
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "isDisposable": {
+                                    "description": "Is disposable.",
+                                    "type": "boolean"
+                                  },
+                                  "postalCode": {
+                                    "description": "Postal code.",
+                                    "type": "string"
+                                  },
+                                  "city": {
+                                    "description": "City.",
+                                    "type": "string"
+                                  },
+                                  "state": {
+                                    "description": "State.",
+                                    "type": "string"
+                                  },
+                                  "country": {
+                                    "description": "Country.",
+                                    "type": "string"
+                                  },
+                                  "street": {
+                                    "description": "Street.",
+                                    "type": "string"
+                                  },
+                                  "number": {
+                                    "description": "Number.",
+                                    "type": "string"
+                                  },
+                                  "neighborhood": {
+                                    "description": "Neighborhood.",
+                                    "type": "string"
+                                  },
+                                  "complement": {
+                                    "description": "Complement to the shipping address, in case it applies.",
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "reference": {
+                                    "description": "Racao.",
+                                    "type": "string"
+                                  },
+                                  "geoCoordinates": {
+                                    "description": "Geo coordinates.",
+                                    "type": "array",
+                                    "items": {
+                                      "description": "Geo coordinate.",
+                                      "type": "integer"
+                                    }
+                                  }
+                                }
+                              },
+                              "additionalInfo": {
+                                "description": "Additional info.",
+                                "type": "string"
+                              },
+                              "id": {
+                                "description": "ID.",
+                                "type": "string"
+                              },
+                              "businessHours": {
+                                "description": "Array with business hours.",
+                                "type": "array",
+                                "items": {
+                                  "description": "Business hours.",
+                                  "type": "object",
+                                  "properties": {
+                                    "DayOfWeek": {
+                                      "description": "Day of week.",
+                                      "type": "integer"
+                                    },
+                                    "OpeningTime": {
+                                      "description": "Opening time.",
+                                      "type": "string"
+                                    },
+                                    "ClosingTime": {
+                                      "description": "Closing time.",
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

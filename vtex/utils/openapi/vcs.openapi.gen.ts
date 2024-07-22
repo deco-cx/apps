@@ -16845,6 +16845,133 @@ postalCode?: string
  */
 countryCode?: string
 }
+response: {
+/**
+ * Paging.
+ */
+paging?: {
+/**
+ * Page number.
+ */
+page?: number
+/**
+ * Page size.
+ */
+pageSize?: number
+/**
+ * Total pages.
+ */
+total?: number
+/**
+ * Pages.
+ */
+pages?: number
+}
+/**
+ * Items.
+ */
+items?: {
+/**
+ * Distance.
+ */
+distance?: number
+/**
+ * Pickup point.
+ */
+pickupPoint?: {
+/**
+ * Friendly name.
+ */
+friendlyName?: string
+/**
+ * Address.
+ */
+address?: {
+/**
+ * Address type.
+ */
+addressType?: string
+/**
+ * Receiver name.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Is disposable.
+ */
+isDisposable?: boolean
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City.
+ */
+city?: string
+/**
+ * State.
+ */
+state?: string
+/**
+ * Country.
+ */
+country?: string
+/**
+ * Street.
+ */
+street?: string
+/**
+ * Number.
+ */
+number?: string
+/**
+ * Neighborhood.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Racao.
+ */
+reference?: string
+/**
+ * Geo coordinates.
+ */
+geoCoordinates?: number[]
+}
+/**
+ * Additional info.
+ */
+additionalInfo?: string
+/**
+ * ID.
+ */
+id?: string
+/**
+ * Array with business hours.
+ */
+businessHours?: {
+/**
+ * Day of week.
+ */
+DayOfWeek?: number
+/**
+ * Opening time.
+ */
+OpeningTime?: string
+/**
+ * Closing time.
+ */
+ClosingTime?: string
+}[]
+}
+}[]
+}
 }
 /**
  * Retrieves address information for a given postal code and country.
