@@ -1,6 +1,10 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { createClient as createSQLClient, drizzle } from "./deps.ts";
+import {
+  createClient as createSQLClient,
+  createLocalClient,
+  drizzle,
+} from "./deps.ts";
 import { getSQLClientConfig, StorageConfig } from "./utils.ts";
 
 export interface Props extends StorageConfig {}
@@ -14,7 +18,11 @@ export interface Props extends StorageConfig {}
 export default function Records(
   { url, authToken, ...state }: Props,
 ) {
-  const sqlClient = createSQLClient(getSQLClientConfig({ url, authToken }));
+  const sqlClientConfig = getSQLClientConfig({ url, authToken });
+  const sqlClient =
+    sqlClientConfig.url.startsWith("file://") && createLocalClient
+      ? createLocalClient(sqlClientConfig)
+      : createSQLClient(sqlClientConfig);
 
   const appState = {
     ...state,

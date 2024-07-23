@@ -1,7 +1,7 @@
 import { ImportMap } from "deco/blocks/app.ts";
 import { buildImportMap } from "deco/blocks/utils.tsx";
 import { notUndefined } from "deco/engine/core/utils.ts";
-import { type App, AppModule, context, type FnContext } from "deco/mod.ts";
+import { type App, AppModule, type FnContext } from "deco/mod.ts";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
@@ -79,7 +79,7 @@ export default async function App(
         // build apps based on name
         ...dynamicApps,
         ...manifest.apps,
-        ...context.play || state.enableAdmin // this is an optimization to not include the admin code for everyone in case of play is not being used.
+        ...state.enableAdmin // this is an optimization to not include the admin code for everyone in case of play is not being used.
           ? {
             [ADMIN_APP]: await import(
               resolvedAdminImport
@@ -92,7 +92,7 @@ export default async function App(
       },
     } as Manifest,
     state,
-    ...(context.play || state.enableAdmin)
+    ...state.enableAdmin
       ? {
         importMap: {
           ...enhancedImportMap,
