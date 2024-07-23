@@ -1,15 +1,15 @@
 import "./utils/unhandledRejection.ts";
 
+import { Matcher } from "deco/blocks/matcher.ts";
+import { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
 import type { App, FnContext } from "deco/mod.ts";
 import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { Page } from "deco/blocks/page.tsx";
 import { TextReplace } from "./handlers/proxy.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import { Script } from "./types.ts";
-import { Matcher } from "deco/blocks/matcher.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -105,13 +105,6 @@ export interface Props {
    * @description the caching configuration
    */
   caching?: Caching;
-
-  /**
-   * @title Async Rendering
-   * @description Async sections will be deferred to the client-side
-   * @default false
-   */
-  firstByteThresholdMS?: boolean;
 
   /**
    * @title Avoid redirecting to editor

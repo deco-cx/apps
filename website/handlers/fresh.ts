@@ -38,7 +38,6 @@ export default function Fresh(
     | "monitoring"
     | "response"
     | "caching"
-    | "firstByteThresholdMS"
     | "isBot"
     | "flavor"
   >,
@@ -50,10 +49,6 @@ export default function Fresh(
     const timing = appContext?.monitoring?.timings?.start?.("load-data");
     const url = new URL(req.url);
     const asJson = url.searchParams.get("asJson");
-    const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
-    const delay = Number(
-      url.searchParams.get(__DECO_FBT) ?? delayFromProps,
-    );
 
     /** Controller to abort third party fetch (loaders) */
     const ctrl = new AbortController();
@@ -62,54 +57,68 @@ export default function Fresh(
     const abortHandler = () => ctrl.abort();
     req.signal.addEventListener("abort", abortHandler);
 
-    /**
-     * Aborts when:
-     *
-     * 1. Page is HTML
-     * 2. Async Rendering Feature is activated
-     * 3. Is not a bot (bot requires the whole page html for boosting SEO)
-     */
-    const firstByteThreshold = !asJson && delay && !appContext.isBot
-      ? delay === 1 ? ctrl.abort() : setTimeout(() => ctrl.abort(), delay)
-      : undefined;
+    const getPage = RequestContext.bind(
+      { signal: ctrl.signal },
+      async () =>
+        isDeferred<Page, BaseContext & { context: ConnInfo }>(
+            freshConfig.page,
+          )
+          ? await freshConfig.page()
+          : freshConfig.page,
+    );
 
-    try {
-      const getPage = RequestContext.bind(
-        { signal: ctrl.signal },
-        async () =>
-          isDeferred<Page, BaseContext & { context: ConnInfo }>(
-              freshConfig.page,
-            )
-            ? await freshConfig.page({ context: ctx }, {
-              propagateOptions: true,
-              hooks: {
-                onPropsResolveStart: (
-                  resolve,
-                  _props,
-                  resolver,
-                ) => {
-                  let next = resolve;
-                  if (resolver?.type === "matchers") { // matchers should not have a timeout.
-                    next = RequestContext.bind(
-                      { signal: req.signal },
-                      resolve,
-                    );
-                  }
-                  return next();
-                },
-              },
-            })
-            : freshConfig.page,
+    const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
+      "load-data",
+      async (span) => {
+        try {
+          return await getPage();
+        } catch (e) {
+          span.recordException(e);
+          throw e;
+        } finally {
+          span.end();
+          timing?.end();
+        }
+      },
+    );
+
+    if (asJson !== null) {
+      return Response.json(page, { headers: allowCorsFor(req) });
+    }
+    if (isFreshCtx<DecoState>(ctx)) {
+      const timing = appContext?.monitoring?.timings?.start?.(
+        "render-to-string",
       );
 
-      const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
-        "load-data",
+      const renderToString = RequestContext.bind(
+        { framework: appContext.flavor?.framework ?? "fresh" },
+        ctx.render,
+      );
+
+      const response = await appContext.monitoring!.tracer.startActiveSpan(
+        "render-to-string",
         async (span) => {
           try {
-            return await getPage();
-          } catch (e) {
-            span.recordException(e);
-            throw e;
+            const response = await renderToString({
+              page,
+              routerInfo: {
+                flags: ctx.state.flags,
+                pagePath: ctx.state.pathTemplate,
+              },
+            });
+            const setCookies = getSetCookies(appContext.response.headers);
+            if (appContext?.caching?.enabled && setCookies.length === 0) {
+              appContext.response.headers.set(
+                "Cache-Control",
+                (appContext?.caching?.directives ?? []).map((
+                  { name, value },
+                ) => `${name}=${value}`).join(","),
+              );
+            }
+            return response;
+          } catch (err) {
+            span.recordException(err);
+            throw err;
           } finally {
             span.end();
             timing?.end();
@@ -117,60 +126,11 @@ export default function Fresh(
         },
       );
 
-      if (asJson !== null) {
-        return Response.json(page, { headers: allowCorsFor(req) });
-      }
-      if (isFreshCtx<DecoState>(ctx)) {
-        const timing = appContext?.monitoring?.timings?.start?.(
-          "render-to-string",
-        );
-
-        const renderToString = RequestContext.bind(
-          { framework: appContext.flavor?.framework ?? "fresh" },
-          ctx.render,
-        );
-
-        const response = await appContext.monitoring!.tracer.startActiveSpan(
-          "render-to-string",
-          async (span) => {
-            try {
-              const response = await renderToString({
-                page,
-                routerInfo: {
-                  flags: ctx.state.flags,
-                  pagePath: ctx.state.pathTemplate,
-                },
-              });
-              const setCookies = getSetCookies(appContext.response.headers);
-              if (appContext?.caching?.enabled && setCookies.length === 0) {
-                appContext.response.headers.set(
-                  "Cache-Control",
-                  (appContext?.caching?.directives ?? []).map((
-                    { name, value },
-                  ) => `${name}=${value}`).join(","),
-                );
-              }
-              return response;
-            } catch (err) {
-              span.recordException(err);
-              throw err;
-            } finally {
-              span.end();
-              timing?.end();
-            }
-          },
-        );
-
-        return response;
-      }
-      return Response.json({ message: "Fresh is not being used" }, {
-        status: 500,
-      });
-    } finally {
-      if (firstByteThreshold) {
-        clearTimeout(firstByteThreshold);
-      }
+      return response;
     }
+    return Response.json({ message: "Fresh is not being used" }, {
+      status: 500,
+    });
   };
 }
 
