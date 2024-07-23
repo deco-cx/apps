@@ -60,7 +60,16 @@ export const loader = async (
     )()
     : props.section;
 
-  return { ...props, framework, section: null, fallback: section };
+  return {
+    ...props,
+    framework,
+    section: null,
+    fallback: {
+      Component: section.LoadingFallback,
+      props: {},
+      metadata: section.metadata,
+    } as Section,
+  };
 };
 
 type SectionProps = Awaited<ReturnType<typeof loader>>;
