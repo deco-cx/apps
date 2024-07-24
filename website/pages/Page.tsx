@@ -4,7 +4,7 @@ import { Section } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
-import { Resolved, isDeferred } from "deco/mod.ts";
+import { isDeferred, Resolved } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import {
   usePageContext as useDecoPageContext,
@@ -163,14 +163,14 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
-  const globalSections : Array<Section | Resolved<Section>> = []
-  
+  const globalSections: Array<Section | Resolved<Section>> = [];
+
   ctx.global?.forEach(async (section) => {
-    if(isDeferred<Section>(section)) {
+    if (isDeferred<Section>(section)) {
       globalSections.push(await section());
     }
     globalSections.push(section);
-  })
+  });
   return {
     ...restProps,
     sections: [...globalSections, ...sections],

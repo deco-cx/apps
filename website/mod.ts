@@ -148,7 +148,7 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
   const global = theme ? [...(state.global ?? []), theme] : state.global;
 
   return {
-    state : {
+    state: {
       ...state,
       global,
     },
