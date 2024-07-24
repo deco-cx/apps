@@ -84,6 +84,16 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
     ? await section({}, {
       propagateOptions: true,
       hooks: {
+        onResolveStart: (resolve, _props, resolver, _resolveType, ctx) => {
+          if (resolvingMatchers[ctx.resolveId]) {
+            return resolve();
+          }
+          if (resolver.type === "loaders") {
+            // deno-lint-ignore no-explicit-any
+            return undefined as any;
+          }
+          return resolve();
+        },
         onPropsResolveStart: (
           resolve,
           _props,
@@ -98,10 +108,6 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
             const id = crypto.randomUUID();
             resolvingMatchers[id] = true;
             return resolve(id);
-          }
-          if (resolver?.type === "loaders") {
-            // deno-lint-ignore no-explicit-any
-            return undefined as any;
           }
           return resolve();
         },
