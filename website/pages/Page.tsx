@@ -4,7 +4,7 @@ import { Section } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
-import { isDeferred, Resolved } from "deco/mod.ts";
+import { isDeferred } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import {
   usePageContext as useDecoPageContext,
@@ -103,11 +103,13 @@ function Page({
   unindexedDomain,
   avoidRedirectingToEditor,
   sendToClickHouse,
+  pageSections,
 }: Props & {
   errorPage?: Page;
   devMode: boolean;
   avoidRedirectingToEditor?: boolean;
   sendToClickHouse?: boolean;
+  pageSections: Section[];
 }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -145,6 +147,7 @@ function Page({
         {sendToClickHouse && (
           <Clickhouse siteId={site.id} siteName={site.name} />
         )}
+        {pageSections?.map(renderSection)}
         {sections.map(renderSection)}
       </ErrorBoundary>
     </>
@@ -163,17 +166,12 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
-  const globalSections: Array<Section | Resolved<Section>> = [];
-
-  ctx.global?.forEach(async (section) => {
-    if (isDeferred<Section>(section)) {
-      globalSections.push(await section());
-    }
-    globalSections.push(section);
-  });
   return {
     ...restProps,
-    sections: [...globalSections, ...sections],
+    sections,
+    pageSections: isDeferred<Page>(ctx.pageSections)
+      ? await ctx.pageSections()
+      : undefined,
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
@@ -184,8 +182,8 @@ export const loader = async (
   };
 };
 
-export function Preview(props: Props) {
-  const { sections, seo } = props;
+export function Preview(props: Props & { pageSections: Section[] }) {
+  const { sections, seo, pageSections } = props;
   const deco = useDeco();
 
   return (
@@ -196,7 +194,8 @@ export function Preview(props: Props) {
 
       {seo && renderSection(seo)}
       <Events deco={deco} />
-      {sections.map(renderSection)}      
+      {pageSections?.map(renderSection)}
+      {sections.map(renderSection)}
     </>
   );
 }

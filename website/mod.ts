@@ -3,7 +3,7 @@ import "./utils/unhandledRejection.ts";
 import { Matcher } from "deco/blocks/matcher.ts";
 import { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
-import type { App, FnContext, Resolved } from "deco/mod.ts";
+import type { App, FnContext } from "deco/mod.ts";
 import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
@@ -83,7 +83,13 @@ export interface Props {
    * @title Global Sections
    * @description These sections run once on the start of the website and will be included on the start of each page
    */
-  global?: Array<Section | Resolved<Section>>;
+  global?: Section[];
+
+  /**
+   * @title Page Sections
+   * @description These sections will be included on each page
+   */
+  pageSections?: Section[];
 
   /**
    * @title Error Page
@@ -148,10 +154,7 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
   const global = theme ? [...(state.global ?? []), theme] : state.global;
 
   return {
-    state: {
-      ...state,
-      global,
-    },
+    state,
     manifest: {
       ...manifest,
       sections: {
@@ -167,6 +170,22 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
             manifest.sections["website/sections/Seo/Seo.tsx"].default({
               ...state.seo,
               ...props,
+            }),
+        },
+      },
+      pages: {
+        ...manifest.pages,
+        "website/pages/Page.tsx": {
+          ...manifest.pages["website/pages/Page.tsx"],
+          Preview: (props) =>
+            manifest.pages["website/pages/Page.tsx"].Preview({
+              ...props,
+              sections: [...global ?? [], ...props.sections],
+            }),
+          default: (props) =>
+            manifest.pages["website/pages/Page.tsx"].default({
+              ...props,
+              sections: [...global ?? [], ...props.sections],
             }),
         },
       },
@@ -227,13 +246,21 @@ const deferPropsResolve = (routes: Routes): Routes => {
 };
 
 export const onBeforeResolveProps = <
-  T extends { routes?: Routes[]; errorPage?: Page; abTesting: AbTesting },
+  T extends {
+    routes?: Routes[];
+    errorPage?: Page;
+    abTesting: AbTesting;
+    pageSections?: Section[];
+  },
 >(
   props: T,
 ): T => {
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
+      pageSections: props.pageSections
+        ? asResolved(props.pageSections, true)
+        : undefined,
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
         : undefined,
