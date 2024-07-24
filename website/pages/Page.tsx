@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import type { Page } from "deco/blocks/page.tsx";
-import { Section } from "deco/blocks/section.ts";
+import { Section, SectionProps } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
@@ -104,13 +104,7 @@ function Page({
   avoidRedirectingToEditor,
   sendToClickHouse,
   pageSections,
-}: Props & {
-  errorPage?: Page;
-  devMode: boolean;
-  avoidRedirectingToEditor?: boolean;
-  sendToClickHouse?: boolean;
-  pageSections: Section[];
-}): JSX.Element {
+}: SectionProps<typeof loader>): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
@@ -166,12 +160,19 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
+  const pageSections = await Promise.all(
+    (ctx.pageSections || [])?.map(async (section) => {
+      if (isDeferred(section)) {
+        return await section() as Section;
+      }
+      return section;
+    }),
+  );
+
   return {
     ...restProps,
     sections,
-    pageSections: isDeferred<Page>(ctx.pageSections)
-      ? await ctx.pageSections()
-      : undefined,
+    pageSections,
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
@@ -182,7 +183,7 @@ export const loader = async (
   };
 };
 
-export function Preview(props: Props & { pageSections: Section[] }) {
+export function Preview(props: SectionProps<typeof loader>) {
   const { sections, seo, pageSections } = props;
   const deco = useDeco();
 
