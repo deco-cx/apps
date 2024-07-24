@@ -1,6 +1,6 @@
 import type { Section } from "deco/blocks/section.ts";
 import { SectionContext } from "deco/components/section.tsx";
-import { asResolved, context } from "deco/mod.ts";
+import { asResolved, context, isDeferred } from "deco/mod.ts";
 import { useContext } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
 import type { AppContext } from "../../mod.ts";
@@ -75,43 +75,46 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   if (shouldRender) {
     return {
       loading: "eager",
-      section: await ctx.get<Section>(section),
+      section: isDeferred<Section>(section) ? await section() : section,
     };
   }
 
   const resolvingMatchers: Record<string, boolean> = {};
-  const resolvedSection = await ctx.get<Section>(section, {
-    propagateOptions: true,
-    hooks: {
-      onPropsResolveStart: (
-        resolve,
-        _props,
-        resolver,
-        _resolveType,
-        ctx,
-      ) => {
-        if (resolvingMatchers[ctx.resolveId]) {
+  const resolvedSection = isDeferred<Section>(section)
+    ? await section({}, {
+      propagateOptions: true,
+      hooks: {
+        onPropsResolveStart: (
+          resolve,
+          _props,
+          resolver,
+          _resolveType,
+          ctx,
+        ) => {
+          if (resolvingMatchers[ctx.resolveId]) {
+            return resolve();
+          }
+          if (resolver?.type === "matchers") { // matchers should not have a timeout.
+            const id = crypto.randomUUID();
+            resolvingMatchers[id] = true;
+            return resolve(id);
+          }
+          if (resolver?.type === "loaders") {
+            // deno-lint-ignore no-explicit-any
+            return undefined as any;
+          }
           return resolve();
-        }
-        if (resolver?.type === "matchers") { // matchers should not have a timeout.
-          const id = crypto.randomUUID();
-          resolvingMatchers[id] = true;
-          return resolve(id);
-        }
-        if (resolver?.type === "loaders") {
-          // deno-lint-ignore no-explicit-any
-          return undefined as any;
-        }
-        return resolve();
+        },
       },
-    },
-  });
+    })
+    : section;
 
   return {
     loading: shouldRender ? "eager" : "lazy",
     section: {
       Component: resolvedSection.LoadingFallback ??
         defaultFallbackFor(resolvedSection.metadata?.component ?? "unknown"),
+      metadata: resolvedSection.metadata,
       props: {},
     },
   };
@@ -139,7 +142,7 @@ function Lazy({ section, loading }: SectionProps) {
 
 export const onBeforeResolveProps = (props: Props) => ({
   ...props,
-  section: asResolved(props.section),
+  section: asResolved(props.section, true),
 });
 
 export default Lazy;
