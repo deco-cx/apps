@@ -259,7 +259,7 @@ export const onBeforeResolveProps = <
     const newRoutes: T = {
       ...props,
       pageSections: props.pageSections?.map((section) =>
-        asResolved(section, true)
+        asResolved(section, false)
       ),
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)

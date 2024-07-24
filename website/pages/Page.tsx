@@ -162,10 +162,7 @@ export const loader = async (
 
   const pageSections = await Promise.all(
     (ctx.pageSections || [])?.map(async (section) => {
-      if (isDeferred(section)) {
-        return await section() as Section;
-      }
-      return section;
+      return await ctx.get(section);
     }),
   );
 
