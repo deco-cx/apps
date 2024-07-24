@@ -4,7 +4,7 @@ import { Section } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
-import { isDeferred } from "deco/mod.ts";
+import { Resolved, isDeferred } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import {
   usePageContext as useDecoPageContext,
@@ -97,8 +97,6 @@ const useDeco = () => {
  */
 function Page({
   sections,
-  startSections,
-  endSections,
   errorPage,
   devMode,
   seo,
@@ -110,8 +108,6 @@ function Page({
   devMode: boolean;
   avoidRedirectingToEditor?: boolean;
   sendToClickHouse?: boolean;
-  startSections?: Section[];
-  endSections?: Section[];
 }): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -149,9 +145,7 @@ function Page({
         {sendToClickHouse && (
           <Clickhouse siteId={site.id} siteName={site.name} />
         )}
-        {startSections?.map(renderSection)}
         {sections.map(renderSection)}
-        {endSections?.map(renderSection)}
       </ErrorBoundary>
     </>
   );
@@ -169,15 +163,17 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
+  const globalSections : Array<Section | Resolved<Section>> = []
+  
+  ctx.global?.forEach(async (section) => {
+    if(isDeferred<Section>(section)) {
+      globalSections.push(await section());
+    }
+    globalSections.push(section);
+  })
   return {
     ...restProps,
-    sections,
-    startSections: isDeferred<Page>(ctx.startSections)
-      ? await ctx.startSections()
-      : undefined,
-    endSections: isDeferred<Page>(ctx.endSections)
-      ? await ctx.endSections()
-      : undefined,
+    sections: [...globalSections, ...sections],
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,

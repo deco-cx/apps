@@ -3,7 +3,7 @@ import "./utils/unhandledRejection.ts";
 import { Matcher } from "deco/blocks/matcher.ts";
 import { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
-import type { App, FnContext } from "deco/mod.ts";
+import type { App, FnContext, Resolved } from "deco/mod.ts";
 import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
@@ -83,19 +83,7 @@ export interface Props {
    * @title Global Sections
    * @description These sections run once on the start of the website and will be included on the start of each page
    */
-  global?: Section[];
-
-  /**
-   * @title Start Sections
-   * @description These sections run every time a page is loaded and will be included on the start of each page
-   */
-  startSections?: Section[];
-
-  /**
-   * @title End Sections
-   * @description These sections run every time a page is loaded and will be included on the end of each page
-   */
-  endSections?: Section[];
+  global?: Array<Section | Resolved<Section>>;
 
   /**
    * @title Error Page
@@ -160,7 +148,10 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
   const global = theme ? [...(state.global ?? []), theme] : state.global;
 
   return {
-    state,
+    state : {
+      ...state,
+      global,
+    },
     manifest: {
       ...manifest,
       sections: {
@@ -176,22 +167,6 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
             manifest.sections["website/sections/Seo/Seo.tsx"].default({
               ...state.seo,
               ...props,
-            }),
-        },
-      },
-      pages: {
-        ...manifest.pages,
-        "website/pages/Page.tsx": {
-          ...manifest.pages["website/pages/Page.tsx"],
-          Preview: (props) =>
-            manifest.pages["website/pages/Page.tsx"].Preview({
-              ...props,
-              sections: [...global ?? [], ...props.sections],
-            }),
-          default: (props) =>
-            manifest.pages["website/pages/Page.tsx"].default({
-              ...props,
-              sections: [...global ?? [], ...props.sections],
             }),
         },
       },
@@ -270,12 +245,6 @@ export const onBeforeResolveProps = <
         : undefined,
       abTesting: props.abTesting
         ? asResolved(props.abTesting, false)
-        : undefined,
-      startSections: props.startSections
-        ? asResolved(props.startSections, true)
-        : undefined,
-      endSections: props.endSections
-        ? asResolved(props.endSections, true)
         : undefined,
       routes: props.routes.map(deferPropsResolve),
     };
