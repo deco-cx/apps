@@ -227,13 +227,7 @@ const deferPropsResolve = (routes: Routes): Routes => {
 };
 
 export const onBeforeResolveProps = <
-  T extends {
-    routes?: Routes[];
-    errorPage?: Page;
-    abTesting: AbTesting;
-    startSections: Section[];
-    endSections: Section[];
-  },
+  T extends { routes?: Routes[]; errorPage?: Page; abTesting: AbTesting },
 >(
   props: T,
 ): T => {
