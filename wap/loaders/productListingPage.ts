@@ -155,7 +155,7 @@ const loader = async (
   nextPage.searchParams.append("pg", String(page + 1));
 
   return {
-    "@type": "ProductListingPage",
+    "@type": "ListItem",
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement,

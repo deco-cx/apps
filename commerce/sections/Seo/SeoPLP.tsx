@@ -1,5 +1,5 @@
 import Seo, { Props as SeoProps } from "../../../website/components/Seo.tsx";
-import { ProductListingPage } from "../../types.ts";
+import { ProductListingPage, ProductListingPageListItem } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 
 export type Props = {
@@ -17,15 +17,50 @@ function Section({ jsonLD, ...props }: Props) {
   const canonical = props.canonical
     ? props.canonical
     : jsonLD?.seo?.canonical
-    ? jsonLD.seo.canonical
-    : jsonLD?.breadcrumb
-    ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
-    : undefined;
+      ? jsonLD.seo.canonical
+      : jsonLD?.breadcrumb
+        ? canonicalFromBreadcrumblist(jsonLD?.breadcrumb)
+        : undefined;
 
   const noIndexing = props.noIndexing ||
     jsonLD?.seo?.noIndexing ||
     !jsonLD ||
     !jsonLD.products.length;
+
+  function formatProductListing(data: ProductListingPage | null) {
+    if (!data) return null;
+
+    const itemListElement: ProductListingPageListItem[] = data.products.reduce((accu: ProductListingPageListItem[], product, index) => {
+      accu.push({
+        "@type": "ListItem",
+        position: index + 1,
+        item: product
+      });
+      return accu;
+    }, []);
+
+    return {
+      "@type": "ItemList",
+      "itemListElement": itemListElement
+    };
+  }
+
+  function formatBreadCrumb(data: ProductListingPage | null) {
+    if (!data) return null;
+
+    return {
+      "@type": "BreadcrumbList",
+      "itemListElement": data.breadcrumb
+    };
+  }
+
+  function formatNewJsonLd(data: ProductListingPage | null) {
+    const items = [formatProductListing(data), formatBreadCrumb(data)].filter((item) => item !== null && item !== undefined);
+
+    return items;
+  }
+
+  const newJsonLd = formatNewJsonLd(jsonLD);
 
   return (
     <Seo
@@ -33,7 +68,7 @@ function Section({ jsonLD, ...props }: Props) {
       title={title || props.title}
       description={description || props.description}
       canonical={canonical}
-      jsonLDs={[jsonLD]}
+      jsonLDs={newJsonLd}
       noIndexing={noIndexing}
     />
   );
