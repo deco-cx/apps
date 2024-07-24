@@ -104,8 +104,9 @@ export interface Props {
   caching?: Caching;
 
   /**
-   * @title Async Rendering
-   * @description Async sections will be deferred to the client-side
+   * @title Global Async Rendering (Deprecated)
+   * @description Please disable this setting and enable each section individually. More info at https://deco.cx/en/blog/async-render-default
+   * @deprecated true
    * @default false
    */
   firstByteThresholdMS?: boolean;
