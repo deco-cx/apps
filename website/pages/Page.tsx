@@ -184,10 +184,8 @@ export const loader = async (
   };
 };
 
-export function Preview(
-  props: Props & { startSections?: Section[]; endSections?: Section[] },
-) {
-  const { sections, startSections, endSections, seo } = props;
+export function Preview(props: Props) {
+  const { sections, seo } = props;
   const deco = useDeco();
 
   return (
@@ -198,9 +196,7 @@ export function Preview(
 
       {seo && renderSection(seo)}
       <Events deco={deco} />
-      {startSections?.map(renderSection)}
-      {sections.map(renderSection)}
-      {endSections?.map(renderSection)}
+      {sections.map(renderSection)}      
     </>
   );
 }
