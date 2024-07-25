@@ -1,7 +1,7 @@
 import type { Section } from "deco/blocks/section.ts";
 import { useSection } from "deco/hooks/useSection.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
-import { renderSection, shouldForceRender } from "../../utils/deferred.tsx";
+import { shouldForceRender } from "../../utils/deferred.ts";
 import { AppContext } from "../mod.ts";
 
 /**
@@ -46,7 +46,7 @@ const Deferred = (props: Props) => {
   if (loading === "eager") {
     return (
       <>
-        {sections.map(renderSection)}
+        {sections.map((section) => <section.Component {...section.props} />)}
       </>
     );
   }
@@ -69,7 +69,9 @@ const Deferred = (props: Props) => {
         hx-swap="outerHTML"
         style={{ height: "100vh" }}
       />
-      {props.fallbacks?.map(renderSection)}
+      {props.fallbacks?.map((section) =>
+        section ? <section.Component {...section.props} /> : null
+      )}
     </>
   );
 };
