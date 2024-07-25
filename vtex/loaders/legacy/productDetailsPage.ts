@@ -98,7 +98,7 @@ async function loader(
       ? await withIsSimilarTo(req, ctx, page.product)
       : page.product,
     seo: {
-      title: product.productTitle,
+      title: product.productTitle || product.productName,
       description: product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
       noIndexing: props.indexingSkus ? false : !!skuId,
