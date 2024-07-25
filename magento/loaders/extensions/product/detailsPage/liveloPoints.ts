@@ -2,7 +2,6 @@ import { ProductDetailsPage } from "../../../../../commerce/types.ts";
 import { ExtensionOf } from "../../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../../mod.ts";
 import { ExtensionProps } from "../../../../utils/client/types.ts";
-import { liveloExt } from "../../../../utils/extension.ts";
 
 export const cache = "stale-while-revalidate";
 
@@ -30,7 +29,8 @@ async (page: ProductDetailsPage | null) => {
   }
 
   if (props.active) {
-    const product = await liveloExt([page.product], props.path, ctx);
+    const product = await ctx.invoke.magento.loaders.extensions.product
+      .liveloPoints({ products: [page.product], path: props.path });
 
     return {
       ...page,
