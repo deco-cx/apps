@@ -110,8 +110,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
             return resolve(id);
           }
           if (resolver?.type === "loaders") {
-            // deno-lint-ignore no-explicit-any
-            return undefined as any;
+            return Promise.resolve([]);
           }
           return resolve();
         },
