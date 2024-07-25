@@ -181,9 +181,16 @@ const fromProps = ({ props }: Props) => {
   throw new Error(`Unknown props: ${JSON.stringify(props)}`);
 };
 
+export const getFirstItemAvailable = (item: Item) => {
+  return !!item?.sellers?.find((s) => s.commertialOffer?.AvailableQuantity > 0);
+};
+
 const preferredSKU = (items: Item[], { props }: Props) => {
   const fetchedSkus = new Set((props as ProductIDProps).ids ?? []);
-  return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
+  if (fetchedSkus.size > 0) {
+    return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
+  }
+  return items.find(getFirstItemAvailable) || items[0];
 };
 
 /**

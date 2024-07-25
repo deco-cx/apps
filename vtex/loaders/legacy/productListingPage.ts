@@ -134,7 +134,7 @@ const getTerm = (path: string, map: string) => {
   return term;
 };
 
-const getFirstItemAvailable = (item: LegacyItem) => {
+export const getFirstItemAvailable = (item: LegacyItem) => {
   return !!item?.sellers?.find((s) => s.commertialOffer?.AvailableQuantity > 0);
 };
 
