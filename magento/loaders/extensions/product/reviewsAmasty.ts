@@ -1,20 +1,16 @@
 import { Product } from "../../../../commerce/types.ts";
 import { STALE as DecoStale } from "../../../../utils/fetch.ts";
 import { AppContext } from "../../../mod.ts";
+import { ExtensionLoaderProps } from "../../../utils/client/types.ts";
 import { toReviewAmasty } from "../../../utils/transform.ts";
 import { sanitizePath } from "../../../utils/utils.ts";
-
-type Props = {
-  products: Product[];
-  path: string;
-};
 
 /**
  * @title Magento Product Extension Loader - Reviews Amasty
  * @description Only invokable
  */
 async function loader(
-  { products, path }: Props,
+  { products, path }: ExtensionLoaderProps,
   _req: Request,
   ctx: AppContext,
 ): Promise<Product[]> {
@@ -39,12 +35,12 @@ async function loader(
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (
-  { products, path }: Props,
+  { products, path, from }: ExtensionLoaderProps,
   _req: Request,
   _ctx: AppContext,
 ) => {
   const skus = products?.reduce((acc, p) => `${acc}|${p.sku}`, "");
-  return `${skus}-amastyReviewsExt-${path}`;
+  return `${skus}-amastyReviewsExt-${path}-${from}`;
 };
 
 export default loader;

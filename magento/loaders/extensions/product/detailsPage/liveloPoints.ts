@@ -3,17 +3,6 @@ import { ExtensionOf } from "../../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../../mod.ts";
 import { ExtensionProps } from "../../../../utils/client/types.ts";
 
-export const cache = "stale-while-revalidate";
-
-export const cacheKey = (
-  props: ExtensionProps,
-  req: Request,
-  _ctx: AppContext,
-) => {
-  const url = new URL(req.url);
-  return `${url.hostname}${url.pathname}-pdp-liveloPoints:${props.active}-url:${props.path}`;
-};
-
 /**
  * @title Magento ExtensionOf Details Page - Livelo Points
  * @description Add extra data to your loader. This may harm performance
@@ -30,7 +19,11 @@ async (page: ProductDetailsPage | null) => {
 
   if (props.active) {
     const product = await ctx.invoke.magento.loaders.extensions.product
-      .liveloPoints({ products: [page.product], path: props.path });
+      .liveloPoints({
+        products: [page.product],
+        path: props.path,
+        from: "PDP",
+      });
 
     return {
       ...page,

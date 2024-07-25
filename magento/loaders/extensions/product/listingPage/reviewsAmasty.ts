@@ -1,18 +1,18 @@
-import { ProductDetailsPage } from "../../../../../commerce/types.ts";
+import { ProductListingPage } from "../../../../../commerce/types.ts";
 import { ExtensionOf } from "../../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../../mod.ts";
 import { ExtensionProps } from "../../../../utils/client/types.ts";
 
 /**
- * @title Magento ExtensionOf Details Page - Amasty Reviews
+ * @title Magento ExtensionOf Listing Page - Amasty Reviews
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (
   props: ExtensionProps,
   _req: Request,
   ctx: AppContext,
-): ExtensionOf<ProductDetailsPage | null> =>
-async (page: ProductDetailsPage | null) => {
+): ExtensionOf<ProductListingPage | null> =>
+async (page: ProductListingPage | null) => {
   if (!page) {
     return page;
   }
@@ -20,9 +20,9 @@ async (page: ProductDetailsPage | null) => {
   if (props.active) {
     const product = await ctx.invoke.magento.loaders.extensions.product
       .reviewsAmasty({
-        products: [page.product],
+        products: page.products,
         path: props.path,
-        from: "PDP",
+        from: "PLP",
       });
 
     return {

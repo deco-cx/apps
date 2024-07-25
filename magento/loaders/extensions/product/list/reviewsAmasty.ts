@@ -1,4 +1,4 @@
-import { ProductDetailsPage } from "../../../../../commerce/types.ts";
+import { Product } from "../../../../../commerce/types.ts";
 import { ExtensionOf } from "../../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../../mod.ts";
 import { ExtensionProps } from "../../../../utils/client/types.ts";
@@ -11,26 +11,19 @@ const loader = (
   props: ExtensionProps,
   _req: Request,
   ctx: AppContext,
-): ExtensionOf<ProductDetailsPage | null> =>
-async (page: ProductDetailsPage | null) => {
-  if (!page) {
-    return page;
+): ExtensionOf<Product[] | null> =>
+async (products: Product[] | null) => {
+  if (!products || products.length === 0) {
+    return products;
   }
 
   if (props.active) {
-    const product = await ctx.invoke.magento.loaders.extensions.product
-      .reviewsAmasty({
-        products: [page.product],
-        path: props.path,
-        from: "PDP",
-      });
+    const extendedProducts = await ctx.invoke.magento.loaders.extensions.product
+      .reviewsAmasty({ products, path: props.path, from: "SHELF" });
 
-    return {
-      ...page,
-      product: product[0],
-    };
+    return extendedProducts;
   }
-  return page;
+  return products;
 };
 
 export default loader;

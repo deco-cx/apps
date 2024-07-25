@@ -1,45 +1,41 @@
 import { Product } from "../../../../commerce/types.ts";
 import { STALE as DecoStale } from "../../../../utils/fetch.ts";
 import { AppContext } from "../../../mod.ts";
-import { toReviewAmasty } from "../../../utils/transform.ts";
+import { ExtensionLoaderProps } from "../../../utils/client/types.ts";
+import { toLiveloPoints } from "../../../utils/transform.ts";
 import { sanitizePath } from "../../../utils/utils.ts";
-
-type Props = {
-  products: Product[];
-  path: string;
-};
 
 /**
  * @title Magento Product Extension Loader - Livelo Points
  * @description Only invokable
  */
 async function loader(
-  { products, path }: Props,
+  { products, path }: ExtensionLoaderProps,
   _req: Request,
   ctx: AppContext,
 ): Promise<Product[]> {
   const STALE = ctx.enableCache ? DecoStale : undefined;
 
-  const reviews = await Promise.all(
+  const liveloPoints = await Promise.all(
     products.map(
       async (product) =>
-        await ctx.clientAdmin["GET /rest/:reviewUrl/:productId"](
+        await ctx.clientAdmin["GET /rest/:liveloUrl/:productId"](
           {
-            reviewUrl: sanitizePath(path),
+            liveloUrl: sanitizePath(path),
             productId: product!.productID,
           },
           STALE,
-        ).then((review) => review.json()),
+        ).then((points) => points.json()),
     ),
   );
 
-  return toReviewAmasty(products, reviews);
+  return toLiveloPoints(products, liveloPoints);
 }
 
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (
-  { products, path }: Props,
+  { products, path }: ExtensionLoaderProps,
   _req: Request,
   _ctx: AppContext,
 ) => {

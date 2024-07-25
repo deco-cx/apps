@@ -1,4 +1,4 @@
-import { ImageObject } from "../../../commerce/types.ts";
+import { ImageObject, Product } from "../../../commerce/types.ts";
 
 export interface CategoryLink {
   position: number;
@@ -605,7 +605,13 @@ export interface ExtensionProps {
   active: boolean;
   /**
    * @title Path of the REST API
-   * @description The partial path of the API. ex: /all/V1/custom/review
+   * @description The partial path of the API. ex: /all/V1/custom
    */
   path: string;
+}
+
+export interface ExtensionLoaderProps {
+  products: Product[];
+  path: string;
+  from: "PDP" | "PLP" | "SHELF";
 }
