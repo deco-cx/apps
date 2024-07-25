@@ -109,6 +109,10 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
             resolvingMatchers[id] = true;
             return resolve(id);
           }
+          if (resolver.type === "loaders") {
+            // deno-lint-ignore no-explicit-any
+            return undefined as any;
+          }
           return resolve();
         },
       },
