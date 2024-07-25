@@ -9,19 +9,19 @@ import { Cart } from "../../cart.ts";
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (
-    props: ExtensionProps,
-    _req: Request,
-    ctx: AppContext,
+  props: ExtensionProps,
+  _req: Request,
+  ctx: AppContext,
 ): ExtensionOf<Cart | null> =>
 async (page: Cart | null) => {
-    if (!page) {
-        return page;
-    }
-
-    if (props.active) {
-        return await liveloCartExt(page, props.path, ctx);
-    }
+  if (!page) {
     return page;
+  }
+
+  if (props.active) {
+    return await liveloCartExt(page, props.path, ctx);
+  }
+  return page;
 };
 
 export default loader;

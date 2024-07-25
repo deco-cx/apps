@@ -42,3 +42,5 @@ export const sortSearchParams = (url: URL) => {
   });
   return sortedParams.join("&");
 };
+
+export const sanitizePath = (path: string) => path.replace(/^\/?(rest\/)?/, "");

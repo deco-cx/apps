@@ -5,7 +5,7 @@ import { liveloCartExt } from "../../../utils/extension.ts";
 import { Cart } from "../../cart.ts";
 
 interface Props {
-    liveloPoints: ExtensionProps;
+  liveloPoints: ExtensionProps;
 }
 
 /**
@@ -13,19 +13,19 @@ interface Props {
  * @description Add extra data to your loader. This may harm performance
  */
 const loader = (
-    { liveloPoints }: Props,
-    _req: Request,
-    ctx: AppContext,
+  { liveloPoints }: Props,
+  _req: Request,
+  ctx: AppContext,
 ): ExtensionOf<Cart | null> =>
 async (page: Cart | null) => {
-    if (!page) {
-        return page;
-    }
-
-    if (liveloPoints.active) {
-        return await liveloCartExt(page, liveloPoints.path, ctx);
-    }
+  if (!page) {
     return page;
+  }
+
+  if (liveloPoints.active) {
+    return await liveloCartExt(page, liveloPoints.path, ctx);
+  }
+  return page;
 };
 
 export default loader;
