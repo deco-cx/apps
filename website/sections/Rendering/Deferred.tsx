@@ -4,7 +4,7 @@ import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { asResolved, isDeferred } from "deco/mod.ts";
 import { useId } from "preact/hooks";
 import { AppContext } from "../../mod.ts";
-import { renderSection, shouldForceRender } from "../../../utils/deferred.tsx";
+import { shouldForceRender } from "../../../utils/deferred.ts";
 
 /** @titleBy type */
 export interface Scroll {
@@ -43,8 +43,6 @@ export interface Props {
   sections: Section[];
   display?: boolean;
   behavior?: Scroll | Intersection | Load;
-  /** @hide true */
-  fallbacks?: Section[];
 }
 
 const script = (
@@ -103,7 +101,7 @@ const Deferred = (props: Props) => {
   if (display) {
     return (
       <>
-        {sections.map(renderSection)}
+        {sections.map(({ Component, props }) => <Component {...props} />)}
       </>
     );
   }
@@ -125,7 +123,6 @@ const Deferred = (props: Props) => {
           behavior?.payload.toString() || "",
         )}
       />
-      {props.fallbacks?.map(renderSection)}
     </>
   );
 };
