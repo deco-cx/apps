@@ -85,10 +85,10 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       propagateOptions: true,
       hooks: {
         onResolveStart: (resolve, _props, resolver, _resolveType, ctx) => {
-          if (resolvingMatchers[ctx.resolveId]) {
+          if (ctx.resolveId in resolvingMatchers) {
             return resolve();
           }
-          if (resolver.type === "loaders") {
+          if (resolver?.type === "loaders") {
             // deno-lint-ignore no-explicit-any
             return undefined as any;
           }
@@ -101,7 +101,7 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
           _resolveType,
           ctx,
         ) => {
-          if (resolvingMatchers[ctx.resolveId]) {
+          if (ctx.resolveId in resolvingMatchers) {
             return resolve();
           }
           if (resolver?.type === "matchers") { // matchers should not have a timeout.
