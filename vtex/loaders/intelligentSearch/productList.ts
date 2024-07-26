@@ -19,6 +19,7 @@ import {
   mapLabelledFuzzyToFuzzy,
 } from "./productListingPage.ts";
 import { sortProducts } from "../../utils/transform.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 
 /**
  * @title Collection ID
@@ -179,10 +180,6 @@ const fromProps = ({ props }: Props) => {
   }
 
   throw new Error(`Unknown props: ${JSON.stringify(props)}`);
-};
-
-export const getFirstItemAvailable = (item: Item) => {
-  return !!item?.sellers?.find((s) => s.commertialOffer?.AvailableQuantity > 0);
 };
 
 const preferredSKU = (items: Item[], { props }: Props) => {
