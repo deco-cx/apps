@@ -36,9 +36,9 @@ import type {
   SelectedFacet,
   Sort,
 } from "../../utils/types.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 import { redirect } from "deco/mod.ts";
-import { getFirstItemAvailable } from "./productList.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";
