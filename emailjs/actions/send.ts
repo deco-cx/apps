@@ -9,7 +9,7 @@ export interface Props {
   /**
    * @description Template parameters of the template
    */
-  template_params?: { [key: string]: string };
+  template_params?: Array<{ key: string; value: string }>;
 }
 
 const action = async (
@@ -23,9 +23,18 @@ const action = async (
     ? accessToken
     : accessToken?.get?.() ?? "";
 
+  const templateParamsObject = payload.template_params?.reduce(
+    (acc, { key, value }) => {
+      acc[key] = value;
+      return acc;
+    },
+    {} as { [key: string]: string },
+  );
+
   const response = await api["POST /email/send"]({}, {
     body: {
       ...payload,
+      template_params: templateParamsObject,
       service_id,
       user_id,
       accessToken: stringAccessToken,
