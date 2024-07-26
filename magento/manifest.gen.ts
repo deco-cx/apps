@@ -29,15 +29,11 @@ import * as $$$9 from "./loaders/extensions/product/reviewsAmasty.ts";
 import * as $$$10 from "./loaders/features.ts";
 import * as $$$11 from "./loaders/product/detailsPage.ts";
 import * as $$$12 from "./loaders/product/detailsPageGQL.ts";
-import * as $$$13 from "./loaders/product/extensions/amasty/detailsPage.ts";
-import * as $$$14 from "./loaders/product/extensions/amasty/list.ts";
-import * as $$$15 from "./loaders/product/extensions/amasty/listingPage.ts";
-import * as $$$16 from "./loaders/product/extensions/extend.ts";
-import * as $$$17 from "./loaders/product/list.ts";
-import * as $$$18 from "./loaders/product/listingPage.ts";
-import * as $$$19 from "./loaders/proxy.ts";
-import * as $$$20 from "./loaders/user.ts";
-import * as $$$21 from "./loaders/wishlist.ts";
+import * as $$$13 from "./loaders/product/list.ts";
+import * as $$$14 from "./loaders/product/listingPage.ts";
+import * as $$$15 from "./loaders/proxy.ts";
+import * as $$$16 from "./loaders/user.ts";
+import * as $$$17 from "./loaders/wishlist.ts";
 
 const manifest = {
   "loaders": {
@@ -54,15 +50,11 @@ const manifest = {
     "magento/loaders/features.ts": $$$10,
     "magento/loaders/product/detailsPage.ts": $$$11,
     "magento/loaders/product/detailsPageGQL.ts": $$$12,
-    "magento/loaders/product/extensions/amasty/detailsPage.ts": $$$13,
-    "magento/loaders/product/extensions/amasty/list.ts": $$$14,
-    "magento/loaders/product/extensions/amasty/listingPage.ts": $$$15,
-    "magento/loaders/product/extensions/extend.ts": $$$16,
-    "magento/loaders/product/list.ts": $$$17,
-    "magento/loaders/product/listingPage.ts": $$$18,
-    "magento/loaders/proxy.ts": $$$19,
-    "magento/loaders/user.ts": $$$20,
-    "magento/loaders/wishlist.ts": $$$21,
+    "magento/loaders/product/list.ts": $$$13,
+    "magento/loaders/product/listingPage.ts": $$$14,
+    "magento/loaders/proxy.ts": $$$15,
+    "magento/loaders/user.ts": $$$16,
+    "magento/loaders/wishlist.ts": $$$17,
   },
   "handlers": {
     "magento/handlers/proxy.ts": $$$$0,
