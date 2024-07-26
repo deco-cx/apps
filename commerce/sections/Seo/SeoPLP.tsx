@@ -27,6 +27,37 @@ function Section({ jsonLD, ...props }: Props) {
     !jsonLD ||
     !jsonLD.products.length;
 
+
+  function sanitizeObj<T>(obj: T): T {
+    const propsToRemove = [
+      "additionalProperty",
+      "isVariantOf",
+      "image",
+      "teasers",
+      "priceSpecification",
+      "inProductGroupWithID",
+      "sellerName",
+      "inventoryLevel",
+      "sellerDefault",
+      "giftSkuIds",
+      "priceValidUntil",
+    ];
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => sanitizeObj(item)) as T;
+    }
+
+    if (typeof obj === 'object' && obj !== null) {
+      return Object.fromEntries(
+        Object.entries(obj)
+          .filter(([key]) => !propsToRemove.includes(key))
+          .map(([key, value]) => [key, sanitizeObj(value)])
+      ) as T;
+    }
+
+    return obj;
+  }
+
   function formatProductListing(data: ProductListingPage | null) {
     if (!data) return null;
 
@@ -34,7 +65,7 @@ function Section({ jsonLD, ...props }: Props) {
       accu.push({
         "@type": "ListItem",
         position: index + 1,
-        item: product
+        item: sanitizeObj(product)
       });
       return accu;
     }, []);
