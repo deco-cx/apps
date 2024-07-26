@@ -43,9 +43,11 @@ export default async function BlogPostPageLoader(
     "@type": "BlogPostPage",
     post,
     seo: {
-      title: post.title,
-      description: post.excerpt,
-      canonical: url.href,
+      title: post.seo?.title || post.title,
+      description: post.seo?.description || post.excerpt,
+      canonical: post.seo?.canonical || url.href,
+      image: post.seo?.image || post.image,
+      noIndexing: post.seo?.noIndexing || false,
     },
   };
 }
