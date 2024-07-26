@@ -80,6 +80,19 @@ export const PreviewMagento = (
             <GoLiveEnUs decoSite={decoSite} />
           </ul>
         </details>
+        <details id="tab" class="group text-black">
+          <summary class="w-auto text-lef text-2xl cursor-pointer py-4 group-open:font-semibold">
+            Webhooks
+          </summary>
+          <ul
+            class="absolute top-[70px] w-full left-0 bg-white rounded-lg p-4"
+            style={{
+              boxShadow: "0px 0px 5px 3px rgba(0,0,0,0.20)",
+            }}
+          >
+            <Webhooks />
+          </ul>
+        </details>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -443,5 +456,209 @@ function GoLiveEnUs({ decoSite }: { decoSite: string }) {
         </p>
       </details>
     </>
+  );
+}
+
+function Webhooks() {
+  return (
+    <>
+      <h2 class="text-2xl font-semibold">
+        Preparing your webhooks to use as extensions
+      </h2>
+      <p>
+        To use the available Magento extensions, you`ll need to set up an
+        webhook for each one.
+      </p>
+      <LiveloCartWebhook />
+      <LiveloProductWebhook />
+      <AmastyReviewsWebhook />
+    </>
+  );
+}
+
+function LiveloCartWebhook() {
+  return (
+    <details>
+      <summary class="text-lg font-semibold mt-4 cursor-pointer">
+        Livelo Points (Cart)
+      </summary>
+      <p>This webhook will be used as an Cart extension</p>
+      <details class="ml-4">
+        <summary class="text-lg font-regular mt-2 cursor-pointer">
+          Query
+        </summary>
+        <p>
+          METHOD: <span class="font-semibold">GET</span>
+        </p>
+        <p>Path Params:</p>
+        <p class="ml-4">
+          - <span class="font-semibold">quote_id:</span>{" "}
+          ID of the cart/quote/bag
+        </p>
+        <p>
+          Example:{" "}
+          <span class="underline">
+            https://mydomain.com.br/rest/xpto/livelo/cart/$quote_id
+          </span>
+        </p>
+      </details>
+      <details class="ml-4">
+        <summary class="text-lg font-regular mt-2 cursor-pointer">
+          Interface
+        </summary>
+        <p>
+          The <span class="underline">body</span>{" "}
+          of the data returned in this webhook{" "}
+          <span class="font-bold">MUST FOLLOW</span> the following format:
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">phrase:</span> string
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">points:</span> number
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">factor:</span> number
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">message?:</span> string
+        </p>
+      </details>
+    </details>
+  );
+}
+
+function LiveloProductWebhook() {
+  return (
+    <details>
+      <summary class="text-lg font-semibold mt-4 cursor-pointer">
+        Livelo Points (Product)
+      </summary>
+      <p>
+        This webhook will be used as an Product extension. Can be integrated at
+        Details Page, Listing Page or Shelves
+      </p>
+      <details class="ml-4">
+        <summary class="text-lg font-regular mt-2 cursor-pointer">
+          Query
+        </summary>
+        <p>
+          METHOD: <span class="font-semibold">GET</span>
+        </p>
+        <p>Path Params:</p>
+        <p class="ml-4">
+          - <span class="font-semibold">product_id:</span> ID of the product
+        </p>
+        <p>
+          Example:{" "}
+          <span class="underline">
+            https://mydomain.com.br/rest/xpto/livelo/product/$product_id
+          </span>
+        </p>
+      </details>
+      <details class="ml-4">
+        <summary class="text-lg font-regular mt-2 cursor-pointer">
+          Interface
+        </summary>
+        <p>
+          The <span class="underline">body</span>{" "}
+          of the data returned in this webhook{" "}
+          <span class="font-bold">MUST FOLLOW</span> the following format:
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">phrase:</span> string
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">points:</span> number
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">factor:</span> number
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">message?:</span> string
+        </p>
+      </details>
+    </details>
+  );
+}
+
+function AmastyReviewsWebhook() {
+  return (
+    <details>
+      <summary class="text-lg font-semibold mt-4 cursor-pointer">
+        Reviews Amasty (Product)
+      </summary>
+      <p>
+        This webhook will be used as an Product extension. Can be integrated at
+        Details Page, Listing Page or Shelves
+      </p>
+      <details class="ml-4">
+        <summary class="text-lg font-regular mt-2 cursor-pointer">
+          Query
+        </summary>
+        <p>
+          METHOD: <span class="font-semibold">GET</span>
+        </p>
+        <p>Path Params:</p>
+        <p class="ml-4">
+          - <span class="font-semibold">product_id:</span> ID of the product
+        </p>
+        <p>
+          Example:{" "}
+          <span class="underline">
+            https://mydomain.com.br/rest/xpto/amasty/reviews/$product_id
+          </span>
+        </p>
+      </details>
+      <details class="ml-4">
+        <summary class="text-lg font-regular mt-2 cursor-pointer">
+          Interface
+        </summary>
+        <p>
+          The <span class="underline">body</span>{" "}
+          of the data returned in this webhook{" "}
+          <span class="font-bold">MUST FOLLOW</span> the following format:
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">success:</span> boolean
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">message:</span> string
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">summary:</span>
+          <p class="ml-8">
+            - <span class="font-semibold">reviews_count</span> number
+          </p>
+        </p>
+        <p class="ml-4">
+          - <span class="font-semibold">reviews:</span>
+          <p class="ml-8">
+            - <span class="font-semibold">review_id</span> number
+          </p>
+          <p class="ml-8">
+            - <span class="font-semibold">title</span> string
+          </p>
+          <p class="ml-8">
+            - <span class="font-semibold">detail</span> string
+          </p>
+          <p class="ml-8">
+            - <span class="font-semibold">nickname</span> string
+          </p>
+          <p class="ml-8">
+            - <span class="font-semibold">created_at</span> string
+          </p>
+          <p class="ml-8">
+            - <span class="font-semibold">verified_buyer</span> boolean
+          </p>
+          <p class="ml-8">
+            - <span class="font-semibold">review_stars</span> number
+          </p>
+          <p class="ml-8">
+            - <span class="font-semibold">review_stars_percentage</span> number
+          </p>
+        </p>
+      </details>
+    </details>
   );
 }
