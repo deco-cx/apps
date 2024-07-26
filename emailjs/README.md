@@ -61,10 +61,10 @@ EmailJS is a service that allows developers to send emails directly from JavaScr
           "user_id": "your_user_id",
           "accessToken": "your_access_token",
           "template_params": {
-            "name": "Yuri",
-            "subject": "Assunto do Email",
+            "name": "Name",
+            "subject": "Subject",
             "email": "your-email@gmail.com",
-            "message": "Email cadastrado"
+            "message": "Registered Email"
           }
         });
       }
