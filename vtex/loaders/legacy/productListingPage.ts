@@ -353,6 +353,7 @@ const loader = async (
         term,
         filtersBehavior,
         props.ignoreCaseSelected,
+        name === "Categories",
       )
     )
     .flat()
