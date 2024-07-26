@@ -17,48 +17,44 @@ import * as $$$$0 from "./handlers/proxy.ts";
 import * as $$$$1 from "./handlers/redirect.ts";
 import * as $$$$2 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/extensions/cart/cart.ts";
-import * as $$$2 from "./loaders/extensions/productDetailsPage.ts";
-import * as $$$3 from "./loaders/extensions/productList.ts";
-import * as $$$4 from "./loaders/extensions/productListingPage.ts";
-import * as $$$5 from "./loaders/features.ts";
-import * as $$$6 from "./loaders/product/detailsPage.ts";
-import * as $$$7 from "./loaders/product/detailsPageGQL.ts";
-import * as $$$8 from "./loaders/product/extensions/amasty/detailsPage.ts";
-import * as $$$9 from "./loaders/product/extensions/amasty/list.ts";
-import * as $$$10 from "./loaders/product/extensions/amasty/listingPage.ts";
-import * as $$$11 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$12 from "./loaders/product/extensions/extend.ts";
-import * as $$$13 from "./loaders/product/extensions/list.ts";
-import * as $$$14 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$15 from "./loaders/product/list.ts";
-import * as $$$16 from "./loaders/product/listingPage.ts";
-import * as $$$17 from "./loaders/proxy.ts";
-import * as $$$18 from "./loaders/user.ts";
-import * as $$$19 from "./loaders/wishlist.ts";
+import * as $$$1 from "./loaders/extensions/cart/liveloPoints.ts";
+import * as $$$2 from "./loaders/extensions/product/detailsPage/liveloPoints.ts";
+import * as $$$3 from "./loaders/extensions/product/detailsPage/reviewsAmasty.ts";
+import * as $$$4 from "./loaders/extensions/product/list/liveloPoints.ts";
+import * as $$$5 from "./loaders/extensions/product/list/reviewsAmasty.ts";
+import * as $$$6 from "./loaders/extensions/product/listingPage/liveloPoints.ts";
+import * as $$$7 from "./loaders/extensions/product/listingPage/reviewsAmasty.ts";
+import * as $$$8 from "./loaders/extensions/product/liveloPoints.ts";
+import * as $$$9 from "./loaders/extensions/product/reviewsAmasty.ts";
+import * as $$$10 from "./loaders/features.ts";
+import * as $$$11 from "./loaders/product/detailsPage.ts";
+import * as $$$12 from "./loaders/product/detailsPageGQL.ts";
+import * as $$$13 from "./loaders/product/list.ts";
+import * as $$$14 from "./loaders/product/listingPage.ts";
+import * as $$$15 from "./loaders/proxy.ts";
+import * as $$$16 from "./loaders/user.ts";
+import * as $$$17 from "./loaders/wishlist.ts";
 
 const manifest = {
   "loaders": {
     "magento/loaders/cart.ts": $$$0,
-    "magento/loaders/extensions/cart/cart.ts": $$$1,
-    "magento/loaders/extensions/productDetailsPage.ts": $$$2,
-    "magento/loaders/extensions/productList.ts": $$$3,
-    "magento/loaders/extensions/productListingPage.ts": $$$4,
-    "magento/loaders/features.ts": $$$5,
-    "magento/loaders/product/detailsPage.ts": $$$6,
-    "magento/loaders/product/detailsPageGQL.ts": $$$7,
-    "magento/loaders/product/extensions/amasty/detailsPage.ts": $$$8,
-    "magento/loaders/product/extensions/amasty/list.ts": $$$9,
-    "magento/loaders/product/extensions/amasty/listingPage.ts": $$$10,
-    "magento/loaders/product/extensions/detailsPage.ts": $$$11,
-    "magento/loaders/product/extensions/extend.ts": $$$12,
-    "magento/loaders/product/extensions/list.ts": $$$13,
-    "magento/loaders/product/extensions/listingPage.ts": $$$14,
-    "magento/loaders/product/list.ts": $$$15,
-    "magento/loaders/product/listingPage.ts": $$$16,
-    "magento/loaders/proxy.ts": $$$17,
-    "magento/loaders/user.ts": $$$18,
-    "magento/loaders/wishlist.ts": $$$19,
+    "magento/loaders/extensions/cart/liveloPoints.ts": $$$1,
+    "magento/loaders/extensions/product/detailsPage/liveloPoints.ts": $$$2,
+    "magento/loaders/extensions/product/detailsPage/reviewsAmasty.ts": $$$3,
+    "magento/loaders/extensions/product/list/liveloPoints.ts": $$$4,
+    "magento/loaders/extensions/product/list/reviewsAmasty.ts": $$$5,
+    "magento/loaders/extensions/product/listingPage/liveloPoints.ts": $$$6,
+    "magento/loaders/extensions/product/listingPage/reviewsAmasty.ts": $$$7,
+    "magento/loaders/extensions/product/liveloPoints.ts": $$$8,
+    "magento/loaders/extensions/product/reviewsAmasty.ts": $$$9,
+    "magento/loaders/features.ts": $$$10,
+    "magento/loaders/product/detailsPage.ts": $$$11,
+    "magento/loaders/product/detailsPageGQL.ts": $$$12,
+    "magento/loaders/product/list.ts": $$$13,
+    "magento/loaders/product/listingPage.ts": $$$14,
+    "magento/loaders/proxy.ts": $$$15,
+    "magento/loaders/user.ts": $$$16,
+    "magento/loaders/wishlist.ts": $$$17,
   },
   "handlers": {
     "magento/handlers/proxy.ts": $$$$0,

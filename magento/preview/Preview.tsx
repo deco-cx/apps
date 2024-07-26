@@ -11,7 +11,7 @@ export interface Props {
 export const PreviewMagento = (
   app: AppRuntime<BaseContext, AppType["state"]> & {
     markdownContent: () => JSX.Element;
-  }
+  },
 ) => {
   const context = Context.active();
   const decoSite = context.site;
@@ -30,7 +30,8 @@ export const PreviewMagento = (
             }
           `,
         }}
-      ></style>
+      >
+      </style>
       <div>
         <a
           href="https://business.adobe.com/br/products/magento/magento-commerce.html"
@@ -92,7 +93,8 @@ export const PreviewMagento = (
             })
           `,
           }}
-        ></script>
+        >
+        </script>
         <script src="https://unpkg.com/windicss-runtime-dom"></script>
       </div>
     </div>
@@ -430,7 +432,8 @@ function GoLiveEnUs({ decoSite }: { decoSite: string }) {
         </summary>
         <p>Again in deco.cx panel settings:</p>
         <p>
-          Click on the 3 dots in the row of the domain you want to validate.{" "}
+          Click on the 3 dots in the row of the domain you want to
+          validate.{" "}
         </p>
         <p>Then click Setup.</p>
         <p>Lastly, click Validate.</p>
