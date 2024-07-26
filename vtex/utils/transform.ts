@@ -687,6 +687,7 @@ export const legacyFacetToFilter = (
   term: string,
   behavior: "dynamic" | "static",
   ignoreCaseSelected?: boolean,
+  fullPath = false,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = term.replace(/^\//, "").split("/").slice(
@@ -706,7 +707,9 @@ export const legacyFacetToFilter = (
   // category2/123?map=c,productClusterIds -> DO NOT WORK
   // category1/category2/123?map=c,c,productClusterIds -> WORK
   const hasProductClusterIds = mapSegments.includes("productClusterIds");
-  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") ||
+  const hasToBeFullpath = fullPath ||
+    hasProductClusterIds ||
+    mapSegments.includes("ft") ||
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
@@ -804,6 +807,8 @@ export const legacyFacetToFilter = (
             map,
             term,
             behavior,
+            ignoreCaseSelected,
+            fullPath,
           )
           : undefined,
       };

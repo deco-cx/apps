@@ -10,9 +10,8 @@ import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
 import { getSetCookies } from "std/http/cookie.ts";
 import { ConnInfo } from "std/http/server.ts";
+import { __DECO_FBT } from "../../utils/deferred.ts";
 import { AppContext } from "../mod.ts";
-
-export const __DECO_FBT = "__decoFBT";
 
 /**
  * @title Fresh Config
