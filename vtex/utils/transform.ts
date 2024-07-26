@@ -492,11 +492,13 @@ const legacyToProductGroupAdditionalProperties = (
   const groups = product.allSpecificationsGroups ?? [];
   const allSpecifications = product.allSpecifications ?? [];
 
-  const specByGroup : Record<string, string> = {}
+  const specByGroup: Record<string, string> = {};
 
   groups.forEach((group) => {
     const groupSpecs = (product as unknown as Record<string, string[]>)[group];
-    groupSpecs.forEach((specName) => {specByGroup[specName] = group})
+    groupSpecs.forEach((specName) => {
+      specByGroup[specName] = group;
+    });
   });
 
   return allSpecifications.flatMap((name) => {
@@ -505,7 +507,7 @@ const legacyToProductGroupAdditionalProperties = (
       toAdditionalPropertySpecification({
         name,
         value,
-        propertyID: specByGroup[name]
+        propertyID: specByGroup[name],
       })
     );
   });
@@ -678,6 +680,7 @@ export const legacyFacetToFilter = (
   term: string,
   behavior: "dynamic" | "static",
   ignoreCaseSelected?: boolean,
+  fullPath = false,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = term.replace(/^\//, "").split("/").slice(
@@ -697,7 +700,9 @@ export const legacyFacetToFilter = (
   // category2/123?map=c,productClusterIds -> DO NOT WORK
   // category1/category2/123?map=c,c,productClusterIds -> WORK
   const hasProductClusterIds = mapSegments.includes("productClusterIds");
-  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") ||
+  const hasToBeFullpath = fullPath ||
+    hasProductClusterIds ||
+    mapSegments.includes("ft") ||
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
@@ -795,6 +800,8 @@ export const legacyFacetToFilter = (
             map,
             term,
             behavior,
+            ignoreCaseSelected,
+            fullPath,
           )
           : undefined,
       };
