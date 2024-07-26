@@ -656,6 +656,7 @@ export type LegacyProduct = IProduct & {
   productTitle: string;
   items: LegacyItem[];
   allSpecifications: string[];
+  allSpecificationsGroups?: string[];
 };
 
 export type LegacyFacets = {

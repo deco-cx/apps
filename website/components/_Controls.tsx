@@ -12,7 +12,6 @@ interface Live {
   page?: Page;
   site: Site;
   flags: Flag[];
-  play: boolean;
   avoidRedirectingToEditor?: boolean;
 }
 
@@ -134,7 +133,6 @@ function LiveControls(
           page,
           site,
           flags,
-          play: !!context.play,
           avoidRedirectingToEditor,
         })}
       />

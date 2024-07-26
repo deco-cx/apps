@@ -1,5 +1,8 @@
 import type { Section } from "deco/blocks/section.ts";
 import { useSection } from "deco/hooks/useSection.ts";
+import { asResolved, isDeferred } from "deco/mod.ts";
+import { shouldForceRender } from "../../utils/deferred.ts";
+import { AppContext } from "../mod.ts";
 
 /**
  * @titleBy type
@@ -7,6 +10,8 @@ import { useSection } from "deco/hooks/useSection.ts";
  */
 interface Load {
   type: "load";
+  /** @hide true */
+  delay?: number;
 }
 
 /**
@@ -29,6 +34,8 @@ interface Intersect {
 
 export interface Props {
   sections: Section[];
+  /** @hide true */
+  fallbacks?: Section[];
   trigger?: Load | Revealed | Intersect;
   loading?: "lazy" | "eager";
 }
@@ -39,7 +46,7 @@ const Deferred = (props: Props) => {
   if (loading === "eager") {
     return (
       <>
-        {sections.map(({ Component, props }) => <Component {...props} />)}
+        {sections.map((section) => <section.Component {...section.props} />)}
       </>
     );
   }
@@ -48,26 +55,49 @@ const Deferred = (props: Props) => {
     props: { loading: "eager" },
   });
 
+  const triggerList: (string | number)[] = [trigger?.type ?? "load", "once"];
+  if (trigger?.type === "load" && trigger.delay !== undefined) {
+    triggerList.push(`delay:${trigger.delay}ms`);
+  }
+
   return (
-    <div
-      hx-get={href}
-      hx-trigger={`${trigger?.type ?? "load"} once`}
-      hx-target="closest section"
-      hx-swap="outerHTML"
-      style={{ height: "100vh" }}
-    />
+    <>
+      <div
+        hx-get={href}
+        hx-trigger={triggerList.join(" ")}
+        hx-target="closest section"
+        hx-swap="outerHTML"
+        style={{ height: "100vh" }}
+      />
+      {props.fallbacks?.map((section) =>
+        section ? <section.Component {...section.props} /> : null
+      )}
+    </>
   );
 };
 
-export const onBeforeResolveProps = (props: Props) => {
-  if (props.loading === "lazy") {
-    return {
-      ...props,
-      sections: [],
-    };
+export const loader = async (props: Props, req: Request, ctx: AppContext) => {
+  const url = new URL(req.url);
+  const shouldRender = props.loading === "eager" ||
+    shouldForceRender({ ctx, searchParams: url.searchParams });
+  if (shouldRender) {
+    const sections = isDeferred(props.sections)
+      ? await props.sections()
+      : props.sections;
+    return { ...props, sections, loading: "eager" };
   }
 
-  return props;
+  return { ...props, sections: [] };
+};
+
+const DEFERRED = true;
+
+export const onBeforeResolveProps = (props: Props) => {
+  return {
+    ...props,
+    fallback: null,
+    sections: asResolved(props.sections, DEFERRED),
+  };
 };
 
 export default Deferred;

@@ -486,14 +486,32 @@ const toBreadcrumbList = (
   };
 };
 
-const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
-  product.allSpecifications?.flatMap((name) => {
-    const values = (product as unknown as Record<string, string[]>)[name];
+const legacyToProductGroupAdditionalProperties = (
+  product: LegacyProductVTEX,
+) => {
+  const groups = product.allSpecificationsGroups ?? [];
+  const allSpecifications = product.allSpecifications ?? [];
 
+  const specByGroup: Record<string, string> = {};
+
+  groups.forEach((group) => {
+    const groupSpecs = (product as unknown as Record<string, string[]>)[group];
+    groupSpecs.forEach((specName) => {
+      specByGroup[specName] = group;
+    });
+  });
+
+  return allSpecifications.flatMap((name) => {
+    const values = (product as unknown as Record<string, string[]>)[name];
     return values.map((value) =>
-      toAdditionalPropertySpecification({ name, value })
+      toAdditionalPropertySpecification({
+        name,
+        value,
+        propertyID: specByGroup[name],
+      })
     );
-  }) ?? [];
+  });
+};
 
 const toProductGroupAdditionalProperties = (
   { specificationGroups = [] }: ProductVTEX,
