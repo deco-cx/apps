@@ -1,6 +1,6 @@
-import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { context } from "deco/live.ts";
+import { Head } from "deco/mod.ts";
 import type { Flag, Site } from "deco/types.ts";
 import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
 import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";

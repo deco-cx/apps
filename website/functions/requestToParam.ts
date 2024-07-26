@@ -20,8 +20,10 @@ const requestToParam: LoaderFunction<
   Props,
   RequestURLParam,
   FunctionContext
-> = (_req, ctx) => ({
-  data: ctx.params[ctx.state.$live.param || "slug"],
-});
+> = (_req, ctx) => {
+  return ({
+    data: ctx.params?.[ctx.state.$live.param || "slug"],
+  });
+};
 
 export default requestToParam;

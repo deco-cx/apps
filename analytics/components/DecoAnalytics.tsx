@@ -1,5 +1,5 @@
-import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { Head } from "deco/mod.ts";
 
 export interface Props {
   /**
