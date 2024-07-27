@@ -56,16 +56,13 @@ EmailJS is a service that allows developers to send emails directly from JavaScr
         e.preventDefault();
         
         await invoke.emailjs.actions.emails.send({
-          "service_id": "your_service_id",
-          "template_id": "your_template_id",
-          "user_id": "your_user_id",
-          "accessToken": "your_access_token",
-          "template_params": {
-            "name": "Name",
-            "subject": "Subject",
-            "email": "your-email@gmail.com",
-            "message": "Registered Email"
-          }
+          template_id: "your_template_id",
+          template_params: [
+            { key: "name", value: "Your name" },
+            { key: "subject", value: "Subject" },
+            { key: "email", value: "your-email@gmail.com" },
+            { key: "message", value: "Message" }
+          ]
         });
       }
 
