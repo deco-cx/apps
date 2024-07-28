@@ -1,4 +1,7 @@
-import { AppContext } from "../../mod.ts";
+import type { Place } from "../../../commerce/types.ts";
+import type { AppContext } from "../../mod.ts";
+import { toPlace } from "../../utils/transform.ts";
+import type { PickupPoint } from "../../utils/types.ts";
 
 interface Props {
   /**
@@ -19,7 +22,7 @@ export default async function loader(
   props: Props,
   _req: Request,
   ctx: AppContext,
-) {
+): Promise<Place[]> {
   const { geoCoordinates, postalCode, countryCode } = props;
   const { vcs } = ctx;
 
@@ -29,7 +32,15 @@ export default async function loader(
 
   const pickupPoints = await vcs
     ["GET /api/checkout/pub/pickup-points"](_props)
-    .then((r) => r.json());
+    .then((r) => r.json()) as {
+      paging: { page: number; pageSize: number; total: number; pages: number };
+      items: { distance: number; pickupPoint: PickupPoint }[];
+    };
 
-  return pickupPoints;
+  return pickupPoints.items?.map(({ distance, pickupPoint }) =>
+    toPlace({
+      distance,
+      ...pickupPoint,
+    })
+  ) ?? [];
 }
