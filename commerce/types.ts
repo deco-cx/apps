@@ -693,7 +693,7 @@ export interface Certification extends Omit<CreativeWork, "@type"> {
   validIn?: AdministrativeArea;
 }
 
-export interface Place extends Omit<Thing, "@type"> {
+export interface PlaceLeaf extends Omit<Thing, "@type"> {
   "@type": "Place";
   /** A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org. */
   additionalProperty?: PropertyValue[];
@@ -705,32 +705,10 @@ export interface Place extends Omit<Thing, "@type"> {
   amenityFeature?: LocationFeatureSpecification;
   /** A short textual code (also called "store code") that uniquely identifies a place of business. The code is typically assigned by the parentOrganization and used in structured URLs. */
   branchCode?: string;
-  /** The basic containment relation between a place and one that contains it. Supersedes containedIn. Inverse property: containsPlace. */
-  containedIn?: Place;
-  /** The basic containment relation between a place and another that it contains. Inverse property: containedInPlace. */
-  containedInPlace?: Place;
   /** Upcoming or past event associated with this place, organization, or action. */
   faxNumber?: string;
   /** The geo coordinates of the place. */
   geo?: GeoCoordinates | GeoShape;
-  /** Represents a relationship between two geometries (or the places they represent), relating a containing geometry to a contained geometry. "a contains b iff no points of b lie in the exterior of a, and at least one point of the interior of b lies in the interior of a". As defined in DE-9IM. */
-  geoContains?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that covers it. As defined in DE-9IM. */
-  geoCoveredBy?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that crosses it: for example, the union of two geometries. As defined in DE-9IM. */
-  geoCrosses?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that disjoints it: for example, a spit or cut in two geometries. As defined in DE-9IM. */
-  geoDisjoint?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that equals it: for example, a point marked by a sign or a symbol. As defined in DE-9IM. */
-  geoEquals?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that has as part(s) that overlap the subject geometry. As defined in DE-9IM. */
-  geoIntersects?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that is within it: for example, the region of spread out of a given geographical area. As defined in DE-9IM. */
-  geoOverlaps?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that covers it. As defined in DE-9IM. */
-  geoTouches?: Place;
-  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that lies on it. As defined in DE-9IM. */
-  geoWithin?: Place;
   /** The Global Location Number (GLN, sometimes also referred to as International Location Number or ILN) of the respective organization, person, or place. The GLN is a 13-digit number used to identify parties and physical locations. */
   globalLocationNumber?: string;
   /** Certification information about a product, organization, service, place or person. */
@@ -773,6 +751,32 @@ export interface Place extends Omit<Thing, "@type"> {
   telephone?: string;
   /** A page providing information on how to book a tour of some Place, such as an Accommodation or ApartmentComplex in a real estate setting, as well as other kinds of tours as appropriate. */
   tourBookingPage?: string;
+}
+
+/** Entities that have a somewhat fixed, physical extension. */
+export interface Place extends PlaceLeaf {
+  /** The basic containment relation between a place and one that contains it. Supersedes containedIn. Inverse property: containsPlace. */
+  containedIn?: PlaceLeaf;
+  /** The basic containment relation between a place and another that it contains. Inverse property: containedInPlace. */
+  containedInPlace?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a containing geometry to a contained geometry. "a contains b iff no points of b lie in the exterior of a, and at least one point of the interior of b lies in the interior of a". As defined in DE-9IM. */
+  geoContains?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that covers it. As defined in DE-9IM. */
+  geoCoveredBy?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that crosses it: for example, the union of two geometries. As defined in DE-9IM. */
+  geoCrosses?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that disjoints it: for example, a spit or cut in two geometries. As defined in DE-9IM. */
+  geoDisjoint?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that equals it: for example, a point marked by a sign or a symbol. As defined in DE-9IM. */
+  geoEquals?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that has as part(s) that overlap the subject geometry. As defined in DE-9IM. */
+  geoIntersects?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that is within it: for example, the region of spread out of a given geographical area. As defined in DE-9IM. */
+  geoOverlaps?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that covers it. As defined in DE-9IM. */
+  geoTouches?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that lies on it. As defined in DE-9IM. */
+  geoWithin?: PlaceLeaf;
 }
 
 export interface FilterToggleValue {
