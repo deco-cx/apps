@@ -609,17 +609,31 @@ export interface PageInfo {
   records?: number | undefined;
   recordPerPage?: number | undefined;
   pageTypes?: PageType[];
-  pagination: PaginationInfo;
+  pagination?: PaginationInfo;
 }
 
 export interface ProductListingPage {
-  "@type": "ProductListingPage";
+  "@type": "ItemList" | "ListItem";
+  position?: number;
+  item?: Product;
   breadcrumb: BreadcrumbList;
   filters: Filter[];
   products: Product[];
   pageInfo: PageInfo;
   sortOptions: SortOption[];
   seo?: Seo | null;
+}
+
+export interface ProductListingPageListItem {
+  "@type": "ListItem";
+  position?: number;
+  item: Product;
+}
+
+export interface BreadcrumbListPLP {
+  "@type": "BreadcrumbList";
+  itemListElement: ListItem[];
+  numberOfItems?: number;
 }
 
 export interface Seo {

@@ -378,7 +378,7 @@ const loader = async (
   const currentPage = page + currentPageoffset;
 
   return {
-    "@type": "ProductListingPage",
+    "@type": "ItemList",
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement,
