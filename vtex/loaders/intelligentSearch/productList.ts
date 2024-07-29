@@ -19,6 +19,7 @@ import {
   mapLabelledFuzzyToFuzzy,
 } from "./productListingPage.ts";
 import { sortProducts } from "../../utils/transform.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 
 /**
  * @title Collection ID
@@ -183,7 +184,10 @@ const fromProps = ({ props }: Props) => {
 
 const preferredSKU = (items: Item[], { props }: Props) => {
   const fetchedSkus = new Set((props as ProductIDProps).ids ?? []);
-  return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
+  if (fetchedSkus.size > 0) {
+    return items.find((item) => fetchedSkus.has(item.itemId)) || items[0];
+  }
+  return items.find(getFirstItemAvailable) || items[0];
 };
 
 /**

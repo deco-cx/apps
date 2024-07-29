@@ -10,6 +10,7 @@ import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
 import { getSetCookies } from "std/http/cookie.ts";
 import { ConnInfo } from "std/http/server.ts";
+import { __DECO_FBT } from "../../utils/deferred.ts";
 import { AppContext } from "../mod.ts";
 
 /**
@@ -50,7 +51,7 @@ export default function Fresh(
     const asJson = url.searchParams.get("asJson");
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
     const delay = Number(
-      url.searchParams.get("__decoFBT") ?? delayFromProps,
+      url.searchParams.get(__DECO_FBT) ?? delayFromProps,
     );
 
     /** Controller to abort third party fetch (loaders) */

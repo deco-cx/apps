@@ -58,7 +58,6 @@ async function loader(
       { ...params, slug: lowercaseSlug },
       { ...STALE, headers: withSegmentCookie(segment) },
     ).then((res) => res.json());
-
   if (response && !Array.isArray(response)) {
     throw new Error(
       `Error while fetching VTEX data ${JSON.stringify(response)}`,
@@ -99,7 +98,7 @@ async function loader(
       ? await withIsSimilarTo(req, ctx, page.product)
       : page.product,
     seo: {
-      title: product.productTitle,
+      title: product.productTitle || product.productName,
       description: product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
       noIndexing: props.indexingSkus ? false : !!skuId,

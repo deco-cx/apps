@@ -17,6 +17,7 @@ export interface State {
 
 /**
  * @title Anthropic
+ * @description Interact with the Anthropic API.
  */
 export default function App(state: Props): App<Manifest, State> {
   const getToken = state?.apiKey?.get;
