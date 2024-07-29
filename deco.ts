@@ -14,6 +14,7 @@ const config = {
     app("ra-trustvox"),
     app("anthropic"),
     app("resend"),
+    app("emailjs"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
