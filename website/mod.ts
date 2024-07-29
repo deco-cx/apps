@@ -1,15 +1,15 @@
 import "./utils/unhandledRejection.ts";
 
+import { Matcher } from "deco/blocks/matcher.ts";
+import { Page } from "deco/blocks/page.tsx";
 import { Section } from "deco/blocks/section.ts";
 import type { App, FnContext } from "deco/mod.ts";
 import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { Page } from "deco/blocks/page.tsx";
 import { TextReplace } from "./handlers/proxy.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import { Script } from "./types.ts";
-import { Matcher } from "deco/blocks/matcher.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -79,20 +79,17 @@ export interface Props {
    */
   routes?: Routes[];
 
-  /** @title Seo */
-  seo?: Omit<
-    Seo,
-    "jsonLDs" | "canonical"
-  >;
-  /**
-   * @title Theme
-   */
-  theme?: Section;
   /**
    * @title Global Sections
-   * @description These sections will be included on all website/pages/Page.ts
+   * @description These sections run once on the start of the website and will be included on the start of each page
    */
   global?: Section[];
+
+  /**
+   * @title Page Sections
+   * @description These sections will be included on each page
+   */
+  pageSections?: Section[];
 
   /**
    * @title Error Page
@@ -107,8 +104,9 @@ export interface Props {
   caching?: Caching;
 
   /**
-   * @title Async Rendering
-   * @description Async sections will be deferred to the client-side
+   * @title Global Async Rendering (Deprecated)
+   * @description Please disable this setting and enable each section individually. More info at https://deco.cx/en/blog/async-render-default
+   * @deprecated true
    * @default false
    */
   firstByteThresholdMS?: boolean;
@@ -130,6 +128,17 @@ export interface Props {
    * @description The flavor of the website
    */
   flavor?: Fresh | HTMX;
+
+  /** @title Seo */
+  seo?: Omit<
+    Seo,
+    "jsonLDs" | "canonical"
+  >;
+
+  /**
+   * @title Theme
+   */
+  theme?: Section;
 
   // We are hiding this prop because it is in testing phase
   // after that, probably we will remove this prop and default will be true
@@ -238,13 +247,21 @@ const deferPropsResolve = (routes: Routes): Routes => {
 };
 
 export const onBeforeResolveProps = <
-  T extends { routes?: Routes[]; errorPage?: Page; abTesting: AbTesting },
+  T extends {
+    routes?: Routes[];
+    errorPage?: Page;
+    abTesting: AbTesting;
+    pageSections?: Section[];
+  },
 >(
   props: T,
 ): T => {
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
+      pageSections: props.pageSections?.map((section) =>
+        asResolved(section, false)
+      ),
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
         : undefined,

@@ -26,15 +26,21 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
   const title = renderTemplateString(
     titleTemplate,
-    titleProp || jsonLD?.seo?.title || "",
+    titleProp || jsonLD?.seo?.title || ""
   );
   const description = renderTemplateString(
     descriptionTemplate,
-    descriptionProp || jsonLD?.seo?.description || "",
+    descriptionProp || jsonLD?.seo?.description || ""
   );
   const image = jsonLD?.post.image;
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
+
+  // Some HTML can break the meta tag
+  const jsonLDWithoutContent = {
+    ...jsonLD,
+    post: { ...jsonLD?.post, content: undefined },
+  };
 
   return {
     ...seoSiteProps,
@@ -43,7 +49,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     image,
     canonical,
     noIndexing,
-    jsonLDs: [jsonLD],
+    jsonLDs: [jsonLDWithoutContent],
   };
 }
 
