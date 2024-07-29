@@ -45,7 +45,7 @@ import * as $$$8 from "./loaders/proxy.ts";
 import * as $$$9 from "./loaders/recommendations.ts";
 import * as $$$10 from "./loaders/shop.ts";
 import * as $$$11 from "./loaders/suggestion.ts";
-import * as $$$12 from "./loaders/useCustomCheckout.ts";
+import * as $$$12 from "./loaders/headlessCheckout.ts";
 import * as $$$13 from "./loaders/user.ts";
 import * as $$$14 from "./loaders/userAddresses.ts";
 import * as $$$15 from "./loaders/wishlist.ts";
@@ -64,7 +64,7 @@ const manifest = {
     "wake/loaders/recommendations.ts": $$$9,
     "wake/loaders/shop.ts": $$$10,
     "wake/loaders/suggestion.ts": $$$11,
-    "wake/loaders/useCustomCheckout.ts": $$$12,
+    "wake/loaders/headlessCheckout.ts": $$$12,
     "wake/loaders/user.ts": $$$13,
     "wake/loaders/userAddresses.ts": $$$14,
     "wake/loaders/wishlist.ts": $$$15,

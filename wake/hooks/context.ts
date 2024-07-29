@@ -75,10 +75,10 @@ const enqueue2 = (
   queue2 = queue2.then(async () => {
     try {
       const { shop } = await cb(controller.signal);
-      const useCustomCheckout = await invoke.wake.loaders.useCustomCheckout();
+      const headlessCheckout = await invoke.wake.loaders.headlessCheckout();
       const isLocalhost = window.location.hostname === "localhost";
 
-      if (!isLocalhost && !useCustomCheckout) {
+      if (!isLocalhost && !headlessCheckout) {
         const url = new URL("/api/carrinho", shop.checkoutUrl);
 
         const { Id } = await fetch(url, { credentials: "include" }).then((r) =>

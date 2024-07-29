@@ -12,9 +12,9 @@ const authenticate = async (
   req: Request,
   ctx: AppContext,
 ): Promise<string | null> => {
-  const { checkoutApi, useCustomCheckout } = ctx;
+  const { checkoutApi, headlessCheckout } = ctx;
 
-  if (useCustomCheckout) {
+  if (headlessCheckout) {
     const headers = parseHeaders(req.headers);
     const cookies = getCookies(req.headers);
     const customerToken = cookies.customerToken;
@@ -49,7 +49,7 @@ const authenticate = async (
   const loginCookie = getUserCookie(req.headers);
   if (!loginCookie) return null;
 
-  if (useCustomCheckout) return loginCookie;
+  if (headlessCheckout) return loginCookie;
 
   const data = await checkoutApi["GET /api/Login/Get"](
     {},

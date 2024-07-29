@@ -44,17 +44,16 @@ export interface Props {
   platform: "wake";
 
   /**
-   * @title Use Custom Checkout
    * @description Use wake headless api for checkout
    */
-  useCustomCheckout?: boolean;
+  headlessCheckout?: boolean;
 }
 
 export interface State extends Props {
   api: ReturnType<typeof createHttpClient<OpenAPI>>;
   checkoutApi: ReturnType<typeof createHttpClient<CheckoutApi>>;
   storefront: ReturnType<typeof createGraphqlClient>;
-  useCustomCheckout: boolean;
+  headlessCheckout: boolean;
 }
 
 export const color = 0xb600ee;
@@ -71,7 +70,7 @@ export default function App(props: Props): App<Manifest, State> {
     storefrontToken,
     account,
     checkoutUrl,
-    useCustomCheckout = false,
+    headlessCheckout = false,
   } = props;
 
   if (!token || !storefrontToken) {
@@ -105,7 +104,7 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  state = { ...props, api, storefront, checkoutApi, useCustomCheckout };
+  state = { ...props, api, storefront, checkoutApi, headlessCheckout };
 
   return {
     state,
