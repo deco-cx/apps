@@ -66,6 +66,17 @@ export type OptinNewsLetter = boolean
 
 export interface OpenAPI {
 /**
+ * Retrieves information about [pickup points](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) of your store.
+ * 
+ * >⚠️ The response is limited to 1.000 pickup points. If you need more than 1000 results, you can use the [List paged pickup points](https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/configuration/pickuppoints/_search) endpoint.
+ */
+"GET /api/logistics/pvt/configuration/pickuppoints": {
+/**
+ * List of pickup points, limited to 1.000 pickup points. If you need more than 1000 results, you can use the [List paged pickup points](https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/configuration/pickuppoints/_search) endpoint.
+ */
+response: PickupPoint[]
+}
+/**
  * Retrieves the IDs of products and SKUs. 
  * > 📘 Onboarding guide 
  * >
@@ -16834,6 +16845,133 @@ postalCode?: string
  */
 countryCode?: string
 }
+response: {
+/**
+ * Paging.
+ */
+paging?: {
+/**
+ * Page number.
+ */
+page?: number
+/**
+ * Page size.
+ */
+pageSize?: number
+/**
+ * Total pages.
+ */
+total?: number
+/**
+ * Pages.
+ */
+pages?: number
+}
+/**
+ * Items.
+ */
+items?: {
+/**
+ * Distance.
+ */
+distance?: number
+/**
+ * Pickup point.
+ */
+pickupPoint?: {
+/**
+ * Friendly name.
+ */
+friendlyName?: string
+/**
+ * Address.
+ */
+address?: {
+/**
+ * Address type.
+ */
+addressType?: string
+/**
+ * Receiver name.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Is disposable.
+ */
+isDisposable?: boolean
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City.
+ */
+city?: string
+/**
+ * State.
+ */
+state?: string
+/**
+ * Country.
+ */
+country?: string
+/**
+ * Street.
+ */
+street?: string
+/**
+ * Number.
+ */
+number?: string
+/**
+ * Neighborhood.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Racao.
+ */
+reference?: string
+/**
+ * Geo coordinates.
+ */
+geoCoordinates?: number[]
+}
+/**
+ * Additional info.
+ */
+additionalInfo?: string
+/**
+ * ID.
+ */
+id?: string
+/**
+ * Array with business hours.
+ */
+businessHours?: {
+/**
+ * Day of week.
+ */
+DayOfWeek?: number
+/**
+ * Opening time.
+ */
+OpeningTime?: string
+/**
+ * Closing time.
+ */
+ClosingTime?: string
+}[]
+}
+}[]
+}
 }
 /**
  * Retrieves address information for a given postal code and country.
@@ -18460,6 +18598,168 @@ logo?: (null | string)
 }[]
 }
 }
+}
+/**
+ * Pickup point information.
+ */
+export interface PickupPoint {
+/**
+ * [Pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) ID.
+ */
+id?: string
+/**
+ * Pickup point name displayed to customers at checkout.
+ */
+name?: string
+/**
+ * Pickup point description displayed to customers at checkout.
+ */
+description?: string
+/**
+ * Instructions for customers when collecting their package.
+ */
+instructions?: string
+/**
+ * Formatted address.
+ */
+formatted_address?: string
+/**
+ * Pickup point address information.
+ */
+address?: {
+/**
+ * Pickup point address postal code.
+ */
+postalCode?: string
+/**
+ * Information about the pickup point address country.
+ */
+country?: {
+/**
+ * Three-digit country code of the pickup point address, in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+acronym?: string
+/**
+ * Country name of the pickup point address.
+ */
+name?: string
+}
+/**
+ * Pickup point address city.
+ */
+city?: string
+/**
+ * Pickup point address state.
+ */
+state?: string
+/**
+ * Pickup point address neighborhood.
+ */
+neighborhood?: string
+/**
+ * Pickup point address street.
+ */
+street?: string
+/**
+ * Pickup point address number.
+ */
+number?: string
+/**
+ * Pickup point address complement.
+ */
+complement?: string
+/**
+ * Reference point to help the customer find the pickup point.
+ */
+reference?: string
+/**
+ * Pickup point address geolocation coordinates.
+ */
+location?: {
+/**
+ * Latitude coordinate.
+ */
+latitude?: number
+/**
+ * Longitude coordinate.
+ */
+longitude?: number
+}
+}
+/**
+ * Defines if the pickup point is active (`true`) or inactive (`false`).
+ */
+isActive?: boolean
+/**
+ * Pickup point configured distance.
+ */
+distance?: number
+/**
+ * Seller that corresponds to the pickup point.
+ */
+seller?: string
+/**
+ * Sort array.
+ */
+_sort?: number[]
+/**
+ * Pickup point business hours configurations.
+ */
+businessHours?: {
+/**
+ * Day of the week identification, as in `1` = Monday, `2` = Tuesday, `3` = Wednesday, `4` = Thursday, and `5` = Friday.
+ */
+dayOfWeek?: number
+/**
+ * Opening time in `HH:MM:SS` format.
+ */
+openingTime?: string
+/**
+ * Closing time in `HH:MM:SS` format.
+ */
+closingTime?: string
+}[]
+/**
+ * Tags that identify a group of pickup points.
+ */
+tagsLabel?: string[]
+/**
+ * [Holidays](https://help.vtex.com/en/tutorial/registering-holidays--2ItOthSEAoyAmcwsuiO6Yk) configured for the pickup point.
+ */
+pickupHolidays?: {
+/**
+ * Holiday date and time, in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ss.ssZ`.
+ */
+date?: string
+/**
+ * Holiday beginning time in `HH:MM` format.
+ */
+hourBegin?: string
+/**
+ * Holiday ending time in `HH:MM` format.
+ */
+hourEnd?: string
+}[]
+/**
+ * Defines if the pickup point is third-party (`true`) or not (`false`).
+ */
+isThirdPartyPickup?: boolean
+/**
+ * Account owner name.
+ */
+accountOwnerName?: string
+/**
+ * Account owner ID.
+ */
+accountOwnerId?: string
+/**
+ * Parent account name.
+ */
+parentAccountName?: string
+/**
+ * Original ID.
+ */
+originalId?: string
 }
 export interface GetorUpdateProductSpecification {
 /**

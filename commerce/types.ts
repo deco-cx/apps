@@ -523,6 +523,262 @@ export interface BreadcrumbList extends Omit<ItemList, "@type"> {
   "@type": "BreadcrumbList";
 }
 
+export type DayOfWeek =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday"
+  | "PublicHolidays";
+
+export interface OpeningHoursSpecification extends Omit<Thing, "@type"> {
+  "@type": "OpeningHoursSpecification";
+  /** The closing hour of the place or service on the given day(s) of the week. */
+  closes?: string;
+  /** The day of the week for which these opening hours are valid. */
+  dayOfWeek?: DayOfWeek;
+  /** The opening hour of the place or service on the given day(s) of the week. */
+  opens?: string;
+  /** The date when the item becomes valid. */
+  validFrom?: string;
+  /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
+  validThrough?: string;
+}
+
+export interface ContactPoint extends Omit<Thing, "@type"> {
+  "@type": "ContactPoint";
+  /** The geographic area where a service or offered item is provided. */
+  areaServed?: string;
+  /** The language of the content or performance or used in an action. Please use one of the language codes from the IETF BCP 47 standard. See also availableLanguage. */
+  availableLanguage?: string;
+  /** An option available on this contact point (e.g. a toll-free number or support for hearing-impaired callers). */
+  contactOption?: "TollFree" | "HearingImpairedSupported";
+  /** A person or organization can have different contact points, for different purposes. For example, a sales contact point, a PR contact point and so on. This property is used to specify the kind of contact point. */
+  contactType?: string;
+  /** Email address. */
+  email?: string;
+  /** The fax number. */
+  faxNumber?: string;
+  /** The hours during which this service or contact is available. */
+  hoursAvailable?: OpeningHoursSpecification;
+  /** The product or service this support contact point is related to (such as product support for a particular product line). This can be a specific product or product line (e.g. "iPhone") or a general category of products or services (e.g. "smartphones"). */
+  productSupported?: string;
+  /** The telephone number. */
+  telephone?: string;
+}
+
+export interface PostalAddress extends Omit<ContactPoint, "@type"> {
+  "@type": "PostalAddress";
+  /** The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code. */
+  addressCountry?: string;
+  /** The locality in which the street address is, and which is in the region. For example, Mountain View. */
+  addressLocality?: string;
+  /** The region in which the locality is, and which is in the country. For example, California. */
+  addressRegion?: string;
+  /** The postal code. For example, 94043. */
+  postalCode?: string;
+  /** The street address. For example, 1600 Amphitheatre Pkwy. */
+  streetAddress?: string;
+}
+
+export interface LocationFeatureSpecification
+  extends Omit<PropertyValue, "@type"> {
+  "@type": "LocationFeatureSpecification";
+  /** The hours during which this service or contact is available. */
+  hoursAvailable?: OpeningHoursSpecification;
+  /** The date when the item becomes valid. */
+  validFrom?: string;
+  /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
+  validThrough?: string;
+}
+
+export interface GeoCoordinates extends Omit<Thing, "@type"> {
+  "@type": "GeoCoordinates";
+  /** The geographic area where a service or offered item is provided. */
+  address?: PostalAddress;
+  /** The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code. */
+  addressCountry?: string;
+  /** The elevation of a location (WGS 84). Values may be of the form 'NUMBER UNIT_OF_MEASUREMENT' (e.g., '1,000 m', '3,200 ft') while numbers alone should be assumed to be a value in meters. */
+  elevation?: number;
+  /** The latitude of a location. For example 37.42242 (WGS 84). */
+  latitude?: number;
+  /** The longitude of a location. For example -122.08585 (WGS 84). */
+  longitude?: number;
+  /** The postal code. For example, 94043. */
+  postalCode?: string;
+}
+
+export interface GeoShape extends Omit<Thing, "@type"> {
+  "@type": "GeoShape";
+  /** The GeoShape for the GeoCoordinates or GeoCircle. */
+  box?: string;
+  /** The GeoShape for the GeoCoordinates or GeoCircle. */
+  circle?: string;
+  /** The elevation of a location (WGS 84). Values may be of the form 'NUMBER UNIT_OF_MEASUREMENT' (e.g., '1,000 m', '3,200 ft') while numbers alone should be assumed to be a value in meters. */
+  elevation?: number;
+  /** A line is a point-to-point path consisting of two or more points. A line is expressed as a series of two or more point objects separated by space. */
+  line?: string;
+  /** The GeoShape for the GeoCoordinates or GeoCircle. */
+  polygon?: string;
+  /** The postal code. For example, 94043. */
+  postalCode?: string;
+}
+
+export interface About extends Omit<Thing, "@type"> {
+  "@type": "About";
+}
+
+export interface Rating extends Omit<Thing, "@type"> {
+  "@type": "Rating";
+  /** The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably. */
+  author?: Person;
+  /** The highest value allowed in this rating system. */
+  bestRating?: number;
+  /** 	A short explanation (e.g. one to two sentences) providing background context and other information that led to the conclusion expressed in the rating. This is particularly applicable to ratings associated with "fact check" markup using ClaimReview. */
+  ratingExplanation?: string;
+  /**
+   * The rating for the content.
+   * Usage guidelines:
+   *
+   * Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similar Unicode symbols.
+   *
+   * Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.
+   */
+  ratingValue?: number;
+  /** This Review or Rating is relevant to this part or facet of the itemReviewed. */
+  reviewAspect?: string;
+  /** The lowest value allowed in this rating system. */
+  worstRating?: number;
+}
+
+export interface Organization extends Omit<Thing, "@type"> {
+  "@type": "Organization";
+}
+
+export interface AdministrativeArea extends Omit<Thing, "@type"> {
+  "@type": "AdministrativeArea";
+}
+
+export type CertificationStatus =
+  | "CertificationActive"
+  | "CertificationInactive";
+
+export interface Certification extends Omit<CreativeWork, "@type"> {
+  "@type": "Certification";
+  /** The subject matter of the content. */
+  about?: About;
+  /** Date when a certification was last audited. */
+  auditData?: string;
+  /** Identifier of a certification instance (as registered with an independent certification body). Typically this identifier can be used to consult and verify the certification instance. */
+  certificationIdentification?: string;
+  /** 	Rating of a certification instance (as defined by an independent certification body). Typically this rating can be used to rate the level to which the requirements of the certification instance are fulfilled. */
+  certificationRating?: Rating;
+  /** Indicates the current status of a certification: active or inactive. */
+  certificationStatus?: CertificationStatus;
+  /** Date of first publication or broadcast. For example the date a CreativeWork was broadcast or a Certification was issued. */
+  datePublished?: string;
+  /** Date the content expires and is no longer useful or available. For example a VideoObject or NewsArticle whose availability or relevance is time-limited, a ClaimReview fact check whose publisher wants to indicate that it may no longer be relevant (or helpful to highlight) after some date, or a Certification the validity has expired. */
+  expires?: string;
+  /** A measurement of an item, For example, the inseam of pants, the wheel size of a bicycle, the gauge of a screw, or the carbon footprint measured for certification by an authority. Usually an exact measurement, but can also be a range of measurements for adjustable products, for example belts and ski bindings. */
+  hasMeasurement?: QuantitativeValue;
+  /** The organization issuing the item, for example a Permit, Ticket, or Certification. */
+  issuedBy?: Organization;
+  /** An associated logo. */
+  logo?: ImageObject;
+  /** The date when the item becomes valid. */
+  validFrom?: string;
+  /** The geographic area where the item is valid. Applies for example to a Permit, a Certification, or an EducationalOccupationalCredential. */
+  validIn?: AdministrativeArea;
+}
+
+export interface PlaceLeaf extends Omit<Thing, "@type"> {
+  "@type": "Place";
+  /** A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org. */
+  additionalProperty?: PropertyValue[];
+  /** Physical address of the item. */
+  address?: PostalAddress;
+  /** The overall rating, based on a collection of reviews or ratings, of the item. */
+  aggregateRating?: AggregateRating;
+  /** An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs. */
+  amenityFeature?: LocationFeatureSpecification;
+  /** A short textual code (also called "store code") that uniquely identifies a place of business. The code is typically assigned by the parentOrganization and used in structured URLs. */
+  branchCode?: string;
+  /** Upcoming or past event associated with this place, organization, or action. */
+  faxNumber?: string;
+  /** The geo coordinates of the place. */
+  geo?: GeoCoordinates | GeoShape;
+  /** The Global Location Number (GLN, sometimes also referred to as International Location Number or ILN) of the respective organization, person, or place. The GLN is a 13-digit number used to identify parties and physical locations. */
+  globalLocationNumber?: string;
+  /** Certification information about a product, organization, service, place or person. */
+  hasCertification?: Certification;
+  /** Indicates whether some facility offers the service that can be used by driving through in a car */
+  hasDriveThroughService?: boolean;
+  /** The GS1 digital link associated with the object. This URL should conform to the particular requirements of digital links. The link should only contain the Application Identifiers (AIs) that are relevant for the entity being annotated, for instance a Product or an Organization, and for the correct granularity. */
+  hasDigitalLink?: string;
+  /** A URL to a map of the place. Supersedes maps, map. */
+  hasMap?: string;
+  /** A flag to signal that the item, event, or place is accessible for free. Supersedes free. */
+  isAccessibleForFree?: boolean;
+  /** The International Standard of Industrial Classification of All Economic Activities (ISIC), Revision 4 code for a particular organization, business person, or place. */
+  isicV4?: string;
+  /** Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property. */
+  keywords?: string;
+  /** The latitude of a location. For example 37.42242 (WGS 84). */
+  latitude?: number;
+  /** An associated logo. */
+  logo?: ImageObject;
+  /** The longitude of a location. For example -122.08585 (WGS 84). */
+  longitude?: number;
+  /** The total number of individuals that may attend an event or venue. */
+  maximumAttendeeCapacity?: number;
+  /** The opening hours of a certain place. */
+  openingHoursSpecification?: OpeningHoursSpecification[];
+  /** A photograph of this place. */
+  photo?: ImageObject;
+  /** A flag to signal that the Place is open to public visitors. If this property is omitted there is no assumed default boolean value. */
+  publicAccess?: boolean;
+  /** A review of the item. */
+  review?: Review;
+  /** A slogan or motto associated with the item. */
+  slogan?: string;
+  /** Indicates whether it is allowed to smoke in the place, e.g. in the restaurant, hotel or hotel room. */
+  smokingAllowed?: boolean;
+  /** The special opening hours of a certain place. */
+  specialOpeningHoursSpecification?: OpeningHoursSpecification[];
+  /** The telephone number. */
+  telephone?: string;
+  /** A page providing information on how to book a tour of some Place, such as an Accommodation or ApartmentComplex in a real estate setting, as well as other kinds of tours as appropriate. */
+  tourBookingPage?: string;
+}
+
+/** Entities that have a somewhat fixed, physical extension. */
+export interface Place extends PlaceLeaf {
+  /** The basic containment relation between a place and one that contains it. Supersedes containedIn. Inverse property: containsPlace. */
+  containedIn?: PlaceLeaf;
+  /** The basic containment relation between a place and another that it contains. Inverse property: containedInPlace. */
+  containedInPlace?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a containing geometry to a contained geometry. "a contains b iff no points of b lie in the exterior of a, and at least one point of the interior of b lies in the interior of a". As defined in DE-9IM. */
+  geoContains?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that covers it. As defined in DE-9IM. */
+  geoCoveredBy?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that crosses it: for example, the union of two geometries. As defined in DE-9IM. */
+  geoCrosses?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that disjoints it: for example, a spit or cut in two geometries. As defined in DE-9IM. */
+  geoDisjoint?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that equals it: for example, a point marked by a sign or a symbol. As defined in DE-9IM. */
+  geoEquals?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that has as part(s) that overlap the subject geometry. As defined in DE-9IM. */
+  geoIntersects?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that is within it: for example, the region of spread out of a given geographical area. As defined in DE-9IM. */
+  geoOverlaps?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that covers it. As defined in DE-9IM. */
+  geoTouches?: PlaceLeaf;
+  /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that lies on it. As defined in DE-9IM. */
+  geoWithin?: PlaceLeaf;
+}
+
 export interface FilterToggleValue {
   quantity: number;
   label: string;
