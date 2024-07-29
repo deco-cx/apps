@@ -20,6 +20,13 @@ const loader = async (
       count: 6,
     });
 
+  if (suggestions?.products?.length === 0) {
+    return [{
+      value: "No products found, use search",
+      label: "No products found, use search",
+    }];
+  }
+
   return suggestions?.products?.map((product) => ({
     value: `${product.productID}`,
     label: `${product.productID} - ${product.name}`,
