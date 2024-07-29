@@ -17,7 +17,7 @@ const loader = async (
   const suggestions = await ctx.invoke.vtex.loaders.intelligentSearch
     .suggestions({
       query: props.term || "",
-      count: 6,
+      count: 10,
     });
 
   if (suggestions?.products?.length === 0) {
