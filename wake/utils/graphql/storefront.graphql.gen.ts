@@ -40,7 +40,7 @@ export type AddPriceAlertInput = {
   name: Scalars['String']['input'];
   /** The product variant id to create the price alert. */
   productVariantId: Scalars['Long']['input'];
-  /** The google recaptcha token. */
+  /** [Deprecated: use the root field] The google recaptcha token. */
   recaptchaToken?: InputMaybe<Scalars['String']['input']>;
   /** The target price to alert. */
   targetPrice: Scalars['Decimal']['input'];
@@ -389,10 +389,14 @@ export type BuyList = Node & {
   addToCartFromSpot?: Maybe<Scalars['Boolean']['output']>;
   /** The product url alias. */
   alias?: Maybe<Scalars['String']['output']>;
+  /** The complete product url alias. */
+  aliasComplete?: Maybe<Scalars['String']['output']>;
   /** Information about the possible selection attributes. */
   attributeSelections?: Maybe<AttributeSelection>;
   /** List of the product attributes. */
   attributes?: Maybe<Array<Maybe<ProductAttribute>>>;
+  /** The product author. */
+  author?: Maybe<Scalars['String']['output']>;
   /** Field to check if the product is available in stock. */
   available?: Maybe<Scalars['Boolean']['output']>;
   /** The product average rating. From 0 to 5. */
@@ -405,16 +409,22 @@ export type BuyList = Node & {
   buyListProducts?: Maybe<Array<Maybe<BuyListProduct>>>;
   /** Buy together products. */
   buyTogether?: Maybe<Array<Maybe<SingleProduct>>>;
+  /** Buy together groups products. */
+  buyTogetherGroups?: Maybe<Array<Maybe<BuyTogetherGroup>>>;
   /** The product collection. */
   collection?: Maybe<Scalars['String']['output']>;
   /** The product condition. */
   condition?: Maybe<Scalars['String']['output']>;
+  /** Checks if the product allows counteroffers. */
+  counterOffer?: Maybe<Scalars['Boolean']['output']>;
   /** The product creation date. */
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   /** A list of customizations available for the given products. */
   customizations?: Maybe<Array<Maybe<Customization>>>;
   /** The product delivery deadline. */
   deadline?: Maybe<Scalars['Int']['output']>;
+  /** Product deadline alert informations. */
+  deadlineAlert?: Maybe<DeadlineAlert>;
   /** Check if the product should be displayed. */
   display?: Maybe<Scalars['Boolean']['output']>;
   /** Check if the product should be displayed only for partners. */
@@ -425,14 +435,23 @@ export type BuyList = Node & {
   ean?: Maybe<Scalars['String']['output']>;
   /** Check if the product offers free shipping. */
   freeShipping?: Maybe<Scalars['Boolean']['output']>;
+  /** The product gender. */
+  gender?: Maybe<Scalars['String']['output']>;
+  /** The height of the product. */
+  height?: Maybe<Scalars['Float']['output']>;
   /** The node unique identifier. */
   id?: Maybe<Scalars['ID']['output']>;
   /** List of the product images. */
   images?: Maybe<Array<Maybe<Image>>>;
   /** List of the product insformations. */
   informations?: Maybe<Array<Maybe<Information>>>;
+  kit: Scalars['Boolean']['output'];
+  /** The length of the product. */
+  length?: Maybe<Scalars['Float']['output']>;
   /** Check if its the main variant. */
   mainVariant?: Maybe<Scalars['Boolean']['output']>;
+  /** The product maximum quantity for an order. */
+  maximumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   /** The product minimum quantity for an order. */
   minimumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   /** Check if the product is a new release. */
@@ -453,12 +472,17 @@ export type BuyList = Node & {
   productId?: Maybe<Scalars['Long']['output']>;
   /** The product name. */
   productName?: Maybe<Scalars['String']['output']>;
-  /** Summarized informations about the subscription of the product. */
+  /**
+   * Summarized informations about the subscription of the product.
+   * @deprecated Use subscriptionGroups to get subscription information.
+   */
   productSubscription?: Maybe<ProductSubscription>;
   /** Variant unique identifier. */
   productVariantId?: Maybe<Scalars['Long']['output']>;
   /** List of promotions this product belongs to. */
   promotions?: Maybe<Array<Maybe<Promotion>>>;
+  /** The product publisher */
+  publisher?: Maybe<Scalars['String']['output']>;
   /** List of customer reviews for this product. */
   reviews?: Maybe<Array<Maybe<Review>>>;
   /** The product seller. */
@@ -475,7 +499,7 @@ export type BuyList = Node & {
   spotInformation?: Maybe<Scalars['String']['output']>;
   /** Check if the product is on spotlight. */
   spotlight?: Maybe<Scalars['Boolean']['output']>;
-  /** The available stock at the default distribution center. */
+  /** The available aggregated product stock (all variants) at the default distribution center. */
   stock?: Maybe<Scalars['Long']['output']>;
   /** List of the product stocks on different distribution centers. */
   stocks?: Maybe<Array<Maybe<Stock>>>;
@@ -491,6 +515,10 @@ export type BuyList = Node & {
   variantName?: Maybe<Scalars['String']['output']>;
   /** The available aggregated variant stock at the default distribution center. */
   variantStock?: Maybe<Scalars['Long']['output']>;
+  /** The weight of the product. */
+  weight?: Maybe<Scalars['Float']['output']>;
+  /** The width of the product. */
+  width?: Maybe<Scalars['Float']['output']>;
 };
 
 
@@ -502,9 +530,25 @@ export type BuyListImagesArgs = {
 
 /** Contains the id and quantity of a product in the buy list. */
 export type BuyListProduct = {
+  includeSameParent: Scalars['Boolean']['output'];
+  price?: Maybe<Scalars['Decimal']['output']>;
   productId: Scalars['Long']['output'];
   quantity: Scalars['Int']['output'];
 };
+
+/** BuyTogetherGroups informations. */
+export type BuyTogetherGroup = {
+  /** BuyTogether name */
+  name?: Maybe<Scalars['String']['output']>;
+  /** BuyTogether products */
+  products?: Maybe<Array<Maybe<SingleProduct>>>;
+  /** BuyTogether type */
+  type: BuyTogetherType;
+};
+
+export type BuyTogetherType =
+  | 'CAROUSEL'
+  | 'PRODUCT';
 
 /** The products to calculate prices. */
 export type CalculatePricesProductsInput = {
@@ -586,21 +630,35 @@ export type CategorySortKeys =
 export type Checkout = Node & {
   /** The CEP. */
   cep?: Maybe<Scalars['Int']['output']>;
+  /** Indicates if the checking account is being used. */
+  checkingAccountActive: Scalars['Boolean']['output'];
+  /** Total used from checking account. */
+  checkingAccountValue?: Maybe<Scalars['Decimal']['output']>;
   /** The checkout unique identifier. */
   checkoutId: Scalars['Uuid']['output'];
   /** Indicates if the checkout is completed. */
   completed: Scalars['Boolean']['output'];
   /** The coupon for discounts. */
   coupon?: Maybe<Scalars['String']['output']>;
+  /** The total coupon discount applied at checkout. */
+  couponDiscount: Scalars['Decimal']['output'];
   /** The customer associated with the checkout. */
   customer?: Maybe<CheckoutCustomer>;
+  /** The total value of customizations added to the products. */
+  customizationValue: Scalars['Decimal']['output'];
+  /** The discount applied at checkout excluding any coupons. */
+  discount: Scalars['Decimal']['output'];
   /** The node unique identifier. */
   id?: Maybe<Scalars['ID']['output']>;
+  /** A list of kits associated with the checkout. */
+  kits?: Maybe<Array<Maybe<CheckoutKit>>>;
   login?: Maybe<Scalars['String']['output']>;
   /** The metadata related to this checkout. */
   metadata?: Maybe<Array<Maybe<Metadata>>>;
   /** The checkout orders informations. */
   orders?: Maybe<Array<Maybe<CheckoutOrder>>>;
+  /** The additional fees applied based on the payment method. */
+  paymentFees: Scalars['Decimal']['output'];
   /** A list of products associated with the checkout. */
   products?: Maybe<Array<Maybe<CheckoutProductNode>>>;
   /** The selected delivery address for the checkout. */
@@ -609,12 +667,16 @@ export type Checkout = Node & {
   selectedPaymentMethod?: Maybe<SelectedPaymentMethod>;
   /** Selected Shipping. */
   selectedShipping?: Maybe<ShippingNode>;
+  /** Selected shipping quote groups. */
+  selectedShippingGroups?: Maybe<Array<Maybe<CheckoutShippingQuoteGroupNode>>>;
   /** The shipping fee. */
   shippingFee: Scalars['Decimal']['output'];
   /** The subtotal value. */
   subtotal: Scalars['Decimal']['output'];
   /** The total value. */
   total: Scalars['Decimal']['output'];
+  /** The total discount applied at checkout. */
+  totalDiscount: Scalars['Decimal']['output'];
   /** The last update date. */
   updateDate: Scalars['DateTime']['output'];
   /** Url for the current checkout id. */
@@ -645,14 +707,12 @@ export type CheckoutAddress = {
 
 /** Represents a customer node in the checkout. */
 export type CheckoutCustomer = {
+  /** Customer's checking account balance. */
+  checkingAccountBalance?: Maybe<Scalars['Decimal']['output']>;
   /** Taxpayer identification number for businesses. */
   cnpj?: Maybe<Scalars['String']['output']>;
   /** Brazilian individual taxpayer registry identification. */
   cpf?: Maybe<Scalars['String']['output']>;
-  /** The credit limit of the customer. */
-  creditLimit: Scalars['Decimal']['output'];
-  /** The credit limit balance of the customer. */
-  creditLimitBalance: Scalars['Decimal']['output'];
   /** Customer's unique identifier. */
   customerId: Scalars['Long']['output'];
   /** Customer's name. */
@@ -666,6 +726,58 @@ export type CheckoutCustomer = {
 export type CheckoutCustomizationInput = {
   customizationId: Scalars['Long']['input'];
   value?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CheckoutKit = {
+  /** The price adjusted with promotions and other price changes */
+  ajustedPrice: Scalars['Decimal']['output'];
+  /** The kit alias */
+  alias?: Maybe<Scalars['String']['output']>;
+  /** The kit URL image */
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  /** The kit unique identifier */
+  kitGroupId?: Maybe<Scalars['String']['output']>;
+  /** The kit identifier */
+  kitId: Scalars['Long']['output'];
+  /** The kit list price */
+  listPrice: Scalars['Decimal']['output'];
+  /** The kit name */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The kit price */
+  price: Scalars['Decimal']['output'];
+  /** The products contained in this kit */
+  products?: Maybe<Array<Maybe<CheckoutProductNode>>>;
+  /** The kit quantity */
+  quantity: Scalars['Int']['output'];
+  /** The total price adjusted with promotions and other price changes */
+  totalAdjustedPrice: Scalars['Decimal']['output'];
+  /** The total list price */
+  totalListPrice: Scalars['Decimal']['output'];
+};
+
+export type CheckoutKitInput = {
+  id: Scalars['Uuid']['input'];
+  kitGroupId?: InputMaybe<Scalars['String']['input']>;
+  kitId: Scalars['Long']['input'];
+  products?: InputMaybe<Array<InputMaybe<CheckoutKitProductInput>>>;
+  quantity: Scalars['Int']['input'];
+};
+
+export type CheckoutKitProductInput = {
+  productId: Scalars['Long']['input'];
+  variants?: InputMaybe<Array<InputMaybe<CheckoutKitVariantInput>>>;
+};
+
+export type CheckoutKitVariantInput = {
+  productVariantId: Scalars['Long']['input'];
+  quantity: Scalars['Int']['input'];
+};
+
+export type CheckoutLite = {
+  /** Indicates if the checkout is completed. */
+  completed: Scalars['Boolean']['output'];
+  /** The customer ID associated with the checkout. */
+  customerId?: Maybe<Scalars['Long']['output']>;
 };
 
 export type CheckoutMetadataInput = {
@@ -731,6 +843,20 @@ export type CheckoutOrderAdjustment = {
   value: Scalars['Decimal']['output'];
 };
 
+/** This represents a Card payment node in the checkout order. */
+export type CheckoutOrderCardPayment = {
+  /** The brand card. */
+  brand?: Maybe<Scalars['String']['output']>;
+  /** The interest generated by the card. */
+  cardInterest: Scalars['Decimal']['output'];
+  /** The installments generated for the card. */
+  installments: Scalars['Int']['output'];
+  /** The cardholder name. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The final four numbers on the card. */
+  number?: Maybe<Scalars['String']['output']>;
+};
+
 /** The delivery or store pickup details. */
 export type CheckoutOrderDelivery = {
   /** The delivery or store pickup address. */
@@ -739,6 +865,8 @@ export type CheckoutOrderDelivery = {
   cost: Scalars['Decimal']['output'];
   /** The estimated delivery or pickup time, in days. */
   deliveryTime: Scalars['Int']['output'];
+  /** The estimated delivery or pickup time, in hours. */
+  deliveryTimeInHours?: Maybe<Scalars['Int']['output']>;
   /** The name of the recipient. */
   name?: Maybe<Scalars['String']['output']>;
 };
@@ -753,6 +881,8 @@ export type CheckoutOrderInvoicePayment = {
 
 /** The checkout order payment. */
 export type CheckoutOrderPayment = {
+  /** The card payment information. */
+  card?: Maybe<CheckoutOrderCardPayment>;
   /** The bank invoice payment information. */
   invoice?: Maybe<CheckoutOrderInvoicePayment>;
   /** The name of the payment method. */
@@ -785,6 +915,8 @@ export type CheckoutOrderProduct = {
   productVariantId: Scalars['Long']['output'];
   /** The quantity of the product. */
   quantity: Scalars['Int']['output'];
+  /** The unit value of the product. */
+  unitValue: Scalars['Decimal']['output'];
   /** The value of the product. */
   value: Scalars['Decimal']['output'];
 };
@@ -809,12 +941,39 @@ export type CheckoutOrderProductAttribute = {
   value?: Maybe<Scalars['String']['output']>;
 };
 
+export type CheckoutProductAdjustmentNode = {
+  /** The observation referent adjustment in Product */
+  observation?: Maybe<Scalars['String']['output']>;
+  /** The type that was applied in product adjustment */
+  type?: Maybe<Scalars['String']['output']>;
+  /** The value that was applied to the product adjustment */
+  value: Scalars['Decimal']['output'];
+};
+
 export type CheckoutProductAttributeNode = {
   /** The attribute name */
   name?: Maybe<Scalars['String']['output']>;
   /** The attribute type */
   type: Scalars['Int']['output'];
   /** The attribute value */
+  value?: Maybe<Scalars['String']['output']>;
+};
+
+export type CheckoutProductCustomizationNode = {
+  /** The available product customizations. */
+  availableCustomizations?: Maybe<Array<Maybe<Customization>>>;
+  /** The product customization unique identifier. */
+  id?: Maybe<Scalars['ID']['output']>;
+  /** The product customization values. */
+  values?: Maybe<Array<Maybe<CheckoutProductCustomizationValueNode>>>;
+};
+
+export type CheckoutProductCustomizationValueNode = {
+  /** The product customization cost. */
+  cost: Scalars['Decimal']['output'];
+  /** The product customization name. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The product customization value. */
   value?: Maybe<Scalars['String']['output']>;
 };
 
@@ -825,14 +984,24 @@ export type CheckoutProductInput = {
 
 export type CheckoutProductItemInput = {
   customization?: InputMaybe<Array<InputMaybe<CheckoutCustomizationInput>>>;
+  customizationId?: InputMaybe<Scalars['String']['input']>;
   metadata?: InputMaybe<Array<InputMaybe<CheckoutMetadataInput>>>;
   productVariantId: Scalars['Long']['input'];
   quantity: Scalars['Int']['input'];
   subscription?: InputMaybe<CheckoutSubscriptionInput>;
 };
 
+export type CheckoutProductItemUpdateInput = {
+  customization?: InputMaybe<Array<InputMaybe<CheckoutCustomizationInput>>>;
+  customizationId?: InputMaybe<Scalars['String']['input']>;
+  productVariantId: Scalars['Long']['input'];
+  subscription?: InputMaybe<CheckoutSubscriptionInput>;
+};
+
 export type CheckoutProductNode = {
-  /** The product adjusted price */
+  /** The product adjustment information */
+  adjustments?: Maybe<Array<Maybe<CheckoutProductAdjustmentNode>>>;
+  /** The price adjusted with promotions and other price changes */
   ajustedPrice: Scalars['Decimal']['output'];
   /** Information about the possible selection attributes. */
   attributeSelections?: Maybe<AttributeSelection>;
@@ -840,6 +1009,8 @@ export type CheckoutProductNode = {
   brand?: Maybe<Scalars['String']['output']>;
   /** The product category */
   category?: Maybe<Scalars['String']['output']>;
+  /** The product customization. */
+  customization?: Maybe<CheckoutProductCustomizationNode>;
   /** If the product is a gift */
   gift: Scalars['Boolean']['output'];
   /** The product Google category */
@@ -852,6 +1023,8 @@ export type CheckoutProductNode = {
   installmentFee: Scalars['Boolean']['output'];
   /** The product installment value */
   installmentValue: Scalars['Decimal']['output'];
+  /** The product has a kit */
+  kit: Scalars['Boolean']['output'];
   /** The product list price */
   listPrice: Scalars['Decimal']['output'];
   /** The metadata related to this checkout. */
@@ -870,18 +1043,66 @@ export type CheckoutProductNode = {
   productVariantId: Scalars['Long']['output'];
   /** The product quantity */
   quantity: Scalars['Int']['output'];
+  /** The product seller. */
+  seller?: Maybe<CheckoutProductSellerNode>;
   /** The product shipping deadline */
   shippingDeadline?: Maybe<CheckoutShippingDeadlineNode>;
   /** The product SKU */
   sku?: Maybe<Scalars['String']['output']>;
+  /** The product subscription information */
+  subscription?: Maybe<CheckoutProductSubscription>;
+  /** The total price adjusted with promotions and other price changes */
+  totalAdjustedPrice: Scalars['Decimal']['output'];
+  /** The total list price */
+  totalListPrice: Scalars['Decimal']['output'];
   /** The product URL */
   url?: Maybe<Scalars['String']['output']>;
 };
 
 
 export type CheckoutProductNodeAttributeSelectionsArgs = {
+  includeParentIdVariants?: InputMaybe<Scalars['Boolean']['input']>;
   selected?: InputMaybe<Array<InputMaybe<AttributeFilterInput>>>;
 };
+
+export type CheckoutProductSellerNode = {
+  /** The distribution center ID. */
+  distributionCenterId?: Maybe<Scalars['String']['output']>;
+  /** The seller name. */
+  sellerName?: Maybe<Scalars['String']['output']>;
+};
+
+/** Information for the subscription of a product in checkout. */
+export type CheckoutProductSubscription = {
+  /** The available subscriptions. */
+  availableSubscriptions?: Maybe<Array<Maybe<CheckoutProductSubscriptionItemNode>>>;
+  /** The selected subscription. */
+  selected?: Maybe<CheckoutProductSubscriptionItemNode>;
+};
+
+export type CheckoutProductSubscriptionItemNode = {
+  /** Display text. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The number of days of the recurring type. */
+  recurringDays: Scalars['Int']['output'];
+  /** The recurring type id. */
+  recurringTypeId: Scalars['Long']['output'];
+  /** If selected. */
+  selected: Scalars['Boolean']['output'];
+  /** Subscription group discount value. */
+  subscriptionGroupDiscount: Scalars['Decimal']['output'];
+  /** The subscription group id. */
+  subscriptionGroupId: Scalars['Long']['output'];
+};
+
+export type CheckoutProductUpdateInput = {
+  id: Scalars['Uuid']['input'];
+  product: CheckoutProductItemUpdateInput;
+};
+
+/** The checkout areas available to reset */
+export type CheckoutResetType =
+  | 'PAYMENT';
 
 export type CheckoutShippingDeadlineNode = {
   /** The shipping deadline */
@@ -894,6 +1115,15 @@ export type CheckoutShippingDeadlineNode = {
   secondTitle?: Maybe<Scalars['String']['output']>;
   /** The shipping title */
   title?: Maybe<Scalars['String']['output']>;
+};
+
+export type CheckoutShippingQuoteGroupNode = {
+  /** The distribution center. */
+  distributionCenter?: Maybe<DistributionCenter>;
+  /** The products related to the shipping quote group. */
+  products?: Maybe<Array<Maybe<ShippingQuoteGroupProduct>>>;
+  /** Selected Shipping. */
+  selectedShipping?: Maybe<ShippingNode>;
 };
 
 export type CheckoutSubscriptionInput = {
@@ -948,29 +1178,51 @@ export type ContentsEdge = {
   node?: Maybe<Content>;
 };
 
+/** Input data for submitting a counter offer for a product. */
+export type CounterOfferInput = {
+  /** Any additional information or comments provided by the user regarding the counter offer. */
+  additionalInfo?: InputMaybe<Scalars['String']['input']>;
+  /** The email address of the user submitting the counter offer. */
+  email?: InputMaybe<Scalars['String']['input']>;
+  /** The proposed price by the user for the product. */
+  price: Scalars['Decimal']['input'];
+  /** The unique identifier of the product variant for which the counter offer is made. */
+  productVariantId: Scalars['Long']['input'];
+  /** URL linking to the page or the location where the product is listed. */
+  url?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateCustomerAddressInput = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  address2?: InputMaybe<Scalars['String']['input']>;
   addressDetails?: InputMaybe<Scalars['String']['input']>;
-  addressNumber: Scalars['String']['input'];
+  addressNumber?: InputMaybe<Scalars['String']['input']>;
   cep: Scalars['CEP']['input'];
   city: Scalars['String']['input'];
   country: Scalars['CountryCode']['input'];
-  email: Scalars['EmailAddress']['input'];
+  email?: InputMaybe<Scalars['EmailAddress']['input']>;
   name: Scalars['String']['input'];
-  neighborhood: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
+  neighborhood?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
   referencePoint?: InputMaybe<Scalars['String']['input']>;
   state: Scalars['String']['input'];
-  street: Scalars['String']['input'];
+  street?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** A customer from the store. */
 export type Customer = Node & {
+  /** A specific customer's address. */
+  address?: Maybe<CustomerAddressNode>;
   /** Customer's addresses. */
   addresses?: Maybe<Array<Maybe<CustomerAddressNode>>>;
   /** Customer's birth date. */
   birthDate: Scalars['DateTime']['output'];
   /** Customer's business phone number. */
   businessPhoneNumber?: Maybe<Scalars['String']['output']>;
+  /** Customer's checking account balance. */
+  checkingAccountBalance?: Maybe<Scalars['Decimal']['output']>;
+  /** Customer's checking account History. */
+  checkingAccountHistory?: Maybe<Array<Maybe<CustomerCheckingAccountHistoryNode>>>;
   /** Taxpayer identification number for businesses. */
   cnpj?: Maybe<Scalars['String']['output']>;
   /** Entities legal name. */
@@ -997,12 +1249,14 @@ export type Customer = Node & {
   informationGroups?: Maybe<Array<Maybe<CustomerInformationGroupNode>>>;
   /** Customer's mobile phone number. */
   mobilePhoneNumber?: Maybe<Scalars['String']['output']>;
+  /** A specific order placed by the customer. */
+  order?: Maybe<Order>;
   /** List of orders placed by the customer. */
   orders?: Maybe<CustomerOrderCollectionSegment>;
   /** Statistics about the orders the customer made in a specific timeframe. */
   ordersStatistics?: Maybe<CustomerOrdersStatistics>;
   /** Get info about the associated partners. */
-  partners?: Maybe<Array<Maybe<CustomerPartnerNode>>>;
+  partners?: Maybe<Array<Maybe<Partner>>>;
   /** Customer's phone number. */
   phoneNumber?: Maybe<Scalars['String']['output']>;
   /** Customer's residential address. */
@@ -1013,10 +1267,24 @@ export type Customer = Node & {
   rg?: Maybe<Scalars['String']['output']>;
   /** State registration number. */
   stateRegistration?: Maybe<Scalars['String']['output']>;
+  /** Customer's subscriptions. */
+  subscriptions?: Maybe<Array<Maybe<CustomerSubscription>>>;
   /** Date of the last update. */
   updateDate: Scalars['DateTime']['output'];
   /** Customer wishlist. */
   wishlist?: Maybe<Wishlist>;
+};
+
+
+/** A customer from the store. */
+export type CustomerAddressArgs = {
+  addressId: Scalars['ID']['input'];
+};
+
+
+/** A customer from the store. */
+export type CustomerOrderArgs = {
+  orderId?: Scalars['Long']['input'];
 };
 
 
@@ -1044,7 +1312,22 @@ export type CustomerWishlistArgs = {
 
 export type CustomerAccessToken = {
   isMaster: Scalars['Boolean']['output'];
+  legacyToken?: Maybe<Scalars['String']['output']>;
   token?: Maybe<Scalars['String']['output']>;
+  /** The user login type */
+  type?: Maybe<LoginType>;
+  validUntil: Scalars['DateTime']['output'];
+};
+
+export type CustomerAccessTokenDetails = {
+  /** The customer id */
+  customerId: Scalars['Long']['output'];
+  /** The identifier linked to the access token */
+  identifier?: Maybe<Scalars['String']['output']>;
+  /** Specifies whether the user is a master user */
+  isMaster: Scalars['Boolean']['output'];
+  /** The user login origin */
+  origin?: Maybe<LoginOrigin>;
   /** The user login type */
   type?: Maybe<LoginType>;
   validUntil: Scalars['DateTime']['output'];
@@ -1057,6 +1340,10 @@ export type CustomerAccessTokenInput = {
 };
 
 export type CustomerAddressNode = Node & {
+  /** Address street. */
+  address?: Maybe<Scalars['String']['output']>;
+  /** Address street 2. */
+  address2?: Maybe<Scalars['String']['output']>;
   /** Address details. */
   addressDetails?: Maybe<Scalars['String']['output']>;
   /** Address number. */
@@ -1081,8 +1368,28 @@ export type CustomerAddressNode = Node & {
   referencePoint?: Maybe<Scalars['String']['output']>;
   /** State. */
   state?: Maybe<Scalars['String']['output']>;
-  /** Address street. */
+  /**
+   * Address street.
+   * @deprecated Use the 'address' field to get the address.
+   */
   street?: Maybe<Scalars['String']['output']>;
+};
+
+/** The input to authenticate a user. */
+export type CustomerAuthenticateInput = {
+  input: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
+export type CustomerCheckingAccountHistoryNode = {
+  /** Customer's checking account history date. */
+  date: Scalars['DateTime']['output'];
+  /** Description of the customer's checking account history. */
+  historic?: Maybe<Scalars['String']['output']>;
+  /** Type of customer's checking account history. */
+  type: TypeCheckingAccount;
+  /** Value of customer's checking account history. */
+  value: Scalars['Decimal']['output'];
 };
 
 export type CustomerCreateInput = {
@@ -1116,6 +1423,8 @@ export type CustomerCreateInput = {
   fullName?: InputMaybe<Scalars['String']['input']>;
   /** The gender of the customer. */
   gender?: InputMaybe<Gender>;
+  /** The customer information group values. */
+  informationGroupValues?: InputMaybe<Array<InputMaybe<InformationGroupValueInput>>>;
   /** Indicates if the customer is state registration exempt. */
   isStateRegistrationExempt?: InputMaybe<Scalars['Boolean']['input']>;
   /** The neighborhood for the registered address. */
@@ -1197,21 +1506,24 @@ export type CustomerOrdersStatistics = {
   quantity: Scalars['Int']['output'];
 };
 
-export type CustomerPartnerNode = {
-  /** The partner alias. */
-  alias?: Maybe<Scalars['String']['output']>;
-  /** The partner's name. */
-  name?: Maybe<Scalars['String']['output']>;
-  /** The partner's access token. */
-  partnerAccessToken?: Maybe<Scalars['String']['output']>;
+/** The input to change the user password by recovery. */
+export type CustomerPasswordChangeByRecoveryInput = {
+  /** Key generated for password recovery. */
+  key: Scalars['String']['input'];
+  /** The new password. */
+  newPassword: Scalars['String']['input'];
+  /** New password confirmation. */
+  newPasswordConfirmation: Scalars['String']['input'];
 };
 
 /** The input to change the user password. */
-export type CustomerPasswordChangeInputGraphInput = {
+export type CustomerPasswordChangeInput = {
   /** The current password. */
   currentPassword: Scalars['String']['input'];
   /** The new password. */
   newPassword: Scalars['String']['input'];
+  /** New password confirmation. */
+  newPasswordConfirmation: Scalars['String']['input'];
 };
 
 export type CustomerSimpleCreateInputGraphInput = {
@@ -1239,31 +1551,102 @@ export type CustomerSimpleCreateInputGraphInput = {
   stateRegistration?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CustomerSubscription = {
+  /** Subscription billing address. */
+  billingAddress?: Maybe<CustomerAddressNode>;
+  /** The date when the subscription was cancelled. */
+  cancellationDate?: Maybe<Scalars['DateTime']['output']>;
+  /** The coupon code applied to the subscription. */
+  coupon?: Maybe<Scalars['String']['output']>;
+  /** The date of the subscription. */
+  date: Scalars['DateTime']['output'];
+  /** Subscription delivery address. */
+  deliveryAddress?: Maybe<CustomerAddressNode>;
+  /** The date of intercalated recurring payments. */
+  intercalatedRecurrenceDate?: Maybe<Scalars['DateTime']['output']>;
+  /** The date of the next recurring payment. */
+  nextRecurrenceDate?: Maybe<Scalars['DateTime']['output']>;
+  /** Subscription orders. */
+  orders?: Maybe<Array<Maybe<Order>>>;
+  /** The date when the subscription was paused. */
+  pauseDate?: Maybe<Scalars['DateTime']['output']>;
+  /** The payment details for the subscription. */
+  payment?: Maybe<CustomerSubscriptionPayment>;
+  /** The list of products associated with the subscription. */
+  products?: Maybe<Array<Maybe<CustomerSubscriptionProduct>>>;
+  /** The details of the recurring subscription. */
+  recurring?: Maybe<CustomerSubscriptionRecurring>;
+  /** The subscription status. */
+  status?: Maybe<Scalars['String']['output']>;
+  /** The subscription group id. */
+  subscriptionGroupId: Scalars['Long']['output'];
+  /** Subscription unique identifier. */
+  subscriptionId: Scalars['Long']['output'];
+};
+
+export type CustomerSubscriptionPayment = {
+  /** The details of the payment card associated with the subscription. */
+  card?: Maybe<CustomerSubscriptionPaymentCard>;
+  /** The type of payment for the subscription. */
+  type?: Maybe<Scalars['String']['output']>;
+};
+
+export type CustomerSubscriptionPaymentCard = {
+  /** The brand of the payment card (e.g., Visa, MasterCard). */
+  brand?: Maybe<Scalars['String']['output']>;
+  /** The expiration date of the payment card. */
+  expiration?: Maybe<Scalars['String']['output']>;
+  /** The masked or truncated number of the payment card. */
+  number?: Maybe<Scalars['String']['output']>;
+};
+
+export type CustomerSubscriptionProduct = {
+  /** The id of the product variant associated with the subscription. */
+  productVariantId: Scalars['Long']['output'];
+  /** The quantity of the product variant in the subscription. */
+  quantity: Scalars['Int']['output'];
+  /** Indicates whether the product variant is removed from the subscription. */
+  removed: Scalars['Boolean']['output'];
+  /** The id of the subscription product. */
+  subscriptionProductId: Scalars['Long']['output'];
+  /** The monetary value of the product variant in the subscription. */
+  value: Scalars['Decimal']['output'];
+};
+
+export type CustomerSubscriptionRecurring = {
+  /** The number of days between recurring payments. */
+  days: Scalars['Int']['output'];
+  /** The description of the recurring subscription. */
+  description?: Maybe<Scalars['String']['output']>;
+  /** The name of the recurring subscription. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The recurring subscription id. */
+  recurringId: Scalars['Long']['output'];
+  /** Indicates whether the recurring subscription is removed. */
+  removed: Scalars['Boolean']['output'];
+};
+
 export type CustomerUpdateInput = {
   /** The date of birth of the customer. */
   birthDate?: InputMaybe<Scalars['DateTime']['input']>;
-  /** The Brazilian tax identification number for corporations. */
-  cnpj?: InputMaybe<Scalars['String']['input']>;
   /** The legal name of the corporate customer. */
   corporateName?: InputMaybe<Scalars['String']['input']>;
-  /** The Brazilian tax identification number for individuals. */
-  cpf?: InputMaybe<Scalars['String']['input']>;
-  /** Indicates if it is a natural person or company profile. */
-  customerType: EntityType;
   /** The full name of the customer. */
   fullName?: InputMaybe<Scalars['String']['input']>;
   /** The gender of the customer. */
   gender?: InputMaybe<Gender>;
-  /** The area code for the customer's primary phone number. */
-  primaryPhoneAreaCode?: InputMaybe<Scalars['String']['input']>;
+  /** The customer information group values. */
+  informationGroupValues?: InputMaybe<Array<InputMaybe<InformationGroupValueInput>>>;
   /** The customer's primary phone number. */
   primaryPhoneNumber?: InputMaybe<Scalars['String']['input']>;
+  /** The customer's primary phone number. */
+  primaryPhoneNumberInternational?: InputMaybe<Scalars['String']['input']>;
   /** The Brazilian register identification number for individuals. */
   rg?: InputMaybe<Scalars['String']['input']>;
-  /** The area code for the customer's secondary phone number. */
-  secondaryPhoneAreaCode?: InputMaybe<Scalars['String']['input']>;
   /** The customer's secondary phone number. */
   secondaryPhoneNumber?: InputMaybe<Scalars['String']['input']>;
+  /** The customer's secondary phone number. */
+  secondaryPhoneNumberInternational?: InputMaybe<Scalars['String']['input']>;
   /** The state registration number for businesses. */
   stateRegistration?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1290,6 +1673,22 @@ export type Customization = Node & {
   values?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
+/** Deadline alert informations. */
+export type DeadlineAlert = {
+  /** Deadline alert time */
+  deadline?: Maybe<Scalars['Int']['output']>;
+  /** Deadline alert description */
+  description?: Maybe<Scalars['String']['output']>;
+  /** Second deadline alert time */
+  secondDeadline?: Maybe<Scalars['Int']['output']>;
+  /** Second deadline alert description */
+  secondDescription?: Maybe<Scalars['String']['output']>;
+  /** Second deadline alert title */
+  secondTitle?: Maybe<Scalars['String']['output']>;
+  /** Deadline alert title */
+  title?: Maybe<Scalars['String']['output']>;
+};
+
 /** The delivery schedule detail. */
 export type DeliveryScheduleDetail = {
   /** The date of the delivery schedule. */
@@ -1312,6 +1711,14 @@ export type DeliveryScheduleInput = {
   periodId: Scalars['Long']['input'];
 };
 
+/** A distribution center. */
+export type DistributionCenter = {
+  /** The distribution center unique identifier. */
+  id?: Maybe<Scalars['ID']['output']>;
+  /** The distribution center seller name. */
+  sellerName?: Maybe<Scalars['String']['output']>;
+};
+
 /** Define the entity type of the customer registration. */
 export type EntityType =
   /** Legal entity, a company, business, organization. */
@@ -1321,6 +1728,62 @@ export type EntityType =
   /** An individual person, a physical person. */
   | 'PERSON';
 
+export type EnumInformationGroup =
+  | 'NEWSLETTER'
+  | 'PESSOA_FISICA'
+  | 'PESSOA_JURIDICA';
+
+/** Represents a list of events with their details. */
+export type EventList = {
+  /** URL of the event's cover image */
+  coverUrl?: Maybe<Scalars['String']['output']>;
+  /** Date of the event */
+  date?: Maybe<Scalars['DateTime']['output']>;
+  /** Type of the event */
+  eventType?: Maybe<Scalars['String']['output']>;
+  /** Indicates if the token is from the owner of this event list */
+  isOwner: Scalars['Boolean']['output'];
+  /** URL of the event's logo */
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  /** Name of the event owner */
+  ownerName?: Maybe<Scalars['String']['output']>;
+  /** Event title */
+  title?: Maybe<Scalars['String']['output']>;
+  /** URL of the event */
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type EventListAddProductInput = {
+  /** The unique identifier of the product variant. */
+  productVariantId: Scalars['Long']['input'];
+  /** The quantity of the product to be added. */
+  quantity: Scalars['Int']['input'];
+};
+
+/** Represents a list of store events. */
+export type EventListStore = {
+  /** Date of the event */
+  date?: Maybe<Scalars['DateTime']['output']>;
+  /** Event type name of the event */
+  eventType?: Maybe<Scalars['String']['output']>;
+  /** URL of the event's logo */
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  /** The name of the event. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The URL of the event. */
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+/** Represents a list of events types. */
+export type EventListType = {
+  /** The URL of the event's logo. */
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  /** The name of the event. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The URL path of the event. */
+  urlPath?: Maybe<Scalars['String']['output']>;
+};
+
 export type FilterPosition =
   /** Both filter position. */
   | 'BOTH'
@@ -1329,10 +1792,43 @@ export type FilterPosition =
   /** Vertical filter position. */
   | 'VERTICAL';
 
+export type FriendRecommendInput = {
+  /** The buy list id */
+  buyListId?: InputMaybe<Scalars['Long']['input']>;
+  /** Email of who is recommending a product */
+  fromEmail: Scalars['String']['input'];
+  /** Who is recommending */
+  fromName: Scalars['String']['input'];
+  /** The message */
+  message?: InputMaybe<Scalars['String']['input']>;
+  /** The Product Id */
+  productId?: InputMaybe<Scalars['Long']['input']>;
+  /** Email of the person who will receive a product recommendation */
+  toEmail: Scalars['String']['input'];
+  /** Name of the person who will receive a product recommendation */
+  toName: Scalars['String']['input'];
+};
+
 /** The customer's gender. */
 export type Gender =
   | 'FEMALE'
   | 'MALE';
+
+/** The shipping quotes for group. */
+export type GroupShippingQuote = {
+  /** The shipping deadline. */
+  deadline: Scalars['Int']['output'];
+  /** The shipping deadline, in hours. */
+  deadlineInHours?: Maybe<Scalars['Int']['output']>;
+  /** The shipping name. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The shipping quote unique identifier. */
+  shippingQuoteId: Scalars['Uuid']['output'];
+  /** The shipping type. */
+  type?: Maybe<Scalars['String']['output']>;
+  /** The shipping value. */
+  value: Scalars['Float']['output'];
+};
 
 /** A hotsite is a group of products used to organize them or to make them easier to browse. */
 export type Hotsite = Node & {
@@ -1502,6 +1998,11 @@ export type InstallmentPlan = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+/** The user login origin. */
+export type LoginOrigin =
+  | 'SIMPLE'
+  | 'SOCIAL';
+
 /** The user login type. */
 export type LoginType =
   | 'AUTHENTICATED'
@@ -1583,6 +2084,8 @@ export type Metadata = {
 export type Mutation = {
   /** Add coupon to checkout */
   checkoutAddCoupon?: Maybe<Checkout>;
+  /** Add kit to an existing checkout */
+  checkoutAddKit?: Maybe<Checkout>;
   /** Add metadata to checkout */
   checkoutAddMetadata?: Maybe<Checkout>;
   /** Add metadata to a checkout product */
@@ -1597,20 +2100,38 @@ export type Mutation = {
   checkoutComplete?: Maybe<Checkout>;
   /** Associate the customer with a checkout. */
   checkoutCustomerAssociate?: Maybe<Checkout>;
+  /** Delete a suggested card */
+  checkoutDeleteSuggestedCard?: Maybe<OperationResult>;
   /** Selects the variant of a gift product */
   checkoutGiftVariantSelection?: Maybe<Checkout>;
   /** Associate the partner with a checkout. */
   checkoutPartnerAssociate?: Maybe<Checkout>;
-  /** Add coupon to checkout */
+  /** Disassociates the checkout from the partner and returns a new checkout. */
+  checkoutPartnerDisassociate?: Maybe<Checkout>;
+  /** Remove coupon to checkout */
   checkoutRemoveCoupon?: Maybe<Checkout>;
+  /** Remove kit from an existing checkout */
+  checkoutRemoveKit?: Maybe<Checkout>;
+  /** Removes metadata keys from a checkout */
+  checkoutRemoveMetadata?: Maybe<Checkout>;
   /** Remove products from an existing checkout */
   checkoutRemoveProduct?: Maybe<Checkout>;
+  /** Remove Customization to Checkout */
+  checkoutRemoveProductCustomization?: Maybe<Checkout>;
+  /** Remove Subscription to Checkout */
+  checkoutRemoveProductSubscription?: Maybe<Checkout>;
+  /** Resets a specific area of a checkout */
+  checkoutReset?: Maybe<OperationResult>;
   /** Select installment. */
   checkoutSelectInstallment?: Maybe<Checkout>;
   /** Select payment method. */
   checkoutSelectPaymentMethod?: Maybe<Checkout>;
   /** Select shipping quote */
   checkoutSelectShippingQuote?: Maybe<Checkout>;
+  /** Update a product of an existing checkout */
+  checkoutUpdateProduct?: Maybe<Checkout>;
+  /** Use balance checking account checkout */
+  checkoutUseCheckingAccount?: Maybe<Checkout>;
   /** Create a new checkout */
   createCheckout?: Maybe<Checkout>;
   /** Register an email in the newsletter. */
@@ -1619,14 +2140,21 @@ export type Mutation = {
   createProductReview?: Maybe<Review>;
   /** Record a searched term for admin reports */
   createSearchTermRecord?: Maybe<SearchRecord>;
-  /** Creates a new customer access token with an expiration time. */
+  /**
+   * Creates a new customer access token with an expiration time.
+   * @deprecated Use the CustomerAuthenticatedLogin mutation.
+   */
   customerAccessTokenCreate?: Maybe<CustomerAccessToken>;
   /** Renews the expiration time of a customer access token. The token must not be expired. */
   customerAccessTokenRenew?: Maybe<CustomerAccessToken>;
   /** Create an address. */
   customerAddressCreate?: Maybe<CustomerAddressNode>;
+  /** Delete an existing address, if it is not the only registered address */
+  customerAddressRemove?: Maybe<OperationResult>;
   /** Change an existing address */
   customerAddressUpdate?: Maybe<CustomerAddressNode>;
+  /** Creates a new customer access token with an expiration time. */
+  customerAuthenticatedLogin?: Maybe<CustomerAccessToken>;
   /** Allows the user to complete the required information for a partial registration. */
   customerCompletePartialRegistration?: Maybe<CustomerAccessToken>;
   /** Creates a new customer register. */
@@ -1637,6 +2165,8 @@ export type Mutation = {
   customerImpersonate?: Maybe<CustomerAccessToken>;
   /** Changes user password. */
   customerPasswordChange?: Maybe<OperationResult>;
+  /** Change user password by recovery. */
+  customerPasswordChangeByRecovery?: Maybe<OperationResult>;
   /** Sends a password recovery email to the user. */
   customerPasswordRecovery?: Maybe<OperationResult>;
   /** Returns the user associated with a simple login (CPF or Email) if exists, else return a New user. */
@@ -1647,10 +2177,26 @@ export type Mutation = {
   customerSocialLoginFacebook?: Maybe<CustomerAccessToken>;
   /** Returns the user associated with a Google account if exists, else return a New user. */
   customerSocialLoginGoogle?: Maybe<CustomerAccessToken>;
+  /** Allows a customer to change the delivery address for an existing subscription. */
+  customerSubscriptionAddressChange?: Maybe<Customer>;
+  /** Add products to an existing subscription */
+  customerSubscriptionProductAdd?: Maybe<Customer>;
+  /** Remove products to an existing subscription */
+  customerSubscriptionProductRemove?: Maybe<Customer>;
+  /** Allows a customer to change an existing subscription status. */
+  customerSubscriptionUpdateStatus?: Maybe<Customer>;
   /** Updates a customer register. */
   customerUpdate?: Maybe<Customer>;
+  /** Adds products to the event list. */
+  eventListAddProduct?: Maybe<OperationResult>;
+  /** Allows changing the payment method of a specific order */
+  orderChangePayment?: Maybe<OperationResult>;
   /** Creates a new closed scope partner access token with an expiration time. */
   partnerAccessTokenCreate?: Maybe<PartnerAccessToken>;
+  /** Submits a counteroffer for a product. */
+  productCounterOfferSubmit?: Maybe<OperationResult>;
+  /** Mutation to recommend a product to a friend */
+  productFriendRecommend?: Maybe<OperationResult>;
   /** Add a price alert. */
   productPriceAlert?: Maybe<ProductPriceAlert>;
   /** Creates an alert to notify when the product is back in stock. */
@@ -1677,10 +2223,18 @@ export type MutationCheckoutAddCouponArgs = {
 };
 
 
+export type MutationCheckoutAddKitArgs = {
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  input: CheckoutKitInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationCheckoutAddMetadataArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   metadata: Array<InputMaybe<CheckoutMetadataInput>>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1689,12 +2243,14 @@ export type MutationCheckoutAddMetadataForProductVariantArgs = {
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   metadata: Array<InputMaybe<CheckoutMetadataInput>>;
   productVariantId: Scalars['Long']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCheckoutAddProductArgs = {
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   input: CheckoutProductInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1702,6 +2258,7 @@ export type MutationCheckoutAddressAssociateArgs = {
   addressId: Scalars['ID']['input'];
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1709,6 +2266,7 @@ export type MutationCheckoutCloneArgs = {
   checkoutId: Scalars['Uuid']['input'];
   copyUser?: Scalars['Boolean']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1724,6 +2282,16 @@ export type MutationCheckoutCompleteArgs = {
 export type MutationCheckoutCustomerAssociateArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutDeleteSuggestedCardArgs = {
+  cardKey: Scalars['String']['input'];
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken: Scalars['String']['input'];
+  paymentMethodId: Scalars['ID']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1731,6 +2299,7 @@ export type MutationCheckoutGiftVariantSelectionArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   productVariantId: Scalars['Long']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1738,18 +2307,67 @@ export type MutationCheckoutPartnerAssociateArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   partnerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutPartnerDisassociateArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCheckoutRemoveCouponArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutRemoveKitArgs = {
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  input: CheckoutKitInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutRemoveMetadataArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  keys: Array<InputMaybe<Scalars['String']['input']>>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCheckoutRemoveProductArgs = {
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   input: CheckoutProductInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutRemoveProductCustomizationArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  customizationId: Scalars['ID']['input'];
+  productVariantId: Scalars['Long']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutRemoveProductSubscriptionArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  productVariantId: Scalars['Long']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutResetArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+  types: Array<CheckoutResetType>;
 };
 
 
@@ -1757,6 +2375,8 @@ export type MutationCheckoutSelectInstallmentArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   installmentNumber: Scalars['Int']['input'];
+  orderId?: InputMaybe<Scalars['Long']['input']>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
   selectedPaymentMethodId: Scalars['Uuid']['input'];
 };
 
@@ -1764,7 +2384,9 @@ export type MutationCheckoutSelectInstallmentArgs = {
 export type MutationCheckoutSelectPaymentMethodArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  orderId?: InputMaybe<Scalars['Long']['input']>;
   paymentMethodId: Scalars['ID']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1773,27 +2395,48 @@ export type MutationCheckoutSelectShippingQuoteArgs = {
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
   deliveryScheduleInput?: InputMaybe<DeliveryScheduleInput>;
+  distributionCenterId?: InputMaybe<Scalars['ID']['input']>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
   shippingQuoteId: Scalars['Uuid']['input'];
+};
+
+
+export type MutationCheckoutUpdateProductArgs = {
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  input: CheckoutProductUpdateInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCheckoutUseCheckingAccountArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+  useBalance: Scalars['Boolean']['input'];
 };
 
 
 export type MutationCreateCheckoutArgs = {
   products?: InputMaybe<Array<InputMaybe<CheckoutProductItemInput>>>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCreateNewsletterRegisterArgs = {
   input: NewsletterInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCreateProductReviewArgs = {
   input: ReviewCreateInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCreateSearchTermRecordArgs = {
   input: SearchRecordInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1811,6 +2454,14 @@ export type MutationCustomerAccessTokenRenewArgs = {
 export type MutationCustomerAddressCreateArgs = {
   address: CreateCustomerAddressInput;
   customerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCustomerAddressRemoveArgs = {
+  customerAccessToken: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1818,6 +2469,13 @@ export type MutationCustomerAddressUpdateArgs = {
   address: UpdateCustomerAddressInput;
   customerAccessToken: Scalars['String']['input'];
   id: Scalars['ID']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCustomerAuthenticatedLoginArgs = {
+  input: CustomerAuthenticateInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1837,18 +2495,26 @@ export type MutationCustomerCreateArgs = {
 export type MutationCustomerEmailChangeArgs = {
   customerAccessToken: Scalars['String']['input'];
   input?: InputMaybe<CustomerEmailChangeInput>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCustomerImpersonateArgs = {
   customerAccessToken: Scalars['String']['input'];
   input: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationCustomerPasswordChangeArgs = {
   customerAccessToken: Scalars['String']['input'];
-  input?: InputMaybe<CustomerPasswordChangeInputGraphInput>;
+  input?: InputMaybe<CustomerPasswordChangeInput>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCustomerPasswordChangeByRecoveryArgs = {
+  input?: InputMaybe<CustomerPasswordChangeByRecoveryInput>;
   recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1866,7 +2532,7 @@ export type MutationCustomerSimpleLoginStartArgs = {
 
 
 export type MutationCustomerSimpleLoginVerifyAnwserArgs = {
-  anwserId: Scalars['Uuid']['input'];
+  answerId: Scalars['Uuid']['input'];
   input?: InputMaybe<Scalars['String']['input']>;
   questionId: Scalars['Uuid']['input'];
   recaptchaToken?: InputMaybe<Scalars['String']['input']>;
@@ -1886,25 +2552,89 @@ export type MutationCustomerSocialLoginGoogleArgs = {
 };
 
 
+export type MutationCustomerSubscriptionAddressChangeArgs = {
+  addressId: Scalars['ID']['input'];
+  customerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+  subscriptionId: Scalars['Long']['input'];
+};
+
+
+export type MutationCustomerSubscriptionProductAddArgs = {
+  customerAccessToken: Scalars['String']['input'];
+  products: Array<InputMaybe<SubscriptionProductsInput>>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+  subscriptionId: Scalars['Long']['input'];
+};
+
+
+export type MutationCustomerSubscriptionProductRemoveArgs = {
+  customerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+  subscriptionId: Scalars['Long']['input'];
+  subscriptionProducts: Array<InputMaybe<RemoveSubscriptionProductInput>>;
+};
+
+
+export type MutationCustomerSubscriptionUpdateStatusArgs = {
+  customerAccessToken: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+  status: Status;
+  subscriptionId: Scalars['Long']['input'];
+};
+
+
 export type MutationCustomerUpdateArgs = {
   customerAccessToken: Scalars['String']['input'];
   input: CustomerUpdateInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationEventListAddProductArgs = {
+  eventListToken: Scalars['String']['input'];
+  products: Array<InputMaybe<EventListAddProductInput>>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationOrderChangePaymentArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken: Scalars['String']['input'];
+  orderId: Scalars['Long']['input'];
+  paymentData: Scalars['String']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationPartnerAccessTokenCreateArgs = {
   input: PartnerAccessTokenInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationProductCounterOfferSubmitArgs = {
+  input: CounterOfferInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationProductFriendRecommendArgs = {
+  input: FriendRecommendInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationProductPriceAlertArgs = {
   input: AddPriceAlertInput;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationProductRestockAlertArgs = {
   input: RestockAlertInput;
   partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1919,24 +2649,28 @@ export type MutationUpdateAddressArgs = {
   address: UpdateCustomerAddressInput;
   customerAccessToken: Scalars['String']['input'];
   id: Scalars['ID']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationWishlistAddProductArgs = {
   customerAccessToken: Scalars['String']['input'];
   productId: Scalars['Long']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type MutationWishlistRemoveProductArgs = {
   customerAccessToken: Scalars['String']['input'];
   productId: Scalars['Long']['input'];
+  recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type NewsletterInput = {
   email: Scalars['String']['input'];
   informationGroupValues?: InputMaybe<Array<InputMaybe<InformationGroupValueInput>>>;
   name: Scalars['String']['input'];
+  /** [Deprecated: use the root field] The google recaptcha token. */
   recaptchaToken?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -2027,6 +2761,29 @@ export type OrderInvoiceNode = {
   serialDigit?: Maybe<Scalars['String']['output']>;
   /** The invoice URL. */
   url?: Maybe<Scalars['String']['output']>;
+};
+
+export type OrderKitNode = {
+  /** The kit alias */
+  alias?: Maybe<Scalars['String']['output']>;
+  /** The kit URL image */
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  /** The kit unique identifier */
+  kitGroupId?: Maybe<Scalars['String']['output']>;
+  /** The kit identifier */
+  kitId: Scalars['Long']['output'];
+  /** The kit list price */
+  listPrice: Scalars['Decimal']['output'];
+  /** The kit name */
+  name?: Maybe<Scalars['String']['output']>;
+  /** The kit price */
+  price: Scalars['Decimal']['output'];
+  /** The products contained in this kit */
+  products?: Maybe<Array<Maybe<OrderProductNode>>>;
+  /** The kit quantity */
+  quantity: Scalars['Int']['output'];
+  /** The total list price */
+  totalListPrice: Scalars['Decimal']['output'];
 };
 
 export type OrderNoteNode = {
@@ -2121,6 +2878,8 @@ export type OrderProductNode = {
   gift?: Maybe<Scalars['Boolean']['output']>;
   /** The product image. */
   image?: Maybe<Scalars['String']['output']>;
+  /** The product has a kit */
+  kit: Scalars['Boolean']['output'];
   /** The product list price. */
   listPrice: Scalars['Decimal']['output'];
   /** The product name. */
@@ -2155,6 +2914,8 @@ export type OrderSellerNode = {
 export type OrderShippingNode = {
   /** Limit date of delivery, in days. */
   deadline?: Maybe<Scalars['Int']['output']>;
+  /** Limit date of delivery, in hours. */
+  deadlineInHours?: Maybe<Scalars['Int']['output']>;
   /** Deadline text message. */
   deadlineText?: Maybe<Scalars['String']['output']>;
   /** Distribution center unique identifier. */
@@ -2259,6 +3020,21 @@ export type OrderStatusNode = {
   status?: Maybe<Scalars['String']['output']>;
   /** Status unique identifier. */
   statusId: Scalars['Long']['output'];
+};
+
+export type OrderSubscriptionNode = {
+  /** The length of the order signature period. */
+  recurringDays?: Maybe<Scalars['Int']['output']>;
+  /** The order subscription period type. */
+  recurringName?: Maybe<Scalars['String']['output']>;
+  /** The order signing group identifier. */
+  subscriptionGroupId?: Maybe<Scalars['Long']['output']>;
+  /** subscription unique identifier. */
+  subscriptionId?: Maybe<Scalars['Long']['output']>;
+  /** The subscription's order identifier. */
+  subscriptionOrderId?: Maybe<Scalars['Long']['output']>;
+  /** The subscription fee for the order. */
+  value?: Maybe<Scalars['Decimal']['output']>;
 };
 
 export type OrderTrackingNode = {
@@ -2476,8 +3252,12 @@ export type Product = Node & {
   addToCartFromSpot?: Maybe<Scalars['Boolean']['output']>;
   /** The product url alias. */
   alias?: Maybe<Scalars['String']['output']>;
+  /** The complete product url alias. */
+  aliasComplete?: Maybe<Scalars['String']['output']>;
   /** List of the product attributes. */
   attributes?: Maybe<Array<Maybe<ProductAttribute>>>;
+  /** The product author. */
+  author?: Maybe<Scalars['String']['output']>;
   /** Field to check if the product is available in stock. */
   available?: Maybe<Scalars['Boolean']['output']>;
   /** The product average rating. From 0 to 5. */
@@ -2488,6 +3268,8 @@ export type Product = Node & {
   collection?: Maybe<Scalars['String']['output']>;
   /** The product condition. */
   condition?: Maybe<Scalars['String']['output']>;
+  /** Checks if the product allows counteroffers. */
+  counterOffer?: Maybe<Scalars['Boolean']['output']>;
   /** The product creation date. */
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   /** The product delivery deadline. */
@@ -2502,14 +3284,22 @@ export type Product = Node & {
   ean?: Maybe<Scalars['String']['output']>;
   /** Check if the product offers free shipping. */
   freeShipping?: Maybe<Scalars['Boolean']['output']>;
+  /** The product gender. */
+  gender?: Maybe<Scalars['String']['output']>;
+  /** The height of the product. */
+  height?: Maybe<Scalars['Float']['output']>;
   /** The node unique identifier. */
   id?: Maybe<Scalars['ID']['output']>;
   /** List of the product images. */
   images?: Maybe<Array<Maybe<Image>>>;
   /** List of the product insformations. */
   informations?: Maybe<Array<Maybe<Information>>>;
+  /** The length of the product. */
+  length?: Maybe<Scalars['Float']['output']>;
   /** Check if its the main variant. */
   mainVariant?: Maybe<Scalars['Boolean']['output']>;
+  /** The product maximum quantity for an order. */
+  maximumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   /** The product minimum quantity for an order. */
   minimumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   /** Check if the product is a new release. */
@@ -2528,12 +3318,17 @@ export type Product = Node & {
   productId?: Maybe<Scalars['Long']['output']>;
   /** The product name. */
   productName?: Maybe<Scalars['String']['output']>;
-  /** Summarized informations about the subscription of the product. */
+  /**
+   * Summarized informations about the subscription of the product.
+   * @deprecated Use subscriptionGroups to get subscription information.
+   */
   productSubscription?: Maybe<ProductSubscription>;
   /** Variant unique identifier. */
   productVariantId?: Maybe<Scalars['Long']['output']>;
   /** List of promotions this product belongs to. */
   promotions?: Maybe<Array<Maybe<Promotion>>>;
+  /** The product publisher */
+  publisher?: Maybe<Scalars['String']['output']>;
   /** The product seller. */
   seller?: Maybe<Seller>;
   /** List of similar products.  */
@@ -2546,7 +3341,7 @@ export type Product = Node & {
   spotInformation?: Maybe<Scalars['String']['output']>;
   /** Check if the product is on spotlight. */
   spotlight?: Maybe<Scalars['Boolean']['output']>;
-  /** The available stock at the default distribution center. */
+  /** The available aggregated product stock (all variants) at the default distribution center. */
   stock?: Maybe<Scalars['Long']['output']>;
   /** List of the product stocks on different distribution centers. */
   stocks?: Maybe<Array<Maybe<Stock>>>;
@@ -2562,6 +3357,10 @@ export type Product = Node & {
   variantName?: Maybe<Scalars['String']['output']>;
   /** The available aggregated variant stock at the default distribution center. */
   variantStock?: Maybe<Scalars['Long']['output']>;
+  /** The weight of the product. */
+  weight?: Maybe<Scalars['Float']['output']>;
+  /** The width of the product. */
+  width?: Maybe<Scalars['Float']['output']>;
 };
 
 
@@ -2659,10 +3458,16 @@ export type ProductExplicitFiltersInput = {
   categoryId?: InputMaybe<Array<Scalars['Long']['input']>>;
   /** The set of EANs which the result item EAN must be included. */
   ean?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** An external parent ID or a list of IDs to search for products with the external parent ID. */
+  externalParentId?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   /** Retrieve the product variant only if it contains images. */
   hasImages?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Ignores the display rules when searching for products. */
+  ignoreDisplayRules?: InputMaybe<Scalars['Boolean']['input']>;
   /** Retrieve the product variant only if it is the main product variant. */
   mainVariant?: InputMaybe<Scalars['Boolean']['input']>;
+  /** A parent ID or a list of IDs to search for products with the parent ID. */
+  parentId?: InputMaybe<Array<Scalars['Long']['input']>>;
   /** The set of prices to filter. */
   prices?: InputMaybe<PricesInput>;
   /** The product unique identifier (you may provide a list of IDs if needed). */
@@ -2679,6 +3484,8 @@ export type ProductExplicitFiltersInput = {
   stock_lte?: InputMaybe<Scalars['Long']['input']>;
   /** The set of stocks to filter. */
   stocks?: InputMaybe<StocksInput>;
+  /** The subscription group IDs to search for products inside those groups. */
+  subscriptionGroupId?: InputMaybe<Array<Scalars['Long']['input']>>;
   /** Retrieve products which the last update date is greater than or equal to the given date. */
   updatedAt_gte?: InputMaybe<Scalars['String']['input']>;
   /** Retrieve products which the last update date is less than or equal to the given date. */
@@ -2839,6 +3646,8 @@ export type Promotion = {
   content?: Maybe<Scalars['String']['output']>;
   /** Where the promotion is shown (spot, product page, etc..). */
   disclosureType?: Maybe<Scalars['String']['output']>;
+  /** The end date for the promotion. */
+  endDate: Scalars['DateTime']['output'];
   /** The stamp URL of the promotion. */
   fullStampUrl?: Maybe<Scalars['String']['output']>;
   /** The promotion id. */
@@ -2873,17 +3682,32 @@ export type QueryRoot = {
   categories?: Maybe<CategoriesConnection>;
   /** Get info from the checkout cart corresponding to the given ID. */
   checkout?: Maybe<Checkout>;
+  /** Retrieve essential checkout details for a specific cart. */
+  checkoutLite?: Maybe<CheckoutLite>;
   /** List of contents. */
   contents?: Maybe<ContentsConnection>;
   /** Get informations about a customer from the store. */
   customer?: Maybe<Customer>;
+  /** Get informations about a customer access token. */
+  customerAccessTokenDetails?: Maybe<CustomerAccessTokenDetails>;
+  /** Retrieve an event list by the token. */
+  eventList?: Maybe<EventList>;
+  /** Retrieves event types */
+  eventListType?: Maybe<Array<Maybe<EventListType>>>;
+  /** Retrieves a list of store events. */
+  eventLists?: Maybe<Array<Maybe<EventListStore>>>;
   /** Retrieve a single hotsite. A hotsite consists of products, banners and contents. */
   hotsite?: Maybe<SingleHotsite>;
   /** List of the shop's hotsites. A hotsite consists of products, banners and contents. */
   hotsites?: Maybe<HotsitesConnection>;
+  /** Get information group fields. */
+  informationGroupFields?: Maybe<Array<Maybe<InformationGroupFieldNode>>>;
   /** List of menu groups. */
   menuGroups?: Maybe<Array<Maybe<MenuGroup>>>;
-  /** Get newsletter information group fields. */
+  /**
+   * Get newsletter information group fields.
+   * @deprecated Use the informationGroupFields
+   */
   newsletterInformationGroupFields?: Maybe<Array<Maybe<InformationGroupFieldNode>>>;
   node?: Maybe<Node>;
   nodes?: Maybe<Array<Maybe<Node>>>;
@@ -2906,14 +3730,20 @@ export type QueryRoot = {
   productRecommendations?: Maybe<Array<Maybe<Product>>>;
   /** Retrieve a list of products by specific filters. */
   products?: Maybe<ProductsConnection>;
+  /** List of resellers */
+  resellers?: Maybe<ResellersConnection>;
   /** Retrieve a list of scripts. */
   scripts?: Maybe<Array<Maybe<Script>>>;
   /** Search products with cursor pagination. */
   search?: Maybe<Search>;
+  /** Get the shipping quote groups by providing CEP and checkout or products. */
+  shippingQuoteGroups?: Maybe<Array<Maybe<ShippingQuoteGroup>>>;
   /** Get the shipping quotes by providing CEP and checkout or product identifier. */
   shippingQuotes?: Maybe<Array<Maybe<ShippingQuote>>>;
   /** Store informations */
   shop?: Maybe<Shop>;
+  /** Returns a single store setting */
+  shopSetting?: Maybe<ShopSetting>;
   /** Store settings */
   shopSettings?: Maybe<Array<Maybe<ShopSetting>>>;
   /** Get the URI kind. */
@@ -2976,12 +3806,18 @@ export type QueryRootCategoriesArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   sortDirection?: SortDirection;
   sortKey?: CategorySortKeys;
+  urls?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
 export type QueryRootCheckoutArgs = {
   checkoutId: Scalars['String']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryRootCheckoutLiteArgs = {
+  checkoutId: Scalars['Uuid']['input'];
 };
 
 
@@ -3001,6 +3837,23 @@ export type QueryRootCustomerArgs = {
 };
 
 
+export type QueryRootCustomerAccessTokenDetailsArgs = {
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryRootEventListArgs = {
+  eventListToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryRootEventListsArgs = {
+  eventDate?: InputMaybe<Scalars['DateTime']['input']>;
+  eventName?: InputMaybe<Scalars['String']['input']>;
+  eventType?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryRootHotsiteArgs = {
   hotsiteId?: InputMaybe<Scalars['Long']['input']>;
   partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
@@ -3017,6 +3870,11 @@ export type QueryRootHotsitesArgs = {
   partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
   sortDirection?: SortDirection;
   sortKey?: HotsiteSortKeys;
+};
+
+
+export type QueryRootInformationGroupFieldsArgs = {
+  type: EnumInformationGroup;
 };
 
 
@@ -3096,6 +3954,17 @@ export type QueryRootProductsArgs = {
 };
 
 
+export type QueryRootResellersArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  resellerName?: InputMaybe<Scalars['String']['input']>;
+  sortDirection?: SortDirection;
+  sortKey?: ResellerSortKeys;
+};
+
+
 export type QueryRootScriptsArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   pageType?: InputMaybe<Array<ScriptPageType>>;
@@ -3105,9 +3974,17 @@ export type QueryRootScriptsArgs = {
 
 
 export type QueryRootSearchArgs = {
+  autoSecondSearch?: Scalars['Boolean']['input'];
   operation?: Operation;
   partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryRootShippingQuoteGroupsArgs = {
+  cep?: InputMaybe<Scalars['CEP']['input']>;
+  checkoutId: Scalars['Uuid']['input'];
+  useSelectedAddress?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -3115,8 +3992,14 @@ export type QueryRootShippingQuotesArgs = {
   cep?: InputMaybe<Scalars['CEP']['input']>;
   checkoutId?: InputMaybe<Scalars['Uuid']['input']>;
   productVariantId?: InputMaybe<Scalars['Long']['input']>;
+  products?: InputMaybe<Array<InputMaybe<ProductsInput>>>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
   useSelectedAddress?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryRootShopSettingArgs = {
+  settingName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3126,6 +4009,7 @@ export type QueryRootShopSettingsArgs = {
 
 
 export type QueryRootUriArgs = {
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
   url: Scalars['String']['input'];
 };
 
@@ -3133,6 +4017,47 @@ export type Question = {
   answers?: Maybe<Array<Maybe<Answer>>>;
   question?: Maybe<Scalars['String']['output']>;
   questionId?: Maybe<Scalars['String']['output']>;
+};
+
+/** Represents the product to be removed from the subscription. */
+export type RemoveSubscriptionProductInput = {
+  /** The Id of the product within the subscription to be removed. */
+  subscriptionProductId: Scalars['Long']['input'];
+};
+
+export type ResellerNode = {
+  /** Taxpayer identification number for businesses */
+  cnpj?: Maybe<Scalars['String']['output']>;
+  /** The reseller's name */
+  name?: Maybe<Scalars['String']['output']>;
+  /** Reseller unique identifier */
+  resellerId: Scalars['Long']['output'];
+};
+
+/** Define the reseller attribute which the result set will be sorted on. */
+export type ResellerSortKeys =
+  /** Reseller unique identifier */
+  | 'ID'
+  /** The reseller's name */
+  | 'NAME';
+
+/** A connection to a list of items. */
+export type ResellersConnection = {
+  /** A list of edges. */
+  edges?: Maybe<Array<ResellersEdge>>;
+  /** A flattened list of the nodes. */
+  nodes?: Maybe<Array<Maybe<ResellerNode>>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** An edge in a connection. */
+export type ResellersEdge = {
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node?: Maybe<ResellerNode>;
 };
 
 /** Back in stock registration input parameters. */
@@ -3180,7 +4105,7 @@ export type ReviewCreateInput = {
   productVariantId: Scalars['Long']['input'];
   /** The review rating. */
   rating: Scalars['Int']['input'];
-  /** The google recaptcha token. */
+  /** [Deprecated: use the root field] The google recaptcha token. */
   recaptchaToken?: InputMaybe<Scalars['String']['input']>;
   /** The review content. */
   review: Scalars['String']['input'];
@@ -3328,12 +4253,20 @@ export type SearchRecordInput = {
 
 /** The selected payment method details. */
 export type SelectedPaymentMethod = {
+  /** The payment html. */
+  html?: Maybe<Scalars['String']['output']>;
   /** The unique identifier for the selected payment method. */
   id: Scalars['Uuid']['output'];
   /** The list of installments associated with the selected payment method. */
   installments?: Maybe<Array<Maybe<SelectedPaymentMethodInstallment>>>;
+  /** The payment Method Id. */
+  paymentMethodId?: Maybe<Scalars['ID']['output']>;
+  /** Payment related scripts. */
+  scripts?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   /** The selected installment. */
   selectedInstallment?: Maybe<SelectedPaymentMethodInstallment>;
+  /** The suggested cards. */
+  suggestedCards?: Maybe<Array<Maybe<SuggestedCard>>>;
 };
 
 /** Details of an installment of the selected payment method. */
@@ -3394,6 +4327,8 @@ export type SellerPrices = {
 export type ShippingNode = {
   /** The shipping deadline. */
   deadline: Scalars['Int']['output'];
+  /** The shipping deadline in hours. */
+  deadlineInHours?: Maybe<Scalars['Int']['output']>;
   /** The delivery schedule detail. */
   deliverySchedule?: Maybe<DeliveryScheduleDetail>;
   /** The shipping name. */
@@ -3418,6 +4353,8 @@ export type ShippingProduct = {
 export type ShippingQuote = Node & {
   /** The shipping deadline. */
   deadline: Scalars['Int']['output'];
+  /** The shipping deadline in hours. */
+  deadlineInHours?: Maybe<Scalars['Int']['output']>;
   /** The available time slots for scheduling the delivery of the shipping quote. */
   deliverySchedules?: Maybe<Array<Maybe<DeliverySchedule>>>;
   /** The node unique identifier. */
@@ -3434,10 +4371,28 @@ export type ShippingQuote = Node & {
   value: Scalars['Float']['output'];
 };
 
+/** A shipping quote group. */
+export type ShippingQuoteGroup = {
+  /** The distribution center. */
+  distributionCenter?: Maybe<DistributionCenter>;
+  /** The products related to the shipping quote group. */
+  products?: Maybe<Array<Maybe<ShippingQuoteGroupProduct>>>;
+  /** Shipping quotes to group. */
+  shippingQuotes?: Maybe<Array<Maybe<GroupShippingQuote>>>;
+};
+
+/** The product informations related to the shipping. */
+export type ShippingQuoteGroupProduct = {
+  /** The product unique identifier. */
+  productVariantId: Scalars['Int']['output'];
+};
+
 /** Informations about the store. */
 export type Shop = {
   /** Checkout URL */
   checkoutUrl?: Maybe<Scalars['String']['output']>;
+  /** The Google Recaptcha Site Key for reCAPTCHA validation */
+  googleRecaptchaSiteKey?: Maybe<Scalars['String']['output']>;
   /** Store main URL */
   mainUrl?: Maybe<Scalars['String']['output']>;
   /** Mobile checkout URL */
@@ -3450,6 +4405,10 @@ export type Shop = {
   name?: Maybe<Scalars['String']['output']>;
   /** Physical stores */
   physicalStores?: Maybe<Array<Maybe<PhysicalStore>>>;
+  /** The URL to obtain the SitemapImagens.xml file */
+  sitemapImagesUrl?: Maybe<Scalars['String']['output']>;
+  /** The URL to obtain the Sitemap.xml file */
+  sitemapUrl?: Maybe<Scalars['String']['output']>;
 };
 
 /** Store setting. */
@@ -3569,10 +4528,14 @@ export type SingleProduct = Node & {
   addToCartFromSpot?: Maybe<Scalars['Boolean']['output']>;
   /** The product url alias. */
   alias?: Maybe<Scalars['String']['output']>;
+  /** The complete product url alias. */
+  aliasComplete?: Maybe<Scalars['String']['output']>;
   /** Information about the possible selection attributes. */
   attributeSelections?: Maybe<AttributeSelection>;
   /** List of the product attributes. */
   attributes?: Maybe<Array<Maybe<ProductAttribute>>>;
+  /** The product author. */
+  author?: Maybe<Scalars['String']['output']>;
   /** Field to check if the product is available in stock. */
   available?: Maybe<Scalars['Boolean']['output']>;
   /** The product average rating. From 0 to 5. */
@@ -3583,16 +4546,22 @@ export type SingleProduct = Node & {
   buyBox?: Maybe<BuyBox>;
   /** Buy together products. */
   buyTogether?: Maybe<Array<Maybe<SingleProduct>>>;
+  /** Buy together groups products. */
+  buyTogetherGroups?: Maybe<Array<Maybe<BuyTogetherGroup>>>;
   /** The product collection. */
   collection?: Maybe<Scalars['String']['output']>;
   /** The product condition. */
   condition?: Maybe<Scalars['String']['output']>;
+  /** Checks if the product allows counteroffers. */
+  counterOffer?: Maybe<Scalars['Boolean']['output']>;
   /** The product creation date. */
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   /** A list of customizations available for the given products. */
   customizations?: Maybe<Array<Maybe<Customization>>>;
   /** The product delivery deadline. */
   deadline?: Maybe<Scalars['Int']['output']>;
+  /** Product deadline alert informations. */
+  deadlineAlert?: Maybe<DeadlineAlert>;
   /** Check if the product should be displayed. */
   display?: Maybe<Scalars['Boolean']['output']>;
   /** Check if the product should be displayed only for partners. */
@@ -3603,14 +4572,22 @@ export type SingleProduct = Node & {
   ean?: Maybe<Scalars['String']['output']>;
   /** Check if the product offers free shipping. */
   freeShipping?: Maybe<Scalars['Boolean']['output']>;
+  /** The product gender. */
+  gender?: Maybe<Scalars['String']['output']>;
+  /** The height of the product. */
+  height?: Maybe<Scalars['Float']['output']>;
   /** The node unique identifier. */
   id?: Maybe<Scalars['ID']['output']>;
   /** List of the product images. */
   images?: Maybe<Array<Maybe<Image>>>;
   /** List of the product insformations. */
   informations?: Maybe<Array<Maybe<Information>>>;
+  /** The length of the product. */
+  length?: Maybe<Scalars['Float']['output']>;
   /** Check if its the main variant. */
   mainVariant?: Maybe<Scalars['Boolean']['output']>;
+  /** The product maximum quantity for an order. */
+  maximumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   /** The product minimum quantity for an order. */
   minimumOrderQuantity?: Maybe<Scalars['Int']['output']>;
   /** Check if the product is a new release. */
@@ -3631,12 +4608,17 @@ export type SingleProduct = Node & {
   productId?: Maybe<Scalars['Long']['output']>;
   /** The product name. */
   productName?: Maybe<Scalars['String']['output']>;
-  /** Summarized informations about the subscription of the product. */
+  /**
+   * Summarized informations about the subscription of the product.
+   * @deprecated Use subscriptionGroups to get subscription information.
+   */
   productSubscription?: Maybe<ProductSubscription>;
   /** Variant unique identifier. */
   productVariantId?: Maybe<Scalars['Long']['output']>;
   /** List of promotions this product belongs to. */
   promotions?: Maybe<Array<Maybe<Promotion>>>;
+  /** The product publisher */
+  publisher?: Maybe<Scalars['String']['output']>;
   /** List of customer reviews for this product. */
   reviews?: Maybe<Array<Maybe<Review>>>;
   /** The product seller. */
@@ -3653,7 +4635,7 @@ export type SingleProduct = Node & {
   spotInformation?: Maybe<Scalars['String']['output']>;
   /** Check if the product is on spotlight. */
   spotlight?: Maybe<Scalars['Boolean']['output']>;
-  /** The available stock at the default distribution center. */
+  /** The available aggregated product stock (all variants) at the default distribution center. */
   stock?: Maybe<Scalars['Long']['output']>;
   /** List of the product stocks on different distribution centers. */
   stocks?: Maybe<Array<Maybe<Stock>>>;
@@ -3669,11 +4651,16 @@ export type SingleProduct = Node & {
   variantName?: Maybe<Scalars['String']['output']>;
   /** The available aggregated variant stock at the default distribution center. */
   variantStock?: Maybe<Scalars['Long']['output']>;
+  /** The weight of the product. */
+  weight?: Maybe<Scalars['Float']['output']>;
+  /** The width of the product. */
+  width?: Maybe<Scalars['Float']['output']>;
 };
 
 
 /** A product represents an item for sale in the store. */
 export type SingleProductAttributeSelectionsArgs = {
+  includeParentIdVariants?: InputMaybe<Scalars['Boolean']['input']>;
   selected?: InputMaybe<Array<InputMaybe<AttributeFilterInput>>>;
 };
 
@@ -3690,6 +4677,12 @@ export type SortDirection =
   | 'ASC'
   /** The results will be sorted in an descending order. */
   | 'DESC';
+
+/** The subscription status to update. */
+export type Status =
+  | 'ACTIVE'
+  | 'CANCELED'
+  | 'PAUSED';
 
 /** Information about a product stock in a particular distribution center. */
 export type Stock = {
@@ -3726,6 +4719,14 @@ export type SubscriptionGroup = {
   subscriptionOnly: Scalars['Boolean']['output'];
 };
 
+/** Represents the product to be applied to the subscription. */
+export type SubscriptionProductsInput = {
+  /** The variant Id of the product. */
+  productVariantId: Scalars['Long']['input'];
+  /** The quantity of the product. */
+  quantity: Scalars['Int']['input'];
+};
+
 export type SubscriptionRecurringType = {
   /** The number of days of the recurring type. */
   days: Scalars['Int']['output'];
@@ -3735,7 +4736,27 @@ export type SubscriptionRecurringType = {
   recurringTypeId: Scalars['Long']['output'];
 };
 
+export type SuggestedCard = {
+  /** Credit card brand. */
+  brand?: Maybe<Scalars['String']['output']>;
+  /** Credit card key. */
+  key?: Maybe<Scalars['String']['output']>;
+  /** Customer name on credit card. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** Credit card number. */
+  number?: Maybe<Scalars['String']['output']>;
+};
+
+/** Represents the Type of Customer's Checking Account. */
+export type TypeCheckingAccount =
+  /** Credit */
+  | 'Credit'
+  /** Debit */
+  | 'Debit';
+
 export type UpdateCustomerAddressInput = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  address2?: InputMaybe<Scalars['String']['input']>;
   addressDetails?: InputMaybe<Scalars['String']['input']>;
   addressNumber?: InputMaybe<Scalars['String']['input']>;
   cep?: InputMaybe<Scalars['CEP']['input']>;
@@ -3800,10 +4821,12 @@ export type ForbiddenTerm = {
 };
 
 export type Order = {
+  /** Checking account value used for the order. */
+  checkingAccount: Scalars['Decimal']['output'];
+  /** The checkout unique identifier. */
+  checkoutId: Scalars['Uuid']['output'];
   /** The coupon for discounts. */
   coupon?: Maybe<Scalars['String']['output']>;
-  /** Current account value used for the order. */
-  currentAccount: Scalars['Decimal']['output'];
   /** The date when te order was placed. */
   date: Scalars['DateTime']['output'];
   /** The address where the order will be delivered. */
@@ -3814,6 +4837,8 @@ export type Order = {
   interestFee: Scalars['Decimal']['output'];
   /** Information about order invoices. */
   invoices?: Maybe<Array<Maybe<OrderInvoiceNode>>>;
+  /** A list of kits belonging to the order. */
+  kits?: Maybe<Array<Maybe<OrderKitNode>>>;
   /** Information about order notes. */
   notes?: Maybe<Array<Maybe<OrderNoteNode>>>;
   /** Order unique identifier. */
@@ -3834,6 +4859,8 @@ export type Order = {
   status?: Maybe<OrderStatusNode>;
   /** List of the order status history. */
   statusHistory?: Maybe<Array<Maybe<OrderStatusNode>>>;
+  /** List of order subscriptions. */
+  subscriptions?: Maybe<Array<Maybe<OrderSubscriptionNode>>>;
   /** Order subtotal value. */
   subtotal: Scalars['Decimal']['output'];
   /** Order total value. */
@@ -3861,12 +4888,18 @@ export type Period = {
   start?: Maybe<Scalars['String']['output']>;
 };
 
+/** The list of products to quote shipping. */
+export type ProductsInput = {
+  productVariantId: Scalars['Long']['input'];
+  quantity: Scalars['Int']['input'];
+};
+
 export type Wishlist = {
   /** Wishlist products. */
   products?: Maybe<Array<Maybe<Product>>>;
 };
 
-export type CheckoutFragment = { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null } | null> | null };
+export type CheckoutFragment = { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null };
 
 export type ProductFragment = { mainVariant?: boolean | null, productName?: string | null, productId?: any | null, alias?: string | null, available?: boolean | null, averageRating?: number | null, condition?: string | null, createdAt?: any | null, ean?: string | null, id?: string | null, minimumOrderQuantity?: number | null, productVariantId?: any | null, parentId?: any | null, sku?: string | null, numberOfVotes?: number | null, stock?: any | null, variantName?: string | null, variantStock?: any | null, collection?: string | null, urlVideo?: string | null, attributes?: Array<{ value?: string | null, name?: string | null } | null> | null, productCategories?: Array<{ name?: string | null, url?: string | null, hierarchy?: string | null, main: boolean, googleCategories?: string | null } | null> | null, informations?: Array<{ title?: string | null, value?: string | null, type?: string | null } | null> | null, images?: Array<{ url?: string | null, fileName?: string | null, print: boolean } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null, productBrand?: { fullUrlLogo?: string | null, logoUrl?: string | null, name?: string | null, alias?: string | null } | null, seller?: { name?: string | null } | null, similarProducts?: Array<{ alias?: string | null, image?: string | null, imageUrl?: string | null, name?: string | null } | null> | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null };
 
@@ -3888,6 +4921,7 @@ export type WishlistReducedProductFragment = { productId?: any | null, productNa
 
 export type GetProductQueryVariables = Exact<{
   productId: Scalars['Long']['input'];
+  includeParentIdVariants?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
@@ -3898,12 +4932,12 @@ export type GetCartQueryVariables = Exact<{
 }>;
 
 
-export type GetCartQuery = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null } | null> | null } | null };
+export type GetCartQuery = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type CreateCartMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CreateCartMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null } | null> | null } | null };
+export type CreateCartMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type GetProductsQueryVariables = Exact<{
   filters: ProductExplicitFiltersInput;
@@ -3938,28 +4972,28 @@ export type AddCouponMutationVariables = Exact<{
 }>;
 
 
-export type AddCouponMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null } | null> | null } | null };
+export type AddCouponMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type AddItemToCartMutationVariables = Exact<{
   input: CheckoutProductInput;
 }>;
 
 
-export type AddItemToCartMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null } | null> | null } | null };
+export type AddItemToCartMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type RemoveCouponMutationVariables = Exact<{
   checkoutId: Scalars['Uuid']['input'];
 }>;
 
 
-export type RemoveCouponMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null } | null> | null } | null };
+export type RemoveCouponMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type RemoveItemFromCartMutationVariables = Exact<{
   input: CheckoutProductInput;
 }>;
 
 
-export type RemoveItemFromCartMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null } | null> | null } | null };
+export type RemoveItemFromCartMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type ProductRestockAlertMutationVariables = Exact<{
   input: RestockAlertInput;
@@ -4088,3 +5122,10 @@ export type ShopQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ShopQuery = { shop?: { checkoutUrl?: string | null, mainUrl?: string | null, mobileCheckoutUrl?: string | null, mobileUrl?: string | null, modifiedName?: string | null, name?: string | null } | null };
+
+export type BuyListQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type BuyListQuery = { buyList?: { mainVariant?: boolean | null, productName?: string | null, productId?: any | null, alias?: string | null, collection?: string | null, kit: boolean, numberOfVotes?: number | null, available?: boolean | null, averageRating?: number | null, condition?: string | null, createdAt?: any | null, ean?: string | null, id?: string | null, minimumOrderQuantity?: number | null, productVariantId?: any | null, sku?: string | null, stock?: any | null, variantName?: string | null, parallelOptions?: Array<string | null> | null, urlVideo?: string | null, buyListId: number, attributes?: Array<{ name?: string | null, type?: string | null, value?: string | null, attributeId: any, displayType?: string | null, id?: string | null } | null> | null, productCategories?: Array<{ name?: string | null, url?: string | null, hierarchy?: string | null, main: boolean, googleCategories?: string | null } | null> | null, informations?: Array<{ title?: string | null, value?: string | null, type?: string | null, id: any } | null> | null, breadcrumbs?: Array<{ text?: string | null, link?: string | null } | null> | null, images?: Array<{ url?: string | null, fileName?: string | null, print: boolean } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null, productBrand?: { fullUrlLogo?: string | null, logoUrl?: string | null, name?: string | null, alias?: string | null } | null, seller?: { name?: string | null } | null, seo?: Array<{ name?: string | null, scheme?: string | null, type?: string | null, httpEquiv?: string | null, content?: string | null } | null> | null, reviews?: Array<{ rating: number, review?: string | null, reviewDate: any, email?: string | null, customer?: string | null } | null> | null, similarProducts?: Array<{ alias?: string | null, image?: string | null, imageUrl?: string | null, name?: string | null } | null> | null, attributeSelections?: { canBeMatrix: boolean, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, value?: string | null, selected: boolean, printUrl?: string | null } | null> | null } | null> | null, matrix?: { column?: { displayType?: string | null, name?: string | null, values?: Array<{ value?: string | null } | null> | null } | null, data?: Array<Array<{ available: boolean, productVariantId: any, stock: any } | null> | null> | null, row?: { displayType?: string | null, name?: string | null, values?: Array<{ value?: string | null, printUrl?: string | null } | null> | null } | null } | null } | null, buyTogether?: Array<{ productId?: any | null } | null> | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null, buyListProducts?: Array<{ productId: any, quantity: number, includeSameParent: boolean } | null> | null } | null };

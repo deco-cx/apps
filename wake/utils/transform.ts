@@ -303,6 +303,17 @@ export const toProduct = (
     });
   }
 
+  //@ts-expect-error kit prop exists on buy list
+  if (variant.kit) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "kit",
+      //@ts-expect-error kit prop exists on buy list
+      value: variant.kit,
+      valueReference: "PROPERTY",
+    });
+  }
+
   if (variant.collection) {
     additionalProperty.push({
       "@type": "PropertyValue",
