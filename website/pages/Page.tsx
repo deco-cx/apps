@@ -1,24 +1,22 @@
 import { Head } from "$fresh/runtime.ts";
-import { Section } from "deco/blocks/section.ts";
-import { ComponentMetadata } from "deco/engine/block.ts";
+import type { Page } from "deco/blocks/page.tsx";
+import { Section, SectionProps } from "deco/blocks/section.ts";
+import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
+import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
+import { isDeferred } from "deco/mod.ts";
+import { logger } from "deco/observability/otel/config.ts";
 import {
   usePageContext as useDecoPageContext,
   useRouterContext,
 } from "deco/runtime/fresh/routes/entrypoint.tsx";
-import { JSX } from "preact";
+import { Component, JSX } from "preact";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import Clickhouse from "../components/Clickhouse.tsx";
 import Events from "../components/Events.tsx";
+import { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
 import { AppContext } from "../mod.ts";
-import type { Page } from "deco/blocks/page.tsx";
-import { Component } from "preact";
-import { ComponentFunc } from "deco/engine/block.ts";
-import { HttpError } from "deco/engine/errors.ts";
-import { logger } from "deco/observability/otel/config.ts";
-import { isDeferred } from "deco/mod.ts";
-import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import { SEOSection } from "../components/Seo.tsx";
-import Clickhouse from "../components/Clickhouse.tsx";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -105,12 +103,8 @@ function Page({
   unindexedDomain,
   avoidRedirectingToEditor,
   sendToClickHouse,
-}: Props & {
-  errorPage?: Page;
-  devMode: boolean;
-  avoidRedirectingToEditor?: boolean;
-  sendToClickHouse?: boolean;
-}): JSX.Element {
+  pageSections,
+}: SectionProps<typeof loader>): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
@@ -147,6 +141,7 @@ function Page({
         {sendToClickHouse && (
           <Clickhouse siteId={site.id} siteName={site.name} />
         )}
+        {pageSections?.map(renderSection)}
         {sections.map(renderSection)}
       </ErrorBoundary>
     </>
@@ -165,9 +160,16 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
+  const pageSections = await Promise.all(
+    (ctx.pageSections || [])?.map(async (section) => {
+      return await ctx.get(section);
+    }),
+  );
+
   return {
     ...restProps,
     sections,
+    pageSections,
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
@@ -178,8 +180,8 @@ export const loader = async (
   };
 };
 
-export function Preview(props: Props) {
-  const { sections, seo } = props;
+export function Preview(props: SectionProps<typeof loader>) {
+  const { sections, seo, pageSections } = props;
   const deco = useDeco();
 
   return (
@@ -190,6 +192,7 @@ export function Preview(props: Props) {
 
       {seo && renderSection(seo)}
       <Events deco={deco} />
+      {pageSections?.map(renderSection)}
       {sections.map(renderSection)}
     </>
   );

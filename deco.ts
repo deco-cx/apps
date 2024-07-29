@@ -11,6 +11,7 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("smarthint"),
+    app("ra-trustvox"),
     app("anthropic"),
     app("resend"),
     app("konfidency"),
