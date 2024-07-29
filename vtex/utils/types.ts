@@ -1,4 +1,8 @@
-/** @description Equivalent to sku ID in VTEX platform */
+/**
+ * @format dynamic-options
+ * @options vtex/loaders/options/productIdByTerm.ts
+ * @description Equivalent to sku ID in VTEX platform
+ */
 export type ProductID = string;
 
 export interface OrderForm {
