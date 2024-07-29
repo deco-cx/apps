@@ -29,6 +29,7 @@ import {
   toProduct,
 } from "../../utils/transform.ts";
 import type {
+  EnumPageType,
   Facet,
   Fuzzy,
   PageType,
@@ -95,6 +96,16 @@ const ALLOWED_PARAMS = new Set([
   "map",
 ]);
 
+/** @title {{{pageType}}} */
+interface SortByPagetype {
+  pageType: EnumPageType;
+  sort: Sort;
+}
+
+interface AdvancedSettings {
+  sortByPageType?: SortByPagetype[];
+}
+
 export interface Props {
   /**
    * @description overides the query term
@@ -150,9 +161,16 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+
+  advancedSettings?: AdvancedSettings;
 }
 
-const searchArgsOf = (props: Props, url: URL) => {
+const searchArgsOf = (
+  props: Props,
+  url: URL,
+  pageType: PageType[],
+  advancedSettings?: AdvancedSettings,
+) => {
   const hideUnavailableItems = props.hideUnavailableItems;
   const countFromSearchParams = url.searchParams.get("PS");
   const count = Number(countFromSearchParams ?? props.count ?? 12);
@@ -167,6 +185,9 @@ const searchArgsOf = (props: Props, url: URL) => {
     );
   const sort = (url.searchParams.get("sort") as Sort) ??
     LEGACY_TO_IS[url.searchParams.get("O") ?? ""] ??
+    (advancedSettings?.sortByPageType?.find((s) =>
+      s.pageType === pageType[0].pageType
+    )?.sort) ??
     props.sort ??
     sortOptions[0].value;
   const selectedFacets = mergeFacets(
@@ -279,11 +300,6 @@ const loader = async (
   const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
-  const {
-    selectedFacets: baseSelectedFacets,
-    page,
-    ...args
-  } = searchArgsOf(props, url);
 
   let pathToUse = url.pathname;
 
@@ -296,6 +312,12 @@ const loader = async (
   const allPageTypes = await pageTypesPromise;
 
   const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+
+  const {
+    selectedFacets: baseSelectedFacets,
+    page,
+    ...args
+  } = searchArgsOf(props, url, pageTypes, props.advancedSettings);
 
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)

@@ -667,23 +667,25 @@ export type LegacyFacets = {
   PriceRanges: LegacyFacet[];
 };
 
+export type EnumPageType =
+  | "Brand"
+  | "Category"
+  | "Department"
+  | "SubCategory"
+  | "Product"
+  | "Collection"
+  | "Cluster"
+  | "NotFound"
+  | "FullText"
+  | "Search";
+
 export interface PageType {
   id: string | null;
   name: string | null;
   url: string | null;
   title: string | null;
   metaTagDescription: string | null;
-  pageType:
-    | "Brand"
-    | "Category"
-    | "Department"
-    | "SubCategory"
-    | "Product"
-    | "Collection"
-    | "Cluster"
-    | "NotFound"
-    | "FullText"
-    | "Search";
+  pageType: EnumPageType;
 }
 
 export interface Category {
