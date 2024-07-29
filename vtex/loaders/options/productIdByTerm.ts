@@ -30,6 +30,7 @@ const loader = async (
   return suggestions?.products?.map((product) => ({
     value: `${product.productID}`,
     label: `${product.productID} - ${product.name}`,
+    image: product.image?.[0]?.url,
   }));
 };
 
