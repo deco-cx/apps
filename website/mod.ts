@@ -81,7 +81,7 @@ export interface Props {
 
   /**
    * @title Global Sections
-   * @description These sections run once on the start of the website and will be included on the start of each page
+   * @description These sections will be included on the start of each page
    */
   global?: Section[];
 
