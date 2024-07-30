@@ -86,12 +86,6 @@ export interface Props {
   global?: Section[];
 
   /**
-   * @title Page Sections
-   * @description These sections will be included on each page
-   */
-  pageSections?: Section[];
-
-  /**
    * @title Error Page
    * @description This page will be used when something goes wrong beyond section error-boundaries when rendering a page
    */
@@ -251,7 +245,7 @@ export const onBeforeResolveProps = <
     routes?: Routes[];
     errorPage?: Page;
     abTesting: AbTesting;
-    pageSections?: Section[];
+    global: Section[];
   },
 >(
   props: T,
@@ -259,7 +253,7 @@ export const onBeforeResolveProps = <
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
-      pageSections: props.pageSections?.map((section) =>
+      globalSections: props.global?.map((section) =>
         asResolved(section, false)
       ),
       errorPage: props.errorPage
