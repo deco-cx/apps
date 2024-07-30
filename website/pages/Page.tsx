@@ -103,7 +103,6 @@ function Page({
   unindexedDomain,
   avoidRedirectingToEditor,
   sendToClickHouse,
-  pageSections,
 }: SectionProps<typeof loader>): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -141,7 +140,6 @@ function Page({
         {sendToClickHouse && (
           <Clickhouse siteId={site.id} siteName={site.name} />
         )}
-        {pageSections?.map(renderSection)}
         {sections.map(renderSection)}
       </ErrorBoundary>
     </>
@@ -160,19 +158,20 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
-  const pageSections = await Promise.all(
-    (ctx.pageSections || [])?.map(async (section) => {
+  const global = await Promise.all(
+    (ctx.global || [])?.map(async (section) => {
       if (isDeferred(section)) {
-        return await section() as Section;
+        return await ctx.get(section) as Section;
       }
       return section;
     }),
   );
 
+
+  console.log(global)
   return {
     ...restProps,
-    sections,
-    pageSections,
+    sections: [...global, ...sections],
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
@@ -184,7 +183,7 @@ export const loader = async (
 };
 
 export function Preview(props: SectionProps<typeof loader>) {
-  const { sections, seo, pageSections } = props;
+  const { sections, seo } = props;
   const deco = useDeco();
 
   return (
@@ -195,7 +194,6 @@ export function Preview(props: SectionProps<typeof loader>) {
 
       {seo && renderSection(seo)}
       <Events deco={deco} />
-      {pageSections?.map(renderSection)}
       {sections.map(renderSection)}
     </>
   );
