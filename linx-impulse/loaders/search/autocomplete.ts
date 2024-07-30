@@ -1,4 +1,4 @@
-import type { Suggestion } from "../../../commerce/types.ts";
+import type { Person, Suggestion } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 import getSource from "../../utils/source.ts";
@@ -11,6 +11,17 @@ export interface Props {
    * @default 5
    */
   count?: number;
+
+  /**
+   * @title User
+   * @description Used to sync user data with linx impulse
+   */
+  user?: Person | null;
+
+  /**
+   * @ignore
+   */
+  userId?: string;
 }
 
 /**
@@ -23,7 +34,8 @@ const loaders = async (
   ctx: AppContext,
 ): Promise<Suggestion | null> => {
   const { api, apiKey, origin, cdn } = ctx;
-  const { query, count = 20 } = props;
+  const { query, count = 20, user, userId: _userId } = props;
+  const userId = _userId ?? user?.["@id"];
 
   if (!query) return null;
 
@@ -37,6 +49,7 @@ const loaders = async (
     salesChannel: ctx.salesChannel,
     source: getSource(ctx),
     productFormat: "complete",
+    userId,
   })
     .then((res) => res.json())
     .catch(() => null);
