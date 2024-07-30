@@ -25,7 +25,7 @@ export const middleware = (
           value: cookie,
           name,
           path: "/",
-          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
           // secure: true,
           // httpOnly: true,
         });
