@@ -36,6 +36,7 @@ import type {
   SelectedFacet,
   Sort,
 } from "../../utils/types.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 import { redirect } from "deco/mod.ts";
 
@@ -379,7 +380,7 @@ const loader = async (
   const products = await Promise.all(
     vtexProducts
       .map((p) =>
-        toProduct(p, p.items[0], 0, {
+        toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
           baseUrl: baseUrl,
           priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })

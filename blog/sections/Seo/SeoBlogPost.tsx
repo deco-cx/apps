@@ -36,6 +36,12 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
+  // Some HTML can break the meta tag
+  const jsonLDWithoutContent = {
+    ...jsonLD,
+    post: { ...jsonLD?.post, content: undefined },
+  };
+
   return {
     ...seoSiteProps,
     title,
@@ -43,7 +49,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     image,
     canonical,
     noIndexing,
-    jsonLDs: [jsonLD],
+    jsonLDs: [jsonLDWithoutContent],
   };
 }
 

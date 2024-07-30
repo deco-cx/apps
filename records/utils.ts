@@ -1,6 +1,7 @@
 import { context } from "deco/live.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { brightGreen, brightRed } from "std/fmt/colors.ts";
+import { join } from "https://deno.land/std@0.204.0/path/join.ts";
 
 export interface StorageConfig {
   /**
@@ -14,10 +15,10 @@ export interface StorageConfig {
   authToken: Secret;
 }
 
-export const getLocalDbFilename = () => `${Deno.cwd()}/sqlite.db`;
+export const getLocalDbFilename = () => join(Deno.cwd(), "sqlite.db");
 
 export const getLocalSQLClientConfig = () => ({
-  url: `file://${getLocalDbFilename()}`,
+  url: new URL(`file://${getLocalDbFilename()}`).href,
   authToken: "",
 });
 

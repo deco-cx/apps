@@ -132,7 +132,7 @@ export const pageTypesToSeo = (
   }
 
   return {
-    title: current.title!,
+    title: current.title || current.name || "",
     description: current.metaTagDescription!,
     noIndexing: hasMapTermOrSkuId,
     canonical: toCanonical(

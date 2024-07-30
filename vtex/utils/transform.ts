@@ -2,10 +2,13 @@ import type {
   AggregateOffer,
   Brand,
   BreadcrumbList,
+  DayOfWeek,
   Filter,
   FilterToggleValue,
   Offer,
+  OpeningHoursSpecification,
   PageType,
+  Place,
   Product,
   ProductDetailsPage,
   ProductGroup,
@@ -15,6 +18,7 @@ import type {
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
+import type { PickupPoint as PickupPointVCS } from "./openapi/vcs.openapi.gen.ts";
 import { slugify } from "./slugify.ts";
 import type {
   Brand as BrandVTEX,
@@ -28,6 +32,7 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   PageType as PageTypeVTEX,
+  PickupPoint,
   Product as ProductVTEX,
   ProductRating,
   ProductReviewData,
@@ -680,6 +685,7 @@ export const legacyFacetToFilter = (
   term: string,
   behavior: "dynamic" | "static",
   ignoreCaseSelected?: boolean,
+  fullPath = false,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = term.replace(/^\//, "").split("/").slice(
@@ -699,7 +705,9 @@ export const legacyFacetToFilter = (
   // category2/123?map=c,productClusterIds -> DO NOT WORK
   // category1/category2/123?map=c,c,productClusterIds -> WORK
   const hasProductClusterIds = mapSegments.includes("productClusterIds");
-  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") ||
+  const hasToBeFullpath = fullPath ||
+    hasProductClusterIds ||
+    mapSegments.includes("ft") ||
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
@@ -797,6 +805,8 @@ export const legacyFacetToFilter = (
             map,
             term,
             behavior,
+            ignoreCaseSelected,
+            fullPath,
           )
           : undefined,
       };
@@ -1035,3 +1045,103 @@ export const parsePageType = (p: PageTypeVTEX): PageType => {
 
   return type;
 };
+
+function dayOfWeekIndexToString(day?: number): DayOfWeek | undefined {
+  switch (day) {
+    case 0:
+      return "Sunday";
+    case 1:
+      return "Monday";
+    case 2:
+      return "Tuesday";
+    case 3:
+      return "Wednesday";
+    case 4:
+      return "Thursday";
+    case 5:
+      return "Friday";
+    case 6:
+      return "Saturday";
+    default:
+      return undefined;
+  }
+}
+
+interface Hours {
+  dayOfWeek?: number;
+  openingTime?: string;
+  closingTime?: string;
+}
+
+function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
+  return {
+    "@type": "OpeningHoursSpecification",
+    opens: hours.openingTime,
+    closes: hours.closingTime,
+    dayOfWeek: dayOfWeekIndexToString(hours.dayOfWeek),
+  };
+}
+
+function isPickupPointVCS(
+  pickupPoint: PickupPoint | PickupPointVCS,
+): pickupPoint is PickupPointVCS {
+  return "name" in pickupPoint;
+}
+
+export function toPlace(
+  pickupPoint: PickupPoint & { distance?: number } | PickupPointVCS,
+): Place {
+  const {
+    name,
+    country,
+    latitude,
+    longitude,
+    openingHoursSpecification,
+  } = isPickupPointVCS(pickupPoint)
+    ? {
+      name: pickupPoint.name,
+      country: pickupPoint.address?.country?.acronym,
+      latitude: pickupPoint.address?.location?.latitude,
+      longitude: pickupPoint.address?.location?.longitude,
+      openingHoursSpecification: pickupPoint.businessHours?.map(
+        toHoursSpecification,
+      ),
+    }
+    : {
+      name: pickupPoint.friendlyName,
+      country: pickupPoint.address?.country,
+      latitude: pickupPoint.address?.geoCoordinates[0],
+      longitude: pickupPoint.address?.geoCoordinates[1],
+      openingHoursSpecification: pickupPoint.businessHours?.map((
+        { ClosingTime, DayOfWeek, OpeningTime },
+      ) =>
+        toHoursSpecification({
+          closingTime: ClosingTime,
+          dayOfWeek: DayOfWeek,
+          openingTime: OpeningTime,
+        })
+      ),
+    };
+
+  return {
+    "@id": pickupPoint.id,
+    "@type": "Place",
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: country,
+      addressLocality: pickupPoint.address?.city,
+      addressRegion: pickupPoint.address?.state,
+      postalCode: pickupPoint.address?.postalCode,
+      streetAddress: pickupPoint.address?.street,
+    },
+    latitude,
+    longitude,
+    name,
+    openingHoursSpecification,
+    additionalProperty: [{
+      "@type": "PropertyValue",
+      name: "distance",
+      value: `${pickupPoint.distance}`,
+    }],
+  };
+}

@@ -1,4 +1,4 @@
-import { __DECO_FBT } from "../website/handlers/fresh.ts";
+export const __DECO_FBT = "__decoFBT";
 
 export const shouldForceRender = <Ctx extends { isBot?: boolean }>(
   { ctx, searchParams }: { ctx: Ctx; searchParams: URLSearchParams },
