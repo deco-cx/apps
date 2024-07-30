@@ -145,9 +145,7 @@ export interface Props {
 /**
  * @title Website
  */
-export default function App({ theme, ...state }: Props): App<Manifest, Props> {
-  const global = theme ? [...(state.global ?? []), theme] : state.global;
-
+export default function App({ ...state }: Props): App<Manifest, Props> {
   return {
     state,
     manifest: {
@@ -237,9 +235,7 @@ export const onBeforeResolveProps = <
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
-      global: props.global?.map((section) =>
-        asResolved(section, false)
-      ),
+      global: props.global?.map((section) => asResolved(section, false)),
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
         : undefined,
