@@ -18,6 +18,8 @@ export default async function redirect(
   req: Request,
   ctx: AppContext,
 ): Promise<{ location: Location } | null> {
+  const user = await ctx.invoke.linx.loaders.user();
+
   const { api } = ctx;
   const requestHost = new URL(req.url).hostname;
 
@@ -44,13 +46,16 @@ export default async function redirect(
 
   proxySetCookie(response.headers, ctx.response.headers, req.url);
 
-  setCookie(ctx.response.headers, {
-    name: "lcsid",
-    value: "",
-    expires: new Date(0),
-    domain: requestHost ?? undefined,
-    path: "/",
-  });
+  if (!user) {
+    setCookie(ctx.response.headers, {
+      name: "lcsid",
+      value: "",
+      expires: new Date(0),
+      domain: requestHost ?? undefined,
+      path: "/",
+    });
+  }
+
 
   const url = new URL(location);
 
