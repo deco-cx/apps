@@ -26,11 +26,11 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
   const title = renderTemplateString(
     titleTemplate,
-    titleProp || jsonLD?.seo?.title || ""
+    titleProp || jsonLD?.seo?.title || "",
   );
   const description = renderTemplateString(
     descriptionTemplate,
-    descriptionProp || jsonLD?.seo?.description || ""
+    descriptionProp || jsonLD?.seo?.description || "",
   );
   const image = jsonLD?.post.image;
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
