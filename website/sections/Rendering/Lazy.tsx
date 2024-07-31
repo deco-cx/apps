@@ -1,5 +1,6 @@
 import type { Section } from "deco/blocks/section.ts";
 import { SectionContext } from "deco/components/section.tsx";
+import { RequestContext } from "deco/deco.ts";
 import { asResolved, context, isDeferred } from "deco/mod.ts";
 import { useContext } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
@@ -79,44 +80,33 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
     };
   }
 
-  const resolvingMatchers: Record<string, boolean> = {};
-  const resolvedSection = isDeferred<Section>(section)
-    ? await section({}, {
-      propagateOptions: true,
-      hooks: {
-        onResolveStart: (resolve, _props, resolver, _resolveType, ctx) => {
-          if (ctx.resolveId in resolvingMatchers) {
-            return resolve();
-          }
-          if (resolver?.type === "loaders") {
-            // deno-lint-ignore no-explicit-any
-            return undefined as any;
-          }
-          return resolve();
-        },
-        onPropsResolveStart: (
-          resolve,
-          _props,
-          resolver,
-          _resolveType,
-          ctx,
-        ) => {
-          if (ctx.resolveId in resolvingMatchers) {
-            return resolve();
-          }
-          if (resolver?.type === "matchers") { // matchers should not have a timeout.
-            const id = crypto.randomUUID();
-            resolvingMatchers[id] = true;
-            return resolve(id);
-          }
-          if (resolver?.type === "loaders") {
-            return Promise.resolve([]);
-          }
-          return resolve();
-        },
+  const abortController = new AbortController();
+  abortController.abort();
+  const resolveSection = isDeferred<Section>(section)
+    ? RequestContext.bind(
+      { signal: abortController.signal },
+      section,
+    )
+    : () => section;
+  const resolvedSection = await resolveSection({}, {
+    propagateOptions: true,
+    hooks: {
+      onPropsResolveStart: (
+        resolve,
+        _props,
+        resolver,
+      ) => {
+        let next = resolve;
+        if (resolver?.type === "matchers") { // matchers should not have a timeout.
+          next = RequestContext.bind(
+            { signal: req.signal },
+            resolve,
+          );
+        }
+        return next();
       },
-    })
-    : section;
+    },
+  });
 
   return {
     loading: shouldRender ? "eager" : "lazy",
