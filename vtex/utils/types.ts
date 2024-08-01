@@ -1161,6 +1161,14 @@ export interface CreateNewDocument {
   DocumentId?: string;
 }
 
+export interface Document extends Record<string, unknown> {
+  additionalProperties?: string;
+  id?: string;
+  accountId?: string;
+  accountName?: string;
+  dataEntityId?: string;
+}
+
 export interface SelectableGifts {
   id: string;
   selectedGifts: {
