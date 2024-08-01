@@ -7,6 +7,211 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/logistics/pvt/configuration/pickuppoints": {
+      "get": {
+        "tags": [
+          "Pickup points"
+        ],
+        "summary": "List pickup points",
+        "description": "Retrieves information about [pickup points](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) of your store.\r\n\r\n>⚠️ The response is limited to 1.000 pickup points. If you need more than 1000 results, you can use the [List paged pickup points](https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/configuration/pickuppoints/_search) endpoint.",
+        "operationId": "ListAllPickupPpoints",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "Type of the content being sent.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "HTTP Client Negotiation Accept Header. Indicates the types of responses the client can understand.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "List of pickup points, limited to 1.000 pickup points. If you need more than 1000 results, you can use the [List paged pickup points](https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/configuration/pickuppoints/_search) endpoint.",
+                  "items": {
+                    "$ref": "#/components/schemas/PickupPoint"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "b8e7ca56",
+                    "name": "Pickup Shopping Center",
+                    "description": "Shopping Center from Barra",
+                    "instructions": "You have to present a document to collect your package",
+                    "formatted_address": "undefined",
+                    "address": {
+                      "postalCode": "22250040",
+                      "country": {
+                        "acronym": "BRA",
+                        "name": "Brazil"
+                      },
+                      "city": "Rio de Janeiro",
+                      "state": "RJ",
+                      "neighborhood": "Botafogo",
+                      "street": "Botafogo beach",
+                      "number": "300",
+                      "complement": "Shopping Center",
+                      "reference": "Third floor",
+                      "location": {
+                        "latitude": -22.906847,
+                        "longitude": -43.172897
+                      }
+                    },
+                    "isActive": true,
+                    "distance": 0,
+                    "seller": "Fashion Skirts",
+                    "_sort": [
+                      1574240390000
+                    ],
+                    "businessHours": [
+                      {
+                        "dayOfWeek": 1,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 2,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 3,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 4,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 5,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      }
+                    ],
+                    "tagsLabel": [
+                      "w67",
+                      "p34"
+                    ],
+                    "pickupHolidays": [
+                      {
+                        "date": "2024-12-28T03:00:00Z",
+                        "hourBegin": "09:00",
+                        "hourEnd": "13:00"
+                      },
+                      {
+                        "date": "2024-11-17T03:00:00Z",
+                        "hourBegin": "00:00",
+                        "hourEnd": "00:00"
+                      }
+                    ],
+                    "isThirdPartyPickup": false,
+                    "accountOwnerName": "Fashion Store",
+                    "accountOwnerId": "1b4018ec-48bf-4a59-9eae-547403e11afc",
+                    "parentAccountName": "Fashion Store",
+                    "originalId": null
+                  },
+                  {
+                    "id": "792893547449051",
+                    "name": "Bleu PUP",
+                    "description": "Bleu Store",
+                    "instructions": "You must present a document to collect your order",
+                    "formatted_address": "undefined",
+                    "address": {
+                      "postalCode": "18550-000",
+                      "country": {
+                        "acronym": "BRA",
+                        "name": "Brasil"
+                      },
+                      "city": "Boituva",
+                      "state": "SP",
+                      "neighborhood": "Tancredo Neves",
+                      "street": "BTV-250",
+                      "number": "01",
+                      "complement": "Second floor",
+                      "reference": "Next to the city hall",
+                      "location": {
+                        "latitude": -23.2863329,
+                        "longitude": -47.6783742
+                      }
+                    },
+                    "isActive": true,
+                    "distance": 1574240387072,
+                    "seller": "Recurrency",
+                    "_sort": [
+                      1574240390000
+                    ],
+                    "businessHours": [
+                      {
+                        "dayOfWeek": 1,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 2,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 3,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 4,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      },
+                      {
+                        "dayOfWeek": 5,
+                        "openingTime": "09:00:00",
+                        "closingTime": "18:00:00"
+                      }
+                    ],
+                    "tagsLabel": [
+                      "kr47",
+                      "yk15"
+                    ],
+                    "pickupHolidays": [
+                      {
+                        "date": "2024-12-28T03:00:00Z",
+                        "hourBegin": "09:00",
+                        "hourEnd": "13:00"
+                      }
+                    ],
+                    "isThirdPartyPickup": false,
+                    "accountOwnerName": "sportsstore",
+                    "accountOwnerId": "9ddcfba5-3855-49ec-b61e-b2847b9314cc",
+                    "parentAccountName": "sportsstore",
+                    "originalId": "b8e7ca56"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/catalog_system/pvt/products/GetProductAndSkuIds": {
       "get": {
         "tags": [
@@ -33551,6 +33756,155 @@
                       }
                     }
                   ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paging": {
+                      "description": "Paging.",
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "description": "Page number.",
+                          "type": "integer"
+                        },
+                        "pageSize": {
+                          "description": "Page size.",
+                          "type": "integer"
+                        },
+                        "total": {
+                          "description": "Total pages.",
+                          "type": "integer"
+                        },
+                        "pages": {
+                          "description": "Pages.",
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "items": {
+                      "description": "Items.",
+                      "type": "array",
+                      "items": {
+                        "description": "Item information.",
+                        "type": "object",
+                        "properties": {
+                          "distance": {
+                            "description": "Distance.",
+                            "type": "integer"
+                          },
+                          "pickupPoint": {
+                            "description": "Pickup point.",
+                            "type": "object",
+                            "properties": {
+                              "friendlyName": {
+                                "description": "Friendly name.",
+                                "type": "string"
+                              },
+                              "address": {
+                                "description": "Address.",
+                                "type": "object",
+                                "properties": {
+                                  "addressType": {
+                                    "description": "Address type.",
+                                    "type": "string"
+                                  },
+                                  "receiverName": {
+                                    "description": "Receiver name.",
+                                    "type": "string"
+                                  },
+                                  "addressId": {
+                                    "description": "Address ID.",
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "isDisposable": {
+                                    "description": "Is disposable.",
+                                    "type": "boolean"
+                                  },
+                                  "postalCode": {
+                                    "description": "Postal code.",
+                                    "type": "string"
+                                  },
+                                  "city": {
+                                    "description": "City.",
+                                    "type": "string"
+                                  },
+                                  "state": {
+                                    "description": "State.",
+                                    "type": "string"
+                                  },
+                                  "country": {
+                                    "description": "Country.",
+                                    "type": "string"
+                                  },
+                                  "street": {
+                                    "description": "Street.",
+                                    "type": "string"
+                                  },
+                                  "number": {
+                                    "description": "Number.",
+                                    "type": "string"
+                                  },
+                                  "neighborhood": {
+                                    "description": "Neighborhood.",
+                                    "type": "string"
+                                  },
+                                  "complement": {
+                                    "description": "Complement to the shipping address, in case it applies.",
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "reference": {
+                                    "description": "Racao.",
+                                    "type": "string"
+                                  },
+                                  "geoCoordinates": {
+                                    "description": "Geo coordinates.",
+                                    "type": "array",
+                                    "items": {
+                                      "description": "Geo coordinate.",
+                                      "type": "integer"
+                                    }
+                                  }
+                                }
+                              },
+                              "additionalInfo": {
+                                "description": "Additional info.",
+                                "type": "string"
+                              },
+                              "id": {
+                                "description": "ID.",
+                                "type": "string"
+                              },
+                              "businessHours": {
+                                "description": "Array with business hours.",
+                                "type": "array",
+                                "items": {
+                                  "description": "Business hours.",
+                                  "type": "object",
+                                  "properties": {
+                                    "DayOfWeek": {
+                                      "description": "Day of week.",
+                                      "type": "integer"
+                                    },
+                                    "OpeningTime": {
+                                      "description": "Opening time.",
+                                      "type": "string"
+                                    },
+                                    "ClosingTime": {
+                                      "description": "Closing time.",
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -36758,6 +37112,192 @@
   },
   "components": {
     "schemas": {
+      "PickupPoint": {
+        "type": "object",
+        "description": "Pickup point information.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "[Pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) ID."
+          },
+          "name": {
+            "type": "string",
+            "description": "Pickup point name displayed to customers at checkout."
+          },
+          "description": {
+            "type": "string",
+            "description": "Pickup point description displayed to customers at checkout."
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Instructions for customers when collecting their package."
+          },
+          "formatted_address": {
+            "type": "string",
+            "description": "Formatted address.",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "description": "Pickup point address information.",
+            "properties": {
+              "postalCode": {
+                "type": "string",
+                "description": "Pickup point address postal code."
+              },
+              "country": {
+                "type": "object",
+                "description": "Information about the pickup point address country.",
+                "properties": {
+                  "acronym": {
+                    "type": "string",
+                    "description": "Three-digit country code of the pickup point address, in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Country name of the pickup point address."
+                  }
+                }
+              },
+              "city": {
+                "type": "string",
+                "description": "Pickup point address city."
+              },
+              "state": {
+                "type": "string",
+                "description": "Pickup point address state."
+              },
+              "neighborhood": {
+                "type": "string",
+                "description": "Pickup point address neighborhood."
+              },
+              "street": {
+                "type": "string",
+                "description": "Pickup point address street."
+              },
+              "number": {
+                "type": "string",
+                "description": "Pickup point address number."
+              },
+              "complement": {
+                "type": "string",
+                "description": "Pickup point address complement."
+              },
+              "reference": {
+                "type": "string",
+                "description": "Reference point to help the customer find the pickup point."
+              },
+              "location": {
+                "type": "object",
+                "description": "Pickup point address geolocation coordinates.",
+                "properties": {
+                  "latitude": {
+                    "type": "number",
+                    "description": "Latitude coordinate."
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "Longitude coordinate."
+                  }
+                }
+              }
+            }
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Defines if the pickup point is active (`true`) or inactive (`false`)."
+          },
+          "distance": {
+            "type": "number",
+            "description": "Pickup point configured distance."
+          },
+          "seller": {
+            "type": "string",
+            "description": "Seller that corresponds to the pickup point."
+          },
+          "_sort": {
+            "type": "array",
+            "description": "Sort array.",
+            "items": {
+              "type": "number",
+              "description": "Pickup point sort information."
+            }
+          },
+          "businessHours": {
+            "type": "array",
+            "description": "Pickup point business hours configurations.",
+            "items": {
+              "type": "object",
+              "description": "Business hours configurations from Monday to Friday.",
+              "properties": {
+                "dayOfWeek": {
+                  "type": "integer",
+                  "description": "Day of the week identification, as in `1` = Monday, `2` = Tuesday, `3` = Wednesday, `4` = Thursday, and `5` = Friday."
+                },
+                "openingTime": {
+                  "type": "string",
+                  "description": "Opening time in `HH:MM:SS` format."
+                },
+                "closingTime": {
+                  "type": "string",
+                  "description": "Closing time in `HH:MM:SS` format."
+                }
+              }
+            }
+          },
+          "tagsLabel": {
+            "type": "array",
+            "description": "Tags that identify a group of pickup points.",
+            "items": {
+              "type": "string",
+              "description": "Pickup point tag label."
+            }
+          },
+          "pickupHolidays": {
+            "type": "array",
+            "description": "[Holidays](https://help.vtex.com/en/tutorial/registering-holidays--2ItOthSEAoyAmcwsuiO6Yk) configured for the pickup point.",
+            "items": {
+              "type": "object",
+              "description": "Holiday information.",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "description": "Holiday date and time, in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ss.ssZ`."
+                },
+                "hourBegin": {
+                  "type": "string",
+                  "description": "Holiday beginning time in `HH:MM` format."
+                },
+                "hourEnd": {
+                  "type": "string",
+                  "description": "Holiday ending time in `HH:MM` format."
+                }
+              }
+            }
+          },
+          "isThirdPartyPickup": {
+            "type": "boolean",
+            "description": "Defines if the pickup point is third-party (`true`) or not (`false`)."
+          },
+          "accountOwnerName": {
+            "type": "string",
+            "description": "Account owner name."
+          },
+          "accountOwnerId": {
+            "type": "string",
+            "description": "Account owner ID."
+          },
+          "parentAccountName": {
+            "type": "string",
+            "description": "Parent account name."
+          },
+          "originalId": {
+            "type": "string",
+            "description": "Original ID.",
+            "nullable": true
+          }
+        }
+      },
       "CreateNewDocument": {
         "type": "object",
         "properties": {

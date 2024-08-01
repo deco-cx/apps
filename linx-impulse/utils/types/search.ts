@@ -41,6 +41,18 @@ export interface NavigateResponse {
   sort: Sort[];
 }
 
+export interface QuickFilter {
+  name: string;
+  applyLink: string;
+  image: string;
+  type: string;
+}
+
+export interface Suggestion {
+  query: string;
+  link: string;
+}
+
 export interface SearchResponse {
   requestId: string;
   searchId: string;
@@ -56,7 +68,9 @@ export interface SearchResponse {
     last?: string;
     next?: string;
   };
+  suggestions: Suggestion[];
   filters: Filter[];
+  quickFilters: QuickFilter[];
   products: Product[];
   sort: Sort[];
 }
@@ -84,4 +98,10 @@ export interface HotsiteResponse {
   banners: Banner[];
   filters: Filter[];
   products: Product[];
+}
+
+export interface NotFoundResponse {
+  searchId: string;
+  code: number;
+  message: string;
 }

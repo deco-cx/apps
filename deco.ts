@@ -11,8 +11,10 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("smarthint"),
+    app("ra-trustvox"),
     app("anthropic"),
     app("resend"),
+    app("emailjs"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
