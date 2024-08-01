@@ -51,7 +51,9 @@ export interface APIConfig {
    * @title Use "Magento store" prop as URL path suffix in details pages
    */
   useSuffix: boolean;
-
+  /**
+   * @title Choose what data to use in "Store" header in GraphQL
+   */
   storeHeader: "storeId" | "site" | "none";
 }
 
@@ -234,7 +236,7 @@ export default function App(props: Props): App<Manifest, State> {
   const { apiKey } = apiConfig;
 
   const secretKey = typeof apiKey === "string" ? apiKey : apiKey?.get() ?? "";
-  const gqlHeader = getStoreHeader(storeId, site, storeHeader);
+  const headerGql = getStoreHeader(storeId, site, storeHeader);
 
   const clientAdmin = createHttpClient<API>({
     base: apiConfig.baseUrl,
@@ -249,7 +251,7 @@ export default function App(props: Props): App<Manifest, State> {
     headers: new Headers({
       "Content-Type": "application/json",
       Authorization: `Bearer ${secretKey}`,
-      ...gqlHeader,
+      ...headerGql,
     }),
   });
   return {
