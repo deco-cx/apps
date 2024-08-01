@@ -51,6 +51,8 @@ export interface APIConfig {
    * @title Use "Magento store" prop as URL path suffix in details pages
    */
   useSuffix: boolean;
+
+  storeHeader: "storeId" | "site" | "none";
 }
 
 export interface ImagesConfig {
@@ -198,6 +200,25 @@ export type State =
  */
 export type AppType = ReturnType<typeof App>;
 
+const getStoreHeader = (
+  storeId: number,
+  site: string,
+  storeHeader: "storeId" | "site" | "none",
+) => {
+  const HEADER = {
+    "storeId": String(storeId),
+    "site": site,
+  };
+
+  if (storeHeader === "none") {
+    return null;
+  }
+
+  return {
+    "Store": HEADER[storeHeader],
+  };
+};
+
 export default function App(props: Props): App<Manifest, State> {
   const {
     apiConfig,
@@ -208,9 +229,12 @@ export default function App(props: Props): App<Manifest, State> {
     features,
   } = props;
 
+  const { site, storeId, storeHeader } = apiConfig;
+
   const { apiKey } = apiConfig;
 
   const secretKey = typeof apiKey === "string" ? apiKey : apiKey?.get() ?? "";
+  const gqlHeader = getStoreHeader(storeId, site, storeHeader);
 
   const clientAdmin = createHttpClient<API>({
     base: apiConfig.baseUrl,
@@ -225,6 +249,7 @@ export default function App(props: Props): App<Manifest, State> {
     headers: new Headers({
       "Content-Type": "application/json",
       Authorization: `Bearer ${secretKey}`,
+      ...gqlHeader,
     }),
   });
   return {
