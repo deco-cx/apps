@@ -1,4 +1,5 @@
 import { AppContext } from "../../mod.ts";
+import { ajustLimits } from "../../utils/ajustLimits.ts";
 import type { Document } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
@@ -26,6 +27,13 @@ interface Props {
    * @minValue 1
    */
   count?: number;
+  /**
+   * @description Skip how many documents
+   * @default 0
+   * @maxValue 100
+   * @minValue 0
+   */
+  skip?: number;
 }
 
 /**
@@ -38,8 +46,9 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<Document[]> {
   const { vcs } = ctx;
-  const { acronym, fields, where, sort, count = 10 } = props;
+  const { acronym, fields, where, sort, skip = 0, count = 10 } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
+  const { start, end } = ajustLimits(skip, count, 100);
 
   const documents = await vcs["GET /api/dataentities/:acronym/search"]({
     acronym,
@@ -51,7 +60,7 @@ export default async function loader(
       accept: "application/vnd.vtex.ds.v10+json",
       "content-type": "application/json",
       cookie,
-      "REST-Range": `resources=1-${Math.max(1, Math.min(count, 100))}`,
+      "REST-Range": `resources=${start}-${end}`,
     },
   }).then((response) => response.json());
 
