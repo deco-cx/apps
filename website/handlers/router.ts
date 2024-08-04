@@ -59,11 +59,14 @@ export const router = (
       routePath: string,
       groups?: Record<string, string | undefined>,
     ) => {
-      const ctx = { ...connInfo, params: (groups ?? {}) } as ConnInfo & {
-        params: Record<string, string>;
-        state: DecoState;
-      };
+      const ctx = connInfo as
+        & ConnInfo
+        & {
+          params: Record<string, string | undefined>;
+          state: DecoState;
+        };
 
+      ctx.params = groups ?? {};
       ctx.state.routes = routes;
       ctx.state.pathTemplate = routePath;
 
