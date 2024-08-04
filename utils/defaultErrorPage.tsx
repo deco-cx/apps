@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "deco/mod.ts";
 
 type Props = {
   error?: string;

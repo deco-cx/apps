@@ -1,15 +1,15 @@
-import { Head } from "$fresh/runtime.ts";
 import type { Page } from "deco/blocks/page.tsx";
 import { Section, SectionProps } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
-import { isDeferred } from "deco/mod.ts";
-import { logger } from "deco/observability/otel/config.ts";
 import {
+  Head,
+  isDeferred,
   usePageContext as useDecoPageContext,
   useRouterContext,
-} from "deco/runtime/fresh/routes/entrypoint.tsx";
+} from "deco/mod.ts";
+import { logger } from "deco/observability/otel/config.ts";
 import { Component, JSX } from "preact";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import Clickhouse from "../components/Clickhouse.tsx";

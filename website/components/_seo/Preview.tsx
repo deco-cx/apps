@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head } from "deco/mod.ts";
 import type { ComponentChildren, ComponentProps } from "preact";
 import { useMemo } from "preact/hooks";
 import { ImageWidget } from "../../../admin/widgets.ts";
@@ -7,22 +7,22 @@ import { OGType } from "../Seo.tsx";
 import Discord from "./Discord.tsx";
 import Facebook from "./Facebook.tsx";
 import Google from "./Google.tsx";
+import {
+    DiscordIcon,
+    FacebookIcon,
+    GoogleIcon,
+    LinkedInIcon,
+    SlackIcon,
+    TelegramIcon,
+    WhatsAppIcon,
+    XIcon,
+} from "./Icons.tsx";
 import LinkedIn from "./LinkedIn.tsx";
 import Slack from "./Slack.tsx";
 import Telegram from "./Telegram.tsx";
 import Twitter from "./Twitter.tsx";
 import WhatsApp from "./WhatsApp.tsx";
 import instructions from "./instructions.json" with { type: "json" };
-import {
-  DiscordIcon,
-  FacebookIcon,
-  GoogleIcon,
-  LinkedInIcon,
-  SlackIcon,
-  TelegramIcon,
-  WhatsAppIcon,
-  XIcon,
-} from "./Icons.tsx";
 
 export type SeoProps = ComponentProps<typeof Seo>;
 

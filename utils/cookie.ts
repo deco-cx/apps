@@ -1,7 +1,7 @@
-import { getCookies, getSetCookies, setCookie } from "std/http/cookie.ts";
-import { tryOrDefault } from "deco/utils/object.ts";
+import { DECO_SEGMENT } from "deco/mod.ts";
 import { Flag } from "deco/types.ts";
-import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
+import { tryOrDefault } from "deco/utils/object.ts";
+import { getCookies, getSetCookies, setCookie } from "std/http/cookie.ts";
 
 export const getFlagsFromRequest = (req: Request) => {
   const cookies = getCookies(req.headers);
