@@ -5,8 +5,9 @@ import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
 import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
 import {
-  isDeferred, usePageContext as useDecoPageContext,
-  useRouterContext
+  isDeferred,
+  usePageContext as useDecoPageContext,
+  useRouterContext,
 } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { Component, JSX } from "preact";
