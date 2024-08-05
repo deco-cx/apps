@@ -160,6 +160,7 @@ export const createHttpClient = <T>({
           body,
         });
         console.log(curl);
+
         return fetcher(url.href, {
           ...init,
           headers: processHeaders(headers),

@@ -76,7 +76,7 @@ export interface Facet {
   PropertyDisplayName: null;
   PropertyMetadataID: number;
   SearchFacetID: number;
-  SelectedOptions: unknown[];
+  SelectedOptions: AvailableOption[];
   Selection: string;
   ShowEmptyFacets: boolean;
   ShowGroupMetadataOptions: boolean;

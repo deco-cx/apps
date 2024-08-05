@@ -281,7 +281,7 @@ export const toFilters = (facets: Facet[], url: URL): Filter[] => {
     "@type": "FilterToggle",
     label: f.Name,
     key: f.Alias,
-    values: f.AvailableOptions.map(
+    values: f.SelectedOptions.concat(f.AvailableOptions).map(
       ({ Url: value, Count: quantity, Label: label }) => {
         const index = currentFilters.findIndex((x) => x === value);
         const selected = index > -1;
