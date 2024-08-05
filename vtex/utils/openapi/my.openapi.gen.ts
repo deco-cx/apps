@@ -45,4 +45,12 @@ to?: number
 }
 }
 }
+/**
+ * Creates new review
+ */
+"POST /reviews-and-ratings/api/reviews": {
+body: {
+anyProperty?: string
+}
+}
 }
