@@ -28,6 +28,9 @@ interface Includes extends BaseCase {
 }
 
 export interface Props {
+  /**
+   * @title Operation
+   */
   case:
     | Equals
     | Includes;
