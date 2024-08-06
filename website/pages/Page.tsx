@@ -194,12 +194,10 @@ export const loader = async (
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
 
-  const userId = await generateUserId(
-    site.name,
-    getClientIp(req),
-    getUserAgent(req),
-  );
-  const sessionId = generateSessionId();
+  const [userId, sessionId] = await Promise.all([
+    generateUserId(site.name, getClientIp(req), getUserAgent(req)),
+    generateSessionId(site.name, getClientIp(req), getUserAgent(req)),
+  ]);
 
   return {
     ...restProps,
