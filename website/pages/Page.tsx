@@ -174,6 +174,10 @@ function Page({
   );
 }
 
+const getClientIp = (req: Request): string => {
+  return req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
+}
+
 export const loader = async (
   { sections, ...restProps }: Props,
   req: Request,
@@ -192,7 +196,10 @@ export const loader = async (
     }),
   );
 
-  const userId = generateUserId();
+  const context = Context.active();
+  const site = { id: context.siteId, name: context.site };
+
+  const userId = generateUserId(site.name, getClientIp(req));
   const sessionId = generateSessionId();
 
   return {

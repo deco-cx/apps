@@ -1,5 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import * as CryptoJS from "https://esm.sh/crypto-js@4.1.1";
 
 declare global {
   interface Window {
@@ -54,8 +55,16 @@ const SERVICE_ENDPOINT = Deno.env.get("EVENT_COLLECTOR") ??
 export const UID_COOKIE_NAME = "deco_user_id";
 export const SESSION_COOKIE_NAME = "deco_session_id";
 
-export const generateUserId = () => {
-  return "";
+function getDailySalt(): string {
+  const today = new Date();
+  return today.toISOString().slice(0, 10);
+}
+
+export const generateUserId = (sitename: string, ipAddress: string) => {
+  const daily_salt = getDailySalt();
+  const data = daily_salt + sitename + ipAddress;
+  const hash = CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
+  return hash;
 };
 
 export const generateSessionId = () => {
