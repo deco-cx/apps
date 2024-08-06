@@ -63,18 +63,13 @@ export const generateUserId = async (
   ipAddress: string,
   userAgent: string,
 ) => {
-  const data = sitename + ipAddress + userAgent;
-  return await encryptToHex(data);
-};
-
-export const generateSessionId = async (
-  sitename: string,
-  ipAddress: string,
-  userAgent: string,
-) => {
   const daily_salt = getDailySalt();
   const data = daily_salt + sitename + ipAddress + userAgent;
   return await encryptToHex(data);
+};
+
+export const generateSessionId = (): string => {
+  return crypto.randomUUID();
 };
 
 /**
