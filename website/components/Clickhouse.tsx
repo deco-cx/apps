@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-import * as CryptoJS from "https://esm.sh/crypto-js@4.1.1";
+import { encryptToHex } from "../utils/crypto.ts";
 
 declare global {
   interface Window {
@@ -60,14 +60,14 @@ function getDailySalt(): string {
   return today.toISOString().slice(0, 10);
 }
 
-export const generateUserId = (sitename: string, ipAddress: string) => {
+export const generateUserId = async (
+  sitename: string,
+  ipAddress: string,
+  userAgent: string,
+) => {
   const daily_salt = getDailySalt();
-  const data = daily_salt + sitename + ipAddress;
-  
-  console.log("generateUserId", { daily_salt, sitename, ipAddress});
-
-  const hash = CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
-  return hash;
+  const data = daily_salt + sitename + ipAddress + userAgent;
+  return await encryptToHex(data);
 };
 
 export const generateSessionId = () => {

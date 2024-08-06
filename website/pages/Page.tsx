@@ -27,10 +27,7 @@ import { SEOSection } from "../components/Seo.tsx";
 import Clickhouse, {
   generateSessionId,
   generateUserId,
-  SESSION_COOKIE_NAME,
-  UID_COOKIE_NAME,
 } from "../components/Clickhouse.tsx";
-import { getCookies, setCookie } from "std/http/cookie.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -175,8 +172,13 @@ function Page({
 }
 
 const getClientIp = (req: Request): string => {
-  return req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
-}
+  return req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") ||
+    "";
+};
+
+const getUserAgent = (req: Request): string => {
+  return req.headers.get("user-agent") || "";
+};
 
 export const loader = async (
   { sections, ...restProps }: Props,
@@ -199,7 +201,11 @@ export const loader = async (
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
 
-  const userId = generateUserId(site.name, getClientIp(req));
+  const userId = await generateUserId(
+    site.name,
+    getClientIp(req),
+    getUserAgent(req),
+  );
   const sessionId = generateSessionId();
 
   return {
