@@ -63,6 +63,9 @@ function getDailySalt(): string {
 export const generateUserId = (sitename: string, ipAddress: string) => {
   const daily_salt = getDailySalt();
   const data = daily_salt + sitename + ipAddress;
+  
+  console.log("generateUserId", { daily_salt, sitename, ipAddress});
+
   const hash = CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex);
   return hash;
 };
