@@ -27,9 +27,6 @@ interface Includes extends BaseCase {
   type: "Includes";
 }
 
-/**
- * @title {{{pathname}}}
- */
 export interface Props {
   case:
     | Equals
