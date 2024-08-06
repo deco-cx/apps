@@ -172,7 +172,8 @@ function Page({
 }
 
 const getClientIp = (req: Request): string => {
-  return req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") ||
+  return req.headers.get("CF-Connecting-IP") ||
+    req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") ||
     "";
 };
 
