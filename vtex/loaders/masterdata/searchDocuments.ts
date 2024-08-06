@@ -1,5 +1,5 @@
 import { AppContext } from "../../mod.ts";
-import { ajustLimits } from "../../utils/ajustLimits.ts";
+import { resourceRange } from "../../utils/resourceRange.ts";
 import type { Document } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
@@ -48,7 +48,7 @@ export default async function loader(
   const { vcs } = ctx;
   const { acronym, fields, where, sort, skip = 0, take = 10 } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
-  const limits = ajustLimits(skip, take);
+  const limits = resourceRange(skip, take);
 
   const documents = await vcs["GET /api/dataentities/:acronym/search"]({
     acronym,
@@ -60,7 +60,7 @@ export default async function loader(
       accept: "application/vnd.vtex.ds.v10+json",
       "content-type": "application/json",
       cookie,
-      "REST-Range": `resources=${limits.skip}-${limits.take}`,
+      "REST-Range": `resources=${limits.from}-${limits.to}`,
     },
   }).then((response) => response.json());
 
