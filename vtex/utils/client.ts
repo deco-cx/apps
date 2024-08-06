@@ -8,6 +8,7 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
+  Orders,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -225,6 +226,9 @@ export interface VTEXCommerceStable {
   };
   "GET /api/catalog_system/pub/brand/list": {
     response: Brand[];
+  };
+  "GET /api/oms/pvt/orders": {
+    response: Orders;
   };
 }
 
