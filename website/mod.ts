@@ -81,15 +81,9 @@ export interface Props {
 
   /**
    * @title Global Sections
-   * @description These sections run once on the start of the website and will be included on the start of each page
+   * @description These sections will be included on the start of each page
    */
   global?: Section[];
-
-  /**
-   * @title Page Sections
-   * @description These sections will be included on each page
-   */
-  pageSections?: Section[];
 
   /**
    * @title Error Page
@@ -151,9 +145,7 @@ export interface Props {
 /**
  * @title Website
  */
-export default function App({ theme, ...state }: Props): App<Manifest, Props> {
-  const global = theme ? [...(state.global ?? []), theme] : state.global;
-
+export default function App({ ...state }: Props): App<Manifest, Props> {
   return {
     state,
     manifest: {
@@ -171,22 +163,6 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
             manifest.sections["website/sections/Seo/Seo.tsx"].default({
               ...state.seo,
               ...props,
-            }),
-        },
-      },
-      pages: {
-        ...manifest.pages,
-        "website/pages/Page.tsx": {
-          ...manifest.pages["website/pages/Page.tsx"],
-          Preview: (props) =>
-            manifest.pages["website/pages/Page.tsx"].Preview({
-              ...props,
-              sections: [...global ?? [], ...props.sections],
-            }),
-          default: (props) =>
-            manifest.pages["website/pages/Page.tsx"].default({
-              ...props,
-              sections: [...global ?? [], ...props.sections],
             }),
         },
       },
@@ -251,7 +227,7 @@ export const onBeforeResolveProps = <
     routes?: Routes[];
     errorPage?: Page;
     abTesting: AbTesting;
-    pageSections?: Section[];
+    global: Section[];
   },
 >(
   props: T,
@@ -259,9 +235,7 @@ export const onBeforeResolveProps = <
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
-      pageSections: props.pageSections?.map((section) =>
-        asResolved(section, false)
-      ),
+      global: props.global?.map((section) => asResolved(section, false)),
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
         : undefined,
