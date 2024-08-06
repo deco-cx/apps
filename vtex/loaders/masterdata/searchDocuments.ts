@@ -48,7 +48,7 @@ export default async function loader(
   const { vcs } = ctx;
   const { acronym, fields, where, sort, skip = 0, take = 10 } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
-  const limits = ajustLimits(skip, take, 100);
+  const limits = ajustLimits(skip, take);
 
   const documents = await vcs["GET /api/dataentities/:acronym/search"]({
     acronym,
