@@ -1,13 +1,13 @@
 export function ajustLimits(
-  start: number,
-  end: number,
-  offset: number,
+  skip: number,
+  take: number,
+  size = 100,
 ) {
-  const newStart = start > 0 ? start : 0;
-  const newEnd = (end - newStart > offset) ? newStart + offset : end;
+  const newSkip = Math.max(skip, 0);
+  const newTake = Math.min(newSkip + size, take);
 
   return {
-    start: newStart,
-    end: newEnd,
+    skip: newSkip,
+    take: newTake,
   };
 }

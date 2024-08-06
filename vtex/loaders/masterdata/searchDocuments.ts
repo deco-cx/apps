@@ -26,7 +26,7 @@ interface Props {
    * @maxValue 100
    * @minValue 1
    */
-  count?: number;
+  take?: number;
   /**
    * @description Skip how many documents
    * @default 0
@@ -46,9 +46,9 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<Document[]> {
   const { vcs } = ctx;
-  const { acronym, fields, where, sort, skip = 0, count = 10 } = props;
+  const { acronym, fields, where, sort, skip = 0, take = 10 } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
-  const { start, end } = ajustLimits(skip, count, 100);
+  const limits = ajustLimits(skip, take, 100);
 
   const documents = await vcs["GET /api/dataentities/:acronym/search"]({
     acronym,
@@ -60,7 +60,7 @@ export default async function loader(
       accept: "application/vnd.vtex.ds.v10+json",
       "content-type": "application/json",
       cookie,
-      "REST-Range": `resources=${start}-${end}`,
+      "REST-Range": `resources=${limits.skip}-${limits.take}`,
     },
   }).then((response) => response.json());
 
