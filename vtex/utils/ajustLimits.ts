@@ -1,12 +1,12 @@
-export function ajustLimits(
+export function resourceRange(
   skip: number,
   take: number,
 ) {
-  const newSkip = Math.max(skip, 0);
-  const newTake = Math.min(newSkip + 100, take);
+  const from = Math.max(skip, 0);
+  const to = from + Math.min(100, take);
 
   return {
-    skip: newSkip,
-    take: newTake,
+    from,
+    to,
   };
 }
