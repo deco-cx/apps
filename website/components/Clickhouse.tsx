@@ -52,8 +52,6 @@ interface Event {
 
 const SERVICE_ENDPOINT = Deno.env.get("EVENT_COLLECTOR") ??
   "https://juggler.deco.site/live/invoke/site/actions/sendEvent.ts";
-export const UID_COOKIE_NAME = "deco_user_id";
-export const SESSION_COOKIE_NAME = "deco_session_id";
 
 function getDailySalt(): string {
   const today = new Date();
