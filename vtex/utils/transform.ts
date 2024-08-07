@@ -347,7 +347,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     kitItems,
   } = sku;
 
-  const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
+  const videos = (sku as LegacySkuVTEX)?.Videos ?? sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
