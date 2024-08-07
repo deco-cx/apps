@@ -18,10 +18,11 @@ export interface Props {
 /** @title Blog Post details */
 export function loader(props: Props, _req: Request, ctx: AppContext) {
   const {
-    titleTemplate = "",
-    descriptionTemplate = "",
+    titleTemplate = "%s",
+    descriptionTemplate = "%s",
     ...seoSiteProps
   } = ctx.seo ?? {};
+
   const { title: titleProp, description: descriptionProp, jsonLD } = props;
 
   const title = renderTemplateString(
@@ -32,7 +33,8 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     descriptionTemplate,
     descriptionProp || jsonLD?.seo?.description || "",
   );
-  const image = jsonLD?.post.image;
+
+  const image = jsonLD?.post?.image;
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
