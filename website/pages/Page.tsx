@@ -108,14 +108,7 @@ function Page({
   sendToClickHouse,
   userId,
   sessionId,
-}: Props & {
-  errorPage?: Page;
-  devMode: boolean;
-  avoidRedirectingToEditor?: boolean;
-  sendToClickHouse?: boolean;
-  userId: string;
-  sessionId: string;
-}): JSX.Element {
+}: SectionProps<typeof loader>): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
