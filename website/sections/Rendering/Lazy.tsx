@@ -1,7 +1,7 @@
 import type { Section } from "deco/blocks/section.ts";
 import { SectionContext } from "deco/components/section.tsx";
-import { RequestContext } from "deco/deco.ts";
-import { asResolved, context, isDeferred } from "deco/mod.ts";
+import { context, RequestContext } from "deco/deco.ts";
+import { asResolved, isDeferred } from "deco/mod.ts";
 import { useContext } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
 import type { AppContext } from "../../mod.ts";

@@ -1,4 +1,4 @@
-import { DECO_SEGMENT } from "deco/mod.ts";
+import { DECO_SEGMENT } from "deco/runtime/mod.ts";
 import { Flag } from "deco/types.ts";
 import { tryOrDefault } from "deco/utils/object.ts";
 import { getCookies, getSetCookies, setCookie } from "std/http/cookie.ts";

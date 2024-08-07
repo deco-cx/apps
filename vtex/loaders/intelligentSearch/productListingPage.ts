@@ -1,3 +1,4 @@
+import { redirect } from "deco/runtime/errors.ts";
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
@@ -38,7 +39,6 @@ import type {
 } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
-import { redirect } from "deco/mod.ts";
 
 /** this type is more friendly user to fuzzy type that is 0, 1 or auto. */
 export type LabelledFuzzy = "automatic" | "disabled" | "enabled";

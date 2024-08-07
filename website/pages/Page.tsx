@@ -6,10 +6,12 @@ import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
 import {
   isDeferred,
-  usePageContext as useDecoPageContext,
-  useRouterContext,
 } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
+import {
+  usePageContext as useDecoPageContext,
+  useRouterContext,
+} from "deco/runtime/mod.ts";
 import { Component, JSX } from "preact";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import Clickhouse from "../components/Clickhouse.tsx";
