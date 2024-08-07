@@ -1,5 +1,6 @@
 import { AppContext } from "../../../vtex/mod.ts";
 import type { CreateNewDocument } from "../../../vtex/utils/types.ts";
+import { getCookies } from "std/http/cookie.ts";
 
 export interface Props {
   data: {
@@ -20,19 +21,18 @@ const action = async (
   ctx: AppContext,
 ): Promise<CreateNewDocument | undefined> => {
   
-  // deno-lint-ignore no-explicit-any
-  const { my }: any = await ctx.invoke.vtex.loaders.config() 
+  const { my } = await ctx.invoke.vtex.loaders.config() 
   const { data } = props;
-  const cookie = req.headers.get('cookie');
-  const arrCookie = cookie?.split(';');
-  const finalCookie = arrCookie?.find((item) => item.includes("VtexIdclientAutCookie"))?.split('=')[1]?.trim();
+  const cookies = getCookies(req.headers);
+  const key = Object.keys(cookies).find((key) => key.includes("VtexIdclientAutCookie"));
+  const authcookie = cookies[key ?? ""];
 
   const requestOptions = {
     body: data,
     headers: {
       "accept": "application/json",
       "content-type": "application/json",
-      "VtexidClientAutCookie": finalCookie
+      "VtexidClientAutCookie": authcookie
     },
   };
 
