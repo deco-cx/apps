@@ -42,8 +42,8 @@ export interface Props {
    * [models](https://docs.anthropic.com/en/docs/models-overview) for details.
    */
   max_tokens?: number;
-
   enableTools?: boolean;
+  temperature?: number;
 }
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
@@ -129,8 +129,9 @@ export default async function chat(
     system,
     messages,
     availableFunctions,
-    model = "claude-3-sonnet-20240229",
+    model = "claude-3-5-sonnet-20240620",
     max_tokens = 1024,
+    temperature = 1.0,
     enableTools,
   }: Props,
   _req: Request,
@@ -145,6 +146,7 @@ export default async function chat(
   const headers = {
     "anthropic-version": "2023-06-01",
     "content-type": "application/json",
+    "anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15",
     "x-api-key": ctx.token ?? "",
   };
 
@@ -153,7 +155,7 @@ export default async function chat(
     messages,
     model,
     max_tokens,
-    temperature: 0.5,
+    temperature,
     stream: true,
   };
 
