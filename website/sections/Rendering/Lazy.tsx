@@ -6,7 +6,7 @@ import { useContext } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
 import type { AppContext } from "../../mod.ts";
 
-const useSectionContext = () => useContext(SectionContext);
+const useSectionContext = () => useContext<SectionContext>(SectionContext);
 
 interface Props {
   /** @label hidden */
