@@ -8,7 +8,7 @@
     "std/": "https://deno.land/std@0.204.0/",
     "partytown/": "https://deno.land/x/partytown@0.4.8/",
     "deco-sites/std/": "https://denopkg.com/deco-sites/std@1.26.7/",
-    "deco/": "../deco/",
+    "deco/": "https://denopkg.com/deco-cx/deco@12ebb09de2d21299a8a20f3da8309419bf504d1e/",
     "@std/assert": "jsr:@std/assert@^1.0.2",
     "@std/async": "jsr:@std/async@^0.224.1",
     "@std/crypto": "jsr:@std/crypto@1.0.0-rc.1",

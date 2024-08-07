@@ -26,7 +26,6 @@ declare global {
       (action: string, eventType: string, props?: any) => void
     >;
     DECO_SITES_STD: { sendAnalyticsEvent: (event: unknown) => void };
-    DECO: { events: EventsAPI; featureFlags: FeatureFlags };
   }
 }
 
