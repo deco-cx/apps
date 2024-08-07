@@ -1,8 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
-import type { Page } from "deco/blocks/page.tsx";
 import { Section, SectionProps } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
-import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
 import {
   isDeferred,
@@ -11,12 +9,17 @@ import {
 } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { Component, JSX } from "preact";
-import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import Clickhouse from "../components/Clickhouse.tsx";
 import Events from "../components/Events.tsx";
-import { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
 import { AppContext } from "../mod.ts";
+import type { Page } from "deco/blocks/page.tsx";
+import { HttpError } from "deco/engine/errors.ts";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import { SEOSection } from "../components/Seo.tsx";
+import Clickhouse, {
+  generateSessionId,
+  generateUserId,
+} from "../components/Clickhouse.tsx";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -103,6 +106,8 @@ function Page({
   unindexedDomain,
   avoidRedirectingToEditor,
   sendToClickHouse,
+  userId,
+  sessionId,
 }: SectionProps<typeof loader>): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -138,13 +143,28 @@ function Page({
         />
         <Events deco={deco} />
         {sendToClickHouse && (
-          <Clickhouse siteId={site.id} siteName={site.name} />
+          <Clickhouse
+            siteId={site.id}
+            siteName={site.name}
+            userId={userId}
+            sessionId={sessionId}
+          />
         )}
         {sections.map(renderSection)}
       </ErrorBoundary>
     </>
   );
 }
+
+const getClientIp = (req: Request): string => {
+  return req.headers.get("CF-Connecting-IP") ||
+    req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") ||
+    "";
+};
+
+const getUserAgent = (req: Request): string => {
+  return req.headers.get("user-agent") || "";
+};
 
 export const loader = async (
   { sections, ...restProps }: Props,
@@ -164,6 +184,16 @@ export const loader = async (
     }),
   );
 
+  const context = Context.active();
+  const site = { id: context.siteId, name: context.site };
+
+  const userId = await generateUserId(
+    site.name,
+    getClientIp(req),
+    getUserAgent(req),
+  );
+  const sessionId = generateSessionId();
+
   return {
     ...restProps,
     sections: [...global, ...sections],
@@ -174,6 +204,8 @@ export const loader = async (
     unindexedDomain,
     avoidRedirectingToEditor: ctx.avoidRedirectingToEditor,
     sendToClickHouse: ctx.sendToClickHouse,
+    userId,
+    sessionId,
   };
 };
 
