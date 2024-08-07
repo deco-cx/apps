@@ -10,7 +10,7 @@ import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
 import { getSetCookies } from "std/http/cookie.ts";
 import { __DECO_FBT } from "../../utils/deferred.ts";
-import { errorIfFrameworkMismatch } from "../../utils/forceFramework.tsx";
+import { errorIfFrameworkMismatch } from "../../utils/framework.tsx";
 import { AppContext } from "../mod.ts";
 
 type ConnInfo = Deno.ServeHandlerInfo;
