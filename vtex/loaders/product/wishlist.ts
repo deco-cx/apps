@@ -49,7 +49,7 @@ const loader = async (
     .slice(start, end);
 
   return {
-    "@type": "ProductListingPage",
+    "@type": "ItemList",
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [],

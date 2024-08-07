@@ -2,8 +2,12 @@ import { allowCorsFor } from "deco/mod.ts";
 import { AppContext } from "../../mod.ts";
 import { CollectionList } from "../../utils/types.ts";
 
+export interface Props {
+  term?: string;
+}
+
 export default async function loader(
-  _props: unknown,
+  { term }: Props,
   req: Request,
   ctx: AppContext,
 ) {
@@ -13,12 +17,19 @@ export default async function loader(
 
   const { vcs } = ctx;
 
-  const collectionResponse = await vcs
-    ["GET /api/catalog_system/pvt/collection/search"]({
-      page: 1,
-      pageSize: 3000,
-      orderByAsc: false,
-    });
+  const collectionResponse = term
+    ? await vcs
+      ["GET /api/catalog_system/pvt/collection/search/:searchTerms"]({
+        searchTerms: term,
+        page: 1,
+        pageSize: 15,
+      })
+    : await vcs
+      ["GET /api/catalog_system/pvt/collection/search"]({
+        page: 1,
+        pageSize: 3000,
+        orderByAsc: false,
+      });
 
   const collectionList = await collectionResponse.json();
 

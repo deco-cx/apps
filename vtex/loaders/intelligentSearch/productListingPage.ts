@@ -444,7 +444,7 @@ const loader = async (
   };
 
   return {
-    "@type": "ProductListingPage",
+    "@type": "ItemList",
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement,
