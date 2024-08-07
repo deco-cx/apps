@@ -1,4 +1,4 @@
-import { logger } from "deco/mod.ts";
+import { logger } from "deco/observability/mod.ts";
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
