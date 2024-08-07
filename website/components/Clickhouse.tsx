@@ -1,5 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { encryptToHex } from "../utils/crypto.ts";
 
 declare global {
   interface Window {
@@ -52,15 +53,36 @@ interface Event {
 const SERVICE_ENDPOINT = Deno.env.get("EVENT_COLLECTOR") ??
   "https://juggler.deco.site/live/invoke/site/actions/sendEvent.ts";
 
+function getDailySalt(): string {
+  const today = new Date();
+  return today.toISOString().slice(0, 10);
+}
+
+export const generateUserId = async (
+  sitename: string,
+  ipAddress: string,
+  userAgent: string,
+) => {
+  const daily_salt = getDailySalt();
+  const data = daily_salt + sitename + ipAddress + userAgent;
+  return await encryptToHex(data);
+};
+
+export const generateSessionId = (): string => {
+  return crypto.randomUUID();
+};
+
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
 const snippet = (
-  { siteId, siteName, serviceEndpoint }: {
+  { siteId, siteName, serviceEndpoint, userId, sessionId }: {
     siteId?: number;
     siteName?: string;
     serviceEndpoint: string;
+    userId: string;
+    sessionId: string;
   },
 ) => {
   const props: Record<string, string> = {};
@@ -209,8 +231,8 @@ const snippet = (
       hostname: globalThis.window.location.origin,
       site_id: siteId || "",
       site_name: siteName || "",
-      user_id: undefined, // get server side
-      session_id: undefined, // get server side
+      user_id: userId, // get server side
+      session_id: sessionId, // get server side
       event_name: name,
       start_time: new Date().toISOString(),
       timestamp: undefined, // get server side
@@ -267,9 +289,11 @@ const snippet = (
 };
 
 function Clickhouse(
-  { siteId, siteName }: {
+  { siteId, siteName, userId, sessionId }: {
     siteId?: number;
     siteName?: string;
+    userId: string;
+    sessionId: string;
   },
 ) {
   return (
@@ -281,6 +305,8 @@ function Clickhouse(
           siteId,
           siteName,
           serviceEndpoint: SERVICE_ENDPOINT,
+          userId,
+          sessionId,
         })}
       />
     </Head>
