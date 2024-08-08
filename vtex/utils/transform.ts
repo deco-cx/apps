@@ -44,7 +44,8 @@ import type {
 const DEFAULT_CATEGORY_SEPARATOR = ">";
 
 const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
-  typeof (sku as LegacySkuVTEX).variations?.[0] === "string";
+  typeof (sku as LegacySkuVTEX).variations?.[0] === "string" ||
+  !!(sku as LegacySkuVTEX).Videos;
 
 const isLegacyProduct = (
   product: ProductVTEX | LegacyProductVTEX,
@@ -347,7 +348,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     kitItems,
   } = sku;
 
-  const videos = (sku as LegacySkuVTEX)?.Videos ?? sku.videos;
+  const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
   const nonEmptyVideos = nonEmptyArray(videos);
   const imagesByKey = options.imagesByKey ??
     items
