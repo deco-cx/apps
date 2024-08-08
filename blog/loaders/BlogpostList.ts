@@ -70,6 +70,10 @@ export default async function BlogPostList(
     ? posts.filter(({ categories }) => categories.find((c) => c.slug === slug))
     : posts;
 
+  if (!filteredPosts) {
+    return null;
+  }
+
   //Order posts
   const sortedPosts = sortPosts(filteredPosts, pageSort);
 

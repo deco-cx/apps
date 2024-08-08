@@ -64,4 +64,4 @@ export type SortBy =
   | "date_desc"
   | "date_asc"
   | "title_asc"
-  | "title_desc"
+  | "title_desc";
