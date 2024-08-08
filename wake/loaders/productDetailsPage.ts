@@ -71,9 +71,9 @@ async function loader(
 
       buyListProductPage.product.additionalProperty?.push({
         "@type": "PropertyValue",
-        name: "quantity",
+        name: "SuggestedQuantity",
         value: String(quantity),
-        alternateName: "Buy List Quantity",
+        alternateName: "Buy List Suggested Quantity",
       });
 
       return buyListProductPage.product;
