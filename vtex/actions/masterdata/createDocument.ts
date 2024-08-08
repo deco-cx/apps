@@ -1,4 +1,4 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 import type { CreateNewDocument } from "../../utils/types.ts";
 

@@ -1,5 +1,4 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
-import { Markdown } from "../decohub/components/Markdown.tsx";
+import type { App, AppContext as AC } from "@deco/deco";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";

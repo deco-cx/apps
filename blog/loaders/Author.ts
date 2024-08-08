@@ -1,4 +1,4 @@
-import { Author } from "../types.ts";
+import type { Author } from "../types.ts";
 
 /**
  * @title Author

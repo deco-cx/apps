@@ -1,7 +1,7 @@
-import { useContext, useMemo } from "preact/hooks";
+import { Head } from "@deco/deco";
+import { type ComponentChildren, createContext, type JSX } from "preact";
 import { forwardRef } from "preact/compat";
-import { ComponentChildren, createContext, JSX } from "preact";
-import { Head } from "$fresh/runtime.ts";
+import { useContext, useMemo } from "preact/hooks";
 
 import { getSrcSet } from "./Image.tsx";
 

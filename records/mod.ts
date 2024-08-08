@@ -1,10 +1,10 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import {
   createClient as createSQLClient,
   createLocalClient,
   drizzle,
 } from "./deps.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import { getSQLClientConfig, StorageConfig } from "./utils.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 

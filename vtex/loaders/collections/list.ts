@@ -1,6 +1,6 @@
-import { allowCorsFor } from "deco/mod.ts";
-import { AppContext } from "../../mod.ts";
-import { CollectionList } from "../../utils/types.ts";
+import { allowCorsFor } from "@deco/deco";
+import type { AppContext } from "../../mod.ts";
+import type { CollectionList } from "../../utils/types.ts";
 
 export interface Props {
   term?: string;

@@ -1,5 +1,5 @@
-import { AppContext } from "../mod.ts";
-import { BlogPost } from "../types.ts";
+import type { AppContext } from "../mod.ts";
+import type { BlogPost } from "../types.ts";
 import { getRecordsByPath } from "../utils/records.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 

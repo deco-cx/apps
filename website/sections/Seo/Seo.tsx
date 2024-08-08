@@ -1,4 +1,4 @@
-import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
+import Seo, { type Props as SeoProps } from "../../components/Seo.tsx";
 
 type Props = Omit<SeoProps, "jsonLDs">;
 

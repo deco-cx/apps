@@ -1,4 +1,4 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { resourceRange } from "../../utils/resourceRange.ts";
 import type { Document } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";

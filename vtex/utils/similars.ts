@@ -1,6 +1,6 @@
 import type { Product } from "../../commerce/types.ts";
 import relatedProductsLoader from "../loaders/legacy/relatedProductsLoader.ts";
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 
 export const withIsSimilarTo = async (
   req: Request,

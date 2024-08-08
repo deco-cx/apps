@@ -1,4 +1,4 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 
 export interface Props {
   email: string;

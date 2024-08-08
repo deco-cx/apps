@@ -1,5 +1,5 @@
+import { brightGreen } from "@std/fmt/colors";
 import { decode } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
-import { brightGreen } from "std/fmt/colors.ts";
 
 const error = "Could not pull production database";
 

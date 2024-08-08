@@ -1,11 +1,10 @@
-import type { App, FnContext } from "deco/mod.ts";
+import type { App, FnContext } from "@deco/deco";
+import getStateFromZip from "../commerce/utils/stateByZip.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import getStateFromZip from "../commerce/utils/stateByZip.ts";
-import type { Secret } from "../website/loaders/secret.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
-import { Markdown } from "../decohub/components/Markdown.tsx";
+import type { Secret } from "../website/loaders/secret.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 

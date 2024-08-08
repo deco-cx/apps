@@ -1,6 +1,6 @@
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-import { type JSX } from "preact";
-import { Product } from "../../commerce/types.ts";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
+import type { JSX } from "preact";
+import type { Product } from "../../commerce/types.ts";
 
 declare global {
   interface Window {

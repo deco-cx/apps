@@ -1,4 +1,4 @@
-import { proxy } from "deco/clients/withManifest.ts";
-import { Manifest } from "./manifest.gen.ts";
+import { proxy } from "@deco/deco";
+import type { Manifest } from "./manifest.gen.ts";
 
 export const invoke = proxy<Manifest>();

@@ -1,5 +1,5 @@
-import { ImageWidget } from "../admin/widgets.ts";
-import { PageInfo } from "../commerce/types.ts";
+import type { ImageWidget } from "../admin/widgets.ts";
+import type { PageInfo } from "../commerce/types.ts";
 
 /**
  * @titleBy name

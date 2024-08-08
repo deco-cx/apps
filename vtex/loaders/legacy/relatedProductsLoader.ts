@@ -1,7 +1,7 @@
 import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
-import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
-import { AppContext } from "../../mod.ts";
+import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
+import type { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";

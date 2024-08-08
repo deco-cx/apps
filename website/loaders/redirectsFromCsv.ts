@@ -1,5 +1,5 @@
-import { join } from "std/path/mod.ts";
-import { Route } from "../flags/audience.ts";
+import { join } from "@std/path";
+import type { Route } from "../flags/audience.ts";
 
 const REDIRECT_TYPE_ENUM = ["temporary", "permanent"];
 const CONCATENATE_PARAMS_VALUES = ["true", "false"];
@@ -11,7 +11,6 @@ export interface Redirect {
   type?: "temporary" | "permanent";
   discardQueryParameters?: boolean;
 }
-
 export interface Redirects {
   /**
    * @title The file url or path

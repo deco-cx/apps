@@ -1,4 +1,4 @@
-import { JSONSchema7 } from "deco/deps.ts";
+import { JSONSchema7 } from "@deco/deco";
 
 const isJSONSchema = (
   v: unknown | JSONSchema7,

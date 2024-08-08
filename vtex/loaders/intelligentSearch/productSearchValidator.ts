@@ -1,5 +1,5 @@
-import { AppContext } from "../../mod.ts";
-import { FacetsProps, Props } from "./productList.ts";
+import type { AppContext } from "../../mod.ts";
+import type { FacetsProps, Props } from "./productList.ts";
 import type { Product } from "../../../commerce/types.ts";
 
 /**

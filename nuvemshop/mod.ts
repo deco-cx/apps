@@ -3,13 +3,13 @@ import type {
   AppContext as AC,
   AppMiddlewareContext as AMC,
   ManifestOf,
-} from "deco/mod.ts";
-import { createHttpClient } from "../utils/http.ts";
-import workflow from "../workflows/mod.ts";
-import { NuvemShopAPI } from "./utils/client.ts";
+} from "@deco/deco";
 import { fetchSafe } from "../utils/fetch.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
+import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import workflow from "../workflows/mod.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { NuvemShopAPI } from "./utils/client.ts";
 
 import { ClientOf } from "../utils/http.ts";
 import PreviewNuvemshop from "./preview/index.tsx";

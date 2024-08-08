@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { SectionProps } from "deco/mod.ts";
+import { SectionProps } from "@deco/deco";
 import { AppContext } from "../../mod.ts";
 
 export const loader = (_props: unknown, _req: Request, ctx: AppContext) => ({

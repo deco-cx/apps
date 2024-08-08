@@ -1,4 +1,4 @@
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import { getSegmentFromBag, isAnonymous } from "./segment.ts";
 
 export const cache = "stale-while-revalidate";

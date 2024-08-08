@@ -1,5 +1,7 @@
-import type { Workflow } from "deco/blocks/workflow.ts";
-import type { WorkflowContext, WorkflowGen } from "deco/mod.ts";
+import type { WorkflowGen } from "@deco/deco";
+import type { WorkflowContext } from "@deco/deco/blocks";
+
+import type { Workflow } from "@deco/deco/blocks";
 import type { Product } from "../../commerce/types.ts";
 import { waitForWorkflowCompletion } from "../../workflows/utils/awaiters.ts";
 import type { VTEXNotificationPayload } from "../actions/trigger.ts";

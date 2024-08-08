@@ -1,7 +1,6 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import algolia from "https://esm.sh/algoliasearch@4.20.0";
 import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
-import { Markdown } from "../decohub/components/Markdown.tsx";
 import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";

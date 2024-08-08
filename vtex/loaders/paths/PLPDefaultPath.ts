@@ -1,7 +1,7 @@
-import { DefaultPathProps } from "../../../website/pages/Page.tsx";
-import { AppContext } from "../../mod.ts";
+import type { DefaultPathProps } from "../../../website/pages/Page.tsx";
+import type { AppContext } from "../../mod.ts";
 import categoryTree from "../categories/tree.ts";
-import { Category } from "../../../commerce/types.ts";
+import type { Category } from "../../../commerce/types.ts";
 
 export interface Props {
   level: number;

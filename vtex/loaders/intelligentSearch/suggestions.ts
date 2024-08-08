@@ -1,6 +1,6 @@
-import { Suggestion } from "../../../commerce/types.ts";
+import type { Suggestion } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import {
   toPath,
   withDefaultFacets,

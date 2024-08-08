@@ -1,4 +1,4 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { PreviewContainer } from "../utils/preview.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";

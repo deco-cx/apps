@@ -1,5 +1,5 @@
-import { MatchContext } from "deco/blocks/matcher.ts";
-import { getCookies } from "std/http/cookie.ts";
+import type { MatchContext } from "@deco/deco/blocks";
+import { getCookies } from "@std/http/cookie";
 
 /**
  * @title Cookie

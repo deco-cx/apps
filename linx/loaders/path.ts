@@ -1,4 +1,4 @@
-import { redirect } from "deco/mod.ts";
+import { redirect } from "@deco/deco";
 import { STALE } from "../../utils/fetch.ts";
 import type { AppContext } from "../mod.ts";
 import type { API } from "../utils/client.ts";

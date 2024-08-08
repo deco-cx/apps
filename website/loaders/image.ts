@@ -1,6 +1,6 @@
 import { HttpError } from "../../utils/http.ts";
 import { PATH } from "../components/Image.tsx";
-import { Params as Props } from "../utils/image/engine.ts";
+import type { Params as Props } from "../utils/image/engine.ts";
 import { engine as cloudflare } from "../utils/image/engines/cloudflare/engine.ts";
 import { engine as deco } from "../utils/image/engines/deco/engine.ts";
 import { engine as passThrough } from "../utils/image/engines/passThrough/engine.ts";

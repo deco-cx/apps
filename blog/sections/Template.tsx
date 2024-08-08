@@ -1,4 +1,4 @@
-import { BlogPost } from "../types.ts";
+import type { BlogPost } from "../types.ts";
 import { CSS } from "../static/css.ts";
 
 export interface Props {

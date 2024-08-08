@@ -1,7 +1,6 @@
-import { ImportMap } from "deco/blocks/app.ts";
-import { buildImportMap } from "deco/blocks/utils.tsx";
-import { notUndefined } from "deco/engine/core/utils.ts";
-import { type App, AppModule, type FnContext } from "deco/mod.ts";
+import { type App, AppModule, type FnContext } from "@deco/deco";
+import { buildImportMap, ImportMap } from "@deco/deco/blocks";
+import { notUndefined } from "@deco/deco/utils";
 import { Markdown } from "./components/Markdown.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 

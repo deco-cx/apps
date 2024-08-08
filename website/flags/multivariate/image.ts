@@ -1,7 +1,9 @@
 export { onBeforeResolveProps } from "../../utils/multivariate.ts";
-import { MultivariateFlag } from "deco/blocks/flag.ts";
-import multivariate, { MultivariateProps } from "../../utils/multivariate.ts";
-import { ImageWidget } from "../../../admin/widgets.ts";
+import type { MultivariateFlag } from "@deco/deco/blocks";
+import type { ImageWidget } from "../../../admin/widgets.ts";
+import multivariate, {
+  type MultivariateProps,
+} from "../../utils/multivariate.ts";
 
 /**
  * @title Image Variants

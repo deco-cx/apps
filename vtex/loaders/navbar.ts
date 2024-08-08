@@ -1,6 +1,6 @@
 import type { SiteNavigationElement } from "../../commerce/types.ts";
 import { STALE } from "../../utils/fetch.ts";
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import { categoryTreeToNavbar } from "../utils/transform.ts";
 
 export interface Props {

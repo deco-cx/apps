@@ -1,4 +1,4 @@
-import { isFreshCtx } from "./fresh.ts";
+import { isHandlerContext } from "./fresh.ts";
 
 type ConnInfo = Deno.ServeHandlerInfo;
 export interface RedirectConfig {
@@ -24,7 +24,7 @@ export default function Redirect(
   };
 
   return (req: Request, conn: ConnInfo) => {
-    const params = isFreshCtx(conn) ? conn.params ?? {} : {};
+    const params = isHandlerContext(conn) ? conn.params ?? {} : {};
     /**
      * This allows redirects to have dynamic parameters.
      *

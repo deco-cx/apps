@@ -1,6 +1,6 @@
 /** TODO: Deprecate this file */
-import { Page } from "deco/blocks/page.tsx";
-import { notUndefined } from "deco/engine/core/utils.ts";
+import { Page } from "@deco/deco/blocks";
+import { notUndefined } from "@deco/deco/utils";
 
 import {
   Props as LivePageProps,

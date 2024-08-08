@@ -1,4 +1,4 @@
-import { context } from "deco/live.ts";
+import { context } from "@deco/deco";
 import { AnalyticsEvent } from "../../../commerce/types.ts";
 import {
   getGTMIdFromSrc,

@@ -1,0 +1,22 @@
+name: Publish
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish package
+        run: npx jsr publish --allow-slow-types
+
+      - name: Publish script package
+        run: cd scripts/ && npx jsr publish

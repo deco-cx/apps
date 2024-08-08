@@ -1,4 +1,4 @@
-import { FlagObj } from "deco/blocks/flag.ts";
+import type { FlagObj } from "@deco/deco/blocks";
 export { onBeforeResolveProps } from "./everyone.ts";
 
 export type Props<T> = FlagObj<T>;

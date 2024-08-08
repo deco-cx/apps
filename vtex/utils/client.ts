@@ -1,5 +1,5 @@
-import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
-import {
+import type { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
+import type {
   Brand,
   Category,
   CreateNewDocument,

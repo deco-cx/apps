@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "deco/types.ts";
+import type { LoaderFunction } from "@deco/deco";
 import type { Suggestion } from "../../../commerce/types.ts";
 import type { Props } from "../../../vtex/loaders/intelligentSearch/suggestions.ts";
 import type { AppContext } from "../mod.ts";

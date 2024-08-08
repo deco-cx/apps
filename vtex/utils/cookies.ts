@@ -1,4 +1,4 @@
-import { getSetCookies, setCookie } from "std/http/cookie.ts";
+import { getSetCookies, setCookie } from "@std/http/cookie";
 
 export const stringify = (cookies: Record<string, string>) =>
   Object.entries(cookies)

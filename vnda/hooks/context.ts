@@ -1,7 +1,7 @@
-import { IS_BROWSER } from "$fresh/runtime.ts";
+import { IS_BROWSER } from "@deco/deco";
 import { signal } from "@preact/signals";
-import { invoke } from "../runtime.ts";
 import type { Cart } from "../loaders/cart.ts";
+import { invoke } from "../runtime.ts";
 
 export interface Context {
   cart: Cart;
