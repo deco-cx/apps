@@ -68,7 +68,7 @@ export default async function BlogPostList(
     ? posts.filter(({ categories }) => categories.find((c) => c.slug === slug))
     : posts;
 
-  if (!filteredPosts) {
+  if (!filteredPosts || filteredPosts.length === 0) {
     return null;
   }
 
