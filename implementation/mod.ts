@@ -1,6 +1,6 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import { previewFromMarkdown } from "../utils/preview.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type Agency =
   | "2B Digital"

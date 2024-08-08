@@ -1,12 +1,12 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import Typesense from "npm:typesense@1.7.1";
+import { previewFromMarkdown } from "../utils/preview.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import {
   ProductsCollectionName,
   setupProductsCollection,
 } from "./utils/product.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 

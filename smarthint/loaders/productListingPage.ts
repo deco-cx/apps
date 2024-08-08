@@ -1,5 +1,7 @@
+import { redirect } from "@deco/deco";
 import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
+import { getSessionCookie } from "../utils/getSession.ts";
 import {
   getFilterParam,
   getPaginationInfo,
@@ -9,8 +11,6 @@ import {
   toProduct,
   toSortOption,
 } from "../utils/transform.ts";
-import { redirect } from "deco/mod.ts";
-import { getSessionCookie } from "../utils/getSession.ts";
 import { FilterProp, SearchSort, SHProduct } from "../utils/typings.ts";
 import { RuleType } from "./PLPBanners.ts";
 import { getCategoriesParam } from "./recommendations.ts";

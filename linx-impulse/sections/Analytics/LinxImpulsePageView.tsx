@@ -1,15 +1,15 @@
-import { SectionProps } from "deco/types.ts";
+import { SectionProps } from "@deco/deco";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 import {
   PageInfo,
   Person,
   ProductDetailsPage,
   ProductListingPage,
 } from "../../../commerce/types.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { AppContext } from "../../mod.ts";
+import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 import getSource from "../../utils/source.ts";
 import type { LinxUser } from "../../utils/types/analytics.ts";
-import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
 
 type Page =
   | "home"

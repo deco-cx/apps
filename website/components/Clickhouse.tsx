@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { encryptToHex } from "../utils/crypto.ts";
 
 declare global {

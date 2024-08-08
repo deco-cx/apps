@@ -1,9 +1,9 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
-import { createHttpClient } from "../utils/http.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import { fetchSafe } from "../utils/fetch.ts";
+import { createHttpClient } from "../utils/http.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 import type { Secret } from "../website/loaders/secret.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import type { EmailJSApi } from "./utils/client.ts";
 
 export interface Props {

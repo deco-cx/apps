@@ -1,8 +1,5 @@
-import { JSONSchema7 } from "deco/deps.ts";
-import { shortcircuit } from "deco/engine/errors.ts";
-import { lazySchemaFor } from "deco/engine/schema/lazy.ts";
-import { Context } from "deco/live.ts";
-import { readFromStream } from "deco/utils/http.ts";
+import { Context, JSONSchema7, lazySchemaFor, shortcircuit } from "@deco/deco";
+import { readFromStream } from "@deco/deco/utils";
 import { dereferenceJsonSchema } from "../../ai-assistants/schema.ts";
 import { Anthropic } from "../deps.ts";
 import { AppContext } from "../mod.ts";

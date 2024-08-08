@@ -1,11 +1,10 @@
-import type { Section } from "deco/blocks/section.ts";
-import { usePartialSection } from "deco/hooks/usePartialSection.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-import { asResolved, isDeferred } from "deco/mod.ts";
+import { asResolved, isDeferred } from "@deco/deco";
+import type { Section } from "@deco/deco/blocks";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
+import { usePartialSection } from "https://denopkg.com/deco-cx/deco@1.83.6/hooks/usePartialSection.ts";
 import { useId } from "preact/hooks";
-import { AppContext } from "../../mod.ts";
 import { shouldForceRender } from "../../../utils/deferred.ts";
-
+import { AppContext } from "../../mod.ts";
 /** @titleBy type */
 export interface Scroll {
   type: "scroll";

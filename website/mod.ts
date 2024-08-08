@@ -1,10 +1,8 @@
 import "./utils/unhandledRejection.ts";
 
-import { Matcher } from "deco/blocks/matcher.ts";
-import { Page } from "deco/blocks/page.tsx";
-import { Section } from "deco/blocks/section.ts";
-import type { App, Flag, FnContext, Site } from "deco/mod.ts";
-import { asResolved } from "deco/mod.ts";
+import type { App, Flag, FnContext, Site } from "@deco/deco";
+import { asResolved } from "@deco/deco";
+import { Matcher, Page, Section } from "@deco/deco/blocks";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
 import { TextReplace } from "./handlers/proxy.ts";

@@ -1,14 +1,14 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { Page } from "deco/blocks/page.tsx";
-import { RequestContext } from "deco/deco.ts";
 import {
+  allowCorsFor,
   asResolved,
   BaseContext,
+  DecoState,
   isDeferred,
-} from "deco/engine/core/resolver.ts";
-import { DecoState } from "deco/types.ts";
-import { allowCorsFor } from "deco/utils/http.ts";
-import { getSetCookies } from "std/http/cookie.ts";
+  RequestContext,
+} from "@deco/deco";
+import { Page } from "@deco/deco/blocks";
+import { getSetCookies } from "@std/http/cookie";
 import { __DECO_FBT } from "../../utils/deferred.ts";
 import { errorIfFrameworkMismatch } from "../../utils/framework.tsx";
 import { AppContext } from "../mod.ts";

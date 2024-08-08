@@ -1,4 +1,4 @@
-import { Cookie, getCookies } from "std/http/mod.ts";
+import { Cookie, getCookies } from "@std/http/cookie";
 import { stringify } from "./cookies.ts";
 import { MarketingData } from "./types.ts";
 

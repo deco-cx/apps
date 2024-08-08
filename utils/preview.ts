@@ -1,4 +1,4 @@
-import { AppRuntime } from "deco/mod.ts";
+import { AppRuntime } from "@deco/deco";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 
 export const previewFromMarkdown = (url: URL) => {

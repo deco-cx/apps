@@ -1,6 +1,6 @@
-import type { App } from "deco/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
+import type { App } from "@deco/deco";
 import { previewFromMarkdown } from "../utils/preview.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 
 /**
  * @title Sourei

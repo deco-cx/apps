@@ -1,4 +1,4 @@
-import { isSection, Section } from "deco/blocks/section.ts";
+import { isSection, Section } from "@deco/deco/blocks";
 
 export type WellKnownSlots =
   | "content"

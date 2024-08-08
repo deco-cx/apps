@@ -1,10 +1,10 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest from "./manifest.gen.ts";
+import type { App, AppContext as AC } from "@deco/deco";
+import { Category } from "../commerce/types.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
-import { OpenAPI } from "./utils/openapi/smarthint.openapi.gen.ts";
 import { previewFromMarkdown } from "../utils/preview.ts";
-import { Category } from "../commerce/types.ts";
+import manifest from "./manifest.gen.ts";
+import { OpenAPI } from "./utils/openapi/smarthint.openapi.gen.ts";
 
 export interface State {
   /**

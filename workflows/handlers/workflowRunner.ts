@@ -1,8 +1,8 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { Handler } from "deco/blocks/handler.ts";
-import { Workflow, WorkflowContext } from "deco/blocks/workflow.ts";
-import { workflowHTTPHandler } from "deco/deps.ts";
-import { AppManifest, DecoSiteState, DecoState } from "deco/mod.ts";
+import { Handler, Workflow, WorkflowContext } from "@deco/deco/blocks";
+import { workflowHTTPHandler } from "@deco/durable";
+
+import { AppManifest, DecoSiteState, DecoState } from "@deco/deco";
 export interface Config {
   workflow: Workflow;
 }

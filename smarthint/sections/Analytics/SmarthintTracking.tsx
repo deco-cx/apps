@@ -1,9 +1,9 @@
-import { AppContext } from "../../mod.ts";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { Props as ClickProps } from "../../actions/click.ts";
-import { PageType } from "../../utils/typings.ts";
+import { AppContext } from "../../mod.ts";
 import { ANONYMOUS_COOKIE, SESSION_COOKIE } from "../../utils/getSession.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { sortPagesPattern } from "../../utils/sortPagesPattern.ts";
+import { PageType } from "../../utils/typings.ts";
 
 declare global {
   interface Window {
