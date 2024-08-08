@@ -10,6 +10,7 @@ import {
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import {
+  BuyList,
   ProductFragment,
   SearchQuery,
   SingleProductFragment,
@@ -52,7 +53,7 @@ export const getProductUrl = (
 ) => new URL(`/produto/${alias}`, base);
 
 export const getVariantUrl = (
-  variant: ProductFragment | SingleProductFragment,
+  variant: ProductFragment | SingleProductFragment | BuyList,
   base: URL | string,
   variantId?: string,
 ) => {
@@ -303,13 +304,11 @@ export const toProduct = (
     });
   }
 
-  //@ts-expect-error kit prop exists on buy list
-  if (variant.kit) {
+  if ((variant as BuyList).kit) {
     additionalProperty.push({
       "@type": "PropertyValue",
       name: "kit",
-      //@ts-expect-error kit prop exists on buy list
-      value: variant.kit,
+      value: String((variant as BuyList).kit),
       valueReference: "PROPERTY",
     });
   }

@@ -471,6 +471,228 @@ fragment ProductVariant on ProductVariant {
         }
 }`;
 
+const BuyList = gql`
+fragment BuyList on BuyList {
+ 
+      mainVariant
+  productName
+  productId
+  alias
+  collection
+  kit
+  attributes {
+    name
+    type
+    value
+    attributeId
+    displayType
+    id
+  }
+  numberOfVotes
+  productCategories {
+    name
+    url
+    hierarchy
+    main
+    googleCategories
+  }
+  informations {
+    title
+    value
+    type
+  }
+  available
+  averageRating
+  breadcrumbs {
+    text
+    link
+  }
+  condition
+  createdAt
+  ean
+  id
+  images {
+    url
+    fileName
+    print
+  }
+  minimumOrderQuantity
+  prices {
+    bestInstallment {
+      discount
+      displayName
+      fees
+      name
+      number
+      value
+    }
+    discountPercentage
+    discounted
+    installmentPlans {
+      displayName
+      installments {
+        discount
+        fees
+        number
+        value
+      }
+      name
+    }
+    listPrice
+    multiplicationFactor
+    price
+    priceTables {
+      discountPercentage
+      id
+      listPrice
+      price
+    }
+    wholesalePrices {
+      price
+      quantity
+    }
+  }
+  productBrand {
+    fullUrlLogo
+    logoUrl
+    name
+    alias
+  }
+  productVariantId
+  seller {
+    name
+  }
+  seo {
+    name
+    scheme
+    type
+    httpEquiv
+    content
+  }
+  sku
+  stock
+  variantName
+  parallelOptions
+  urlVideo
+  reviews {
+    rating
+    review
+    reviewDate
+    email
+    customer
+  }
+  similarProducts {
+    alias
+    image
+    imageUrl
+    name
+  }
+  attributeSelections {
+    selections {
+      attributeId
+      displayType
+      name
+      varyByParent
+      values {
+        alias
+        available
+        value
+        selected
+        printUrl
+      }
+    }
+    canBeMatrix
+    matrix {
+        column {
+          displayType
+          name
+          values {
+            value
+          }
+        }
+        data {
+          available
+          productVariantId
+          stock
+        }
+        row {
+          displayType
+          name
+          values {
+            value
+            printUrl
+          }
+        }
+      }
+  },
+  buyTogether {
+    productId
+  } 
+  promotions {
+    content
+    disclosureType
+    id
+    fullStampUrl
+    stamp
+    title
+  }
+      alias
+    buyListId
+    kit
+    available
+    variantName
+    buyListProducts {
+      productId
+      quantity
+      includeSameParent
+    }
+    images{
+      url
+      fileName
+      print
+    }
+    informations{
+      id
+      title
+      type
+      value
+    }
+    promotions{
+      content
+      id
+      stamp
+      fullStampUrl
+      title
+      disclosureType
+    }
+    productName
+    prices {
+      listPrice
+      price
+      discountPercentage
+      installmentPlans{
+          displayName
+          name
+          installments{
+            discount
+            fees
+            number
+            value
+          }
+      }
+      bestInstallment {
+        name
+        displayName
+        discount
+        fees
+        number
+        value
+      }
+    }
+    
+}
+`;
+
 const SingleProductPart = gql`
 fragment SingleProductPart on SingleProduct {
   mainVariant
@@ -1073,223 +1295,10 @@ export const Shop = {
 };
 
 export const GetBuyList = {
+  fragments: [BuyList],
   query: gql`query BuyList($id: Long!) {
-    buyList(id: $id){
-      mainVariant
-  productName
-  productId
-  alias
-  collection
-  kit
-  attributes {
-    name
-    type
-    value
-    attributeId
-    displayType
-    id
-  }
-  numberOfVotes
-  productCategories {
-    name
-    url
-    hierarchy
-    main
-    googleCategories
-  }
-  informations {
-    title
-    value
-    type
-  }
-  available
-  averageRating
-  breadcrumbs {
-    text
-    link
-  }
-  condition
-  createdAt
-  ean
-  id
-  images {
-    url
-    fileName
-    print
-  }
-  minimumOrderQuantity
-  prices {
-    bestInstallment {
-      discount
-      displayName
-      fees
-      name
-      number
-      value
-    }
-    discountPercentage
-    discounted
-    installmentPlans {
-      displayName
-      installments {
-        discount
-        fees
-        number
-        value
-      }
-      name
-    }
-    listPrice
-    multiplicationFactor
-    price
-    priceTables {
-      discountPercentage
-      id
-      listPrice
-      price
-    }
-    wholesalePrices {
-      price
-      quantity
-    }
-  }
-  productBrand {
-    fullUrlLogo
-    logoUrl
-    name
-    alias
-  }
-  productVariantId
-  seller {
-    name
-  }
-  seo {
-    name
-    scheme
-    type
-    httpEquiv
-    content
-  }
-  sku
-  stock
-  variantName
-  parallelOptions
-  urlVideo
-  reviews {
-    rating
-    review
-    reviewDate
-    email
-    customer
-  }
-  similarProducts {
-    alias
-    image
-    imageUrl
-    name
-  }
-  attributeSelections {
-    selections {
-      attributeId
-      displayType
-      name
-      varyByParent
-      values {
-        alias
-        available
-        value
-        selected
-        printUrl
-      }
-    }
-    canBeMatrix
-    matrix {
-        column {
-          displayType
-          name
-          values {
-            value
-          }
-        }
-        data {
-          available
-          productVariantId
-          stock
-        }
-        row {
-          displayType
-          name
-          values {
-            value
-            printUrl
-          }
-        }
-      }
-  },
-  buyTogether {
-    productId
-  } 
-  promotions {
-    content
-    disclosureType
-    id
-    fullStampUrl
-    stamp
-    title
-  }
-      alias
-    buyListId
-    kit
-    available
-    variantName
-    buyListProducts {
-      productId
-      quantity
-      includeSameParent
-    }
-    images{
-      url
-      fileName
-      print
-    }
-    informations{
-      id
-      title
-      type
-      value
-    }
-    promotions{
-      content
-      id
-      stamp
-      fullStampUrl
-      title
-      disclosureType
-    }
-    productName
-    prices {
-      listPrice
-      price
-      discountPercentage
-      installmentPlans{
-          displayName
-          name
-          installments{
-            discount
-            fees
-            number
-            value
-          }
-      }
-      bestInstallment {
-        name
-        displayName
-        discount
-        fees
-        number
-        value
-      }
-    }
-    }
+     buyList(id: $id){
+      ...BuyList
+     }
   }`,
 };

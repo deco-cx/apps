@@ -73,7 +73,7 @@ async function loader(
         "@type": "PropertyValue",
         name: "quantity",
         value: String(quantity),
-        valueReference: "BUY_LIST_PROPERTY",
+        alternateName: "Buy List Quantity",
       });
 
       return buyListProductPage.product;
