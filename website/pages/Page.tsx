@@ -1,6 +1,8 @@
 import { Head } from "$fresh/runtime.ts";
+import type { Page } from "deco/blocks/page.tsx";
 import { Section, SectionProps } from "deco/blocks/section.ts";
 import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
+import { HttpError } from "deco/engine/errors.ts";
 import { Context } from "deco/live.ts";
 import {
   isDeferred,
@@ -9,17 +11,15 @@ import {
 } from "deco/mod.ts";
 import { logger } from "deco/observability/otel/config.ts";
 import { Component, JSX } from "preact";
-import Events from "../components/Events.tsx";
-import LiveControls from "../components/_Controls.tsx";
-import { AppContext } from "../mod.ts";
-import type { Page } from "deco/blocks/page.tsx";
-import { HttpError } from "deco/engine/errors.ts";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import { SEOSection } from "../components/Seo.tsx";
 import Clickhouse, {
   generateSessionId,
   generateUserId,
 } from "../components/Clickhouse.tsx";
+import Events from "../components/Events.tsx";
+import { SEOSection } from "../components/Seo.tsx";
+import LiveControls from "../components/_Controls.tsx";
+import { AppContext } from "../mod.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 
@@ -121,7 +121,7 @@ function Page({
         </Head>
       )}
       <ErrorBoundary
-        fallback={(error) =>
+        fallback={(error: unknown) =>
           error instanceof HttpError &&
             errorPage !== undefined &&
             errorPage !== null &&

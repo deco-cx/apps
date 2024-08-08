@@ -1,7 +1,7 @@
-import { ConnInfo } from "std/http/server.ts";
 import Proxy from "../../website/handlers/proxy.ts";
 import { AppContext } from "../mod.ts";
 
+type ConnInfo = Deno.ServeHandlerInfo;
 const xmlHeader =
   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 

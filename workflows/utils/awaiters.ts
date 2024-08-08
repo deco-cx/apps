@@ -1,6 +1,6 @@
 import { type WorkflowContext } from "deco/mod.ts";
-import { type AppManifest } from "../mod.ts";
 import { isEventStreamResponse } from "deco/utils/invoke.ts";
+import { type AppManifest } from "../mod.ts";
 
 export const waitForWorkflowCompletion = <T extends AppManifest>(
   ctx: WorkflowContext<T>,
@@ -8,10 +8,11 @@ export const waitForWorkflowCompletion = <T extends AppManifest>(
   timeoutMS?: number,
 ) =>
   ctx.callLocalActivity(async () => {
-    const events = await (ctx as WorkflowContext<AppManifest>).state.invoke(
-      "workflows/loaders/events.ts",
-      { stream: true, id },
-    );
+    const events = await (ctx as unknown as WorkflowContext<AppManifest>).state
+      .invoke(
+        "workflows/loaders/events.ts",
+        { stream: true, id },
+      );
 
     if (!isEventStreamResponse(events)) return;
 
