@@ -14,5 +14,11 @@ export async function getRecordsByPath<T>(
     return key.startsWith(path) ? value : [];
   });
 
-  return (current as Record<string, T>[]).map((item) => item[accessor]);
+  return (current as Record<string, T>[]).map((item) => {
+    const name = (item.name as string).split(path)[1]?.replace("/", "");
+    return {
+      ...item[accessor],
+      name,
+    };
+  });
 }
