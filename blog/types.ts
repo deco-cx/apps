@@ -59,3 +59,9 @@ export interface BlogPostPage {
   post: BlogPost;
   seo?: Seo | null;
 }
+
+export type SortBy =
+  | "date_desc"
+  | "date_asc"
+  | "title_asc"
+  | "title_desc"
