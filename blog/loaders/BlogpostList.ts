@@ -6,6 +6,7 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost } from "../types.ts";
 import { getRecordsByPath } from "../utils/records.ts";
@@ -15,10 +16,15 @@ const ACCESSOR = "post";
 
 export interface Props {
   /**
+   * @title Category Slug
+   * @description Filter by a specific category slug.
+   */
+  slug?: RequestURLParam;
+  /**
    * @title Items per page
    * @description Number of posts per page to display.
    */
-  count: number;
+  count?: number;
   /**
    * @title Page query parameter
    * @description The current page number. Defaults to 1.
@@ -38,17 +44,25 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-  props: Props,
-  _req: Request,
+  { page = 1, count = 1, slug }: Props,
+  req: Request,
   ctx: AppContext,
 ): Promise<BlogPost[] | null> {
+  const url = new URL(req.url);
+  const postCount = Number(count ?? url.searchParams.get("count"));
+  const pageNumber = Number(page ?? url.searchParams.get("p"));
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
     ACCESSOR,
   );
 
-  const mostRecentPosts = posts.toSorted((a, b) => {
+  //Filter posts by category slug
+  const filteredPosts = slug
+    ? posts.filter(({ categories }) => categories.find((c) => c.slug === slug))
+    : posts;
+
+  const mostRecentPosts = filteredPosts.toSorted((a, b) => {
     if (!a.date && !b.date) {
       return 0; // If both posts don't have a date, consider them equal
     }
@@ -61,9 +75,8 @@ export default async function BlogPostList(
     return new Date(b.date).getTime() - new Date(a.date).getTime(); // Sort by date in descending order
   });
 
-  const page = props.page ?? 1;
-  const startIndex = (page - 1) * props.count;
-  const endIndex = startIndex + props.count;
+  const startIndex = (pageNumber - 1) * postCount;
+  const endIndex = startIndex + postCount;
   const paginatedPosts = mostRecentPosts.slice(startIndex, endIndex);
 
   return paginatedPosts.length > 0 ? paginatedPosts : null;
