@@ -1,8 +1,8 @@
 /**
  * Retrieves a list of blog posts.
  *
- * @param _props - The props for the blog post list (unused).
- * @param _req - The request object (unused).
+ * @param props - The props for the blog post list.
+ * @param req - The request object.
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
@@ -42,10 +42,8 @@ export interface Props {
  * @title BlogPostList
  * @description Retrieves a list of blog posts.
  *
- * Retrieves a list of blog posts.
- *
- * @param _props - The props for the blog post list (unused).
- * @param _req - The request object (unused).
+ * @param props - The props for the blog post list.
+ * @param req - The request object.
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
@@ -95,15 +93,15 @@ const sortPosts = (blogPosts: BlogPost[], sortOption: SortBy) => {
 
   return blogPosts.toSorted((a, b) => {
     if (!a[sortMethod] && !b[sortMethod]) {
-      return 0; // If both posts don't have a date, consider them equal
+      return 0; // If both posts don't have the sort method, consider them equal
     }
     if (!a[sortMethod]) {
-      return 1; // If post a doesn't have a date, put it after post b
+      return 1; // If post a doesn't have sort method, put it after post b
     }
     if (!b[sortMethod]) {
-      return -1; // If post b doesn't have a date, put it after post a
+      return -1; // If post b doesn't have sort method, put it after post a
     }
-    const comparison = new Date(b.date).getTime() - new Date(a.date).getTime(); // Sort by date in descending order
-    return sortOrder === "desc" ? comparison : -comparison;
+    const comparison = new Date(b.date).getTime() - new Date(a.date).getTime(); // Sort in descending order
+    return sortOrder === "desc" ? comparison : -comparison; // Invert sort depending of desc or asc
   });
 };
