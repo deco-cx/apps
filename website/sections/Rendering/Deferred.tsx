@@ -1,7 +1,6 @@
 import { asResolved, isDeferred } from "@deco/deco";
 import type { Section } from "@deco/deco/blocks";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
-import { usePartialSection } from "https://denopkg.com/deco-cx/deco@1.83.6/hooks/usePartialSection.ts";
+import { usePartialSection, useScriptAsDataURI } from "@deco/deco/hooks";
 import { useId } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
 import { AppContext } from "../../mod.ts";
