@@ -1,16 +1,16 @@
-import { AppContext } from "../../../vtex/mod.ts";
-import type { CreateNewDocument } from "../../../vtex/utils/types.ts";
 import { getCookies } from "std/http/cookie.ts";
+import { AppContext } from "../../../vtex/mod.ts";
+import { VTEX_ID_CLIENT_COOKIE } from "../../utils/vtexId.ts";
 
 export interface Props {
   data: {
-    productId: string | null | undefined;
+    productId: string;
     rating: number;
     title: string;
     text: string;
     reviewerName: string;
     approved: boolean;
-  }
+  };
 }
 
 // docs https://developers.vtex.com/docs/api-reference/reviews-and-ratings-api#post-/reviews-and-ratings/api/review?endpoint=post-/reviews-and-ratings/api/review
@@ -19,27 +19,24 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<CreateNewDocument | undefined> => {
-  
-  const { my } = await ctx.invoke.vtex.loaders.config() 
+) => {
   const { data } = props;
   const cookies = getCookies(req.headers);
-  const key = Object.keys(cookies).find((key) => key.includes("VtexIdclientAutCookie"));
-  const authcookie = cookies[key ?? ""];
+  const authCookie = cookies[VTEX_ID_CLIENT_COOKIE] ||
+    cookies[`${VTEX_ID_CLIENT_COOKIE}_${ctx.account}`];
 
   const requestOptions = {
     body: data,
     headers: {
       "accept": "application/json",
       "content-type": "application/json",
-      "VtexidClientAutCookie": authcookie
+      "VtexidClientAutCookie": authCookie,
     },
   };
 
-  const response =
-    await (
-      my[`POST /reviews-and-ratings/api/review`]({}, requestOptions)
-    );
+  const response = await (
+    ctx.my[`POST /reviews-and-ratings/api/review`]({}, requestOptions)
+  );
 
   return response.json();
 };
