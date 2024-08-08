@@ -53,6 +53,10 @@ export default function Linx({ secretKey, ...props }: State) {
     "x-secret-key",
     typeof secretKey === "string" ? secretKey : secretKey?.get() ?? "",
   );
+  props.origin && headers.set(
+    "origin",
+    props.origin,
+  );
 
   const eventsApi = createHttpClient<EventsAPI>({
     base: "https://api.event.linximpulse.net/",

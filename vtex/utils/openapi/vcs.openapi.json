@@ -7,6 +7,148 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/dataentities/{acronym}/search": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Search documents",
+        "description": "Searches Master Data v1 documents with highly customizable filters.\r\n\r\n> Learn more about [Master Data v1 search queries](https://developers.vtex.com/vtex-rest-api/docs/how-the-queries-in-master-data-v1-work).\r\n\r\n## Query Examples\r\n\r\n\r\n### Simple filter\r\n\r\n```\r\n/dataentities/CL/search?email=my@email.com\r\n```\r\n\r\n### Complex filter\r\n\r\n```\r\n/dataentities/CL/search?_where=(firstName=Jon OR lastName=Smith) OR (createdIn between 2001-01-01 AND 2016-01-01)\r\n```\r\n\r\n### Filter by range\r\n\r\n#### Date Range\r\n\r\n```\r\n/dataentities/CL/search?_where=createdIn between 2001-01-01 AND 2016-01-01\r\n```\r\n\r\n#### Range numeric fields\r\n\r\n```\r\n/dataentities/CL/search?_where=age between 18 AND 25\r\n```\r\n\r\n### Partial filter\r\n\r\n```\r\n/dataentities/CL/search?firstName=*Maria*\r\n```\r\n\r\n### Filter for null values\r\n\r\n```\r\n/dataentities/CL/search?_where=firstName is null\r\n```\r\n\r\n### Filter for non-null values\r\n\r\n```\r\n/dataentities/CL/search?_where=firstName is not null\r\n```\r\n\r\n### Filter for difference\r\n```\r\n/dataentities/CL/search?_where=firstName<>maria\r\n```\r\n\r\n### Filter greater than or less than\r\n```\r\n/dataentities/CL/search?_where=number>5\r\n/dataentities/CL/search?_where=date<2001-01-01\r\n```\n\r\n\r> Avoid sending too many requests with wildcards (`*`) in the search parameters or that use the `keyword` parameter. This may lead to this endpoint being temporarily blocked for your account. If this happens you will receive an error with status code `503`. \r\n\r\n## Permissions\r\n\r\nAny user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:\r\n\r\n| **Product** | **Category** | **Resource** |\r\n| --------------- | ----------------- | ----------------- |\r\n| Dynamic Storage | Dynamic storage generic resources | **Read only documents** |\r\n| Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |\r\n| Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |\r\n| Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |\r\n\r\nThere are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).\r\n\r\n>\u2757 To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.",
+        "operationId": "Searchdocuments",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "Type of the content being sent.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "HTTP Client Negotiation _Accept_ Header. Indicates the types of responses the client can understand.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "REST-Range",
+            "in": "header",
+            "description": "Defines the collection of documents to be returned. A range within the collection limited by 100 documents per query.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "resources=0-10"
+            }
+          },
+          {
+            "name": "acronym",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "_fields",
+            "in": "query",
+            "description": "Names of the fields that will be returned per document, separated by a comma `,`. It is possible to fetch all fields using `_all` as the value of this query parameter. However, in order to avoid permission errors, we strongly recommend informing only the names of the exact fields that will be used.",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "email,firstName,document"
+            }
+          },
+          {
+            "name": "_where",
+            "in": "query",
+            "description": "Specification of filters.",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "firstName is not null"
+            }
+          },
+          {
+            "name": "_sort",
+            "in": "query",
+            "description": "Inform a field name plus `ASC` to sort results by this field value in ascending order or `DESC` to sort by descending order.",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "firstName ASC"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "List of documents.",
+                  "items": {
+                    "type": "object",
+                    "description": "Object representing each document.",
+                    "properties": {
+                      "additionalProperties": {
+                        "type": "string",
+                        "description": "Custom properties."
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "Unique identifier of the document."
+                      },
+                      "accountId": {
+                        "type": "string",
+                        "description": "Unique identifier of the account."
+                      },
+                      "accountName": {
+                        "type": "string",
+                        "description": "Account name."
+                      },
+                      "dataEntityId": {
+                        "type": "string",
+                        "description": "Two-letter string that identifies the data entity."
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "2f5dde81-1613-11ea-82ee-12f868feb457",
+                    "accountId": "a8b27fb4-6516-4cc0-82b6-a5f2b011e6e2",
+                    "accountName": "apiexamples",
+                    "dataEntityId": "AS"
+                  },
+                  {
+                    "id": "3b3a3fc9-164b-11ea-82ee-121449f60ecb",
+                    "accountId": "a8b27fb4-6516-4cc0-82b6-a5f2b011e6e2",
+                    "accountName": "apiexamples",
+                    "dataEntityId": "AS"
+                  }
+                ]
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable. Wildcard queries temporarily blocked due to excessive usage. Consider adjusting your code to remove them or reduce the rate of search requests with wildcards (*). This temporary block may also be due to excessive use of requests with the parameter `keyword`."
+          }
+        }
+      }
+    },
     "/api/logistics/pvt/configuration/pickuppoints": {
       "get": {
         "tags": [
