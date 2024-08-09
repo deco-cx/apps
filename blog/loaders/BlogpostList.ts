@@ -16,26 +16,26 @@ const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
 
 export interface Props {
-    /**
-     * @title Category Slug
-     * @description Filter by a specific category slug.
-     */
-    slug?: RequestURLParam;
-    /**
-     * @title Items per page
-     * @description Number of posts per page to display.
-     */
-    count?: number;
-    /**
-     * @title Page query parameter
-     * @description The current page number. Defaults to 1.
-     */
-    page?: number;
-    /**
-     * @title Page sorting parameter
-     * @description The sorting option. Default is "date_desc"
-     */
-    sortBy?: SortBy;
+  /**
+   * @title Category Slug
+   * @description Filter by a specific category slug.
+   */
+  slug?: RequestURLParam;
+  /**
+   * @title Items per page
+   * @description Number of posts per page to display.
+   */
+  count?: number;
+  /**
+   * @title Page query parameter
+   * @description The current page number. Defaults to 1.
+   */
+  page?: number;
+  /**
+   * @title Page sorting parameter
+   * @description The sorting option. Default is "date_desc"
+   */
+  sortBy?: SortBy;
 }
 
 /**
@@ -48,28 +48,28 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-    { page, count, slug, sortBy }: Props,
-    req: Request,
-    ctx: AppContext,
+  { page, count, slug, sortBy }: Props,
+  req: Request,
+  ctx: AppContext,
 ): Promise<BlogPost[] | null> {
-    const url = new URL(req.url);
-    const postsPerPage = Number(count ?? url.searchParams.get("count"));
-    const pageNumber = Number(page ?? url.searchParams.get("p"));
-    const pageSort = sortBy ?? url.searchParams.get("sortBy") as SortBy ??
-        "date_desc";
-    const posts = await getRecordsByPath<BlogPost>(
-        ctx,
-        COLLECTION_PATH,
-        ACCESSOR,
-    );
+  const url = new URL(req.url);
+  const postsPerPage = Number(count ?? url.searchParams.get("count"));
+  const pageNumber = Number(page ?? url.searchParams.get("p"));
+  const pageSort = sortBy ?? url.searchParams.get("sortBy") as SortBy ??
+    "date_desc";
+  const posts = await getRecordsByPath<BlogPost>(
+    ctx,
+    COLLECTION_PATH,
+    ACCESSOR,
+  );
 
-    const handledPosts = handlePosts(posts, pageSort, slug);
+  const handledPosts = handlePosts(posts, pageSort, slug);
 
-    if (!handledPosts) {
-        return null;
-    }
+  if (!handledPosts) {
+    return null;
+  }
 
-    const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
+  const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
 
-    return slicedPosts.length > 0 ? slicedPosts : null;
+  return slicedPosts.length > 0 ? slicedPosts : null;
 }
