@@ -2,7 +2,7 @@ import { getCookies } from "std/http/mod.ts";
 import { decode } from "https://deno.land/x/djwt@v2.8/mod.ts";
 import { stringify } from "./cookies.ts";
 
-const NAME = "VtexIdclientAutCookie";
+export const VTEX_ID_CLIENT_COOKIE = "VtexIdclientAutCookie";
 
 interface CookiePayload {
   sub: string; // user email
@@ -15,16 +15,21 @@ interface CookiePayload {
 
 export const parseCookie = (headers: Headers, account: string) => {
   const cookies = getCookies(headers);
-  const cookie = cookies[NAME] || cookies[`${NAME}_${account}`];
+  const cookie = cookies[VTEX_ID_CLIENT_COOKIE] ||
+    cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`];
   const decoded = cookie ? decode(cookie) : null;
 
   const payload = decoded?.[1] as CookiePayload | undefined;
 
   return {
     cookie: stringify({
-      ...(cookies[NAME] && { [NAME]: cookies[NAME] }),
-      ...(cookies[`${NAME}_${account}`] &&
-        { [`${NAME}_${account}`]: cookies[`${NAME}_${account}`] }),
+      ...(cookies[VTEX_ID_CLIENT_COOKIE] &&
+        { [VTEX_ID_CLIENT_COOKIE]: cookies[VTEX_ID_CLIENT_COOKIE] }),
+      ...(cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`] &&
+        {
+          [`${VTEX_ID_CLIENT_COOKIE}_${account}`]:
+            cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`],
+        }),
     }),
     payload,
   };
