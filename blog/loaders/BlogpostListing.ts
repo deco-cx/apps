@@ -1,14 +1,15 @@
 /**
- * Retrieves a list of blog posts.
+ * Retrieves a listing page of blog posts.
  *
- * @param props - The props for the blog post list.
+ * @param props - The props for the blog post listing.
  * @param req - The request object.
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
+import { PageInfo } from "../../commerce/types.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
-import { BlogPost, SortBy } from "../types.ts";
+import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../utils/handlePosts.ts";
 import { getRecordsByPath } from "../utils/records.ts";
 
@@ -51,11 +52,12 @@ export default async function BlogPostList(
     { page, count, slug, sortBy }: Props,
     req: Request,
     ctx: AppContext,
-): Promise<BlogPost[] | null> {
+): Promise<BlogPostListingPage | null> {
     const url = new URL(req.url);
-    const postsPerPage = Number(count ?? url.searchParams.get("count"));
-    const pageNumber = Number(page ?? url.searchParams.get("p"));
-    const pageSort = sortBy ?? url.searchParams.get("sortBy") as SortBy ??
+    const params = url.searchParams;
+    const postsPerPage = Number(count ?? params.get("count") ?? 12);
+    const pageNumber = Number(page ?? params.get("p") ?? 1);
+    const pageSort = sortBy ?? params.get("sortBy") as SortBy ??
         "date_desc";
     const posts = await getRecordsByPath<BlogPost>(
         ctx,
@@ -71,5 +73,47 @@ export default async function BlogPostList(
 
     const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
 
-    return slicedPosts.length > 0 ? slicedPosts : null;
+    if (slicedPosts.length === 0) {
+        return null;
+    }
+
+    const category = slicedPosts[0].categories.find((c) => c.slug === slug);
+    return {
+        posts: slicedPosts,
+        pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
+        seo: {
+            title: category?.name ?? "",
+            canonical: new URL(url.pathname, url.origin).href,
+        },
+    };
 }
+
+const toPageInfo = (
+    posts: BlogPost[],
+    postsPerPage: number,
+    pageNumber: number,
+    params: URLSearchParams,
+): PageInfo => {
+    const totalPosts = posts.length;
+    const totalPages = Math.ceil(totalPosts / postsPerPage);
+    const hasNextPage = totalPages > pageNumber;
+    const hasPrevPage = pageNumber > 1;
+    const nextPage = new URLSearchParams(params);
+    const previousPage = new URLSearchParams(params);
+
+    if (hasNextPage) {
+        nextPage.set("p", (pageNumber + 1).toString());
+    }
+
+    if (hasPrevPage) {
+        previousPage.set("p", (pageNumber - 1).toString());
+    }
+
+    return {
+        nextPage: hasNextPage ? `?${nextPage}` : undefined,
+        previousPage: hasPrevPage ? `?${previousPage}` : undefined,
+        currentPage: pageNumber,
+        records: totalPosts,
+        recordPerPage: postsPerPage,
+    };
+};
