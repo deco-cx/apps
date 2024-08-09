@@ -1,7 +1,7 @@
 import { context } from "deco/live.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { brightGreen, brightRed } from "std/fmt/colors.ts";
-import { join } from "https://deno.land/std@0.204.0/path/join.ts";
+import { join } from "https://deno.land/std@0.224.0/path/join.ts";
 
 export interface StorageConfig {
   /**

@@ -1,4 +1,4 @@
-import { existsSync } from "https://deno.land/std@0.201.0/fs/exists.ts";
+import { existsSync } from "https://deno.land/std@0.224.0/fs/exists.ts";
 import { createClient as createSQLClient } from "../deps.ts";
 import { getLocalDbFilename, getLocalSQLClientConfig } from "../utils.ts";
 import { brightGreen, brightYellow } from "std/fmt/colors.ts";
