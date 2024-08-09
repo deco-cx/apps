@@ -2,7 +2,7 @@ import { AppContext } from "../../mod.ts";
 import type { FieldsList, User } from "../../utils/types.ts";
 
 export interface Props {
-  fields: FieldsList
+  fields: FieldsList;
   userId: string;
 }
 
@@ -19,7 +19,7 @@ const action = async (
 
   try {
     const response = await api["DELETE ​/users​/:userId"](
-      { fields, userId }
+      { fields, userId },
     ).then((res) => res.json());
 
     return await response.json();

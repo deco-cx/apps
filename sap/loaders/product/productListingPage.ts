@@ -7,7 +7,12 @@ import {
   ProductListResponse,
   Sort,
 } from "../../utils/types.ts";
-import { convertBreadcrumb, convertFacetsToFilters, convertProductData, getPreviousNextPagination } from "../../utils/transform.ts";
+import {
+  convertBreadcrumb,
+  convertFacetsToFilters,
+  convertProductData,
+  getPreviousNextPagination,
+} from "../../utils/transform.ts";
 
 export interface Props {
   /**
@@ -50,7 +55,7 @@ export interface Props {
 const productListLoader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductListingPage> => {
   const { api } = ctx;
   const { categoryId, currentPage, facets, fields, pageSize, sort } = props;
@@ -58,7 +63,7 @@ const productListLoader = async (
   const facetsQuery = facets
     .reduce(
       (prev, curr) => [...prev, `${curr.key}:${curr.value}`],
-      [] as string[]
+      [] as string[],
     )
     .join(":");
 
@@ -70,10 +75,10 @@ const productListLoader = async (
     res.json()
   );
 
-  const products = data.products.map(convertProductData)
-  const breadcrumb = convertBreadcrumb(data.breadcrumbs)
-  const filters = convertFacetsToFilters(data.facets)
-  const [previousPage, nextPage] = getPreviousNextPagination(data.pagination)
+  const products = data.products.map(convertProductData);
+  const breadcrumb = convertBreadcrumb(data.breadcrumbs);
+  const filters = convertFacetsToFilters(data.facets);
+  const [previousPage, nextPage] = getPreviousNextPagination(data.pagination);
 
   return {
     "@type": "ProductListingPage",

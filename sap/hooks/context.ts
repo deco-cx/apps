@@ -5,68 +5,68 @@ import { invoke } from "../runtime.ts";
 import type { Cart } from "../utils/types.ts";
 
 export interface Context {
-    cart: Cart | null;
-    user: Person | null;
+  cart: Cart | null;
+  user: Person | null;
 }
 
 const loading = signal<boolean>(true);
 const context = {
-    cart: signal<Cart | null>(null),
-    user: signal<Person | null>(null),
+  cart: signal<Cart | null>(null),
+  user: signal<Person | null>(null),
 };
 
 let queue = Promise.resolve();
-let abort = () => { };
+let abort = () => {};
 const enqueue = (
-    cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>,
+  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>,
 ) => {
-    abort();
+  abort();
 
-    loading.value = true;
-    const controller = new AbortController();
+  loading.value = true;
+  const controller = new AbortController();
 
-    queue = queue.then(async () => {
-        try {
-            const { cart, user } = await cb(controller.signal);
+  queue = queue.then(async () => {
+    try {
+      const { cart, user } = await cb(controller.signal);
 
-            if (controller.signal.aborted) {
-                throw { name: "AbortError" };
-            }
+      if (controller.signal.aborted) {
+        throw { name: "AbortError" };
+      }
 
-            context.cart.value = cart || context.cart.value;
-            context.user.value = user || context.user.value;
+      context.cart.value = cart || context.cart.value;
+      context.user.value = user || context.user.value;
 
-            loading.value = false;
-        } catch (error) {
-            if (error.name === "AbortError") return;
+      loading.value = false;
+    } catch (error) {
+      if (error.name === "AbortError") return;
 
-            console.error(error);
-            loading.value = false;
-        }
-    });
+      console.error(error);
+      loading.value = false;
+    }
+  });
 
-    abort = () => controller.abort();
+  abort = () => controller.abort();
 
-    return queue;
+  return queue;
 };
 
 const load = (signal: AbortSignal) =>
-    invoke({
-        cart: invoke.sap.loaders.cart(),
-        user: invoke.sap.loaders.user(),
-    }, { signal });
+  invoke({
+    cart: invoke.sap.loaders.cart(),
+    user: invoke.sap.loaders.user(),
+  }, { signal });
 
 if (IS_BROWSER) {
-    enqueue(load);
+  enqueue(load);
 
-    document.addEventListener(
-        "visibilitychange",
-        () => document.visibilityState === "visible" && enqueue(load),
-    );
+  document.addEventListener(
+    "visibilitychange",
+    () => document.visibilityState === "visible" && enqueue(load),
+  );
 }
 
 export const state = {
-    ...context,
-    loading,
-    enqueue,
+  ...context,
+  loading,
+  enqueue,
 };

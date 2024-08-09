@@ -2,7 +2,7 @@ import { AppContext } from "../mod.ts";
 import { User } from "../utils/types.ts";
 
 /**
- * @docs 
+ * @docs
  */
 const loader = async (
   _props: unknown,

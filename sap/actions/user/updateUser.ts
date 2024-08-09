@@ -3,7 +3,7 @@ import type { FieldsList, User } from "../../utils/types.ts";
 
 export interface Props {
   user: User;
-  fields: FieldsList
+  fields: FieldsList;
   userId: string;
 }
 
@@ -20,7 +20,7 @@ const action = async (
 
   try {
     const response = await api["PUT ​/users​/:userId"](
-      { user, fields, userId }
+      { user, fields, userId },
     ).then((res) => res.json());
 
     return await response.json();

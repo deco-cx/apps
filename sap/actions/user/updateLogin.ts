@@ -2,9 +2,9 @@ import { AppContext } from "../../mod.ts";
 import type { FieldsList, User } from "../../utils/types.ts";
 
 export interface Props {
-  fields: FieldsList
-  newLogin: string
-  password: string
+  fields: FieldsList;
+  newLogin: string;
+  password: string;
   userId: string;
 }
 
@@ -21,7 +21,7 @@ const action = async (
 
   try {
     const response = await api["PUT ​/users​/:userId/login"](
-      { fields, newLogin, password, userId }
+      { fields, newLogin, password, userId },
     ).then((res) => res.json());
 
     return await response.json();

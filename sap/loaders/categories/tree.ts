@@ -30,7 +30,7 @@ const loader = async (
   let tree = data.catalogs[0].catalogVersions
     .find((version) => {
       version.id == "Online";
-    })
+    });
 
   if (categoryType && categoryType !== "default") {
     tree = tree.categories.find((category) => {
