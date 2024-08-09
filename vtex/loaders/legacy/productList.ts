@@ -282,7 +282,9 @@ export const cacheKey = (
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (
-    url.searchParams.has("q") || !isAnonymous(ctx)
+    url.searchParams.has("q") || !isAnonymous(ctx) ||
+    // loader is invoked directly should not vary
+    ctx.isInvoke && (isSKUIDProps(props) || isProductIDProps(props))
   ) {
     return null;
   }
