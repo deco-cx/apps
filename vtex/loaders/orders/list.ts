@@ -1,17 +1,14 @@
-import { allowCorsFor } from "deco/mod.ts";
 import { AppContext } from "../../mod.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { Orders } from "../../utils/types.ts";
 
 export default async function loader(
   _props: unknown,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<Orders> {
-  Object.entries(allowCorsFor(req)).map(([name, value]) => {
-    ctx.response.headers.set(name, value);
-  });
-
   const { vcsDeprecated } = ctx;
+  const segment = getSegmentFromBag(ctx);
 
   const currentDate = new Date();
   const pastDate = new Date(currentDate);
@@ -25,6 +22,7 @@ export default async function loader(
         f_creationDate:
           `creationDate:[${pastDate.toISOString()} TO ${currentDate.toISOString()}]`,
       },
+      { headers: withSegmentCookie(segment) },
     );
 
   const ordersList = await ordersResponse.json();
