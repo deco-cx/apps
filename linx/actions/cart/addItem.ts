@@ -1,3 +1,4 @@
+import { getLinxBasketId } from "../../loaders/cart.ts";
 import type { AppContext } from "../../mod.ts";
 import { toLinxHeaders } from "../../utils/headers.ts";
 import { toCart } from "../../utils/transform.ts";
@@ -10,6 +11,7 @@ export interface Props {
   FeatureID?: number;
   Products: CartProduct[];
   QueryString?: string;
+  BasketID?: number;
 }
 
 const action = async (
@@ -17,12 +19,16 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<CartResponse | null> => {
+  const BasketID = getLinxBasketId(req.headers);
   try {
     const response = await ctx.api
       ["POST /web-api/v1/Shopping/Basket/AddProduct"](
         {},
         {
-          body: props,
+          body: {
+            ...props,
+            BasketID,
+          },
           headers: toLinxHeaders(req.headers),
         },
       ).then((res) => res.json());
