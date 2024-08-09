@@ -295,12 +295,20 @@ export const cacheKey = (
   const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (
-    url.searchParams.has("q") || !isAnonymous(ctx) || isProductIDList(props)
+    url.searchParams.has("q") || !isAnonymous(ctx) ||
+    ctx.isInvoke && isProductIDList(props)
   ) {
     return null;
   }
 
   const params = new URLSearchParams(getSearchParams(props));
+
+  if (
+    isProductIDList(props)
+  ) {
+    const productIds = [props.ids ?? []].sort();
+    params.append("productids", productIds.join(","));
+  }
 
   url.searchParams.forEach((value, key) => {
     params.append(key, value);
