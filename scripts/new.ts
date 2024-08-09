@@ -1,4 +1,4 @@
-import { join } from "std/path/mod.ts";
+import { join } from "@std/path";
 
 const appName = Deno.args[0];
 const decoTsPath = join(Deno.cwd(), "deco.ts");
