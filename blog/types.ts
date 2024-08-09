@@ -1,4 +1,5 @@
 import { ImageWidget } from "../admin/widgets.ts";
+import { PageInfo } from "../commerce/types.ts";
 
 /**
  * @titleBy name
@@ -58,4 +59,16 @@ export interface BlogPostPage {
   "@type": "BlogPostPage";
   post: BlogPost;
   seo?: Seo | null;
+}
+
+export type SortBy =
+  | "date_desc"
+  | "date_asc"
+  | "title_asc"
+  | "title_desc";
+
+export interface BlogPostListingPage {
+  posts: BlogPost[];
+  pageInfo: PageInfo;
+  seo: Seo;
 }
