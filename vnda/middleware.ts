@@ -1,5 +1,5 @@
+import { equal } from "@std/assert";
 import { AppMiddlewareContext } from "./mod.ts";
-import { equal } from "std/testing/asserts.ts";
 import {
   buildSegmentCookie,
   getSegmentFromBag,

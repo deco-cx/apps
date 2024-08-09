@@ -1,4 +1,4 @@
-import type { FnContext } from "deco/types.ts";
+import type { FnContext } from "@deco/deco";
 
 export interface Account {
   /**

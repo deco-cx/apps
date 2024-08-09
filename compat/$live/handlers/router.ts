@@ -1,5 +1,5 @@
-import { Handler } from "deco/blocks/handler.ts";
-import { FnContext } from "deco/types.ts";
+import { FnContext } from "@deco/deco";
+import { Handler } from "@deco/deco/blocks";
 import { Routes } from "../../../website/flags/audience.ts";
 import { router } from "../../../website/handlers/router.ts";
 

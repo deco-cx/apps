@@ -1,5 +1,5 @@
+import { Resolvable } from "@deco/deco";
 import { AppContext } from "../mod.ts";
-import { Resolvable } from "deco/engine/core/resolver.ts";
 
 export async function getRecordsByPath<T>(
   ctx: AppContext,

@@ -1,13 +1,13 @@
 // deno-lint-ignore-file no-explicit-any
-import type { App } from "deco/mod.ts";
+import type { App } from "@deco/deco";
 // this should not be changed to $live because newly created versions might not include live.gen.ts.
-import { buildImportMap } from "deco/blocks/utils.tsx";
+import { buildImportMap, ImportMap } from "@deco/deco/blocks";
 
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
 import webSite, { Props } from "../../website/mod.ts";
 import type { Manifest as WorkflowsManifest } from "../../workflows/manifest.gen.ts";
 
-import { AppContext as AC, ImportMap } from "deco/blocks/app.ts";
+import { AppContext as AC } from "@deco/deco";
 import workflows from "../../workflows/mod.ts";
 import manifest, { Manifest as _Manifest } from "./manifest.gen.ts";
 

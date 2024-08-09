@@ -1,5 +1,5 @@
-import { Context } from "deco/deco.ts";
-import * as colors from "std/fmt/colors.ts";
+import { Context } from "@deco/deco";
+import * as colors from "@std/fmt/colors";
 import { once } from "../../typesense/utils/once.ts";
 import { decryptFromHex, hasLocalCryptoKey } from "../utils/crypto.ts";
 /**

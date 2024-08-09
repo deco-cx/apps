@@ -1,12 +1,12 @@
 // deno-lint-ignore-file ban-unused-ignore no-explicit-any
-import type { ManifestOf } from "deco/mod.ts";
-import { logger } from "deco/observability/otel/config.ts";
+import type { ManifestOf } from "@deco/deco/blocks";
+import { logger } from "@deco/deco/o11y";
+import { Tokens } from "../../ai-assistants/loaders/messages.ts";
 import type { AIAssistant, Log, Prompt } from "../../ai-assistants/mod.ts";
+import type { AssistantPersonalization } from "../../ai-assistants/types.ts";
 import type { Category, Product, Suggestion } from "../../commerce/types.ts";
 import type { Manifest as OpenAIManifest } from "../../openai/manifest.gen.ts";
 import type vtex from "../../vtex/mod.ts";
-import { Tokens } from "../../ai-assistants/loaders/messages.ts";
-import type { AssistantPersonalization } from "../../ai-assistants/types.ts";
 export interface Props {
   name: string;
   productsSample?: Product[] | null;

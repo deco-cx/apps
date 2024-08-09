@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "std/http/cookie.ts";
+import { getCookies, setCookie } from "@std/http/cookie";
 
 const CART_COOKIE = "carrinho-id";
 

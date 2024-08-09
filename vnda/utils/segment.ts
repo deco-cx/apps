@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "std/http/mod.ts";
+import { getCookies, setCookie } from "@std/http/cookie";
 import { AppContext } from "../mod.ts";
 
 interface Segment {

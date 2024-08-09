@@ -1,6 +1,6 @@
-import { Page } from "deco/blocks/page.tsx";
-import { context } from "deco/live.ts";
-import { adminUrlFor, isAdmin } from "deco/utils/admin.ts";
+import { context } from "@deco/deco";
+import { Page } from "@deco/deco/blocks";
+import { adminUrlFor, isAdmin } from "@deco/deco/utils";
 import Fresh from "../../../website/handlers/fresh.ts";
 import { pageIdFromMetadata } from "../../../website/pages/Page.tsx";
 import { AppContext } from "../mod.ts";

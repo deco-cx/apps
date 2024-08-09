@@ -1,4 +1,4 @@
-import { getCookies } from "std/http/mod.ts";
+import { getCookies } from "@std/http/cookie";
 import { decode } from "https://deno.land/x/djwt@v2.8/mod.ts";
 import { stringify } from "./cookies.ts";
 

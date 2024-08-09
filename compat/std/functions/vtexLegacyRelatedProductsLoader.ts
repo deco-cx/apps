@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "deco/types.ts";
+import type { LoaderFunction } from "@deco/deco";
 import type { Product } from "../../../commerce/types.ts";
 import type { CrossSellingType } from "../../../vtex/utils/types.ts";
 import type { AppContext } from "../mod.ts";

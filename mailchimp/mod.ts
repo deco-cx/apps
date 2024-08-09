@@ -1,9 +1,9 @@
-import type { App as A, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type { App as A, AppContext as AC, ManifestOf } from "@deco/deco";
 import { createHttpClient } from "../utils/http.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
+import { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client.ts";
-import { Secret } from "../website/loaders/secret.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type App = ReturnType<typeof Mailchimp>;
 export type AppContext = AC<App>;

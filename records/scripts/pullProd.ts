@@ -1,7 +1,7 @@
+import { brightGreen, brightYellow } from "@std/fmt/colors";
 import { existsSync } from "https://deno.land/std@0.201.0/fs/exists.ts";
 import { createClient as createSQLClient } from "../deps.ts";
 import { getLocalDbFilename, getLocalSQLClientConfig } from "../utils.ts";
-import { brightGreen, brightYellow } from "std/fmt/colors.ts";
 import { getDbCredentials } from "./checkDbCredential.ts";
 
 const PRAGMA = "PRAGMA foreign_keys=OFF";

@@ -1,12 +1,12 @@
-import type { App, FnContext } from "deco/mod.ts";
+import type { App, FnContext } from "@deco/deco";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
+import { previewFromMarkdown } from "../utils/preview.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
 import { CheckoutApi } from "./utils/client.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
+import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 

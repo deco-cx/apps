@@ -1,4 +1,4 @@
-import { allowCorsFor } from "deco/mod.ts";
+import { allowCorsFor } from "@deco/deco";
 import { AppContext } from "../../mod.ts";
 
 type Resolvable<

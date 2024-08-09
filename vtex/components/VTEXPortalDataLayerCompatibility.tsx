@@ -1,4 +1,4 @@
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 import { type JSX } from "preact";
 import { Product } from "../../commerce/types.ts";
 

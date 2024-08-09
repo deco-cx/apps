@@ -1,5 +1,5 @@
-import type { Page } from "deco/blocks/page.tsx";
-import { asResolved, isDeferred } from "deco/mod.ts";
+import { asResolved, isDeferred } from "@deco/deco";
+import type { Page } from "@deco/deco/blocks";
 import type { AppContext } from "../mod.ts";
 import { LinxPage } from "./pages.ts";
 

@@ -1,8 +1,6 @@
-import { AppRuntime } from "deco/types.ts";
-import { App } from "../mod.ts";
+import { AppRuntime, BaseContext, Context } from "@deco/deco";
 import type { JSX } from "preact";
-import { Context } from "deco/live.ts";
-import { BaseContext } from "deco/engine/core/resolver.ts";
+import { App } from "../mod.ts";
 
 export interface Props {
   publicUrl: string;

@@ -1,13 +1,14 @@
-import { weakcache } from "deco/deps.ts";
-import { ResolveOptions } from "deco/engine/core/mod.ts";
 import {
+  DecoSiteState,
+  DecoState,
   isDeferred,
   Resolvable,
   ResolveFunc,
-} from "deco/engine/core/resolver.ts";
-import { isAwaitable } from "deco/engine/core/utils.ts";
-import { RouteContext } from "deco/engine/manifest/manifest.ts";
-import { DecoSiteState, DecoState } from "deco/types.ts";
+  ResolveOptions,
+  RouteContext,
+} from "@deco/deco";
+import { isAwaitable } from "@deco/deco/utils";
+import { weakcache } from "../../utils/weakcache.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { isFreshCtx } from "../handlers/fresh.ts";
 import { AppContext } from "../mod.ts";

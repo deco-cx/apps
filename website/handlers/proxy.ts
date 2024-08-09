@@ -1,4 +1,4 @@
-import { DecoSiteState } from "deco/mod.ts";
+import { DecoSiteState } from "@deco/deco";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { removeDirtyCookies as removeDirtyCookiesFn } from "../../utils/normalize.ts";
 import { Script } from "../types.ts";

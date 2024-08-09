@@ -1,11 +1,10 @@
-import type { App, FnContext } from "deco/mod.ts";
+import type { App, AppMiddlewareContext as AMC, FnContext } from "@deco/deco";
 import { createHttpClient } from "../utils/http.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { OpenAPI } from "./utils/openapi/vnda.openapi.gen.ts";
-import type { Secret } from "../website/loaders/secret.ts";
-import type { AppMiddlewareContext as AMC } from "deco/mod.ts";
-import { middleware } from "./middleware.ts";
 import { previewFromMarkdown } from "../utils/preview.ts";
+import type { Secret } from "../website/loaders/secret.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { middleware } from "./middleware.ts";
+import { OpenAPI } from "./utils/openapi/vnda.openapi.gen.ts";
 
 export type AppMiddlewareContext = AMC<ReturnType<typeof VNDA>>;
 
