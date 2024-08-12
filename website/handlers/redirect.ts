@@ -1,6 +1,6 @@
-import { ConnInfo } from "std/http/mod.ts";
 import { isFreshCtx } from "./fresh.ts";
 
+type ConnInfo = Deno.ServeHandlerInfo;
 export interface RedirectConfig {
   to: string;
   type?: "permanent" | "temporary";

@@ -1,12 +1,16 @@
 import type { Section } from "deco/blocks/section.ts";
-import { SectionContext } from "deco/components/section.tsx";
+import {
+  type SectionContext,
+  SectionContext as SectionCtx,
+} from "deco/components/section.tsx";
 import { RequestContext } from "deco/deco.ts";
 import { asResolved, context, isDeferred } from "deco/mod.ts";
 import { useContext } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
 import type { AppContext } from "../../mod.ts";
 
-const useSectionContext = () => useContext(SectionContext);
+const useSectionContext = () =>
+  useContext<SectionContext | undefined>(SectionCtx);
 
 interface Props {
   /** @label hidden */
