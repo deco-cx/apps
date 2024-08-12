@@ -29,7 +29,7 @@ const action = async (
         {
           orderFormId,
           id,
-          index: index.toString(),
+          index: index,
         },
         {
           body: {
