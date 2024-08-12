@@ -1,11 +1,9 @@
 import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
 import { AppContext } from "../../mod.ts";
 
-type Props = Omit<SeoProps, "jsonLDs">;
-
-export function loader(props: Props, _req: Request, ctx: AppContext): Props {
+export function loader(props: SeoProps, _req: Request, ctx: AppContext): SeoProps {
   const referer = _req.headers.get("referer");
-  return { canonical: referer! };
+  return { ...props,canonical: referer! };
 }
 
 /**
@@ -13,7 +11,7 @@ export function loader(props: Props, _req: Request, ctx: AppContext): Props {
  * @migrate website/sections/Seo/SeoV2.tsx
  * @title SEO deprecated
  */
-function Section(props: Props) {
+function Section(props: SeoProps) {
   return <Seo {...props} />;
 }
 
