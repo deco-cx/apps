@@ -12,6 +12,7 @@ import { LoginResponse } from "./types/login.ts";
 import { NewsletterResponse } from "./types/newsletterJSON.ts";
 import { UserResponse } from "./types/userJSON.ts";
 import { ProductGetByIdResponse } from "./types/productByIdJSON.ts";
+import { Associations } from "./types/associationsJSON.ts";
 
 export interface API {
   "GET /*splat": {
@@ -137,5 +138,10 @@ export interface API {
     searchParams: {
       id: string;
     };
+  };
+
+  "GET /widget/:widget": {
+    response: unknown;
+    searchParams: Record<string, string>;
   };
 }

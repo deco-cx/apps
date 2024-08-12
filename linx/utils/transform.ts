@@ -32,6 +32,7 @@ import {
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
+import { Associations } from "./types/associationsJSON.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -116,6 +117,7 @@ interface ProductOptions {
   url: URL | string;
   currency: string;
   cdn: string;
+  associations?: Associations | null;
 }
 
 export const toProduct = (
@@ -124,7 +126,7 @@ export const toProduct = (
   options: ProductOptions,
   level = 0,
 ): Product => {
-  const { currency, url, cdn } = options;
+  const { currency, url, cdn, associations } = options;
   // Linx API returns the SKU as the tail of Items[]
   const [_, ...variants] = product?.Items ?? [];
   const variant = pickVariant(variants, variantId);
@@ -235,6 +237,13 @@ export const toProduct = (
     ? groupImages
     : [DEFAULT_IMAGE];
 
+  const isRelatedTo = associations?.ProductLists.map((p) => {
+    return toProduct(p.Product, variant.ProductID, {
+      ...options,
+      associations: null,
+    });
+  });
+
   return {
     "@type": "Product",
     productID: `${variant.ProductID}`,
@@ -263,6 +272,7 @@ export const toProduct = (
       additionalProperty: [],
       hasVariant,
     },
+    isRelatedTo,
     offers: {
       "@type": "AggregateOffer" as const,
       priceCurrency: currency,
@@ -316,6 +326,7 @@ export const toBreadcrumbList = (
 export const toProductDetails = (
   webPage: ProductWebPage,
   variantId: number | null,
+  associations: Associations | null,
   options: ProductOptions,
 ): ProductDetailsPage => {
   const { Model: product, PageInfo: pageInfo } = webPage;
@@ -323,7 +334,10 @@ export const toProductDetails = (
   return {
     "@type": "ProductDetailsPage",
     breadcrumbList: toBreadcrumbList(product.Navigation, options.url),
-    product: toProduct(product, variantId, options),
+    product: toProduct(product, variantId, {
+      ...options,
+      associations,
+    }),
     seo: {
       title: pageInfo.PageTitle,
       description: pageInfo.MetaDescription ?? "",
