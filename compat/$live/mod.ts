@@ -2,7 +2,6 @@
 import type { App } from "deco/mod.ts";
 // this should not be changed to $live because newly created versions might not include live.gen.ts.
 import { buildImportMap } from "deco/blocks/utils.tsx";
-import type { Manifest as LiveManifest } from "deco/live.gen.ts";
 
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
 import webSite, { Props } from "../../website/mod.ts";
@@ -14,20 +13,20 @@ import manifest, { Manifest as _Manifest } from "./manifest.gen.ts";
 
 export { onBeforeResolveProps } from "../../website/mod.ts";
 export type AppContext = AC<ReturnType<typeof App>>;
-export type Manifest = Omit<LiveManifest, "routes" | "islands"> & _Manifest;
+export type Manifest = _Manifest;
 
 export type ManifestMappings = Partial<
   {
     [
       blockType in keyof Omit<
-        LiveManifest,
+        Manifest,
         "name" | "baseUrl" | "routes" | "islands"
       >
     ]: Partial<
       {
         [
           blockKey in keyof Omit<
-            LiveManifest,
+            Manifest,
             "name" | "baseUrl" | "routes" | "islands"
           >[blockType]
         ]: blockType extends keyof (WebSiteManifest | WorkflowsManifest)
@@ -42,7 +41,7 @@ export type ManifestMappings = Partial<
   }
 >;
 
-const manifestMappings: ManifestMappings = {
+const manifestMappings = {
   pages: {
     "$live/pages/LivePage.tsx": "website/pages/Page.tsx",
   },
