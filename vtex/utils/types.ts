@@ -145,7 +145,7 @@ export interface OrderFormItem {
   bundleItems: unknown[];
   attachments: unknown[];
   attachmentOfferings: AttachmentOffering[];
-  offerings: unknown[];
+  offerings: Offering[];
   priceTags: PriceTag[];
   availability: string;
   measurementUnit: string;
