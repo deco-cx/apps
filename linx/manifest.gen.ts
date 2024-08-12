@@ -24,15 +24,16 @@ import * as $$$3 from "./loaders/cart.ts";
 import * as $$$4 from "./loaders/page.ts";
 import * as $$$5 from "./loaders/pages.ts";
 import * as $$$6 from "./loaders/path.ts";
-import * as $$$7 from "./loaders/product/byId.ts";
-import * as $$$8 from "./loaders/product/detailsPage.ts";
-import * as $$$9 from "./loaders/product/list.ts";
-import * as $$$10 from "./loaders/product/listingPage.ts";
-import * as $$$11 from "./loaders/product/suggestions.ts";
-import * as $$$12 from "./loaders/proxy.ts";
-import * as $$$13 from "./loaders/user.ts";
-import * as $$$14 from "./loaders/widget.ts";
-import * as $$$15 from "./loaders/wishlist/search.ts";
+import * as $$$7 from "./loaders/product/associations.ts";
+import * as $$$8 from "./loaders/product/byId.ts";
+import * as $$$9 from "./loaders/product/detailsPage.ts";
+import * as $$$10 from "./loaders/product/list.ts";
+import * as $$$11 from "./loaders/product/listingPage.ts";
+import * as $$$12 from "./loaders/product/suggestions.ts";
+import * as $$$13 from "./loaders/proxy.ts";
+import * as $$$14 from "./loaders/user.ts";
+import * as $$$15 from "./loaders/widget.ts";
+import * as $$$16 from "./loaders/wishlist/search.ts";
 
 const manifest = {
   "loaders": {
@@ -43,15 +44,16 @@ const manifest = {
     "linx/loaders/page.ts": $$$4,
     "linx/loaders/pages.ts": $$$5,
     "linx/loaders/path.ts": $$$6,
-    "linx/loaders/product/byId.ts": $$$7,
-    "linx/loaders/product/detailsPage.ts": $$$8,
-    "linx/loaders/product/list.ts": $$$9,
-    "linx/loaders/product/listingPage.ts": $$$10,
-    "linx/loaders/product/suggestions.ts": $$$11,
-    "linx/loaders/proxy.ts": $$$12,
-    "linx/loaders/user.ts": $$$13,
-    "linx/loaders/widget.ts": $$$14,
-    "linx/loaders/wishlist/search.ts": $$$15,
+    "linx/loaders/product/associations.ts": $$$7,
+    "linx/loaders/product/byId.ts": $$$8,
+    "linx/loaders/product/detailsPage.ts": $$$9,
+    "linx/loaders/product/list.ts": $$$10,
+    "linx/loaders/product/listingPage.ts": $$$11,
+    "linx/loaders/product/suggestions.ts": $$$12,
+    "linx/loaders/proxy.ts": $$$13,
+    "linx/loaders/user.ts": $$$14,
+    "linx/loaders/widget.ts": $$$15,
+    "linx/loaders/wishlist/search.ts": $$$16,
   },
   "handlers": {
     "linx/handlers/sitemap.ts": $$$$0,
