@@ -45,8 +45,6 @@ const action = async (
         },
       });
 
-    console.log("response", response);
-
     proxySetCookie(response.headers, ctx.response.headers, req.url);
 
     return forceHttpsOnAssets((await response.json()) as OrderForm);

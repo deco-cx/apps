@@ -16,7 +16,6 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ) => {
-  console.log("addOffferings");
   const { index, id, expectedOrderFormSections = DEFAULT_EXPECTED_SECTIONS } =
     props;
   const { vcsDeprecated } = ctx;
@@ -24,9 +23,6 @@ const action = async (
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
 
-  console.log("action index", index);
-  console.log("action id", id);
-  console.log("oid", orderFormId);
   try {
     const response = await vcsDeprecated
       ["POST /api/checkout/pub/orderForm/:orderFormId/items/:index/offerings/:id/remove"](
@@ -36,6 +32,9 @@ const action = async (
           index: index.toString(),
         },
         {
+          body: {
+            expectedOrderFormSections,
+          },
           headers: {
             "content-type": "application/json",
             accept: "application/json",
@@ -44,14 +43,10 @@ const action = async (
         },
       );
 
-    console.log("response", response);
-
     proxySetCookie(response.headers, ctx.response.headers, req.url);
 
     return forceHttpsOnAssets((await response.json()) as OrderForm);
   } catch (error) {
-    console.error(error);
-
     throw error;
   }
 };
