@@ -8,11 +8,7 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
-import {
-  getSegmentFromBag,
-  isAnonymous,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
@@ -155,17 +151,15 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  if (!isAnonymous(ctx)) {
-    return null;
-  }
-  const { token } = getSegmentFromBag(ctx);
+  const segment = getSegmentFromBag(ctx)?.token;
   const url = new URL(req.url);
+  const skuId = url.searchParams.get("skuId") ?? "";
 
   const params = new URLSearchParams([
     ["slug", props.slug],
+    ["segment", segment ?? ""],
+    ["skuId", skuId],
   ]);
-  params.set("skuId", url.searchParams.get("skuId") ?? "");
-  params.set("segment", token);
 
   url.search = params.toString();
 
