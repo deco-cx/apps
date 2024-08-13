@@ -50,7 +50,6 @@ export default async function BlogPostList(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlogPost[] | null> {
-  console.log(props);
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
