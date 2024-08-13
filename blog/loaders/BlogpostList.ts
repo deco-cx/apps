@@ -6,6 +6,7 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost } from "../types.ts";
 import { getRecordsByPath } from "../utils/records.ts";
@@ -24,6 +25,13 @@ export interface Props {
    * @description The current page number. Defaults to 1.
    */
   page?: number;
+
+  filters?: {
+    /**
+     * @title By category
+     */
+    category?: RequestURLParam;
+  };
 }
 
 /**
@@ -42,13 +50,27 @@ export default async function BlogPostList(
   _req: Request,
   ctx: AppContext,
 ): Promise<BlogPost[] | null> {
+  console.log(props);
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
     ACCESSOR,
   );
 
-  const mostRecentPosts = posts.toSorted((a, b) => {
+  const { filters } = props;
+
+  const filteredPosts = filters?.category
+    ? posts.filter((post) => {
+      if (
+        post?.categories?.findIndex((cat) => cat.slug === filters.category) !==
+          -1
+      ) {
+        return true;
+      }
+    })
+    : posts;
+
+  const mostRecentPosts = filteredPosts.toSorted((a, b) => {
     if (!a.date && !b.date) {
       return 0; // If both posts don't have a date, consider them equal
     }
