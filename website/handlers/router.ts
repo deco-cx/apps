@@ -6,13 +6,14 @@ import {
   ResolveFunc,
 } from "deco/engine/core/resolver.ts";
 import { isAwaitable } from "deco/engine/core/utils.ts";
-import { FreshContext } from "deco/engine/manifest/manifest.ts";
+import { RouteContext } from "deco/engine/manifest/manifest.ts";
 import { DecoSiteState, DecoState } from "deco/types.ts";
-import { ConnInfo, Handler } from "std/http/server.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { isFreshCtx } from "../handlers/fresh.ts";
 import { AppContext } from "../mod.ts";
 
+export type ConnInfo = Deno.ServeHandlerInfo;
+export type Handler = Deno.ServeHandler;
 export interface SelectionConfig {
   audiences: Routes[];
 }
@@ -59,17 +60,20 @@ export const router = (
       routePath: string,
       groups?: Record<string, string | undefined>,
     ) => {
-      const ctx = { ...connInfo, params: (groups ?? {}) } as ConnInfo & {
-        params: Record<string, string>;
-        state: DecoState;
-      };
+      const ctx = connInfo as
+        & ConnInfo
+        & {
+          params: Record<string, string | undefined>;
+          state: DecoState;
+        };
 
+      ctx.params = groups ?? {};
       ctx.state.routes = routes;
       ctx.state.pathTemplate = routePath;
 
       const resolvedOrPromise = isDeferred<
           Handler,
-          Omit<FreshContext, "context"> & { context: typeof ctx }
+          Omit<RouteContext, "context"> & { context: typeof ctx }
         >(handler)
         ? handler({ context: ctx, request: req })
         : resolver<Handler>(

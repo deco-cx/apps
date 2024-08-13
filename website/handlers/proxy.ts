@@ -1,9 +1,10 @@
 import { DecoSiteState } from "deco/mod.ts";
-import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
+import { removeDirtyCookies as removeDirtyCookiesFn } from "../../utils/normalize.ts";
 import { Script } from "../types.ts";
 import { isFreshCtx } from "./fresh.ts";
 
+type Handler = Deno.ServeHandler;
 const HOP_BY_HOP = [
   "Keep-Alive",
   "Transfer-Encoding",
@@ -81,6 +82,12 @@ export interface Props {
   avoidAppendPath?: boolean;
 
   replaces?: TextReplace[];
+
+  /**
+   * @description remove cookies that have non-ASCII characters and some symbols
+   * @default false
+   */
+  removeDirtyCookies?: boolean;
 }
 
 /**
@@ -96,6 +103,7 @@ export default function Proxy({
   redirect = "manual",
   avoidAppendPath,
   replaces,
+  removeDirtyCookies = false,
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -116,6 +124,10 @@ export default function Proxy({
       _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
+    if (removeDirtyCookies) {
+      removeDirtyCookiesFn(headers);
+    }
+
     if (isFreshCtx<DecoSiteState>(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
     }

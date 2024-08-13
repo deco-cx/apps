@@ -1,4 +1,8 @@
-/** @description Equivalent to sku ID in VTEX platform */
+/**
+ * @format dynamic-options
+ * @options vtex/loaders/options/productIdByTerm.ts
+ * @description Equivalent to sku ID in VTEX platform
+ */
 export type ProductID = string;
 
 export interface OrderForm {
@@ -141,7 +145,7 @@ export interface OrderFormItem {
   bundleItems: unknown[];
   attachments: unknown[];
   attachmentOfferings: AttachmentOffering[];
-  offerings: unknown[];
+  offerings: Offering[];
   priceTags: PriceTag[];
   availability: string;
   measurementUnit: string;
@@ -656,6 +660,7 @@ export type LegacyProduct = IProduct & {
   productTitle: string;
   items: LegacyItem[];
   allSpecifications: string[];
+  allSpecificationsGroups?: string[];
 };
 
 export type LegacyFacets = {
@@ -1154,6 +1159,14 @@ export interface CreateNewDocument {
   Id?: string;
   Href?: string;
   DocumentId?: string;
+}
+
+export interface Document extends Record<string, unknown> {
+  additionalProperties?: string;
+  id?: string;
+  accountId?: string;
+  accountName?: string;
+  dataEntityId?: string;
 }
 
 export interface SelectableGifts {

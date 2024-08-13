@@ -66,6 +66,138 @@ export type OptinNewsLetter = boolean
 
 export interface OpenAPI {
 /**
+ * Searches Master Data v1 documents with highly customizable filters.
+ * 
+ * > Learn more about [Master Data v1 search queries](https://developers.vtex.com/vtex-rest-api/docs/how-the-queries-in-master-data-v1-work).
+ * 
+ * ## Query Examples
+ * 
+ * 
+ * ### Simple filter
+ * 
+ * ```
+ * /dataentities/CL/search?email=my@email.com
+ * ```
+ * 
+ * ### Complex filter
+ * 
+ * ```
+ * /dataentities/CL/search?_where=(firstName=Jon OR lastName=Smith) OR (createdIn between 2001-01-01 AND 2016-01-01)
+ * ```
+ * 
+ * ### Filter by range
+ * 
+ * #### Date Range
+ * 
+ * ```
+ * /dataentities/CL/search?_where=createdIn between 2001-01-01 AND 2016-01-01
+ * ```
+ * 
+ * #### Range numeric fields
+ * 
+ * ```
+ * /dataentities/CL/search?_where=age between 18 AND 25
+ * ```
+ * 
+ * ### Partial filter
+ * 
+ * ```
+ * /dataentities/CL/search?firstName=*Maria*
+ * ```
+ * 
+ * ### Filter for null values
+ * 
+ * ```
+ * /dataentities/CL/search?_where=firstName is null
+ * ```
+ * 
+ * ### Filter for non-null values
+ * 
+ * ```
+ * /dataentities/CL/search?_where=firstName is not null
+ * ```
+ * 
+ * ### Filter for difference
+ * ```
+ * /dataentities/CL/search?_where=firstName<>maria
+ * ```
+ * 
+ * ### Filter greater than or less than
+ * ```
+ * /dataentities/CL/search?_where=number>5
+ * /dataentities/CL/search?_where=date<2001-01-01
+ * ```
+ * 
+ * > Avoid sending too many requests with wildcards (`*`) in the search parameters or that use the `keyword` parameter. This may lead to this endpoint being temporarily blocked for your account. If this happens you will receive an error with status code `503`. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Read only documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"GET /api/dataentities/:acronym/search": {
+searchParams: {
+/**
+ * Names of the fields that will be returned per document, separated by a comma `,`. It is possible to fetch all fields using `_all` as the value of this query parameter. However, in order to avoid permission errors, we strongly recommend informing only the names of the exact fields that will be used.
+ */
+_fields?: string
+/**
+ * Specification of filters.
+ */
+_where?: string
+/**
+ * Inform a field name plus `ASC` to sort results by this field value in ascending order or `DESC` to sort by descending order.
+ */
+_sort?: string
+}
+/**
+ * List of documents.
+ */
+response: {
+/**
+ * Custom properties.
+ */
+additionalProperties?: string
+/**
+ * Unique identifier of the document.
+ */
+id?: string
+/**
+ * Unique identifier of the account.
+ */
+accountId?: string
+/**
+ * Account name.
+ */
+accountName?: string
+/**
+ * Two-letter string that identifies the data entity.
+ */
+dataEntityId?: string
+}[]
+}
+/**
+ * Retrieves information about [pickup points](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) of your store.
+ * 
+ * >⚠️ The response is limited to 1.000 pickup points. If you need more than 1000 results, you can use the [List paged pickup points](https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/configuration/pickuppoints/_search) endpoint.
+ */
+"GET /api/logistics/pvt/configuration/pickuppoints": {
+/**
+ * List of pickup points, limited to 1.000 pickup points. If you need more than 1000 results, you can use the [List paged pickup points](https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/configuration/pickuppoints/_search) endpoint.
+ */
+response: PickupPoint[]
+}
+/**
  * Retrieves the IDs of products and SKUs. 
  * > 📘 Onboarding guide 
  * >
@@ -16834,6 +16966,133 @@ postalCode?: string
  */
 countryCode?: string
 }
+response: {
+/**
+ * Paging.
+ */
+paging?: {
+/**
+ * Page number.
+ */
+page?: number
+/**
+ * Page size.
+ */
+pageSize?: number
+/**
+ * Total pages.
+ */
+total?: number
+/**
+ * Pages.
+ */
+pages?: number
+}
+/**
+ * Items.
+ */
+items?: {
+/**
+ * Distance.
+ */
+distance?: number
+/**
+ * Pickup point.
+ */
+pickupPoint?: {
+/**
+ * Friendly name.
+ */
+friendlyName?: string
+/**
+ * Address.
+ */
+address?: {
+/**
+ * Address type.
+ */
+addressType?: string
+/**
+ * Receiver name.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Is disposable.
+ */
+isDisposable?: boolean
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City.
+ */
+city?: string
+/**
+ * State.
+ */
+state?: string
+/**
+ * Country.
+ */
+country?: string
+/**
+ * Street.
+ */
+street?: string
+/**
+ * Number.
+ */
+number?: string
+/**
+ * Neighborhood.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Racao.
+ */
+reference?: string
+/**
+ * Geo coordinates.
+ */
+geoCoordinates?: number[]
+}
+/**
+ * Additional info.
+ */
+additionalInfo?: string
+/**
+ * ID.
+ */
+id?: string
+/**
+ * Array with business hours.
+ */
+businessHours?: {
+/**
+ * Day of week.
+ */
+DayOfWeek?: number
+/**
+ * Opening time.
+ */
+OpeningTime?: string
+/**
+ * Closing time.
+ */
+ClosingTime?: string
+}[]
+}
+}[]
+}
 }
 /**
  * Retrieves address information for a given postal code and country.
@@ -18460,6 +18719,168 @@ logo?: (null | string)
 }[]
 }
 }
+}
+/**
+ * Pickup point information.
+ */
+export interface PickupPoint {
+/**
+ * [Pickup point](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) ID.
+ */
+id?: string
+/**
+ * Pickup point name displayed to customers at checkout.
+ */
+name?: string
+/**
+ * Pickup point description displayed to customers at checkout.
+ */
+description?: string
+/**
+ * Instructions for customers when collecting their package.
+ */
+instructions?: string
+/**
+ * Formatted address.
+ */
+formatted_address?: string
+/**
+ * Pickup point address information.
+ */
+address?: {
+/**
+ * Pickup point address postal code.
+ */
+postalCode?: string
+/**
+ * Information about the pickup point address country.
+ */
+country?: {
+/**
+ * Three-digit country code of the pickup point address, in [ISO 3166 ALPHA-3](https://www.iban.com/country-codes) format.
+ */
+acronym?: string
+/**
+ * Country name of the pickup point address.
+ */
+name?: string
+}
+/**
+ * Pickup point address city.
+ */
+city?: string
+/**
+ * Pickup point address state.
+ */
+state?: string
+/**
+ * Pickup point address neighborhood.
+ */
+neighborhood?: string
+/**
+ * Pickup point address street.
+ */
+street?: string
+/**
+ * Pickup point address number.
+ */
+number?: string
+/**
+ * Pickup point address complement.
+ */
+complement?: string
+/**
+ * Reference point to help the customer find the pickup point.
+ */
+reference?: string
+/**
+ * Pickup point address geolocation coordinates.
+ */
+location?: {
+/**
+ * Latitude coordinate.
+ */
+latitude?: number
+/**
+ * Longitude coordinate.
+ */
+longitude?: number
+}
+}
+/**
+ * Defines if the pickup point is active (`true`) or inactive (`false`).
+ */
+isActive?: boolean
+/**
+ * Pickup point configured distance.
+ */
+distance?: number
+/**
+ * Seller that corresponds to the pickup point.
+ */
+seller?: string
+/**
+ * Sort array.
+ */
+_sort?: number[]
+/**
+ * Pickup point business hours configurations.
+ */
+businessHours?: {
+/**
+ * Day of the week identification, as in `1` = Monday, `2` = Tuesday, `3` = Wednesday, `4` = Thursday, and `5` = Friday.
+ */
+dayOfWeek?: number
+/**
+ * Opening time in `HH:MM:SS` format.
+ */
+openingTime?: string
+/**
+ * Closing time in `HH:MM:SS` format.
+ */
+closingTime?: string
+}[]
+/**
+ * Tags that identify a group of pickup points.
+ */
+tagsLabel?: string[]
+/**
+ * [Holidays](https://help.vtex.com/en/tutorial/registering-holidays--2ItOthSEAoyAmcwsuiO6Yk) configured for the pickup point.
+ */
+pickupHolidays?: {
+/**
+ * Holiday date and time, in [ISO 8601 time zone offset format](https://learn.microsoft.com/en-us/rest/api/storageservices/formatting-datetime-values), as in `YYYY-MM-DDThh:mm:ss.ssZ`.
+ */
+date?: string
+/**
+ * Holiday beginning time in `HH:MM` format.
+ */
+hourBegin?: string
+/**
+ * Holiday ending time in `HH:MM` format.
+ */
+hourEnd?: string
+}[]
+/**
+ * Defines if the pickup point is third-party (`true`) or not (`false`).
+ */
+isThirdPartyPickup?: boolean
+/**
+ * Account owner name.
+ */
+accountOwnerName?: string
+/**
+ * Account owner ID.
+ */
+accountOwnerId?: string
+/**
+ * Parent account name.
+ */
+parentAccountName?: string
+/**
+ * Original ID.
+ */
+originalId?: string
 }
 export interface GetorUpdateProductSpecification {
 /**

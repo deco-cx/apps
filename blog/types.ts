@@ -41,11 +41,16 @@ export interface BlogPost {
    * @format rich-text
    */
   content: string;
+  /**
+   * @title SEO
+   */
+  seo?: Seo;
 }
 export interface Seo {
-  title: string;
-  description: string;
-  canonical: string;
+  title?: string;
+  description?: string;
+  image?: ImageWidget;
+  canonical?: string;
   noIndexing?: boolean;
 }
 

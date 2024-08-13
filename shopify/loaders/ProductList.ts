@@ -1,6 +1,10 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
 import {
+  ProductsByCollection,
+  SearchProducts,
+} from "../utils/storefront/queries.ts";
+import {
   CollectionProductsArgs,
   Product as ProductShopify,
   ProductConnection,
@@ -9,13 +13,13 @@ import {
   QueryRootSearchArgs,
   SearchResultItemConnection,
 } from "../utils/storefront/storefront.graphql.gen.ts";
-import {
-  ProductsByCollection,
-  SearchProducts,
-} from "../utils/storefront/queries.ts";
 import { toProduct } from "../utils/transform.ts";
-import { CollectionSortKeys, SearchSortKeys } from "../utils/utils.ts";
-import { searchSortShopify, sortShopify } from "../utils/utils.ts";
+import {
+  CollectionSortKeys,
+  SearchSortKeys,
+  searchSortShopify,
+  sortShopify,
+} from "../utils/utils.ts";
 
 export interface QueryProps {
   /** @description search term to use on search */

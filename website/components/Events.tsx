@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-import { DECO_SEGMENT } from "deco/runtime/fresh/middlewares/3_main.ts";
+import { DECO_SEGMENT } from "deco/mod.ts";
 import { Flag } from "deco/types.ts";
 import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 
@@ -14,24 +14,35 @@ interface EventsAPI {
   ) => () => void;
 }
 
+interface FeatureFlags {
+  enableImageOptimization: boolean;
+}
+
 declare global {
   interface Window {
+    DECO: { events: EventsAPI; featureFlags: FeatureFlags };
     DECO_ANALYTICS: Record<
       string,
       // deno-lint-ignore no-explicit-any
       (action: string, eventType: string, props?: any) => void
     >;
     DECO_SITES_STD: { sendAnalyticsEvent: (event: unknown) => void };
-    DECO: { events: EventsAPI };
   }
 }
+
+const ENABLE_IMAGE_OPTIMIZATION =
+  Deno.env.get("ENABLE_IMAGE_OPTIMIZATION") !== "false";
 
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
 const snippet = (
-  { deco: { page }, segmentCookie }: { deco: Deco; segmentCookie: string },
+  { deco: { page }, segmentCookie, featureFlags }: {
+    deco: Deco;
+    segmentCookie: string;
+    featureFlags: FeatureFlags;
+  },
 ) => {
   const cookie = document.cookie;
   const out: Record<string, string> = {};
@@ -82,6 +93,7 @@ const snippet = (
   globalThis.window.DECO = {
     ...globalThis.window.DECO,
     events: { dispatch, subscribe },
+    featureFlags,
   };
 };
 
@@ -91,7 +103,13 @@ function Events({ deco }: { deco: Deco }) {
       <script
         defer
         id="deco-events"
-        src={useScriptAsDataURI(snippet, { deco, segmentCookie: DECO_SEGMENT })}
+        src={useScriptAsDataURI(snippet, {
+          deco,
+          segmentCookie: DECO_SEGMENT,
+          featureFlags: {
+            enableImageOptimization: ENABLE_IMAGE_OPTIMIZATION,
+          },
+        })}
       />
     </Head>
   );

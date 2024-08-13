@@ -9,9 +9,11 @@ import {
 import { DecoState } from "deco/types.ts";
 import { allowCorsFor } from "deco/utils/http.ts";
 import { getSetCookies } from "std/http/cookie.ts";
-import { ConnInfo } from "std/http/server.ts";
+import { __DECO_FBT } from "../../utils/deferred.ts";
+import { errorIfFrameworkMismatch } from "../../utils/framework.tsx";
 import { AppContext } from "../mod.ts";
 
+type ConnInfo = Deno.ServeHandlerInfo;
 /**
  * @title Fresh Config
  */
@@ -50,7 +52,7 @@ export default function Fresh(
     const asJson = url.searchParams.get("asJson");
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
     const delay = Number(
-      url.searchParams.get("__decoFBT") ?? delayFromProps,
+      url.searchParams.get(__DECO_FBT) ?? delayFromProps,
     );
 
     /** Controller to abort third party fetch (loaders) */
@@ -133,9 +135,12 @@ export default function Fresh(
           async (span) => {
             try {
               const response = await renderToString({
-                page,
+                page: appContext.flavor && page
+                  ? errorIfFrameworkMismatch(appContext.flavor?.framework, page)
+                  : page,
                 routerInfo: {
-                  flags: ctx.state.flags,
+                  // deno-lint-ignore no-explicit-any
+                  flags: (ctx.state as any).flags,
                   pagePath: ctx.state.pathTemplate,
                 },
               });

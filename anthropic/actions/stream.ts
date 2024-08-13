@@ -42,6 +42,8 @@ export interface Props {
    * [models](https://docs.anthropic.com/en/docs/models-overview) for details.
    */
   max_tokens?: number;
+  enableTools?: boolean;
+  temperature?: number;
 }
 
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
@@ -127,8 +129,10 @@ export default async function chat(
     system,
     messages,
     availableFunctions,
-    model = "claude-3-sonnet-20240229",
+    model = "claude-3-5-sonnet-20240620",
     max_tokens = 1024,
+    temperature = 1.0,
+    enableTools,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -141,21 +145,27 @@ export default async function chat(
 
   const headers = {
     "anthropic-version": "2023-06-01",
-    "anthropic-beta": "tools-2024-05-16",
     "content-type": "application/json",
+    "anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15",
     "x-api-key": ctx.token ?? "",
   };
 
-  const payload: Anthropic.Beta.Tools.MessageCreateParamsStreaming = {
+  let payload: Anthropic.Beta.Tools.MessageCreateParamsStreaming = {
     system,
     messages,
     model,
     max_tokens,
-    temperature: 0.5,
+    temperature,
     stream: true,
-    tools,
-    tool_choice: { type: "auto" },
   };
+
+  if (enableTools) {
+    payload = {
+      ...payload,
+      tools,
+      tool_choice: { type: "auto" },
+    };
+  }
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -164,7 +174,6 @@ export default async function chat(
   });
 
   if (!response.ok) {
-    console.error("Failed to send messages to Anthropic API:", response.text);
     return shortcircuit(
       new Response(await response.text(), { status: response.status }),
     );
