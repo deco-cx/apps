@@ -59,44 +59,6 @@ export const isAnonymous = (
     !regionId;
 };
 
-type Entry = [string, string];
-const VALUE_IDX = 1;
-
-export const getPayloadVariablesEntries = (
-  ctx: AppContext,
-): Entry[] => {
-  const payload = getSegmentFromBag(ctx)?.payload;
-  if (!payload) return [];
-
-  const {
-    campaigns,
-    utm_campaign,
-    utm_source,
-    utmi_campaign,
-    channel,
-    priceTables,
-    regionId,
-    cultureInfo,
-    currencyCode,
-  } = payload;
-
-  const variables: [string, string | null | undefined][] = [
-    ["campaign", `${campaigns}`],
-    ["utm_campaign", utm_campaign],
-    ["utm_source", utm_source],
-    ["utmi_campaign", utmi_campaign],
-    ["channel", channel],
-    ["priceTables", priceTables],
-    ["regionId", regionId],
-    ["cultureInfo", cultureInfo],
-    ["currencyCode", currencyCode],
-  ];
-
-  return variables.filter((variable): variable is Entry =>
-    variable[VALUE_IDX] !== null && variable[VALUE_IDX] !== undefined
-  );
-};
-
 const setSegmentInBag = (ctx: AppContext, data: WrappedSegment) =>
   ctx?.bag?.set(SEGMENT, data);
 

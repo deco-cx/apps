@@ -3,12 +3,8 @@ import { STALE } from "../../../utils/fetch.ts";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
-import { toSegmentParams } from "../../utils/legacy.ts";
-import {
-  getPayloadVariablesEntries,
-  getSegmentFromBag,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { pickSku } from "../../utils/transform.ts";
 import type { CrossSellingType } from "../../utils/types.ts";
 import productList from "./productList.ts";
@@ -135,16 +131,18 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
 
+  const segment = getSegmentFromBag(ctx)?.token || "";
   const params = new URLSearchParams([
     ["slug", props.slug ?? ""],
     ["id", props.id ?? ""],
     ["crossSelling", props.crossSelling],
     ["count", (props.count ?? 0).toString()],
     ["hideUnavailableItems", (props.hideUnavailableItems ?? false).toString()],
-    ...getPayloadVariablesEntries(ctx),
+    ["segment", segment],
   ]);
 
   url.searchParams.forEach((value, key) => {
+    if (!isFilterParam(key)) return;
     params.append(key, value);
   });
 
