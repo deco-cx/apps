@@ -4,8 +4,8 @@ import type { RequestURLParam } from "../../../website/functions/requestToParam.
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
 import {
+  getPayloadVariablesEntries,
   getSegmentFromBag,
-  isAnonymous,
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -109,15 +109,15 @@ async function loader(
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
-  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+  if (url.searchParams.has("ft")) {
     return null;
   }
 
   const params = new URLSearchParams([
     ["slug", props.slug],
+    ...getPayloadVariablesEntries(ctx),
   ]);
 
   url.searchParams.forEach((value, key) => {
@@ -125,7 +125,6 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 

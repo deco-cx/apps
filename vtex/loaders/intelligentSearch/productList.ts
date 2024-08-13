@@ -7,8 +7,8 @@ import {
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
 import {
+  getPayloadVariablesEntries,
   getSegmentFromBag,
-  isAnonymous,
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -292,16 +292,18 @@ export const cacheKey = (
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
 
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (
-    url.searchParams.has("q") || !isAnonymous(ctx) ||
+    url.searchParams.has("q") ||
     ctx.isInvoke && isProductIDList(props)
   ) {
     return null;
   }
 
-  const params = new URLSearchParams(getSearchParams(props));
+  const params = new URLSearchParams([
+    ...getSearchParams(props),
+    ...getPayloadVariablesEntries(ctx),
+  ]);
 
   if (
     isProductIDList(props)
@@ -315,7 +317,6 @@ export const cacheKey = (
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 

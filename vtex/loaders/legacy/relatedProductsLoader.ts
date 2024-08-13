@@ -5,8 +5,8 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
 import {
+  getPayloadVariablesEntries,
   getSegmentFromBag,
-  isAnonymous,
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { pickSku } from "../../utils/transform.ts";
@@ -129,10 +129,9 @@ async function loader(
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
-  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+  if (url.searchParams.has("ft")) {
     return null;
   }
 
@@ -142,6 +141,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["crossSelling", props.crossSelling],
     ["count", (props.count ?? 0).toString()],
     ["hideUnavailableItems", (props.hideUnavailableItems ?? false).toString()],
+    ...getPayloadVariablesEntries(ctx),
   ]);
 
   url.searchParams.forEach((value, key) => {
@@ -149,7 +149,6 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 

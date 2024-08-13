@@ -9,8 +9,8 @@ import {
 } from "../../utils/intelligentSearch.ts";
 import { pageTypesToSeo } from "../../utils/legacy.ts";
 import {
+  getPayloadVariablesEntries,
   getSegmentFromBag,
-  isAnonymous,
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -155,17 +155,14 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  if (!isAnonymous(ctx)) {
-    return null;
-  }
-  const { token } = getSegmentFromBag(ctx);
+  const variableEntries = getPayloadVariablesEntries(ctx);
   const url = new URL(req.url);
 
   const params = new URLSearchParams([
     ["slug", props.slug],
+    ...variableEntries,
   ]);
   params.set("skuId", url.searchParams.get("skuId") ?? "");
-  params.set("segment", token);
 
   url.search = params.toString();
 

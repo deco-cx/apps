@@ -11,8 +11,8 @@ import {
   toSegmentParams,
 } from "../../utils/legacy.ts";
 import {
+  getPayloadVariablesEntries,
   getSegmentFromBag,
-  isAnonymous,
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -408,10 +408,9 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(props.pageHref || req.url);
 
-  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+  if (url.searchParams.has("ft")) {
     return null;
   }
 
@@ -426,6 +425,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["map", props.map ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
     ["ignoreCaseSelected", (props.ignoreCaseSelected ?? false).toString()],
+    ...getPayloadVariablesEntries(ctx),
   ]);
 
   url.searchParams.forEach((value, key) => {
@@ -433,7 +433,6 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 

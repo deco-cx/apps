@@ -3,8 +3,8 @@ import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
 import {
+  getPayloadVariablesEntries,
   getSegmentFromBag,
-  isAnonymous,
   withSegmentCookie,
 } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
@@ -279,17 +279,20 @@ export const cacheKey = (
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
 
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
+
   if (
-    url.searchParams.has("q") || !isAnonymous(ctx) ||
+    url.searchParams.has("q") ||
     // loader is invoked directly should not vary
     ctx.isInvoke && (isSKUIDProps(props) || isProductIDProps(props))
   ) {
     return null;
   }
 
-  const params = new URLSearchParams(getSearchParams(props));
+  const params = new URLSearchParams([
+    ...getSearchParams(props),
+    ...getPayloadVariablesEntries(ctx),
+  ]);
 
   if (isSKUIDProps(props)) {
     const skuIds = [...props.ids ?? []]?.sort();
@@ -308,7 +311,6 @@ export const cacheKey = (
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 
