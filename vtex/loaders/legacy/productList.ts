@@ -313,9 +313,9 @@ export const cacheKey = (
   }
 
   url.searchParams.forEach((value, key) => {
-    if (!isFilterParam(key)) {
-      params.append(key, value);
-    }
+    if (!isFilterParam(key)) return;
+
+    params.append(key, value);
   });
 
   params.sort();
