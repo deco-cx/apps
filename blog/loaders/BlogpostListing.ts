@@ -56,7 +56,7 @@ export default async function BlogPostList(
   const url = new URL(req.url);
   const params = url.searchParams;
   const postsPerPage = Number(count ?? params.get("count") ?? 12);
-  const pageNumber = Number(page ?? params.get("p") ?? 1);
+  const pageNumber = Number(page ?? params.get("page") ?? 1);
   const pageSort = sortBy ?? params.get("sortBy") as SortBy ??
     "date_desc";
   const posts = await getRecordsByPath<BlogPost>(
@@ -102,11 +102,11 @@ const toPageInfo = (
   const previousPage = new URLSearchParams(params);
 
   if (hasNextPage) {
-    nextPage.set("p", (pageNumber + 1).toString());
+    nextPage.set("page", (pageNumber + 1).toString());
   }
 
   if (hasPrevPage) {
-    previousPage.set("p", (pageNumber - 1).toString());
+    previousPage.set("page", (pageNumber - 1).toString());
   }
 
   return {

@@ -17,11 +17,6 @@ const ACCESSOR = "post";
 
 export interface Props {
   /**
-   * @title Category Slug
-   * @description Filter by a specific category slug.
-   */
-  slug?: RequestURLParam;
-  /**
    * @title Items per page
    * @description Number of posts per page to display.
    */
@@ -31,6 +26,11 @@ export interface Props {
    * @description The current page number. Defaults to 1.
    */
   page?: number;
+  /**
+   * @title Category Slug
+   * @description Filter by a specific category slug.
+   */
+  slug?: RequestURLParam;
   /**
    * @title Page sorting parameter
    * @description The sorting option. Default is "date_desc"
@@ -54,7 +54,7 @@ export default async function BlogPostList(
 ): Promise<BlogPost[] | null> {
   const url = new URL(req.url);
   const postsPerPage = Number(count ?? url.searchParams.get("count"));
-  const pageNumber = Number(page ?? url.searchParams.get("p"));
+  const pageNumber = Number(page ?? url.searchParams.get("page") ?? 1);
   const pageSort = sortBy ?? url.searchParams.get("sortBy") as SortBy ??
     "date_desc";
   const posts = await getRecordsByPath<BlogPost>(
