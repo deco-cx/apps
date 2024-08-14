@@ -34,9 +34,12 @@ export const toProduct = (product: SHProduct): Product => {
 
   priceSpecification.push({
     "@type": "UnitPriceSpecification" as const,
-    priceType: "https://schema.org/ListPrice" as const,
+    priceType: product.HasSalePrice
+      ? "https://schema.org/ListPrice"
+      : "https://schema.org/SalePrice" as const,
     price: product.Price!,
   });
+
   if (product.HasSalePrice) {
     priceSpecification.push({
       "@type": "UnitPriceSpecification" as const,
@@ -202,7 +205,7 @@ export const toProduct = (product: SHProduct): Product => {
         "@type": "Offer" as const,
         availability:
           AvailabilityMap[firstAvailable?.availability ?? "out of stock"],
-        price: product.SalePrice ?? 0,
+        price: (product.HasSalePrice ? product.SalePrice : product.Price) ?? 0,
         inventoryLevel: {
           value: 1000, //TODO
         },
