@@ -1,5 +1,6 @@
 import type { FunctionContext, LoaderFunction } from "deco/types.ts";
 
+/** @title Force param */
 export type RequestURLParam = string;
 
 export interface Props {
