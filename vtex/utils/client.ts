@@ -1,3 +1,4 @@
+import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
   Category,
@@ -8,7 +9,6 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
-  Orders,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -244,8 +244,8 @@ export interface VTEXCommerceStable {
   "GET /api/catalog_system/pub/brand/list": {
     response: Brand[];
   };
-  "GET /api/oms/pvt/orders": {
-    response: Orders;
+  "GET /api/oms/user/orders": {
+    response: Userorderslist;
   };
 }
 

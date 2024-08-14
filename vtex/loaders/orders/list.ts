@@ -1,31 +1,37 @@
 import { AppContext } from "../../mod.ts";
-import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
-import { Orders } from "../../utils/types.ts";
+import { Userorderslist } from "../../utils/openapi/vcs.openapi.gen.ts";
+import { parseCookie } from "../../utils/vtexId.ts";
+
+export interface Props {
+  clientEmail: string;
+  page: string;
+  per_page: string;
+}
 
 export default async function loader(
-  _props: unknown,
-  _req: Request,
+  props: Props,
+  req: Request,
   ctx: AppContext,
-): Promise<Orders> {
+): Promise<Userorderslist> {
   const { vcsDeprecated } = ctx;
-  const segment = getSegmentFromBag(ctx);
+  const { clientEmail, page = "0", per_page = "15" } = props;
+  const { cookie } = parseCookie(req.headers, ctx.account);
 
-  const currentDate = new Date();
-  const pastDate = new Date(currentDate);
-  pastDate.setFullYear(currentDate.getFullYear() - 1);
-
-  // TODO: This endpoint is failing when we don't specify the creationDate. We need to check with VTEX.
-  // https://community.vtex.com/t/get-list-orders-retorna-invalid-f-creationdate/22706
   const ordersResponse = await vcsDeprecated
-    ["GET /api/oms/pvt/orders"](
+    ["GET /api/oms/user/orders"](
       {
-        f_creationDate:
-          `creationDate:[${pastDate.toISOString()} TO ${currentDate.toISOString()}]`,
+        clientEmail,
+        page,
+        per_page,
       },
-      { headers: withSegmentCookie(segment) },
+      {
+        headers: {
+          cookie,
+        },
+      },
     );
 
   const ordersList = await ordersResponse.json();
 
-  return ordersList as Orders;
+  return ordersList;
 }
