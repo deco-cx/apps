@@ -3,7 +3,7 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
-import { toReview } from "../../utils/transform.ts";
+import { toInventories, toReview } from "../../utils/transform.ts";
 import listLoader from "../legacy/productList.ts";
 
 export interface Props {
@@ -12,6 +12,7 @@ export interface Props {
   kitItems?: boolean;
   variants?: boolean;
   reviews?: boolean;
+  inventory?: boolean;
 
   products: Product[];
 }
@@ -120,6 +121,26 @@ const reviewsExt = async (
   return toReview(products, ratings, reviews);
 };
 
+const inventoryExt = async (
+  products: Product[],
+  ctx: AppContext,
+): Promise<Product[]> => {
+  const inventoriesPromises = products.map((product) =>
+    ctx.vcs["GET /api/logistics/pvt/inventory/skus/:skuId"]({
+      skuId: product.inProductGroupWithID ?? "",
+    }).then((res) => res.json())
+      .catch(() => ({}))
+  );
+
+  const inventoriesPromise = Promise.all(inventoriesPromises);
+
+  const [inventories] = await Promise.all([
+    inventoriesPromise,
+  ]);
+
+  return toInventories(products, inventories);
+};
+
 export default async (
   {
     products,
@@ -128,6 +149,7 @@ export default async (
     similars,
     simulate,
     reviews,
+    inventory,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -152,6 +174,10 @@ export default async (
 
   if (reviews) {
     p = await reviewsExt(p, ctx);
+  }
+
+  if (inventory) {
+    p = await inventoryExt(p, ctx);
   }
 
   return p;

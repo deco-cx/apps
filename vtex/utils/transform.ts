@@ -34,6 +34,7 @@ import type {
   PageType as PageTypeVTEX,
   PickupPoint,
   Product as ProductVTEX,
+  ProductInventoryData,
   ProductRating,
   ProductReviewData,
   SelectedFacet,
@@ -1010,6 +1011,33 @@ export const toReview = (
           ratingValue: productReviews[reviewIndex]?.rating || 0,
         },
       })),
+    };
+  });
+};
+
+export const toInventories = (
+  products: Product[],
+  inventories: ProductInventoryData[],
+): Product[] => {
+  console.log(inventories);
+  return products.map((p, index) => {
+    const balance = inventories[index].balance || [];
+
+    const additionalProperty = Array.from(p.additionalProperty || []);
+
+    balance.forEach((b) => {
+      additionalProperty.push({
+        "@type": "PropertyValue",
+        valueReference: "INVENTORY",
+        propertyID: b.warehouseId,
+        name: b.warehouseName,
+        value: b.totalQuantity?.toString(),
+      });
+    });
+
+    return {
+      ...p,
+      additionalProperty,
     };
   });
 };

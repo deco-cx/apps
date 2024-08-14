@@ -1249,3 +1249,17 @@ export interface ProductReviewData {
   data?: ProductReview[] | undefined;
   range?: ProductReviewRange;
 }
+
+export interface ProductBalance {
+  hasUnlimitedQuantity?: boolean;
+  leadTime?: string;
+  reservedQuantity?: number;
+  totalQuantity?: number;
+  warehouseId?: string;
+  warehouseName?: string;
+}
+
+export interface ProductInventoryData {
+  skuId?: string;
+  balance?: ProductBalance[];
+}

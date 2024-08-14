@@ -186,6 +186,31 @@ accountName?: string
 dataEntityId?: string
 }[]
 }
+"GET /api/logistics/pvt/inventory/skus/:skuId": {
+response: {
+/**
+ * Unique identifier of the SKU.
+ */
+skuId?: string
+/**
+ * List of warehouses.
+ */
+balance?: {
+hasUnlimitedQuantity?: boolean
+leadTime?: string
+reservedQuantity?: number
+totalQuantity?: number
+/**
+ * Warehouse ID.
+ */
+warehouseId?: string
+/**
+ * Warehouse name.
+ */
+warehouseName?: string
+}[]
+}
+}
 /**
  * Retrieves information about [pickup points](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) of your store.
  * 
