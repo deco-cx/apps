@@ -156,3 +156,9 @@ function toCanonical(url: URL, page?: number) {
 
   return url.href;
 }
+
+/**
+ * @description keyFilter is the querystring names which can be vtex filter parameter
+ */
+export const isFilterParam = (keyFilter: string): boolean =>
+  keyFilter.startsWith("filter.");

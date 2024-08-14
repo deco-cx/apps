@@ -5,16 +5,13 @@ import { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
   getValidTypesFromPageTypes,
+  isFilterParam,
   pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
   toSegmentParams,
 } from "../../utils/legacy.ts";
-import {
-  getSegmentFromBag,
-  isAnonymous,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { parsePageType } from "../../utils/transform.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
@@ -408,32 +405,41 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(props.pageHref || req.url);
 
-  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+  if (url.searchParams.has("ft")) {
     return null;
   }
 
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
   const params = new URLSearchParams([
-    ["term", props.term ?? ""],
-    ["count", props.count.toString()],
-    ["page", (props.page ?? 1).toString()],
-    ["sort", props.sort ?? ""],
+    ["term", props.term ?? url.pathname ?? ""],
+    ["count", (props.count || url.searchParams.get("count") || 12).toString()],
+    ["page", (props.page ?? url.searchParams.get("page") ?? 1).toString()],
+    [
+      "sort",
+      (url.searchParams.get("O") as LegacySort) ??
+        IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
+        props.sort ?? "",
+    ],
     ["filters", props.filters ?? ""],
-    ["fq", props.fq ?? ""],
-    ["ft", props.ft ?? ""],
-    ["map", props.map ?? ""],
+    ["fq", props.fq ?? url.searchParams.getAll("fq").join(",") ?? ""],
+    [
+      "ft",
+      props.ft ?? url.searchParams.get("ft") ?? url.searchParams.get("q") ?? "",
+    ],
+    ["map", props.map ?? url.searchParams.get("map") ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
     ["ignoreCaseSelected", (props.ignoreCaseSelected ?? false).toString()],
+    ["segment", segment],
   ]);
 
   url.searchParams.forEach((value, key) => {
+    if (!isFilterParam(key)) return;
     params.append(key, value);
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 
