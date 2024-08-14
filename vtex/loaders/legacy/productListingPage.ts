@@ -413,13 +413,21 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
 
   const segment = getSegmentFromBag(ctx)?.token ?? "";
   const params = new URLSearchParams([
-    ["term", props.term ?? url.searchParams.get("q") ?? ""],
+    ["term", props.term ?? url.pathname ?? ""],
     ["count", (props.count || url.searchParams.get("count") || 12).toString()],
     ["page", (props.page ?? url.searchParams.get("page") ?? 1).toString()],
-    ["sort", props.sort ?? url.searchParams.get("sort") ?? ""],
+    [
+      "sort",
+      (url.searchParams.get("O") as LegacySort) ??
+        IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
+        props.sort ?? "",
+    ],
     ["filters", props.filters ?? ""],
     ["fq", props.fq ?? url.searchParams.getAll("fq").join(",") ?? ""],
-    ["ft", props.ft ?? ""],
+    [
+      "ft",
+      props.ft ?? url.searchParams.get("ft") ?? url.searchParams.get("q") ?? "",
+    ],
     ["map", props.map ?? url.searchParams.get("map") ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
     ["ignoreCaseSelected", (props.ignoreCaseSelected ?? false).toString()],
