@@ -1,3 +1,4 @@
+import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
   Category,
@@ -242,6 +243,9 @@ export interface VTEXCommerceStable {
   };
   "GET /api/catalog_system/pub/brand/list": {
     response: Brand[];
+  };
+  "GET /api/oms/user/orders": {
+    response: Userorderslist;
   };
 }
 
