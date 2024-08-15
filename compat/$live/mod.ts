@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
 import type { App } from "deco/mod.ts";
 
 import webSite, { Props } from "../../website/mod.ts";
