@@ -105,7 +105,11 @@ const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
     priceValidUntil: item?.PromotionTo ?? undefined,
     price: item.Price?.SalesPrice ?? item.RetailPrice ?? Infinity,
     priceSpecification,
-    inventoryLevel: {},
+    inventoryLevel: {
+      "@type": "QuantitativeValue",
+      value: Number(item.StockBalance) || 0,
+      unitCode: "C62"
+    },
     availability:
       item.Availability != "O" && item.AvailabilityText != "Descontinuado"
         ? "https://schema.org/InStock"
