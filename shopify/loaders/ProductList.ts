@@ -6,8 +6,8 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
-  ProductConnection,
   Product as ProductShopify,
+  ProductConnection,
   QueryRoot,
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
