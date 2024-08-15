@@ -41,48 +41,6 @@ export type ManifestMappings = Partial<
   }
 >;
 
-const manifestMappings = {
-  pages: {
-    "$live/pages/LivePage.tsx": "website/pages/Page.tsx",
-  },
-  loaders: {
-    "$live/loaders/workflows/events.ts": "workflows/loaders/events.ts",
-    "$live/loaders/workflows/get.ts": "workflows/loaders/get.ts",
-  },
-  handlers: {
-    "$live/handlers/fresh.ts": "website/handlers/fresh.ts",
-    "$live/handlers/proxy.ts": "website/handlers/proxy.ts",
-    "$live/handlers/routesSelection.ts": "website/handlers/router.ts",
-    "$live/handlers/redirect.ts": "website/handlers/redirect.ts",
-    "$live/handlers/workflowRunner.ts": "workflows/handlers/workflowRunner.ts",
-  },
-  matchers: {
-    "$live/matchers/MatchAlways.ts": "website/matchers/always.ts",
-    "$live/matchers/MatchCron.ts": "website/matchers/cron.ts",
-    "$live/matchers/MatchDate.ts": "website/matchers/date.ts",
-    "$live/matchers/MatchDevice.ts": "website/matchers/device.ts",
-    "$live/matchers/MatchEnvironment.ts": "website/matchers/environment.ts",
-    "$live/matchers/MatchHost.ts": "website/matchers/host.ts",
-    "$live/matchers/MatchLocation.ts": "website/matchers/location.ts",
-    "$live/matchers/MatchMulti.ts": "website/matchers/multi.ts",
-    "$live/matchers/MatchRandom.ts": "website/matchers/random.ts",
-    "$live/matchers/MatchSite.ts": "website/matchers/site.ts",
-    "$live/matchers/MatchUserAgent.ts": "website/matchers/userAgent.ts",
-  },
-  actions: {
-    "$live/actions/secrets/encrypt.ts": "website/actions/secrets/encrypt.ts",
-    "$live/actions/workflows/cancel.ts": "workflows/actions/cancel.ts",
-    "$live/actions/workflows/signal.ts": "workflows/actions/signal.ts",
-    "$live/actions/workflows/start.ts": "workflows/actions/start.ts",
-  },
-  flags: {
-    "$live/flags/audience.ts": "website/flags/audience.ts",
-    "$live/flags/everyone.ts": "website/flags/everyone.ts",
-    "$live/flags/flag.ts": "website/flags/flag.ts",
-    "$live/flags/multivariate.ts": "website/flags/multivariate.ts",
-  },
-};
-
 export type { Props };
 /**
  * @title $live
@@ -108,23 +66,6 @@ export default function App(
       ...workflowsManifestImportMap.imports,
     },
   };
-  const _manifest = { ...manifest };
-
-  for (const [_blockKey, blockMappings] of Object.entries(manifestMappings)) {
-    const blockKey = _blockKey as keyof _Manifest;
-    _manifest[blockKey] = { ...(manifest as any)[blockKey] ?? {} };
-    for (const [from, to] of Object.entries(blockMappings)) {
-      if (to.startsWith("website")) {
-        // @ts-ignore: blockkeys and from/to always exists for those types
-        _manifest[blockKey][from] = webSiteManifest[blockKey][to];
-        importMap.imports[from] = webSiteManifestImportMap.imports[to];
-      } else if (to.startsWith("workflows")) {
-        // @ts-ignore: blockkeys and from/to always exists for those types
-        _manifest[blockKey][from] = workflowsManifest[blockKey][to];
-        importMap.imports[from] = workflowsManifestImportMap.imports[to];
-      }
-    }
-  }
 
   const liveImportMap = buildImportMap(manifest);
   return {
@@ -137,7 +78,7 @@ export default function App(
         ...importMap.imports,
       },
     },
-    manifest: _manifest as Manifest,
+    manifest,
     dependencies: [webSiteApp, workflowsApp],
   };
 }
