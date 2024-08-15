@@ -216,11 +216,19 @@ export const toProduct = (
     additionalType: "descriptions",
   }));
 
+  const categoryItems: PropertyValue[] = product.CategoryItems?.map((cat) => ({
+    "@type": "PropertyValue" as const,
+    name: cat.Name,
+    value: cat.ID,
+    additionalType: "categoryItem",
+  }));
+
   const additionalProperty = [
     ...skuOptions,
     ...metadatas,
     ...descriptions,
     ...prodOptions,
+    ...categoryItems,
   ];
 
   const hasVariant = level < 1
