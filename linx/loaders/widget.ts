@@ -10,21 +10,16 @@ export default async function widgetLoader(
   _req: Request,
   ctx: AppContext,
 ) {
-  try {
-    const { widget, params } = props;
+  const { widget, params } = props;
 
-    const response = await ctx.api["GET /widget/:widget"]({
-      widget,
-      ...params,
-    });
+  const response = await ctx.api["GET /widget/:widget"]({
+    widget,
+    ...params,
+  });
 
-    if (!response) {
-      return null;
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error(error);
+  if (!response) {
     return null;
   }
+
+  return response.json();
 }
