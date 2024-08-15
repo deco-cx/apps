@@ -4,8 +4,8 @@ import { parseCookie } from "../../utils/vtexId.ts";
 
 export interface Props {
   clientEmail: string;
-  page: string;
-  per_page: string;
+  page?: string;
+  per_page?: string;
 }
 
 export default async function loader(
