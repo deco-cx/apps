@@ -108,13 +108,30 @@ const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
     inventoryLevel: {
       "@type": "QuantitativeValue",
       value: Number(item.StockBalance) || 0,
-      unitCode: "C62"
+      unitCode: "C62",
     },
     availability:
       item.Availability != "O" && item.AvailabilityText != "Descontinuado"
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
   };
+};
+
+const createAssociationPropertyValues = (
+  associationsMetadata: Record<string, string>,
+): PropertyValue[] => {
+  if (!associationsMetadata) {
+    return [];
+  }
+
+  const entries = Object.entries(associationsMetadata);
+  return entries.map(([key, value]) => ({
+    "@type": "PropertyValue" as const,
+    name: key,
+    value: value,
+    propertyID: key,
+    additionalType: "association",
+  }));
 };
 
 interface ProductOptions {
@@ -241,12 +258,30 @@ export const toProduct = (
     ? groupImages
     : [DEFAULT_IMAGE];
 
-  const isRelatedTo = associations?.ProductLists.map((p) => {
-    return toProduct(p.Product, variant.ProductID, {
-      ...options,
-      associations: null,
+  const isRelatedTo = associations?.ProductLists.map((list) => {
+    return list.Products.map((p) => {
+      const associationProperties: PropertyValue[] =
+        createAssociationPropertyValues(
+          {
+            alias: list.Alias,
+            name: list.Name,
+          },
+        );
+
+      const _prod = toProduct(
+        p,
+        variant.ProductID,
+        {
+          ...options,
+          associations: null,
+        },
+      );
+
+      _prod.additionalProperty?.push(...associationProperties);
+
+      return _prod;
     });
-  });
+  }).flat();
 
   return {
     "@type": "Product",
