@@ -46,7 +46,20 @@ export interface BlogPost {
    * @title SEO
    */
   seo?: Seo;
+  /**
+   * @title ReadTime in minutes
+   */
+  readTime?: number;
+  /**
+   * @title Extra Props
+   */
+  extraProps?: ExtraProps[];
 }
+
+export interface ExtraProps {
+  [key: string]: string;
+}
+
 export interface Seo {
   title?: string;
   description?: string;
