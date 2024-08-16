@@ -1,10 +1,13 @@
 import type { AppContext } from "../mod.ts";
 import { CustomerPasswordRecovery } from "../utils/graphql/queries.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
-import { CustomerPasswordRecoveryMutation, CustomerPasswordRecoveryMutationVariables } from "../utils/graphql/storefront.graphql.gen.ts";
+import {
+  CustomerPasswordRecoveryMutation,
+  CustomerPasswordRecoveryMutationVariables,
+} from "../utils/graphql/storefront.graphql.gen.ts";
 
 export interface Props {
-  email: string
+  email: string;
 }
 
 const action = async (
@@ -22,7 +25,7 @@ const action = async (
   >(
     {
       variables: {
-        input: props.email
+        input: props.email,
       },
       ...CustomerPasswordRecovery,
     },

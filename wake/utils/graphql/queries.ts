@@ -1742,3 +1742,13 @@ export const CustomerCompletePartialRegistration = {
     }
   }`,
 };
+
+export const CustomerPasswordRecovery = {
+  query: gql`
+    mutation CustomerPasswordRecovery($input: String!) {
+      customerPasswordRecovery(input: $input) {
+      isSuccess
+    }
+  }
+  `,
+};

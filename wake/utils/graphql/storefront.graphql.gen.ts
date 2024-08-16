@@ -1291,6 +1291,7 @@ export type CustomerOrderArgs = {
 /** A customer from the store. */
 export type CustomerOrdersArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
   sortDirection?: InputMaybe<OrderSortDirection>;
   sortKey?: InputMaybe<CustomerOrderSortKeys>;
 };
@@ -2668,6 +2669,8 @@ export type MutationWishlistRemoveProductArgs = {
 
 export type NewsletterInput = {
   email: Scalars['String']['input'];
+  /** The receiver gender. Default is null. */
+  gender?: InputMaybe<Gender>;
   informationGroupValues?: InputMaybe<Array<InputMaybe<InformationGroupValueInput>>>;
   name: Scalars['String']['input'];
   /** [Deprecated: use the root field] The google recaptcha token. */
@@ -2679,6 +2682,8 @@ export type NewsletterNode = {
   createDate: Scalars['DateTime']['output'];
   /** The newsletter receiver email. */
   email?: Maybe<Scalars['String']['output']>;
+  /** Newsletter receiver gender. */
+  gender?: Maybe<Gender>;
   /** The newsletter receiver name. */
   name?: Maybe<Scalars['String']['output']>;
   /** Newsletter update date. */
@@ -3721,6 +3726,10 @@ export type QueryRoot = {
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** Retrieve a product by the given id. */
   product?: Maybe<SingleProduct>;
+  /** Retrieve a list of product recommendations based on the customer's cart. */
+  productAIRecommendationsByCart?: Maybe<Array<Maybe<Product>>>;
+  /** Retrieve a list of product recommendations based on the customer's orders. */
+  productAIRecommendationsByOrder?: Maybe<Array<Maybe<Product>>>;
   /**
    * Options available for the given product.
    * @deprecated Use the product query.
@@ -3929,6 +3938,20 @@ export type QueryRootProductArgs = {
 };
 
 
+export type QueryRootProductAiRecommendationsByCartArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  quantity?: Scalars['Int']['input'];
+};
+
+
+export type QueryRootProductAiRecommendationsByOrderArgs = {
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  quantity?: Scalars['Int']['input'];
+};
+
+
 export type QueryRootProductOptionsArgs = {
   productId: Scalars['Long']['input'];
 };
@@ -3978,6 +4001,7 @@ export type QueryRootSearchArgs = {
   operation?: Operation;
   partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
+  useAI?: Scalars['Boolean']['input'];
 };
 
 
@@ -4021,6 +4045,8 @@ export type Question = {
 
 /** Represents the product to be removed from the subscription. */
 export type RemoveSubscriptionProductInput = {
+  /** The quantity to be removed for the product. Removes all if not passed */
+  quantity?: InputMaybe<Scalars['Int']['input']>;
   /** The Id of the product within the subscription to be removed. */
   subscriptionProductId: Scalars['Long']['input'];
 };
@@ -4312,6 +4338,8 @@ export type SellerOffer = {
   prices?: Maybe<SellerPrices>;
   /** Variant unique identifier. */
   productVariantId?: Maybe<Scalars['Long']['output']>;
+  /** The stock of the product variant. */
+  stock: Scalars['Int']['output'];
 };
 
 /** The prices of the product. */
@@ -5309,3 +5337,10 @@ export type CompleteRegistrationMutationVariables = Exact<{
 
 
 export type CompleteRegistrationMutation = { customerCompletePartialRegistration?: { isMaster: boolean, token?: string | null, legacyToken?: string | null, type?: LoginType | null, validUntil: any } | null };
+
+export type CustomerPasswordRecoveryMutationVariables = Exact<{
+  input: Scalars['String']['input'];
+}>;
+
+
+export type CustomerPasswordRecoveryMutation = { customerPasswordRecovery?: { isSuccess: boolean } | null };
