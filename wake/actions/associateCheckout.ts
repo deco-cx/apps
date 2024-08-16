@@ -1,3 +1,4 @@
+import { badRequest } from "deco/mod.ts";
 import type { AppContext } from "../mod.ts";
 import authenticate from "../utils/authenticate.ts";
 import { getCartCookie } from "../utils/cart.ts";
@@ -34,7 +35,6 @@ export default async function (_props: object, req: Request, ctx: AppContext) {
       { headers },
     );
   } catch (err) {
-    console.error("Associate Checkout Error", err);
-    throw err;
+    throw badRequest(err);
   }
 }

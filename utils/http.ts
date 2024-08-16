@@ -153,15 +153,6 @@ export const createHttpClient = <T>({
 
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
 
-        const curl = fetchToCurl(url.href, {
-          ...init,
-          headers: processHeaders(headers),
-          method,
-          body,
-        });
-
-        console.log(curl);
-
         return fetcher(url.href, {
           ...init,
           headers: processHeaders(headers),
