@@ -4,25 +4,27 @@
 
 import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
 import * as $$$$$$$$$1 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$2 from "./actions/cart/clearOrderformMessages.ts";
-import * as $$$$$$$$$3 from "./actions/cart/getInstallment.ts";
-import * as $$$$$$$$$4 from "./actions/cart/removeItemAttachment.ts";
-import * as $$$$$$$$$5 from "./actions/cart/removeItems.ts";
-import * as $$$$$$$$$6 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$7 from "./actions/cart/updateAttachment.ts";
-import * as $$$$$$$$$8 from "./actions/cart/updateCoupons.ts";
-import * as $$$$$$$$$9 from "./actions/cart/updateGifts.ts";
-import * as $$$$$$$$$10 from "./actions/cart/updateItemAttachment.ts";
-import * as $$$$$$$$$11 from "./actions/cart/updateItemPrice.ts";
-import * as $$$$$$$$$12 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$13 from "./actions/cart/updateProfile.ts";
-import * as $$$$$$$$$14 from "./actions/cart/updateUser.ts";
-import * as $$$$$$$$$15 from "./actions/masterdata/createDocument.ts";
-import * as $$$$$$$$$16 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$17 from "./actions/notifyme.ts";
-import * as $$$$$$$$$18 from "./actions/trigger.ts";
-import * as $$$$$$$$$19 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$20 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$2 from "./actions/cart/addOfferings.ts";
+import * as $$$$$$$$$3 from "./actions/cart/clearOrderformMessages.ts";
+import * as $$$$$$$$$4 from "./actions/cart/getInstallment.ts";
+import * as $$$$$$$$$5 from "./actions/cart/removeItemAttachment.ts";
+import * as $$$$$$$$$6 from "./actions/cart/removeItems.ts";
+import * as $$$$$$$$$7 from "./actions/cart/removeOffering.ts";
+import * as $$$$$$$$$8 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$9 from "./actions/cart/updateAttachment.ts";
+import * as $$$$$$$$$10 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$11 from "./actions/cart/updateGifts.ts";
+import * as $$$$$$$$$12 from "./actions/cart/updateItemAttachment.ts";
+import * as $$$$$$$$$13 from "./actions/cart/updateItemPrice.ts";
+import * as $$$$$$$$$14 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$15 from "./actions/cart/updateProfile.ts";
+import * as $$$$$$$$$16 from "./actions/cart/updateUser.ts";
+import * as $$$$$$$$$17 from "./actions/masterdata/createDocument.ts";
+import * as $$$$$$$$$18 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$19 from "./actions/notifyme.ts";
+import * as $$$$$$$$$20 from "./actions/trigger.ts";
+import * as $$$$$$$$$21 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$22 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/categories/tree.ts";
@@ -43,21 +45,23 @@ import * as $$$15 from "./loaders/legacy/relatedProductsLoader.ts";
 import * as $$$16 from "./loaders/legacy/suggestions.ts";
 import * as $$$17 from "./loaders/logistics/listPickupPoints.ts";
 import * as $$$18 from "./loaders/logistics/listPickupPointsByLocation.ts";
-import * as $$$19 from "./loaders/navbar.ts";
-import * as $$$20 from "./loaders/options/productIdByTerm.ts";
-import * as $$$21 from "./loaders/paths/PDPDefaultPath.ts";
-import * as $$$22 from "./loaders/paths/PLPDefaultPath.ts";
-import * as $$$23 from "./loaders/product/extend.ts";
-import * as $$$24 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$25 from "./loaders/product/extensions/list.ts";
-import * as $$$26 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$27 from "./loaders/product/extensions/suggestions.ts";
-import * as $$$28 from "./loaders/product/wishlist.ts";
-import * as $$$29 from "./loaders/proxy.ts";
-import * as $$$30 from "./loaders/user.ts";
-import * as $$$31 from "./loaders/wishlist.ts";
-import * as $$$32 from "./loaders/workflow/product.ts";
-import * as $$$33 from "./loaders/workflow/products.ts";
+import * as $$$19 from "./loaders/masterdata/searchDocuments.ts";
+import * as $$$20 from "./loaders/navbar.ts";
+import * as $$$21 from "./loaders/options/productIdByTerm.ts";
+import * as $$$22 from "./loaders/orders/list.ts";
+import * as $$$23 from "./loaders/paths/PDPDefaultPath.ts";
+import * as $$$24 from "./loaders/paths/PLPDefaultPath.ts";
+import * as $$$25 from "./loaders/product/extend.ts";
+import * as $$$26 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$27 from "./loaders/product/extensions/list.ts";
+import * as $$$28 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$29 from "./loaders/product/extensions/suggestions.ts";
+import * as $$$30 from "./loaders/product/wishlist.ts";
+import * as $$$31 from "./loaders/proxy.ts";
+import * as $$$32 from "./loaders/user.ts";
+import * as $$$33 from "./loaders/wishlist.ts";
+import * as $$$34 from "./loaders/workflow/product.ts";
+import * as $$$35 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -83,21 +87,23 @@ const manifest = {
     "vtex/loaders/legacy/suggestions.ts": $$$16,
     "vtex/loaders/logistics/listPickupPoints.ts": $$$17,
     "vtex/loaders/logistics/listPickupPointsByLocation.ts": $$$18,
-    "vtex/loaders/navbar.ts": $$$19,
-    "vtex/loaders/options/productIdByTerm.ts": $$$20,
-    "vtex/loaders/paths/PDPDefaultPath.ts": $$$21,
-    "vtex/loaders/paths/PLPDefaultPath.ts": $$$22,
-    "vtex/loaders/product/extend.ts": $$$23,
-    "vtex/loaders/product/extensions/detailsPage.ts": $$$24,
-    "vtex/loaders/product/extensions/list.ts": $$$25,
-    "vtex/loaders/product/extensions/listingPage.ts": $$$26,
-    "vtex/loaders/product/extensions/suggestions.ts": $$$27,
-    "vtex/loaders/product/wishlist.ts": $$$28,
-    "vtex/loaders/proxy.ts": $$$29,
-    "vtex/loaders/user.ts": $$$30,
-    "vtex/loaders/wishlist.ts": $$$31,
-    "vtex/loaders/workflow/product.ts": $$$32,
-    "vtex/loaders/workflow/products.ts": $$$33,
+    "vtex/loaders/masterdata/searchDocuments.ts": $$$19,
+    "vtex/loaders/navbar.ts": $$$20,
+    "vtex/loaders/options/productIdByTerm.ts": $$$21,
+    "vtex/loaders/orders/list.ts": $$$22,
+    "vtex/loaders/paths/PDPDefaultPath.ts": $$$23,
+    "vtex/loaders/paths/PLPDefaultPath.ts": $$$24,
+    "vtex/loaders/product/extend.ts": $$$25,
+    "vtex/loaders/product/extensions/detailsPage.ts": $$$26,
+    "vtex/loaders/product/extensions/list.ts": $$$27,
+    "vtex/loaders/product/extensions/listingPage.ts": $$$28,
+    "vtex/loaders/product/extensions/suggestions.ts": $$$29,
+    "vtex/loaders/product/wishlist.ts": $$$30,
+    "vtex/loaders/proxy.ts": $$$31,
+    "vtex/loaders/user.ts": $$$32,
+    "vtex/loaders/wishlist.ts": $$$33,
+    "vtex/loaders/workflow/product.ts": $$$34,
+    "vtex/loaders/workflow/products.ts": $$$35,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
@@ -108,25 +114,27 @@ const manifest = {
   "actions": {
     "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$0,
     "vtex/actions/cart/addItems.ts": $$$$$$$$$1,
-    "vtex/actions/cart/clearOrderformMessages.ts": $$$$$$$$$2,
-    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$3,
-    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$4,
-    "vtex/actions/cart/removeItems.ts": $$$$$$$$$5,
-    "vtex/actions/cart/simulation.ts": $$$$$$$$$6,
-    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$7,
-    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$8,
-    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$9,
-    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$10,
-    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$11,
-    "vtex/actions/cart/updateItems.ts": $$$$$$$$$12,
-    "vtex/actions/cart/updateProfile.ts": $$$$$$$$$13,
-    "vtex/actions/cart/updateUser.ts": $$$$$$$$$14,
-    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$15,
-    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$16,
-    "vtex/actions/notifyme.ts": $$$$$$$$$17,
-    "vtex/actions/trigger.ts": $$$$$$$$$18,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$19,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$20,
+    "vtex/actions/cart/addOfferings.ts": $$$$$$$$$2,
+    "vtex/actions/cart/clearOrderformMessages.ts": $$$$$$$$$3,
+    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$4,
+    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$5,
+    "vtex/actions/cart/removeItems.ts": $$$$$$$$$6,
+    "vtex/actions/cart/removeOffering.ts": $$$$$$$$$7,
+    "vtex/actions/cart/simulation.ts": $$$$$$$$$8,
+    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$9,
+    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$10,
+    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$11,
+    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$12,
+    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$13,
+    "vtex/actions/cart/updateItems.ts": $$$$$$$$$14,
+    "vtex/actions/cart/updateProfile.ts": $$$$$$$$$15,
+    "vtex/actions/cart/updateUser.ts": $$$$$$$$$16,
+    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$17,
+    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$18,
+    "vtex/actions/notifyme.ts": $$$$$$$$$19,
+    "vtex/actions/trigger.ts": $$$$$$$$$20,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$21,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$22,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,

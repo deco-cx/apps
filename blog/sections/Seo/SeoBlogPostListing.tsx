@@ -3,12 +3,12 @@ import {
   renderTemplateString,
   SEOSection,
 } from "../../../website/components/Seo.tsx";
-import { BlogPostPage } from "../../types.ts";
+import { BlogPostListingPage } from "../../types.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
   /** @title Data Source */
-  jsonLD: BlogPostPage | null;
+  jsonLD: BlogPostListingPage | null;
   /** @title Title Override */
   title?: string;
   /** @title Description Override */
@@ -34,21 +34,19 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     descriptionProp || jsonLD?.seo?.description || "",
   );
 
-  const image = jsonLD?.post?.image;
   const canonical = jsonLD?.seo?.canonical ? jsonLD?.seo?.canonical : undefined;
   const noIndexing = !jsonLD || jsonLD.seo?.noIndexing;
 
   // Some HTML can break the meta tag
   const jsonLDWithoutContent = {
     ...jsonLD,
-    post: { ...jsonLD?.post, content: undefined },
+    post: { ...jsonLD?.posts, content: undefined },
   };
 
   return {
     ...seoSiteProps,
     title,
     description,
-    image,
     canonical,
     noIndexing,
     jsonLDs: [jsonLDWithoutContent],

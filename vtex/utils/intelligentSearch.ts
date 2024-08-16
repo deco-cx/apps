@@ -123,3 +123,9 @@ export const setISCookiesBag = (
     session,
   };
 };
+
+/**
+ * @description keyFilter is the querystring names which can be vtex filter parameter
+ */
+export const isFilterParam = (keyFilter: string): boolean =>
+  keyFilter.startsWith("filter.");

@@ -136,6 +136,14 @@ export const getFiltersByUrl = (url: URL) => {
       filters.push({ price: { min: Number(value) } });
     } else if (key.startsWith("filter.v.price.lte")) {
       filters.push({ price: { max: Number(value) } });
+    } else if (key.startsWith("filter.p.m.custom")) {
+      filters.push({
+        productMetafield: {
+          namespace: "custom",
+          key: key.replace("filter.p.m.custom.", ""),
+          value: value,
+        },
+      });
     }
   });
   return filters;

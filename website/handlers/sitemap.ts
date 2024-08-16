@@ -1,7 +1,6 @@
 import type { Handler } from "deco/blocks/handler.ts";
 import type { Resolvable } from "deco/engine/core/resolver.ts";
 import { isResolvable } from "deco/engine/core/resolver.ts";
-import { ConnInfo } from "std/http/server.ts";
 import { Route } from "../flags/audience.ts";
 
 const isPage = (handler: Resolvable<Handler>) =>
@@ -52,9 +51,9 @@ interface Props {
  * @description Return deco's sitemap.xml
  */
 export default function SiteMap({ excludePaths = [] }: Props) {
-  return function (req: Request, connInfo: ConnInfo) {
+  return function (req: Request, connInfo: Deno.ServeHandlerInfo) {
     const reqUrl = new URL(req.url);
-    const ctx = connInfo as ConnInfo & {
+    const ctx = connInfo as Deno.ServeHandlerInfo & {
       params: Record<string, string>;
       state: {
         routes: Route[];
