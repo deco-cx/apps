@@ -1,6 +1,5 @@
 import { RequestInit } from "deco/runtime/fetch/mod.ts";
 import { fetchSafe } from "./fetch.ts";
-import { fetchToCurl } from "jsr:@viktor/fetch-to-curl";
 
 const HTTP_VERBS = new Set(
   [
