@@ -7,6 +7,7 @@ import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
 import { sortProducts } from "../../utils/transform.ts";
+import { createFrameCacheKey } from "../../../utils/loaderCacheKey.ts";
 
 /**
  * @title Collection ID
@@ -276,6 +277,12 @@ const getSearchParams = (
 
 export const cache = "stale-while-revalidate";
 
+const numberOfSavedCacheKeys = 200;
+const { getTimedCacheKey, windowTime } = createFrameCacheKey(
+  numberOfSavedCacheKeys,
+  "10m",
+);
+
 export const cacheKey = (
   expandedProps: Props,
   req: Request,
@@ -321,8 +328,9 @@ export const cacheKey = (
   params.sort();
 
   url.search = params.toString();
+  const key = `${url.pathname}${url.search}`;
 
-  return url.href;
+  return getTimedCacheKey(windowTime, key);
 };
 
 export default loader;
