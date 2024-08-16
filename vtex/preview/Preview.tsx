@@ -1,8 +1,10 @@
-import { AppRuntime } from "deco/types.ts";
-import { App } from "../mod.ts";
-import type { JSX } from "preact";
-import { Context } from "deco/live.ts";
 import { BaseContext } from "deco/engine/core/resolver.ts";
+import { useScript } from "deco/hooks/useScript.ts";
+import { Context } from "deco/live.ts";
+import { AppRuntime } from "deco/types.ts";
+import type { JSX } from "preact";
+import { PreviewContainer } from "../../utils/preview.tsx";
+import { App } from "../mod.ts";
 
 export interface Props {
   publicUrl: string;
@@ -18,76 +20,56 @@ export const PreviewVtex = (
   const publicUrl = app.state?.publicUrl || "";
   const account = app.state?.account || "";
   const withoutSubDomain = publicUrl.split(".").slice(1).join(".");
+
+  if (!account) {
+    return (
+      <PreviewContainer>
+        <div class="w-full h-full bg-[#ff3366]">
+          <h1 class="text-[128px] text-center text-white">Welcome</h1>
+          <button
+            class="bg-white text-[48px] p-8 rounded-[24px]"
+            hx-on:click={useScript(() => {
+              window.DECO_FORM.setProp(["account"], "bravtexfashionstore");
+              window.DECO_FORM.setProp(
+                ["publicUrl"],
+                "https://www.example.com.br",
+              );
+            })}
+          >
+            Use Demo Account
+          </button>
+        </div>
+      </PreviewContainer>
+    );
+  }
   return (
     <div class="h-full px-4 relative">
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            a{
-              color: #111827;
-              font-weight: 600;
-              text-decoration: underline;
-            }
-            #tab[open]>summary{
-              font-weight: 700;
-            }
-          `,
-        }}
+      <button
+        hx-on:click={useScript(() => {
+          top?.postMessage(
+            {
+              type: "editor::click",
+              action: "change-prop",
+              prop: "account",
+              value: "bravtexfashionstore",
+            },
+            "*",
+          );
+          top?.postMessage(
+            {
+              type: "editor::click",
+              action: "change-prop",
+              prop: "publicUrl",
+              value: "https://www.example.com.br",
+            },
+            "*",
+          );
+        })}
       >
-      </style>
-      <div>
-        <a href="https://vtex.com/" class="flex justify-center py-4">
-          <VtexSvg />
-        </a>
-      </div>
-      <div class="flex justify-center relative gap-8">
-        <details open id="tab" class="group text-black">
-          <summary class="w-auto text-left text-2xl cursor-pointer py-4 group-open:font-semibold">
-            General Information
-          </summary>
-          <div
-            class="absolute top-[70px] w-full left-0 bg-white rounded-lg p-4"
-            style={{
-              boxShadow: "0px 0px 5px 3px rgba(0,0,0,0.20)",
-            }}
-          >
-            {app.markdownContent && <app.markdownContent />}
-          </div>
-        </details>
-        <details id="tab" class="group text-black">
-          <summary class="w-auto text-lef text-2xl cursor-pointer py-4 group-open:font-semibold">
-            Go Live (pt-BR)
-          </summary>
-          <ul
-            class="absolute top-[70px] w-full left-0 bg-white rounded-lg p-4"
-            style={{
-              boxShadow: "0px 0px 5px 3px rgba(0,0,0,0.20)",
-            }}
-          >
-            <GoLivePtBr
-              decoSite={decoSite}
-              withoutSubDomain={withoutSubDomain}
-              account={account}
-            />
-          </ul>
-        </details>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-            // script to close all details when click on one
-            document.querySelectorAll('#tab>summary').forEach((summary)=>{
-              summary.onclick = (e)=>{
-                const details = summary.parentElement
-                const open = details.open
-                document.querySelectorAll('#tab').forEach((d)=>{ d.open = false });
-              }
-            })
-          `,
-          }}
-        >
-        </script>
-        <script src="https://unpkg.com/windicss-runtime-dom"></script>
-      </div>
+        Use Demo Account
+      </button>
+
+      <VtexSvg />
     </div>
   );
 };
