@@ -57,7 +57,8 @@ export interface BlogPost {
 }
 
 export interface ExtraProps {
-  [key: string]: string;
+  key: string;
+  value: string;
 }
 
 export interface Seo {
