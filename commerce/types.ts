@@ -249,18 +249,41 @@ export interface Teasers {
   effects: TeasersEffect;
 }
 
+export interface MonetaryAmount extends Omit<Thing, "@type"> {
+  /**
+   * The currency in which the monetary amount is expressed.
+   *
+   * Use standard formats: ISO 4217 currency format, e.g. "USD"; Ticker symbol for cryptocurrencies, e.g. "BTC"; well known names for Local Exchange Trading Systems (LETS) and other currency types, e.g. "Ithaca HOUR".
+   */
+  currency: string;
+  /**
+   * The upper value of some characteristic or property.
+   */
+  maxValue: number;
+  /** The lower value of some characteristic or property. */
+  minValue: number;
+  /** The date when the item becomes valid. */
+  validFrom: string;
+  /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
+  validThrough: string;
+  /** The value of a QuantitativeValue (including Observation) or property value node. */
+  value: boolean | number | string;
+}
+
 export interface MerchantReturnPolicy extends Omit<Thing, "@type"> {
   "@type": "MerchantReturnPolicy";
   /** Specifies either a fixed return date or the number of days (from the delivery date) that a product can be returned. Used when the returnPolicyCategory property is specified as MerchantReturnFiniteReturnWindow. Supersedes productReturnDays */
-  merchantReturnDays: number;
+  merchantReturnDays?: number;
   /** A country where a particular merchant return policy applies to, for example the two-letter ISO 3166-1 alpha-2 country code. */
   applicableCountry: string;
   /** The type of return fees for purchased products (for any return reason). */
-  returnFees: ReturnFeesEnumeration;
+  returnFees?: ReturnFeesEnumeration;
   /** The type of return method offered, specified from an enumeration. */
-  returnMethod: ReturnMethodEnumeration;
+  returnMethod?: ReturnMethodEnumeration;
   /** Specifies an applicable return policy (from an enumeration). */
   returnPolicyCategory: MerchantReturnEnumeration;
+  /** Amount of shipping costs for product returns (for any reason). Applicable when property returnFees equals ReturnShippingFees. */
+  returnShippingFeesAmount?: MonetaryAmount;
 }
 export interface Offer extends Omit<Thing, "@type"> {
   "@type": "Offer";
