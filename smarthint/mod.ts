@@ -30,7 +30,7 @@ export interface State {
  * @title SmartHint
  * @description Smart search and product recommendation to improve your eCommerce customer experience.
  * @category Search
- * @logo https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/smarthint/logo.png
  */
 export default function App(
   props: State,

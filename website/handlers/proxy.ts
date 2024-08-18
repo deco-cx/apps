@@ -1,10 +1,10 @@
 import { DecoSiteState } from "deco/mod.ts";
-import { Handler } from "std/http/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { removeDirtyCookies as removeDirtyCookiesFn } from "../../utils/normalize.ts";
 import { Script } from "../types.ts";
 import { isFreshCtx } from "./fresh.ts";
 
+type Handler = Deno.ServeHandler;
 const HOP_BY_HOP = [
   "Keep-Alive",
   "Transfer-Encoding",

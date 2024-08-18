@@ -2,6 +2,12 @@ import { Head } from "$fresh/runtime.ts";
 import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { context } from "deco/live.ts";
 
+declare global {
+  interface Window {
+    dataLayer: unknown[];
+  }
+}
+
 export const getGTMIdFromSrc = (src: string | undefined) => {
   const trackingId = src ? new URL(src).searchParams.get("id") : undefined;
   return trackingId;

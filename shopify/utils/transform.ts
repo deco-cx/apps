@@ -216,7 +216,7 @@ const toPropertyValue = (
 const isSelectedFilter = (filterValue: FilterValue, url: URL) => {
   let isSelected = false;
   url.searchParams.forEach((value, key) => {
-    if (!key.startsWith("filter")) return;
+    if (!key?.startsWith("filter")) return;
     if (value === filterValue.label) isSelected = true;
   });
   return isSelected;

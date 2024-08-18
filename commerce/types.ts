@@ -528,7 +528,7 @@ export interface Product extends Omit<Thing, "@type"> {
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
-  isAccessoryOrSparePartFor?: ProductLeaf[];
+  isAccessoryOrSparePartFor?: Product[];
 
   questions?: Question[];
 }
