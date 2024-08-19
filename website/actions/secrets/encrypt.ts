@@ -10,7 +10,7 @@ export interface SignedMessage {
   value: string;
 }
 
-export default async function Encrypt(
+export default async function encrypt(
   { value }: Props,
   req: Request,
   ctx: ActionContext,
