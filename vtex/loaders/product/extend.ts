@@ -156,3 +156,5 @@ export default async (
 
   return p;
 };
+
+export const cache = "stale-while-revalidate";
