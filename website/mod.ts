@@ -239,6 +239,7 @@ export const onBeforeResolveProps = <
     errorPage?: Page;
     abTesting: AbTesting;
     global: Section[];
+    theme: Section;
   },
 >(
   props: T,
@@ -247,6 +248,7 @@ export const onBeforeResolveProps = <
     const newRoutes: T = {
       ...props,
       global: props.global?.map((section) => asResolved(section, false)),
+      theme: asResolved(props.theme, false),
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
         : undefined,
