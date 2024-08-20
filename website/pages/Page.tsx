@@ -178,8 +178,16 @@ export const loader = async (
     url.origin.includes(domain)
   );
 
-  const global = await Promise.all(
-    (ctx.global || [])?.map(async (section) => {
+  const global = ctx.global || [];
+
+  const alreadyHasTheme = ctx.theme ? global.indexOf(ctx.theme) > -1 : false;
+
+  const globalSections = (alreadyHasTheme || !ctx.theme)
+    ? global
+    : [ctx.theme, ...global];
+
+  const resolvedGlobals = await Promise.all(
+    globalSections?.map(async (section) => {
       return await ctx.get(section);
     }),
   );
@@ -196,7 +204,7 @@ export const loader = async (
 
   return {
     ...restProps,
-    sections: [...global, ...sections],
+    sections: [...resolvedGlobals, ...sections],
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,

@@ -18744,6 +18744,49 @@ logo?: (null | string)
 }[]
 }
 }
+/**
+ * Lists all orders from a given customer, filtering by their email. 
+ * 
+ * > You can only access information from orders created in the last two years, and that same period is valid for customers through [My Account](https://help.vtex.com/en/tutorial/how-my-account-works--2BQ3GiqhqGJTXsWVuio3Xh). 
+ * 
+ * > Note that this request should be made by an [user](https://developers.vtex.com/docs/guides/user-authentication-and-login) or [an appKey / appToken pair](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) that is associated with the [Call center operator](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy#call-center-operator) role. Otherwise, it will return only orders from the same email informed in the `clientEmail` query parameter. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | OMS | OMS access | **View order** |
+ * 
+ * You can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):
+ * 
+ * | **Role** | **Resource** | 
+ * | --------------- | ----------------- | 
+ * | Call center operator | View order |
+ * | OMS - Read only | View order |
+ * 
+ * >❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm). 
+ * 
+ * To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ */
+"GET /api/oms/user/orders": {
+searchParams: {
+/**
+ * Customer email.
+ */
+clientEmail: string
+/**
+ * Page number for result pagination.
+ */
+page: string
+/**
+ * Page quantity for result pagination.
+ */
+per_page: string
+}
+response: Userorderslist
+}
 }
 /**
  * Pickup point information.
@@ -20924,4 +20967,220 @@ export interface WaitingTime {
  * Number of days after order cancelation by a seller, during which another seller may be assigned to fulfill the order.
  */
 waitingTime: number
+}
+/**
+ * Order list object.
+ */
+export interface Userorderslist {
+/**
+ * List with user's orders details.
+ */
+list: List1[]
+/**
+ * Array containing facets information.
+ */
+facets: string[]
+paging: Paging
+stats: Stats2
+}
+export interface List1 {
+/**
+ * Order ID is a unique code that identifies an order.
+ */
+orderId: string
+/**
+ * Order's creation date.
+ */
+creationDate: string
+/**
+ * Order's customer name.
+ */
+clientName: string
+/**
+ * @deprecated
+ * Information about order's items.
+ */
+items: Item2[]
+/**
+ * Total value amount.
+ */
+totalValue: number
+/**
+ * Payment system name.
+ */
+paymentNames: string
+/**
+ * Order [status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196).
+ */
+status: string
+/**
+ * @deprecated
+ * Status description which is displayed on the Admin panel. This field is deprecated and may not return any value.
+ */
+statusDescription: string
+/**
+ * Marketplace order ID.
+ */
+marketPlaceOrderId: string
+/**
+ * Six-digit string that follows the order ID. For example, in order `1268540501456-01 (501456)`, the sequence is `501456`.
+ */
+sequence: string
+/**
+ * Sales channel (or [trade policy](https://help.vtex.com/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV)) ID related to the order.
+ */
+salesChannel: string
+/**
+ * Corresponds to the three-digits [affiliate](https://help.vtex.com/en/tutorial/configuring-affiliates--tutorials_187) identification code of the seller responsible for the order.
+ */
+affiliateId: string
+/**
+ * Order's [origin in the order flow](https://developers.vtex.com/docs/guides/orders-overview#understanding-order-flow-types), which can be `Marketplace`, `Fulfillment` or `Chain`.
+ */
+origin: string
+/**
+ * If there is a work flow error (`true`) or not (`false`).
+ */
+workflowInErrorState: boolean
+/**
+ * If the order is in a work flow retry (`true`) or not (`false`).
+ */
+workflowInRetry: boolean
+/**
+ * Last sent transactional message.
+ */
+lastMessageUnread: string
+/**
+ * Estimate shipping date.
+ */
+ShippingEstimatedDate: string
+/**
+ * The most extended shipping estimation possible.
+ */
+ShippingEstimatedDateMax: string
+/**
+ * The least extended shipping estimation possible.
+ */
+ShippingEstimatedDateMin: string
+/**
+ * If it is a completed order (`true`) or not (`false`). For more information, see [Order flow and status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196).
+ */
+orderIsComplete: boolean
+/**
+ * Related Gift List ID.
+ */
+listId: string
+/**
+ * Related Gift list type.
+ */
+listType: string
+/**
+ * Authorized order date.
+ */
+authorizedDate: string
+/**
+ * Call center operator responsible for the order.
+ */
+callCenterOperatorName: string
+/**
+ * Order's total amount of items.
+ */
+totalItems: number
+/**
+ * Currency code in ISO 4217. For example, `BRL`.
+ */
+currencyCode: string
+minItems?: 0
+}
+export interface Item2 {
+/**
+ * Seller related to the order.
+ */
+seller: string
+/**
+ * Quantity of SKUs.
+ */
+quantity: number
+/**
+ * Description of items.
+ */
+description: string
+/**
+ * EAN of the SKU.
+ */
+ean: string
+/**
+ * Item's reference ID.
+ */
+refId: string
+/**
+ * Item's SKU ID, which is a unique numerical identifier.
+ */
+id: string
+/**
+ * ID of the Product associated with the item.
+ */
+productId: string
+/**
+ * Details on item's selling price.
+ */
+sellingPrice: number
+/**
+ * Item's price.
+ */
+price: number
+}
+/**
+ * Pagination information.
+ */
+export interface Paging {
+/**
+ * Total number of orders.
+ */
+total: number
+/**
+ * Total number of pages.
+ */
+pages: number
+/**
+ * Number of the current page.
+ */
+currentPage: number
+/**
+ * Number of orders per page.
+ */
+perPage: number
+}
+export interface Stats2 {
+stats: Stats3
+}
+export interface Stats3 {
+totalValue: TotalValue1
+totalItems: TotalItems1
+}
+export interface TotalValue1 {
+Count: number
+Max: number
+Mean: number
+Min: number
+Missing: number
+StdDev: number
+Sum: number
+SumOfSquares: number
+Facets: {
+
+}
+}
+export interface TotalItems1 {
+Count: number
+Max: number
+Mean: number
+Min: number
+Missing: number
+StdDev: number
+Sum: number
+SumOfSquares: number
+Facets: {
+
+}
 }

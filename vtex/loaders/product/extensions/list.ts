@@ -20,4 +20,6 @@ async (products: Product[] | null) =>
     )
     : products;
 
+export const cache = "stale-while-revalidate";
+
 export default loader;
