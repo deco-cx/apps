@@ -28,6 +28,4 @@ async (suggestion: Suggestion | null) => {
   };
 };
 
-export const cache = "stale-while-revalidate";
-
 export default loader;
