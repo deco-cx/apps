@@ -1,3 +1,5 @@
+import { LinxError } from "./common.ts";
+
 export interface WebPage {
   Response: Response;
   Model: Model;
@@ -391,7 +393,7 @@ export interface PageInfo {
 }
 
 export interface Response {
-  Errors: unknown[];
+  Errors: LinxError[];
   IsValid: boolean;
   RefreshBasket: boolean;
   ResponseCallBack: ResponseCallBack;

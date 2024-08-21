@@ -1,8 +1,9 @@
 import { API } from "./client.ts";
 import { WebPage as ProductWebPage } from "./types/productJSON.ts";
 import { WebPage as GridProductsWebPage } from "./types/gridProductsJSON.ts";
-import { WebPage as BasketWebPage } from "./types/basketJSON.ts";
 import { WebPage as SuggestionsWebPage } from "./types/suggestionsJSON.ts";
+import { WebPage as AuctionWebPage } from "./types/auctionJSON.ts";
+import { WebPage as AuctionDetailWebPage } from "./types/auctionDetailJSON.ts";
 
 export const isProductModel = (
   page: API["GET /*splat"]["response"],
@@ -13,11 +14,16 @@ export const isGridProductsModel = (
 ): page is GridProductsWebPage =>
   page.PageInfo.SectionClass === "grid-products";
 
-export const isBasketModel = (
-  page: API["GET /*splat"]["response"],
-): page is BasketWebPage => page.PageInfo.RouteClass === "BasketIndexRoute";
-
 export const isSuggestionModel = (
   page: API["GET /*splat"]["response"],
 ): page is SuggestionsWebPage =>
   page.PageInfo.RouteClass === "SearchSuggestRoute";
+
+export const isAuctionModel = (
+  page: API["GET /*splat"]["response"],
+): page is AuctionWebPage => page.PageInfo.RouteClass === "ProductAuctionRoute";
+
+export const isAuctionDetailModel = (
+  page: API["GET /*splat"]["response"],
+): page is AuctionDetailWebPage =>
+  page.PageInfo.RouteClass === "ProductAuctionDetailRoute";
