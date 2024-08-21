@@ -152,10 +152,6 @@ export const toProduct = (
   const [_, ...variants] = product?.Items ?? [];
   const variant = pickVariant(variants, variantId);
 
-  if (!variant) {
-    console.info(product.ProductID);
-  }
-
   const offer = toOffer(variant, product);
   const offers = offer ? [offer] : [];
 
