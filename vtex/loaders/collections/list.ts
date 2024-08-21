@@ -42,5 +42,3 @@ export default async function loader(
 
   return stringList;
 }
-
-export const cache = "stale-while-revalidate";

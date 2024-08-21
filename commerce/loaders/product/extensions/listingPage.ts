@@ -12,5 +12,3 @@ export default function ProductDetailsExt(
 ): Promise<ProductListingPage | null> {
   return extend(props);
 }
-
-export const cache = "stale-while-revalidate";
