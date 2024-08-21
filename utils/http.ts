@@ -1,6 +1,5 @@
 import { RequestInit } from "deco/runtime/fetch/mod.ts";
 import { fetchSafe } from "./fetch.ts";
-import { fetchToCurl } from "jsr:@viktor/fetch-to-curl";
 
 const HTTP_VERBS = new Set(
   [
@@ -152,14 +151,6 @@ export const createHttpClient = <T>({
         isJSON && headers.set("content-type", "application/json");
 
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
-
-        const curl = fetchToCurl(url.href, {
-          ...init,
-          headers,
-          method,
-          body,
-        });
-        console.log(curl);
 
         return fetcher(url.href, {
           ...init,
