@@ -89,6 +89,7 @@ export interface Props {
    * @default false
    */
   removeDirtyCookies?: boolean;
+  excludeHeaders?: string[];
 }
 
 /**
@@ -100,6 +101,7 @@ export default function Proxy({
   basePath,
   host: hostToUse,
   customHeaders = [],
+  excludeHeaders = [],
   includeScriptsToHead,
   avoidAppendPath,
   redirect = "manual",
@@ -148,6 +150,10 @@ export default function Proxy({
       } else {
         headers.set(key, value);
       }
+    }
+
+    for (const key of excludeHeaders) {
+      headers.delete(key);
     }
 
     const response = await fetch(to, {

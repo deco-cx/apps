@@ -1,15 +1,14 @@
 import { Route } from "../../website/flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import { Script } from "../../website/types.ts";
+import { linxProxyFailingHeaders } from "../utils/headers.ts";
 
 const PATHS_TO_PROXY = [
   "/login",
-  "/login/",
-  "/login/*",
   "/painel-do-cliente",
-  "/painel-do-cliente/",
-  "/painel-do-cliente/*",
-];
+  "/carrinho",
+].flatMap((path) => [path, `${path}/`, `${path}/*`]);
+
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = (
@@ -49,6 +48,7 @@ const buildProxyRoutes = (
           url: urlToProxy,
           host: hostToUse,
           includeScriptsToHead,
+          excludeHeaders: linxProxyFailingHeaders,
         },
       },
     });
@@ -126,13 +126,20 @@ function loader(
   _req: Request,
   ctx: AppContext,
 ): Route[] {
-  return buildProxyRoutes({
+  const routes = buildProxyRoutes({
     generateDecoSiteMap,
     includeSiteMap,
     extraPaths: extraPathsToProxy,
     includeScriptsToHead,
     ctx,
   });
+
+  Deno.writeTextFileSync(
+    "./routes.json",
+    JSON.stringify(routes, null, 2),
+  );
+
+  return routes;
 }
 
 export default loader;

@@ -56,7 +56,6 @@ export default async function redirect(
     });
   }
 
-
   const url = new URL(location);
 
   return {
