@@ -1,3 +1,6 @@
+import { LinxInstallment } from "./installments.ts";
+import { Description } from "./productList.ts";
+
 export interface ProductByIdResponse {
   HasPreviousPage: boolean;
   HasNextPage: boolean;
@@ -29,7 +32,7 @@ export interface ProviderCapabilities {
 
 export interface Product {
   BrowsingImage: BrowsingImage;
-  BrowsingImages: BrowsingImage2[];
+  BrowsingImages: BrowsingImage[];
   Price: Price;
   JoinCollection: unknown;
   Items: Item[];
@@ -86,7 +89,7 @@ export interface Product {
   PromotionPrice: number;
   IsPromotion: boolean;
   PromotionFrom: unknown;
-  PromotionTo: unknown;
+  PromotionTo: null;
   RetailPrice: number;
   Tax: number;
   TaxationAmount: number;
@@ -103,7 +106,7 @@ export interface Product {
   RatingAverage: number;
   RatingCount: number;
   ReviewCount: number;
-  Options: Option3[];
+  Options: Option[];
   PropertyPath: string;
   CurrentSkuID: number;
   HasCurrentSkuID: boolean;
@@ -119,7 +122,7 @@ export interface Product {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: unknown[];
+  ExtendedMetadatas: Description[];
   LoyaltyProgramPoints: unknown[];
   ProductDefinition: unknown;
 }
@@ -135,33 +138,16 @@ export interface BrowsingImage {
   ProductPath: string;
   MediaType: string;
   Index: number;
-  Title: unknown;
-  Url: unknown;
-  Attributes: unknown[];
-  HasMediaPath: boolean;
-}
-
-export interface BrowsingImage2 {
-  MaxWidth: number;
-  MaxHeight: number;
-  Width: number;
-  Height: number;
-  MediaSizeType: string;
-  MediaPath: string;
-  VariationPath: string;
-  ProductPath: string;
-  MediaType: string;
-  Index: number;
-  Title: unknown;
-  Url: unknown;
+  Title: string | null;
+  Url: string | null;
   Attributes: unknown[];
   HasMediaPath: boolean;
 }
 
 export interface Price {
   MaxInstallmentsWithInterest: unknown;
-  MaxInstallmentsNoInterest: MaxInstallmentsNoInterest;
-  BestInstallment: unknown;
+  MaxInstallmentsNoInterest: LinxInstallment;
+  BestInstallment: LinxInstallment | null;
   BestInstallmentCreditCard: unknown;
   ItemAddFreeItem: unknown;
   HasMunknownSkus: boolean;
@@ -180,25 +166,13 @@ export interface Price {
   IsNullPrice: boolean;
 }
 
-export interface MaxInstallmentsNoInterest {
-  Installments: number;
-  InstallmentPrice: number;
-  InterestRate: number;
-  YearInterestRate: number;
-  RetailPrice: number;
-  Discount: number;
-  DiscountType: string;
-  PaymentName: string;
-  PaymentType: string;
-}
-
 export interface BuyBox {
   SellerID: number;
-  SellerName: unknown;
+  SellerName: null;
 }
 
 export interface Item {
-  Items: Item2[];
+  Items: Item[];
   VariationPath: string;
   VariationLevel: number;
   ProductPath: string;
@@ -215,21 +189,21 @@ export interface Item {
   BundleQuantity: number;
   BundleAdjustType: string;
   BundleAdjustValue: number;
-  BundleGroup: unknown;
+  BundleGroup: null;
   BundleType: string;
   BundlePriceType: string;
   BundleKitDiscount: string;
   BundleKitDiscountValue: number;
   ComposeMinPrice: boolean;
-  PriceDescription?: string;
+  PriceDescription: string | null;
   ListPrice: number;
   RetailPrice: number;
   Tax: number;
   TaxationAmount: number;
   PromotionPrice: number;
   IsPromotion: boolean;
-  PromotionFrom: unknown;
-  PromotionTo: unknown;
+  PromotionFrom: string | null;
+  PromotionTo: null;
   StockBalance: number;
   InStockHandlingDays: number;
   OutOfStockHandlingDays: number;
@@ -242,89 +216,18 @@ export interface Item {
   Preorderable: boolean;
   PreorderDate: string;
   Backorderable: boolean;
-  BackorderLimit: unknown;
-  OutOfStockFrom: unknown;
-  OutOfStockTo: unknown;
-  UPC?: string;
-  EstimatedReorderDate: unknown;
-  HasEstimatedReorderDate: boolean;
-  Options: Option2[];
-  SKUOptions: Skuoption2[];
-  BundleHierarchyPrice: unknown;
-  IntegrationID: string;
-  Edit: unknown;
-  BuyBox: unknown;
-  IsDeliverable: boolean;
-  UrlHelper: unknown;
-  ProductID: number;
-  SKU: string;
-  Name: string;
-  ProductTypeID: number;
-  CatalogItemTypeID: number;
-  CatalogItemBehavior: string;
-  ExtendedMetadatas: ExtendedMetadata2[];
-  LoyaltyProgramPoints: unknown[];
-  Price: unknown;
-  ProductDefinition: unknown;
-}
-
-export interface Item2 {
-  Items: unknown[];
-  VariationPath: string;
-  VariationLevel: number;
-  ProductPath: string;
-  ProductLevel: number;
-  MinimumQtyAllowed: number;
-  MaximumQtyAllowed: number;
-  Weight: number;
-  Height: number;
-  Width: number;
-  Depth: number;
-  Order: number;
-  UrlFriendly: string;
-  IsBundleItemRequired: boolean;
-  BundleQuantity: number;
-  BundleAdjustType: string;
-  BundleAdjustValue: number;
-  BundleGroup: unknown;
-  BundleType: string;
-  BundlePriceType: string;
-  BundleKitDiscount: string;
-  BundleKitDiscountValue: number;
-  ComposeMinPrice: boolean;
-  PriceDescription: unknown;
-  ListPrice: number;
-  RetailPrice: number;
-  Tax: number;
-  TaxationAmount: number;
-  PromotionPrice: number;
-  IsPromotion: boolean;
-  PromotionFrom: unknown;
-  PromotionTo: unknown;
-  StockBalance: number;
-  InStockHandlingDays: number;
-  OutOfStockHandlingDays: number;
-  HandlingDays: number;
-  Availability: string;
-  AvailabilityText: string;
-  ReplenishmentStatus: string;
-  IsPurchasable: boolean;
-  IsInventoryAvailable: boolean;
-  Preorderable: boolean;
-  PreorderDate: string;
-  Backorderable: boolean;
-  BackorderLimit: unknown;
-  OutOfStockFrom: unknown;
-  OutOfStockTo: unknown;
-  UPC: string;
-  EstimatedReorderDate: unknown;
+  BackorderLimit: null;
+  OutOfStockFrom: null;
+  OutOfStockTo: null;
+  UPC: string | null;
+  EstimatedReorderDate: null;
   HasEstimatedReorderDate: boolean;
   Options: Option[];
   SKUOptions: Skuoption[];
-  BundleHierarchyPrice: unknown;
+  BundleHierarchyPrice: null;
   IntegrationID: string;
-  Edit: unknown;
-  BuyBox: unknown;
+  Edit: null;
+  BuyBox: null;
   IsDeliverable: boolean;
   UrlHelper: unknown;
   ProductID: number;
@@ -333,10 +236,10 @@ export interface Item2 {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: ExtendedMetadata[];
+  ExtendedMetadatas: Description[];
   LoyaltyProgramPoints: unknown[];
-  Price: unknown;
-  ProductDefinition: unknown;
+  Price: null;
+  ProductDefinition: null;
 }
 
 export interface Option {
@@ -346,7 +249,7 @@ export interface Option {
   IsVerificationRequired: boolean;
   HasVariationLayout: boolean;
   VariationLayoutTemplate: string;
-  Values: unknown[];
+  Values: Value[];
 }
 
 export interface Skuoption {
@@ -357,84 +260,26 @@ export interface Skuoption {
   Title: string;
   PropertyPath: string;
   ValueAlias: string;
-  Reference: unknown;
-  Color: unknown;
-  ImagePath: unknown;
+  Reference: string | null;
+  Color: string | null;
+  ImagePath: string | null;
   Order: number;
-  GroupName: unknown;
+  GroupName: null;
   GroupType: string;
-}
-
-export interface ExtendedMetadata {
-  PropertyMetadataID: number;
-  Alias: string;
-  Name: string;
-  Value: string;
-  Title: string;
-  PropertyPath: string;
-  ValueAlias: string;
-  Reference: unknown;
-  Color: unknown;
-  ImagePath: unknown;
-  Order: number;
-  GroupName: unknown;
-  GroupType: string;
-}
-
-export interface Option2 {
-  PropertyMetadataID: number;
-  PropertyName: string;
-  Label: string;
-  IsVerificationRequired: boolean;
-  HasVariationLayout: boolean;
-  VariationLayoutTemplate: string;
-  Values: Value[];
 }
 
 export interface Value {
   HasItems: boolean;
   OptionID: number;
-  Reference?: string;
-  Color?: string;
-  ImagePath?: string;
+  Reference: null;
+  Color: string | null;
+  ImagePath: string | null;
   IsSelected: boolean;
   Text: string;
   Value: string;
   Order: number;
   PropertyPath: string;
-  GroupName?: string;
-}
-
-export interface Skuoption2 {
-  PropertyMetadataID: number;
-  Alias: string;
-  Name: string;
-  Value: string;
-  Title: string;
-  PropertyPath: string;
-  ValueAlias: string;
-  Reference: unknown;
-  Color: unknown;
-  ImagePath: unknown;
-  Order: number;
-  GroupName: unknown;
-  GroupType: string;
-}
-
-export interface ExtendedMetadata2 {
-  PropertyMetadataID: number;
-  Alias: string;
-  Name: string;
-  Value: string;
-  Title: string;
-  PropertyPath: string;
-  ValueAlias: string;
-  Reference: unknown;
-  Color: unknown;
-  ImagePath: unknown;
-  Order: number;
-  GroupName: unknown;
-  GroupType: string;
+  GroupName: null;
 }
 
 export interface CategoryItem {
@@ -454,8 +299,8 @@ export interface Media {
   ProductPath: string;
   MediaType: string;
   Index: number;
-  Title: unknown;
-  Url: unknown;
+  Title: string | null;
+  Url: string | null;
   Attributes: unknown[];
   HasMediaPath: boolean;
 }
@@ -467,30 +312,13 @@ export interface MediaGroup {
   VariationPath: string;
   VariationLevel: number;
   MediaType: string;
-  Medias: Media2[];
+  Medias: Media[];
   Thumbnail: Thumbnail;
   Small: Small;
   Medium: Medium;
   Large: Large;
   Zoom: Zoom;
   Custom: unknown;
-}
-
-export interface Media2 {
-  MaxWidth: number;
-  MaxHeight: number;
-  Width: number;
-  Height: number;
-  MediaSizeType: string;
-  MediaPath: string;
-  VariationPath: string;
-  ProductPath: string;
-  MediaType: string;
-  Index: number;
-  Title: unknown;
-  Url: unknown;
-  Attributes: unknown[];
-  HasMediaPath: boolean;
 }
 
 export interface Thumbnail {
@@ -504,8 +332,8 @@ export interface Thumbnail {
   ProductPath: string;
   MediaType: string;
   Index: number;
-  Title: unknown;
-  Url: unknown;
+  Title: string | null;
+  Url: string | null;
   Attributes: unknown[];
   HasMediaPath: boolean;
 }
@@ -521,8 +349,8 @@ export interface Small {
   ProductPath: string;
   MediaType: string;
   Index: number;
-  Title: unknown;
-  Url: unknown;
+  Title: string | null;
+  Url: string | null;
   Attributes: unknown[];
   HasMediaPath: boolean;
 }
@@ -538,8 +366,8 @@ export interface Medium {
   ProductPath: string;
   MediaType: string;
   Index: number;
-  Title: unknown;
-  Url: unknown;
+  Title: string | null;
+  Url: string | null;
   Attributes: unknown[];
   HasMediaPath: boolean;
 }
@@ -555,8 +383,8 @@ export interface Large {
   ProductPath: string;
   MediaType: string;
   Index: number;
-  Title: unknown;
-  Url: unknown;
+  Title: string | null;
+  Url: string | null;
   Attributes: unknown[];
   HasMediaPath: boolean;
 }
@@ -572,50 +400,10 @@ export interface Zoom {
   ProductPath: string;
   MediaType: string;
   Index: number;
-  Title: unknown;
-  Url: unknown;
+  Title: string | null;
+  Url: string | null;
   Attributes: unknown[];
   HasMediaPath: boolean;
-}
-
-export interface Option3 {
-  PropertyMetadataID: number;
-  PropertyName: string;
-  Label: string;
-  IsVerificationRequired: boolean;
-  HasVariationLayout: boolean;
-  VariationLayoutTemplate: string;
-  Values: Value2[];
-}
-
-export interface Value2 {
-  HasItems: boolean;
-  OptionID: number;
-  Reference?: string;
-  Color?: string;
-  ImagePath?: string;
-  IsSelected: boolean;
-  Text: string;
-  Value: string;
-  Order: number;
-  PropertyPath: string;
-  GroupName?: string;
-}
-
-export interface Description {
-  PropertyMetadataID: number;
-  Alias: string;
-  Name: string;
-  Value: string;
-  Title: string;
-  PropertyPath: string;
-  ValueAlias: string;
-  Reference: unknown;
-  Color: unknown;
-  ImagePath: unknown;
-  Order: number;
-  GroupName: unknown;
-  GroupType: string;
 }
 
 export interface ProductSelection {

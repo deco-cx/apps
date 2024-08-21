@@ -1,4 +1,3 @@
-import { ConnInfo } from "std/http/server.ts";
 import Proxy from "../../website/handlers/proxy.ts";
 import { AppContext } from "../mod.ts";
 
@@ -41,7 +40,7 @@ export default function Sitemap(
   const url = `https://${ctx.account}.core.dcg.com.br`;
   return async (
     req: Request,
-    connInfoctx: ConnInfo,
+    connInfoctx: Deno.ServeHandlerInfo,
   ) => {
     if (!url) {
       throw new Error("Missing publicUrl");

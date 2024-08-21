@@ -17,7 +17,9 @@ const loader = async (
   const upstream = new URL(req.url);
   const splat = upstream.pathname;
 
-  const response = await api["GET " + splat]({
+  const response = await api["GET /*splat"]({
+    splat,
+  }, {
     headers: req.headers,
   }).catch(nullOnNotFound);
 

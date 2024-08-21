@@ -6,12 +6,10 @@ import {
   ProductDetailsPage,
   PropertyValue,
   UnitPriceSpecification,
-  VideoObject,
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { CartResponse } from "./types/basketJSON.ts";
 import {
-  Facet,
   Navigation as GridProductsNavigation,
   Product as LinxProductGroupGridProductsJSON,
 } from "./types/gridProductsJSON.ts";
@@ -29,6 +27,7 @@ import {
   Item as LinxSuggestionProductJSON,
   Product as LinxSuggestionProductGroupJSON,
 } from "./types/suggestionsJSON.ts";
+import type { Facet } from "./types/facets.ts";
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
@@ -106,9 +105,7 @@ const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
     price: item.Price?.SalesPrice ?? item.RetailPrice ?? Infinity,
     priceSpecification,
     inventoryLevel: {
-      "@type": "QuantitativeValue",
       value: Number(item.StockBalance) || 0,
-      unitCode: "C62",
     },
     availability:
       item.Availability != "O" && item.AvailabilityText != "Descontinuado"
@@ -161,16 +158,6 @@ export const toProduct = (
     value: option.Title,
     propertyID: option.Value,
     additionalType: "skuOptions",
-  }));
-
-  const productVideo: VideoObject[] = product?.Medias?.filter((option) =>
-    option.MediaType === "Video"
-  ).map((option) => ({
-    "@type": "PropertyValue" as const,
-    name: option.Title || "",
-    value: option.Url || "",
-    propertyID: option.VariationPath,
-    additionalType: "productVideo",
   }));
 
   const prodOptions: PropertyValue[] = product.Options.map((option) => {
@@ -302,7 +289,14 @@ export const toProduct = (
       logo: product.BrandImageUrl ?? undefined,
     },
     additionalProperty,
-    video: productVideo,
+    video: product?.Medias?.filter((option) => option.MediaType === "Video")
+      .map((option) => ({
+        "@type": "VideoObject" as const,
+        name: option.Title || "",
+        value: option.Url || "",
+        propertyID: option.VariationPath,
+        additionalType: "productVideo",
+      })),
     image,
     isVariantOf: {
       "@type": "ProductGroup",

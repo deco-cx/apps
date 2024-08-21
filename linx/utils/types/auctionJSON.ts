@@ -1,4 +1,6 @@
 import { LinxError } from "./common.ts";
+import { Facet } from "./facets.ts";
+import { LinxInstallment } from "./installments.ts";
 
 export interface WebPage {
   Response: Response;
@@ -33,62 +35,6 @@ export interface Grid {
   SortOptions: SortOption[];
   Spell: Spell;
   Terms: unknown[];
-}
-
-export interface Facet {
-  Alias: string;
-  AvailableOptions: AvailableOption[];
-  DatesFacets: null;
-  Facet: string;
-  FieldName: string;
-  InitClosed: boolean;
-  LabelPattern: string;
-  LabelPatternEnd: string;
-  LabelPatternRange: string;
-  LabelPatternStart: string;
-  Layout: null;
-  Limit: number | null;
-  MaxOptions: number | null;
-  MinOptions: null;
-  MinRange: null;
-  Name: string;
-  Offset: null;
-  ParameterPatternFormatted: string;
-  Prefix: null;
-  Priority: number;
-  PropertyDisplayName: string;
-  PropertyMetadataID: number;
-  SearchFacetID: number;
-  SelectedOptions: unknown[];
-  Selection: string;
-  ShowEmptyFacets: boolean;
-  ShowGroupMetadataOptions: boolean;
-  Sort: string;
-  Stats: null;
-  UrlPattern: string;
-  UrlPatternEnd: string;
-  UrlPatternRange: string;
-  UrlPatternStart: string;
-  WidgetName: string;
-  WidgetProperties: null;
-}
-
-export interface AvailableOption {
-  Color: string;
-  Count: number;
-  End: null;
-  GroupName: null;
-  HasImage: boolean;
-  HasMetadataOption: boolean;
-  ImagePath: string;
-  Label: string;
-  MetadataPath: string;
-  Order: number;
-  Reference: string;
-  Start: null;
-  Title: string;
-  Url: string;
-  Value: string;
 }
 
 export interface Product {
@@ -368,8 +314,8 @@ export interface LoyaltyProgramPoint {
 }
 
 export interface Price {
-  BestInstallment: BestInstallment;
-  BestInstallmentCreditCard: null;
+  BestInstallment: LinxInstallment;
+  BestInstallmentCreditCard: LinxInstallment | null;
   BuyBox: BuyBox;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
@@ -379,7 +325,7 @@ export interface Price {
   ItemAddFreeItem: null;
   ListPrice: number;
   ListPriceWithTax: number;
-  MaxInstallmentsNoInterest: BestInstallment;
+  MaxInstallmentsNoInterest: LinxInstallment;
   MaxInstallmentsWithInterest: null;
   SalesPrice: number;
   SalesPriceDiscount: number;
@@ -388,24 +334,6 @@ export interface Price {
   Tax: number;
   TaxationAmount: number;
 }
-
-export interface BestInstallment {
-  Discount: number;
-  DiscountType: DiscountType;
-  InstallmentPrice: number;
-  Installments: number;
-  InterestRate: number;
-  PaymentName: PaymentName;
-  PaymentType: PaymentType;
-  RetailPrice: number;
-  YearInterestRate: number;
-}
-
-export type DiscountType = "DecreasePercentage" | "IncreaseAmount";
-
-export type PaymentName = "BRADESCO" | "VISA";
-
-export type PaymentType = "PaymentSlip" | "CreditCard";
 
 export interface BuyBox {
   SellerID: number;
