@@ -12,5 +12,3 @@ export default function ProductsExt(
 ): Promise<Product[] | null> {
   return extend(props);
 }
-
-export const cache = "stale-while-revalidate";
