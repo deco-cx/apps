@@ -1017,27 +1017,24 @@ export const toReview = (
 
 export const toInventories = (
   products: Product[],
-  inventories: ProductInventoryData[],
+  inventoriesData: ProductInventoryData[],
 ): Product[] => {
-  console.log(inventories);
   return products.map((p, index) => {
-    const balance = inventories[index].balance || [];
+    const balance = inventoriesData[index].balance || [];
 
     const additionalProperty = Array.from(p.additionalProperty || []);
 
-    balance.forEach((b) => {
-      additionalProperty.push({
-        "@type": "PropertyValue",
-        valueReference: "INVENTORY",
-        propertyID: b.warehouseId,
-        name: b.warehouseName,
-        value: b.totalQuantity?.toString(),
-      });
-    });
+    const inventories: PropertyValue[] = balance.map((b) => ({
+      "@type": "PropertyValue",
+      valueReference: "INVENTORY",
+      propertyID: b.warehouseId,
+      name: b.warehouseName,
+      value: b.totalQuantity?.toString(),
+    }));
 
     return {
       ...p,
-      additionalProperty,
+      additionalProperty: [...additionalProperty, ...inventories],
     };
   });
 };
