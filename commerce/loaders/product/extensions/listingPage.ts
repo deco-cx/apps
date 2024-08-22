@@ -13,4 +13,4 @@ export default function ProductDetailsExt(
   return extend(props);
 }
 
-export const cache = "stale-while-revalidate";
+export const cache = "no-cache";

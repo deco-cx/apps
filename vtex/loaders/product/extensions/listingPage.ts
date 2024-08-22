@@ -28,6 +28,6 @@ async (page: ProductListingPage | null) => {
   };
 };
 
-export const cache = "stale-while-revalidate";
+export const cache = "no-cache";
 
 export default loader;

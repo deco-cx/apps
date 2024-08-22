@@ -2,6 +2,7 @@ import type { ProductDetailsPage } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { isProductModel } from "../../utils/paths.ts";
 import { toProductDetails } from "../../utils/transform.ts";
+import { Associations } from "../../utils/types/associationsJSON.ts";
 
 /**
  * @title LINX Integration
@@ -12,18 +13,47 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
-  const url = new URL(req.url);
-  const { cdn } = ctx;
+  try {
+    const url = new URL(req.url);
+    const { cdn } = ctx;
 
-  const productID = Number(url.searchParams.get("productID")) || null;
+    const productIDfromSearch = Number(url.searchParams.get("productID")) ||
+      null;
 
-  const response = await ctx.invoke("linx/loaders/path.ts");
+    const response = await ctx.invoke("linx/loaders/path.ts");
 
-  if (!response || !isProductModel(response)) {
+    if (!response || !isProductModel(response)) {
+      return null;
+    }
+
+    const productIDfromResponse = response?.Model?.ProductID;
+    const productID = productIDfromResponse ?? productIDfromSearch;
+
+    let associations: Associations | null = null;
+    try {
+      /**
+       * Example:
+       * https://joiasvip.core.dcg.com.br/widget/product_associations?ProductID=1171872&Template=~/Custom/Content/Themes/Shared/Templates/debug.template
+       */
+      associations = await ctx.invoke.linx.loaders.widget({
+        widget: "product_associations",
+        params: {
+          ProductID: String(productID),
+          Template: "~/Custom/Content/Themes/Shared/Templates/debug.template",
+        },
+      }) as Associations | null;
+    } catch (_) {
+      associations = null;
+    }
+
+    return toProductDetails(response, productID, associations, {
+      url,
+      cdn,
+      currency: "BRL",
+    });
+  } catch (_) {
     return null;
   }
-
-  return toProductDetails(response, productID, { url, cdn, currency: "BRL" });
 }
 
 export default loader;

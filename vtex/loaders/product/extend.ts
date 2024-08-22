@@ -120,6 +120,8 @@ const reviewsExt = async (
   return toReview(products, ratings, reviews);
 };
 
+export const cache = "no-cache";
+
 export default async (
   {
     products,
@@ -156,5 +158,3 @@ export default async (
 
   return p;
 };
-
-export const cache = "stale-while-revalidate";
