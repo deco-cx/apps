@@ -141,6 +141,8 @@ const inventoryExt = async (
   return toInventories(products, inventories);
 };
 
+export const cache = "no-cache";
+
 export default async (
   {
     products,

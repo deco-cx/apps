@@ -201,7 +201,7 @@ export interface Item {
   BackorderLimit: null;
   OutOfStockFrom: null;
   OutOfStockTo: null;
-  UPC: null;
+  UPC: string | null;
   EstimatedReorderDate: null;
   HasEstimatedReorderDate: boolean;
   Options: Option[];

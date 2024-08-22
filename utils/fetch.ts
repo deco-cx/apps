@@ -46,6 +46,13 @@ export const fetchSafe = async (
     return response;
   }
 
+  const isManual = init?.redirect === "manual";
+  const isRedirect = response.status === 301 || response.status === 302;
+
+  if (isManual && isRedirect) {
+    return response;
+  }
+
   throw new HttpError(response.status, `${await response.text()}`);
 };
 

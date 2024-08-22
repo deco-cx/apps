@@ -180,17 +180,15 @@ export const loader = async (
 
   const global = ctx.global || [];
 
-  const alreadyHasTheme = ctx.theme ? global.indexOf(ctx.theme) > -1 : false;
-
-  const globalSections = (alreadyHasTheme || !ctx.theme)
-    ? global
-    : [ctx.theme, ...global];
-
   const resolvedGlobals = await Promise.all(
-    globalSections?.map(async (section) => {
+    global?.map(async (section) => {
       return await ctx.get(section);
     }),
   );
+
+  const globalSections = ctx.theme
+    ? [ctx.theme, ...resolvedGlobals]
+    : resolvedGlobals;
 
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
@@ -204,7 +202,7 @@ export const loader = async (
 
   return {
     ...restProps,
-    sections: [...resolvedGlobals, ...sections],
+    sections: [...globalSections, ...sections],
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,

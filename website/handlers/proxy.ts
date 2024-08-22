@@ -19,7 +19,7 @@ const HOP_BY_HOP = [
 const noTrailingSlashes = (str: string) =>
   str.at(-1) === "/" ? str.slice(0, -1) : str;
 const sanitize = (str: string) => str.startsWith("/") ? str : `/${str}`;
-const removeCFHeaders = (headers: Headers) => {
+export const removeCFHeaders = (headers: Headers) => {
   headers.forEach((_value, key) => {
     if (key.startsWith("cf-")) {
       headers.delete(key);
@@ -66,6 +66,7 @@ export interface Props {
    * @description custom headers
    */
   customHeaders?: Header[];
+
   /**
    * @description Scripts to be included in the head of the html
    */
@@ -88,6 +89,7 @@ export interface Props {
    * @default false
    */
   removeDirtyCookies?: boolean;
+  excludeHeaders?: string[];
 }
 
 /**
@@ -99,9 +101,10 @@ export default function Proxy({
   basePath,
   host: hostToUse,
   customHeaders = [],
+  excludeHeaders = [],
   includeScriptsToHead,
-  redirect = "manual",
   avoidAppendPath,
+  redirect = "manual",
   replaces,
   removeDirtyCookies = false,
 }: Props): Handler {
@@ -147,6 +150,10 @@ export default function Proxy({
       } else {
         headers.set(key, value);
       }
+    }
+
+    for (const key of excludeHeaders) {
+      headers.delete(key);
     }
 
     const response = await fetch(to, {
