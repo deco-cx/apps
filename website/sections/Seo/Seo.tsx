@@ -1,8 +1,7 @@
 import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
-import { AppContext } from "../../mod.ts";
 
-export function loader(props: SeoProps, _req: Request, ctx: AppContext): SeoProps {
-  const referer = _req.headers.get("referer");
+export function loader(props: SeoProps, req: Request): SeoProps {
+  const referer = req.headers.get("referer");
   return { ...props,canonical: referer! };
 }
 

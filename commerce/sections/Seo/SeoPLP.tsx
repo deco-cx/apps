@@ -88,10 +88,11 @@ function Section({ jsonLD, ...props }: Props) {
   function formatNewJsonLd(data: ProductListingPage | null) {
     const items = [formatProductListing(data), formatBreadCrumb(data)].filter((item) => item !== null && item !== undefined);
 
-    return items;
+    return [{...items, pageInfo: jsonLD?.pageInfo, seo: jsonLD?.seo }]
   }
 
   const newJsonLd = formatNewJsonLd(jsonLD);
+ 
 
   return (
     <Seo
@@ -101,6 +102,7 @@ function Section({ jsonLD, ...props }: Props) {
       canonical={canonical}
       jsonLDs={newJsonLd}
       noIndexing={noIndexing}
+      
     />
   );
 }
