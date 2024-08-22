@@ -1,4 +1,5 @@
 import { Route } from "../../website/flags/audience.ts";
+import { TextReplace } from "../handlers/proxy.ts";
 import { AppContext } from "../mod.ts";
 
 interface RedirectRouteProps {
@@ -50,6 +51,7 @@ const buildProxyRoutes = ({
   pathsWithoutPrefix,
   prefix,
   redirectRoutesProps,
+  replaces = []
 }: {
   extraPagePaths: string[];
   includeSiteMap?: string[];
@@ -60,6 +62,7 @@ const buildProxyRoutes = ({
   pathsWithoutPrefix: string[];
   prefix: string;
   redirectRoutesProps: RedirectRouteProps;
+  replaces?: TextReplace[];
 }) => {
   const publicUrl = new URL(
     ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
@@ -79,6 +82,7 @@ const buildProxyRoutes = ({
           __resolveType: "magento/handlers/proxy.ts",
           url: urlToProxy,
           host: hostToUse,
+          replaces,
           customHeaders: [
             {
               key: "x-forwarded-for",
@@ -197,6 +201,8 @@ export interface Props {
    * @title Exclude paths from /deco-sitemap.xml
    */
   excludePathsFromDecoSiteMap?: string[];
+  
+  replaces?: TextReplace[];
 }
 
 /**
@@ -211,6 +217,7 @@ function loader(
     pathsWithoutPrefix = [],
     prefix = "",
     redirectRoutesProps,
+    replaces = [],
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -226,6 +233,7 @@ function loader(
     pathsWithoutPrefix,
     prefix,
     redirectRoutesProps,
+    replaces
   });
 }
 
