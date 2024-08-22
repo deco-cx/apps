@@ -51,7 +51,7 @@ const buildProxyRoutes = ({
   pathsWithoutPrefix,
   prefix,
   redirectRoutesProps,
-  replaces = []
+  replaces = [],
 }: {
   extraPagePaths: string[];
   includeSiteMap?: string[];
@@ -201,7 +201,7 @@ export interface Props {
    * @title Exclude paths from /deco-sitemap.xml
    */
   excludePathsFromDecoSiteMap?: string[];
-  
+
   replaces?: TextReplace[];
 }
 
@@ -233,7 +233,7 @@ function loader(
     pathsWithoutPrefix,
     prefix,
     redirectRoutesProps,
-    replaces
+    replaces,
   });
 }
 
