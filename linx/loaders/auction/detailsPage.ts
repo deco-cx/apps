@@ -15,7 +15,7 @@ const loader = async (
 ): Promise<AuctionDetail | null> => {
   const { api, cdn } = ctx;
   const upstream = new URL(req.url);
-  const splat = upstream.pathname;
+  const splat = upstream.pathname.slice(1);
 
   const response = await api["GET /*splat"]({
     splat,

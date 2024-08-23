@@ -39,4 +39,6 @@ const loader = async (
   return navbar?.map(transform) ?? null;
 };
 
+export { cache } from "../../../../vtex/loaders/navbar.ts";
+
 export default loader;
