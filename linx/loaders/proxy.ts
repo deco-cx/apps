@@ -134,11 +134,6 @@ function loader(
     ctx,
   });
 
-  Deno.writeTextFileSync(
-    "./routes.json",
-    JSON.stringify(routes, null, 2),
-  );
-
   return routes;
 }
 
