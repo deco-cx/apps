@@ -4,6 +4,7 @@ import { STALE } from "../../../utils/fetch.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
 import {
+  isFilterParam,
   toPath,
   withDefaultFacets,
   withDefaultParams,
@@ -14,11 +15,7 @@ import {
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
-import {
-  getSegmentFromBag,
-  isAnonymous,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -36,6 +33,7 @@ import type {
   SelectedFacet,
   Sort,
 } from "../../utils/types.ts";
+import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 import { redirect } from "deco/mod.ts";
 
@@ -408,7 +406,7 @@ const loader = async (
   const products = await Promise.all(
     vtexProducts
       .map((p) =>
-        toProduct(p, p.items[0], 0, {
+        toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
           baseUrl: baseUrl,
           priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })
@@ -473,18 +471,18 @@ const loader = async (
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(props.pageHref || req.url);
-  if (url.searchParams.has("q") || !isAnonymous(ctx)) {
+  if (url.searchParams.has("q")) {
     return null;
   }
 
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
   const params = new URLSearchParams([
     ["query", props.query ?? ""],
-    ["count", props.count.toString()],
-    ["page", (props.page ?? 1).toString()],
-    ["sort", props.sort ?? ""],
-    ["fuzzy", props.fuzzy ?? ""],
+    ["count", (props.count || url.searchParams.get("count") || 12).toString()],
+    ["page", (props.page ?? url.searchParams.get("page") ?? 1).toString()],
+    ["sort", props.sort ?? url.searchParams.get("sort") ?? ""],
+    ["fuzzy", props.fuzzy ?? url.searchParams.get("fuzzy") ?? ""],
     ["hideUnavailableItems", props.hideUnavailableItems?.toString() ?? ""],
     ["pageOffset", (props.pageOffset ?? 1).toString()],
     [
@@ -494,18 +492,16 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
         [] as string[],
       ).join("\\"),
     ],
+    ["segment", segment],
   ]);
 
   url.searchParams.forEach((value, key) => {
-    if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !key.startsWith("filter.")) {
-      return;
-    }
+    if (!ALLOWED_PARAMS.has(key.toLowerCase()) && !isFilterParam(key)) return;
 
     params.append(key, value);
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 

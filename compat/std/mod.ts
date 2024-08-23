@@ -14,25 +14,18 @@ import type { Manifest as VTEXManifest } from "../../vtex/manifest.gen.ts";
 import vtex, { Props as VTEXProps } from "../../vtex/mod.ts";
 
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
-import type {
-  ShopifyAccount,
-  StdManifest,
-  VNDAAccount,
-  VTEXAccount,
-} from "./deps.ts";
+import type { ShopifyAccount, VNDAAccount, VTEXAccount } from "./deps.ts";
 import type { Manifest as _Manifest } from "./manifest.gen.ts";
 
 import manifest from "./manifest.gen.ts";
 
-export type ManifestWithStdCompat =
-  & Omit<StdManifest, "routes" | "islands">
-  & _Manifest;
+export type ManifestWithStdCompat = _Manifest;
 
 export type ManifestMappings = Partial<
   {
     [
       blockType in keyof Omit<
-        StdManifest,
+        _Manifest,
         "name" | "baseUrl" | "routes" | "islands"
       >
     ]: {
@@ -40,7 +33,7 @@ export type ManifestMappings = Partial<
         blockKey in
           & Exclude<
             (keyof Omit<
-              StdManifest,
+              _Manifest,
               "name" | "baseUrl" | "routes" | "islands"
             >[blockType]),
             blockType extends keyof _Manifest ? keyof _Manifest[blockType] : ""
@@ -162,7 +155,7 @@ const manifestMappings = {
     "deco-sites/std/actions/vtex/wishlist/removeItem.ts":
       "vtex/actions/wishlist/removeItem.ts",
   },
-} satisfies ManifestMappings;
+};
 
 type Mappings = typeof manifestMappings;
 type Manifest = {

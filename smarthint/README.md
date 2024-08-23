@@ -1,7 +1,7 @@
 <h1>
   <p align="center">
     <a href="https://www.smarthint.co/">
-      <img alt="SmartHint" src="https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png" width="125" />
+      <img alt="SmartHint" src="https://raw.githubusercontent.com/deco-cx/apps/main/smarthint/logo.png" width="125" />
     </a>
   </p>
 </h1>

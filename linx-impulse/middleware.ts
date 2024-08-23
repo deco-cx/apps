@@ -1,7 +1,10 @@
 import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppMiddlewareContext } from "./mod.ts";
 import { getDeviceIdFromBag, setDeviceIdInBag } from "./utils/deviceId.ts";
-import { DEVICE_ID_COOKIE_NAME } from "./utils/constants.ts";
+import {
+  DEVICE_ID_COOKIE_NAME,
+  NAVIGATION_ID_COOKIE_NAME,
+} from "./utils/constants.ts";
 
 export const middleware = (
   _props: unknown,
@@ -17,12 +20,15 @@ export const middleware = (
     if (!cookie) {
       cookie = crypto.randomUUID();
 
-      setCookie(ctx.response.headers, {
-        value: cookie,
-        name: DEVICE_ID_COOKIE_NAME,
-        path: "/",
-        secure: true,
-        httpOnly: true,
+      [NAVIGATION_ID_COOKIE_NAME, DEVICE_ID_COOKIE_NAME].forEach((name) => {
+        setCookie(ctx.response.headers, {
+          value: cookie,
+          name,
+          path: "/",
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+          // secure: true,
+          // httpOnly: true,
+        });
       });
     }
 

@@ -28,4 +28,6 @@ async (page: ProductDetailsPage | null) => {
   };
 };
 
+export const cache = "no-cache";
+
 export default loader;

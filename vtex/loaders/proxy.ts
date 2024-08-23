@@ -65,6 +65,7 @@ const buildProxyRoutes = (
           host: hostToUse,
           includeScriptsToHead,
           removeDirtyCookies: true,
+          redirect: "follow",
         },
       },
     });

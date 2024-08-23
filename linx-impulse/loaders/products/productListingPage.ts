@@ -1,165 +1,67 @@
-import type { Person, ProductListingPage } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
-import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
-import getSource from "../../utils/source.ts";
+// deno-lint-ignore-file require-await
+import type { ProductListingPage } from "../../../commerce/types.ts";
 import { sortOptions, toProductListingPage } from "../../utils/transform.ts";
-import type { SortBy } from "../../utils/types/linx.ts";
+import { LinxEngage } from "./linxEngage.ts";
 
 export interface Props {
-  /**
-   * @description overides the query term
-   */
-  terms?: string;
-  /**
-   * @title Items per page
-   * @description number of products per page to display
-   */
-  resultsPerPage: number;
-
-  /**
-   * @title Sorting
-   */
-  sort?: SortBy;
-
-  /**
-   * @title Hide Unavailable Items
-   * @description Do not return out of stock items
-   */
-  showOnlyAvailable?: boolean;
-
-  /**
-   * @title Allow Results Redirect
-   * @description Allows the redirect of queries. If false, the API will return results for the term sought even if there is registration of redirects on the dashboard for this term.
-   */
-  allowRedirect?: boolean;
-
-  /**
-   * @title User
-   * @description Used to sync user data with linx impulse
-   */
-  user: Person | null;
-
-  /**
-   * @ignore
-   */
-  page?: number;
-  /**
-   * @ignore
-   */
-  multicategories?: string[];
-  /**
-   * @ignore
-   */
-  categories?: string[];
+  linxEngage: LinxEngage | null;
 }
 
-const getSortFromQuery = (query: string): SortBy | undefined => {
-  switch (query) {
-    case "relevance":
-    case "pid":
-    case "ascPrice":
-    case "descPrice":
-    case "descDate":
-    case "ascSold":
-    case "descSold":
-    case "ascReview":
-    case "descReview":
-    case "descDiscount":
-      return query;
-    default:
-      return undefined;
-  }
-};
-
 /**
- * @title Linx Impulse - Search
+ * @title Linx Impulse Products - Search
  * @description Product Listing Page loader
  */
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
   if (req.url.includes("_frsh")) {
     return null;
   }
 
-  const { resultsPerPage, allowRedirect, showOnlyAvailable, user } = props;
-  const { apiKey, origin, salesChannel, api, cdn } = ctx;
-  const deviceId = getDeviceIdFromBag(ctx);
-  const source = getSource(ctx);
   const url = new URL(req.url);
 
-  const category = props.categories && props.categories.length > 0
-    ? props.categories
-    : url.pathname.split("/").filter((x) => x);
-  const multicategory =
-    props.multicategories && props.multicategories.length > 0
-      ? props.multicategories
-      : url.searchParams.getAll("multicategory");
-  const searchTerm = props.terms || url.searchParams.get("q");
+  if (!props.linxEngage) {
+    return {
+      "@type": "ProductListingPage",
+      breadcrumb: {
+        "@type": "BreadcrumbList",
+        itemListElement: [],
+        numberOfItems: 0,
+      },
+      filters: [],
+      products: [],
+      pageInfo: {
+        nextPage: undefined,
+        previousPage: undefined,
+        currentPage: Number.parseInt(url.searchParams.get("page") || "1"),
+        records: 0,
+        recordPerPage: 0,
+      },
+      sortOptions,
+    };
+  }
 
-  const page = props.page ||
-    Number.parseInt(url.searchParams.get("page") || "1");
-  const sortBy = getSortFromQuery(url.searchParams.get("sort") ?? "") ||
-    props.sort;
-  const fields = url.searchParams.getAll("fields");
-  const filter = url.searchParams.getAll("filter");
-  const userId = user?.["@id"];
-  const productFormat = "complete";
-
-  if (searchTerm) {
-    const response = await api["GET /engage/search/v3/search"]({
-      apiKey,
-      origin,
-      salesChannel,
-      deviceId,
-      allowRedirect,
-      showOnlyAvailable,
-      resultsPerPage,
-      page,
-      sortBy,
-      filter,
-      source,
-      terms: searchTerm,
-      userId,
-      productFormat,
-    }).then((res) => res.json());
-
+  if (props.linxEngage.params?.searchTerm) {
     return toProductListingPage(
-      response,
-      page,
-      resultsPerPage,
-      req.url,
-      response.searchId,
-      cdn,
+      props.linxEngage.response,
+      props.linxEngage.params.page,
+      props.linxEngage.params.resultsPerPage,
+      props.linxEngage.params.url,
+      props.linxEngage.params.cdn,
+      props.linxEngage.params.pageType,
     );
-  } else if (category.length > 0 || multicategory.length > 0) {
-    const response = await api["GET /engage/search/v3/navigates"]({
-      apiKey,
-      origin,
-      salesChannel,
-      deviceId,
-      allowRedirect,
-      showOnlyAvailable,
-      resultsPerPage,
-      page,
-      sortBy,
-      fields,
-      filter,
-      source,
-      userId,
-      productFormat,
-      ...(multicategory.length > 0 ? { multicategory } : { category }),
-    }).then((res) => res.json());
-
+  } else if (
+    props.linxEngage.params.category.length > 0 ||
+    props.linxEngage.params.multicategory.length > 0
+  ) {
     return toProductListingPage(
-      response,
-      page,
-      resultsPerPage,
-      req.url,
-      response.searchId,
-      cdn,
+      props.linxEngage.response,
+      props.linxEngage.params.page,
+      props.linxEngage.params.resultsPerPage,
+      props.linxEngage.params.url,
+      props.linxEngage.params.cdn,
+      props.linxEngage.params.pageType,
     );
   } else {
     return {
@@ -174,7 +76,7 @@ const loader = async (
       pageInfo: {
         nextPage: undefined,
         previousPage: undefined,
-        currentPage: page,
+        currentPage: props.linxEngage.params.page,
         records: 0,
         recordPerPage: 0,
       },

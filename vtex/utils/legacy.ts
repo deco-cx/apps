@@ -130,7 +130,7 @@ export const pageTypesToSeo = (
   }
 
   return {
-    title: current.title!,
+    title: current.title || current.name || "",
     description: current.metaTagDescription!,
     noIndexing: false,
     canonical: toCanonical(
@@ -154,3 +154,9 @@ function toCanonical(url: URL, page?: number) {
 
   return url.href;
 }
+
+/**
+ * @description keyFilter is the querystring names which can be vtex filter parameter
+ */
+export const isFilterParam = (keyFilter: string): boolean =>
+  keyFilter.startsWith("filter.");
