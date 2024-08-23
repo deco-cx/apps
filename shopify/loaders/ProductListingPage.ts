@@ -195,4 +195,6 @@ const loader = async (
   };
 };
 
+export const cache = "no-cache";
+
 export default loader;

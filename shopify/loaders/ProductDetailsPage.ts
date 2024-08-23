@@ -44,4 +44,6 @@ const loader = async (
   return toProductPage(data.product, new URL(_req.url), maybeSkuId);
 };
 
+export const cache = "no-cache";
+
 export default loader;

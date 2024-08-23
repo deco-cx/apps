@@ -155,4 +155,6 @@ const loader = async (
   return products ?? [];
 };
 
+export const cache = "no-cache";
+
 export default loader;

@@ -67,4 +67,6 @@ const loader = async (
   ).slice(0, count);
 };
 
+export const cache = "no-cache";
+
 export default loader;
