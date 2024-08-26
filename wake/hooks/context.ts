@@ -63,7 +63,11 @@ const enqueue = (
 };
 
 const enqueue2 = (
-  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>,
+  cb: (
+    signal: AbortSignal,
+  ) =>
+    | Promise<{ shop: ShopQuery["shop"] }>
+    | Partial<{ shop: ShopQuery["shop"] }>,
 ) => {
   abort2();
 
@@ -74,17 +78,27 @@ const enqueue2 = (
     try {
       const { shop } = await cb(controller.signal);
 
-      const url = new URL("/api/carrinho", shop.checkoutUrl);
-
-      const { Id } = await fetch(url, { credentials: "include" }).then((r) =>
-        r.json()
-      );
-
-      if (controller.signal.aborted) {
-        throw { name: "AbortError" };
+      if (!shop || !shop?.checkoutUrl) {
+        console.error("Erro on get shop checkoutUrl");
+        return;
       }
 
-      setClientCookie(Id);
+      const isLocalhost = window.location.hostname === "localhost";
+
+      if (!isLocalhost) {
+        const url = new URL("/api/carrinho", shop.checkoutUrl);
+
+        const { Id } = await fetch(url, { credentials: "include" }).then((r) =>
+          r.json()
+        );
+
+        if (controller.signal.aborted) {
+          throw { name: "AbortError" };
+        }
+
+        setClientCookie(Id);
+      }
+
       enqueue(load);
 
       loading.value = false;
