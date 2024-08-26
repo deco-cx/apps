@@ -69,4 +69,16 @@ const loader = async (
 
 export const cache = "no-cache";
 
+export const cacheKey = (props: Props, req: Request): string => {
+  const { slug, count } = props;
+  const searchParams = new URLSearchParams({
+    slug,
+    count: count.toString(),
+  });
+
+  const url = new URL(req.url);
+  url.search = searchParams.toString();
+  return url.href;
+};
+
 export default loader;
