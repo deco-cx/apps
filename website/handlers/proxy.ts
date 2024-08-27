@@ -166,7 +166,7 @@ export default function Proxy({
 
     const contentType = response.headers.get("Content-Type");
 
-    let newBody = await response.text();
+    let newBody: ReadableStream<Uint8Array> | string | null = response.body;
 
     if (
       contentType?.includes("text/html") &&
@@ -174,7 +174,7 @@ export default function Proxy({
       includeScriptsToHead.includes.length > 0
     ) {
       // Use a more efficient approach to insert scripts
-
+      newBody = await response.text();
       // Find the position of <head> tag
       const headEndPos = newBody.indexOf("</head>");
       if (headEndPos !== -1) {
