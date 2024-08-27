@@ -17,7 +17,7 @@ const loader = async (props: Props) => {
 
   const original = await fetchSafe(url.href, STALE);
 
-  const response = new Response(original.clone().body, original);
+  const response = new Response(original.body, original);
   response.headers.set(
     "cache-control",
     "public, s-maxage=15552000, max-age=15552000, immutable",
