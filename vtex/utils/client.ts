@@ -1,3 +1,4 @@
+import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
   Category,
@@ -219,12 +220,32 @@ export interface VTEXCommerceStable {
         expectedOrderFormSections: string[];
       };
     };
+  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/offerings": {
+    searchParams: { sc?: string };
+    response: OrderForm;
+    body: {
+      expectedOrderFormSections: string[];
+      id: number;
+      info: null;
+    };
+  };
+  "POST /api/checkout/pub/orderForm/:orderFormId/items/:index/offerings/:id/remove":
+    {
+      searchParams: { sc?: string };
+      response: OrderForm;
+      body: {
+        expectedOrderFormSections: string[];
+      };
+    };
   "POST /api/dataentities/:acronym/documents": {
     response: CreateNewDocument;
     body: Record<string, unknown>;
   };
   "GET /api/catalog_system/pub/brand/list": {
     response: Brand[];
+  };
+  "GET /api/oms/user/orders": {
+    response: Userorderslist;
   };
 }
 

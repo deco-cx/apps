@@ -2,10 +2,37 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
+import * as $$$$$$$$$1 from "./actions/workflows/cancel.ts";
+import * as $$$$$$$$$2 from "./actions/workflows/signal.ts";
+import * as $$$$$$$$$3 from "./actions/workflows/start.ts";
+import * as $$$$$$$$0 from "./flags/audience.ts";
+import * as $$$$$$$$1 from "./flags/everyone.ts";
+import * as $$$$$$$$2 from "./flags/flag.ts";
+import * as $$$$$$$$3 from "./flags/multivariate.ts";
 import * as $$$$0 from "./handlers/devPage.ts";
-import * as $$$$1 from "./handlers/router.ts";
+import * as $$$$1 from "./handlers/fresh.ts";
+import * as $$$$2 from "./handlers/proxy.ts";
+import * as $$$$3 from "./handlers/redirect.ts";
+import * as $$$$4 from "./handlers/router.ts";
+import * as $$$$5 from "./handlers/routesSelection.ts";
+import * as $$$$6 from "./handlers/workflowRunner.ts";
 import * as $$$0 from "./loaders/secret.ts";
 import * as $$$1 from "./loaders/state.ts";
+import * as $$$2 from "./loaders/workflows/events.ts";
+import * as $$$3 from "./loaders/workflows/get.ts";
+import * as $$$$$$$0 from "./matchers/MatchAlways.ts";
+import * as $$$$$$$1 from "./matchers/MatchCron.ts";
+import * as $$$$$$$2 from "./matchers/MatchDate.ts";
+import * as $$$$$$$3 from "./matchers/MatchDevice.ts";
+import * as $$$$$$$4 from "./matchers/MatchEnvironment.ts";
+import * as $$$$$$$5 from "./matchers/MatchHost.ts";
+import * as $$$$$$$6 from "./matchers/MatchLocation.ts";
+import * as $$$$$$$7 from "./matchers/MatchMulti.ts";
+import * as $$$$$$$8 from "./matchers/MatchRandom.ts";
+import * as $$$$$$$9 from "./matchers/MatchSite.ts";
+import * as $$$$$$$10 from "./matchers/MatchUserAgent.ts";
+import * as $$$$$0 from "./pages/LivePage.tsx";
 import * as $$$$$$0 from "./sections/EmptySection.tsx";
 import * as $$$$$$1 from "./sections/PageInclude.tsx";
 import * as $$$$$$2 from "./sections/Slot.tsx";
@@ -14,15 +41,50 @@ const manifest = {
   "loaders": {
     "$live/loaders/secret.ts": $$$0,
     "$live/loaders/state.ts": $$$1,
+    "$live/loaders/workflows/events.ts": $$$2,
+    "$live/loaders/workflows/get.ts": $$$3,
   },
   "handlers": {
     "$live/handlers/devPage.ts": $$$$0,
-    "$live/handlers/router.ts": $$$$1,
+    "$live/handlers/fresh.ts": $$$$1,
+    "$live/handlers/proxy.ts": $$$$2,
+    "$live/handlers/redirect.ts": $$$$3,
+    "$live/handlers/router.ts": $$$$4,
+    "$live/handlers/routesSelection.ts": $$$$5,
+    "$live/handlers/workflowRunner.ts": $$$$6,
+  },
+  "pages": {
+    "$live/pages/LivePage.tsx": $$$$$0,
   },
   "sections": {
     "$live/sections/EmptySection.tsx": $$$$$$0,
     "$live/sections/PageInclude.tsx": $$$$$$1,
     "$live/sections/Slot.tsx": $$$$$$2,
+  },
+  "matchers": {
+    "$live/matchers/MatchAlways.ts": $$$$$$$0,
+    "$live/matchers/MatchCron.ts": $$$$$$$1,
+    "$live/matchers/MatchDate.ts": $$$$$$$2,
+    "$live/matchers/MatchDevice.ts": $$$$$$$3,
+    "$live/matchers/MatchEnvironment.ts": $$$$$$$4,
+    "$live/matchers/MatchHost.ts": $$$$$$$5,
+    "$live/matchers/MatchLocation.ts": $$$$$$$6,
+    "$live/matchers/MatchMulti.ts": $$$$$$$7,
+    "$live/matchers/MatchRandom.ts": $$$$$$$8,
+    "$live/matchers/MatchSite.ts": $$$$$$$9,
+    "$live/matchers/MatchUserAgent.ts": $$$$$$$10,
+  },
+  "flags": {
+    "$live/flags/audience.ts": $$$$$$$$0,
+    "$live/flags/everyone.ts": $$$$$$$$1,
+    "$live/flags/flag.ts": $$$$$$$$2,
+    "$live/flags/multivariate.ts": $$$$$$$$3,
+  },
+  "actions": {
+    "$live/actions/secrets/encrypt.ts": $$$$$$$$$0,
+    "$live/actions/workflows/cancel.ts": $$$$$$$$$1,
+    "$live/actions/workflows/signal.ts": $$$$$$$$$2,
+    "$live/actions/workflows/start.ts": $$$$$$$$$3,
   },
   "name": "$live",
   "baseUrl": import.meta.url,

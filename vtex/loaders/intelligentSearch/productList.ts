@@ -2,15 +2,12 @@ import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import {
+  isFilterParam,
   toPath,
   withDefaultFacets,
   withDefaultParams,
 } from "../../utils/intelligentSearch.ts";
-import {
-  getSegmentFromBag,
-  isAnonymous,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { Item, ProductID, Sort } from "../../utils/types.ts";
@@ -193,7 +190,6 @@ const preferredSKU = (items: Item[], { props }: Props) => {
 /**
  * @title VTEX Integration - Intelligent Search
  * @description Product List loader
- * @examples { "props": { "collection": "139", "count": 12 } }\n{ "props": { "query": "shoes", "count": 12 } }\n{ "props": { "ids": ["2000001", "2000002"], "count": 12 } }
  */
 const loader = async (
   expandedProps: Props,
@@ -240,12 +236,17 @@ const loader = async (
   );
 };
 
-const getSearchParams = (props: Props["props"]) => {
+type Entry = [string, string];
+
+const getSearchParams = (
+  props: Props["props"],
+  searchParams: URLSearchParams,
+): Entry[] => {
   if (isFacetsList(props)) {
     return [
-      ["query", props.query],
-      ["count", (props.count || 12).toString()],
-      ["sort", props.sort || ""],
+      ["query", props.query ?? searchParams.get("q")],
+      ["count", (props.count || searchParams.get("count") || 12).toString()],
+      ["sort", props.sort || searchParams.get("sort") || ""],
       ["selectedFacets", props.facets],
       [
         "hideUnavailableItems",
@@ -256,9 +257,9 @@ const getSearchParams = (props: Props["props"]) => {
 
   if (isQueryList(props)) {
     return [
-      ["query", props.query],
-      ["count", (props.count || 12).toString()],
-      ["sort", props.sort || ""],
+      ["query", props.query ?? searchParams.get("q")],
+      ["count", (props.count || searchParams.get("count") || 12).toString()],
+      ["sort", props.sort || searchParams.get("sort") || ""],
       ["fuzzy", mapLabelledFuzzyToFuzzy(props.fuzzy) ?? ""],
       [
         "hideUnavailableItems",
@@ -269,8 +270,8 @@ const getSearchParams = (props: Props["props"]) => {
 
   if (isCollectionList(props)) {
     return [
-      ["count", (props.count || 12).toString()],
-      ["sort", props.sort || ""],
+      ["count", (props.count || searchParams.get("count") || 12).toString()],
+      ["sort", props.sort || searchParams.get("sort") || ""],
       ["collection", props.collection],
       [
         "hideUnavailableItems",
@@ -292,22 +293,33 @@ export const cacheKey = (
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
 
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
   if (
-    url.searchParams.has("q") || !isAnonymous(ctx) || isProductIDList(props)
+    url.searchParams.has("q") ||
+    ctx.isInvoke && isProductIDList(props)
   ) {
     return null;
   }
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const params = new URLSearchParams([
+    ...getSearchParams(props, url.searchParams),
+    ["segment", segment],
+  ]);
 
-  const params = new URLSearchParams(getSearchParams(props));
+  if (
+    isProductIDList(props)
+  ) {
+    const productIds = [props.ids ?? []].sort();
+    params.append("productids", productIds.join(","));
+  }
 
   url.searchParams.forEach((value, key) => {
+    // Add filter filter.category-1, filter.category-2, filter.colors, filter.price, filter.size
+    if (!isFilterParam(key)) return;
     params.append(key, value);
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 
