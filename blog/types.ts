@@ -1,24 +1,25 @@
 import { ImageWidget } from "../admin/widgets.ts";
-import { PageInfo } from "../commerce/types.ts";
+import { ImageObject, PageInfo, Thing } from "../commerce/types.ts";
 
 /**
  * @titleBy name
  * @widget author
+ * https://schema.org/author
  */
-export interface Author {
-  name: string;
-  email: string;
-  avatar?: ImageWidget;
-  jobTitle?: string;
-  company?: string;
-}
+export type Author = Person | Organization;
 
+//Vira about
 export interface Category {
   name: string;
   slug: string;
 }
 
+export interface BlogPosting extends Omit<Thing, "@type">{
+  "@type": "BlogPosting", 
+}
+
 export interface BlogPost {
+  
   title: string;
   excerpt: string;
   image?: ImageWidget;
@@ -85,4 +86,36 @@ export interface BlogPostListingPage {
   posts: BlogPost[];
   pageInfo: PageInfo;
   seo: Seo;
+}
+
+/** https://schema.org/Person */
+export interface Person extends Omit<Thing, "@type"> {
+  "@type": "Person";
+  /** Email address. */
+  email?: string;
+  /** Given name. In the U.S., the first name of a Person. */
+  givenName?: string;
+  /** Family name. In the U.S., the last name of a Person. */
+  familyName?: string;
+  /** Gender of something, typically a Person, but possibly also fictional characters, animals, etc */
+  gender?: "https://schema.org/Male" | "https://schema.org/Female";
+  /** An image of the item. This can be a URL or a fully described ImageObject. **/
+  image?: ImageObject[];
+  /** The job title of the person (for example, Financial Manager). */
+  jobTitle?: string;
+  /** To indicate a topic that is known about - suggesting possible expertise but not implying it. */
+  knowsAbout?: Omit<Thing, "@type">;
+  /** Organizations that the person works for. */
+  worksFor?: Organization;
+}
+
+/** https://schema.org/Organization */
+export interface Organization extends Omit<Thing, "@type"> {
+  "@type": "Organization";
+  /** Email address. */
+  email?: string;
+}
+
+export interface About extends Omit<Thing, "@type"> {
+  "@type": "About";
 }
