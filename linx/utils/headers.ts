@@ -13,6 +13,7 @@ const linxApiFailingHeaders = [
   "host",
   "origin",
   "referer",
+  "cdn-loop",
 ];
 
 /**
