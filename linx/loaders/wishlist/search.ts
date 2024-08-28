@@ -1,6 +1,7 @@
 import { SearchWishlistResponse } from "../../utils/types/wishlistJSON.ts";
 import type { AppContext } from "../../../linx/mod.ts";
 import { toLinxHeaders } from "../../utils/headers.ts";
+
 export interface Props {
   Page?: {
     PageIndex: number;
@@ -50,7 +51,6 @@ const loader = async (
     },
   );
 
-  console.log("WISHLIST RESPONSE", response);
   if (response === null) {
     return null;
   }
