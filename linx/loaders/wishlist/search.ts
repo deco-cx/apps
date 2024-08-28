@@ -29,12 +29,14 @@ const loader = async (
   const { layer } = ctx;
   const user = await ctx.invoke.linx.loaders.user();
 
+  console.log(user);
   if (!user) {
     return null;
   }
 
   const { CustomerID } = user;
 
+  console.log("WISHHELL CUSTOMERID", CustomerID);
   if (!CustomerID) {
     return null;
   }
@@ -51,6 +53,7 @@ const loader = async (
     },
   );
 
+  console.log("WISHLIST RESPONSE", response);
   if (response === null) {
     return null;
   }
