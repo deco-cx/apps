@@ -81,6 +81,7 @@ jobs:
 
       - name: Determine the next version based on comments
         id: determine_version
+        if: env.PR_NUMBER != ''
         env:
           PR_NUMBER: ${{ env.PR_NUMBER }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
