@@ -472,28 +472,16 @@ const toBreadcrumbList = (
 ): BreadcrumbList => {
   const { categories, productName } = product;
 
-  // Prevents malformed breadcrumbs when a category name contains slashes
-  const names = categories.toReversed().reduce((acc, path, index) => {
-    // Remove barras do início e do fim do caminho, se houver
-    const trimmedPath = path.startsWith("/") ? path.slice(1) : path;
-    const finalPath = trimmedPath.endsWith("/")
-      ? trimmedPath.slice(0, -1)
-      : trimmedPath;
-
-    // Se for a primeira iteração, apenas adicione o caminho ao acumulador
-    if (index === 0) return [finalPath];
-
-    // Obtenha o último item do acumulador para comparação
-    const lastItem = acc[index - 1];
-
-    // Extraia a parte do caminho que vem após o último item
-    const newItem = finalPath.includes(lastItem)
-      ? finalPath.split(lastItem)[1]
-      : finalPath;
-
-    // Adicione o novo item ao acumulador
-    return [...acc, newItem];
-  }, [] as string[]);
+  const names = categories.map((category, idx) => {
+    const removeNext = category?.replace(categories[idx + 1], "");
+    const removeSlashStart = removeNext?.startsWith("/")
+      ? removeNext?.slice(1)
+      : removeNext;
+    const removeSlashEnd = removeSlashStart?.endsWith("/")
+      ? removeSlashStart?.slice(0, -1)
+      : removeSlashStart;
+    return removeSlashEnd;
+  }).toReversed();
 
   const segments = names.map(slugify);
 
