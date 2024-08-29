@@ -37250,6 +37250,521 @@
           }
         }
       }
+    },
+    "/api/oms/user/orders": {
+      "get": {
+        "tags": ["User orders"],
+        "summary": "Retrieve user's orders",
+        "description": "Lists all orders from a given customer, filtering by their email. \r\n\r\n> You can only access information from orders created in the last two years, and that same period is valid for customers through [My Account](https://help.vtex.com/en/tutorial/how-my-account-works--2BQ3GiqhqGJTXsWVuio3Xh). \r\n\r\n> Note that this request should be made by an [user](https://developers.vtex.com/docs/guides/user-authentication-and-login) or [an appKey / appToken pair](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) that is associated with the [Call center operator](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy#call-center-operator) role. Otherwise, it will return only orders from the same email informed in the `clientEmail` query parameter. \r\n\r\n## Permissions\r\n\r\nAny user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:\r\n\r\n| **Product** | **Category** | **Resource** |\r\n| --------------- | ----------------- | ----------------- |\r\n| OMS | OMS access | **View order** |\r\n\r\nYou can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):\r\n\r\n| **Role** | **Resource** | \r\n| --------------- | ----------------- | \r\n| Call center operator | View order |\r\n| OMS - Read only | View order |\r\n\r\n>❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm). \r\n\r\nTo learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).",
+        "operationId": "Userorderslist",
+        "parameters": [
+          {
+            "name": "clientEmail",
+            "in": "query",
+            "description": "Customer email.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "customer@mail.com"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for result pagination.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "15"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Page quantity for result pagination.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "15"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "Type of the content being sent.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "HTTP Client Negotiation Accept Header. Indicates the types of responses the client can understand.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Userorderslist"
+                },
+                "example": {
+                  "list": [
+                    {
+                      "orderId": "v502556llux-01",
+                      "creationDate": "2019-01-28T20:09:43+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": null,
+                      "totalValue": 1160,
+                      "paymentNames": "Boleto Bancário",
+                      "status": "handling",
+                      "statusDescription": "Preparando Entrega",
+                      "marketPlaceOrderId": null,
+                      "sequence": "502556",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": " Lux Store Seu pedido foi alterado! Pedido realizado em: 28/01/2019 Olá, Rodrigo. Seu pedido foi alterado. Seguem informações abaixo: ",
+                      "ShippingEstimatedDate": "2019-02-04T20:33:46+00:00",
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": "2019-01-28T20:33:04+00:00",
+                      "callCenterOperatorName": null,
+                      "totalItems": 1,
+                      "currencyCode": "BRL"
+                    },
+                    {
+                      "orderId": "v502449llux-02",
+                      "creationDate": "2018-08-28T17:42:40+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": null,
+                      "totalValue": 118588,
+                      "paymentNames": "Promissory",
+                      "status": "canceled",
+                      "statusDescription": "Cancelado",
+                      "marketPlaceOrderId": null,
+                      "sequence": "502452",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": " Lux Store 96 Seu pedido foi cancelado. Referente ao Pedido #v502449llux-02 Resumo Itens R$ 1.178,98 Entrega R$ 6,90 Total R$ 1.185,88",
+                      "ShippingEstimatedDate": null,
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 12,
+                      "currencyCode": "BRL"
+                    },
+                    {
+                      "orderId": "v502449llux-01",
+                      "creationDate": "2018-08-28T17:42:28.9171556+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Mangueira Reservatório Ao Cavalete",
+                          "ean": null,
+                          "refId": "TE3121110",
+                          "id": "195",
+                          "productId": "134",
+                          "sellingPrice": 7390,
+                          "price": 7390
+                        },
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Mangueira Filtro",
+                          "ean": null,
+                          "refId": "XC459N610CA",
+                          "id": "238",
+                          "productId": "162",
+                          "sellingPrice": 5190,
+                          "price": 5190
+                        }
+                      ],
+                      "totalValue": 21526180,
+                      "paymentNames": null,
+                      "status": "canceled",
+                      "statusDescription": "Cancelado",
+                      "marketPlaceOrderId": "",
+                      "sequence": "502449",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": null,
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    },
+                    {
+                      "orderId": "v502058llux-01",
+                      "creationDate": "2017-07-25T23:17:36.7963248+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Aquecedor Britania 1500 Branco",
+                          "ean": "1235567890143",
+                          "refId": "branquinho",
+                          "id": "1234568212",
+                          "productId": "1000200",
+                          "sellingPrice": 35599,
+                          "price": 35599
+                        }
+                      ],
+                      "totalValue": 35599,
+                      "paymentNames": null,
+                      "status": "invoiced",
+                      "statusDescription": "Faturado",
+                      "marketPlaceOrderId": "",
+                      "sequence": "502058",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": "2017-07-29T19:24:20.7444363+00:00",
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    },
+                    {
+                      "orderId": "v501538llux-01",
+                      "creationDate": "2017-06-26T16:57:58.9986524+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Boneco do Mário",
+                          "ean": "bonecomario",
+                          "refId": "bonecomario",
+                          "id": "1234568183",
+                          "productId": "1000257",
+                          "sellingPrice": 150363,
+                          "price": 150363
+                        },
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Camiseta GG",
+                          "ean": null,
+                          "refId": "abc1234",
+                          "id": "1234567894",
+                          "productId": "1000187",
+                          "sellingPrice": 899,
+                          "price": 899
+                        }
+                      ],
+                      "totalValue": 151262,
+                      "paymentNames": null,
+                      "status": "invoiced",
+                      "statusDescription": "Faturado",
+                      "marketPlaceOrderId": "",
+                      "sequence": "501538",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": "2017-06-27T13:59:49.7705236+00:00",
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    },
+                    {
+                      "orderId": "v501020llux-01",
+                      "creationDate": "2016-11-21T19:57:54.0415289+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 2,
+                          "description": "Camiseta GG",
+                          "ean": null,
+                          "refId": "abc1234",
+                          "id": "1234567894",
+                          "productId": "1000187",
+                          "sellingPrice": 899,
+                          "price": 899
+                        }
+                      ],
+                      "totalValue": 3190,
+                      "paymentNames": null,
+                      "status": "canceled",
+                      "statusDescription": "Cancelado",
+                      "marketPlaceOrderId": "",
+                      "sequence": "501020",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": "2016-12-02T08:00:00+00:00",
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    },
+                    {
+                      "orderId": "v500973llux-01",
+                      "creationDate": "2016-10-10T17:19:30.8562035+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "SMARTPHONE SAMSUNG GALAXY S7 FLAT SM-G930FZDLZTO 32GB DOURADO TELA 5.1\" 4G CÂMERA 12 MP",
+                          "ean": null,
+                          "refId": "testefnac",
+                          "id": "1234568028",
+                          "productId": "1000203",
+                          "sellingPrice": 299000,
+                          "price": 299000
+                        }
+                      ],
+                      "totalValue": 299900,
+                      "paymentNames": null,
+                      "status": "handling",
+                      "statusDescription": "Preparando Entrega",
+                      "marketPlaceOrderId": "",
+                      "sequence": "500973",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": "2016-10-10T14:23:17.1897068+00:00",
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    },
+                    {
+                      "orderId": "v500970llux-01",
+                      "creationDate": "2016-10-10T17:07:59.0889392+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Camiseta GG",
+                          "ean": null,
+                          "refId": "abc1234",
+                          "id": "1234567894",
+                          "productId": "1000187",
+                          "sellingPrice": 899,
+                          "price": 899
+                        }
+                      ],
+                      "totalValue": 1799,
+                      "paymentNames": null,
+                      "status": "invoiced",
+                      "statusDescription": "Faturado",
+                      "marketPlaceOrderId": "",
+                      "sequence": "500970",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": "2016-10-10T14:13:34.4927265+00:00",
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    },
+                    {
+                      "orderId": "v500890llux-01",
+                      "creationDate": "2016-08-17T18:35:04.8659804+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Botin Futbol Adidas 11Questra Fg Cesped Hombre Absolut - M",
+                          "ean": "absolutm",
+                          "refId": null,
+                          "id": "549",
+                          "productId": "9",
+                          "sellingPrice": 1000,
+                          "price": 1000
+                        }
+                      ],
+                      "totalValue": 1000,
+                      "paymentNames": null,
+                      "status": "canceled",
+                      "statusDescription": "Cancelado",
+                      "marketPlaceOrderId": "",
+                      "sequence": "500890",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": null,
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    },
+                    {
+                      "orderId": "v500838llux-01",
+                      "creationDate": "2016-07-29T00:20:47.7736718+00:00",
+                      "clientName": "Cunha VTEX",
+                      "items": [
+                        {
+                          "seller": "1",
+                          "quantity": 1,
+                          "description": "Rooibos Lavanda - Pouch - 50gr",
+                          "ean": "198",
+                          "refId": "10098",
+                          "id": "98",
+                          "productId": "1000025",
+                          "sellingPrice": 5200,
+                          "price": 5200
+                        }
+                      ],
+                      "totalValue": 6200,
+                      "paymentNames": null,
+                      "status": "canceled",
+                      "statusDescription": "Cancelado",
+                      "marketPlaceOrderId": "",
+                      "sequence": "500838",
+                      "salesChannel": "1",
+                      "affiliateId": "",
+                      "origin": "Marketplace",
+                      "workflowInErrorState": false,
+                      "workflowInRetry": false,
+                      "lastMessageUnread": null,
+                      "ShippingEstimatedDate": null,
+                      "ShippingEstimatedDateMax": null,
+                      "ShippingEstimatedDateMin": null,
+                      "orderIsComplete": true,
+                      "listId": null,
+                      "listType": null,
+                      "authorizedDate": null,
+                      "callCenterOperatorName": null,
+                      "totalItems": 0,
+                      "currencyCode": null
+                    }
+                  ],
+                  "facets": [],
+                  "paging": {
+                    "total": 19,
+                    "pages": 10,
+                    "currentPage": 1,
+                    "perPage": 2
+                  },
+                  "stats": {
+                    "stats": {
+                      "totalValue": {
+                        "Count": 19,
+                        "Max": 0,
+                        "Mean": 0,
+                        "Min": 0,
+                        "Missing": 0,
+                        "StdDev": 0,
+                        "Sum": 0,
+                        "SumOfSquares": 0,
+                        "Facets": {}
+                      },
+                      "totalItems": {
+                        "Count": 19,
+                        "Max": 0,
+                        "Mean": 0,
+                        "Min": 0,
+                        "Missing": 0,
+                        "StdDev": 0,
+                        "Sum": 0,
+                        "SumOfSquares": 0,
+                        "Facets": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -41185,6 +41700,517 @@
             "description": "Defines if the Supplier is active (`true`) or not (`false`).",
             "example": false
           }
+        }
+      },
+      "Userorderslist": {
+        "title": "Userorderslist",
+        "required": ["list", "facets", "paging", "stats"],
+        "type": "object",
+        "description": "Order list object.",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/List1"
+            },
+            "description": "List with user's orders details."
+          },
+          "facets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array containing facets information."
+          },
+          "paging": {
+            "$ref": "#/components/schemas/Paging"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/Stats2"
+          }
+        }
+      },
+      "List1": {
+        "title": "List1",
+        "required": [
+          "orderId",
+          "creationDate",
+          "clientName",
+          "items",
+          "totalValue",
+          "paymentNames",
+          "status",
+          "statusDescription",
+          "marketPlaceOrderId",
+          "sequence",
+          "salesChannel",
+          "affiliateId",
+          "origin",
+          "workflowInErrorState",
+          "workflowInRetry",
+          "lastMessageUnread",
+          "ShippingEstimatedDate",
+          "ShippingEstimatedDateMax",
+          "ShippingEstimatedDateMin",
+          "orderIsComplete",
+          "listId",
+          "listType",
+          "authorizedDate",
+          "callCenterOperatorName",
+          "totalItems",
+          "currencyCode"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Order ID is a unique code that identifies an order."
+          },
+          "creationDate": {
+            "type": "string",
+            "description": "Order's creation date."
+          },
+          "clientName": {
+            "type": "string",
+            "description": "Order's customer name."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item2"
+            },
+            "description": "Information about order's items.",
+            "nullable": true,
+            "deprecated": true
+          },
+          "totalValue": {
+            "type": "integer",
+            "description": "Total value amount."
+          },
+          "paymentNames": {
+            "type": "string",
+            "nullable": true,
+            "description": "Payment system name."
+          },
+          "status": {
+            "type": "string",
+            "description": "Order [status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196)."
+          },
+          "statusDescription": {
+            "type": "string",
+            "description": "Status description which is displayed on the Admin panel. This field is deprecated and may not return any value.",
+            "deprecated": true
+          },
+          "marketPlaceOrderId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Marketplace order ID."
+          },
+          "sequence": {
+            "type": "string",
+            "description": "Six-digit string that follows the order ID. For example, in order `1268540501456-01 (501456)`, the sequence is `501456`."
+          },
+          "salesChannel": {
+            "type": "string",
+            "description": "Sales channel (or [trade policy](https://help.vtex.com/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV)) ID related to the order."
+          },
+          "affiliateId": {
+            "type": "string",
+            "description": "Corresponds to the three-digits [affiliate](https://help.vtex.com/en/tutorial/configuring-affiliates--tutorials_187) identification code of the seller responsible for the order."
+          },
+          "origin": {
+            "type": "string",
+            "description": "Order's [origin in the order flow](https://developers.vtex.com/docs/guides/orders-overview#understanding-order-flow-types), which can be `Marketplace`, `Fulfillment` or `Chain`."
+          },
+          "workflowInErrorState": {
+            "type": "boolean",
+            "description": "If there is a work flow error (`true`) or not (`false`)."
+          },
+          "workflowInRetry": {
+            "type": "boolean",
+            "description": "If the order is in a work flow retry (`true`) or not (`false`)."
+          },
+          "lastMessageUnread": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last sent transactional message."
+          },
+          "ShippingEstimatedDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "Estimate shipping date."
+          },
+          "ShippingEstimatedDateMax": {
+            "type": "string",
+            "nullable": true,
+            "description": "The most extended shipping estimation possible."
+          },
+          "ShippingEstimatedDateMin": {
+            "type": "string",
+            "nullable": true,
+            "description": "The least extended shipping estimation possible."
+          },
+          "orderIsComplete": {
+            "type": "boolean",
+            "description": "If it is a completed order (`true`) or not (`false`). For more information, see [Order flow and status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196)."
+          },
+          "listId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Related Gift List ID."
+          },
+          "listType": {
+            "type": "string",
+            "nullable": true,
+            "description": "Related Gift list type."
+          },
+          "authorizedDate": {
+            "type": "string",
+            "nullable": true,
+            "description": "Authorized order date."
+          },
+          "callCenterOperatorName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Call center operator responsible for the order."
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Order's total amount of items."
+          },
+          "currencyCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Currency code in ISO 4217. For example, `BRL`."
+          }
+        },
+        "example": {
+          "orderId": "1172452900788-01",
+          "creationDate": "2019-01-28T20:09:43+00:00",
+          "clientName": "Cunha VTEX",
+          "items": [
+            {
+              "seller": "1",
+              "quantity": 1,
+              "description": "Reservoir hose",
+              "ean": null,
+              "refId": "TE3121110",
+              "id": "195",
+              "productId": "134",
+              "sellingPrice": 7390,
+              "price": 7390
+            },
+            {
+              "seller": "1",
+              "quantity": 1,
+              "description": "Reservoir filter",
+              "ean": null,
+              "refId": "XC459N610CA",
+              "id": "238",
+              "productId": "162",
+              "sellingPrice": 5190,
+              "price": 5190
+            }
+          ],
+          "totalValue": 1160,
+          "paymentNames": "Boleto Bancário",
+          "status": "handling",
+          "statusDescription": "Preparing for delivery",
+          "marketPlaceOrderId": null,
+          "sequence": "502556",
+          "salesChannel": "1",
+          "affiliateId": "GTB",
+          "origin": "Marketplace",
+          "workflowInErrorState": false,
+          "workflowInRetry": false,
+          "lastMessageUnread": " Lux Store Seu pedido foi alterado! Pedido realizado em: 28/01/2019 Olá, Rodrigo. Seu pedido foi alterado. Seguem informações abaixo: ",
+          "ShippingEstimatedDate": "2019-02-04T20:33:46+00:00",
+          "ShippingEstimatedDateMax": null,
+          "ShippingEstimatedDateMin": null,
+          "orderIsComplete": true,
+          "listId": null,
+          "listType": null,
+          "authorizedDate": "2019-01-28T20:33:04+00:00",
+          "callCenterOperatorName": null,
+          "totalItems": 1,
+          "currencyCode": "BRL"
+        }
+      },
+      "Item2": {
+        "title": "Item2",
+        "required": [
+          "seller",
+          "quantity",
+          "description",
+          "ean",
+          "refId",
+          "id",
+          "productId",
+          "sellingPrice",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "seller": {
+            "type": "string",
+            "description": "Seller related to the order."
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Quantity of SKUs."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of items."
+          },
+          "ean": {
+            "type": "string",
+            "nullable": true,
+            "description": "EAN of the SKU."
+          },
+          "refId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Item's reference ID."
+          },
+          "id": {
+            "type": "string",
+            "description": "Item's SKU ID, which is a unique numerical identifier."
+          },
+          "productId": {
+            "type": "string",
+            "description": "ID of the Product associated with the item."
+          },
+          "sellingPrice": {
+            "type": "integer",
+            "description": "Details on item's selling price."
+          },
+          "price": {
+            "type": "integer",
+            "description": "Item's price."
+          }
+        },
+        "example": {
+          "seller": "1",
+          "quantity": 1,
+          "description": "Mangueira Reservatório Ao Cavalete",
+          "ean": null,
+          "refId": "TE3121110",
+          "id": "195",
+          "productId": "134",
+          "sellingPrice": 7390,
+          "price": 7390
+        }
+      },
+      "Paging": {
+        "type": "object",
+        "description": "Pagination information.",
+        "required": [
+          "total",
+          "pages",
+          "currentPage",
+          "perPage"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "Total number of orders."
+          },
+          "pages": {
+            "type": "integer",
+            "description": "Total number of pages."
+          },
+          "currentPage": {
+            "type": "integer",
+            "description": "Number of the current page."
+          },
+          "perPage": {
+            "type": "integer",
+            "description": "Number of orders per page."
+          }
+        }
+      },
+      "Stats2": {
+        "title": "Stats2",
+        "required": ["stats"],
+        "type": "object",
+        "properties": {
+          "stats": {
+            "$ref": "#/components/schemas/Stats3"
+          }
+        },
+        "example": {
+          "stats": {
+            "totalValue": {
+              "Count": 19,
+              "Max": 0,
+              "Mean": 0,
+              "Min": 0,
+              "Missing": 0,
+              "StdDev": 0,
+              "Sum": 0,
+              "SumOfSquares": 0,
+              "Facets": {}
+            },
+            "totalItems": {
+              "Count": 19,
+              "Max": 0,
+              "Mean": 0,
+              "Min": 0,
+              "Missing": 0,
+              "StdDev": 0,
+              "Sum": 0,
+              "SumOfSquares": 0,
+              "Facets": {}
+            }
+          }
+        }
+      },
+      "Stats3": {
+        "title": "Stats3",
+        "required": ["totalValue", "totalItems"],
+        "type": "object",
+        "properties": {
+          "totalValue": {
+            "$ref": "#/components/schemas/TotalValue1"
+          },
+          "totalItems": {
+            "$ref": "#/components/schemas/TotalItems1"
+          }
+        },
+        "example": {
+          "totalValue": {
+            "Count": 19,
+            "Max": 0,
+            "Mean": 0,
+            "Min": 0,
+            "Missing": 0,
+            "StdDev": 0,
+            "Sum": 0,
+            "SumOfSquares": 0,
+            "Facets": {}
+          },
+          "totalItems": {
+            "Count": 19,
+            "Max": 0,
+            "Mean": 0,
+            "Min": 0,
+            "Missing": 0,
+            "StdDev": 0,
+            "Sum": 0,
+            "SumOfSquares": 0,
+            "Facets": {}
+          }
+        }
+      },
+      "TotalValue1": {
+        "title": "TotalValue1",
+        "required": [
+          "Count",
+          "Max",
+          "Mean",
+          "Min",
+          "Missing",
+          "StdDev",
+          "Sum",
+          "SumOfSquares",
+          "Facets"
+        ],
+        "type": "object",
+        "properties": {
+          "Count": {
+            "type": "integer"
+          },
+          "Max": {
+            "type": "integer"
+          },
+          "Mean": {
+            "type": "integer"
+          },
+          "Min": {
+            "type": "integer"
+          },
+          "Missing": {
+            "type": "integer"
+          },
+          "StdDev": {
+            "type": "integer"
+          },
+          "Sum": {
+            "type": "integer"
+          },
+          "SumOfSquares": {
+            "type": "integer"
+          },
+          "Facets": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "Count": 19,
+          "Max": 0,
+          "Mean": 0,
+          "Min": 0,
+          "Missing": 0,
+          "StdDev": 0,
+          "Sum": 0,
+          "SumOfSquares": 0,
+          "Facets": {}
+        }
+      },
+      "TotalItems1": {
+        "title": "TotalItems1",
+        "required": [
+          "Count",
+          "Max",
+          "Mean",
+          "Min",
+          "Missing",
+          "StdDev",
+          "Sum",
+          "SumOfSquares",
+          "Facets"
+        ],
+        "type": "object",
+        "properties": {
+          "Count": {
+            "type": "integer"
+          },
+          "Max": {
+            "type": "integer"
+          },
+          "Mean": {
+            "type": "integer"
+          },
+          "Min": {
+            "type": "integer"
+          },
+          "Missing": {
+            "type": "integer"
+          },
+          "StdDev": {
+            "type": "integer"
+          },
+          "Sum": {
+            "type": "integer"
+          },
+          "SumOfSquares": {
+            "type": "integer"
+          },
+          "Facets": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "Count": 19,
+          "Max": 0,
+          "Mean": 0,
+          "Min": 0,
+          "Missing": 0,
+          "StdDev": 0,
+          "Sum": 0,
+          "SumOfSquares": 0,
+          "Facets": {}
         }
       }
     }

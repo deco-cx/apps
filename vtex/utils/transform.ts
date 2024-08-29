@@ -346,6 +346,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     itemId: skuId,
     referenceId = [],
     kitItems,
+    estimatedDateArrival,
   } = sku;
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
@@ -427,6 +428,12 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(categoryAdditionalProperties ?? [])
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
+
+  estimatedDateArrival && additionalProperty.push({
+    "@type": "PropertyValue",
+    name: "Estimated Date Arrival",
+    value: estimatedDateArrival,
+  });
 
   return {
     "@type": "Product",

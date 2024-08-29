@@ -179,5 +179,7 @@ export default async function chat(
     );
   }
 
-  return readFromStream(response);
+  return readFromStream(response, {
+    shouldDecodeChunk: false,
+  });
 }
