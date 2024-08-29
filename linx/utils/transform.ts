@@ -256,6 +256,7 @@ export const toProduct = (
           {
             alias: list.Alias,
             name: list.Name,
+            type: list.Type,
           },
         );
 
