@@ -1,28 +1,28 @@
 import decodeAVIF, {
   init as initDecodeAVIF,
-} from "https://esm.sh/@jsquash/avif@1.1.2/decode";
+} from "https://esm.sh/@jsquash/avif@1.3.0/decode";
 import encodeAVIF, {
   init as initEncodeAVIF,
-} from "https://esm.sh/@jsquash/avif@1.1.2/encode";
+} from "https://esm.sh/@jsquash/avif@1.3.0/encode";
 import decodeJPEG, {
   init as initDecodeJPEG,
-} from "https://esm.sh/@jsquash/jpeg@1.2.0/decode";
+} from "https://esm.sh/@jsquash/jpeg@1.4.0/decode";
 import encodeJPEG, {
   init as initEncodeJPEG,
-} from "https://esm.sh/@jsquash/jpeg@1.2.0/encode";
+} from "https://esm.sh/@jsquash/jpeg@1.4.0/encode";
 import decodePNG, {
   init as initDecodePNG,
-} from "https://esm.sh/@jsquash/png@2.1.2/decode";
+} from "https://esm.sh/@jsquash/png@2.2.0/decode";
 import encodePNG, {
   init as initEncodePNG,
-} from "https://esm.sh/@jsquash/png@2.1.2/encode";
-import resize from "https://esm.sh/@jsquash/resize@1.0.1";
+} from "https://esm.sh/@jsquash/png@2.2.0/encode";
+import resize from "https://esm.sh/@jsquash/resize@1.1.1";
 import decodeWEBP, {
   init as initDecodeWEBP,
-} from "https://esm.sh/@jsquash/webp@1.2.0/decode";
+} from "https://esm.sh/@jsquash/webp@1.4.0/decode";
 import encodeWEBP, {
   init as initEncodeWEBP,
-} from "https://esm.sh/@jsquash/webp@1.2.0/encode";
+} from "https://esm.sh/@jsquash/webp@1.4.0/encode";
 import "./canvas.ts";
 
 if (typeof caches !== "undefined") {
