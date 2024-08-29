@@ -2,7 +2,11 @@ name: Release Tagging
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, closed]
+    types: [opened]
+
+  push:
+    branches:
+      - main
 
 permissions:
   contents: write  # Allows pushing changes and creating tags
@@ -11,7 +15,7 @@ permissions:
 
 jobs:
   tag-discussion:
-    if: github.event.action == 'opened'
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -22,16 +26,15 @@ jobs:
         run: |
           git fetch --tags
           LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-          echo "latest tag: $LATEST_TAG"
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="0.0.0"
+          fi
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
-
-
           NEW_PATCH_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
           NEW_MINOR_VERSION="$MAJOR.$((MINOR + 1)).0"
           NEW_MAJOR_VERSION="$((MAJOR + 1)).0.0"
-
           echo "patch_version=$NEW_PATCH_VERSION" >> $GITHUB_OUTPUT
           echo "minor_version=$NEW_MINOR_VERSION" >> $GITHUB_OUTPUT
           echo "major_version=$NEW_MAJOR_VERSION" >> $GITHUB_OUTPUT
@@ -50,18 +53,36 @@ jobs:
             - 🚀 for **Major** ${{ steps.calculate_versions.outputs.major_version }} update
 
   determine-tag:
-    if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.ref == 'refs/heads/main'
-    needs: tag-discussion
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Determine the next version based on comments
-        id: determine_version
+      - name: Find the Merged Pull Request
+        id: find_pr
+        run: |
+          BASE_BRANCH="main"
+          RECENT_PR=$(gh pr list --state closed --base $BASE_BRANCH --json number,title,closedAt --jq '.[] | select(.closedAt >= "'$(date -u -d '1 minute ago' +%Y-%m-%dT%H:%M:%SZ)'") | {number, title}')
+          echo "RECENT_PR=$RECENT_PR" >> $GITHUB_ENV
+          echo "PR_NUMBER=$(echo $RECENT_PR | jq -r '.number')" >> $GITHUB_ENV
+
+      - name: Fetch latest stable tag (excluding prerelease tags)
+        id: get_latest_tag
         run: |
           git fetch --tags
           LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="0.0.0"
+          fi
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Determine the next version based on comments
+        id: determine_version
+        env:
+          PR_NUMBER: ${{ env.PR_NUMBER }}
+        run: |
+          LATEST_TAG=${{ steps.get_latest_tag.outputs.latest_tag }}
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
@@ -74,7 +95,7 @@ jobs:
           REACTION=$(gh api graphql -f query='
             query {
               repository(owner:"${{ github.repository_owner }}", name:"${{ github.event.repository.name }}") {
-                pullRequest(number: ${{ github.event.pull_request.number }}) {
+                pullRequest(number: '${PR_NUMBER}') {
                   comments(last: 100) {
                     nodes {
                       body
@@ -98,7 +119,6 @@ jobs:
               select(.user.login | inside(["'${ALLOWED_USERS[*]}'"])) |
               .content'
           )
-
 
           # Determine the new tag version based on the allowed reactions
           if [[ "$REACTION" == *"ROCKET"* ]]; then
