@@ -30,7 +30,7 @@ At the core of all websites within this repository is the `website` app, located
 
 ## Contributing
 
-Check ['./CONTRIBUTING.md]
+Check [CONTRIBUTING.md](https://github.com/deco-cx/apps/blob/main/CONTRIBUTING.md)
 
 ### Apps
 
