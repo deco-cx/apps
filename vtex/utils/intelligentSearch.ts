@@ -136,7 +136,7 @@ const segmentsFromTerm = (term: string) => term.split("/").filter(Boolean);
 const segmentsFromSearchParams = (url: string) => {
   const searchParams = new URLSearchParams(url).entries();
 
-  const categories = Array.from(searchParams)
+  const categories = Array.from(searchParams).toSorted()
     .reduce((acc, [key, value]) => {
       if (key.includes("filter.category")) {
         acc.push(value);
