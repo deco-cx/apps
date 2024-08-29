@@ -61,6 +61,8 @@ jobs:
 
       - name: Find the Merged Pull Request
         id: find_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BASE_BRANCH="main"
           RECENT_PR=$(gh pr list --state closed --base $BASE_BRANCH --json number,title,closedAt --jq '.[] | select(.closedAt >= "'$(date -u -d '1 minute ago' +%Y-%m-%dT%H:%M:%SZ)'") | {number, title}')
@@ -81,6 +83,7 @@ jobs:
         id: determine_version
         env:
           PR_NUMBER: ${{ env.PR_NUMBER }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           LATEST_TAG=${{ steps.get_latest_tag.outputs.latest_tag }}
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
@@ -119,19 +122,22 @@ jobs:
               select(.user.login | inside(["'${ALLOWED_USERS[*]}'"])) |
               .content'
           )
-
           # Determine the new tag version based on the allowed reactions
           if [[ "$REACTION" == *"ROCKET"* ]]; then
             NEW_TAG="$((MAJOR + 1)).0.0"
           elif [[ "$REACTION" == *"TADA"* ]]; then
             NEW_TAG="$MAJOR.$((MINOR + 1)).0"
-          else
+          elif [[ "$REACTION" == *"THUMBS_UP"* ]]; then  # Ensure thumbs up reaction is correctly identified
             NEW_TAG="$MAJOR.$MINOR.$((PATCH + 1))"
+          else
+            echo "No valid reactions found for version bump. Exiting."
+            exit 0
           fi
 
           echo "new_version=$NEW_TAG" >> $GITHUB_OUTPUT
 
       - name: Update deno.json Version
+        if: steps.determine_version.outputs.new_version != ''
         run: |
           jq --arg new_version "${{ steps.determine_version.outputs.new_version }}" '.version = $new_version' deno.json > tmp.$$.json && mv tmp.$$.json deno.json
           git config user.name "decobot"
@@ -141,6 +147,7 @@ jobs:
           git push origin main
 
       - name: Create and Push Tag
+        if: steps.determine_version.outputs.new_version != ''
         run: |
           git tag ${{ steps.determine_version.outputs.new_version }}
           git push origin ${{ steps.determine_version.outputs.new_version }}
