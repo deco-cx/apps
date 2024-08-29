@@ -239,6 +239,7 @@ export const onBeforeResolveProps = <
     errorPage?: Page;
     abTesting: AbTesting;
     global: Section[];
+    theme: Section;
   },
 >(
   props: T,

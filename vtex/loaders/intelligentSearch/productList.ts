@@ -190,7 +190,6 @@ const preferredSKU = (items: Item[], { props }: Props) => {
 /**
  * @title VTEX Integration - Intelligent Search
  * @description Product List loader
- * @examples { "props": { "collection": "139", "count": 12 } }\n{ "props": { "query": "shoes", "count": 12 } }\n{ "props": { "ids": ["2000001", "2000002"], "count": 12 } }
  */
 const loader = async (
   expandedProps: Props,
