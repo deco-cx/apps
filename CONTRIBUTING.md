@@ -57,8 +57,9 @@ Since this repository contains integrations that must be tested against a deco s
 We follow semantic versioning, and all apps in this repository are versioned collectively using git tags. To release a new version:
 
 1. Fork the repository and create a pull request with your changes.
-2. After the PR is approved and merged, request a maintainer to run the release task:
+2. After the PR is approved and merged, request a maintainer to react the releaser comment with the required emoji
+👍 for **Patch**
+🎉 for **Minor**
+🚀 for **Major**
 
-```sh
-deno task release
-```
+When your PR got merged, a new tag will arrive with the desired semver modification.
