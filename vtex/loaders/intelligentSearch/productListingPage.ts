@@ -11,11 +11,11 @@ import {
 } from "../../utils/intelligentSearch.ts";
 import {
   getValidTypesFromPageTypes,
-  pageTypesFromPathname,
   pageTypesToBreadcrumbList,
   pageTypesToSeo,
 } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
+import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
 import {
@@ -282,14 +282,14 @@ const loader = async (
     ...args
   } = searchArgsOf(props, url);
 
-  let pathToUse = url.pathname;
+  let pathToUse = url.href.replace(url.origin, "");
 
   if (pathToUse === "/" || pathToUse === "/*") {
     const result = await PLPDefaultPath({ level: 1 }, req, ctx);
     pathToUse = result?.possiblePaths[0] ?? pathToUse;
   }
 
-  const pageTypesPromise = pageTypesFromPathname(pathToUse, ctx);
+  const pageTypesPromise = pageTypesFromUrl(pathToUse, ctx);
   const allPageTypes = await pageTypesPromise;
 
   const pageTypes = getValidTypesFromPageTypes(allPageTypes);
