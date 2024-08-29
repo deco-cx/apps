@@ -1251,6 +1251,20 @@ export interface ProductReviewData {
   range?: ProductReviewRange;
 }
 
+export interface ProductBalance {
+  hasUnlimitedQuantity?: boolean;
+  leadTime?: string;
+  reservedQuantity?: number;
+  totalQuantity?: number;
+  warehouseId?: string;
+  warehouseName?: string;
+}
+
+export interface ProductInventoryData {
+  skuId?: string;
+  balance?: ProductBalance[];
+}
+
 export interface Order {
   ShippingEstimatedDate?: Date;
   ShippingEstimatedDateMax: string;
