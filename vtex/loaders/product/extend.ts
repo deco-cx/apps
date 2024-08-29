@@ -98,7 +98,12 @@ const reviewsExt = async (
 ): Promise<Product[]> => {
   const reviewPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/reviews"]({
-      product_id: product.inProductGroupWithID,
+      product_id: product.inProductGroupWithID ?? "",
+      search_term: "",
+      from: "0",
+      to: "10",
+      order_by: "",
+      status: true,
     }).then((res) => res.json())
       .catch(() => ({}))
   );

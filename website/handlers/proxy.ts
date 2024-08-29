@@ -166,7 +166,7 @@ export default function Proxy({
 
     const contentType = response.headers.get("Content-Type");
 
-    let newBodyStream = null;
+    let newBody: ReadableStream<Uint8Array> | string | null = response.body;
 
     if (
       contentType?.includes("text/html") &&
@@ -174,39 +174,24 @@ export default function Proxy({
       includeScriptsToHead.includes.length > 0
     ) {
       // Use a more efficient approach to insert scripts
-      const insertScriptsStream = new TransformStream({
-        async transform(chunk, controller) {
-          const chunkStr = new TextDecoder().decode(await chunk);
+      newBody = await response.text();
+      // Find the position of <head> tag
+      const headEndPos = newBody.indexOf("</head>");
+      if (headEndPos !== -1) {
+        // Split the response body at </head> position
+        const beforeHeadEnd = newBody.substring(0, headEndPos);
+        const afterHeadEnd = newBody.substring(headEndPos);
 
-          // Find the position of <head> tag
-          const headEndPos = chunkStr.indexOf("</head>");
-          if (headEndPos !== -1) {
-            // Split the chunk at </head> position
-            const beforeHeadEnd = chunkStr.substring(0, headEndPos);
-            const afterHeadEnd = chunkStr.substring(headEndPos);
+        // Prepare scripts to insert
+        let scriptsInsert = "";
+        for (const script of (includeScriptsToHead?.includes ?? [])) {
+          scriptsInsert += typeof script.src === "string"
+            ? script.src
+            : script.src(req);
+        }
 
-            // Prepare scripts to insert
-            let scriptsInsert = "";
-            for (const script of (includeScriptsToHead?.includes ?? [])) {
-              scriptsInsert += typeof script.src === "string"
-                ? script.src
-                : script.src(req);
-            }
-
-            // Combine and encode the new chunk
-            const newChunkStr = beforeHeadEnd + scriptsInsert + afterHeadEnd;
-
-            controller.enqueue(new TextEncoder().encode(newChunkStr));
-          } else {
-            // If </head> not found, pass the chunk unchanged
-            controller.enqueue(chunk);
-          }
-        },
-      });
-
-      // Modify the response body by piping through the transform stream
-      if (response.body) {
-        newBodyStream = response.body.pipeThrough(insertScriptsStream);
+        // Combine the new response body
+        newBody = beforeHeadEnd + scriptsInsert + afterHeadEnd;
       }
     }
 
@@ -225,8 +210,6 @@ export default function Proxy({
         );
       }
     }
-
-    const newBody = newBodyStream === null ? response.body : newBodyStream;
 
     let text: undefined | string = undefined;
 

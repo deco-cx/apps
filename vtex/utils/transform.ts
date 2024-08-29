@@ -45,7 +45,8 @@ import type {
 const DEFAULT_CATEGORY_SEPARATOR = ">";
 
 const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
-  typeof (sku as LegacySkuVTEX).variations?.[0] === "string";
+  typeof (sku as LegacySkuVTEX).variations?.[0] === "string" ||
+  !!(sku as LegacySkuVTEX).Videos;
 
 const isLegacyProduct = (
   product: ProductVTEX | LegacyProductVTEX,
@@ -346,6 +347,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     itemId: skuId,
     referenceId = [],
     kitItems,
+    estimatedDateArrival,
   } = sku;
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
@@ -427,6 +429,12 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(categoryAdditionalProperties ?? [])
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
+
+  estimatedDateArrival && additionalProperty.push({
+    "@type": "PropertyValue",
+    name: "Estimated Date Arrival",
+    value: estimatedDateArrival,
+  });
 
   return {
     "@type": "Product",

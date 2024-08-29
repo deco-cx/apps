@@ -741,6 +741,7 @@ export interface Item {
   nameComplete: string;
   complementName: string;
   ean: string;
+  estimatedDateArrival: string;
   referenceId?: Array<{ Key: string; Value: string }>;
   measurementUnit: string;
   unitMultiplier: number;
