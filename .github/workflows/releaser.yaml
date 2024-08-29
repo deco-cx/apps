@@ -4,9 +4,13 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, closed]
 
+permissions:
+  contents: write  # Allows pushing changes and creating tags
+  pull-requests: write  # Allows adding comments to pull requests
+  issues: write
 jobs:
   tag-discussion:
-    if: github.event.action == 'opened'
+    if: github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     steps:
       - name: Start Discussion for Tagging
