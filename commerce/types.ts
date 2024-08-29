@@ -174,6 +174,25 @@ export declare type PriceComponentTypeEnumeration =
   | "https://schema.org/Installment"
   | "https://schema.org/Subscription";
 
+export declare type ReturnFeesEnumeration =
+  | "https://schema.org/FreeReturn"
+  | "https://schema.org/OriginalShippingFees"
+  | "https://schema.org/RestockingFees"
+  | "https://schema.org/ReturnFeesCustomerResponsibility"
+  | "https://schema.org/ReturnShippingFees";
+
+export declare type ReturnMethodEnumeration =
+  | "https://schema.org/KeepProduct"
+  | "https://schema.org/ReturnAtKiosk"
+  | "https://schema.org/ReturnByMail"
+  | "https://schema.org/ReturnInStore";
+
+export declare type MerchantReturnEnumeration =
+  | "https://schema.org/MerchantReturnFiniteReturnWindow"
+  | "https://schema.org/MerchantReturnNotPermitted"
+  | "https://schema.org/MerchantReturnUnlimitedWindow"
+  | "https://schema.org/MerchantReturnUnspecified";
+
 export interface PriceSpecification extends Omit<Thing, "@type"> {
   "@type": "PriceSpecification";
   /** The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity. */
@@ -230,6 +249,42 @@ export interface Teasers {
   effects: TeasersEffect;
 }
 
+export interface MonetaryAmount extends Omit<Thing, "@type"> {
+  /**
+   * The currency in which the monetary amount is expressed.
+   *
+   * Use standard formats: ISO 4217 currency format, e.g. "USD"; Ticker symbol for cryptocurrencies, e.g. "BTC"; well known names for Local Exchange Trading Systems (LETS) and other currency types, e.g. "Ithaca HOUR".
+   */
+  currency: string;
+  /**
+   * The upper value of some characteristic or property.
+   */
+  maxValue: number;
+  /** The lower value of some characteristic or property. */
+  minValue: number;
+  /** The date when the item becomes valid. */
+  validFrom: string;
+  /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
+  validThrough: string;
+  /** The value of a QuantitativeValue (including Observation) or property value node. */
+  value: boolean | number | string;
+}
+
+export interface MerchantReturnPolicy extends Omit<Thing, "@type"> {
+  "@type": "MerchantReturnPolicy";
+  /** Specifies either a fixed return date or the number of days (from the delivery date) that a product can be returned. Used when the returnPolicyCategory property is specified as MerchantReturnFiniteReturnWindow. Supersedes productReturnDays */
+  merchantReturnDays?: number;
+  /** A country where a particular merchant return policy applies to, for example the two-letter ISO 3166-1 alpha-2 country code. */
+  applicableCountry: string;
+  /** The type of return fees for purchased products (for any return reason). */
+  returnFees?: ReturnFeesEnumeration;
+  /** The type of return method offered, specified from an enumeration. */
+  returnMethod?: ReturnMethodEnumeration;
+  /** Specifies an applicable return policy (from an enumeration). */
+  returnPolicyCategory: MerchantReturnEnumeration;
+  /** Amount of shipping costs for product returns (for any reason). Applicable when property returnFees equals ReturnShippingFees. */
+  returnShippingFeesAmount?: MonetaryAmount;
+}
 export interface Offer extends Omit<Thing, "@type"> {
   "@type": "Offer";
   /** The availability of this item—for example In stock, Out of stock, Pre-order, etc. */
@@ -270,6 +325,8 @@ export interface Offer extends Omit<Thing, "@type"> {
   giftSkuIds?: string[];
   /** Used by some ecommerce providers (e.g: VTEX) to describe special promotions that depend on some conditions */
   teasers?: Teasers[];
+  /** Specifies a MerchantReturnPolicy that may be applicable.  */
+  hasMerchantReturnPolicy?: MerchantReturnPolicy;
 }
 
 export interface AggregateOffer {
@@ -300,6 +357,8 @@ export interface AggregateOffer {
    * Use standard formats: {@link http://en.wikipedia.org/wiki/ISO_4217 ISO 4217 currency format} e.g. "USD"; {@link https://en.wikipedia.org/wiki/List_of_cryptocurrencies Ticker symbol} for cryptocurrencies e.g. "BTC"; well known names for {@link https://en.wikipedia.org/wiki/Local_exchange_trading_system Local Exchange Tradings Systems} (LETS) and other currency types e.g. "Ithaca HOUR".
    */
   priceCurrency?: string;
+  /** Specifies a MerchantReturnPolicy that may be applicable.  */
+  hasMerchantReturnPolicy?: MerchantReturnPolicy;
 }
 
 export interface ReviewPageResults {
