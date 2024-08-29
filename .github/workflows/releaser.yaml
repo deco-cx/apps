@@ -21,9 +21,11 @@ jobs:
         id: calculate_versions
         run: |
           LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+          echo "latest tag: $LATEST_TAG"
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+
 
           NEW_PATCH_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
           NEW_MINOR_VERSION="$MAJOR.$((MINOR + 1)).0"
