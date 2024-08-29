@@ -1,0 +1,87 @@
+name: Release Tagging
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+jobs:
+  tag-discussion:
+    if: github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start Discussion for Tagging
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## Tagging Options
+            Should a new tag be published when this PR is merged?
+            - 👍 for **Patch** update
+            - 🎉 for **Minor** update
+            - 🚀 for **Major** update
+
+  determine-tag:
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    needs: tag-discussion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Get the latest tag
+        id: get_tag
+        run: echo "::set-output name=latest_tag::$(git describe --tags --abbrev=0)"
+
+      - name: Determine the next version based on comments
+        id: determine_version
+        run: |
+          LATEST_TAG=${{ steps.get_tag.outputs.latest_tag }}
+          MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
+          MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+          PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+
+          REACTION=$(gh api graphql -f query='
+            query {
+              repository(owner:"${{ github.repository_owner }}", name:"${{ github.event.repository.name }}") {
+                pullRequest(number: ${{ github.event.pull_request.number }}) {
+                  comments(last: 100) {
+                    nodes {
+                      body
+                      reactions(last: 100) {
+                        nodes {
+                          content
+                          user {
+                            login
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }' | jq -r '.data.repository.pullRequest.comments.nodes[].reactions.nodes[].content')
+
+          if [[ "$REACTION" == *"ROCKET"* ]]; then
+            NEW_TAG="$((MAJOR + 1)).0.0"
+          elif [[ "$REACTION" == *"TADA"* ]]; then
+            NEW_TAG="$MAJOR.$((MINOR + 1)).0"
+          else
+            NEW_TAG="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+
+          echo "::set-output name=new_version::$NEW_TAG"
+
+      - name: Update Version File
+        run: |
+          echo ${{ steps.determine_version.outputs.new_version }} > version.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.txt
+          git commit -m "Update version to ${{ steps.determine_version.outputs.new_version }}"
+          git push origin ${{ github.head_ref }}
+
+      - name: Create and Push Tag
+        run: |
+          git tag ${{ steps.determine_version.outputs.new_version }}
+          git push origin ${{ steps.determine_version.outputs.new_version }}
