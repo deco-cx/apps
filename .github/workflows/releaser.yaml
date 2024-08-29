@@ -20,6 +20,7 @@ jobs:
       - name: Calculate new versions
         id: calculate_versions
         run: |
+          git fetch --tags
           LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
           echo "latest tag: $LATEST_TAG"
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
