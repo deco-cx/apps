@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   tag-discussion:
-    if: github.event.action == 'synchronize'
+    if: github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -60,6 +60,7 @@ jobs:
       - name: Determine the next version based on comments
         id: determine_version
         run: |
+          git fetch --tags
           LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
