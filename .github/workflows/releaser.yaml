@@ -17,17 +17,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Get the latest tag
-        id: get_tag
-        run: |
-          LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-          echo "$LATEST_TAG"
-          echo "::set-output name=latest_tag::$LATEST_TAG"
-
       - name: Calculate new versions
         id: calculate_versions
         run: |
-          LATEST_TAG=${{ steps.get_tag.outputs.latest_tag }}
+          LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
@@ -61,16 +54,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Get the latest tag
-        id: get_tag
-        run: |
-          LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-          echo "::set-output name=latest_tag::$LATEST_TAG"
-
       - name: Determine the next version based on comments
         id: determine_version
         run: |
-          LATEST_TAG=${{ steps.get_tag.outputs.latest_tag }}
+          LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
