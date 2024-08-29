@@ -5,12 +5,15 @@
 import * as $$$$$$$$$0 from "./actions/analytics/sendEvent.ts";
 import * as $$$0 from "./loaders/config.ts";
 import * as $$$1 from "./loaders/products/hotsite.ts";
-import * as $$$2 from "./loaders/products/productList.ts";
-import * as $$$3 from "./loaders/products/productListingPage.ts";
-import * as $$$4 from "./loaders/products/productLists.ts";
-import * as $$$5 from "./loaders/search/autocomplete.ts";
-import * as $$$6 from "./loaders/search/popular.ts";
-import * as $$$7 from "./loaders/search/products.ts";
+import * as $$$2 from "./loaders/products/linxEngage.ts";
+import * as $$$3 from "./loaders/products/productList.ts";
+import * as $$$4 from "./loaders/products/productListingPage.ts";
+import * as $$$5 from "./loaders/products/productLists.ts";
+import * as $$$6 from "./loaders/products/quickFilters.ts";
+import * as $$$7 from "./loaders/products/suggestions.ts";
+import * as $$$8 from "./loaders/search/autocomplete.ts";
+import * as $$$9 from "./loaders/search/popular.ts";
+import * as $$$10 from "./loaders/search/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/LinxImpulsePageView.tsx";
 import * as $$$$$$1 from "./sections/Script/LinxImpulseScript.tsx";
 
@@ -18,12 +21,15 @@ const manifest = {
   "loaders": {
     "linx-impulse/loaders/config.ts": $$$0,
     "linx-impulse/loaders/products/hotsite.ts": $$$1,
-    "linx-impulse/loaders/products/productList.ts": $$$2,
-    "linx-impulse/loaders/products/productListingPage.ts": $$$3,
-    "linx-impulse/loaders/products/productLists.ts": $$$4,
-    "linx-impulse/loaders/search/autocomplete.ts": $$$5,
-    "linx-impulse/loaders/search/popular.ts": $$$6,
-    "linx-impulse/loaders/search/products.ts": $$$7,
+    "linx-impulse/loaders/products/linxEngage.ts": $$$2,
+    "linx-impulse/loaders/products/productList.ts": $$$3,
+    "linx-impulse/loaders/products/productListingPage.ts": $$$4,
+    "linx-impulse/loaders/products/productLists.ts": $$$5,
+    "linx-impulse/loaders/products/quickFilters.ts": $$$6,
+    "linx-impulse/loaders/products/suggestions.ts": $$$7,
+    "linx-impulse/loaders/search/autocomplete.ts": $$$8,
+    "linx-impulse/loaders/search/popular.ts": $$$9,
+    "linx-impulse/loaders/search/products.ts": $$$10,
   },
   "sections": {
     "linx-impulse/sections/Analytics/LinxImpulsePageView.tsx": $$$$$$0,

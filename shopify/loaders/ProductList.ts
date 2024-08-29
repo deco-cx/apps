@@ -1,6 +1,10 @@
 import type { Product } from "../../commerce/types.ts";
 import { AppContext } from "../../shopify/mod.ts";
 import {
+  ProductsByCollection,
+  SearchProducts,
+} from "../utils/storefront/queries.ts";
+import {
   CollectionProductsArgs,
   Product as ProductShopify,
   ProductConnection,
@@ -9,13 +13,13 @@ import {
   QueryRootSearchArgs,
   SearchResultItemConnection,
 } from "../utils/storefront/storefront.graphql.gen.ts";
-import {
-  ProductsByCollection,
-  SearchProducts,
-} from "../utils/storefront/queries.ts";
 import { toProduct } from "../utils/transform.ts";
-import { CollectionSortKeys, SearchSortKeys } from "../utils/utils.ts";
-import { searchSortShopify, sortShopify } from "../utils/utils.ts";
+import {
+  CollectionSortKeys,
+  SearchSortKeys,
+  searchSortShopify,
+  sortShopify,
+} from "../utils/utils.ts";
 
 export interface QueryProps {
   /** @description search term to use on search */
@@ -149,6 +153,44 @@ const loader = async (
   );
 
   return products ?? [];
+};
+
+export const cache = "no-cache";
+export const cacheKey = (expandedProps: Props, req: Request): string => {
+  const props = expandedProps.props ??
+    (expandedProps as unknown as Props["props"]);
+
+  const count = (props.count ?? 12).toString();
+  const sort = props.sort ?? "";
+  const searchParams = new URLSearchParams({
+    count,
+    sort,
+  });
+
+  expandedProps.filters?.tags?.forEach((tag) => {
+    searchParams.append("tag", tag);
+  });
+  expandedProps.filters?.productTypes?.forEach((productType) => {
+    searchParams.append("productType", productType);
+  });
+  expandedProps.filters?.productVendors?.forEach((productVendor) => {
+    searchParams.append("productVendor", productVendor);
+  });
+  expandedProps.filters?.priceMin &&
+    searchParams.append("price.min", expandedProps.filters.priceMin.toString());
+  expandedProps.filters?.priceMax &&
+    searchParams.append("price.max", expandedProps.filters.priceMax.toString());
+  expandedProps.filters?.variantOptions?.forEach((variantOption) => {
+    searchParams.append(
+      "variantOption",
+      `${variantOption.name}:${variantOption.value}`,
+    );
+  });
+
+  const url = new URL(req.url);
+  url.search = searchParams.toString();
+
+  return url.href;
 };
 
 export default loader;

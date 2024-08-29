@@ -3,11 +3,7 @@ import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { toSegmentParams } from "../../utils/legacy.ts";
-import {
-  getSegmentFromBag,
-  isAnonymous,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
 import type { LegacyProduct } from "../../utils/types.ts";
@@ -109,23 +105,21 @@ async function loader(
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
 
-  if (url.searchParams.has("ft") || !isAnonymous(ctx)) {
+  if (url.searchParams.has("ft")) {
     return null;
   }
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const skuId = url.searchParams.get("skuId") ?? "";
 
   const params = new URLSearchParams([
     ["slug", props.slug],
+    ["segment", segment],
+    ["skuId", skuId],
   ]);
 
-  url.searchParams.forEach((value, key) => {
-    params.append(key, value);
-  });
-
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 

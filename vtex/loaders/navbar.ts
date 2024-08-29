@@ -28,4 +28,8 @@ const loader = async (
   return categoryTreeToNavbar(tree);
 };
 
+/** TODO (@igorbrasileiro): implement stale-while-revalidate */
+// This cache is used by compat/std/vtex/loaders/navbar.ts
+export const cache = "no-cache";
+
 export default loader;
