@@ -21,6 +21,7 @@ jobs:
         id: get_tag
         run: |
           LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+          echo "$LATEST_TAG"
           echo "::set-output name=latest_tag::$LATEST_TAG"
 
       - name: Calculate new versions
