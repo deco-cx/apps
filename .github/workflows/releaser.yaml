@@ -8,9 +8,10 @@ permissions:
   contents: write  # Allows pushing changes and creating tags
   pull-requests: write  # Allows adding comments to pull requests
   issues: write
+
 jobs:
   tag-discussion:
-    if: github.event.action == 'synchronize'
+    if: github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
       - name: Start Discussion for Tagging
@@ -26,7 +27,7 @@ jobs:
             - 🚀 for **Major** update
 
   determine-tag:
-    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.ref == 'refs/heads/main'
     needs: tag-discussion
     runs-on: ubuntu-latest
     steps:
@@ -45,6 +46,11 @@ jobs:
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
 
+          # Define allowed users
+          ALLOWED_USERS=$(cat MAINTAINERS.txt | tr '\n' ' ')
+          echo "Maintainers list: $ALLOWED_USERS"
+
+          # Fetch reactions and filter by allowed users
           REACTION=$(gh api graphql -f query='
             query {
               repository(owner:"${{ github.repository_owner }}", name:"${{ github.event.repository.name }}") {
@@ -52,6 +58,7 @@ jobs:
                   comments(last: 100) {
                     nodes {
                       body
+                      id
                       reactions(last: 100) {
                         nodes {
                           content
@@ -64,8 +71,16 @@ jobs:
                   }
                 }
               }
-            }' | jq -r '.data.repository.pullRequest.comments.nodes[].reactions.nodes[].content')
+            }' | jq -r '
+              .data.repository.pullRequest.comments.nodes[] |
+              select(.body | contains("## Tagging Options")) |
+              .reactions.nodes[] |
+              select(.user.login | inside(["'${ALLOWED_USERS[*]}'"])) |
+              .content'
+          )
 
+
+          # Determine the new tag version based on the allowed reactions
           if [[ "$REACTION" == *"ROCKET"* ]]; then
             NEW_TAG="$((MAJOR + 1)).0.0"
           elif [[ "$REACTION" == *"TADA"* ]]; then
@@ -76,14 +91,14 @@ jobs:
 
           echo "::set-output name=new_version::$NEW_TAG"
 
-      - name: Update Version File
+      - name: Update deno.json Version
         run: |
-          echo ${{ steps.determine_version.outputs.new_version }} > version.txt
-          git config user.name "github-actions[bot]"
+          jq --arg new_version "${{ steps.determine_version.outputs.new_version }}" '.version = $new_version' deno.json > tmp.$$.json && mv tmp.$$.json deno.json
+          git config user.name "decobot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add version.txt
+          git add deno.json
           git commit -m "Update version to ${{ steps.determine_version.outputs.new_version }}"
-          git push origin ${{ github.head_ref }}
+          git push origin main
 
       - name: Create and Push Tag
         run: |
