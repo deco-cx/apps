@@ -90,8 +90,8 @@ jobs:
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
 
-          # Define allowed users
-          ALLOWED_USERS=$(cat MAINTAINERS.txt | tr '\n' ' ')
+          # Define allowed users as a JSON array
+          ALLOWED_USERS=$(cat MAINTAINERS.txt | jq -R -s -c 'split("\n")[:-1]')
           echo "Maintainers list: $ALLOWED_USERS"
 
           # Fetch reactions and filter by allowed users
@@ -115,11 +115,11 @@ jobs:
                   }
                 }
               }
-            }' | jq -r '
+            }' | jq -r --argjson allowed_users "$ALLOWED_USERS" '
               .data.repository.pullRequest.comments.nodes[] |
               select(.body | contains("## Tagging Options")) |
               .reactions.nodes[] |
-              select(.user.login | inside(["'${ALLOWED_USERS[*]}'"])) |
+              select(.user.login | IN($allowed_users[])) |
               .content'
           )
           # Determine the new tag version based on the allowed reactions
