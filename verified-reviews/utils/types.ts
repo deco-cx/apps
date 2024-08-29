@@ -42,7 +42,7 @@ export interface Review {
 
 export interface Reviews {
   reviews: Review[];
-  status: number[];
+  stats: number[];
 }
 
 export interface VerifiedReviewsFullReview {
