@@ -82,8 +82,6 @@ const getRedirectFromFile = async (
       discardQueryParameters: discardQueryParameters as boolean,
     }));
 
-  console.log(redirectsFromFiles);
-
   return redirectsFromFiles.map((
     { from, to, type, discardQueryParameters },
   ) => ({
