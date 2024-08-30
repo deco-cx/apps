@@ -58,8 +58,6 @@ const getRedirectFromFile = async (
       // this regex is necessary to handle csv with comma as part of value
       const parts = row.split(/,|;(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
-      console.log({ parts });
-
       const type = findAndRemove(parts, REDIRECT_TYPE_ENUM) ??
         (forcePermanentRedirects ? "permanent" : "temporary");
       const discardQueryParameters =
