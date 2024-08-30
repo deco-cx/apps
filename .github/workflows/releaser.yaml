@@ -120,10 +120,16 @@ jobs:
               select(.user.login | IN($allowed_users[])) |
               .content'
           )
+          # Print the reaction to debug
+          echo "Captured reaction: $REACTION"
+
+          # Convert reaction to uppercase to handle any case inconsistencies
+          REACTION=$(echo "$REACTION" | tr '[:lower:]' '[:upper:]')
+
           # Determine the new tag version based on the allowed reactions
           if [[ "$REACTION" == *"ROCKET"* ]]; then
             NEW_TAG="$((MAJOR + 1)).0.0"
-          elif [[ "$REACTION" == *"TADA"* ]]; then
+          elif [[ "$REACTION" == *"HOORAY"* ]]; then
             NEW_TAG="$MAJOR.$((MINOR + 1)).0"
           elif [[ "$REACTION" == *"THUMBS_UP"* ]]; then  # Ensure thumbs up reaction is correctly identified
             NEW_TAG="$MAJOR.$MINOR.$((PATCH + 1))"
@@ -131,6 +137,7 @@ jobs:
             echo "No valid reactions found for version bump. Exiting."
             exit 0
           fi
+
 
           echo "new_version=$NEW_TAG" >> $GITHUB_OUTPUT
 
