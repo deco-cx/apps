@@ -29,7 +29,11 @@ export interface Props {
    * @default 12
    */
   pageSize?: number;
-  term: RequestURLParam;
+  /**
+   * @title Search term
+   * @description The free text search term.
+   */
+  term?: RequestURLParam;
 }
 
 /**

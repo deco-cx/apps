@@ -5,7 +5,10 @@ import { ProductDetailsResponse } from "../../utils/types.ts";
 import { convertProductData } from "../../utils/transform.ts";
 
 export interface Props {
-  /** @description Product codes. */
+  /**
+   * @title Product codes
+   * @description List of product codes for shelf products.
+   */
   productCodes: string[];
 }
 

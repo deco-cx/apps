@@ -30,7 +30,7 @@ export interface State extends Props {
  * @category Ecommmerce
  * @logo https://fakestoreapi.com/icons/logo.png
  */
-export default function SAP(props: Props): App<Manifest, unknown> {
+export default function SAP(props: Props): App<Manifest, State> {
   const { apiUrl, baseSiteId } = props;
 
   const api = createHttpClient<API>({

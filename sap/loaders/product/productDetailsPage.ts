@@ -10,10 +10,15 @@ import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 
 export interface Props {
   /**
+   * @title Fields
    * @description Response configuration. This is the list of fields that should be returned in the response body. Examples: BASIC, DEFAULT, FULL
    *  @default DEFAULT
    */
   fields?: FieldsList;
+  /**
+   * @title Product code
+   * @description Product identifier.
+   */
   productCode: RequestURLParam;
 }
 
@@ -25,7 +30,7 @@ const productDetailsLoader = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<ProductDetailsPage> => {
+): Promise<ProductDetailsPage | null> => {
   const { api } = ctx;
   const { productCode } = props;
 
