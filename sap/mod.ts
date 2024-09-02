@@ -26,7 +26,7 @@ export interface State extends Props {
 
 /**
  * @title SAP
- * @description
+ * @description Loaders, actions and workflows for adding SAP Commerce to your website.
  * @category Ecommmerce
  * @logo https://fakestoreapi.com/icons/logo.png
  */
