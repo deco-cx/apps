@@ -472,17 +472,7 @@ const toBreadcrumbList = (
   { baseUrl }: ProductOptions,
 ): BreadcrumbList => {
   const { categories, productName } = product;
-
-  const names = categories.map((category, idx) => {
-    const removeNext = category?.replace(categories[idx + 1], "");
-    const removeSlashStart = removeNext?.startsWith("/")
-      ? removeNext?.slice(1)
-      : removeNext;
-    const removeSlashEnd = removeSlashStart?.endsWith("/")
-      ? removeSlashStart?.slice(0, -1)
-      : removeSlashStart;
-    return removeSlashEnd;
-  }).toReversed();
+  const names = categories[0]?.split("/").filter(Boolean);
 
   const segments = names.map(slugify);
 
