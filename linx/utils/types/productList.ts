@@ -1,3 +1,5 @@
+import { LinxMetadata } from "./shared-types/LinxMetada.ts";
+
 export interface ProductListResponse {
   HasPreviousPage: boolean;
   HasNextPage: boolean;
@@ -98,7 +100,7 @@ export interface Product {
   PropertyPath: string;
   CurrentSkuID: number;
   HasCurrentSkuID: boolean;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   MininumOfDistinctSKUs: number;
   MininumOfSKUsQuantity: number;
   QuantityReturned: null;
@@ -109,7 +111,7 @@ export interface Product {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   ProductDefinition: null;
 }
@@ -135,22 +137,6 @@ export interface CategoryItem {
   ID: string;
   ParentID: string;
   Name: string;
-}
-
-export interface Description {
-  PropertyMetadataID: number;
-  Alias: string;
-  Name: string;
-  Value: string;
-  Title: string;
-  PropertyPath: string;
-  ValueAlias: string;
-  Reference: null | string;
-  Color: null | string;
-  ImagePath: null | string;
-  Order: number;
-  GroupName: null | string;
-  GroupType: string;
 }
 
 export interface Item {
@@ -205,7 +191,7 @@ export interface Item {
   EstimatedReorderDate: null;
   HasEstimatedReorderDate: boolean;
   Options: Option[];
-  SKUOptions: Description[];
+  SKUOptions: LinxMetadata[];
   BundleHierarchyPrice: null;
   IntegrationID: null | string;
   Edit: null;
@@ -218,7 +204,7 @@ export interface Item {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   Price: null;
   ProductDefinition: null;

@@ -1,6 +1,7 @@
 import { LinxError } from "./common.ts";
 import { Facet } from "./facets.ts";
 import { LinxInstallment } from "./installments.ts";
+import { LinxMetadata } from "./shared-types/LinxMetada.ts";
 
 export interface WebPage {
   Response: Response;
@@ -55,12 +56,12 @@ export interface Product {
   Condition: string;
   CurrentSellerID: number;
   CurrentSkuID: number;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   DisplayCondition: boolean;
   DisplayPrice: DisplayPrice;
   DisplayStockQuantity: boolean;
   EstimatedReorderDate: Date | null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   Flags: unknown[];
   HasCurrentSkuID: boolean;
   HasEstimatedReorderDate: boolean;
@@ -173,22 +174,6 @@ export interface CategoryItem {
   ParentID: string;
 }
 
-export interface Description {
-  Alias: Alias;
-  Color: null | string;
-  GroupName: null | string;
-  GroupType: GroupType;
-  ImagePath: null | string;
-  Name: Name;
-  Order: number;
-  PropertyMetadataID: number;
-  PropertyPath: string;
-  Reference: null | string;
-  Title: string;
-  Value: string;
-  ValueAlias: string;
-}
-
 export type Alias =
   | "WarrantyDescription"
   | "LongDescription"
@@ -248,7 +233,7 @@ export interface Item {
   Depth: number;
   Edit: null;
   EstimatedReorderDate: Date | null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   HandlingDays: number;
   HasEstimatedReorderDate: boolean;
   Height: number;

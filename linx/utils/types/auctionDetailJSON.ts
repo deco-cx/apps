@@ -1,4 +1,5 @@
 import { LinxError } from "./common.ts";
+import { LinxMetadata } from "./shared-types/LinxMetada.ts";
 
 export interface WebPage {
   Response: Response;
@@ -51,13 +52,13 @@ export interface Product {
   Condition: string;
   CurrentSellerID: number;
   CurrentSkuID: number;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   DisplayCondition: boolean;
   DisplayPrice: string;
   DisplayStockQuantity: boolean;
   Edit: null;
   EstimatedReorderDate: Date;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   Flags: unknown[];
   HasAnyItemDeliverable: boolean;
   HasCurrentSkuID: boolean;
@@ -144,22 +145,6 @@ export interface CategoryItem {
   ParentID: string;
 }
 
-export interface Description {
-  Alias: string;
-  Color: null;
-  GroupName: null;
-  GroupType: string;
-  ImagePath: null;
-  Name: string;
-  Order: number;
-  PropertyMetadataID: number;
-  PropertyPath: string;
-  Reference: null;
-  Title: string;
-  Value: string;
-  ValueAlias: string;
-}
-
 export interface Item {
   Availability: string;
   AvailabilityText: string;
@@ -181,7 +166,7 @@ export interface Item {
   Depth: number;
   Edit: null;
   EstimatedReorderDate: Date;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   HandlingDays: number;
   HasEstimatedReorderDate: boolean;
   Height: number;

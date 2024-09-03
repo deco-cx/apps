@@ -3,6 +3,7 @@
  */
 
 import { LinxError } from "./common.ts";
+import { LinxMetadata } from "./shared-types/LinxMetada.ts";
 
 export interface WebPage {
   Response: Response;
@@ -28,13 +29,13 @@ export interface Model {
   Condition: string;
   CurrentSellerID: number;
   CurrentSkuID: number;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   DisplayCondition: boolean;
   DisplayPrice: string;
   DisplayStockQuantity: boolean;
   Edit: null;
   EstimatedReorderDate: null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   Flags: unknown[];
   HasAnyItemDeliverable: boolean;
   HasCurrentSkuID: boolean;
@@ -121,22 +122,6 @@ export interface CategoryItem {
   ParentID: string;
 }
 
-export interface Description {
-  Alias: string;
-  Color: null | string;
-  GroupName: null | string;
-  GroupType: string;
-  ImagePath: null | string;
-  Name: string;
-  Order: number;
-  PropertyMetadataID: number;
-  PropertyPath: string;
-  Reference: null | string;
-  Title: string;
-  Value: string;
-  ValueAlias: string;
-}
-
 export interface Item {
   Availability: string;
   AvailabilityText: string;
@@ -158,7 +143,7 @@ export interface Item {
   Depth: number;
   Edit: null;
   EstimatedReorderDate: null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   HandlingDays: number;
   HasEstimatedReorderDate: boolean;
   Height: number;
@@ -195,7 +180,7 @@ export interface Item {
   ReplenishmentStatus: string;
   RetailPrice: number;
   SKU: string;
-  SKUOptions: Description[];
+  SKUOptions: LinxMetadata[];
   StockBalance: number;
   Tax: number;
   TaxationAmount: number;
