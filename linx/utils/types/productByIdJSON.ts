@@ -1,5 +1,5 @@
 import { LinxInstallment } from "./installments.ts";
-import { Description } from "./productList.ts";
+import { LinxMetadata } from "./shared-types/linxMetada.ts";
 
 export interface ProductByIdResponse {
   HasPreviousPage: boolean;
@@ -110,7 +110,7 @@ export interface Product {
   PropertyPath: string;
   CurrentSkuID: number;
   HasCurrentSkuID: boolean;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   MininumOfDistinctSKUs: number;
   MininumOfSKUsQuantity: number;
   QuantityReturned: unknown;
@@ -122,7 +122,7 @@ export interface Product {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   ProductDefinition: unknown;
 }
@@ -236,7 +236,7 @@ export interface Item {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   Price: null;
   ProductDefinition: null;

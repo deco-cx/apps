@@ -1,4 +1,4 @@
-import { AvailableOption } from "./availableOptions.ts";
+import { AvailableOption } from "../availableOptions.ts";
 
 export interface Facet {
   Alias: string;

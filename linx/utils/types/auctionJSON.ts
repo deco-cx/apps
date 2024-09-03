@@ -1,7 +1,8 @@
 import { LinxError } from "./common.ts";
-import { Facet } from "./facets.ts";
+import { Facet } from "./shared-types/facets.ts";
 import { LinxInstallment } from "./installments.ts";
-import { LinxMetadata } from "./shared-types/LinxMetada.ts";
+import { LinxMetadata } from "./shared-types/linxMetada.ts";
+import { NavigationInfo } from "./shared-types/navigations.ts";
 
 export interface WebPage {
   Response: Response;
@@ -13,7 +14,7 @@ export interface WebPage {
 export interface Model {
   Grid: Grid;
   Message: null;
-  Navigation: Navigation[];
+  Navigation: NavigationInfo[];
   ProductAuctions: ProductAuction[];
   SortAlias: null;
 }
@@ -376,15 +377,6 @@ export interface SortOption {
 export interface Spell {
   Collation: string;
   Options: unknown[];
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
 }
 
 export interface ProductAuction {

@@ -3,7 +3,8 @@
  */
 
 import { LinxError } from "./common.ts";
-import { LinxMetadata } from "./shared-types/LinxMetada.ts";
+import { LinxMetadata } from "./shared-types/linxMetada.ts";
+import { NavigationInfo } from "./shared-types/navigations.ts";
 
 export interface WebPage {
   Response: Response;
@@ -69,7 +70,7 @@ export interface Model {
   MininumOfSKUsQuantity: number;
   MinLeadTimeDays: number;
   Name: string;
-  Navigation: Navigation[];
+  Navigation: NavigationInfo[];
   NewFrom: null;
   NewTo: null;
   Options: Option[];
@@ -287,15 +288,6 @@ export interface Media {
   Url: null;
   VariationPath: string;
   Width: number;
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
 }
 
 export interface ProductDefinition {

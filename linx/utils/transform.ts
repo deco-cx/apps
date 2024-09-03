@@ -10,13 +10,12 @@ import {
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { CartResponse } from "./types/basketJSON.ts";
 import {
-  Navigation as GridProductsNavigation,
   Product as LinxProductGroupGridProductsJSON,
 } from "./types/gridProductsJSON.ts";
+import { NavigationInfo as ProductNavigation } from "./types/shared-types/navigations.ts";
 import {
   Item as LinxProductFromJSON,
   Model as LinxProductGroupProductJSON,
-  Navigation as ProductNavigation,
   WebPage as ProductWebPage,
 } from "./types/productJSON.ts";
 import {
@@ -27,7 +26,7 @@ import {
   Item as LinxSuggestionProductJSON,
   Product as LinxSuggestionProductGroupJSON,
 } from "./types/suggestionsJSON.ts";
-import type { Facet } from "./types/facets.ts";
+import type { Facet } from "./types/shared-types/facets.ts";
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
@@ -43,7 +42,7 @@ type LinxProduct =
   | LinxProductFromList
   | LinxProductFromJSON
   | LinxSuggestionProductJSON;
-type LinxNavigation = ProductNavigation | GridProductsNavigation;
+type LinxNavigation = ProductNavigation;
 
 const pickVariant = (variants: LinxProduct[], variantId: number | null) => {
   if (variantId === null) {

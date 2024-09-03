@@ -1,5 +1,6 @@
 import { LinxError } from "./common.ts";
-import { LinxMetadata } from "./shared-types/LinxMetada.ts";
+import { LinxMetadata } from "./shared-types/linxMetada.ts";
+import { NavigationInfo } from "./shared-types/navigations.ts";
 
 export interface WebPage {
   Response: Response;
@@ -17,21 +18,12 @@ export interface Model {
   MarketAmountMultiplier: number;
   MinimunBidAmount: number;
   Name: string;
-  Navigation: Navigation[];
+  Navigation: NavigationInfo[];
   Product: Product;
   ProductAuctionID: number;
   ReservationAmount: number;
   VisibleFrom: Date;
   VisibleTo: Date;
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
 }
 
 export interface Product {

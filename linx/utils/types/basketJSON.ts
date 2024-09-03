@@ -1,5 +1,5 @@
 import { LinxError } from "./common.ts";
-import { LinxMetadata } from "./shared-types/LinxMetada.ts";
+import { LinxMetadata } from "./shared-types/linxMetada.ts";
 
 export interface CartResponse {
   Shopper: Shopper;

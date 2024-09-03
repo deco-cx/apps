@@ -1,3 +1,5 @@
+import { NavigationInfo } from "./shared-types/navigations.ts";
+
 export interface NewsletterResponse {
   Response: Response;
   Model: Model;
@@ -6,16 +8,7 @@ export interface NewsletterResponse {
 }
 
 export interface Model {
-  Navigation: Navigation[];
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
+  Navigation: NavigationInfo[];
 }
 
 export interface PageInfo {

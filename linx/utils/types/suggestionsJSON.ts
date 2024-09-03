@@ -1,5 +1,6 @@
 import { LinxError } from "./common.ts";
-import { LinxMetadata } from "./shared-types/LinxMetada.ts";
+import { LinxMetadata } from "./shared-types/linxMetada.ts";
+import { NavigationInfo } from "./shared-types/navigations.ts";
 
 export interface WebPage {
   Response: Response;
@@ -10,7 +11,7 @@ export interface WebPage {
 export interface Model {
   Grid: Grid;
   Keywords: string;
-  Navigation: Navigation[];
+  Navigation: NavigationInfo[];
   Provider: string;
   QuickFilters: unknown[];
   SearchId: string;
@@ -345,15 +346,6 @@ export interface Term {
 export interface TermOption {
   Count: number;
   Term: string;
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
 }
 
 export interface PageInfo {
