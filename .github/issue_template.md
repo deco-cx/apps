@@ -8,12 +8,12 @@ assignees: ""
 
 ## Issue Type
 
-Please select the type of issue you are reporting:
+Please inform the type(s) of issue(s) you are reporting:
 
-- [ ] Bug Report
-- [ ] Feature Request
-- [ ] Discussion
-- [ ] Question
+- Bug Report
+- Feature Request
+- Discussion
+- Question
 
 ## Description
 
