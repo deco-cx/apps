@@ -1,6 +1,8 @@
 import { LinxError } from "./common.ts";
+import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigations.ts";
+import { ProductSelectionItem } from "./shared-types/productSelection.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 
 export interface WebPage {
@@ -104,7 +106,7 @@ export interface Product {
   ProductDefinition: null;
   ProductDefinitionID: number;
   ProductID: number;
-  ProductSelection: ProductSelection;
+  ProductSelection: ProductSelectionItem;
   ProductTypeID: number;
   PromotionFrom: null;
   PromotionOnlyCheckout: boolean;
@@ -152,11 +154,6 @@ export interface BrowsingImage {
   Width: number;
 }
 
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
 
 export interface Item {
   Availability: string;
@@ -305,13 +302,6 @@ export interface MaxInstallmentsNoInterest {
   PaymentType: string;
   RetailPrice: number;
   YearInterestRate: number;
-}
-
-export interface ProductSelection {
-  PropertyLevel: number;
-  PropertyPath: string;
-  Quantity: number;
-  SkuID: number;
 }
 
 export interface Tag {

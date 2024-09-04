@@ -4,6 +4,7 @@ import { LinxInstallment } from "./installments.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigations.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
+import { CategoryItem } from "./shared-types/categoryItem.ts";
 
 export interface WebPage {
   Response: Response;
@@ -170,11 +171,6 @@ export type Path = "/";
 
 export type CatalogItemBehavior = "Default";
 
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
 
 export type Alias =
   | "WarrantyDescription"

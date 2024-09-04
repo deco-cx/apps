@@ -8,6 +8,8 @@ import { Facet } from "./shared-types/facets.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigations.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
+import { ProductSelectionItem } from "./shared-types/productSelection.ts";
+import { CategoryItem } from "./shared-types/categoryItem.ts";
 
 export interface WebPage {
   Response: Response;
@@ -122,7 +124,7 @@ export interface Product {
   ProductDefinition: null;
   ProductDefinitionID: number;
   ProductID: number;
-  ProductSelection: ProductSelection;
+  ProductSelection: ProductSelectionItem;
   ProductTypeID: number;
   PromotionFrom: null | string;
   PromotionOnlyCheckout: boolean;
@@ -170,11 +172,6 @@ export interface BrowsingImage {
   Width: number;
 }
 
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
 
 export interface Item {
   Availability: string;
@@ -313,12 +310,6 @@ export interface BuyBox {
   SellerName: null;
 }
 
-export interface ProductSelection {
-  PropertyLevel: number;
-  PropertyPath: string;
-  Quantity: number;
-  SkuID: number;
-}
 
 export interface Tag {
   Label: string;

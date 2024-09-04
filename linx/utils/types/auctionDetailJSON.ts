@@ -1,4 +1,5 @@
 import { LinxError } from "./common.ts";
+import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigations.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
@@ -132,11 +133,6 @@ export interface Product {
   VisibleTo: null;
 }
 
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
 
 export interface Item {
   Availability: string;
