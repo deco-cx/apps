@@ -6,6 +6,7 @@ import { NavigationInfo } from "./shared-types/navigationInfo.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
+import { ProviderCapabilities } from "./shared-types/providerCapabilities.ts";
 
 export interface WebPage {
   Response: Response;
@@ -318,7 +319,6 @@ export interface Price {
   TaxationAmount: number;
 }
 
-
 // deno-lint-ignore no-empty-interface
 export interface PageParameters {
 }
@@ -352,14 +352,6 @@ export type RootCategoryName = "Joias";
 
 export type RootCategoryURL = "/joias";
 
-export interface ProviderCapabilities {
-  CanFacet: boolean;
-  CanPage: boolean;
-  CanSort: boolean;
-  CanSpell: boolean;
-  CanTerm: boolean;
-  Provider: string;
-}
 
 export interface SortOption {
   Alias: string;

@@ -167,7 +167,6 @@ export interface Price {
   IsNullPrice: boolean;
 }
 
-
 export interface Item {
   Items: Item[];
   VariationPath: string;

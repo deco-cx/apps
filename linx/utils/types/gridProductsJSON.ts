@@ -11,6 +11,8 @@ import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { ProductSelectionItem } from "./shared-types/productSelectionItem.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
+import { PropertyItem } from "./shared-types/propertyItem.ts";
+import { ProviderCapabilities } from "./shared-types/providerCapabilities.ts";
 
 export interface WebPage {
   Response: Response;
@@ -249,23 +251,10 @@ export interface Option {
   Label: string;
   PropertyMetadataID: number;
   PropertyName: string;
-  Values: Value[];
+  Values: PropertyItem[];
   VariationLayoutTemplate: string;
 }
 
-export interface Value {
-  Color: null | string;
-  GroupName: null;
-  HasItems: boolean;
-  ImagePath: null | string;
-  IsSelected: boolean;
-  OptionID: number;
-  Order: number;
-  PropertyPath: string;
-  Reference: null;
-  Text: string;
-  Value: string;
-}
 
 export interface MediaGroup {
   Custom: null;
@@ -310,14 +299,6 @@ export interface Tag {
   TagID: number;
 }
 
-export interface ProviderCapabilities {
-  CanFacet: boolean;
-  CanPage: boolean;
-  CanSort: boolean;
-  CanSpell: boolean;
-  CanTerm: boolean;
-  Provider: string;
-}
 
 export interface SortOption {
   Alias: string;

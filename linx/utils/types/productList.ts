@@ -273,7 +273,6 @@ export interface Price {
   IsNullPrice: boolean;
 }
 
-
 export interface MaxInstallmentsNoInterest {
   Installments: number;
   InstallmentPrice: number;

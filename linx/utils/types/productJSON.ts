@@ -7,6 +7,7 @@ import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigationInfo.ts";
 import { ProductSelectionItem } from "./shared-types/productSelectionItem.ts";
+import { PropertyItem } from "./shared-types/propertyItem.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
@@ -198,23 +199,10 @@ export interface Option {
   Label: string;
   PropertyMetadataID: number;
   PropertyName: string;
-  Values: Value[];
+  Values: PropertyItem[];
   VariationLayoutTemplate: string;
 }
 
-export interface Value {
-  Color: null | string;
-  GroupName: null;
-  HasItems: boolean;
-  ImagePath: null | string;
-  IsSelected: boolean;
-  OptionID: number;
-  Order: number;
-  PropertyPath: string;
-  Reference: null;
-  Text: string;
-  Value: string;
-}
 
 export interface Price {
   BestInstallment: MaxInstallmentsNoInterest | null;

@@ -1,5 +1,4 @@
 export interface SellerInfo {
-    SellerID: number;
-    SellerName: null;
-  }
-  
+  SellerID: number;
+  SellerName: null;
+}
