@@ -5,6 +5,7 @@
 import { LinxError } from "./common.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigations.ts";
+import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 
 export interface WebPage {
   Response: Response;
@@ -340,10 +341,4 @@ export interface Response {
   SuccessMessage: null;
   Url: null;
   Warnings: unknown[];
-}
-
-export interface ResponseCallBack {
-  Code: string;
-  Parameters: unknown[];
-  Value: string;
 }

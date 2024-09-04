@@ -1,4 +1,5 @@
 import { LinxError } from "./common.ts";
+import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 
 export interface CartOperation {
   Errors: LinxError[];
@@ -8,12 +9,6 @@ export interface CartOperation {
   SuccessMessage: null;
   Url: null;
   Warnings: unknown[];
-}
-
-export interface ResponseCallBack {
-  Code: string;
-  Parameters: unknown[];
-  Value: string;
 }
 
 export interface Meta {
