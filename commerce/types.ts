@@ -41,8 +41,8 @@ export interface Thing {
   /** The identifier property represents any kind of identifier for any kind of {@link https://schema.org/Thing Thing}, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See {@link /docs/datamodel.html#identifierBg background notes} for more details. */
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
-  image?: ImageObject[];
-  video?: VideoObject[];
+  image?: ImageObject[] | null;
+  video?: VideoObject[] | null;
   /** The name of the item. */
   name?: string;
   /** URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website. */
@@ -174,6 +174,25 @@ export declare type PriceComponentTypeEnumeration =
   | "https://schema.org/Installment"
   | "https://schema.org/Subscription";
 
+export declare type ReturnFeesEnumeration =
+  | "https://schema.org/FreeReturn"
+  | "https://schema.org/OriginalShippingFees"
+  | "https://schema.org/RestockingFees"
+  | "https://schema.org/ReturnFeesCustomerResponsibility"
+  | "https://schema.org/ReturnShippingFees";
+
+export declare type ReturnMethodEnumeration =
+  | "https://schema.org/KeepProduct"
+  | "https://schema.org/ReturnAtKiosk"
+  | "https://schema.org/ReturnByMail"
+  | "https://schema.org/ReturnInStore";
+
+export declare type MerchantReturnEnumeration =
+  | "https://schema.org/MerchantReturnFiniteReturnWindow"
+  | "https://schema.org/MerchantReturnNotPermitted"
+  | "https://schema.org/MerchantReturnUnlimitedWindow"
+  | "https://schema.org/MerchantReturnUnspecified";
+
 export interface PriceSpecification extends Omit<Thing, "@type"> {
   "@type": "PriceSpecification";
   /** The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity. */
@@ -230,6 +249,42 @@ export interface Teasers {
   effects: TeasersEffect;
 }
 
+export interface MonetaryAmount extends Omit<Thing, "@type"> {
+  /**
+   * The currency in which the monetary amount is expressed.
+   *
+   * Use standard formats: ISO 4217 currency format, e.g. "USD"; Ticker symbol for cryptocurrencies, e.g. "BTC"; well known names for Local Exchange Trading Systems (LETS) and other currency types, e.g. "Ithaca HOUR".
+   */
+  currency: string;
+  /**
+   * The upper value of some characteristic or property.
+   */
+  maxValue: number;
+  /** The lower value of some characteristic or property. */
+  minValue: number;
+  /** The date when the item becomes valid. */
+  validFrom: string;
+  /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
+  validThrough: string;
+  /** The value of a QuantitativeValue (including Observation) or property value node. */
+  value: boolean | number | string;
+}
+
+export interface MerchantReturnPolicy extends Omit<Thing, "@type"> {
+  "@type": "MerchantReturnPolicy";
+  /** Specifies either a fixed return date or the number of days (from the delivery date) that a product can be returned. Used when the returnPolicyCategory property is specified as MerchantReturnFiniteReturnWindow. Supersedes productReturnDays */
+  merchantReturnDays?: number;
+  /** A country where a particular merchant return policy applies to, for example the two-letter ISO 3166-1 alpha-2 country code. */
+  applicableCountry: string;
+  /** The type of return fees for purchased products (for any return reason). */
+  returnFees?: ReturnFeesEnumeration;
+  /** The type of return method offered, specified from an enumeration. */
+  returnMethod?: ReturnMethodEnumeration;
+  /** Specifies an applicable return policy (from an enumeration). */
+  returnPolicyCategory: MerchantReturnEnumeration;
+  /** Amount of shipping costs for product returns (for any reason). Applicable when property returnFees equals ReturnShippingFees. */
+  returnShippingFeesAmount?: MonetaryAmount;
+}
 export interface Offer extends Omit<Thing, "@type"> {
   "@type": "Offer";
   /** The availability of this item—for example In stock, Out of stock, Pre-order, etc. */
@@ -270,6 +325,8 @@ export interface Offer extends Omit<Thing, "@type"> {
   giftSkuIds?: string[];
   /** Used by some ecommerce providers (e.g: VTEX) to describe special promotions that depend on some conditions */
   teasers?: Teasers[];
+  /** Specifies a MerchantReturnPolicy that may be applicable.  */
+  hasMerchantReturnPolicy?: MerchantReturnPolicy;
 }
 
 export interface AggregateOffer {
@@ -300,6 +357,8 @@ export interface AggregateOffer {
    * Use standard formats: {@link http://en.wikipedia.org/wiki/ISO_4217 ISO 4217 currency format} e.g. "USD"; {@link https://en.wikipedia.org/wiki/List_of_cryptocurrencies Ticker symbol} for cryptocurrencies e.g. "BTC"; well known names for {@link https://en.wikipedia.org/wiki/Local_exchange_trading_system Local Exchange Tradings Systems} (LETS) and other currency types e.g. "Ithaca HOUR".
    */
   priceCurrency?: string;
+  /** Specifies a MerchantReturnPolicy that may be applicable.  */
+  hasMerchantReturnPolicy?: MerchantReturnPolicy;
 }
 
 export interface ReviewPageResults {
@@ -381,7 +440,7 @@ export interface Person extends Omit<Thing, "@type"> {
   /** Gender of something, typically a Person, but possibly also fictional characters, animals, etc */
   gender?: "https://schema.org/Male" | "https://schema.org/Female";
   /** An image of the item. This can be a URL or a fully described ImageObject. **/
-  image?: ImageObject[];
+  image?: ImageObject[] | null;
   /** The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain. */
   taxID?: string;
 }
@@ -474,9 +533,9 @@ export interface Product extends Omit<Thing, "@type"> {
   inProductGroupWithID?: string;
   // TODO: Make json schema generator support self-referencing types
   // /** A pointer to another, somehow related product (or multiple products). */
-  isRelatedTo?: Product[];
+  isRelatedTo?: Product[] | null;
   /** A pointer to another, functionally similar product (or multiple products). */
-  isSimilarTo?: Product[];
+  isSimilarTo?: Product[] | null;
   /** Indicates the kind of product that this is a variant of. In the case of {@link https://schema.org/ProductModel ProductModel}, this is a pointer (from a ProductModel) to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive. In the case of a {@link https://schema.org/ProductGroup ProductGroup}, the group description also serves as a template, representing a set of Products that vary on explicitly defined, specific dimensions only (so it defines both a set of variants, as well as which values distinguish amongst those variants). When used with {@link https://schema.org/ProductGroup ProductGroup}, this property can apply to any {@link https://schema.org/Product Product} included in the group. */
   isVariantOf?: ProductGroup;
   /** An offer to provide this item—for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use {@link https://schema.org/businessFunction businessFunction} to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a {@link https://schema.org/Demand Demand}. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer. */
@@ -492,7 +551,7 @@ export interface Product extends Omit<Thing, "@type"> {
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
-  isAccessoryOrSparePartFor?: Product[];
+  isAccessoryOrSparePartFor?: Product[] | null;
 
   questions?: Question[];
 }
@@ -864,7 +923,7 @@ export interface Search {
 
 export interface Suggestion {
   searches?: Search[];
-  products?: Product[];
+  products?: Product[] | null;
   hits?: number;
 }
 
@@ -879,7 +938,7 @@ export interface SiteNavigationElementLeaf {
   /** The identifier property represents any kind of identifier for any kind of {@link https://schema.org/Thing Thing}, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See {@link /docs/datamodel.html#identifierBg background notes} for more details. */
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
-  image?: ImageObject[];
+  image?: ImageObject[] | null;
   /** The name of the item. */
   name?: string;
   /** URL of the item. */
