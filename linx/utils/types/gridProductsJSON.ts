@@ -6,10 +6,11 @@ import { LinxInstallment } from "./installments.ts";
 import { LinxError } from "./common.ts";
 import { Facet } from "./shared-types/facets.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { NavigationInfo } from "./shared-types/navigations.ts";
+import { NavigationInfo } from "./shared-types/navigationInfo.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
-import { ProductSelectionItem } from "./shared-types/productSelection.ts";
+import { ProductSelectionItem } from "./shared-types/productSelectionItem.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
+import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
 export interface WebPage {
   Response: Response;
@@ -172,7 +173,6 @@ export interface BrowsingImage {
   Width: number;
 }
 
-
 export interface Item {
   Availability: string;
   AvailabilityText: string;
@@ -286,7 +286,7 @@ export interface MediaGroup {
 export interface Price {
   BestInstallment: LinxInstallment | null;
   BestInstallmentCreditCard: null;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
   HasMunknownSkus: boolean;
@@ -304,12 +304,6 @@ export interface Price {
   Tax: number;
   TaxationAmount: number;
 }
-
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
-}
-
 
 export interface Tag {
   Label: string;

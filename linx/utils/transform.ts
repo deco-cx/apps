@@ -12,7 +12,7 @@ import { CartResponse } from "./types/basketJSON.ts";
 import {
   Product as LinxProductGroupGridProductsJSON,
 } from "./types/gridProductsJSON.ts";
-import { NavigationInfo as ProductNavigation } from "./types/shared-types/navigations.ts";
+import { NavigationInfo as ProductNavigation } from "./types/shared-types/navigationInfo.ts";
 import {
   Item as LinxProductFromJSON,
   Model as LinxProductGroupProductJSON,

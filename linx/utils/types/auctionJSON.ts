@@ -2,9 +2,10 @@ import { LinxError } from "./common.ts";
 import { Facet } from "./shared-types/facets.ts";
 import { LinxInstallment } from "./installments.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { NavigationInfo } from "./shared-types/navigations.ts";
+import { NavigationInfo } from "./shared-types/navigationInfo.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
+import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
 export interface WebPage {
   Response: Response;
@@ -171,7 +172,6 @@ export type Path = "/";
 
 export type CatalogItemBehavior = "Default";
 
-
 export type Alias =
   | "WarrantyDescription"
   | "LongDescription"
@@ -299,7 +299,7 @@ export interface LoyaltyProgramPoint {
 export interface Price {
   BestInstallment: LinxInstallment;
   BestInstallmentCreditCard: LinxInstallment | null;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
   HasMunknownSkus: boolean;
@@ -318,10 +318,6 @@ export interface Price {
   TaxationAmount: number;
 }
 
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
-}
 
 // deno-lint-ignore no-empty-interface
 export interface PageParameters {

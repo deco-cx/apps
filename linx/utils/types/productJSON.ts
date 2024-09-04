@@ -5,9 +5,10 @@
 import { LinxError } from "./common.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { NavigationInfo } from "./shared-types/navigations.ts";
-import { ProductSelectionItem } from "./shared-types/productSelection.ts";
+import { NavigationInfo } from "./shared-types/navigationInfo.ts";
+import { ProductSelectionItem } from "./shared-types/productSelectionItem.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
+import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
 export interface WebPage {
   Response: Response;
@@ -218,7 +219,7 @@ export interface Value {
 export interface Price {
   BestInstallment: MaxInstallmentsNoInterest | null;
   BestInstallmentCreditCard: null;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
   HasManySkus: boolean;
@@ -235,11 +236,6 @@ export interface Price {
   SalesPriceWithTaxDiscount: number;
   Tax: number;
   TaxationAmount: number;
-}
-
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
 }
 
 export interface MaxInstallmentsNoInterest {
@@ -295,7 +291,6 @@ export interface ProductDefinition {
   JoinStockKeepUnitPatternLength: null;
   ProductDefinitionID: number;
 }
-
 
 export interface Tag {
   Label: string;

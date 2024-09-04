@@ -1,8 +1,9 @@
 import { LinxError } from "./common.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { NavigationInfo } from "./shared-types/navigations.ts";
+import { NavigationInfo } from "./shared-types/navigationInfo.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
+import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
 export interface WebPage {
   Response: Response;
@@ -133,7 +134,6 @@ export interface Product {
   VisibleTo: null;
 }
 
-
 export interface Item {
   Availability: string;
   AvailabilityText: string;
@@ -208,7 +208,7 @@ export interface Item {
 export interface Price {
   BestInstallment: BestInstallment;
   BestInstallmentCreditCard: null;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
   HasMunknownSkus: boolean;
@@ -237,11 +237,6 @@ export interface BestInstallment {
   PaymentType: string;
   RetailPrice: number;
   YearInterestRate: number;
-}
-
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
 }
 
 // deno-lint-ignore no-empty-interface

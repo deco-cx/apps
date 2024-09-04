@@ -1,5 +1,6 @@
 import { LinxInstallment } from "./installments.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
+import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
 export interface ProductByIdResponse {
   HasPreviousPage: boolean;
@@ -161,15 +162,11 @@ export interface Price {
   SalesPriceWithTaxDiscount: number;
   TaxationAmount: number;
   HasBuyBox: boolean;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: unknown;
   IsNullPrice: boolean;
 }
 
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
-}
 
 export interface Item {
   Items: Item[];
