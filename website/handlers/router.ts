@@ -99,8 +99,16 @@ export const router = (
     }
 
     for (const { pathTemplate: routePath, handler } of routes) {
+      let url;
+      if (URL.canParse(routePath)) {
+        url = new URL(routePath);
+      } else {
+        url = new URL(routePath, "http://localhost:8000");
+      }
+
       const pattern = urlPatternCache[routePath] ??= new URLPattern({
-        pathname: routePath,
+        pathname: url.pathname,
+        search: url.search,
       });
       const res = pattern.exec(req.url);
       const groups = res?.pathname.groups ?? {};
