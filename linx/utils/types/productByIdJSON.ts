@@ -1,4 +1,6 @@
 import { LinxInstallment } from "./installments.ts";
+import { CategoryItem } from "./shared-types/categoryItem.ts";
+import { SortOption, Spell } from "./shared-types/labelOptions.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
@@ -278,12 +280,6 @@ export interface Value {
   GroupName: null;
 }
 
-export interface CategoryItem {
-  ID: string;
-  ParentID: string;
-  Name: string;
-}
-
 export interface Media {
   MaxWidth: number;
   MaxHeight: number;
@@ -407,15 +403,4 @@ export interface ProductSelection {
   PropertyLevel: number;
   SkuID: number;
   Quantity: number;
-}
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
 }

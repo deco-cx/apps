@@ -1,3 +1,5 @@
+import { CategoryItem } from "./shared-types/categoryItem.ts";
+import { SortOption, Spell } from "./shared-types/labelOptions.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
@@ -132,12 +134,6 @@ export interface BrowsingImage {
   Url: null;
   Attributes: unknown[];
   HasMediaPath: boolean;
-}
-
-export interface CategoryItem {
-  ID: string;
-  ParentID: string;
-  Name: string;
 }
 
 export interface Item {
@@ -304,15 +300,4 @@ export interface ProviderCapabilities {
   CanPage: boolean;
   CanTerm: boolean;
   CanSpell: boolean;
-}
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
 }

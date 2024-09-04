@@ -1,4 +1,4 @@
-import { LinxError } from "./common.ts";
+import { LinxError } from "./shared-types/common.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigationInfo.ts";

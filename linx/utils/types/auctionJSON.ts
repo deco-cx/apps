@@ -1,4 +1,4 @@
-import { LinxError } from "./common.ts";
+import { LinxError } from "./shared-types/common.ts";
 import { Facet } from "./shared-types/facets.ts";
 import { LinxInstallment } from "./installments.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
@@ -7,6 +7,7 @@ import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 import { ProviderCapabilities } from "./shared-types/providerCapabilities.ts";
+import { SortOption, Spell } from "./shared-types/labelOptions.ts";
 
 export interface WebPage {
   Response: Response;
@@ -351,18 +352,6 @@ export type ReplenishmentStatus = "Normal" | "Discontinued";
 export type RootCategoryName = "Joias";
 
 export type RootCategoryURL = "/joias";
-
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
-}
 
 export interface ProductAuction {
   BidAmountMultiplier: number;

@@ -1,4 +1,5 @@
-import { LinxError } from "./common.ts";
+import { CategoryItem } from "./shared-types/categoryItem.ts";
+import { LinxError } from "./shared-types/common.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 
 export interface CartResponse {
@@ -332,12 +333,6 @@ export type MediaSizeType = "Small" | "Thumbnail" | "Medium" | "Large" | "Zoom";
 export type MediaType = "Image";
 
 export type Path = "/";
-
-export interface CategoryItem {
-  ID: string;
-  ParentID: string;
-  Name: string;
-}
 
 export type GroupType = "Description" | "Extended";
 

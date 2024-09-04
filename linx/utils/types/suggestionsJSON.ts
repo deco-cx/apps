@@ -1,4 +1,4 @@
-import { LinxError } from "./common.ts";
+import { LinxError } from "./shared-types/common.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigationInfo.ts";
@@ -7,6 +7,7 @@ import { ProductSelectionItem } from "./shared-types/productSelectionItem.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 import { ProviderCapabilities } from "./shared-types/providerCapabilities.ts";
+import { SortOption, Spell, Tag } from "./shared-types/labelOptions.ts";
 
 export interface WebPage {
   Response: Response;
@@ -237,7 +238,6 @@ export interface ItemOption {
   VariationLayoutTemplate: string;
 }
 
-
 export interface MediaGroup {
   Custom: null;
   IsPurchasable: boolean;
@@ -286,23 +286,6 @@ export interface MaxInstallmentsNoInterest {
   PaymentType: string;
   RetailPrice: number;
   YearInterestRate: number;
-}
-
-export interface Tag {
-  Label: string;
-  TagID: number;
-}
-
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
 }
 
 export interface Term {
