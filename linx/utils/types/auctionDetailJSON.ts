@@ -4,6 +4,8 @@ import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { NavigationInfo } from "./shared-types/navigationInfo.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
+import { Path, ProductSelection } from "./shared-types/productSelection.ts";
+import { ProductDefinition } from "./shared-types/productDefinition.ts";
 
 export interface WebPage {
   Response: Response;
@@ -243,8 +245,6 @@ export interface BestInstallment {
 export interface PageParameters {
 }
 
-export type Path = "/";
-
 export interface MediaGroup {
   Custom: null;
   IsPurchasable: boolean;
@@ -281,22 +281,6 @@ export interface Media {
 export type MediaSizeType = "Large" | "Thumbnail" | "Small" | "Medium" | "Zoom";
 
 export type MediaType = "Image";
-
-export interface ProductDefinition {
-  IsJoinable: boolean;
-  JoinDisplayText: null;
-  JoinProductBehavior: number;
-  JoinPropertyMetadataID: null;
-  JoinStockKeepUnitPatternLength: null;
-  ProductDefinitionID: number;
-}
-
-export interface ProductSelection {
-  PropertyLevel: number;
-  PropertyPath: Path;
-  Quantity: number;
-  SkuID: number;
-}
 
 export interface PageInfo {
   AlternateTitle: null;

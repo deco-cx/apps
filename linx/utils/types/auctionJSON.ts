@@ -8,6 +8,7 @@ import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 import { ProviderCapabilities } from "./shared-types/providerCapabilities.ts";
 import { SortOption, Spell } from "./shared-types/labelOptions.ts";
+import { Path, ProductSelection } from "./shared-types/productSelection.ts";
 
 export interface WebPage {
   Response: Response;
@@ -169,8 +170,6 @@ export interface BrowsingImage {
 export type MediaSizeType = "Small" | "Thumbnail" | "Medium" | "Large" | "Zoom";
 
 export type MediaType = "Image";
-
-export type Path = "/";
 
 export type CatalogItemBehavior = "Default";
 
@@ -338,13 +337,6 @@ export interface MediaGroup {
   VariationLevel: number;
   VariationPath: Path;
   Zoom: BrowsingImage;
-}
-
-export interface ProductSelection {
-  PropertyLevel: number;
-  PropertyPath: Path;
-  Quantity: number;
-  SkuID: number;
 }
 
 export type ReplenishmentStatus = "Normal" | "Discontinued";

@@ -11,6 +11,7 @@ import { PropertyItem } from "./shared-types/propertyItem.ts";
 import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 import { Tag } from "./shared-types/labelOptions.ts";
+import { ProductDefinition } from "./shared-types/productDefinition.ts";
 
 export interface WebPage {
   Response: Response;
@@ -270,16 +271,6 @@ export interface Media {
   VariationPath: string;
   Width: number;
 }
-
-export interface ProductDefinition {
-  IsJoinable: boolean;
-  JoinDisplayText: null;
-  JoinProductBehavior: number;
-  JoinPropertyMetadataID: null;
-  JoinStockKeepUnitPatternLength: null;
-  ProductDefinitionID: number;
-}
-
 
 export interface PageInfo {
   AlternateTitle: null;

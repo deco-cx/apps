@@ -1,6 +1,7 @@
 import { CategoryItem } from "./shared-types/categoryItem.ts";
 import { LinxError } from "./shared-types/common.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
+import { Path } from "./shared-types/productSelection.ts";
 
 export interface CartResponse {
   Shopper: Shopper;
@@ -331,8 +332,6 @@ export interface BrowsingImage {
 export type MediaSizeType = "Small" | "Thumbnail" | "Medium" | "Large" | "Zoom";
 
 export type MediaType = "Image";
-
-export type Path = "/";
 
 export type GroupType = "Description" | "Extended";
 
