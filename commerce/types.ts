@@ -41,8 +41,8 @@ export interface Thing {
   /** The identifier property represents any kind of identifier for any kind of {@link https://schema.org/Thing Thing}, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See {@link /docs/datamodel.html#identifierBg background notes} for more details. */
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
-  image?: ImageObject[];
-  video?: VideoObject[];
+  image?: ImageObject[] | null;
+  video?: VideoObject[] | null;
   /** The name of the item. */
   name?: string;
   /** URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website. */
@@ -440,7 +440,7 @@ export interface Person extends Omit<Thing, "@type"> {
   /** Gender of something, typically a Person, but possibly also fictional characters, animals, etc */
   gender?: "https://schema.org/Male" | "https://schema.org/Female";
   /** An image of the item. This can be a URL or a fully described ImageObject. **/
-  image?: ImageObject[];
+  image?: ImageObject[] | null;
   /** The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain. */
   taxID?: string;
 }
@@ -533,9 +533,9 @@ export interface Product extends Omit<Thing, "@type"> {
   inProductGroupWithID?: string;
   // TODO: Make json schema generator support self-referencing types
   // /** A pointer to another, somehow related product (or multiple products). */
-  isRelatedTo?: Product[];
+  isRelatedTo?: Product[] | null;
   /** A pointer to another, functionally similar product (or multiple products). */
-  isSimilarTo?: Product[];
+  isSimilarTo?: Product[] | null;
   /** Indicates the kind of product that this is a variant of. In the case of {@link https://schema.org/ProductModel ProductModel}, this is a pointer (from a ProductModel) to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive. In the case of a {@link https://schema.org/ProductGroup ProductGroup}, the group description also serves as a template, representing a set of Products that vary on explicitly defined, specific dimensions only (so it defines both a set of variants, as well as which values distinguish amongst those variants). When used with {@link https://schema.org/ProductGroup ProductGroup}, this property can apply to any {@link https://schema.org/Product Product} included in the group. */
   isVariantOf?: ProductGroup;
   /** An offer to provide this item—for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use {@link https://schema.org/businessFunction businessFunction} to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a {@link https://schema.org/Demand Demand}. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer. */
@@ -551,7 +551,7 @@ export interface Product extends Omit<Thing, "@type"> {
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
-  isAccessoryOrSparePartFor?: Product[];
+  isAccessoryOrSparePartFor?: Product[] | null;
 
   questions?: Question[];
 }
@@ -923,7 +923,7 @@ export interface Search {
 
 export interface Suggestion {
   searches?: Search[];
-  products?: Product[];
+  products?: Product[] | null;
   hits?: number;
 }
 
@@ -938,7 +938,7 @@ export interface SiteNavigationElementLeaf {
   /** The identifier property represents any kind of identifier for any kind of {@link https://schema.org/Thing Thing}, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See {@link /docs/datamodel.html#identifierBg background notes} for more details. */
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
-  image?: ImageObject[];
+  image?: ImageObject[] | null;
   /** The name of the item. */
   name?: string;
   /** URL of the item. */

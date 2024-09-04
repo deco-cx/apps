@@ -17,7 +17,9 @@ Please inform the type(s) of issue(s) you are reporting:
 
 ## Description
 
-Please provide a clear and concise description of the issue or enhancement. Include any relevant information that could help reproduce the issue or understand the request.
+Please provide a clear and concise description of the issue or enhancement.
+Include any relevant information that could help reproduce the issue or
+understand the request.
 
 ## Steps to Reproduce (for bugs)
 
@@ -35,7 +37,8 @@ Describe what actually happened.
 
 ## Additional Context
 
-Add any other context about the issue here, including screenshots, logs, or other supporting information.
+Add any other context about the issue here, including screenshots, logs, or
+other supporting information.
 
 ---
 
