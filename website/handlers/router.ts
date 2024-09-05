@@ -159,6 +159,34 @@ const RouterId = {
 const routerCache = new weakcache.WeakLRUCache({
   cacheSize: 16, // up to 16 different routers stored here.
 });
+
+const prepareRoutes = (audiences: Routes[], ctx: AppContext) => {
+  const routesFromProps = Array.isArray(audiences) ? audiences : [];
+  // everyone should come first in the list given that we override the everyone value with the upcoming flags.
+  const [routes, hrefRoutes] = buildRoutes(
+    Array.isArray(ctx.routes)
+      ? [...ctx.routes, ...routesFromProps]
+      : routesFromProps,
+  );
+  // build the router from entries
+  const builtRoutes = Object.entries(routes).sort((
+    [routeStringA, { highPriority: highPriorityA }],
+    [routeStringB, { highPriority: highPriorityB }],
+  ) =>
+    (highPriorityB ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
+    rankRoute(routeStringB) -
+    ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
+      rankRoute(routeStringA))
+  );
+  return {
+    routes: builtRoutes.map((route) => ({
+      pathTemplate: route[0],
+      handler: { value: route[1].func },
+    })),
+    hrefRoutes,
+  };
+};
+
 /**
  * @title Router
  * @description Route requests based on audience
@@ -181,35 +209,9 @@ export default function RoutesSelection(
 
     const timing = monitoring?.timings.start("router");
 
-    const prepareRoutes = () => {
-      const routesFromProps = Array.isArray(audiences) ? audiences : [];
-      // everyone should come first in the list given that we override the everyone value with the upcoming flags.
-      const [routes, hrefRoutes] = buildRoutes(
-        Array.isArray(ctx.routes)
-          ? [...ctx.routes, ...routesFromProps]
-          : routesFromProps,
-      );
-      // build the router from entries
-      const builtRoutes = Object.entries(routes).sort((
-        [routeStringA, { highPriority: highPriorityA }],
-        [routeStringB, { highPriority: highPriorityB }],
-      ) =>
-        (highPriorityB ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
-        rankRoute(routeStringB) -
-        ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
-          rankRoute(routeStringA))
-      );
-      return {
-        routes: builtRoutes.map((route) => ({
-          pathTemplate: route[0],
-          handler: { value: route[1].func },
-        })),
-        hrefRoutes,
-      };
-    };
     const routerId = `${RouterId.fromFlags(ctx.flags)}/${ctx.revision ?? ""}`;
     if (!routerCache.has(routerId)) {
-      routerCache.setValue(routerId, prepareRoutes());
+      routerCache.setValue(routerId, prepareRoutes(audiences, ctx));
     }
     const { routes, hrefRoutes }: {
       routes: Route[];

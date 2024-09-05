@@ -27,6 +27,37 @@ export const isFreshCtx = <TState>(
   return typeof (ctx as HandlerContext).render === "function";
 };
 
+function abortHandler(ctrl: AbortController, signal: AbortSignal) {
+  let aborted = false;
+  const abortCtrlInstance = () =>  {
+    if (aborted) return; // Early return if already handled
+
+    try {
+      if (!ctrl.signal.aborted) {
+        ctrl?.abort();
+        aborted = true; // Mark as aborted after calling abort
+      }
+    } catch (_err) {
+      // We tried our best, but it is already dead... so.. lets ignore it :)
+    } finally {
+      signal.removeEventListener("abort", abortCtrlInstance)
+    }
+  }
+  return abortCtrlInstance;
+};
+
+function removeCtrl(handler: () => any, signal: AbortSignal) {
+  signal.removeEventListener("abort", handler);
+};
+
+function registerFinilizer(req: Request, abortCtrl: () => void) {
+  const finalizer = new FinalizationRegistry((abortCtrl) => {
+    req.signal.removeEventListener("abort", abortCtrl);
+  });
+
+  finalizer.register(req, removeCtrl(abortCtrl, req.signal));
+}
+
 /**
  * @title Fresh Page
  * @description Renders a fresh page.
@@ -57,10 +88,12 @@ export default function Fresh(
 
     /** Controller to abort third party fetch (loaders) */
     const ctrl = new AbortController();
+    const abortCtrl = abortHandler(ctrl, req.signal);
 
     /** Aborts when: Incomming request is aborted */
-    const abortHandler = () => ctrl.abort();
-    req.signal.addEventListener("abort", abortHandler);
+    req.signal.addEventListener("abort", abortCtrl, {once: true});
+
+    registerFinilizer(req, abortCtrl);
 
     /**
      * Aborts when:
