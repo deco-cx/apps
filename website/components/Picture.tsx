@@ -1,4 +1,4 @@
-import { Head } from "@deco/deco";
+import { Head } from "$fresh/runtime.ts";
 import { type ComponentChildren, createContext, type JSX } from "preact";
 import { forwardRef } from "preact/compat";
 import { useContext, useMemo } from "preact/hooks";

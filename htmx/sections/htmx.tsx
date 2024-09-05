@@ -1,6 +1,6 @@
+import { Head } from "$fresh/runtime.ts";
 import type { SectionProps } from "@deco/deco";
 import { useScript } from "@deco/deco/hooks";
-import { Head } from "@deco/deco/htmx";
 import type { AppContext, Extension } from "../mod.ts";
 
 const script = (extensions: Extension[]) => {

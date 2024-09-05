@@ -1,4 +1,4 @@
-import { IS_BROWSER } from "@deco/deco";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
 import type { Person } from "../../commerce/types.ts";
 import { invoke } from "../runtime.ts";
