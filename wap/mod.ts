@@ -3,6 +3,7 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { OpenAPI } from "./utils/openapi/api.openapi.gen.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 export const color = 0xfe5000;
 
@@ -16,6 +17,7 @@ export type AppContext = FnContext<State, Manifest>;
 export interface Props {
   /**
    * @description Use Wap as backend platform
+   * @hide true
    */
   platform: "wap";
   /**
@@ -51,3 +53,21 @@ export default function App(
 
   return { manifest, state };
 }
+
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Wap",
+      owner: "deco.cx",
+      description:
+        "Loaders, actions and workflows for adding Wap Commerce Platform to your website.",
+      logo:
+        "https://auth.deco.cx/storage/v1/object/public/assets/1/user_content/uappi.png",
+      images: [
+        "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/starting/235b17e1-6f7a-4077-98cf-dad53ef075e5/2.Home-Galeria-de-topicos-principais-575x455px.jpg",
+      ],
+      tabs: [],
+    },
+  };
+};

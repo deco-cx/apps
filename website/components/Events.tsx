@@ -21,10 +21,6 @@ interface FeatureFlags {
 declare global {
   interface Window {
     DECO: { events: EventsAPI; featureFlags: FeatureFlags };
-    DECO_FORM: {
-      change: (formState: any) => void;
-      setProp: (pathProp: string[], value: any) => void;
-    };
     DECO_ANALYTICS: Record<
       string,
       // deno-lint-ignore no-explicit-any

@@ -1,9 +1,10 @@
 import type { App as A, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
 import { createHttpClient } from "../utils/http.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
+import { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client.ts";
-import { Secret } from "../website/loaders/secret.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type App = ReturnType<typeof Mailchimp>;
 export type AppContext = AC<App>;
@@ -40,6 +41,27 @@ export default function Mailchimp(props: Props) {
   return app;
 }
 
-export const preview = previewFromMarkdown(
-  new URL("README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Mailchimp",
+      owner: "deco.cx",
+      description:
+        "Mailchimp is an email and marketing automations platform for growing businesses.",
+      logo:
+        "https://s3.amazonaws.com/www-inside-design/uploads/2018/10/mailchimp-sq.jpg",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

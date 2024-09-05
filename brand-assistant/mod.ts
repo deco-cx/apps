@@ -1,5 +1,6 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 // deno-lint-ignore no-empty-interface
 export interface Props {
@@ -21,3 +22,18 @@ export default function App(
 }
 
 export type AppContext = AC<ReturnType<typeof App>>;
+
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Deco Brand Assistant",
+      owner: "deco.cx",
+      description: "A concierge for your ecommerce.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/brand-assistant/logo.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};

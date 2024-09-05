@@ -4,7 +4,8 @@ import { createGraphqlClient } from "../utils/graphql.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import getStateFromZip from "../commerce/utils/stateByZip.ts";
 import type { Secret } from "../website/loaders/secret.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
+import { Markdown } from "../decohub/components/Markdown.tsx";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -32,6 +33,8 @@ export interface Props {
 
   /**
    * @description Use Shopify as backend platform
+   * @default shopify
+   * @hide true
    */
   platform: "shopify";
 }
@@ -95,6 +98,29 @@ export default function App(props: Props): App<Manifest, State> {
   };
 }
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Shopify",
+      owner: "deco.cx",
+      description:
+        "Loaders, actions and workflows for adding Shopify Commerce Platform to your website.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/shopify/logo.png",
+      images: [
+        "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/starting/03899f97-2ebc-48c6-8c70-1e5448bfb4db/shopify.webp",
+      ],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

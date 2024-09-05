@@ -13,6 +13,8 @@ import type { Secret } from "../website/loaders/secret.ts";
 
 import { ClientOf } from "../utils/http.ts";
 import PreviewNuvemshop from "./preview/index.tsx";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 export type App = ReturnType<typeof Nuvemshop>;
 export type AppContext = AC<App>;
@@ -50,6 +52,8 @@ export interface Props {
 
   /**
    * @description Use Nuvemshop as backend platform
+   * @default nuvemshop
+   * @hide true
    */
   platform: "nuvemshop";
 }
@@ -95,4 +99,33 @@ export default function Nuvemshop(
   return app;
 }
 
-export const Preview = PreviewNuvemshop;
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Nuvemshop",
+      owner: "deco.cx",
+      description:
+        "Loaders, actions and workflows for adding Nuvemshop Commerce Platform to your website.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/nuvemshop/logo.png",
+      images: [
+        "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/starting/a1525b04-3a8d-40cf-b07d-13bf0e950239/nuvemshop.webp",
+      ],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+        {
+          title: "Setup",
+          content: PreviewNuvemshop(),
+        },
+      ],
+    },
+  };
+};

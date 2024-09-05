@@ -1,10 +1,11 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { createHttpClient } from "../utils/http.ts";
-import { ResendApi } from "./utils/client.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
 import { fetchSafe } from "../utils/fetch.ts";
+import { createHttpClient } from "../utils/http.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { ResendApi } from "./utils/client.ts";
 
 export interface EmailFrom {
   name?: string;
@@ -79,6 +80,26 @@ export default function App(
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Resend",
+      owner: "deco.cx",
+      description: "App for sending emails using https://resend.com/",
+      logo:
+        "https://auth.deco.cx/storage/v1/object/public/assets/1/user_content/resend-logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

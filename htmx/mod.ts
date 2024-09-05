@@ -1,6 +1,7 @@
 import { App, FnContext } from "deco/mod.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 
@@ -56,6 +57,25 @@ export default function Site(state: Props): App<Manifest, Required<Props>> {
   };
 }
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "HTMX",
+      owner: "deco.cx",
+      description: "High power tools for HTML",
+      logo: "https://raw.githubusercontent.com/deco-cx/apps/main/htmx/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

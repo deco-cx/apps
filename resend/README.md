@@ -1,13 +1,3 @@
-<h1>
-  <a href="https://resend.com/">
-    <p align="center">
-      <strong>
-        RESEND
-      </strong>
-    </p>
-  </a>
-</h1>
-
 
 Resend is an email platform that helps developers build and send transactional and marketing emails. It is designed to be easy to use and reliable, with a focus on deliverability. Resend offers a variety of features to help improve email deliverability, including dedicated IPs, email authentication, and spam tracking. Additionally, Resend integrates with React to allow developers to create beautiful email templates.
 

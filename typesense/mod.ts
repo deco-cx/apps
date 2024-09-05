@@ -1,12 +1,13 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import Typesense from "npm:typesense@1.7.1";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import {
   ProductsCollectionName,
   setupProductsCollection,
 } from "./utils/product.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -87,6 +88,27 @@ export default function App(
   return app;
 }
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "TypeSense",
+      owner: "deco.cx",
+      description:
+        "Open source search engine meticulously engineered for performance & ease-of-use.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/typesense/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

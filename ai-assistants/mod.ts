@@ -12,6 +12,7 @@ import openai, {
 import { Assistant } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Secret } from "../website/loaders/secret.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 export type GPTModel =
   | "gpt-4-0613"
@@ -204,3 +205,18 @@ export const onBeforeResolveProps = (
 };
 
 export type AppContext = AC<ReturnType<typeof App>>;
+
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Deco AI Assistant",
+      owner: "deco.cx",
+      description: "Create AI assistants on deco.cx.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};

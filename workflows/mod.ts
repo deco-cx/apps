@@ -1,5 +1,6 @@
 import type { App, FnContext } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 // deno-lint-ignore ban-types
 export type State = {};
@@ -18,3 +19,18 @@ export default function App(
 
 export type AppContext = FnContext<State, Manifest>;
 export type AppManifest = Manifest;
+
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Deco Workflows",
+      owner: "deco.cx",
+      description: "Build customized and automated tasks.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/workflows/logo.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};

@@ -1,10 +1,11 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest from "./manifest.gen.ts";
+import { Category } from "../commerce/types.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
+import manifest from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/smarthint.openapi.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
-import { Category } from "../commerce/types.ts";
 
 export interface State {
   /**
@@ -69,8 +70,29 @@ export default function App(
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "SmartHint",
+      owner: "deco.cx",
+      description:
+        "Smart search and product recommendation to improve your eCommerce customer experience.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/smarthint/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};
 
 // TODO fix image path

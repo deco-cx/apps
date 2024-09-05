@@ -1,9 +1,10 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
-import { createHttpClient } from "../utils/http.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
 import { fetchSafe } from "../utils/fetch.ts";
+import { createHttpClient } from "../utils/http.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import type { EmailJSApi } from "./utils/client.ts";
 
 export interface Props {
@@ -57,6 +58,27 @@ export default function App(
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "EmailJS",
+      owner: "deco.cx",
+      description:
+        "EmailJS integrates easily with popular email services like Gmail and Outlook, offering features to enhance email functionality.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/emailjs/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

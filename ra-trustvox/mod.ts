@@ -1,4 +1,5 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export interface State {
@@ -36,3 +37,18 @@ export default function RATrustvox(
 }
 
 export type AppContext = AC<ReturnType<typeof RATrustvox>>;
+
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "RA Trustvox",
+      owner: "deco.cx",
+      description: "RA trustvox reviews.",
+      logo:
+        "https://raw.githubusercontent.com/trustvox/deco-apps/enhancement/trustvox-app/ra-trustvox/ra-trustvox.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};
