@@ -1,10 +1,11 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 import { API } from "./utils/client.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { LayerAPI } from "./utils/layer.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -71,6 +72,28 @@ export default function App(
   return app;
 }
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Linx",
+      owner: "deco.cx",
+      description:
+        "Loaders, actions and workflows for adding Linx Commerce Platform to your website.",
+      logo: "https://raw.githubusercontent.com/deco-cx/apps/main/linx/logo.png",
+      images: [
+        "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/starting/6a71271e-6298-45c9-be8d-f226f7e5a4f5/linx.webp",
+      ],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

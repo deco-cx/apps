@@ -2,6 +2,7 @@ import type {
   App as A,
   AppContext as AC,
   AppMiddlewareContext as AMC,
+  AppRuntime,
   ManifestOf,
 } from "deco/mod.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
@@ -17,6 +18,8 @@ import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewVtex } from "./preview/Preview.tsx";
 
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
@@ -78,6 +81,8 @@ export interface Props {
 
   /**
    * @description Use VTEX as backend platform
+   * @default vtex
+   * @hide true
    */
   platform: "vtex";
 }
@@ -168,4 +173,15 @@ export default function VTEX({
   return app;
 }
 
-export { PreviewVtex as Preview } from "./preview/Preview.tsx";
+export const preview = async (props: AppRuntime) => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+  return {
+    Component: PreviewVtex,
+    props: {
+      ...props,
+      markdownContent,
+    },
+  };
+};

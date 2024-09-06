@@ -1,9 +1,10 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
-import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
 import algolia from "https://esm.sh/algoliasearch@4.20.0";
+import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
@@ -76,6 +77,27 @@ export default function App(
   return app;
 }
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Algolia",
+      owner: "deco.cx",
+      description:
+        "Product search & discovery that increases conversions at scale.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/algolia/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

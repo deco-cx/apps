@@ -1,6 +1,7 @@
 import type { App, AppContext as AC } from "deco/mod.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
 
 export type Agency =
   | "2B Digital"
@@ -51,6 +52,7 @@ export interface State {
  * @title Implementer
  * @description The agency that's implementing your store
  * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png
  */
 export default function App(
   state: State,
@@ -60,6 +62,26 @@ export default function App(
 
 export type AppContext = AC<ReturnType<typeof App>>;
 
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Implementer",
+      owner: "deco.cx",
+      description: "The agency that's implementing your store",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

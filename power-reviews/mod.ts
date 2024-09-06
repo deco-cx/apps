@@ -5,6 +5,8 @@ import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PowerReviews } from "./utils/client.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -98,3 +100,28 @@ export default function App(
 
   return app;
 }
+
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./readme.md", import.meta.url).href,
+  );
+
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Power Reviews",
+      owner: "deco.cx",
+      description:
+        "Collect more and better Ratings & Reviews and other UGC. Create UGC displays that convert. Analyze to enhance product experience and positioning.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/power-reviews/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

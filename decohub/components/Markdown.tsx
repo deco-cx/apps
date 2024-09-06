@@ -16,7 +16,6 @@ export const Markdown = async (path: string) => {
         <style dangerouslySetInnerHTML={{ __html: KATEX_CSS }} />
         <div
           class="markdown-body"
-          style={{ padding: "16px 32px" }}
           dangerouslySetInnerHTML={{
             __html: render(content, {
               allowIframes: true,

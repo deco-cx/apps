@@ -10,6 +10,7 @@ import { middleware } from "./middleware.ts";
 import { ChaordicAPI } from "./utils/chaordic.ts";
 import { LinxAPI } from "./utils/client.ts";
 import { EventsAPI } from "./utils/events.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 export type App = ReturnType<typeof Linx>;
 export type AppContext = AC<App>;
@@ -85,3 +86,19 @@ export default function Linx({ secretKey, ...props }: State) {
 
   return app;
 }
+
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Linx Impulse",
+      owner: "deco.cx",
+      description:
+        "Build, manage and deliver B2B, B2C and Marketplace commerce experiences.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/linx-impulse/logo.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};

@@ -6,6 +6,7 @@ import {
   drizzle,
 } from "./deps.ts";
 import { getSQLClientConfig, StorageConfig } from "./utils.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 export interface Props extends StorageConfig {}
 
@@ -40,3 +41,18 @@ export default function Records(
 
 export type RecordsApp = ReturnType<typeof Records>;
 export type AppContext = AC<RecordsApp>;
+
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Deco Records",
+      owner: "deco.cx",
+      description: "Deco database for records",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/records/logo.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};
