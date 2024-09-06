@@ -1,5 +1,4 @@
-import { NavigationInfo } from "./shared-types/navigationInfo.ts";
-import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
+import { NavigationInfo, ResponseCallBack } from "./shared.ts";
 
 export interface NewsletterResponse {
   Response: Response;

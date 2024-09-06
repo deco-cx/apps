@@ -12,7 +12,7 @@ import { CartResponse } from "./types/basketJSON.ts";
 import {
   Product as LinxProductGroupGridProductsJSON,
 } from "./types/gridProductsJSON.ts";
-import { NavigationInfo as ProductNavigation } from "./types/shared-types/navigationInfo.ts";
+import { NavigationInfo as ProductNavigation } from "./types/shared.ts";
 import {
   Item as LinxProductFromJSON,
   Model as LinxProductGroupProductJSON,
@@ -26,7 +26,7 @@ import {
   Item as LinxSuggestionProductJSON,
   Product as LinxSuggestionProductGroupJSON,
 } from "./types/suggestionsJSON.ts";
-import type { Facet } from "./types/shared-types/facets.ts";
+import type { Facet } from "./types/shared.ts";
 import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";

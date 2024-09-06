@@ -1,8 +1,12 @@
-import { BrowsingImage } from "./shared-types/browsingImage.ts";
-import { CategoryItem } from "./shared-types/categoryItem.ts";
-import { SortOption, Spell, Tag } from "./shared-types/labelOptions.ts";
-import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { SellerInfo } from "./shared-types/sellerInfo.ts";
+import {
+  BrowsingImage,
+  CategoryItem,
+  LinxMetadata,
+  SellerInfo,
+  SortOption,
+  Spell,
+  Tag,
+} from "./shared.ts";
 
 export interface ProductListResponse {
   HasPreviousPage: boolean;

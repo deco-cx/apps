@@ -3,17 +3,21 @@
  */
 
 import { LinxInstallment } from "./installments.ts";
-import { LinxError } from "./shared-types/common.ts";
-import { Facet } from "./shared-types/facets.ts";
-import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { NavigationInfo } from "./shared-types/navigationInfo.ts";
-import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
-import { ProductSelectionItem } from "./shared-types/productSelectionItem.ts";
-import { CategoryItem } from "./shared-types/categoryItem.ts";
-import { SellerInfo } from "./shared-types/sellerInfo.ts";
-import { PropertyItem } from "./shared-types/propertyItem.ts";
-import { ProviderCapabilities } from "./shared-types/providerCapabilities.ts";
-import { SortOption, Spell, Tag } from "./shared-types/labelOptions.ts";
+import {
+  CategoryItem,
+  Facet,
+  LinxError,
+  LinxMetadata,
+  NavigationInfo,
+  ProductSelectionItem,
+  PropertyItem,
+  ProviderCapabilities,
+  ResponseCallBack,
+  SellerInfo,
+  SortOption,
+  Spell,
+  Tag,
+} from "./shared.ts";
 
 export interface WebPage {
   Response: Response;

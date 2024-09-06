@@ -1,7 +1,4 @@
-import { CategoryItem } from "./shared-types/categoryItem.ts";
-import { LinxError } from "./shared-types/common.ts";
-import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { Path } from "./shared-types/productSelection.ts";
+import { CategoryItem, LinxError, LinxMetadata, Path } from "./shared.ts";
 
 export interface CartResponse {
   Shopper: Shopper;

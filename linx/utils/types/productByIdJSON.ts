@@ -1,8 +1,5 @@
 import { LinxInstallment } from "./installments.ts";
-import { CategoryItem } from "./shared-types/categoryItem.ts";
-import { SortOption, Spell } from "./shared-types/labelOptions.ts";
-import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { SellerInfo } from "./shared-types/sellerInfo.ts";
+import { CategoryItem, LinxMetadata, SortOption, Spell, SellerInfo } from "./shared.ts";
 
 export interface ProductByIdResponse {
   HasPreviousPage: boolean;

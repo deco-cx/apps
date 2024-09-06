@@ -1,11 +1,14 @@
-import { LinxError } from "./shared-types/common.ts";
-import { CategoryItem } from "./shared-types/categoryItem.ts";
-import { LinxMetadata } from "./shared-types/linxMetada.ts";
-import { NavigationInfo } from "./shared-types/navigationInfo.ts";
-import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
-import { SellerInfo } from "./shared-types/sellerInfo.ts";
-import { Path, ProductSelection } from "./shared-types/productSelection.ts";
-import { ProductDefinition } from "./shared-types/productDefinition.ts";
+import {
+  CategoryItem,
+  LinxError,
+  LinxMetadata,
+  NavigationInfo,
+  Path,
+  ProductDefinition,
+  ProductSelection,
+  ResponseCallBack,
+  SellerInfo,
+} from "./shared.ts";
 
 export interface WebPage {
   Response: Response;

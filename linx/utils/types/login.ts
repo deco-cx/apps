@@ -1,4 +1,4 @@
-import { LinxError } from "./shared-types/common.ts";
+import { LinxError } from "./shared.ts";
 
 export interface LoginResponse {
   CustomerID: number;
