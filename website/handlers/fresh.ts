@@ -29,7 +29,7 @@ export const isFreshCtx = <TState>(
 
 function abortHandler(ctrl: AbortController, signal: AbortSignal) {
   let aborted = false;
-  const abortCtrlInstance = () =>  {
+  const abortCtrlInstance = () => {
     if (aborted) return; // Early return if already handled
 
     try {
@@ -40,22 +40,18 @@ function abortHandler(ctrl: AbortController, signal: AbortSignal) {
     } catch (_err) {
       // We tried our best, but it is already dead... so.. lets ignore it :)
     } finally {
-      signal.removeEventListener("abort", abortCtrlInstance)
+      signal.removeEventListener("abort", abortCtrlInstance);
     }
-  }
+  };
   return abortCtrlInstance;
-};
-
-function removeCtrl(handler: () => any, signal: AbortSignal) {
-  signal.removeEventListener("abort", handler);
-};
+}
 
 function registerFinilizer(req: Request, abortCtrl: () => void) {
-  const finalizer = new FinalizationRegistry((abortCtrl) => {
+  const finalizer = new FinalizationRegistry((abortCtrl: () => void) => {
     req.signal.removeEventListener("abort", abortCtrl);
   });
 
-  finalizer.register(req, removeCtrl(abortCtrl, req.signal));
+  finalizer.register(req, abortCtrl);
 }
 
 /**
@@ -91,7 +87,7 @@ export default function Fresh(
     const abortCtrl = abortHandler(ctrl, req.signal);
 
     /** Aborts when: Incomming request is aborted */
-    req.signal.addEventListener("abort", abortCtrl, {once: true});
+    req.signal.addEventListener("abort", abortCtrl, { once: true });
 
     registerFinilizer(req, abortCtrl);
 
