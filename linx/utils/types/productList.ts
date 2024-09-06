@@ -1,5 +1,6 @@
+import { BrowsingImage } from "./shared-types/browsingImage.ts";
 import { CategoryItem } from "./shared-types/categoryItem.ts";
-import { SortOption, Spell } from "./shared-types/labelOptions.ts";
+import { SortOption, Spell, Tag } from "./shared-types/labelOptions.ts";
 import { LinxMetadata } from "./shared-types/linxMetada.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 
@@ -117,23 +118,6 @@ export interface Product {
   ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   ProductDefinition: null;
-}
-
-export interface BrowsingImage {
-  MaxWidth: number;
-  MaxHeight: number;
-  Width: number;
-  Height: number;
-  MediaSizeType: string;
-  MediaPath: string;
-  VariationPath: string;
-  ProductPath: string;
-  MediaType: string;
-  Index: number;
-  Title: null;
-  Url: null;
-  Attributes: unknown[];
-  HasMediaPath: boolean;
 }
 
 export interface Item {
@@ -286,11 +270,6 @@ export interface ProductSelection {
   PropertyLevel: number;
   SkuID: number;
   Quantity: number;
-}
-
-export interface Tag {
-  TagID: number;
-  Label: string;
 }
 
 export interface ProviderCapabilities {

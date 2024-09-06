@@ -8,6 +8,7 @@ import { ResponseCallBack } from "./shared-types/responseCallBack.ts";
 import { SellerInfo } from "./shared-types/sellerInfo.ts";
 import { ProviderCapabilities } from "./shared-types/providerCapabilities.ts";
 import { SortOption, Spell, Tag } from "./shared-types/labelOptions.ts";
+import { BrowsingImage } from "./shared-types/browsingImage.ts";
 
 export interface WebPage {
   Response: Response;
@@ -139,23 +140,6 @@ export interface Product {
   Url: string;
   VisibleFrom: string;
   VisibleTo: null;
-}
-
-export interface BrowsingImage {
-  Attributes: unknown[];
-  HasMediaPath: boolean;
-  Height: number;
-  Index: number;
-  MaxHeight: number;
-  MaxWidth: number;
-  MediaPath: string;
-  MediaSizeType: string;
-  MediaType: string;
-  ProductPath: string;
-  Title: null;
-  Url: null;
-  VariationPath: string;
-  Width: number;
 }
 
 export interface Item {
