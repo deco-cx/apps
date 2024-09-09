@@ -1,5 +1,5 @@
-import { isEventStreamResponse } from "@deco/deco";
 import { WorkflowContext } from "@deco/deco/blocks";
+import { isEventStreamResponse } from "@deco/deco/web";
 import { type AppManifest } from "../mod.ts";
 
 export const waitForWorkflowCompletion = <T extends AppManifest>(
