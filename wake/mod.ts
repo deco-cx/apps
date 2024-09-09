@@ -3,7 +3,7 @@ import { Markdown } from "../decohub/components/Markdown.tsx";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { CheckoutApi } from "./utils/client.ts";

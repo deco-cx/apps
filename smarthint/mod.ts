@@ -5,7 +5,6 @@ import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import manifest from "./manifest.gen.ts";
-import manifest from "./manifest.gen.ts";
 import { OpenAPI } from "./utils/openapi/smarthint.openapi.gen.ts";
 
 export interface State {

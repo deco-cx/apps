@@ -1,7 +1,7 @@
 import type { App, AppContext as AC } from "@deco/deco";
+import { Markdown } from "../decohub/components/Markdown.tsx";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
-import manifest, { Manifest } from "./manifest.gen.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { API } from "./utils/client.ts";
 

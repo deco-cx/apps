@@ -1,5 +1,4 @@
 import { type AppRuntime, type BaseContext, Context } from "@deco/deco";
-import { Context } from "deco/live.ts";
 import type { JSX } from "preact";
 import { PreviewContainer } from "../../utils/preview.tsx";
 import { App } from "../mod.ts";
