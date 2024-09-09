@@ -1,5 +1,4 @@
-import { ProductListingPage } from "../../../commerce/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
+import { BreadcrumbList, ProductListingPage } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import { FieldsList, ProductListResponse } from "../../utils/types.ts";
 import {
@@ -8,9 +7,12 @@ import {
   convertProductData,
   getPreviousNextPagination,
 } from "../../utils/transform.ts";
-import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 
 export interface Props {
+  /**
+   * @description Category code of the products of this page.
+   */
+  categoryCode?: string;
   /**
    * @description The current result page requested.
    * @hide true
@@ -20,20 +22,15 @@ export interface Props {
   /**
    * @title Fields
    * @description Response configuration. This is the list of fields that should be returned in the response body. Examples: BASIC, DEFAULT, FULL
-   * @default DEFAULT
+   * @default FULL
    */
-  fields?: FieldsList;
+  fields?: string;
   /**
    * @title Items per page
    * @description The number of results returned per page.
    * @default 12
    */
   pageSize?: number;
-  /**
-   * @title Search term
-   * @description The free text search term.
-   */
-  term?: RequestURLParam;
 }
 
 /**
@@ -44,27 +41,47 @@ const PLPLoader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<ProductListingPage> => {
+): Promise<ProductListingPage | null> => {
   const { api } = ctx;
   const { url: baseUrl } = req;
-  const { currentPage, fields, pageSize, term } = props;
+  const { categoryCode, currentPage, fields, pageSize } = props;
 
   const url = new URL(baseUrl);
-  let query = url.searchParams.get("query");
+  let query = url.searchParams.get("q");
   const sort = query?.split(":")[1] || "";
 
-  if (term) {
-    query = term + query;
+  if (!query) {
+    query = `:relevance:allCategories:${categoryCode}`;
   }
 
   const data: ProductListResponse = await api[
-    "GET /product/search"
-  ]({ currentPage, fields, pageSize, query }, STALE).then((
-    res: Response,
-  ) => res.json());
+    "GET /users/anonymous/eluxproducts/search"
+  ]({
+    currentPage,
+    fields: `${fields},facets,products(FULL)`,
+    pageSize,
+    query,
+    sort: "approvalStatusSort",
+    searchType: "FINISHED_GOODS",
+  }).then(
+    (
+      res: Response,
+    ) => res.json(),
+  );
+
+  "fields=FULL%2Cproducts(FULL)%2Cfacets&query=standard%3Arelevance%3Afeatures%3AIce%20Maker&pageSize=12&sort=approvalStatusSort&searchType=FINISHED_GOODS&lang=en&curr=USD";
 
   const products = data.products.map(convertProductData);
-  const breadcrumb = convertBreadcrumb(data.breadcrumbs);
+
+  let breadcrumb: BreadcrumbList = {
+    "@type": "BreadcrumbList",
+    itemListElement: [],
+    numberOfItems: 0,
+  };
+  if (data.breadcrumbs) {
+    breadcrumb = convertBreadcrumb(data.breadcrumbs);
+  }
+
   const filters = convertFacetsToFilters(data.facets);
   const [previousPage, nextPage] = getPreviousNextPagination(data.pagination);
 
@@ -78,6 +95,10 @@ const PLPLoader = async (
       nextPage,
       previousPage,
       pageTypes: ["Category", "SubCategory", "Collection"], // TODO: Filter these types.
+      recordPerPage: data.pagination.totalResults < data.pagination.pageSize
+        ? data.pagination.totalResults
+        : data.pagination.pageSize,
+      records: data.pagination.totalResults,
     },
     sortOptions: [{ value: sort, label: sort }],
   };

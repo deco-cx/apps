@@ -4,6 +4,7 @@ import type {
   ImageObject,
   ListItem,
   Product as CommerceProduct,
+  ProductLeaf,
   SiteNavigationElement,
 } from "../../commerce/types.ts";
 import {
@@ -67,16 +68,89 @@ export const convertBreadcrumb = (
   };
 };
 
+export const formatPrice = (price: number) => {
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+
+  return formatter.format(price);
+};
+
+export const formatProductUrl = (url: string) => url.split("/c/")[1];
+
 export const convertProductData = (
   product: Product,
 ): CommerceProduct => {
-  const images: ImageObject[] = product.images.map((image) => ({
-    "@type": "ImageObject",
-    description: image.altText,
-    encodingFormat: image.format,
-    url: image.url,
-    thumbnailUrl: image.url,
-  }));
+  let images: ImageObject[] = [];
+  if (product.images) {
+    images = product.images.map((image) => ({
+      "@type": "ImageObject",
+      description: image.altText,
+      encodingFormat: "image",
+      url: image.url,
+      thumbnailUrl: image.url,
+    }));
+  }
+
+  if (!product.images && product.plpImage) {
+    images = [{
+      "@type": "ImageObject",
+      description: product.summary,
+      encodingFormat: "image",
+      url: product.plpImage,
+      thumbnailUrl: product.plpImage,
+    }];
+  }
+
+  const hasVariant: ProductLeaf[] = product.colorVariants?.map((variant) => {
+    return {
+      "@type": "Product",
+      additionalProperty: [{
+        "@type": "PropertyValue",
+        propertyID: "colorUrl",
+        value: variant.variantSwatchColors,
+      }],
+      category: product.categories?.[0].name || product.categoryName,
+      description: variant.altText,
+      image: [{
+        "@type": "ImageObject",
+        description: variant.altText,
+        encodingFormat: "image",
+        url: variant.plpImage,
+        thumbnailUrl: variant.plpImage,
+      }],
+      offers: {
+        "@type": "AggregateOffer",
+        highPrice: variant.price?.value,
+        lowPrice: variant.price?.value,
+        offerCount: 1,
+        offers: [{
+          "@type": "Offer",
+          availability: variant.saleable
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+          inventoryLevel: {
+            value: product.stock?.stockLevel,
+          },
+          price: variant.price?.value,
+          priceCurrency: variant.price?.currencyIso,
+          priceSpecification: [
+            {
+              "@type": "UnitPriceSpecification",
+              priceType: "https://schema.org/ListPrice",
+              price: variant.mapUSD,
+            },
+          ],
+        }],
+        priceCurrency: product.price?.currencyIso,
+      },
+      productID: variant.code,
+      sku: variant.code,
+      url: formatProductUrl(variant.url),
+    };
+  });
+  console.log({ img: images });
 
   return {
     "@type": "Product",
@@ -90,14 +164,23 @@ export const convertProductData = (
       worstRating: 0,
       ratingExplanation: "",
     },
-    category: product.categories[0]?.name,
+    category: product.categories?.[0].name || product.categoryName,
     description: product.summary,
     // isRelatedTo: [product.], // TODO
+    isVariantOf: {
+      "@type": "ProductGroup",
+      productGroupID: product.code,
+      hasVariant: hasVariant || [],
+      url: `${product.url}`,
+      name: product.name,
+      additionalProperty: [],
+      image: images,
+    },
     image: images,
     offers: {
       "@type": "AggregateOffer",
-      highPrice: product.price.value,
-      lowPrice: product.price.value,
+      highPrice: product.price?.value,
+      lowPrice: product.price?.value,
       offerCount: 1,
       offers: [{
         "@type": "Offer",
@@ -105,36 +188,36 @@ export const convertProductData = (
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
         inventoryLevel: {
-          value: product.stock.stockLevel,
+          value: product.stock?.stockLevel,
         },
-        price: product.price.value,
-        priceCurrency: product.price.currencyIso,
+        price: product.price?.value,
+        priceCurrency: product.price?.currencyIso,
         priceSpecification: [
           {
             "@type": "UnitPriceSpecification",
             priceType: "https://schema.org/ListPrice",
-            price: product.price.value,
+            price: product.mapUSD,
           },
         ],
       }],
-      priceCurrency: product.price.currencyIso,
+      priceCurrency: product.price?.currencyIso,
     },
     name: product.name,
     productID: product.code,
     sku: "",
-    url: product.url,
+    url: formatProductUrl(product.url),
   };
 };
 
 export const getPreviousNextPagination = (pagination: Pagination): string[] => {
   const previousPage = pagination.currentPage > 0
     ? pagination.currentPage - 1
-    : undefined;
+    : "";
   const nextPage = pagination.currentPage + 1 < pagination.totalPages
     ? pagination.currentPage + 1
-    : undefined;
+    : "";
 
-  return [previousPage, nextPage].map(toString);
+  return [previousPage, nextPage].map((page) => page.toString());
 };
 
 export const convertFacetsToFilters = (facets: FacetResponse[]): Filter[] => {

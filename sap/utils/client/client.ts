@@ -18,7 +18,7 @@ import { Props as SetDeliveryProps } from "../../actions/cart/setDeliveryAddress
 import { Props as UpdateCartProps } from "../../actions/cart/updateItems.ts";
 
 export interface API {
-  "GET /product/search": {
+  "GET /users/anonymous/eluxproducts/search": {
     response: ProductListResponse;
     // searchParams: ProductListingPageProps & { query: string };
     searchParams: any;

@@ -1,5 +1,4 @@
 import type { SiteNavigationElement } from "../../../commerce/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
 import { CatalogsResponse, FieldsList } from "../../utils/types.ts";
 
@@ -25,7 +24,6 @@ const loader = async (
 
   const data: CatalogsResponse = await api["GET /catalogs?:fields"](
     { fields },
-    STALE,
   ).then(
     (res: Response) => res.json(),
   );

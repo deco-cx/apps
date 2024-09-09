@@ -1,5 +1,4 @@
 import { ProductDetailsPage } from "../../../commerce/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
 import type { AppContext } from "../../mod.ts";
 import { FieldsList, ProductDetailsResponse } from "../../utils/types.ts";
 import {
@@ -14,7 +13,7 @@ export interface Props {
    * @description Response configuration. This is the list of fields that should be returned in the response body. Examples: BASIC, DEFAULT, FULL
    *  @default DEFAULT
    */
-  fields?: FieldsList;
+  fields?: string;
   /**
    * @title Product code
    * @description Product identifier.
@@ -32,11 +31,15 @@ const productDetailsLoader = async (
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> => {
   const { api } = ctx;
-  const { productCode } = props;
+  const { fields, productCode } = props;
 
-  const data: ProductDetailsResponse = await api[
-    "GET /products/:productCode"
-  ]({ productCode }, STALE).then((res: Response) => res.json());
+  const data: ProductDetailsResponse = await api["GET /products/:productCode"]({
+    productCode,
+    fields:
+      `${fields},FULL,averageRating,stock(DEFAULT),description,availableForPickup,code,url,price(DEFAULT),manufacturer,categories(FULL),priceRange,multidimensional,configuratorType,configurable,tags,images(FULL),name,purchasable,baseOptions(DEFAULT),baseProduct,variantOptions(DEFAULT),variantType,numberOfReviews,productReferences,likeProductCopy,likeProductGroup,likeProducts(code,likeProductCopy,likeProductGroup,price(DEFAULT),url,primaryFlag,msrpUSD,msrpCAD,msrpCADFormattedValue),classifications`,
+  }).then((res: Response) => {
+    return res.json();
+  });
 
   const breadcrumbList = convertCategoriesToBreadcrumb(data.categories);
   const product = convertProductData(data);

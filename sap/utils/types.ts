@@ -140,13 +140,50 @@ export interface VariantMatrix {
   };
 }
 
+export interface ColorVariant {
+  "altText": string;
+  "approvalStatus": string;
+  "code": string;
+  "color": string;
+  "colorPriority": number;
+  "depth": string;
+  "height": string;
+  "isConsumerVisUS": boolean;
+  "mapUSD": number;
+  "msrpCAD": number;
+  "msrpCADFormattedValue": string;
+  "msrpUSD": number;
+  "name": number;
+  "pimStatus": "";
+  "plpBadges": [
+    {
+      "icon": string;
+      "name": string;
+    },
+    {
+      "icon": string;
+      "name": string;
+    },
+  ];
+  "plpImage": string;
+  "price": PriceData;
+  "saleable": true;
+  "url": string;
+  "variantSwatchColors": string;
+  "width": string;
+}
+
 export interface Product {
+  approvalStatus: string;
   availableForPickup: boolean;
   averageRating: number;
   baseProduct: string;
+  brand: string;
   categories: Category[];
+  categoryName: string;
   classifications: ProductClassification[];
   code: string;
+  colorVariants: ColorVariant[];
   configurable: boolean;
   configuratorType: string;
   description: string;
@@ -158,10 +195,13 @@ export interface Product {
     stock: Stock;
   }[];
   images: Image[];
+  mapUSD: number;
+  manual: boolean;
   manufacturer: string;
   multidimensional: string;
   name: string;
   numberOfReviews: number;
+  plpImage: string;
   promotions: Promotion[];
   price: PriceData;
   priceRange: {

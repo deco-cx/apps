@@ -1,5 +1,4 @@
 import { Product } from "../../../commerce/types.ts";
-import { STALE } from "../../../utils/fetch.ts";
 import type { AppContext } from "../../mod.ts";
 import { ProductDetailsResponse } from "../../utils/types.ts";
 import { convertProductData } from "../../utils/transform.ts";
@@ -20,7 +19,7 @@ const productListLoader = (
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<Product[]> => {
+): Promise<Product[] | null> => {
   const { api } = ctx;
   const { productCodes } = props;
 
@@ -28,7 +27,7 @@ const productListLoader = (
     productCodes.map(async (productCode) => {
       const data: ProductDetailsResponse = await api[
         "GET /products/:productCode"
-      ]({ productCode }, STALE).then((res: Response) => res.json());
+      ]({ productCode }).then((res: Response) => res.json());
 
       const product = convertProductData(data);
 

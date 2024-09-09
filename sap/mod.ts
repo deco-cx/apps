@@ -31,11 +31,10 @@ export interface State extends Props {
  * @logo https://fakestoreapi.com/icons/logo.png
  */
 export default function SAP(props: Props): App<Manifest, State> {
-  const { apiUrl, baseSiteId } = props;
+  // const { apiUrl, baseSiteId } = props;
 
   const api = createHttpClient<API>({
-    base: `${apiUrl}/${baseSiteId}/` ||
-      "https://apolloapi.electrolux.com/occ/v2/frigidaire",
+    base: "https://apolloapi.electrolux.com/occ/v2/frigidaire/",
     headers: new Headers({
       "Content-Type": "application/json",
       Accept: "application/json",
