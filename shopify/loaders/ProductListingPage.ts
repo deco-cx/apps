@@ -218,6 +218,14 @@ export const cacheKey = (props: Props, req: Request): string | null => {
     sort,
   });
 
+  url.searchParams.forEach((value, key) => {
+    if (!key.startsWith("filter.")) return;
+
+    searchParams.append(key, value);
+  });
+
+  searchParams.sort();
+
   url.search = searchParams.toString();
 
   return url.href;
