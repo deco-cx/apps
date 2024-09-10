@@ -1,5 +1,11 @@
 import { LinxInstallment } from "./installments.ts";
-import { Description } from "./productList.ts";
+import {
+  CategoryItem,
+  LinxMetadata,
+  SellerInfo,
+  SortOption,
+  Spell,
+} from "./shared.ts";
 
 export interface ProductByIdResponse {
   HasPreviousPage: boolean;
@@ -110,7 +116,7 @@ export interface Product {
   PropertyPath: string;
   CurrentSkuID: number;
   HasCurrentSkuID: boolean;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   MininumOfDistinctSKUs: number;
   MininumOfSKUsQuantity: number;
   QuantityReturned: unknown;
@@ -122,7 +128,7 @@ export interface Product {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   ProductDefinition: unknown;
 }
@@ -161,14 +167,9 @@ export interface Price {
   SalesPriceWithTaxDiscount: number;
   TaxationAmount: number;
   HasBuyBox: boolean;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: unknown;
   IsNullPrice: boolean;
-}
-
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
 }
 
 export interface Item {
@@ -236,7 +237,7 @@ export interface Item {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   Price: null;
   ProductDefinition: null;
@@ -280,12 +281,6 @@ export interface Value {
   Order: number;
   PropertyPath: string;
   GroupName: null;
-}
-
-export interface CategoryItem {
-  ID: string;
-  ParentID: string;
-  Name: string;
 }
 
 export interface Media {
@@ -411,15 +406,4 @@ export interface ProductSelection {
   PropertyLevel: number;
   SkuID: number;
   Quantity: number;
-}
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
 }
