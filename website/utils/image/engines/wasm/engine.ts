@@ -1,4 +1,4 @@
-import { parseMediaType } from "@std/media-types";
+import { parseMediaType } from "std/media_types/parse_media_type.ts";
 import { HttpError } from "../../../../../utils/http.ts";
 import { createPool } from "../../../../../utils/pool.ts";
 import { createWorker } from "../../../../../utils/worker.ts";

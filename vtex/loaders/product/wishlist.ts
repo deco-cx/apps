@@ -1,5 +1,5 @@
-import type { Product, ProductListingPage } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
+import { Product, ProductListingPage } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import wishlistLoader from "../wishlist.ts";
 
 export interface Props {

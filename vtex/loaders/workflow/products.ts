@@ -1,5 +1,5 @@
 import type { Product } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 
 export type Props = {
   page: number;

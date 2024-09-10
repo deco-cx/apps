@@ -1,5 +1,5 @@
-import { allowCorsFor } from "@deco/deco";
-import type { AppContext } from "../../mod.ts";
+import { allowCorsFor } from "deco/mod.ts";
+import { AppContext } from "../../mod.ts";
 
 export interface Props {
   path: string;

@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
-import type { Manifest } from "../manifest.gen.ts";
+import { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import type { WishlistItem } from "../utils/types.ts";
+import { WishlistItem } from "../utils/types.ts";
 import { state as storeState } from "./context.ts";
 
 const { wishlist, loading } = storeState;

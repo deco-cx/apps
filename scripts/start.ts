@@ -1,16 +1,17 @@
 // deno-lint-ignore-file no-explicit-any
-import "npm:@graphql-codegen/add";
-import "npm:@graphql-codegen/schema-ast";
 import "npm:@graphql-codegen/typescript";
 import "npm:@graphql-codegen/typescript-operations";
+import "npm:@graphql-codegen/add";
+import "npm:@graphql-codegen/schema-ast";
 
-import { walk } from "@std/fs";
-import { basename, dirname, join } from "@std/path";
-import { setupGithooks } from "https://deno.land/x/githooks@0.0.4/githooks.ts";
 import { CodegenConfig, generate } from "npm:@graphql-codegen/cli";
-import camel from "npm:camelcase";
 import { compile } from "npm:json-schema-to-typescript";
 import { OpenAPIV3 } from "npm:openapi-types";
+import camel from "npm:camelcase";
+import { walk } from "std/fs/mod.ts";
+import { dirname, join } from "std/path/mod.ts";
+import { basename } from "std/path/win32.ts";
+import { setupGithooks } from "https://deno.land/x/githooks@0.0.4/githooks.ts";
 
 await setupGithooks();
 
@@ -256,7 +257,7 @@ const generateGraphQL = async () => {
   }
 };
 
-const generateDeco = () => import("@deco/deco/scripts/bundle");
+const generateDeco = () => import("deco/scripts/apps/bundle.ts");
 
 await generateOpenAPI();
 await generateGraphQL();

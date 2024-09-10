@@ -1,29 +1,25 @@
 import { Head } from "$fresh/runtime.ts";
+import type { Page } from "deco/blocks/page.tsx";
+import { Section, SectionProps } from "deco/blocks/section.ts";
+import { ComponentFunc, ComponentMetadata } from "deco/engine/block.ts";
+import { HttpError } from "deco/engine/errors.ts";
+import { Context } from "deco/live.ts";
 import {
-  Context,
-  HttpError,
   isDeferred,
-  type SectionProps,
   usePageContext as useDecoPageContext,
   useRouterContext,
-} from "@deco/deco";
-import type {
-  ComponentFunc,
-  ComponentMetadata,
-  Page,
-  Section,
-} from "@deco/deco/blocks";
-import { logger } from "@deco/deco/o11y";
-import { Component, type JSX } from "preact";
+} from "deco/mod.ts";
+import { logger } from "deco/observability/otel/config.ts";
+import { Component, JSX } from "preact";
 import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
 import Clickhouse, {
   generateSessionId,
   generateUserId,
 } from "../components/Clickhouse.tsx";
 import Events from "../components/Events.tsx";
-import type { SEOSection } from "../components/Seo.tsx";
+import { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
-import type { AppContext } from "../mod.ts";
+import { AppContext } from "../mod.ts";
 
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
 

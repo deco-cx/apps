@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "@std/http/cookie";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 
 const CART_COOKIE = "cart";
 const SHOPIFY_PREFIX = "gid://shopify/Cart/";

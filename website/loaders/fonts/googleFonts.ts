@@ -1,5 +1,5 @@
 import { fetchSafe } from "../../../utils/fetch.ts";
-import type { Font } from "../../components/Theme.tsx";
+import { Font } from "../../components/Theme.tsx";
 import type { Manifest } from "../../manifest.gen.ts";
 import { hashStringSync } from "../../../utils/shortHash.ts";
 

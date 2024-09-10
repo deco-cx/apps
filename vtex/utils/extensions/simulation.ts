@@ -1,7 +1,7 @@
-import type { Product, ProductLeaf } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
+import { Product, ProductLeaf } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import { batch } from "../batch.ts";
-import type { OpenAPI } from "../openapi/vcs.openapi.gen.ts";
+import { OpenAPI } from "../openapi/vcs.openapi.gen.ts";
 import { getSegmentFromBag, isAnonymous } from "../segment.ts";
 import { aggregateOffers } from "../transform.ts";
 

@@ -1,7 +1,7 @@
-import type { Suggestion } from "../../../../commerce/types.ts";
-import type { ExtensionOf } from "../../../../website/loaders/extension.ts";
-import type { AppContext } from "../../../mod.ts";
-import type { Props } from "../extend.ts";
+import { Suggestion } from "../../../../commerce/types.ts";
+import { ExtensionOf } from "../../../../website/loaders/extension.ts";
+import { AppContext } from "../../../mod.ts";
+import { Props } from "../extend.ts";
 
 /**
  * @title VTEX Integration - Extra Info

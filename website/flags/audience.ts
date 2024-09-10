@@ -1,6 +1,9 @@
-import type { Resolvable } from "@deco/deco";
-import type { FlagObj, Handler, Matcher } from "@deco/deco/blocks";
-import { JsonViewer, metabasePreview } from "@deco/deco/utils";
+import { FlagObj } from "deco/blocks/flag.ts";
+import { Handler } from "deco/blocks/handler.ts";
+import { Matcher } from "deco/blocks/matcher.ts";
+import JsonViewer from "deco/components/JsonViewer.tsx";
+import { Resolvable } from "deco/engine/core/resolver.ts";
+import { metabasePreview } from "deco/utils/metabase.tsx";
 import Flag from "./flag.ts";
 export { onBeforeResolveProps } from "./everyone.ts";
 /**

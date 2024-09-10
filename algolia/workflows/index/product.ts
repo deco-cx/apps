@@ -1,5 +1,4 @@
-import { WorkflowGen } from "@deco/deco";
-import { WorkflowContext } from "@deco/deco/blocks";
+import { WorkflowContext, WorkflowGen } from "deco/mod.ts";
 import { Product } from "../../../commerce/types.ts";
 import type { Manifest } from "../../manifest.gen.ts";
 

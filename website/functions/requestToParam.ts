@@ -1,4 +1,4 @@
-import type { FunctionContext, LoaderFunction } from "@deco/deco";
+import type { FunctionContext, LoaderFunction } from "deco/types.ts";
 
 /** @title Force param */
 export type RequestURLParam = string;

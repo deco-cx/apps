@@ -1,8 +1,12 @@
 import "../website/utils/unhandledRejection.ts";
 
-import { fetch } from "@deco/deco";
-import { ExponentialBackoff, handleWhen, retry } from "npm:cockatiel@3.1.1";
+import {
+  ExponentialBackoff,
+  handleWhen,
+  retry,
+} from "https://esm.sh/cockatiel@3.1.1?target=es2019";
 import { HttpError } from "./http.ts";
+import { fetch } from "deco/runtime/fetch/mod.ts";
 
 // this error is thrown by deno deploy when the connection is closed by the server.
 // check the discussion at discord: https://discord.com/channels/985687648595243068/1107104244517048320/1107111259813466192

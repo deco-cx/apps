@@ -1,4 +1,4 @@
-import type { BlogPost, SortBy } from "../types.ts";
+import { BlogPost, SortBy } from "../types.ts";
 import { VALID_SORT_ORDERS } from "./constants.ts";
 
 /**

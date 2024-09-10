@@ -1,6 +1,6 @@
-import { type Cookie, getCookies } from "@std/http/cookie";
+import { Cookie, getCookies } from "std/http/mod.ts";
 import { stringify } from "./cookies.ts";
-import type { MarketingData } from "./types.ts";
+import { MarketingData } from "./types.ts";
 
 const VTEX_CHECKOUT_COOKIE = "checkout.vtex.com";
 

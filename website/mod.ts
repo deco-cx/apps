@@ -1,13 +1,15 @@
 import "./utils/unhandledRejection.ts";
 
-import type { App, Flag, FnContext, Site } from "@deco/deco";
-import { asResolved } from "@deco/deco";
-import type { Matcher, Page, Section } from "@deco/deco/blocks";
+import { Matcher } from "deco/blocks/matcher.ts";
+import { Page } from "deco/blocks/page.tsx";
+import { Section } from "deco/blocks/section.ts";
+import type { App, Flag, FnContext, Site } from "deco/mod.ts";
+import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
-import type { Routes } from "./flags/audience.ts";
-import type { TextReplace } from "./handlers/proxy.ts";
-import manifest, { type Manifest } from "./manifest.gen.ts";
-import type { Script } from "./types.ts";
+import { Routes } from "./flags/audience.ts";
+import { TextReplace } from "./handlers/proxy.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { Script } from "./types.ts";
 
 declare global {
   interface Window {

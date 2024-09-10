@@ -1,4 +1,4 @@
-import type { App, FnContext } from "@deco/deco";
+import type { App, FnContext } from "deco/mod.ts";
 
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";

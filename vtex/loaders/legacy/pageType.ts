@@ -1,5 +1,5 @@
 import { STALE } from "../../../utils/fetch.ts";
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 
 interface Props {
   term?: string;

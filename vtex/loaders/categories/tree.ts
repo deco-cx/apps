@@ -1,7 +1,7 @@
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { STALE } from "../../../utils/fetch.ts";
-import type { Category } from "../../../commerce/types.ts";
+import { Category } from "../../../commerce/types.ts";
 
 export interface Props {
   /**

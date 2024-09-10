@@ -1,8 +1,9 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
-import type { Person } from "../../commerce/types.ts";
+import { Person } from "../../commerce/types.ts";
 import { invoke } from "../runtime.ts";
-import type { OrderForm, WishlistItem } from "../utils/types.ts";
+import type { OrderForm } from "../utils/types.ts";
+import { WishlistItem } from "../utils/types.ts";
 
 export interface Context {
   cart: OrderForm | null;

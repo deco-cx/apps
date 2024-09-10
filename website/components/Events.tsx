@@ -1,7 +1,8 @@
 import { Head } from "$fresh/runtime.ts";
-import { DECO_SEGMENT, type Flag } from "@deco/deco";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
-import type { AnalyticsEvent, Deco } from "../../commerce/types.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { DECO_SEGMENT } from "deco/mod.ts";
+import { Flag } from "deco/types.ts";
+import { type AnalyticsEvent, type Deco } from "../../commerce/types.ts";
 
 type EventHandler = (event?: AnalyticsEvent) => void | Promise<void>;
 

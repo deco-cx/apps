@@ -1,13 +1,11 @@
-import { LoaderContext } from "@deco/deco";
-import {
-  Accounts,
-  Apps,
-  Flag,
-  Loader,
-  Page,
-  Resolvable,
-  Section,
-} from "@deco/deco/blocks";
+import { Accounts } from "deco/blocks/account.ts";
+import { Flag } from "deco/blocks/flag.ts";
+import { Loader } from "deco/blocks/loader.ts";
+import { Page } from "deco/blocks/page.tsx";
+import { Section } from "deco/blocks/section.ts";
+import { Resolvable } from "deco/engine/core/resolver.ts";
+import { LoaderContext } from "deco/mod.ts";
+import { Apps } from "deco/blocks/app.ts";
 
 /**
  * @titleBy key

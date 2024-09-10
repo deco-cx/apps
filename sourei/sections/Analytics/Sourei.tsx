@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Head } from "$fresh/runtime.ts";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 
 interface Props {
   /**

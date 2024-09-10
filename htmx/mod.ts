@@ -1,7 +1,7 @@
-import type { App, FnContext } from "@deco/deco";
+import { App, FnContext } from "deco/mod.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { PreviewContainer } from "../utils/preview.tsx";
-import manifest, { type Manifest } from "./manifest.gen.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 

@@ -1,4 +1,4 @@
-import type { MatchContext } from "@deco/deco/blocks";
+import { MatchContext } from "deco/blocks/matcher.ts";
 
 interface BaseCase {
   value: string;

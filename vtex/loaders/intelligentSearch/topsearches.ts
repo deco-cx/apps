@@ -1,7 +1,7 @@
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { STALE } from "../../../utils/fetch.ts";
-import type { Suggestion } from "../../../commerce/types.ts";
+import { Suggestion } from "../../../commerce/types.ts";
 
 export default async function (
   _props: unknown,

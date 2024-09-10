@@ -1,7 +1,7 @@
-import { setCookie } from "@std/http/cookie";
-import { removeNonLatin1Chars } from "../../utils/normalize.ts";
-import type { AppContext } from "../mod.ts";
+import { setCookie } from "std/http/mod.ts";
+import { AppContext } from "../mod.ts";
 import type { Segment } from "./types.ts";
+import { removeNonLatin1Chars } from "../../utils/normalize.ts";
 
 const SEGMENT_COOKIE_NAME = "vtex_segment";
 const SEGMENT = Symbol("segment");

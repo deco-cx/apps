@@ -1,5 +1,5 @@
-import type { DefaultPathProps } from "../../../website/pages/Page.tsx";
-import type { AppContext } from "../../mod.ts";
+import { DefaultPathProps } from "../../../website/pages/Page.tsx";
+import { AppContext } from "../../mod.ts";
 import productList from "../legacy/productList.ts";
 
 export interface Props {

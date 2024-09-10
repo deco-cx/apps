@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals";
-import { debounce } from "@std/async/debounce";
+import { debounce } from "std/async/debounce.ts";
 import type { Suggestion } from "../../commerce/types.ts";
 import { invoke } from "../runtime.ts";
 

@@ -1,5 +1,5 @@
 // Intelligent Search analytics integration
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
 
 export type Props =

@@ -1,4 +1,5 @@
-import { AppRuntime, BaseContext } from "@deco/deco";
+import { BaseContext } from "deco/engine/core/resolver.ts";
+import { AppRuntime } from "deco/types.ts";
 import { App } from "../mod.ts";
 
 // this base URL was found at this documentation: https://developer.chrome.com/docs/crux/dashboard?hl=pt-br

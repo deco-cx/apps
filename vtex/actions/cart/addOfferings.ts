@@ -1,8 +1,8 @@
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import { forceHttpsOnAssets } from "../../utils/transform.ts";
-import type { OrderForm } from "../../utils/types.ts";
+import { OrderForm } from "../../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "./updateItemAttachment.ts";
 
 export interface Props {

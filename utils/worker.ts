@@ -1,4 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
+import { Deferred, deferred } from "std/async/deferred.ts";
+
 /**
  * Deco labs: 🐁🐁🐁
  *
@@ -50,9 +52,9 @@ export const createWorker = (
   url: URL,
   options?: WorkerOptions | undefined,
 ): Promise<any> => {
-  const setup = Promise.withResolvers();
+  const setup = deferred();
   const worker = new Worker(new URL(import.meta.url), options);
-  const invokes = new Map<string, typeof setup>([]);
+  const invokes = new Map<string, Deferred<unknown>>([]);
 
   worker.postMessage({ type: "setup", payload: url.href });
 
@@ -63,7 +65,7 @@ export const createWorker = (
       case "setup:fulfill": {
         const mod = payload.reduce((acc, curr) => {
           acc[curr] = (...args: any[]) => {
-            const run = Promise.withResolvers();
+            const run = deferred<void>();
             const id = crypto.randomUUID();
 
             invokes.set(id, run);
@@ -114,7 +116,7 @@ export const createWorker = (
     }
   });
 
-  return setup.promise;
+  return setup;
 };
 
 if (IS_WORKER) {

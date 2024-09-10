@@ -1,4 +1,4 @@
-import type { App, AppContext as AC } from "@deco/deco";
+import type { App, AppContext as AC } from "deco/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";

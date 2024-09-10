@@ -1,5 +1,5 @@
 import Image from "../../components/Image.tsx";
-import type { SeoProps } from "./Preview.tsx";
+import { SeoProps } from "./Preview.tsx";
 import { Avatar, GlobeIcon } from "./Icons.tsx";
 
 export default function LinkedIn(props: SeoProps) {

@@ -1,8 +1,8 @@
-import { asResolved, isDeferred } from "@deco/deco";
-import type { Section } from "@deco/deco/blocks";
-import { useSection } from "@deco/deco/hooks";
+import type { Section } from "deco/blocks/section.ts";
+import { useSection } from "deco/hooks/useSection.ts";
+import { asResolved, isDeferred } from "deco/mod.ts";
 import { shouldForceRender } from "../../utils/deferred.ts";
-import type { AppContext } from "../mod.ts";
+import { AppContext } from "../mod.ts";
 
 /**
  * @titleBy type

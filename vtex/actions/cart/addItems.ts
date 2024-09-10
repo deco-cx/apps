@@ -1,9 +1,9 @@
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
-import { forceHttpsOnAssets } from "../../utils/transform.ts";
 import type { OrderForm } from "../../utils/types.ts";
+import { forceHttpsOnAssets } from "../../utils/transform.ts";
 
 export interface Item {
   quantity: number;

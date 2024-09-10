@@ -1,9 +1,9 @@
-import type { ComponentChildren } from "preact";
+import { ComponentChildren } from "preact";
 import Image from "../../components/Image.tsx";
 import { VerifiedIcon } from "./Icons.tsx";
 import { Avatar } from "./Icons.tsx";
-import type { SeoProps } from "./Preview.tsx";
-import type { PreviewItem } from "./Preview.tsx";
+import { SeoProps } from "./Preview.tsx";
+import { PreviewItem } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
 function CardWrapper(props: SeoProps & { children: ComponentChildren }) {

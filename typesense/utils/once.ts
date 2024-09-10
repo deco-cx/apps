@@ -1,9 +1,11 @@
+import { deferred } from "std/async/deferred.ts";
+
 export const once = <T>(cb: () => Promise<T>) => {
-  let promise = Promise.withResolvers<T>();
+  let promise = deferred<T>();
   let run = true;
 
   const reset = () => {
-    promise = Promise.withResolvers<T>();
+    promise = deferred<T>();
     run = true;
   };
 
@@ -21,6 +23,6 @@ export const once = <T>(cb: () => Promise<T>) => {
       }
     }
 
-    return promise.promise;
+    return promise;
   };
 };

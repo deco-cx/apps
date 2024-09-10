@@ -1,7 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 export { onBeforeResolveProps } from "../../website/mod.ts";
-import type { App, AppContext as AC, AppManifest } from "@deco/deco";
-import { buildImportMap, ImportMap } from "@deco/deco/blocks";
+import { ImportMap } from "deco/blocks/app.ts";
+import { buildImportMap } from "deco/blocks/utils.tsx";
+import type { App, AppContext as AC, AppManifest } from "deco/mod.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
 import $live, { Props as LiveProps } from "../$live/mod.ts";
 import commerce, { Props as CommerceProps } from "../../commerce/mod.ts";
