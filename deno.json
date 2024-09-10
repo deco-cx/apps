@@ -39,7 +39,7 @@
   "lock": false,
   "tasks": {
     "check": "deno fmt && deno lint && deno check **/mod.ts",
-    "release": "deno run -A jsr:@deco/deco/scripts/release",
+    "release": "deno run -A jsr:@deco/scripts/release",
     "bundle": "deno run -A jsr:@deco/deco/scripts/bundle",
     "update": "deno run -A https://deco.cx/update",
     "start": "deno run -A ./scripts/start.ts",
@@ -64,5 +64,5 @@
       ]
     }
   },
-  "version": "0.56.23"
+  "version": "0.57.0"
 }
