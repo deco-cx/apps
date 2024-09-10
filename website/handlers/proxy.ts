@@ -1,8 +1,7 @@
-import { DecoSiteState } from "deco/mod.ts";
 import { proxySetCookie } from "../../utils/cookie.ts";
 import { removeDirtyCookies as removeDirtyCookiesFn } from "../../utils/normalize.ts";
-import { Script } from "../types.ts";
-import { isFreshCtx } from "./fresh.ts";
+import type { Script } from "../types.ts";
+import { isHandlerContext } from "./fresh.ts";
 
 type Handler = Deno.ServeHandler;
 const HOP_BY_HOP = [
@@ -123,7 +122,7 @@ export default function Proxy({
     const headers = new Headers(req.headers);
     HOP_BY_HOP.forEach((h) => headers.delete(h));
 
-    if (isFreshCtx<DecoSiteState>(_ctx)) {
+    if (isHandlerContext(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
@@ -131,7 +130,7 @@ export default function Proxy({
       removeDirtyCookiesFn(headers);
     }
 
-    if (isFreshCtx<DecoSiteState>(_ctx)) {
+    if (isHandlerContext(_ctx)) {
       _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
     }
 

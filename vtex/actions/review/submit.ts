@@ -1,5 +1,5 @@
 import { getCookies } from "std/http/cookie.ts";
-import { AppContext } from "../../../vtex/mod.ts";
+import type { AppContext } from "../../../vtex/mod.ts";
 import { VTEX_ID_CLIENT_COOKIE } from "../../utils/vtexId.ts";
 
 export interface Props {

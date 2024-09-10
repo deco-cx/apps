@@ -1,4 +1,4 @@
-import { Arg } from "deco/deps.ts";
+import { Arg } from "@deco/durable";
 import { get } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 export interface Props {

@@ -1,4 +1,4 @@
-import { SeoProps } from "./Preview.tsx";
+import type { SeoProps } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
 const MAX_DESCRIPTION_LENGTH = 130;

@@ -1,4 +1,4 @@
-import { BlogPost } from "../types.ts";
+import type { BlogPost } from "../types.ts";
 
 /**
  * @title Blogpost

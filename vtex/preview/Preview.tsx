@@ -1,6 +1,4 @@
-import { BaseContext } from "deco/engine/core/resolver.ts";
-import { Context } from "deco/live.ts";
-import { AppRuntime } from "deco/types.ts";
+import { type AppRuntime, type BaseContext, Context } from "@deco/deco";
 import type { JSX } from "preact";
 import { PreviewContainer } from "../../utils/preview.tsx";
 import { App } from "../mod.ts";
@@ -13,7 +11,7 @@ export const PreviewVtex = (
   app: AppRuntime<BaseContext, App["state"]> & {
     markdownContent: () => JSX.Element;
   },
-) => {
+): JSX.Element => {
   const context = Context.active();
   const decoSite = context.site;
   const publicUrl = app.state?.publicUrl || "";

@@ -1,4 +1,4 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
 import { parseCookie } from "../../utils/orderForm.ts";
 import type { OrderForm, SelectableGifts } from "../../utils/types.ts";

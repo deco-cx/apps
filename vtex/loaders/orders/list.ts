@@ -1,5 +1,5 @@
-import { AppContext } from "../../mod.ts";
-import { Userorderslist } from "../../utils/openapi/vcs.openapi.gen.ts";
+import type { AppContext } from "../../mod.ts";
+import type { Userorderslist } from "../../utils/openapi/vcs.openapi.gen.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
 export interface Props {

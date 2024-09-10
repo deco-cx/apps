@@ -1,13 +1,13 @@
+import { weakcache } from "../../utils/weakcache.ts";
 import {
   AssistantCreateParams,
   RequiredActionFunctionToolCall,
   Thread,
 } from "../deps.ts";
 import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
-import { JSONSchema7, ValueType, weakcache } from "deco/deps.ts";
-import { lazySchemaFor } from "deco/engine/schema/lazy.ts";
-import { Context } from "deco/live.ts";
-import { meter } from "deco/observability/otel/metrics.ts";
+
+import { Context, JSONSchema7, lazySchemaFor } from "@deco/deco";
+import { meter, ValueType } from "@deco/deco/o11y";
 import {
   ChatMessage,
   FunctionCallReply,

@@ -1,4 +1,4 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import type { SimulationOrderForm } from "../../utils/types.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 

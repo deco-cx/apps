@@ -1,9 +1,8 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
-import { Person } from "../../commerce/types.ts";
+import type { Person } from "../../commerce/types.ts";
 import { invoke } from "../runtime.ts";
-import type { OrderForm } from "../utils/types.ts";
-import { WishlistItem } from "../utils/types.ts";
+import type { OrderForm, WishlistItem } from "../utils/types.ts";
 
 export interface Context {
   cart: OrderForm | null;
@@ -15,7 +14,8 @@ const loading = signal<boolean>(true);
 const context = {
   cart: IS_BROWSER && signal<OrderForm | null>(null) || { value: null },
   user: IS_BROWSER && signal<Person | null>(null) || { value: null },
-  wishlist: IS_BROWSER && signal<WishlistItem[] | null>(null) || { value: null },
+  wishlist: IS_BROWSER && signal<WishlistItem[] | null>(null) ||
+    { value: null },
 };
 
 let queue = Promise.resolve();

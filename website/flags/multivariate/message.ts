@@ -1,6 +1,8 @@
 export { onBeforeResolveProps } from "../../utils/multivariate.ts";
-import { MultivariateFlag } from "deco/blocks/flag.ts";
-import multivariate, { MultivariateProps } from "../../utils/multivariate.ts";
+import type { MultivariateFlag } from "@deco/deco/blocks";
+import multivariate, {
+  type MultivariateProps,
+} from "../../utils/multivariate.ts";
 
 export type Message = string;
 

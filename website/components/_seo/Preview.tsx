@@ -1,18 +1,12 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ComponentChildren, ComponentProps } from "preact";
 import { useMemo } from "preact/hooks";
-import { ImageWidget } from "../../../admin/widgets.ts";
+import type { ImageWidget } from "../../../admin/widgets.ts";
 import type Seo from "../Seo.tsx";
-import { OGType } from "../Seo.tsx";
+import type { OGType } from "../Seo.tsx";
 import Discord from "./Discord.tsx";
 import Facebook from "./Facebook.tsx";
 import Google from "./Google.tsx";
-import LinkedIn from "./LinkedIn.tsx";
-import Slack from "./Slack.tsx";
-import Telegram from "./Telegram.tsx";
-import Twitter from "./Twitter.tsx";
-import WhatsApp from "./WhatsApp.tsx";
-import instructions from "./instructions.json" with { type: "json" };
 import {
   DiscordIcon,
   FacebookIcon,
@@ -23,6 +17,12 @@ import {
   WhatsAppIcon,
   XIcon,
 } from "./Icons.tsx";
+import LinkedIn from "./LinkedIn.tsx";
+import Slack from "./Slack.tsx";
+import Telegram from "./Telegram.tsx";
+import Twitter from "./Twitter.tsx";
+import WhatsApp from "./WhatsApp.tsx";
+import instructions from "./instructions.json" with { type: "json" };
 
 export type SeoProps = ComponentProps<typeof Seo>;
 

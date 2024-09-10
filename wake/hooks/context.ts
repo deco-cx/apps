@@ -1,12 +1,12 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { signal } from "@preact/signals";
+import { Person } from "../../commerce/types.ts";
 import { invoke } from "../runtime.ts";
+import { setClientCookie } from "../utils/cart.ts";
 import type {
   CheckoutFragment,
   WishlistReducedProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
-import { Person } from "../../commerce/types.ts";
-import { setClientCookie } from "../utils/cart.ts";
 import { ShopQuery } from "../utils/graphql/storefront.graphql.gen.ts";
 
 export interface Context {

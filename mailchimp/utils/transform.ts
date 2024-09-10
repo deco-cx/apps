@@ -1,4 +1,4 @@
-import { crypto } from "std/crypto/crypto.ts";
+import { crypto } from "@std/crypto";
 
 /**
  * @description Gets the MD5 hash of an email address, which is used to identify a subscriber in Mailchimp.

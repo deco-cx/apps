@@ -1,7 +1,7 @@
-import { LegacyItem } from "../../utils/types.ts";
+import type { LegacyItem } from "../../utils/types.ts";
 import type { Filter, ProductListingPage } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import {
   getMapAndTerm,
   getValidTypesFromPageTypes,

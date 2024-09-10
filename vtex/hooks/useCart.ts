@@ -1,10 +1,10 @@
 // deno-lint-ignore-file no-explicit-any
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import { mapCategoriesToAnalyticsCategories } from "../../commerce/utils/productToAnalyticsItem.ts";
-import { Manifest } from "../manifest.gen.ts";
+import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
 import type { OrderForm, OrderFormItem } from "../utils/types.ts";
-import { Context, state as storeState } from "./context.ts";
+import { type Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
 

@@ -1,4 +1,4 @@
-import { logger } from "deco/observability/otel/config.ts";
+import { logger } from "@deco/deco/o11y";
 import { AssistantIds } from "../types.ts";
 
 export default function base64ToBlob(

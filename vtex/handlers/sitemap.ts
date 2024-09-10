@@ -1,5 +1,5 @@
 import Proxy from "../../website/handlers/proxy.ts";
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 
 type ConnInfo = Deno.ServeHandlerInfo;
 const xmlHeader =

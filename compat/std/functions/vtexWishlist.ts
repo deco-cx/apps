@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "deco/types.ts";
+import type { LoaderFunction } from "@deco/deco";
 import type { ProductListingPage } from "../../../commerce/types.ts";
 import type { Props } from "../../../vtex/loaders/wishlist.ts";
 import { Product } from "../../../vtex/utils/types.ts";

@@ -1,8 +1,10 @@
-import { type WorkflowContext, WorkflowGen } from "deco/mod.ts";
-import { type VTEXNotificationPayload } from "../../actions/trigger.ts";
-import { type AppManifest } from "../../mod.ts";
-import { type Product } from "../../../commerce/types.ts";
+import type { WorkflowGen } from "@deco/deco";
+import type { WorkflowContext } from "@deco/deco/blocks";
+
+import type { Product } from "../../../commerce/types.ts";
 import { waitForWorkflowCompletion } from "../../../workflows/utils/awaiters.ts";
+import type { VTEXNotificationPayload } from "../../actions/trigger.ts";
+import type { AppManifest } from "../../mod.ts";
 
 const PAGE_SIZE = 50;
 
@@ -32,7 +34,7 @@ export default function Index() {
       const executions = [];
       for (const product of products) {
         const exec = yield ctx.invoke("workflows/actions/start.ts", {
-          // @ts-expect-error vtex trigger is on generated type
+          // @ts-ignore: TODO: fix this
           key: "vtex-trigger",
           args: [{ IdSku: product.productID }] as VTEXNotificationPayload[],
         });

@@ -1,9 +1,7 @@
-import { logger } from "deco/observability/otel/config.ts";
-import { meter } from "deco/observability/otel/metrics.ts";
-import base64ToBlob from "../utils/blobConversion.ts";
-import { AssistantIds } from "../types.ts";
-import { ValueType } from "deco/deps.ts";
+import { logger, meter, ValueType } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
+import { AssistantIds } from "../types.ts";
+import base64ToBlob from "../utils/blobConversion.ts";
 
 const stats = {
   awsUploadImageError: meter.createCounter("assistant_aws_upload_error", {

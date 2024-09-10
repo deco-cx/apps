@@ -6,9 +6,9 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
-import { RequestURLParam } from "../../website/functions/requestToParam.ts";
-import { AppContext } from "../mod.ts";
-import { Category } from "../types.ts";
+import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import type { AppContext } from "../mod.ts";
+import type { Category } from "../types.ts";
 import { getRecordsByPath } from "../utils/records.ts";
 
 const COLLECTION_PATH = "collections/blog/categories";

@@ -1,4 +1,4 @@
-import { PromiseOrValue } from "deco/engine/core/utils.ts";
+import type { PromiseOrValue } from "@deco/deco/utils";
 
 /**
  * @title The type extension.

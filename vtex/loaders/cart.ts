@@ -1,4 +1,4 @@
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import { proxySetCookie } from "../utils/cookies.ts";
 import { hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
 import { getSegmentFromBag } from "../utils/segment.ts";

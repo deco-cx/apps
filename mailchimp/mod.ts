@@ -1,4 +1,4 @@
-import type { App as A, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import type { App as A, AppContext as AC, ManifestOf } from "@deco/deco";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";

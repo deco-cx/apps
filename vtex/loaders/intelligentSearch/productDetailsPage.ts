@@ -1,7 +1,7 @@
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import type { RequestURLParam } from "../../../website/functions/requestToParam.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import {
   toPath,
   withDefaultFacets,
@@ -150,7 +150,11 @@ const loader = async (
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
+export const cacheKey = (
+  props: Props,
+  req: Request,
+  ctx: AppContext,
+): string | null => {
   const segment = getSegmentFromBag(ctx)?.token;
   const url = new URL(req.url);
   const skuId = url.searchParams.get("skuId") ?? "";

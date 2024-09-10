@@ -1,6 +1,6 @@
 import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import {
   isFilterParam,
   toPath,
@@ -12,7 +12,7 @@ import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { Item, ProductID, Sort } from "../../utils/types.ts";
 import {
-  LabelledFuzzy,
+  type LabelledFuzzy,
   mapLabelledFuzzyToFuzzy,
 } from "./productListingPage.ts";
 import { sortProducts } from "../../utils/transform.ts";

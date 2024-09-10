@@ -1,22 +1,17 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { Handler } from "deco/blocks/handler.ts";
-import { Workflow, WorkflowContext } from "deco/blocks/workflow.ts";
-import { workflowHTTPHandler } from "deco/deps.ts";
-import { AppManifest, DecoSiteState, DecoState } from "deco/mod.ts";
+import { Handler, Workflow, WorkflowContext } from "@deco/deco/blocks";
+import { workflowHTTPHandler } from "@deco/durable";
+
 export interface Config {
   workflow: Workflow;
 }
 
 export default function WorkflowHandler({ workflow }: Config): Handler {
   return (req: Request, conn: Deno.ServeHandlerInfo) => {
-    const ctx = conn as unknown as HandlerContext<
-      unknown,
-      DecoState<unknown, DecoSiteState, AppManifest>
-    >;
-    if (ctx?.state) {
+    if ("state" in conn) {
       const handler = workflowHTTPHandler(
         workflow,
-        (exec) => new WorkflowContext(ctx.state, exec),
+        // deno-lint-ignore no-explicit-any
+        (exec) => new WorkflowContext(conn.state as any, exec),
       );
       return handler(req, conn);
     }

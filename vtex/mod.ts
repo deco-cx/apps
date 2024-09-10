@@ -4,20 +4,20 @@ import type {
   AppMiddlewareContext as AMC,
   AppRuntime,
   ManifestOf,
-} from "deco/mod.ts";
+} from "@deco/deco";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
-import workflow from "../workflows/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { middleware } from "./middleware.ts";
-import { SP, VTEXCommerceStable } from "./utils/client.ts";
-import { fetchSafe } from "./utils/fetchVTEX.ts";
-import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
-import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
-import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
-import { Segment } from "./utils/types.ts";
-import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
+import type { Secret } from "../website/loaders/secret.ts";
+import workflow from "../workflows/mod.ts";
+import manifest, { type Manifest } from "./manifest.gen.ts";
+import { middleware } from "./middleware.ts";
+import type { SP, VTEXCommerceStable } from "./utils/client.ts";
+import { fetchSafe } from "./utils/fetchVTEX.ts";
+import type { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
+import type { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
+import type { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
+import type { Segment } from "./utils/types.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { PreviewVtex } from "./preview/Preview.tsx";
 

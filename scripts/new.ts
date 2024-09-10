@@ -1,4 +1,4 @@
-import { join } from "std/path/mod.ts";
+import { join } from "@std/path";
 
 const appName = Deno.args[0];
 const decoTsPath = join(Deno.cwd(), "deco.ts");
@@ -13,7 +13,7 @@ await Deno.writeTextFile(
 await Deno.writeTextFile(
   join(Deno.cwd(), appName, "mod.ts"),
   `
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export interface State {

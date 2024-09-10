@@ -1,5 +1,5 @@
 import wishlistLoader from "../../loaders/wishlist.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import type { WishlistItem } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 

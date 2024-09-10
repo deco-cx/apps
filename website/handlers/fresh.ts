@@ -1,17 +1,17 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { Page } from "deco/blocks/page.tsx";
-import { RequestContext } from "deco/deco.ts";
 import {
+  allowCorsFor,
   asResolved,
-  BaseContext,
+  type BaseContext,
+  type DecoSiteState,
+  type DecoState,
   isDeferred,
-} from "deco/engine/core/resolver.ts";
-import { DecoState } from "deco/types.ts";
-import { allowCorsFor } from "deco/utils/http.ts";
-import { getSetCookies } from "std/http/cookie.ts";
+  RequestContext,
+} from "@deco/deco";
+import type { Page } from "@deco/deco/blocks";
+import { getSetCookies } from "@std/http/cookie";
 import { __DECO_FBT } from "../../utils/deferred.ts";
 import { errorIfFrameworkMismatch } from "../../utils/framework.tsx";
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 
 type ConnInfo = Deno.ServeHandlerInfo;
 /**
@@ -21,10 +21,16 @@ export interface FreshConfig {
   page: Page;
 }
 
-export const isFreshCtx = <TState>(
-  ctx: ConnInfo | HandlerContext<unknown, TState>,
-): ctx is HandlerContext<unknown, TState> => {
-  return typeof (ctx as HandlerContext).render === "function";
+export interface RenderCtx {
+  render: (data: unknown) => Promise<Response>;
+}
+export const isHandlerContext = <TState = DecoSiteState>(
+  ctx: ConnInfo | RenderCtx,
+): ctx is RenderCtx & {
+  state: TState;
+  params: Record<string, string>;
+} => {
+  return typeof (ctx as RenderCtx).render === "function";
 };
 
 function abortHandler(ctrl: AbortController, signal: AbortSignal) {
@@ -149,7 +155,7 @@ export default function Fresh(
       if (asJson !== null) {
         return Response.json(page, { headers: allowCorsFor(req) });
       }
-      if (isFreshCtx<DecoState>(ctx)) {
+      if (isHandlerContext<DecoState>(ctx)) {
         const timing = appContext?.monitoring?.timings?.start?.(
           "render-to-string",
         );
@@ -166,12 +172,7 @@ export default function Fresh(
               const response = await renderToString({
                 page: appContext.flavor && page
                   ? errorIfFrameworkMismatch(appContext.flavor?.framework, page)
-                  : page,
-                routerInfo: {
-                  // deno-lint-ignore no-explicit-any
-                  flags: (ctx.state as any).flags,
-                  pagePath: ctx.state.pathTemplate,
-                },
+                  : page!,
               });
               const setCookies = getSetCookies(appContext.response.headers);
               if (appContext?.caching?.enabled && setCookies.length === 0) {

@@ -1,5 +1,5 @@
 import Image from "../../components/Image.tsx";
-import { PreviewItem, SeoProps } from "./Preview.tsx";
+import type { PreviewItem, SeoProps } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
 const BACKGROUND_BASE64 =

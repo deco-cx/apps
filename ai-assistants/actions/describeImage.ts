@@ -1,9 +1,7 @@
-import { logger } from "deco/observability/otel/config.ts";
-import { meter } from "deco/observability/otel/metrics.ts";
-import { AssistantIds } from "../types.ts";
-import { ValueType } from "deco/deps.ts";
+import { shortcircuit } from "@deco/deco";
+import { logger, meter, ValueType } from "@deco/deco/o11y";
 import { AppContext } from "../mod.ts";
-import { shortcircuit } from "deco/engine/errors.ts";
+import { AssistantIds } from "../types.ts";
 
 const stats = {
   promptTokens: meter.createHistogram("assistant_image_prompt_tokens", {

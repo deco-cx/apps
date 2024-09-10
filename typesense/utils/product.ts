@@ -4,11 +4,9 @@ import { Product, ProductLeaf, PropertyValue } from "../../commerce/types.ts";
 import { replaceHighlight } from "./highlight.ts";
 import { once } from "./once.ts";
 
-type PromiseOf<T> = T extends Promise<infer K> ? K : never;
-
 export type ProductsCollectionName = "products";
 export type IndexedProduct = ReturnType<typeof toIndex>;
-export type ProductsCollection = PromiseOf<
+export type ProductsCollection = Awaited<
   ReturnType<ReturnType<typeof setupProductsCollection>>
 >;
 

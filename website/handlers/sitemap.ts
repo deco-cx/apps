@@ -1,7 +1,7 @@
-import type { Handler } from "deco/blocks/handler.ts";
-import type { Resolvable } from "deco/engine/core/resolver.ts";
-import { isResolvable } from "deco/engine/core/resolver.ts";
-import { Route } from "../flags/audience.ts";
+import type { Resolvable } from "@deco/deco";
+import { isResolvable } from "@deco/deco";
+import type { Handler } from "@deco/deco/blocks";
+import type { Route } from "../flags/audience.ts";
 
 const isPage = (handler: Resolvable<Handler>) =>
   isResolvable(handler) &&

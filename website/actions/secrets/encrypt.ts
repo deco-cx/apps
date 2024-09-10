@@ -1,5 +1,4 @@
-import { ActionContext } from "deco/types.ts";
-import { allowCorsFor } from "deco/utils/http.ts";
+import { type ActionContext, allowCorsFor } from "@deco/deco";
 import { encryptToHex } from "../../utils/crypto.ts";
 
 export interface Props {

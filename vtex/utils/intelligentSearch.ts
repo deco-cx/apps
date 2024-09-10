@@ -1,5 +1,5 @@
-import { setCookie } from "std/http/mod.ts";
-import { AppContext } from "../mod.ts";
+import { setCookie } from "@std/http/cookie";
+import type { AppContext } from "../mod.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { SelectedFacet, Sort } from "../utils/types.ts";
 

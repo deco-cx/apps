@@ -1,5 +1,5 @@
-import type { Page } from "deco/blocks/page.tsx";
-import { asResolved } from "deco/mod.ts";
+import { asResolved } from "@deco/deco";
+import type { Page } from "@deco/deco/blocks";
 import type { Route } from "../../website/flags/audience.ts";
 import type { AppContext } from "../mod.ts";
 

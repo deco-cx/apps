@@ -1,10 +1,10 @@
 import Seo from "../../../website/components/Seo.tsx";
 import {
   renderTemplateString,
-  SEOSection,
+  type SEOSection,
 } from "../../../website/components/Seo.tsx";
-import { BlogPostPage } from "../../types.ts";
-import { AppContext } from "../../mod.ts";
+import type { BlogPostPage } from "../../types.ts";
+import type { AppContext } from "../../mod.ts";
 
 export interface Props {
   /** @title Data Source */

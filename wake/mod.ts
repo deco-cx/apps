@@ -1,4 +1,4 @@
-import type { App, FnContext } from "deco/mod.ts";
+import type { App, FnContext } from "@deco/deco";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";

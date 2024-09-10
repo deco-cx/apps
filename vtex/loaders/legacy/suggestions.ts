@@ -1,5 +1,5 @@
-import { Product, Suggestion } from "../../../commerce/types.ts";
-import { AppContext } from "../../mod.ts";
+import type { Product, Suggestion } from "../../../commerce/types.ts";
+import type { AppContext } from "../../mod.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 
 export interface Props {

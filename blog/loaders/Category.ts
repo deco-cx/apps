@@ -1,4 +1,4 @@
-import { Category } from "../types.ts";
+import type { Category } from "../types.ts";
 
 /**
  * @title Category

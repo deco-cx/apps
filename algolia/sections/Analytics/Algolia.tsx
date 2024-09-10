@@ -1,5 +1,5 @@
-import { SectionProps } from "deco/blocks/section.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { SectionProps } from "@deco/deco";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 import insights from "npm:search-insights@2.9.0";
 import {
   AddToCartEvent,

@@ -1,6 +1,6 @@
 import Image from "../../components/Image.tsx";
 import { Avatar, GlobeIcon, VerifiedIcon } from "./Icons.tsx";
-import { PreviewItem, SeoProps } from "./Preview.tsx";
+import type { PreviewItem, SeoProps } from "./Preview.tsx";
 import { textShortner } from "./helpers/textShortner.tsx";
 
 function FacebookBigOpenGraph(props: PreviewItem & SeoProps) {

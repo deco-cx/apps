@@ -1,8 +1,8 @@
-import type { App } from "deco/mod.ts";
+import type { App } from "@deco/deco";
 
 import webSite, { Props } from "../../website/mod.ts";
 
-import { AppContext as AC } from "deco/blocks/app.ts";
+import { AppContext as AC } from "@deco/deco";
 import workflows from "../../workflows/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
