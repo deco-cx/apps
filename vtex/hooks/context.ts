@@ -15,7 +15,8 @@ const loading = signal<boolean>(true);
 const context = {
   cart: IS_BROWSER && signal<OrderForm | null>(null) || { value: null },
   user: IS_BROWSER && signal<Person | null>(null) || { value: null },
-  wishlist: IS_BROWSER && signal<WishlistItem[] | null>(null) || { value: null },
+  wishlist: IS_BROWSER && signal<WishlistItem[] | null>(null) ||
+    { value: null },
 };
 
 let queue = Promise.resolve();
