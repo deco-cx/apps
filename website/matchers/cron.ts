@@ -1,4 +1,4 @@
-import Cron from "npm:croner@6.0.3";
+import Cron from "https://deno.land/x/croner@6.0.3/dist/croner.js";
 
 /**
  * @titleBy cron

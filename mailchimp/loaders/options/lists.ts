@@ -1,4 +1,4 @@
-import { allowCorsFor } from "@deco/deco";
+import { allowCorsFor } from "deco/mod.ts";
 import { AppContext } from "../../mod.ts";
 
 export default async function loader(

@@ -4,7 +4,7 @@ import type {
   PropertyValue,
   UnitPriceSpecification,
 } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import {
   aggregateOffers,
   toAdditionalPropertyCategory,

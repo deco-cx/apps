@@ -1,4 +1,4 @@
-import { Context } from "@deco/deco";
+import { Context } from "deco/live.ts";
 import {
   cancel as durableCancel,
   get as durableGet,

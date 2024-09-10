@@ -1,10 +1,10 @@
-import type { createGraphqlClient } from "../../utils/graphql.ts";
-import type { createHttpClient } from "../../utils/http.ts";
-import type { AppContext } from "../mod.ts";
-import type { SP } from "../utils/client.ts";
-import type { OpenAPI as API } from "../utils/openapi/api.openapi.gen.ts";
-import type { OpenAPI as VCS } from "../utils/openapi/vcs.openapi.gen.ts";
-import type { OpenAPI as MY } from "../utils/openapi/my.openapi.gen.ts";
+import { type createGraphqlClient } from "../../utils/graphql.ts";
+import { type createHttpClient } from "../../utils/http.ts";
+import { type AppContext } from "../mod.ts";
+import { type SP } from "../utils/client.ts";
+import { type OpenAPI as API } from "../utils/openapi/api.openapi.gen.ts";
+import { type OpenAPI as VCS } from "../utils/openapi/vcs.openapi.gen.ts";
+import { type OpenAPI as MY } from "../utils/openapi/my.openapi.gen.ts";
 
 export type Config = {
   sp: ReturnType<typeof createHttpClient<SP>>;

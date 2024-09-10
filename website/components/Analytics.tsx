@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
-import { context } from "@deco/deco";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { context } from "deco/live.ts";
 
 declare global {
   interface Window {

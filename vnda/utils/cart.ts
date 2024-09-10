@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "@std/http/cookie";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 import { SEGMENT_COOKIE_NAME } from "./segment.ts";
 
 const CART_COOKIE = "vnda_cart_id";

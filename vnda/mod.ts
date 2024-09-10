@@ -1,4 +1,4 @@
-import type { App, AppMiddlewareContext as AMC, FnContext } from "@deco/deco";
+import type { App, AppMiddlewareContext as AMC, FnContext } from "deco/mod.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";

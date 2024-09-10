@@ -1,5 +1,5 @@
-import { getCookies } from "@std/http/cookie";
-import type { AppMiddlewareContext } from "./mod.ts";
+import { getCookies } from "std/http/cookie.ts";
+import { AppMiddlewareContext } from "./mod.ts";
 import {
   getISCookiesFromBag,
   setISCookiesBag,

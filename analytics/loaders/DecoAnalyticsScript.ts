@@ -1,5 +1,5 @@
-import { Flag } from "@deco/deco";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import { Flag } from "deco/types.ts";
 import { Script } from "../../website/types.ts";
 import { AppContext } from "../mod.ts";
 

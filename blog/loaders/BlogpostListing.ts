@@ -6,10 +6,10 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
-import type { PageInfo } from "../../commerce/types.ts";
-import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
-import type { AppContext } from "../mod.ts";
-import type { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
+import { PageInfo } from "../../commerce/types.ts";
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import { AppContext } from "../mod.ts";
+import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
 import handlePosts, { slicePosts } from "../utils/handlePosts.ts";
 import { getRecordsByPath } from "../utils/records.ts";
 

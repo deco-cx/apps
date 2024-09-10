@@ -1,5 +1,5 @@
-import type { App, FnContext } from "@deco/deco";
-import manifest, { type Manifest } from "./manifest.gen.ts";
+import type { App, FnContext } from "deco/mod.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 
 // deno-lint-ignore no-explicit-any

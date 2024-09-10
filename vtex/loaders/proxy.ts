@@ -1,6 +1,6 @@
-import type { Route } from "../../website/flags/audience.ts";
-import type { AppContext } from "../mod.ts";
-import type { Script } from "../../website/types.ts";
+import { Route } from "../../website/flags/audience.ts";
+import { AppContext } from "../mod.ts";
+import { Script } from "../../website/types.ts";
 
 const PATHS_TO_PROXY = [
   "/account",

@@ -1,7 +1,7 @@
-import type { LoaderFunction } from "@deco/deco";
+import type { LoaderFunction } from "deco/types.ts";
 import type { Navbar } from "../../../commerce/types.ts";
-import type { Props } from "../../../vtex/loaders/navbar.ts";
 import type { AppContext } from "../mod.ts";
+import type { Props } from "../../../vtex/loaders/navbar.ts";
 
 /**
  * @title Navigation Bar

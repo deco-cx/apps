@@ -2,7 +2,7 @@ import type {
   App as A,
   AppContext as AC,
   AppMiddlewareContext as AMC,
-} from "@deco/deco";
+} from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";

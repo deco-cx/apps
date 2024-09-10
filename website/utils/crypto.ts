@@ -1,5 +1,7 @@
-import { crypto } from "@std/crypto";
-import { encodeHex } from "@std/encoding";
+/// <reference lib="deno.unstable" />
+
+import { crypto } from "std/crypto/mod.ts";
+import { decode as decodeHex, encode as encodeHex } from "std/encoding/hex.ts";
 
 const generateKey = async (): Promise<CryptoKey> => {
   return await crypto.subtle.generateKey(
@@ -138,7 +140,7 @@ export const encryptToHex = async (value: string): Promise<string> => {
     textEncode(value),
   );
   const encryptedBytes = new Uint8Array(encrypted);
-  return encodeHex(encryptedBytes);
+  return textDecode(encodeHex(encryptedBytes));
 };
 
 export const decryptFromHex = async (encrypted: string) => {
@@ -146,7 +148,7 @@ export const decryptFromHex = async (encrypted: string) => {
   const decrypted = await crypto.subtle.decrypt(
     { name: "AES-CBC", iv },
     key,
-    textEncode(encrypted),
+    decodeHex(textEncode(encrypted)),
   );
   const decryptedBytes = new Uint8Array(decrypted);
   return { decrypted: textDecode(decryptedBytes) };

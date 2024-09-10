@@ -1,20 +1,17 @@
-import type { App, AppContext as AC } from "@deco/deco";
-import {
-  AppManifest,
-  asResolved,
-  AvailableActions,
-  AvailableLoaders,
-  isDeferred,
-} from "@deco/deco";
-import { isAwaitable } from "@deco/deco/utils";
 import AWS from "https://esm.sh/aws-sdk@2.1585.0";
+import { asResolved, isDeferred } from "deco/engine/core/resolver.ts";
+import { isAwaitable } from "deco/engine/core/utils.ts";
+import type { App, AppContext as AC } from "deco/mod.ts";
+import { AvailableActions, AvailableLoaders } from "deco/utils/invoke.types.ts";
+import { AppManifest } from "deco/types.ts";
+import { deferred } from "std/async/deferred.ts";
 import openai, {
   Props as OpenAIProps,
   State as OpenAIState,
 } from "../openai/mod.ts";
-import { Secret } from "../website/loaders/secret.ts";
 import { Assistant } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { Secret } from "../website/loaders/secret.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 
 export type GPTModel =
@@ -160,7 +157,7 @@ export default function App(
       ...openAIApp.state,
       assistants: (state.assistants ?? []).filter(Boolean).reduce(
         (acc, assistant) => {
-          const assistantDeferred = Promise.withResolvers<AIAssistant>();
+          const assistantDeferred = deferred<AIAssistant>();
           if (isDeferred<AIAssistant>(assistant)) {
             const aiAssistant = assistant();
             if (isAwaitable(aiAssistant)) {

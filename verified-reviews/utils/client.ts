@@ -1,8 +1,8 @@
-import { context } from "@deco/deco";
-import { Product } from "../../commerce/types.ts";
 import { fetchAPI } from "../../utils/fetch.ts";
-import { ConfigVerifiedReviews } from "../mod.ts";
 import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
+import { Product } from "../../commerce/types.ts";
+import { ConfigVerifiedReviews } from "../mod.ts";
+import { context } from "deco/live.ts";
 
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
 

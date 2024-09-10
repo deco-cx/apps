@@ -1,5 +1,5 @@
-import type { Brand } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
+import { Brand } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import { toBrand } from "../../utils/transform.ts";
 
 interface Props {

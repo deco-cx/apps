@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
-import type { JSX } from "preact";
 import type { ImageWidget } from "../../admin/widgets.ts";
 import { stripHTML } from "../utils/html.ts";
+import { JSX } from "preact";
 
 export const renderTemplateString = (template: string, value: string) =>
   template.replace("%s", value);

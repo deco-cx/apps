@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 
-import { badRequest, notFound } from "@deco/deco";
+import { badRequest, notFound } from "deco/mod.ts";
 import { messageProcessorFor } from "../chat/messages.ts";
 import { Notify, Queue } from "../deps.ts";
 

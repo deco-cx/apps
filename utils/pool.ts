@@ -1,19 +1,15 @@
+import { Deferred, deferred } from "std/async/deferred.ts";
+
 export const createPool = <T>(resources: T[]) => {
   const taken = new Set<number>();
   const free = new Set<number>(resources.map((_, i) => i));
 
-  const waiting: Array<
-    {
-      resolve: (v: T) => void;
-      reject: (e: unknown) => void;
-      promise: Promise<T>;
-    }
-  > = [];
+  const waiting: Deferred<T>[] = [];
 
   return {
     acquire: () => {
       if (free.size === 0) {
-        const p = Promise.withResolvers<T>();
+        const p = deferred<T>();
         waiting.push(p);
 
         return p;

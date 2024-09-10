@@ -1,14 +1,10 @@
 // deno-lint-ignore-file no-explicit-any
-import {
-  AppManifest,
-  BlockFromKey,
-  BlockFunc,
-  BlockKeys,
-  Context,
-  Resolvable,
-} from "@deco/deco";
-import { Workflow, WorkflowFn } from "@deco/deco/blocks";
-import { Arg, RuntimeParameters, WorkflowExecutionBase } from "@deco/durable";
+import { Workflow, WorkflowFn } from "deco/blocks/workflow.ts";
+import { Arg, RuntimeParameters, WorkflowExecutionBase } from "deco/deps.ts";
+import { BlockFromKey, BlockFunc, BlockKeys } from "deco/engine/block.ts";
+import { Resolvable } from "deco/engine/core/resolver.ts";
+import { Context } from "deco/live.ts";
+import { AppManifest } from "deco/mod.ts";
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
 

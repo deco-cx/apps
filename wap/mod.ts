@@ -1,8 +1,8 @@
-import type { App, FnContext } from "@deco/deco";
-import { fetchSafe } from "../utils/fetch.ts";
-import { createHttpClient } from "../utils/http.ts";
+import type { App, FnContext } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { createHttpClient } from "../utils/http.ts";
 import { OpenAPI } from "./utils/openapi/api.openapi.gen.ts";
+import { fetchSafe } from "../utils/fetch.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 
 export const color = 0xfe5000;

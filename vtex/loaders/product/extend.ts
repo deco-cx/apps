@@ -1,5 +1,5 @@
-import type { Product, ProductLeaf } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
+import { Product, ProductLeaf } from "../../../commerce/types.ts";
+import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";

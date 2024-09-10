@@ -1,9 +1,6 @@
-import Seo, { type Props as SeoProps } from "../../components/Seo.tsx";
-import {
-  renderTemplateString,
-  type SEOSection,
-} from "../../components/Seo.tsx";
-import type { AppContext } from "../../mod.ts";
+import Seo, { Props as SeoProps } from "../../components/Seo.tsx";
+import { renderTemplateString, SEOSection } from "../../components/Seo.tsx";
+import { AppContext } from "../../mod.ts";
 
 type Props = Pick<
   SeoProps,

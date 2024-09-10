@@ -1,4 +1,4 @@
-import { shortcircuit } from "@deco/deco";
+import { shortcircuit } from "deco/engine/errors.ts";
 import { fetchSafe, STALE } from "../../utils/fetch.ts";
 
 interface Props {

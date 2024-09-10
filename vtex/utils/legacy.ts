@@ -1,10 +1,10 @@
 import type { Seo } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
 import { STALE } from "../../utils/fetch.ts";
-import type { AppContext } from "../mod.ts";
+import { AppContext } from "../mod.ts";
 import { slugify } from "../utils/slugify.ts";
 import type { PageType } from "../utils/types.ts";
-import type { WrappedSegment } from "./segment.ts";
+import { WrappedSegment } from "./segment.ts";
 
 export const toSegmentParams = (
   { payload: segment }: WrappedSegment,

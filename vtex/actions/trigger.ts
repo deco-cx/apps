@@ -1,4 +1,4 @@
-import type { AppContext } from "../mod.ts";
+import { AppContext } from "../mod.ts";
 
 export interface VTEXNotificationPayload {
   /** @description SKU ID in VTEX **/

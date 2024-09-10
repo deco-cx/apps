@@ -1,11 +1,11 @@
-import { App, FnContext } from "@deco/deco";
-import { bgYellow } from "@std/fmt/colors";
+import { App, FnContext } from "deco/mod.ts";
 import shopify, { Props as ShopifyProps } from "../shopify/mod.ts";
 import vnda, { Props as VNDAProps } from "../vnda/mod.ts";
 import vtex, { Props as VTEXProps } from "../vtex/mod.ts";
 import wake, { Props as WakeProps } from "../wake/mod.ts";
 import website, { Props as WebsiteProps } from "../website/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { bgYellow } from "std/fmt/colors.ts";
 
 export type AppContext = FnContext<Props, Manifest>;
 

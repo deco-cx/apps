@@ -1,4 +1,4 @@
-import type { App, AppContext as AC } from "@deco/deco";
+import type { App, AppContext as AC } from "deco/mod.ts";
 import algolia from "https://esm.sh/algoliasearch@4.20.0";
 import { createFetchRequester } from "npm:@algolia/requester-fetch@4.20.0";
 import { Markdown } from "../decohub/components/Markdown.tsx";

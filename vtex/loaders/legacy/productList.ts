@@ -1,6 +1,6 @@
 import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";

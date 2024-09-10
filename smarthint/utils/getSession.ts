@@ -1,4 +1,4 @@
-import { getCookies } from "@std/http/cookie";
+import { getCookies } from "std/http/cookie.ts";
 
 export const SESSION_COOKIE = "SmartHint-Session";
 export const ANONYMOUS_COOKIE = "SmartHint-AnonymousConsumer";

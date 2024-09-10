@@ -1,4 +1,4 @@
-import type { Secret } from "./secret.ts";
+import { Secret } from "./secret.ts";
 
 export interface Props {
   secret: Secret;

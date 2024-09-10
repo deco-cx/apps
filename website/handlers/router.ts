@@ -1,16 +1,16 @@
+import { weakcache } from "deco/deps.ts";
+import { ResolveOptions } from "deco/engine/core/mod.ts";
 import {
-  type DecoState,
   isDeferred,
-  type Resolvable,
-  type ResolveFunc,
-  type ResolveOptions,
-  type RouteContext,
-} from "@deco/deco";
-import { isAwaitable } from "@deco/deco/utils";
-import { weakcache } from "../../utils/weakcache.ts";
-import type { Route, Routes } from "../flags/audience.ts";
-import { isHandlerContext } from "../handlers/fresh.ts";
-import type { AppContext } from "../mod.ts";
+  Resolvable,
+  ResolveFunc,
+} from "deco/engine/core/resolver.ts";
+import { isAwaitable } from "deco/engine/core/utils.ts";
+import { RouteContext } from "deco/engine/manifest/manifest.ts";
+import { DecoSiteState, DecoState } from "deco/types.ts";
+import { Route, Routes } from "../flags/audience.ts";
+import { isFreshCtx } from "../handlers/fresh.ts";
+import { AppContext } from "../mod.ts";
 
 export type ConnInfo = Deno.ServeHandlerInfo;
 export type Handler = Deno.ServeHandler;
@@ -203,7 +203,7 @@ export default function RoutesSelection(
         status: 404,
       });
     }
-    const monitoring = isHandlerContext(connInfo)
+    const monitoring = isFreshCtx<DecoSiteState>(connInfo)
       ? connInfo.state.monitoring
       : undefined;
 

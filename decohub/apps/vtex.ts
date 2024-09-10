@@ -1,6 +1,6 @@
 export { default } from "../../vtex/mod.ts";
 
-import { AppRuntime } from "@deco/deco";
+import { AppRuntime } from "deco/types.ts";
 import { PreviewVtex } from "../../vtex/preview/Preview.tsx";
 import { Markdown } from "../components/Markdown.tsx";
 

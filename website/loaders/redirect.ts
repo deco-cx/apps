@@ -1,4 +1,4 @@
-import type { Redirect } from "../../compat/std/loaders/x/redirects.ts";
+import { Redirect } from "../../compat/std/loaders/x/redirects.ts";
 
 export interface Props {
   redirect: Redirect;

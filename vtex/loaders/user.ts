@@ -1,5 +1,5 @@
-import type { Person } from "../../commerce/types.ts";
-import type { AppContext } from "../mod.ts";
+import { Person } from "../../commerce/types.ts";
+import { AppContext } from "../mod.ts";
 import { parseCookie } from "../utils/vtexId.ts";
 
 interface User {

@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "@deco/deco";
+import type { LoaderFunction } from "deco/types.ts";
 import type { ProductDetailsPage } from "../../../commerce/types.ts";
 import type { AppContext } from "../mod.ts";
 

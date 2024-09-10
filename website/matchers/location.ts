@@ -1,5 +1,5 @@
-import type { MatchContext } from "@deco/deco/blocks";
-import type { MapWidget } from "../../admin/widgets.ts";
+import { MatchContext } from "deco/blocks/matcher.ts";
+import { MapWidget } from "../../admin/widgets.ts";
 import { haversine } from "../utils/location.ts";
 
 export interface Coordinate {

@@ -1,10 +1,10 @@
-import { getCookies, setCookie } from "@std/http/cookie";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 import { AppMiddlewareContext } from "./mod.ts";
+import { getDeviceIdFromBag, setDeviceIdInBag } from "./utils/deviceId.ts";
 import {
   DEVICE_ID_COOKIE_NAME,
   NAVIGATION_ID_COOKIE_NAME,
 } from "./utils/constants.ts";
-import { getDeviceIdFromBag, setDeviceIdInBag } from "./utils/deviceId.ts";
 
 export const middleware = (
   _props: unknown,

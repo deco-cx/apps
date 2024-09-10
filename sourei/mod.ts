@@ -1,6 +1,6 @@
-import type { App } from "@deco/deco";
-import { PreviewContainer } from "../utils/preview.tsx";
+import type { App } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
 
 /**
  * @title Sourei

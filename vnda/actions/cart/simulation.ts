@@ -1,6 +1,6 @@
-import { badRequest } from "@deco/deco";
 import { AppContext } from "../../mod.ts";
 import type { ShippingMethod } from "../../utils/client/types.ts";
+import { badRequest } from "deco/mod.ts";
 
 export interface Props {
   skuId: string;

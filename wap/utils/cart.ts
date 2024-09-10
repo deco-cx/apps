@@ -1,4 +1,4 @@
-import { getCookies } from "@std/http/cookie";
+import { getCookies } from "std/http/cookie.ts";
 
 const CART_COOKIE = "PHPSESSID";
 

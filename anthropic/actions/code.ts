@@ -1,6 +1,6 @@
-import { shortcircuit } from "@deco/deco";
-import { Anthropic } from "../deps.ts";
+import { shortcircuit } from "deco/engine/errors.ts";
 import { AppContext } from "../mod.ts";
+import { Anthropic } from "../deps.ts";
 export interface Props {
   /**
    * @description The system prompt to be used for the AI Assistant.

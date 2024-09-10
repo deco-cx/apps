@@ -1,13 +1,13 @@
-import type { SectionProps } from "@deco/deco";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
-import type {
+import { SectionProps } from "deco/blocks/section.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
+import {
   AddToCartEvent,
   AnalyticsItem,
   SelectItemEvent,
 } from "../../../commerce/types.ts";
-import type { AppContext } from "../../mod.ts";
+import { AppContext } from "../../mod.ts";
 import { getISCookiesFromBag } from "../../utils/intelligentSearch.ts";
-import type { SPEvent } from "../../utils/types.ts";
+import { SPEvent } from "../../utils/types.ts";
 
 interface ISCookies {
   // deno-lint-ignore no-explicit-any

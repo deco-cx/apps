@@ -1,4 +1,4 @@
-import { context } from "@deco/deco";
+import { context } from "deco/deco.ts";
 export * from "https://esm.sh/drizzle-orm@0.30.10/libsql";
 export * from "npm:@libsql/client@0.7.0";
 

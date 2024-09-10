@@ -1,6 +1,6 @@
-import type { App as A } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import PreviewCrux from "./preview/Preview.tsx";
+import type { App as A } from "deco/mod.ts";
 
 export type App = ReturnType<typeof CRUX>;
 

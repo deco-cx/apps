@@ -1,4 +1,4 @@
-import { SectionProps } from "@deco/deco";
+import { SectionProps } from "deco/blocks/section.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 import { AppContext } from "../mod.ts";
 
