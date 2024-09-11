@@ -87,7 +87,7 @@ export const router = (
         }
         return new URLPattern({
           pathname: url.pathname,
-          search: url.search,
+          ...(url.search ? {search: url.search} : {}),
         });
       })();
       const res = pattern.exec(req.url);
