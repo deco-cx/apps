@@ -2,13 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$1 from "./sections/Analytics/PostHog.tsx";
+import * as $$$$$$0 from "./sections/Analytics/PostHog.tsx";
 
 const manifest = {
   "sections": {
-    "analytics/sections/Analytics/PostHog.tsx": $$$$$$1,
+    "posthog/sections/Analytics/PostHog.tsx": $$$$$$0,
   },
-  "name": "analytics",
+  "name": "posthog",
   "baseUrl": import.meta.url,
 };
 
