@@ -1,11 +1,10 @@
-import { context } from "deco/live.ts";
 import { AnalyticsEvent } from "../../../commerce/types.ts";
 import {
   getGTMIdFromSrc,
   GoogleTagManager,
   GTAG,
 } from "../../../website/components/Analytics.tsx";
-
+import { context } from "@deco/deco";
 declare global {
   interface Window {
     DECO_ANALYTICS: Record<
@@ -15,7 +14,6 @@ declare global {
     >;
   }
 }
-
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
@@ -28,43 +26,35 @@ const sendAnalyticsEvent = <T extends AnalyticsEvent>(event: T) => {
       event: event.name,
       ecommerce: event.params,
     });
-
   globalThis.window.DECO_ANALYTICS &&
     Object.values(globalThis.window.DECO_ANALYTICS).map((f) =>
       f("track", "ecommerce", event)
     );
 };
-
 export interface Props {
   /**
    * @description google tag manager container id. For more info: https://developers.google.com/tag-platform/tag-manager/web#standard_web_page_installation .
    */
   trackingIds?: string[];
-
   /**
    * @title GA Measurement Ids
    * @label measurement id
    * @description the google analytics property measurement id. For more info: https://support.google.com/analytics/answer/9539598
    */
   googleAnalyticsIds?: string[];
-
   /**
    * @description custom url for serving google tag manager. Set either this url or the tracking id
    */
   src?: string;
 }
-
-export default function Analtyics({
-  src,
-  trackingIds,
-  googleAnalyticsIds,
-}: Props) {
+export default function Analtyics(
+  { src, trackingIds, googleAnalyticsIds }: Props,
+) {
   const isDeploy = !!context.isDeploy;
   // Prevent breacking change. Drop this in next major to only have
   // src: https://hostname
   // trackingId: GTM-ID
   const trackingId = getGTMIdFromSrc(src) ?? "";
-
   return (
     <>
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}

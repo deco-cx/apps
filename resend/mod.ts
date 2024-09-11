@@ -1,4 +1,3 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
@@ -6,12 +5,11 @@ import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { ResendApi } from "./utils/client.ts";
-
+import { type App, type AppContext as AC } from "@deco/deco";
 export interface EmailFrom {
   name?: string;
   domain?: string;
 }
-
 export interface Props {
   /**@title API KEY Resend  */
   apiKey?: Secret;
@@ -29,31 +27,26 @@ export interface Props {
    */
   subject?: string;
 }
-
 export interface State extends Props {
   apiWrite: ReturnType<typeof createHttpClient<ResendApi>>;
 }
-
 /**
  * @title Resend
  * @description app for sending emails using https://resend.com/
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/resend/logo.png
  */
-export default function App(
-  {
-    apiKey,
-    emailFrom = {
-      name: "Contact",
-      domain: "<onboarding@resend.dev>",
-    },
-    emailTo,
-    subject = "Contato via app resend",
-  }: State,
-): App<Manifest, State> {
+export default function App({
+  apiKey,
+  emailFrom = {
+    name: "Contact",
+    domain: "<onboarding@resend.dev>",
+  },
+  emailTo,
+  subject = "Contato via app resend",
+}: State): App<Manifest, State> {
   const apiKeyToken = typeof apiKey === "string"
     ? apiKey
     : apiKey?.get?.() ?? "";
-
   const apiWrite = createHttpClient<ResendApi>({
     base: "https://api.resend.com/emails",
     fetcher: fetchSafe,
@@ -62,7 +55,6 @@ export default function App(
       "Content-Type": "application/json",
     }),
   });
-
   const state = {
     apiKey,
     emailFrom,
@@ -70,21 +62,17 @@ export default function App(
     subject,
     apiWrite,
   };
-
   const app: App<Manifest, typeof state> = {
     manifest,
     state,
   };
   return app;
 }
-
 export type AppContext = AC<ReturnType<typeof App>>;
-
 export const preview = async () => {
   const markdownContent = await Markdown(
     new URL("./README.md", import.meta.url).href,
   );
-
   return {
     Component: PreviewContainer,
     props: {
