@@ -33,7 +33,7 @@ export default function App(
   };
 }
 
-export const Preview = () => {
+export const preview = () => {
   return {
     Component: PreviewContainer,
     props: {
