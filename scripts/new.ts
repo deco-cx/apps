@@ -13,7 +13,7 @@ await Deno.writeTextFile(
 await Deno.writeTextFile(
   join(Deno.cwd(), appName, "mod.ts"),
   `
-import type { App, AppContext as AC } from "deco/mod.ts";
+import type { App, AppContext as AC } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
 export interface State {

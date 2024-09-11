@@ -1,3 +1,5 @@
+import { ImportMap } from "@deco/deco/blocks";
+import { decoManifestBuilder } from "@deco/deco/utils";
 import { createCache } from "https://deno.land/x/deno_cache@0.6.3/mod.ts";
 import { build, initialize } from "https://deno.land/x/esbuild@v0.20.2/wasm.js";
 import {
@@ -8,8 +10,6 @@ import { dirname, join } from "std/path/mod.ts";
 import { DynamicApp } from "../../decohub/mod.ts";
 import { AppContext } from "../mod.ts";
 import { create, FileSystemNode, isDir, nodesToMap, walk } from "../sdk.ts";
-import { ImportMap } from "@deco/deco/blocks";
-import { decoManifestBuilder } from "@deco/deco/utils";
 const initializePromise = initialize({
   wasmURL: "https://deno.land/x/esbuild@v0.20.2/esbuild.wasm",
   worker: false,
@@ -170,7 +170,7 @@ const loader = async (
 \n
 import manifest, { Manifest } from "./manifest.gen.ts";
 import website, { Props as WebSiteProps } from "apps/website/mod.ts";
-import { App, AppContext as AC } from "deco/mod.ts";
+import { App, AppContext as AC } from "@deco/deco";
 
 export default function App(props: WebSiteProps): App<Manifest, WebSiteProps, [ReturnType<typeof website>]> {
   return {
