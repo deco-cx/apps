@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("decopilot-app"),
     app("smarthint"),
     app("ra-trustvox"),
     app("anthropic"),
