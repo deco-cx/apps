@@ -1,10 +1,14 @@
+import { BaseContext } from "deco/engine/core/resolver.ts";
+import { Context } from "deco/live.ts";
+import { AppRuntime } from "deco/types.ts";
 import type { JSX } from "preact";
 import { PreviewContainer } from "../../utils/preview.tsx";
 import { App } from "../mod.ts";
-import { type AppRuntime, type BaseContext, Context } from "@deco/deco";
+
 export interface Props {
   publicUrl: string;
 }
+
 export const PreviewVtex = (
   app: AppRuntime<BaseContext, App["state"]> & {
     markdownContent: () => JSX.Element;
@@ -15,6 +19,7 @@ export const PreviewVtex = (
   const publicUrl = app.state?.publicUrl || "";
   const account = app.state?.account || "";
   const withoutSubDomain = publicUrl.split(".").slice(1).join(".");
+
   return (
     <PreviewContainer
       name="VTEX"
@@ -51,6 +56,7 @@ export const PreviewVtex = (
     />
   );
 };
+
 export function Indexing() {
   return (
     <div>
@@ -74,11 +80,14 @@ export function Indexing() {
     </div>
   );
 }
-export function GoLivePtBr({ decoSite, withoutSubDomain, account }: {
-  decoSite: string;
-  withoutSubDomain: string;
-  account: string;
-}) {
+
+export function GoLivePtBr(
+  { decoSite, withoutSubDomain, account }: {
+    decoSite: string;
+    withoutSubDomain: string;
+    account: string;
+  },
+) {
   return (
     <>
       <h2 class="text-2xl">

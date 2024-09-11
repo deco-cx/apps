@@ -1,4 +1,5 @@
-import { type MatchContext } from "@deco/deco/blocks";
+import { MatchContext } from "deco/blocks/matcher.ts";
+
 /**
  * @title {{{includes}}} {{{match}}}
  */
@@ -6,6 +7,7 @@ export interface Props {
   includes?: string;
   match?: string;
 }
+
 /**
  * @title User Agent
  * @description Target users based on their web browser or operational system
@@ -18,6 +20,8 @@ const MatchUserAgent = (
   const ua = request.headers.get("user-agent") || "";
   const regexMatch = match ? new RegExp(match).test(ua) : true;
   const includesFound = includes ? ua.includes(includes) : true;
+
   return regexMatch && includesFound;
 };
+
 export default MatchUserAgent;

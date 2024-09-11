@@ -1,11 +1,15 @@
+import { ActionContext } from "deco/types.ts";
+import { allowCorsFor } from "deco/utils/http.ts";
 import { encryptToHex } from "../../utils/crypto.ts";
-import { type ActionContext, allowCorsFor } from "@deco/deco";
+
 export interface Props {
   value: string;
 }
+
 export interface SignedMessage {
   value: string;
 }
+
 export default async function encrypt(
   { value }: Props,
   req: Request,

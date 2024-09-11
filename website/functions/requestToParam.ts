@@ -1,6 +1,8 @@
-import { type FunctionContext, type LoaderFunction } from "@deco/deco";
+import type { FunctionContext, LoaderFunction } from "deco/types.ts";
+
 /** @title Force param */
 export type RequestURLParam = string;
+
 export interface Props {
   /**
    * @default slug
@@ -10,12 +12,17 @@ export interface Props {
    */
   param: string;
 }
+
 /**
  * @title Get params from request parameters
  * @description Set param to slug for routes of type /:slug
  */
-const requestToParam: LoaderFunction<Props, RequestURLParam, FunctionContext> =
-  (_req, ctx) => ({
-    data: ctx.params[ctx.state.$live.param || "slug"],
-  });
+const requestToParam: LoaderFunction<
+  Props,
+  RequestURLParam,
+  FunctionContext
+> = (_req, ctx) => ({
+  data: ctx.params[ctx.state.$live.param || "slug"],
+});
+
 export default requestToParam;

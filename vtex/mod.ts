@@ -1,3 +1,10 @@
+import type {
+  App as A,
+  AppContext as AC,
+  AppMiddlewareContext as AMC,
+  AppRuntime,
+  ManifestOf,
+} from "deco/mod.ts";
 import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
 import workflow from "../workflows/mod.ts";
@@ -13,17 +20,12 @@ import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { PreviewVtex } from "./preview/Preview.tsx";
-import {
-  type App as A,
-  type AppContext as AC,
-  type AppMiddlewareContext as AMC,
-  type AppRuntime,
-  type ManifestOf,
-} from "@deco/deco";
+
 export type App = ReturnType<typeof VTEX>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
 export type AppMiddlewareContext = AMC<App>;
+
 export type SegmentCulture = Omit<
   Partial<Segment>,
   | "utm_medium"
@@ -42,22 +44,26 @@ export interface Props {
    * @description VTEX Account name. For more info, read here: https://help.vtex.com/en/tutorial/o-que-e-account-name--i0mIGLcg3QyEy8OCicEoC.
    */
   account: string;
+
   /**
    * @title Public store URL
    * @description Domain that is registered on License Manager (e.g: www.mystore.com.br)
    */
   publicUrl: string;
+
   /**
    * @title App Key
    * @description Only required for extra features
    */
   appKey?: Secret;
+
   /**
    * @title App Token
    * @description Only required for extra features
    * @format password
    */
   appToken?: Secret;
+
   /**
    * @title Default Sales Channel
    * @description (Use defaultSegment instead)
@@ -65,11 +71,14 @@ export interface Props {
    * @deprecated
    */
   salesChannel?: string;
+
   /**
    * @title Default Segment
    */
   defaultSegment?: SegmentCulture;
+
   usePortalSitemap?: boolean;
+
   /**
    * @description Use VTEX as backend platform
    * @default vtex
@@ -77,17 +86,25 @@ export interface Props {
    */
   platform: "vtex";
 }
+
 export const color = 0xf71963;
+
 /**
  * @title VTEX
  * @description Loaders, actions and workflows for adding VTEX Commerce Platform to your website.
  * @category Ecommmerce
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vtex/logo.png
  */
-export default function VTEX(
-  { appKey, appToken, account, publicUrl, salesChannel, ...props }: Props,
-) {
+export default function VTEX({
+  appKey,
+  appToken,
+  account,
+  publicUrl,
+  salesChannel,
+  ...props
+}: Props) {
   const headers = new Headers();
+
   appKey &&
     headers.set(
       "X-VTEX-API-AppKey",
@@ -98,6 +115,7 @@ export default function VTEX(
       "X-VTEX-API-AppToken",
       typeof appToken === "string" ? appToken : appToken?.get?.() ?? "",
     );
+
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
     processHeaders: removeDirtyCookies,
@@ -131,6 +149,7 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     headers: headers,
   });
+
   const state = {
     ...props,
     salesChannel: salesChannel ?? "1",
@@ -143,16 +162,17 @@ export default function VTEX(
     my,
     api,
   };
-  const app: A<Manifest, typeof state, [
-    ReturnType<typeof workflow>,
-  ]> = {
+
+  const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
     state,
     manifest,
     middleware,
     dependencies: [workflow({})],
   };
+
   return app;
 }
+
 export const preview = async (props: AppRuntime) => {
   const markdownContent = await Markdown(
     new URL("./README.md", import.meta.url).href,

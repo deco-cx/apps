@@ -1,17 +1,18 @@
+import { HandlerContext } from "$fresh/server.ts";
+import { Page } from "deco/blocks/page.tsx";
+import { RequestContext } from "deco/deco.ts";
 import {
-  allowCorsFor,
   asResolved,
-  type BaseContext,
-  DecoSiteState,
-  type DecoState,
+  BaseContext,
   isDeferred,
-  RequestContext,
-} from "@deco/deco";
-import { type Page } from "@deco/deco/blocks";
+} from "deco/engine/core/resolver.ts";
+import { DecoState } from "deco/types.ts";
+import { allowCorsFor } from "deco/utils/http.ts";
 import { getSetCookies } from "std/http/cookie.ts";
 import { __DECO_FBT } from "../../utils/deferred.ts";
 import { errorIfFrameworkMismatch } from "../../utils/framework.tsx";
 import { AppContext } from "../mod.ts";
+
 type ConnInfo = Deno.ServeHandlerInfo;
 /**
  * @title Fresh Config
@@ -19,23 +20,18 @@ type ConnInfo = Deno.ServeHandlerInfo;
 export interface FreshConfig {
   page: Page;
 }
-export interface RenderCtx {
-  render: (data: unknown) => Promise<Response>;
-}
-export const isHandlerContext = <TState = DecoSiteState>(
-  ctx: ConnInfo | RenderCtx,
-): ctx is RenderCtx & {
-  state: TState;
-  params: Record<string, string>;
-} => {
-  return typeof (ctx as RenderCtx).render === "function";
+
+export const isFreshCtx = <TState>(
+  ctx: ConnInfo | HandlerContext<unknown, TState>,
+): ctx is HandlerContext<unknown, TState> => {
+  return typeof (ctx as HandlerContext).render === "function";
 };
+
 function abortHandler(ctrl: AbortController, signal: AbortSignal) {
   let aborted = false;
   const abortCtrlInstance = () => {
-    if (aborted) {
-      return; // Early return if already handled
-    }
+    if (aborted) return; // Early return if already handled
+
     try {
       if (!ctrl.signal.aborted) {
         ctrl?.abort();
@@ -49,12 +45,15 @@ function abortHandler(ctrl: AbortController, signal: AbortSignal) {
   };
   return abortCtrlInstance;
 }
+
 function registerFinilizer(req: Request, abortCtrl: () => void) {
   const finalizer = new FinalizationRegistry((abortCtrl: () => void) => {
     req.signal.removeEventListener("abort", abortCtrl);
   });
+
   finalizer.register(req, abortCtrl);
 }
+
 /**
  * @title Fresh Page
  * @description Renders a fresh page.
@@ -79,13 +78,19 @@ export default function Fresh(
     const url = new URL(req.url);
     const asJson = url.searchParams.get("asJson");
     const delayFromProps = appContext.firstByteThresholdMS ? 1 : 0;
-    const delay = Number(url.searchParams.get(__DECO_FBT) ?? delayFromProps);
+    const delay = Number(
+      url.searchParams.get(__DECO_FBT) ?? delayFromProps,
+    );
+
     /** Controller to abort third party fetch (loaders) */
     const ctrl = new AbortController();
     const abortCtrl = abortHandler(ctrl, req.signal);
+
     /** Aborts when: Incomming request is aborted */
     req.signal.addEventListener("abort", abortCtrl, { once: true });
+
     registerFinilizer(req, abortCtrl);
+
     /**
      * Aborts when:
      *
@@ -96,23 +101,28 @@ export default function Fresh(
     const firstByteThreshold = !asJson && delay && !appContext.isBot
       ? delay === 1 ? ctrl.abort() : setTimeout(() => ctrl.abort(), delay)
       : undefined;
+
     try {
       const getPage = RequestContext.bind(
         { signal: ctrl.signal },
         async () =>
-          isDeferred<
-              Page,
-              BaseContext & {
-                context: ConnInfo;
-              }
-            >(freshConfig.page)
+          isDeferred<Page, BaseContext & { context: ConnInfo }>(
+              freshConfig.page,
+            )
             ? await freshConfig.page({ context: ctx }, {
               propagateOptions: true,
               hooks: {
-                onPropsResolveStart: (resolve, _props, resolver) => {
+                onPropsResolveStart: (
+                  resolve,
+                  _props,
+                  resolver,
+                ) => {
                   let next = resolve;
                   if (resolver?.type === "matchers") { // matchers should not have a timeout.
-                    next = RequestContext.bind({ signal: req.signal }, resolve);
+                    next = RequestContext.bind(
+                      { signal: req.signal },
+                      resolve,
+                    );
                   }
                   return next();
                 },
@@ -120,6 +130,7 @@ export default function Fresh(
             })
             : freshConfig.page,
       );
+
       const page = await appContext?.monitoring?.tracer?.startActiveSpan?.(
         "load-data",
         async (span) => {
@@ -134,16 +145,20 @@ export default function Fresh(
           }
         },
       );
+
       if (asJson !== null) {
         return Response.json(page, { headers: allowCorsFor(req) });
       }
-      if (isHandlerContext<DecoState>(ctx)) {
+      if (isFreshCtx<DecoState>(ctx)) {
         const timing = appContext?.monitoring?.timings?.start?.(
           "render-to-string",
         );
-        const renderToString = RequestContext.bind({
-          framework: appContext.flavor?.framework ?? "fresh",
-        }, ctx.render);
+
+        const renderToString = RequestContext.bind(
+          { framework: appContext.flavor?.framework ?? "fresh" },
+          ctx.render,
+        );
+
         const response = await appContext.monitoring!.tracer.startActiveSpan(
           "render-to-string",
           async (span) => {
@@ -177,6 +192,7 @@ export default function Fresh(
             }
           },
         );
+
         return response;
       }
       return Response.json({ message: "Fresh is not being used" }, {
@@ -189,7 +205,10 @@ export default function Fresh(
     }
   };
 }
-export const onBeforeResolveProps = (props: FreshConfig) => {
+
+export const onBeforeResolveProps = (
+  props: FreshConfig,
+) => {
   if (props?.page) {
     return { ...props, page: asResolved(props.page, true) };
   }

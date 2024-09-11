@@ -1,15 +1,18 @@
+import type { Page } from "deco/blocks/page.tsx";
+import { asResolved } from "deco/mod.ts";
 import type { Route } from "../../website/flags/audience.ts";
 import type { AppContext } from "../mod.ts";
-import { type Page } from "@deco/deco/blocks";
-import { asResolved } from "@deco/deco";
+
 /** @titleBy selected */
 export interface LinxPage {
   selected: "category" | "search" | "product";
   page: Page;
 }
+
 interface Props {
   pages: LinxPage[];
 }
+
 const PROXY_PATHS = [
   "/carrinho",
   "/carrinho/*",
@@ -27,6 +30,7 @@ const PROXY_PATHS = [
   "/painel-do-cliente",
   "/painel-do-cliente/*",
 ];
+
 /**
  * @title Linx Pages
  */
@@ -53,6 +57,7 @@ const loader = (props: Props, _req: Request, ctx: AppContext): Route[] => [
     },
   })),
 ];
+
 export const onBeforeResolveProps = (props: Props) => ({
   ...props,
   pages: props?.pages.map((linx) => ({
@@ -60,4 +65,5 @@ export const onBeforeResolveProps = (props: Props) => ({
     page: asResolved(linx?.page),
   })),
 });
+
 export default loader;

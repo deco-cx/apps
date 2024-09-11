@@ -1,8 +1,10 @@
-import { type MatchContext } from "@deco/deco/blocks";
+import { MatchContext } from "deco/blocks/matcher.ts";
+
 /**
  * @title {{{.}}}
  */
 export type Device = "mobile" | "tablet" | "desktop";
+
 /**
  * @title {{#mobile}}Mobile{{/mobile}} {{#tablet}}Tablet{{/tablet}} {{#desktop}}Desktop{{/desktop}}
  */
@@ -20,10 +22,12 @@ export interface Props {
    */
   desktop?: boolean;
 }
+
 // backwards compatibility
 interface OldProps {
   devices: Device[];
 }
+
 /**
  * @title Device
  * @description Target users based on their device type, such as desktop, tablet, or mobile
@@ -37,6 +41,8 @@ const MatchDevice = (
   mobile && devices.push("mobile");
   tablet && devices.push("tablet");
   desktop && devices.push("desktop");
+
   return devices.includes(device);
 };
+
 export default MatchDevice;

@@ -1,13 +1,12 @@
+import { JSONSchema7 } from "deco/deps.ts";
+import { shortcircuit } from "deco/engine/errors.ts";
+import { lazySchemaFor } from "deco/engine/schema/lazy.ts";
+import { Context } from "deco/live.ts";
+import { readFromStream } from "deco/utils/http.ts";
 import { dereferenceJsonSchema } from "../../ai-assistants/schema.ts";
 import { Anthropic } from "../deps.ts";
 import { AppContext } from "../mod.ts";
-import {
-  Context,
-  type JSONSchema7,
-  lazySchemaFor,
-  shortcircuit,
-} from "@deco/deco";
-import { readFromStream } from "@deco/deco/utils";
+
 export interface Props {
   /**
    * @description The system prompt to be used for the AI Assistant.
@@ -46,13 +45,16 @@ export interface Props {
   enableTools?: boolean;
   temperature?: number;
 }
+
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
+
 const pathFormatter = {
   encode: (path: string): string =>
     path.replace(/\.ts/g, "").replace(/\//g, "__"),
   decode: (encodedPath: string): string =>
     encodedPath.replace(/__/g, "/") + ".ts",
 };
+
 /**
  * Retrieves the available tools for the AI Assistant.
  * @param availableFunctions List of functions available for the AI Assistant.
@@ -64,30 +66,32 @@ const getAppTools = async (
   const ctx = Context.active();
   const runtime = await ctx.runtime!;
   const schemas = await lazySchemaFor(ctx).value;
+
   const functionKeys = availableFunctions ??
     Object.keys({
       ...runtime.manifest.loaders,
       ...runtime.manifest.actions,
     });
+
   const tools = functionKeys
     .map((functionKey) => {
       const functionDefinition = btoa(functionKey);
       const schema = schemas.definitions[functionDefinition];
-      if (
-        (schema as {
-          ignoreAI?: boolean;
-        })?.ignoreAI
-      ) {
+
+      if ((schema as { ignoreAI?: boolean })?.ignoreAI) {
         return undefined;
       }
+
       const propsRef = (schema?.allOf?.[0] as JSONSchema7)?.$ref;
       if (!propsRef) {
         return undefined;
       }
+
       const dereferenced = dereferenceJsonSchema({
         $ref: propsRef,
         ...schemas,
       });
+
       if (
         dereferenced.type !== "object" ||
         dereferenced.oneOf ||
@@ -98,6 +102,7 @@ const getAppTools = async (
       ) {
         return undefined;
       }
+
       return {
         name: pathFormatter.encode(functionKey),
         description:
@@ -111,8 +116,10 @@ const getAppTools = async (
       };
     })
     .filter(notUndefined);
+
   return tools as Anthropic.Beta.Tools.Tool[] | undefined;
 };
+
 /**
  * @title Anthropic chat streaming
  * @description Sends messages to the Anthropic API for processing.
@@ -133,13 +140,16 @@ export default async function chat(
   if (!messages) {
     return shortcircuit(new Response("No messages provided", { status: 400 }));
   }
+
   const tools = await getAppTools(availableFunctions ?? []);
+
   const headers = {
     "anthropic-version": "2023-06-01",
     "content-type": "application/json",
     "anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15",
     "x-api-key": ctx.token ?? "",
   };
+
   let payload: Anthropic.Beta.Tools.MessageCreateParamsStreaming = {
     system,
     messages,
@@ -148,6 +158,7 @@ export default async function chat(
     temperature,
     stream: true,
   };
+
   if (enableTools) {
     payload = {
       ...payload,
@@ -155,16 +166,19 @@ export default async function chat(
       tool_choice: { type: "auto" },
     };
   }
+
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers,
     body: JSON.stringify(payload),
   });
+
   if (!response.ok) {
     return shortcircuit(
       new Response(await response.text(), { status: response.status }),
     );
   }
+
   return readFromStream(response, {
     shouldDecodeChunk: false,
   });

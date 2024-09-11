@@ -1,3 +1,5 @@
+import type { App, FnContext } from "deco/mod.ts";
+
 import { fetchSafe } from "../utils/fetch.ts";
 import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
@@ -5,8 +7,9 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 import { PowerReviews } from "./utils/client.ts";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { PreviewContainer } from "../utils/preview.tsx";
-import { type App, type FnContext } from "@deco/deco";
+
 export type AppContext = FnContext<State, Manifest>;
+
 export interface Props {
   /**
    * @title App Key
@@ -25,10 +28,12 @@ export interface Props {
    */
   merchantGroup?: string;
 }
+
 interface State extends Props {
   api: ReturnType<typeof createHttpClient<PowerReviews>>;
   apiWrite: ReturnType<typeof createHttpClient<PowerReviews>>;
 }
+
 /**
  * @title Power Reviews
  * @description Collect more and better Ratings & Reviews and other UGC. Create UGC displays that convert. Analyze to enhance product experience and positioning.
@@ -38,12 +43,12 @@ interface State extends Props {
 export default function App(
   { appKey, locale, merchantId, merchantGroup }: Props,
 ) {
-  if (!appKey) {
-    throw new Error("Missing appKey");
-  }
+  if (!appKey) throw new Error("Missing appKey");
+
   const stringAppKey = typeof appKey === "string"
     ? appKey
     : appKey?.get?.() ?? "";
+
   const api = createHttpClient<PowerReviews>({
     base: `https://readservices-b2c.powerreviews.com`,
     fetcher: fetchSafe,
@@ -51,6 +56,7 @@ export default function App(
       Authorization: stringAppKey,
     }),
   });
+
   const apiWrite = createHttpClient<PowerReviews>({
     base: `https://writeservices.powerreviews.com`,
     fetcher: fetchSafe,
@@ -58,6 +64,7 @@ export default function App(
       Authorization: stringAppKey,
     }),
   });
+
   const state = {
     appKey: stringAppKey,
     locale,
@@ -66,6 +73,7 @@ export default function App(
     api,
     apiWrite,
   };
+
   const app: App<Manifest, typeof state> = {
     state,
     manifest: {
@@ -89,12 +97,15 @@ export default function App(
       },
     },
   };
+
   return app;
 }
+
 export const preview = async () => {
   const markdownContent = await Markdown(
     new URL("./readme.md", import.meta.url).href,
   );
+
   return {
     Component: PreviewContainer,
     props: {

@@ -1,6 +1,7 @@
+import type { App } from "deco/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
-import { type App } from "@deco/deco";
+
 /**
  * @title Sourei
  * @description Get sourei to analyze your data.
@@ -9,8 +10,10 @@ import { type App } from "@deco/deco";
  */
 export default function App() {
   const app: App<Manifest> = { manifest, state: {} };
+
   return app;
 }
+
 export const preview = () => {
   return {
     Component: PreviewContainer,

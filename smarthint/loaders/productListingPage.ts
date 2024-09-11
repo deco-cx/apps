@@ -9,11 +9,12 @@ import {
   toProduct,
   toSortOption,
 } from "../utils/transform.ts";
+import { redirect } from "deco/mod.ts";
 import { getSessionCookie } from "../utils/getSession.ts";
 import { FilterProp, SearchSort, SHProduct } from "../utils/typings.ts";
 import { RuleType } from "./PLPBanners.ts";
 import { getCategoriesParam } from "./recommendations.ts";
-import { redirect } from "@deco/deco";
+
 export interface Props {
   /**
    * @hide
@@ -53,6 +54,7 @@ export interface Props {
     validation?: string;
   };
 }
+
 /**
  * @title SmartHint Integration - Product List Page
  * @description Product List Page
@@ -73,21 +75,31 @@ const loader = async (
     rule,
     ruletype,
   } = props;
+
   const url = new URL(req.url);
+
   const { page, from } = resolvePage(url, size, fromParam);
+
   const sort = getSortParam(url, searchSort);
+
   const filters = getFilterParam(url, filter) ?? [];
+
   const { anonymous } = getSessionCookie(req.headers);
+
   const categories = categoryTree
     ? getCategoriesParam({ categoryTree, url })
     : undefined;
+
   const categoriesFilter = categories ? [`categories:${categories}`] : [];
+
   const term = termProp ?? url.searchParams.get("busca") ??
     url.searchParams.get("q") ?? undefined;
+
   const conditionString =
     condition?.field && condition.value && condition.validation
       ? `valueDouble:${condition.field}:${condition.value}:validation:${condition.validation}`
       : undefined;
+
   const commonParams = {
     cluster,
     shcode,
@@ -100,6 +112,7 @@ const loader = async (
     filter: [...filters, ...categoriesFilter],
     condition: conditionString,
   };
+
   const data = term || categories
     ? await api["GET /:cluster/Search/GetPrimarySearch"]({
       ...commonParams,
@@ -109,19 +122,23 @@ const loader = async (
       ...commonParams,
       url: url.pathname.replace("/", ""),
     }).then((r) => r.json()).then((result) => result.SearchResult);
-  if (!data) {
-    return null;
-  }
+
+  if (!data) return null;
+
   if (data.IsRedirect) {
     redirect(
       new URL(data?.urlRedirect!, url.origin)
         .href,
     );
   }
+
   const products =
     data?.Products?.map((product) => toProduct(product as SHProduct)) ?? [];
+
   const sortOptions = toSortOption(data?.Sorts ?? []);
+
   const resultFilters = toFilters(data?.Filters ?? [], url);
+
   const { nextPage, previousPage } = getPaginationInfo(
     url,
     size,
@@ -129,6 +146,7 @@ const loader = async (
     page,
     data?.TotalResult,
   );
+
   return {
     "@type": "ProductListingPage",
     products: products,
@@ -151,4 +169,5 @@ const loader = async (
     },
   };
 };
+
 export default loader;

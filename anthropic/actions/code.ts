@@ -1,6 +1,6 @@
+import { shortcircuit } from "deco/engine/errors.ts";
 import { AppContext } from "../mod.ts";
 import { Anthropic } from "../deps.ts";
-import { shortcircuit } from "@deco/deco";
 export interface Props {
   /**
    * @description The system prompt to be used for the AI Assistant.
@@ -29,20 +29,27 @@ export interface Props {
    */
   max_tokens?: number;
 }
+
 export default async function chat(
-  { system, messages, model = "claude-3-opus-20240229", max_tokens = 4096 }:
-    Props,
+  {
+    system,
+    messages,
+    model = "claude-3-opus-20240229",
+    max_tokens = 4096,
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
   if (!messages) {
     return shortcircuit(new Response("No messages provided", { status: 400 }));
   }
+
   const msg = await ctx.anthropic.messages.create({
     system,
     model,
     max_tokens,
     messages,
   });
+
   return msg;
 }

@@ -1,15 +1,16 @@
+import { SectionProps } from "deco/types.ts";
 import {
   PageInfo,
   Person,
   ProductDetailsPage,
   ProductListingPage,
 } from "../../../commerce/types.ts";
+import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { AppContext } from "../../mod.ts";
 import getSource from "../../utils/source.ts";
 import type { LinxUser } from "../../utils/types/analytics.ts";
 import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
-import { type SectionProps } from "@deco/deco";
-import { useScriptAsDataURI } from "@deco/deco/hooks";
+
 type Page =
   | "home"
   | "category"
@@ -22,6 +23,7 @@ type Page =
   | "hotsite"
   | "userprofile"
   | "other";
+
 interface Category {
   /**
    * @hide
@@ -30,6 +32,7 @@ interface Category {
   page: string;
   products: ProductListingPage | null;
 }
+
 interface Subcategory {
   /**
    * @hide
@@ -38,6 +41,7 @@ interface Subcategory {
   page: string;
   products: ProductListingPage | null;
 }
+
 interface Product {
   /**
    * @hide
@@ -46,6 +50,7 @@ interface Product {
   page: string;
   details: ProductDetailsPage | null;
 }
+
 interface Home {
   /**
    * @hide
@@ -53,6 +58,7 @@ interface Home {
    */
   page: string;
 }
+
 interface Other {
   /**
    * @hide
@@ -60,6 +66,7 @@ interface Other {
    */
   page: string;
 }
+
 interface Search {
   /**
    * @hide
@@ -68,6 +75,7 @@ interface Search {
   page: string;
   result: ProductListingPage | null;
 }
+
 interface Checkout {
   /**
    * @hide
@@ -75,6 +83,7 @@ interface Checkout {
    */
   page: string;
 }
+
 interface LandingPage {
   /**
    * @hide
@@ -82,6 +91,7 @@ interface LandingPage {
    */
   page: string;
 }
+
 interface NotFound {
   /**
    * @hide
@@ -89,6 +99,7 @@ interface NotFound {
    */
   page: string;
 }
+
 interface Hotsite {
   /**
    * @hide
@@ -96,6 +107,7 @@ interface Hotsite {
    */
   page: string;
 }
+
 interface UserProfile {
   /**
    * @hide
@@ -103,11 +115,13 @@ interface UserProfile {
    */
   page: string;
 }
+
 interface SendViewEventParams {
   page: Page | string;
   // deno-lint-ignore no-explicit-any
   body?: Record<string, any>;
 }
+
 interface Props {
   /**
    * @title Event
@@ -127,13 +141,14 @@ interface Props {
     | UserProfile;
   user: Person | null;
 }
+
 /** @title Linx Impulse Integration - Events */
 export const script = async (props: SectionProps<typeof loader>) => {
   const { event, source, apiKey, salesChannel, url: urlStr, deviceId } = props;
-  if (!event) {
-    return;
-  }
+  if (!event) return;
+
   const { page } = event;
+
   const user: LinxUser | undefined = props.user
     ? {
       id: props.user["@id"] ?? props.user.email ?? "",
@@ -145,14 +160,18 @@ export const script = async (props: SectionProps<typeof loader>) => {
       birthday: undefined,
     }
     : undefined;
+
   const sendViewEvent = (params: SendViewEventParams) => {
     const baseUrl = new URL(
       `https://api.event.linximpulse.net/v7/events/views/${params.page}`,
     );
+
     // deviceId && baseUrl.searchParams.append("deviceId", deviceId);
+
     const headers = new Headers();
     headers.set("content-type", "application/json");
     props.origin && headers.set("origin", props.origin);
+
     return fetch(baseUrl.toString(), {
       method: "POST",
       credentials: "include",
@@ -167,46 +186,54 @@ export const script = async (props: SectionProps<typeof loader>) => {
       }),
     });
   };
+
   const getSearchIdFromPageInfo = (pageInfo?: PageInfo | null) => {
     const searchIdInPageTypes = pageInfo?.pageTypes?.find((pageType) =>
       pageType?.startsWith("SearchId:")
     );
     return searchIdInPageTypes?.replace("SearchId:", "");
   };
+
   const getCategoriesFromPage = (page: ProductListingPage) => {
     if (page.breadcrumb.itemListElement.length) {
       return page.breadcrumb.itemListElement.map((item) => item.name!);
     } else {
-      const departmentsFilter = page.filters.find((filter) =>
-        filter.key === "Departments"
+      const departmentsFilter = page.filters.find(
+        (filter) => filter.key === "Departments",
       )?.values;
       if (Array.isArray(departmentsFilter)) {
         return departmentsFilter.map((value) => value.label);
       }
     }
   };
+
   const getItemsFromProducts = (products?: ProductListingPage["products"]) => {
-    return (products?.map((product) => {
-      return {
-        pid: product.isVariantOf?.productGroupID ?? product.productID,
-        sku: product.sku,
-      };
-    }) ?? []);
+    return (
+      products?.map((product) => {
+        return {
+          pid: product.isVariantOf?.productGroupID ?? product.productID,
+          sku: product.sku,
+        };
+      }) ?? []
+    );
   };
+
   const url = new URL(urlStr);
+
   switch (page) {
     case "category": {
       let searchId: string | undefined;
       let categories: string[] | undefined;
+
       if ("products" in event && event.products) {
         const query = url.searchParams.get("q");
-        const searchIndex =
-          event.products.pageInfo.pageTypes?.findIndex((pageType) =>
-            pageType === "Search"
-          ) ?? -1;
+        const searchIndex = event.products.pageInfo.pageTypes?.findIndex(
+          (pageType) => pageType === "Search",
+        ) ?? -1;
         // If page has a search term
         if (searchIndex > 0 || query) {
           const items = getItemsFromProducts(event.products.products);
+
           await sendViewEvent({
             page: "search",
             body: {
@@ -215,11 +242,14 @@ export const script = async (props: SectionProps<typeof loader>) => {
               searchId,
             },
           });
+
           break;
         }
+
         searchId = getSearchIdFromPageInfo(event.products.pageInfo);
         categories = getCategoriesFromPage(event.products);
       }
+
       await sendViewEvent({
         page: (categories?.length ?? 1) === 1 ? "category" : "subcategory",
         body: {
@@ -227,15 +257,18 @@ export const script = async (props: SectionProps<typeof loader>) => {
           searchId,
         },
       });
+
       break;
     }
     case "subcategory": {
       let searchId: string | undefined;
       let categories: string[] | undefined;
+
       if ("products" in event && event.products) {
         searchId = getSearchIdFromPageInfo(event.products.pageInfo);
         categories = getCategoriesFromPage(event.products);
       }
+
       await sendViewEvent({
         page: "subcategory",
         body: {
@@ -243,13 +276,13 @@ export const script = async (props: SectionProps<typeof loader>) => {
           searchId,
         },
       });
+
       break;
     }
     case "product": {
-      if (!("details" in event) || !event.details) {
-        break;
-      }
+      if (!("details" in event) || !event.details) break;
       const { details } = event;
+
       await sendViewEvent({
         page,
         body: {
@@ -259,6 +292,7 @@ export const script = async (props: SectionProps<typeof loader>) => {
           sku: details.product.sku,
         },
       });
+
       break;
     }
     case "search": {
@@ -267,6 +301,7 @@ export const script = async (props: SectionProps<typeof loader>) => {
       );
       const query = url.searchParams.get("q") ??
         url.pathname.split("/").pop() ?? "";
+
       if (
         !("result" in event) ||
         !event.result ||
@@ -281,8 +316,11 @@ export const script = async (props: SectionProps<typeof loader>) => {
           },
         });
       }
+
       const { result } = event;
+
       const items = getItemsFromProducts(result.products);
+
       await sendViewEvent({
         page,
         body: {
@@ -291,28 +329,34 @@ export const script = async (props: SectionProps<typeof loader>) => {
           searchId,
         },
       });
+
       break;
     }
+
     case "landingpage": {
       await sendViewEvent({
         page: "landing_page",
       });
+
       break;
     }
     case "notfound": {
       await sendViewEvent({
         page: "not_found",
       });
+
       break;
     }
     default: {
       await sendViewEvent({
         page,
       });
+
       break;
     }
   }
 };
+
 /** @title Linx Impulse - Page View Events */
 export const loader = (props: Props, req: Request, ctx: AppContext) => ({
   ...props,
@@ -323,6 +367,7 @@ export const loader = (props: Props, req: Request, ctx: AppContext) => ({
   deviceId: getDeviceIdFromBag(ctx),
   origin: ctx.origin,
 });
+
 export default function LinxImpulsePageView(
   props: SectionProps<typeof loader>,
 ) {

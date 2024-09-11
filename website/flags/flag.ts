@@ -1,12 +1,17 @@
-import { type FlagObj } from "@deco/deco/blocks";
+import { FlagObj } from "deco/blocks/flag.ts";
 export { onBeforeResolveProps } from "./everyone.ts";
+
 export type Props<T> = FlagObj<T>;
+
 /**
  * @title Flag
  */
-export default function Flag<T>(
-  { matcher, name, true: T, false: F }: Props<T>,
-): FlagObj<T> {
+export default function Flag<T>({
+  matcher,
+  name,
+  true: T,
+  false: F,
+}: Props<T>): FlagObj<T> {
   return {
     matcher,
     true: T,

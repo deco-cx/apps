@@ -1,3 +1,4 @@
+import defaults from "deco/engine/manifest/defaults.ts";
 import { Route } from "../flags/audience.ts";
 import { AppContext } from "../mod.ts";
 import Page from "../pages/Page.tsx";
@@ -7,7 +8,7 @@ async function getAllPages(ctx: AppContext): Promise<Route[]> {
     Record<string, Parameters<typeof Page>[0]>
   >({
     type: "pages",
-    __resolveType: "blockSelector",
+    __resolveType: defaults["blockSelector"].name,
   });
 
   const routes: Route[] = [];
@@ -45,7 +46,7 @@ export default async function Pages(
     Route[]
   >({
     func: () => getAllPages(ctx),
-    __resolveType: "once",
+    __resolveType: defaults["once"].name,
   });
 
   return allPages;

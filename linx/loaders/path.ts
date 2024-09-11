@@ -1,7 +1,8 @@
+import { redirect } from "deco/mod.ts";
 import { STALE } from "../../utils/fetch.ts";
 import type { AppContext } from "../mod.ts";
 import type { API } from "../utils/client.ts";
-import { redirect } from "@deco/deco";
+
 /**
  * @title LINX Integration
  * @description Load Page as JSON
@@ -30,6 +31,7 @@ async function loader(
     params[key] = params[key] || [];
     params[key].push(value);
   });
+
   /**
    * TODO: Fix the /*splat route being called for images and other assets.
    */
@@ -37,11 +39,15 @@ async function loader(
     console.error("imagem");
     return null;
   }
+
   const splat = `${upstream.pathname.slice(1)}.json`;
+
   const defaults = {
     fc: params.fc || props.fc || "false",
   };
+
   const isSearch = upstream.searchParams.has("t");
+
   const response = await ctx.api["GET /*splat"](
     { splat, ...params, ...props, ...defaults },
     isSearch
@@ -50,14 +56,19 @@ async function loader(
       }
       : STALE,
   );
+
   if (response.status === 301) {
     const redirectUrlRaw = response.headers.get("location");
+
     if (!redirectUrlRaw) {
       return null;
     }
+
     const redirectUrl = new URL(redirectUrlRaw);
     throw redirect(redirectUrl);
   }
+
   return response.json();
 }
+
 export default loader;
