@@ -41,8 +41,7 @@ export const Preview = () => {
       owner: "deco.cx",
       description:
         "PostHog is the only all-in-one platform for product analytics, feature flags, session replays, experiments, and surveys that's built for developers.",
-      logo:
-        "https://posthog.com/brand/posthog-logomark.png",
+      logo: "https://posthog.com/brand/posthog-logomark.png",
       images: [],
       tabs: [],
     },
