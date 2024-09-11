@@ -1,28 +1,23 @@
-import type { Section } from "deco/blocks/section.ts";
+import { asResolved, context, isDeferred, RequestContext } from "@deco/deco";
 import {
+  type Section,
   type SectionContext,
-  SectionContext as SectionCtx,
-} from "deco/components/section.tsx";
-import { RequestContext } from "deco/deco.ts";
-import { asResolved, context, isDeferred } from "deco/mod.ts";
+  SectionCtx,
+} from "@deco/deco/blocks";
 import { useContext } from "preact/hooks";
 import { shouldForceRender } from "../../../utils/deferred.ts";
 import type { AppContext } from "../../mod.ts";
-
 const useSectionContext = () =>
   useContext<SectionContext | undefined>(SectionCtx);
-
 interface Props {
   /** @label hidden */
   section: Section;
-
   /**
    * @description htmx/Deferred.tsx prop
    * @hide true
    */
   loading?: "eager" | "lazy";
 }
-
 const defaultFallbackFor = (section: string) => () => (
   <div
     style={{
@@ -67,51 +62,36 @@ const defaultFallbackFor = (section: string) => () => (
     )}
   </div>
 );
-
 export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   const { section, loading } = props;
   const url = new URL(req.url);
-
   const shouldRender = loading === "eager" || shouldForceRender({
     ctx,
     searchParams: url.searchParams,
   });
-
   if (shouldRender) {
     return {
       loading: "eager",
       section: isDeferred<Section>(section) ? await section() : section,
     };
   }
-
   const abortController = new AbortController();
   abortController.abort();
   const resolveSection = isDeferred<Section>(section)
-    ? RequestContext.bind(
-      { signal: abortController.signal },
-      section,
-    )
+    ? RequestContext.bind({ signal: abortController.signal }, section)
     : () => section;
   const resolvedSection = await resolveSection({}, {
     propagateOptions: true,
     hooks: {
-      onPropsResolveStart: (
-        resolve,
-        _props,
-        resolver,
-      ) => {
+      onPropsResolveStart: (resolve, _props, resolver) => {
         let next = resolve;
         if (resolver?.type === "matchers") { // matchers should not have a timeout.
-          next = RequestContext.bind(
-            { signal: req.signal },
-            resolve,
-          );
+          next = RequestContext.bind({ signal: req.signal }, resolve);
         }
         return next();
       },
     },
   });
-
   return {
     loading: shouldRender ? "eager" : "lazy",
     section: {
@@ -122,16 +102,12 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
     },
   };
 };
-
 type SectionProps = Awaited<ReturnType<typeof loader>>;
-
 function Lazy({ section, loading }: SectionProps) {
   const ctx = useSectionContext();
-
   if (!ctx) {
     throw new Error("Missing SectionContext");
   }
-
   if (loading === "lazy") {
     return (
       <ctx.FallbackWrapper props={{ loading: "eager" }}>
@@ -139,13 +115,10 @@ function Lazy({ section, loading }: SectionProps) {
       </ctx.FallbackWrapper>
     );
   }
-
   return <section.Component {...section.props} />;
 }
-
 export const onBeforeResolveProps = (props: Props) => ({
   ...props,
   section: asResolved(props.section, true),
 });
-
 export default Lazy;

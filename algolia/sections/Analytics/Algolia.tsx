@@ -1,5 +1,3 @@
-import { SectionProps } from "deco/blocks/section.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import insights from "npm:search-insights@2.9.0";
 import {
   AddToCartEvent,
@@ -8,13 +6,13 @@ import {
   ViewItemListEvent,
 } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-
+import { type SectionProps } from "@deco/deco";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 declare global {
   interface Window {
     aa: typeof insights.default;
   }
 }
-
 const setupAndListen = (appId: string, apiKey: string, version: string) => {
   function setupScriptTag() {
     globalThis.window.AlgoliaAnalyticsObject = "aa";
@@ -26,7 +24,6 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
         );
       };
     globalThis.window.aa.version = version;
-
     const script = document.createElement("script");
     script.setAttribute("async", "");
     script.setAttribute(
@@ -35,7 +32,6 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
     );
     document.head.appendChild(script);
   }
-
   function createUserToken() {
     if (
       typeof crypto !== "undefined" &&
@@ -43,67 +39,55 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
     ) {
       return crypto.randomUUID();
     }
-
     return (Math.random() * 1e9).toFixed();
   }
-
   function setupSession() {
     globalThis.window.aa("init", { appId, apiKey });
-
     const userToken = localStorage.getItem("ALGOLIA_USER_TOKEN") ||
       createUserToken();
     localStorage.setItem("ALGOLIA_USER_TOKEN", userToken);
     globalThis.window.aa("setUserToken", userToken);
   }
-
   function setupEventListeners() {
     function attributesFromURL(href: string) {
       const url = new URL(href);
       const queryID = url.searchParams.get("algoliaQueryID");
       const indexName = url.searchParams.get("algoliaIndex");
-
       // Not comming from an algolia search page
       if (!queryID || !indexName) {
         return null;
       }
-
       return { queryID, indexName };
     }
-
     // deno-lint-ignore no-explicit-any
     function isSelectItemEvent(event: any): event is SelectItemEvent {
       return event.name === "select_item";
     }
-
     // deno-lint-ignore no-explicit-any
     function isAddToCartEvent(event: any): event is AddToCartEvent {
       return event.name === "add_to_cart";
     }
-
     function isViewItem(
       // deno-lint-ignore no-explicit-any
       event: any,
     ): event is ViewItemEvent | ViewItemListEvent {
       return event.name === "view_item" || event.name === "view_item_list";
     }
-
-    type WithID<T> = T & { item_id: string };
-
+    type WithID<T> = T & {
+      item_id: string;
+    };
     const hasItemId = <T,>(item: T): item is WithID<T> =>
       // deno-lint-ignore no-explicit-any
       typeof (item as any).item_id === "string";
-
     const PRODUCTS = "products";
     const MAX_BATCH_SIZE = 20;
-
     globalThis.window.DECO.events.subscribe((event) => {
-      if (!event) return;
-
+      if (!event) {
+        return;
+      }
       const eventName = event.name;
-
       if (isSelectItemEvent(event)) {
         const [item] = event.params.items;
-
         if (
           !item ||
           !hasItemId(item) ||
@@ -115,9 +99,7 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
             JSON.stringify(event, null, 2),
           );
         }
-
         const attr = attributesFromURL(item.item_url);
-
         if (attr) {
           globalThis.window.aa("clickedObjectIDsAfterSearch", {
             eventName,
@@ -134,16 +116,13 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           });
         }
       }
-
       if (isAddToCartEvent(event)) {
         const [item] = event.params.items;
-
         const attr = attributesFromURL(globalThis.window.location.href) ||
           attributesFromURL(item.item_url || "");
         const objectIDs = event.params.items
           .filter(hasItemId)
           .map((i) => i.item_id);
-
         if (attr) {
           globalThis.window.aa("convertedObjectIDsAfterSearch", {
             eventName,
@@ -159,12 +138,10 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
           });
         }
       }
-
       if (isViewItem(event)) {
         const objectIDs = event.params.items
           .filter(hasItemId)
           .map((i) => i.item_id);
-
         for (let it = 0; it < objectIDs.length; it += MAX_BATCH_SIZE) {
           globalThis.window.aa("viewedObjectIDs", {
             eventName,
@@ -175,16 +152,13 @@ const setupAndListen = (appId: string, apiKey: string, version: string) => {
       }
     });
   }
-
   setupScriptTag();
   setupSession();
   setupEventListeners();
 };
-
-function Analytics({
-  applicationId,
-  searchApiKey,
-}: SectionProps<typeof loader>) {
+function Analytics(
+  { applicationId, searchApiKey }: SectionProps<typeof loader>,
+) {
   return (
     <script
       defer
@@ -197,11 +171,9 @@ function Analytics({
     />
   );
 }
-
 /** @title Algolia Integration - Events */
 export const loader = (_props: unknown, _req: Request, ctx: AppContext) => ({
   applicationId: ctx.applicationId,
   searchApiKey: ctx.searchApiKey,
 });
-
 export default Analytics;

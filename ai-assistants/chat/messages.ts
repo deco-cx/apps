@@ -1,22 +1,20 @@
-import {
-  AssistantCreateParams,
-  RequiredActionFunctionToolCall,
-  Thread,
-} from "../deps.ts";
-import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
-import { JSONSchema7, ValueType, weakcache } from "deco/deps.ts";
-import { lazySchemaFor } from "deco/engine/schema/lazy.ts";
-import { Context } from "deco/live.ts";
-import { meter } from "deco/observability/otel/metrics.ts";
+import { Context, type JSONSchema7, lazySchemaFor } from "@deco/deco";
+import { meter, ValueType } from "@deco/deco/o11y";
+import { weakcache } from "../../utils/weakcache.ts";
 import {
   ChatMessage,
   FunctionCallReply,
   Reply,
   ReplyMessage,
 } from "../actions/chat.ts";
+import {
+  AssistantCreateParams,
+  RequiredActionFunctionToolCall,
+  Thread,
+} from "../deps.ts";
+import { threadMessageToReply, Tokens } from "../loaders/messages.ts";
 import { AIAssistant, AppContext } from "../mod.ts";
 import { dereferenceJsonSchema } from "../schema.ts";
-
 const stats = {
   latency: meter.createHistogram("assistant_latency", {
     description:
@@ -25,24 +23,20 @@ const stats = {
     valueType: ValueType.DOUBLE,
   }),
 };
-
 // Max length of instructions. The maximum context of the assistant is 32K chars. We use 25K for instructions to be safe.
 const MAX_INSTRUCTIONS_LENGTH = 25000;
-
 const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
-
 const toolsCache = new weakcache.WeakLRUCache({
   cacheSize: 16, // up to 16 different schemas stored here.
 });
-
 /**
  * Builds assistant tools that can be used by OpenAI assistant to execute actions based on users requests.
  * @param assistant the assistant that will handle the request
  * @returns an array of available functions that can be used.
  */
-const appTools = async (assistant: AIAssistant): Promise<
-  AssistantCreateParams.AssistantToolsFunction[]
-> => {
+const appTools = async (
+  assistant: AIAssistant,
+): Promise<AssistantCreateParams.AssistantToolsFunction[]> => {
   const ctx = Context.active();
   const assistantsKey = assistant.availableFunctions?.join(",") ?? "all";
   const revision = await ctx.release!.revision();
@@ -56,60 +50,57 @@ const appTools = async (assistant: AIAssistant): Promise<
       ...runtime.manifest.loaders,
       ...runtime.manifest.actions,
     });
-    const tools = functionKeys.map(
-      (functionKey) => {
-        const functionDefinition = btoa(functionKey);
-        const schema = schemas.definitions[functionDefinition];
-        if ((schema as { ignoreAI?: boolean })?.ignoreAI) {
-          return undefined;
-        }
-        const propsRef = (schema?.allOf?.[0] as JSONSchema7)?.$ref;
-        if (!propsRef) {
-          return undefined;
-        }
-        const dereferenced = dereferenceJsonSchema({
-          $ref: propsRef,
-          ...schemas,
-        });
-        if (
-          dereferenced.type !== "object" ||
-          (dereferenced.oneOf || dereferenced.anyOf ||
-            dereferenced?.allOf || dereferenced?.enum || dereferenced?.not)
-        ) {
-          return undefined;
-        }
-        return {
-          type: "function" as const,
-          function: {
-            name: functionKey,
-            description:
-              `Usage for: ${schema?.description}. Example: ${schema?.examples}`,
-            parameters: {
-              ...dereferenced,
-              definitions: undefined,
-              root: undefined,
-            },
+    const tools = functionKeys.map((functionKey) => {
+      const functionDefinition = btoa(functionKey);
+      const schema = schemas.definitions[functionDefinition];
+      if (
+        (schema as {
+          ignoreAI?: boolean;
+        })?.ignoreAI
+      ) {
+        return undefined;
+      }
+      const propsRef = (schema?.allOf?.[0] as JSONSchema7)?.$ref;
+      if (!propsRef) {
+        return undefined;
+      }
+      const dereferenced = dereferenceJsonSchema({
+        $ref: propsRef,
+        ...schemas,
+      });
+      if (
+        dereferenced.type !== "object" ||
+        (dereferenced.oneOf || dereferenced.anyOf ||
+          dereferenced?.allOf || dereferenced?.enum || dereferenced?.not)
+      ) {
+        return undefined;
+      }
+      return {
+        type: "function" as const,
+        function: {
+          name: functionKey,
+          description:
+            `Usage for: ${schema?.description}. Example: ${schema?.examples}`,
+          parameters: {
+            ...dereferenced,
+            definitions: undefined,
+            root: undefined,
           },
-        };
-      },
-    ).filter(notUndefined);
-
+        },
+      };
+    }).filter(notUndefined);
     toolsCache.set(ctx, tools);
     return tools;
   });
   toolsCache.set(cacheKey, toolsPromise);
   return toolsPromise;
 };
-
 export interface ProcessorOpts {
   assistantId: string;
   instructions: string;
 }
-
 const sleep = (ns: number) => new Promise((resolve) => setTimeout(resolve, ns));
-
 const cache: Record<string, unknown> = {};
-
 const invokeFor = (
   ctx: AppContext,
   assistant: AIAssistant,
@@ -126,9 +117,7 @@ const invokeFor = (
   return async (call: RequiredActionFunctionToolCall) => {
     try {
       const props = JSON.parse(call.function.arguments || "{}");
-
       const cacheKey = `${call.function.arguments}${call.function.name}`;
-
       const assistantProps = assistant?.useProps?.(props) ?? props;
       cache[cacheKey] ??= ctx.invoke(
         // deno-lint-ignore no-explicit-any
@@ -180,11 +169,9 @@ export const messageProcessorFor = async (
     `;
   const assistantId = await ctx.assistant.then((assistant) => assistant.id);
   const tools = await appTools(assistant);
-
   // Update the assistant object with the thread and assistant id
   assistant.threadId = thread.id;
   assistant.id = assistantId;
-
   /**
    * Processes an incoming chat message.
    * @param {ChatMessage} message - The incoming chat message.
@@ -206,11 +193,9 @@ export const messageProcessorFor = async (
       instructions: instructions.slice(0, MAX_INSTRUCTIONS_LENGTH),
       tools,
     });
-
     const messageId = run.id;
     // Wait for the assistant answer
     const functionCallReplies: FunctionCallReply<unknown>[] = [];
-
     // Reply to the user
     const reply = (message: Reply<unknown>) => {
       assistant.onMessageSent?.({
@@ -222,7 +207,6 @@ export const messageProcessorFor = async (
       });
       return _reply(message);
     };
-
     assistant.onMessageReceived?.({
       assistantId: run.assistant_id,
       threadId: thread.id,
@@ -230,7 +214,6 @@ export const messageProcessorFor = async (
       model: run.model,
       message: { type: "text", value: content },
     });
-
     const invoke = invokeFor(ctx, assistant, (call, props) => {
       reply({
         threadId: thread.id,
@@ -252,21 +235,13 @@ export const messageProcessorFor = async (
         response,
       });
     });
-
     let runStatus;
     do {
-      runStatus = await threads.runs.retrieve(
-        thread.id,
-        run.id,
-      );
-
+      runStatus = await threads.runs.retrieve(thread.id, run.id);
       if (runStatus.status === "requires_action") {
         const actions = runStatus.required_action!;
         const outputs = actions.submit_tool_outputs;
-
-        const tool_outputs = await Promise.all(
-          outputs.tool_calls.map(invoke),
-        );
+        const tool_outputs = await Promise.all(outputs.tool_calls.map(invoke));
         if (tool_outputs.length === 0) {
           const message: ReplyMessage = {
             messageId: Date.now().toString(),
@@ -278,28 +253,19 @@ export const messageProcessorFor = async (
           reply(message);
           return;
         }
-        await threads.runs.submitToolOutputs(
-          thread.id,
-          run.id,
-          {
-            tool_outputs,
-          },
-        );
-        runStatus = await threads.runs.retrieve(
-          thread.id,
-          run.id,
-        );
+        await threads.runs.submitToolOutputs(thread.id, run.id, {
+          tool_outputs,
+        });
+        runStatus = await threads.runs.retrieve(thread.id, run.id);
       }
       await sleep(500);
     } while (["in_progress", "queued"].includes(runStatus.status));
-
     const messages = await threads.messages.list(thread.id);
     const threadMessages = messages.data;
     const lastMsg = threadMessages
       .findLast((message) =>
         message.run_id == run.id && message.role === "assistant"
       );
-
     if (!lastMsg) {
       // TODO(@mcandeia) in some cases the bot didn't respond anything.
       const message: ReplyMessage = {
@@ -312,9 +278,7 @@ export const messageProcessorFor = async (
       reply(message);
       return;
     }
-
     const replyMessage = threadMessageToReply(lastMsg);
-
     // multi tool use parallel seems to be some sort of openai bug, and it seems to have no solution yet.
     // https://community.openai.com/t/model-tries-to-call-unknown-function-multi-tool-use-parallel/490653
     // It's an error that only happens every now and then. Open ai tries to call "multi_tool_use.parallel" function that doesn't even exist and isn't even in the OpenAI documentation
@@ -339,7 +303,6 @@ export const messageProcessorFor = async (
         assistant_id: run.assistant_id,
       });
     }
-
     if (functionCallReplies.length > 0) {
       reply({
         threadId: thread.id,
