@@ -208,7 +208,7 @@ const searchLoader = async (
 
   const hasNextPage = Boolean(
     (data?.result?.productsByOffset?.totalCount ?? 0) /
-        (data?.result?.pageSize ?? limit) >
+        (limit) >
       (data?.result?.productsByOffset?.page ?? 0),
   );
 
