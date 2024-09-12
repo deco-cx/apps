@@ -1,12 +1,12 @@
 // deno-lint-ignore-file ban-unused-ignore no-explicit-any
-import type { ManifestOf } from "deco/mod.ts";
-import { logger } from "deco/observability/otel/config.ts";
 import type { AIAssistant, Log, Prompt } from "../../ai-assistants/mod.ts";
 import type { Category, Product, Suggestion } from "../../commerce/types.ts";
 import type { Manifest as OpenAIManifest } from "../../openai/manifest.gen.ts";
 import type vtex from "../../vtex/mod.ts";
 import { Tokens } from "../../ai-assistants/loaders/messages.ts";
 import type { AssistantPersonalization } from "../../ai-assistants/types.ts";
+import { type ManifestOf } from "@deco/deco";
+import { logger } from "@deco/deco/o11y";
 export interface Props {
   name: string;
   productsSample?: Product[] | null;
@@ -29,14 +29,11 @@ const removePropertiesRecursively = <T>(category: T): T => {
   if (typeof category !== "object" || category === null) {
     return category;
   }
-
   const { hasChildren: _ignoreHasChildren, url: _ignoreUrl, ...rest } =
     category as any;
-
   rest.children = rest.children.map(removePropertiesRecursively);
   return rest;
 };
-
 type VTEXManifest = ManifestOf<ReturnType<typeof vtex>>;
 // TODO(ItamarRocha): Add store name in props or gather it from elsewhere.
 const BASE_INSTRUCTIONS =
