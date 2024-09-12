@@ -1,8 +1,8 @@
-import { CSS, KATEX_CSS, render } from "https://deno.land/x/gfm@0.3.0/mod.ts";
-import "https://esm.sh/prismjs@1.27.0/components/prism-diff.js?no-check";
-import "https://esm.sh/prismjs@1.27.0/components/prism-jsx.js?no-check";
-import "https://esm.sh/prismjs@1.27.0/components/prism-tsx.js?no-check";
-import "https://esm.sh/prismjs@1.27.0/components/prism-typescript.js?no-check";
+import { CSS, KATEX_CSS, render } from "jsr:@deno/gfm@0.9.0";
+import "npm:prismjs@1.29.0/components/prism-diff.js";
+import "npm:prismjs@1.29.0/components/prism-jsx.js";
+import "npm:prismjs@1.29.0/components/prism-tsx.js";
+import "npm:prismjs@1.29.0/components/prism-typescript.js";
 
 export const Markdown = async (path: string) => {
   const content = await fetch(path)
