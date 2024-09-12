@@ -1,13 +1,11 @@
 import { AppContext } from "../../mod.ts";
 import type { ShippingMethod } from "../../utils/client/types.ts";
-import { badRequest } from "deco/mod.ts";
-
+import { badRequest } from "@deco/deco";
 export interface Props {
   skuId: string;
   quantity: number;
   zip: string;
 }
-
 const action = async (
   props: Props,
   _req: Request,
@@ -15,7 +13,6 @@ const action = async (
 ): Promise<ShippingMethod[]> => {
   const { api } = ctx;
   const { skuId, quantity, zip } = props;
-
   if (!skuId || !quantity || !zip) {
     badRequest({
       message: "could not find some props",
@@ -28,5 +25,4 @@ const action = async (
   });
   return cep.json();
 };
-
 export default action;

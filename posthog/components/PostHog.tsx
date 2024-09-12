@@ -1,7 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
 import { AppContext } from "../mod.ts";
-
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 export interface Props {
   /**
    * @description posthog identifier (override app apiKey).
@@ -16,26 +15,19 @@ export interface Props {
    */
   anonUsers?: boolean;
 }
-
 declare global {
   interface Window {
     posthog: {
-      capture: (
-        name: string,
-        values: Record<string, string | boolean>,
-      ) => void;
+      capture: (name: string, values: Record<string, string | boolean>) => void;
     };
   }
 }
-
 // This function should be self contained, because it is stringified!
 const snippet = () => {
   // Flags and additional dimentions
   const props: Record<string, string> = {};
-
   const trackPageview = () =>
     globalThis.window.posthog?.capture("pageview", props);
-
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
   if (originalPushState) {
@@ -46,14 +38,13 @@ const snippet = () => {
     };
     addEventListener("popstate", trackPageview);
   }
-
   // 2000 bytes limit
   const truncate = (str: string) => `${str}`.slice(0, 990);
-
   // setup plausible script and unsubscribe
   globalThis.window.DECO.events.subscribe((event) => {
-    if (!event || event.name !== "deco") return;
-
+    if (!event || event.name !== "deco") {
+      return;
+    }
     if (event.params) {
       const { flags, page } = event.params;
       if (Array.isArray(flags)) {
@@ -63,47 +54,38 @@ const snippet = () => {
       }
       props["pageId"] = truncate(`${page.id}`);
     }
-
     trackPageview();
   })();
-
   globalThis.window.DECO.events.subscribe((event) => {
-    if (!event) return;
-
+    if (!event) {
+      return;
+    }
     const { name, params } = event;
-
-    if (!name || !params || name === "deco") return;
-
+    if (!name || !params || name === "deco") {
+      return;
+    }
     const values = { ...props };
     for (const key in params) {
       // @ts-expect-error somehow typescript bugs
       const value = params[key];
-
       if (value !== null && value !== undefined) {
         values[key] = truncate(
           typeof value !== "object" ? value : JSON.stringify(value),
         );
       }
     }
-
     globalThis.window.posthog?.capture(name, values);
   });
 };
-
 export const loader = (props: Props, _req: Request, ctx: AppContext) => {
   return ({ apiKey: props.apiKey ?? ctx.apiKey, host: props.host ?? ctx.host });
 };
-
 function Component({ apiKey, host, anonUsers }: Props) {
   host ??= "https://us.i.posthog.com";
   return (
     <Head>
       <link rel="dns-prefetch" href={host} />
-      <link
-        rel="preconnect"
-        href={host}
-        crossOrigin="anonymous"
-      />
+      <link rel="preconnect" href={host} crossOrigin="anonymous" />
       <script
         dangerouslySetInnerHTML={{
           __html:
@@ -118,5 +100,4 @@ function Component({ apiKey, host, anonUsers }: Props) {
     </Head>
   );
 }
-
 export default Component;

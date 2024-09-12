@@ -1,13 +1,12 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
+import { type App, type AppContext as AC } from "@deco/deco";
 export interface ConfigVerifiedReviews {
   idWebsite: string;
   secretKey?: Secret;
   plateforme?: string;
 }
-
 /**
  * @title Verified Reviews
  * @description A specialized solution in the collection of customer reviews
@@ -19,9 +18,7 @@ export default function App(
 ): App<Manifest, ConfigVerifiedReviews> {
   return { manifest, state };
 }
-
 export type AppContext = AC<ReturnType<typeof App>>;
-
 export const preview = () => {
   return {
     Component: PreviewContainer,

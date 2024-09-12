@@ -1,9 +1,7 @@
 import manifest, { Manifest } from "./manifest.gen.ts";
 import PreviewCrux from "./preview/Preview.tsx";
-import type { App as A } from "deco/mod.ts";
-
+import { type App as A } from "@deco/deco";
 export type App = ReturnType<typeof CRUX>;
-
 export interface State {
   /**
    * @title Site URL
@@ -11,7 +9,6 @@ export interface State {
    */
   siteUrl: string;
 }
-
 /**
  * @title Chrome User Experience Report
  * @description Measure your site traffic at a glance in a simple and modern web analytics dashboard.
@@ -24,5 +21,4 @@ export default function CRUX(state: State): A<Manifest, State> {
     manifest,
   };
 }
-
 export const Preview = PreviewCrux;

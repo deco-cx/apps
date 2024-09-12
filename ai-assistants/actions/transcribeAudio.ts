@@ -1,10 +1,7 @@
-import { logger } from "deco/observability/otel/config.ts";
 import base64ToBlob from "../utils/blobConversion.ts";
-import { meter } from "deco/observability/otel/metrics.ts";
 import { AssistantIds } from "../types.ts";
-import { ValueType } from "deco/deps.ts";
 import { AppContext } from "../mod.ts";
-
+import { logger, meter, ValueType } from "@deco/deco/o11y";
 const stats = {
   audioSize: meter.createHistogram("assistant_transcribe_audio_size", {
     description:
@@ -20,13 +17,11 @@ const stats = {
     },
   ),
 };
-
 export interface TranscribeAudioProps {
   file: string | ArrayBuffer | null;
   assistantIds?: AssistantIds;
   audioDuration: number;
 }
-
 // TODO(ItamarRocha): Rate limit
 export default async function transcribeAudio(
   transcribeAudioProps: TranscribeAudioProps,
@@ -41,14 +36,12 @@ export default async function transcribeAudio(
     });
     throw new Error("Audio file is empty");
   }
-
   const blobData = base64ToBlob(
     transcribeAudioProps.file,
     "audio",
     transcribeAudioProps.assistantIds,
   );
   const file = new File([blobData], "input.wav", { type: "audio/wav" });
-
   stats.audioSize.record(transcribeAudioProps.audioDuration, {
     assistant_id: assistantId,
   });

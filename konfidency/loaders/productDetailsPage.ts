@@ -1,9 +1,8 @@
-import { logger } from "deco/observability/mod.ts";
 import { ProductDetailsPage } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
 import { toReview } from "../utils/transform.ts";
-
+import { logger } from "@deco/deco/o11y";
 export interface Props {
   /**
    * @description The default value is 5
@@ -14,7 +13,6 @@ export interface Props {
    */
   page?: number;
 }
-
 export default function productDetailsPage(
   { pageSize = 5, page = 1 }: Props,
   _req: Request,
@@ -25,7 +23,6 @@ export default function productDetailsPage(
     if (!productDetailsPage) {
       return null;
     }
-
     try {
       const reviews = await api["GET /:customer/:sku/summary"]({
         customer,
@@ -34,7 +31,6 @@ export default function productDetailsPage(
         sku: productDetailsPage.product.inProductGroupWithID as string,
       }).then((res) => res.json());
       const { aggregateRating, review } = toReview(reviews.reviews[0]);
-
       return {
         ...productDetailsPage,
         product: {
