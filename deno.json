@@ -41,7 +41,7 @@
   "tasks": {
     "check": "deno fmt && deno lint && deno check **/mod.ts",
     "release": "deno eval 'import \"deco/scripts/release.ts\"'",
-    "start": "deno run -A --unstable-http --env https://deco.cx/run -- deno task dev",
+    "start": "deno run -A ./scripts/start.ts",
     "bundle": "deno run -A jsr:@deco/deco/scripts/bundle",
     "link": "deno eval 'import \"deco/scripts/apps/link.ts\"'",
     "unlink": "deno eval 'import \"deco/scripts/apps/unlink.ts\"'",
