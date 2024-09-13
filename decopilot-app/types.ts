@@ -15,6 +15,11 @@ export interface LLMClient {
   call: (prompt: string) => LLMResponseType; //Add tool calling parameters, differents models (Available tools?)
 }
 
+export type Text = string;
+export type Image = string;
+
+export type Attachment = Text | Image;
+
 export interface PromptDetails {
   /**
    * @format textarea
@@ -22,22 +27,31 @@ export interface PromptDetails {
    * @description Context for query
    */
   context?: string;
+
   /**
    * @format textarea
    * @title Examples
    * @description Useful examples for defining expected output. Refer to prompting guide for more details
    */
   examples?: string;
+
   /**
    * @format textarea
    * @title Restrictions
    * @description Restrictions for query ex: "only output code, not text"
    */
   restrictions?: string;
+
+  /**
+   * @description Group of available functions to run on this prompt
+   * @example deco-sites/admin/actions/studio/draw.ts
+   */
+  functions?: string[];
 }
-/**@title Prompt: {{{agentName}}} */
+
+/**@title Prompt {{{agentName}}} */
 export interface Prompt {
-  agentName: string;
+  name: string;
   provider: Provider;
   model: string;
   /**

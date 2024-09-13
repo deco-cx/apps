@@ -14,8 +14,8 @@ const loader = (
   _request: Request,
   ctx: AppContext,
 ): Prompt | null => {
-  const foundPrompt = ctx.content.find(({ agentName }) =>
-    agentName === props.agentName
+  const foundPrompt = ctx.content.find(({ name }) =>
+    name === props.agentName
   );
   return foundPrompt || null; // Return null if no prompt is found
 };

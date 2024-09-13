@@ -60,7 +60,7 @@ const pathFormatter = {
  * @param availableFunctions List of functions available for the AI Assistant.
  * @returns Promise resolving to a list of tools.
  */
-const getAppTools = async (
+export const getAppTools = async (
   availableFunctions: string[],
 ): Promise<Anthropic.Beta.Tools.Tool[] | undefined> => {
   const ctx = Context.active();

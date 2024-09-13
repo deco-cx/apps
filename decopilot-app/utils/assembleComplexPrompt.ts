@@ -1,4 +1,5 @@
-import { Prompt, PromptDetails } from "../types.ts";
+import { String } from "https://esm.sh/v135/aws-sdk@2.1585.0/clients/batch.js";
+import { Attachment, Prompt, PromptDetails } from "../types.ts";
 
 function assembleOpenAIPrompt(
   mainPrompt: string,
@@ -75,7 +76,10 @@ function assembleFallbackPrompt(
   return finalPrompt;
 }
 
-export default function assembleFinalPrompt(prompt: Prompt): string {
+export default function assembleFinalPrompt(
+  prompt: Prompt,
+  attachments: Attachment[],
+): string {
   const { provider, prompt: mainPrompt, advanced } = prompt;
 
   let finalPrompt = "";
