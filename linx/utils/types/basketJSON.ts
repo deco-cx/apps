@@ -1,4 +1,4 @@
-import { LinxError } from "./common.ts";
+import { CategoryItem, LinxError, LinxMetadata, Path } from "./shared.ts";
 
 export interface CartResponse {
   Shopper: Shopper;
@@ -292,7 +292,7 @@ export interface Product {
   PropertyPath: string;
   CurrentSkuID: number;
   HasCurrentSkuID: boolean;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   MininumOfDistinctSKUs: number;
   MininumOfSKUsQuantity: number;
   QuantityReturned: null;
@@ -304,7 +304,7 @@ export interface Product {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   ProductDefinition: null;
 }
@@ -329,30 +329,6 @@ export interface BrowsingImage {
 export type MediaSizeType = "Small" | "Thumbnail" | "Medium" | "Large" | "Zoom";
 
 export type MediaType = "Image";
-
-export type Path = "/";
-
-export interface CategoryItem {
-  ID: string;
-  ParentID: string;
-  Name: string;
-}
-
-export interface Description {
-  PropertyMetadataID: number;
-  Alias: string;
-  Name: string;
-  Value: string;
-  Title: string;
-  PropertyPath: string;
-  ValueAlias: string;
-  Reference: null;
-  Color: null;
-  ImagePath: null;
-  Order: number;
-  GroupName: null;
-  GroupType: GroupType;
-}
 
 export type GroupType = "Description" | "Extended";
 
@@ -428,7 +404,7 @@ export interface ProductItem {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   Price: null;
   ProductDefinition: null;

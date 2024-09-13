@@ -751,6 +751,7 @@ export interface Item {
   nameComplete: string;
   complementName: string;
   ean: string;
+  estimatedDateArrival: string;
   referenceId?: Array<{ Key: string; Value: string }>;
   measurementUnit: string;
   unitMultiplier: number;
@@ -1258,6 +1259,20 @@ export interface ProductReviewRange {
 export interface ProductReviewData {
   data?: ProductReview[] | undefined;
   range?: ProductReviewRange;
+}
+
+export interface ProductBalance {
+  hasUnlimitedQuantity?: boolean;
+  leadTime?: string;
+  reservedQuantity?: number;
+  totalQuantity?: number;
+  warehouseId?: string;
+  warehouseName?: string;
+}
+
+export interface ProductInventoryData {
+  skuId?: string;
+  balance?: ProductBalance[];
 }
 
 export interface Order {

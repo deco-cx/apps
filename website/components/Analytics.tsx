@@ -1,23 +1,19 @@
 import { Head } from "$fresh/runtime.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-import { context } from "deco/live.ts";
-
+import { useScriptAsDataURI } from "@deco/deco/hooks";
+import { context } from "@deco/deco";
 declare global {
   interface Window {
     dataLayer: unknown[];
   }
 }
-
 export const getGTMIdFromSrc = (src: string | undefined) => {
   const trackingId = src ? new URL(src).searchParams.get("id") : undefined;
   return trackingId;
 };
-
 interface TagManagerProps {
   trackingId: string;
   src?: string;
 }
-
 export function GoogleTagManager(props: TagManagerProps) {
   const _isOnPremises = !!props.src;
   const hasTrackingId = "trackingId" in props;
@@ -33,7 +29,6 @@ export function GoogleTagManager(props: TagManagerProps) {
     `/ns.html?id=${hasTrackingId ? props.trackingId : ""}`,
     hostname,
   );
-
   return (
     <>
       <Head>
@@ -60,7 +55,6 @@ j=d.createElement(s);j.async=true;j.src=i;f.parentNode.insertBefore(j,f);
     </>
   );
 }
-
 export function GTAG({ trackingId }: Pick<TagManagerProps, "trackingId">) {
   return (
     <Head>
@@ -81,7 +75,6 @@ gtag("config", '${trackingId}');`,
     </Head>
   );
 }
-
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
@@ -96,7 +89,6 @@ const snippet = () => {
     ) {
       return;
     }
-
     if (event.name === "deco") {
       globalThis.window.dataLayer.push({
         event: event.name,
@@ -104,7 +96,6 @@ const snippet = () => {
       });
       return;
     }
-
     globalThis.window.dataLayer.push({ ecommerce: null });
     globalThis.window.dataLayer.push({
       event: event.name,
@@ -112,43 +103,34 @@ const snippet = () => {
     });
   });
 };
-
 export interface Props {
   /**
    * @description google tag manager container id. For more info: https://developers.google.com/tag-platform/tag-manager/web#standard_web_page_installation .
    */
   trackingIds?: string[];
-
   /**
    * @title GA Measurement Ids
    * @label measurement id
    * @description the google analytics property measurement id. For more info: https://support.google.com/analytics/answer/9539598
    */
   googleAnalyticsIds?: string[];
-
   /**
    * @description custom url for serving google tag manager.
    */
   src?: string;
-
   /**
    * @description Disable forwarding events into dataLayer
    */
   disableAutomaticEventPush?: boolean;
 }
-
-export default function Analytics({
-  trackingIds,
-  src,
-  googleAnalyticsIds,
-  disableAutomaticEventPush,
-}: Props) {
+export default function Analytics(
+  { trackingIds, src, googleAnalyticsIds, disableAutomaticEventPush }: Props,
+) {
   const isDeploy = !!context.isDeploy;
   // Prevent breacking change. Drop this in next major to only have
   // src: https://hostname
   // trackingId: GTM-ID
   const trackingId = getGTMIdFromSrc(src) ?? "";
-
   return (
     <>
       {/* Add Tag Manager script during production only. To test it locally remove the condition */}

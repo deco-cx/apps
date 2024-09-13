@@ -9,6 +9,7 @@ import { VALID_SORT_ORDERS } from "./constants.ts";
  */
 export const sortPosts = (blogPosts: BlogPost[], sortBy: SortBy) => {
   const splittedSort = sortBy.split("_");
+
   const sortMethod = splittedSort[0] in blogPosts[0]
     ? splittedSort[0] as keyof BlogPost
     : "date";
@@ -26,8 +27,12 @@ export const sortPosts = (blogPosts: BlogPost[], sortBy: SortBy) => {
     if (!b[sortMethod]) {
       return -1; // If post b doesn't have sort method, put it after post a
     }
-    const comparison = new Date(b.date).getTime() -
-      new Date(a.date).getTime(); // Sort in descending order
+    const comparison = sortMethod === "date"
+      ? new Date(b.date).getTime() -
+        new Date(a.date).getTime()
+      : a[sortMethod]?.toString().localeCompare(
+        b[sortMethod]?.toString() ?? "",
+      ) ?? 0;
     return sortOrder === "desc" ? comparison : -comparison; // Invert sort depending of desc or asc
   });
 };

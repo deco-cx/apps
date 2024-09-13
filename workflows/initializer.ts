@@ -1,4 +1,3 @@
-import { Context } from "deco/live.ts";
 import {
   cancel as durableCancel,
   get as durableGet,
@@ -6,7 +5,7 @@ import {
   signal as durableSignal,
   start as durableStart,
 } from "./deps.ts";
-
+import { Context } from "@deco/deco";
 const LOCAL_OPTIONS = {
   durableEndpoint: "http://localhost:8001",
   namespace: "x",
@@ -28,7 +27,6 @@ const durableDefaultOpts = () => {
   };
   return context.isDeploy ? remoteOptions : LOCAL_OPTIONS;
 };
-
 export const cancel: typeof durableCancel = (id, reason, opts) => {
   return durableCancel(id, reason, opts ?? durableDefaultOpts());
 };

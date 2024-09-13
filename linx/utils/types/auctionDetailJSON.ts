@@ -1,4 +1,14 @@
-import { LinxError } from "./common.ts";
+import {
+  CategoryItem,
+  LinxError,
+  LinxMetadata,
+  NavigationInfo,
+  Path,
+  ProductDefinition,
+  ProductSelection,
+  ResponseCallBack,
+  SellerInfo,
+} from "./shared.ts";
 
 export interface WebPage {
   Response: Response;
@@ -16,21 +26,12 @@ export interface Model {
   MarketAmountMultiplier: number;
   MinimunBidAmount: number;
   Name: string;
-  Navigation: Navigation[];
+  Navigation: NavigationInfo[];
   Product: Product;
   ProductAuctionID: number;
   ReservationAmount: number;
   VisibleFrom: Date;
   VisibleTo: Date;
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
 }
 
 export interface Product {
@@ -51,13 +52,13 @@ export interface Product {
   Condition: string;
   CurrentSellerID: number;
   CurrentSkuID: number;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   DisplayCondition: boolean;
   DisplayPrice: string;
   DisplayStockQuantity: boolean;
   Edit: null;
   EstimatedReorderDate: Date;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   Flags: unknown[];
   HasAnyItemDeliverable: boolean;
   HasCurrentSkuID: boolean;
@@ -138,28 +139,6 @@ export interface Product {
   VisibleTo: null;
 }
 
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
-
-export interface Description {
-  Alias: string;
-  Color: null;
-  GroupName: null;
-  GroupType: string;
-  ImagePath: null;
-  Name: string;
-  Order: number;
-  PropertyMetadataID: number;
-  PropertyPath: string;
-  Reference: null;
-  Title: string;
-  Value: string;
-  ValueAlias: string;
-}
-
 export interface Item {
   Availability: string;
   AvailabilityText: string;
@@ -181,7 +160,7 @@ export interface Item {
   Depth: number;
   Edit: null;
   EstimatedReorderDate: Date;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   HandlingDays: number;
   HasEstimatedReorderDate: boolean;
   Height: number;
@@ -234,7 +213,7 @@ export interface Item {
 export interface Price {
   BestInstallment: BestInstallment;
   BestInstallmentCreditCard: null;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
   HasMunknownSkus: boolean;
@@ -265,16 +244,9 @@ export interface BestInstallment {
   YearInterestRate: number;
 }
 
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
-}
-
 // deno-lint-ignore no-empty-interface
 export interface PageParameters {
 }
-
-export type Path = "/";
 
 export interface MediaGroup {
   Custom: null;
@@ -313,22 +285,6 @@ export type MediaSizeType = "Large" | "Thumbnail" | "Small" | "Medium" | "Zoom";
 
 export type MediaType = "Image";
 
-export interface ProductDefinition {
-  IsJoinable: boolean;
-  JoinDisplayText: null;
-  JoinProductBehavior: number;
-  JoinPropertyMetadataID: null;
-  JoinStockKeepUnitPatternLength: null;
-  ProductDefinitionID: number;
-}
-
-export interface ProductSelection {
-  PropertyLevel: number;
-  PropertyPath: Path;
-  Quantity: number;
-  SkuID: number;
-}
-
 export interface PageInfo {
   AlternateTitle: null;
   BodyClass: string;
@@ -359,10 +315,4 @@ export interface Response {
   SuccessMessage: null;
   Url: null;
   Warnings: unknown[];
-}
-
-export interface ResponseCallBack {
-  Code: string;
-  Parameters: unknown[];
-  Value: string;
 }

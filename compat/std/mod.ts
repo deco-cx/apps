@@ -1,8 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
 export { onBeforeResolveProps } from "../../website/mod.ts";
-import { ImportMap } from "deco/blocks/app.ts";
-import { buildImportMap } from "deco/blocks/utils.tsx";
-import type { App, AppContext as AC, AppManifest } from "deco/mod.ts";
 import type { PickByValue } from "https://esm.sh/utility-types@3.10.0";
 import $live, { Props as LiveProps } from "../$live/mod.ts";
 import commerce, { Props as CommerceProps } from "../../commerce/mod.ts";
@@ -12,15 +9,13 @@ import type { Manifest as VNDAManifest } from "../../vnda/manifest.gen.ts";
 import vnda, { Props as VNDAProps } from "../../vnda/mod.ts";
 import type { Manifest as VTEXManifest } from "../../vtex/manifest.gen.ts";
 import vtex, { Props as VTEXProps } from "../../vtex/mod.ts";
-
 import type { Manifest as WebSiteManifest } from "../../website/manifest.gen.ts";
 import type { ShopifyAccount, VNDAAccount, VTEXAccount } from "./deps.ts";
 import type { Manifest as _Manifest } from "./manifest.gen.ts";
-
 import manifest from "./manifest.gen.ts";
-
+import { buildImportMap, ImportMap } from "@deco/deco/blocks";
+import { type App, type AppContext as AC, type AppManifest } from "@deco/deco";
 export type ManifestWithStdCompat = _Manifest;
-
 export type ManifestMappings = Partial<
   {
     [
@@ -111,7 +106,6 @@ const manifestMappings = {
     "deco-sites/std/sections/configShopify.global.tsx": NOT_IMPLEMENTED,
     "deco-sites/std/sections/configVTEX.global.tsx": NOT_IMPLEMENTED,
     "deco-sites/std/sections/configYourViews.global.tsx": NOT_IMPLEMENTED,
-
     "deco-sites/std/sections/SEO.tsx": "website/sections/Seo/Seo.tsx",
   },
   actions: {
@@ -156,7 +150,6 @@ const manifestMappings = {
       "vtex/actions/wishlist/removeItem.ts",
   },
 };
-
 type Mappings = typeof manifestMappings;
 type Manifest = {
   [key in keyof ManifestWithStdCompat]: key extends keyof Mappings ? {
@@ -172,19 +165,15 @@ type Manifest = {
     }
     : ManifestWithStdCompat[key];
 };
-
 type AvailableCommerceProps = CommerceProps["commerce"];
-
 const isVTEXProps = (props: AvailableCommerceProps): props is VTEXProps => {
   return (props as VTEXProps)?.platform === "vtex";
 };
-
 const isShopifyProps = (
   props: AvailableCommerceProps,
 ): props is ShopifyProps => {
   return (props as ShopifyProps)?.platform === "shopify";
 };
-
 const isVNDAProps = (props: AvailableCommerceProps): props is VNDAProps => {
   return (props as VNDAProps)?.platform === "vnda";
 };
@@ -193,21 +182,14 @@ export type State = {
   configShopify?: ShopifyAccount;
   configVNDA?: VNDAAccount;
 } & AvailableCommerceProps;
-
 export type Props = CommerceProps;
-
-export function WithoutCommerce(
-  props: LiveProps,
-): App<
-  Manifest,
-  LiveProps,
-  [ReturnType<typeof $live>]
-> {
-  const targetApps: Record<
-    string,
-    { manifest: AppManifest; importMap: ImportMap }
-  > = {};
-
+export function WithoutCommerce(props: LiveProps): App<Manifest, LiveProps, [
+  ReturnType<typeof $live>,
+]> {
+  const targetApps: Record<string, {
+    manifest: AppManifest;
+    importMap: ImportMap;
+  }> = {};
   const liveApp = $live(props);
   const { resolvables: _ignoreResolvables, ...webSiteApp } =
     liveApp.dependencies![0];
@@ -240,7 +222,6 @@ export function WithoutCommerce(
       }
     }
   }
-
   return {
     state: props,
     importMap,
@@ -248,37 +229,27 @@ export function WithoutCommerce(
     dependencies: [liveApp],
   };
 }
-
 export type VTEXContext = AC<
-  App<
-    Manifest,
-    State,
-    [ReturnType<typeof $live>, ReturnType<typeof vtex>]
-  >
+  App<Manifest, State, [
+    ReturnType<typeof $live>,
+    ReturnType<typeof vtex>,
+  ]>
 >;
-
 export type AppContext = AC<ReturnType<typeof Std>>;
-export default function Std(
-  props: CommerceProps,
-): App<
-  Manifest,
-  State,
-  [ReturnType<typeof $live>, ReturnType<typeof commerce>]
-> {
-  const targetApps: Record<
-    string,
-    { manifest: AppManifest; importMap: ImportMap }
-  > = {};
-
+export default function Std(props: CommerceProps): App<Manifest, State, [
+  ReturnType<typeof $live>,
+  ReturnType<typeof commerce>,
+]> {
+  const targetApps: Record<string, {
+    manifest: AppManifest;
+    importMap: ImportMap;
+  }> = {};
   if (!props.commerce) {
     throw new Error(
       "Missing commerce props. Please migrate to apps before removing commerce prop",
     );
   }
-
-  const commerceApp = commerce(
-    props,
-  );
+  const commerceApp = commerce(props);
   let state: State = { ...props.commerce };
   if (isVTEXProps(props.commerce)) {
     state.configVTEX = {
@@ -294,18 +265,15 @@ export default function Std(
       manifest,
     };
   }
-
   if (isShopifyProps(props.commerce)) {
     state.configShopify = props.commerce;
     const { manifest, state: appState } = shopify(props.commerce);
     state = { ...state, ...appState };
-
     targetApps["shopify"] = {
       importMap: buildImportMap(manifest),
       manifest,
     };
   }
-
   if (isVNDAProps(props.commerce)) {
     state.configVNDA = {
       domain: props.commerce.publicUrl,
@@ -318,7 +286,6 @@ export default function Std(
     };
     const { manifest, state: appState } = vnda(props.commerce);
     state = { ...state, ...appState };
-
     targetApps["vnda"] = {
       importMap: buildImportMap(manifest),
       manifest,
@@ -356,9 +323,7 @@ export default function Std(
       }
     }
   }
-
   const [, ecomPlatform] = commerceApp.dependencies ?? [];
-
   return {
     state,
     importMap,

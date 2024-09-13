@@ -18,7 +18,7 @@ export interface Props {
  * @title Wake Integration
  * @description Product Suggestion loader
  */
-const action = async (
+const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
@@ -56,4 +56,4 @@ const action = async (
   };
 };
 
-export default action;
+export default loader;

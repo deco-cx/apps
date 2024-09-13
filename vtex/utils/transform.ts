@@ -35,6 +35,7 @@ import type {
   PageType as PageTypeVTEX,
   PickupPoint,
   Product as ProductVTEX,
+  ProductInventoryData,
   ProductRating,
   ProductReviewData,
   SelectedFacet,
@@ -45,7 +46,8 @@ import type {
 const DEFAULT_CATEGORY_SEPARATOR = ">";
 
 const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
-  typeof (sku as LegacySkuVTEX).variations?.[0] === "string";
+  typeof (sku as LegacySkuVTEX).variations?.[0] === "string" ||
+  !!(sku as LegacySkuVTEX).Videos;
 
 const isLegacyProduct = (
   product: ProductVTEX | LegacyProductVTEX,
@@ -346,6 +348,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     itemId: skuId,
     referenceId = [],
     kitItems,
+    estimatedDateArrival,
   } = sku;
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
@@ -434,6 +437,12 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     otherProps.advertisement = product.advertisement;
   }
 
+  estimatedDateArrival && additionalProperty.push({
+    "@type": "PropertyValue",
+    name: "Estimated Date Arrival",
+    value: estimatedDateArrival,
+  });
+
   return {
     "@type": "Product",
     category: categoriesString,
@@ -472,6 +481,7 @@ const toBreadcrumbList = (
 ): BreadcrumbList => {
   const { categories, productName } = product;
   const names = categories[0]?.split("/").filter(Boolean);
+
   const segments = names.map(slugify);
 
   return {
@@ -589,10 +599,14 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   return [...specificationProperties, ...attachmentProperties];
 };
 
-const toOffer = (
-  { commertialOffer: offer, sellerId, sellerName, sellerDefault }: SellerVTEX,
-): Offer => ({
+const toOffer = ({
+  commertialOffer: offer,
+  sellerId,
+  sellerName,
+  sellerDefault,
+}: SellerVTEX): Offer => ({
   "@type": "Offer",
+  identifier: sellerDefault ? "default" : undefined,
   price: offer.spotPrice ?? offer.Price,
   seller: sellerId,
   sellerName,
@@ -1019,6 +1033,30 @@ export const toReview = (
           ratingValue: productReviews[reviewIndex]?.rating || 0,
         },
       })),
+    };
+  });
+};
+
+export const toInventories = (
+  products: Product[],
+  inventoriesData: ProductInventoryData[],
+): Product[] => {
+  return products.map((p, index) => {
+    const balance = inventoriesData[index].balance || [];
+
+    const additionalProperty = Array.from(p.additionalProperty || []);
+
+    const inventories: PropertyValue[] = balance.map((b) => ({
+      "@type": "PropertyValue",
+      valueReference: "INVENTORY",
+      propertyID: b.warehouseId,
+      name: b.warehouseName,
+      value: b.totalQuantity?.toString(),
+    }));
+
+    return {
+      ...p,
+      additionalProperty: [...additionalProperty, ...inventories],
     };
   });
 };
