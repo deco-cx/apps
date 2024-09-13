@@ -2,41 +2,17 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$1 from "./actions/cart/createDeliveryAddress.ts";
-import * as $$$$$$$$$2 from "./actions/cart/removeItems.ts";
-import * as $$$$$$$$$3 from "./actions/cart/setDeliveryAddress.ts";
-import * as $$$$$$$$$4 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$5 from "./actions/user/deleteUser.ts";
-import * as $$$$$$$$$6 from "./actions/user/updateLogin.ts";
-import * as $$$$$$$$$7 from "./actions/user/updatePassword.ts";
-import * as $$$$$$$$$8 from "./actions/user/updateUser.ts";
-import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/categories/tree.ts";
-import * as $$$3 from "./loaders/product/productDetailsPage.ts";
-import * as $$$2 from "./loaders/product/ProductList.ts";
-import * as $$$4 from "./loaders/product/productListingPage.ts";
-import * as $$$5 from "./loaders/user.ts";
+import * as $$$0 from "./loaders/categories/tree.ts";
+import * as $$$2 from "./loaders/product/productDetailsPage.ts";
+import * as $$$1 from "./loaders/product/ProductList.ts";
+import * as $$$3 from "./loaders/product/productListingPage.ts";
 
 const manifest = {
   "loaders": {
-    "sap/loaders/cart.ts": $$$0,
-    "sap/loaders/categories/tree.ts": $$$1,
-    "sap/loaders/product/productDetailsPage.ts": $$$3,
-    "sap/loaders/product/ProductList.ts": $$$2,
-    "sap/loaders/product/productListingPage.ts": $$$4,
-    "sap/loaders/user.ts": $$$5,
-  },
-  "actions": {
-    "sap/actions/cart/addItems.ts": $$$$$$$$$0,
-    "sap/actions/cart/createDeliveryAddress.ts": $$$$$$$$$1,
-    "sap/actions/cart/removeItems.ts": $$$$$$$$$2,
-    "sap/actions/cart/setDeliveryAddress.ts": $$$$$$$$$3,
-    "sap/actions/cart/updateItems.ts": $$$$$$$$$4,
-    "sap/actions/user/deleteUser.ts": $$$$$$$$$5,
-    "sap/actions/user/updateLogin.ts": $$$$$$$$$6,
-    "sap/actions/user/updatePassword.ts": $$$$$$$$$7,
-    "sap/actions/user/updateUser.ts": $$$$$$$$$8,
+    "sap/loaders/categories/tree.ts": $$$0,
+    "sap/loaders/product/productDetailsPage.ts": $$$2,
+    "sap/loaders/product/ProductList.ts": $$$1,
+    "sap/loaders/product/productListingPage.ts": $$$3,
   },
   "name": "sap",
   "baseUrl": import.meta.url,
