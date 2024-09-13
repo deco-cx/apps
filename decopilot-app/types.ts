@@ -1,4 +1,19 @@
+import { App } from "deco/mod.ts";
+import { Secret } from "../website/loaders/secret.ts";
+
 export type Provider = "Anthropic" | "Openai";
+
+/**@title {{{llmProvider}}} API Key */
+export interface Credentials {
+  llmProvider: Provider;
+  key: Secret;
+}
+
+export interface LLMClient {
+  provider?: Provider;
+  client?: App;
+  call: (prompt: string) => LLMResponseType;
+}
 
 export interface PromptDetails {
   /**
@@ -24,6 +39,7 @@ export interface PromptDetails {
 export interface Prompt {
   agentName: string;
   provider: Provider;
+  model: string;
   /**
    * @format textarea
    * @title Prompt content
@@ -33,3 +49,23 @@ export interface Prompt {
 
   advanced?: PromptDetails;
 }
+
+export type LLMResponseType = {
+  id: string;
+  created?: number;
+  provider: Provider;
+  model: string;
+  stop_reason?: string;
+  llm_response: Array<{
+    message: {
+      role: string;
+      content: string | null;
+    };
+    index: number;
+  }>;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+};
