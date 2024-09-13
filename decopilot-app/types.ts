@@ -12,7 +12,7 @@ export interface Credentials {
 export interface LLMClient {
   provider?: Provider;
   client?: App;
-  call: (prompt: string) => LLMResponseType;
+  call: (prompt: string) => LLMResponseType; //Add tool calling parameters, differents models (Available tools?)
 }
 
 export interface PromptDetails {

@@ -2,7 +2,20 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/runAIWorkflows.ts";
+import * as $$$0 from "./loaders/getSavedPrompts.ts";
+import * as $$$$$$$$$$0 from "./workflows/fillContentWorkflow.ts";
+
 const manifest = {
+  "loaders": {
+    "decopilot-app/loaders/getSavedPrompts.ts": $$$0,
+  },
+  "actions": {
+    "decopilot-app/actions/runAIWorkflows.ts": $$$$$$$$$0,
+  },
+  "workflows": {
+    "decopilot-app/workflows/fillContentWorkflow.ts": $$$$$$$$$$0,
+  },
   "name": "decopilot-app",
   "baseUrl": import.meta.url,
 };

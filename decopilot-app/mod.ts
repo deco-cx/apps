@@ -1,9 +1,8 @@
+//IMPORTS-------------------------------------------------------------
 import type {
   App as A,
   AppContext as AC,
-  ManifestOf,
-  // AppMiddlewareContext as AMC,
-  // AppRuntime,
+  // ManifestOf,
 } from "deco/mod.ts";
 
 import {
@@ -29,21 +28,19 @@ import AnthropicApp, {
 import _assembleFinalPrompt from "./utils/assembleComplexPrompt.ts";
 import { AnthropicClient, OpenAIClient } from "./clients/llmClientObjects.ts";
 
-// import workflow from "../workflows/mod.ts";
+
+//EXPORTS-------------------------------------------------------------
+
+// export type AppManifest = ManifestOf<App>;
 
 export type App = ReturnType<typeof Decopilot>;
 export type AppContext = AC<App>;
-export type AppManifest = ManifestOf<App>;
-// export type AppMiddlewareContext = AMC<App>;
 
 export interface Props {
-  credentials: Credentials;
-  // you can freely change this to accept new properties when installing this app
-  // exampleProp: string;
-
+  credentials: Credentials[];
   content: Prompt[];
 }
-
+//APP-------------------------------------------------------------
 /**
  * @title decopilot-app
  */
@@ -52,6 +49,11 @@ export default function Decopilot({
   content,
   ...props
 }: Props) {
+
+  // const deps = credentials.map(
+  //   credential => 
+  //   )
+
   const openAIApp = OpenAIApp({ apiKey: credentials.key });
   const anthropicApp = AnthropicApp({ apiKey: credentials.key });
 
@@ -60,22 +62,8 @@ export default function Decopilot({
     Openai: new OpenAIClient("Openai", openAIApp),
   };
 
-  // Function to get the appropriate LLM client based on the provider key
-  // function getLLMClient(provider: Provider): LLMClient {
-  //   switch (provider) {
-  //     case 'Anthropic':
-  //       return providers.Anthropic;
-  //     case 'Openai':
-  //       return providers.Openai;
-  //     default:
-  //       throw new Error(`Unsupported provider: ${provider}`);
-  //   }
-  // }
   const llmClient = providers[credentials.llmProvider];
-  // const llmClient = getLLMClient(credentials.llmProvider);
 
-  // Call the LLM client with the prompt
-  // const llm = llmClient.call(prompt);
 
   const state = {
     ...props,
@@ -94,16 +82,3 @@ export default function Decopilot({
 
   return ctx;
 }
-
-// export const preview = async (props: AppRuntime) => {
-//   const markdownContent = await Markdown(
-//     new URL("./README.md", import.meta.url).href,
-//   );
-//   return {
-//     Component: PreviewVtex,
-//     props: {
-//       ...props,
-//       markdownContent,
-//     },
-//   };
-// };
