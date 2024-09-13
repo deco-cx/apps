@@ -1,5 +1,5 @@
 import { ImageWidget } from "../admin/widgets.ts";
-import { PageInfo } from "../commerce/types.ts";
+import { PageInfo, Person } from "../commerce/types.ts";
 
 /**
  * @titleBy name
@@ -54,6 +54,8 @@ export interface BlogPost {
    * @title Extra Props
    */
   extraProps?: ExtraProps[];
+  /** @hide true */
+  reactions?: Reaction[];
 }
 
 export interface ExtraProps {
@@ -85,4 +87,11 @@ export interface BlogPostListingPage {
   posts: BlogPost[];
   pageInfo: PageInfo;
   seo: Seo;
+}
+
+export interface Reaction {
+  person: Person;
+  datePublished: string;
+  dateModified: string;
+  action: "like" | "deslike";
 }
