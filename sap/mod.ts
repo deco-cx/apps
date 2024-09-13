@@ -9,13 +9,13 @@ export type AppContext = FnContext<State, Manifest>;
 export interface Props {
   /**
    * @title Api url
-   * @default https://api.lisacx.com.br:9002/occ/v2
+   * @default https://apolloapi.electrolux.com/occ/v2/
    */
   apiUrl: string;
 
   /**
    * @title Base site ID
-   * @default apparel-uk-spa
+   * @default frigidaire
    */
   baseSiteId: string;
 }
@@ -31,10 +31,10 @@ export interface State extends Props {
  * @logo https://fakestoreapi.com/icons/logo.png
  */
 export default function SAP(props: Props): App<Manifest, State> {
-  // const { apiUrl, baseSiteId } = props;
+  const { apiUrl, baseSiteId } = props;
 
   const api = createHttpClient<API>({
-    base: "https://apolloapi.electrolux.com/occ/v2/frigidaire/",
+    base: `${apiUrl}/${baseSiteId}/`,
     headers: new Headers({
       "Content-Type": "application/json",
       Accept: "application/json",

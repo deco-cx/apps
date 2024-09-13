@@ -5,6 +5,7 @@ import type {
   ListItem,
   Product as CommerceProduct,
   ProductLeaf,
+  PropertyValue,
   SiteNavigationElement,
 } from "../../commerce/types.ts";
 import {
@@ -104,13 +105,44 @@ export const convertProductData = (
   }
 
   const hasVariant: ProductLeaf[] = product.colorVariants?.map((variant) => {
+    const dimensions: PropertyValue[] = [
+      {
+        "@type": "PropertyValue",
+        propertyID: "depth",
+        value: variant.depth,
+      },
+      {
+        "@type": "PropertyValue",
+        propertyID: "height",
+        value: variant.height,
+      },
+      {
+        "@type": "PropertyValue",
+        propertyID: "width",
+        value: variant.width,
+      },
+    ];
+
+    const badges: PropertyValue[] = variant.plpBadges
+      ? variant.plpBadges.map((badge) => ({
+        "@type": "PropertyValue",
+        propertyID: "badge",
+        value: badge.name,
+        valueReference: badge.icon,
+      }))
+      : [];
+
     return {
       "@type": "Product",
-      additionalProperty: [{
-        "@type": "PropertyValue",
-        propertyID: "colorUrl",
-        value: variant.variantSwatchColors,
-      }],
+      additionalProperty: [
+        {
+          "@type": "PropertyValue",
+          propertyID: "colorUrl",
+          value: variant.variantSwatchColors,
+        },
+        ...dimensions,
+        ...badges,
+      ],
       category: product.categories?.[0].name || product.categoryName,
       description: variant.altText,
       image: [{
@@ -150,11 +182,18 @@ export const convertProductData = (
       url: formatProductUrl(variant.url),
     };
   });
-  console.log({ img: images });
+
+  const additionalProperty: PropertyValue[] = Object.entries(product).filter((
+    [key],
+  ) => key.startsWith("packageBullet")).map(([_key, value]) => ({
+    "@type": "PropertyValue",
+    propertyID: "bullet",
+    value,
+  }));
 
   return {
     "@type": "Product",
-    additionalProperty: [], // TODO: Need to organize the products data like dimensions, manuals, features, etc.
+    additionalProperty, // TODO: Need to organize the products data like dimensions, manuals, features, etc.
     aggregateRating: { // TODO: It seems like Frigidaire use the product reviews from another database
       "@type": "AggregateRating",
       ratingCount: product.numberOfReviews,
@@ -224,9 +263,9 @@ export const convertFacetsToFilters = (facets: FacetResponse[]): Filter[] => {
   const filters: Filter[] = facets.map((facet) => {
     return {
       "@type": "FilterToggle",
-      label: facet.name,
+      label: facet.name.charAt(0).toUpperCase() + facet.name.slice(1),
       key: facet.priority.toString(),
-      values: facet.values.map((value) => {
+      values: facet.values.filter((value) => value.count > 0).map((value) => {
         return {
           quantity: value.count,
           label: value.name,

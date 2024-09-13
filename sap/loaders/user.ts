@@ -2,7 +2,8 @@ import { AppContext } from "../mod.ts";
 import { User } from "../utils/types.ts";
 
 /**
- * @docs
+ * @title SAP Integration
+ * @description WORK IN PROGRESS - User loader
  */
 const loader = async (
   _props: unknown,
@@ -11,10 +12,10 @@ const loader = async (
 ): Promise<User> => {
   const { api } = ctx;
 
-  // Cookie to validate if it's logged in
+  // WIP - Need to check cookie to validate if it's logged in
 
   const response = await api["GET /users/:userId"](
-    { userId: "current", headers: {} },
+    { userId: "current" },
   );
 
   const result = response.json();

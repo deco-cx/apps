@@ -1,6 +1,6 @@
 import { ProductDetailsPage } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
-import { FieldsList, ProductDetailsResponse } from "../../utils/types.ts";
+import { ProductDetailsResponse } from "../../utils/types.ts";
 import {
   convertCategoriesToBreadcrumb,
   convertProductData,
@@ -11,9 +11,9 @@ export interface Props {
   /**
    * @title Fields
    * @description Response configuration. This is the list of fields that should be returned in the response body. Examples: BASIC, DEFAULT, FULL
-   *  @default DEFAULT
+   * @default "FULL,averageRating,stock(DEFAULT),description,availableForPickup,code,url,price(DEFAULT),manufacturer,categories(FULL),priceRange,multidimensional,configuratorType,configurable,tags,images(FULL),name,purchasable,baseOptions(DEFAULT),baseProduct,variantOptions(DEFAULT),variantType,numberOfReviews,productReferences,likeProductCopy,likeProductGroup,likeProducts(code,likeProductCopy,likeProductGroup,price(DEFAULT),url,primaryFlag,msrpUSD,msrpCAD,msrpCADFormattedValue),classifications"
    */
-  fields?: string;
+  fields: string;
   /**
    * @title Product code
    * @description Product identifier.
@@ -35,8 +35,7 @@ const productDetailsLoader = async (
 
   const data: ProductDetailsResponse = await api["GET /products/:productCode"]({
     productCode,
-    fields:
-      `${fields},FULL,averageRating,stock(DEFAULT),description,availableForPickup,code,url,price(DEFAULT),manufacturer,categories(FULL),priceRange,multidimensional,configuratorType,configurable,tags,images(FULL),name,purchasable,baseOptions(DEFAULT),baseProduct,variantOptions(DEFAULT),variantType,numberOfReviews,productReferences,likeProductCopy,likeProductGroup,likeProducts(code,likeProductCopy,likeProductGroup,price(DEFAULT),url,primaryFlag,msrpUSD,msrpCAD,msrpCADFormattedValue),classifications`,
+    fields,
   }).then((res: Response) => {
     return res.json();
   });

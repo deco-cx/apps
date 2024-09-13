@@ -2,7 +2,8 @@ import { AppContext } from "../mod.ts";
 import { Cart } from "../utils/types.ts";
 
 /**
- * @docs
+ * @title SAP Integration
+ * @description WORK IN PROGRESS - Cart loader
  */
 const loader = async (
   _props: unknown,
@@ -19,7 +20,7 @@ const loader = async (
 
   if (isLogged) {
     const response = await api["GET /users/:userId/carts/:cartId"](
-      { cartId: "", userId: "current", headers: {} },
+      { cartId: "", userId: "current" },
     );
 
     return response.json();
@@ -29,7 +30,6 @@ const loader = async (
     {
       oldCartId: hasAnonymousCart ? "" : null,
       userId: "anonymous",
-      headers: {},
     },
   );
 

@@ -6,8 +6,6 @@ export type Sort =
   | "price-asc"
   | "price-desc";
 
-export type FieldsList = "BASIC" | "DEFAULT" | "FULL";
-
 export interface Facet {
   key: string;
   value: string;
@@ -201,6 +199,12 @@ export interface Product {
   multidimensional: string;
   name: string;
   numberOfReviews: number;
+  packageBullet1: string;
+  packageBullet2: string;
+  packageBullet3: string;
+  packageBullet4: string;
+  packageBullet5: string;
+  packageBullet6: string;
   plpImage: string;
   promotions: Promotion[];
   price: PriceData;

@@ -1,15 +1,16 @@
 import { AppContext } from "../../mod.ts";
-import type { Address, FieldsList } from "../../utils/types.ts";
+import type { Address } from "../../utils/types.ts";
 
 export interface Props {
   addressId: string;
   cartId: string;
-  fields: FieldsList;
+  fields: string;
   userId: string;
 }
 
 /**
- * @docs https://api.lisacx.com.br:9002/occ/v2/swagger-ui.html
+ * @title SAP Integration
+ * @description WORK IN PROGRESS - Action to set an existing delivery address during checkout
  */
 const action = async (
   props: Props,
@@ -21,9 +22,9 @@ const action = async (
 
   try {
     const response = await api
-      ["PUT ​/users​/:userId​/carts​/:cartId​/addresses/delivery"](
+      ["PUT /users/:userId/carts/:cartId/addresses/delivery"](
         { addressId, cartId, fields, userId },
-      ).then((res) => res.json());
+      ).then((res: Response) => res.json());
 
     return await response.json();
   } catch (error) {

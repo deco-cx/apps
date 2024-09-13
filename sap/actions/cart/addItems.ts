@@ -1,19 +1,16 @@
 import { AppContext } from "../../mod.ts";
-import type {
-  CartEntry,
-  CartUpdateResponse,
-  FieldsList,
-} from "../../utils/types.ts";
+import type { CartEntry, CartUpdateResponse } from "../../utils/types.ts";
 
 export interface Props {
   cartId: string;
   entry: CartEntry;
-  fields: FieldsList;
+  fields: string;
   userId: string;
 }
 
 /**
- * @docs https://api.lisacx.com.br:9002/occ/v2/swagger-ui.html
+ * @title SAP Integration
+ * @description WORK IN PROGRESS - Action to add items to the cart
  */
 const action = async (
   props: Props,
@@ -24,9 +21,9 @@ const action = async (
   const { cartId, entry, fields, userId } = props;
 
   try {
-    const response = await api["POST ​/users​/:userId​/carts​/:cartId​/entries"](
+    const response = await api["POST /users/:userId/carts/:cartId/entries"](
       { cartId, fields, entry, userId },
-    ).then((res) => res.json());
+    ).then((res: Response) => res.json());
 
     return await response.json();
   } catch (error) {

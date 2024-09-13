@@ -1,8 +1,8 @@
 import { AppContext } from "../../mod.ts";
-import type { FieldsList, User } from "../../utils/types.ts";
+import type { User } from "../../utils/types.ts";
 
 export interface Props {
-  fields: FieldsList;
+  fields: string;
   newPassword: string;
   userId: string;
 }

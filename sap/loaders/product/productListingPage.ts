@@ -1,6 +1,6 @@
 import { BreadcrumbList, ProductListingPage } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
-import { FieldsList, ProductListResponse } from "../../utils/types.ts";
+import { ProductListResponse } from "../../utils/types.ts";
 import {
   convertBreadcrumb,
   convertFacetsToFilters,
@@ -54,6 +54,8 @@ const PLPLoader = async (
     query = `:relevance:allCategories:${categoryCode}`;
   }
 
+  query = decodeURIComponent(query.replace(/\+/g, " "));
+
   const data: ProductListResponse = await api[
     "GET /users/anonymous/eluxproducts/search"
   ]({
@@ -68,8 +70,6 @@ const PLPLoader = async (
       res: Response,
     ) => res.json(),
   );
-
-  "fields=FULL%2Cproducts(FULL)%2Cfacets&query=standard%3Arelevance%3Afeatures%3AIce%20Maker&pageSize=12&sort=approvalStatusSort&searchType=FINISHED_GOODS&lang=en&curr=USD";
 
   const products = data.products.map(convertProductData);
 

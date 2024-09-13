@@ -1,13 +1,14 @@
 import { AppContext } from "../../mod.ts";
-import type { FieldsList, User } from "../../utils/types.ts";
+import type { User } from "../../utils/types.ts";
 
 export interface Props {
-  fields: FieldsList;
+  fields: string;
   userId: string;
 }
 
 /**
- * @docs https://api.lisacx.com.br:9002/occ/v2/swagger-ui.html
+ * @title SAP Integration
+ * @description WORK IN PROGRESS - Action to delete an user
  */
 const action = async (
   props: Props,
@@ -18,9 +19,9 @@ const action = async (
   const { fields, userId } = props;
 
   try {
-    const response = await api["DELETE ​/users​/:userId"](
+    const response = await api["DELETE /users/:userId"](
       { fields, userId },
-    ).then((res) => res.json());
+    ).then((res: Response) => res.json());
 
     return await response.json();
   } catch (error) {

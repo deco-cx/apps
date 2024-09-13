@@ -1,19 +1,16 @@
 import { AppContext } from "../../mod.ts";
-import type {
-  CartEntry,
-  CartUpdateResponse,
-  FieldsList,
-} from "../../utils/types.ts";
+import type { CartEntry, CartUpdateResponse } from "../../utils/types.ts";
 
 export interface Props {
   cartId: string;
   entryNumber: CartEntry["entryNumber"];
-  fields: FieldsList;
+  fields: string;
   userId: string;
 }
 
 /**
- * @docs https://api.lisacx.com.br:9002/occ/v2/swagger-ui.html
+ * @title SAP Integration
+ * @description WORK IN PROGRESS - Action to remove items from the cart
  */
 const action = async (
   props: Props,
