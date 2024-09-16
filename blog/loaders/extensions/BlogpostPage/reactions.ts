@@ -13,7 +13,7 @@ export default function reactionsExt(
     if (!blogpostPage) {
       return null;
     }
-    const extendedPosts = await getReactions({ post: blogpostPage.post, ctx });
-    return { ...blogpostPage, post: extendedPosts };
+    const post = await getReactions({ post: blogpostPage.post, ctx });
+    return { ...blogpostPage, post };
   };
 }

@@ -2,6 +2,7 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/submitReaction.ts";
 import * as $$$0 from "./loaders/Author.ts";
 import * as $$$3 from "./loaders/Blogpost.ts";
 import * as $$$1 from "./loaders/BlogPostItem.ts";
@@ -41,6 +42,9 @@ const manifest = {
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
     "blog/sections/Template.tsx": $$$$$$2,
+  },
+  "actions": {
+    "blog/actions/submitReaction.ts": $$$$$$$$$0,
   },
   "name": "blog",
   "baseUrl": import.meta.url,

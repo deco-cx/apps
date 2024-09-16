@@ -2,6 +2,7 @@ import {
   sqliteTable,
   text,
 } from "https://esm.sh/drizzle-orm@0.30.10/sqlite-core";
+import { Reaction } from "../types.ts";
 
 export const reactions = sqliteTable("reactions", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -11,3 +12,7 @@ export const reactions = sqliteTable("reactions", {
   dateModified: (text("dateModified")).notNull(),
   action: (text("action")).notNull(),
 });
+
+export interface ReactionSchema extends Reaction {
+  id: string;
+}
