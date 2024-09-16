@@ -8,8 +8,8 @@ import { BlogPostListingPage } from "../../types.ts";
  * @title Extend your Blogpost Listing Page
  */
 export default function ProductDetailsExt(
-  props: Props<BlogPostListingPage[] | null>,
-): Promise<BlogPostListingPage[] | null> {
+  props: Props<BlogPostListingPage | null>,
+): Promise<BlogPostListingPage | null> {
   return extend(props);
 }
 

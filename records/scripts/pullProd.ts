@@ -91,7 +91,7 @@ async function run() {
 
   await checkDumpInsertedTables(sqlClient);
 
-  return "sqlite.db updated sucessfully!"
+  return "sqlite.db updated sucessfully!";
 }
 
 run()

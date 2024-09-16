@@ -1,24 +1,26 @@
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../mod.ts";
 import { BlogPost } from "../../../types.ts";
-import { REACTIONS_MOCK } from "../../../utils/constants.ts";
+import { getReactions } from "../../../utils/records.ts";
 
 /** @title ExtensionOf BlogPost list: Reactions */
 export default function reactionsExt(
   _props: unknown,
   _req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): ExtensionOf<BlogPost[] | null> {
-  return (posts: BlogPost[] | null) => {
+  return async (posts: BlogPost[] | null) => {
     if (posts?.length === 0 || !posts) {
       return null;
     }
 
-    const extendedPosts = posts?.map((post) => ({
-      ...post,
-      reactions: REACTIONS_MOCK,
-    }));
+    const postsWithReactions = await Promise.all(
+      posts.map(async (post) => {
+        const reactions = await getReactions({ post, ctx });
+        return { ...post, ...reactions };
+      }),
+    );
 
-    return extendedPosts;
+    return postsWithReactions;
   };
 }

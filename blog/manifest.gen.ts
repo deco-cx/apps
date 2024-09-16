@@ -9,8 +9,8 @@ import * as $$$4 from "./loaders/BlogpostList.ts";
 import * as $$$5 from "./loaders/BlogpostListing.ts";
 import * as $$$2 from "./loaders/BlogPostPage.ts";
 import * as $$$6 from "./loaders/Category.ts";
-import * as $$$8 from "./loaders/extensions/BlogposList/reactions.ts";
-import * as $$$9 from "./loaders/extensions/BlogpostList.ts";
+import * as $$$8 from "./loaders/extensions/BlogpostList.ts";
+import * as $$$9 from "./loaders/extensions/BlogpostList/reactions.ts";
 import * as $$$10 from "./loaders/extensions/BlogpostListing.ts";
 import * as $$$11 from "./loaders/extensions/BlogpostListing/reactions.ts";
 import * as $$$12 from "./loaders/extensions/BlogpostPage.ts";
@@ -29,8 +29,8 @@ const manifest = {
     "blog/loaders/BlogpostListing.ts": $$$5,
     "blog/loaders/BlogPostPage.ts": $$$2,
     "blog/loaders/Category.ts": $$$6,
-    "blog/loaders/extensions/BlogposList/reactions.ts": $$$8,
-    "blog/loaders/extensions/BlogpostList.ts": $$$9,
+    "blog/loaders/extensions/BlogpostList.ts": $$$8,
+    "blog/loaders/extensions/BlogpostList/reactions.ts": $$$9,
     "blog/loaders/extensions/BlogpostListing.ts": $$$10,
     "blog/loaders/extensions/BlogpostListing/reactions.ts": $$$11,
     "blog/loaders/extensions/BlogpostPage.ts": $$$12,
