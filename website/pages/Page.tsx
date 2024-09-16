@@ -174,7 +174,9 @@ export const loader = async (
   const global = ctx.global || [];
   const resolvedGlobals = await Promise.all(
     global?.map(async (section) => {
-      return await ctx.get(section);
+      return await ctx.get(section, {
+        resolveChain: [{ value: ctx.resolverId ?? "root", type: "resolver" }],
+      });
     }),
   );
   const globalSections = ctx.theme

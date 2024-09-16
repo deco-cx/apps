@@ -45,6 +45,7 @@ const config = {
     app("crux"),
     app("decohub"),
     app("htmx"),
+    app("sap"),
     ...compatibilityApps,
   ],
 };

@@ -121,7 +121,9 @@ export const createHttpClient = <T>(
             }
             return param;
           })
-          .filter((x) => typeof x === "string" || typeof x === "number")
+          .filter((x) =>
+            typeof x === "string" && x.length || typeof x === "number"
+          )
           .join("/");
         const url = new URL(compiled, base);
         mapped.forEach((value, key) => {
