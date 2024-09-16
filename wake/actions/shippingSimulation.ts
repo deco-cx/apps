@@ -33,6 +33,8 @@ const buildSimulationParams = (
     useSelectedAddress,
   };
 
+  console.log(props)
+
   if (simulateCartItems) {
     if (!checkoutId) throw new HttpError(400, "Missing cart cookie");
 
@@ -59,6 +61,7 @@ const action = async (
   const headers = parseHeaders(req.headers);
 
   const cartId = getCartCookie(req.headers);
+  console.log(cartId)
 
   const simulationParams = buildSimulationParams(props, cartId);
 
