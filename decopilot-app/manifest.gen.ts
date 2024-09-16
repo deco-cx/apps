@@ -4,17 +4,15 @@
 
 import * as $$$$$$$$$0 from "./actions/prompt/run.ts";
 import * as $$$0 from "./loaders/getSavedPrompts.ts";
-import * as $$$$$$$$$$0 from "./workflows/fillContentWorkflow.ts";
+import * as $$$1 from "./loaders/listAvailablePrompts.ts";
 
 const manifest = {
   "loaders": {
     "decopilot-app/loaders/getSavedPrompts.ts": $$$0,
+    "decopilot-app/loaders/listAvailablePrompts.ts": $$$1,
   },
   "actions": {
     "decopilot-app/actions/prompt/run.ts": $$$$$$$$$0,
-  },
-  "workflows": {
-    "decopilot-app/workflows/fillContentWorkflow.ts": $$$$$$$$$$0,
   },
   "name": "decopilot-app",
   "baseUrl": import.meta.url,

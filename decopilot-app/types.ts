@@ -1,7 +1,7 @@
 import { App } from "deco/mod.ts";
 import { Secret } from "../website/loaders/secret.ts";
 
-export type Provider = "Anthropic" | "Openai";
+export type Provider = "Anthropic" | "OpenAI";
 
 /**@title {{{llmProvider}}} API Key */
 export interface Credentials {
@@ -19,6 +19,16 @@ export type Text = string;
 export type Image = string;
 
 export type Attachment = Text | Image;
+
+export type Model =
+  | "claude-3-5-sonnet-20240620"
+  | "claude-3-opus-20240229"
+  | "claude-3-sonnet-20240229"
+  | "claude-3-haiku-20240307"
+  | "gpt-4o"
+  | "gpt-4"
+  | "gpt-4-turbo"
+  | "gpt-3.5-turbo";
 
 export interface PromptDetails {
   /**
@@ -49,11 +59,11 @@ export interface PromptDetails {
   functions?: string[];
 }
 
-/**@title Prompt {{{agentName}}} */
+/**@title Prompt {{{name}}} */
 export interface Prompt {
   name: string;
   provider: Provider;
-  model: string;
+  model: Model;
   /**
    * @format textarea
    * @title Prompt content

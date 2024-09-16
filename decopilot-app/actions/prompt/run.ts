@@ -1,13 +1,15 @@
-import {
-  callAntropic,
-  callOpenAI
-} from "../../clients/llmClientObjects.ts";
+// import { invoke } from "../../../vtex/runtime.ts";
+import { callAntropic, callOpenAI } from "../../clients/llmClientObjects.ts";
 import type { AppContext } from "../../mod.ts";
 import type { Attachment, LLMResponseType } from "../../types.ts";
 
 interface Props {
+  /**
+   * @format dynamic-options
+   * @options decopilot-app/loaders/listAvailablePrompts.ts
+   */
   name: string;
-  attachments: Attachment[];
+  attachments?: Attachment[];
 }
 
 export default async function action(
@@ -22,11 +24,11 @@ export default async function action(
   }
 
   if (prompt.provider === "Anthropic") {
-    return await callAntropic(prompt, attachments, ctx);
+    return await callAntropic(prompt, ctx, attachments);
   }
 
-  if (prompt.provider === "Openai") {
-    return await callOpenAI(prompt, attachments, ctx);
+  if (prompt.provider === "OpenAI") {
+    return await callOpenAI(prompt, ctx, attachments);
   }
 
   throw new Error(`Provider ${prompt.provider} not found`);

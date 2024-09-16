@@ -2,7 +2,7 @@ import { AppContext } from "../mod.ts";
 import { Prompt } from "../types.ts";
 
 interface Props {
-  agentName: string;
+  name: string;
 }
 
 /**
@@ -14,9 +14,7 @@ const loader = (
   _request: Request,
   ctx: AppContext,
 ): Prompt | null => {
-  const foundPrompt = ctx.content.find(({ name }) =>
-    name === props.agentName
-  );
+  const foundPrompt = ctx.content.find(({ name }) => name === props.name);
   return foundPrompt || null; // Return null if no prompt is found
 };
 
