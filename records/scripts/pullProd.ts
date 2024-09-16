@@ -1,5 +1,5 @@
 import { existsSync } from "https://deno.land/std@0.201.0/fs/exists.ts";
-import { createClient as createSQLClient } from "../deps.ts";
+import { createClient as createSQLClient, createLocalClient } from "../deps.ts";
 import { getLocalDbFilename, getLocalSQLClientConfig } from "../utils.ts";
 import { brightGreen, brightYellow } from "std/fmt/colors.ts";
 import { getDbCredentials } from "./checkDbCredential.ts";
@@ -77,7 +77,11 @@ async function run() {
     }
   }
 
-  const sqlClient = createSQLClient(
+  if (!createLocalClient) {
+    return "local client not defined!";
+  }
+
+  const sqlClient = createLocalClient(
     getLocalSQLClientConfig(),
   );
 
@@ -86,6 +90,8 @@ async function run() {
   await sqlClient.batch(sliced, "write");
 
   await checkDumpInsertedTables(sqlClient);
+
+  return "sqlite.db updated sucessfully!"
 }
 
 run()
