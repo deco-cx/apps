@@ -3,6 +3,7 @@ import { Person } from "../../commerce/types.ts";
 import { reactions, ReactionSchema } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { logger } from "@deco/deco/o11y";
+import { Reaction } from "../types.ts";
 
 export interface Props {
   postSlug: string;
@@ -19,7 +20,7 @@ export default async function submitReaction(
   { postSlug, person, action }: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<SubmitResult> {
+): Promise<Reaction | null> {
   const isoDate = new Date().toISOString().split("T")[0];
   const records = await ctx.invoke.records.loaders.drizzle();
 
@@ -28,6 +29,8 @@ export default async function submitReaction(
       postSlug: reactions.postSlug,
       person: reactions.person,
       action: reactions.action,
+      dateModified: reactions.dateModified,
+      datePublished: reactions.datePublished,
       id: reactions.id,
     })
       .from(reactions).where(
@@ -41,15 +44,17 @@ export default async function submitReaction(
       ) as ReactionSchema[];
 
     if (currentReaction.length > 0 && currentReaction[0].id) {
-      const { id } = currentReaction[0]!;
+      const current = currentReaction[0]!;
       await records.update(reactions).set({
         action: action,
         dateModified: isoDate,
       }).where(
-        eq(reactions.id, id),
+        eq(reactions.id, current.id),
       );
       return {
-        success: true,
+        ...current,
+        action,
+        dateModified: isoDate,
       };
     }
 
@@ -62,13 +67,13 @@ export default async function submitReaction(
     });
 
     return {
-      success: true,
+      person,
+      datePublished: isoDate,
+      dateModified: isoDate,
+      action,
     };
   } catch (e) {
     logger.error(e);
-    return {
-      success: false,
-      message: e,
-    };
+    return null;
   }
 }
