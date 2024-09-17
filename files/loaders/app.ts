@@ -170,7 +170,7 @@ const loader = async (
 \n
 import manifest, { Manifest } from "./manifest.gen.ts";
 import website, { Props as WebSiteProps } from "apps/website/mod.ts";
-import { App, AppContext as AC } from "deco/mod.ts";
+import { App, AppContext as AC } from "@deco/deco";
 
 export default function App(props: WebSiteProps): App<Manifest, WebSiteProps, [ReturnType<typeof website>]> {
   return {
