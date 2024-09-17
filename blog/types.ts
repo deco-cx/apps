@@ -92,12 +92,12 @@ export interface BlogPostListingPage {
 }
 
 export interface Reaction extends PersonAndDate {
-  action: "like" | "deslike";
+  action: "like" | "deslike" | "invalid";
 }
 
 export interface ArticleComment extends PersonAndDate {
   comment: string;
-  removed: boolean;
+  status: "submited" | "aproved" | "declined" | "deleted";
 }
 
 export interface PersonAndDate {

@@ -1,5 +1,4 @@
 import {
-  integer,
   sqliteTable,
   text,
 } from "https://esm.sh/drizzle-orm@0.30.10/sqlite-core";
@@ -21,7 +20,7 @@ export const comments = sqliteTable("comments", {
   datePublished: (text("datePublished")).notNull(),
   dateModified: (text("dateModified")).notNull(),
   comment: (text("comment")).notNull(),
-  removed: integer("removed", { mode: "boolean" }).notNull().default(false),
+  status: (text("status")).notNull(),
 });
 
 export interface ReactionSchema extends Reaction {

@@ -1,4 +1,4 @@
-import { comments, reactions } from "../db/schema.ts";
+import { comments, CommentsSchema, reactions } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { type Resolvable } from "@deco/deco";
 import { eq } from "https://esm.sh/drizzle-orm@0.30.10";
@@ -64,7 +64,7 @@ export async function getCommentsFromSlug(
       datePublished: comments.datePublished,
       dateModified: comments.dateModified,
       comment: comments.comment,
-      removed: comments.removed,
+      status: comments.status,
     })
       .from(comments).where(eq(comments.postSlug, slug)) as ArticleComment[];
 
@@ -88,3 +88,28 @@ export async function getComments(
     comments,
   };
 }
+
+export const getCommentById = async (
+  { ctx, id }: { ctx: AppContext; id?: string },
+) => {
+  if (!id) {
+    return null;
+  }
+  const records = await ctx.invoke.records.loaders.drizzle();
+  try {
+    const comment = await records.select({
+      postSlug: comments.postSlug,
+      person: comments.person,
+      datePublished: comments.datePublished,
+      dateModified: comments.dateModified,
+      comment: comments.comment,
+      status: comments.status,
+      id: comments.id,
+    })
+      .from(comments).where(eq(comments.id, id)).get() as CommentsSchema;
+    return comment;
+  } catch (e) {
+    logger.error(e);
+    return null;
+  }
+};
