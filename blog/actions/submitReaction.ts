@@ -25,7 +25,7 @@ export default async function submitReaction(
   const records = await ctx.invoke.records.loaders.drizzle();
 
   try {
-    const currentReaction = await records.select({
+    const storedReaction = await records.select({
       postSlug: reactions.postSlug,
       person: reactions.person,
       action: reactions.action,
@@ -43,10 +43,11 @@ export default async function submitReaction(
         ),
       ) as ReactionSchema[];
 
-    if (currentReaction.length > 0 && currentReaction[0].id) {
-      const current = currentReaction[0]!;
+    //if has data, then update de table
+    if (storedReaction.length > 0 && storedReaction?.at(0)?.id) {
+      const current = storedReaction.at(0)!;
       await records.update(reactions).set({
-        action: action,
+        action,
         dateModified: isoDate,
       }).where(
         eq(reactions.id, current.id),
@@ -58,20 +59,20 @@ export default async function submitReaction(
       };
     }
 
+    //Or insert more data
+    const insertedData = {
+      person,
+      action,
+      datePublished: isoDate,
+      dateModified: isoDate,
+    };
+
     await records.insert(reactions).values({
       postSlug: postSlug,
-      person: person,
-      datePublished: isoDate,
-      dateModified: isoDate,
-      action: action,
+      ...insertedData,
     });
 
-    return {
-      person,
-      datePublished: isoDate,
-      dateModified: isoDate,
-      action,
-    };
+    return insertedData;
   } catch (e) {
     logger.error(e);
     return null;
