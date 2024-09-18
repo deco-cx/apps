@@ -1,14 +1,21 @@
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../mod.ts";
-import { BlogPostPage } from "../../../types.ts";
+import { BlogPostPage, Ignore } from "../../../types.ts";
 import { getRatings } from "../../../utils/records.ts";
+
+interface Props {
+  /**
+   * @description Ignore ratings in the aggregateRating calc
+   */
+  ignoreRatings?: Ignore;
+}
 
 /**
  * @title ExtensionOf BlogPostPage: Ratings
  * @description It can harm performance. Use wisely
  */
 export default function ratingsExt(
-  _props: unknown,
+  { ignoreRatings }: Props,
   _req: Request,
   ctx: AppContext,
 ): ExtensionOf<BlogPostPage | null> {
@@ -16,7 +23,11 @@ export default function ratingsExt(
     if (!blogpostPage) {
       return null;
     }
-    const post = await getRatings({ post: blogpostPage.post, ctx });
+    const post = await getRatings({
+      post: blogpostPage.post,
+      ctx,
+      ignoreRatings,
+    });
     return { ...blogpostPage, post };
   };
 }

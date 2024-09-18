@@ -14,7 +14,7 @@ export default function Template({ post }: Props) {
     excerpt = "Excerpt",
     date,
     image,
-    alt
+    alt,
   } = post;
 
   return (
@@ -33,7 +33,11 @@ export default function Template({ post }: Props) {
             : ""}
         </p>
         {image && (
-          <img class="w-full rounded-2xl bg-cover" src={image} alt={alt ?? title} />
+          <img
+            class="w-full rounded-2xl bg-cover"
+            src={image}
+            alt={alt ?? title}
+          />
         )}
         <div dangerouslySetInnerHTML={{ __html: content }} />
       </div>

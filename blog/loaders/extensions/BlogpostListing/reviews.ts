@@ -1,14 +1,25 @@
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../mod.ts";
-import { BlogPostListingPage } from "../../../types.ts";
+import { BlogPostListingPage, Ignore } from "../../../types.ts";
 import { getReviews } from "../../../utils/records.ts";
 
+interface Props {
+  /**
+   * @description Ignore specific reviews
+   */
+  ignoreReviews?: Ignore;
+  /**
+   * @description Order By
+   */
+  orderBy?: "date_asc" | "date_desc";
+}
+
 /**
- * @title ExtensionOf BlogPostPage: Reviews
+ * @title ExtensionOf BlogPostListing: Reviews
  * @description It can harm performance. Use wisely
  */
 export default function reviewsExt(
-  _props: unknown,
+  { ignoreReviews, orderBy }: Props,
   _req: Request,
   ctx: AppContext,
 ): ExtensionOf<BlogPostListingPage | null> {
@@ -19,7 +30,7 @@ export default function reviewsExt(
 
     const posts = await Promise.all(
       blogpostListingPage.posts.map(async (post) => {
-        const reviews = await getReviews({ post, ctx });
+        const reviews = await getReviews({ post, ctx, ignoreReviews, orderBy });
         return { ...post, ...reviews };
       }),
     );
