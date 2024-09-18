@@ -148,3 +148,14 @@ export interface AggregateRating {
   /** The lowest value allowed in this rating system. */
   worstRating?: number;
 }
+
+export interface Ignore {
+  /**
+   * @title Active
+   */
+  active?: boolean;
+  /**
+   * @title When additionalType is marked with:
+   */
+  markedAs?: string[];
+}

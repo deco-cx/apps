@@ -1,8 +1,14 @@
 import { rating, review } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { type Resolvable } from "@deco/deco";
-import { eq } from "https://esm.sh/drizzle-orm@0.30.10";
-import { BlogPost, Rating, Review } from "../types.ts";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  notInArray,
+} from "https://esm.sh/drizzle-orm@0.30.10";
+import { BlogPost, Ignore, Rating, Review } from "../types.ts";
 import { logger } from "@deco/deco/o11y";
 
 export async function getRecordsByPath<T>(
@@ -49,28 +55,44 @@ export async function getRatingsBySlug(
 }
 
 export async function getRatings(
-  { ctx, post }: { ctx: AppContext; post: BlogPost },
+  { ctx, post, ignoreRatings, onlyAggregate }: {
+    ctx: AppContext;
+    post: BlogPost;
+    ignoreRatings?: Ignore;
+    onlyAggregate?: boolean;
+  },
 ): Promise<BlogPost> {
   const contentRating = await getRatingsBySlug({
     ctx,
     slug: post.slug,
   });
 
-  const ratingValue = contentRating.length === 0 ? 0 : contentRating.reduce(
-    (acc, rating) => acc = acc + rating!.ratingValue!,
-    0,
-  ) / contentRating.length;
+  const { ratingCount, ratingTotal } = contentRating.length === 0
+    ? { ratingCount: 0, ratingTotal: 0 }
+    : contentRating.reduce(
+      (acc, { ratingValue, additionalType }) =>
+        ignoreRatings?.active && additionalType &&
+          ignoreRatings.markedAs?.includes(additionalType)
+          ? acc
+          : {
+            ratingCount: acc.ratingCount + 1,
+            ratingTotal: acc.ratingTotal + (ratingValue ?? 0),
+          },
+      { ratingCount: 0, ratingTotal: 0 },
+    );
+
+  const ratingValue = ratingTotal / ratingCount;
 
   return {
     ...post,
-    contentRating,
+    contentRating: onlyAggregate ? undefined : contentRating,
     aggregateRating: {
       ...post.aggregateRating,
       "@type": "AggregateRating",
-      ratingCount: contentRating.length,
+      ratingCount,
+      ratingValue: isNaN(ratingValue) ? 0 : ratingValue,
       bestRating: 5,
       worstRating: 1,
-      ratingValue,
     },
   };
 }
@@ -103,9 +125,26 @@ export const getReviewById = async (
 };
 
 export async function getReviewsBySlug(
-  { ctx, slug }: { ctx: AppContext; slug: string },
+  { ctx, slug, ignoreReviews, orderBy = "date_desc" }: {
+    ctx: AppContext;
+    slug: string;
+    ignoreReviews?: Ignore;
+    orderBy?: "date_asc" | "date_desc";
+  },
 ): Promise<Review[]> {
   const records = await ctx.invoke.records.loaders.drizzle();
+
+  const whereClause = ignoreReviews?.active && ignoreReviews?.markedAs &&
+      ignoreReviews?.markedAs?.length > 0
+    ? and(
+      eq(review.itemReviewed, slug),
+      notInArray(review.additionalType, ignoreReviews.markedAs),
+    )
+    : eq(review.itemReviewed, slug);
+  const orderClause = orderBy.endsWith("desc")
+    ? desc(review.datePublished)
+    : asc(review.datePublished);
+
   try {
     const currentComments = await records.select({
       itemReviewed: review.itemReviewed,
@@ -118,7 +157,7 @@ export async function getReviewsBySlug(
       additionalType: review.additionalType,
       id: review.id,
     })
-      .from(review).where(eq(review.itemReviewed, slug)) as
+      .from(review).where(whereClause).orderBy(orderClause) as
         | Review[]
         | undefined;
 
@@ -130,11 +169,17 @@ export async function getReviewsBySlug(
 }
 
 export async function getReviews(
-  { ctx, post }: { ctx: AppContext; post: BlogPost },
+  { ctx, post, ...rest }: {
+    ctx: AppContext;
+    post: BlogPost;
+    ignoreReviews?: Ignore;
+    orderBy?: "date_asc" | "date_desc";
+  },
 ): Promise<BlogPost> {
   const review = await getReviewsBySlug({
     ctx,
     slug: post.slug,
+    ...rest,
   });
 
   return {
