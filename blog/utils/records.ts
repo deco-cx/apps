@@ -1,9 +1,10 @@
-import { comments, CommentsSchema, reactions } from "../db/schema.ts";
+import { rating, review } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { type Resolvable } from "@deco/deco";
 import { eq } from "https://esm.sh/drizzle-orm@0.30.10";
-import { ArticleComment, BlogPost, Reaction } from "../types.ts";
+import { BlogPost, Rating, Review } from "../types.ts";
 import { logger } from "@deco/deco/o11y";
+
 export async function getRecordsByPath<T>(
   ctx: AppContext,
   path: string,
@@ -18,98 +19,131 @@ export async function getRecordsByPath<T>(
   return (current as Record<string, T>[]).map((item) => item[accessor]);
 }
 
-export async function getReactionFromSlug(
+export async function getRatingsBySlug(
   { ctx, slug }: { ctx: AppContext; slug: string },
-): Promise<Reaction[]> {
+): Promise<Rating[]> {
   const records = await ctx.invoke.records.loaders.drizzle();
   try {
-    const currentReactions = await records.select({
-      postSlug: reactions.postSlug,
-      person: reactions.person,
-      datePublished: reactions.datePublished,
-      dateModified: reactions.dateModified,
-      action: reactions.action,
+    const currentRatings = await records.select({
+      id: rating.id,
+      itemReviewed: rating.itemReviewed,
+      author: rating.author,
+      ratingValue: rating.ratingValue,
+      additionalType: rating.additionalType,
     })
-      .from(reactions).where(eq(reactions.postSlug, slug)) as Reaction[];
+      .from(rating).where(eq(rating.itemReviewed, slug)) as
+        | Rating[]
+        | undefined;
 
-    return currentReactions;
+    return currentRatings?.length === 0 || !currentRatings
+      ? []
+      : currentRatings.map((rating) => ({
+        ...rating,
+        bestRating: 5,
+        worstRating: 1,
+      }));
   } catch (e) {
     logger.error(e);
     return [];
   }
 }
 
-export async function getReactions(
+export async function getRatings(
   { ctx, post }: { ctx: AppContext; post: BlogPost },
 ): Promise<BlogPost> {
-  const currentReactions = await getReactionFromSlug({
+  const contentRating = await getRatingsBySlug({
     ctx,
     slug: post.slug,
   });
 
-  return {
-    ...post,
-    reactions: currentReactions,
-  };
-}
-
-export async function getCommentsFromSlug(
-  { ctx, slug }: { ctx: AppContext; slug: string },
-): Promise<ArticleComment[]> {
-  const records = await ctx.invoke.records.loaders.drizzle();
-  try {
-    const currentComments = await records.select({
-      postSlug: comments.postSlug,
-      person: comments.person,
-      datePublished: comments.datePublished,
-      dateModified: comments.dateModified,
-      comment: comments.comment,
-      status: comments.status,
-    })
-      .from(comments).where(eq(comments.postSlug, slug)) as ArticleComment[];
-
-    return currentComments;
-  } catch (e) {
-    logger.error(e);
-    return [];
-  }
-}
-
-export async function getComments(
-  { ctx, post }: { ctx: AppContext; post: BlogPost },
-): Promise<BlogPost> {
-  const comments = await getCommentsFromSlug({
-    ctx,
-    slug: post.slug,
-  });
+  const ratingValue = contentRating.length === 0 ? 0 : contentRating.reduce(
+    (acc, rating) => acc = acc + rating!.ratingValue!,
+    0,
+  ) / contentRating.length;
 
   return {
     ...post,
-    comments,
+    contentRating,
+    aggregateRating: {
+      ...post.aggregateRating,
+      "@type": "AggregateRating",
+      ratingCount: contentRating.length,
+      bestRating: 5,
+      worstRating: 1,
+      ratingValue,
+    },
   };
 }
 
-export const getCommentById = async (
+export const getReviewById = async (
   { ctx, id }: { ctx: AppContext; id?: string },
-) => {
+): Promise<Review | null> => {
   if (!id) {
     return null;
   }
   const records = await ctx.invoke.records.loaders.drizzle();
   try {
-    const comment = await records.select({
-      postSlug: comments.postSlug,
-      person: comments.person,
-      datePublished: comments.datePublished,
-      dateModified: comments.dateModified,
-      comment: comments.comment,
-      status: comments.status,
-      id: comments.id,
+    const targetReview = await records.select({
+      itemReviewed: review.itemReviewed,
+      author: review.author,
+      datePublished: review.datePublished,
+      dateModified: review.dateModified,
+      reviewBody: review.reviewBody,
+      reviewHeadline: review.reviewHeadline,
+      isAnonymous: review.isAnonymous,
+      additionalType: review.additionalType,
+      id: review.id,
     })
-      .from(comments).where(eq(comments.id, id)).get() as CommentsSchema;
-    return comment;
+      .from(review).where(eq(review.id, id)).get() as Review | undefined;
+    return targetReview ?? null;
   } catch (e) {
     logger.error(e);
     return null;
   }
 };
+
+export async function getReviewsBySlug(
+  { ctx, slug }: { ctx: AppContext; slug: string },
+): Promise<Review[]> {
+  const records = await ctx.invoke.records.loaders.drizzle();
+  try {
+    const currentComments = await records.select({
+      itemReviewed: review.itemReviewed,
+      author: review.author,
+      datePublished: review.datePublished,
+      dateModified: review.dateModified,
+      reviewBody: review.reviewBody,
+      reviewHeadline: review.reviewHeadline,
+      isAnonymous: review.isAnonymous,
+      additionalType: review.additionalType,
+      id: review.id,
+    })
+      .from(review).where(eq(review.itemReviewed, slug)) as
+        | Review[]
+        | undefined;
+
+    return currentComments ?? [];
+  } catch (e) {
+    logger.error(e);
+    return [];
+  }
+}
+
+export async function getReviews(
+  { ctx, post }: { ctx: AppContext; post: BlogPost },
+): Promise<BlogPost> {
+  const review = await getReviewsBySlug({
+    ctx,
+    slug: post.slug,
+  });
+
+  return {
+    ...post,
+    review,
+    aggregateRating: {
+      ...post.aggregateRating,
+      "@type": "AggregateRating",
+      reviewCount: review.length,
+    },
+  };
+}

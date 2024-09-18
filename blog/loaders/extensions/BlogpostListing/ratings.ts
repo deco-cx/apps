@@ -1,13 +1,13 @@
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../mod.ts";
 import { BlogPostListingPage } from "../../../types.ts";
-import { getReactions } from "../../../utils/records.ts";
+import { getRatings } from "../../../utils/records.ts";
 
 /**
- * @title ExtensionOf BlogPostPage: Reactions
+ * @title ExtensionOf BlogPostPage: Ratings
  * @description It can harm performance. Use wisely
  */
-export default function reactionsExt(
+export default function ratingsExt(
   _props: unknown,
   _req: Request,
   ctx: AppContext,
@@ -17,16 +17,16 @@ export default function reactionsExt(
       return null;
     }
 
-    const postsWithReactions = await Promise.all(
+    const posts = await Promise.all(
       blogpostListingPage.posts.map(async (post) => {
-        const reactions = await getReactions({ post, ctx });
-        return { ...post, ...reactions };
+        const ratings = await getRatings({ post, ctx });
+        return { ...post, ...ratings };
       }),
     );
 
     return {
       ...blogpostListingPage,
-      posts: postsWithReactions,
+      posts,
     };
   };
 }

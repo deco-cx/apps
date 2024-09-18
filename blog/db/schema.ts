@@ -1,34 +1,25 @@
 import {
+  integer,
   sqliteTable,
   text,
 } from "https://esm.sh/drizzle-orm@0.30.10/sqlite-core";
-import { ArticleComment, Reaction } from "../types.ts";
 
-export const reactions = sqliteTable("reactions", {
+export const rating = sqliteTable("rating", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  postSlug: text("postSlug").notNull(),
-  person: text("person", { mode: "json" }),
-  datePublished: (text("datePublished")).notNull(),
-  dateModified: (text("dateModified")).notNull(),
-  action: (text("action")).notNull(),
+  itemReviewed: text("itemReviewed").notNull(),
+  author: text("author", { mode: "json" }),
+  ratingValue: (integer("ratingValue")).notNull(),
+  additionalType: text("additionalType"),
 });
 
-export const comments = sqliteTable("comments", {
+export const review = sqliteTable("review", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  postSlug: text("postSlug").notNull(),
-  person: text("person", { mode: "json" }),
+  itemReviewed: text("itemReviewed").notNull(),
+  author: text("author", { mode: "json" }),
   datePublished: (text("datePublished")).notNull(),
   dateModified: (text("dateModified")).notNull(),
-  comment: (text("comment")).notNull(),
-  status: (text("status")).notNull(),
+  reviewHeadline: (text("reviewHeadline")),
+  reviewBody: (text("reviewBody")).notNull(),
+  additionalType: (text("additionalType")),
+  isAnonymous: integer("isAnonymous", { mode: "boolean" }),
 });
-
-export interface ReactionSchema extends Reaction {
-  id: string;
-  postSlug: string;
-}
-
-export interface CommentsSchema extends ArticleComment {
-  id: string;
-  postSlug: string;
-}
