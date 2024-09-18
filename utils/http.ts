@@ -100,7 +100,7 @@ export const createHttpClient = <T>(
       if (!HTTP_VERBS.has(method)) {
         throw new TypeError(`HttpClient: Verb ${method} is not allowed`);
       }
-      return (
+      return async (
         params: Record<string, string | number | string[] | number[]>,
         init?: RequestInit,
       ) => {
@@ -144,6 +144,14 @@ export const createHttpClient = <T>(
         defaultHeaders?.forEach((value, key) => headers.set(key, value));
         isJSON && headers.set("content-type", "application/json");
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
+        console.log(
+          {
+            ...init,
+            headers: processHeaders(headers),
+            method,
+            body,
+          },
+        );
         return fetcher(url.href, {
           ...init,
           headers: processHeaders(headers),

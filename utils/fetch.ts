@@ -38,6 +38,12 @@ export const fetchSafe = async (
   input: string | Request | URL,
   init?: DecoRequestInit,
 ) => {
+  console.log(
+    {
+      input,
+      ...init,
+    },
+  );
   const response = await retryExceptionOr500.execute(() => fetch(input, init));
   if (response.ok) {
     return response;

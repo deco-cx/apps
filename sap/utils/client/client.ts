@@ -5,13 +5,13 @@ import {
 } from "../types.ts";
 
 export interface API {
-  "GET /users/anonymous/eluxproducts/search": {
+  "GET /products/search": {
     response: ProductListResponse;
   };
   "GET /catalogs?:fields": {
     response: CatalogsResponse;
   };
-  "GET /products/:productCode": {
+  "GET /orgProducts/:productCode": {
     response: ProductDetailsResponse;
     searchParams: {
       productCode: string;

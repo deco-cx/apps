@@ -32,7 +32,7 @@ const productListLoader = (
   return Promise.all(
     productCodes.map(async (productCode) => {
       const data: ProductDetailsResponse = await api[
-        "GET /products/:productCode"
+        "GET /orgProducts/:productCode"
       ]({ productCode, fields }).then((res: Response) => res.json());
 
       const product = convertProductData(data);

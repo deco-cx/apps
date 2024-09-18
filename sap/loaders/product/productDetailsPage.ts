@@ -33,12 +33,14 @@ const productDetailsLoader = async (
   const { api } = ctx;
   const { fields, productCode } = props;
 
-  const data: ProductDetailsResponse = await api["GET /products/:productCode"]({
-    productCode,
-    fields,
-  }).then((res: Response) => {
-    return res.json();
-  });
+  const data: ProductDetailsResponse = await api
+    ["GET /orgProducts/:productCode"]({
+      productCode,
+      fields,
+    }).then((res: Response) => {
+      console.log({ res });
+      return res.json();
+    });
 
   const breadcrumbList = convertCategoriesToBreadcrumb(data.categories);
   const product = convertProductData(data);

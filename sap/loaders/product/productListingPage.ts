@@ -57,7 +57,7 @@ const PLPLoader = async (
   query = decodeURIComponent(query.replace(/\+/g, " "));
 
   const data: ProductListResponse = await api[
-    "GET /users/anonymous/eluxproducts/search"
+    "GET /products/search"
   ]({
     currentPage,
     fields: `${fields},facets,products(FULL)`,
