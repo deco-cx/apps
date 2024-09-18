@@ -60,6 +60,8 @@ export interface BlogPost {
   extraProps?: ExtraProps[];
   /** @hide true */
   reactions?: Reaction[];
+  /** @hide true */
+  comments?: ArticleComment[];
 }
 
 export interface ExtraProps {
@@ -93,9 +95,17 @@ export interface BlogPostListingPage {
   seo: Seo;
 }
 
-export interface Reaction {
+export interface Reaction extends PersonAndDate {
+  action: "like" | "deslike" | "invalid";
+}
+
+export interface ArticleComment extends PersonAndDate {
+  comment: string;
+  status: "submited" | "aproved" | "declined" | "deleted";
+}
+
+export interface PersonAndDate {
   person: Person;
   datePublished: string;
   dateModified: string;
-  action: "like" | "deslike";
 }

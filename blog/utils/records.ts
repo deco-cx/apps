@@ -1,8 +1,8 @@
-import { reactions } from "../db/schema.ts";
+import { comments, CommentsSchema, reactions } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { type Resolvable } from "@deco/deco";
 import { eq } from "https://esm.sh/drizzle-orm@0.30.10";
-import { BlogPost, Reaction } from "../types.ts";
+import { ArticleComment, BlogPost, Reaction } from "../types.ts";
 import { logger } from "@deco/deco/o11y";
 export async function getRecordsByPath<T>(
   ctx: AppContext,
@@ -52,3 +52,64 @@ export async function getReactions(
     reactions: currentReactions,
   };
 }
+
+export async function getCommentsFromSlug(
+  { ctx, slug }: { ctx: AppContext; slug: string },
+): Promise<ArticleComment[]> {
+  const records = await ctx.invoke.records.loaders.drizzle();
+  try {
+    const currentComments = await records.select({
+      postSlug: comments.postSlug,
+      person: comments.person,
+      datePublished: comments.datePublished,
+      dateModified: comments.dateModified,
+      comment: comments.comment,
+      status: comments.status,
+    })
+      .from(comments).where(eq(comments.postSlug, slug)) as ArticleComment[];
+
+    return currentComments;
+  } catch (e) {
+    logger.error(e);
+    return [];
+  }
+}
+
+export async function getComments(
+  { ctx, post }: { ctx: AppContext; post: BlogPost },
+): Promise<BlogPost> {
+  const comments = await getCommentsFromSlug({
+    ctx,
+    slug: post.slug,
+  });
+
+  return {
+    ...post,
+    comments,
+  };
+}
+
+export const getCommentById = async (
+  { ctx, id }: { ctx: AppContext; id?: string },
+) => {
+  if (!id) {
+    return null;
+  }
+  const records = await ctx.invoke.records.loaders.drizzle();
+  try {
+    const comment = await records.select({
+      postSlug: comments.postSlug,
+      person: comments.person,
+      datePublished: comments.datePublished,
+      dateModified: comments.dateModified,
+      comment: comments.comment,
+      status: comments.status,
+      id: comments.id,
+    })
+      .from(comments).where(eq(comments.id, id)).get() as CommentsSchema;
+    return comment;
+  } catch (e) {
+    logger.error(e);
+    return null;
+  }
+};

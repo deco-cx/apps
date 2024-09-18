@@ -2,7 +2,8 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/submitReaction.ts";
+import * as $$$$$$$$$0 from "./actions/submitComment.ts";
+import * as $$$$$$$$$1 from "./actions/submitReaction.ts";
 import * as $$$0 from "./loaders/Author.ts";
 import * as $$$3 from "./loaders/Blogpost.ts";
 import * as $$$1 from "./loaders/BlogPostItem.ts";
@@ -11,11 +12,14 @@ import * as $$$5 from "./loaders/BlogpostListing.ts";
 import * as $$$2 from "./loaders/BlogPostPage.ts";
 import * as $$$6 from "./loaders/Category.ts";
 import * as $$$8 from "./loaders/extensions/BlogpostList.ts";
-import * as $$$9 from "./loaders/extensions/BlogpostList/reactions.ts";
-import * as $$$10 from "./loaders/extensions/BlogpostListing.ts";
-import * as $$$11 from "./loaders/extensions/BlogpostListing/reactions.ts";
-import * as $$$12 from "./loaders/extensions/BlogpostPage.ts";
-import * as $$$13 from "./loaders/extensions/BlogpostPage/reactions.ts";
+import * as $$$9 from "./loaders/extensions/BlogpostList/comments.ts";
+import * as $$$10 from "./loaders/extensions/BlogpostList/reactions.ts";
+import * as $$$11 from "./loaders/extensions/BlogpostListing.ts";
+import * as $$$12 from "./loaders/extensions/BlogpostListing/comments.ts";
+import * as $$$13 from "./loaders/extensions/BlogpostListing/reactions.ts";
+import * as $$$14 from "./loaders/extensions/BlogpostPage.ts";
+import * as $$$15 from "./loaders/extensions/BlogpostPage/comments.ts";
+import * as $$$16 from "./loaders/extensions/BlogpostPage/reactions.ts";
 import * as $$$7 from "./loaders/GetCategories.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
@@ -31,11 +35,14 @@ const manifest = {
     "blog/loaders/BlogPostPage.ts": $$$2,
     "blog/loaders/Category.ts": $$$6,
     "blog/loaders/extensions/BlogpostList.ts": $$$8,
-    "blog/loaders/extensions/BlogpostList/reactions.ts": $$$9,
-    "blog/loaders/extensions/BlogpostListing.ts": $$$10,
-    "blog/loaders/extensions/BlogpostListing/reactions.ts": $$$11,
-    "blog/loaders/extensions/BlogpostPage.ts": $$$12,
-    "blog/loaders/extensions/BlogpostPage/reactions.ts": $$$13,
+    "blog/loaders/extensions/BlogpostList/comments.ts": $$$9,
+    "blog/loaders/extensions/BlogpostList/reactions.ts": $$$10,
+    "blog/loaders/extensions/BlogpostListing.ts": $$$11,
+    "blog/loaders/extensions/BlogpostListing/comments.ts": $$$12,
+    "blog/loaders/extensions/BlogpostListing/reactions.ts": $$$13,
+    "blog/loaders/extensions/BlogpostPage.ts": $$$14,
+    "blog/loaders/extensions/BlogpostPage/comments.ts": $$$15,
+    "blog/loaders/extensions/BlogpostPage/reactions.ts": $$$16,
     "blog/loaders/GetCategories.ts": $$$7,
   },
   "sections": {
@@ -44,7 +51,8 @@ const manifest = {
     "blog/sections/Template.tsx": $$$$$$2,
   },
   "actions": {
-    "blog/actions/submitReaction.ts": $$$$$$$$$0,
+    "blog/actions/submitComment.ts": $$$$$$$$$0,
+    "blog/actions/submitReaction.ts": $$$$$$$$$1,
   },
   "name": "blog",
   "baseUrl": import.meta.url,
