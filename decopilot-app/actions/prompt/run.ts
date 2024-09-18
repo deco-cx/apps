@@ -1,4 +1,3 @@
-// import { invoke } from "../../../vtex/runtime.ts";
 import { callAntropic, callOpenAI } from "../../clients/llmClientObjects.ts";
 import type { AppContext } from "../../mod.ts";
 import type { Attachment, LLMResponseType } from "../../types.ts";

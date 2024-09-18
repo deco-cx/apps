@@ -5,11 +5,14 @@ import { allowedModels } from "../../anthropic/actions/code.ts";
 
 import { AppContext } from "../mod.ts";
 import { Attachment, LLMResponseType, Prompt } from "../types.ts";
+// import { handleAnthropicAttachments } from "../utils/handleAttachments.ts";
+// import { propsLoader } from "deco/blocks/propsLoader.ts";
+import assembleFinalPrompt from "../utils/assembleComplexPrompt.ts";
 
 export const callAntropic = async (
   prompt: Prompt,
   ctx: AppContext,
-  _attachments?: Attachment[],
+  attachments?: Attachment[],
 ): Promise<LLMResponseType> => {
   const appCtx = ctx as unknown as AnthropicAppContext;
 
@@ -18,10 +21,15 @@ export const callAntropic = async (
     ? (prompt.model as typeof allowedModels[number])
     : "claude-3-opus-20240229"; // fallback to a default model if not valid
 
-  // const funcs = getAppTools(prompt.advanced?.functions ?? []);
+  let callMessage = prompt.prompt;
+
+  if (prompt.advanced || attachments) {
+    callMessage = assembleFinalPrompt(prompt, attachments);
+  }
+
   const Clientresponse = await appCtx.invoke("anthropic/actions/code.ts", {
     messages: [
-      { role: "user", content: prompt.prompt },
+      { role: "user", content: callMessage },
     ],
     model: modelToUse,
     max_tokens: 4096,
@@ -34,8 +42,8 @@ export const callAntropic = async (
   const response: LLMResponseType = {
     id: Clientresponse.id,
     created: 0,
-    provider: "Anthropic", // Provider is OpenAI
-    model: "chatGPT",
+    provider: "Anthropic", // Provider is Anthropic
+    model: modelToUse,
     llm_response: [{
       message: {
         role: Clientresponse.role ?? "unknown", // Adjust based on actual response structure

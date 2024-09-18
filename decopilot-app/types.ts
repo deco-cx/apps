@@ -17,8 +17,9 @@ export interface LLMClient {
 
 export type Text = string;
 export type Image = string;
+export type File = string;
 
-export type Attachment = Text | Image;
+export type Attachment = Text | Image | File;
 
 export type Model =
   | "claude-3-5-sonnet-20240620"
@@ -63,7 +64,7 @@ export interface PromptDetails {
 export interface Prompt {
   name: string;
   provider: Provider;
-  model: Model;
+  model: Model; //fazer Dynamic Options
   /**
    * @format textarea
    * @title Prompt content
