@@ -55,9 +55,11 @@ export interface BlogPost {
    */
   extraProps?: ExtraProps[];
   /** @hide true */
-  reactions?: Reaction[];
+  aggregateRating?: AggregateRating;
   /** @hide true */
-  comments?: ArticleComment[];
+  review?: Review[];
+  /** @hide true */
+  contentRating?: Rating[];
 }
 
 export interface ExtraProps {
@@ -91,17 +93,54 @@ export interface BlogPostListingPage {
   seo: Seo;
 }
 
-export interface Reaction extends PersonAndDate {
-  action: "like" | "deslike" | "invalid";
+export interface Review {
+  "@type": "Review";
+  id?: string;
+  /** Author of the */
+  author?: Person;
+  /** The date that the review was published, in ISO 8601 date format.*/
+  datePublished?: string;
+  /** The date that the review was modified, in ISO 8601 date format.*/
+  dateModified?: string;
+  /** The item that is being reviewed/rated. */
+  itemReviewed?: string;
+  /** Emphasis part of the review */
+  reviewHeadline?: string;
+  /** The actual body of the review. */
+  reviewBody?: string;
+  /** Review status */
+  additionalType?: string;
+  /** Anonymous comment. Not in Schema.org */
+  isAnonymous?: boolean;
 }
 
-export interface ArticleComment extends PersonAndDate {
-  comment: string;
-  status: "submited" | "aproved" | "declined" | "deleted";
+export interface Rating {
+  "@type": "Rating";
+  id?: string;
+  /** The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably. */
+  author?: Person;
+  /** The item that is being reviewed/rated. */
+  itemReviewed?: string;
+  /** The highest value allowed in this rating system. */
+  bestRating?: number;
+  /** The lowest value allowed in this rating system. */
+  worstRating?: number;
+  /** 	A short explanation (e.g. one to two sentences) providing background context and other information that led to the conclusion expressed in the rating. This is particularly applicable to ratings associated with "fact check" markup using ClaimReview. */
+  ratingValue?: number;
+  /** Review status */
+  additionalType?: string;
 }
 
-export interface PersonAndDate {
-  person: Person;
-  datePublished: string;
-  dateModified: string;
+export interface AggregateRating {
+  "@type": "AggregateRating";
+  /** The count of total number of ratings. */
+  ratingCount?: number;
+  /** The count of total number of reviews. */
+  reviewCount?: number;
+  /** The rating for the content. */
+  ratingValue?: number;
+  /** The highest value allowed in this rating system. */
+  bestRating?: number;
+  /** The lowest value allowed in this rating system. */
+  worstRating?: number;
 }
