@@ -121,9 +121,6 @@ export default function Proxy({
     headers.set("origin", req.headers.get("origin") ?? url.origin);
     headers.set("host", hostToUse ?? to.host);
     headers.set("x-forwarded-host", url.host);
-    if(to.pathname.includes("AviseMe")){
-      headers.set("referer", to.href);
-    }
     for (const { key, value } of customHeaders) {
       if (key === "cookie") {
         const existingCookie = headers.get("cookie");
