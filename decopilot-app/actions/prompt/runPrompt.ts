@@ -1,4 +1,3 @@
-
 // import { shortcircuit } from "@deco/deco";
 import { callAntropic, callOpenAI } from "../../clients/llmClientObjects.ts";
 import type { AppContext } from "../../mod.ts";
@@ -18,17 +17,18 @@ export default async function action(
   _req: Request,
   ctx: AppContext,
 ): Promise<LLMResponseType> {
-
   let prompt: Prompt | undefined;
 
-  if (!isPrompt(called_prompt)){
+  if (!isPrompt(called_prompt)) {
     prompt = ctx.content.find((p) => p.name === called_prompt);
   } else {
     prompt = called_prompt;
   }
 
   if (!prompt) {
-    const promptName = typeof called_prompt === "string" ? called_prompt : called_prompt.name;
+    const promptName = typeof called_prompt === "string"
+      ? called_prompt
+      : called_prompt.name;
     throw new Error(`Prompt with Name: ${promptName} not found`);
   }
 
