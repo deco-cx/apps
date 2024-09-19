@@ -18,7 +18,7 @@ const loader = async (
   const upstream = new URL(req.url);
   const splat = upstream.pathname.slice(1);
 
-  const headers = req.headers;
+  const headers = new Headers(req.headers);
   removeCFHeaders(headers)
 
   const response = await api["GET /*splat"]({
