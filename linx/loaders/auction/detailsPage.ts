@@ -1,5 +1,6 @@
 import type { AppContext } from "../../../linx/mod.ts";
 import { nullOnNotFound } from "../../../utils/http.ts";
+import { removeCFHeaders } from "../../../website/handlers/proxy.ts";
 import { isAuctionDetailModel } from "../../utils/paths.ts";
 import { toAuctionDetail } from "../../utils/transform.ts";
 import { Model as AuctionDetail } from "../../utils/types/auctionDetailJSON.ts";
@@ -16,12 +17,16 @@ const loader = async (
   const { api, cdn } = ctx;
   const upstream = new URL(req.url);
   const splat = upstream.pathname.slice(1);
-  console.log(req.headers)
+
+  const headers = req.headers;
+  removeCFHeaders(headers)
 
   const response = await api["GET /*splat"]({
     splat,
   }, {
-    headers: req.headers,
+    headers: {
+      ...headers,
+    },
   }).catch(nullOnNotFound);
 
   console.log(response)
