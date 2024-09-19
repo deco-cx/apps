@@ -4,6 +4,7 @@
 
 import * as $$$$$$$$$0 from "./actions/chain/runChain.ts";
 import * as $$$$$$$$$1 from "./actions/prompt/runPrompt.ts";
+import * as $$$$$$$$$2 from "./actions/prompt/runSavedPrompts.ts";
 import * as $$$0 from "./loaders/getSavedPrompts.ts";
 import * as $$$1 from "./loaders/listAvailableChains.ts";
 import * as $$$2 from "./loaders/listAvailablePrompts.ts";
@@ -17,6 +18,7 @@ const manifest = {
   "actions": {
     "decopilot-app/actions/chain/runChain.ts": $$$$$$$$$0,
     "decopilot-app/actions/prompt/runPrompt.ts": $$$$$$$$$1,
+    "decopilot-app/actions/prompt/runSavedPrompts.ts": $$$$$$$$$2,
   },
   "name": "decopilot-app",
   "baseUrl": import.meta.url,
