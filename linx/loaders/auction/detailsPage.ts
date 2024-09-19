@@ -16,12 +16,15 @@ const loader = async (
   const { api, cdn } = ctx;
   const upstream = new URL(req.url);
   const splat = upstream.pathname.slice(1);
+  console.log(req.headers)
 
   const response = await api["GET /*splat"]({
     splat,
   }, {
     headers: req.headers,
   }).catch(nullOnNotFound);
+
+  console.log(response)
 
   if (response === null) {
     return null;
