@@ -24,9 +24,9 @@ export const callAntropic = async (
   let callMessage = prompt.prompt;
 
   if (prompt.advanced || attachments) {
-    callMessage = assembleFinalPrompt(prompt, attachments);
+    callMessage = await assembleFinalPrompt(prompt, attachments);
   }
-
+  console.log(callMessage);
   const Clientresponse = await appCtx.invoke("anthropic/actions/code.ts", {
     messages: [
       { role: "user", content: callMessage },
@@ -83,62 +83,3 @@ export type Caller = (
   attachments: Attachment[],
   ctx: AppContext,
 ) => Promise<LLMResponseType>;
-
-// export class AnthropicClient implements LLMClient {
-//   // private client: LLMClient;
-//   public provider: Provider;
-
-//   constructor(provider: Provider) {
-//     // this.client = client;
-//     this.provider = provider;
-//   }
-
-//   // const providerName = "Anthropic"
-//   call(prompt: string, ctx: AppContext): LLMResponseType {
-//     ctx.invoke("decopilot");
-//     console.log(`Calling Anthropic with prompt: ${prompt}`);
-//     const response: LLMResponseType = {
-//       id: "lol",
-//       created: 0,
-//       provider: this.provider, // Provider is OpenAI
-//       model: "Claude",
-//       llm_response: [{
-//         message: {
-//           role: "lol",
-//           content: `Pedro didn't write this yet, the prompt was ${prompt}`,
-//         },
-//         index: 0,
-//       }],
-//     };
-//     return response;
-//     // logica pra chamar a anthropic
-//   }
-// }
-
-// export class OpenAIClient implements LLMClient {
-//   public provider: Provider;
-
-//   constructor(provider: Provider, client: App) {
-//     // this.client = client;
-//     this.provider = provider;
-//   }
-
-//   call(prompt: string, agent: Prompt): LLMResponseType {
-//     console.log(`Calling OpenAI with prompt: ${prompt}`);
-//     const response: LLMResponseType = {
-//       id: "lol",
-//       created: 0,
-//       provider: "Anthropic", // Provider is OpenAI
-//       model: "chatGPT",
-//       llm_response: [{
-//         message: {
-//           role: "lol",
-//           content: `Pedro didn't write this yet, the prompt was ${prompt}`,
-//         },
-//         index: 0,
-//       }],
-//     };
-//     return response;
-//     // logica pra chamar a openai
-//   }
-// }

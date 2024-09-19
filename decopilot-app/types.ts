@@ -15,11 +15,32 @@ export interface LLMClient {
   call: (prompt: string) => LLMResponseType; //Add tool calling parameters, differents models (Available tools?)
 }
 
-export type Text = string;
-export type Image = string;
-export type File = string;
+export type AttachmentExtension =
+  | ".csv"
+  | ".jpeg"
+  | ".png"
+  | ".json";
 
-export type Attachment = Text | Image | File;
+export interface TextOnly {
+  /**
+   * @default TextOnly
+   * @hide True
+   */
+  type: "TextOnly";
+  call_text: string;
+}
+export interface FileURL {
+  /**
+   * @default URL
+   * @hide True
+   */
+  type: "URL";
+  call_text?: string;
+  fileUrl: string;
+  fileType: AttachmentExtension;
+}
+/**@title Attachment */
+export type Attachment = TextOnly | FileURL;
 
 export type Model =
   | "claude-3-5-sonnet-20240620"
@@ -60,9 +81,14 @@ export interface PromptDetails {
   functions?: string[];
 }
 
-/**@title Prompt {{{name}}} */
+/**@title Prompt: {{{name}}} */
 export interface Prompt {
   name: string;
+  /**
+   * @description Brief description of Prompt output
+   * @example Prompt lists out the meaning of life
+   */
+  description?: string;
   provider: Provider;
   model: Model; //fazer Dynamic Options
   /**
@@ -71,7 +97,10 @@ export interface Prompt {
    * @description ex: "Please do xyz" To be used in calling via code
    */
   prompt: string;
-
+  /**
+   * @title Advanced Prompt Settings
+   * @description Extra parameters to regulate prompt behaviour
+   */
   advanced?: PromptDetails;
 }
 
@@ -81,6 +110,67 @@ export type LLMResponseType = {
   provider: Provider;
   model: string;
   stop_reason?: string;
+  llm_response: Array<{
+    message: {
+      role: string;
+      content: string | null;
+    };
+    index: number;
+  }>;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+};
+
+//Simple Chains are made exclusively of Prompts, while Complex can contain Agents
+export type ChainType = "Simple" | "Complex";
+
+export type LLMAgent = {
+  name: string;
+  path: string;
+};
+
+/**@title Prompt: {{{blockNames}}} */
+export interface ComponentArray {
+  /**
+   * @format dynamic-options
+   * @options decopilot-app/loaders/listAvailablePrompts.ts
+   */
+  blockNames: string;
+  blockType: BlockType;
+}
+
+export type BlockType = "Prompt" | "Agent";
+
+/**@title Chain: {{{name}}} */
+export interface Chain {
+  name: string;
+  /**
+   * @title Chain components
+   * @description Prompts or Agents to be called in Chain
+   */
+  chainType: ChainType;
+  /**
+   * @description Brief description of Chain output
+   * @example Chain lists out the meaning of life
+   */
+  description?: string;
+  /**
+   * @title Chain components
+   * @description Prompts or Agents to be called in Chain
+   */
+  blockNames: ComponentArray[];
+}
+
+export type LLMChainResponseType = {
+  id: string;
+  created?: number;
+  provider: Provider[];
+  model: string[];
+  stop_reason?: string;
+  stopping_point?: ComponentArray;
   llm_response: Array<{
     message: {
       role: string;

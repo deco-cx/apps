@@ -19,7 +19,7 @@ export default async function action(
   const prompt = ctx.content.find((p) => p.name === name);
 
   if (!prompt) {
-    throw new Error(`Prompt with agentName ${name} not found`);
+    throw new Error(`Prompt with Agent Name ${name} not found`);
   }
 
   if (prompt.provider === "Anthropic") {

@@ -2,6 +2,7 @@
 import type { App as A, AppContext as AC } from "deco/mod.ts";
 
 import {
+  Chain,
   Credentials,
   // LLMResponseType,
   Prompt,
@@ -23,6 +24,7 @@ export type AppContext = AC<App>;
 export interface Props {
   credentials: Credentials[];
   content: Prompt[];
+  chains: Chain[];
 }
 
 //APP-------------------------------------------------------------
@@ -32,6 +34,7 @@ export interface Props {
 export default function Decopilot({
   credentials,
   content,
+  chains,
   ...props
 }: Props) {
   const deps = credentials.map(
@@ -41,7 +44,7 @@ export default function Decopilot({
         : OpenAIApp({ apiKey: credential.key }),
   );
 
-  const state = { ...props, content };
+  const state = { ...props, content, chains };
 
   const ctx: A<Manifest, typeof state> = {
     state,

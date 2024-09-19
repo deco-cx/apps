@@ -1,4 +1,3 @@
-// import { String } from "https://esm.sh/v135/aws-sdk@2.1585.0/clients/batch.js";
 import { Attachment, Prompt, PromptDetails } from "../types.ts";
 import { handleAnthropicAttachments } from "./handleAttachments.ts";
 
@@ -98,17 +97,17 @@ function assembleFallbackPrompt(
   return finalPrompt;
 }
 
-export default function assembleFinalPrompt(
+export default async function assembleFinalPrompt(
   prompt: Prompt,
   attachments?: Attachment[],
-): string {
+): Promise<string> {
   const { provider, prompt: mainPrompt, advanced } = prompt;
 
   let finalPrompt = "";
   let handledAttachments = "";
 
   if (attachments) {
-    handledAttachments = handleAnthropicAttachments(attachments);
+    handledAttachments = await handleAnthropicAttachments(attachments);
   }
 
   switch (provider) {

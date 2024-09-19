@@ -32,6 +32,7 @@ export interface Props {
    * [models](https://docs.anthropic.com/en/docs/models-overview) for details.
    */
   max_tokens?: number;
+  temperature?: number;
 }
 
 export default async function chat(
@@ -40,6 +41,7 @@ export default async function chat(
     messages,
     model = "claude-3-opus-20240229",
     max_tokens = 4096,
+    temperature = 0.0,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -53,6 +55,7 @@ export default async function chat(
     model,
     max_tokens,
     messages,
+    temperature,
   });
 
   return msg;

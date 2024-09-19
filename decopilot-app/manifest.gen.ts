@@ -2,17 +2,21 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/prompt/run.ts";
+import * as $$$$$$$$$0 from "./actions/chain/runChain.ts";
+import * as $$$$$$$$$1 from "./actions/prompt/runPrompt.ts";
 import * as $$$0 from "./loaders/getSavedPrompts.ts";
-import * as $$$1 from "./loaders/listAvailablePrompts.ts";
+import * as $$$1 from "./loaders/listAvailableChains.ts";
+import * as $$$2 from "./loaders/listAvailablePrompts.ts";
 
 const manifest = {
   "loaders": {
     "decopilot-app/loaders/getSavedPrompts.ts": $$$0,
-    "decopilot-app/loaders/listAvailablePrompts.ts": $$$1,
+    "decopilot-app/loaders/listAvailableChains.ts": $$$1,
+    "decopilot-app/loaders/listAvailablePrompts.ts": $$$2,
   },
   "actions": {
-    "decopilot-app/actions/prompt/run.ts": $$$$$$$$$0,
+    "decopilot-app/actions/chain/runChain.ts": $$$$$$$$$0,
+    "decopilot-app/actions/prompt/runPrompt.ts": $$$$$$$$$1,
   },
   "name": "decopilot-app",
   "baseUrl": import.meta.url,
