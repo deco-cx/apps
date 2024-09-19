@@ -1,13 +1,9 @@
-import { dereferenceJsonSchema } from "../../ai-assistants/schema.ts";
+import { shortcircuit } from "@deco/deco";
+import { readFromStream } from "@deco/deco/utils";
 import { Anthropic } from "../deps.ts";
 import { AppContext } from "../mod.ts";
-import {
-  Context,
-  type JSONSchema7,
-  lazySchemaFor,
-  shortcircuit,
-} from "@deco/deco";
-import { readFromStream } from "@deco/deco/utils";
+import { getAppTools } from "../utils.ts";
+
 export interface Props {
   /**
    * @description The system prompt to be used for the AI Assistant.
@@ -20,7 +16,7 @@ export interface Props {
   /**
    * @description The messages to be processed by the AI Assistant.
    */
-  messages: Anthropic.Beta.Tools.ToolsBetaMessageParam[];
+  messages: Anthropic.MessageParam[];
   /**
    * Optional list of available functions (actions or loaders) that the AI Assistant can perform.
    */
@@ -28,14 +24,7 @@ export interface Props {
   /**
    * @description The model that will complete your prompt.
    */
-  model?:
-    | "claude-3-5-sonnet-20240620"
-    | "claude-3-opus-20240229"
-    | "claude-3-sonnet-20240229"
-    | "claude-3-haiku-20240307"
-    | "claude-2.1"
-    | "claude-2.0"
-    | "claude-instant-1.2";
+  model?: Anthropic.Model;
   /**
    * @description The maximum number of tokens to generate.
    *
@@ -43,76 +32,8 @@ export interface Props {
    * [models](https://docs.anthropic.com/en/docs/models-overview) for details.
    */
   max_tokens?: number;
-  enableTools?: boolean;
-  temperature?: number;
 }
-const notUndefined = <T>(v: T | undefined): v is T => v !== undefined;
-const pathFormatter = {
-  encode: (path: string): string =>
-    path.replace(/\.ts/g, "").replace(/\//g, "__"),
-  decode: (encodedPath: string): string =>
-    encodedPath.replace(/__/g, "/") + ".ts",
-};
-/**
- * Retrieves the available tools for the AI Assistant.
- * @param availableFunctions List of functions available for the AI Assistant.
- * @returns Promise resolving to a list of tools.
- */
-const getAppTools = async (
-  availableFunctions: string[],
-): Promise<Anthropic.Beta.Tools.Tool[] | undefined> => {
-  const ctx = Context.active();
-  const runtime = await ctx.runtime!;
-  const schemas = await lazySchemaFor(ctx).value;
-  const functionKeys = availableFunctions ??
-    Object.keys({
-      ...runtime.manifest.loaders,
-      ...runtime.manifest.actions,
-    });
-  const tools = functionKeys
-    .map((functionKey) => {
-      const functionDefinition = btoa(functionKey);
-      const schema = schemas.definitions[functionDefinition];
-      if (
-        (schema as {
-          ignoreAI?: boolean;
-        })?.ignoreAI
-      ) {
-        return undefined;
-      }
-      const propsRef = (schema?.allOf?.[0] as JSONSchema7)?.$ref;
-      if (!propsRef) {
-        return undefined;
-      }
-      const dereferenced = dereferenceJsonSchema({
-        $ref: propsRef,
-        ...schemas,
-      });
-      if (
-        dereferenced.type !== "object" ||
-        dereferenced.oneOf ||
-        dereferenced.anyOf ||
-        dereferenced.allOf ||
-        dereferenced.enum ||
-        dereferenced.not
-      ) {
-        return undefined;
-      }
-      return {
-        name: pathFormatter.encode(functionKey),
-        description:
-          `Usage for: ${schema?.description}. Example: ${schema?.examples}`,
-        input_schema: {
-          ...dereferenced,
-          definitions: undefined,
-          root: undefined,
-          title: undefined,
-        },
-      };
-    })
-    .filter(notUndefined);
-  return tools as Anthropic.Beta.Tools.Tool[] | undefined;
-};
+
 /**
  * @title Anthropic chat streaming
  * @description Sends messages to the Anthropic API for processing.
@@ -124,8 +45,6 @@ export default async function chat(
     availableFunctions,
     model = "claude-3-5-sonnet-20240620",
     max_tokens = 1024,
-    temperature = 1.0,
-    enableTools,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -133,39 +52,38 @@ export default async function chat(
   if (!messages) {
     return shortcircuit(new Response("No messages provided", { status: 400 }));
   }
+
   const tools = await getAppTools(availableFunctions ?? []);
+
   const headers = {
     "anthropic-version": "2023-06-01",
     "content-type": "application/json",
-    "anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15",
     "x-api-key": ctx.token ?? "",
   };
-  let payload: Anthropic.Beta.Tools.MessageCreateParamsStreaming = {
+
+  const payload: Anthropic.MessageCreateParamsStreaming = {
     system,
     messages,
     model,
     max_tokens,
-    temperature,
+    temperature: 0.5,
     stream: true,
+    tools,
+    tool_choice: { type: "auto" },
   };
-  if (enableTools) {
-    payload = {
-      ...payload,
-      tools,
-      tool_choice: { type: "auto" },
-    };
-  }
+
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers,
     body: JSON.stringify(payload),
   });
+
   if (!response.ok) {
+    console.error("Failed to send messages to Anthropic API:", response.text);
     return shortcircuit(
       new Response(await response.text(), { status: response.status }),
     );
   }
-  return readFromStream(response, {
-    shouldDecodeChunk: false,
-  });
+
+  return readFromStream(response);
 }
