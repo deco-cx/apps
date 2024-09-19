@@ -1,7 +1,7 @@
 import { App } from "deco/mod.ts";
 import { Secret } from "../website/loaders/secret.ts";
 
-export type Provider = "Anthropic" | "OpenAI";
+export type Provider = "Anthropic" | "OpenAI";// | "Custom";
 
 /**@title {{{llmProvider}}} API Key */
 export interface Credentials {

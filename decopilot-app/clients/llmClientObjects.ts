@@ -26,13 +26,14 @@ export const callAntropic = async (
   if (prompt.advanced || attachments) {
     callMessage = await assembleFinalPrompt(prompt, attachments);
   }
-  console.log(callMessage);
+  console.log(callMessage)
   const Clientresponse = await appCtx.invoke("anthropic/actions/code.ts", {
     messages: [
       { role: "user", content: callMessage },
     ],
     model: modelToUse,
     max_tokens: 4096,
+    temperature: 0.0
   });
 
   const contentString = Clientresponse.content
@@ -77,6 +78,8 @@ export const callOpenAI = (
   return response;
   // logica pra chamar a openai
 };
+
+// export const allCustomProvider = ():=>{}
 
 export type Caller = (
   prompt: Prompt,
