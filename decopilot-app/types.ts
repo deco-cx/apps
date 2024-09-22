@@ -1,7 +1,7 @@
 import { App } from "@deco/deco";
 import { Secret } from "../website/loaders/secret.ts";
 
-export type Provider = "Anthropic" | "OpenAI"; // | "Custom";
+export type Provider = "Anthropic" | "OpenAI"; // | "HugginFace" | "Ollama";
 
 /**@title {{{llmProvider}}} API Key */
 export interface Credentials {
@@ -78,10 +78,10 @@ export interface PromptDetails {
    * @description Group of available functions to run on this prompt
    * @example deco-sites/admin/actions/studio/draw.ts
    */
-  /**
+    /**
    * @description Optional list of available functions (actions or loaders) that the AI Assistant can perform.
    */
-  availableFunctions?: string[];
+    availableFunctions?: string[];
 }
 
 /**@title Prompt: {{{name}}} */

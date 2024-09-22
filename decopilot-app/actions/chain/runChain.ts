@@ -1,4 +1,5 @@
 import type { AppContext } from "../../mod.ts";
+
 import type {
   Attachment,
   LLMChainResponseType,
@@ -6,6 +7,7 @@ import type {
   Provider,
   TextOnly,
 } from "../../types.ts";
+
 // import { LLMAgent } from "../../types.ts";
 import runPrompt from "../prompt/runPrompt.ts";
 import getSavedPrompts from "../../loaders/getSavedPrompts.ts";
@@ -31,8 +33,10 @@ export default async function action(
   }
 
   let runResponse: LLMResponseType | null = null;
+
   const providerArray: Provider[] = [];
   const modelArray: string[] = [];
+
   let runAttachments = attachments; // Initial attachments from Props
   console.log(runAttachments);
 
