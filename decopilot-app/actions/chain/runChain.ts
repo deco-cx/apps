@@ -62,7 +62,7 @@ export default async function action(
 
         // Call runPrompt and use the output as the next attachment
         const response = await runPrompt(
-          { called_prompt: selected_prompt.name, attachments },
+          { promptName: selected_prompt.name, attachments },
           _req,
           ctx,
         );

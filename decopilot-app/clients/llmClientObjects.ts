@@ -1,12 +1,9 @@
-// import  getAppTools from "../../anthropic/actions/code.ts";
 // import  getAppTools from "../../openai/actions/code.ts";
 import { AppContext as AnthropicAppContext } from "../../anthropic/mod.ts";
 import { allowedModels } from "../../anthropic/actions/code.ts";
 
 import { AppContext } from "../mod.ts";
 import { Attachment, LLMResponseType, Prompt } from "../types.ts";
-// import { handleAnthropicAttachments } from "../utils/handleAttachments.ts";
-// import { propsLoader } from "deco/blocks/propsLoader.ts";
 import assembleFinalPrompt from "../utils/assembleComplexPrompt.ts";
 
 export const callAntropic = async (
@@ -22,33 +19,51 @@ export const callAntropic = async (
     : "claude-3-opus-20240229"; // fallback to a default model if not valid
 
   let callMessage = prompt.prompt;
+  let message_text: string;
+  const final_message: string[] = [];
+  // let Clientresponse : any
+  const tools_used: string[] = [];
 
   if (prompt.advanced || attachments) {
     callMessage = await assembleFinalPrompt(prompt, attachments);
   }
-  console.log(callMessage);
-  const Clientresponse = await appCtx.invoke("anthropic/actions/code.ts", {
+
+  const Clientresponse = await appCtx.invoke("anthropic/actions/invoke.ts", {
     messages: [
       { role: "user", content: callMessage },
     ],
+    availableFunctions: prompt.advanced?.availableFunctions,
+    tool_choice: { type: "any" },
     model: modelToUse,
     max_tokens: 4096,
     temperature: 0.0,
   });
+  console.log(Clientresponse);
 
-  const contentString = Clientresponse.content
-    .map((block) => block.text) // Extract the text from each block
-    .join(" "); // Join them into a single string with a space between blocks
+  for (const block of Clientresponse.content) {
+    if (block.type == "text") {
+      message_text = block.text;
+      final_message.push(message_text);
+    } else if (block.type == "tool_use") {
+      const key = block.name.replace(/__/g, "/") + ".ts";
+      message_text = `used tool:\n ${key}\n inputs:\n ${
+        JSON.stringify(block.input)
+      }`; //change this to be able to actually use this
+      tools_used.push(block.name);
+      final_message.push(message_text);
+    }
+  }
 
   const response: LLMResponseType = {
     id: Clientresponse.id,
     created: 0,
     provider: "Anthropic", // Provider is Anthropic
     model: modelToUse,
+    tools: tools_used,
     llm_response: [{
       message: {
         role: Clientresponse.role ?? "unknown", // Adjust based on actual response structure
-        content: contentString ?? "", // Adjust based on actual response structure
+        content: final_message.join("\n") ?? "", // Adjust based on actual response structure
       },
       index: 0,
     }],
@@ -67,6 +82,7 @@ export const callOpenAI = (
     created: 0,
     provider: "OpenAI", // Provider is OpenAI
     model: prompt.model,
+    tools: [""],
     llm_response: [{
       message: {
         role: "lol",

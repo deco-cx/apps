@@ -1,4 +1,4 @@
-import { App } from "deco/mod.ts";
+import { App } from "@deco/deco";
 import { Secret } from "../website/loaders/secret.ts";
 
 export type Provider = "Anthropic" | "OpenAI"; // | "Custom";
@@ -78,7 +78,10 @@ export interface PromptDetails {
    * @description Group of available functions to run on this prompt
    * @example deco-sites/admin/actions/studio/draw.ts
    */
-  functions?: string[];
+  /**
+   * @description Optional list of available functions (actions or loaders) that the AI Assistant can perform.
+   */
+  availableFunctions?: string[];
 }
 
 /**@title Prompt: {{{name}}} */
@@ -109,6 +112,7 @@ export type LLMResponseType = {
   created?: number;
   provider: Provider;
   model: string;
+  tools: string[];
   stop_reason?: string;
   llm_response: Array<{
     message: {

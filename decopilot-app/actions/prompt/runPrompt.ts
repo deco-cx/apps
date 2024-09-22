@@ -4,28 +4,41 @@ import type { AppContext } from "../../mod.ts";
 import type { Attachment, LLMResponseType, Prompt } from "../../types.ts";
 
 interface Props {
-  called_prompt: string | Prompt;
+  promptName?: string;
+  inlinePrompt?: Prompt;
   attachments?: Attachment[];
 }
 
 export default async function action(
-  { called_prompt, attachments }: Props,
+  {
+    promptName,
+    inlinePrompt,
+    attachments,
+  }: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<LLMResponseType> {
   let prompt: Prompt | undefined;
 
-  if (!isPrompt(called_prompt)) {
-    prompt = ctx.content.find((p) => p.name === called_prompt);
-  } else {
-    prompt = called_prompt;
+  if (!promptName && !inlinePrompt) {
+    throw new Error(`No prompt provided`);
+  }
+  if (promptName && inlinePrompt) {
+    throw new Error(`Only provide prompt name or inline prompt, not both.`);
   }
 
+  if (promptName) {
+    prompt = ctx.content.find((p) => p.name === promptName);
+    if (!prompt) {
+      throw new Error(`Prompt with name: ${promptName} not found`);
+    }
+  } else if (inlinePrompt) {
+    prompt = inlinePrompt;
+  }
+
+  // Type guard to ensure 'prompt' is defined before proceeding
   if (!prompt) {
-    const promptName = typeof called_prompt === "string"
-      ? called_prompt
-      : called_prompt.name;
-    throw new Error(`Prompt with Name: ${promptName} not found`);
+    throw new Error("Prompt is undefined");
   }
 
   if (prompt.provider === "Anthropic") {
@@ -40,8 +53,4 @@ export default async function action(
   // }
 
   throw new Error(`Provider ${prompt.provider} is not supported`);
-}
-
-function isPrompt(called_prompt: string | Prompt): called_prompt is Prompt {
-  return typeof called_prompt !== "string";
 }

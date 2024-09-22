@@ -5,7 +5,7 @@ import { AppContext } from "../mod.ts";
  * @title Decopilot App - Get Saved Prompt
  * @description Retrieves a saved prompt from app array
  */
-import { allowCorsFor } from "deco/mod.ts";
+import { allowCorsFor } from "@deco/deco";
 
 interface Props {
   term?: string;

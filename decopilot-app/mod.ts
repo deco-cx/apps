@@ -1,5 +1,8 @@
 //IMPORTS-------------------------------------------------------------
-import type { App as A, AppContext as AC } from "deco/mod.ts";
+import { PreviewDecopilot } from "./preview/Preview.tsx";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+
+import type { App as A, AppContext as AC, AppRuntime } from "@deco/deco";
 
 import {
   Chain,
@@ -54,3 +57,15 @@ export default function Decopilot({
 
   return ctx;
 }
+export const preview = async (props: AppRuntime) => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+  return {
+    Component: PreviewDecopilot,
+    props: {
+      ...props,
+      markdownContent,
+    },
+  };
+};

@@ -1,4 +1,4 @@
-import { shortcircuit } from "deco/engine/errors.ts";
+import { shortcircuit } from "@deco/deco";
 import { AppContext } from "../mod.ts";
 import { Anthropic } from "../deps.ts";
 
