@@ -78,24 +78,21 @@ export const callOpenAI = (
   _attachments?: Attachment[],
 ): LLMResponseType => {
   const response: LLMResponseType = {
-    id: "lol",
+    id: "None",
     created: 0,
     provider: "OpenAI", // Provider is OpenAI
     model: prompt.model,
     tools: [""],
     llm_response: [{
       message: {
-        role: "lol",
-        content: `Pedro didn't write this yet, the prompt was ${prompt.prompt}`,
+        role: "Not Ready",
+        content: `OpenAI functions still not ready`,
       },
       index: 0,
     }],
   };
   return response;
-  // logica pra chamar a openai
 };
-
-// export const allCustomProvider = ():=>{}
 
 export type Caller = (
   prompt: Prompt,

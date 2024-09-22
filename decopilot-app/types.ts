@@ -78,10 +78,10 @@ export interface PromptDetails {
    * @description Group of available functions to run on this prompt
    * @example deco-sites/admin/actions/studio/draw.ts
    */
-    /**
+  /**
    * @description Optional list of available functions (actions or loaders) that the AI Assistant can perform.
    */
-    availableFunctions?: string[];
+  availableFunctions?: string[];
 }
 
 /**@title Prompt: {{{name}}} */
