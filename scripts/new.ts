@@ -1,4 +1,4 @@
-import { join } from "std/path/mod.ts";
+import { join } from "@std/path";
 
 const init = async (appName: string) => {
   const repoUrl = "https://github.com/deco-cx/app-template";
