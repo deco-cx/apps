@@ -8,12 +8,11 @@ const init = async (appName: string) => {
 
   await Deno.mkdir(appPath);
 
-  const gitClone = Deno.run({
-    cmd: ["git", "clone", "--depth", "1", repoUrl, appPath],
+  const gitClone = new Deno.Command("git", {
+    args: ["clone", "--depth", "1", repoUrl, appPath],
   });
 
-  await gitClone.status();
-  gitClone.close();
+  await gitClone.output();
 
   await Deno.writeTextFile(
     decoTsPath,
