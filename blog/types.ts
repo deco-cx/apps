@@ -21,6 +21,9 @@ export interface Category {
 export interface BlogPost {
   title: string;
   excerpt: string;
+  /**
+   * @title Main image
+   */
   image?: ImageWidget;
   /**
    * @title Alt text for the image
@@ -46,6 +49,11 @@ export interface BlogPost {
    * @format rich-text
    */
   content: string;
+  /**
+   * @title Carousel in post content
+   * @description add a carousel in the middle of the post. Must be implemented in frontEnd
+   */
+  imageCarousel?: ImageCarousel;
   /**
    * @title SEO
    */
@@ -95,6 +103,11 @@ export interface BlogPostListingPage {
   posts: BlogPost[];
   pageInfo: PageInfo;
   seo: Seo;
+}
+
+export interface ImageCarousel {
+  banners?: Banner[];
+  description?: string;
 }
 
 export interface Review {
@@ -158,4 +171,23 @@ export interface Ignore {
    * @title When additionalType is marked with:
    */
   markedAs?: string[];
+}
+
+export interface BannerItem {
+  image?: ImageWidget;
+  width?: number;
+  height?: number;
+}
+
+export interface Banner {
+  /** @description desktop otimized image */
+  desktop: BannerItem;
+  /** @description mobile otimized image */
+  mobile: BannerItem;
+  /** @description Image's alt text */
+  alt: string;
+  action?: {
+    /** @description when user clicks on the image, go to this link */
+    href: string;
+  };
 }
