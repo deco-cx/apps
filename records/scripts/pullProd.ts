@@ -38,6 +38,10 @@ function extractStatements(sql: string) {
 }
 
 async function run() {
+  if (createLocalClient === false) {
+    throw new Error("client is not defined. run it locally");
+  }
+
   const { sitename, token } = getDbCredentials();
 
   const productionDumpUrl = `https://${sitename}-decocx.turso.io/dump`;

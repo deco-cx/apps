@@ -1,1 +1,1 @@
-export { default as Anthropic } from "https://esm.sh/@anthropic-ai/sdk@0.21.1";
+export { default as Anthropic } from "https://esm.sh/@anthropic-ai/sdk@0.27.3";
