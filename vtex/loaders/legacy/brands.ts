@@ -43,4 +43,5 @@ const loaders = async (
 export default loaders;
 
 export const cache = "stale-while-revalidate";
-export const cacheKey = () => "brands";
+export const cacheKey = (props: Props) =>
+  props.filterInactive ? "brands-filtered" : "brands";
