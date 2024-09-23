@@ -10,7 +10,6 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
-    app("my-app"),
     app("posthog"),
     app("smarthint"),
     app("ra-trustvox"),
