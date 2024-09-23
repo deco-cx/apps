@@ -1,27 +1,38 @@
 import { join } from "std/path/mod.ts";
 
-const appName = Deno.args[0];
-const repoUrl = "https://github.com/deco-cx/app-template"
-const appPath = join(Deno.cwd(), appName);
-const decoTsPath = join(Deno.cwd(), "deco.ts");
-const decoTs = await Deno.readTextFile(decoTsPath);
+const init = async (appName: string) => {
+  const repoUrl = "https://github.com/deco-cx/app-template";
+  const appPath = join(Deno.cwd(), appName);
+  const decoTsPath = join(Deno.cwd(), "deco.ts");
+  const decoTs = await Deno.readTextFile(decoTsPath);
 
-await Deno.mkdir(appPath);
+  await Deno.mkdir(appPath);
 
-const gitClone = Deno.run({
-  cmd: ["git", "clone", "--depth", "1", repoUrl, appPath],
-});
+  const gitClone = Deno.run({
+    cmd: ["git", "clone", "--depth", "1", repoUrl, appPath],
+  });
 
-await gitClone.status();
-gitClone.close();
+  await gitClone.status();
+  gitClone.close();
 
-await Deno.writeTextFile(
-  decoTsPath,
-  decoTs.replace(`  apps: [`, `  apps: [\n    app("${appName}"),`)
-);
+  await Deno.writeTextFile(
+    decoTsPath,
+    decoTs.replace(`  apps: [`, `  apps: [\n    app("${appName}"),`),
+  );
 
-const denoJsonPath = join(appPath, "deno.json");
-await Deno.remove(denoJsonPath);
+  const denoJsonPath = join(appPath, "deno.json");
+  await Deno.remove(denoJsonPath);
 
-const gitDirPath = join(appPath, ".git");
-await Deno.remove(gitDirPath, { recursive: true });
+  const gitDirPath = join(appPath, ".git");
+  await Deno.remove(gitDirPath, { recursive: true });
+};
+
+if (import.meta.main) {
+  const name = prompt("What's the app name?:");
+
+  if (name) {
+    await init(name);
+  } else {
+    console.error("app name is required");
+  }
+}
