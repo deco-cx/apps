@@ -1,11 +1,10 @@
-import { Brand, Product, ProductLeaf } from "../../../commerce/types.ts";
+import { Product, ProductLeaf } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toReview } from "../../utils/transform.ts";
 import listLoader from "../legacy/productList.ts";
-import brandsLoader from "../legacy/brands.ts";
 
 export interface Props {
   simulate?: boolean;
@@ -14,58 +13,27 @@ export interface Props {
   variants?: boolean;
   reviews?: boolean;
   /**
-   * @description Adds brand information to the product, useful for the Intelligent Search loaders.
+   * @description Adds brand information to products, useful for Intelligent Search loaders.
    */
   brands?: boolean;
 
   products: Product[];
 }
 
-const CACHE_NAME = "vtex-brands";
-const ONE_HOUR = 60 * 60 * 1000;
-
 const brandsExt = async (
   products: Product[],
-  req: Request,
   ctx: AppContext,
 ) => {
-  const url = new URL(req.url);
-  const brandKey = new URL("/brands", url.origin);
+  const brands = await ctx.invoke.vtex.loaders.legacy.brands();
 
-  const cache = await caches.open(CACHE_NAME);
-  const brandsResponse = await cache.match(brandKey);
-  const expiresAtHeader = brandsResponse?.headers.get("expiresAt");
-  const isExpired = !!expiresAtHeader && new Date(expiresAtHeader) < new Date();
-
-  const productsWithBrand = (brands: Brand[]) => {
-    return products.map((p) => ({
-      ...p,
-      brand: brands.find((b) => b["@id"] === p.brand?.["@id"]) || p.brand,
-    }));
-  };
-
-  if (brandsResponse && !isExpired) {
-    const brands = await brandsResponse.json() as Brand[];
-    return productsWithBrand(brands);
-  }
-
-  const brands = await brandsLoader({ filterInactive: true }, req, ctx);
-
-  if (!brands) {
+  if (!brands || !brands.length) {
     return products;
   }
 
-  await cache.put(
-    brandKey,
-    new Response(JSON.stringify(brands), {
-      headers: {
-        "Content-Type": "application/json",
-        expiresAt: new Date(Date.now() + ONE_HOUR).toUTCString(),
-      },
-    }),
-  );
-
-  return productsWithBrand(brands);
+  return products.map((p) => ({
+    ...p,
+    brand: brands.find((b) => b["@id"] === p.brand?.["@id"]) || p.brand,
+  }));
 };
 
 const similarsExt = (
@@ -208,7 +176,7 @@ export default async (
   }
 
   if (brands) {
-    p = await brandsExt(p, req, ctx);
+    p = await brandsExt(p, ctx);
   }
 
   return p;
