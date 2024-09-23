@@ -1,6 +1,18 @@
-import { LinxError } from "./common.ts";
-import { Facet } from "./facets.ts";
 import { LinxInstallment } from "./installments.ts";
+import {
+  CategoryItem,
+  Facet,
+  LinxError,
+  LinxMetadata,
+  NavigationInfo,
+  Path,
+  ProductSelection,
+  ProviderCapabilities,
+  ResponseCallBack,
+  SellerInfo,
+  SortOption,
+  Spell,
+} from "./shared.ts";
 
 export interface WebPage {
   Response: Response;
@@ -12,7 +24,7 @@ export interface WebPage {
 export interface Model {
   Grid: Grid;
   Message: null;
-  Navigation: Navigation[];
+  Navigation: NavigationInfo[];
   ProductAuctions: ProductAuction[];
   SortAlias: null;
 }
@@ -55,12 +67,12 @@ export interface Product {
   Condition: string;
   CurrentSellerID: number;
   CurrentSkuID: number;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   DisplayCondition: boolean;
   DisplayPrice: DisplayPrice;
   DisplayStockQuantity: boolean;
   EstimatedReorderDate: Date | null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   Flags: unknown[];
   HasCurrentSkuID: boolean;
   HasEstimatedReorderDate: boolean;
@@ -163,31 +175,7 @@ export type MediaSizeType = "Small" | "Thumbnail" | "Medium" | "Large" | "Zoom";
 
 export type MediaType = "Image";
 
-export type Path = "/";
-
 export type CatalogItemBehavior = "Default";
-
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
-
-export interface Description {
-  Alias: Alias;
-  Color: null | string;
-  GroupName: null | string;
-  GroupType: GroupType;
-  ImagePath: null | string;
-  Name: Name;
-  Order: number;
-  PropertyMetadataID: number;
-  PropertyPath: string;
-  Reference: null | string;
-  Title: string;
-  Value: string;
-  ValueAlias: string;
-}
 
 export type Alias =
   | "WarrantyDescription"
@@ -248,7 +236,7 @@ export interface Item {
   Depth: number;
   Edit: null;
   EstimatedReorderDate: Date | null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   HandlingDays: number;
   HasEstimatedReorderDate: boolean;
   Height: number;
@@ -316,7 +304,7 @@ export interface LoyaltyProgramPoint {
 export interface Price {
   BestInstallment: LinxInstallment;
   BestInstallmentCreditCard: LinxInstallment | null;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
   HasMunknownSkus: boolean;
@@ -333,11 +321,6 @@ export interface Price {
   SalesPriceWithTaxDiscount: number;
   Tax: number;
   TaxationAmount: number;
-}
-
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
 }
 
 // deno-lint-ignore no-empty-interface
@@ -360,47 +343,11 @@ export interface MediaGroup {
   Zoom: BrowsingImage;
 }
 
-export interface ProductSelection {
-  PropertyLevel: number;
-  PropertyPath: Path;
-  Quantity: number;
-  SkuID: number;
-}
-
 export type ReplenishmentStatus = "Normal" | "Discontinued";
 
 export type RootCategoryName = "Joias";
 
 export type RootCategoryURL = "/joias";
-
-export interface ProviderCapabilities {
-  CanFacet: boolean;
-  CanPage: boolean;
-  CanSort: boolean;
-  CanSpell: boolean;
-  CanTerm: boolean;
-  Provider: string;
-}
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
-}
 
 export interface ProductAuction {
   BidAmountMultiplier: number;
@@ -451,10 +398,4 @@ export interface Response {
   SuccessMessage: null;
   Url: null;
   Warnings: unknown[];
-}
-
-export interface ResponseCallBack {
-  Code: string;
-  Parameters: unknown[];
-  Value: string;
 }

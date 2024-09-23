@@ -287,6 +287,7 @@ fragment Product on Product {
     name
   }
   productCategories {
+    id
     name
     url
     hierarchy
@@ -490,6 +491,7 @@ fragment BuyList on BuyList {
   }
   numberOfVotes
   productCategories {
+    id
     name
     url
     hierarchy
@@ -710,6 +712,7 @@ fragment SingleProductPart on SingleProduct {
   }
   numberOfVotes
   productCategories {
+    id
     name
     url
     hierarchy

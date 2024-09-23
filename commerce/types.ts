@@ -1,10 +1,8 @@
-import { type Flag } from "deco/types.ts";
-
+import { type Flag } from "@deco/deco";
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export declare type WithContext<T extends Things> = T & {
   "@context": "https://schema.org";
 };
-
 /**
  * An store category
  */
@@ -23,9 +21,7 @@ export interface Category {
    */
   children?: Category[];
 }
-
 export declare type Things = Thing | Product | BreadcrumbList;
-
 export interface Thing {
   "@type": "Thing";
   /** IRI identifying the canonical address of this object. */
@@ -41,8 +37,8 @@ export interface Thing {
   /** The identifier property represents any kind of identifier for any kind of {@link https://schema.org/Thing Thing}, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See {@link /docs/datamodel.html#identifierBg background notes} for more details. */
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
-  image?: ImageObject[];
-  video?: VideoObject[];
+  image?: ImageObject[] | null;
+  video?: VideoObject[] | null;
   /** The name of the item. */
   name?: string;
   /** URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website. */
@@ -52,7 +48,6 @@ export interface Thing {
   /** URL of the item. */
   url?: string;
 }
-
 export interface MediaObject {
   /** Media type typically expressed using a MIME format (see IANA site and MDN reference) */
   encodingFormat?: string;
@@ -61,12 +56,10 @@ export interface MediaObject {
   /** Actual bytes of the media object, for example the image file or video file. */
   contentUrl?: string;
 }
-
 export interface CreativeWork {
   /** A thumbnail image relevant to the Thing */
   thumbnailUrl?: string;
 }
-
 export interface VideoObject
   extends MediaObject, CreativeWork, Omit<Thing, "@type" | "url"> {
   /**
@@ -83,7 +76,6 @@ export interface VideoObject
    */
   duration?: string;
 }
-
 export interface ImageObject
   extends MediaObject, CreativeWork, Omit<Thing, "@type" | "url"> {
   /**
@@ -95,7 +87,6 @@ export interface ImageObject
    */
   url?: string;
 }
-
 export interface PropertyValue extends Omit<Thing, "@type"> {
   "@type": "PropertyValue";
   /** The upper value of some characteristic or property. */
@@ -119,7 +110,6 @@ export interface PropertyValue extends Omit<Thing, "@type"> {
   /** A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement. */
   valueReference?: string;
 }
-
 export interface AggregateRating {
   "@type": "AggregateRating";
   /** The count of total number of ratings. */
@@ -135,7 +125,6 @@ export interface AggregateRating {
   /** A short explanation (e.g. one to two sentences) providing background context and other information that led to the conclusion expressed in the rating. This is particularly applicable to ratings associated with "fact check" markup using ClaimReview. */
   ratingExplanation?: string;
 }
-
 export declare type ItemAvailability =
   | "https://schema.org/BackOrder"
   | "https://schema.org/Discontinued"
@@ -147,17 +136,14 @@ export declare type ItemAvailability =
   | "https://schema.org/PreOrder"
   | "https://schema.org/PreSale"
   | "https://schema.org/SoldOut";
-
 export declare type OfferItemCondition =
   | "https://schema.org/DamagedCondition"
   | "https://schema.org/NewCondition"
   | "https://schema.org/RefurbishedCondition"
   | "https://schema.org/UsedCondition";
-
 export interface QuantitativeValue {
   value?: number;
 }
-
 export declare type PriceTypeEnumeration =
   | "https://schema.org/InvoicePrice"
   | "https://schema.org/ListPrice"
@@ -165,7 +151,6 @@ export declare type PriceTypeEnumeration =
   | "https://schema.org/MSRP"
   | "https://schema.org/SalePrice"
   | "https://schema.org/SRP";
-
 export declare type PriceComponentTypeEnumeration =
   | "https://schema.org/ActivationFee"
   | "https://schema.org/CleaningFee"
@@ -173,7 +158,22 @@ export declare type PriceComponentTypeEnumeration =
   | "https://schema.org/Downpayment"
   | "https://schema.org/Installment"
   | "https://schema.org/Subscription";
-
+export declare type ReturnFeesEnumeration =
+  | "https://schema.org/FreeReturn"
+  | "https://schema.org/OriginalShippingFees"
+  | "https://schema.org/RestockingFees"
+  | "https://schema.org/ReturnFeesCustomerResponsibility"
+  | "https://schema.org/ReturnShippingFees";
+export declare type ReturnMethodEnumeration =
+  | "https://schema.org/KeepProduct"
+  | "https://schema.org/ReturnAtKiosk"
+  | "https://schema.org/ReturnByMail"
+  | "https://schema.org/ReturnInStore";
+export declare type MerchantReturnEnumeration =
+  | "https://schema.org/MerchantReturnFiniteReturnWindow"
+  | "https://schema.org/MerchantReturnNotPermitted"
+  | "https://schema.org/MerchantReturnUnlimitedWindow"
+  | "https://schema.org/MerchantReturnUnspecified";
 export interface PriceSpecification extends Omit<Thing, "@type"> {
   "@type": "PriceSpecification";
   /** The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity. */
@@ -195,7 +195,6 @@ export interface PriceSpecification extends Omit<Thing, "@type"> {
    */
   priceCurrency?: string;
 }
-
 export interface UnitPriceSpecification
   extends Omit<PriceSpecification, "@type"> {
   "@type": "UnitPriceSpecification";
@@ -208,28 +207,58 @@ export interface UnitPriceSpecification
   /** This property specifies the minimal quantity and rounding increment that will be the basis for the billing. The unit of measurement is specified by the unitCode property. */
   billingIncrement?: number;
 }
-
 export interface TeasersParameters {
   name: string;
   value: string;
 }
-
 export interface TeasersConditions {
   minimumQuantity: number;
   parameters: TeasersParameters[];
 }
-
 export interface TeasersEffect {
   parameters: TeasersParameters[];
 }
-
 export interface Teasers {
   name: string;
   generalValues?: unknown;
   conditions: TeasersConditions;
   effects: TeasersEffect;
 }
-
+export interface MonetaryAmount extends Omit<Thing, "@type"> {
+  /**
+   * The currency in which the monetary amount is expressed.
+   *
+   * Use standard formats: ISO 4217 currency format, e.g. "USD"; Ticker symbol for cryptocurrencies, e.g. "BTC"; well known names for Local Exchange Trading Systems (LETS) and other currency types, e.g. "Ithaca HOUR".
+   */
+  currency: string;
+  /**
+   * The upper value of some characteristic or property.
+   */
+  maxValue: number;
+  /** The lower value of some characteristic or property. */
+  minValue: number;
+  /** The date when the item becomes valid. */
+  validFrom: string;
+  /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
+  validThrough: string;
+  /** The value of a QuantitativeValue (including Observation) or property value node. */
+  value: boolean | number | string;
+}
+export interface MerchantReturnPolicy extends Omit<Thing, "@type"> {
+  "@type": "MerchantReturnPolicy";
+  /** Specifies either a fixed return date or the number of days (from the delivery date) that a product can be returned. Used when the returnPolicyCategory property is specified as MerchantReturnFiniteReturnWindow. Supersedes productReturnDays */
+  merchantReturnDays?: number;
+  /** A country where a particular merchant return policy applies to, for example the two-letter ISO 3166-1 alpha-2 country code. */
+  applicableCountry: string;
+  /** The type of return fees for purchased products (for any return reason). */
+  returnFees?: ReturnFeesEnumeration;
+  /** The type of return method offered, specified from an enumeration. */
+  returnMethod?: ReturnMethodEnumeration;
+  /** Specifies an applicable return policy (from an enumeration). */
+  returnPolicyCategory: MerchantReturnEnumeration;
+  /** Amount of shipping costs for product returns (for any reason). Applicable when property returnFees equals ReturnShippingFees. */
+  returnShippingFeesAmount?: MonetaryAmount;
+}
 export interface Offer extends Omit<Thing, "@type"> {
   "@type": "Offer";
   /** The availability of this item—for example In stock, Out of stock, Pre-order, etc. */
@@ -270,8 +299,9 @@ export interface Offer extends Omit<Thing, "@type"> {
   giftSkuIds?: string[];
   /** Used by some ecommerce providers (e.g: VTEX) to describe special promotions that depend on some conditions */
   teasers?: Teasers[];
+  /** Specifies a MerchantReturnPolicy that may be applicable.  */
+  hasMerchantReturnPolicy?: MerchantReturnPolicy;
 }
-
 export interface AggregateOffer {
   "@type": "AggregateOffer";
   /**
@@ -300,8 +330,9 @@ export interface AggregateOffer {
    * Use standard formats: {@link http://en.wikipedia.org/wiki/ISO_4217 ISO 4217 currency format} e.g. "USD"; {@link https://en.wikipedia.org/wiki/List_of_cryptocurrencies Ticker symbol} for cryptocurrencies e.g. "BTC"; well known names for {@link https://en.wikipedia.org/wiki/Local_exchange_trading_system Local Exchange Tradings Systems} (LETS) and other currency types e.g. "Ithaca HOUR".
    */
   priceCurrency?: string;
+  /** Specifies a MerchantReturnPolicy that may be applicable.  */
+  hasMerchantReturnPolicy?: MerchantReturnPolicy;
 }
-
 export interface ReviewPageResults {
   currentPageNumber?: number;
   nextPageUrl?: string;
@@ -309,14 +340,12 @@ export interface ReviewPageResults {
   pagesTotal?: number;
   totalResults?: number;
 }
-
 export interface ReviewPage {
   page: ReviewPageResults;
   id: string;
   review?: Review[];
   aggregateRating?: AggregateRating;
 }
-
 export interface Review extends Omit<Thing, "@type"> {
   "@type": "Review";
   id?: string;
@@ -345,7 +374,6 @@ export interface Review extends Omit<Thing, "@type"> {
   /** Medias */
   media?: ReviewMedia[];
 }
-
 export interface ReviewMedia {
   type: "image" | "video";
   url?: string;
@@ -353,7 +381,6 @@ export interface ReviewMedia {
   likes?: number;
   unlikes?: number;
 }
-
 export interface ReviewBrand {
   /** Brand Name */
   name: string;
@@ -362,14 +389,12 @@ export interface ReviewBrand {
   /** Brand website url */
   url: string;
 }
-
 export interface ReviewTag {
   /** Label of specific topic */
   label?: string;
   /** Caracteristics about the topic */
   value?: string[];
 }
-
 /** https://schema.org/Person */
 export interface Person extends Omit<Thing, "@type"> {
   /** Email address. */
@@ -381,11 +406,10 @@ export interface Person extends Omit<Thing, "@type"> {
   /** Gender of something, typically a Person, but possibly also fictional characters, animals, etc */
   gender?: "https://schema.org/Male" | "https://schema.org/Female";
   /** An image of the item. This can be a URL or a fully described ImageObject. **/
-  image?: ImageObject[];
+  image?: ImageObject[] | null;
   /** The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain. */
   taxID?: string;
 }
-
 // NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {
   "@type": "Author";
@@ -398,11 +422,10 @@ export interface Author extends Omit<Thing, "@type"> {
   /** Author location */
   location?: string;
 }
-
 // TODO: fix this hack and use Product directly where it appears
 // Hack to prevent type self referencing and we end up with an infinite loop
-export interface ProductLeaf extends Omit<Product, "isVariantOf"> {}
-
+export interface ProductLeaf extends Omit<Product, "isVariantOf"> {
+}
 export interface ProductGroup extends Omit<Thing, "@type"> {
   "@type": "ProductGroup";
   /** Indicates a {@link https://schema.org/Product Product} that is a member of this {@link https://schema.org/ProductGroup ProductGroup} (or {@link https://schema.org/ProductModel ProductModel}). */
@@ -418,13 +441,11 @@ export interface ProductGroup extends Omit<Thing, "@type"> {
   /** docs https://schema.org/gtin */
   model?: string;
 }
-
 export interface Brand extends Omit<Thing, "@type"> {
   "@type": "Brand";
   /** Brand's image url */
   logo?: string;
 }
-
 export interface Answer extends Omit<Thing, "@type"> {
   text: string;
   /** The date that the anwser was published, in ISO 8601 date format.*/
@@ -434,7 +455,6 @@ export interface Answer extends Omit<Thing, "@type"> {
   /** Author of the */
   author?: Author[];
 }
-
 export interface Question extends Omit<Thing, "@type" | "name"> {
   "@type": "Question";
   answerCount: number;
@@ -451,7 +471,6 @@ export interface Question extends Omit<Thing, "@type" | "name"> {
   /** Author of the */
   author?: Author[];
 }
-
 export interface Product extends Omit<Thing, "@type"> {
   "@type": "Product";
   /**
@@ -474,9 +493,9 @@ export interface Product extends Omit<Thing, "@type"> {
   inProductGroupWithID?: string;
   // TODO: Make json schema generator support self-referencing types
   // /** A pointer to another, somehow related product (or multiple products). */
-  isRelatedTo?: Product[];
+  isRelatedTo?: Product[] | null;
   /** A pointer to another, functionally similar product (or multiple products). */
-  isSimilarTo?: Product[];
+  isSimilarTo?: Product[] | null;
   /** Indicates the kind of product that this is a variant of. In the case of {@link https://schema.org/ProductModel ProductModel}, this is a pointer (from a ProductModel) to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive. In the case of a {@link https://schema.org/ProductGroup ProductGroup}, the group description also serves as a template, representing a set of Products that vary on explicitly defined, specific dimensions only (so it defines both a set of variants, as well as which values distinguish amongst those variants). When used with {@link https://schema.org/ProductGroup ProductGroup}, this property can apply to any {@link https://schema.org/Product Product} included in the group. */
   isVariantOf?: ProductGroup;
   /** An offer to provide this item—for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use {@link https://schema.org/businessFunction businessFunction} to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a {@link https://schema.org/Demand Demand}. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer. */
@@ -492,11 +511,9 @@ export interface Product extends Omit<Thing, "@type"> {
   /** The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers. */
   sku: string;
   /** A pointer to another product (or multiple products) for which this product is an accessory or spare part. */
-  isAccessoryOrSparePartFor?: Product[];
-
+  isAccessoryOrSparePartFor?: Product[] | null;
   questions?: Question[];
 }
-
 export interface ListItem<T = string> extends Omit<Thing, "@type"> {
   "@type": "ListItem";
   /** An entity represented by an entry in a list or data feed (e.g. an 'artist' in a list of 'artists')’. */
@@ -504,7 +521,6 @@ export interface ListItem<T = string> extends Omit<Thing, "@type"> {
   /** The position of an item in a series or sequence of items. */
   position: number;
 }
-
 export interface ItemList<T = string> extends Omit<Thing, "@type"> {
   "@type": "ItemList";
   /**
@@ -518,11 +534,9 @@ export interface ItemList<T = string> extends Omit<Thing, "@type"> {
   /** The number of items in an ItemList. Note that some descriptions might not fully describe all items in a list (e.g., multi-page pagination); in such cases, the numberOfItems would be for the entire list. */
   numberOfItems: number;
 }
-
 export interface BreadcrumbList extends Omit<ItemList, "@type"> {
   "@type": "BreadcrumbList";
 }
-
 export type DayOfWeek =
   | "Monday"
   | "Tuesday"
@@ -532,7 +546,6 @@ export type DayOfWeek =
   | "Saturday"
   | "Sunday"
   | "PublicHolidays";
-
 export interface OpeningHoursSpecification extends Omit<Thing, "@type"> {
   "@type": "OpeningHoursSpecification";
   /** The closing hour of the place or service on the given day(s) of the week. */
@@ -546,7 +559,6 @@ export interface OpeningHoursSpecification extends Omit<Thing, "@type"> {
   /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
   validThrough?: string;
 }
-
 export interface ContactPoint extends Omit<Thing, "@type"> {
   "@type": "ContactPoint";
   /** The geographic area where a service or offered item is provided. */
@@ -568,7 +580,6 @@ export interface ContactPoint extends Omit<Thing, "@type"> {
   /** The telephone number. */
   telephone?: string;
 }
-
 export interface PostalAddress extends Omit<ContactPoint, "@type"> {
   "@type": "PostalAddress";
   /** The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code. */
@@ -582,7 +593,6 @@ export interface PostalAddress extends Omit<ContactPoint, "@type"> {
   /** The street address. For example, 1600 Amphitheatre Pkwy. */
   streetAddress?: string;
 }
-
 export interface LocationFeatureSpecification
   extends Omit<PropertyValue, "@type"> {
   "@type": "LocationFeatureSpecification";
@@ -593,7 +603,6 @@ export interface LocationFeatureSpecification
   /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
   validThrough?: string;
 }
-
 export interface GeoCoordinates extends Omit<Thing, "@type"> {
   "@type": "GeoCoordinates";
   /** The geographic area where a service or offered item is provided. */
@@ -609,7 +618,6 @@ export interface GeoCoordinates extends Omit<Thing, "@type"> {
   /** The postal code. For example, 94043. */
   postalCode?: string;
 }
-
 export interface GeoShape extends Omit<Thing, "@type"> {
   "@type": "GeoShape";
   /** The GeoShape for the GeoCoordinates or GeoCircle. */
@@ -625,11 +633,9 @@ export interface GeoShape extends Omit<Thing, "@type"> {
   /** The postal code. For example, 94043. */
   postalCode?: string;
 }
-
 export interface About extends Omit<Thing, "@type"> {
   "@type": "About";
 }
-
 export interface Rating extends Omit<Thing, "@type"> {
   "@type": "Rating";
   /** The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably. */
@@ -652,19 +658,15 @@ export interface Rating extends Omit<Thing, "@type"> {
   /** The lowest value allowed in this rating system. */
   worstRating?: number;
 }
-
 export interface Organization extends Omit<Thing, "@type"> {
   "@type": "Organization";
 }
-
 export interface AdministrativeArea extends Omit<Thing, "@type"> {
   "@type": "AdministrativeArea";
 }
-
 export type CertificationStatus =
   | "CertificationActive"
   | "CertificationInactive";
-
 export interface Certification extends Omit<CreativeWork, "@type"> {
   "@type": "Certification";
   /** The subject matter of the content. */
@@ -692,7 +694,6 @@ export interface Certification extends Omit<CreativeWork, "@type"> {
   /** The geographic area where the item is valid. Applies for example to a Permit, a Certification, or an EducationalOccupationalCredential. */
   validIn?: AdministrativeArea;
 }
-
 export interface PlaceLeaf extends Omit<Thing, "@type"> {
   "@type": "Place";
   /** A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org. */
@@ -752,7 +753,6 @@ export interface PlaceLeaf extends Omit<Thing, "@type"> {
   /** A page providing information on how to book a tour of some Place, such as an Accommodation or ApartmentComplex in a real estate setting, as well as other kinds of tours as appropriate. */
   tourBookingPage?: string;
 }
-
 /** Entities that have a somewhat fixed, physical extension. */
 export interface Place extends PlaceLeaf {
   /** The basic containment relation between a place and one that contains it. Supersedes containedIn. Inverse property: containsPlace. */
@@ -778,7 +778,6 @@ export interface Place extends PlaceLeaf {
   /** Represents a relationship between two geometries (or the places they represent), relating a geometry to another that lies on it. As defined in DE-9IM. */
   geoWithin?: PlaceLeaf;
 }
-
 export interface FilterToggleValue {
   quantity: number;
   label: string;
@@ -787,37 +786,34 @@ export interface FilterToggleValue {
   url: string;
   children?: Filter | null;
 }
-
 export interface FilterRangeValue {
   min: number;
   max: number;
 }
-
 export interface FilterBase {
   label: string;
   key: string;
 }
-
 export interface FilterToggle extends FilterBase {
   "@type": "FilterToggle";
   values: FilterToggleValue[];
   quantity: number;
 }
-
 export interface FilterRange extends FilterBase {
   "@type": "FilterRange";
   values: FilterRangeValue;
 }
-
 export type Filter = FilterToggle | FilterRange;
-export type SortOption = { value: string; label: string };
+export type SortOption = {
+  value: string;
+  label: string;
+};
 export interface ProductDetailsPage {
   "@type": "ProductDetailsPage";
   breadcrumbList: BreadcrumbList;
   product: Product;
   seo?: Seo | null;
 }
-
 export type PageType =
   | "Brand"
   | "Category"
@@ -828,7 +824,6 @@ export type PageType =
   | "Cluster"
   | "Search"
   | "Unknown";
-
 export interface PageInfo {
   currentPage: number;
   nextPage: string | undefined;
@@ -837,7 +832,6 @@ export interface PageInfo {
   recordPerPage?: number | undefined;
   pageTypes?: PageType[];
 }
-
 export interface ProductListingPage {
   "@type": "ProductListingPage";
   breadcrumb: BreadcrumbList;
@@ -847,27 +841,26 @@ export interface ProductListingPage {
   sortOptions: SortOption[];
   seo?: Seo | null;
 }
-
 export interface Seo {
   title: string;
   description: string;
   canonical: string;
   noIndexing?: boolean;
 }
-
 export interface Search {
   term: string;
   href?: string;
   hits?: number;
-  facets?: Array<{ key: string; values: string[] }>;
+  facets?: Array<{
+    key: string;
+    values: string[];
+  }>;
 }
-
 export interface Suggestion {
   searches?: Search[];
-  products?: Product[];
+  products?: Product[] | null;
   hits?: number;
 }
-
 /** @titleBy url */
 export interface SiteNavigationElementLeaf {
   /**
@@ -879,13 +872,12 @@ export interface SiteNavigationElementLeaf {
   /** The identifier property represents any kind of identifier for any kind of {@link https://schema.org/Thing Thing}, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See {@link /docs/datamodel.html#identifierBg background notes} for more details. */
   identifier?: string;
   /** An image of the item. This can be a {@link https://schema.org/URL URL} or a fully described {@link https://schema.org/ImageObject ImageObject}. */
-  image?: ImageObject[];
+  image?: ImageObject[] | null;
   /** The name of the item. */
   name?: string;
   /** URL of the item. */
   url?: string;
 }
-
 export interface SiteNavigationElement extends SiteNavigationElementLeaf {
   // TODO: The schema generator is not handling recursive types leading to an infinite loop
   // Lets circunvent this issue by enumerating the max allowed depth
@@ -907,41 +899,36 @@ export interface SiteNavigationElement extends SiteNavigationElementLeaf {
     }
   >;
 }
-
 /** @deprecated Use SiteNavigationElement instead */
 export interface NavItem {
   label: string;
   href: string;
-  image?: { src?: string; alt?: string };
+  image?: {
+    src?: string;
+    alt?: string;
+  };
 }
-
 /** @deprecated Use SiteNavigationElement instead */
 export interface Navbar extends NavItem {
   // TODO: The schema generator is not handling recursive types leading in a infinite recursion loop
   // deno-lint-ignore no-explicit-any
   children?: any[];
 }
-
 // deno-lint-ignore no-explicit-any
 export interface IEvent<Params = any> {
   name: string;
   params: Params;
 }
-
 // 3 letter ISO 4217 - Doc: https://en.wikipedia.org/wiki/ISO_4217#Active_codes
 type Currency = string;
 type Value = number;
-
 interface WithItemId {
   item_id: string;
 }
-
 interface WithItemName {
   item_name: string;
 }
-
 type ItemIdentifier = WithItemId | WithItemName;
-
 interface AnalyticsItemWithoutIdentifier {
   affiliation?: string;
   coupon?: string;
@@ -962,9 +949,7 @@ interface AnalyticsItemWithoutIdentifier {
   price?: Value;
   quantity: number;
 }
-
 export type AnalyticsItem = AnalyticsItemWithoutIdentifier & ItemIdentifier;
-
 export interface AddShippingInfoParams {
   currency?: Currency;
   value?: Value;
@@ -972,46 +957,38 @@ export interface AddShippingInfoParams {
   shipping_tier?: string;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#add_shipping_info */
 export interface AddShippingInfoEvent extends IEvent<AddShippingInfoParams> {
   name: "add_shipping_info";
 }
-
 export interface AddToCartParams {
   currency?: Currency;
   value?: Value;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#add_to_cart */
 export interface AddToCartEvent extends IEvent<AddToCartParams> {
   name: "add_to_cart";
 }
-
 export interface AddToWishlistParams {
   currency?: Currency;
   value?: Value;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#add_to_wishlist */
 export interface AddToWishlistEvent extends IEvent<AddToWishlistParams> {
   name: "add_to_wishlist";
 }
-
 export interface BeginCheckoutParams {
   currency: Currency;
   value: Value;
   items: AnalyticsItem[];
   coupon?: string;
 }
-
 /** docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#begin_checkout */
 export interface BeginCheckoutEvent extends IEvent<BeginCheckoutParams> {
   name: "begin_checkout";
 }
-
 export interface LoginParams {
   method?: string;
 }
@@ -1019,37 +996,30 @@ export interface LoginParams {
 export interface LoginEvent extends IEvent<LoginParams> {
   name: "login";
 }
-
 export interface RemoveFromCartParams {
   currency?: Currency;
   value?: Value;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#remove_from_cart */
 export interface RemoveFromCartEvent extends IEvent<RemoveFromCartParams> {
   name: "remove_from_cart";
 }
-
 export interface SearchParams {
   search_term: string;
 }
-
 export interface SearchEvent extends IEvent<SearchParams> {
   name: "search";
 }
-
 export interface SelectItemParams {
   item_list_id?: string;
   item_list_name?: string;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#select_item */
 export interface SelectItemEvent extends IEvent<SelectItemParams> {
   name: "select_item";
 }
-
 export interface SelectPromotionParams {
   creative_name?: string;
   creative_slot?: string;
@@ -1057,45 +1027,37 @@ export interface SelectPromotionParams {
   promotion_name?: string;
   items?: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#select_promotion */
 export interface SelectPromotionEvent extends IEvent<SelectPromotionParams> {
   name: "select_promotion";
 }
-
 export interface ViewCartParams {
   currency: Currency;
   value: Value;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#view_cart */
 export interface ViewCartEvent extends IEvent<ViewCartParams> {
   name: "view_cart";
 }
-
 export interface ViewItemParams {
   currency?: Currency;
   value?: Value;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#view_item */
 export interface ViewItemEvent extends IEvent<ViewItemParams> {
   name: "view_item";
 }
-
 export interface ViewItemListParams {
   item_list_id?: string;
   item_list_name?: string;
   items: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#view_item_list */
 export interface ViewItemListEvent extends IEvent<ViewItemListParams> {
   name: "view_item_list";
 }
-
 export interface ViewPromotionParams {
   creative_name?: string;
   creative_slot?: string;
@@ -1103,26 +1065,21 @@ export interface ViewPromotionParams {
   promotion_name?: string;
   items?: AnalyticsItem[];
 }
-
 /** @docs https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtm#view_promotion */
 export interface ViewPromotionEvent extends IEvent<ViewPromotionParams> {
   name: "view_promotion";
 }
-
 export interface Page {
   id: string | number;
   pathTemplate?: string;
 }
-
 export interface Deco {
   flags: Flag[];
   page: Page;
 }
-
 export interface DecoEvent extends IEvent<Deco> {
   name: "deco";
 }
-
 export type AnalyticsEvent =
   | AddShippingInfoEvent
   | AddToCartEvent

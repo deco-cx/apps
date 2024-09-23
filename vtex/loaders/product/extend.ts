@@ -3,7 +3,7 @@ import { AppContext } from "../../mod.ts";
 import { batch } from "../../utils/batch.ts";
 import { extension as simulateExt } from "../../utils/extensions/simulation.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
-import { toReview } from "../../utils/transform.ts";
+import { toInventories, toReview } from "../../utils/transform.ts";
 import listLoader from "../legacy/productList.ts";
 
 export interface Props {
@@ -12,10 +12,12 @@ export interface Props {
   kitItems?: boolean;
   variants?: boolean;
   reviews?: boolean;
+  inventory?: boolean;
   /**
    * @description Adds brand information to products, useful for Intelligent Search loaders.
    */
   brands?: boolean;
+  
 
   products: Product[];
 }
@@ -117,7 +119,12 @@ const reviewsExt = async (
 ): Promise<Product[]> => {
   const reviewPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/reviews"]({
-      product_id: product.inProductGroupWithID,
+      product_id: product.inProductGroupWithID ?? "",
+      search_term: "",
+      from: "0",
+      to: "10",
+      order_by: "",
+      status: true,
     }).then((res) => res.json())
       .catch(() => ({}))
   );
@@ -140,6 +147,28 @@ const reviewsExt = async (
   return toReview(products, ratings, reviews);
 };
 
+const inventoryExt = async (
+  products: Product[],
+  ctx: AppContext,
+): Promise<Product[]> => {
+  const inventoriesPromises = products.map((product) =>
+    ctx.vcs["GET /api/logistics/pvt/inventory/skus/:skuId"]({
+      skuId: product.inProductGroupWithID ?? "",
+    }).then((res) => res.json())
+      .catch(() => ({}))
+  );
+
+  const inventoriesPromise = Promise.all(inventoriesPromises);
+
+  const [inventories] = await Promise.all([
+    inventoriesPromise,
+  ]);
+
+  return toInventories(products, inventories);
+};
+
+export const cache = "no-cache";
+
 export default async (
   {
     products,
@@ -148,6 +177,7 @@ export default async (
     similars,
     simulate,
     reviews,
+    inventory,
     brands,
   }: Props,
   req: Request,
@@ -173,6 +203,10 @@ export default async (
 
   if (reviews) {
     p = await reviewsExt(p, ctx);
+  }
+
+  if (inventory) {
+    p = await inventoryExt(p, ctx);
   }
 
   if (brands) {

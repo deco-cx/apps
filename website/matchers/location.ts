@@ -1,13 +1,11 @@
-import { MatchContext } from "deco/blocks/matcher.ts";
 import { MapWidget } from "../../admin/widgets.ts";
 import { haversine } from "../utils/location.ts";
-
+import { type MatchContext } from "@deco/deco/blocks";
 export interface Coordinate {
   latitude: number;
   longitude: number;
   radius?: number;
 }
-
 export interface Map {
   /**
    * @title Area selection
@@ -15,7 +13,6 @@ export interface Map {
    */
   coordinates?: MapWidget;
 }
-
 export interface Location {
   /**
    * @title City
@@ -33,7 +30,6 @@ export interface Location {
    */
   country?: string;
 }
-
 export interface Props {
   /**
    * @title Include Locations
@@ -44,7 +40,6 @@ export interface Props {
    */
   excludeLocations?: (Location | Map)[];
 }
-
 export interface MapLocation {
   /**
    * @title City
@@ -61,14 +56,12 @@ export interface MapLocation {
    * @example BR
    */
   country?: string;
-
   /**
    * @title Area selection
    * @example -7.27820,-35.97630,2000
    */
   coordinates?: MapWidget;
 }
-
 const matchLocation =
   (defaultNotMatched = true, source: MapLocation) => (target: MapLocation) => {
     if (
@@ -79,24 +72,18 @@ const matchLocation =
     ) {
       return defaultNotMatched;
     }
-
     let result = !target.regionCode || target.regionCode === source.regionCode;
     result &&= !source.coordinates ||
       !target.coordinates ||
       haversine(source.coordinates, target.coordinates) <=
         Number(target.coordinates.split(",")[2]);
-
     result &&= !target.city || target.city === source.city;
     result &&= !target.country || target.country === source.country;
     return result;
   };
-
-const escaped = ({
-  city,
-  country,
-  regionCode,
-  coordinates,
-}: MapLocation): MapLocation => {
+const escaped = (
+  { city, country, regionCode, coordinates }: MapLocation,
+): MapLocation => {
   return {
     coordinates,
     regionCode,
@@ -126,12 +113,9 @@ export default function MatchLocation(
   if (isLocationExcluded) {
     return false;
   }
-
   if (includeLocations?.length === 0) {
     return true;
   }
-
-  return (
-    includeLocations?.some(matchLocation(true, escaped(userLocation))) ?? true
-  );
+  return (includeLocations?.some(matchLocation(true, escaped(userLocation))) ??
+    true);
 }
