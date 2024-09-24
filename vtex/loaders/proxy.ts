@@ -59,18 +59,38 @@ const buildProxyRoutes = (
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
 
-    const routeFromPath = (pathTemplate: string): Route => ({
-      pathTemplate,
-      handler: {
-        value: {
-          __resolveType: "website/handlers/proxy.ts",
-          url: urlToProxy,
-          host: hostToUse,
-          includeScriptsToHead,
-          removeDirtyCookies: true,
+    const routeFromPath = (pathTemplate: string): Route => {
+      const handlerValue = {
+        __resolveType: "website/handlers/proxy.ts",
+        url: urlToProxy,
+        host: hostToUse,
+        includeScriptsToHead,
+        removeDirtyCookies: true,
+      };
+      // we have this check because we need to add
+      // the referer header to the AviseMe route
+      if (pathTemplate.includes("AviseMe")) {
+        return {
+          pathTemplate,
+          handler: {
+            value: {
+              ...handlerValue,
+              customHeaders: [{
+                key: "referer",
+                value: urlToProxy,
+              }],
+            },
+          },
+        };
+      }
+
+      return ({
+        pathTemplate,
+        handler: {
+          value: handlerValue,
         },
-      },
-    });
+      });
+    };
     const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
       routeFromPath,
     );
