@@ -87,7 +87,6 @@ async function loader(
   if (!maybeProduct || variantsLength === 0) {
     return null;
   }
-  console.log({ productPrice });
   const product = toProduct(maybeProduct, variantId, {
     url,
     priceCurrency: "BRL",
