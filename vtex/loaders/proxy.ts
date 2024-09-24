@@ -67,6 +67,8 @@ const buildProxyRoutes = (
         includeScriptsToHead,
         removeDirtyCookies: true,
       };
+      // we have this check because we need to add
+      // the referer header to the AviseMe route
       if (pathTemplate.includes("AviseMe")) {
         return {
           pathTemplate,
