@@ -69,4 +69,3 @@ export type CSVWidget = string;
  * @accept application/pdf
  */
 export type PDFWidget = string;
-
