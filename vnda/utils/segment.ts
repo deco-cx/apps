@@ -19,11 +19,13 @@ export const parse = (cookie: string) => JSON.parse(atob(cookie));
 export const buildSegmentCookie = (req: Request): string | null => {
   const url = new URL(req.url);
   const param = url.searchParams.get("agent");
-  if (param) {
-    const partialSegment: string = param;
-    return partialSegment;
+  const cc = url.searchParams.get("cc");
+
+  if (cc) {
+    return btoa(JSON.stringify({ cc }));
   }
-  return null;
+
+  return param || null;
 };
 
 export const getSegmentFromCookie = (
