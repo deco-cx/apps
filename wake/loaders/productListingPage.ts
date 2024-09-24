@@ -214,8 +214,7 @@ const searchLoader = async (
 
   const hasPreviousPage = page > 1;
 
-  // if the home page is not 0, there is a chance that the "previous page" button will replicate the value of the current page
-  const pageOffset = 0;
+  const pageOffset = props.pageOffset ?? 0;
 
   if (hasNextPage) {
     nextPage.set("page", (page + pageOffset + 1).toString());
