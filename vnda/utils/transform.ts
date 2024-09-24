@@ -7,6 +7,8 @@ import {
   Seo,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
 import { ProductGroup, ProductPrice, SEO } from "./client/types.ts";
 import {
   OpenAPI,
@@ -16,8 +18,9 @@ import {
   ProductVariant,
   VariantProductSearch,
 } from "./openapi/vnda.openapi.gen.ts";
+import { getSegmentFromCookie, parse } from "./segment.ts";
 
-type VNDAProductGroup = ProductSearch | OProduct;
+export type VNDAProductGroup = ProductSearch | OProduct;
 type VNDAProduct = VariantProductSearch | ProductVariant;
 
 interface ProductOptions {
@@ -80,7 +83,7 @@ export const parseSlug = (slug: string) => {
   };
 };
 
-const pickVariant = (
+export const pickVariant = (
   variants: VNDAProductGroup["variants"],
   variantId: string | null,
   normalize = true,
@@ -129,7 +132,7 @@ const normalizeInstallments = (
 
 const toURL = (src: string) => src.startsWith("//") ? `https:${src}` : src;
 
-const toOffer = ({
+export const toOffer = ({
   price,
   sale_price,
   intl_price,
@@ -501,3 +504,54 @@ export const addVideoToProduct = (
     ...(video ? toImageObjectVideo(video) : []),
   ],
 });
+
+export const fetchAndApplyPrices = async (
+  products: Product[],
+  priceCurrency: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product[]> => {
+  const segmentCookie = getSegmentFromCookie(req);
+  const segment = segmentCookie ? parse(segmentCookie) : null;
+
+  const pricePromises = products.map((product) =>
+    ctx.api["GET /api/v2/products/:productId/price"]({
+      productId: product.sku,
+      coupon_codes: segment?.cc ? [segment.cc] : [],
+    }, STALE)
+  );
+
+  const priceResults = await Promise.all(pricePromises);
+
+  return products.map((product) => {
+    const matchingPriceInfo = priceResults.find((priceResult) =>
+      (priceResult as unknown as ProductPrice).variants.some((variant) =>
+        variant.sku === product.sku
+      )
+    ) as unknown as ProductPrice;
+
+    const variantPrices = matchingPriceInfo?.variants
+      ? pickVariant(
+        matchingPriceInfo.variants as VNDAProductGroup["variants"],
+        product.sku,
+        false,
+      )
+      : null;
+
+    if (!variantPrices) return product;
+
+    const offers = toOffer(variantPrices);
+
+    return {
+      ...product,
+      offers: {
+        "@type": "AggregateOffer" as const,
+        priceCurrency: priceCurrency,
+        highPrice: variantPrices?.price ?? product.offers?.highPrice ?? 0,
+        lowPrice: variantPrices?.sale_price ?? product.offers?.lowPrice ?? 0,
+        offerCount: offers.length,
+        offers: offers,
+      },
+    };
+  });
+};
