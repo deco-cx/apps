@@ -974,11 +974,12 @@ export const categoryTreeToNavbar = (
 
 export const toBrand = (
   { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+  baseUrl: string,
 ): Brand => ({
   "@type": "Brand",
   "@id": `${id}`,
   name,
-  logo: imageUrl ?? undefined,
+  logo: imageUrl?.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}`,
   description: metaTagDescription,
 });
 

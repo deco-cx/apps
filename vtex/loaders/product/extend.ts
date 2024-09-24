@@ -13,9 +13,30 @@ export interface Props {
   variants?: boolean;
   reviews?: boolean;
   inventory?: boolean;
+  /**
+   * @description Adds brand information to products, useful for Intelligent Search loaders.
+   */
+  brands?: boolean;
+  
 
   products: Product[];
 }
+
+const brandsExt = async (
+  products: Product[],
+  ctx: AppContext,
+) => {
+  const brands = await ctx.invoke.vtex.loaders.legacy.brands();
+
+  if (!brands || !brands.length) {
+    return products;
+  }
+
+  return products.map((p) => ({
+    ...p,
+    brand: brands.find((b) => b["@id"] === p.brand?.["@id"]) || p.brand,
+  }));
+};
 
 const similarsExt = (
   products: Product[],
@@ -157,6 +178,7 @@ export default async (
     simulate,
     reviews,
     inventory,
+    brands,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -185,6 +207,10 @@ export default async (
 
   if (inventory) {
     p = await inventoryExt(p, ctx);
+  }
+
+  if (brands) {
+    p = await brandsExt(p, ctx);
   }
 
   return p;
