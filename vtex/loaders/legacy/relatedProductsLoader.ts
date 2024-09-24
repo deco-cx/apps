@@ -119,12 +119,21 @@ async function loader(
 
   relatedProductsResults
     .filter((result) => result.status === "rejected")
-    .forEach((result) =>
-      console.error("Error loading related products:", result.reason)
-    );
+    .forEach((result, index) => {
+      console.error(
+        `Error loading related products for batch ${index}:`,
+        (result as PromiseRejectedResult).reason,
+      );
+    });
 
-  // Search API does not offer a way to filter out in stock products
-  // This is a scape hatch
+  const allPromisesFailed = relatedProductsResults.every(
+    (result) => result.status === "rejected",
+  );
+
+  if (allPromisesFailed) {
+    throw new Error("Failed to load related products for all batches.");
+  }
+
   if (hideUnavailableItems && relatedProducts) {
     const inStock = (p: Product) =>
       p.offers?.offers.find((o) =>
