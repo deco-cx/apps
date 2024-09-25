@@ -20,7 +20,7 @@ async function getAllPages(ctx: AppContext): Promise<Route[]> {
       continue;
     }
     routes.push({
-      pathTemplate: pathTemplate,
+      pathTemplate,
       handler: {
         value: {
           __resolveType: "website/handlers/fresh.ts",
