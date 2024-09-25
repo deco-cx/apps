@@ -67,7 +67,7 @@ export default async function Pages(
   });
 
   if (props?.external?.preferRoutes) {
-    allPages.map(({ pathTemplate, ...pageProps }: Route) => {
+    return allPages.map(({ pathTemplate, ...pageProps }: Route) => {
       const isException = props.external?.exceptionRoutes?.some((path) =>
         path === pathTemplate
       );
@@ -78,7 +78,7 @@ export default async function Pages(
       return ({
         pathTemplate: isException
           ? pathTemplate
-          : `${pathTemplate}?${queryString}${separator}rdc=true`,
+          : `${pathTemplate}?${queryString}${separator}*rdc=true*`,
         ...pageProps,
       });
     });
