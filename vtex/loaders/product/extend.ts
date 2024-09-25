@@ -17,7 +17,6 @@ export interface Props {
    * @description Adds brand information to products, useful for Intelligent Search loaders.
    */
   brands?: boolean;
-  
 
   products: Product[];
 }
