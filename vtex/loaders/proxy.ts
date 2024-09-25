@@ -30,6 +30,7 @@ const buildProxyRoutes = (
     includeSiteMap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromVtexProxy,
     includeScriptsToHead,
     includeScriptsToBody,
   }: {
@@ -38,6 +39,7 @@ const buildProxyRoutes = (
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
     excludePathsFromDecoSiteMap: string[];
+    excludePathsFromVtexProxy?: string[];
     includeScriptsToHead?: {
       includes?: Script[];
     };
@@ -84,7 +86,10 @@ const buildProxyRoutes = (
         },
       });
     };
-    const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
+    const currentPathsToProxy = PATHS_TO_PROXY.filter((path) =>
+      !excludePathsFromVtexProxy?.includes(path)
+    );
+    const routesFromPaths = [...currentPathsToProxy, ...extraPaths].map(
       routeFromPath,
     );
 
@@ -143,6 +148,10 @@ export interface Props {
    */
   excludePathsFromDecoSiteMap?: string[];
   /**
+   * @title Exclude paths from VTEX PATHS_TO_PROXY
+   */
+  excludePathsFromVtexProxy?: string[];
+  /**
    * @title Scripts to include on Html head
    */
   includeScriptsToHead?: {
@@ -165,6 +174,7 @@ function loader(
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
+    excludePathsFromVtexProxy = [],
     includeScriptsToHead = { includes: [] },
     includeScriptsToBody = { includes: [] },
   }: Props,
@@ -174,6 +184,7 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromVtexProxy,
     includeSiteMap,
     publicUrl: ctx.publicUrl,
     extraPaths: extraPathsToProxy,
