@@ -37,7 +37,16 @@ export default function SAP(props: Props): App<Manifest, State> {
     base: `${apiUrl}/${baseSiteId}/`,
     headers: new Headers({
       "Content-Type": "application/json",
-      Accept: "application/json",
+      Accept: "*/*",
+      "accept-language": "en-US,en;q=0.9",
+      "cookie": "",
+      priority: "u=0, i",
+      "sec-ch-ua":
+        '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "macOS",
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
     }),
   });
 
