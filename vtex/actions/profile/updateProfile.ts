@@ -50,7 +50,10 @@ const loader = async (
   `;
 
   try {
-    const { updateProfile: updatedUser } = await io.query<typeof User>(
+    const { updateProfile: updatedUser } = await io.query<
+      { updateProfile: typeof User },
+      unknown
+    >(
       {
         query: mutation,
         operationName: "UpdateProfile",

@@ -11,6 +11,8 @@ interface User {
   profilePicture?: string;
   gender?: string;
   document?: string;
+  homePhone?: string;
+  customFields?: { key: string; value: string }[];
 }
 
 async function loader(
@@ -26,13 +28,15 @@ async function loader(
   }
 
   const query =
-    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document }}";
+    `query getUserProfile { profile(customFields: "isNewsletterOptIn") { id userId email firstName lastName profilePicture gender document homePhone customFields { key value } }}`;
 
   try {
-    const { profile: user } = await io.query<{ profile: User }, null>(
+    const data = await io.query<{ profile: User }, null>(
       { query },
       { headers: { cookie } },
     );
+
+    const { profile: user } = data;
 
     return {
       "@id": user.userId ?? user.id,
@@ -43,6 +47,8 @@ async function loader(
       gender: user.gender === "f"
         ? "https://schema.org/Female"
         : "https://schema.org/Male",
+      telephone: user.homePhone,
+      customFields: user.customFields,
     };
   } catch (_) {
     return null;

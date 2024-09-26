@@ -409,7 +409,17 @@ export interface Person extends Omit<Thing, "@type"> {
   image?: ImageObject[] | null;
   /** The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain. */
   taxID?: string;
+  /** The telephone number. */
+  telephone?: string;
+  /** Custom fields */
+  customFields?: CustomFields[];
 }
+
+interface CustomFields {
+  key: string;
+  value: string;
+}
+
 // NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {
   "@type": "Author";
