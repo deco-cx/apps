@@ -40,7 +40,7 @@ export default function SAP(props: Props): App<Manifest, State> {
       Accept: "*/*",
       "accept-language": "en-US,en;q=0.9",
       "cookie":
-        "JSESSIONID=7386EA2FC0F9EF7581F736851090A9D.api-78ccdc6899-v8bfk; ROUTE=.api-85c46fdbcb-xtvc2; _abck=C38C0F52396B7A403E5A469B43D38CBE~-1~YAAQlpSuyNFYkQ2SAQAAnlMLEQwjPSJBajHurN1YzGmJLWIq/mv/ar/fxAJgi2Rd+fqU+DQqw6+c6ajfGfUTIYVWO9LSYIW3triwKgeWwzuLCuVxV9+1EmYHFAYUcJkd7Kun3hkadjekIVLGP5I9uWivpZ104mx7Rp+AjM1RoWoQ9y8TFUJsVrJtgR6wDCvDIdZa36KPwOLWH2gqIpqXia4kyg4szVKFwCAllMJ0CI3/HJzqirhBk2taxtit9fHFCVEPtpTiXPkLHFMEngquQF+N4ELGXAukJ2Jh32Fj3bp1LtNHvAojTFUGMJc5wqnsRHksWRkMCTlZ6vEIvV3K6C5tqzGWyZk/N2lkGEBNmJNONLboSCPc/Hqvvi5UFXvaWLUc5pmyjDKSZZA+D3Q=~-1~-1~-1; _dd_s=logs=1&id=581758a9-387a-47e2-8d01-0fabddb1b64b&created=1727111219844&expire=1727112193338",
+        "JSESSIONID=7386EA2FC0F9EF7581F736851090A9D.api-78ccdc6899-v8bfk; ROUTE=.api-85c46fdbcb-xtvc2; _abck=C38C0F52396B7A403E5A469B43D38CBE~-1~YAAQlpSuyNFYkQ2SAQAAnlMLEQwjPSJBajHurN1YzGmJLWIq/mv/ar/fxAJgi2Rd+fqU+DQqw6+c6ajfGfUTIYVWO9LSYIW3triwKgeWwzuLCuVxV9+1EmYHFAYUcJkd7Kun3hkadjekIVLGP5I9uWivpZ104mx7Rp+AjM1RoWoQ9y8TFUJsVrJtgR6wDCvDIdZa36KPwOLWH2gqIpqXia4kyg4szVKFwCAllMJ0CI3/HJzqirhBk2taxtit9fHFCVEPtpTiXPkLHFMEngquQF+N4ELGXAukJ2Jh32Fj3bp1LtNHvAojTFUGMJc5wqnsRHksWRkMCTlZ6vEIvV3K6C5tqzGWyZk/N2lkGEBNmJNONLboSCPc/Hqvvi5UFXvaWLUc5pmyjDKSZZA+D3Q=~-1~-1~-1; _dd_s=logs=1&id=581758a9-387a-47e2-8d01-0fabddb1b64b&created=1727111219844&expire=9727112193338",
       priority: "u=0, i",
       "sec-ch-ua":
         '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
