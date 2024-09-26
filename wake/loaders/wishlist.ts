@@ -12,7 +12,7 @@ import { parseHeaders } from "../utils/parseHeaders.ts";
  * @title Wake Integration
  * @description Product Wishlist loader
  */
-const action = async (
+const loader = async (
   _props: unknown,
   req: Request,
   ctx: AppContext,
@@ -40,4 +40,4 @@ const action = async (
   ): p is WishlistReducedProductFragment => Boolean(p)) ?? [];
 };
 
-export default action;
+export default loader;

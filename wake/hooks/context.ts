@@ -65,7 +65,11 @@ const enqueue = (
 };
 
 const enqueue2 = (
-  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>,
+  cb: (
+    signal: AbortSignal,
+  ) =>
+    | Promise<{ shop: ShopQuery["shop"] }>
+    | Partial<{ shop: ShopQuery["shop"] }>,
 ) => {
   abort2();
 
@@ -77,6 +81,11 @@ const enqueue2 = (
       const { shop } = await cb(controller.signal);
       const headlessCheckout = await invoke.wake.loaders.headlessCheckout();
       const isLocalhost = window.location.hostname === "localhost";
+
+      if (!shop || !shop?.checkoutUrl) {
+        console.error("Erro on get shop checkoutUrl");
+        return;
+      }
 
       if (!isLocalhost && !headlessCheckout) {
         const url = new URL("/api/carrinho", shop.checkoutUrl);
