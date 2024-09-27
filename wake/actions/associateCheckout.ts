@@ -1,4 +1,4 @@
-import { badRequest } from "deco/mod.ts";
+import { badRequest } from "@deco/deco";
 import type { AppContext } from "../mod.ts";
 import authenticate from "../utils/authenticate.ts";
 import { getCartCookie } from "../utils/cart.ts";
