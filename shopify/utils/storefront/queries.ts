@@ -210,6 +210,15 @@ fragment Cart on Cart {
   }
 }`;
 
+const Customer = gql`
+  fragment Customer on Customer {
+    id
+    email
+    firstName
+    lastName
+  }
+`;
+
 export const CreateCart = {
   query: gql`mutation CreateCart {
   payload: cartCreate { 
@@ -326,6 +335,15 @@ export const ProductRecommendations = {
   query: gql`query productRecommendations($productId: ID!) {
     productRecommendations(productId: $productId) {
       ...Product
+    }
+  }`,
+};
+
+export const FetchCustomerInfo = {
+  fragments: [Customer],
+  query: gql`query FetchCustomerInfo($customerAccessToken: String!) {
+    customer(customerAccessToken: $customerAccessToken) {
+      ...Customer
     }
   }`,
 };
