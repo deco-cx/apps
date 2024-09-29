@@ -35,6 +35,11 @@ export type TextArea = string;
 export type RichText = string;
 
 /**
+ * @format password
+ */
+export type Password = string;
+
+/**
  * @format color-input
  * @default #000000
  */
