@@ -28,6 +28,7 @@ export interface Props {
    * @description The tool choice to be used for the AI Assistant.
    */
   tool_choice?: Anthropic.MessageCreateParams["tool_choice"];
+  temperature: number;
 }
 
 export default async function invoke(
@@ -38,6 +39,7 @@ export default async function invoke(
     max_tokens = 4096,
     availableFunctions = [],
     tool_choice = { type: "auto" },
+    temperature = 0.0,
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -53,9 +55,15 @@ export default async function invoke(
     model,
     max_tokens,
     messages,
-    tools,
-    tool_choice,
+    temperature,
   };
+
+  if (tools?.length) {
+    params.tools = tools;
+    params.tool_choice = tool_choice;
+  }
+
+  console.log(tools);
 
   try {
     const msg = await ctx.anthropic.messages.create(params);

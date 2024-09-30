@@ -11,6 +11,7 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("posthog"),
+    app("decopilot-app"),
     app("smarthint"),
     app("ra-trustvox"),
     app("anthropic"),

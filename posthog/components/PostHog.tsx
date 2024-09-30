@@ -27,7 +27,7 @@ const snippet = () => {
   // Flags and additional dimentions
   const props: Record<string, string> = {};
   const trackPageview = () =>
-    globalThis.window.posthog?.capture("pageview", props);
+    globalThis.window.posthog?.capture("$pageview", props);
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
   if (originalPushState) {

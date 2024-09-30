@@ -96,14 +96,13 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
 ): T["items"][number] => {
   const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
-
   for (const item of product.items) {
     if (item.itemId === skuId) {
       return item;
     }
   }
 
-  throw new Error(`Missing sku ${skuId} on product ${product.productName}`);
+  return product.items[0];
 };
 
 const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -974,11 +973,12 @@ export const categoryTreeToNavbar = (
 
 export const toBrand = (
   { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+  baseUrl: string,
 ): Brand => ({
   "@type": "Brand",
   "@id": `${id}`,
   name,
-  logo: imageUrl ?? undefined,
+  logo: imageUrl?.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}`,
   description: metaTagDescription,
 });
 
