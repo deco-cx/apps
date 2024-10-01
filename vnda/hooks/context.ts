@@ -53,7 +53,7 @@ const enqueue = (
 const load = (signal: AbortSignal) =>
   invoke({
     cart: invoke.vnda.loaders.cart(),
-    user: invoke.shopify.loaders.user(),
+    user: invoke.vnda.loaders.user(),
   }, { signal });
 
 if (IS_BROWSER) {
