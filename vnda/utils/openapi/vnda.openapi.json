@@ -5109,27 +5109,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "sku": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "exclusiveMinimum": true
-                  },
-                  "extra": {
-                    "type": "object"
-                  },
-                  "place_id": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "exclusiveMinimum": true
-                  },
                   "items": {
                     "type": "array",
                     "description": "Itens do carrinho",
                     "items": {
-                      "type": "array",
+                      "type": "object",
                       "properties": {
                         "sku": {
                           "type": "string",
@@ -5156,39 +5140,31 @@
                         "sku",
                         "quantity"
                       ]
-                    },
-                    "example": {
-                      "itemcustomizado": {
-                        "items": {
-                          "value": [
-                            {
-                              "sku": "variante.sku1",
-                              "quantity": 1,
-                              "customizations": [
-                                {
-                                  "Color": "Black"
-                                }
-                              ]
-                            },
-                            {
-                              "sku": "variante.sku2",
-                              "quantity": 10,
-                              "customizations": [
-                                {
-                                  "Color": "Red"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
                     }
                   }
                 },
-                "required": [
-                  "sku",
-                  "quantity"
-                ]
+                "example": {
+                  "items": [
+                    {
+                      "sku": "teste",
+                      "quantity": 1,
+                      "customizations": [
+                        {
+                          "Color": "Black"
+                        }
+                      ]
+                    },
+                    {
+                      "sku": "variante.sku2",
+                      "quantity": 10,
+                      "customizations": [
+                        {
+                          "Color": "Red"
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
             }
           }
