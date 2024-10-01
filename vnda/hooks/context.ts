@@ -12,7 +12,7 @@ export interface Context {
 const loading = signal<boolean>(true);
 const context = {
   user: IS_BROWSER && signal<Person | null>(null) || { value: null },
-  cart: IS_BROWSER && signal<CartFragment | null>(null) || { value: null },
+  cart: IS_BROWSER && signal<Cart | null>(null) || { value: null },
 };
 
 let queue = Promise.resolve();
