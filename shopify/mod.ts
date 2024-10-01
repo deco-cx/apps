@@ -6,7 +6,9 @@ import type { Secret } from "../website/loaders/secret.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import { Markdown } from "../decohub/components/Markdown.tsx";
 import { type App, type FnContext } from "@deco/deco";
+
 export type AppContext = FnContext<State, Manifest>;
+
 /** @title Shopify */
 export interface Props {
   /**
@@ -32,17 +34,21 @@ export interface Props {
    */
   platform: "shopify";
 }
+
 export interface Address {
   provinceCode: string;
 }
+
 export interface AddressLocator {
   byZipCode(zip: string): Promise<Address | null>;
 }
+
 export interface State extends Props {
   storefront: ReturnType<typeof createGraphqlClient>;
   admin: ReturnType<typeof createGraphqlClient>;
   address: AddressLocator;
 }
+
 export const color = 0x96BF48;
 /**
  * @title Shopify
@@ -52,9 +58,11 @@ export const color = 0x96BF48;
  */
 export default function App(props: Props): App<Manifest, State> {
   const { storeName, storefrontAccessToken, adminAccessToken } = props;
+
   const stringAdminAccessToken = typeof adminAccessToken === "string"
     ? adminAccessToken
     : adminAccessToken?.get?.() ?? "";
+
   const storefront = createGraphqlClient({
     fetcher: fetchSafe,
     endpoint: `https://${storeName}.myshopify.com/api/2023-07/graphql.json`,
@@ -63,6 +71,7 @@ export default function App(props: Props): App<Manifest, State> {
       "X-Shopify-Storefront-Access-Token": storefrontAccessToken,
     }),
   });
+
   const admin = createGraphqlClient({
     fetcher: fetchSafe,
     endpoint:
@@ -72,16 +81,19 @@ export default function App(props: Props): App<Manifest, State> {
       "X-Shopify-Access-Token": stringAdminAccessToken,
     }),
   });
+
   const byZipCode = (zip: string) => {
     return Promise.resolve({
       provinceCode: getStateFromZip(zip),
     });
   };
+
   return {
     state: { ...props, admin, storefront, address: { byZipCode } },
     manifest,
   };
 }
+
 export const preview = async () => {
   const markdownContent = await Markdown(
     new URL("./README.md", import.meta.url).href,
