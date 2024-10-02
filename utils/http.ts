@@ -76,6 +76,8 @@ export interface HttpClientOptions {
   headers?: Headers;
   processHeaders?: (headers?: Headers) => Headers | undefined;
   fetcher?: typeof fetch;
+  // Keep empty segments in the URL
+  keepEmptySegments?: boolean;
 }
 export const createHttpClient = <T>(
   {
@@ -83,6 +85,7 @@ export const createHttpClient = <T>(
     headers: defaultHeaders,
     processHeaders = (headers?: Headers) => headers,
     fetcher = fetchSafe,
+    keepEmptySegments,
   }: HttpClientOptions,
 ): ClientOf<T> => {
   // Base should always endwith / so when concatenating with path we get the right URL
@@ -122,7 +125,9 @@ export const createHttpClient = <T>(
             return param;
           })
           .filter((x) =>
-            typeof x === "string" && x.length || typeof x === "number"
+            typeof x === "string"
+              ? (keepEmptySegments || x.length)
+              : typeof x === "number"
           )
           .join("/");
         const url = new URL(compiled, base);
