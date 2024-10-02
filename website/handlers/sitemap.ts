@@ -1,16 +1,11 @@
-import type { Handler } from "deco/blocks/handler.ts";
-import type { Resolvable } from "deco/engine/core/resolver.ts";
-import { isResolvable } from "deco/engine/core/resolver.ts";
-import { ConnInfo } from "std/http/server.ts";
 import { Route } from "../flags/audience.ts";
-
+import { type Handler } from "@deco/deco/blocks";
+import { isResolvable, type Resolvable } from "@deco/deco";
 const isPage = (handler: Resolvable<Handler>) =>
   isResolvable(handler) &&
   handler.__resolveType.endsWith("handlers/fresh.ts");
-
 const isAbsolute = (href: string) =>
   !href.includes(":") && !href.includes("*") && !href.startsWith("/_live");
-
 const buildSiteMap = (urls: string[]) => {
   const entries: string[] = [];
   for (const url of urls) {
@@ -23,7 +18,6 @@ const buildSiteMap = (urls: string[]) => {
   }
   return entries.join("\n");
 };
-
 const sanitize = (url: string) => url.startsWith("/") ? url : `/${url}`;
 const siteMapFromRoutes = (
   publicUrl: string,
@@ -42,19 +36,17 @@ const siteMapFromRoutes = (
   }
   return buildSiteMap(urls);
 };
-
 interface Props {
   excludePaths?: string[];
 }
-
 /**
  * @title Sitemap
  * @description Return deco's sitemap.xml
  */
 export default function SiteMap({ excludePaths = [] }: Props) {
-  return function (req: Request, connInfo: ConnInfo) {
+  return function (req: Request, connInfo: Deno.ServeHandlerInfo) {
     const reqUrl = new URL(req.url);
-    const ctx = connInfo as ConnInfo & {
+    const ctx = connInfo as Deno.ServeHandlerInfo & {
       params: Record<string, string>;
       state: {
         routes: Route[];

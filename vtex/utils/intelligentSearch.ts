@@ -1,5 +1,6 @@
 import { setCookie } from "std/http/mod.ts";
 import { AppContext } from "../mod.ts";
+import { STALE } from "../../utils/fetch.ts";
 import type { SelectedFacet, Sort } from "../utils/types.ts";
 
 export const SESSION_COOKIE = "vtex_is_session";
@@ -122,4 +123,43 @@ export const setISCookiesBag = (
     anonymous,
     session,
   };
+};
+
+/**
+ * @description keyFilter is the querystring names which can be vtex filter parameter
+ */
+export const isFilterParam = (keyFilter: string): boolean =>
+  keyFilter.startsWith("filter.");
+
+const segmentsFromTerm = (term: string) => term.split("/").filter(Boolean);
+
+const segmentsFromSearchParams = (url: string) => {
+  const searchParams = new URLSearchParams(url).entries();
+
+  const categories = Array.from(searchParams).toSorted()
+    .reduce((acc, [key, value]) => {
+      if (key.includes("filter.category")) {
+        acc.push(value);
+      }
+
+      return acc;
+    }, [] as string[]);
+
+  return categories.length ? categories : segmentsFromTerm(url);
+};
+
+export const pageTypesFromUrl = async (
+  url: string,
+  ctx: AppContext,
+) => {
+  const segments = segmentsFromSearchParams(url);
+  const { vcsDeprecated } = ctx;
+
+  return await Promise.all(
+    segments.map((_, index) =>
+      vcsDeprecated["GET /api/catalog_system/pub/portal/pagetype/:term"]({
+        term: segments.slice(0, index + 1).join("/"),
+      }, STALE).then((res) => res.json())
+    ),
+  );
 };

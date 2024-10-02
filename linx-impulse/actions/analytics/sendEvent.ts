@@ -6,6 +6,7 @@ import {
 } from "../../utils/types/analytics.ts";
 import { Source } from "../../utils/types/linx.ts";
 import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
+import getSource from "../../utils/source.ts";
 
 interface CategoryParams {
   page: "category";
@@ -64,6 +65,7 @@ interface ViewEvent {
       | OtherParams
     )
     & {
+      userId?: string;
       user?: LinxUser;
       source: Source;
     };
@@ -73,11 +75,13 @@ interface ClickEventParams {
   trackingId: string;
   source: Source;
   user?: LinxUser;
+  userId?: string;
   interactionType?: "PRODUCT_VIEW" | "ADD_TO_CART";
 }
 
 interface ChaordicClickEventParams {
   trackingId: string;
+  userId?: string;
   interactionType: "SHELF_CLICK";
 }
 
@@ -98,8 +102,19 @@ interface ImpressionEvent {
      * @description Contains the position of the last product shown in the visible area of the product shelf
      */
     lastOffset: number;
+
+    userId?: string;
   };
 }
+
+const isChaordicTrackingId = (trackingId: string) => {
+  try {
+    JSON.parse(atob(trackingId));
+    return false;
+  } catch {
+    return true;
+  }
+};
 
 /**
  * @docs https://docs.linximpulse.com/api/events/getting-started
@@ -119,14 +134,16 @@ const action = async (
     origin,
   } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
+  const source = getSource(ctx);
 
   switch (event) {
     case "view": {
-      const { page, source, user } = params;
+      const { page, source, user, userId } = params;
       const commonBody = {
         apiKey,
         source,
         user,
+        userId,
         salesChannel,
         deviceId,
       };
@@ -214,32 +231,52 @@ const action = async (
       break;
     }
     case "click": {
-      const { trackingId, interactionType } = params;
+      const { trackingId, interactionType, userId } = params;
+
+      const isChaordic = isChaordicTrackingId(trackingId);
 
       // Chaordic event click
       if (interactionType === "SHELF_CLICK") {
+        if (!isChaordic) {
+          return null;
+        }
+
         await chaordicApi["GET /v0/click"]({
-          trackingId: trackingId,
           apiKey,
+          trackingId,
+          source,
           deviceId,
+          interactionType,
+          userId,
         });
         return null;
       }
 
       // Impulse event click
-      const { source, user } = params;
-      await api["GET /engage/search/v3/clicks"]({
-        apiKey,
-        trackingId,
-        source,
-        userId: user?.id,
-        interactionType,
-        deviceId,
-      });
+      const { source: paramsSource, user } = params;
+      if (!isChaordic) {
+        await api["GET /engage/search/v3/clicks"]({
+          apiKey,
+          trackingId,
+          source: paramsSource ?? source,
+          userId: userId ?? user?.id,
+          interactionType,
+          deviceId,
+        });
+      } else {
+        await chaordicApi["GET /v0/click"]({
+          apiKey,
+          trackingId,
+          source,
+          userId: userId ?? user?.id,
+          interactionType,
+          deviceId,
+        });
+      }
       break;
     }
     case "impression": {
-      const { trackingImpression, firstOffset, lastOffset } = params;
+      const { trackingImpression, firstOffset, lastOffset, userId } = params;
       await chaordicApi["GET /v0/impression"]({
         apiKey,
         origin,
@@ -247,6 +284,8 @@ const action = async (
         firstOffset,
         lastOffset,
         deviceId,
+        userId: userId,
+        source,
       });
       break;
     }

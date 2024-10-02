@@ -1,23 +1,30 @@
-import type { Section } from "deco/blocks/section.ts";
-import { usePartialSection } from "deco/hooks/usePartialSection.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-import { asResolved, isDeferred } from "deco/mod.ts";
 import { useId } from "preact/hooks";
 import { AppContext } from "../../mod.ts";
 import { shouldForceRender } from "../../../utils/deferred.ts";
-
+import { type Section } from "@deco/deco/blocks";
+import { usePartialSection, useScriptAsDataURI } from "@deco/deco/hooks";
+import { asResolved, isDeferred } from "@deco/deco";
 /** @titleBy type */
-interface Scroll {
+export interface Scroll {
   type: "scroll";
   /**
+   * @hide true
    * @title Delay MS
-   * @description Delay (in milliseconds) to wait after the scroll event is fired
+   * @description Delay (in milliseconds) to wait after the scroll event is fired.
    */
   payload: number;
 }
-
+interface Load {
+  type: "load";
+  /**
+   * @hide true
+   * @title Delay MS
+   * @description Delay (in milliseconds) to wait after the DOMContentLoaded event is fired. If value is 0, it will trigger when page load
+   */
+  payload: number;
+}
 /** @titleBy type */
-interface Intersection {
+export interface Intersection {
   type: "intersection";
   /**
    * @title Root Margin
@@ -25,32 +32,37 @@ interface Intersection {
    */
   payload: string;
 }
-
 export interface Props {
   sections: Section[];
   display?: boolean;
-  behavior?: Scroll | Intersection;
+  behavior?: Scroll | Intersection | Load;
 }
-
 const script = (
   id: string,
-  type: "scroll" | "intersection",
+  type: "scroll" | "intersection" | "load",
   payload: string,
 ) => {
   const element = document.getElementById(id);
-
   if (!element) {
     return;
   }
-
-  if (type === "scroll") {
-    addEventListener(
-      "scroll",
-      () => setTimeout(() => element.click(), Number(payload) || 200),
-      { once: true },
-    );
+  const triggerRender = (timeout: number) => () => {
+    setTimeout(() => element.click(), timeout);
+  };
+  if (type === "load") {
+    const timeout = Number(payload || 200);
+    const instant = timeout === 0;
+    if (instant || document.readyState === "complete") {
+      triggerRender(timeout);
+    } else {
+      addEventListener("DOMContentLoaded", triggerRender(timeout));
+    }
   }
-
+  if (type === "scroll") {
+    addEventListener("scroll", triggerRender(Number(payload) ?? 200), {
+      once: true,
+    });
+  }
   if (type === "intersection") {
     new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -62,7 +74,6 @@ const script = (
     }, { rootMargin: payload || "200px" }).observe(element);
   }
 };
-
 const Deferred = (props: Props) => {
   const { sections, display, behavior } = props;
   const sectionID = useId();
@@ -70,7 +81,6 @@ const Deferred = (props: Props) => {
   const partial = usePartialSection<typeof Deferred>({
     props: { display: true },
   });
-
   if (display) {
     return (
       <>
@@ -78,7 +88,6 @@ const Deferred = (props: Props) => {
       </>
     );
   }
-
   return (
     <>
       <button
@@ -99,12 +108,10 @@ const Deferred = (props: Props) => {
     </>
   );
 };
-
 export const loader = async (props: Props, req: Request, ctx: AppContext) => {
   const url = new URL(req.url);
   const shouldRender = props.display === true ||
     shouldForceRender({ ctx, searchParams: url.searchParams });
-
   if (shouldRender) {
     const sections = isDeferred(props.sections)
       ? await props.sections()
@@ -115,17 +122,14 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       sections,
     };
   }
-
   return { ...props, sections: [] };
 };
-
 const DEFERRED = true;
-
 export const onBeforeResolveProps = (props: Props) => {
   return {
     ...props,
+    fallback: null,
     sections: asResolved(props.sections, DEFERRED),
   };
 };
-
 export default Deferred;

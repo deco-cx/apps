@@ -190,9 +190,46 @@ const loader = async (
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage: page,
       records,
+      recordPerPage: count,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
   };
+};
+
+export const cache = "no-cache";
+export const cacheKey = (props: Props, req: Request): string | null => {
+  const url = new URL(props.pageHref || req.url);
+
+  if (url.searchParams.get("q")) return null;
+
+  const count = (props.count ?? 12).toString();
+  const query = props.query || "";
+  const page = (props.page || Number(url.searchParams.get("page")) || 0)
+    .toString();
+  const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
+  const startCursor = props.startCursor ||
+    url.searchParams.get("startCursor") || "";
+  const sort = url.searchParams.get("sort") ?? "";
+  const searchParams = new URLSearchParams({
+    count,
+    query,
+    page,
+    endCursor,
+    startCursor,
+    sort,
+  });
+
+  url.searchParams.forEach((value, key) => {
+    if (!key.startsWith("filter.")) return;
+
+    searchParams.append(key, value);
+  });
+
+  searchParams.sort();
+
+  url.search = searchParams.toString();
+
+  return url.href;
 };
 
 export default loader;

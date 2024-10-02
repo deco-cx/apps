@@ -1,4 +1,5 @@
 import {
+  PageInfo,
   Person,
   ProductDetailsPage,
   ProductListingPage,
@@ -6,10 +7,13 @@ import {
 import { AppContext } from "../../mod.ts";
 import getSource from "../../utils/source.ts";
 import type { LinxUser } from "../../utils/types/analytics.ts";
-
+import { getDeviceIdFromBag } from "../../utils/deviceId.ts";
+import { type SectionProps } from "@deco/deco";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 type Page =
   | "home"
   | "category"
+  | "subcategory"
   | "product"
   | "search"
   | "checkout"
@@ -18,7 +22,6 @@ type Page =
   | "hotsite"
   | "userprofile"
   | "other";
-
 interface Category {
   /**
    * @hide
@@ -27,7 +30,14 @@ interface Category {
   page: string;
   products: ProductListingPage | null;
 }
-
+interface Subcategory {
+  /**
+   * @hide
+   * @default subcategory
+   */
+  page: string;
+  products: ProductListingPage | null;
+}
 interface Product {
   /**
    * @hide
@@ -36,7 +46,6 @@ interface Product {
   page: string;
   details: ProductDetailsPage | null;
 }
-
 interface Home {
   /**
    * @hide
@@ -44,7 +53,6 @@ interface Home {
    */
   page: string;
 }
-
 interface Other {
   /**
    * @hide
@@ -52,7 +60,6 @@ interface Other {
    */
   page: string;
 }
-
 interface Search {
   /**
    * @hide
@@ -61,7 +68,6 @@ interface Search {
   page: string;
   result: ProductListingPage | null;
 }
-
 interface Checkout {
   /**
    * @hide
@@ -69,7 +75,6 @@ interface Checkout {
    */
   page: string;
 }
-
 interface LandingPage {
   /**
    * @hide
@@ -77,7 +82,6 @@ interface LandingPage {
    */
   page: string;
 }
-
 interface NotFound {
   /**
    * @hide
@@ -85,7 +89,6 @@ interface NotFound {
    */
   page: string;
 }
-
 interface Hotsite {
   /**
    * @hide
@@ -93,7 +96,6 @@ interface Hotsite {
    */
   page: string;
 }
-
 interface UserProfile {
   /**
    * @hide
@@ -101,7 +103,11 @@ interface UserProfile {
    */
   page: string;
 }
-
+interface SendViewEventParams {
+  page: Page | string;
+  // deno-lint-ignore no-explicit-any
+  body?: Record<string, any>;
+}
 interface Props {
   /**
    * @title Event
@@ -110,6 +116,7 @@ interface Props {
   event:
     | Home
     | Category
+    | Subcategory
     | Product
     | Search
     | Other
@@ -120,14 +127,13 @@ interface Props {
     | UserProfile;
   user: Person | null;
 }
-
 /** @title Linx Impulse Integration - Events */
-export const loader = async (props: Props, req: Request, ctx: AppContext) => {
-  const { event } = props;
-  const page = event.page as Page;
-
-  const url = new URL(req.url);
-  const source = getSource(ctx);
+export const script = async (props: SectionProps<typeof loader>) => {
+  const { event, source, apiKey, salesChannel, url: urlStr, deviceId } = props;
+  if (!event) {
+    return;
+  }
+  const { page } = event;
   const user: LinxUser | undefined = props.user
     ? {
       id: props.user["@id"] ?? props.user.email ?? "",
@@ -139,45 +145,114 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       birthday: undefined,
     }
     : undefined;
-
+  const sendViewEvent = (params: SendViewEventParams) => {
+    const baseUrl = new URL(
+      `https://api.event.linximpulse.net/v7/events/views/${params.page}`,
+    );
+    // deviceId && baseUrl.searchParams.append("deviceId", deviceId);
+    const headers = new Headers();
+    headers.set("content-type", "application/json");
+    props.origin && headers.set("origin", props.origin);
+    return fetch(baseUrl.toString(), {
+      method: "POST",
+      credentials: "include",
+      headers,
+      body: JSON.stringify({
+        apiKey,
+        source,
+        user,
+        deviceId,
+        salesChannel,
+        ...params.body,
+      }),
+    });
+  };
+  const getSearchIdFromPageInfo = (pageInfo?: PageInfo | null) => {
+    const searchIdInPageTypes = pageInfo?.pageTypes?.find((pageType) =>
+      pageType?.startsWith("SearchId:")
+    );
+    return searchIdInPageTypes?.replace("SearchId:", "");
+  };
+  const getCategoriesFromPage = (page: ProductListingPage) => {
+    if (page.breadcrumb.itemListElement.length) {
+      return page.breadcrumb.itemListElement.map((item) => item.name!);
+    } else {
+      const departmentsFilter = page.filters.find((filter) =>
+        filter.key === "Departments"
+      )?.values;
+      if (Array.isArray(departmentsFilter)) {
+        return departmentsFilter.map((value) => value.label);
+      }
+    }
+  };
+  const getItemsFromProducts = (products?: ProductListingPage["products"]) => {
+    return (products?.map((product) => {
+      return {
+        pid: product.isVariantOf?.productGroupID ?? product.productID,
+        sku: product.sku,
+      };
+    }) ?? []);
+  };
+  const url = new URL(urlStr);
   switch (page) {
     case "category": {
       let searchId: string | undefined;
-
+      let categories: string[] | undefined;
       if ("products" in event && event.products) {
-        for (const product of event.products.products ?? []) {
-          searchId = product.isVariantOf?.additionalProperty?.find((p) =>
-            p.name === "searchId"
-          )?.value;
-
-          if (searchId) {
-            break;
-          }
+        const query = url.searchParams.get("q");
+        const searchIndex =
+          event.products.pageInfo.pageTypes?.findIndex((pageType) =>
+            pageType === "Search"
+          ) ?? -1;
+        // If page has a search term
+        if (searchIndex > 0 || query) {
+          const items = getItemsFromProducts(event.products.products);
+          await sendViewEvent({
+            page: "search",
+            body: {
+              query: query || url.pathname.split("/").at(-1) || "",
+              items,
+              searchId,
+            },
+          });
+          break;
         }
+        searchId = getSearchIdFromPageInfo(event.products.pageInfo);
+        categories = getCategoriesFromPage(event.products);
       }
-
-      await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
-        event: "view",
-        params: {
-          page,
-          source,
-          user,
+      await sendViewEvent({
+        page: (categories?.length ?? 1) === 1 ? "category" : "subcategory",
+        body: {
+          categories,
           searchId,
-          categories: url.pathname.slice(1).split("/"),
+        },
+      });
+      break;
+    }
+    case "subcategory": {
+      let searchId: string | undefined;
+      let categories: string[] | undefined;
+      if ("products" in event && event.products) {
+        searchId = getSearchIdFromPageInfo(event.products.pageInfo);
+        categories = getCategoriesFromPage(event.products);
+      }
+      await sendViewEvent({
+        page: "subcategory",
+        body: {
+          categories,
+          searchId,
         },
       });
       break;
     }
     case "product": {
-      if (!("details" in event) || !event.details) break;
+      if (!("details" in event) || !event.details) {
+        break;
+      }
       const { details } = event;
-
-      await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
-        event: "view",
-        params: {
-          page,
-          source,
-          user,
+      await sendViewEvent({
+        page,
+        body: {
           pid: details.product.isVariantOf?.productGroupID ??
             details.product.productID,
           price: details.product.offers?.lowPrice,
@@ -187,31 +262,30 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       break;
     }
     case "search": {
-      if (!("result" in event) || !event.result) break;
-      const { result } = event;
-
+      const searchId = getSearchIdFromPageInfo(
+        "result" in event && event.result ? event.result.pageInfo : undefined,
+      );
       const query = url.searchParams.get("q") ??
         url.pathname.split("/").pop() ?? "";
-
-      let searchId: string | undefined;
-      const items = result.products.map((product) => {
-        if (!searchId) {
-          searchId = product.isVariantOf?.additionalProperty?.find((p) =>
-            p.name === "searchId"
-          )?.value;
-        }
-        return ({
-          pid: product.isVariantOf?.productGroupID ?? product.productID,
-          sku: product.sku,
+      if (
+        !("result" in event) ||
+        !event.result ||
+        !event.result.products.length
+      ) {
+        return sendViewEvent({
+          page: "emptysearch",
+          body: {
+            query,
+            items: [],
+            searchId,
+          },
         });
-      });
-
-      await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
-        event: "view",
-        params: {
-          page,
-          source,
-          user,
+      }
+      const { result } = event;
+      const items = getItemsFromProducts(result.products);
+      await sendViewEvent({
+        page,
+        body: {
           query,
           items,
           searchId,
@@ -219,20 +293,50 @@ export const loader = async (props: Props, req: Request, ctx: AppContext) => {
       });
       break;
     }
+    case "landingpage": {
+      await sendViewEvent({
+        page: "landing_page",
+      });
+      break;
+    }
+    case "notfound": {
+      await sendViewEvent({
+        page: "not_found",
+      });
+      break;
+    }
     default: {
-      await ctx.invoke["linx-impulse"].actions.analytics.sendEvent({
-        event: "view",
-        params: {
-          page,
-          source,
-          user,
-        },
+      await sendViewEvent({
+        page,
       });
       break;
     }
   }
 };
-
-export default function LinxImpulsePageView() {
-  return null;
+/** @title Linx Impulse - Page View Events */
+export const loader = (props: Props, req: Request, ctx: AppContext) => ({
+  ...props,
+  apiKey: ctx.apiKey,
+  salesChannel: ctx.salesChannel,
+  source: getSource(ctx),
+  url: req.url,
+  deviceId: getDeviceIdFromBag(ctx),
+  origin: ctx.origin,
+});
+export default function LinxImpulsePageView(
+  props: SectionProps<typeof loader>,
+) {
+  return (
+    <div>
+      <script defer src={useScriptAsDataURI(script, props)} />
+      <span class="hidden">
+        {/* The props from loaders come undefined when Async Rendering is active. */}
+        {/* Calling them below forces them to be recognized as "being used" */}
+        {!!props.user?.email && "user ok"}
+        {"details" in props.event && props.event.details?.product?.productID}
+        {"result" in props.event && props.event.result?.products?.length}
+        {"products" in props.event && props.event.products?.products?.length}
+      </span>
+    </div>
+  );
 }
