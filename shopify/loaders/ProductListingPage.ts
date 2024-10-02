@@ -203,7 +203,7 @@ const loader = async (
       title: collectionTitle || query || "",
       description: collectionDescription || "",
       canonical: `${url.origin}${url.pathname}`,
-    }
+    },
   };
 };
 
