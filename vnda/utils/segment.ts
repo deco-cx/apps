@@ -5,6 +5,8 @@ interface Segment {
   agent: string;
 }
 
+export const STORE_CC_COOKIE_NAME = "store_cc";
+export const CART_CC_COOKIE_NAME = "cart_cc";
 export const SEGMENT_COOKIE_NAME = "vnda_segment";
 const SEGMENT = Symbol("segment");
 const SIXTYDAYS = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000);
@@ -19,11 +21,6 @@ export const parse = (cookie: string) => JSON.parse(atob(cookie));
 export const buildSegmentCookie = (req: Request): string | null => {
   const url = new URL(req.url);
   const param = url.searchParams.get("agent");
-  const cc = url.searchParams.get("cc");
-
-  if (cc) {
-    return btoa(JSON.stringify({ cc }));
-  }
 
   return param || null;
 };
@@ -47,6 +44,36 @@ export const setSegmentCookie = (
     secure: true,
     httpOnly: true,
     expires: SIXTYDAYS,
+  });
+
+  return headers;
+};
+
+export const getCC = (
+  req: Request,
+): string | undefined => {
+  const cookies = getCookies(req.headers);
+  const cookie = cookies[STORE_CC_COOKIE_NAME];
+  return cookie;
+};
+
+export const setStoreCC = (
+  cc: string,
+  headers: Headers = new Headers(),
+): Headers => {
+  setCookie(headers, {
+    value: cc,
+    name: STORE_CC_COOKIE_NAME,
+    path: "/",
+    secure: true,
+    httpOnly: true,
+  });
+  setCookie(headers, {
+    value: cc,
+    name: CART_CC_COOKIE_NAME,
+    path: "/",
+    secure: true,
+    httpOnly: true,
   });
 
   return headers;

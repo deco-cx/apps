@@ -2,6 +2,7 @@ import { HttpError } from "../../../utils/http.ts";
 import cartLoader, { Cart } from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie } from "../../utils/cart.ts";
+import { getCC } from "../../utils/segment.ts";
 
 export interface Props {
   itemId: string;
@@ -22,11 +23,14 @@ const action = async (
     throw new HttpError(400, "Missing cart cookie");
   }
 
+  const cc = getCC(req);
+
   await api["POST /api/v2/carts/:cartId/items"]({ cartId }, {
     body: {
       sku: itemId,
       quantity,
       extra: attributes,
+      store_coupon_code: cc,
     },
   });
 

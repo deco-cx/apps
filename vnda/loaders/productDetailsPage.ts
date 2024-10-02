@@ -3,7 +3,7 @@ import { STALE } from "../../utils/fetch.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { ProductPrice } from "../utils/client/types.ts";
-import { getSegmentFromCookie, parse } from "../utils/segment.ts";
+import { getCC } from "../utils/segment.ts";
 import { parseSlug, toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -35,7 +35,7 @@ async function loader(
   }
 
   const { id } = fromSlug;
-  const segment = parse(getSegmentFromCookie(req) ?? "");
+  const cc = getCC(req);
 
   const getMaybeProduct = async (id: number) => {
     try {
@@ -56,14 +56,14 @@ async function loader(
 
   // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
   const getProductPrice = async (id: number): Promise<ProductPrice | null> => {
-    if (!priceIntl && !segment?.cc) {
+    if (!priceIntl && !cc) {
       return null;
     }
 
     try {
       const result = await api["GET /api/v2/products/:productId/price"]({
         productId: id,
-        coupon_codes: segment?.cc ? [segment.cc] : [],
+        coupon_codes: cc ? [cc] : [],
       }, STALE);
       return result.json();
     } catch (error) {
