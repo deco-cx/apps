@@ -411,6 +411,14 @@ export interface Person extends Omit<Thing, "@type"> {
   taxID?: string;
   /** The telephone number. */
   telephone?: string;
+  /** The birth date of the person. */
+  birthDate?: string;
+  /** The name of the organization. */
+  corporateName?: string;
+  corporateDocument?: string;
+  tradeName?: string;
+  businessPhone?: string;
+  isCorporate?: boolean;
   /** Custom fields */
   customFields?: CustomFields[];
 }
