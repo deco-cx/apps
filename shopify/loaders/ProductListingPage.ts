@@ -73,7 +73,7 @@ const loader = async (
 
   const count = props.count ?? 12;
   const query = props.query || url.searchParams.get("q") || "";
-  const page = props.page || Number(url.searchParams.get("page")) || 0;
+  const page = props.page || Number(url.searchParams.get("page")) || 1;
   const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
   const startCursor = props.startCursor ||
     url.searchParams.get("startCursor") || "";
