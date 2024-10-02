@@ -18,9 +18,11 @@ const loader = async (props: Props, req: Request, ctx: AppContext) => {
       label: "No products found, use search",
     }];
   }
+
   return suggestions?.products?.map((product) => ({
     value: `${product.productID}`,
-    label: `${product.productID} - ${product.name}`,
+    label:
+      `${product.productID} - ${product.isVariantOf?.name} ${product.name} - ${product.isVariantOf?.productGroupID}`,
     image: product.image?.[0]?.url,
   }));
 };
