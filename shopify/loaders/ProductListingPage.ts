@@ -174,8 +174,6 @@ const loader = async (
 
   const filters = shopifyFilters?.map((filter) => toFilter(filter, url));
 
-  console.log("collectionDescription", collectionDescription);
-
   return {
     "@type": "ProductListingPage",
     // TODO: Update breadcrumb when accept more than one path
@@ -200,7 +198,7 @@ const loader = async (
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
     seo: {
-      title: collectionTitle || query || "",
+      title: collectionTitle || "",
       description: collectionDescription || "",
       canonical: `${url.origin}${url.pathname}`,
     },
