@@ -22,11 +22,12 @@ import * as $$$$$$$$$16 from "./actions/cart/updateUser.ts";
 import * as $$$$$$$$$17 from "./actions/masterdata/createDocument.ts";
 import * as $$$$$$$$$18 from "./actions/newsletter/subscribe.ts";
 import * as $$$$$$$$$19 from "./actions/notifyme.ts";
-import * as $$$$$$$$$20 from "./actions/review/submit.ts";
-import * as $$$$$$$$$21 from "./actions/sessions/delete.ts";
-import * as $$$$$$$$$22 from "./actions/trigger.ts";
-import * as $$$$$$$$$23 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$24 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$20 from "./actions/payments/delete.ts";
+import * as $$$$$$$$$21 from "./actions/review/submit.ts";
+import * as $$$$$$$$$22 from "./actions/sessions/delete.ts";
+import * as $$$$$$$$$23 from "./actions/trigger.ts";
+import * as $$$$$$$$$24 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$25 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/categories/tree.ts";
@@ -53,18 +54,20 @@ import * as $$$21 from "./loaders/options/productIdByTerm.ts";
 import * as $$$22 from "./loaders/orders/list.ts";
 import * as $$$23 from "./loaders/paths/PDPDefaultPath.ts";
 import * as $$$24 from "./loaders/paths/PLPDefaultPath.ts";
-import * as $$$25 from "./loaders/product/extend.ts";
-import * as $$$26 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$27 from "./loaders/product/extensions/list.ts";
-import * as $$$28 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$29 from "./loaders/product/extensions/suggestions.ts";
-import * as $$$30 from "./loaders/product/wishlist.ts";
-import * as $$$31 from "./loaders/proxy.ts";
-import * as $$$32 from "./loaders/sessions/info.ts";
-import * as $$$33 from "./loaders/user.ts";
-import * as $$$34 from "./loaders/wishlist.ts";
-import * as $$$35 from "./loaders/workflow/product.ts";
-import * as $$$36 from "./loaders/workflow/products.ts";
+import * as $$$25 from "./loaders/payments/info.ts";
+import * as $$$26 from "./loaders/payments/userPayments.ts";
+import * as $$$27 from "./loaders/product/extend.ts";
+import * as $$$28 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$29 from "./loaders/product/extensions/list.ts";
+import * as $$$30 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$31 from "./loaders/product/extensions/suggestions.ts";
+import * as $$$32 from "./loaders/product/wishlist.ts";
+import * as $$$33 from "./loaders/proxy.ts";
+import * as $$$34 from "./loaders/sessions/info.ts";
+import * as $$$35 from "./loaders/user.ts";
+import * as $$$36 from "./loaders/wishlist.ts";
+import * as $$$37 from "./loaders/workflow/product.ts";
+import * as $$$38 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -96,18 +99,20 @@ const manifest = {
     "vtex/loaders/orders/list.ts": $$$22,
     "vtex/loaders/paths/PDPDefaultPath.ts": $$$23,
     "vtex/loaders/paths/PLPDefaultPath.ts": $$$24,
-    "vtex/loaders/product/extend.ts": $$$25,
-    "vtex/loaders/product/extensions/detailsPage.ts": $$$26,
-    "vtex/loaders/product/extensions/list.ts": $$$27,
-    "vtex/loaders/product/extensions/listingPage.ts": $$$28,
-    "vtex/loaders/product/extensions/suggestions.ts": $$$29,
-    "vtex/loaders/product/wishlist.ts": $$$30,
-    "vtex/loaders/proxy.ts": $$$31,
-    "vtex/loaders/sessions/info.ts": $$$32,
-    "vtex/loaders/user.ts": $$$33,
-    "vtex/loaders/wishlist.ts": $$$34,
-    "vtex/loaders/workflow/product.ts": $$$35,
-    "vtex/loaders/workflow/products.ts": $$$36,
+    "vtex/loaders/payments/info.ts": $$$25,
+    "vtex/loaders/payments/userPayments.ts": $$$26,
+    "vtex/loaders/product/extend.ts": $$$27,
+    "vtex/loaders/product/extensions/detailsPage.ts": $$$28,
+    "vtex/loaders/product/extensions/list.ts": $$$29,
+    "vtex/loaders/product/extensions/listingPage.ts": $$$30,
+    "vtex/loaders/product/extensions/suggestions.ts": $$$31,
+    "vtex/loaders/product/wishlist.ts": $$$32,
+    "vtex/loaders/proxy.ts": $$$33,
+    "vtex/loaders/sessions/info.ts": $$$34,
+    "vtex/loaders/user.ts": $$$35,
+    "vtex/loaders/wishlist.ts": $$$36,
+    "vtex/loaders/workflow/product.ts": $$$37,
+    "vtex/loaders/workflow/products.ts": $$$38,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
@@ -136,11 +141,12 @@ const manifest = {
     "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$17,
     "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$18,
     "vtex/actions/notifyme.ts": $$$$$$$$$19,
-    "vtex/actions/review/submit.ts": $$$$$$$$$20,
-    "vtex/actions/sessions/delete.ts": $$$$$$$$$21,
-    "vtex/actions/trigger.ts": $$$$$$$$$22,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$23,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$24,
+    "vtex/actions/payments/delete.ts": $$$$$$$$$20,
+    "vtex/actions/review/submit.ts": $$$$$$$$$21,
+    "vtex/actions/sessions/delete.ts": $$$$$$$$$22,
+    "vtex/actions/trigger.ts": $$$$$$$$$23,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$24,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$25,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
