@@ -22,10 +22,12 @@ import * as $$$$$$$$$16 from "./actions/cart/updateUser.ts";
 import * as $$$$$$$$$17 from "./actions/masterdata/createDocument.ts";
 import * as $$$$$$$$$18 from "./actions/newsletter/subscribe.ts";
 import * as $$$$$$$$$19 from "./actions/notifyme.ts";
-import * as $$$$$$$$$20 from "./actions/review/submit.ts";
-import * as $$$$$$$$$21 from "./actions/trigger.ts";
-import * as $$$$$$$$$22 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$23 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$20 from "./actions/profile/newsletterProfile.ts";
+import * as $$$$$$$$$21 from "./actions/profile/updateProfile.ts";
+import * as $$$$$$$$$22 from "./actions/review/submit.ts";
+import * as $$$$$$$$$23 from "./actions/trigger.ts";
+import * as $$$$$$$$$24 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$25 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/categories/tree.ts";
@@ -133,10 +135,12 @@ const manifest = {
     "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$17,
     "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$18,
     "vtex/actions/notifyme.ts": $$$$$$$$$19,
-    "vtex/actions/review/submit.ts": $$$$$$$$$20,
-    "vtex/actions/trigger.ts": $$$$$$$$$21,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$22,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$23,
+    "vtex/actions/profile/newsletterProfile.ts": $$$$$$$$$20,
+    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$21,
+    "vtex/actions/review/submit.ts": $$$$$$$$$22,
+    "vtex/actions/trigger.ts": $$$$$$$$$23,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$24,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$25,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
