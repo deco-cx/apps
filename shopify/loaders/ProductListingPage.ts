@@ -190,6 +190,7 @@ const loader = async (
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage: page,
       records,
+      recordPerPage: count,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
   };
@@ -217,6 +218,14 @@ export const cacheKey = (props: Props, req: Request): string | null => {
     startCursor,
     sort,
   });
+
+  url.searchParams.forEach((value, key) => {
+    if (!key.startsWith("filter.")) return;
+
+    searchParams.append(key, value);
+  });
+
+  searchParams.sort();
 
   url.search = searchParams.toString();
 

@@ -1,11 +1,13 @@
 import { ApiError } from "npm:@algolia/transporter@4.20.0";
 import { Product } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
-import { Indices, toIndex } from "../../utils/product.ts";
+import { toIndex } from "../../utils/product.ts";
+import { INDEX_NAME } from "../../loaders/product/list.ts";
 
 interface Props {
   product: Product;
   action: "DELETE" | "UPSERT";
+  indexName?: string;
 }
 
 // deno-lint-ignore no-explicit-any
@@ -13,10 +15,8 @@ const isAPIError = (x: any): x is ApiError =>
   typeof x?.status === "number" &&
   x.name === "ApiError";
 
-const indexName: Indices = "products";
-
 const action = async (props: Props, _req: Request, ctx: AppContext) => {
-  const { product, action } = props;
+  const { indexName = INDEX_NAME, product, action } = props;
   const { client } = ctx;
 
   try {

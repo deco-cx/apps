@@ -180,7 +180,7 @@ export default function Proxy({
       }
     }
     let text: undefined | string = undefined;
-    if (replaces && replaces.length > 0) {
+    if (replaces && replaces.length > 0 && contentType?.includes("text/html")) {
       if (response.ok) {
         text = await new Response(newBody).text();
         replaces.forEach(({ from, to }) => {
