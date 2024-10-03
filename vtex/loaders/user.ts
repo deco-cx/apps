@@ -36,12 +36,10 @@ async function loader(
     `query getUserProfile { profile(customFields: "isNewsletterOptIn") { id userId email firstName lastName profilePicture gender document homePhone birthDate corporateDocument tradeName businessPhone isCorporate customFields { key value } }}`;
 
   try {
-    const data = await io.query<{ profile: User }, null>(
+    const { profile: user } = await io.query<{ profile: User }, null>(
       { query },
       { headers: { cookie } },
     );
-
-    const { profile: user } = data;
 
     return {
       "@id": user?.userId ?? user.id,

@@ -16,19 +16,6 @@ export interface UserMutation {
   isCorporate?: boolean;
 }
 
-interface ProfileInput {
-  firstName?: string;
-  lastName?: string;
-  email: string;
-  homePhone?: string | null;
-  gender?: string | null;
-  birthDate?: string | null;
-  corporateName?: string | null;
-  tradeName?: string | null;
-  businessPhone?: string | null;
-  isCorporate?: boolean;
-}
-
 const updateProfile = async (
   props: UserMutation,
   req: Request,
@@ -65,7 +52,7 @@ const updateProfile = async (
   try {
     const { updateProfile: updatedUser } = await io.query<
       { updateProfile: User },
-      { input: ProfileInput }
+      { input: UserMutation }
     >(
       {
         query: mutation,
