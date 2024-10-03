@@ -23,11 +23,13 @@ import * as $$$$$$$$$17 from "./actions/masterdata/createDocument.ts";
 import * as $$$$$$$$$18 from "./actions/newsletter/subscribe.ts";
 import * as $$$$$$$$$19 from "./actions/notifyme.ts";
 import * as $$$$$$$$$20 from "./actions/payments/delete.ts";
-import * as $$$$$$$$$21 from "./actions/review/submit.ts";
-import * as $$$$$$$$$22 from "./actions/sessions/delete.ts";
-import * as $$$$$$$$$23 from "./actions/trigger.ts";
-import * as $$$$$$$$$24 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$25 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$21 from "./actions/profile/newsletterProfile.ts";
+import * as $$$$$$$$$22 from "./actions/profile/updateProfile.ts";
+import * as $$$$$$$$$23 from "./actions/review/submit.ts";
+import * as $$$$$$$$$24 from "./actions/sessions/delete.ts";
+import * as $$$$$$$$$25 from "./actions/trigger.ts";
+import * as $$$$$$$$$26 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$27 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/categories/tree.ts";
@@ -142,11 +144,13 @@ const manifest = {
     "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$18,
     "vtex/actions/notifyme.ts": $$$$$$$$$19,
     "vtex/actions/payments/delete.ts": $$$$$$$$$20,
-    "vtex/actions/review/submit.ts": $$$$$$$$$21,
-    "vtex/actions/sessions/delete.ts": $$$$$$$$$22,
-    "vtex/actions/trigger.ts": $$$$$$$$$23,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$24,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$25,
+    "vtex/actions/profile/newsletterProfile.ts": $$$$$$$$$21,
+    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$22,
+    "vtex/actions/review/submit.ts": $$$$$$$$$23,
+    "vtex/actions/sessions/delete.ts": $$$$$$$$$24,
+    "vtex/actions/trigger.ts": $$$$$$$$$25,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$26,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$27,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
