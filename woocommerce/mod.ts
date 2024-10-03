@@ -1,8 +1,4 @@
-import type { 
-  App as A,
-  AppContext as AC,
-  AppRuntime as AR 
-} from "@deco/deco";
+import type { App as A, AppContext as AC, AppRuntime as AR } from "@deco/deco";
 import workflow from "../workflows/mod.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { WooCommerceAPI } from "./utils/client.ts";
@@ -52,9 +48,9 @@ export default function WooCommerce(
   const ck = getAuthValue(customer_key);
   const cs = getAuthValue(customer_secret);
 
-  const createBasicAuth = (key: string, secret: string) => 
+  const createBasicAuth = (key: string, secret: string) =>
     btoa(`${encodeURIComponent(key)}:${encodeURIComponent(secret)}`);
-  
+
   const auth = createBasicAuth(ck, cs);
 
   const headers = new Headers();

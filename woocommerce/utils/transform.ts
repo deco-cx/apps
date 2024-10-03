@@ -44,7 +44,7 @@ export const toBreadcrumbList = (
 };
 
 export const toImage = (
-  images: WCImage[]
+  images: WCImage[],
 ): ImageObject[] => {
   return images.map((image) => ({
     "@type": "ImageObject",
