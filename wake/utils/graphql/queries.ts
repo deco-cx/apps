@@ -1390,8 +1390,28 @@ export const Shop = {
 export const GetBuyList = {
   fragments: [BuyList],
   query: gql`query BuyList($id: Long!) {
-    buyList(id: $id){
-      ...BuyList
+      buyList(id: $id){
+        ...BuyList
+      }
+  }`,
+};
+
+export const AddKit = {
+  fragments: [Checkout],
+  query:
+    gql`mutation AddKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
+   checkout: checkoutAddKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
+    }
+  }`,
+};
+
+export const RemoveKit = {
+  fragments: [Checkout],
+  query:
+    gql`mutation RemoveKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
+    checkout: checkoutRemoveKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
     }
   }`,
 };

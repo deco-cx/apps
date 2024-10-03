@@ -221,7 +221,7 @@ const searchLoader = async (
 
   const hasPreviousPage = page > 1;
 
-  const pageOffset = props.pageOffset ?? 1;
+  const pageOffset = props.pageOffset ?? 0;
 
   if (hasNextPage) {
     nextPage.set("page", (page + pageOffset + 1).toString());

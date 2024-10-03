@@ -49,6 +49,8 @@ const state = {
     loading.value = false;
   },
   addItem: enqueue("wake/actions/cart/addItem.ts"),
+  addKit: enqueue("wake/actions/cart/addKit.ts"),
+  removeKit: enqueue("wake/actions/cart/removeKit.ts"),
   addItems: enqueue("wake/actions/cart/addItems.ts"),
   updateItem: enqueue("wake/actions/cart/updateItemQuantity.ts"),
   addCoupon: enqueue("wake/actions/cart/addCoupon.ts"),
