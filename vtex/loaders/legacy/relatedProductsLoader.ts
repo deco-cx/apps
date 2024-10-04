@@ -89,12 +89,6 @@ async function loader(
     }, { ...STALE, headers: withSegmentCookie(segment) })
     .then((res) => res.json());
 
-  if (products && !Array.isArray(products)) {
-    throw new Error(
-      `Error while fetching VTEX data ${JSON.stringify(products)}`,
-    );
-  }
-
   // unique Ids
   const relatedIds = [...new Set(
     products.slice(0, count).map((p) => pickSku(p).itemId),
