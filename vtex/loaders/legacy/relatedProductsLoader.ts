@@ -106,10 +106,25 @@ async function loader(
     batchedIds.map((ids) =>
       productList({ props: { similars: false, ids } }, req, ctx)
     ),
-  ).then((p) => p.flat().filter((x): x is Product => Boolean(x)));
+  );
 
-  // Search API does not offer a way to filter out in stock products
-  // This is a scape hatch
+  const relatedProducts = relatedProductsResults
+    .filter(
+      (result): result is PromiseFulfilledResult<Product[]> =>
+        result.status === "fulfilled",
+    )
+    .flatMap((result) => result.value)
+    .filter((x): x is Product => Boolean(x));
+
+  relatedProductsResults
+    .filter((result) => result.status === "rejected")
+    .forEach((result, index) => {
+      console.error(
+        `Error loading related products for batch ${index}:`,
+        (result as PromiseRejectedResult).reason,
+      );
+    });
+
   if (hideUnavailableItems && relatedProducts) {
     const inStock = (p: Product) =>
       p.offers?.offers.find((o) =>
