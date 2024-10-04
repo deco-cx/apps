@@ -12,15 +12,20 @@ export const withIsSimilarTo = async (
   if (!id) {
     return product;
   }
+  let isSimilarTo = undefined;
 
-  const isSimilarTo = await relatedProductsLoader(
-    {
-      crossSelling: "similars",
-      id: product.inProductGroupWithID,
-    },
-    req,
-    ctx,
-  );
+  try{
+    isSimilarTo = await relatedProductsLoader(
+      {
+        crossSelling: "similars",
+        id: product.inProductGroupWithID,
+      },
+      req,
+      ctx,
+    );
+  }catch(e){
+    console.error(e)
+  }
 
   return {
     ...product,
