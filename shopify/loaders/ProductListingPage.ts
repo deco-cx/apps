@@ -21,6 +21,7 @@ import {
   sortOptions,
   sortShopify,
 } from "../utils/utils.ts";
+import { Metafields } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -37,6 +38,11 @@ export interface Props {
    * @description number of products per page to display
    */
   count: number;
+  /**
+   * @title Metafields
+   * @description search for metafields
+   */
+  metafields?: Metafields[];
   /**
    * @hide
    * @description it is hidden because only page prop is not sufficient, we need cursors
@@ -77,6 +83,7 @@ const loader = async (
   const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
   const startCursor = props.startCursor ||
     url.searchParams.get("startCursor") || "";
+  const metafields = props.metafields || [];
 
   const isSearch = Boolean(query);
   let hasNextPage = false;
@@ -129,6 +136,7 @@ const loader = async (
         ...(endCursor && { last: count }),
         ...(startCursor && { after: startCursor }),
         ...(endCursor && { before: endCursor }),
+        ...(metafields.length && { metafields }),
         handle: pathname,
         filters: getFiltersByUrl(url),
         ...sortShopify[sort],

@@ -181,3 +181,11 @@ export interface UnitPriceMeasurement {
   referenceUnit: null;
   quantityUnit: null;
 }
+
+/**
+ * @title {{{key}}}
+ */
+export interface Metafields {
+  namespace: string;
+  key: string;
+}
