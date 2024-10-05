@@ -6,7 +6,20 @@ export type OrderBy =
   | "modified"
   | "title"
   | "slug"
-  | "date";
+  | "date"
+  | "id"
+  | "menu_order";
+
+export type Status =
+  | "any"
+  | "draft"
+  | "pending"
+  | "private"
+  | "publish";
+
+export type Order = "asc" | "desc";
+
+export type StockStatus = "instock" | "outofstock" | "onbackorder";
 
 export interface BaseProduct {
   id: number;

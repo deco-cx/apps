@@ -3,12 +3,14 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/product/productDetailsPage.ts";
-import * as $$$1 from "./loaders/proxy.ts";
+import * as $$$1 from "./loaders/product/productList.ts";
+import * as $$$2 from "./loaders/proxy.ts";
 
 const manifest = {
   "loaders": {
     "woocommerce/loaders/product/productDetailsPage.ts": $$$0,
-    "woocommerce/loaders/proxy.ts": $$$1,
+    "woocommerce/loaders/product/productList.ts": $$$1,
+    "woocommerce/loaders/proxy.ts": $$$2,
   },
   "name": "woocommerce",
   "baseUrl": import.meta.url,

@@ -7,6 +7,10 @@ export interface Props {
   slug: RequestURLParam;
 }
 
+/**
+ * @title WooCommerce Integration
+ * @description Product Details Page loader
+ */
 async function loader(
   props: Props,
   _req: Request,
