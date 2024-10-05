@@ -1,4 +1,11 @@
-import { BaseProduct, Category, OrderBy } from "./types.ts";
+import {
+  BaseProduct,
+  Category,
+  Order,
+  OrderBy,
+  Status,
+  StockStatus,
+} from "./types.ts";
 
 export interface WooCommerceAPI {
   "GET /wc/v3/products": {
@@ -12,8 +19,8 @@ export interface WooCommerceAPI {
       slug?: string;
       parent?: string;
       parent_exclude?: string[];
-      status?: "any" | "draft" | "pending" | "private" | "publish";
-      stock_status?: "instock" | "outofstock" | "onbackorder";
+      status?: Status;
+      stock_status?: StockStatus;
       type?: "simple" | "grouped" | "external" | "variable";
       featured?: boolean;
       tag?: string;
@@ -32,7 +39,7 @@ export interface WooCommerceAPI {
     searchParams: {
       page?: number;
       per_page?: number;
-      order?: "asc" | "desc";
+      order?: Order;
       orderby?: OrderBy;
       hide_empty?: boolean;
       parent?: number;
