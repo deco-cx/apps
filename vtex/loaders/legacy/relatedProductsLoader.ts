@@ -102,7 +102,8 @@ async function loader(
 
   /** Batch fetches due to VTEX API limits */
   const batchedIds = batch(relatedIds, 50);
-  const relatedProducts = await Promise.all(
+
+  const relatedProductsResults = await Promise.allSettled(
     batchedIds.map((ids) =>
       productList({ props: { similars: false, ids } }, req, ctx)
     ),

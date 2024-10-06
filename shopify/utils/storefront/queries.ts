@@ -210,6 +210,15 @@ fragment Cart on Cart {
   }
 }`;
 
+const Customer = gql`
+  fragment Customer on Customer {
+    id
+    email
+    firstName
+    lastName
+  }
+`;
+
 export const CreateCart = {
   query: gql`mutation CreateCart {
   payload: cartCreate { 
@@ -330,6 +339,15 @@ export const ProductRecommendations = {
   }`,
 };
 
+export const FetchCustomerInfo = {
+  fragments: [Customer],
+  query: gql`query FetchCustomerInfo($customerAccessToken: String!) {
+    customer(customerAccessToken: $customerAccessToken) {
+      ...Customer
+    }
+  }`,
+};
+
 export const AddItemToCart = {
   fragments: [Cart],
   query: gql`mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
@@ -360,4 +378,20 @@ export const UpdateItems = {
         cart { ...Cart }
       }
     }`,
+};
+
+export const SignInWithEmailAndPassword = {
+  query:
+    gql`mutation SignInWithEmailAndPassword($email: String!, $password: String!) {
+    customerAccessTokenCreate(input: { email: $email, password: $password }) {
+      customerAccessToken {
+        accessToken
+        expiresAt
+      }
+      customerUserErrors {
+        code
+        message
+      }
+    }
+  }`,
 };

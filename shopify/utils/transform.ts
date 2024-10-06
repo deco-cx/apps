@@ -42,10 +42,10 @@ export const toProductPage = (
   const skuId = maybeSkuId
     ? getVariantIdFromId(maybeSkuId)
     : product.variants.nodes[0]?.id;
-  const sku = product.variants.nodes.find((node) => node.id === skuId);
+  let sku = product.variants.nodes.find((node) => node.id === skuId);
 
   if (!sku) {
-    throw new Error(`Missing sku ${skuId} on product ${product.title}`);
+    sku = product.variants.nodes[0];
   }
 
   return {
