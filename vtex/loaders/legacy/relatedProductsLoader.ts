@@ -126,14 +126,6 @@ async function loader(
       );
     });
 
-  const allPromisesFailed = relatedProductsResults.every(
-    (result) => result.status === "rejected",
-  );
-
-  if (allPromisesFailed) {
-    throw new Error("Failed to load related products for all batches.");
-  }
-
   if (hideUnavailableItems && relatedProducts) {
     const inStock = (p: Product) =>
       p.offers?.offers.find((o) =>

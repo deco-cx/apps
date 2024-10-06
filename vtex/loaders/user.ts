@@ -14,6 +14,7 @@ export interface User {
   homePhone?: string;
   birthDate?: string;
   corporateDocument?: string;
+  corporateName?: string;
   tradeName?: string;
   businessPhone?: string;
   isCorporate?: boolean;
@@ -33,7 +34,7 @@ async function loader(
   }
 
   const query =
-    `query getUserProfile { profile(customFields: "isNewsletterOptIn") { id userId email firstName lastName profilePicture gender document homePhone birthDate corporateDocument tradeName businessPhone isCorporate customFields { key value } }}`;
+    `query getUserProfile { profile(customFields: "isNewsletterOptIn") { id userId email firstName lastName profilePicture gender document homePhone birthDate corporateDocument corporateName tradeName businessPhone isCorporate customFields { key value } }}`;
 
   try {
     const { profile: user } = await io.query<{ profile: User }, null>(
@@ -52,7 +53,8 @@ async function loader(
         : "https://schema.org/Male",
       telephone: user?.homePhone,
       birthDate: user?.birthDate,
-      corporateName: user?.tradeName,
+      corporateName: user?.corporateName,
+      tradeName: user?.tradeName,
       corporateDocument: user?.corporateDocument,
       businessPhone: user?.businessPhone,
       isCorporate: user?.isCorporate,
