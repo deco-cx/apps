@@ -37,18 +37,9 @@ async function loader(
   const query = `query getUserAddresses {
       profile {
         addresses {
-          addressId: id
-          addressType
-          addressName
           city
-          complement
           country
-          neighborhood
-          number
           postalCode
-          geoCoordinates
-          receiverName
-          reference
           state
           street
         }
@@ -63,7 +54,7 @@ async function loader(
       { query },
       { headers: { cookie } },
     );
-
+    
     return profile.addresses?.map((address) => ({
       "@type": "PostalAddress",
       addressCountry: address?.country,
