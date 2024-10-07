@@ -190,6 +190,7 @@ const loader = async (
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
       currentPage: page,
       records,
+      recordPerPage: count,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
   };
