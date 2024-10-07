@@ -12,8 +12,11 @@ import {
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
+  HasMetafieldsMetafieldsArgs,
+  HasMetafieldsIdentifier,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
+import { Metafields } from "../utils/types.ts";
 import {
   CollectionSortKeys,
   SearchSortKeys,
@@ -28,6 +31,11 @@ export interface QueryProps {
   count: number;
   /** @description sort products */
   sort?: SearchSortKeys;
+  /**
+   * @title Metafields
+   * @description search for metafields
+   */
+  metafields?: Metafields[];
 }
 
 export interface CollectionProps {
@@ -37,6 +45,11 @@ export interface CollectionProps {
   count: number;
   /** @description sort products */
   sort?: CollectionSortKeys;
+  /**
+   * @title Metafields
+   * @description search for metafields
+   */
+  metafields?: Metafields[];
 }
 
 export interface FilterProps {
@@ -84,6 +97,7 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
 
   const count = props.count ?? 12;
+  const metafields = props.metafields || [];
 
   let shopifyProducts:
     | SearchResultItemConnection
@@ -113,12 +127,13 @@ const loader = async (
   if (isQueryList(props)) {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         first: count,
         query: props.query,
         productFilters: filters,
+        identifiers: metafields as HasMetafieldsIdentifier[],
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -127,12 +142,13 @@ const loader = async (
   } else {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootCollectionArgs & CollectionProductsArgs
+      QueryRootCollectionArgs & CollectionProductsArgs & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         first: count,
         handle: props.collection,
         filters,
+        identifiers: metafields as HasMetafieldsIdentifier[],
         ...sortShopify[sort],
       },
       ...ProductsByCollection,

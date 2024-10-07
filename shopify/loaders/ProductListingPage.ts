@@ -12,6 +12,8 @@ import {
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
+  HasMetafieldsMetafieldsArgs,
+  HasMetafieldsIdentifier,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
 import {
@@ -101,7 +103,7 @@ const loader = async (
   if (isSearch) {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
@@ -110,6 +112,7 @@ const loader = async (
         ...(endCursor && { before: endCursor }),
         query: query,
         productFilters: getFiltersByUrl(url),
+        identifiers: metafields as HasMetafieldsIdentifier[],
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -129,14 +132,14 @@ const loader = async (
 
     const data = await storefront.query<
       QueryRoot,
-      QueryRootCollectionArgs & CollectionProductsArgs
+      QueryRootCollectionArgs & CollectionProductsArgs & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
         ...(endCursor && { last: count }),
         ...(startCursor && { after: startCursor }),
         ...(endCursor && { before: endCursor }),
-        ...(metafields.length && { metafields }),
+        identifiers: metafields as HasMetafieldsIdentifier[],
         handle: pathname,
         filters: getFiltersByUrl(url),
         ...sortShopify[sort],
