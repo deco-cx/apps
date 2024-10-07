@@ -7704,6 +7704,8 @@ export type FilterFragment = { id: string, label: string, type: FilterType, valu
 
 export type CartFragment = { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<{ id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string }, price: { amount: any, currencyCode: CurrencyCode } }, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } } | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string }, price: { amount: any, currencyCode: CurrencyCode } }, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } }> }, cost: { subtotalAmount: { amount: any, currencyCode: CurrencyCode }, totalAmount: { amount: any, currencyCode: CurrencyCode }, checkoutChargeAmount: { amount: any, currencyCode: CurrencyCode } }, discountCodes: Array<{ code: string, applicable: boolean }>, discountAllocations: Array<{ discountedAmount: { amount: any, currencyCode: CurrencyCode } } | { discountedAmount: { amount: any, currencyCode: CurrencyCode } } | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }> };
 
+export type CustomerFragment = { id: string, email?: string | null, firstName?: string | null, lastName?: string | null };
+
 export type CreateCartMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7767,6 +7769,13 @@ export type ProductRecommendationsQueryVariables = Exact<{
 
 export type ProductRecommendationsQuery = { productRecommendations?: Array<{ availableForSale: boolean, createdAt: any, description: string, descriptionHtml: any, handle: string, id: string, isGiftCard: boolean, onlineStoreUrl?: any | null, productType: string, publishedAt: any, requiresSellingPlan: boolean, tags: Array<string>, title: string, totalInventory?: number | null, updatedAt: any, vendor: string, featuredImage?: { altText?: string | null, url: any } | null, images: { nodes: Array<{ altText?: string | null, url: any }> }, media: { nodes: Array<{ alt?: string | null, mediaContentType: MediaContentType, previewImage?: { altText?: string | null, url: any } | null } | { alt?: string | null, mediaContentType: MediaContentType, previewImage?: { altText?: string | null, url: any } | null } | { alt?: string | null, mediaContentType: MediaContentType, previewImage?: { altText?: string | null, url: any } | null } | { alt?: string | null, mediaContentType: MediaContentType, previewImage?: { altText?: string | null, url: any } | null }> }, options: Array<{ name: string, values: Array<string> }>, priceRange: { minVariantPrice: { amount: any, currencyCode: CurrencyCode }, maxVariantPrice: { amount: any, currencyCode: CurrencyCode } }, seo: { title?: string | null, description?: string | null }, variants: { nodes: Array<{ availableForSale: boolean, barcode?: string | null, currentlyNotInStock: boolean, id: string, quantityAvailable?: number | null, requiresShipping: boolean, sku?: string | null, title: string, weight?: number | null, weightUnit: WeightUnit, compareAtPrice?: { amount: any, currencyCode: CurrencyCode } | null, image?: { altText?: string | null, url: any } | null, price: { amount: any, currencyCode: CurrencyCode }, selectedOptions: Array<{ name: string, value: string }>, unitPrice?: { amount: any, currencyCode: CurrencyCode } | null, unitPriceMeasurement?: { measuredType?: UnitPriceMeasurementMeasuredType | null, quantityValue: number, referenceUnit?: UnitPriceMeasurementMeasuredUnit | null, quantityUnit?: UnitPriceMeasurementMeasuredUnit | null } | null }> }, collections: { nodes: Array<{ description: string, descriptionHtml: any, handle: string, id: string, title: string, updatedAt: any, image?: { altText?: string | null, url: any } | null }> } }> | null };
 
+export type FetchCustomerInfoQueryVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type FetchCustomerInfoQuery = { customer?: { id: string, email?: string | null, firstName?: string | null, lastName?: string | null } | null };
+
 export type AddItemToCartMutationVariables = Exact<{
   cartId: Scalars['ID']['input'];
   lines: Array<CartLineInput> | CartLineInput;
@@ -7790,3 +7799,11 @@ export type UpdateItemsMutationVariables = Exact<{
 
 
 export type UpdateItemsMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<{ id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string }, price: { amount: any, currencyCode: CurrencyCode } }, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } } | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string }, price: { amount: any, currencyCode: CurrencyCode } }, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } }> }, cost: { subtotalAmount: { amount: any, currencyCode: CurrencyCode }, totalAmount: { amount: any, currencyCode: CurrencyCode }, checkoutChargeAmount: { amount: any, currencyCode: CurrencyCode } }, discountCodes: Array<{ code: string, applicable: boolean }>, discountAllocations: Array<{ discountedAmount: { amount: any, currencyCode: CurrencyCode } } | { discountedAmount: { amount: any, currencyCode: CurrencyCode } } | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }> } | null } | null };
+
+export type SignInWithEmailAndPasswordMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type SignInWithEmailAndPasswordMutation = { customerAccessTokenCreate?: { customerAccessToken?: { accessToken: string, expiresAt: any } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }> } | null };
