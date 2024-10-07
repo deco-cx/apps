@@ -110,17 +110,17 @@ export const toProduct = (
     "value": product.descriptionHtml,
   };
   const additionalProperty: PropertyValue[] = selectedOptions
-  .map(toPropertyValue)
-  .concat(descriptionHtml)
-  .concat(
-    (product.metafields ?? [])
-      .filter((metafield) => metafield && metafield.key && metafield.value)
-      .map((metafield) => ({
-        "@type": "PropertyValue",
-        name: metafield?.key,
-        value: metafield?.value,
-      }))
-  );
+    .map(toPropertyValue)
+    .concat(descriptionHtml)
+    .concat(
+      (product.metafields ?? [])
+        .filter((metafield) => metafield && metafield.key && metafield.value)
+        .map((metafield) => ({
+          "@type": "PropertyValue",
+          name: metafield?.key,
+          value: metafield?.value,
+        })),
+    );
   const skuImages = nonEmptyArray([image]);
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));

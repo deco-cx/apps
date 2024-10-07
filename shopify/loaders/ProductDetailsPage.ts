@@ -42,7 +42,7 @@ const loader = async (
     GetProductQuery,
     GetProductQueryVariables & HasMetafieldsMetafieldsArgs
   >({
-    variables: { handle, identifiers: metafields as HasMetafieldsIdentifier[], },
+    variables: { handle, identifiers: metafields as HasMetafieldsIdentifier[] },
     ...GetProduct,
   });
 

@@ -241,7 +241,8 @@ export const GetCart = {
 
 export const GetProduct = {
   fragments: [Product, ProductVariant, Collection],
-  query: gql`query GetProduct($handle: String, $identifiers: [HasMetafieldsIdentifier!]!) {
+  query:
+    gql`query GetProduct($handle: String, $identifiers: [HasMetafieldsIdentifier!]!) {
     product(handle: $handle) { ...Product }
   }`,
 };

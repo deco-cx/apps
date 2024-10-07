@@ -6,14 +6,14 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
+  HasMetafieldsIdentifier,
+  HasMetafieldsMetafieldsArgs,
   Product,
   ProductConnection,
   QueryRoot,
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
-  HasMetafieldsMetafieldsArgs,
-  HasMetafieldsIdentifier,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
 import {
@@ -132,7 +132,9 @@ const loader = async (
 
     const data = await storefront.query<
       QueryRoot,
-      QueryRootCollectionArgs & CollectionProductsArgs & HasMetafieldsMetafieldsArgs
+      & QueryRootCollectionArgs
+      & CollectionProductsArgs
+      & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
