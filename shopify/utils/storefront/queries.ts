@@ -249,7 +249,8 @@ export const GetProduct = {
 
 export const ListProducts = {
   fragments: [Product, ProductVariant, Collection],
-  query: gql`query ListProducts($first: Int, $after: String, $query: String) {
+  query:
+    gql`query ListProducts($first: Int, $after: String, $query: String, $identifiers: [HasMetafieldsIdentifier!]!) {
     products(first: $first, after: $after, query: $query) {
       nodes {
         ...Product 
@@ -342,7 +343,8 @@ export const ProductsByCollection = {
 
 export const ProductRecommendations = {
   fragments: [Product, ProductVariant, Collection],
-  query: gql`query productRecommendations($productId: ID!) {
+  query:
+    gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!) {
     productRecommendations(productId: $productId) {
       ...Product
     }
