@@ -55,7 +55,7 @@ async function loader(
       { headers: { cookie } },
     );
 
-    return profile.addresses?.map((address) => ({
+    return profile?.addresses?.map((address) => ({
       "@type": "PostalAddress",
       addressCountry: address?.country,
       addressLocality: address?.city,
