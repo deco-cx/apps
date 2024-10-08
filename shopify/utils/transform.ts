@@ -116,7 +116,7 @@ export const toProduct = (
       "@type": "PropertyValue",
       name: metafield?.key,
       value: metafield?.reference && "image" in metafield.reference
-        ? metafield.reference.image?.originalSrc
+        ? metafield.reference.image?.url
         : metafield?.value,
     }));
 

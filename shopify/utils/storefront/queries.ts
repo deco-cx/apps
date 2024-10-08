@@ -130,7 +130,7 @@ fragment Product on Product {
     reference {
       ... on MediaImage {
         image {
-          originalSrc
+          url
         }
       }
     }
