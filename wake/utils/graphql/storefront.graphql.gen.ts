@@ -697,6 +697,8 @@ export type CheckoutAddress = {
   id?: Maybe<Scalars['ID']['output']>;
   /** The neighborhood of the address. */
   neighborhood?: Maybe<Scalars['String']['output']>;
+  /** Receiver's name */
+  receiverName?: Maybe<Scalars['String']['output']>;
   /** The reference point for the address. */
   referencePoint?: Maybe<Scalars['String']['output']>;
   /** The state of the address. */
@@ -713,6 +715,10 @@ export type CheckoutCustomer = {
   cnpj?: Maybe<Scalars['String']['output']>;
   /** Brazilian individual taxpayer registry identification. */
   cpf?: Maybe<Scalars['String']['output']>;
+  /** Customer's credit limit. */
+  creditLimit: Scalars['Decimal']['output'];
+  /** Customer's credit balance. */
+  creditLimitBalance: Scalars['Decimal']['output'];
   /** Customer's unique identifier. */
   customerId: Scalars['Long']['output'];
   /** Customer's name. */
@@ -724,7 +730,9 @@ export type CheckoutCustomer = {
 };
 
 export type CheckoutCustomizationInput = {
+  /** The ID of a customization type related to the product. */
   customizationId: Scalars['Long']['input'];
+  /** The value of the applied customization. */
   value?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -978,23 +986,37 @@ export type CheckoutProductCustomizationValueNode = {
 };
 
 export type CheckoutProductInput = {
+  /** The checkout unique identifier. */
   id: Scalars['Uuid']['input'];
+  /** The checkout products. */
   products: Array<InputMaybe<CheckoutProductItemInput>>;
 };
 
 export type CheckoutProductItemInput = {
+  /** The customizations of the product. */
   customization?: InputMaybe<Array<InputMaybe<CheckoutCustomizationInput>>>;
+  /** The ID represents all customizations applied to the product. */
   customizationId?: InputMaybe<Scalars['String']['input']>;
+  /** The metadata of the product. */
   metadata?: InputMaybe<Array<InputMaybe<CheckoutMetadataInput>>>;
+  /** The ID of the product variant. */
   productVariantId: Scalars['Long']['input'];
+  /** The quantity of the product. */
   quantity: Scalars['Int']['input'];
+  /** Product subscriptions related to checkout. */
   subscription?: InputMaybe<CheckoutSubscriptionInput>;
 };
 
 export type CheckoutProductItemUpdateInput = {
+  /** The customizations of the product. */
   customization?: InputMaybe<Array<InputMaybe<CheckoutCustomizationInput>>>;
+  /** The ID represents all customizations applied to the product. If it is a new customization, this field must be null, otherwise it must be inserted and must have the value. */
   customizationId?: InputMaybe<Scalars['String']['input']>;
+  /** The ID of the product variant. */
   productVariantId: Scalars['Long']['input'];
+  /** The quantity of the product. */
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+  /** The checkout subscription. */
   subscription?: InputMaybe<CheckoutSubscriptionInput>;
 };
 
@@ -1096,7 +1118,9 @@ export type CheckoutProductSubscriptionItemNode = {
 };
 
 export type CheckoutProductUpdateInput = {
+  /** The checkout unique identifier. */
   id: Scalars['Uuid']['input'];
+  /** The checkout product. */
   product: CheckoutProductItemUpdateInput;
 };
 
@@ -1127,7 +1151,9 @@ export type CheckoutShippingQuoteGroupNode = {
 };
 
 export type CheckoutSubscriptionInput = {
+  /** The recurring type id. */
   recurringTypeId: Scalars['Int']['input'];
+  /** The subscription group id. */
   subscriptionGroupId: Scalars['Long']['input'];
 };
 
@@ -1201,9 +1227,10 @@ export type CreateCustomerAddressInput = {
   city: Scalars['String']['input'];
   country: Scalars['CountryCode']['input'];
   email?: InputMaybe<Scalars['EmailAddress']['input']>;
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   neighborhood?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
+  receiverName?: InputMaybe<Scalars['String']['input']>;
   referencePoint?: InputMaybe<Scalars['String']['input']>;
   state: Scalars['String']['input'];
   street?: InputMaybe<Scalars['String']['input']>;
@@ -1239,6 +1266,8 @@ export type Customer = Node & {
   customerType?: Maybe<Scalars['String']['output']>;
   /** Customer's delivery address. */
   deliveryAddress?: Maybe<CustomerAddressNode>;
+  /** Customer's digital products. */
+  digitalProducts?: Maybe<Array<Maybe<OrderDigitalProductNode>>>;
   /** Customer's email address. */
   email?: Maybe<Scalars['String']['output']>;
   /** Customer's gender. */
@@ -1291,6 +1320,7 @@ export type CustomerOrderArgs = {
 /** A customer from the store. */
 export type CustomerOrdersArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
   sortDirection?: InputMaybe<OrderSortDirection>;
   sortKey?: InputMaybe<CustomerOrderSortKeys>;
 };
@@ -1358,12 +1388,17 @@ export type CustomerAddressNode = Node & {
   email?: Maybe<Scalars['String']['output']>;
   /** The node unique identifier. */
   id?: Maybe<Scalars['ID']['output']>;
-  /** The name of the customer address. */
+  /**
+   * The name of the customer address.
+   * @deprecated Use the 'receiverName' field to get the receiver name.
+   */
   name?: Maybe<Scalars['String']['output']>;
   /** Address neighborhood. */
   neighborhood?: Maybe<Scalars['String']['output']>;
   /** The phone of the customer address. */
   phone?: Maybe<Scalars['String']['output']>;
+  /** The name of the customer address. */
+  receiverName?: Maybe<Scalars['String']['output']>;
   /** Address reference point. */
   referencePoint?: Maybe<Scalars['String']['output']>;
   /** State. */
@@ -1667,6 +1702,8 @@ export type Customization = Node & {
   name?: Maybe<Scalars['String']['output']>;
   /** Priority order of customization. */
   order: Scalars['Int']['output'];
+  /** Customization is required. */
+  required: Scalars['Boolean']['output'];
   /** Type of customization. */
   type?: Maybe<Scalars['String']['output']>;
   /** Value of customization. */
@@ -1747,6 +1784,8 @@ export type EventList = {
   logoUrl?: Maybe<Scalars['String']['output']>;
   /** Name of the event owner */
   ownerName?: Maybe<Scalars['String']['output']>;
+  /** A list of products associated with the event. */
+  products?: Maybe<Array<Maybe<Product>>>;
   /** Event title */
   title?: Maybe<Scalars['String']['output']>;
   /** URL of the event */
@@ -2668,6 +2707,8 @@ export type MutationWishlistRemoveProductArgs = {
 
 export type NewsletterInput = {
   email: Scalars['String']['input'];
+  /** The receiver gender. Default is null. */
+  gender?: InputMaybe<Gender>;
   informationGroupValues?: InputMaybe<Array<InputMaybe<InformationGroupValueInput>>>;
   name: Scalars['String']['input'];
   /** [Deprecated: use the root field] The google recaptcha token. */
@@ -2679,6 +2720,8 @@ export type NewsletterNode = {
   createDate: Scalars['DateTime']['output'];
   /** The newsletter receiver email. */
   email?: Maybe<Scalars['String']['output']>;
+  /** Newsletter receiver gender. */
+  gender?: Maybe<Gender>;
   /** The newsletter receiver name. */
   name?: Maybe<Scalars['String']['output']>;
   /** Newsletter update date. */
@@ -2750,6 +2793,19 @@ export type OrderDeliveryAddressNode = {
   state?: Maybe<Scalars['String']['output']>;
   /** The street name of the address. */
   street?: Maybe<Scalars['String']['output']>;
+};
+
+export type OrderDigitalProductNode = {
+  /** The content of the digital product. */
+  content?: Maybe<Scalars['String']['output']>;
+  /** The order date. */
+  date: Scalars['DateTime']['output'];
+  /** The product name. */
+  name?: Maybe<Scalars['String']['output']>;
+  /** Order unique identifier. */
+  orderId: Scalars['Long']['output'];
+  /** The product sale price. */
+  salePrice: Scalars['Decimal']['output'];
 };
 
 export type OrderInvoiceNode = {
@@ -3476,6 +3532,8 @@ export type ProductExplicitFiltersInput = {
   productVariantId?: InputMaybe<Array<Scalars['Long']['input']>>;
   /** A product ID or a list of IDs to search for other products with the same parent ID. */
   sameParentAs?: InputMaybe<Array<Scalars['Long']['input']>>;
+  /** Search products. */
+  search?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   /** The set of SKUs which the result item SKU must be included. */
   sku?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   /** Show products with a quantity of available products in stock greater than or equal to the given number. */
@@ -3721,6 +3779,10 @@ export type QueryRoot = {
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** Retrieve a product by the given id. */
   product?: Maybe<SingleProduct>;
+  /** Retrieve a list of product recommendations based on the customer's cart. */
+  productAIRecommendationsByCart?: Maybe<Array<Maybe<Product>>>;
+  /** Retrieve a list of product recommendations based on the customer's orders. */
+  productAIRecommendationsByOrder?: Maybe<Array<Maybe<Product>>>;
   /**
    * Options available for the given product.
    * @deprecated Use the product query.
@@ -3730,12 +3792,12 @@ export type QueryRoot = {
   productRecommendations?: Maybe<Array<Maybe<Product>>>;
   /** Retrieve a list of products by specific filters. */
   products?: Maybe<ProductsConnection>;
-  /** List of resellers */
-  resellers?: Maybe<ResellersConnection>;
   /** Retrieve a list of scripts. */
   scripts?: Maybe<Array<Maybe<Script>>>;
   /** Search products with cursor pagination. */
   search?: Maybe<Search>;
+  /** List of sellers */
+  sellers?: Maybe<SellersConnection>;
   /** Get the shipping quote groups by providing CEP and checkout or products. */
   shippingQuoteGroups?: Maybe<Array<Maybe<ShippingQuoteGroup>>>;
   /** Get the shipping quotes by providing CEP and checkout or product identifier. */
@@ -3804,6 +3866,7 @@ export type QueryRootCategoriesArgs = {
   categoryIds?: InputMaybe<Array<Scalars['Long']['input']>>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  onlyRoot?: Scalars['Boolean']['input'];
   sortDirection?: SortDirection;
   sortKey?: CategorySortKeys;
   urls?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -3929,6 +3992,20 @@ export type QueryRootProductArgs = {
 };
 
 
+export type QueryRootProductAiRecommendationsByCartArgs = {
+  checkoutId: Scalars['Uuid']['input'];
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  quantity?: Scalars['Int']['input'];
+};
+
+
+export type QueryRootProductAiRecommendationsByOrderArgs = {
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  quantity?: Scalars['Int']['input'];
+};
+
+
 export type QueryRootProductOptionsArgs = {
   productId: Scalars['Long']['input'];
 };
@@ -3954,18 +4031,8 @@ export type QueryRootProductsArgs = {
 };
 
 
-export type QueryRootResellersArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  resellerName?: InputMaybe<Scalars['String']['input']>;
-  sortDirection?: SortDirection;
-  sortKey?: ResellerSortKeys;
-};
-
-
 export type QueryRootScriptsArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   pageType?: InputMaybe<Array<ScriptPageType>>;
   position?: InputMaybe<ScriptPosition>;
@@ -3978,6 +4045,18 @@ export type QueryRootSearchArgs = {
   operation?: Operation;
   partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
+  useAI?: Scalars['Boolean']['input'];
+};
+
+
+export type QueryRootSellersArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  sellerName?: InputMaybe<Scalars['String']['input']>;
+  sortDirection?: SortDirection;
+  sortKey?: ResellerSortKeys;
 };
 
 
@@ -4021,6 +4100,8 @@ export type Question = {
 
 /** Represents the product to be removed from the subscription. */
 export type RemoveSubscriptionProductInput = {
+  /** The quantity to be removed for the product. Removes all if not passed */
+  quantity?: InputMaybe<Scalars['Int']['input']>;
   /** The Id of the product within the subscription to be removed. */
   subscriptionProductId: Scalars['Long']['input'];
 };
@@ -4028,10 +4109,12 @@ export type RemoveSubscriptionProductInput = {
 export type ResellerNode = {
   /** Taxpayer identification number for businesses */
   cnpj?: Maybe<Scalars['String']['output']>;
-  /** The reseller's name */
+  /** The registered name of the company */
+  corporateName?: Maybe<Scalars['String']['output']>;
+  /** The seller's name */
   name?: Maybe<Scalars['String']['output']>;
-  /** Reseller unique identifier */
-  resellerId: Scalars['Long']['output'];
+  /** Seller unique identifier */
+  sellerId: Scalars['Long']['output'];
 };
 
 /** Define the reseller attribute which the result set will be sorted on. */
@@ -4040,25 +4123,6 @@ export type ResellerSortKeys =
   | 'ID'
   /** The reseller's name */
   | 'NAME';
-
-/** A connection to a list of items. */
-export type ResellersConnection = {
-  /** A list of edges. */
-  edges?: Maybe<Array<ResellersEdge>>;
-  /** A flattened list of the nodes. */
-  nodes?: Maybe<Array<Maybe<ResellerNode>>>;
-  /** Information to aid in pagination. */
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-/** An edge in a connection. */
-export type ResellersEdge = {
-  /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
-  /** The item at the end of the edge. */
-  node?: Maybe<ResellerNode>;
-};
 
 /** Back in stock registration input parameters. */
 export type RestockAlertInput = {
@@ -4129,6 +4193,8 @@ export type Seo = {
 export type Script = {
   /** The script content. */
   content?: Maybe<Scalars['String']['output']>;
+  /** The script id. */
+  id: Scalars['Long']['output'];
   /** The script name. */
   name?: Maybe<Scalars['String']['output']>;
   /** The script page type. */
@@ -4312,6 +4378,8 @@ export type SellerOffer = {
   prices?: Maybe<SellerPrices>;
   /** Variant unique identifier. */
   productVariantId?: Maybe<Scalars['Long']['output']>;
+  /** The stock of the product variant. */
+  stock: Scalars['Int']['output'];
 };
 
 /** The prices of the product. */
@@ -4322,6 +4390,25 @@ export type SellerPrices = {
   listPrice?: Maybe<Scalars['Decimal']['output']>;
   /** The current working price. */
   price?: Maybe<Scalars['Decimal']['output']>;
+};
+
+/** A connection to a list of items. */
+export type SellersConnection = {
+  /** A list of edges. */
+  edges?: Maybe<Array<SellersEdge>>;
+  /** A flattened list of the nodes. */
+  nodes?: Maybe<Array<Maybe<ResellerNode>>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** An edge in a connection. */
+export type SellersEdge = {
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node?: Maybe<ResellerNode>;
 };
 
 export type ShippingNode = {
@@ -4766,6 +4853,7 @@ export type UpdateCustomerAddressInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   neighborhood?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
+  receiverName?: InputMaybe<Scalars['String']['input']>;
   referencePoint?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['String']['input']>;
   street?: InputMaybe<Scalars['String']['input']>;
@@ -4963,6 +5051,7 @@ export type SearchQueryVariables = Exact<{
   sortDirection?: InputMaybe<SortDirection>;
   sortKey?: InputMaybe<ProductSearchSortKeys>;
   filters?: InputMaybe<Array<InputMaybe<ProductFilterInput>> | InputMaybe<ProductFilterInput>>;
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -5064,12 +5153,12 @@ export type GetUserQueryVariables = Exact<{
 
 export type GetUserQuery = { customer?: { id?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
 
-export type GetWislistQueryVariables = Exact<{
+export type GetWishlistQueryVariables = Exact<{
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetWislistQuery = { customer?: { wishlist?: { products?: Array<{ productId?: any | null, productName?: string | null } | null> | null } | null } | null };
+export type GetWishlistQuery = { customer?: { wishlist?: { products?: Array<{ productId?: any | null, productName?: string | null } | null> | null } | null } | null };
 
 export type GetUrlQueryVariables = Exact<{
   url: Scalars['String']['input'];
@@ -5108,6 +5197,7 @@ export type HotsiteQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']['input']>;
   sortDirection?: InputMaybe<SortDirection>;
   sortKey?: InputMaybe<ProductSortKeys>;
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -5127,6 +5217,7 @@ export type ShopQuery = { shop?: { checkoutUrl?: string | null, mainUrl?: string
 
 export type BuyListQueryVariables = Exact<{
   id: Scalars['Long']['input'];
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -5149,3 +5240,35 @@ export type RemoveKitMutationVariables = Exact<{
 
 
 export type RemoveKitMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
+
+export type GetPartnersQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  names?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
+  priceTableIds?: InputMaybe<Array<Scalars['Int']['input']> | Scalars['Int']['input']>;
+  sortDirection?: SortDirection;
+  sortKey?: PartnerSortKeys;
+  before?: InputMaybe<Scalars['String']['input']>;
+  alias?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetPartnersQuery = { partners?: { edges?: Array<{ node?: { partnerId: any, priceTableId: number, portfolioId: number, type?: string | null, startDate: any, endDate: any, name?: string | null, alias?: string | null, fullUrlLogo?: string | null, origin?: string | null, partnerAccessToken?: string | null } | null }> | null } | null };
+
+export type CheckoutPartnerAssociateMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+  partnerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type CheckoutPartnerAssociateMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
+
+export type CheckoutPartnerDisassociateMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CheckoutPartnerDisassociateMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
