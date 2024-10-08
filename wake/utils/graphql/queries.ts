@@ -1307,6 +1307,26 @@ export const GetBuyList = {
   }`,
 };
 
+export const AddKit = {
+  fragments: [Checkout],
+  query:
+    gql`mutation AddKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
+   checkout: checkoutAddKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
+    }
+  }`,
+};
+
+export const RemoveKit = {
+  fragments: [Checkout],
+  query:
+    gql`mutation RemoveKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
+    checkout: checkoutRemoveKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
+    }
+  }`,
+};
+
 export const GetPartners = {
   query:
     gql`query GetPartners($first: Int,$last: Int,$names: [String],$priceTableIds: [Int!],$sortDirection: SortDirection! = ASC,$sortKey: PartnerSortKeys! = ID,$before: String,$alias: [String],$after: String) {

@@ -92,4 +92,3 @@ In order to make your app available to be installable in any deco site, just imp
 <a href="https://github.com/deco-cx/apps/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=deco-cx/apps" />
 </a>
-

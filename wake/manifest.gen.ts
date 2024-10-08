@@ -5,17 +5,19 @@
 import * as $$$$$$$$$0 from "./actions/cart/addCoupon.ts";
 import * as $$$$$$$$$1 from "./actions/cart/addItem.ts";
 import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$3 from "./actions/cart/partnerAssociate.ts";
-import * as $$$$$$$$$4 from "./actions/cart/partnerDisassociate.ts";
-import * as $$$$$$$$$5 from "./actions/cart/removeCoupon.ts";
-import * as $$$$$$$$$6 from "./actions/cart/updateItemQuantity.ts";
-import * as $$$$$$$$$7 from "./actions/newsletter/register.ts";
-import * as $$$$$$$$$8 from "./actions/notifyme.ts";
-import * as $$$$$$$$$9 from "./actions/review/create.ts";
-import * as $$$$$$$$$10 from "./actions/shippingSimulation.ts";
-import * as $$$$$$$$$11 from "./actions/submmitForm.ts";
-import * as $$$$$$$$$12 from "./actions/wishlist/addProduct.ts";
-import * as $$$$$$$$$13 from "./actions/wishlist/removeProduct.ts";
+import * as $$$$$$$$$3 from "./actions/cart/addKit.ts";
+import * as $$$$$$$$$4 from "./actions/cart/partnerAssociate.ts";
+import * as $$$$$$$$$5 from "./actions/cart/partnerDisassociate.ts";
+import * as $$$$$$$$$6 from "./actions/cart/removeCoupon.ts";
+import * as $$$$$$$$$7 from "./actions/cart/removeKit.ts";
+import * as $$$$$$$$$8 from "./actions/cart/updateItemQuantity.ts";
+import * as $$$$$$$$$9 from "./actions/newsletter/register.ts";
+import * as $$$$$$$$$10 from "./actions/notifyme.ts";
+import * as $$$$$$$$$11 from "./actions/review/create.ts";
+import * as $$$$$$$$$12 from "./actions/shippingSimulation.ts";
+import * as $$$$$$$$$13 from "./actions/submmitForm.ts";
+import * as $$$$$$$$$14 from "./actions/wishlist/addProduct.ts";
+import * as $$$$$$$$$15 from "./actions/wishlist/removeProduct.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/partners.ts";
@@ -50,17 +52,19 @@ const manifest = {
     "wake/actions/cart/addCoupon.ts": $$$$$$$$$0,
     "wake/actions/cart/addItem.ts": $$$$$$$$$1,
     "wake/actions/cart/addItems.ts": $$$$$$$$$2,
-    "wake/actions/cart/partnerAssociate.ts": $$$$$$$$$3,
-    "wake/actions/cart/partnerDisassociate.ts": $$$$$$$$$4,
-    "wake/actions/cart/removeCoupon.ts": $$$$$$$$$5,
-    "wake/actions/cart/updateItemQuantity.ts": $$$$$$$$$6,
-    "wake/actions/newsletter/register.ts": $$$$$$$$$7,
-    "wake/actions/notifyme.ts": $$$$$$$$$8,
-    "wake/actions/review/create.ts": $$$$$$$$$9,
-    "wake/actions/shippingSimulation.ts": $$$$$$$$$10,
-    "wake/actions/submmitForm.ts": $$$$$$$$$11,
-    "wake/actions/wishlist/addProduct.ts": $$$$$$$$$12,
-    "wake/actions/wishlist/removeProduct.ts": $$$$$$$$$13,
+    "wake/actions/cart/addKit.ts": $$$$$$$$$3,
+    "wake/actions/cart/partnerAssociate.ts": $$$$$$$$$4,
+    "wake/actions/cart/partnerDisassociate.ts": $$$$$$$$$5,
+    "wake/actions/cart/removeCoupon.ts": $$$$$$$$$6,
+    "wake/actions/cart/removeKit.ts": $$$$$$$$$7,
+    "wake/actions/cart/updateItemQuantity.ts": $$$$$$$$$8,
+    "wake/actions/newsletter/register.ts": $$$$$$$$$9,
+    "wake/actions/notifyme.ts": $$$$$$$$$10,
+    "wake/actions/review/create.ts": $$$$$$$$$11,
+    "wake/actions/shippingSimulation.ts": $$$$$$$$$12,
+    "wake/actions/submmitForm.ts": $$$$$$$$$13,
+    "wake/actions/wishlist/addProduct.ts": $$$$$$$$$14,
+    "wake/actions/wishlist/removeProduct.ts": $$$$$$$$$15,
   },
   "name": "wake",
   "baseUrl": import.meta.url,
