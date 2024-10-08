@@ -180,8 +180,6 @@ const productFromImpulse = (
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
 
-  console.log("rodou");
-
   const isVariantOfAdditionalProperty = [
     ...Object.entries(product.specs ?? {}).flatMap(([key, value]) =>
       value.map((spec) =>
@@ -445,7 +443,6 @@ export const toProduct = (
   level = 0
 ): Product => {
   const isImpulse = isImpulseProduct(product);
-  console.log("LOG:", "product", product);
   if (isImpulse) {
     return productFromImpulse(product, origin, product.selectedSku, cdn, level);
   }
