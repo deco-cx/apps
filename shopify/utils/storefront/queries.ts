@@ -134,6 +134,17 @@ fragment Product on Product {
         }
       }
     }
+    references(first: 250) {
+      edges {
+        node {
+          ... on MediaImage {
+            image {
+              url
+            }
+          }
+        }
+      }
+    }
   }
 }
 `;
