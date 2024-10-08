@@ -34,6 +34,7 @@ import {
   toProduct,
 } from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
+import { logger } from "@deco/deco/o11y";
 
 export type Sort =
   | "NAME:ASC"
@@ -192,7 +193,7 @@ const searchLoader = async (
         partnerAccessToken,
       });
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
   }
 
