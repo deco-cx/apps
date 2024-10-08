@@ -26,8 +26,8 @@ const loader = async (
   if (!customerAccessToken) return [];
 
   const data = await storefront.query<
-    GetWislistQuery,
-    GetWislistQueryVariables
+    GetWishlistQuery,
+    GetWishlistQueryVariables
   >({
     variables: { customerAccessToken },
     ...GetWishlist,
