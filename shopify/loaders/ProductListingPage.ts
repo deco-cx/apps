@@ -23,7 +23,7 @@ import {
   sortOptions,
   sortShopify,
 } from "../utils/utils.ts";
-import { Metafields } from "../utils/types.ts";
+import { MetafieldsIdentifier } from "./metafields.ts";
 
 export interface Props {
   /**
@@ -44,7 +44,7 @@ export interface Props {
    * @title Metafields
    * @description search for metafields
    */
-  metafields?: Metafields[];
+  metafields?: MetafieldsIdentifier[];
   /**
    * @hide
    * @description it is hidden because only page prop is not sufficient, we need cursors

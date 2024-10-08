@@ -9,7 +9,7 @@ import {
   HasMetafieldsMetafieldsArgs,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { GetProduct } from "../utils/storefront/queries.ts";
-import { Metafields } from "../utils/types.ts";
+import { MetafieldsIdentifier } from "./metafields.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -17,7 +17,7 @@ export interface Props {
    * @title Metafields
    * @description search for metafields
    */
-  metafields?: Metafields[];
+  metafields?: MetafieldsIdentifier[];
 }
 
 /**
