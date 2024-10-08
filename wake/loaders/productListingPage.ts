@@ -201,9 +201,12 @@ const searchLoader = async (
     }
   }
 
-  const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>({
-    variables: {
-      url: url.pathname,
+  const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>(
+    {
+      variables: {
+        url: url.pathname,
+      },
+      ...GetURL,
     },
     {
       headers,
