@@ -116,8 +116,8 @@ export const toProduct = (
       "@type": "PropertyValue",
       name: metafield?.key,
       value: metafield?.reference && "image" in metafield.reference
-      ? metafield.reference.image?.originalSrc
-      : metafield?.value,
+        ? metafield.reference.image?.originalSrc
+        : metafield?.value,
     }));
 
   const additionalProperty: PropertyValue[] = selectedOptions
