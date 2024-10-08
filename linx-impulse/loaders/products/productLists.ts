@@ -275,14 +275,14 @@ const loader = async (
 
   const reqOrigin = url.origin;
 
-  return [
-    ...top.map((shelf) => toLinxImpulseShelf(shelf, "top", reqOrigin, cdn)),
-    ...middle.map((shelf) =>
-      toLinxImpulseShelf(shelf, "middle", reqOrigin, cdn)
-    ),
-    ...bottom.map((shelf) =>
-      toLinxImpulseShelf(shelf, "bottom", reqOrigin, cdn)
-    ),
+  const formattedTop = [...top.map((shelf) => toLinxImpulseShelf(shelf, "top", reqOrigin, cdn))]
+  const formattedMiddle = [...middle.map((shelf) =>toLinxImpulseShelf(shelf, "middle", reqOrigin, cdn))]
+  const formattedBottom = [...bottom.map((shelf) =>toLinxImpulseShelf(shelf, "bottom", reqOrigin, cdn))]
+
+  return [  
+    ...formattedTop,
+    ...formattedMiddle,
+    ...formattedBottom,
   ];
 };
 
