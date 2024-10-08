@@ -6,7 +6,6 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
-  HasMetafieldsIdentifier,
   HasMetafieldsMetafieldsArgs,
   Product,
   ProductConnection,
@@ -16,6 +15,7 @@ import {
   SearchResultItemConnection,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
+import { Metafield } from "../utils/types.ts";
 import {
   getFiltersByUrl,
   searchSortOptions,
@@ -23,7 +23,6 @@ import {
   sortOptions,
   sortShopify,
 } from "../utils/utils.ts";
-import { MetafieldsIdentifier } from "./metafields.ts";
 
 export interface Props {
   /**
@@ -44,7 +43,7 @@ export interface Props {
    * @title Metafields
    * @description search for metafields
    */
-  metafields?: MetafieldsIdentifier[];
+  metafields?: Metafield[];
   /**
    * @hide
    * @description it is hidden because only page prop is not sufficient, we need cursors
@@ -112,7 +111,7 @@ const loader = async (
         ...(endCursor && { before: endCursor }),
         query: query,
         productFilters: getFiltersByUrl(url),
-        identifiers: metafields as HasMetafieldsIdentifier[],
+        identifiers: metafields,
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -141,7 +140,7 @@ const loader = async (
         ...(endCursor && { last: count }),
         ...(startCursor && { after: startCursor }),
         ...(endCursor && { before: endCursor }),
-        identifiers: metafields as HasMetafieldsIdentifier[],
+        identifiers: metafields,
         handle: pathname,
         filters: getFiltersByUrl(url),
         ...sortShopify[sort],

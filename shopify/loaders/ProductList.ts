@@ -6,7 +6,6 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
-  HasMetafieldsIdentifier,
   HasMetafieldsMetafieldsArgs,
   Product as ProductShopify,
   ProductConnection,
@@ -22,7 +21,7 @@ import {
   searchSortShopify,
   sortShopify,
 } from "../utils/utils.ts";
-import { MetafieldsIdentifier } from "./metafields.ts";
+import { Metafield } from "../utils/types.ts";
 
 export interface QueryProps {
   /** @description search term to use on search */
@@ -70,7 +69,7 @@ export type Props = {
    * @title Metafields
    * @description search for metafields
    */
-  metafields?: MetafieldsIdentifier[];
+  metafields?: Metafield[];
 };
 
 // deno-lint-ignore no-explicit-any
@@ -128,7 +127,7 @@ const loader = async (
         first: count,
         query: props.query,
         productFilters: filters,
-        identifiers: metafields as HasMetafieldsIdentifier[],
+        identifiers: metafields,
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -145,7 +144,7 @@ const loader = async (
         first: count,
         handle: props.collection,
         filters,
-        identifiers: metafields as HasMetafieldsIdentifier[],
+        identifiers: metafields,
         ...sortShopify[sort],
       },
       ...ProductsByCollection,

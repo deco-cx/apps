@@ -185,7 +185,7 @@ export interface UnitPriceMeasurement {
 /**
  * @title {{{key}}}
  */
-export interface Metafields {
+export interface Metafield {
   namespace: string;
   key: string;
 }

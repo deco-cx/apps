@@ -5,11 +5,10 @@ import type { RequestURLParam } from "../../website/functions/requestToParam.ts"
 import {
   GetProductQuery,
   GetProductQueryVariables,
-  HasMetafieldsIdentifier,
   HasMetafieldsMetafieldsArgs,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { GetProduct } from "../utils/storefront/queries.ts";
-import { MetafieldsIdentifier } from "./metafields.ts";
+import { Metafield } from "../utils/types.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -17,7 +16,7 @@ export interface Props {
    * @title Metafields
    * @description search for metafields
    */
-  metafields?: MetafieldsIdentifier[];
+  metafields?: Metafield[];
 }
 
 /**
@@ -42,7 +41,7 @@ const loader = async (
     GetProductQuery,
     GetProductQueryVariables & HasMetafieldsMetafieldsArgs
   >({
-    variables: { handle, identifiers: metafields as HasMetafieldsIdentifier[] },
+    variables: { handle, identifiers: metafields },
     ...GetProduct,
   });
 

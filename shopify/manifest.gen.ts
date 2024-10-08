@@ -15,7 +15,6 @@ import * as $$$2 from "./loaders/ProductListingPage.ts";
 import * as $$$5 from "./loaders/proxy.ts";
 import * as $$$3 from "./loaders/RelatedProducts.ts";
 import * as $$$6 from "./loaders/user.ts";
-import * as $$$7 from "./loaders/metafields.ts";
 
 const manifest = {
   "loaders": {
@@ -26,7 +25,6 @@ const manifest = {
     "shopify/loaders/proxy.ts": $$$5,
     "shopify/loaders/RelatedProducts.ts": $$$3,
     "shopify/loaders/user.ts": $$$6,
-    "shopify/loaders/metafields.ts": $$$7,
   },
   "handlers": {
     "shopify/handlers/sitemap.ts": $$$$0,

@@ -127,6 +127,13 @@ fragment Product on Product {
     namespace
     type
     value
+    reference {
+      ... on MediaImage {
+        image {
+          originalSrc
+        }
+      }
+    }
   }
 }
 `;
