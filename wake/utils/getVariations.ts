@@ -1,5 +1,5 @@
 import { GetProducts } from "../utils/graphql/queries.ts";
-import {
+import type {
   GetProductsQuery,
   GetProductsQueryVariables,
   ProductFragment,

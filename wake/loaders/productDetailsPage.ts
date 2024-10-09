@@ -1,14 +1,14 @@
 import type { Product, ProductDetailsPage } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import { MAXIMUM_REQUEST_QUANTITY } from "../utils/getVariations.ts";
-import { GetBuyList, GetProduct } from "../utils/graphql/queries.ts";
 import {
   BuyListQuery,
   BuyListQueryVariables,
   GetProductQuery,
   GetProductQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
+import { GetBuyList, GetProduct } from "../utils/graphql/queries.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
 import { parseSlug, toBreadcrumbList, toProduct } from "../utils/transform.ts";
 

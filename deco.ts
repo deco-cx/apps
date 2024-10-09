@@ -14,6 +14,7 @@ const config = {
     app("decopilot-app"),
     app("smarthint"),
     app("ra-trustvox"),
+    app("checkout"),
     app("anthropic"),
     app("resend"),
     app("emailjs"),

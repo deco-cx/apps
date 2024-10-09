@@ -2,8 +2,8 @@
 import type { AnalyticsItem } from "../../commerce/types.ts";
 import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import { CheckoutFragment } from "../utils/graphql/storefront.graphql.gen.ts";
-import { Context, state as storeState } from "./context.ts";
+import type { CheckoutFragment } from "../utils/graphql/storefront.graphql.gen.ts";
+import { type Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
 
@@ -27,22 +27,27 @@ export const itemToAnalyticsItem = (
   };
 };
 
-type EnqueuableActions<
-  K extends keyof Manifest["actions"],
-> = Manifest["actions"][K]["default"] extends
-  (...args: any[]) => Promise<Context["cart"]> ? K : never;
+type EnqueuableActions<K extends keyof Manifest["actions"]> =
+  Manifest["actions"][K]["default"] extends (
+    ...args: any[]
+  ) => Promise<Context["cart"]> ? K
+    : never;
 
-const enqueue = <
-  K extends keyof Manifest["actions"],
->(key: EnqueuableActions<K>) =>
-(props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
-  storeState.enqueue((signal) =>
-    invoke({ cart: { key, props } } as any, { signal }) as any
-  );
+const enqueue =
+  <K extends keyof Manifest["actions"]>(key: EnqueuableActions<K>) =>
+  (props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
+    storeState.enqueue((signal) =>
+      invoke({ cart: { key, props } } as any, { signal }) as any
+    );
 
 const state = {
   cart,
   loading,
+  updateCart: async () => {
+    loading.value = true;
+    cart.value = await invoke.wake.loaders.cart();
+    loading.value = false;
+  },
   addItem: enqueue("wake/actions/cart/addItem.ts"),
   addKit: enqueue("wake/actions/cart/addKit.ts"),
   removeKit: enqueue("wake/actions/cart/removeKit.ts"),

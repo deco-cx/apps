@@ -1,7 +1,7 @@
 import { HttpError } from "../../../utils/http.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { CreateNewsletterRegister } from "../../utils/graphql/queries.ts";
-import {
+import type {
   CreateNewsletterRegisterMutation,
   CreateNewsletterRegisterMutationVariables,
   NewsletterNode,
@@ -24,12 +24,15 @@ const action = async (
   const data = await storefront.query<
     CreateNewsletterRegisterMutation,
     CreateNewsletterRegisterMutationVariables
-  >({
-    variables: { input: { ...props } },
-    ...CreateNewsletterRegister,
-  }, {
-    headers,
-  });
+  >(
+    {
+      variables: { input: { ...props } },
+      ...CreateNewsletterRegister,
+    },
+    {
+      headers,
+    },
+  );
 
   if (!data.createNewsletterRegister) {
     throw new HttpError(400, "Error on Register");

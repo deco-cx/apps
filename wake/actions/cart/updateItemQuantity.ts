@@ -1,8 +1,8 @@
 import { HttpError } from "../../../utils/http.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
 import { RemoveItemFromCart } from "../../utils/graphql/queries.ts";
-import {
+import type {
   CheckoutFragment,
   RemoveItemFromCartMutation,
   RemoveItemFromCartMutationVariables,
@@ -25,12 +25,15 @@ const removeFromCart = (
   ctx.storefront.query<
     RemoveItemFromCartMutation,
     RemoveItemFromCartMutationVariables
-  >({
-    variables: {
-      input: { id: cartId, products: [props] },
+  >(
+    {
+      variables: {
+        input: { id: cartId, products: [props] },
+      },
+      ...RemoveItemFromCart,
     },
-    ...RemoveItemFromCart,
-  }, { headers });
+    { headers },
+  );
 
 const action = async (
   props: Props,
@@ -51,14 +54,14 @@ const action = async (
    * calculate the difference between the current item amount and requested new amount
    */
 
-  const cart = await ctx.invoke.wake.loaders.cart(props, req);
+  const cart = await ctx.invoke.wake.loaders.cart({}, req);
   const item = cart.products?.find((item) =>
     item?.productVariantId === props.productVariantId
   );
   const quantityItem = item?.quantity ?? 0;
   const quantity = props.quantity - quantityItem;
 
-  let checkout;
+  let checkout: Partial<CheckoutFragment> | null = null;
 
   if (props.quantity > 0 && quantity > 0) {
     checkout = await ctx.invoke.wake.actions.cart.addItem({
@@ -72,7 +75,7 @@ const action = async (
       ctx,
       headers,
     );
-    checkout = data.checkout;
+    checkout = data.checkout ?? null;
   }
 
   const checkoutId = checkout?.checkoutId;

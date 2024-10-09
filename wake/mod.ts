@@ -4,9 +4,9 @@ import { createGraphqlClient } from "../utils/graphql.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { CheckoutApi } from "./utils/client.ts";
-import { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
+import manifest, { type Manifest } from "./manifest.gen.ts";
+import type { OpenAPI } from "./utils/openapi/wake.openapi.gen.ts";
+import type { CheckoutApi } from "./utils/client.ts";
 import { type App, type FnContext } from "@deco/deco";
 export type AppContext = FnContext<State, Manifest>;
 export let state: null | State = null;
@@ -37,13 +37,21 @@ export interface Props {
    * @hide true
    */
   platform: "wake";
+
+  /**
+   * @description Use wake headless api for checkout
+   */
+  headlessCheckout?: boolean;
 }
 export interface State extends Props {
   api: ReturnType<typeof createHttpClient<OpenAPI>>;
   checkoutApi: ReturnType<typeof createHttpClient<CheckoutApi>>;
   storefront: ReturnType<typeof createGraphqlClient>;
+  headlessCheckout: boolean;
 }
-export const color = 0xB600EE;
+
+export const color = 0xb600ee;
+
 /**
  * @title Wake
  * @description Loaders, actions and workflows for adding Wake Commerce Platform to your website.
@@ -51,7 +59,14 @@ export const color = 0xB600EE;
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/wake/logo.png
  */
 export default function App(props: Props): App<Manifest, State> {
-  const { token, storefrontToken, account, checkoutUrl } = props;
+  const {
+    token,
+    storefrontToken,
+    account,
+    checkoutUrl,
+    headlessCheckout = false,
+  } = props;
+
   if (!token || !storefrontToken) {
     console.warn(
       "Missing tokens for wake app. Add it into the wake app config in deco.cx admin. Some functionalities may not work",
@@ -65,7 +80,7 @@ export default function App(props: Props): App<Manifest, State> {
     : storefrontToken?.get?.() ?? "";
   const api = createHttpClient<OpenAPI>({
     base: "https://api.fbits.net",
-    headers: new Headers({ "Authorization": `Basic ${stringToken}` }),
+    headers: new Headers({ Authorization: `Basic ${stringToken}` }),
     fetcher: fetchSafe,
   });
   //22e714b360b7ef187fe4bdb93385dd0a85686e2a
@@ -78,7 +93,9 @@ export default function App(props: Props): App<Manifest, State> {
     base: checkoutUrl ?? `https://${account}.checkout.fbits.store`,
     fetcher: fetchSafe,
   });
-  state = { ...props, api, storefront, checkoutApi };
+
+  state = { ...props, api, storefront, checkoutApi, headlessCheckout };
+
   return {
     state,
     manifest,

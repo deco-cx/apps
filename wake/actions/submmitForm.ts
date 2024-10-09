@@ -1,6 +1,6 @@
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import { SendGenericForm } from "../utils/graphql/queries.ts";
-import {
+import type {
   SendGenericFormMutation,
   SendGenericFormMutationVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";

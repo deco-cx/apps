@@ -1,8 +1,8 @@
 import type { Product } from "../../commerce/types.ts";
-import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
 import { ProductRecommendations } from "../utils/graphql/queries.ts";
-import {
+import type {
   ProductFragment,
   ProductRecommendationsQuery,
   ProductRecommendationsQueryVariables,

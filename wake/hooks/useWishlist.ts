@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
-import { Product } from "../../commerce/types.ts";
-import { Manifest } from "../manifest.gen.ts";
+import type { Product } from "../../commerce/types.ts";
+import type { Manifest } from "../manifest.gen.ts";
 import { invoke } from "../runtime.ts";
-import { WishlistReducedProductFragment } from "../utils/graphql/storefront.graphql.gen.ts";
+import type { WishlistReducedProductFragment } from "../utils/graphql/storefront.graphql.gen.ts";
 import { state as storeState } from "./context.ts";
 
 const { wishlist, loading } = storeState;
@@ -21,7 +21,7 @@ const enqueue = <
   );
 
 const getItem = (item: Omit<WishlistReducedProductFragment, "productName">) =>
-  wishlist.value?.find((id) => id.productId == item.productId);
+  wishlist.value?.find((id) => id.productId === item.productId);
 
 const state = {
   wishlist,

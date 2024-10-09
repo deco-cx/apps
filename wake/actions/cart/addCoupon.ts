@@ -1,8 +1,9 @@
+import { badRequest } from "@deco/deco";
 import { HttpError } from "../../../utils/http.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
 import { AddCoupon } from "../../utils/graphql/queries.ts";
-import {
+import type {
   AddCouponMutation,
   AddCouponMutationVariables,
   CheckoutFragment,
@@ -26,21 +27,28 @@ const action = async (
     throw new HttpError(400, "Missing cart cookie");
   }
 
-  const data = await storefront.query<
-    AddCouponMutation,
-    AddCouponMutationVariables
-  >({
-    variables: { checkoutId: cartId, ...props },
-    ...AddCoupon,
-  }, { headers });
+  try {
+    const data = await storefront.query<
+      AddCouponMutation,
+      AddCouponMutationVariables
+    >(
+      {
+        variables: { checkoutId: cartId, ...props },
+        ...AddCoupon,
+      },
+      { headers },
+    );
 
-  const checkoutId = data.checkout?.checkoutId;
+    const checkoutId = data.checkout?.checkoutId;
 
-  if (cartId !== checkoutId) {
-    setCartCookie(ctx.response.headers, checkoutId);
+    if (cartId !== checkoutId) {
+      setCartCookie(ctx.response.headers, checkoutId);
+    }
+
+    return data.checkout ?? {};
+  } catch (errors) {
+    throw badRequest(errors);
   }
-
-  return data.checkout ?? {};
 };
 
 export default action;

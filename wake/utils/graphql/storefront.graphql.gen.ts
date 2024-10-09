@@ -4997,6 +4997,10 @@ export type BuyListFragment = { mainVariant?: boolean | null, productName?: stri
 
 export type SingleProductPartFragment = { mainVariant?: boolean | null, productName?: string | null, productId?: any | null, alias?: string | null, collection?: string | null, numberOfVotes?: number | null, available?: boolean | null, averageRating?: number | null, condition?: string | null, createdAt?: any | null, ean?: string | null, id?: string | null, minimumOrderQuantity?: number | null, productVariantId?: any | null, sku?: string | null, stock?: any | null, variantName?: string | null, parallelOptions?: Array<string | null> | null, urlVideo?: string | null, attributes?: Array<{ name?: string | null, type?: string | null, value?: string | null, attributeId: any, displayType?: string | null, id?: string | null } | null> | null, productCategories?: Array<{ id: number, name?: string | null, url?: string | null, hierarchy?: string | null, main: boolean, googleCategories?: string | null } | null> | null, informations?: Array<{ title?: string | null, value?: string | null, type?: string | null } | null> | null, breadcrumbs?: Array<{ text?: string | null, link?: string | null } | null> | null, images?: Array<{ url?: string | null, fileName?: string | null, print: boolean } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null, productBrand?: { fullUrlLogo?: string | null, logoUrl?: string | null, name?: string | null, alias?: string | null } | null, seller?: { name?: string | null } | null, seo?: Array<{ name?: string | null, scheme?: string | null, type?: string | null, httpEquiv?: string | null, content?: string | null } | null> | null, reviews?: Array<{ rating: number, review?: string | null, reviewDate: any, email?: string | null, customer?: string | null } | null> | null, similarProducts?: Array<{ alias?: string | null, image?: string | null, imageUrl?: string | null, name?: string | null } | null> | null, attributeSelections?: { canBeMatrix: boolean, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, value?: string | null, selected: boolean, printUrl?: string | null } | null> | null } | null> | null, matrix?: { column?: { displayType?: string | null, name?: string | null, values?: Array<{ value?: string | null } | null> | null } | null, data?: Array<Array<{ available: boolean, productVariantId: any, stock: any } | null> | null> | null, row?: { displayType?: string | null, name?: string | null, values?: Array<{ value?: string | null, printUrl?: string | null } | null> | null } | null } | null, selectedVariant?: { aggregatedStock?: any | null, alias?: string | null, available?: boolean | null, ean?: string | null, id?: string | null, productId?: any | null, productVariantId?: any | null, productVariantName?: string | null, sku?: string | null, stock?: any | null, attributes?: Array<{ attributeId: any, displayType?: string | null, id?: string | null, name?: string | null, type?: string | null, value?: string | null } | null> | null, images?: Array<{ fileName?: string | null, mini: boolean, order: number, print: boolean, url?: string | null } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null } | null, offers?: Array<{ name?: string | null, productVariantId?: any | null, prices?: { listPrice?: any | null, price?: any | null, installmentPlans?: Array<{ displayName?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null } | null } | null> | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null } | null, candidateVariant?: { aggregatedStock?: any | null, alias?: string | null, available?: boolean | null, ean?: string | null, id?: string | null, productId?: any | null, productVariantId?: any | null, productVariantName?: string | null, sku?: string | null, stock?: any | null, attributes?: Array<{ attributeId: any, displayType?: string | null, id?: string | null, name?: string | null, type?: string | null, value?: string | null } | null> | null, images?: Array<{ fileName?: string | null, mini: boolean, order: number, print: boolean, url?: string | null } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null } | null, offers?: Array<{ name?: string | null, productVariantId?: any | null, prices?: { listPrice?: any | null, price?: any | null, installmentPlans?: Array<{ displayName?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null } | null } | null> | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null } | null } | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null };
 
+export type CheckoutCloseFieldsFragment = { checkoutId: any, completed: boolean, orders?: Array<{ date: any, discountValue: any, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, dispatchTimeText?: string | null, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, value: any, adjustments?: Array<{ name?: string | null, additionalInformation?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null, delivery?: { cost: any, deliveryTime: number, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, name?: string | null, isPickupStore: boolean, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null } | null> | null };
+
+export type SelectPaymentFragment = { checkoutId: any, total: any, subtotal: any, selectedPaymentMethod?: { id: any, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null } | null };
+
 export type SingleProductFragment = { mainVariant?: boolean | null, productName?: string | null, productId?: any | null, alias?: string | null, collection?: string | null, numberOfVotes?: number | null, available?: boolean | null, averageRating?: number | null, condition?: string | null, createdAt?: any | null, ean?: string | null, id?: string | null, minimumOrderQuantity?: number | null, productVariantId?: any | null, sku?: string | null, stock?: any | null, variantName?: string | null, parallelOptions?: Array<string | null> | null, urlVideo?: string | null, buyTogether?: Array<{ productId?: any | null } | null> | null, attributes?: Array<{ name?: string | null, type?: string | null, value?: string | null, attributeId: any, displayType?: string | null, id?: string | null } | null> | null, productCategories?: Array<{ id: number, name?: string | null, url?: string | null, hierarchy?: string | null, main: boolean, googleCategories?: string | null } | null> | null, informations?: Array<{ title?: string | null, value?: string | null, type?: string | null } | null> | null, breadcrumbs?: Array<{ text?: string | null, link?: string | null } | null> | null, images?: Array<{ url?: string | null, fileName?: string | null, print: boolean } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null, productBrand?: { fullUrlLogo?: string | null, logoUrl?: string | null, name?: string | null, alias?: string | null } | null, seller?: { name?: string | null } | null, seo?: Array<{ name?: string | null, scheme?: string | null, type?: string | null, httpEquiv?: string | null, content?: string | null } | null> | null, reviews?: Array<{ rating: number, review?: string | null, reviewDate: any, email?: string | null, customer?: string | null } | null> | null, similarProducts?: Array<{ alias?: string | null, image?: string | null, imageUrl?: string | null, name?: string | null } | null> | null, attributeSelections?: { canBeMatrix: boolean, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, value?: string | null, selected: boolean, printUrl?: string | null } | null> | null } | null> | null, matrix?: { column?: { displayType?: string | null, name?: string | null, values?: Array<{ value?: string | null } | null> | null } | null, data?: Array<Array<{ available: boolean, productVariantId: any, stock: any } | null> | null> | null, row?: { displayType?: string | null, name?: string | null, values?: Array<{ value?: string | null, printUrl?: string | null } | null> | null } | null } | null, selectedVariant?: { aggregatedStock?: any | null, alias?: string | null, available?: boolean | null, ean?: string | null, id?: string | null, productId?: any | null, productVariantId?: any | null, productVariantName?: string | null, sku?: string | null, stock?: any | null, attributes?: Array<{ attributeId: any, displayType?: string | null, id?: string | null, name?: string | null, type?: string | null, value?: string | null } | null> | null, images?: Array<{ fileName?: string | null, mini: boolean, order: number, print: boolean, url?: string | null } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null } | null, offers?: Array<{ name?: string | null, productVariantId?: any | null, prices?: { listPrice?: any | null, price?: any | null, installmentPlans?: Array<{ displayName?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null } | null } | null> | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null } | null, candidateVariant?: { aggregatedStock?: any | null, alias?: string | null, available?: boolean | null, ean?: string | null, id?: string | null, productId?: any | null, productVariantId?: any | null, productVariantName?: string | null, sku?: string | null, stock?: any | null, attributes?: Array<{ attributeId: any, displayType?: string | null, id?: string | null, name?: string | null, type?: string | null, value?: string | null } | null> | null, images?: Array<{ fileName?: string | null, mini: boolean, order: number, print: boolean, url?: string | null } | null> | null, prices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, priceTables?: Array<{ discountPercentage: any, id: any, listPrice?: any | null, price: any } | null> | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null, bestInstallment?: { discount: boolean, displayName?: string | null, fees: boolean, name?: string | null, number: number, value: any } | null } | null, offers?: Array<{ name?: string | null, productVariantId?: any | null, prices?: { listPrice?: any | null, price?: any | null, installmentPlans?: Array<{ displayName?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null } | null } | null> | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null } | null } | null, promotions?: Array<{ content?: string | null, disclosureType?: string | null, id: any, fullStampUrl?: string | null, stamp?: string | null, title?: string | null } | null> | null };
 
 export type RestockAlertNodeFragment = { email?: string | null, name?: string | null, productVariantId: any, requestDate: any };
@@ -5005,7 +5009,7 @@ export type NewsletterNodeFragment = { email?: string | null, name?: string | nu
 
 export type ShippingQuoteFragment = { id?: string | null, type?: string | null, name?: string | null, value: number, deadline: number, shippingQuoteId: any, deliverySchedules?: Array<{ date: any, periods?: Array<{ end?: string | null, id: any, start?: string | null } | null> | null } | null> | null, products?: Array<{ productVariantId: number, value: number } | null> | null };
 
-export type CustomerFragment = { id?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null };
+export type CustomerFragment = { id?: string | null, cpf?: string | null, phoneNumber?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null };
 
 export type WishlistReducedProductFragment = { productId?: any | null, productName?: string | null };
 
@@ -5019,6 +5023,7 @@ export type GetProductQuery = { product?: { mainVariant?: boolean | null, produc
 
 export type GetCartQueryVariables = Exact<{
   checkoutId: Scalars['String']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -5151,7 +5156,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { customer?: { id?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
+export type GetUserQuery = { customer?: { id?: string | null, cpf?: string | null, phoneNumber?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
 
 export type GetWishlistQueryVariables = Exact<{
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
@@ -5241,6 +5246,140 @@ export type RemoveKitMutationVariables = Exact<{
 
 export type RemoveKitMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
 
+export type CalculatePricesQueryVariables = Exact<{
+  partnerAccessToken: Scalars['String']['input'];
+  products: Array<InputMaybe<CalculatePricesProductsInput>> | InputMaybe<CalculatePricesProductsInput>;
+}>;
+
+
+export type CalculatePricesQuery = { calculatePrices?: { discountPercentage: any, discounted: boolean, listPrice?: any | null, multiplicationFactor: number, price: any, bestInstallment?: { displayName?: string | null, name?: string | null } | null, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null } | null };
+
+export type CustomerCreateMutationVariables = Exact<{
+  input?: InputMaybe<CustomerCreateInput>;
+}>;
+
+
+export type CustomerCreateMutation = { customerCreate?: { customerId: any, customerName?: string | null, customerType?: string | null } | null };
+
+export type CustomerAuthenticatedLoginMutationVariables = Exact<{
+  input: Scalars['String']['input'];
+  pass: Scalars['String']['input'];
+}>;
+
+
+export type CustomerAuthenticatedLoginMutation = { customerAuthenticatedLogin?: { isMaster: boolean, token?: string | null, legacyToken?: string | null, type?: LoginType | null, validUntil: any } | null };
+
+export type CustomerAccessTokenRenewMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type CustomerAccessTokenRenewMutation = { customerAccessTokenRenew?: { token?: string | null, validUntil: any } | null };
+
+export type CustomerAddressCreateMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  address: CreateCustomerAddressInput;
+}>;
+
+
+export type CustomerAddressCreateMutation = { customerAddressCreate?: { addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, state?: string | null, street?: string | null, referencePoint?: string | null } | null };
+
+export type CustomerAddressRemoveMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type CustomerAddressRemoveMutation = { customerAddressRemove?: { isSuccess: boolean } | null };
+
+export type CustomerAddressUpdateMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  customerAccessToken: Scalars['String']['input'];
+  address: UpdateCustomerAddressInput;
+}>;
+
+
+export type CustomerAddressUpdateMutation = { customerAddressUpdate?: { addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, state?: string | null, street?: string | null, referencePoint?: string | null } | null };
+
+export type GetUserAddressesQueryVariables = Exact<{
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetUserAddressesQuery = { customer?: { id?: string | null, cpf?: string | null, phoneNumber?: string | null, email?: string | null, gender?: string | null, customerId: any, companyName?: string | null, customerName?: string | null, customerType?: string | null, responsibleName?: string | null, addresses?: Array<{ address?: string | null, address2?: string | null, addressDetails?: string | null, addressNumber?: string | null, cep?: string | null, city?: string | null, country?: string | null, email?: string | null, id?: string | null, name?: string | null, neighborhood?: string | null, phone?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null> | null, informationGroups?: Array<{ exibitionName?: string | null, name?: string | null } | null> | null } | null };
+
+export type CreateCheckoutMutationVariables = Exact<{
+  products: Array<InputMaybe<CheckoutProductItemInput>> | InputMaybe<CheckoutProductItemInput>;
+}>;
+
+
+export type CreateCheckoutMutation = { createCheckout?: { checkoutId: any } | null };
+
+export type CheckoutCustomerAssociateMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type CheckoutCustomerAssociateMutation = { checkoutCustomerAssociate?: { checkoutId: any } | null };
+
+export type PaymentMethodsQueryVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+}>;
+
+
+export type PaymentMethodsQuery = { paymentMethods?: Array<{ id?: string | null, name?: string | null, imageUrl?: string | null } | null> | null };
+
+export type GetCheckoutCouponQueryVariables = Exact<{
+  checkoutId: Scalars['String']['input'];
+}>;
+
+
+export type GetCheckoutCouponQuery = { checkout?: { coupon?: string | null } | null };
+
+export type CheckoutAddressAssociateMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  addressId: Scalars['ID']['input'];
+  checkoutId: Scalars['Uuid']['input'];
+}>;
+
+
+export type CheckoutAddressAssociateMutation = { checkoutAddressAssociate?: { cep?: number | null, checkoutId: any, url?: string | null, updateDate: any } | null };
+
+export type CheckoutSelectShippingQuoteMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  shippingQuoteId: Scalars['Uuid']['input'];
+}>;
+
+
+export type CheckoutSelectShippingQuoteMutation = { checkoutSelectShippingQuote?: { cep?: number | null, checkoutId: any, shippingFee: any, selectedShipping?: { deadline: number, name?: string | null, shippingQuoteId: any, type?: string | null, value: number } | null } | null };
+
+export type GetSelectedShippingQueryVariables = Exact<{
+  checkoutId: Scalars['String']['input'];
+  customerAccessToken: Scalars['String']['input'];
+}>;
+
+
+export type GetSelectedShippingQuery = { checkout?: { selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null } | null };
+
+export type CheckoutCompleteMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  paymentData: Scalars['String']['input'];
+  comments?: InputMaybe<Scalars['String']['input']>;
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CheckoutCompleteMutation = { checkoutComplete?: { checkoutId: any, completed: boolean, orders?: Array<{ date: any, discountValue: any, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, dispatchTimeText?: string | null, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, value: any, adjustments?: Array<{ name?: string | null, additionalInformation?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null, delivery?: { cost: any, deliveryTime: number, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, name?: string | null, isPickupStore: boolean, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null } | null> | null } | null };
+
+export type CheckoutSelectPaymentMethodMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  paymentMethodId: Scalars['ID']['input'];
+}>;
+
+
+export type CheckoutSelectPaymentMethodMutation = { checkoutSelectPaymentMethod?: { checkoutId: any, total: any, subtotal: any, selectedPaymentMethod?: { id: any, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null } | null } | null };
+
 export type GetPartnersQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
@@ -5256,6 +5395,15 @@ export type GetPartnersQueryVariables = Exact<{
 
 export type GetPartnersQuery = { partners?: { edges?: Array<{ node?: { partnerId: any, priceTableId: number, portfolioId: number, type?: string | null, startDate: any, endDate: any, name?: string | null, alias?: string | null, fullUrlLogo?: string | null, origin?: string | null, partnerAccessToken?: string | null } | null }> | null } | null };
 
+export type CheckoutSelectInstallmentMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  selectedPaymentMethodId: Scalars['Uuid']['input'];
+  installmentNumber: Scalars['Int']['input'];
+}>;
+
+
+export type CheckoutSelectInstallmentMutation = { checkoutSelectInstallment?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
+
 export type CheckoutPartnerAssociateMutationVariables = Exact<{
   checkoutId: Scalars['Uuid']['input'];
   customerAccessToken?: InputMaybe<Scalars['String']['input']>;
@@ -5264,6 +5412,43 @@ export type CheckoutPartnerAssociateMutationVariables = Exact<{
 
 
 export type CheckoutPartnerAssociateMutation = { checkout?: { checkoutId: any, shippingFee: any, subtotal: any, total: any, completed: boolean, coupon?: string | null, customer?: { customerId: any } | null, products?: Array<{ imageUrl?: string | null, brand?: string | null, ajustedPrice: any, listPrice: any, totalListPrice: any, totalAdjustedPrice: any, price: any, name?: string | null, productId: any, productVariantId: any, quantity: number, sku?: string | null, url?: string | null, category?: string | null, kit: boolean, gift: boolean, productAttributes?: Array<{ name?: string | null, type: number, value?: string | null } | null> | null, adjustments?: Array<{ observation?: string | null, type?: string | null, value: any } | null> | null, subscription?: { availableSubscriptions?: Array<{ name?: string | null, recurringDays: number, recurringTypeId: any, selected: boolean, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null> | null, selected?: { selected: boolean, name?: string | null, recurringDays: number, recurringTypeId: any, subscriptionGroupDiscount: any, subscriptionGroupId: any } | null } | null, customization?: { id?: string | null, availableCustomizations?: Array<{ cost: any, customizationId: any, groupName?: string | null, id?: string | null, maxLength: number, name?: string | null, order: number, type?: string | null, values?: Array<string | null> | null } | null> | null, values?: Array<{ cost: any, name?: string | null, value?: string | null } | null> | null } | null, attributeSelections?: { selectedVariant?: { id?: string | null, alias?: string | null, available?: boolean | null, productId?: any | null, productVariantId?: any | null, stock?: any | null, images?: Array<{ fileName?: string | null, url?: string | null } | null> | null, prices?: { listPrice?: any | null, price: any, discountPercentage: any, installmentPlans?: Array<{ displayName?: string | null, name?: string | null, installments?: Array<{ discount: boolean, fees: boolean, number: number, value: any } | null> | null } | null> | null, bestInstallment?: { name?: string | null, displayName?: string | null, discount: boolean, fees: boolean, number: number, value: any } | null, wholesalePrices?: Array<{ price: any, quantity: number } | null> | null } | null } | null, selections?: Array<{ attributeId: any, displayType?: string | null, name?: string | null, varyByParent: boolean, values?: Array<{ alias?: string | null, available: boolean, printUrl?: string | null, selected: boolean, value?: string | null } | null> | null } | null> | null } | null } | null> | null, selectedAddress?: { addressNumber?: string | null, cep: number, city?: string | null, complement?: string | null, id?: string | null, neighborhood?: string | null, referencePoint?: string | null, state?: string | null, street?: string | null } | null, selectedShipping?: { deadline: number, deadlineInHours?: number | null, name?: string | null, shippingQuoteId: any, type?: string | null, value: number, deliverySchedule?: { date?: string | null, endDateTime: any, endTime?: string | null, startDateTime: any, startTime?: string | null } | null } | null, selectedPaymentMethod?: { html?: string | null, id: any, paymentMethodId?: string | null, scripts?: Array<string | null> | null, installments?: Array<{ adjustment: number, number: number, total: number, value: number } | null> | null, selectedInstallment?: { adjustment: number, number: number, total: number, value: number } | null, suggestedCards?: Array<{ brand?: string | null, key?: string | null, name?: string | null, number?: string | null } | null> | null } | null, orders?: Array<{ date: any, discountValue: any, dispatchTimeText?: string | null, interestValue: any, orderId: any, orderStatus: OrderStatus, shippingValue: any, totalValue: any, adjustments?: Array<{ name?: string | null, type?: string | null, value: any } | null> | null, delivery?: { cost: any, deliveryTime: number, deliveryTimeInHours?: number | null, name?: string | null, address?: { address?: string | null, cep?: string | null, city?: string | null, complement?: string | null, isPickupStore: boolean, name?: string | null, neighborhood?: string | null, pickupStoreText?: string | null } | null } | null, payment?: { name?: string | null, card?: { brand?: string | null, cardInterest: any, installments: number, name?: string | null, number?: string | null } | null, invoice?: { digitableLine?: string | null, paymentLink?: string | null } | null, pix?: { qrCode?: string | null, qrCodeExpirationDate?: any | null, qrCodeUrl?: string | null } | null } | null, products?: Array<{ imageUrl?: string | null, name?: string | null, productVariantId: any, quantity: number, unitValue: any, value: any, adjustments?: Array<{ additionalInformation?: string | null, name?: string | null, type?: string | null, value: any } | null> | null, attributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null, kits?: Array<{ kitId: any, kitGroupId?: string | null, alias?: string | null, imageUrl?: string | null, listPrice: any, price: any, totalListPrice: any, totalAdjustedPrice: any, name?: string | null, quantity: number, products?: Array<{ productId: any, productVariantId: any, imageUrl?: string | null, name?: string | null, url?: string | null, quantity: number, productAttributes?: Array<{ name?: string | null, value?: string | null } | null> | null } | null> | null } | null> | null } | null };
+
+export type CheckoutCloneMutationVariables = Exact<{
+  checkoutId: Scalars['Uuid']['input'];
+  copyUser?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type CheckoutCloneMutation = { checkoutClone?: { checkoutId: any } | null };
+
+export type GetProductCustomizationsQueryVariables = Exact<{
+  productId: Scalars['Long']['input'];
+}>;
+
+
+export type GetProductCustomizationsQuery = { product?: { productName?: string | null, productId?: any | null, productVariantId?: any | null, customizations?: Array<{ customizationId: any, cost: any, name?: string | null, type?: string | null, values?: Array<string | null> | null, order: number, groupName?: string | null, maxLength: number, id?: string | null } | null> | null } | null };
+
+export type CustomerSocialLoginGoogleMutationVariables = Exact<{
+  userCredential: Scalars['String']['input'];
+}>;
+
+
+export type CustomerSocialLoginGoogleMutation = { customerSocialLoginGoogle?: { isMaster: boolean, token?: string | null, legacyToken?: string | null, type?: LoginType | null, validUntil: any } | null };
+
+export type CompleteRegistrationMutationVariables = Exact<{
+  customerAccessToken: Scalars['String']['input'];
+  input: CustomerSimpleCreateInputGraphInput;
+}>;
+
+
+export type CompleteRegistrationMutation = { customerCompletePartialRegistration?: { isMaster: boolean, token?: string | null, legacyToken?: string | null, type?: LoginType | null, validUntil: any } | null };
+
+export type CustomerPasswordRecoveryMutationVariables = Exact<{
+  input: Scalars['String']['input'];
+}>;
+
+
+export type CustomerPasswordRecoveryMutation = { customerPasswordRecovery?: { isSuccess: boolean } | null };
 
 export type CheckoutPartnerDisassociateMutationVariables = Exact<{
   checkoutId: Scalars['Uuid']['input'];

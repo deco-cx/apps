@@ -1,6 +1,6 @@
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import { ProductRestockAlert } from "../utils/graphql/queries.ts";
-import {
+import type {
   ProductRestockAlertMutation,
   ProductRestockAlertMutationVariables,
   RestockAlertNode,
@@ -25,12 +25,15 @@ const action = async (
   const data = await storefront.query<
     ProductRestockAlertMutation,
     ProductRestockAlertMutationVariables
-  >({
-    variables: { input: props },
-    ...ProductRestockAlert,
-  }, {
-    headers,
-  });
+  >(
+    {
+      variables: { input: props },
+      ...ProductRestockAlert,
+    },
+    {
+      headers,
+    },
+  );
 
   return data.productRestockAlert ?? null;
 };
