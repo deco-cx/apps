@@ -200,7 +200,7 @@ const loader = async (
     seo: {
       title: collectionTitle || "",
       description: collectionDescription || "",
-      canonical: `${url.origin}${url.pathname}`,
+      canonical: `${url.origin}${url.pathname}${page >= 1 ? `?page=${page}` : ""}`,
     },
   };
 };
