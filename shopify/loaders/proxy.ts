@@ -27,7 +27,7 @@ const decoSiteMapUrl = "/sitemap/deco.xml";
 const buildProxyRoutes = (
   {
     ctx,
-    ctx: { storeName },
+    ctx: { storeName, publicUrl },
     extraPaths,
     includeSiteMap,
     generateDecoSiteMap,
@@ -40,11 +40,13 @@ const buildProxyRoutes = (
     ctx: AppContext;
   },
 ) => {
-  const publicUrl = new URL(`https://${storeName}.myshopify.com`);
+  const urlToUse = publicUrl ? 
+    new URL(publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`) :
+    new URL(`https://${storeName}.myshopify.com`);
+
+  const hostname = urlToUse.hostname;
 
   try {
-    const hostname = publicUrl.hostname;
-
     // Rejects TLD mystore.com, keep this if Shopify doesn't support
     if (!hostname || hostname.split(".").length <= 2) {
       throw new Error(`Invalid hostname from '${publicUrl}'`);
