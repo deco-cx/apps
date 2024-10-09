@@ -11,6 +11,10 @@ fragment Checkout on Checkout {
   customer {
     customerId
   }
+  metadata {
+    key
+    value
+  }
 	products {
 		imageUrl
 		brand
@@ -1321,6 +1325,26 @@ export const RemoveKit = {
   query:
     gql`mutation RemoveKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
     checkout: checkoutRemoveKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
+    }
+  }`,
+};
+
+export const CheckoutAddMetadata = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutAddMetadata($checkoutId: Uuid!, $metadata: [CheckoutMetadataInput]!) {
+    checkout: checkoutAddMetadata(checkoutId: $checkoutId, metadata: $metadata){
+      ...Checkout
+    }
+  }`,
+};
+
+export const CheckoutRemoveMetadata = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutRemoveMetadata($checkoutId: Uuid!, $keys: [String]!) {
+    checkout: checkoutRemoveMetadata(checkoutId: $checkoutId, keys: $keys){
       ...Checkout
     }
   }`,
