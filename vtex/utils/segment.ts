@@ -165,9 +165,11 @@ export const setSegmentBag = (
 ) => {
   const vtex_segment = cookies[SEGMENT_COOKIE_NAME];
   const segmentFromCookie = vtex_segment && parse(vtex_segment);
-  const segmentFromSalesChannelCookie = cookies[SALES_CHANNEL_COOKIE] ? {
-    channel: cookies[SALES_CHANNEL_COOKIE]?.split("=")[1],
-  } : {};
+  const segmentFromSalesChannelCookie = cookies[SALES_CHANNEL_COOKIE]
+    ? {
+      channel: cookies[SALES_CHANNEL_COOKIE]?.split("=")[1],
+    }
+    : {};
   const segmentFromRequest = buildSegmentFromRequest(req);
 
   const segment = {
@@ -182,7 +184,7 @@ export const setSegmentBag = (
   setSegmentInBag(ctx, { payload: segment, token });
 
   // If the user came from a sales channel in the URL, we set the cookie
-  if(segmentFromRequest.channel) {
+  if (segmentFromRequest.channel) {
     setCookie(ctx.response.headers, {
       value: `sc=${segmentFromRequest.channel}`,
       name: SALES_CHANNEL_COOKIE,
