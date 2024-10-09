@@ -1,5 +1,6 @@
 import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
+  AuthResponse,
   Brand,
   Category,
   CreateNewDocument,
@@ -16,6 +17,7 @@ import {
   SimulationItem,
   SimulationOrderForm,
   SPEvent,
+  StartAuthentication,
   Suggestion,
 } from "./types.ts";
 
@@ -247,6 +249,20 @@ export interface VTEXCommerceStable {
   "GET /api/oms/user/orders": {
     response: Userorderslist;
   };
+  "GET /api/vtexid/pub/authentication/start": {
+    searchParams: { scope?: string; locale?: string };
+    response: StartAuthentication;
+  };
+  "POST /api/vtexid/pub/authentication/classic/validate": {
+    body: URLSearchParams;
+    response: AuthResponse;
+  };
+  // "GET /api/sessions": {
+  //   searchParams: {
+  //     items: string
+  //   },
+  //   response: {}
+  // }
 }
 
 export interface SP {

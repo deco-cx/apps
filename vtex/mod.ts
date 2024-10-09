@@ -43,6 +43,10 @@ export interface Props {
    */
   account: string;
   /**
+   * @description The primary locale of your store, e.g. en-US, pt-BR
+   */
+  locale?: string;
+  /**
    * @title Public store URL
    * @description Domain that is registered on License Manager (e.g: www.mystore.com.br)
    */
