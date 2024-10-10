@@ -8,6 +8,7 @@ import {
   CheckoutPartnerDisassociateMutationVariables,
 } from "../../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../../utils/parseHeaders.ts";
+import { deletePartnerCookie } from "../../utils/partner.ts";
 
 const action = async (
   _props: unknown,
@@ -35,6 +36,8 @@ const action = async (
   if (cartId !== checkoutId) {
     setCartCookie(ctx.response.headers, checkoutId);
   }
+
+  deletePartnerCookie(ctx.response.headers);
 
   return data.checkout ?? {};
 };
