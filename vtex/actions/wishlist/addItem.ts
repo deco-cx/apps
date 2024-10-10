@@ -1,4 +1,3 @@
-import wishlistLoader from "../../loaders/wishlist.ts";
 import { AppContext } from "../../mod.ts";
 import type { WishlistItem } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
@@ -32,7 +31,7 @@ const action = async (
       `mutation AddToWishlist($listItem: ListItemInputType!, $shopperId: String!, $name: String!, $public: Boolean) { addToList(listItem: $listItem, shopperId: $shopperId, name: $name, public: $public) @context(provider: "vtex.wish-list@1.x") }`,
   }, { headers: { cookie } });
 
-  return wishlistLoader({ count: Infinity }, req, ctx);
+  return ctx.invoke.vtex.loaders.wishlist({ allRecords: true });
 };
 
 export default action;

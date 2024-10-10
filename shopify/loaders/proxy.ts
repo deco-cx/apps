@@ -40,9 +40,9 @@ const buildProxyRoutes = (
     ctx: AppContext;
   },
 ) => {
-  const urlToUse = publicUrl ? 
-    new URL(publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`) :
-    new URL(`https://${storeName}.myshopify.com`);
+  const urlToUse = publicUrl
+    ? new URL(publicUrl.startsWith("http") ? publicUrl : `https://${publicUrl}`)
+    : new URL(`https://${storeName}.myshopify.com`);
 
   const hostname = urlToUse.hostname;
 
