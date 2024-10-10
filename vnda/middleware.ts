@@ -1,11 +1,12 @@
-import { AppMiddlewareContext } from "./mod.ts";
 import { equal } from "std/testing/asserts.ts";
+import { AppMiddlewareContext } from "./mod.ts";
 import {
   buildSegmentCookie,
   getSegmentFromBag,
   getSegmentFromCookie,
   setSegmentCookie,
   setSegmentInBag,
+  setStoreCC,
 } from "./utils/segment.ts";
 
 export const middleware = (
@@ -14,9 +15,17 @@ export const middleware = (
   ctx: AppMiddlewareContext,
 ) => {
   const segment = getSegmentFromBag(ctx);
+  const url = new URL(req.url);
+  const cc = url.searchParams.get("cc");
+
+  if (cc) {
+    setStoreCC(cc, ctx.response.headers);
+  }
+
   if (!segment) {
     const segmentFromRequest = buildSegmentCookie(req);
     const segmentFromCookie = getSegmentFromCookie(req);
+
     if (
       segmentFromRequest !== null &&
       !equal(segmentFromRequest, segmentFromCookie)
