@@ -1339,3 +1339,39 @@ export interface Orders {
     };
   };
 }
+
+export interface StartAuthentication {
+  authenticationToken: string | null;
+  oauthProviders: AuthProvider[];
+  showClassicAuthentication: boolean;
+  showAccessKeyAuthentication: boolean;
+  showPasskeyAuthentication: boolean;
+  authCookie: string | null;
+  isAuthenticated: boolean;
+  selectedProvider: string | null;
+  samlProviders: unknown[];
+}
+
+export interface AuthProvider {
+  providerName: string;
+  className: string;
+  expectedContext: unknown[];
+}
+
+export interface AuthResponse {
+  authStatus: string;
+  promptMFA: boolean;
+  clientToken: string | null;
+  authCookie: {
+    Name: string;
+    Value: string;
+  };
+  accountAuthCookie: {
+    Name: string;
+    Value: string;
+  };
+  expiresIn: number;
+  userId: string;
+  phoneNumber: string | null;
+  scope: string | null;
+}
