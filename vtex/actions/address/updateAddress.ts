@@ -4,7 +4,7 @@ import { parseCookie } from "../../utils/vtexId.ts";
 
 interface Address {
   name?: string;
-  addressName?: string;
+  addressName: string;
   addressType?: string;
   city?: string;
   complement?: string;
@@ -20,45 +20,44 @@ interface Address {
 }
 
 interface AddressInput {
-  addressId?: string;
-  name?: string;
-  addressName?: string;
-  addressType?: string;
-  city?: string;
-  complement?: string;
-  country?: string;
-  geoCoordinates?: number[];
-  neighborhood?: string;
-  number?: string;
-  postalCode?: string;
   receiverName?: string;
-  reference?: string;
+  complement?: string | null;
+  neighborhood?: string | null;
+  country?: string;
   state?: string;
+  number?: string | null;
   street?: string;
+  geoCoordinates?: number[];
+  postalCode?: string;
+  city?: string;
+  reference?: string | null;
+  addressName: string;
+  addressType?: string;
 }
 
 async function loader(
-  _props: unknown,
+  props: Address,
   req: Request,
   ctx: AppContext,
-): Promise<PostalAddress | null> {
+): Promise<PostalAddress & { receiverName?: string } | null> {
   const { io } = ctx;
   const { cookie } = parseCookie(req.headers, ctx.account);
+  const id = props.addressName;
 
   const moc: AddressInput = {
-    addressType: "Residential",
-    addressName: "Home Address",
-    city: "Los Angeles",
-    complement: "Apt 4B",
+    addressName: "l1ov8h0kea",
+    addressType: "residential",
+    city: "SAINT GEORGE",
+    complement: null,
     country: "USA",
-    neighborhood: "Downtown",
-    number: "1234",
-    postalCode: "90001",
-    geoCoordinates: [-111.98, 40.74],
-    receiverName: "John Maria",
-    reference: "Near the central park",
-    state: "UTA",
-    street: "Main St",
+    geoCoordinates: [-113.57, 37.06],
+    neighborhood: null,
+    number: null,
+    postalCode: "84790",
+    receiverName: "Joao maria",
+    reference: null,
+    state: "UT",
+    street: "SAINT GEORGE, UT - 4555",
   };
 
   const mutation = `
@@ -94,10 +93,8 @@ async function loader(
         query: mutation,
         operationName: "UpdateAddress",
         variables: {
-          addressId: "9y11rmhpsq",
-          addressFields: {
-            ...moc,
-          },
+          addressId: id,
+          addressFields: props,
         },
       },
       { headers: { cookie } },
@@ -110,6 +107,7 @@ async function loader(
       addressRegion: updatedAddress?.state,
       postalCode: updatedAddress?.postalCode,
       streetAddress: updatedAddress?.street,
+      receiverName: updatedAddress?.receiverName,
     };
   } catch (error) {
     console.error("Error updating address:", error);

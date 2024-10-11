@@ -26,7 +26,9 @@ async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<PostalAddress[] | null> {
+): Promise<
+  PostalAddress[] & { receiverName?: string; addressName?: string } | null
+> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
@@ -42,6 +44,8 @@ async function loader(
           postalCode
           state
           street
+          receiverName
+          addressName
         }
       }
   }`;
@@ -62,6 +66,8 @@ async function loader(
       addressRegion: address?.state,
       postalCode: address?.postalCode,
       streetAddress: address?.street,
+      receiverName: address?.receiverName,
+      addressName: address?.addressName,
     }));
   } catch (_) {
     return null;
