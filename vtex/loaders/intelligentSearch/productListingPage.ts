@@ -432,6 +432,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
   const segment = getSegmentFromBag(ctx)?.token ?? "";
+
   const params = new URLSearchParams([
     ["query", props.query ?? ""],
     ["count", (props.count || url.searchParams.get("count") || 12).toString()],
