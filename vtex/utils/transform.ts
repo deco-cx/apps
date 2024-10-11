@@ -880,16 +880,21 @@ export const legacyFacetsFromURL = (url: URL) => {
   return selectedFacets;
 };
 
+const DELIVERY_PROMISE_PARAMS = ["pickupPoint", "zip-code", "coordinates"]
+
 export const filtersFromURL = (url: URL) => {
   const selectedFacets: SelectedFacet[] = legacyFacetsFromURL(url);
 
   url.searchParams.forEach((value, name) => {
+
     const [filter, key] = name.split(".");
 
     if (filter === "filter" && typeof key === "string") {
       selectedFacets.push({ key, value });
     }
   });
+
+
 
   return selectedFacets;
 };

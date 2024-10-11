@@ -179,6 +179,7 @@ const pageTypeToMapParam = (type: PageType["pageType"], index: number) => {
   if (type === "Category" || type === "Department" || type === "SubCategory") {
     return `category-${index + 1}`;
   }
+  console.log(type)
   return PAGE_TYPE_TO_MAP_PARAM[type];
 };
 const queryFromPathname = (
@@ -245,6 +246,7 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
+  console.log(baseUrl)
   const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
@@ -260,10 +262,20 @@ const loader = async (
   const pageTypesPromise = pageTypesFromUrl(pathToUse, ctx);
   const allPageTypes = await pageTypesPromise;
   const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
-  const selected = withDefaultFacets(selectedFacets, ctx);
+
+  let selected = withDefaultFacets(selectedFacets, ctx);
+  const DELIVERY_PROMISE_PARAMS = ["pickupPoint", "zip-code", "coordinates"]
+
+  url.searchParams.forEach((value, name) => {
+    if (DELIVERY_PROMISE_PARAMS.includes(name)) {
+      selected.push({ key: name, value });
+    }
+  })
+  console.log({selected})
   const fselected = selected.filter((f) => f.key !== "price");
   const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
   const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
