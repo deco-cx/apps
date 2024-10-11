@@ -2,8 +2,8 @@ import { AppContext } from "../mod.ts";
 import authenticate from "../utils/authenticate.ts";
 import { GetWishlist } from "../utils/graphql/queries.ts";
 import {
-  GetWislistQuery,
-  GetWislistQueryVariables,
+  GetWishlistQuery,
+  GetWishlistQueryVariables,
   WishlistReducedProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
@@ -26,8 +26,8 @@ const loader = async (
   if (!customerAccessToken) return [];
 
   const data = await storefront.query<
-    GetWislistQuery,
-    GetWislistQueryVariables
+    GetWishlistQuery,
+    GetWishlistQueryVariables
   >({
     variables: { customerAccessToken },
     ...GetWishlist,
