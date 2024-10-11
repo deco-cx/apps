@@ -39,26 +39,13 @@ async function loader(
   props: Address,
   req: Request,
   ctx: AppContext,
-): Promise<PostalAddress & { receiverName?: string } | null> {
+): Promise<
+  | PostalAddress & { receiverName?: string | null; complement?: string | null }
+  | null
+> {
   const { io } = ctx;
   const { cookie } = parseCookie(req.headers, ctx.account);
   const id = props.addressName;
-
-  const moc: AddressInput = {
-    addressName: "l1ov8h0kea",
-    addressType: "residential",
-    city: "SAINT GEORGE",
-    complement: null,
-    country: "USA",
-    geoCoordinates: [-113.57, 37.06],
-    neighborhood: null,
-    number: null,
-    postalCode: "84790",
-    receiverName: "Joao maria",
-    reference: null,
-    state: "UT",
-    street: "SAINT GEORGE, UT - 4555",
-  };
 
   const mutation = `
     mutation UpdateAddress($addressId: String, $addressFields: AddressInput) {
@@ -108,6 +95,7 @@ async function loader(
       postalCode: updatedAddress?.postalCode,
       streetAddress: updatedAddress?.street,
       receiverName: updatedAddress?.receiverName,
+      complement: updatedAddress?.complement,
     };
   } catch (error) {
     console.error("Error updating address:", error);

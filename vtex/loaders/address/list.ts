@@ -27,7 +27,11 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<
-  PostalAddress[] & { receiverName?: string; addressName?: string } | null
+  PostalAddress[] & {
+    receiverName?: string;
+    addressName?: string;
+    complement?: string | null;
+  } | null
 > {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
@@ -46,6 +50,7 @@ async function loader(
           street
           receiverName
           addressName
+          complement
         }
       }
   }`;
@@ -68,6 +73,7 @@ async function loader(
       streetAddress: address?.street,
       receiverName: address?.receiverName,
       addressName: address?.addressName,
+      complement: address?.complement,
     }));
   } catch (_) {
     return null;

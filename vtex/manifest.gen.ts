@@ -2,35 +2,36 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/address/updateAddress.ts";
-import * as $$$$$$$$$1 from "./actions/analytics/sendEvent.ts";
-import * as $$$$$$$$$2 from "./actions/cart/addItems.ts";
-import * as $$$$$$$$$3 from "./actions/cart/addOfferings.ts";
-import * as $$$$$$$$$4 from "./actions/cart/clearOrderformMessages.ts";
-import * as $$$$$$$$$5 from "./actions/cart/getInstallment.ts";
-import * as $$$$$$$$$6 from "./actions/cart/removeItemAttachment.ts";
-import * as $$$$$$$$$7 from "./actions/cart/removeItems.ts";
-import * as $$$$$$$$$8 from "./actions/cart/removeOffering.ts";
-import * as $$$$$$$$$9 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$10 from "./actions/cart/updateAttachment.ts";
-import * as $$$$$$$$$11 from "./actions/cart/updateCoupons.ts";
-import * as $$$$$$$$$12 from "./actions/cart/updateGifts.ts";
-import * as $$$$$$$$$13 from "./actions/cart/updateItemAttachment.ts";
-import * as $$$$$$$$$14 from "./actions/cart/updateItemPrice.ts";
-import * as $$$$$$$$$15 from "./actions/cart/updateItems.ts";
-import * as $$$$$$$$$16 from "./actions/cart/updateProfile.ts";
-import * as $$$$$$$$$17 from "./actions/cart/updateUser.ts";
-import * as $$$$$$$$$18 from "./actions/masterdata/createDocument.ts";
-import * as $$$$$$$$$19 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$20 from "./actions/notifyme.ts";
-import * as $$$$$$$$$21 from "./actions/payments/delete.ts";
-import * as $$$$$$$$$22 from "./actions/profile/newsletterProfile.ts";
-import * as $$$$$$$$$23 from "./actions/profile/updateProfile.ts";
-import * as $$$$$$$$$24 from "./actions/review/submit.ts";
-import * as $$$$$$$$$25 from "./actions/sessions/delete.ts";
-import * as $$$$$$$$$26 from "./actions/trigger.ts";
-import * as $$$$$$$$$27 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$28 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$0 from "./actions/address/createAddress.ts";
+import * as $$$$$$$$$1 from "./actions/address/updateAddress.ts";
+import * as $$$$$$$$$2 from "./actions/analytics/sendEvent.ts";
+import * as $$$$$$$$$3 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$4 from "./actions/cart/addOfferings.ts";
+import * as $$$$$$$$$5 from "./actions/cart/clearOrderformMessages.ts";
+import * as $$$$$$$$$6 from "./actions/cart/getInstallment.ts";
+import * as $$$$$$$$$7 from "./actions/cart/removeItemAttachment.ts";
+import * as $$$$$$$$$8 from "./actions/cart/removeItems.ts";
+import * as $$$$$$$$$9 from "./actions/cart/removeOffering.ts";
+import * as $$$$$$$$$10 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$11 from "./actions/cart/updateAttachment.ts";
+import * as $$$$$$$$$12 from "./actions/cart/updateCoupons.ts";
+import * as $$$$$$$$$13 from "./actions/cart/updateGifts.ts";
+import * as $$$$$$$$$14 from "./actions/cart/updateItemAttachment.ts";
+import * as $$$$$$$$$15 from "./actions/cart/updateItemPrice.ts";
+import * as $$$$$$$$$16 from "./actions/cart/updateItems.ts";
+import * as $$$$$$$$$17 from "./actions/cart/updateProfile.ts";
+import * as $$$$$$$$$18 from "./actions/cart/updateUser.ts";
+import * as $$$$$$$$$19 from "./actions/masterdata/createDocument.ts";
+import * as $$$$$$$$$20 from "./actions/newsletter/subscribe.ts";
+import * as $$$$$$$$$21 from "./actions/notifyme.ts";
+import * as $$$$$$$$$22 from "./actions/payments/delete.ts";
+import * as $$$$$$$$$23 from "./actions/profile/newsletterProfile.ts";
+import * as $$$$$$$$$24 from "./actions/profile/updateProfile.ts";
+import * as $$$$$$$$$25 from "./actions/review/submit.ts";
+import * as $$$$$$$$$26 from "./actions/sessions/delete.ts";
+import * as $$$$$$$$$27 from "./actions/trigger.ts";
+import * as $$$$$$$$$28 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$29 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/address/list.ts";
 import * as $$$1 from "./loaders/cart.ts";
@@ -130,35 +131,36 @@ const manifest = {
     "vtex/sections/Analytics/Vtex.tsx": $$$$$$0,
   },
   "actions": {
-    "vtex/actions/address/updateAddress.ts": $$$$$$$$$0,
-    "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$1,
-    "vtex/actions/cart/addItems.ts": $$$$$$$$$2,
-    "vtex/actions/cart/addOfferings.ts": $$$$$$$$$3,
-    "vtex/actions/cart/clearOrderformMessages.ts": $$$$$$$$$4,
-    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$5,
-    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$6,
-    "vtex/actions/cart/removeItems.ts": $$$$$$$$$7,
-    "vtex/actions/cart/removeOffering.ts": $$$$$$$$$8,
-    "vtex/actions/cart/simulation.ts": $$$$$$$$$9,
-    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$10,
-    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$11,
-    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$12,
-    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$13,
-    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$14,
-    "vtex/actions/cart/updateItems.ts": $$$$$$$$$15,
-    "vtex/actions/cart/updateProfile.ts": $$$$$$$$$16,
-    "vtex/actions/cart/updateUser.ts": $$$$$$$$$17,
-    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$18,
-    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$19,
-    "vtex/actions/notifyme.ts": $$$$$$$$$20,
-    "vtex/actions/payments/delete.ts": $$$$$$$$$21,
-    "vtex/actions/profile/newsletterProfile.ts": $$$$$$$$$22,
-    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$23,
-    "vtex/actions/review/submit.ts": $$$$$$$$$24,
-    "vtex/actions/sessions/delete.ts": $$$$$$$$$25,
-    "vtex/actions/trigger.ts": $$$$$$$$$26,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$27,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$28,
+    "vtex/actions/address/createAddress.ts": $$$$$$$$$0,
+    "vtex/actions/address/updateAddress.ts": $$$$$$$$$1,
+    "vtex/actions/analytics/sendEvent.ts": $$$$$$$$$2,
+    "vtex/actions/cart/addItems.ts": $$$$$$$$$3,
+    "vtex/actions/cart/addOfferings.ts": $$$$$$$$$4,
+    "vtex/actions/cart/clearOrderformMessages.ts": $$$$$$$$$5,
+    "vtex/actions/cart/getInstallment.ts": $$$$$$$$$6,
+    "vtex/actions/cart/removeItemAttachment.ts": $$$$$$$$$7,
+    "vtex/actions/cart/removeItems.ts": $$$$$$$$$8,
+    "vtex/actions/cart/removeOffering.ts": $$$$$$$$$9,
+    "vtex/actions/cart/simulation.ts": $$$$$$$$$10,
+    "vtex/actions/cart/updateAttachment.ts": $$$$$$$$$11,
+    "vtex/actions/cart/updateCoupons.ts": $$$$$$$$$12,
+    "vtex/actions/cart/updateGifts.ts": $$$$$$$$$13,
+    "vtex/actions/cart/updateItemAttachment.ts": $$$$$$$$$14,
+    "vtex/actions/cart/updateItemPrice.ts": $$$$$$$$$15,
+    "vtex/actions/cart/updateItems.ts": $$$$$$$$$16,
+    "vtex/actions/cart/updateProfile.ts": $$$$$$$$$17,
+    "vtex/actions/cart/updateUser.ts": $$$$$$$$$18,
+    "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$19,
+    "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$20,
+    "vtex/actions/notifyme.ts": $$$$$$$$$21,
+    "vtex/actions/payments/delete.ts": $$$$$$$$$22,
+    "vtex/actions/profile/newsletterProfile.ts": $$$$$$$$$23,
+    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$24,
+    "vtex/actions/review/submit.ts": $$$$$$$$$25,
+    "vtex/actions/sessions/delete.ts": $$$$$$$$$26,
+    "vtex/actions/trigger.ts": $$$$$$$$$27,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$28,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$29,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
