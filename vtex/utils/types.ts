@@ -259,11 +259,43 @@ export interface Fields {
   skuName?: string;
 }
 
+export interface Transaction {
+  isActive:      boolean;
+  transactionId: string;
+  merchantName:  string;
+  payments:      Payment[];
+}
+
+export interface Payment {
+  id:                 string;
+  paymentSystem:      string;
+  paymentSystemName:  string;
+  value:              number;
+  installments:       number;
+  referenceValue:     number;
+  cardHolder:         string | null;
+  cardNumber:         string | null;
+  firstDigits:        string | null;
+  lastDigits:         string | null;
+  cvv2:               string | null;
+  expireMonth:        string | null;
+  expireYear:         string | null;
+  url:                string;
+  giftCardId:         null;
+  giftCardName:       null;
+  giftCardCaption:    null;
+  redemptionCode:     null;
+  group:              string;
+  tid:                null;
+  dueDate:            Date;
+}
+
 export interface PaymentData {
   updateStatus: string;
   installmentOptions: InstallmentOption[];
   paymentSystems: PaymentSystem[];
   payments: unknown[];
+  transactions: Transaction[];
   giftCards: unknown[];
   giftCardMessages: unknown[];
   availableAccounts: unknown[];
@@ -382,8 +414,16 @@ export interface Address {
 export interface LogisticsInfo {
   itemIndex: number;
   selectedSla: SelectedSla | null;
+  price: number;
+  listPrice: number;
+  sellingPrice: number;
+  deliveryCompany: string;
+  shippingEstimate: string;
+  shippingEstimateDate: string;
   selectedDeliveryChannel: SelectedDeliveryChannel;
   addressId: string;
+  pickupPointId: string;
+  pickupStoreInfo: PickupStoreInfo;
   slas: Sla[];
   shipsTo: string[];
   itemId: string;
@@ -1274,6 +1314,7 @@ export interface Order {
   callCenterOperatorName: string;
   clientName: string;
   creationDate: string;
+  invoicedDate: string;
   currencyCode: string;
   deliveryDates: Date[];
   giftCardProviders: string[];
@@ -1294,12 +1335,16 @@ export interface Order {
   origin: string;
   paymentApprovedDate: string;
   paymentNames: string;
+  paymentData: PaymentData;
   salesChannel: string;
   sequence: string;
   status: string;
   statusDescription: string;
   totalItems: number;
   totalValue: number;
+  value: number;
+  totals: Total[];
+  shippingData: ShippingData;
   workflowInErrorState: boolean;
   workflowInRetry: boolean;
 }
