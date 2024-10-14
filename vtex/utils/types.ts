@@ -378,6 +378,7 @@ export interface ShippingData {
 
 export interface Address {
   addressType: string;
+  addressName: string;
   receiverName: null;
   addressId: string;
   isDisposable: boolean;
