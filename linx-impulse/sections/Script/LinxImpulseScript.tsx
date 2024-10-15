@@ -1,11 +1,9 @@
 import { Head } from "$fresh/runtime.ts";
-import { SectionProps } from "deco/mod.ts";
 import { AppContext } from "../../mod.ts";
-
+import { type SectionProps } from "@deco/deco";
 export const loader = (_props: unknown, _req: Request, ctx: AppContext) => ({
   apiKey: ctx.apiKey,
 });
-
 export default function LinxImpulseScript(
   { apiKey }: SectionProps<ReturnType<typeof loader>>,
 ) {

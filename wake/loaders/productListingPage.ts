@@ -1,13 +1,21 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
 import {
   getVariations,
   MAXIMUM_REQUEST_QUANTITY,
 } from "../utils/getVariations.ts";
-import { GetURL, Hotsite, Search } from "../utils/graphql/queries.ts";
 import {
+  GetPartners,
+  GetURL,
+  Hotsite,
+  Search,
+} from "../utils/graphql/queries.ts";
+import {
+  GetPartnersQuery,
+  GetPartnersQueryVariables,
   GetUrlQuery,
   GetUrlQueryVariables,
   HotsiteQuery,
@@ -26,6 +34,7 @@ import {
   toProduct,
 } from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
+import { logger } from "@deco/deco/o11y";
 
 export type Sort =
   | "NAME:ASC"
@@ -96,6 +105,11 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+
+  /**
+   * @description page param to partners page
+   */
+  slug?: RequestURLParam;
 }
 
 const OUTSIDE_ATTRIBUTES_FILTERS = ["precoPor"];
@@ -160,6 +174,29 @@ const searchLoader = async (
 
   const offset = page <= 1 ? 0 : (page - 1) * limit;
 
+  const partnerData = props.slug
+    ? await storefront.query<
+      GetPartnersQuery,
+      GetPartnersQueryVariables
+    >({
+      variables: { first: 1, alias: [props.slug] },
+      ...GetPartners,
+    }, { headers })
+    : null;
+
+  const partnerAccessToken = partnerData?.partners?.edges?.[0]?.node
+    ?.partnerAccessToken;
+
+  if (partnerAccessToken) {
+    try {
+      await ctx.invoke.wake.actions.cart.partnerAssociate({
+        partnerAccessToken,
+      });
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
   const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>({
     variables: {
       url: url.pathname,
@@ -180,9 +217,10 @@ const searchLoader = async (
     onlyMainVariant,
     minimumPrice,
     maximumPrice,
+    partnerAccessToken,
   };
 
-  if (!query && !isHotsite) return null;
+  if (!query && !isHotsite && !partnerAccessToken) return null;
 
   const data = isHotsite
     ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({
@@ -208,13 +246,13 @@ const searchLoader = async (
 
   const hasNextPage = Boolean(
     (data?.result?.productsByOffset?.totalCount ?? 0) /
-        (data?.result?.pageSize ?? limit) >
+        limit >
       (data?.result?.productsByOffset?.page ?? 0),
   );
 
   const hasPreviousPage = page > 1;
 
-  const pageOffset = props.pageOffset ?? 1;
+  const pageOffset = props.pageOffset ?? 0;
 
   if (hasNextPage) {
     nextPage.set("page", (page + pageOffset + 1).toString());

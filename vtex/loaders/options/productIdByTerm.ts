@@ -1,25 +1,17 @@
-import { allowCorsFor } from "deco/mod.ts";
 import { AppContext } from "../../mod.ts";
-
+import { allowCorsFor } from "@deco/deco";
 interface Props {
   term?: string;
 }
-
-const loader = async (
-  props: Props,
-  req: Request,
-  ctx: AppContext,
-) => {
+const loader = async (props: Props, req: Request, ctx: AppContext) => {
   Object.entries(allowCorsFor(req)).map(([name, value]) => {
     ctx.response.headers.set(name, value);
   });
-
   const suggestions = await ctx.invoke.vtex.loaders.intelligentSearch
     .suggestions({
       query: props.term || "",
       count: 10,
     });
-
   if (suggestions?.products?.length === 0) {
     return [{
       value: "No products found, use search",
@@ -29,9 +21,9 @@ const loader = async (
 
   return suggestions?.products?.map((product) => ({
     value: `${product.productID}`,
-    label: `${product.productID} - ${product.name}`,
+    label:
+      `${product.productID} - ${product.isVariantOf?.name} ${product.name} - ${product.isVariantOf?.productGroupID}`,
     image: product.image?.[0]?.url,
   }));
 };
-
 export default loader;
