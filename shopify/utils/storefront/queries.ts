@@ -164,12 +164,21 @@ fragment Cart on Cart {
           }
         }
       }
+      discountAllocations {
+        ...on CartCodeDiscountAllocation {
+          code
+          discountedAmount {
+            amount
+            currencyCode
+          }
+        }
+      }
       cost {
         totalAmount {
           amount
           currencyCode
         }
-        subtotalAmount{
+        subtotalAmount {
           amount
           currencyCode
         }
@@ -193,7 +202,7 @@ fragment Cart on Cart {
       amount
       currencyCode
     }
-    checkoutChargeAmount{
+    checkoutChargeAmount {
       amount
       currencyCode
     }
@@ -202,7 +211,7 @@ fragment Cart on Cart {
     code
     applicable
   }
-  discountAllocations{
+  discountAllocations {
     discountedAmount {
       amount
       currencyCode
