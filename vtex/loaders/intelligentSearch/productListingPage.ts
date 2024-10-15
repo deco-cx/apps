@@ -3,36 +3,14 @@ import { parseRange } from "../../../commerce/utils/filters.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import sendEvent from "../../actions/analytics/sendEvent.ts";
 import { AppContext } from "../../mod.ts";
-import {
-  isFilterParam,
-  toPath,
-  withDefaultFacets,
-  withDefaultParams,
-} from "../../utils/intelligentSearch.ts";
-import {
-  getValidTypesFromPageTypes,
-  pageTypesToBreadcrumbList,
-  pageTypesToSeo,
-} from "../../utils/legacy.ts";
+import { isFilterParam, toPath, withDefaultFacets, withDefaultParams } from "../../utils/intelligentSearch.ts";
+import { getValidTypesFromPageTypes, pageTypesToBreadcrumbList, pageTypesToSeo } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { pageTypesFromUrl } from "../../utils/intelligentSearch.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { slugify } from "../../utils/slugify.ts";
-import {
-  filtersFromURL,
-  mergeFacets,
-  parsePageType,
-  toFilter,
-  toProduct,
-} from "../../utils/transform.ts";
-import type {
-  Facet,
-  Fuzzy,
-  PageType,
-  RangeFacet,
-  SelectedFacet,
-  Sort,
-} from "../../utils/types.ts";
+import { filtersFromURL, mergeFacets, parsePageType, toFilter, toProduct } from "../../utils/transform.ts";
+import type { Facet, Fuzzy, PageType, RangeFacet, SelectedFacet, Sort } from "../../utils/types.ts";
 import { getFirstItemAvailable } from "../legacy/productListingPage.ts";
 import PLPDefaultPath from "../paths/PLPDefaultPath.ts";
 import { redirect } from "@deco/deco";
@@ -62,9 +40,7 @@ const LEGACY_TO_IS: Record<string, Sort> = {
   OrderByReleaseDateDESC: "release:desc",
   OrderByBestDiscountDESC: "discount:desc",
 };
-export const mapLabelledFuzzyToFuzzy = (
-  labelledFuzzy?: LabelledFuzzy,
-): Fuzzy | undefined => {
+export const mapLabelledFuzzyToFuzzy = (labelledFuzzy?: LabelledFuzzy): Fuzzy | undefined => {
   switch (labelledFuzzy) {
     case "automatic":
       return "auto";
@@ -76,15 +52,7 @@ export const mapLabelledFuzzyToFuzzy = (
       return;
   }
 };
-const ALLOWED_PARAMS = new Set([
-  "ps",
-  "sort",
-  "page",
-  "o",
-  "q",
-  "fuzzy",
-  "map",
-]);
+const ALLOWED_PARAMS = new Set(["ps", "sort", "page", "o", "q", "fuzzy", "map"]);
 export interface Props {
   /**
    * @description overides the query term
@@ -132,6 +100,11 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+
+  /**
+   * @description Include price in facets
+   */
+  priceFacets?: boolean;
 }
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
@@ -139,23 +112,19 @@ const searchArgsOf = (props: Props, url: URL) => {
   const count = Number(countFromSearchParams ?? props.count ?? 12);
   const query = props.query ?? url.searchParams.get("q") ?? "";
   const currentPageoffset = props.pageOffset ?? 1;
-  const page = props.page ??
+  const page =
+    props.page ??
     Math.min(
-      url.searchParams.get("page")
-        ? Number(url.searchParams.get("page")) - currentPageoffset
-        : 0,
-      VTEX_MAX_PAGES - currentPageoffset,
+      url.searchParams.get("page") ? Number(url.searchParams.get("page")) - currentPageoffset : 0,
+      VTEX_MAX_PAGES - currentPageoffset
     );
-  const sort = (url.searchParams.get("sort") as Sort) ??
+  const sort =
+    (url.searchParams.get("sort") as Sort) ??
     LEGACY_TO_IS[url.searchParams.get("O") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
-  const selectedFacets = mergeFacets(
-    props.selectedFacets ?? [],
-    filtersFromURL(url),
-  );
-  const fuzzy = mapLabelledFuzzyToFuzzy(props.fuzzy) ??
-    (url.searchParams.get("fuzzy") as Fuzzy);
+  const selectedFacets = mergeFacets(props.selectedFacets ?? [], filtersFromURL(url));
+  const fuzzy = mapLabelledFuzzyToFuzzy(props.fuzzy) ?? (url.searchParams.get("fuzzy") as Fuzzy);
   return {
     query,
     fuzzy,
@@ -181,11 +150,7 @@ const pageTypeToMapParam = (type: PageType["pageType"], index: number) => {
   }
   return PAGE_TYPE_TO_MAP_PARAM[type];
 };
-const queryFromPathname = (
-  isInSeachFormat: boolean,
-  pageTypes: PageType[],
-  path: string,
-) => {
+const queryFromPathname = (isInSeachFormat: boolean, pageTypes: PageType[], path: string) => {
   const pathList = path.split("/").slice(1);
   const isPage = Boolean(pageTypes.length);
   const isValidPathSearch = pathList.length == 1;
@@ -201,16 +166,22 @@ const filtersFromPathname = (pages: PageType[]) =>
       if (!key || !page.name) {
         return;
       }
-      return (key &&
+      return (
+        key &&
         page.name && {
-        key,
-        value: slugify(page.name),
-      });
+          key,
+          value: slugify(page.name),
+        }
+      );
     })
-    .filter((facet): facet is {
-      key: string;
-      value: string;
-    } => Boolean(facet));
+    .filter(
+      (
+        facet
+      ): facet is {
+        key: string;
+        value: string;
+      } => Boolean(facet)
+    );
 // Search API does not return the selected price filter, so there is no way for the
 // user to remove this price filter after it is set. This function selects the facet
 // so users can clear the price filters
@@ -238,20 +209,13 @@ const selectPriceFacet = (facets: Facet[], selectedFacets: SelectedFacet[]) => {
  * @title VTEX Integration - Intelligent Search
  * @description Product Listing Page loader
  */
-const loader = async (
-  props: Props,
-  req: Request,
-  ctx: AppContext,
-): Promise<ProductListingPage | null> => {
+const loader = async (props: Props, req: Request, ctx: AppContext): Promise<ProductListingPage | null> => {
   const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
   const currentPageoffset = props.pageOffset ?? 1;
-  const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(
-    props,
-    url,
-  );
+  const { selectedFacets: baseSelectedFacets, page, ...args } = searchArgsOf(props, url);
   let pathToUse = url.href.replace(url.origin, "");
   if (pathToUse === "/" || pathToUse === "/*") {
     const result = await PLPDefaultPath({ level: 1 }, req, ctx);
@@ -260,11 +224,9 @@ const loader = async (
   const pageTypesPromise = pageTypesFromUrl(pathToUse, ctx);
   const allPageTypes = await pageTypesPromise;
   const pageTypes = getValidTypesFromPageTypes(allPageTypes);
-  const selectedFacets = baseSelectedFacets.length === 0
-    ? filtersFromPathname(pageTypes)
-    : baseSelectedFacets;
+  const selectedFacets = baseSelectedFacets.length === 0 ? filtersFromPathname(pageTypes) : baseSelectedFacets;
   const selected = withDefaultFacets(selectedFacets, ctx);
-  const fselected = selected.filter((f) => f.key !== "price");
+  const fselected = props.priceFacets ? selected : selected.filter((f) => f.key !== "price");
   const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
   const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
   const searchArgs = { ...args, query: args.query || pathQuery };
@@ -274,27 +236,28 @@ const loader = async (
   const params = withDefaultParams({ ...searchArgs, page });
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
-    vcsDeprecated
-      ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
+    vcsDeprecated["GET /api/io/_v/api/intelligent-search/product_search/*facets"](
+      {
         ...params,
         facets: toPath(selected),
-      }, {
+      },
+      {
         ...STALE,
         headers: segment ? withSegmentCookie(segment) : undefined,
-      }).then((res) => res.json()),
-    vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
-      ...params,
-      facets: toPath(fselected),
-    }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
-      .then((res) => res.json()),
+      }
+    ).then((res) => res.json()),
+    vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"](
+      {
+        ...params,
+        facets: toPath(fselected),
+      },
+      { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined }
+    ).then((res) => res.json()),
   ]);
   // It is a feature from Intelligent Search on VTEX panel
   // redirect to a specific page based on configured rules
   if (productsResult.redirect) {
-    redirect(
-      new URL(productsResult.redirect, url.origin)
-        .href,
-    );
+    redirect(new URL(productsResult.redirect, url.origin).href);
   }
   /** Intelligent search API analytics. Fire and forget 🔫 */
   const fullTextTerm = params["query"];
@@ -312,13 +275,12 @@ const loader = async (
             url: url.href,
           },
           req,
-          ctx,
+          ctx
         )
       )
       .catch(console.error);
   }
-  const { products: vtexProducts, pagination, recordsFiltered } =
-    productsResult;
+  const { products: vtexProducts, pagination, recordsFiltered } = productsResult;
   const facets = selectPriceFacet(facetsResult.facets, selectedFacets);
   // Transform VTEX product format into schema.org's compatible format
   // If a property is missing from the final `products` array you can add
@@ -331,16 +293,12 @@ const loader = async (
           priceCurrency: segment?.payload?.currencyCode ?? "BRL",
         })
       )
-      .map((product) =>
-        props.similars ? withIsSimilarTo(req, ctx, product) : product
-      ),
+      .map((product) => (props.similars ? withIsSimilarTo(req, ctx, product) : product))
   );
   const paramsToPersist = new URLSearchParams();
   searchArgs.query && paramsToPersist.set("q", searchArgs.query);
   searchArgs.sort && paramsToPersist.set("sort", searchArgs.sort);
-  const filters = facets
-    .filter((f) => !f.hidden)
-    .map(toFilter(selectedFacets, paramsToPersist));
+  const filters = facets.filter((f) => !f.hidden).map(toFilter(selectedFacets, paramsToPersist));
   const itemListElement = pageTypesToBreadcrumbList(pageTypes, baseUrl);
   const hasNextPage = Boolean(pagination.next.proxyUrl);
   const hasPreviousPage = page > 0;
@@ -371,11 +329,7 @@ const loader = async (
       pageTypes: allPageTypes.map(parsePageType),
     },
     sortOptions,
-    seo: pageTypesToSeo(
-      pageTypes,
-      baseUrl,
-      hasPreviousPage ? currentPage : undefined,
-    ),
+    seo: pageTypesToSeo(pageTypes, baseUrl, hasPreviousPage ? currentPage : undefined),
   };
 };
 export const cache = "stale-while-revalidate";
@@ -396,10 +350,9 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     ["pageOffset", (props.pageOffset ?? 1).toString()],
     [
       "selectedFacets",
-      (props.selectedFacets ?? []).reduce(
-        (prev, curr) => [...prev, `${curr.key}:${curr.value}`],
-        [] as string[],
-      ).join("\\"),
+      (props.selectedFacets ?? [])
+        .reduce((prev, curr) => [...prev, `${curr.key}:${curr.value}`], [] as string[])
+        .join("\\"),
     ],
     ["segment", segment],
   ]);
