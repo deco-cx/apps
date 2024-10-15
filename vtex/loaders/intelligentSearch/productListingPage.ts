@@ -102,7 +102,7 @@ export interface Props {
   pageHref?: string;
 
   /**
-   * @description Include price in facets
+   * @title Include price in facets
    */
   priceFacets?: boolean;
 }
