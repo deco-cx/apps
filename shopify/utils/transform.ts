@@ -1,6 +1,7 @@
 import type {
   BreadcrumbList,
   Filter,
+  ListItem,
   Product,
   ProductDetailsPage,
   PropertyValue,
@@ -63,20 +64,58 @@ export const toProductPage = (
   };
 };
 
+export const toBreadcrumbItem = ({
+  name,
+  position,
+  item,
+}: {
+  name: string;
+  position: number;
+  item: string;
+}): ListItem => ({
+  "@type": "ListItem",
+  name: decodeURI(name),
+  position,
+  item,
+});
+
 export const toBreadcrumbList = (
   product: ProductShopify,
   sku: SkuShopify,
 ): BreadcrumbList => {
-  return {
+  let list: ListItem[] = [];
+  const collection = product.collections?.nodes[0];
+
+  if (collection) {
+    list = [
+      toBreadcrumbItem({
+        name: collection.title,
+        position: 1,
+        item: `/${collection.handle}`,
+      }),
+      toBreadcrumbItem({
+        name: product.title,
+        position: 2,
+        item: getPath(product, sku),
+      }),
+    ];
+  } else {
+    list = [
+      toBreadcrumbItem({
+        name: product.title,
+        position: 2,
+        item: getPath(product, sku),
+      }),
+    ];
+  }
+
+  const data: BreadcrumbList = {
     "@type": "BreadcrumbList",
-    numberOfItems: 1,
-    itemListElement: [{
-      "@type": "ListItem",
-      name: product.title,
-      item: getPath(product, sku),
-      position: 1,
-    }],
+    numberOfItems: list.length,
+    itemListElement: list,
   };
+
+  return data as BreadcrumbList;
 };
 
 export const toProduct = (
