@@ -981,8 +981,8 @@ export const GetProducts = {
 export const Search = {
   fragments: [Product],
   query:
-    gql`query Search($operation: Operation!, $query: String, $onlyMainVariant: Boolean, $minimumPrice: Decimal, $maximumPrice: Decimal , $limit: Int, $offset: Int,  $sortDirection: SortDirection, $sortKey: ProductSearchSortKeys, $filters: [ProductFilterInput]) { 
-       result: search(query: $query, operation: $operation) { 
+    gql`query Search($operation: Operation!, $query: String, $onlyMainVariant: Boolean, $minimumPrice: Decimal, $maximumPrice: Decimal , $limit: Int, $offset: Int,  $sortDirection: SortDirection, $sortKey: ProductSearchSortKeys, $filters: [ProductFilterInput], $partnerAccessToken: String) { 
+       result: search(query: $query, operation: $operation, partnerAccessToken: $partnerAccessToken) { 
           aggregations {
             maximumPrice
             minimumPrice
@@ -1143,7 +1143,7 @@ export const GetUser = {
 
 export const GetWishlist = {
   fragments: [WishlistReducedProduct],
-  query: gql`query getWislist($customerAccessToken: String){
+  query: gql`query getWishlist($customerAccessToken: String){
       customer(customerAccessToken: $customerAccessToken) {
         wishlist {
           products {
@@ -1198,8 +1198,9 @@ export const Hotsite = {
     $onlyMainVariant: Boolean
     $offset: Int,
     $sortDirection: SortDirection,
-    $sortKey: ProductSortKeys) {
-    result: hotsite(url: $url) {
+    $sortKey: ProductSortKeys,
+    $partnerAccessToken: String) {
+    result: hotsite(url: $url,  partnerAccessToken: $partnerAccessToken) {
       aggregations {
         filters {
           field
@@ -1299,10 +1300,10 @@ export const Shop = {
 
 export const GetBuyList = {
   fragments: [BuyList],
-  query: gql`query BuyList($id: Long!) {
-      buyList(id: $id){
-        ...BuyList
-      }
+  query: gql`query BuyList($id: Long!,  $partnerAccessToken: String) {
+     buyList(id: $id,  partnerAccessToken: $partnerAccessToken){
+      ...BuyList
+     }
   }`,
 };
 
@@ -1321,6 +1322,49 @@ export const RemoveKit = {
   query:
     gql`mutation RemoveKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
     checkout: checkoutRemoveKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
+    }
+  }`,
+};
+
+export const GetPartners = {
+  query:
+    gql`query GetPartners($first: Int,$last: Int,$names: [String],$priceTableIds: [Int!],$sortDirection: SortDirection! = ASC,$sortKey: PartnerSortKeys! = ID,$before: String,$alias: [String],$after: String) {
+    partners(first:$first,last:$last,names:$names,priceTableIds:$priceTableIds,sortDirection:$sortDirection,sortKey:$sortKey ,before:$before,alias:$alias,after:$after){
+    edges{
+      node{
+        partnerId
+        priceTableId
+        portfolioId
+        type
+        startDate
+        endDate
+        name
+        alias
+        fullUrlLogo
+        origin
+        partnerAccessToken
+      }
+    }
+  }
+  }`,
+};
+
+export const CheckoutPartnerAssociate = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutPartnerAssociate($checkoutId: Uuid!,$customerAccessToken: String, $partnerAccessToken: String!){
+    checkout: checkoutPartnerAssociate(checkoutId: $checkoutId ,customerAccessToken: $customerAccessToken ,partnerAccessToken: $partnerAccessToken ){
+      ...Checkout
+    }
+  }`,
+};
+
+export const CheckoutPartnerDisassociate = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutPartnerDisassociate($checkoutId: Uuid!, $customerAccessToken: String){
+    checkout: checkoutPartnerDisassociate(checkoutId: $checkoutId , customerAccessToken: $customerAccessToken ){
       ...Checkout
     }
   }`,

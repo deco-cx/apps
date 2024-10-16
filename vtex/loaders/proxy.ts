@@ -27,14 +27,20 @@ const buildProxyRoutes = (
     includeSiteMap,
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromVtexProxy,
     includeScriptsToHead,
+    includeScriptsToBody,
   }: {
     publicUrl?: string;
     extraPaths: string[];
     includeSiteMap?: string[];
     generateDecoSiteMap?: boolean;
     excludePathsFromDecoSiteMap: string[];
+    excludePathsFromVtexProxy?: string[];
     includeScriptsToHead?: {
+      includes?: Script[];
+    };
+    includeScriptsToBody?: {
       includes?: Script[];
     };
   },
@@ -65,6 +71,7 @@ const buildProxyRoutes = (
         url: urlToProxy,
         host: hostToUse,
         includeScriptsToHead,
+        includeScriptsToBody,
         removeDirtyCookies: true,
       };
       // we have this check because we need to add
@@ -91,7 +98,10 @@ const buildProxyRoutes = (
         },
       });
     };
-    const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
+    const currentPathsToProxy = PATHS_TO_PROXY.filter((path) =>
+      !excludePathsFromVtexProxy?.includes(path)
+    );
+    const routesFromPaths = [...currentPathsToProxy, ...extraPaths].map(
       routeFromPath,
     );
 
@@ -150,9 +160,19 @@ export interface Props {
    */
   excludePathsFromDecoSiteMap?: string[];
   /**
+   * @title Exclude paths from VTEX PATHS_TO_PROXY
+   */
+  excludePathsFromVtexProxy?: string[];
+  /**
    * @title Scripts to include on Html head
    */
   includeScriptsToHead?: {
+    includes?: Script[];
+  };
+  /**
+   * @title Scripts to include on Html body
+   */
+  includeScriptsToBody?: {
     includes?: Script[];
   };
 }
@@ -166,7 +186,9 @@ function loader(
     includeSiteMap = [],
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
+    excludePathsFromVtexProxy = [],
     includeScriptsToHead = { includes: [] },
+    includeScriptsToBody = { includes: [] },
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -174,10 +196,12 @@ function loader(
   return buildProxyRoutes({
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
+    excludePathsFromVtexProxy,
     includeSiteMap,
     publicUrl: ctx.publicUrl,
     extraPaths: extraPathsToProxy,
     includeScriptsToHead,
+    includeScriptsToBody,
   });
 }
 

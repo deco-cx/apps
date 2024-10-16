@@ -109,9 +109,35 @@ export const toProduct = (
     "name": "descriptionHtml",
     "value": product.descriptionHtml,
   };
-  const additionalProperty: PropertyValue[] = selectedOptions.map(
-    toPropertyValue,
-  ).concat(descriptionHtml);
+
+  const metafields = (product.metafields ?? [])
+    .filter((metafield) => metafield && metafield.key && metafield.value)
+    .map((metafield): PropertyValue => {
+      const { key, value, reference, references } = metafield || {};
+      const hasReferenceImage = reference && "image" in reference;
+      const referenceImageUrl = hasReferenceImage ? reference.image?.url : null;
+
+      const hasEdges = references?.edges && references.edges.length > 0;
+      const edgeImages = hasEdges
+        ? references.edges.map((edge) =>
+          edge.node && "image" in edge.node ? edge.node.image?.url : null
+        )
+        : null;
+
+      const valueToReturn = referenceImageUrl || edgeImages || value;
+
+      return {
+        "@type": "PropertyValue",
+        name: key,
+        value: valueToReturn,
+      };
+    });
+
+  const additionalProperty: PropertyValue[] = selectedOptions
+    .map(toPropertyValue)
+    .concat(descriptionHtml)
+    .concat(metafields);
+
   const skuImages = nonEmptyArray([image]);
   const hasVariant = level < 1 &&
     variants.nodes.map((variant) => toProduct(product, variant, url, 1));

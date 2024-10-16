@@ -50,6 +50,8 @@ const state = {
   updateItem: enqueue("wake/actions/cart/updateItemQuantity.ts"),
   addCoupon: enqueue("wake/actions/cart/addCoupon.ts"),
   removeCoupon: enqueue("wake/actions/cart/removeCoupon.ts"),
+  partnerAssociate: enqueue("wake/actions/cart/partnerAssociate.ts"),
+  partnerDisassociate: enqueue("wake/actions/cart/partnerDisassociate.ts"),
 };
 
 export const useCart = () => state;

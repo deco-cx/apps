@@ -8,10 +8,12 @@ import {
 import {
   GetProductQuery,
   GetProductQueryVariables,
+  HasMetafieldsMetafieldsArgs,
   ProductRecommendationsQuery,
   ProductRecommendationsQueryVariables,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
+import { Metafield } from "../utils/types.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -20,6 +22,11 @@ export interface Props {
    * @default 10
    */
   count: number;
+  /**
+   * @title Metafields
+   * @description search for metafields
+   */
+  metafields?: Metafield[];
 }
 
 /**
@@ -37,12 +44,13 @@ const loader = async (
   const splitted = slug?.split("-");
   const maybeSkuId = Number(splitted[splitted.length - 1]);
   const handle = splitted.slice(0, maybeSkuId ? -1 : undefined).join("-");
+  const metafields = props.metafields || [];
 
   const query = await storefront.query<
     GetProductQuery,
-    GetProductQueryVariables
+    GetProductQueryVariables & HasMetafieldsMetafieldsArgs
   >({
-    variables: { handle },
+    variables: { handle, identifiers: metafields },
     ...GetProduct,
   });
 
@@ -52,9 +60,12 @@ const loader = async (
 
   const data = await storefront.query<
     ProductRecommendationsQuery,
-    ProductRecommendationsQueryVariables
+    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs
   >({
-    variables: { productId: query.product.id },
+    variables: {
+      productId: query.product.id,
+      identifiers: metafields,
+    },
     ...ProductRecommendations,
   });
 

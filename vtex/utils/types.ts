@@ -62,11 +62,12 @@ export interface ClientProfileData {
 
 export interface ClientPreferencesData {
   locale: string;
-  optinNewsLetter: null;
+  optinNewsLetter: boolean;
 }
 
 export interface ItemMetadata {
-  items: ItemMetadataItem[];
+  items?: ItemMetadataItem[];
+  Items?: ItemMetadataItemUppercase[];
 }
 
 export interface ItemMetadataItem {
@@ -80,6 +81,19 @@ export interface ItemMetadataItem {
   imageUrl: string;
   detailUrl: string;
   assemblyOptions: AssemblyOption[];
+}
+
+export interface ItemMetadataItemUppercase {
+  Id: string;
+  Seller: string;
+  Name: string;
+  SkuName: string;
+  ProductId: string;
+  RefId: string;
+  Ean: null | string;
+  ImageUrl: string;
+  DetailUrl: string;
+  AssemblyOptions: AssemblyOption[];
 }
 
 export interface AssemblyOption {
@@ -396,6 +410,7 @@ export interface ShippingData {
 
 export interface Address {
   addressType: string;
+  addressName: string;
   receiverName: null;
   addressId: string;
   isDisposable: boolean;
@@ -1323,6 +1338,7 @@ export interface Order {
   invoiceOutput: string[];
   isAllDelivered: boolean;
   isAnyDelivered: boolean;
+  itemMetadata: ItemMetadata;
   items: OrderFormItem[];
   lastChange: string;
   lastMessageUnread: string;
@@ -1347,6 +1363,79 @@ export interface Order {
   shippingData: ShippingData;
   workflowInErrorState: boolean;
   workflowInRetry: boolean;
+}
+
+export interface OrderItem {
+  affiliateId: string;
+  allowCancellation: boolean;
+  allowEdition?: boolean;
+  authorizedDate: string;
+  callCenterOperatorData: string;
+  cancelReason: string;
+  cancellationData: {
+    RequestedByUser: boolean;
+    RequestedBySystem: boolean;
+    RequestedBySellerNotification: boolean;
+    RequestedByPaymentNotification: boolean;
+    Reason: string;
+    CancellationDate: string;
+  };
+  cancellationRequests?: null;
+  changesAttachment: string;
+  checkedInPickupPointId: string | null;
+  clientPreferencesData: ClientPreferencesData;
+  clientProfileData: ClientProfileData | null;
+  // deno-lint-ignore no-explicit-any
+  commercialConditionData?: any | null;
+  creationDate: string;
+  // deno-lint-ignore no-explicit-any
+  customData?: Record<string, any> | null;
+  followUpEmail?: string;
+  giftRegistryData?: GiftRegistry | null;
+  hostname: string;
+  // deno-lint-ignore no-explicit-any
+  invoiceData: any | null;
+  invoicedDate: string | null;
+  isCheckedIn: boolean;
+  isCompleted: boolean;
+  itemMetadata: ItemMetadata;
+  items: OrderFormItem[];
+  lastChange: string;
+  lastMessage: string;
+  marketingData: OrderFormMarketingData | null;
+  marketplace: Marketplace;
+  marketplaceItems: [];
+  marketplaceOrderId: string;
+  marketplaceServicesEndpoint: string;
+  merchantName: string;
+  // deno-lint-ignore no-explicit-any
+  openTextField: any | null;
+}
+
+interface Marketplace {
+  baseURL: string;
+  // deno-lint-ignore no-explicit-any
+  isCertified?: any | null;
+  name: string;
+}
+
+interface OrderFormMarketingData {
+  utmCampaign?: string;
+  utmMedium?: string;
+  utmSource?: string;
+  utmiCampaign?: string;
+  utmiPart?: string;
+  utmipage?: string;
+  marketingTags?: string | string[];
+}
+
+interface GiftRegistry {
+  attachmentId: string;
+  giftRegistryId: string;
+  giftRegistryType: string;
+  giftRegistryTypeName: string;
+  addressId: string;
+  description: string;
 }
 
 export interface Orders {
