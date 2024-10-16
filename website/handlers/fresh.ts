@@ -12,6 +12,8 @@ import {
   isDeferred,
   RequestContext,
 } from "@deco/deco";
+import type { Exception } from "npm:@opentelemetry/api@1.9.0";
+
 type ConnInfo = Deno.ServeHandlerInfo;
 /**
  * @title Fresh Config
@@ -120,7 +122,7 @@ export default function Fresh(
           try {
             return await getPage();
           } catch (e) {
-            span.recordException(e);
+            span.recordException(e as Exception);
             throw e;
           } finally {
             span.end();
@@ -163,7 +165,7 @@ export default function Fresh(
               }
               return response;
             } catch (err) {
-              span.recordException(err);
+              span.recordException(err as Exception);
               throw err;
             } finally {
               span.end();
