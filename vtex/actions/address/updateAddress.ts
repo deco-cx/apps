@@ -35,7 +35,7 @@ interface AddressInput {
   addressType?: string;
 }
 
-async function loader(
+async function action(
   props: Address,
   req: Request,
   ctx: AppContext,
@@ -103,4 +103,4 @@ async function loader(
   }
 }
 
-export default loader;
+export default action;
