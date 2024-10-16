@@ -218,7 +218,7 @@ const snippet = ({ siteId, siteName, serviceEndpoint, userId, sessionId }: {
       return match ? match[1].replace("_", ".") : "Unknown";
     }
     function getUrlParam(param: string) {
-      const urlParams = new URLSearchParams(window.location.search);
+      const urlParams = new URLSearchParams(globalThis.location.search);
       return urlParams.get(param);
     }
     function getReferrerSource(referrer: string) {
@@ -245,7 +245,7 @@ const snippet = ({ siteId, siteName, serviceEndpoint, userId, sessionId }: {
       start_time: new Date().toISOString(),
       timestamp: undefined, // get server side
       pathname: globalThis.window.location.pathname +
-        (window.location.hash ?? ""),
+        (globalThis.location.hash ?? ""),
       navigation_from: globalThis.window.navigation.activation.from,
       entry_meta: {
         key: Object.keys(values),
@@ -266,7 +266,7 @@ const snippet = ({ siteId, siteName, serviceEndpoint, userId, sessionId }: {
       ip_timezone: undefined, // get server side
       ip_lat: undefined, // get server side
       ip_long: undefined, // get server side
-      screen_size: `${window.screen.width}x${window.screen.height}`,
+      screen_size: `${globalThis.screen.width}x${globalThis.screen.height}`,
       device: getDeviceType(),
       operating_system: getOperatingSystem(),
       operating_system_version: getOSVersion(),
