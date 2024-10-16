@@ -1,12 +1,12 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { WishlistRemoveProduct } from "../../utils/graphql/queries.ts";
-import {
+import type {
   WishlistReducedProductFragment,
   WishlistRemoveProductMutation,
   WishlistRemoveProductMutationVariables,
 } from "../../utils/graphql/storefront.graphql.gen.ts";
 
-import { ProductFragment } from "../../utils/graphql/storefront.graphql.gen.ts";
+import type { ProductFragment } from "../../utils/graphql/storefront.graphql.gen.ts";
 import authenticate from "../../utils/authenticate.ts";
 import { parseHeaders } from "../../utils/parseHeaders.ts";
 
@@ -31,10 +31,13 @@ const action = async (
   const data = await storefront.query<
     WishlistRemoveProductMutation,
     WishlistRemoveProductMutationVariables
-  >({
-    variables: { customerAccessToken, productId },
-    ...WishlistRemoveProduct,
-  }, { headers });
+  >(
+    {
+      variables: { customerAccessToken, productId },
+      ...WishlistRemoveProduct,
+    },
+    { headers },
+  );
 
   const products = data.wishlistRemoveProduct;
 

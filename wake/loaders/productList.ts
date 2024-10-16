@@ -2,7 +2,7 @@ import type { Product } from "../../commerce/types.ts";
 import type { AppContext } from "../mod.ts";
 import { getVariations } from "../utils/getVariations.ts";
 import { GetProducts } from "../utils/graphql/queries.ts";
-import {
+import type {
   GetProductsQuery,
   GetProductsQueryVariables,
   ProductFragment,
@@ -141,6 +141,13 @@ const productListLoader = async (
 ): Promise<Product[] | null> => {
   const url = new URL(req.url);
   const { storefront } = ctx;
+
+  console.log(props.filters);
+  console.log(props.filters);
+  console.log(props.filters);
+  console.log(props.filters);
+  console.log(props.filters);
+  console.log(props.filters);
 
   const headers = parseHeaders(req.headers);
 

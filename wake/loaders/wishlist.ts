@@ -1,9 +1,9 @@
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import authenticate from "../utils/authenticate.ts";
 import { GetWishlist } from "../utils/graphql/queries.ts";
-import {
-  GetWishlistQuery,
-  GetWishlistQueryVariables,
+import type {
+  GetWislistQuery,
+  GetWislistQueryVariables,
   WishlistReducedProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";

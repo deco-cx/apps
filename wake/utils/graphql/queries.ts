@@ -862,7 +862,95 @@ fragment SingleProductPart on SingleProduct {
     stamp
     title
   }
- 
+}
+`;
+
+const CheckoutCloseFields = gql`
+fragment CheckoutCloseFields on Checkout {
+  checkoutId
+  completed
+  orders {
+    adjustments {
+      name
+      type
+      value
+    }
+    date
+    discountValue
+    interestValue
+    orderId
+    orderStatus
+    products {
+      adjustments {
+        name
+        additionalInformation
+        type
+        value
+      }
+      attributes {
+        name
+        value
+      }
+      imageUrl
+      name
+      productVariantId
+      quantity
+      value
+    }
+    shippingValue
+    totalValue
+    delivery {
+      address {
+        address
+        cep
+        city
+        complement
+        name
+        isPickupStore
+        neighborhood
+        pickupStoreText
+      }
+      cost
+      deliveryTime
+      name
+    }
+    dispatchTimeText
+    payment {
+      invoice {
+        digitableLine
+        paymentLink
+      }
+      name
+      pix {
+        qrCode
+        qrCodeExpirationDate
+        qrCodeUrl
+      }
+    }
+  }
+}
+`;
+
+const SelectPayment = gql`
+fragment SelectPayment on Checkout {
+  checkoutId
+  total
+  subtotal
+  selectedPaymentMethod {
+    id
+    installments {
+      adjustment
+      number
+      total
+      value
+    }
+    selectedInstallment {
+      adjustment
+      number
+      total
+      value
+    }
+  }
 }
 `;
 
@@ -873,7 +961,6 @@ fragment SingleProduct on SingleProduct {
     productId
   } 
 }
-
 `;
 
 const RestockAlertNode = gql`
@@ -920,6 +1007,8 @@ const ShippingQuote = gql`
 export const Customer = gql`
   fragment Customer on Customer {
     id
+    cpf
+    phoneNumber
     email
     gender
     customerId
@@ -953,8 +1042,9 @@ export const GetProduct = {
 
 export const GetCart = {
   fragments: [Checkout],
-  query: gql`query GetCart($checkoutId: String!) { 
-    checkout(checkoutId: $checkoutId) { ...Checkout } 
+  query:
+    gql`query GetCart($checkoutId: String!, $customerAccessToken: String) { 
+    checkout(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) { ...Checkout } 
   }`,
 };
 
@@ -1327,6 +1417,281 @@ export const RemoveKit = {
   }`,
 };
 
+export const CalculatePrices = {
+  query:
+    gql`query calculatePrices($partnerAccessToken: String!, $products: [CalculatePricesProductsInput]!) {
+    calculatePrices(partnerAccessToken: $partnerAccessToken, products: $products) {
+      bestInstallment {
+        displayName
+        name
+      }
+      discountPercentage
+      discounted
+      installmentPlans {
+        displayName
+        name
+        installments{
+          discount
+          fees
+          number
+          value
+        }
+      }
+      listPrice
+      multiplicationFactor
+      price
+    } 
+  }`,
+};
+
+export const CustomerCreate = {
+  query: gql`mutation CustomerCreate($input: CustomerCreateInput) {
+    customerCreate(input: $input) {
+      customerId
+      customerName
+      customerType
+    }
+  }`,
+};
+
+export const CustomerAuthenticatedLogin = {
+  query:
+    gql`mutation customerAuthenticatedLogin($input: String!, $pass: String!) {
+    customerAuthenticatedLogin(input:{input: $input, password: $pass}) {
+      isMaster
+      token
+      legacyToken
+      type
+      validUntil
+    }
+  }`,
+};
+
+export const CustomerAccessTokenRenew = {
+  query: gql`mutation customerAccessTokenRenew($customerAccessToken: String!) {
+    customerAccessTokenRenew(customerAccessToken: $customerAccessToken) {
+      token
+      validUntil
+    }
+  }`,
+};
+
+export const CustomerAddressCreate = {
+  query: gql`mutation customerAddressCreate(
+     $customerAccessToken: String!,
+     $address: CreateCustomerAddressInput!,
+    ) {
+      customerAddressCreate(
+        customerAccessToken: $customerAccessToken,
+        address: $address,
+      ) {
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        state
+        street
+        referencePoint
+      }
+    }`,
+};
+
+export const CustomerAddressRemove = {
+  query:
+    gql`mutation customerAddressRemove($customerAccessToken: String!, $id: ID!) {
+      customerAddressRemove(customerAccessToken: $customerAccessToken, id: $id) {
+        isSuccess
+      }
+    }`,
+};
+
+export const CustomerAddressUpdate = {
+  query: gql`mutation customerAddressUpdate(
+     $id: ID!,
+     $customerAccessToken: String!,
+     $address: UpdateCustomerAddressInput!,
+    ) {
+      customerAddressUpdate(
+        customerAccessToken: $customerAccessToken,
+        address: $address,
+        id: $id
+      ) {
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        state
+        street
+        referencePoint
+      }
+    }`,
+};
+
+export const GetUserAddresses = {
+  fragments: [Customer],
+  query: gql`query GetUserAddresses($customerAccessToken: String) {
+    customer(customerAccessToken: $customerAccessToken) {
+      ...Customer,
+      addresses {
+        address
+        address2
+        addressDetails
+        addressNumber
+        cep
+        city
+        country
+        email
+        id
+        name
+        neighborhood
+        phone
+        referencePoint
+        state
+        street
+      }
+    }
+  }`,
+};
+
+export const CreateCheckout = {
+  query: gql`mutation createCheckout($products: [CheckoutProductItemInput]!) {
+      createCheckout(products: $products) {
+        checkoutId
+      }
+    }`,
+};
+
+export const CheckoutCustomerAssociate = {
+  query:
+    gql`mutation checkoutCustomerAssociate($checkoutId: Uuid!, $customerAccessToken: String!) {
+      checkoutCustomerAssociate(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) {
+        checkoutId
+      }
+    }`,
+};
+
+export const PaymentMethods = {
+  query: gql`query paymentMethods($checkoutId: Uuid!) {
+    paymentMethods(checkoutId: $checkoutId) {
+      id
+      name
+      imageUrl
+    }
+  }`,
+};
+
+export const GetCheckoutCoupon = {
+  query: gql`query GetCheckoutCoupon($checkoutId: String!) {
+    checkout(checkoutId: $checkoutId) {
+      coupon
+    }
+  }`,
+};
+
+export const CheckoutAddressAssociate = {
+  query:
+    gql`mutation checkoutAddressAssociate($customerAccessToken: String!, $addressId: ID!, $checkoutId: Uuid!) {
+    checkoutAddressAssociate(
+      customerAccessToken: $customerAccessToken
+      addressId: $addressId
+      checkoutId: $checkoutId
+    ) {
+      cep
+      checkoutId
+      url
+      updateDate
+    }
+  }`,
+};
+
+export const CheckoutSelectShippingQuote = {
+  query:
+    gql`mutation checkoutSelectShippingQuote($checkoutId: Uuid!, $shippingQuoteId: Uuid!) {
+    checkoutSelectShippingQuote(
+      checkoutId: $checkoutId
+      shippingQuoteId: $shippingQuoteId
+    ) {
+      cep
+      checkoutId
+      shippingFee
+      selectedShipping {
+        deadline
+        name
+        shippingQuoteId
+        type
+        value
+      }
+    }
+  }`,
+};
+
+export const GetSelectedShipping = {
+  query:
+    gql`query GetSelectedShipping($checkoutId: String!, $customerAccessToken: String!) {
+    checkout(checkoutId: $checkoutId, customerAccessToken: $customerAccessToken) {
+      selectedShipping {
+        deadline
+        deadlineInHours
+        deliverySchedule {
+          date
+          endDateTime
+          endTime
+          startDateTime
+          startTime
+        }
+        name
+        shippingQuoteId
+        type
+        value
+      }
+    }
+  }`,
+};
+
+export const CheckoutComplete = {
+  fragments: [CheckoutCloseFields],
+  query: gql`mutation checkoutComplete(
+    $checkoutId: Uuid!
+    $paymentData: String!
+    $comments: String
+    $customerAccessToken: String
+  ) {
+    checkoutComplete(
+      checkoutId: $checkoutId
+      paymentData: $paymentData
+      comments: $comments
+      customerAccessToken: $customerAccessToken
+    ) {
+      ...CheckoutCloseFields
+    }
+  }`,
+};
+
+export const CheckoutSelectPaymentMethod = {
+  fragments: [SelectPayment],
+  query:
+    gql`mutation checkoutSelectPaymentMethod($checkoutId: Uuid!, $paymentMethodId: ID!) {
+    checkoutSelectPaymentMethod(
+      checkoutId: $checkoutId
+      paymentMethodId: $paymentMethodId
+    ) {
+      ...SelectPayment
+    }
+  }`,
+};
+
 export const GetPartners = {
   query:
     gql`query GetPartners($first: Int,$last: Int,$names: [String],$priceTableIds: [Int!],$sortDirection: SortDirection! = ASC,$sortKey: PartnerSortKeys! = ID,$before: String,$alias: [String],$after: String) {
@@ -1350,6 +1715,23 @@ export const GetPartners = {
   }`,
 };
 
+export const CheckoutSelectInstallment = {
+  fragments: [Checkout],
+  query: gql`mutation checkoutSelectInstallment(
+    $checkoutId: Uuid!
+    $selectedPaymentMethodId: Uuid!
+    $installmentNumber: Int!
+  ) {
+    checkoutSelectInstallment(
+      checkoutId: $checkoutId
+      selectedPaymentMethodId: $selectedPaymentMethodId
+      installmentNumber: $installmentNumber
+    ) {
+      ...Checkout
+    }
+  }`,
+};
+
 export const CheckoutPartnerAssociate = {
   fragments: [Checkout],
   query:
@@ -1358,6 +1740,74 @@ export const CheckoutPartnerAssociate = {
       ...Checkout
     }
   }`,
+};
+
+export const CheckoutClone = {
+  query: gql`mutation checkoutClone($checkoutId: Uuid!, $copyUser: Boolean) {
+    checkoutClone(checkoutId: $checkoutId, copyUser: $copyUser) {
+      checkoutId
+    }
+  }`,
+};
+
+export const GetProductCustomizations = {
+  query: gql`query GetProductCustomizations($productId: Long!) {
+    product(productId: $productId) {
+      productName
+      productId
+      productVariantId
+      customizations {
+        customizationId
+        cost
+        name
+        type
+        values
+        order
+        groupName
+        maxLength
+        id
+      }
+    }
+  }
+  `,
+};
+
+export const CustomerSocialLoginGoogle = {
+  query: gql`mutation customerSocialLoginGoogle($userCredential: String!) {
+    customerSocialLoginGoogle(userCredential: $userCredential) {
+      isMaster
+      token
+      legacyToken
+      type
+      validUntil
+    }
+  }
+  `,
+};
+
+export const CustomerCompletePartialRegistration = {
+  query:
+    gql`mutation CompleteRegistration($customerAccessToken: String!, $input: CustomerSimpleCreateInputGraphInput!) {
+    customerCompletePartialRegistration(
+      customerAccessToken: $customerAccessToken
+      input: $input) {
+        isMaster
+        token
+        legacyToken
+        type
+        validUntil
+    }
+  }`,
+};
+
+export const CustomerPasswordRecovery = {
+  query: gql`
+    mutation CustomerPasswordRecovery($input: String!) {
+      customerPasswordRecovery(input: $input) {
+      isSuccess
+    }
+  }
+  `,
 };
 
 export const CheckoutPartnerDisassociate = {

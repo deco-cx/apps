@@ -1,7 +1,8 @@
-import { AppContext } from "../mod.ts";
+import authenticate from "../utils/authenticate.ts";
+import type { AppContext } from "../mod.ts";
 import { getCartCookie, setCartCookie } from "../utils/cart.ts";
 import { CreateCart, GetCart } from "../utils/graphql/queries.ts";
-import {
+import type {
   CheckoutFragment,
   CreateCartMutation,
   CreateCartMutationVariables,
@@ -15,26 +16,33 @@ import { parseHeaders } from "../utils/parseHeaders.ts";
  * @description Cart loader
  */
 const loader = async (
-  _props: unknown,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Partial<CheckoutFragment>> => {
   const { storefront } = ctx;
-  const cartId = getCartCookie(req.headers);
+  const cartId = props?.cartId || getCartCookie(req.headers);
   const headers = parseHeaders(req.headers);
+  const customerAccessToken = await authenticate(req, ctx);
 
   const data = cartId
-    ? await storefront.query<GetCartQuery, GetCartQueryVariables>({
-      variables: { checkoutId: cartId },
-      ...GetCart,
-    }, {
-      headers,
-    })
-    : await storefront.query<CreateCartMutation, CreateCartMutationVariables>({
-      ...CreateCart,
-    }, {
-      headers,
-    });
+    ? await storefront.query<GetCartQuery, GetCartQueryVariables>(
+      {
+        variables: { checkoutId: cartId, customerAccessToken },
+        ...GetCart,
+      },
+      {
+        headers,
+      },
+    )
+    : await storefront.query<CreateCartMutation, CreateCartMutationVariables>(
+      {
+        ...CreateCart,
+      },
+      {
+        headers,
+      },
+    );
 
   const checkoutId = data.checkout?.checkoutId;
 
@@ -46,3 +54,7 @@ const loader = async (
 };
 
 export default loader;
+
+interface Props {
+  cartId?: string;
+}

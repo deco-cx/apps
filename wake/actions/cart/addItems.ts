@@ -1,8 +1,8 @@
 import { HttpError } from "../../../utils/http.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
 import { AddItemToCart } from "../../utils/graphql/queries.ts";
-import {
+import type {
   AddItemToCartMutation,
   AddItemToCartMutationVariables,
   CheckoutFragment,
@@ -36,10 +36,13 @@ const action = async (
   const data = await storefront.query<
     AddItemToCartMutation,
     AddItemToCartMutationVariables
-  >({
-    variables: { input: { id: cartId, products: props.products } },
-    ...AddItemToCart,
-  }, { headers });
+  >(
+    {
+      variables: { input: { id: cartId, products: props.products } },
+      ...AddItemToCart,
+    },
+    { headers },
+  );
 
   const checkoutId = data.checkout?.checkoutId;
 

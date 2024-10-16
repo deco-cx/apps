@@ -1,12 +1,13 @@
-import { AppContext } from "../mod.ts";
+import type { AppContext } from "../mod.ts";
 import { ShippingQuotes } from "../utils/graphql/queries.ts";
-import {
+import type {
   ShippingQuotesQuery,
   ShippingQuotesQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { getCartCookie } from "../utils/cart.ts";
 import { HttpError } from "../../utils/http.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import ensureCheckout from "../utils/ensureCheckout.ts";
 
 export interface Props {
   cep?: string;
@@ -16,7 +17,7 @@ export interface Props {
   useSelectedAddress?: boolean;
 }
 
-const buildSimulationParams = (
+export const buildSimulationParams = (
   props: Props,
   checkoutId?: string,
 ): ShippingQuotesQueryVariables => {
@@ -57,22 +58,23 @@ const action = async (
   const { storefront } = ctx;
 
   const headers = parseHeaders(req.headers);
-
-  const cartId = getCartCookie(req.headers);
-
+  const cartId = ensureCheckout(getCartCookie(req.headers));
   const simulationParams = buildSimulationParams(props, cartId);
 
   const data = await storefront.query<
     ShippingQuotesQuery,
     ShippingQuotesQueryVariables
-  >({
-    variables: {
-      ...simulationParams,
+  >(
+    {
+      variables: {
+        ...simulationParams,
+      },
+      ...ShippingQuotes,
     },
-    ...ShippingQuotes,
-  }, {
-    headers,
-  });
+    {
+      headers,
+    },
+  );
 
   return data.shippingQuotes ?? [];
 };

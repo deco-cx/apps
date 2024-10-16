@@ -1,6 +1,6 @@
-import { AppContext } from "../../mod.ts";
-import { CheckoutFragment } from "../../utils/graphql/storefront.graphql.gen.ts";
-import { CartItem as Props } from "./addItems.ts";
+import type { AppContext } from "../../mod.ts";
+import type { CheckoutFragment } from "../../utils/graphql/storefront.graphql.gen.ts";
+import type { CartItem as Props } from "./addItems.ts";
 
 export type { CartItem as Props } from "./addItems.ts";
 

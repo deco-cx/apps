@@ -1,6 +1,6 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { CreateProductReview } from "../../utils/graphql/queries.ts";
-import {
+import type {
   CreateProductReviewMutation,
   CreateProductReviewMutationVariables,
   Review,
@@ -27,12 +27,15 @@ const action = async (
   const data = await storefront.query<
     CreateProductReviewMutation,
     CreateProductReviewMutationVariables
-  >({
-    variables: props,
-    ...CreateProductReview,
-  }, {
-    headers,
-  });
+  >(
+    {
+      variables: props,
+      ...CreateProductReview,
+    },
+    {
+      headers,
+    },
+  );
 
   return data.createProductReview ?? null;
 };

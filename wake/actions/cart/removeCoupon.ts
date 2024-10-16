@@ -1,8 +1,8 @@
 import { HttpError } from "../../../utils/http.ts";
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import { getCartCookie, setCartCookie } from "../../utils/cart.ts";
 import { RemoveCoupon } from "../../utils/graphql/queries.ts";
-import {
+import type {
   CheckoutFragment,
   RemoveCouponMutation,
   RemoveCouponMutationVariables,
@@ -25,10 +25,13 @@ const action = async (
   const data = await storefront.query<
     RemoveCouponMutation,
     RemoveCouponMutationVariables
-  >({
-    variables: { checkoutId: cartId },
-    ...RemoveCoupon,
-  }, { headers });
+  >(
+    {
+      variables: { checkoutId: cartId },
+      ...RemoveCoupon,
+    },
+    { headers },
+  );
 
   const checkoutId = data.checkout?.checkoutId;
 

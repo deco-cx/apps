@@ -1,8 +1,8 @@
-import { AppContext } from "../../mod.ts";
+import type { AppContext } from "../../mod.ts";
 import authenticate from "../../utils/authenticate.ts";
 import { WishlistAddProduct } from "../../utils/graphql/queries.ts";
-import { ProductFragment } from "../../utils/graphql/storefront.graphql.gen.ts";
-import {
+import type { ProductFragment } from "../../utils/graphql/storefront.graphql.gen.ts";
+import type {
   WishlistAddProductMutation,
   WishlistAddProductMutationVariables,
   WishlistReducedProductFragment,
@@ -28,10 +28,13 @@ const action = async (
   const data = await storefront.query<
     WishlistAddProductMutation,
     WishlistAddProductMutationVariables
-  >({
-    variables: { customerAccessToken, productId },
-    ...WishlistAddProduct,
-  }, { headers });
+  >(
+    {
+      variables: { customerAccessToken, productId },
+      ...WishlistAddProduct,
+    },
+    { headers },
+  );
 
   const products = data.wishlistAddProduct;
 
