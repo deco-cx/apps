@@ -45,6 +45,11 @@ export interface Props {
    */
   metafields?: Metafield[];
   /**
+   * @title Starting page query parameter offset.
+   * @description Set the starting page offset. Default to 1.
+   */
+  pageOffset?: number;
+  /**
    * @hide
    * @description it is hidden because only page prop is not sufficient, we need cursors
    */
@@ -80,7 +85,11 @@ const loader = async (
 
   const count = props.count ?? 12;
   const query = props.query || url.searchParams.get("q") || "";
-  const page = props.page || Number(url.searchParams.get("page")) || 0;
+  const currentPageoffset = props.pageOffset ?? 1;
+  const pageParam = url.searchParams.get("page")
+    ? Number(url.searchParams.get("page")) - currentPageoffset
+    : 0;
+  const page = props.page || pageParam;
   const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
   const startCursor = props.startCursor ||
     url.searchParams.get("startCursor") || "";
@@ -173,18 +182,19 @@ const loader = async (
   const previousPage = new URLSearchParams(url.searchParams);
 
   if (hasNextPage) {
-    nextPage.set("page", (page + 1).toString());
+    nextPage.set("page", (page + currentPageoffset + 1).toString());
     nextPage.set("startCursor", shopifyProducts?.pageInfo.endCursor ?? "");
     nextPage.delete("endCursor");
   }
 
   if (hasPreviousPage) {
-    previousPage.set("page", (page - 1).toString());
+    previousPage.set("page", (page + currentPageoffset - 1).toString());
     previousPage.set("endCursor", shopifyProducts?.pageInfo.startCursor ?? "");
     previousPage.delete("startCursor");
   }
 
   const filters = shopifyFilters?.map((filter) => toFilter(filter, url));
+  const currentPage = page + currentPageoffset;
 
   return {
     "@type": "ProductListingPage",
@@ -204,7 +214,7 @@ const loader = async (
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
-      currentPage: page,
+      currentPage,
       records,
       recordPerPage: count,
     },
