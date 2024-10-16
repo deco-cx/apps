@@ -8,13 +8,15 @@ import * as $$$$$$$$$2 from "./actions/summary/send.ts";
 import * as $$$$$$$$$3 from "./actions/updateCommands.ts";
 import * as $$$$$$$$$4 from "./actions/webhook.ts";
 import * as $$$0 from "./loaders/projects.ts";
-import * as $$$1 from "./loaders/user.ts";
+import * as $$$1 from "./loaders/status.ts";
+import * as $$$2 from "./loaders/user.ts";
 import * as $$$$$$$$$$0 from "./workflows/waitForReviewer.ts";
 
 const manifest = {
   "loaders": {
     "github-bot/loaders/projects.ts": $$$0,
-    "github-bot/loaders/user.ts": $$$1,
+    "github-bot/loaders/status.ts": $$$1,
+    "github-bot/loaders/user.ts": $$$2,
   },
   "actions": {
     "github-bot/actions/interaction.ts": $$$$$$$$$0,

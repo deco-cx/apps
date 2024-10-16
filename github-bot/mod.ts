@@ -110,7 +110,7 @@ interface Props {
 export default function GithubBot(props: Props) {
   const { discord, projects, githubToken } = props;
 
-  if (!discord.token || !projects.length || !githubToken?.get()) {
+  if (!discord.token?.get() || !projects.length || !githubToken?.get()) {
     return {
       state: {
         ...props,
