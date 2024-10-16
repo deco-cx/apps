@@ -1,7 +1,7 @@
 import type {
   DiscordCreateApplicationCommand,
   DiscordInteraction,
-} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+} from "../../deps/discordeno.ts";
 import type { AppContext } from "../../mod.ts";
 import type { Interaction } from "./lib.ts";
 

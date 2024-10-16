@@ -4,11 +4,10 @@ import type {
   AppMiddlewareContext as AMC,
   ManifestOf,
 } from "@deco/deco";
-import { Bot } from "https://deno.land/x/discordeno@18.0.1/bot.ts";
-import { createBot } from "https://deno.land/x/discordeno@18.0.1/mod.ts";
-import { Octokit } from "https://esm.sh/octokit@4.0.2";
 import type { Secret } from "../website/loaders/secret.ts";
 import workflow from "../workflows/mod.ts";
+import { Octokit } from "./deps/deps.ts";
+import { Bot, createBot } from "./deps/discordeno.ts";
 import manifest, { type Manifest } from "./manifest.gen.ts";
 import { GithubClient } from "./sdk/github/client.ts";
 import type { ProjectUser } from "./types.ts";

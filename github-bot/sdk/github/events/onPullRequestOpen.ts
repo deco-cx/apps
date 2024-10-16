@@ -1,11 +1,11 @@
 import { STATUS_CODE } from "@std/http/status";
-import type { WorkflowProps } from "apps/workflows/actions/start.ts";
+import type { WorkflowProps } from "../../../../workflows/actions/start.ts";
 import {
   ButtonStyles,
   sendMessage,
   snowflakeToBigint,
   startThreadWithMessage,
-} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+} from "../../../deps/discordeno.ts";
 import type { AppContext, AppManifest, Project } from "../../../mod.ts";
 import type { WebhookEvent } from "../../../sdk/github/types.ts";
 import confirmReview from "../../discord/buttons/confirmReview.ts";

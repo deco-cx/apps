@@ -1,4 +1,4 @@
-import { ButtonStyles } from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+import { ButtonStyles } from "../../../deps/discordeno.ts";
 import type { AppContext } from "../../../mod.ts";
 import { createActionRow, createButton } from "../components.ts";
 import type { Interaction } from "../lib.ts";

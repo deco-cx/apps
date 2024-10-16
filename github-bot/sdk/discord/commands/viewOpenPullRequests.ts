@@ -2,7 +2,7 @@ import {
   ApplicationCommandOptionTypes,
   ApplicationCommandTypes,
   type DiscordCreateApplicationCommand,
-} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+} from "../../../deps/discordeno.ts";
 import type { AppContext } from "../../../mod.ts";
 import { dateInSeconds } from "../../date.ts";
 import type { Interaction } from "../lib.ts";

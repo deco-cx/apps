@@ -1,22 +1,20 @@
 import {
   type Bot,
   type DiscordInteraction,
+  type DiscordInteractionData,
+  type DiscordInteractionMember,
+  type DiscordMessage,
+  type DiscordUser,
   type EditMessage,
   editMessage,
   editOriginalInteractionResponse,
   type InteractionCallbackData,
   type InteractionResponse,
   InteractionResponseTypes,
+  InteractionTypes,
   MessageComponentTypes,
   sendInteractionResponse,
-} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
-import type {
-  DiscordInteractionData,
-  DiscordInteractionMember,
-  DiscordMessage,
-  DiscordUser,
-} from "https://deno.land/x/discordeno@18.0.1/types/discord.ts";
-import { InteractionTypes } from "https://deno.land/x/discordeno@18.0.1/types/shared.ts";
+} from "../../deps/discordeno.ts";
 import parseCustomId from "./parseCustomId.ts";
 
 export class Interaction implements DiscordInteraction {

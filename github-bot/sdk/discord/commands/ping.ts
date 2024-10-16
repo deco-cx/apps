@@ -1,6 +1,4 @@
-import {
-  InteractionResponseTypes,
-} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+import { InteractionResponseTypes } from "../../../deps/discordeno.ts";
 
 export default function ping() {
   return new Response(

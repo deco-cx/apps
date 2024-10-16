@@ -3,7 +3,7 @@ import {
   ButtonStyles,
   sendMessage,
   snowflakeToBigint,
-} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+} from "../../../deps/discordeno.ts";
 import { AppContext, Project } from "../../../mod.ts";
 import { WebhookEvent } from "../../../sdk/github/types.ts";
 import { createActionRow, createButton } from "../../discord/components.ts";

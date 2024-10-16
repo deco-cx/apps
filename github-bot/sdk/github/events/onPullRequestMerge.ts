@@ -4,7 +4,7 @@ import {
   editChannel,
   sendMessage,
   snowflakeToBigint,
-} from "https://deno.land/x/discordeno@18.0.1/mod.ts";
+} from "../../../deps/discordeno.ts";
 import type { AppContext, Project } from "../../../mod.ts";
 import type { WebhookEvent } from "../../../sdk/github/types.ts";
 import { createActionRow, createButton } from "../../discord/components.ts";
