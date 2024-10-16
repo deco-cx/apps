@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("github-bot"),
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),
