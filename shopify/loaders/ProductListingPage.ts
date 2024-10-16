@@ -96,6 +96,8 @@ const loader = async (
     | undefined = undefined;
   let shopifyFilters = undefined;
   let records = undefined;
+  let collectionTitle = undefined;
+  let collectionDescription = undefined;
 
   const sort = url.searchParams.get("sort") ?? "";
 
@@ -156,6 +158,8 @@ const loader = async (
     hasPreviousPage = Boolean(
       data?.collection?.products.pageInfo.hasPreviousPage ?? false,
     );
+    collectionTitle = data.collection?.title;
+    collectionDescription = data.collection?.description;
   }
 
   // Transform Shopify product format into schema.org's compatible format
@@ -205,6 +209,11 @@ const loader = async (
       recordPerPage: count,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
+    seo: {
+      title: collectionTitle || "",
+      description: collectionDescription || "",
+      canonical: `${url.origin}${url.pathname}${page >= 1 ? `?page=${page}` : ""}`,
+    },
   };
 };
 

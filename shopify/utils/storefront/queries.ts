@@ -333,6 +333,8 @@ export const ProductsByCollection = {
     ){
     collection(handle: $handle) {
       handle
+      description
+      title
       products(
         first: $first, 
         last: $last, 
