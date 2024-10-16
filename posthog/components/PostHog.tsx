@@ -29,7 +29,7 @@ const snippet = () => {
   const trackPageview = () =>
     globalThis.window.posthog?.capture("$pageview", {
       ...props,
-      "$current_url": window.location.href,
+      "$current_url": globalThis.location.href,
     });
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
