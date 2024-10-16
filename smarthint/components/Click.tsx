@@ -21,7 +21,7 @@ export const SmarthintSendEventOnClick = ({
         }
 
         elem.addEventListener("click", () => {
-          window.smarthint.click(event);
+          globalThis.smarthint.click(event);
         });
       },
       id,
