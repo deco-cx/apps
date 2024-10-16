@@ -121,6 +121,31 @@ fragment Product on Product {
       ...Collection
     }
   }
+  metafields(identifiers: $identifiers) {
+    description
+    key
+    namespace
+    type
+    value
+    reference {
+      ... on MediaImage {
+        image {
+          url
+        }
+      }
+    }
+    references(first: 250) {
+      edges {
+        node {
+          ... on MediaImage {
+            image {
+              url
+            }
+          }
+        }
+      }
+    }
+  }
 }
 `;
 
@@ -243,14 +268,16 @@ export const GetCart = {
 
 export const GetProduct = {
   fragments: [Product, ProductVariant, Collection],
-  query: gql`query GetProduct($handle: String) {
+  query:
+    gql`query GetProduct($handle: String, $identifiers: [HasMetafieldsIdentifier!]!) {
     product(handle: $handle) { ...Product }
   }`,
 };
 
 export const ListProducts = {
   fragments: [Product, ProductVariant, Collection],
-  query: gql`query ListProducts($first: Int, $after: String, $query: String) {
+  query:
+    gql`query ListProducts($first: Int, $after: String, $query: String, $identifiers: [HasMetafieldsIdentifier!]!) {
     products(first: $first, after: $after, query: $query) {
       nodes {
         ...Product 
@@ -269,7 +296,8 @@ export const SearchProducts = {
       $query: String!, 
       $productFilters: [ProductFilter!]
       $sortKey: SearchSortKeys, 
-      $reverse: Boolean
+      $reverse: Boolean,
+      $identifiers: [HasMetafieldsIdentifier!]!
      ){
     search(
       first: $first, 
@@ -293,7 +321,7 @@ export const SearchProducts = {
         ...Filter
       }
       nodes {
-        ...Product
+        ...Product 
       }
     }
   }`,
@@ -309,10 +337,13 @@ export const ProductsByCollection = {
       $handle: String,
       $sortKey: ProductCollectionSortKeys, 
       $reverse: Boolean, 
-      $filters: [ProductFilter!]
+      $filters: [ProductFilter!],
+      $identifiers: [HasMetafieldsIdentifier!]!
     ){
     collection(handle: $handle) {
       handle
+      description
+      title
       products(
         first: $first, 
         last: $last, 
@@ -341,7 +372,8 @@ export const ProductsByCollection = {
 
 export const ProductRecommendations = {
   fragments: [Product, ProductVariant, Collection],
-  query: gql`query productRecommendations($productId: ID!) {
+  query:
+    gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!) {
     productRecommendations(productId: $productId) {
       ...Product
     }

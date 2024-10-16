@@ -62,10 +62,17 @@ export interface AbTesting {
    */
   replaces?: TextReplace[];
   /**
-   * @title Scripts to include
+   * @title Scripts to include to the head
    * @description Scripts to include in the head of the page proxied
    */
   includeScriptsToHead?: {
+    includes?: Script[];
+  };
+  /**
+   * @title Scripts to include to the body
+   * @description Scripts to include in the body of the page proxied
+   */
+  includeScriptsToBody?: {
     includes?: Script[];
   };
 }
@@ -176,6 +183,7 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       __resolveType: "website/handlers/proxy.ts",
       customHeaders: [],
       includeScriptsToHead: abTesting.includeScriptsToHead,
+      includeScriptsToBody: abTesting.includeScriptsToBody,
       replaces: abTesting.replaces,
     },
   };

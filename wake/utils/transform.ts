@@ -326,6 +326,15 @@ export const toProduct = (
     });
   }
 
+  if ((variant as BuyList).buyListId) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "buyListId",
+      value: String((variant as BuyList).buyListId),
+      valueReference: "PROPERTY",
+    });
+  }
+
   if (variant.collection) {
     additionalProperty.push({
       "@type": "PropertyValue",
