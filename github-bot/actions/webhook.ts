@@ -1,5 +1,8 @@
 import { STATUS_CODE } from "@std/http/status";
 import type { AppContext } from "../mod.ts";
+import onIssueClosed from "../sdk/github/events/onIssueClosed.ts";
+import onIssueOpened from "../sdk/github/events/onIssueOpened.ts";
+import onIssueReopened from "../sdk/github/events/onIssueReopened.ts";
 import onPullRequestMerge from "../sdk/github/events/onPullRequestMerge.ts";
 import onPullRequestOpen from "../sdk/github/events/onPullRequestOpen.ts";
 import onReviewRequested from "../sdk/github/events/onReviewRequested.ts";
@@ -7,6 +10,7 @@ import onReviewSubmitted from "../sdk/github/events/onReviewSubmitted.ts";
 import type { WebhookEvent } from "../sdk/github/types.ts";
 import { wasInDraft } from "../sdk/github/utils.ts";
 import {
+  isIssuesEvent,
   isPingEvent,
   isPullRequestEvent,
   isPullRequestReviewEvent,
@@ -102,6 +106,27 @@ export default async function action(
   if (isPullRequestReviewEvent(eventName, props)) {
     if (props.action === "submitted") {
       return onReviewSubmitted(props, project, ctx);
+    }
+
+    console.warn("Unhandled action. Data:", {
+      action: props.action,
+      project,
+      props,
+    });
+    return new Response(null, { status: STATUS_CODE.NoContent });
+  }
+
+  if (isIssuesEvent(eventName, props)) {
+    if (props.action === "opened") {
+      return onIssueOpened(props, project, ctx);
+    }
+
+    if (props.action === "closed" && props.issue.state_reason === "completed") {
+      return onIssueClosed(props, project, ctx);
+    }
+
+    if (props.action === "reopened") {
+      return onIssueReopened(props, project, ctx);
     }
 
     console.warn("Unhandled action. Data:", {

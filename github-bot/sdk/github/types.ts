@@ -17,3 +17,5 @@ export type PullRequestCreatedEvent = WebhookEvent<
   "pull-request-review-submitted"
 >;
 export type ReviewSubmittedEvent = WebhookEvent<"pull-request-opened">;
+export type IssuesOpened = WebhookEvent<"issues-opened">;
+export type IssuesClosed = WebhookEvent<"issues-closed">;

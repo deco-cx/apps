@@ -20,6 +20,7 @@ enum Events {
   Ping = "ping",
   PullRequest = "pull_request",
   PullRequestReview = "pull_request_review",
+  Issues = "issues",
 }
 
 export function isPingEvent(
@@ -60,4 +61,16 @@ export function isPullRequestReviewEvent(
       | "pull-request-review-dismissed"
     >(props)
   );
+}
+
+export function isIssuesEvent(
+  event: string,
+  props: unknown,
+): props is WebhookEvent<
+  "issues-opened" | "issues-closed" | "issues-reopened"
+> {
+  return event === Events.Issues &&
+    isWebhookEvent<"issues-opened" | "issues-closed" | "issues-reopened">(
+      props,
+    );
 }
