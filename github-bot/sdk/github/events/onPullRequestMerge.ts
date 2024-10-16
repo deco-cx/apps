@@ -66,7 +66,7 @@ export default async function onPullRequestMerge(
       description: `${bold(`(${repository.full_name})`)}
 [${bold(`#${pull_request.number} - ${pull_request.title}`)}](${pull_request.html_url}) - ${
         duration.join(", ")
-      }\n\n${pull_request.body || "Sem descrição"}`,
+      }`,
       color: 0x8957e5,
       timestamp: Date.now(),
     }],

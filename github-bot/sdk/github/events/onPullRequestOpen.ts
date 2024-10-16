@@ -68,7 +68,7 @@ export default async function onPullRequestOpen(
         description: `${bold(`(${repository.full_name})`)}
 [${bold(`#${pull_request.number} - ${pull_request.title}`)}](${pull_request.html_url}) - ${
           timestamp(seconds, "R")
-        }\n\n${pull_request.body || "Sem descrição"}`,
+        }`,
         color: 0x02c563,
         timestamp: new Date(pull_request.created_at).getTime(),
       }],
