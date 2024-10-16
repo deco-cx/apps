@@ -47,8 +47,8 @@ jobs:
 
       - name: Test
         continue-on-error: true
-        run: deno test --lock=deno.lock --lock-write -A .
+        run: deno test --lock=deno.lock --frozen=false -A .
 
       - name: Benchmark
         continue-on-error: true
-        run: deno bench --lock=deno.lock --lock-write -A .
+        run: deno bench --lock=deno.lock --frozen=false -A .
