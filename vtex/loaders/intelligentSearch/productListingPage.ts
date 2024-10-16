@@ -310,7 +310,7 @@ const loader = async (
       {
         ...aditionalFieldsInQuery,
         ...params,
-        page: paramnPage,
+        page: props.page || paramnPage,
         facets: toPath(selected),
       }, {
         ...STALE,
@@ -319,7 +319,7 @@ const loader = async (
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
       ...params,
       ...aditionalFieldsInQuery,
-      page: paramnPage,
+      page: props.page || paramnPage,
       facets: toPath(fselected),
     }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
       .then((res) => res.json()),
