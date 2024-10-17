@@ -1366,7 +1366,12 @@ export interface Order {
 }
 
 export interface OrderItem {
+  orderId: string;
+  origin: string;
   affiliateId: string;
+  status: string;
+  statusDescription: string;
+  value: number;
   allowCancellation: boolean;
   allowEdition?: boolean;
   authorizedDate: string;
@@ -1383,18 +1388,19 @@ export interface OrderItem {
   cancellationRequests?: null;
   changesAttachment: string;
   checkedInPickupPointId: string | null;
+  paymentData: PaymentData;
+  shippingData: ShippingData;
   clientPreferencesData: ClientPreferencesData;
   clientProfileData: ClientProfileData | null;
-  // deno-lint-ignore no-explicit-any
-  commercialConditionData?: any | null;
+  totals: Total[];
+  commercialConditionData?: string | null;
   creationDate: string;
   // deno-lint-ignore no-explicit-any
   customData?: Record<string, any> | null;
   followUpEmail?: string;
   giftRegistryData?: GiftRegistry | null;
   hostname: string;
-  // deno-lint-ignore no-explicit-any
-  invoiceData: any | null;
+  invoiceData: string | null;
   invoicedDate: string | null;
   isCheckedIn: boolean;
   isCompleted: boolean;
@@ -1408,8 +1414,7 @@ export interface OrderItem {
   marketplaceOrderId: string;
   marketplaceServicesEndpoint: string;
   merchantName: string;
-  // deno-lint-ignore no-explicit-any
-  openTextField: any | null;
+  openTextField: null;
 }
 
 interface Marketplace {
