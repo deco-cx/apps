@@ -219,6 +219,10 @@ fragment Cart on Cart {
     }
   }
   cost {
+    totalTaxAmount {
+      amount
+      currencyCode
+    }
     subtotalAmount {
       amount
       currencyCode
