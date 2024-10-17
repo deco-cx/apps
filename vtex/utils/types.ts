@@ -274,34 +274,34 @@ export interface Fields {
 }
 
 export interface Transaction {
-  isActive:      boolean;
+  isActive: boolean;
   transactionId: string;
-  merchantName:  string;
-  payments:      Payment[];
+  merchantName: string;
+  payments: Payment[];
 }
 
 export interface Payment {
-  id:                 string;
-  paymentSystem:      string;
-  paymentSystemName:  string;
-  value:              number;
-  installments:       number;
-  referenceValue:     number;
-  cardHolder:         string | null;
-  cardNumber:         string | null;
-  firstDigits:        string | null;
-  lastDigits:         string | null;
-  cvv2:               string | null;
-  expireMonth:        string | null;
-  expireYear:         string | null;
-  url:                string;
-  giftCardId:         null;
-  giftCardName:       null;
-  giftCardCaption:    null;
-  redemptionCode:     null;
-  group:              string;
-  tid:                null;
-  dueDate:            Date;
+  id: string;
+  paymentSystem: string;
+  paymentSystemName: string;
+  value: number;
+  installments: number;
+  referenceValue: number;
+  cardHolder: string | null;
+  cardNumber: string | null;
+  firstDigits: string | null;
+  lastDigits: string | null;
+  cvv2: string | null;
+  expireMonth: string | null;
+  expireYear: string | null;
+  url: string;
+  giftCardId: null;
+  giftCardName: null;
+  giftCardCaption: null;
+  redemptionCode: null;
+  group: string;
+  tid: null;
+  dueDate: Date;
 }
 
 export interface PaymentData {
