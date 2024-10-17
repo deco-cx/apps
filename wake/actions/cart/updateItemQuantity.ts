@@ -78,7 +78,7 @@ const action = async (
   const checkoutId = checkout?.checkoutId;
 
   if (cartId !== checkoutId) {
-    setCartCookie(ctx.response.headers, checkoutId);
+    setCartCookie(ctx.response.headers, cartId);
   }
 
   return checkout ?? {};

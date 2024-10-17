@@ -49,7 +49,7 @@ const action = async (
   const checkoutId = data.checkout?.checkoutId;
 
   if (cartId !== checkoutId) {
-    setCartCookie(ctx.response.headers, checkoutId);
+    setCartCookie(ctx.response.headers, cartId);
   }
 
   return data.checkout ?? {};
