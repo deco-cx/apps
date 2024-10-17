@@ -6,11 +6,11 @@ interface DeleteAddress {
 }
 
 interface AddressInput {
-  id: string;
+  addressId: string;
 }
 
 async function action(
-  { id }: AddressInput,
+  { addressId }: AddressInput,
   req: Request,
   ctx: AppContext,
 ) {
@@ -41,11 +41,11 @@ async function action(
   }`;
 
   try {
-    return await io.query<DeleteAddress, { id: string }>(
+    return await io.query<DeleteAddress, { addressId: string }>(
       {
         query: mutation,
         operationName: "DeleteAddress",
-        variables: { id },
+        variables: { addressId },
       },
       { headers: { cookie } },
     );
