@@ -40,19 +40,25 @@ async function loader(
     return null;
   }
 
-  const query = `query getUserAddresses {
-      profile {
-        addresses {
-          city
-          country
-          postalCode
-          state
-          street
-          receiverName
-          addressName
-          complement
-        }
+  const query = `query Addresses @context(scope: "private") {
+    profile {
+      cacheId
+      addresses: address {
+        addressId: id
+        addressType
+        addressName
+        city
+        complement
+        country
+        neighborhood
+        number
+        postalCode
+        geoCoordinates
+        receiverName
+        state
+        street
       }
+    }
   }`;
 
   try {
@@ -74,6 +80,7 @@ async function loader(
       receiverName: address?.receiverName,
       addressName: address?.addressName,
       complement: address?.complement,
+      addressId: address?.addressId,
     }));
   } catch (_) {
     return null;

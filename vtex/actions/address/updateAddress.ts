@@ -17,6 +17,7 @@ interface Address {
   reference?: string;
   state?: string;
   street?: string;
+  addressId: string;
 }
 
 interface AddressInput {
@@ -45,31 +46,32 @@ async function action(
 > {
   const { io } = ctx;
   const { cookie } = parseCookie(req.headers, ctx.account);
-  const id = props.addressName;
+  const { addressId, ...addressFields } = props;
 
   const mutation = `
-    mutation UpdateAddress($addressId: String, $addressFields: AddressInput) {
-        updateAddress(id: $addressId, fields: $addressFields)
-          @context(provider: "vtex.store-graphql") {
-          cacheId
-          addresses: address {
-            addressId: id
-            addressType
-            addressName
-            city
-            complement
-            country
-            neighborhood
-            number
-            postalCode
-            geoCoordinates
-            receiverName
-            reference
-            state
-            street
-          }
+    mutation UpdateAddress($addressId: String!, $addressFields: AddressInput) {
+      updateAddress(id: $addressId, fields: $addressFields)
+        @context(provider: "vtex.store-graphql") {
+        cacheId
+        addresses: address {
+          addressId: id
+          addressType
+          addressName
+          city
+          complement
+          country
+          neighborhood
+          number
+          postalCode
+          geoCoordinates
+          receiverName
+          reference
+          state
+          street
         }
-      }`;
+      }
+    }
+  `;
 
   try {
     const { updateAddress: updatedAddress } = await io.query<
@@ -80,8 +82,8 @@ async function action(
         query: mutation,
         operationName: "UpdateAddress",
         variables: {
-          addressId: id,
-          addressFields: props,
+          addressId,
+          addressFields,
         },
       },
       { headers: { cookie } },
@@ -102,5 +104,4 @@ async function action(
     return null;
   }
 }
-
 export default action;
