@@ -1,5 +1,5 @@
 import { Address } from "../../utils/types.ts";
-import { PostalAddress } from "../../../commerce/types.ts";
+import { PostalAddressVTEX } from "../../../commerce/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 import { AppContext } from "../../mod.ts";
 
@@ -27,11 +27,7 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<
-  PostalAddress[] & {
-    receiverName?: string;
-    addressName?: string;
-    complement?: string | null;
-  } | null
+  PostalAddressVTEX[] | null
 > {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);

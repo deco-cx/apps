@@ -379,7 +379,7 @@ export interface ShippingData {
 export interface Address {
   addressType: string;
   addressName: string;
-  receiverName: null;
+  receiverName: string | null;
   addressId: string;
   isDisposable: boolean;
   postalCode: string;
