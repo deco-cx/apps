@@ -1329,7 +1329,6 @@ export interface Order {
   callCenterOperatorName: string;
   clientName: string;
   creationDate: string;
-  invoicedDate: string;
   currencyCode: string;
   deliveryDates: Date[];
   giftCardProviders: string[];
@@ -1351,24 +1350,25 @@ export interface Order {
   origin: string;
   paymentApprovedDate: string;
   paymentNames: string;
-  paymentData: PaymentData;
   salesChannel: string;
   sequence: string;
   status: string;
   statusDescription: string;
   totalItems: number;
   totalValue: number;
-  value: number;
-  totals: Total[];
-  shippingData: ShippingData;
   workflowInErrorState: boolean;
   workflowInRetry: boolean;
 }
 
 export interface OrderItem {
   orderId: string;
+  sequence: string;
   origin: string;
+  sellerOrderId: string;
+  salesChannel: string;
   affiliateId: string;
+  workflowIsInError: boolean;
+  orderGroup: string;
   status: string;
   statusDescription: string;
   value: number;
@@ -1385,7 +1385,15 @@ export interface OrderItem {
     Reason: string;
     CancellationDate: string;
   };
-  cancellationRequests?: null;
+  cancellationRequests?: {
+    id: string;
+    reason: string;
+    cancellationRequestDate: string;
+    requestedByUser: boolean;
+    deniedBySeller: boolean;
+    deniedBySellerReason: string | null;
+    cancellationRequestDenyDate: string | null;
+  }[] | null;
   changesAttachment: string;
   checkedInPickupPointId: string | null;
   paymentData: PaymentData;
@@ -1404,6 +1412,12 @@ export interface OrderItem {
   invoicedDate: string | null;
   isCheckedIn: boolean;
   isCompleted: boolean;
+  sellers?: {
+    id: string;
+    name: string;
+    logo: string;
+    fulfillmentEndpoint: string;
+  }[];
   itemMetadata: ItemMetadata;
   items: OrderFormItem[];
   lastChange: string;
