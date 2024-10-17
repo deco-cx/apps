@@ -1399,7 +1399,7 @@ export interface OrderItem {
   paymentData: PaymentData;
   shippingData: ShippingData;
   clientPreferencesData: ClientPreferencesData;
-  clientProfileData: ClientProfileData | null;
+  clientProfileData: ClientProfileData;
   totals: Total[];
   commercialConditionData?: string | null;
   creationDate: string;
@@ -1428,7 +1428,7 @@ export interface OrderItem {
   marketplaceOrderId: string;
   marketplaceServicesEndpoint: string;
   merchantName: string;
-  openTextField: null;
+  openTextField: string | null;
 }
 
 interface Marketplace {
