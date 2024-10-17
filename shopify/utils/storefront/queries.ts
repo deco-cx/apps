@@ -182,6 +182,8 @@ fragment Cart on Cart {
           }
           product {
             title
+            onlineStoreUrl
+            handle
           }
           price {
             amount
