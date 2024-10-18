@@ -1,9 +1,4 @@
 import AWS from "https://esm.sh/aws-sdk@2.1585.0";
-import { asResolved, isDeferred } from "deco/engine/core/resolver.ts";
-import { isAwaitable } from "deco/engine/core/utils.ts";
-import type { App, AppContext as AC } from "deco/mod.ts";
-import { AvailableActions, AvailableLoaders } from "deco/utils/invoke.types.ts";
-import { AppManifest } from "deco/types.ts";
 import { deferred } from "std/async/deferred.ts";
 import openai, {
   Props as OpenAIProps,
@@ -12,7 +7,17 @@ import openai, {
 import { Assistant } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Secret } from "../website/loaders/secret.ts";
-
+import { PreviewContainer } from "../utils/preview.tsx";
+import {
+  type App,
+  type AppContext as AC,
+  type AppManifest,
+  asResolved,
+  type AvailableActions,
+  type AvailableLoaders,
+  isDeferred,
+} from "@deco/deco";
+import { isAwaitable } from "@deco/deco/utils";
 export type GPTModel =
   | "gpt-4-0613"
   | "gpt-4-0314"
@@ -32,29 +37,24 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
    * The name of the AI Assistant.
    */
   name: string;
-
   /**
    * Optional instructions or guidelines for the AI Assistant.
    */
   instructions?: string;
-
   /**
    * Optional array of prompts to provide context for the AI Assistant.
    */
   prompts?: Prompt[];
-
   /**
    * Optional welcome message to be displayed when the chat session starts.
    */
   welcomeMessage?: string;
-
   /**
    * Optional list of available functions (actions or loaders) that the AI Assistant can perform.
    */
   availableFunctions?: Array<
     AvailableActions<TManifest> | AvailableLoaders<TManifest>
   >;
-
   /**
    * Optional function to customize the handling of properties (props) passed to the AI Assistant.
    * It takes a set of properties and returns a modified set of properties.
@@ -62,37 +62,33 @@ export interface AIAssistant<TManifest extends AppManifest = AppManifest> {
    * @returns {unknown} - The modified properties.
    */
   useProps?: (props: unknown) => unknown;
-
   /**
    * Optional function to log the received messages from the user.
    * @param {Log} logInfo - User message / information.
    * @returns {void} - The modified properties.
    */
   onMessageReceived?: (logInfo: Log) => void;
-
   /**
    * Optional function to log the received messages sent by the assistant.
    * @param {Log} logInfo - Assistant message / information.
    * @returns {void} - The modified properties.
    */
   onMessageSent?: (logInfo: Log) => void;
-
   /**
    * The GPT model that will be used, if not specified the assistant model will be used.
    */
-  model?: GPTModel | { custom: string };
-
+  model?: GPTModel | {
+    custom: string;
+  };
   /**
    * The Id of the assistant
    */
   id?: string;
-
   /**
    * The Id of the assistant thread
    */
   threadId?: string;
 }
-
 export interface Log {
   assistantId: string;
   threadId: string;
@@ -100,19 +96,16 @@ export interface Log {
   model: string;
   message: object;
 }
-
 export interface Prompt {
   content: string;
   context: string;
 }
-
 export interface AssistantAwsProps {
   assistantBucketRegion: Secret;
   accessKeyId: Secret;
   secretAccessKey: Secret;
   assistantBucketName: Secret;
 }
-
 export interface Props extends OpenAIProps {
   /**
    * @description the assistant Id
@@ -126,7 +119,6 @@ export interface Props extends OpenAIProps {
   assistantAwsProps?: AssistantAwsProps;
   s3?: AWS.S3;
 }
-
 export interface State extends OpenAIState {
   instructions?: string;
   assistant: Promise<Assistant>;
@@ -134,16 +126,15 @@ export interface State extends OpenAIState {
   assistantAwsProps?: AssistantAwsProps;
   s3?: AWS.S3;
 }
-
 /**
  * @title Deco AI Assistant
  * @description Create AI assistants on deco.cx.
  * @category Tool
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png
  */
-export default function App(
-  state: Props,
-): App<Manifest, State, [ReturnType<typeof openai>]> {
+export default function App(state: Props): App<Manifest, State, [
+  ReturnType<typeof openai>,
+]> {
   const openAIApp = openai(state);
   const assistantsAPI = openAIApp.state.openAI.beta.assistants;
   // Sets assistantId only if state.assistants exists
@@ -188,10 +179,7 @@ export default function App(
     dependencies: [openAIApp],
   };
 }
-
-export const onBeforeResolveProps = (
-  props: Props,
-) => {
+export const onBeforeResolveProps = (props: Props) => {
   if (Array.isArray(props?.assistants)) {
     return {
       ...props,
@@ -202,5 +190,18 @@ export const onBeforeResolveProps = (
   }
   return props;
 };
-
 export type AppContext = AC<ReturnType<typeof App>>;
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Deco AI Assistant",
+      owner: "deco.cx",
+      description: "Create AI assistants on deco.cx.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/ai-assistants/logo.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};

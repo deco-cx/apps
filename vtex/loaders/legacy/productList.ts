@@ -1,12 +1,8 @@
 import type { Product } from "../../../commerce/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 import { AppContext } from "../../mod.ts";
-import { toSegmentParams } from "../../utils/legacy.ts";
-import {
-  getSegmentFromBag,
-  isAnonymous,
-  withSegmentCookie,
-} from "../../utils/segment.ts";
+import { isFilterParam, toSegmentParams } from "../../utils/legacy.ts";
+import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
 import type { LegacyItem, LegacySort } from "../../utils/types.ts";
@@ -241,19 +237,28 @@ const loader = async (
   );
 };
 
-const getSearchParams = (props: Props["props"]) => {
+type Entry = [string, string];
+
+const getSearchParams = (
+  props: Props["props"],
+  searchParams: URLSearchParams,
+): Entry[] => {
   if (isCollectionProps(props)) {
     return [
-      ["collection", props.collection],
-      ["count", (props.count || 12).toString()],
+      [
+        "collection",
+        // TODO: get the right qs name
+        props.collection || searchParams.get("productClusterIds") || "",
+      ],
+      ["count", (props.count || searchParams.get("count") || 12).toString()],
       ["sort", props.sort || ""],
     ];
   }
 
   if (isFQProps(props)) {
     return [
-      ["fq", props.fq.join(",")],
-      ["count", (props.count || 12).toString()],
+      ["fq", props.fq.join(",") || searchParams.getAll("fq").join(",") || ""],
+      ["count", (props.count || searchParams.get("count") || 12).toString()],
       ["sort", props.sort || ""],
     ];
   }
@@ -261,8 +266,8 @@ const getSearchParams = (props: Props["props"]) => {
   if (isTermProps(props)) {
     return [
       ["term", props.term ?? ""],
-      ["count", (props.count || 12).toString()],
-      ["sort", props.sort || ""],
+      ["count", (props.count || searchParams.get("count") || 12).toString()],
+      ["sort", props.sort || searchParams.get("sort") || ""],
     ];
   }
 
@@ -279,23 +284,41 @@ export const cacheKey = (
   const props = expandedProps.props ??
     (expandedProps as unknown as Props["props"]);
 
-  const { token } = getSegmentFromBag(ctx);
   const url = new URL(req.url);
+
   if (
-    url.searchParams.has("q") || !isAnonymous(ctx) || isSKUIDProps(props) ||
-    isProductIDProps(props)
+    url.searchParams.has("q") ||
+    // loader is invoked directly should not vary
+    ctx.isInvoke && (isSKUIDProps(props) || isProductIDProps(props))
   ) {
     return null;
   }
 
-  const params = new URLSearchParams(getSearchParams(props));
+  const segment = getSegmentFromBag(ctx)?.token ?? "";
+  const params = new URLSearchParams([
+    ...getSearchParams(props, url.searchParams),
+    ["segment", segment],
+  ]);
+
+  if (isSKUIDProps(props)) {
+    const skuIds = [...props.ids ?? []]?.sort();
+    params.append("skuids", skuIds.join(","));
+  }
+
+  if (
+    isProductIDProps(props)
+  ) {
+    const productIds = [props.productIds ?? []].sort();
+    params.append("productids", productIds.join(","));
+  }
 
   url.searchParams.forEach((value, key) => {
+    if (!isFilterParam(key)) return;
+
     params.append(key, value);
   });
 
   params.sort();
-  params.set("segment", token);
 
   url.search = params.toString();
 

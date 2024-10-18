@@ -10,9 +10,13 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("posthog"),
+    app("decopilot-app"),
     app("smarthint"),
+    app("ra-trustvox"),
     app("anthropic"),
     app("resend"),
+    app("emailjs"),
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
@@ -42,6 +46,7 @@ const config = {
     app("crux"),
     app("decohub"),
     app("htmx"),
+    app("sap"),
     ...compatibilityApps,
   ],
 };

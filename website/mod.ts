@@ -1,42 +1,51 @@
 import "./utils/unhandledRejection.ts";
-
-import { Section } from "deco/blocks/section.ts";
-import type { App, FnContext } from "deco/mod.ts";
-import { asResolved } from "deco/mod.ts";
 import type { Props as Seo } from "./components/Seo.tsx";
 import { Routes } from "./flags/audience.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { Page } from "deco/blocks/page.tsx";
 import { TextReplace } from "./handlers/proxy.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
 import { Script } from "./types.ts";
-import { Matcher } from "deco/blocks/matcher.ts";
-
+import { type Matcher, type Page, type Section } from "@deco/deco/blocks";
+import {
+  type App,
+  asResolved,
+  type Flag,
+  type FnContext,
+  type Site,
+} from "@deco/deco";
+declare global {
+  interface Window {
+    LIVE: {
+      page: {
+        id: string | number;
+        pathTemplate?: string | undefined;
+      };
+      site: Site;
+      flags?: Flag[];
+      play?: boolean;
+    };
+  }
+}
 export type AppContext = FnContext<Props, Manifest>;
-
-export type SectionProps<T> = T & { id: string };
-
+export type SectionProps<T> = T & {
+  id: string;
+};
 export interface CacheDirectiveBase {
   name: string;
   value: number;
 }
-
 export interface StaleWhileRevalidate extends CacheDirectiveBase {
   name: "stale-while-revalidate";
   value: number;
 }
-
 export interface MaxAge extends CacheDirectiveBase {
   name: "max-age";
   value: number;
 }
-
 export type CacheDirective = StaleWhileRevalidate | MaxAge;
-
 export interface Caching {
   enabled?: boolean;
   directives?: CacheDirective[];
 }
-
 export interface AbTesting {
   enabled?: boolean;
   /**
@@ -60,77 +69,64 @@ export interface AbTesting {
     includes?: Script[];
   };
 }
-
 /** @titleBy framework */
 interface Fresh {
   /** @default fresh */
   framework: "fresh";
 }
-
 /** @titleBy framework */
 interface HTMX {
   /** @default htmx */
   framework: "htmx";
 }
-
 export interface Props {
   /**
    * @title Routes Map
    */
   routes?: Routes[];
-
-  /** @title Seo */
-  seo?: Omit<
-    Seo,
-    "jsonLDs" | "canonical"
-  >;
-  /**
-   * @title Theme
-   */
-  theme?: Section;
   /**
    * @title Global Sections
-   * @description These sections will be included on all website/pages/Page.ts
+   * @description These sections will be included on the start of each page
    */
   global?: Section[];
-
   /**
    * @title Error Page
    * @description This page will be used when something goes wrong beyond section error-boundaries when rendering a page
    */
   errorPage?: Page;
-
   /**
    * @title Caching configuration of pages
    * @description the caching configuration
    */
   caching?: Caching;
-
   /**
-   * @title Async Rendering
-   * @description Async sections will be deferred to the client-side
+   * @title Global Async Rendering (Deprecated)
+   * @description Please disable this setting and enable each section individually. More info at https://deco.cx/en/blog/async-render-default
+   * @deprecated true
    * @default false
    */
   firstByteThresholdMS?: boolean;
-
   /**
    * @title Avoid redirecting to editor
    * @description Disable going to editor when "." or "Ctrl + Shift + E" is pressed
    */
   avoidRedirectingToEditor?: boolean;
-
   /**
    * @title AB Testing
    * @description A/B Testing configuration
    */
   abTesting?: AbTesting;
-
   /**
    * @title Flavor
    * @description The flavor of the website
    */
   flavor?: Fresh | HTMX;
-
+  /** @title Seo */
+  seo?: Omit<Seo, "jsonLDs" | "canonical">;
+  /**
+   * @title Theme
+   */
+  theme?: Section;
   // We are hiding this prop because it is in testing phase
   // after that, probably we will remove this prop and default will be true
   /**
@@ -138,13 +134,10 @@ export interface Props {
    */
   sendToClickHouse?: boolean;
 }
-
 /**
  * @title Website
  */
-export default function App({ theme, ...state }: Props): App<Manifest, Props> {
-  const global = theme ? [...(state.global ?? []), theme] : state.global;
-
+export default function App({ ...state }: Props): App<Manifest, Props> {
   return {
     state,
     manifest: {
@@ -165,22 +158,6 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
             }),
         },
       },
-      pages: {
-        ...manifest.pages,
-        "website/pages/Page.tsx": {
-          ...manifest.pages["website/pages/Page.tsx"],
-          Preview: (props) =>
-            manifest.pages["website/pages/Page.tsx"].Preview({
-              ...props,
-              sections: [...global ?? [], ...props.sections],
-            }),
-          default: (props) =>
-            manifest.pages["website/pages/Page.tsx"].default({
-              ...props,
-              sections: [...global ?? [], ...props.sections],
-            }),
-        },
-      },
     },
     resolvables: {
       "./routes/[...catchall].tsx": {
@@ -192,7 +169,6 @@ export default function App({ theme, ...state }: Props): App<Manifest, Props> {
     },
   };
 }
-
 const getAbTestAudience = (abTesting: AbTesting) => {
   const handler = {
     value: {
@@ -203,7 +179,6 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       replaces: abTesting.replaces,
     },
   };
-
   if (abTesting.enabled) {
     return [{
       name: abTesting.name,
@@ -220,7 +195,6 @@ const getAbTestAudience = (abTesting: AbTesting) => {
   }
   return [];
 };
-
 const deferPropsResolve = (routes: Routes): Routes => {
   if (Array.isArray(routes)) {
     const newRoutes = [];
@@ -236,15 +210,19 @@ const deferPropsResolve = (routes: Routes): Routes => {
   }
   return routes;
 };
-
 export const onBeforeResolveProps = <
-  T extends { routes?: Routes[]; errorPage?: Page; abTesting: AbTesting },
->(
-  props: T,
-): T => {
+  T extends {
+    routes?: Routes[];
+    errorPage?: Page;
+    abTesting: AbTesting;
+    global: Section[];
+    theme: Section;
+  },
+>(props: T): T => {
   if (Array.isArray(props?.routes)) {
     const newRoutes: T = {
       ...props,
+      global: props.global?.map((section) => asResolved(section, false)),
       errorPage: props.errorPage
         ? asResolved(props.errorPage, true)
         : undefined,
@@ -257,5 +235,4 @@ export const onBeforeResolveProps = <
   }
   return props;
 };
-
 export { default as Preview } from "./Preview.tsx";

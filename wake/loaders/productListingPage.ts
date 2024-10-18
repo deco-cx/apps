@@ -208,13 +208,13 @@ const searchLoader = async (
 
   const hasNextPage = Boolean(
     (data?.result?.productsByOffset?.totalCount ?? 0) /
-        (data?.result?.pageSize ?? limit) >
+        limit >
       (data?.result?.productsByOffset?.page ?? 0),
   );
 
   const hasPreviousPage = page > 1;
 
-  const pageOffset = props.pageOffset ?? 1;
+  const pageOffset = props.pageOffset ?? 0;
 
   if (hasNextPage) {
     nextPage.set("page", (page + pageOffset + 1).toString());

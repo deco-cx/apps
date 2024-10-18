@@ -1,14 +1,10 @@
-import { BaseContext } from "deco/engine/core/resolver.ts";
-import { AppRuntime } from "deco/types.ts";
 import { App } from "../mod.ts";
-
+import { type AppRuntime, type BaseContext } from "@deco/deco";
 // this base URL was found at this documentation: https://developer.chrome.com/docs/crux/dashboard?hl=pt-br
 const BASE_CRUX_URL =
   "https://lookerstudio.google.com/embed/reporting/bbc5698d-57bb-4969-9e07-68810b9fa348/page/keDQB";
-
 export default function Preview(app: AppRuntime<BaseContext, App["state"]>) {
   const siteUrl = app.state.siteUrl;
-
   const url = BASE_CRUX_URL + `?params=%7B"origin":"${encodeURI(siteUrl)}"%7D`;
   return (
     <div class="h-full">

@@ -1,26 +1,12 @@
-<h1>
-  <p align="center">
-    <a href="https://www.smarthint.co/">
-      <img alt="SmartHint" src="https://raw.githubusercontent.com/IncognitaDev/apps/smarthint/smarthint/logo.png" width="125" />
-    </a>
-  </p>
-</h1>
+The search and recommendation system that enhances the experience in your online store.
 
-<p align="center">
-  <strong>
-    The search and recommendation system that enhances the experience in your online store.
-  </strong>
-</p>
-<p align="center">
-  Loaders and actions for adding SmartHint to your website.
-</p>
+Loaders and actions for adding SmartHint to your website.
 
-<p align="center">
 SmartHint is an e-commerce search and recommendation system that uses artificial intelligence to elevate the online shopping experience.
+
 It consists of smart search, pages of departments/categories and recommendation showcases.
 
 To access the SmartHint account data or register, go to the [admin panel](https://admin.smarthint.co/)
-</p>
 
 ## Installation
 
@@ -40,9 +26,9 @@ loaders/actions available for your sections.
 <details>
   <summary>Admin setup</summary>
   <ul> 
-    <li>3. Add SmarthintTracking section on Global Section in your site configs</li>
-    <li>4. Configure autocomplete/search on pages that has a searchbar</li>
-    <li>5. Configure the SearchResult and Seo section on your Search/Hotsite/Category pages</li>
+    <li>1. Add SmarthintTracking section on Global Section in your site configs</li>
+    <li>2. Configure autocomplete/search on pages that has a searchbar</li>
+    <li>3. Configure the SearchResult and Seo section on your Search/Hotsite/Category pages</li>
   </ul>
 </details>
 

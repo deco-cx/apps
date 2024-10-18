@@ -1,22 +1,18 @@
-import type { FnContext } from "deco/types.ts";
-
+import { type FnContext } from "@deco/deco";
 export interface Account {
   /**
    * @description Header to define our app. For example, https://tiendanube.github.io/api-documentation/intro#authentication.
    */
   userAgent: string;
-
   /**
    * @description The token generated from admin panel. Read here: https://tiendanube.github.io/api-documentation/authentication.
    */
   accessToken: string;
-
   /**
    * @description The id of the store in nuvemshop. Check: https://tiendanube.github.io/api-documentation/intro#languages-and-internationalization
    */
   storeId: string;
 }
-
 // https://tiendanube.github.io/api-documentation/resources/product
 export interface ProductBaseNuvemShop {
   id: number;
@@ -62,7 +58,6 @@ export interface ProductVariant {
   created_at: Date;
   updated_at: Date;
 }
-
 export interface ProductImage {
   id: number;
   product_id: number;
@@ -72,7 +67,6 @@ export interface ProductImage {
   updated_at: Date;
   alt: string;
 }
-
 export interface Category {
   id: number;
   name: LanguageTypes;
@@ -84,7 +78,6 @@ export interface Category {
   created_at: Date;
   updated_at: Date;
 }
-
 export type NuvemShopSort =
   | "user"
   | "price-ascending"
@@ -94,7 +87,6 @@ export type NuvemShopSort =
   | "created-at-ascending"
   | "created-at-descending"
   | "best-selling";
-
 export interface ProductSearchParams {
   q?: string;
   page?: number;
@@ -103,36 +95,29 @@ export interface ProductSearchParams {
   price_min?: string | null;
   price_max?: string | null;
 }
-
 export interface LanguageTypes {
   pt?: string;
   en?: string;
   es?: string;
 }
-
 export interface PriceInterval {
   minPrice: string;
   maxPrice: string;
   quantity: number;
 }
-
 export type Context = FnContext<{
   configNuvemShop?: Account;
 }>;
-
 function account(acc: Account) {
   return acc;
 }
-
 export default account;
-
 export interface UpdateCartResponse {
   success: boolean;
   cart: Cart;
   items: Item[];
   free_shipping: null;
 }
-
 export interface Cart {
   id: number;
   token: string;
@@ -216,13 +201,11 @@ export interface Cart {
   total_short: string;
   total_long: string;
 }
-
 export interface PaymentDetails {
   method: null;
   credit_card_compunknown: null;
   installments: number;
 }
-
 export interface ProductElement {
   id: number;
   depth: string;
@@ -247,7 +230,6 @@ export interface ProductElement {
   subtotal_short: string;
   subtotal_long: string;
 }
-
 export interface PurpleImage {
   id: number;
   product_id: number;
@@ -257,7 +239,6 @@ export interface PurpleImage {
   created_at: string;
   updated_at: string;
 }
-
 export interface PromotionalDiscount {
   id: null;
   store_id: number;
@@ -267,7 +248,6 @@ export interface PromotionalDiscount {
   contents: unknown[];
   promotions_applied: unknown[];
 }
-
 export interface Item {
   id: number;
   name: string;
@@ -283,7 +263,6 @@ export interface Item {
   featured_image: FeaturedImageClass;
   google_item_categories: null;
 }
-
 export interface FeaturedImageClass {
   id: number;
   image: string;
@@ -292,13 +271,11 @@ export interface FeaturedImageClass {
   position: number;
   dimensions: Dimensions;
 }
-
 export interface Dimensions {
   width: number;
   height: number;
   aspect_ratio: number;
 }
-
 export interface ItemProduct {
   id: number;
   name: string;
@@ -342,11 +319,11 @@ export interface ItemProduct {
   depth: string;
   available: boolean;
 }
-
 export interface InstallmentsInfo {
-  "Nuvem Pago": { [key: string]: InstallmentData };
+  "Nuvem Pago": {
+    [key: string]: InstallmentData;
+  };
 }
-
 export interface InstallmentData {
   installment_value: number;
   installment_value_cents: number;
@@ -354,24 +331,22 @@ export interface InstallmentData {
   total_value: number;
   without_interests: boolean;
 }
-
 export interface MaxInstallments {
   installment: number;
   installment_data: InstallmentData;
 }
-
 export interface PaymentMethodsConfig {
   "Nuvem Pago": NuvemPago;
 }
-
 export interface NuvemPago {
   name: string;
-  installments_data: { [key: string]: InstallmentData };
+  installments_data: {
+    [key: string]: InstallmentData;
+  };
   show_full_installments: boolean;
   max_discount: number;
   has_general_discount: boolean;
 }
-
 export interface SelectedOrFirstAvailableVariant {
   id: number;
   name: string;

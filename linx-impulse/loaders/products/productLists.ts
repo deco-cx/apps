@@ -1,4 +1,5 @@
 import type {
+  Person,
   ProductDetailsPage,
   ProductListingPage,
 } from "../../../commerce/types.ts";
@@ -8,6 +9,7 @@ import getSource from "../../utils/source.ts";
 import {
   getTrackingImpressionFromImpressionUrl,
   toProduct,
+  toPropertyValue,
 } from "../../utils/transform.ts";
 import type {
   PageName,
@@ -21,7 +23,19 @@ interface BaseProps {
    * @hide
    */
   page: PageName;
+  showDummyProducts?: boolean;
   showOnlyAvailable?: boolean;
+
+  /**
+   * @hide
+   */
+  userId?: string;
+
+  /**
+   * @title User
+   * @description Used to sync user data with linx impulse
+   */
+  user: Person | null;
 }
 
 /**
@@ -114,10 +128,14 @@ const generateParams = (
       };
     }
     case "category": {
-      if (props.categoryIds?.length) {
+      const categoryIds = props.categoryIds ??
+        props.loader?.breadcrumb.itemListElement.map((item) => item.name!);
+      // use breadcrumb entries as categoryIds
+
+      if (categoryIds) {
         return {
-          name: "category",
-          "categoryId[]": props.categoryIds,
+          name: categoryIds.length > 1 ? "subcategory" : "category",
+          "categoryId[]": categoryIds,
         };
       }
 
@@ -147,16 +165,28 @@ const generateParams = (
     }
     case "search": {
       const productIds = props.productIds ?? props.loader?.products
-        .map((p) => p.productID)
+        .map((p) =>
+          p.isVariantOf?.productGroupID ??
+            p.productID
+        )
         .filter(nonNullable) ??
         [];
+
+      if (!productIds?.length) {
+        return {
+          name: "emptysearch",
+        };
+      }
+
       return {
         name: "search",
         "productId[]": productIds,
       };
     }
     case "product": {
-      const productId = props.productId ?? props.loader?.product.productID;
+      const productId = props.productId ??
+        props.loader?.product.isVariantOf?.productGroupID ??
+        props.loader?.product.productID;
       return {
         name: "product",
         "productId[]": productId ? [productId] : [],
@@ -183,7 +213,16 @@ function toLinxImpulseShelf(
     position,
     feature: shelf.feature,
     products: shelf.displays[0].recommendations.map(
-      (p) => toProduct(p, origin, cdn),
+      (p) => {
+        const shelfTitle = shelf.title;
+        const parsed = toProduct(p, origin, cdn);
+        parsed.isVariantOf?.additionalProperty?.push(toPropertyValue({
+          name: "shelfTitle",
+          value: shelfTitle,
+        }));
+
+        return parsed;
+      },
     ),
   };
 }
@@ -200,12 +239,16 @@ const loader = async (
     return null;
   }
 
-  const { showOnlyAvailable } = props;
+  const { showOnlyAvailable, userId: _userId, user } = props;
   const { chaordicApi, apiKey, salesChannel, origin, cdn } = ctx;
   const deviceId = getDeviceIdFromBag(ctx);
   const source = getSource(ctx);
 
+  const url = new URL(req.url);
+  const dummy = url.searchParams.get("dummy") || undefined;
+
   const params = generateParams(props, req);
+  const userId = _userId ?? user?.["@id"];
   const headers = new Headers();
   if (origin) {
     headers.set("Origin", origin);
@@ -219,14 +262,18 @@ const loader = async (
       source,
       salesChannel,
       showOnlyAvailable,
+      userId,
       productFormat: "complete",
+      dummy: props.showDummyProducts || (dummy === "true" || dummy === "1")
+        ? true
+        : undefined,
     }, {
       headers,
       // TODO: This is a temporary fix for the async rendering issue (https://discord.com/channels/985687648595243068/1236027748674306078)
       signal: new AbortController().signal,
     }).then((res) => res.json());
 
-  const reqOrigin = new URL(req.url).origin;
+  const reqOrigin = url.origin;
 
   return [
     ...top.map((shelf) => toLinxImpulseShelf(shelf, "top", reqOrigin, cdn)),

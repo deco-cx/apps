@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
-import { useScriptAsDataURI } from "deco/hooks/useScript.ts";
-
+import { encryptToHex } from "../utils/crypto.ts";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
 declare global {
   interface Window {
     navigation: {
@@ -10,7 +10,6 @@ declare global {
     };
   }
 }
-
 interface Event {
   hostname: string;
   site_id: string | number;
@@ -48,28 +47,40 @@ interface Event {
   browser: string;
   browser_version: string;
 }
-
 const SERVICE_ENDPOINT = Deno.env.get("EVENT_COLLECTOR") ??
   "https://juggler.deco.site/live/invoke/site/actions/sendEvent.ts";
-
+function getDailySalt(): string {
+  const today = new Date();
+  return today.toISOString().slice(0, 10);
+}
+export const generateUserId = async (
+  sitename: string,
+  ipAddress: string,
+  userAgent: string,
+) => {
+  const daily_salt = getDailySalt();
+  const data = daily_salt + sitename + ipAddress + userAgent;
+  return await encryptToHex(data);
+};
+export const generateSessionId = (): string => {
+  return crypto.randomUUID();
+};
 /**
  * This function handles all ecommerce analytics events.
  * Add another ecommerce analytics modules here.
  */
-const snippet = (
-  { siteId, siteName, serviceEndpoint }: {
-    siteId?: number;
-    siteName?: string;
-    serviceEndpoint: string;
-  },
-) => {
+const snippet = ({ siteId, siteName, serviceEndpoint, userId, sessionId }: {
+  siteId?: number;
+  siteName?: string;
+  serviceEndpoint: string;
+  userId: string;
+  sessionId: string;
+}) => {
   const props: Record<string, string> = {};
-
   const trackPageview = () =>
     globalThis.window.DECO.events.dispatch({
       name: "pageview",
     });
-
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
   if (originalPushState) {
@@ -80,12 +91,11 @@ const snippet = (
     };
     addEventListener("popstate", trackPageview);
   }
-
   const truncate = (str: string) => `${str}`.slice(0, 990);
-
   globalThis.window.DECO.events.subscribe((event) => {
-    if (!event || event.name !== "deco") return;
-
+    if (!event || event.name !== "deco") {
+      return;
+    }
     if (event.params) {
       const { flags, page } = event.params;
       if (Array.isArray(flags)) {
@@ -95,47 +105,56 @@ const snippet = (
       }
       props["pageId"] = truncate(`${page.id}`);
     }
-
     trackPageview();
   })();
-
   globalThis.window.DECO.events.subscribe((event) => {
-    if (!event) return;
-
+    if (!event) {
+      return;
+    }
     const { name, params } = event;
-
-    if (name === "deco") return;
-
+    if (name === "deco") {
+      return;
+    }
     const values = { ...props };
     for (const key in params) {
       // @ts-expect-error somehow typescript bugs
       const value = params[key];
-
       if (value !== null && value !== undefined) {
         values[key] = truncate(
           typeof value !== "object" ? value : JSON.stringify(value),
         );
       }
     }
-
     // Funções auxiliares para capturar informações dinâmicas
     function getDeviceType() {
       const ua = navigator.userAgent;
-      if (/mobile/i.test(ua)) return "mobile";
-      if (/tablet/i.test(ua)) return "tablet";
+      if (/mobile/i.test(ua)) {
+        return "mobile";
+      }
+      if (/tablet/i.test(ua)) {
+        return "tablet";
+      }
       return "desktop";
     }
-
     function getBrowserName() {
       const ua = navigator.userAgent;
-      if (/chrome|crios|crmo/i.test(ua)) return "Chrome";
-      if (/firefox|fxios/i.test(ua)) return "Firefox";
-      if (/safari/i.test(ua)) return "Safari";
-      if (/msie|trident/i.test(ua)) return "Internet Explorer";
-      if (/edge|edgios|edga/i.test(ua)) return "Edge";
+      if (/chrome|crios|crmo/i.test(ua)) {
+        return "Chrome";
+      }
+      if (/firefox|fxios/i.test(ua)) {
+        return "Firefox";
+      }
+      if (/safari/i.test(ua)) {
+        return "Safari";
+      }
+      if (/msie|trident/i.test(ua)) {
+        return "Internet Explorer";
+      }
+      if (/edge|edgios|edga/i.test(ua)) {
+        return "Edge";
+      }
       return "Unknown";
     }
-
     function getBrowserVersion() {
       const ua = navigator.userAgent;
       const browser = getBrowserName();
@@ -159,17 +178,25 @@ const snippet = (
       }
       return match ? match[1] : "Unknown";
     }
-
     function getOperatingSystem() {
       const ua = navigator.userAgent;
-      if (/windows/i.test(ua)) return "Windows";
-      if (/macintosh|mac os x/i.test(ua)) return "Mac OS";
-      if (/linux/i.test(ua)) return "Linux";
-      if (/android/i.test(ua)) return "Android";
-      if (/ios|iphone|ipad|ipod/i.test(ua)) return "iOS";
+      if (/windows/i.test(ua)) {
+        return "Windows";
+      }
+      if (/macintosh|mac os x/i.test(ua)) {
+        return "Mac OS";
+      }
+      if (/linux/i.test(ua)) {
+        return "Linux";
+      }
+      if (/android/i.test(ua)) {
+        return "Android";
+      }
+      if (/ios|iphone|ipad|ipod/i.test(ua)) {
+        return "iOS";
+      }
       return "Unknown";
     }
-
     function getOSVersion() {
       const os = getOperatingSystem();
       const ua = navigator.userAgent;
@@ -190,27 +217,30 @@ const snippet = (
       }
       return match ? match[1].replace("_", ".") : "Unknown";
     }
-
     function getUrlParam(param: string) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(param);
     }
-
     function getReferrerSource(referrer: string) {
-      if (!referrer) return "direct";
+      if (!referrer) {
+        return "direct";
+      }
       const referrerUrl = new URL(referrer);
-      if (referrerUrl.hostname.includes("google")) return "google";
-      if (referrerUrl.hostname.includes("facebook")) return "facebook";
+      if (referrerUrl.hostname.includes("google")) {
+        return "google";
+      }
+      if (referrerUrl.hostname.includes("facebook")) {
+        return "facebook";
+      }
       // Adicione outras fontes conforme necessário
       return "other";
     }
-
     const mock: Event = {
       hostname: globalThis.window.location.origin,
       site_id: siteId || "",
       site_name: siteName || "",
-      user_id: undefined, // get server side
-      session_id: undefined, // get server side
+      user_id: userId, // get server side
+      session_id: sessionId, // get server side
       event_name: name,
       start_time: new Date().toISOString(),
       timestamp: undefined, // get server side
@@ -226,10 +256,8 @@ const snippet = (
       utm_campaign: getUrlParam("utm_campaign"),
       utm_content: getUrlParam("utm_content"),
       utm_term: getUrlParam("utm_term"),
-
       referrer: document.referrer,
       referrer_source: getReferrerSource(document.referrer), // benchmark: plausible
-
       ip_city: undefined, // get server side
       ip_continent: undefined, // get server side
       ip_country: undefined, // get server side
@@ -238,40 +266,32 @@ const snippet = (
       ip_timezone: undefined, // get server side
       ip_lat: undefined, // get server side
       ip_long: undefined, // get server side
-
       screen_size: `${window.screen.width}x${window.screen.height}`,
-
       device: getDeviceType(),
       operating_system: getOperatingSystem(),
       operating_system_version: getOSVersion(),
       browser: getBrowserName(),
       browser_version: getBrowserVersion(),
     };
-
-    fetch(
-      serviceEndpoint,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          event: mock,
-        }),
+    fetch(serviceEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        event: mock,
+      }),
+    });
   });
-
   // first pageview
   trackPageview();
 };
-
-function Clickhouse(
-  { siteId, siteName }: {
-    siteId?: number;
-    siteName?: string;
-  },
-) {
+function Clickhouse({ siteId, siteName, userId, sessionId }: {
+  siteId?: number;
+  siteName?: string;
+  userId: string;
+  sessionId: string;
+}) {
   return (
     <Head>
       <script
@@ -281,10 +301,11 @@ function Clickhouse(
           siteId,
           siteName,
           serviceEndpoint: SERVICE_ENDPOINT,
+          userId,
+          sessionId,
         })}
       />
     </Head>
   );
 }
-
 export default Clickhouse;

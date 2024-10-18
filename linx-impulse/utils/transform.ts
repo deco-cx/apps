@@ -1,6 +1,7 @@
 import type {
   Filter,
   Offer,
+  PageType,
   Person,
   Product,
   ProductListingPage,
@@ -26,6 +27,7 @@ import type {
 import type {
   HotsiteResponse,
   NavigateResponse,
+  NotFoundResponse,
   Query,
   SearchResponse,
 } from "./types/search.ts";
@@ -148,7 +150,7 @@ const toProductUrl = (
   return `${origin}${productURL.pathname}${productURL.search}`;
 };
 
-const toPropertyValue = (
+export const toPropertyValue = (
   value: Partial<Omit<PropertyValue, "@type">>,
 ): PropertyValue => ({
   "@type": "PropertyValue",
@@ -207,6 +209,9 @@ const productFromImpulse = (
     ...Object.entries(variant.properties?.details ?? {})?.map((
       [key, value],
     ) => toPropertyValue({ name: key, value: sanitizeValue(value) })),
+    ...Object.entries(variant.specs ?? {})?.map((
+      [key, value],
+    ) => toPropertyValue({ name: key, value: sanitizeValue(value) })),
     ...product.categories.map((c) =>
       toPropertyValue({
         name: "category",
@@ -214,10 +219,16 @@ const productFromImpulse = (
         propertyID: c.id,
       })
     ),
-    ...(level >= 1 ? isVariantOfAdditionalProperty : [toPropertyValue({
-      name: "trackingId",
-      value: trackingId ?? undefined,
-    })]),
+    // ...(level >= 1 ? isVariantOfAdditionalProperty : [toPropertyValue({
+    //   name: "trackingId",
+    //   value: trackingId ?? undefined,
+    // })]),
+    ...(level === 0
+      ? [toPropertyValue({
+        name: "trackingId",
+        value: trackingId ?? undefined,
+      })]
+      : []),
   ];
 
   const hasVariant = level < 1
@@ -289,6 +300,8 @@ const productFromChaordic = (
       name: brandName,
     } satisfies Brand
     : undefined;
+  const age = product.businessInfo?.age as number | undefined;
+  const releaseDate = age ? String(new Date().getTime() - age) : undefined;
 
   const offer = toOffer(variant);
   const offers = offer ? [offer] : [];
@@ -370,6 +383,7 @@ const productFromChaordic = (
     category: product.categories.map((c) => c.name).join(">"),
     name: variant?.name ?? product.name,
     brand,
+    releaseDate,
     additionalProperty,
     image,
     isVariantOf,
@@ -504,13 +518,51 @@ export const sortOptions: { value: SortBy; label: string }[] = [
 ];
 
 export const toProductListingPage = (
-  response: NavigateResponse | SearchResponse | HotsiteResponse,
+  response:
+    | NavigateResponse
+    | SearchResponse
+    | HotsiteResponse
+    | NotFoundResponse
+    | null,
   page: number,
   resultsPerPage: number,
   url: string,
-  searchId: string,
   cdn?: string,
+  pageType?: "Search" | "Category" | "SubCategory",
 ): ProductListingPage => {
+  const searchId = response?.searchId;
+
+  const searchIdAsPageType = searchId
+    // deno-lint-ignore no-explicit-any
+    ? `SearchId:${searchId}` as any
+    : undefined;
+
+  const pageTypes: PageType[] = [];
+  pageType && pageTypes.push(pageType);
+  searchIdAsPageType && pageTypes.push(searchIdAsPageType);
+
+  if (!response || "code" in response) {
+    return {
+      "@type": "ProductListingPage",
+      breadcrumb: {
+        "@type": "BreadcrumbList",
+        itemListElement: [],
+        numberOfItems: 0,
+      },
+      filters: [],
+      products: [],
+      pageInfo: {
+        nextPage: undefined,
+        previousPage: undefined,
+        currentPage: page,
+        records: 0,
+        recordPerPage: 0,
+        pageTypes,
+      },
+      sortOptions,
+    };
+  }
+
   const { nextPage, previousPage } = generatePages(page, url);
 
   return {
@@ -523,20 +575,36 @@ export const toProductListingPage = (
     sortOptions,
     products: response.products.map((p) =>
       toProduct(
-        { ...p, details: { ...p.details, searchId } },
+        searchId ? { ...p, details: { ...p.details, searchId } } : p,
         new URL(url).origin,
         cdn,
       )
-    ),
+    ) ?? [],
     pageInfo: {
       currentPage: page,
       nextPage,
       previousPage,
-      records: response.size,
+      records: response.size ?? 0,
       recordPerPage: resultsPerPage,
+      pageTypes,
     },
-    filters: response.filters.map((f) => toFilter(f, new URL(url))),
+    filters: response.filters.map((f) => toFilter(f, new URL(url))) ?? [],
   };
+};
+
+export const fixSuggestionLink = (link: string) => {
+  const url = new URL(link, "http://example.com");
+  const search = new URLSearchParams();
+  // ["apikey", "resultsperpage"].forEach((key) => url.searchParams.delete(key))
+
+  const q = url.searchParams.get("q") ?? url.searchParams.get("terms");
+  q && search.set("q", q);
+  const origin = url.searchParams.get("origin");
+  origin && search.set("origin", origin);
+  const filter = url.searchParams.getAll("filter");
+  filter.forEach((f) => search.append("filter", f));
+
+  return `/lxsearch?${search.toString()}`;
 };
 
 export const getTrackingImpressionFromImpressionUrl = (url: string) =>

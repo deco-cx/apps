@@ -1,4 +1,8 @@
-/** @description Equivalent to sku ID in VTEX platform */
+/**
+ * @format dynamic-options
+ * @options vtex/loaders/options/productIdByTerm.ts
+ * @description Equivalent to sku ID in VTEX platform
+ */
 export type ProductID = string;
 
 export interface OrderForm {
@@ -141,7 +145,7 @@ export interface OrderFormItem {
   bundleItems: unknown[];
   attachments: unknown[];
   attachmentOfferings: AttachmentOffering[];
-  offerings: unknown[];
+  offerings: Offering[];
   priceTags: PriceTag[];
   availability: string;
   measurementUnit: string;
@@ -747,6 +751,7 @@ export interface Item {
   nameComplete: string;
   complementName: string;
   ean: string;
+  estimatedDateArrival: string;
   referenceId?: Array<{ Key: string; Value: string }>;
   measurementUnit: string;
   unitMultiplier: number;
@@ -1167,6 +1172,14 @@ export interface CreateNewDocument {
   DocumentId?: string;
 }
 
+export interface Document extends Record<string, unknown> {
+  additionalProperties?: string;
+  id?: string;
+  accountId?: string;
+  accountName?: string;
+  dataEntityId?: string;
+}
+
 export interface SelectableGifts {
   id: string;
   selectedGifts: {
@@ -1246,4 +1259,93 @@ export interface ProductReviewRange {
 export interface ProductReviewData {
   data?: ProductReview[] | undefined;
   range?: ProductReviewRange;
+}
+
+export interface ProductBalance {
+  hasUnlimitedQuantity?: boolean;
+  leadTime?: string;
+  reservedQuantity?: number;
+  totalQuantity?: number;
+  warehouseId?: string;
+  warehouseName?: string;
+}
+
+export interface ProductInventoryData {
+  skuId?: string;
+  balance?: ProductBalance[];
+}
+
+export interface Order {
+  ShippingEstimatedDate?: Date;
+  ShippingEstimatedDateMax: string;
+  ShippingEstimatedDateMin: string;
+  affiliateId: string;
+  authorizedDate: string;
+  callCenterOperatorName: string;
+  clientName: string;
+  creationDate: string;
+  currencyCode: string;
+  deliveryDates: Date[];
+  giftCardProviders: string[];
+  hostname: string;
+  invoiceInput: string;
+  invoiceOutput: string[];
+  isAllDelivered: boolean;
+  isAnyDelivered: boolean;
+  items: OrderFormItem[];
+  lastChange: string;
+  lastMessageUnread: string;
+  listId: string;
+  listType: string;
+  marketPlaceOrderId: string;
+  orderFormId: string;
+  orderId: string;
+  orderIsComplete: boolean;
+  origin: string;
+  paymentApprovedDate: string;
+  paymentNames: string;
+  salesChannel: string;
+  sequence: string;
+  status: string;
+  statusDescription: string;
+  totalItems: number;
+  totalValue: number;
+  workflowInErrorState: boolean;
+  workflowInRetry: boolean;
+}
+
+export interface Orders {
+  facets: Facet[];
+  list: Order[];
+  paging: {
+    total: number;
+    pages: number;
+    currentPage: number;
+    perPage: number;
+  };
+  reportRecordsLimit: number;
+  stats: {
+    stats: {
+      totalItems: {
+        Count: number;
+        Max: number;
+        Mean: number;
+        Min: number;
+        Missing: number;
+        StdDev: number;
+        Sum: number;
+        SumOfSquares: number;
+      };
+      totalValue: {
+        Count: number;
+        Max: number;
+        Mean: number;
+        Min: number;
+        Missing: number;
+        StdDev: number;
+        Sum: number;
+        SumOfSquares: number;
+      };
+    };
+  };
 }

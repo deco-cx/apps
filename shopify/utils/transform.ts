@@ -42,10 +42,10 @@ export const toProductPage = (
   const skuId = maybeSkuId
     ? getVariantIdFromId(maybeSkuId)
     : product.variants.nodes[0]?.id;
-  const sku = product.variants.nodes.find((node) => node.id === skuId);
+  let sku = product.variants.nodes.find((node) => node.id === skuId);
 
   if (!sku) {
-    throw new Error(`Missing sku ${skuId} on product ${product.title}`);
+    sku = product.variants.nodes[0];
   }
 
   return {
@@ -216,7 +216,7 @@ const toPropertyValue = (
 const isSelectedFilter = (filterValue: FilterValue, url: URL) => {
   let isSelected = false;
   url.searchParams.forEach((value, key) => {
-    if (!key.startsWith("filter")) return;
+    if (!key?.startsWith("filter")) return;
     if (value === filterValue.label) isSelected = true;
   });
   return isSelected;
