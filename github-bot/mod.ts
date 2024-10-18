@@ -22,7 +22,7 @@ interface GithubProps {
    * @title Webhook Secret
    * @description Secret create for the git hub webhook under https://github.com/{{organization}}/{{repo}}/settings/hooks
    */
-  webhook_secret: Secret;
+  webhook_secret?: Secret | null;
   /**
    * @title Organization Name
    */

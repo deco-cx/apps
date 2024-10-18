@@ -67,15 +67,15 @@ export default async function action(
     });
   }
 
-  const secret = project.github.webhook_secret.get();
-  if (!secret) {
-    console.error("Secret is missing. Data:", { project, props });
-    return new Response("Secret is missing", {
-      status: STATUS_CODE.BadRequest,
-    });
-  }
+  const secret = project.github.webhook_secret?.get();
+  // if (!secret) {
+  //   console.error("Secret is missing. Data:", { project, props });
+  //   return new Response("Secret is missing", {
+  //     status: STATUS_CODE.BadRequest,
+  //   });
+  // }
 
-  if (!(await verify(secret, JSON.stringify(props), signature))) {
+  if (secret && !(await verify(secret, JSON.stringify(props), signature))) {
     console.error("Invalid signature. Data:", { project, props });
     return new Response("Invalid signature", {
       status: STATUS_CODE.Unauthorized,
