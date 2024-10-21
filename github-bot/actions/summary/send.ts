@@ -34,7 +34,7 @@ export default async function action(
       state: "closed",
       direction: "desc",
       sort: "updated",
-    })).filter((pr) => isToday(pr.created_at));
+    })).filter((pr) => pr.closed_at && isToday(pr.closed_at));
 
     if (!openPullRequests.length && !closedPullRequests.length) {
       continue;
