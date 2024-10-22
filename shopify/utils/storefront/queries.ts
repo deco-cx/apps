@@ -404,6 +404,32 @@ export const AddItemToCart = {
   }`,
 };
 
+export const RegisterAccount = {
+  query: gql`mutation RegisterAccount(
+      $email: String!,
+      $password: String!,
+      $firstName: String,
+      $lastName: String,
+      $acceptsMarketing: Boolean = false
+    ) {
+    customerCreate(input: {
+      email: $email,
+      password: $password,
+      firstName: $firstName,
+      lastName: $lastName,
+      acceptsMarketing: $acceptsMarketing,
+    }) {
+      customer {
+        id
+      }
+      customerUserErrors {
+        code
+        message
+      }
+    }
+  }`,
+};
+
 export const AddCoupon = {
   fragments: [Cart],
   query: gql`mutation AddCoupon($cartId: ID!, $discountCodes: [String!]!) {
