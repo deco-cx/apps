@@ -107,7 +107,7 @@ export default function Proxy({
       `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}`,
     );
     
-    to.search = qs
+    to.search = qs;
 
     const headers = new Headers(req.headers);
     HOP_BY_HOP.forEach((h) => headers.delete(h));
