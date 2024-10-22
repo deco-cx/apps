@@ -132,6 +132,11 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+
+  /**
+   * @title Include price in facets
+   */
+  priceFacets?: boolean;
 }
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
@@ -264,7 +269,7 @@ const loader = async (
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
   const selected = withDefaultFacets(selectedFacets, ctx);
-  const fselected = selected.filter((f) => f.key !== "price");
+  const fselected = props.priceFacets ? selected : selected.filter((f) => f.key !== "price");
   const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
   const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
   const searchArgs = { ...args, query: args.query || pathQuery };

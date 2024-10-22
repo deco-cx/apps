@@ -69,9 +69,9 @@ export const toBreadcrumbItem = ({
   position,
   item,
 }: {
-  name: string,
-  position: number,
-  item: string,
+  name: string;
+  position: number;
+  item: string;
 }): ListItem => ({
   "@type": "ListItem",
   name: decodeURI(name),
@@ -106,7 +106,7 @@ export const toBreadcrumbList = (
         position: 2,
         item: getPath(product, sku),
       }),
-    ]
+    ];
   }
 
   const data: BreadcrumbList = {
