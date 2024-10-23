@@ -62,11 +62,12 @@ export interface ClientProfileData {
 
 export interface ClientPreferencesData {
   locale: string;
-  optinNewsLetter: null;
+  optinNewsLetter: boolean;
 }
 
 export interface ItemMetadata {
-  items: ItemMetadataItem[];
+  items?: ItemMetadataItem[];
+  Items?: ItemMetadataItemUppercase[];
 }
 
 export interface ItemMetadataItem {
@@ -80,6 +81,19 @@ export interface ItemMetadataItem {
   imageUrl: string;
   detailUrl: string;
   assemblyOptions: AssemblyOption[];
+}
+
+export interface ItemMetadataItemUppercase {
+  Id: string;
+  Seller: string;
+  Name: string;
+  SkuName: string;
+  ProductId: string;
+  RefId: string;
+  Ean: null | string;
+  ImageUrl: string;
+  DetailUrl: string;
+  AssemblyOptions: AssemblyOption[];
 }
 
 export interface AssemblyOption {
@@ -259,11 +273,43 @@ export interface Fields {
   skuName?: string;
 }
 
+export interface Transaction {
+  isActive: boolean;
+  transactionId: string;
+  merchantName: string;
+  payments: Payment[];
+}
+
+export interface Payment {
+  id: string;
+  paymentSystem: string;
+  paymentSystemName: string;
+  value: number;
+  installments: number;
+  referenceValue: number;
+  cardHolder: string | null;
+  cardNumber: string | null;
+  firstDigits: string | null;
+  lastDigits: string | null;
+  cvv2: string | null;
+  expireMonth: string | null;
+  expireYear: string | null;
+  url: string;
+  giftCardId: null;
+  giftCardName: null;
+  giftCardCaption: null;
+  redemptionCode: null;
+  group: string;
+  tid: null;
+  dueDate: Date;
+}
+
 export interface PaymentData {
   updateStatus: string;
   installmentOptions: InstallmentOption[];
   paymentSystems: PaymentSystem[];
   payments: unknown[];
+  transactions: Transaction[];
   giftCards: unknown[];
   giftCardMessages: unknown[];
   availableAccounts: unknown[];
@@ -364,7 +410,8 @@ export interface ShippingData {
 
 export interface Address {
   addressType: string;
-  receiverName: null;
+  addressName: string;
+  receiverName: string | null;
   addressId: string;
   isDisposable: boolean;
   postalCode: string;
@@ -382,8 +429,16 @@ export interface Address {
 export interface LogisticsInfo {
   itemIndex: number;
   selectedSla: SelectedSla | null;
+  price: number;
+  listPrice: number;
+  sellingPrice: number;
+  deliveryCompany: string;
+  shippingEstimate: string;
+  shippingEstimateDate: string;
   selectedDeliveryChannel: SelectedDeliveryChannel;
   addressId: string;
+  pickupPointId: string;
+  pickupStoreInfo: PickupStoreInfo;
   slas: Sla[];
   shipsTo: string[];
   itemId: string;
@@ -1282,6 +1337,7 @@ export interface Order {
   invoiceOutput: string[];
   isAllDelivered: boolean;
   isAnyDelivered: boolean;
+  itemMetadata: ItemMetadata;
   items: OrderFormItem[];
   lastChange: string;
   lastMessageUnread: string;
@@ -1302,6 +1358,103 @@ export interface Order {
   totalValue: number;
   workflowInErrorState: boolean;
   workflowInRetry: boolean;
+}
+
+export interface OrderItem {
+  orderId: string;
+  sequence: string;
+  origin: string;
+  sellerOrderId: string;
+  salesChannel: string;
+  affiliateId: string;
+  workflowIsInError: boolean;
+  orderGroup: string;
+  status: string;
+  statusDescription: string;
+  value: number;
+  allowCancellation: boolean;
+  allowEdition?: boolean;
+  authorizedDate: string;
+  callCenterOperatorData: string;
+  cancelReason: string;
+  cancellationData: {
+    RequestedByUser: boolean;
+    RequestedBySystem: boolean;
+    RequestedBySellerNotification: boolean;
+    RequestedByPaymentNotification: boolean;
+    Reason: string;
+    CancellationDate: string;
+  };
+  cancellationRequests?: {
+    id: string;
+    reason: string;
+    cancellationRequestDate: string;
+    requestedByUser: boolean;
+    deniedBySeller: boolean;
+    deniedBySellerReason: string | null;
+    cancellationRequestDenyDate: string | null;
+  }[] | null;
+  changesAttachment: string;
+  checkedInPickupPointId: string | null;
+  paymentData: PaymentData;
+  shippingData: ShippingData;
+  clientPreferencesData: ClientPreferencesData;
+  clientProfileData: ClientProfileData;
+  totals: Total[];
+  commercialConditionData?: string | null;
+  creationDate: string;
+  // deno-lint-ignore no-explicit-any
+  customData?: Record<string, any> | null;
+  followUpEmail?: string;
+  giftRegistryData?: GiftRegistry | null;
+  hostname: string;
+  invoiceData: string | null;
+  invoicedDate: string | null;
+  isCheckedIn: boolean;
+  isCompleted: boolean;
+  sellers?: {
+    id: string;
+    name: string;
+    logo: string;
+    fulfillmentEndpoint: string;
+  }[];
+  itemMetadata: ItemMetadata;
+  items: OrderFormItem[];
+  lastChange: string;
+  lastMessage: string;
+  marketingData: OrderFormMarketingData | null;
+  marketplace: Marketplace;
+  marketplaceItems: [];
+  marketplaceOrderId: string;
+  marketplaceServicesEndpoint: string;
+  merchantName: string;
+  openTextField: string | null;
+}
+
+interface Marketplace {
+  baseURL: string;
+  // deno-lint-ignore no-explicit-any
+  isCertified?: any | null;
+  name: string;
+}
+
+interface OrderFormMarketingData {
+  utmCampaign?: string;
+  utmMedium?: string;
+  utmSource?: string;
+  utmiCampaign?: string;
+  utmiPart?: string;
+  utmipage?: string;
+  marketingTags?: string | string[];
+}
+
+interface GiftRegistry {
+  attachmentId: string;
+  giftRegistryId: string;
+  giftRegistryType: string;
+  giftRegistryTypeName: string;
+  addressId: string;
+  description: string;
 }
 
 export interface Orders {
