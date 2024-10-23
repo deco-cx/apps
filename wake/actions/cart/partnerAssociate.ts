@@ -8,6 +8,7 @@ import {
   CheckoutPartnerAssociateMutationVariables,
 } from "../../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../../utils/parseHeaders.ts";
+import { setPartnerCookie } from "../../utils/partner.ts";
 
 export interface Props {
   partnerAccessToken: string;
@@ -21,6 +22,7 @@ const action = async (
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
   const headers = parseHeaders(req.headers);
+  const { partnerAccessToken } = props;
 
   if (!cartId) {
     throw new HttpError(400, "Missing cart cookie");
@@ -30,7 +32,7 @@ const action = async (
     CheckoutPartnerAssociateMutation,
     CheckoutPartnerAssociateMutationVariables
   >({
-    variables: { checkoutId: cartId, ...props },
+    variables: { checkoutId: cartId, partnerAccessToken },
     ...CheckoutPartnerAssociate,
   }, { headers });
 
@@ -39,6 +41,8 @@ const action = async (
   if (cartId !== checkoutId) {
     setCartCookie(ctx.response.headers, checkoutId);
   }
+
+  setPartnerCookie(ctx.response.headers, partnerAccessToken);
 
   return data.checkout ?? {};
 };
