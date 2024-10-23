@@ -1,43 +1,80 @@
 import {
   Filter,
+  ImageObject,
   Offer,
   Product,
   PropertyValue,
   Seo,
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
+import { AppContext } from "../mod.ts";
+import { ProductGroup, ProductPrice, SEO } from "./client/types.ts";
 import {
-  Installment,
-  ProductGroup,
-  ProductSearchResult,
+  OpenAPI,
+  Product as OProduct,
+  ProductInstallment,
+  ProductSearch,
   ProductVariant,
-  SEO,
-} from "./client/types.ts";
+  VariantProductSearch,
+} from "./openapi/vnda.openapi.gen.ts";
+import { getSegmentFromCookie, parse } from "./segment.ts";
+
+export type VNDAProductGroup = ProductSearch | OProduct;
+type VNDAProduct = VariantProductSearch | ProductVariant;
 
 interface ProductOptions {
   url: URL;
   /** Price coded currency, e.g.: USD, BRL */
   priceCurrency: string;
+  productPrice?: ProductPrice | null;
 }
+
+type TypeTags = (string | {
+  key: string;
+  value: string;
+  isProperty: boolean;
+})[];
 
 export const getProductCategoryTag = ({ tags }: ProductGroup) =>
   tags?.filter(({ type }) => type === "categoria")[0];
 
+export const canonicalFromTags = (
+  tags: Pick<SEO, "name" | "title" | "description">[],
+  url: URL,
+) => {
+  const pathname = tags.map((t) => t.name).join("/");
+  return new URL(`/${pathname}`, url);
+};
+
 export const getSEOFromTag = (
-  tag: Pick<SEO, "title" | "description">,
-  req: Request,
-): Seo => ({
-  title: tag.title || "",
-  description: tag.description || "",
-  canonical: req.url,
-});
+  tags: Pick<SEO, "name" | "title" | "description">[],
+  url: URL,
+  seo: OpenAPI["GET /api/v2/seo_data"]["response"][0] | undefined,
+  hasTypeTags: boolean,
+  isSearchPage?: boolean,
+): Seo => {
+  const tag = tags.at(-1);
+  const canonical = canonicalFromTags(tags, url);
+
+  if (url.searchParams.has("page")) {
+    canonical.searchParams.set("page", url.searchParams.get("page")!);
+  }
+
+  return {
+    title: isSearchPage ? "" : seo?.title || tag?.title || "",
+    description: isSearchPage ? "" : seo?.description || tag?.description || "",
+    canonical: canonical.href,
+    noIndexing: hasTypeTags,
+  };
+};
 
 export const parseSlug = (slug: string) => {
   const segments = slug.split("-");
   const id = Number(segments.at(-1));
 
   if (!id) {
-    throw new Error("Malformed slug. Expecting {slug}-{id} format");
+    return null;
   }
 
   return {
@@ -46,15 +83,21 @@ export const parseSlug = (slug: string) => {
   };
 };
 
-const pickVariant = (product: ProductGroup, variantId: string | null) => {
-  const variants = normalizeVariants(product.variants);
-  const [head] = variants;
+export const pickVariant = (
+  variants: VNDAProductGroup["variants"],
+  variantId: string | null,
+  normalize = true,
+) => {
+  const normalizedVariants = normalize
+    ? normalizeVariants(variants)
+    : variants as VariantProductSearch[];
+  const [head] = normalizedVariants;
 
   let [target, main, available]: Array<
-    ProductVariant | null
+    VNDAProduct | null
   > = [null, head, null];
 
-  for (const variant of variants) {
+  for (const variant of normalizedVariants) {
     if (variant.sku === variantId) target = variant;
     else if (variant.main) main = variant;
     else if (variant.available && !available) available = variant;
@@ -65,7 +108,9 @@ const pickVariant = (product: ProductGroup, variantId: string | null) => {
   return target || fallback || head;
 };
 
-const normalizeInstallments = (installments: Installment[] | number[] = []) => {
+const normalizeInstallments = (
+  installments: ProductInstallment[] | number[] = [],
+) => {
   if (typeof installments[0] === "number") {
     const total = (installments as number[]).reduce((acc, curr) => acc + curr);
 
@@ -76,7 +121,9 @@ const normalizeInstallments = (installments: Installment[] | number[] = []) => {
     }];
   }
 
-  return (installments as Installment[]).map(({ number, price, total }) => ({
+  return (installments as ProductInstallment[]).map((
+    { number, price, total },
+  ) => ({
     number,
     price,
     total,
@@ -85,15 +132,16 @@ const normalizeInstallments = (installments: Installment[] | number[] = []) => {
 
 const toURL = (src: string) => src.startsWith("//") ? `https:${src}` : src;
 
-const toOffer = ({
+export const toOffer = ({
   price,
   sale_price,
+  intl_price,
   available_quantity,
   available,
   installments = [],
-}: ProductVariant): Offer | null => {
+}: VNDAProduct & { intl_price?: number }): Offer[] => {
   if (!price || !sale_price) {
-    return null;
+    return [];
   }
 
   const priceSpecification: UnitPriceSpecification[] = [{
@@ -123,8 +171,8 @@ const toOffer = ({
     });
   }
 
-  return {
-    "@type": "Offer",
+  const offers: Offer[] = [{
+    "@type": "Offer" as const,
     seller: "VNDA",
     price,
     priceSpecification,
@@ -134,10 +182,33 @@ const toOffer = ({
     availability: available
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
-  };
+  }];
+
+  if (intl_price) {
+    offers.push({
+      "@type": "Offer",
+      seller: "VNDA_INTL",
+      price: intl_price,
+      priceSpecification: [{
+        "@type": "UnitPriceSpecification",
+        priceType: "https://schema.org/SalePrice",
+        price: intl_price,
+      }],
+      inventoryLevel: {
+        value: available_quantity,
+      },
+      availability: available
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      // Static since VNDA only have a BRL price and USD when intl_price is available
+      priceCurrency: "USD",
+    });
+  }
+
+  return offers;
 };
 
-const toPropertyValue = (variant: ProductVariant): PropertyValue[] =>
+const toPropertyValue = (variant: VNDAProduct): PropertyValue[] =>
   Object.values(variant.properties ?? {})
     .filter(Boolean)
     .map(({ value, name }) =>
@@ -149,36 +220,89 @@ const toPropertyValue = (variant: ProductVariant): PropertyValue[] =>
       } as PropertyValue)
     ).filter((x): x is PropertyValue => Boolean(x));
 
+const toPropertyValueTags = (tags: ProductSearch["tags"]): PropertyValue[] =>
+  tags?.map((tag) =>
+    tag && ({
+      "@type": "PropertyValue",
+      name: tag.name,
+      value: JSON.stringify(tag),
+      valueReference: "TAGS",
+    } as PropertyValue)
+  );
+
+const toPropertyValueCategoryTags = (
+  categoryTags: OProduct["category_tags"],
+) => {
+  if (!categoryTags) return [];
+
+  return categoryTags.map((tag) => {
+    return {
+      "@type": "PropertyValue",
+      name: tag.tag_type,
+      value: tag.name,
+      description: tag.title,
+      valueReference: "TAGS",
+    } as PropertyValue;
+  });
+};
+
 // deno-lint-ignore no-explicit-any
-const isProductVariant = (p: any): p is ProductVariant =>
+const isProductVariant = (p: any): p is VariantProductSearch =>
   typeof p.id === "number";
 
 const normalizeVariants = (
-  variants: ProductGroup["variants"] = [],
-): ProductVariant[] =>
-  variants.flatMap((v) => isProductVariant(v) ? [v] : Object.values(v));
+  variants: VNDAProductGroup["variants"] = [],
+): VNDAProduct[] =>
+  variants.flatMap((v) =>
+    isProductVariant(v) ? [v] : Object.values(v) as VNDAProduct[]
+  );
+
+const toImageObjectVideo = (
+  video: OpenAPI["GET /api/v2/products/:productId/videos"]["response"],
+): ImageObject[] =>
+  video?.map(({ url, embed_url, thumbnail_url }) => ({
+    "@type": "ImageObject",
+    encodingFormat: "video",
+    contentUrl: url,
+    thumbnailUrl: thumbnail_url,
+    embedUrl: embed_url,
+  } as ImageObject));
 
 export const toProduct = (
-  product: ProductGroup,
+  product: VNDAProductGroup,
   variantId: string | null,
   options: ProductOptions,
   level = 0,
 ): Product => {
-  const { url, priceCurrency } = options;
-  const variant = pickVariant(product, variantId);
+  const { url, priceCurrency, productPrice } = options;
+  const variant = pickVariant(product.variants, variantId);
   const variants = normalizeVariants(product.variants);
+  const variantPrices = productPrice?.variants
+    ? pickVariant(
+      productPrice.variants as VNDAProductGroup["variants"],
+      variantId,
+      false,
+    )
+    : null;
+  const offers = toOffer(variantPrices ?? variant);
+
   const variantUrl = new URL(
     `/produto/${product.slug}-${product.id}?skuId=${variant.sku}`,
     url.origin,
   ).href;
+
   const productUrl = new URL(
     `/produto/${product.slug}-${product.id}`,
     url.origin,
   ).href;
+
   const productID = `${variant.sku}`;
   const productGroupID = `${product.id}`;
-  const offer = toOffer(variant);
-  const offers = offer ? [offer] : [];
+
+  const myTags = "tags" in product ? product.tags : [];
+  const myCategoryTags = "category_tags" in product
+    ? product.category_tags
+    : [];
 
   return {
     "@type": "Product",
@@ -187,7 +311,11 @@ export const toProduct = (
     url: variantUrl,
     name: product.name,
     description: product.description,
-    additionalProperty: toPropertyValue(variant),
+    additionalProperty: [
+      ...toPropertyValue(variant),
+      ...toPropertyValueTags(myTags),
+      ...toPropertyValueCategoryTags(myCategoryTags),
+    ],
     inProductGroupWithID: productGroupID,
     gtin: product.reference,
     isVariantOf: {
@@ -201,16 +329,27 @@ export const toProduct = (
         ? variants.map((v) => toProduct(product, v.sku!, options, 1))
         : [],
     },
-    image: [{
-      "@type": "ImageObject",
-      alternateName: product.name ?? "",
-      url: toURL(product.image_url ?? ""),
-    }],
+    image: product.images?.length ?? 0 > 1
+      ? product.images?.map((img) => ({
+        "@type": "ImageObject" as const,
+        encodingFormat: "image",
+        alternateName: `${img.url}`,
+        url: toURL(img.url!),
+      }))
+      : [
+        {
+          "@type": "ImageObject",
+          encodingFormat: "image",
+          alternateName: product.name ?? "",
+          url: toURL(product.image_url ?? ""),
+        },
+      ],
+    // images:
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: priceCurrency,
-      highPrice: product.price!,
-      lowPrice: product.sale_price!,
+      highPrice: productPrice?.price ?? product.price!,
+      lowPrice: productPrice?.sale_price ?? product.sale_price!,
       offerCount: offers.length,
       offers: offers,
     },
@@ -236,27 +375,60 @@ const removeFilter = (
   filter: { key: string; value: string },
 ) =>
   typeTagsInUse.filter((inUse) =>
-    inUse.key !== filter.key &&
-    inUse.value !== filter.value
+    !(inUse.key === filter.key && inUse.value === filter.value)
   );
 
 export const toFilters = (
-  aggregations: ProductSearchResult["aggregations"],
+  aggregations:
+    OpenAPI["GET /api/v2/products/search"]["response"]["aggregations"],
   typeTagsInUse: { key: string; value: string }[],
   cleanUrl: URL,
 ): Filter[] => {
+  if (!aggregations) {
+    return [];
+  }
+
   const priceRange = {
     "@type": "FilterRange" as const,
     label: "Valor",
     key: "price_range",
     values: {
-      min: aggregations.min_price,
-      max: aggregations.max_price,
+      min: aggregations.min_price!,
+      max: aggregations.max_price!,
     },
   };
 
-  const types = Object.keys(aggregations.types).map((typeKey) => {
-    const typeValues = aggregations.types[typeKey];
+  const combinedFiltersKeys = Object.keys(aggregations.types ?? {}).concat(
+    ...Object.keys(aggregations.properties ?? {}),
+  );
+
+  const types = combinedFiltersKeys.map((typeKey) => {
+    const isProperty = typeKey.includes("property");
+
+    interface AggregationType {
+      name: string;
+      title: string;
+      count: number;
+      value: string;
+    }
+    const typeValues: AggregationType[] = isProperty
+      // deno-lint-ignore no-explicit-any
+      ? ((aggregations.properties as any)[
+        typeKey as string
+      ] as AggregationType[])
+      // deno-lint-ignore no-explicit-any
+      : ((aggregations.types as any)[
+        typeKey as string
+      ] as AggregationType[]);
+
+    if (isProperty) {
+      typeValues.forEach((obj) => {
+        if (obj.value) {
+          obj.title = obj.value;
+          obj.name = obj.value;
+        }
+      });
+    }
 
     return {
       "@type": "FilterToggle" as const,
@@ -293,25 +465,93 @@ export const toFilters = (
   ];
 };
 
-export const typeTagExtractor = (url: URL) => {
+export const typeTagExtractor = (url: URL, tags: { type?: string }[]) => {
+  const cleanUrl = new URL(url);
   const keysToDestroy: string[] = [];
-  const typeTags: { key: string; value: string }[] = [];
-  const typeTagRegex = /\btype_tags\[(\S+)\]\[\]/;
+  const typeTags: { key: string; value: string; isProperty: boolean }[] = [];
+  const typeTagRegex = /\btype_tags\[(.*?)\]\[\]/;
 
-  url.searchParams.forEach((value, key) => {
+  cleanUrl.searchParams.forEach((value, key) => {
     const match = typeTagRegex.exec(key);
 
     if (match) {
-      keysToDestroy.push(key);
-      typeTags.push({ key, value });
+      const tagValue = match[1];
+      const isProperty = tagValue.includes("property");
+      if (tags.some((tag) => tag.type === tagValue) || isProperty) {
+        keysToDestroy.push(key);
+        typeTags.push({ key, value, isProperty });
+      }
     }
   });
 
-  // it can't be done inside the forEach instruction above
-  typeTags.forEach((tag) => url.searchParams.delete(tag.key));
+  keysToDestroy.forEach((key) => cleanUrl.searchParams.delete(key));
+
+  cleanUrl.searchParams.delete("page");
 
   return {
     typeTags,
-    cleanUrl: url,
+    cleanUrl,
   };
+};
+
+export const addVideoToProduct = (
+  product: Product,
+  video: OpenAPI["GET /api/v2/products/:productId/videos"]["response"] | null,
+): Product => ({
+  ...product,
+  image: [
+    ...(product?.image ?? []),
+    ...(video ? toImageObjectVideo(video) : []),
+  ],
+});
+
+export const fetchAndApplyPrices = async (
+  products: Product[],
+  priceCurrency: string,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product[]> => {
+  const segmentCookie = getSegmentFromCookie(req);
+  const segment = segmentCookie ? parse(segmentCookie) : null;
+
+  const pricePromises = products.map((product) =>
+    ctx.api["GET /api/v2/products/:productId/price"]({
+      productId: product.sku,
+      coupon_codes: segment?.cc ? [segment.cc] : [],
+    }, STALE)
+  );
+
+  const priceResults = await Promise.all(pricePromises);
+
+  return products.map((product) => {
+    const matchingPriceInfo = priceResults.find((priceResult) =>
+      (priceResult as unknown as ProductPrice).variants.some((variant) =>
+        variant.sku === product.sku
+      )
+    ) as unknown as ProductPrice;
+
+    const variantPrices = matchingPriceInfo?.variants
+      ? pickVariant(
+        matchingPriceInfo.variants as VNDAProductGroup["variants"],
+        product.sku,
+        false,
+      )
+      : null;
+
+    if (!variantPrices) return product;
+
+    const offers = toOffer(variantPrices);
+
+    return {
+      ...product,
+      offers: {
+        "@type": "AggregateOffer" as const,
+        priceCurrency: priceCurrency,
+        highPrice: variantPrices?.price ?? product.offers?.highPrice ?? 0,
+        lowPrice: variantPrices?.sale_price ?? product.offers?.lowPrice ?? 0,
+        offerCount: offers.length,
+        offers: offers,
+      },
+    };
+  });
 };

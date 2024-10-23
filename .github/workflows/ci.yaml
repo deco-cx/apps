@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    name: "Bundle & Check Apps"
+    steps:
+      - uses: actions/checkout@v3
+      - name: cache deno installation and deno.land dependencies
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/*') }}
+          restore-keys: ${{ runner.os }}-deno-
+          path: |
+            /home/runner/.deno
+            /home/runner/.cache/deno/deps/https/deno.land
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: Bundle Apps
+        run: deno run -A --lock=deno.lock --lock-write --reload scripts/start.ts
+
+      - name: Check
+        run: deno task check
+
+      - name: Check if there are changes on ${{ matrix.os }}
+        id: changes
+        shell: bash
+        run: |
+          git status --porcelain
+          if [[ $(git status --porcelain | wc -c) -eq 0 ]]; then
+              echo "uncommitted changes detected"
+              exit 1
+          fi
+
+      - name: Test
+        continue-on-error: true
+        run: deno test --lock=deno.lock --lock-write -A .
+
+      - name: Benchmark
+        continue-on-error: true
+        run: deno bench --lock=deno.lock --lock-write -A .

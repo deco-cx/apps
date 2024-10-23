@@ -1,119 +1,125 @@
 import { Head } from "$fresh/runtime.ts";
-import type { Flag, Site } from "$live/types.ts";
-
-interface Page {
-  id: string | number;
-  pathTemplate?: string;
+import { DomInspectorActivators } from "https://deno.land/x/inspect_vscode@0.2.1/inspector.ts";
+import { DomInspector } from "https://deno.land/x/inspect_vscode@0.2.1/mod.ts";
+import { Page } from "../../commerce/types.ts";
+import { useScriptAsDataURI } from "@deco/deco/hooks";
+import { context, type Flag, type Site } from "@deco/deco";
+const IS_LOCALHOST = context.deploymentId === undefined;
+interface Live {
+  page?: Page;
+  site: Site;
+  flags: Flag[];
+  avoidRedirectingToEditor?: boolean;
 }
-
-declare global {
-  interface Window {
-    LIVE: {
-      page: Page;
-      site: Site;
-    };
-  }
-}
-
 interface Props {
   site: Site;
   page?: Page;
   flags?: Flag[];
+  avoidRedirectingToEditor?: boolean;
 }
-
 type EditorEvent = {
   type: "editor::inject";
-  args: { script: string };
+  args: {
+    script: string;
+  };
 };
-
-const main = () => {
+const domInspectorModule = IS_LOCALHOST
+  ? `
+const DomInspectorActivators = {
+  Backquote: {
+    label: "\` (backtick) or Ctrl + X",
+    matchEvent: (event) => event.code === "Backquote" || (event.ctrlKey && event.key === "x"),
+  },
+};
+${DomInspector.toString()}`
+  : "";
+const snippet = (live: Live) => {
   const onKeydown = (event: KeyboardEvent) => {
     // in case loaded in iframe, avoid redirecting to editor while in editor
-    if (window !== window.parent) {
+    if (globalThis.window !== globalThis.window.parent) {
       return;
     }
-
     // Disable going to admin while input it being typed
     if (event.target !== document.body) {
       return;
     }
-
     if (event.defaultPrevented) {
       return;
     }
-
     if (
       (event.ctrlKey && event.shiftKey && event.key === "E") ||
       event.key === "."
     ) {
       event.preventDefault();
       event.stopPropagation();
-
       const pathname =
-        `/admin/sites/${window.LIVE.site.name}/blocks/${window.LIVE.page.id}`;
-
-      const href = new URL(
-        pathname,
-        "https://deco.cx",
-      );
-
+        `/choose-editor?site=${globalThis.window.LIVE.site.name}&domain=${globalThis.window.location.origin}&pageId=${globalThis.window.LIVE.page.id}`;
+      const href = new URL(pathname, "https://admin.deco.cx");
       href.searchParams.set(
         "path",
         encodeURIComponent(
-          `${window.location.pathname}${window.location.search}`,
+          `${globalThis.window.location.pathname}${globalThis.window.location.search}`,
         ),
       );
       href.searchParams.set(
         "pathTemplate",
-        encodeURIComponent(window.LIVE.page.pathTemplate ?? "/*"),
+        encodeURIComponent(globalThis.window.LIVE.page.pathTemplate || "/*"),
       );
-      window.location.href = `${href}`;
+      if ((event.ctrlKey || event.metaKey) && event.key === ".") {
+        globalThis.window.open(href, "_blank");
+        return;
+      }
+      globalThis.window.location.href = `${href}`;
     }
   };
-
   const onMessage = (event: MessageEvent<EditorEvent>) => {
     const { data } = event;
-
     switch (data.type) {
       case "editor::inject": {
         return eval(data.args.script);
       }
     }
   };
-
+  //@ts-ignore: "DomInspector not available"
+  const _inspector = typeof DomInspector !== "undefined" &&
+    //@ts-ignore: "DomInspector not available"
+    new DomInspector(document.body, {
+      outline: "1px dashed #2fd080",
+      backgroundColor: "rgba(47, 208, 128, 0.33)",
+      backgroundBlendMode: "multiply",
+      activator: DomInspectorActivators.Backquote,
+      path: "/live/inspect",
+    });
   /** Setup global variables */
-  window.LIVE = {
-    ...window.LIVE,
-    ...JSON.parse(document.getElementById("__DECO_STATE")!.innerText),
-  };
-
+  globalThis.window.LIVE = { ...globalThis.window.LIVE, ...live };
   /** Setup listeners */
-
+  if (!live.avoidRedirectingToEditor) {
+    document.body.addEventListener("keydown", onKeydown);
+  }
   // navigate to admin when user clicks ctrl+shift+e
-  document.body.addEventListener("keydown", onKeydown);
-
   // focus element when inside admin
   addEventListener("message", onMessage);
 };
-
-function LiveControls({ site, page, flags }: Props) {
+function LiveControls(
+  { site, page, flags = [], avoidRedirectingToEditor }: Props,
+) {
   return (
-    <>
-      <Head>
-        <script
-          type="application/json"
-          id="__DECO_STATE"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({ page, site, flags }),
-          }}
-        />
-        <script
-          type="module"
-          dangerouslySetInnerHTML={{ __html: `(${main})()` }}
-        />
-      </Head>
-    </>
+    <Head>
+      <script
+        defer
+        src={useScriptAsDataURI(snippet, {
+          page,
+          site,
+          flags,
+          avoidRedirectingToEditor,
+        })}
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: domInspectorModule,
+        }}
+      />
+    </Head>
   );
 }
-
 export default LiveControls;

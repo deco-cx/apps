@@ -1,4 +1,4 @@
-import { HttpError } from "../../../../../utils/HttpError.ts";
+import { HttpError } from "../../../../../utils/http.ts";
 import type { Engine, Params } from "../../engine.ts";
 
 type ExternalEngine = {

@@ -1,3 +1,5 @@
+import { ProductPriceVariant } from "../openapi/vnda.openapi.gen.ts";
+
 export type Sort = "newest" | "oldest" | "lowest_price" | "highest_price";
 
 export interface ProductSearchResult {
@@ -50,6 +52,12 @@ export type ProductGroup = Partial<{
   };
   attributes: Record<string, Attribute>;
   tags: RelatedItemTag[];
+  images?: {
+    id: number;
+    updated_at: string;
+    url: string;
+    variant_ids: unknown[];
+  }[];
 }>;
 
 export interface Attribute {
@@ -106,8 +114,6 @@ export interface Property {
 export interface Cart {
   orderForm?: OrderForm;
   relatedItems?: RelatedItem[];
-  shipping?: Shipping;
-  coupon?: Coupon;
 }
 
 export interface Installment {
@@ -148,7 +154,7 @@ export interface OrderForm {
   channel: string;
   client_id: null;
   code: string;
-  coupon_code: null;
+  coupon_code: string | null;
   discount: null;
   discount_price: number;
   extra: Record<string, string>;
@@ -209,11 +215,15 @@ export interface ShippingMethod {
   description: string;
   name: string;
   price: number;
-  shipping_method_id: number;
+  shipping_method_id: number | null;
   value: string;
-  countries: string[] | null;
+  countries: {
+    country?: string;
+    price?: string;
+  }[] | null;
   fulfillment_company: string | null;
   value_needed_to_discount: number | null;
+  notice: string | null;
 }
 
 export interface Address {
@@ -370,9 +380,22 @@ export interface Banner {
 
 export interface SEO {
   id: number;
+  name?: string;
   title?: string;
   description?: string | null;
   resource_type: string;
   resource_id: number;
   parent_id: null | number;
+}
+
+export interface ProductPrice {
+  available: boolean;
+  on_sale: boolean;
+  price: number;
+  sale_price: number;
+  intl_price: number;
+  discount_rule?: unknown;
+  updated_at: string;
+  installments: Installment[];
+  variants: ProductPriceVariant[];
 }

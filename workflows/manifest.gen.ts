@@ -2,31 +2,30 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/get.ts";
-import * as $$$1 from "./loaders/events.ts";
+import * as $$$$$$$$$0 from "./actions/cancel.ts";
+import * as $$$$$$$$$1 from "./actions/signal.ts";
+import * as $$$$$$$$$2 from "./actions/start.ts";
 import * as $$$$0 from "./handlers/workflowRunner.ts";
-import * as $$$$$$$$$0 from "./actions/start.ts";
-import * as $$$$$$$$$1 from "./actions/cancel.ts";
-import * as $$$$$$$$$2 from "./actions/signal.ts";
-import { AppManifest } from "$live/types.ts";
+import * as $$$0 from "./loaders/events.ts";
+import * as $$$1 from "./loaders/get.ts";
 
 const manifest = {
   "loaders": {
-    "apps/workflows/loaders/events.ts": $$$1,
-    "apps/workflows/loaders/get.ts": $$$0,
+    "workflows/loaders/events.ts": $$$0,
+    "workflows/loaders/get.ts": $$$1,
   },
   "handlers": {
-    "apps/workflows/handlers/workflowRunner.ts": $$$$0,
+    "workflows/handlers/workflowRunner.ts": $$$$0,
   },
   "actions": {
-    "apps/workflows/actions/cancel.ts": $$$$$$$$$1,
-    "apps/workflows/actions/signal.ts": $$$$$$$$$2,
-    "apps/workflows/actions/start.ts": $$$$$$$$$0,
+    "workflows/actions/cancel.ts": $$$$$$$$$0,
+    "workflows/actions/signal.ts": $$$$$$$$$1,
+    "workflows/actions/start.ts": $$$$$$$$$2,
   },
+  "name": "workflows",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;
 
-export const name = "apps/workflows";
-
-export default manifest satisfies AppManifest;
+export default manifest;

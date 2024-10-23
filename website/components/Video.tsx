@@ -7,11 +7,6 @@ import type { JSX } from "preact";
 
 import { getOptimizedMediaUrl, getSrcSet } from "./Image.tsx";
 
-/**
- * @format video-uri
- */
-export type VideoWidget = string;
-
 export type Props =
   & Omit<JSX.IntrinsicElements["video"], "width" | "height" | "preload">
   & {

@@ -1,19 +1,19 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { Handler } from "$live/blocks/handler.ts";
-import { Workflow, WorkflowContext } from "$live/blocks/workflow.ts";
-import { workflowHTTPHandler } from "$live/deps.ts";
-import type { Manifest } from "$live/live.gen.ts";
-import { LiveConfig, LiveState } from "$live/mod.ts";
-import { ConnInfo } from "std/http/server.ts";
+import { type Handler, Workflow, WorkflowContext } from "@deco/deco/blocks";
+import { workflowHTTPHandler } from "@deco/durable";
+import {
+  type AppManifest,
+  type DecoSiteState,
+  type DecoState,
+} from "@deco/deco";
 export interface Config {
   workflow: Workflow;
 }
-
 export default function WorkflowHandler({ workflow }: Config): Handler {
-  return (req: Request, conn: ConnInfo) => {
-    const ctx = conn as HandlerContext<
+  return (req: Request, conn: Deno.ServeHandlerInfo) => {
+    const ctx = conn as unknown as HandlerContext<
       unknown,
-      LiveConfig<unknown, LiveState, Manifest>
+      DecoState<unknown, DecoSiteState, AppManifest>
     >;
     if (ctx?.state) {
       const handler = workflowHTTPHandler(

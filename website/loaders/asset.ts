@@ -1,24 +1,22 @@
-import { fetchSafe } from "../../utils/fetch.ts";
-
+import { fetchSafe, STALE } from "../../utils/fetch.ts";
+import { shortcircuit } from "@deco/deco";
 interface Props {
   /**
    * @description Asset src like: https://fonts.gstatic.com/...
    */
   src: string;
 }
-
 const loader = async (props: Props) => {
-  const original = await fetchSafe(props.src, {
-    withProxyCache: true,
-  });
-
-  const response = original.clone();
+  const url = new URL(props.src);
+  if (url.protocol === "file:") {
+    shortcircuit(new Response("Forbidden", { status: 403 }));
+  }
+  const original = await fetchSafe(url.href, STALE);
+  const response = new Response(original.body, original);
   response.headers.set(
     "cache-control",
     "public, s-maxage=15552000, max-age=15552000, immutable",
   );
-
   return response;
 };
-
 export default loader;

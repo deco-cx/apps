@@ -1,28 +1,30 @@
-import type { App, FnContext } from "$live/mod.ts";
-import manifest, { Manifest, name } from "./manifest.gen.ts";
-
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
+import { type App, type FnContext } from "@deco/deco";
+// deno-lint-ignore ban-types
+export type State = {};
 /**
- * @title Site
+ * @title Deco Workflows
+ * @description Build customized and automated tasks.
+ * @category Tool
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/main/workflows/logo.png
  */
-export default function App(
-  state: unknown,
-): App<Manifest, unknown> {
-  return {
-    name,
-    manifest,
-    state,
-  };
+export default function App(state: State): App<Manifest, State> {
+  return { manifest, state };
 }
-
-export type AppContext = FnContext<unknown, Manifest>;
-
-// await devApp()
-// await runApp("fashion")
-// tudo começa com dados e apps. inicialmente so começa com apps
-// o admin vai la e configura uma app e da um nome
-// uma app "serializada" é uma lista de resolvers, um schema pra configurar eles (baseado no manifest) e o proprio manifest
-// qualquer request (no middleware) faz um ctx.resolve("appName") e isso retorna {resolvers, schema, manifest, resolvables}
-// depois faz um ctx.with({resolvers, resolvables})
-// ctx.state.manifest = manifest;
-// ctx.state.schema = schema;
-// deno task gen => gen local manifest only (dev purposes)
+export type AppContext = FnContext<State, Manifest>;
+export type AppManifest = Manifest;
+export const preview = () => {
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Deco Workflows",
+      owner: "deco.cx",
+      description: "Build customized and automated tasks.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/workflows/logo.png",
+      images: [],
+      tabs: [],
+    },
+  };
+};

@@ -1,4 +1,5 @@
-import type { Product } from "apps/commerce/types.ts";
+import type { Product } from "../../commerce/types.ts";
+import { STALE } from "../../utils/fetch.ts";
 import type { AppContext } from "../mod.ts";
 import { toProduct } from "../utils/transform.ts";
 
@@ -17,6 +18,12 @@ export interface Props {
 
   /** @description search for products that have certain tag */
   tags?: string[];
+
+  /** @description search for products that have certain type_tag */
+  typeTags?: { key: string; value: string }[];
+
+  /** @description search for products by id */
+  ids: number[];
 }
 
 /**
@@ -29,22 +36,39 @@ const productListLoader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const url = new URL(req.url);
-  const { client } = ctx;
+  const { api } = ctx;
 
-  const search = await client.product.search({
-    term: props?.term,
-    wildcard: props?.wildcard,
-    sort: props?.sort,
-    per_page: props?.count,
-    tags: props?.tags,
+  const { results: searchResults = [] } = await api
+    ["GET /api/v2/products/search"]({
+      term: props?.term,
+      wildcard: props?.wildcard,
+      sort: props?.sort,
+      per_page: props?.count,
+      "tags[]": props?.tags,
+      ...Object.fromEntries(
+        (props.typeTags || []).map((
+          { key, value },
+        ) => [`type_tags[${key}][]`, value]),
+      ),
+      "ids[]": props?.ids,
+    }, STALE).then((res) => res.json());
+
+  const validProducts = searchResults.filter(({ variants }) => {
+    return variants.length !== 0;
   });
 
-  return search.results.map((product) =>
-    toProduct(product, null, {
+  if (validProducts.length === 0) return null;
+
+  const sortedProducts = props.ids?.length > 0
+    ? props.ids.map((id) => validProducts.find((product) => product.id === id))
+    : validProducts;
+
+  return sortedProducts.map((product) => {
+    return toProduct(product!, null, {
       url,
       priceCurrency: "BRL",
-    })
-  );
+    });
+  });
 };
 
 export default productListLoader;

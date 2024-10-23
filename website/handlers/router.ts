@@ -1,201 +1,194 @@
-import { ResolveOptions } from "$live/engine/core/mod.ts";
 import {
-  BaseContext,
+  type DecoSiteState,
+  type DecoState,
   isDeferred,
-  Resolvable,
+  type Resolvable,
   ResolveFunc,
-} from "$live/engine/core/resolver.ts";
-import { isAwaitable } from "$live/engine/core/utils.ts";
-import { Route, Routes } from "$live/flags/audience.ts";
-import { isFreshCtx } from "$live/handlers/fresh.ts";
-import { Flag, LiveState, RouterContext } from "$live/types.ts";
-import { ConnInfo, Handler } from "std/http/server.ts";
+  ResolveOptions,
+  RouteContext,
+} from "@deco/deco";
+import { isAwaitable } from "@deco/deco/utils";
+import { weakcache } from "../../utils/weakcache.ts";
+import { Route, Routes } from "../flags/audience.ts";
+import { isFreshCtx } from "../handlers/fresh.ts";
 import { AppContext } from "../mod.ts";
-
+export type ConnInfo = Deno.ServeHandlerInfo;
+export type Handler = Deno.ServeHandler;
 export interface SelectionConfig {
   audiences: Routes[];
 }
-
 interface MaybePriorityHandler {
   func: Resolvable<Handler>;
   highPriority?: boolean;
 }
-
 const HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE = 1000;
-
-const rankRoute = (pattern: string) =>
+const rankRoute = (pattern: string): number =>
   pattern
     .split("/")
-    .reduce(
-      (acc, routePart) =>
-        routePart.endsWith("*")
-          ? acc
-          : routePart.startsWith(":")
-          ? acc + 1
-          : acc + 2,
-      0,
-    );
-
-/**
- * Since `routePath` is used, for example, by redirects, it can have strings
- * such as "/cachorros?PS=12".
- */
-const createUrlPatternFromHref = (href: string) => {
-  const [pathname, searchRaw] = href.split("?");
-  const search = searchRaw ? `?${encodeURIComponent(searchRaw)}` : undefined;
-
-  return new URLPattern({ pathname, search });
-};
-
+    .reduce((acc, routePart) => {
+      if (routePart === "*") {
+        return acc;
+      }
+      if (routePart.startsWith(":")) {
+        return acc + 1;
+      }
+      if (routePart.includes("*")) {
+        return acc + 2;
+      }
+      return acc + 3;
+    }, 0);
+const urlPatternCache: Record<string, URLPattern> = {};
 export const router = (
   routes: Route[],
   hrefRoutes: Record<string, Resolvable<Handler>> = {},
   resolver: ResolveFunc,
   configs?: ResolveOptions,
+  parsedUrl?: URL,
 ): Handler => {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
-    const url = new URL(req.url);
-    const href = `${url.pathname}${url.search || ""}`;
+    const url = parsedUrl ?? new URL(req.url);
     const route = async (
       handler: Resolvable<Handler>,
       routePath: string,
       groups?: Record<string, string | undefined>,
     ) => {
-      const ctx = { ...connInfo, params: (groups ?? {}) } as ConnInfo & {
-        params: Record<string, string>;
-        state: {
-          routes: Route[];
-          routerInfo: RouterContext;
-          flags: Flag[];
-        };
+      const ctx = connInfo as ConnInfo & {
+        params: Record<string, string | undefined>;
+        state: DecoState;
       };
-
+      ctx.params = groups ?? {};
       ctx.state.routes = routes;
-      ctx.state.routerInfo = {
-        flags: ctx.state.flags,
-        pagePath: routePath,
-      };
-
-      const resolvedOrPromise =
-        isDeferred<Handler, { context: typeof ctx } & BaseContext>(handler)
-          ? handler({ context: ctx })
-          : resolver<Handler>(
-            handler,
-            configs,
-            { context: ctx, request: req },
-          );
-
-      const end = configs?.monitoring?.t.start("load-data");
+      ctx.state.pathTemplate = routePath;
+      const resolvedOrPromise = isDeferred<
+          Handler,
+          Omit<RouteContext, "context"> & {
+            context: typeof ctx;
+          }
+        >(handler)
+        ? handler({ context: ctx, request: req })
+        : resolver<Handler>(handler, configs, { context: ctx, request: req });
       const hand = isAwaitable(resolvedOrPromise)
         ? await resolvedOrPromise
         : resolvedOrPromise;
-      end?.();
-
-      return await hand(
-        req,
-        ctx,
-      );
+      return await hand(req, ctx);
     };
-    if (href && hrefRoutes[href]) {
-      return route(hrefRoutes[href], href);
+    const handler = hrefRoutes[`${url.pathname}${url.search || ""}`] ??
+      hrefRoutes[url.pathname];
+    if (handler) {
+      return route(handler, `${url.pathname}${url.search || ""}`);
     }
     for (const { pathTemplate: routePath, handler } of routes) {
-      const pattern = createUrlPatternFromHref(routePath);
+      const pattern = urlPatternCache[routePath] ??= (() => {
+        let url;
+        if (URL.canParse(routePath)) {
+          url = new URL(routePath);
+        } else {
+          url = new URL(routePath, "http://localhost:8000");
+        }
+        return new URLPattern({
+          pathname: url.pathname,
+          ...(url.search ? { search: url.search } : {}),
+        });
+      })();
       const res = pattern.exec(req.url);
       const groups = res?.pathname.groups ?? {};
-
       if (res !== null) {
         return await route(handler.value, routePath, groups);
       }
     }
-
     return new Response(null, {
       status: 404,
     });
   };
 };
-
-export const toRouteMap = (
-  routes?: Route[],
-): [
+export const buildRoutes = (audiences: Routes[]): [
   Record<string, MaybePriorityHandler>,
   Record<string, Resolvable<Handler>>,
 ] => {
   const routeMap: Record<string, MaybePriorityHandler> = {};
   const hrefRoutes: Record<string, Resolvable<Handler>> = {};
-  (routes ?? [])
-    .forEach(
-      ({ pathTemplate, isHref, highPriority, handler: { value: handler } }) => {
-        if (isHref) {
-          hrefRoutes[pathTemplate] = handler;
-        } else {
-          routeMap[pathTemplate] = { func: handler, highPriority };
-        }
-      },
-    );
+  // We should tackle this problem elsewhere
+  // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
+  for (const audience of audiences.filter(Boolean).flat()) {
+    const { pathTemplate, isHref, highPriority, handler: { value: handler } } =
+      audience;
+    if (isHref) {
+      hrefRoutes[pathTemplate] = handler;
+    } else {
+      routeMap[pathTemplate] = { func: handler, highPriority };
+    }
+  }
   return [routeMap, hrefRoutes];
 };
-
-export const buildRoutes = (audiences: Routes[]): [
-  Record<string, MaybePriorityHandler>,
-  Record<string, Resolvable<Handler>>,
-] => {
-  // We should tackle this problem elsewhere
-  return audiences.filter(Boolean)
-    .reduce(
-      ([routes, hrefRoutes], audience) => {
-        // check if the audience matches with the given context considering the `isMatch` provided by the cookies.
-        const [newRoutes, newHrefRoutes] = toRouteMap(audience ?? []);
-        return [
-          { ...routes, ...newRoutes },
-          { ...hrefRoutes, ...newHrefRoutes },
-        ];
-      },
-      [{}, {}] as [
-        Record<string, MaybePriorityHandler>,
-        Record<string, Resolvable<Handler>>,
-      ],
-    );
+export interface SelectionConfig {
+  audiences: Routes[];
+}
+const RouterId = {
+  fromFlags: (flags: AppContext["flags"]): string => {
+    return flags.toSorted((flagA, flagB) =>
+      flagA.name.localeCompare(flagB.name)
+    ).map((flag) => `${flag.name}@${flag.value}`).join("/");
+  },
 };
-
+const routerCache = new weakcache.WeakLRUCache({
+  cacheSize: 16, // up to 16 different routers stored here.
+});
+const prepareRoutes = (audiences: Routes[], ctx: AppContext) => {
+  const routesFromProps = Array.isArray(audiences) ? audiences : [];
+  // everyone should come first in the list given that we override the everyone value with the upcoming flags.
+  const [routes, hrefRoutes] = buildRoutes(
+    Array.isArray(ctx.routes)
+      ? [...ctx.routes, ...routesFromProps]
+      : routesFromProps,
+  );
+  // build the router from entries
+  const builtRoutes = Object.entries(routes).sort((
+    [routeStringA, { highPriority: highPriorityA }],
+    [routeStringB, { highPriority: highPriorityB }],
+  ) =>
+    (highPriorityB ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
+    rankRoute(routeStringB) -
+    ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
+      rankRoute(routeStringA))
+  );
+  return {
+    routes: builtRoutes.map((route) => ({
+      pathTemplate: route[0],
+      handler: { value: route[1].func },
+    })),
+    hrefRoutes,
+  };
+};
 /**
  * @title Router
  * @description Route requests based on audience
  */
 export default function RoutesSelection(
-  _props: unknown,
+  { audiences }: SelectionConfig,
   ctx: AppContext,
 ): Handler {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
-    const t = isFreshCtx<LiveState>(connInfo) ? connInfo.state.t : undefined;
-
-    // everyone should come first in the list given that we override the everyone value with the upcoming flags.
-    const [routes, hrefRoutes] = buildRoutes(
-      Array.isArray(ctx.routes) ? ctx.routes : [],
-    );
-    // build the router from entries
-    const builtRoutes = Object.entries(routes).sort((
-      [routeStringA, { highPriority: highPriorityA }],
-      [routeStringB, { highPriority: highPriorityB }],
-    ) =>
-      (highPriorityB ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
-      rankRoute(routeStringB) -
-      ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
-        rankRoute(routeStringA))
-    );
-
-    const server = router(
-      builtRoutes.map((route) => ({
-        pathTemplate: route[0],
-        handler: { value: route[1].func },
-      })),
-      hrefRoutes,
-      ctx.get,
-      {
-        monitoring: t ? { t } : undefined,
-      },
-    );
-
+    // TODO: (@tlgimenes) Remove routing from request cycle
+    const url = new URL(req.url);
+    if (url.pathname.startsWith("/_frsh/")) {
+      return new Response(null, {
+        status: 404,
+      });
+    }
+    const monitoring = isFreshCtx<DecoSiteState>(connInfo)
+      ? connInfo.state.monitoring
+      : undefined;
+    const timing = monitoring?.timings.start("router");
+    const routerId = `${RouterId.fromFlags(ctx.flags)}/${ctx.revision ?? ""}`;
+    if (!routerCache.has(routerId)) {
+      routerCache.setValue(routerId, prepareRoutes(audiences, ctx));
+    }
+    const { routes, hrefRoutes }: {
+      routes: Route[];
+      hrefRoutes: Record<string, Resolvable<Handler>>;
+    } = routerCache.getValue(routerId);
+    const server = router(routes, hrefRoutes, ctx.get, { monitoring }, url);
+    timing?.end();
     return await server(req, connInfo);
   };
 }

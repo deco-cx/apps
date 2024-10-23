@@ -2,85 +2,130 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $0 from "./functions/requestToParam.ts";
-import * as $$$0 from "./loaders/image.ts";
-import * as $$$1 from "./loaders/redirectsFromCsv.ts";
-import * as $$$2 from "./loaders/secret.ts";
-import * as $$$3 from "./loaders/asset.ts";
-import * as $$$$0 from "./handlers/router.ts";
-import * as $$$$1 from "./handlers/sitemap.ts";
-import * as $$$$2 from "./handlers/proxy.ts";
-import * as $$$$3 from "./handlers/fresh.ts";
-import * as $$$$4 from "./handlers/redirect.ts";
-import * as $$$$$0 from "./pages/LivePage.tsx";
-import * as $$$$$$0 from "./sections/Empty.tsx";
-import * as $$$$$$$0 from "./matchers/date.ts";
-import * as $$$$$$$1 from "./matchers/environment.ts";
-import * as $$$$$$$2 from "./matchers/site.ts";
-import * as $$$$$$$3 from "./matchers/location.ts";
-import * as $$$$$$$4 from "./matchers/random.ts";
-import * as $$$$$$$5 from "./matchers/multi.ts";
-import * as $$$$$$$6 from "./matchers/cron.ts";
-import * as $$$$$$$7 from "./matchers/device.ts";
-import * as $$$$$$$8 from "./matchers/host.ts";
-import * as $$$$$$$9 from "./matchers/always.ts";
-import * as $$$$$$$10 from "./matchers/userAgent.ts";
-import * as $$$$$$$$0 from "./flags/audience.ts";
-import * as $$$$$$$$1 from "./flags/multivariate.ts";
-import * as $$$$$$$$2 from "./flags/everyone.ts";
-import * as $$$$$$$$3 from "./flags/flag.ts";
 import * as $$$$$$$$$0 from "./actions/secrets/encrypt.ts";
-import { AppManifest } from "$live/types.ts";
+import * as $$$$$$$$0 from "./flags/audience.ts";
+import * as $$$$$$$$1 from "./flags/everyone.ts";
+import * as $$$$$$$$2 from "./flags/flag.ts";
+import * as $$$$$$$$3 from "./flags/multivariate.ts";
+import * as $$$$$$$$4 from "./flags/multivariate/image.ts";
+import * as $$$$$$$$5 from "./flags/multivariate/message.ts";
+import * as $$$$$$$$6 from "./flags/multivariate/page.ts";
+import * as $$$$$$$$7 from "./flags/multivariate/section.ts";
+import * as $0 from "./functions/requestToParam.ts";
+import * as $$$$0 from "./handlers/fresh.ts";
+import * as $$$$1 from "./handlers/proxy.ts";
+import * as $$$$2 from "./handlers/redirect.ts";
+import * as $$$$3 from "./handlers/router.ts";
+import * as $$$$4 from "./handlers/sitemap.ts";
+import * as $$$0 from "./loaders/asset.ts";
+import * as $$$1 from "./loaders/extension.ts";
+import * as $$$2 from "./loaders/fonts/googleFonts.ts";
+import * as $$$3 from "./loaders/fonts/local.ts";
+import * as $$$4 from "./loaders/image.ts";
+import * as $$$5 from "./loaders/options/routes.ts";
+import * as $$$6 from "./loaders/options/urlParams.ts";
+import * as $$$7 from "./loaders/pages.ts";
+import * as $$$8 from "./loaders/redirect.ts";
+import * as $$$9 from "./loaders/redirects.ts";
+import * as $$$10 from "./loaders/redirectsFromCsv.ts";
+import * as $$$11 from "./loaders/secret.ts";
+import * as $$$12 from "./loaders/secretString.ts";
+import * as $$$$$$$0 from "./matchers/always.ts";
+import * as $$$$$$$1 from "./matchers/cookie.ts";
+import * as $$$$$$$2 from "./matchers/cron.ts";
+import * as $$$$$$$3 from "./matchers/date.ts";
+import * as $$$$$$$4 from "./matchers/device.ts";
+import * as $$$$$$$5 from "./matchers/environment.ts";
+import * as $$$$$$$6 from "./matchers/host.ts";
+import * as $$$$$$$7 from "./matchers/location.ts";
+import * as $$$$$$$8 from "./matchers/multi.ts";
+import * as $$$$$$$9 from "./matchers/negate.ts";
+import * as $$$$$$$10 from "./matchers/never.ts";
+import * as $$$$$$$11 from "./matchers/pathname.ts";
+import * as $$$$$$$12 from "./matchers/queryString.ts";
+import * as $$$$$$$13 from "./matchers/random.ts";
+import * as $$$$$$$14 from "./matchers/site.ts";
+import * as $$$$$$$15 from "./matchers/userAgent.ts";
+import * as $$$$$0 from "./pages/Page.tsx";
+import * as $$$$$$0 from "./sections/Analytics/Analytics.tsx";
+import * as $$$$$$1 from "./sections/Rendering/Deferred.tsx";
+import * as $$$$$$2 from "./sections/Rendering/Lazy.tsx";
+import * as $$$$$$3 from "./sections/Rendering/SingleDeferred.tsx";
+import * as $$$$$$4 from "./sections/Seo/Seo.tsx";
+import * as $$$$$$5 from "./sections/Seo/SeoV2.tsx";
 
 const manifest = {
   "functions": {
-    "apps/website/functions/requestToParam.ts": $0,
+    "website/functions/requestToParam.ts": $0,
   },
   "loaders": {
-    "apps/website/loaders/asset.ts": $$$3,
-    "apps/website/loaders/image.ts": $$$0,
-    "apps/website/loaders/redirectsFromCsv.ts": $$$1,
-    "apps/website/loaders/secret.ts": $$$2,
+    "website/loaders/asset.ts": $$$0,
+    "website/loaders/extension.ts": $$$1,
+    "website/loaders/fonts/googleFonts.ts": $$$2,
+    "website/loaders/fonts/local.ts": $$$3,
+    "website/loaders/image.ts": $$$4,
+    "website/loaders/options/routes.ts": $$$5,
+    "website/loaders/options/urlParams.ts": $$$6,
+    "website/loaders/pages.ts": $$$7,
+    "website/loaders/redirect.ts": $$$8,
+    "website/loaders/redirects.ts": $$$9,
+    "website/loaders/redirectsFromCsv.ts": $$$10,
+    "website/loaders/secret.ts": $$$11,
+    "website/loaders/secretString.ts": $$$12,
   },
   "handlers": {
-    "apps/website/handlers/fresh.ts": $$$$3,
-    "apps/website/handlers/proxy.ts": $$$$2,
-    "apps/website/handlers/redirect.ts": $$$$4,
-    "apps/website/handlers/router.ts": $$$$0,
-    "apps/website/handlers/sitemap.ts": $$$$1,
+    "website/handlers/fresh.ts": $$$$0,
+    "website/handlers/proxy.ts": $$$$1,
+    "website/handlers/redirect.ts": $$$$2,
+    "website/handlers/router.ts": $$$$3,
+    "website/handlers/sitemap.ts": $$$$4,
   },
   "pages": {
-    "apps/website/pages/LivePage.tsx": $$$$$0,
+    "website/pages/Page.tsx": $$$$$0,
   },
   "sections": {
-    "apps/website/sections/Empty.tsx": $$$$$$0,
+    "website/sections/Analytics/Analytics.tsx": $$$$$$0,
+    "website/sections/Rendering/Deferred.tsx": $$$$$$1,
+    "website/sections/Rendering/Lazy.tsx": $$$$$$2,
+    "website/sections/Rendering/SingleDeferred.tsx": $$$$$$3,
+    "website/sections/Seo/Seo.tsx": $$$$$$4,
+    "website/sections/Seo/SeoV2.tsx": $$$$$$5,
   },
   "matchers": {
-    "apps/website/matchers/always.ts": $$$$$$$9,
-    "apps/website/matchers/cron.ts": $$$$$$$6,
-    "apps/website/matchers/date.ts": $$$$$$$0,
-    "apps/website/matchers/device.ts": $$$$$$$7,
-    "apps/website/matchers/environment.ts": $$$$$$$1,
-    "apps/website/matchers/host.ts": $$$$$$$8,
-    "apps/website/matchers/location.ts": $$$$$$$3,
-    "apps/website/matchers/multi.ts": $$$$$$$5,
-    "apps/website/matchers/random.ts": $$$$$$$4,
-    "apps/website/matchers/site.ts": $$$$$$$2,
-    "apps/website/matchers/userAgent.ts": $$$$$$$10,
+    "website/matchers/always.ts": $$$$$$$0,
+    "website/matchers/cookie.ts": $$$$$$$1,
+    "website/matchers/cron.ts": $$$$$$$2,
+    "website/matchers/date.ts": $$$$$$$3,
+    "website/matchers/device.ts": $$$$$$$4,
+    "website/matchers/environment.ts": $$$$$$$5,
+    "website/matchers/host.ts": $$$$$$$6,
+    "website/matchers/location.ts": $$$$$$$7,
+    "website/matchers/multi.ts": $$$$$$$8,
+    "website/matchers/negate.ts": $$$$$$$9,
+    "website/matchers/never.ts": $$$$$$$10,
+    "website/matchers/pathname.ts": $$$$$$$11,
+    "website/matchers/queryString.ts": $$$$$$$12,
+    "website/matchers/random.ts": $$$$$$$13,
+    "website/matchers/site.ts": $$$$$$$14,
+    "website/matchers/userAgent.ts": $$$$$$$15,
   },
   "flags": {
-    "apps/website/flags/audience.ts": $$$$$$$$0,
-    "apps/website/flags/everyone.ts": $$$$$$$$2,
-    "apps/website/flags/flag.ts": $$$$$$$$3,
-    "apps/website/flags/multivariate.ts": $$$$$$$$1,
+    "website/flags/audience.ts": $$$$$$$$0,
+    "website/flags/everyone.ts": $$$$$$$$1,
+    "website/flags/flag.ts": $$$$$$$$2,
+    "website/flags/multivariate.ts": $$$$$$$$3,
+    "website/flags/multivariate/image.ts": $$$$$$$$4,
+    "website/flags/multivariate/message.ts": $$$$$$$$5,
+    "website/flags/multivariate/page.ts": $$$$$$$$6,
+    "website/flags/multivariate/section.ts": $$$$$$$$7,
   },
   "actions": {
-    "apps/website/actions/secrets/encrypt.ts": $$$$$$$$$0,
+    "website/actions/secrets/encrypt.ts": $$$$$$$$$0,
   },
+  "name": "website",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;
 
-export const name = "apps/website";
-
-export default manifest satisfies AppManifest;
+export default manifest;

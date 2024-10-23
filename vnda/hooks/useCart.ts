@@ -1,48 +1,49 @@
-import { AnalyticsItem } from "apps/commerce/types.ts";
-import { Runtime } from "../runtime.ts";
-import { Cart, Item } from "../utils/client/types.ts";
-import { state as storeState } from "./context.ts";
+// deno-lint-ignore-file no-explicit-any
+import type { AnalyticsItem } from "../../commerce/types.ts";
+import type { Manifest } from "../manifest.gen.ts";
+import { invoke } from "../runtime.ts";
+import { Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
+
+type Item = NonNullable<Context["cart"]["orderForm"]>["items"][number];
 
 export const itemToAnalyticsItem = (
   item: Item & { quantity: number },
   index: number,
-): AnalyticsItem => ({
-  item_id: `${item.id}_${item.variant_sku}`,
-  item_name: item.product_name,
-  discount: item.price - item.variant_price,
-  item_variant: item.variant_name.slice(item.product_name.length).trim(),
-  // TODO: check
-  price: item.price,
-  // TODO
-  // item_brand: "todo",
-  index,
-  quantity: item.quantity,
-});
+): AnalyticsItem => {
+  return {
+    item_id: item.variant_sku,
+    item_group_id: item.id,
+    quantity: item.quantity,
+    price: item.price,
+    index,
+    discount: Math.abs(item.variant_price - item.price),
+    item_name: item.product_name,
+    item_variant: item.variant_name,
+  };
+};
 
-const wrap =
-  <T>(action: (p: T, init?: RequestInit | undefined) => Promise<Cart>) =>
-  (p: T) =>
-    storeState.enqueue(async (signal) => ({
-      cart: await action(p, { signal }),
-    }));
+type EnqueuableActions<
+  K extends keyof Manifest["actions"],
+> = Manifest["actions"][K]["default"] extends
+  (...args: any[]) => Promise<Context["cart"]> ? K : never;
+
+const enqueue = <
+  K extends keyof Manifest["actions"],
+>(key: EnqueuableActions<K>) =>
+(props: Parameters<Manifest["actions"][K]["default"]>[0]) =>
+  storeState.enqueue((signal) =>
+    invoke({ cart: { key, props } } as any, { signal }) as any
+  );
 
 const state = {
   cart,
   loading,
-  addItem: wrap(
-    Runtime.create("apps/vnda/actions/cart/addItem.ts"),
-  ),
-  updateItem: wrap(
-    Runtime.create("apps/vnda/actions/cart/updateItem.ts"),
-  ),
-  setShippingAddress: wrap(
-    Runtime.create("apps/vnda/actions/cart/setShippingAddress.ts"),
-  ),
-  updateCoupon: wrap(
-    Runtime.create("apps/vnda/actions/cart/updateCoupon.ts"),
-  ),
+  update: enqueue("vnda/actions/cart/updateCart.ts"),
+  addItem: enqueue("vnda/actions/cart/addItem.ts"),
+  updateItem: enqueue("vnda/actions/cart/updateItem.ts"),
+  simulate: invoke.vnda.actions.cart.simulation,
 };
 
 export const useCart = () => state;
