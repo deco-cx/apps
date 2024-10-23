@@ -27,6 +27,7 @@ import {
   SortDirection,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 import {
   FILTER_PARAM,
   toBreadcrumbList,
@@ -107,9 +108,10 @@ export interface Props {
   pageHref?: string;
 
   /**
+   * @title Partner Param
    * @description page param to partners page
    */
-  slug?: RequestURLParam;
+  partnerAlias?: RequestURLParam;
 }
 
 const OUTSIDE_ATTRIBUTES_FILTERS = ["precoPor"];
@@ -147,6 +149,8 @@ const searchLoader = async (
 
   const { storefront } = ctx;
 
+  const partnerAccessTokenCookie = getPartnerCookie(req.headers);
+
   const headers = parseHeaders(req.headers);
 
   const limit = Number(url.searchParams.get("tamanho") ?? props.limit ?? 12);
@@ -174,18 +178,18 @@ const searchLoader = async (
 
   const offset = page <= 1 ? 0 : (page - 1) * limit;
 
-  const partnerData = props.slug
+  const partnerData = props.partnerAlias
     ? await storefront.query<
       GetPartnersQuery,
       GetPartnersQueryVariables
     >({
-      variables: { first: 1, alias: [props.slug] },
+      variables: { first: 1, alias: [props.partnerAlias] },
       ...GetPartners,
     }, { headers })
     : null;
 
   const partnerAccessToken = partnerData?.partners?.edges?.[0]?.node
-    ?.partnerAccessToken;
+    ?.partnerAccessToken ?? partnerAccessTokenCookie;
 
   if (partnerAccessToken) {
     try {
