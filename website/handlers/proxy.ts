@@ -113,7 +113,7 @@ export default function Proxy({
     const to = new URL(
       `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}`,
     );
-    
+
     to.search = qs;
 
     const headers = new Headers(req.headers);
@@ -132,7 +132,6 @@ export default function Proxy({
     headers.set("host", hostToUse ?? to.host);
     headers.set("x-forwarded-host", url.host);
 
-    
     for (const { key, value } of customHeaders) {
       if (key === "cookie") {
         const existingCookie = headers.get("cookie");
