@@ -18,7 +18,7 @@ import {
   ProductVariant,
   VariantProductSearch,
 } from "./openapi/vnda.openapi.gen.ts";
-import { getSegmentFromCookie, parse } from "./segment.ts";
+import { getCC } from "./segment.ts";
 
 export type VNDAProductGroup = ProductSearch | OProduct;
 type VNDAProduct = VariantProductSearch | ProductVariant;
@@ -511,13 +511,12 @@ export const fetchAndApplyPrices = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[]> => {
-  const segmentCookie = getSegmentFromCookie(req);
-  const segment = segmentCookie ? parse(segmentCookie) : null;
+  const cc = getCC(req);
 
   const pricePromises = products.map((product) =>
     ctx.api["GET /api/v2/products/:productId/price"]({
       productId: product.sku,
-      coupon_codes: segment?.cc ? [segment.cc] : [],
+      coupon_codes: cc ? [cc] : [],
     }, STALE)
   );
 
