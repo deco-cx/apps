@@ -273,11 +273,43 @@ export interface Fields {
   skuName?: string;
 }
 
+export interface Transaction {
+  isActive: boolean;
+  transactionId: string;
+  merchantName: string;
+  payments: Payment[];
+}
+
+export interface Payment {
+  id: string;
+  paymentSystem: string;
+  paymentSystemName: string;
+  value: number;
+  installments: number;
+  referenceValue: number;
+  cardHolder: string | null;
+  cardNumber: string | null;
+  firstDigits: string | null;
+  lastDigits: string | null;
+  cvv2: string | null;
+  expireMonth: string | null;
+  expireYear: string | null;
+  url: string;
+  giftCardId: null;
+  giftCardName: null;
+  giftCardCaption: null;
+  redemptionCode: null;
+  group: string;
+  tid: null;
+  dueDate: Date;
+}
+
 export interface PaymentData {
   updateStatus: string;
   installmentOptions: InstallmentOption[];
   paymentSystems: PaymentSystem[];
   payments: unknown[];
+  transactions: Transaction[];
   giftCards: unknown[];
   giftCardMessages: unknown[];
   availableAccounts: unknown[];
@@ -379,7 +411,7 @@ export interface ShippingData {
 export interface Address {
   addressType: string;
   addressName: string;
-  receiverName: null;
+  receiverName: string | null;
   addressId: string;
   isDisposable: boolean;
   postalCode: string;
@@ -397,8 +429,16 @@ export interface Address {
 export interface LogisticsInfo {
   itemIndex: number;
   selectedSla: SelectedSla | null;
+  price: number;
+  listPrice: number;
+  sellingPrice: number;
+  deliveryCompany: string;
+  shippingEstimate: string;
+  shippingEstimateDate: string;
   selectedDeliveryChannel: SelectedDeliveryChannel;
   addressId: string;
+  pickupPointId: string;
+  pickupStoreInfo: PickupStoreInfo;
   slas: Sla[];
   shipsTo: string[];
   itemId: string;
@@ -1321,7 +1361,17 @@ export interface Order {
 }
 
 export interface OrderItem {
+  orderId: string;
+  sequence: string;
+  origin: string;
+  sellerOrderId: string;
+  salesChannel: string;
   affiliateId: string;
+  workflowIsInError: boolean;
+  orderGroup: string;
+  status: string;
+  statusDescription: string;
+  value: number;
   allowCancellation: boolean;
   allowEdition?: boolean;
   authorizedDate: string;
@@ -1335,24 +1385,39 @@ export interface OrderItem {
     Reason: string;
     CancellationDate: string;
   };
-  cancellationRequests?: null;
+  cancellationRequests?: {
+    id: string;
+    reason: string;
+    cancellationRequestDate: string;
+    requestedByUser: boolean;
+    deniedBySeller: boolean;
+    deniedBySellerReason: string | null;
+    cancellationRequestDenyDate: string | null;
+  }[] | null;
   changesAttachment: string;
   checkedInPickupPointId: string | null;
+  paymentData: PaymentData;
+  shippingData: ShippingData;
   clientPreferencesData: ClientPreferencesData;
-  clientProfileData: ClientProfileData | null;
-  // deno-lint-ignore no-explicit-any
-  commercialConditionData?: any | null;
+  clientProfileData: ClientProfileData;
+  totals: Total[];
+  commercialConditionData?: string | null;
   creationDate: string;
   // deno-lint-ignore no-explicit-any
   customData?: Record<string, any> | null;
   followUpEmail?: string;
   giftRegistryData?: GiftRegistry | null;
   hostname: string;
-  // deno-lint-ignore no-explicit-any
-  invoiceData: any | null;
+  invoiceData: string | null;
   invoicedDate: string | null;
   isCheckedIn: boolean;
   isCompleted: boolean;
+  sellers?: {
+    id: string;
+    name: string;
+    logo: string;
+    fulfillmentEndpoint: string;
+  }[];
   itemMetadata: ItemMetadata;
   items: OrderFormItem[];
   lastChange: string;
@@ -1363,8 +1428,7 @@ export interface OrderItem {
   marketplaceOrderId: string;
   marketplaceServicesEndpoint: string;
   merchantName: string;
-  // deno-lint-ignore no-explicit-any
-  openTextField: any | null;
+  openTextField: string | null;
 }
 
 interface Marketplace {

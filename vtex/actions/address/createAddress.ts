@@ -1,8 +1,7 @@
-import { PostalAddress } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
-interface Address {
+interface AddressInput {
   name?: string;
   addressName: string;
   addressType?: string;
@@ -19,31 +18,17 @@ interface Address {
   street?: string;
 }
 
-interface AddressInput {
-  receiverName?: string;
-  complement?: string | null;
-  neighborhood?: string | null;
-  country?: string;
-  state?: string;
-  number?: string | null;
-  street?: string;
-  geoCoordinates?: number[];
-  postalCode?: string;
-  city?: string;
-  reference?: string | null;
-  addressName: string;
-  addressType?: string;
+interface SavedAddress {
+  id: string;
+  cacheId: string;
 }
 
 async function action(
-  props: Address,
+  props: AddressInput,
   req: Request,
   ctx: AppContext,
 ): Promise<
-  | PostalAddress & {
-    receiverName?: string | null;
-    complement?: string | null;
-  }
+  | SavedAddress
   | null
 > {
   const { io } = ctx;
@@ -58,8 +43,8 @@ async function action(
   }`;
 
   try {
-    const { saveAddress: updatedAddress } = await io.query<
-      { saveAddress: Address },
+    const { saveAddress: savedAddress } = await io.query<
+      { saveAddress: SavedAddress },
       { address: AddressInput }
     >(
       {
@@ -72,16 +57,7 @@ async function action(
       { headers: { cookie } },
     );
 
-    return {
-      "@type": "PostalAddress",
-      addressCountry: updatedAddress?.country,
-      addressLocality: updatedAddress?.city,
-      addressRegion: updatedAddress?.state,
-      postalCode: updatedAddress?.postalCode,
-      streetAddress: updatedAddress?.street,
-      receiverName: updatedAddress?.receiverName,
-      complement: updatedAddress?.complement,
-    };
+    return savedAddress;
   } catch (error) {
     console.error("Error saving address:", error);
     return null;

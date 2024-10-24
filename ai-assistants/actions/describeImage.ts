@@ -2,6 +2,7 @@ import { AssistantIds } from "../types.ts";
 import { AppContext } from "../mod.ts";
 import { logger, meter, ValueType } from "@deco/deco/o11y";
 import { shortcircuit } from "@deco/deco";
+
 const stats = {
   promptTokens: meter.createHistogram("assistant_image_prompt_tokens", {
     description: "Tokens used in Sales Assistant Describe Image Input - OpenAI",
@@ -78,13 +79,18 @@ export default async function describeImage(
     });
     return response;
   } catch (error) {
+    const errorObj = error as {
+      error: { message: string };
+      status: number;
+      headers: Headers;
+    };
     stats.describeImageError.add(1, {
       assistantId,
     });
     shortcircuit(
-      new Response(JSON.stringify({ error: error.error.message }), {
-        status: error.status,
-        headers: error.headers,
+      new Response(JSON.stringify({ error: errorObj.error.message }), {
+        status: errorObj.status,
+        headers: errorObj.headers,
       }),
     );
   }

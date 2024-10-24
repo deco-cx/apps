@@ -8,8 +8,8 @@ import {
   LegacyFacets,
   LegacyProduct,
   LegacySort,
-  Order,
   OrderForm,
+  OrderItem,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -182,6 +182,7 @@ export interface VTEXCommerceStable {
   "POST /api/checkout/pub/orderForm/:orderFormId/items/update": {
     response: OrderForm;
     body: {
+      noSplitItem?: boolean;
       orderItems: Array<{
         quantity: number;
         index: number;
@@ -249,7 +250,7 @@ export interface VTEXCommerceStable {
     response: Userorderslist;
   };
   "GET /api/oms/user/orders/:orderId": {
-    response: Order;
+    response: OrderItem;
   };
 }
 

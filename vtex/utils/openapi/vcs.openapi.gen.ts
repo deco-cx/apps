@@ -9669,6 +9669,10 @@ allowedOutdatedData?: any[]
 }
 body: {
 /**
+ * Avoid split items on cart
+ */
+noSplitItem?: boolean
+/**
  * Array containing the cart items. Each object inside this array corresponds to a different item.
  */
 orderItems?: {

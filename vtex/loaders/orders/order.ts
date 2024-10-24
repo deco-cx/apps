@@ -1,6 +1,6 @@
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
-import { Order } from "../../utils/types.ts";
+import { OrderItem } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
 export interface Props {
@@ -11,9 +11,13 @@ export default async function loader(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Order | null> {
+): Promise<OrderItem | null> {
   const { vcsDeprecated } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+
+  if (!payload?.sub || !payload?.userId) {
+    return null;
+  }
 
   const { slug } = props;
 
