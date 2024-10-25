@@ -5,27 +5,32 @@ import type {
   CustomerCreateMutationVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { CustomerCreate } from "../utils/graphql/queries.ts";
+import type { WakeGraphqlError } from "../utils/error.ts";
 
 // https://wakecommerce.readme.io/docs/storefront-api-customercreate
 export default async function (
   props: Props,
   req: Request,
-  { storefront }: AppContext,
-): Promise<CustomerCreateMutation["customerCreate"] | null> {
+  { storefront, response }: AppContext,
+): Promise<CustomerCreateMutation["customerCreate"] | null | WakeGraphqlError> {
   const headers = parseHeaders(req.headers);
 
-  const { customerCreate } = await storefront.query<
-    CustomerCreateMutation,
-    CustomerCreateMutationVariables
-  >(
-    {
-      variables: { input: { ...props, customerType: "PERSON" } },
-      ...CustomerCreate,
-    },
-    { headers },
-  );
-
-  return customerCreate ?? null;
+  try {
+    const { customerCreate } = await storefront.query<
+      CustomerCreateMutation,
+      CustomerCreateMutationVariables
+    >(
+      {
+        variables: { input: { ...props, customerType: "PERSON" } },
+        ...CustomerCreate,
+      },
+      { headers },
+    );
+    return customerCreate ?? null;
+  } catch (err) {
+    response.status = 400;
+    return err as WakeGraphqlError;
+  }
 }
 
 interface Props {
