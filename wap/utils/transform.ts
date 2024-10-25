@@ -188,6 +188,18 @@ export const toProduct = (
     });
   });
 
+  product?.caracteristicas?.forEach((item) => {
+    item.itens.forEach((carac) => {
+      additionalProperty.push({
+        "@type": "PropertyValue",
+        name: carac.label,
+        value: carac.valor,
+        valueReference: item.nome,
+      });
+
+    })
+  });
+
   if (product?.filtros) {
     product?.filtros.forEach((filtro) => {
       additionalProperty.push({

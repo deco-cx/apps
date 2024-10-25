@@ -32,6 +32,8 @@ const loader = async (
 
   const itemListElement = toBreadcrumbList(data.estrutura.breadcrumb, baseUrl);
 
+  Deno.writeTextFileSync(`product_uappi.json`, JSON.stringify(data.conteudo))
+
   const product = toProduct(data.conteudo, baseUrl);
 
   return {
