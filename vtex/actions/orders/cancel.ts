@@ -1,15 +1,17 @@
 import { parseCookie } from "../../utils/vtexId.ts";
 import { AppContext } from "../../mod.ts";
+import { CanceledOrder } from "../../utils/types.ts";
 
 interface Props {
   orderId: string;
+  reason: string;
 }
 
 async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
-) {
+): Promise<CanceledOrder | null> {
   const { vcsDeprecated } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
@@ -17,12 +19,13 @@ async function action(
     return null;
   }
 
-  const { orderId } = props;
+  const { orderId, reason } = props;
 
   const response = await vcsDeprecated
     ["POST /api/oms/user/orders/:orderId/cancel"](
       { orderId },
       {
+        body: { reason },
         headers: {
           cookie,
         },
@@ -30,8 +33,8 @@ async function action(
     );
 
   if (response.ok) {
-    const order = await response.json();
-    return order;
+    const canceledOrder = await response.json();
+    return canceledOrder;
   }
 
   return null;

@@ -1,6 +1,7 @@
 import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
+  CanceledOrder,
   Category,
   CreateNewDocument,
   FacetSearchResult,
@@ -253,7 +254,10 @@ export interface VTEXCommerceStable {
     response: OrderItem;
   };
   "POST /api/oms/user/orders/:orderId/cancel": {
-    response: void;
+    response: CanceledOrder;
+    body: {
+      reason: string;
+    };
   };
 }
 

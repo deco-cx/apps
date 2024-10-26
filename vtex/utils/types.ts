@@ -1375,7 +1375,7 @@ export interface Package {
     finished: boolean;
     deliveredDate: string;
   };
-  type: "Input" | "Output"
+  type: "Input" | "Output";
 }
 
 export interface OrderItem {
@@ -1450,6 +1450,12 @@ export interface OrderItem {
   marketplaceServicesEndpoint: string;
   merchantName: string;
   openTextField: string | null;
+}
+
+export interface CanceledOrder {
+  date: string;
+  orderId: string;
+  receipt: string | null;
 }
 
 interface Marketplace {
