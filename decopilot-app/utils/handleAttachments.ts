@@ -1,6 +1,6 @@
 import { Attachment, FileURL } from "../types.ts";
 
-// currently handles using anthropic supported method
+// currently handles using anthropic suggested method
 
 export async function handleAttachments(
   attachments: Attachment[],
