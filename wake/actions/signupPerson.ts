@@ -12,7 +12,7 @@ export default async function (
   props: Props,
   req: Request,
   { storefront, response }: AppContext,
-): Promise<CustomerCreateMutation["customerCreate"] | null | WakeGraphqlError> {
+): Promise<CustomerCreateMutation["customerCreate"] | null | WakeGraphqlError[]> {
   const headers = parseHeaders(req.headers);
 
   try {
@@ -28,8 +28,12 @@ export default async function (
     );
     return customerCreate ?? null;
   } catch (err) {
-    response.status = 400;
-    return err as WakeGraphqlError;
+    if (Array.isArray(err)) {
+      return err as WakeGraphqlError[];
+    }
+
+    response.status = 500;
+    return null
   }
 }
 
