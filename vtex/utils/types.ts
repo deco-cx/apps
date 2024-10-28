@@ -1360,6 +1360,24 @@ export interface Order {
   workflowInRetry: boolean;
 }
 
+export interface Package {
+  cfop: string | null;
+  invoiceNumber: string;
+  invoiceValue: number;
+  invoiceUrl: string | null;
+  issuanceDate: string;
+  trackingNumber: string | null;
+  invoiceKey: string;
+  trackingUrl: string | null;
+  embeddedInvoice: string;
+  courierStatus: {
+    status: string | null;
+    finished: boolean;
+    deliveredDate: string;
+  };
+  type: "Input" | "Output";
+}
+
 export interface OrderItem {
   orderId: string;
   sequence: string;
@@ -1377,6 +1395,9 @@ export interface OrderItem {
   authorizedDate: string;
   callCenterOperatorData: string;
   cancelReason: string;
+  packageAttachment: {
+    packages: Package[];
+  } | null;
   cancellationData: {
     RequestedByUser: boolean;
     RequestedBySystem: boolean;
@@ -1429,6 +1450,12 @@ export interface OrderItem {
   marketplaceServicesEndpoint: string;
   merchantName: string;
   openTextField: string | null;
+}
+
+export interface CanceledOrder {
+  date: string;
+  orderId: string;
+  receipt: string | null;
 }
 
 interface Marketplace {
