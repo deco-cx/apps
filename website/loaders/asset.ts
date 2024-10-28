@@ -1,5 +1,5 @@
+import { forbidden } from "@deco/deco";
 import { fetchSafe, STALE } from "../../utils/fetch.ts";
-
 interface Props {
   /**
    * @description Asset src like: https://fonts.gstatic.com/...
@@ -13,10 +13,9 @@ const loader = async (props: Props, request: Request): Promise<Response> => {
   // Whitelist allowed protocols
   const allowedProtocols = ["https:", "http:"];
   if (!allowedProtocols.includes(url.protocol)) {
-    return new Response(
-      "Forbidden: Only HTTP and HTTPS protocols are allowed",
-      { status: 403 },
-    );
+    forbidden({
+      message: "Only HTTP and HTTPS protocols are allowed",
+    });
   }
 
   const original = await fetchSafe(url.href, STALE);
@@ -25,13 +24,15 @@ const loader = async (props: Props, request: Request): Promise<Response> => {
   // Check if the request's Accept header includes "text/html"
   const acceptHeader = request.headers.get("accept");
   if (acceptHeader && acceptHeader.includes("text/html")) {
-    return new Response("Forbidden: text/html not accepted", { status: 403 });
+    forbidden({
+      message: "Forbidden: text/html not accepted",
+    });
   }
 
   const contentType = response.headers.get("Content-Type");
   if (contentType && contentType.includes("text/html")) {
-    return new Response("Forbidden: text/html not accepted as a response", {
-      status: 403,
+    forbidden({
+      message: "Forbidden: text/html not accepted as a response",
     });
   }
 
