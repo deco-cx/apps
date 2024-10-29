@@ -1,12 +1,7 @@
 import { STATUS_CODE } from "@std/http/status";
-import {
-  ButtonStyles,
-  sendMessage,
-  snowflakeToBigint,
-} from "../../../deps/discordeno.ts";
+import { sendMessage, snowflakeToBigint } from "../../../deps/discordeno.ts";
 import { AppContext, Project } from "../../../mod.ts";
 import { WebhookEvent } from "../../../sdk/github/types.ts";
-import { createActionRow, createButton } from "../../discord/components.ts";
 import { bold, timestamp, userMention } from "../../discord/textFormatting.ts";
 import { getPullRequestThreadId } from "../../kv.ts";
 import getUserByGithubUsername from "../../user/getUserByGithubUsername.ts";
@@ -18,14 +13,6 @@ export default async function onReviewRequested(
 ) {
   const bot = ctx.discord.bot;
   const { pull_request, repository, requested_reviewer, sender } = props;
-
-  const viewOnGithubRow = createActionRow([
-    createButton({
-      label: "Ver no Github",
-      url: pull_request.html_url,
-      style: ButtonStyles.Link,
-    }),
-  ]);
 
   const seconds = Math.floor(
     new Date(pull_request.created_at).getTime() / 1000,
@@ -40,21 +27,17 @@ export default async function onReviewRequested(
     project.discord.pr_channel_id;
 
   await sendMessage(bot, threadId, {
-    content: requestedUser ? userMention(requestedUser.discordId) : "",
-    embeds: [{
-      thumbnail: {
-        url: sender.avatar_url,
-      },
-      title: `${sender.login} pediu para ${
-        requested_reviewer?.login || "alguém"
-      } revisar um PR`,
-      description: `${bold(`(${repository.full_name})`)}
-[${bold(`#${pull_request.number} - ${pull_request.title}`)}](${pull_request.html_url}) - ${
-        timestamp(seconds, "R")
-      }`,
-      timestamp: new Date().getTime(),
-    }],
-    components: [viewOnGithubRow],
+    content: `${
+      bold(
+        `${sender.login} pediu para ${
+          (requestedUser ? userMention(requestedUser.discordId) : "") ||
+          requested_reviewer?.login || "alguém"
+        } revisar um PR`,
+      )
+    }\n${bold(`(${repository.full_name})`)}
+    [${
+      bold(`#${pull_request.number} - ${pull_request.title}`)
+    }](<${pull_request.html_url}>) - ${timestamp(seconds, "R")}`,
     allowedMentions: {
       users: requestedUser ? [snowflakeToBigint(requestedUser.discordId)] : [],
     },

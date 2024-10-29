@@ -1,13 +1,11 @@
 import { STATUS_CODE } from "@std/http";
 import {
-  ButtonStyles,
   editChannel,
   sendMessage,
   snowflakeToBigint,
 } from "../../../deps/discordeno.ts";
 import type { AppContext, Project } from "../../../mod.ts";
 import type { WebhookEvent } from "../../../sdk/github/types.ts";
-import { createActionRow, createButton } from "../../discord/components.ts";
 import { bold } from "../../discord/textFormatting.ts";
 import { deletePullRequestThreadId, getPullRequestThreadId } from "../../kv.ts";
 import { getRandomItem } from "../../random.ts";
@@ -46,31 +44,15 @@ export default async function onPullRequestMerge(
   }
 
   const theChosenOne = getRandomItem(project.users);
-  const viewOnGithubRow = createActionRow([
-    createButton({
-      label: "Ver no GitHub",
-      url: pull_request.html_url,
-      style: ButtonStyles.Link,
-    }),
-  ]);
 
   const threadId = await getPullRequestThreadId(`${pull_request.id}`);
   const channelId = threadId || project.discord.pr_channel_id;
 
   await sendMessage(bot, channelId, {
-    embeds: [{
-      thumbnail: {
-        url: mergedBy.avatar_url,
-      },
-      title,
-      description: `${bold(`(${repository.full_name})`)}
-[${bold(`#${pull_request.number} - ${pull_request.title}`)}](${pull_request.html_url}) - ${
-        duration.join(", ")
-      }`,
-      color: 0x8957e5,
-      timestamp: Date.now(),
-    }],
-    components: [viewOnGithubRow],
+    content: `${bold(title)}\n${bold(`(${repository.full_name})`)}
+    [${
+      bold(`#${pull_request.number} - ${pull_request.title}`)
+    }](<${pull_request.html_url}>) - ${duration.join(", ")}`,
     allowedMentions: {
       users: theChosenOne ? [snowflakeToBigint(theChosenOne.discordId)] : [],
     },

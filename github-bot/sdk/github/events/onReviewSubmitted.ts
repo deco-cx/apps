@@ -1,12 +1,7 @@
 import { STATUS_CODE } from "@std/http/status";
-import {
-  ButtonStyles,
-  sendMessage,
-  snowflakeToBigint,
-} from "../../../deps/discordeno.ts";
+import { sendMessage, snowflakeToBigint } from "../../../deps/discordeno.ts";
 import { AppContext, Project } from "../../../mod.ts";
 import { WebhookEvent } from "../../../sdk/github/types.ts";
-import { createActionRow, createButton } from "../../discord/components.ts";
 import { bold, timestamp, userMention } from "../../discord/textFormatting.ts";
 import { getPullRequestThreadId } from "../../kv.ts";
 
@@ -29,14 +24,6 @@ export default async function onReviewSubmitted(
     (user) => user.githubUsername === owner.login,
   )?.discordId;
 
-  const viewOnGithubRow = createActionRow([
-    createButton({
-      label: "Ver revisão",
-      url: review.html_url,
-      style: ButtonStyles.Link,
-    }),
-  ]);
-
   const seconds = Math.floor(
     new Date(pull_request.created_at).getTime() / 1000,
   );
@@ -49,32 +36,20 @@ export default async function onReviewSubmitted(
     ? "pediu alterações no PR de"
     : "comentou no PR de";
 
-  const color = state === "approved"
-    ? 0x02c563
-    : state === "changes_requested"
-    ? 0xda3633
-    : 0x383a40;
-
   const threadId = await getPullRequestThreadId(`${pull_request.id}`) ||
     project.discord.pr_channel_id;
 
   await sendMessage(bot, threadId, {
-    content: (ownerDiscordId ? ` ${userMention(ownerDiscordId)}` : ""),
-    embeds: [{
-      thumbnail: {
-        url: sender.avatar_url,
-      },
-      title: `${sender.login} ${title} ${owner.login}`,
-      description: `${bold(`(${repository.full_name})`)}
-[${bold(`#${pull_request.number} - ${pull_request.title}`)}](${pull_request.html_url}) - ${
-        timestamp(seconds, "R")
-      }`,
-      color,
-      timestamp: review.submitted_at
-        ? new Date(review.submitted_at).getTime()
-        : new Date().getTime(),
-    }],
-    components: [viewOnGithubRow],
+    content: `${
+      bold(
+        `${sender.login} ${title} ${
+          ownerDiscordId ? ` ${userMention(ownerDiscordId)}` : owner.login
+        }`,
+      )
+    }\n${bold(`(${repository.full_name})`)}
+    [${
+      bold(`#${pull_request.number} - ${pull_request.title}`)
+    }](<${pull_request.html_url}>) - ${timestamp(seconds, "R")}`,
     allowedMentions: {
       users: ownerDiscordId ? [snowflakeToBigint(ownerDiscordId)] : [],
     },
