@@ -22,7 +22,7 @@ async function action(
   const { orderId, reason } = props;
 
   const response = await vcsDeprecated
-    ["POST /api/oms/user/orders/:orderId/cancel"](
+    ["POST /api/oms/pvt/orders/:orderId/cancel"](
       { orderId },
       {
         body: { reason },
