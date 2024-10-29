@@ -253,7 +253,7 @@ export interface VTEXCommerceStable {
   "GET /api/oms/user/orders/:orderId": {
     response: OrderItem;
   };
-  "POST /api/oms/user/orders/:orderId/cancel": {
+  "POST /api/oms/pvt/orders/:orderId/cancel": {
     response: CanceledOrder;
     body: {
       reason: string;
