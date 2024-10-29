@@ -46,8 +46,7 @@ export default async function onReviewSubmitted(
           ownerDiscordId ? ` ${userMention(ownerDiscordId)}` : owner.login
         }`,
       )
-    }\n${bold(`(${repository.full_name})`)}
-    [${
+    }\n${bold(`(${repository.full_name})`)} [${
       bold(`#${pull_request.number} - ${pull_request.title}`)
     }](<${pull_request.html_url}>) - ${timestamp(seconds, "R")}`,
     allowedMentions: {

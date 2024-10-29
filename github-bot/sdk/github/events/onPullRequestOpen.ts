@@ -7,7 +7,7 @@ import {
 } from "../../../deps/discordeno.ts";
 import type { AppContext, AppManifest, Project } from "../../../mod.ts";
 import type { WebhookEvent } from "../../../sdk/github/types.ts";
-import { timestamp, userMention } from "../../discord/textFormatting.ts";
+import { bold, timestamp, userMention } from "../../discord/textFormatting.ts";
 import { setPullRequestThreadId } from "../../kv.ts";
 import { getRandomItem } from "../../random.ts";
 import { isDraft } from "../utils.ts";
@@ -41,11 +41,11 @@ export default async function onPullRequestOpen(
     bot,
     channelId,
     {
-      content: `${
-        userMention(reviewer.discordId)
-      } | **${owner.login} abriu um novo PR**\n(${repository.full_name}) [**#${pull_request.number} - ${pull_request.title}**](<${pull_request.html_url}>) - ${
-        timestamp(seconds, "R")
-      }`,
+      content: `${userMention(reviewer.discordId)} | ${
+        bold(owner.login)
+      } abriu um novo PR\n(${repository.full_name}) [${
+        bold(`#${pull_request.number} - ${pull_request.title}`)
+      }](<${pull_request.html_url}>) - ${timestamp(seconds, "R")}`,
       allowedMentions: {
         users: reviewer ? [snowflakeToBigint(reviewer.discordId)] : [],
       },

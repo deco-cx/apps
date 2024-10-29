@@ -31,10 +31,9 @@ export default async function onIssueClosed(
     bot,
     channelId,
     {
-      content: `${bold(title)}\n${bold(`(${repository.full_name})`)}
-      [${bold(`#${issue.number} - ${issue.title}`)}](<${issue.html_url}>) - ${
-        timestamp(seconds, "R")
-      }`,
+      content: `${bold(title)}\n(${repository.full_name}) [${
+        bold(`#${issue.number} - ${issue.title}`)
+      }](<${issue.html_url}>) - ${timestamp(seconds, "R")}`,
     },
   );
 

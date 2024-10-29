@@ -34,8 +34,7 @@ export default async function onReviewRequested(
           requested_reviewer?.login || "alguém"
         } revisar um PR`,
       )
-    }\n${bold(`(${repository.full_name})`)}
-    [${
+    }\n${bold(`(${repository.full_name})`)} [${
       bold(`#${pull_request.number} - ${pull_request.title}`)
     }](<${pull_request.html_url}>) - ${timestamp(seconds, "R")}`,
     allowedMentions: {

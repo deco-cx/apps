@@ -49,10 +49,9 @@ export default async function onPullRequestMerge(
   const channelId = threadId || project.discord.pr_channel_id;
 
   await sendMessage(bot, channelId, {
-    content: `${bold(title)}\n${bold(`(${repository.full_name})`)}
-    [${
+    content: `${title}\n(${repository.full_name}) [${
       bold(`#${pull_request.number} - ${pull_request.title}`)
-    }](<${pull_request.html_url}>) - ${duration.join(", ")}`,
+    }](<${pull_request.html_url}>)`,
     allowedMentions: {
       users: theChosenOne ? [snowflakeToBigint(theChosenOne.discordId)] : [],
     },

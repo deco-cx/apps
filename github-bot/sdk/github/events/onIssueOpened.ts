@@ -26,12 +26,11 @@ export default async function onIssueOpened(
     bot,
     channelId,
     {
-      content: `${bold(`${sender.login} abriu uma nova Issue`)}\n${
-        bold(`(${repository.full_name})`)
-      }
-      [${bold(`#${issue.number} - ${issue.title}`)}](<${issue.html_url}>) - ${
-        timestamp(seconds, "R")
-      }`,
+      content: `${
+        bold(`${sender.login} abriu uma nova Issue`)
+      }\n(${repository.full_name}) [${
+        bold(`#${issue.number} - ${issue.title}`)
+      }](<${issue.html_url}>) - ${timestamp(seconds, "R")}`,
     },
   );
 
