@@ -1,5 +1,5 @@
 import { ImageWidget } from "../admin/widgets.ts";
-import { PageInfo, Person } from "../commerce/types.ts";
+import { PageInfo, Person, Thing } from "../commerce/types.ts";
 
 /**
  * @titleBy name
@@ -72,6 +72,8 @@ export interface BlogPost {
   review?: Review[];
   /** @hide true */
   contentRating?: Rating[];
+  /** @hide true */
+  interactionStatistic?: InteractionCounter;
 }
 
 export interface ExtraProps {
@@ -160,6 +162,12 @@ export interface AggregateRating {
   bestRating?: number;
   /** The lowest value allowed in this rating system. */
   worstRating?: number;
+}
+
+export interface InteractionCounter extends Omit<Thing, "@type"> {
+  "@type": "InteractionCounter";
+  /** The number of interactions or views */
+  userInteractionCount?: number;
 }
 
 export interface Ignore {

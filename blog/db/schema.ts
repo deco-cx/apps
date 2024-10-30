@@ -23,3 +23,8 @@ export const review = sqliteTable("review", {
   additionalType: (text("additionalType")),
   isAnonymous: integer("isAnonymous", { mode: "boolean" }),
 });
+
+export const postViews = sqliteTable("postViews", {
+  id: text("id").primaryKey(),
+  userInteractionCount: integer("userInteractionCount").notNull(),
+});

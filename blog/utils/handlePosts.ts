@@ -8,6 +8,10 @@ import { VALID_SORT_ORDERS } from "./constants.ts";
  * @param sortBy Sort option (must be: "date_desc" | "date_asc" | "title_asc" | "title_desc" )
  */
 export const sortPosts = (blogPosts: BlogPost[], sortBy: SortBy) => {
+  //Sort by most viewed.
+  //Is drizzle installed?
+  //Make the req to views database and do semething like an extension.
+
   const splittedSort = sortBy.split("_");
 
   const sortMethod = splittedSort[0] in blogPosts[0]
