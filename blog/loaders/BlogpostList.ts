@@ -6,6 +6,7 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
+import { logger } from "@deco/deco/o11y";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy } from "../types.ts";
@@ -63,13 +64,18 @@ export default async function BlogPostList(
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(posts, pageSort, slug);
+  try {
+    const handledPosts = await handlePosts(posts, pageSort, ctx, slug);
 
-  if (!handledPosts) {
+    if (!handledPosts) {
+      return null;
+    }
+
+    const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
+
+    return slicedPosts.length > 0 ? slicedPosts : null;
+  } catch (e) {
+    logger.error(e);
     return null;
   }
-
-  const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
-
-  return slicedPosts.length > 0 ? slicedPosts : null;
 }

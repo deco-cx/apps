@@ -99,7 +99,9 @@ export type SortBy =
   | "date_desc"
   | "date_asc"
   | "title_asc"
-  | "title_desc";
+  | "title_desc"
+  | "view_asc"
+  | "view_desc";
 
 export interface BlogPostListingPage {
   posts: BlogPost[];
@@ -167,6 +169,11 @@ export interface AggregateRating {
 export interface InteractionCounter extends Omit<Thing, "@type"> {
   "@type": "InteractionCounter";
   /** The number of interactions or views */
+  userInteractionCount?: number;
+}
+
+export interface ViewFromDatabase {
+  id: string;
   userInteractionCount?: number;
 }
 

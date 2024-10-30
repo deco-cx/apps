@@ -1,18 +1,72 @@
-import { BlogPost, SortBy } from "../types.ts";
+import { postViews } from "../db/schema.ts";
+import { AppContext } from "../mod.ts";
+import { BlogPost, SortBy, ViewFromDatabase } from "../types.ts";
 import { VALID_SORT_ORDERS } from "./constants.ts";
 
 /**
  * Returns an sorted BlogPost list
  *
  * @param posts Posts to be sorted
- * @param sortBy Sort option (must be: "date_desc" | "date_asc" | "title_asc" | "title_desc" )
+ * @param sortBy Sort option (must be: "date_desc" | "date_asc" | "title_asc" | "title_desc" | "view_asc" | "view_desc" )
  */
-export const sortPosts = (blogPosts: BlogPost[], sortBy: SortBy) => {
-  //Sort by most viewed.
-  //Is drizzle installed?
-  //Make the req to views database and do semething like an extension.
-
+export const sortPosts = async (
+  blogPosts: BlogPost[],
+  sortBy: SortBy,
+  ctx: AppContext,
+) => {
   const splittedSort = sortBy.split("_");
+
+  if (splittedSort[0] === "view") {
+    //If sort is "view_asc" or "view_desc"
+
+    const records = await ctx.invoke.records.loaders.drizzle();
+    //Deco records not installed
+    if (records.__resolveType) {
+      throw new Error("Deco Records not installed!");
+    }
+
+    //Get views from database
+    const views = await records.select({
+      id: postViews.id,
+      userInteractionCount: postViews.userInteractionCount,
+    }).from(postViews) as ViewFromDatabase[] | null;
+
+    if (!views) {
+      return blogPosts;
+    }
+
+    //Act like a real extension
+    for (let i = 0; i < views.length; i++) {
+      const view = views[i];
+      const post = blogPosts.findIndex(({ slug }) => slug === view.id);
+
+      if (blogPosts[post]) {
+        blogPosts[post].interactionStatistic = {
+          "@type": "InteractionCounter",
+          userInteractionCount: view.userInteractionCount,
+        };
+      }
+    }
+
+    const sortOrder = VALID_SORT_ORDERS.includes(splittedSort[1])
+      ? splittedSort[1]
+      : "desc";
+
+    //Sort and return
+    return blogPosts.toSorted((a, b) => {
+      const countOfA = a?.interactionStatistic?.userInteractionCount;
+      const countOfB = b?.interactionStatistic?.userInteractionCount;
+      if (
+        !countOfA &&
+        !countOfB
+      ) {
+        return 0;
+      }
+
+      const comparison = (countOfA ?? 0) - (countOfB ?? 0);
+      return sortOrder === "desc" ? comparison : -comparison;
+    });
+  }
 
   const sortMethod = splittedSort[0] in blogPosts[0]
     ? splittedSort[0] as keyof BlogPost
@@ -73,12 +127,14 @@ export const slicePosts = (
  * Returns an filtered and sorted BlogPost list. It dont slice
  *
  * @param posts Posts to be handled
- * @param sortBy Sort option (must be: "date_desc" | "date_asc" | "title_asc" | "title_desc" )
+ * @param sortBy Sort option (must be: "date_desc" | "date_asc" | "title_asc" | "title_desc")
+ * @param ctx AppContext
  * @param slug Category slug to be filter
  */
-export default function handlePosts(
+export default async function handlePosts(
   posts: BlogPost[],
   sortBy: SortBy,
+  ctx: AppContext,
   slug?: string,
 ) {
   const filteredPosts = filterPostsByCategory(posts, slug);
@@ -87,5 +143,5 @@ export default function handlePosts(
     return null;
   }
 
-  return sortPosts(filteredPosts, sortBy);
+  return await sortPosts(filteredPosts, sortBy, ctx);
 }

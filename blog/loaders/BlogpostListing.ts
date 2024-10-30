@@ -6,6 +6,7 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
+import { logger } from "@deco/deco/o11y";
 import { PageInfo } from "../../commerce/types.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
@@ -65,27 +66,32 @@ export default async function BlogPostList(
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(posts, pageSort, slug);
+  try {
+    const handledPosts = await handlePosts(posts, pageSort, ctx, slug);
 
-  if (!handledPosts) {
+    if (!handledPosts) {
+      return null;
+    }
+
+    const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
+
+    if (slicedPosts.length === 0) {
+      return null;
+    }
+
+    const category = slicedPosts[0].categories.find((c) => c.slug === slug);
+    return {
+      posts: slicedPosts,
+      pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
+      seo: {
+        title: category?.name ?? "",
+        canonical: new URL(url.pathname, url.origin).href,
+      },
+    };
+  } catch (e) {
+    logger.error(e);
     return null;
   }
-
-  const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
-
-  if (slicedPosts.length === 0) {
-    return null;
-  }
-
-  const category = slicedPosts[0].categories.find((c) => c.slug === slug);
-  return {
-    posts: slicedPosts,
-    pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
-    seo: {
-      title: category?.name ?? "",
-      canonical: new URL(url.pathname, url.origin).href,
-    },
-  };
 }
 
 const toPageInfo = (
