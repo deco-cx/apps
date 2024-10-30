@@ -12,17 +12,13 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<OrderItem | null> {
-  const { vcsDeprecated } = ctx;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
-
-  if (!payload?.sub || !payload?.userId) {
-    return null;
-  }
+  const { vcs } = ctx;
+  const { cookie } = parseCookie(req.headers, ctx.account);
 
   const { slug } = props;
 
-  const response = await vcsDeprecated["GET /api/oms/user/orders/:orderId"](
-    { orderId: slug },
+  const response = await vcs["GET /api/oms/user/orders/:orderId"](
+    { orderId: slug + "-01" },
     {
       headers: {
         cookie,
