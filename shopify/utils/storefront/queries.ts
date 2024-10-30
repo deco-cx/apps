@@ -182,8 +182,19 @@ fragment Cart on Cart {
           }
           product {
             title
+            onlineStoreUrl
+            handle
           }
           price {
+            amount
+            currencyCode
+          }
+        }
+      }
+      discountAllocations {
+        ...on CartCodeDiscountAllocation {
+          code
+          discountedAmount {
             amount
             currencyCode
           }
@@ -194,7 +205,7 @@ fragment Cart on Cart {
           amount
           currencyCode
         }
-        subtotalAmount{
+        subtotalAmount {
           amount
           currencyCode
         }
@@ -210,6 +221,10 @@ fragment Cart on Cart {
     }
   }
   cost {
+    totalTaxAmount {
+      amount
+      currencyCode
+    }
     subtotalAmount {
       amount
       currencyCode
@@ -218,7 +233,7 @@ fragment Cart on Cart {
       amount
       currencyCode
     }
-    checkoutChargeAmount{
+    checkoutChargeAmount {
       amount
       currencyCode
     }
@@ -227,7 +242,7 @@ fragment Cart on Cart {
     code
     applicable
   }
-  discountAllocations{
+  discountAllocations {
     discountedAmount {
       amount
       currencyCode
@@ -385,6 +400,32 @@ export const AddItemToCart = {
   query: gql`mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
     payload: cartLinesAdd(cartId: $cartId, lines: $lines) {
       cart { ...Cart }
+    }
+  }`,
+};
+
+export const RegisterAccount = {
+  query: gql`mutation RegisterAccount(
+      $email: String!,
+      $password: String!,
+      $firstName: String,
+      $lastName: String,
+      $acceptsMarketing: Boolean = false
+    ) {
+    customerCreate(input: {
+      email: $email,
+      password: $password,
+      firstName: $firstName,
+      lastName: $lastName,
+      acceptsMarketing: $acceptsMarketing,
+    }) {
+      customer {
+        id
+      }
+      customerUserErrors {
+        code
+        message
+      }
     }
   }`,
 };

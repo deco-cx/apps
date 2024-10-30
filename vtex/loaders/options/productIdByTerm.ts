@@ -3,6 +3,13 @@ import { allowCorsFor } from "@deco/deco";
 interface Props {
   term?: string;
 }
+
+interface DynamicOptionsReturn {
+  value: string;
+  label: string;
+  image?: string;
+}
+
 const loader = async (props: Props, req: Request, ctx: AppContext) => {
   Object.entries(allowCorsFor(req)).map(([name, value]) => {
     ctx.response.headers.set(name, value);
@@ -19,11 +26,20 @@ const loader = async (props: Props, req: Request, ctx: AppContext) => {
     }];
   }
 
-  return suggestions?.products?.map((product) => ({
-    value: `${product.productID}`,
-    label:
-      `${product.productID} - ${product.isVariantOf?.name} ${product.name} - ${product.isVariantOf?.productGroupID}`,
-    image: product.image?.[0]?.url,
-  }));
+  let suggestionsArray: DynamicOptionsReturn[] = [];
+
+  suggestions?.products?.forEach((product) => {
+    const variants = product.isVariantOf?.hasVariant?.map((variant) => {
+      return {
+        value: `${variant.productID}`,
+        label:
+          `${variant.productID} - ${product.isVariantOf?.name} ${variant.name} - ${product.isVariantOf?.productGroupID}`,
+        image: variant.image?.[0]?.url,
+      };
+    }) || [];
+    suggestionsArray = suggestionsArray.concat(variants);
+  });
+
+  return suggestionsArray;
 };
 export default loader;

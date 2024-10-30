@@ -269,7 +269,9 @@ const loader = async (
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
   const selected = withDefaultFacets(selectedFacets, ctx);
-  const fselected = props.priceFacets ? selected : selected.filter((f) => f.key !== "price");
+  const fselected = props.priceFacets
+    ? selected
+    : selected.filter((f) => f.key !== "price");
   const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
   const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
   const searchArgs = { ...args, query: args.query || pathQuery };
