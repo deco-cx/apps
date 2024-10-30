@@ -11,7 +11,7 @@ export interface Redirect {
    * @description Path is url pattern. https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
    */
   to: string;
-  type?: "temporary" | "permanent";
+  type?: "temporary" | "permanent" | "found";
   /**
    * @title Discard query parameters
    */

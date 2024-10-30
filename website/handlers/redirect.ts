@@ -3,7 +3,7 @@ import { isFreshCtx } from "./fresh.ts";
 type ConnInfo = Deno.ServeHandlerInfo;
 export interface RedirectConfig {
   to: string;
-  type?: "permanent" | "temporary";
+  type?: "permanent" | "temporary" | "found";
   discardQueryParameters?: boolean;
 }
 
@@ -20,6 +20,7 @@ export default function Redirect(
     number
   > = {
     "temporary": 307,
+    "found": 302,
     "permanent": 301,
   };
 

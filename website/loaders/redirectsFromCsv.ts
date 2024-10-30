@@ -1,14 +1,14 @@
 import { join } from "std/path/mod.ts";
 import { Route } from "../flags/audience.ts";
 
-const REDIRECT_TYPE_ENUM = ["temporary", "permanent"];
+const REDIRECT_TYPE_ENUM = ["temporary", "permanent", "found"];
 const CONCATENATE_PARAMS_VALUES = ["true", "false"];
 
 /** @titleBy from */
 export interface Redirect {
   from: string;
   to: string;
-  type?: "temporary" | "permanent";
+  type?: "temporary" | "permanent" | "found";
   discardQueryParameters?: boolean;
 }
 
