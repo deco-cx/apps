@@ -18,7 +18,7 @@ export default async function loader(
   const { slug } = props;
 
   const response = await vcs["GET /api/oms/user/orders/:orderId"](
-    { orderId: slug + "-01" },
+    { orderId: slug.includes("-") ? slug : slug + "-01" },
     {
       headers: {
         cookie,
