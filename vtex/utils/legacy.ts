@@ -84,10 +84,11 @@ export const pageTypesToBreadcrumbList = (
   pages: PageType[],
   baseUrl: string,
 ) => {
+  console.log({ pages });
   const filteredPages = pages
     .filter(({ pageType }) =>
       pageType === "Category" || pageType === "Department" ||
-      pageType === "SubCategory"
+      pageType === "SubCategory" || pageType === "Brand"
     );
 
   return filteredPages.map((page, index) => {
