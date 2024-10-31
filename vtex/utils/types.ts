@@ -1448,6 +1448,7 @@ export interface OrderItem {
   invoicedDate: string | null;
   isCheckedIn: boolean;
   isCompleted: boolean;
+  storePreferencesData: StorePreferencesData;
   sellers?: {
     id: string;
     name: string;
