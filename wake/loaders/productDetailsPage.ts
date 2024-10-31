@@ -121,6 +121,20 @@ async function loader(
       }) ?? []
       : [];
 
+  const buyListSimilarProducts = wakeProductOrBuyList.similarProducts?.length
+    ? await ctx.invoke.wake.loaders.productList({
+      first: wakeProductOrBuyList.similarProducts.length,
+      sortDirection: 'ASC',
+      filters: {
+        productId: wakeProductOrBuyList.similarProducts?.map(
+          (sp) => Number(sp!.alias?.split('-').at(-1))
+        ),
+        mainVariant: true
+      },
+      getVariations: true
+    })
+    : null
+
   const product = toProduct(
     wakeProductOrBuyList,
     { base: url },
@@ -143,6 +157,7 @@ async function loader(
           };
         },
       ) ?? [],
+      isSimilarTo: buyListSimilarProducts ?? product.isSimilarTo
     },
     seo: {
       canonical: product.isVariantOf?.url ?? "",
