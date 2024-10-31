@@ -84,7 +84,6 @@ export const pageTypesToBreadcrumbList = (
   pages: PageType[],
   baseUrl: string,
 ) => {
-
   const filteredPages = pages
     .filter(({ pageType }) =>
       pageType === "Category" || pageType === "Department" ||
