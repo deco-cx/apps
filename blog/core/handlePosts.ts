@@ -1,7 +1,7 @@
 import { postViews } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy, ViewFromDatabase } from "../types.ts";
-import { VALID_SORT_ORDERS } from "./constants.ts";
+import { VALID_SORT_ORDERS } from "../utils/constants.ts";
 
 /**
  * Returns an sorted BlogPost list

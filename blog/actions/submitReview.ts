@@ -3,7 +3,7 @@ import { Person } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import { logger } from "@deco/deco/o11y";
 import { Review } from "../types.ts";
-import { getReviewById } from "../utils/records.ts";
+import { getReviewById } from "../core/records.ts";
 import { review } from "../db/schema.ts";
 
 export interface Props {

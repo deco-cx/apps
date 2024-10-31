@@ -10,8 +10,8 @@ import { logger } from "@deco/deco/o11y";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy } from "../types.ts";
-import handlePosts, { slicePosts } from "../utils/handlePosts.ts";
-import { getRecordsByPath } from "../utils/records.ts";
+import handlePosts, { slicePosts } from "../core/handlePosts.ts";
+import { getRecordsByPath } from "../core/records.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";

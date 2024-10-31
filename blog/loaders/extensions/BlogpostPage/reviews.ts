@@ -1,7 +1,7 @@
 import { ExtensionOf } from "../../../../website/loaders/extension.ts";
 import { AppContext } from "../../../mod.ts";
 import { BlogPostPage, Ignore } from "../../../types.ts";
-import { getReviews } from "../../../utils/records.ts";
+import { getReviews } from "../../../core/records.ts";
 
 interface Props {
   /**
