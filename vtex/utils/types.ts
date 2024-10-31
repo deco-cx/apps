@@ -175,6 +175,12 @@ export interface AdditionalInfo {
   offeringInfo: null;
   offeringType: null;
   offeringTypeId: null;
+  categories: CategoryItem[];
+}
+
+export interface CategoryItem {
+  id: number;
+  name: string;
 }
 
 export interface AttachmentOffering {
