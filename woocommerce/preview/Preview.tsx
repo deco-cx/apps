@@ -20,7 +20,7 @@ export const PreviewWooCommerce = (
     <PreviewContainer
       name="WooCommerce"
       owner="deco.cx"
-      description="This document will help you set up the app and launch your VTEX store efficiently. The information is divided into three main sections: General Information, App Configuration, and Go Live Preparations. Follow each section carefully to ensure a successful integration."
+      description="This document will help you set up the app and launch your WooCommerce store efficiently. The information is divided into three main sections: General Information, App Configuration, and Go Live Preparations. Follow each section carefully to ensure a successful integration."
       logo="https://raw.githubusercontent.com/deco-cx/apps/main/woocommerce/logo.png"
       images={[]}
     />
