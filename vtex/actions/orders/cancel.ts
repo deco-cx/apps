@@ -5,6 +5,7 @@ import { CanceledOrder } from "../../utils/types.ts";
 interface Props {
   orderId: string;
   reason: string;
+  requestedByUser: boolean;
 }
 
 async function action(
@@ -19,13 +20,13 @@ async function action(
     return null;
   }
 
-  const { orderId, reason } = props;
+  const { orderId, reason, requestedByUser } = props;
 
   const response = await vcsDeprecated
     ["POST /api/oms/pvt/orders/:orderId/cancel"](
       { orderId },
       {
-        body: { reason },
+        body: { reason, requestedByUser },
         headers: {
           cookie,
         },
