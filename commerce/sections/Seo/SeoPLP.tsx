@@ -81,7 +81,7 @@ function Section({ jsonLD, ...props }: Props) {
 
     return {
       "@type": "BreadcrumbList",
-      "itemListElement": data.breadcrumb
+      "itemListElement": data.breadcrumb.itemListElement
     };
   }
 
