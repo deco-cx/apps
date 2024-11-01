@@ -2,15 +2,19 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/product/productDetailsPage.ts";
-import * as $$$1 from "./loaders/product/productList.ts";
-import * as $$$2 from "./loaders/proxy.ts";
+import * as $$$0 from "./loaders/product/productCategory.ts";
+import * as $$$1 from "./loaders/product/productDetailsPage.ts";
+import * as $$$2 from "./loaders/product/productList.ts";
+import * as $$$3 from "./loaders/product/productListingPage.ts";
+import * as $$$4 from "./loaders/proxy.ts";
 
 const manifest = {
   "loaders": {
-    "woocommerce/loaders/product/productDetailsPage.ts": $$$0,
-    "woocommerce/loaders/product/productList.ts": $$$1,
-    "woocommerce/loaders/proxy.ts": $$$2,
+    "woocommerce/loaders/product/productCategory.ts": $$$0,
+    "woocommerce/loaders/product/productDetailsPage.ts": $$$1,
+    "woocommerce/loaders/product/productList.ts": $$$2,
+    "woocommerce/loaders/product/productListingPage.ts": $$$3,
+    "woocommerce/loaders/proxy.ts": $$$4,
   },
   "name": "woocommerce",
   "baseUrl": import.meta.url,
