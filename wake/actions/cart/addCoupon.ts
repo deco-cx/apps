@@ -11,6 +11,7 @@ import type {
 import { parseHeaders } from "../../utils/parseHeaders.ts";
 import ensureCustomerToken from "../../utils/ensureCustomerToken.ts";
 import authenticate from "../../utils/authenticate.ts";
+import { WakeGraphqlError } from "../../utils/error.ts";
 
 export interface Props {
   coupon: string;
@@ -20,7 +21,7 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Partial<CheckoutFragment>> => {
+): Promise<Partial<CheckoutFragment> | WakeGraphqlError[]> => {
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
   const headers = parseHeaders(req.headers);
@@ -50,8 +51,14 @@ const action = async (
     }
 
     return data.checkout ?? {};
-  } catch (errors: any) {
-    throw badRequest(errors);
+  } catch (errors) {
+    if (Array.isArray(errors)) {
+      return errors as WakeGraphqlError[];
+    }
+
+    throw badRequest({
+      message: String(errors),
+    });
   }
 };
 
