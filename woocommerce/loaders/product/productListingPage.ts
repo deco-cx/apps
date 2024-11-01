@@ -37,8 +37,10 @@ async function loader(
   const url = new URL(req.url);
   const pathname = url.pathname.split("/").filter(Boolean).pop();
 
-  const { page = 1, per_page = 12, query } = props;
+  const { per_page = 12, query } = props;
   const { api } = ctx;
+
+  const page = Number(url.searchParams.get("page")) || props.page || 1;
 
   const category = await ctx.invoke.woocommerce.loaders.product.productCategory(
     {
