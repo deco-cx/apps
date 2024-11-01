@@ -24,7 +24,7 @@ const action = async (
   const { storefront } = ctx;
   const cartId = getCartCookie(req.headers);
   const headers = parseHeaders(req.headers);
-  const customerAccessToken = ensureCustomerToken(await authenticate(req, ctx));
+  const customerAccessToken = await authenticate(req, ctx);
 
   if (!cartId) {
     throw new HttpError(400, "Missing cart cookie");
@@ -50,7 +50,7 @@ const action = async (
     }
 
     return data.checkout ?? {};
-  } catch (errors) {
+  } catch (errors: any) {
     throw badRequest(errors);
   }
 };

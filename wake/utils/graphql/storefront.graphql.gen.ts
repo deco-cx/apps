@@ -5065,7 +5065,7 @@ export type SearchQuery = { result?: { pageSize: number, redirectUrl?: string | 
 export type AddCouponMutationVariables = Exact<{
   checkoutId: Scalars['Uuid']['input'];
   coupon: Scalars['String']['input'];
-  customerAccessToken: Scalars['String']['input'];
+  customerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 

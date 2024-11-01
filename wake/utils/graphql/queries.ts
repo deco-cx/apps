@@ -1124,7 +1124,7 @@ export const Search = {
 
 export const AddCoupon = {
   fragments: [Checkout],
-  query: gql`mutation AddCoupon($checkoutId: Uuid!, $coupon: String!, $customerAccessToken: String!) {
+  query: gql`mutation AddCoupon($checkoutId: Uuid!, $coupon: String!, $customerAccessToken: String) {
     checkout: checkoutAddCoupon(
       checkoutId: $checkoutId
       coupon: $coupon
