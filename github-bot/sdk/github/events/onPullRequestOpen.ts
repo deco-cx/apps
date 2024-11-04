@@ -11,6 +11,7 @@ import { bold, timestamp, userMention } from "../../discord/textFormatting.ts";
 import { setPullRequestThreadId } from "../../kv.ts";
 import { getRandomItem } from "../../random.ts";
 import { isDraft } from "../utils.ts";
+import type { ProjectUser } from "../../../types.ts";
 
 export default async function onPullRequestOpen(
   props: WebhookEvent<"pull-request-opened" | "pull-request-edited">,
@@ -24,7 +25,7 @@ export default async function onPullRequestOpen(
   }
 
   const owner = pull_request.user;
-  const reviewer = getRandomItem(
+  const reviewer = getRandomItem<ProjectUser | undefined>(
     project.users.filter((user) => user.githubUsername !== owner.login),
   );
   const reviewers = project.users.filter((user) =>
@@ -41,7 +42,7 @@ export default async function onPullRequestOpen(
     bot,
     channelId,
     {
-      content: `${userMention(reviewer.discordId)} | ${
+      content: `${reviewer ? `${userMention(reviewer.discordId)} | ` : ""}${
         bold(owner.login)
       } abriu um novo PR\n(${repository.full_name}) [${
         bold(`#${pull_request.number} - ${pull_request.title}`)
