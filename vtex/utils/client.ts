@@ -257,6 +257,7 @@ export interface VTEXCommerceStable {
     response: CanceledOrder;
     body: {
       reason: string;
+      requestedByUser: boolean;
     };
   };
 }
