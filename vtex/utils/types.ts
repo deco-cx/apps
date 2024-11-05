@@ -1,3 +1,6 @@
+import { PaymentData as PaymentDataOpenAPI } from "./openapi/vcs.openapi.gen.ts";
+import { ChangesAttachment } from "./openapi/vcs.openapi.gen.ts";
+
 /**
  * @format dynamic-options
  * @options vtex/loaders/options/productIdByTerm.ts
@@ -1428,9 +1431,9 @@ export interface OrderItem {
     deniedBySellerReason: string | null;
     cancellationRequestDenyDate: string | null;
   }[] | null;
-  changesAttachment: string;
+  changesAttachment: ChangesAttachment;
   checkedInPickupPointId: string | null;
-  paymentData: PaymentData;
+  paymentData: PaymentDataOpenAPI;
   shippingData: ShippingData;
   clientPreferencesData: ClientPreferencesData;
   clientProfileData: ClientProfileData;
