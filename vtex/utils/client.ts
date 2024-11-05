@@ -244,6 +244,10 @@ export interface VTEXCommerceStable {
     response: CreateNewDocument;
     body: Record<string, unknown>;
   };
+  "PATCH /api/dataentities/:acronym/documents/:documentId": {
+    response: CreateNewDocument;
+    body: Record<string, unknown>;
+  };
   "GET /api/catalog_system/pub/brand/list": {
     response: Brand[];
   };
