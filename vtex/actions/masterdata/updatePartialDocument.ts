@@ -30,8 +30,8 @@ const action = async (
   };
 
   await (isPrivateEntity
-    ? vcs[`PATCH /api/dataentities/:acronym/documents/:documentId`](
-      { acronym, documentId },
+    ? vcs["PATCH /api/dataentities/:acronym/documents/:id"](
+      { acronym, id: documentId },
       requestOptions,
     )
     : vcsDeprecated[`PATCH /api/dataentities/:acronym/documents/:documentId`](
