@@ -62,25 +62,25 @@ function Component({
 
   return (
     <Head>
-      <title>{renderTemplateString(titleTemplate, title)}</title>
-      <meta
+      {title && <title>{renderTemplateString(titleTemplate, title)}</title>}
+      {description && <meta
         name="description"
         content={renderTemplateString(descriptionTemplate, description)}
-      />
-      <meta name="theme-color" content={themeColor} />
-      <link rel="icon" href={favicon} />
+      />}
+      {themeColor && <meta name="theme-color" content={themeColor} />}
+      {favicon && <link rel="icon" href={favicon} />}
 
       {/* Twitter tags */}
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={image} />
-      <meta property="twitter:card" content={twitterCard} />
+      {title && <meta property="twitter:title" content={title} />}
+      {description && <meta property="twitter:description" content={description} />}
+      {image && <meta property="twitter:image" content={image} />}
+      {twitterCard && <meta property="twitter:card" content={twitterCard} />}
 
       {/* OpenGraph tags */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={type} />
-      <meta property="og:image" content={image} />
+      {title && <meta property="og:title" content={title} />}
+      {description && <meta property="og:description" content={description} />}
+      {type && <meta property="og:type" content={type} />}
+      {image && <meta property="og:image" content={image} />}
 
       {/* Link tags */}
       {canonical && <link rel="canonical" href={canonical} />}
