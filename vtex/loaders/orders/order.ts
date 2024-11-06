@@ -15,11 +15,6 @@ export default async function loader(
   const { vcs } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
-  // sub is userEmail
-  if (!payload?.sub || !payload?.userId) {
-    return null;
-  }
-
   const { slug } = props;
 
   const response = await vcs["GET /api/oms/user/orders/:orderId"](
