@@ -279,6 +279,9 @@ const loader = async (
     return null;
   }
   const params = withDefaultParams({ ...searchArgs, page });
+
+  const headers = new Headers();
+  headers.set("host", url.host);
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
@@ -287,12 +290,15 @@ const loader = async (
         facets: toPath(selected),
       }, {
         ...STALE,
-        headers: segment ? withSegmentCookie(segment) : undefined,
+        headers: segment ? withSegmentCookie(segment, headers) : headers,
       }).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
       ...params,
       facets: toPath(fselected),
-    }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
+    }, {
+      ...STALE,
+      headers: segment ? withSegmentCookie(segment, headers) : headers,
+    })
       .then((res) => res.json()),
   ]);
   // It is a feature from Intelligent Search on VTEX panel
