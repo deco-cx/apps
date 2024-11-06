@@ -63,16 +63,20 @@ function Component({
   return (
     <Head>
       {title && <title>{renderTemplateString(titleTemplate, title)}</title>}
-      {description && <meta
-        name="description"
-        content={renderTemplateString(descriptionTemplate, description)}
-      />}
+      {description && (
+        <meta
+          name="description"
+          content={renderTemplateString(descriptionTemplate, description)}
+        />
+      )}
       {themeColor && <meta name="theme-color" content={themeColor} />}
       {favicon && <link rel="icon" href={favicon} />}
 
       {/* Twitter tags */}
       {title && <meta property="twitter:title" content={title} />}
-      {description && <meta property="twitter:description" content={description} />}
+      {description && (
+        <meta property="twitter:description" content={description} />
+      )}
       {image && <meta property="twitter:image" content={image} />}
       {twitterCard && <meta property="twitter:card" content={twitterCard} />}
 
