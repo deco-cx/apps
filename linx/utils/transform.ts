@@ -206,12 +206,20 @@ export const toProduct = (
     additionalType: "categoryItem",
   }));
 
+  const displayPrice = {
+    "@type": "PropertyValue",
+    name: product.DisplayPrice,
+    value: product.DisplayPrice,
+    additionalType: "displayPrice",
+  };
+
   const additionalProperty = [
     ...skuOptions,
     ...metadatas,
     ...descriptions,
     ...prodOptions,
     ...categoryItems,
+    displayPrice,
   ];
 
   const hasVariant = level < 1
