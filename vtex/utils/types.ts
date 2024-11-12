@@ -1339,3 +1339,27 @@ export interface Orders {
     };
   };
 }
+
+export interface SalesChannel {
+  Id?: number;
+  Name?: string;
+  IsActive?: boolean;
+  ProductClusterId?: number | null;
+  CountryCode?: string;
+  CultureInfo?: string;
+  TimeZone?: string;
+  CurrencyCode?: string;
+  CurrencySymbol?: string;
+  CurrencyLocale?: number;
+  CurrencyFormatInfo?: {
+    CurrencyDecimalDigits?: number;
+    CurrencyDecimalSeparator?: string;
+    CurrencyGroupSeparator?: string;
+    CurrencyGroupSize?: number;
+    StartsWithCurrencySymbol?: boolean;
+  };
+  Origin?: string | null;
+  Position?: number | null;
+  ConditionRule?: string | null;
+  CurrencyDecimalDigits?: number;
+}
