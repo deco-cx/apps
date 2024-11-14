@@ -201,10 +201,13 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const { selectedFacets, ...args } = fromProps({ props });
-  const params = withDefaultParams(args);
+  const params = withDefaultParams({ ...args, locale });
   const facets = withDefaultFacets(selectedFacets, ctx);
+  console.log({ params, localeList: locale });
 
   const { products: vtexProducts } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({

@@ -37,8 +37,9 @@ const loaders = async (
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const { count, query } = props;
-  const locale = "pt-BR"; // config!.defaultLocale; // TODO
   const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const suggestions = () =>
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
