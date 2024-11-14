@@ -10,9 +10,8 @@ import { type LoadingFallbackProps } from "@deco/deco";
 interface Props extends SectionHeaderProps {
   /**
    * @title Slug Videos
-   * @description Slug separados por vírgula - dBXLVDZM,B9hKEmHZ,...
    */
-  slugs: string;
+  slugs: string[];
 }
 
 /**
@@ -21,8 +20,7 @@ interface Props extends SectionHeaderProps {
 export default function Stories({
   title = "Stories",
   cta = "See all",
-  slugs =
-    "lnSWxBFj,E5hUMpXl,o8GbO1r7,g31wys57,4J8mqGAD,Q41wyj80,NJ6WxSZp,lCx1dr89,ZI2NBKS7,ximkLtuV,AG6Fhvn0,YLohX8FM,lUwLnDpx,5ur2WIIU,PdfbAvpP",
+  slugs = ["lnSWxBFj","E5hUMpXl","o8GbO1r7","g31wys57","4J8mqGAD","Q41wyj80","NJ6WxSZp","lCx1dr89","ZI2NBKS7","ximkLtuV","AG6Fhvn0","YLohX8FM","lUwLnDpx","5ur2WIIU","PdfbAvpP"]
 }: Props) {
   return (
     <>
@@ -36,7 +34,7 @@ export default function Stories({
             height="80px"
             border-radius="50%"
             gap="25px"
-            slugs-video={slugs}
+            slugs-video={slugs.join(",")}
           >
             {/* @ts-ignore */}
           </liveshop-ads-carousel>
