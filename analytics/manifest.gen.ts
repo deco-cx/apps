@@ -4,6 +4,7 @@
 
 import * as $$$0 from "./loaders/DecoAnalyticsScript.ts";
 import * as $$$$$$0 from "./sections/Analytics/DecoAnalytics.tsx";
+import * as $$$$$$1 from "./sections/Analytics/OneDollarStats.tsx";
 
 const manifest = {
   "loaders": {
@@ -11,6 +12,7 @@ const manifest = {
   },
   "sections": {
     "analytics/sections/Analytics/DecoAnalytics.tsx": $$$$$$0,
+    "analytics/sections/Analytics/OneDollarStats.tsx": $$$$$$1,
   },
   "name": "analytics",
   "baseUrl": import.meta.url,
