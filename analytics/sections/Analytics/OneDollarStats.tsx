@@ -1,4 +1,4 @@
-import Plausible, { type Props } from "../../components/OneDollarStat.tsx";
+import Plausible, { type Props } from "../../components/OneDollarStats.tsx";
 
 function Section(props: Props) {
   return <Plausible {...props} />;
