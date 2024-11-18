@@ -58,7 +58,7 @@ export default function Banner(
     images,
     cta = { href: "/", label: "Click me!" },
     containerWidth,
-    link
+    link,
   }: Props,
 ) {
   return (

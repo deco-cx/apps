@@ -20,7 +20,23 @@ interface Props extends SectionHeaderProps {
 export default function Stories({
   title = "Stories",
   cta = "See all",
-  slugs = ["lnSWxBFj","E5hUMpXl","o8GbO1r7","g31wys57","4J8mqGAD","Q41wyj80","NJ6WxSZp","lCx1dr89","ZI2NBKS7","ximkLtuV","AG6Fhvn0","YLohX8FM","lUwLnDpx","5ur2WIIU","PdfbAvpP"]
+  slugs = [
+    "lnSWxBFj",
+    "E5hUMpXl",
+    "o8GbO1r7",
+    "g31wys57",
+    "4J8mqGAD",
+    "Q41wyj80",
+    "NJ6WxSZp",
+    "lCx1dr89",
+    "ZI2NBKS7",
+    "ximkLtuV",
+    "AG6Fhvn0",
+    "YLohX8FM",
+    "lUwLnDpx",
+    "5ur2WIIU",
+    "PdfbAvpP",
+  ],
 }: Props) {
   return (
     <>
