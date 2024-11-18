@@ -58,7 +58,7 @@ export function PreviewContainer(props: Props) {
           <liveshop-ads-carousel
             videos-width="100%"
             height="400px"
-            slugs-video={"dBXLVDZM"}
+            slugs-video={"y7CsjIQW,hgkY4Jep,zaz69CFN,5BIW6TxE"}
           >
             {/* @ts-ignore */}
           </liveshop-ads-carousel>
@@ -136,6 +136,33 @@ export function PreviewContainer(props: Props) {
             </div>
           )}
         </div>
+        {/* Stories */}
+        {/* @ts-ignore */}
+        <div
+          id="3957755711-00"
+          data-manifest-key="streamshop-app/sections/Stories.tsx"
+        >
+          <div class="container flex flex-col gap-4 sm:gap-6 w-full py-5 sm:py-10">
+            <div class="flex justify-between items-center gap-2 px-5 sm:px-0">
+              <span class="text-white text-2xl sm:text-3xl font-semibold">
+                Stories
+              </span>
+            </div>
+            <div
+              style="width: 100%; height: 100px;"
+              class="w-full px-5 sm:px-0"
+            >
+              <liveshop-ads-carousel
+                videos-width="80px"
+                height="80px"
+                border-radius="50%"
+                gap="25px"
+                slugs-video="dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J,dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J,dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J"
+              >
+              </liveshop-ads-carousel>
+            </div>
+          </div>
+        </div>
         <div class="flex gap-8 m-8 px-8 relative">
           {tabs?.map((tab, idx) => {
             return (
@@ -173,33 +200,7 @@ export function PreviewContainer(props: Props) {
           </script>
         </div>
 
-        {/* Stories */}
-        {/* @ts-ignore */}
-        <div
-          id="3957755711-00"
-          data-manifest-key="streamshop-app/sections/Stories.tsx"
-        >
-          <div class="container flex flex-col gap-4 sm:gap-6 w-full py-5 sm:py-10">
-            <div class="flex justify-between items-center gap-2 px-5 sm:px-0">
-              <span class="text-white text-2xl sm:text-3xl font-semibold">
-                Stories
-              </span>
-            </div>
-            <div
-              style="width: 100%; height: 100px;"
-              class="w-full px-5 sm:px-0"
-            >
-              <liveshop-ads-carousel
-                videos-width="80px"
-                height="80px"
-                border-radius="50%"
-                gap="25px"
-                slugs-video="dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J,dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J,dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J"
-              >
-              </liveshop-ads-carousel>
-            </div>
-          </div>
-        </div>
+        
 
         {
           /* Reels e Info
@@ -213,14 +214,14 @@ export function PreviewContainer(props: Props) {
             <div class="w-full flex justify-between items-start flex-col sm:flex-row gap-4 !px-5 md:!px-0">
               <div class="w-full">
                 <div class="text-white lynx-subtitle">
-                  MUITO&nbsp;MAIS&nbsp;INTERATIVIDADE&nbsp;E&nbsp;CONVERSÃO
+                Video Commerce StreamShop
                 </div>
                 <h2 class="lynx-heading !text-white">
                   <span
                     style="font-size: 24pt;"
                     data-mce-style="font-size: 24pt;"
                   >
-                    StreamShop + Mondelez
+                    Incorpore Reels interativos no seu ecommerce ou distribua por whatsapp 🚀
                   </span>
                 </h2>
                 <p class="lynx-paragraph !text-white">
@@ -229,8 +230,9 @@ export function PreviewContainer(props: Props) {
                       style="font-size: 18pt;color: white"
                       data-mce-style="font-size: 18pt;"
                     >
-                      Já imaginou poder transformar todos os videos da Mondelez
-                      em vídeos interativos?
+                      O Video Commerce da StreamShop é uma solução inovadora de simples implementação que eleva a experiência dos seus clientes com a sua marca.
+
+Incorpore os vídeos que você já produz para as redes sociais às páginas do seu site ou distribua por whatsapp, oferecendo muito mais conteúdo e interatividade para seus consumidores.
                     </span>
                     <br />‍
                   </strong>
@@ -239,20 +241,10 @@ export function PreviewContainer(props: Props) {
                     style="font-size: 14pt;color: white"
                     data-mce-style="font-size: 14pt;"
                   >
-                    O Video Commerce da StreamShop é uma solução inovadora de
-                    simples implementação que eleva a experiência dos seus
-                    clientes com a sua marca.
+                    Eleve a conversão de suas vendas. Abra a sua conta!
                   </span>
                   <br />
                   <br />
-                  <span
-                    style="font-size: 14pt;color: white"
-                    data-mce-style="font-size: 14pt;"
-                  >
-                    Incorpore os vídeos que você já produz para as redes sociais
-                    às páginas do seu site, oferecendo muito mais conteúdo e
-                    interatividade para seus consumidores.
-                  </span>
                   <br />‍
                   <br />
                   <span
