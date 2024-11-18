@@ -5,10 +5,6 @@ import Section from "../components/ui/Section.tsx";
 
 export interface Props {
   /**
-   * @title Link Video
-   */
-  link: string;
-  /**
    * @title Título
    */
   title?: string;
@@ -70,7 +66,7 @@ export default function Banner(
     >
       <div
         class="relative bg-base-200 mx-5 sm:mx-0"
-        hx-on:click={`openStreamShopLive('${link}')`}
+        hx-on:click="openStreamShopLive('https://live.hml.streamshop.com.br/trident/loja?v=WSkU9DFr')"
       >
         <Picture>
           {images?.mobile && (
