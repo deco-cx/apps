@@ -26,7 +26,7 @@ export interface State extends Omit<Props, "token"> {
  * @title Stream shop app
  * @description Integration of streamshop services.
  * @category Tools
- * @logo https://cdn.prod.website-files.com/6445b237edd0d4b3293ec173/64615f42bc5c993a71331743_SSHOP_LOGO-p-500.png
+ * @logo https://
  */
 export default function App(props: Props): App<Manifest, State> {
   const { token, account: _account } = props;
