@@ -111,8 +111,11 @@ export default function Proxy({
       ? url.pathname.replace(basePath, "")
       : url.pathname;
     const to = new URL(
-      `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}?${qs}`,
+      `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}`,
     );
+
+    to.search = qs;
+
     const headers = new Headers(req.headers);
     HOP_BY_HOP.forEach((h) => headers.delete(h));
     if (isFreshCtx<DecoSiteState>(_ctx)) {
@@ -128,6 +131,7 @@ export default function Proxy({
     headers.set("origin", req.headers.get("origin") ?? url.origin);
     headers.set("host", hostToUse ?? to.host);
     headers.set("x-forwarded-host", url.host);
+
     for (const { key, value } of customHeaders) {
       if (key === "cookie") {
         const existingCookie = headers.get("cookie");

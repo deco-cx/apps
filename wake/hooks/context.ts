@@ -83,7 +83,7 @@ const enqueue2 = (
         return;
       }
 
-      const isLocalhost = window.location.hostname === "localhost";
+      const isLocalhost = globalThis.location.hostname === "localhost";
 
       if (!isLocalhost) {
         const url = new URL("/api/carrinho", shop.checkoutUrl);

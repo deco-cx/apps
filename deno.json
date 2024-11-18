@@ -38,7 +38,7 @@
   },
   "lock": false,
   "tasks": {
-    "check": "deno fmt && deno lint && deno check **/mod.ts",
+    "check": "deno fmt && deno lint && deno check --allow-import **/mod.ts",
     "release": "deno eval 'import \"deco/scripts/release.ts\"'",
     "start": "deno run -A ./scripts/start.ts",
     "bundle": "deno run -A jsr:@deco/deco/scripts/bundle",
@@ -62,5 +62,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "version": "0.62.4"
+  "version": "0.63.0"
 }

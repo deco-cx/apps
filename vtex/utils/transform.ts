@@ -356,7 +356,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     items
       .flatMap((i) => i.images)
       .reduce((map, img) => {
-        map.set(getImageKey(img.imageUrl), img.imageUrl);
+        img?.imageUrl && map.set(getImageKey(img.imageUrl), img.imageUrl);
         return map;
       }, new Map<string, string>());
 
