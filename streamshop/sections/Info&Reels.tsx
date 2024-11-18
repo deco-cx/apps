@@ -35,7 +35,7 @@ export default function InfoStories(
   {
     title,
     cta,
-    storeSlug,
+    storeSlug = "streamshopdemo",
     size = { width: "300px", height: "500px" },
     text = `<div class="lynx-subtitle">
 <div>Video Commerce StreamShop</div>
@@ -49,17 +49,6 @@ export default function InfoStories(
       <Section.Container>
         <Section.Header title={title} cta={cta} />
         <div class="w-full flex justify-between items-start flex-col sm:flex-row gap-4 !px-5 md:!px-0">
-          {
-            /* <div
-          style={{
-            display: "inline-block",
-            height: "auto",
-            cursor: "pointer",
-            overflow: "hidden",
-            borderRadius: "0px"
-          }}
-          hx-on:click="openStreamShopLive('https://live.hml.streamshop.com.br/trident/loja?v=WSkU9DFr')">AQUI</div> */
-          }
           <div class="w-full" dangerouslySetInnerHTML={{ __html: text }}>
           </div>
 
@@ -71,9 +60,7 @@ export default function InfoStories(
               class="max-md:max-w-[380px]  max-md:min-h-[675px]  aspect-[9/16]"
               style="border-radius: 16px; overflow: hidden"
               frameborder="0"
-              src={storeSlug
-                ? `https://lite.streamshop.com.br/${storeSlug}`
-                : "https://lite.streamshop.com.br/streamshopdemo"}
+              src={`https://lite.streamshop.com.br/${storeSlug}`}
               height={size.height}
               width={size.width}
               allow="fullscreen; autoplay; picture-in-picture"
