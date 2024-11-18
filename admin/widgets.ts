@@ -25,6 +25,11 @@ export type SiteRoute = string;
 export type MapWidget = string;
 
 /**
+ * @format date-time
+ */
+export type DateTime = string;
+
+/**
  * @format textarea
  */
 export type TextArea = string;
