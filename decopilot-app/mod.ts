@@ -22,7 +22,7 @@ import AnthropicApp from "../anthropic/mod.ts";
 // export type AppManifest = ManifestOf<App>;
 
 export type App = ReturnType<typeof Decopilot>;
-export type AppContext = AC<App>;
+export type AppContext = AC<App> & { prompt: Prompt };
 
 export interface Props {
   credentials: Credentials[];
