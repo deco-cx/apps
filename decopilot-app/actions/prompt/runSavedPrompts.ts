@@ -1,5 +1,4 @@
-// import { shortcircuit } from "@deco/deco";
-import { callAntropic, callOpenAI } from "../../clients/llmClientObjects.ts";
+import { callAnthropic } from "../../clients/llmClientObjects.ts";
 import type { AppContext } from "../../mod.ts";
 import type { Attachment, LLMResponseType } from "../../types.ts";
 
@@ -24,15 +23,8 @@ export default async function action(
   }
 
   if (prompt.provider === "Anthropic") {
-    return await callAntropic(prompt, ctx, attachments ?? []);
+    return await callAnthropic(prompt, ctx, attachments ?? []);
   }
-
-  if (prompt.provider === "OpenAI") {
-    return await callOpenAI(prompt, ctx, attachments ?? []);
-  }
-  // if (prompt.provider === "Custom") {
-  //   return await callCustomProvider(prompt, ctx, attachments);
-  // }
 
   throw new Error(`Provider ${prompt.provider} is not supported`);
 }

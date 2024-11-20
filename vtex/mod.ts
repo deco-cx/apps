@@ -44,7 +44,7 @@ export interface Props {
   account: string;
   /**
    * @title Public store URL
-   * @description Domain that is registered on License Manager (e.g: www.mystore.com.br)
+   * @description Domain that is registered on License Manager (e.g: secure.mystore.com.br) to enable account/checkout/api proxy. Important: dont use the same domain as the public store url, or it will create a loop and break the app.
    */
   publicUrl: string;
   /**
