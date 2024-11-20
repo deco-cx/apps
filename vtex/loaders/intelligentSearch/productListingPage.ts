@@ -26,6 +26,7 @@ import {
   toProduct,
 } from "../../utils/transform.ts";
 import type {
+  CollectionList,
   Facet,
   Fuzzy,
   PageType,
@@ -248,7 +249,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const { vcsDeprecated } = ctx;
+  const { vcsDeprecated, vcs } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
@@ -262,9 +263,40 @@ const loader = async (
     const result = await PLPDefaultPath({ level: 1 }, req, ctx);
     pathToUse = result?.possiblePaths[0] ?? pathToUse;
   }
-  const pageTypesPromise = pageTypesFromUrl(pathToUse, ctx);
-  const allPageTypes = await pageTypesPromise;
-  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+
+  const getPageName = async (
+    type: PageType,
+  ): Promise<CollectionList | null> => {
+    if (!type.name) return null;
+
+    try {
+      const response = await vcs
+        ["GET /api/catalog_system/pvt/collection/search/:searchTerms"]({
+          searchTerms: type.name,
+          page: 1,
+          pageSize: 15,
+        });
+
+      return response.json() as Promise<CollectionList>;
+    } catch (error) {
+      console.error(`Error fetching data for type: ${type.name}`, error);
+      return null;
+    }
+  };
+
+  const allPageTypes = await pageTypesFromUrl(pathToUse, ctx);
+  const validPageTypes = getValidTypesFromPageTypes(allPageTypes);
+  const possiblePageName = await getPageName(
+    validPageTypes[validPageTypes.length - 1],
+  );
+
+  const pageName = possiblePageName?.items?.[0]?.id.toString() ?? null;
+  const currentName = possiblePageName?.items?.[0]?.name ?? null;
+  const hasName = validPageTypes.find((type) => type.name === pageName);
+  const pageTypes = hasName
+    ? [{ ...validPageTypes[0], name: currentName }]
+    : validPageTypes;
+
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
@@ -295,6 +327,7 @@ const loader = async (
     }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
       .then((res) => res.json()),
   ]);
+
   // It is a feature from Intelligent Search on VTEX panel
   // redirect to a specific page based on configured rules
   if (productsResult.redirect) {
