@@ -26,7 +26,6 @@ import {
   toProduct,
 } from "../../utils/transform.ts";
 import type {
-  CollectionList,
   Facet,
   Fuzzy,
   PageType,
@@ -109,6 +108,11 @@ export interface Props {
    * @description Override selected facets from url
    */
   selectedFacets?: SelectedFacet[];
+  /**
+   * @title Use collection name
+   * @description Overwrite the page title with the collection name
+   */
+  useCollectionName?: boolean;
   /**
    * @title Hide Unavailable Items
    * @description Do not return out of stock items
@@ -249,7 +253,7 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
-  const { vcsDeprecated, vcs } = ctx;
+  const { vcsDeprecated } = ctx;
   const { url: baseUrl } = req;
   const url = new URL(props.pageHref || baseUrl);
   const segment = getSegmentFromBag(ctx);
@@ -259,43 +263,14 @@ const loader = async (
     url,
   );
   let pathToUse = url.href.replace(url.origin, "");
+
   if (pathToUse === "/" || pathToUse === "/*") {
     const result = await PLPDefaultPath({ level: 1 }, req, ctx);
     pathToUse = result?.possiblePaths[0] ?? pathToUse;
   }
 
-  const getPageName = async (
-    type: PageType,
-  ): Promise<CollectionList | null> => {
-    if (!type.name) return null;
-
-    try {
-      const response = await vcs
-        ["GET /api/catalog_system/pvt/collection/search/:searchTerms"]({
-          searchTerms: type.name,
-          page: 1,
-          pageSize: 15,
-        });
-
-      return response.json() as Promise<CollectionList>;
-    } catch (error) {
-      console.error(`Error fetching data for type: ${type.name}`, error);
-      return null;
-    }
-  };
-
   const allPageTypes = await pageTypesFromUrl(pathToUse, ctx);
-  const validPageTypes = getValidTypesFromPageTypes(allPageTypes);
-  const possiblePageName = await getPageName(
-    validPageTypes[validPageTypes.length - 1],
-  );
-
-  const pageName = possiblePageName?.items?.[0]?.id.toString() ?? null;
-  const currentName = possiblePageName?.items?.[0]?.name ?? null;
-  const hasName = validPageTypes.find((type) => type.name === pageName);
-  const pageTypes = hasName
-    ? [{ ...validPageTypes[0], name: currentName }]
-    : validPageTypes;
+  const pageTypes = getValidTypesFromPageTypes(allPageTypes);
 
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
@@ -310,6 +285,7 @@ const loader = async (
   if (!isInSeachFormat && !pathQuery) {
     return null;
   }
+
   const params = withDefaultParams({ ...searchArgs, page });
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
@@ -327,6 +303,23 @@ const loader = async (
     }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
       .then((res) => res.json()),
   ]);
+
+  const fisrtProduct = productsResult.products[0];
+
+  if (props.useCollectionName && fisrtProduct) {
+    const collectionId = pageTypes.at(-1)?.name ?? null;
+    const collectionName: string | null = collectionId
+      ? fisrtProduct.productClusters.find((collection) =>
+        collection.id === collectionId
+      )?.name ?? null
+      : null;
+    // create a new object and pass it to pagetoseo and have an if there
+    // if (collectionName) {
+    //   pageTypes[pageTypes.length - 1].name = collectionName;
+    // }
+  }
+
+  console.log(pageTypes)
 
   // It is a feature from Intelligent Search on VTEX panel
   // redirect to a specific page based on configured rules
