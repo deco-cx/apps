@@ -1,26 +1,8 @@
 import type { App, FnContext } from "@deco/deco";
-import { fetchSafe } from "apps/utils/fetch.ts";
-import { createHttpClient } from "apps/utils/http.ts";
 import { PreviewContainer } from "./components/ui/Preview.tsx";
-import type { Secret } from "apps/website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { ClientInterfaceExample } from "./utils/client.ts";
 
-export type AppContext = FnContext<State, Manifest>;
-
-export interface Props {
-  /** @hidden */
-  account?: string;
-
-  /** @hidden */
-  token?: Secret;
-}
-
-// Here we define the state of the app
-// You choose what to put in the state
-export interface State extends Omit<Props, "token"> {
-  api: ReturnType<typeof createHttpClient<ClientInterfaceExample>>;
-}
+export type AppContext = FnContext< Manifest>;
 
 /**
  * @title Stream shop app
@@ -28,24 +10,9 @@ export interface State extends Omit<Props, "token"> {
  * @category Tools
  * @logo https://
  */
-export default function App(props: Props): App<Manifest, State> {
-  const { token, account: _account } = props;
-
-  const _stringToken = typeof token === "string" ? token : token?.get?.() ?? "";
-
-  const api = createHttpClient<ClientInterfaceExample>({
-    base: `https://api.github.com/users/guitavano`,
-    // headers: new Headers({ "Authorization": `Bearer ${stringToken}` }),
-    fetcher: fetchSafe,
-  });
-
-  // it is the state of the app, all data
-  // here will be available in the context of
-  // loaders, actions and workflows
-  const state = { ...props, api };
+export default function App(): App<Manifest> {
 
   return {
-    state,
     manifest,
   };
 }

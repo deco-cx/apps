@@ -1,7 +1,7 @@
 import { type HTMLWidget, type ImageWidget } from "apps/admin/widgets.ts";
 import { Picture, Source } from "apps/website/components/Picture.tsx";
 import { clx } from "../sdk/clx.ts";
-import Section from "../components/ui/Section.tsx";
+import Section from "../components/ui/StreamshopSection.tsx";
 
 export interface Props {
   /**
@@ -68,29 +68,33 @@ export default function Banner(
         class="relative bg-base-200 mx-5 sm:mx-0"
         hx-on:click="openStreamShopLive('https://live.hml.streamshop.com.br/trident/loja?v=WSkU9DFr')"
       >
-        <Picture>
-          {images?.mobile && (
-            <Source
-              media="(max-width: 640px)"
-              src={images.mobile.src}
-              width={images.mobile.width}
-              height={images.mobile?.height}
+        { images?.desktop?.src ? (
+          <Picture>
+            {images?.mobile && (
+              <Source
+                media="(max-width: 640px)"
+                src={images.mobile.src}
+                width={images.mobile.width}
+                height={images.mobile?.height}
+              />
+            )}
+            {images?.desktop && (
+              <Source
+                media="(min-width: 640px)"
+                src={images.desktop.src}
+                width={images.desktop.width}
+                height={images.desktop.height}
+              />
+            )}
+            <img
+              src={images?.desktop?.src}
+              alt={title}
+              class="w-full object-cover"
             />
-          )}
-          {images?.desktop && (
-            <Source
-              media="(min-width: 640px)"
-              src={images.desktop.src}
-              width={images.desktop.width}
-              height={images.desktop.height}
-            />
-          )}
-          <img
-            src={images?.desktop?.src || "https://fakeimg.pl/1320x448/"}
-            alt={title}
-            class="w-full object-cover"
-          />
         </Picture>
+        ): (
+          <div class="flex max-w-full w-[1320px]  min-h-[448px] bg-slate-400"></div>
+        )}
 
         <div
           class={clx(

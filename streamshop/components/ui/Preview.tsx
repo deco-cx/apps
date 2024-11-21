@@ -1,8 +1,8 @@
 import { ComponentChildren } from "preact";
 import { useId } from "preact/hooks";
 import HTMXSection from "apps/htmx/sections/htmx.tsx";
-import Slider from "./Slider.tsx";
-import SliderJS from "apps/htmx/sections/htmx.tsx";
+import Slider from "../../../utils/components/Slider";
+import SliderJS from "../../../utils/components/SliderJS";
 
 interface Props {
   name: string;
@@ -132,7 +132,7 @@ export function PreviewContainer(props: Props) {
                     </li>
                   ))}
               </ul>
-              <Slider.JS rootId={id} interval={5000} infinite />
+              <SliderJS rootId={id} interval={5000} infinite />
             </div>
           )}
         </div>
