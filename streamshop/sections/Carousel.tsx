@@ -1,13 +1,10 @@
 import { clx } from "../sdk/clx.ts";
 import Section, {
   Props as SectionHeaderProps,
-} from "../components/ui/Section.tsx";
+} from "../components/ui/StreamshopSection.tsx";
 import { type LoadingFallbackProps } from "@deco/deco";
 import { useDevice } from "@deco/deco/hooks";
 
-// notice that using the same types from the loaders
-// it will be easier to use the data from the loaders
-// on deco.cx admin
 
 interface StyleDesktop {
   /**
@@ -62,10 +59,9 @@ interface Style {
 
 interface Props extends SectionHeaderProps {
   /**
-   * @title Slug Videos
-   * @description Slug separados por vírgula - dBXLVDZM,B9hKEmHZ,...
+   * @title Slug dos videos
    */
-  slugs: string;
+  slugs: string[];
 
   /**
    * @title Estilo
@@ -80,7 +76,7 @@ export default function Carousel({
   title = "Title",
   cta,
   slugs =
-    "lnSWxBFj,E5hUMpXl,o8GbO1r7,g31wys57,4J8mqGAD,Q41wyj80,NJ6WxSZp,lCx1dr89,ZI2NBKS7,ximkLtuV,AG6Fhvn0,YLohX8FM,lUwLnDpx,5ur2WIIU,PdfbAvpP",
+   [ "lnSWxBFj","E5hUMpXl","o8GbO1r7","g31wys57","4J8mqGAD","Q41wyj80","NJ6WxSZp","lCx1dr89","ZI2NBKS7","ximkLtuV","AG6Fhvn0","YLohX8FM","lUwLnDpx","5ur2WIIU","PdfbAvpP"],
   style = {
     styleDesktop: {
       videoWidth: "300px",
@@ -122,7 +118,7 @@ export default function Carousel({
               : style?.radius == "pílula"
               ? "500px"
               : "5px"}
-            slugs-video={slugs}
+            slugs-video={slugs.join(",")}
           >
             {/* @ts-ignore */}
           </liveshop-ads-carousel>
