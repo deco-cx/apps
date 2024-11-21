@@ -107,6 +107,7 @@ export const pageTypesToSeo = (
   pages: PageType[],
   baseUrl: string,
   currentPage?: number,
+  collectionPageType?: PageType[],
 ): Seo | null => {
   const current = pages.at(-1);
 
@@ -114,13 +115,16 @@ export const pageTypesToSeo = (
   const fullTextSearch = url.searchParams.get("q");
   const hasMapTermOrSkuId =
     !!(url.searchParams.get("map") || url.searchParams.get("skuId"));
+  const collectionName = collectionPageType?.at(-1)?.name;
 
   if (
     (!current || current.pageType === "Search" ||
       current.pageType === "FullText") && fullTextSearch
   ) {
     return {
-      title: capitalize(fullTextSearch),
+      title: collectionName
+        ? capitalize(collectionName)
+        : capitalize(fullTextSearch),
       description: capitalize(fullTextSearch),
       canonical: url.href,
       noIndexing: hasMapTermOrSkuId,
@@ -132,7 +136,7 @@ export const pageTypesToSeo = (
   }
 
   return {
-    title: current.title || current.name || "",
+    title: collectionName || current.title || current.name || "",
     description: current.metaTagDescription!,
     noIndexing: hasMapTermOrSkuId,
     canonical: toCanonical(

@@ -305,6 +305,7 @@ const loader = async (
   ]);
 
   const fisrtProduct = productsResult.products[0];
+  let collectionPageType: PageType[] | undefined = undefined;
 
   if (props.useCollectionName && fisrtProduct) {
     const collectionId = pageTypes.at(-1)?.name ?? null;
@@ -313,13 +314,13 @@ const loader = async (
         collection.id === collectionId
       )?.name ?? null
       : null;
-    // create a new object and pass it to pagetoseo and have an if there
-    // if (collectionName) {
-    //   pageTypes[pageTypes.length - 1].name = collectionName;
-    // }
-  }
 
-  console.log(pageTypes)
+    if (collectionName) {
+      const lastPageType = { ...pageTypes[pageTypes.length - 1] };
+      lastPageType.name = collectionName;
+      collectionPageType = [lastPageType];
+    }
+  }
 
   // It is a feature from Intelligent Search on VTEX panel
   // redirect to a specific page based on configured rules
@@ -408,6 +409,7 @@ const loader = async (
       pageTypes,
       baseUrl,
       hasPreviousPage ? currentPage : undefined,
+      collectionPageType,
     ),
   };
 };
