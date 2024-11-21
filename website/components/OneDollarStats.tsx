@@ -16,10 +16,10 @@ function Component({ collectorAddress }: Props) {
 
   return (
     <Head>
-      <link rel="dns-prefetch" href="https://collector.deco.cx/events" />
+      <link rel="dns-prefetch" href={collector} />
       <link
         rel="preconnect"
-        href="https://collector.deco.cx/events"
+        href={collector}
         crossOrigin="anonymous"
       />
       <script
