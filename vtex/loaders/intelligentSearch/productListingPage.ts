@@ -306,8 +306,7 @@ const loader = async (
       }, {
         ...STALE,
         headers: segment ? withSegmentCookie(segment) : undefined,
-      })
-      .then((res) => res.json()),
+      }).then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
       ...params,
       facets: toPath(fselected),
