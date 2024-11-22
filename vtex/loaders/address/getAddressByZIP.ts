@@ -42,7 +42,7 @@ export default async function loader(
 
     return addressByPostalCode;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return {
       postalCode: "",
       city: "",
