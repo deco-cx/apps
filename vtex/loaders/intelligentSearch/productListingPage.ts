@@ -291,9 +291,6 @@ const loader = async (
 
   const params = withDefaultParams({ ...searchArgs, page, locale });
 
-  const headers = new Headers();
-  headers.set("host", url.host);
-
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
@@ -302,15 +299,13 @@ const loader = async (
         facets: toPath(selected),
       }, {
         ...STALE,
-        headers: segment ? withSegmentCookie(segment, headers) : headers,
-      }).then((res) => res.json()),
+        headers: segment ? withSegmentCookie(segment) : undefined,
+      })
+      .then((res) => res.json()),
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/facets/*facets"]({
       ...params,
       facets: toPath(fselected),
-    }, {
-      ...STALE,
-      headers: segment ? withSegmentCookie(segment, headers) : headers,
-    })
+    }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
       .then((res) => res.json()),
   ]);
 
