@@ -18,7 +18,6 @@ async function loader(
   if (!payload?.sub || !payload?.userId) {
     return null;
   }
-  console.log({ teste: payload?.userId });
 
   const query = `query getUserProfile { profile { passwordLastUpdate }}`;
 
@@ -27,8 +26,6 @@ async function loader(
       { query },
       { headers: { cookie } },
     );
-
-    console.log({ profile });
 
     return profile.passwordLastUpdate ?? null;
   } catch (_) {
