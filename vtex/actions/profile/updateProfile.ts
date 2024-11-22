@@ -73,7 +73,7 @@ const updateProfile = async (
       givenName: updatedUser?.firstName,
       familyName: updatedUser?.lastName,
       taxID: updatedUser?.document?.replace(/[^\d]/g, ""),
-      gender: updatedUser?.gender === "female"
+      gender: (updatedUser?.gender === "f" || updatedUser?.gender === "female")
         ? "https://schema.org/Female"
         : "https://schema.org/Male",
       telephone: updatedUser?.homePhone,
