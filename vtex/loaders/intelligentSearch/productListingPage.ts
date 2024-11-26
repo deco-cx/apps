@@ -304,23 +304,20 @@ const loader = async (
       .then((res) => res.json()),
   ]);
 
-  const fisrtProduct = productsResult.products[0];
-  let collectionPageType: PageType[] | undefined = undefined;
+  const currentPageTypes = !props.useCollectionName
+    ? pageTypes
+    : pageTypes.map((pageType) => {
+      if (pageType.id !== pageTypes.at(-1)?.id) return pageType;
 
-  if (props.useCollectionName && fisrtProduct) {
-    const collectionId = pageTypes.at(-1)?.name ?? null;
-    const collectionName: string | null = collectionId
-      ? fisrtProduct.productClusters.find((collection) =>
-        collection.id === collectionId
-      )?.name ?? null
-      : null;
+      const name = productsResult?.products?.[0]?.productClusters?.find(
+        (collection) => collection.id === pageType.name,
+      )?.name ?? pageType.name;
 
-    if (collectionName) {
-      const lastPageType = { ...pageTypes[pageTypes.length - 1] };
-      lastPageType.name = collectionName;
-      collectionPageType = [lastPageType];
-    }
-  }
+      return {
+        ...pageType,
+        name,
+      };
+    });
 
   // It is a feature from Intelligent Search on VTEX panel
   // redirect to a specific page based on configured rules
@@ -406,10 +403,9 @@ const loader = async (
     },
     sortOptions,
     seo: pageTypesToSeo(
-      pageTypes,
+      currentPageTypes,
       baseUrl,
       hasPreviousPage ? currentPage : undefined,
-      collectionPageType,
     ),
   };
 };
