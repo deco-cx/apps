@@ -9,10 +9,11 @@ export interface PaginationOptions {
   offset?: number;
   order?:
     | "date_desc"
-    | "date_ASC"
-    | "rate_DESC"
-    | "rate_ASC"
-    | "helpfulrating_DESC";
+    | "date_asc"
+    | "rate_desc"
+    | "rate_asc"
+    | "helpfulrating_desc";
+  isSimilarTo?: boolean;
 }
 const MessageError = {
   ratings:
@@ -23,6 +24,15 @@ const MessageError = {
     "🔴⭐ Error on call Full Review of Verified Review - probably unidentified product",
 };
 const baseUrl = "https://awsapis3.netreviews.eu/product";
+
+export const getSimilarProductIds = (product: Product): string[] => {
+  const similarProducts = product.isSimilarTo ?? [];
+  return [
+    product.isVariantOf!.productGroupID,
+    ...similarProducts.map((p) => p.productID),
+  ].filter(Boolean);
+};
+
 export const createClient = (params: ConfigVerifiedReviews | undefined) => {
   if (!params) {
     return;
@@ -102,14 +112,16 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     });
   };
   const fullReview = async (
-    { productId, count = 5, offset = 0 }: PaginationOptions & {
-      productId: string;
-    },
+    { productId, count = 5, offset = 0, order = "date_desc" }:
+      & PaginationOptions
+      & {
+        productId: string;
+      },
   ): Promise<VerifiedReviewsFullReview> => {
     try {
       const response = await Promise.all([
         rating({ productId }),
-        reviews({ productId, count, offset }),
+        reviews({ productId, count, offset, order }),
       ]);
       const [responseRating, responseReview] = response.flat() as [
         Ratings,
