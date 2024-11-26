@@ -71,6 +71,12 @@ export interface Props {
   page?: number;
 
   /**
+   * @title Use collection name
+   * @description Overwrite the page title with the collection name
+   */
+  useCollectionName?: boolean;
+
+  /**
    * @description Include similar products
    * @deprecated Use product extensions instead
    */
@@ -281,6 +287,22 @@ const loader = async (
       ),
   );
 
+  const currentPageTypes = !props.useCollectionName
+    ? pageTypes
+    : pageTypes.map((pageType) => {
+      if (pageType.id !== pageTypes.at(-1)?.id) return pageType;
+
+      const name = products?.[0]?.additionalProperty?.find(
+        (property) =>
+          property.name === "cluster" && property.propertyID === pageType.name,
+      )?.value ?? pageType.name;
+
+      return {
+        ...pageType,
+        name,
+      };
+    });
+
   const getFlatCategories = (
     CategoriesTrees: LegacyFacet[],
   ): Record<string, LegacyFacet[]> => {
@@ -395,7 +417,7 @@ const loader = async (
     },
     sortOptions,
     seo: pageTypesToSeo(
-      pageTypes,
+      currentPageTypes,
       baseUrl,
       hasPreviousPage ? currentPage : undefined,
     ),
