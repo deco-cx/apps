@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { ProductDetailsPage } from "../../commerce/types.ts";
+import { ProductDetailsPage, Review } from "../../commerce/types.ts";
 import { ExtensionOf } from "../../website/loaders/extension.ts";
 import {
   createClient,
@@ -43,8 +43,32 @@ export default function productDetailsPage(
         similarProductIds.map(fetchFullReview),
       );
 
+      const similarReviewsFlat = similarReviews.flatMap((review) =>
+        review || []
+      );
+
+      const similarReviewsRatings = similarReviewsFlat.reduce(
+        (acc, review) => {
+          const reviewCount = review.aggregateRating?.reviewCount || 0;
+          return {
+            reviewCount: acc.reviewCount + reviewCount,
+            reviews: [...acc.reviews, ...(review.review || [])],
+          };
+        },
+        { reviewCount: 0, reviews: [] } as {
+          reviewCount: number;
+          reviews: Review[];
+        },
+      );
+
       combinedReviews = {
         ...fullReview,
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ...fullReview.aggregateRating,
+          reviewCount: (fullReview.aggregateRating?.reviewCount || 0) +
+            similarReviewsRatings.reviewCount,
+        },
         review: [
           ...(fullReview.review || []),
           ...similarReviews.flatMap((review) => review.review || []),
