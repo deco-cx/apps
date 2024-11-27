@@ -33,6 +33,11 @@ export interface Props {
    */
   slug?: RequestURLParam;
   /**
+   * @title Specific post slugs
+   * @description Filter by specific post slugs.
+   */
+  postSlugs?: string[];
+  /**
    * @title Page sorting parameter
    * @description The sorting option. Default is "date_desc"
    */
@@ -49,7 +54,7 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-  { page, count, slug, sortBy }: Props,
+  { page, count, slug, sortBy, postSlugs }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<BlogPost[] | null> {
@@ -65,7 +70,13 @@ export default async function BlogPostList(
   );
 
   try {
-    const handledPosts = await handlePosts(posts, pageSort, ctx, slug);
+    const handledPosts = await handlePosts(
+      posts,
+      pageSort,
+      ctx,
+      slug,
+      postSlugs,
+    );
 
     if (!handledPosts) {
       return null;

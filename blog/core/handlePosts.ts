@@ -107,6 +107,15 @@ export const filterPostsByCategory = (posts: BlogPost[], slug?: string) =>
     : posts;
 
 /**
+ * Returns an filtered BlogPost list by specific slugs
+ *
+ * @param posts Posts to be handled
+ * @param postSlugs Specific slugs to be filter
+ */
+export const filterPostsBySlugs = (posts: BlogPost[], postSlugs: string[]) =>
+  posts.filter(({ slug }) => postSlugs.includes(slug));
+
+/**
  * Returns an filtered and sorted BlogPost list
  *
  * @param posts Posts to be handled
@@ -136,8 +145,11 @@ export default async function handlePosts(
   sortBy: SortBy,
   ctx: AppContext,
   slug?: string,
+  postSlugs?: string[],
 ) {
-  const filteredPosts = filterPostsByCategory(posts, slug);
+  const filteredPosts = postSlugs && postSlugs.length > 0
+    ? filterPostsBySlugs(posts, postSlugs)
+    : filterPostsByCategory(posts, slug);
 
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;
