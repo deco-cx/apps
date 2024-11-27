@@ -7,6 +7,7 @@ import {
   ProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -26,6 +27,7 @@ const loader = async (
   const { storefront } = ctx;
   const { query, limit = 10 } = props;
 
+  const partnerAccessToken = getPartnerCookie(req.headers);
   const headers = parseHeaders(req.headers);
 
   if (!query) return null;
@@ -34,7 +36,7 @@ const loader = async (
     AutocompleteQuery,
     AutocompleteQueryVariables
   >({
-    variables: { query, limit },
+    variables: { query, limit, partnerAccessToken },
     ...Autocomplete,
   }, {
     headers,
