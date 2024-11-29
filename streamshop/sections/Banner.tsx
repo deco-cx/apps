@@ -36,6 +36,10 @@ export interface Props {
     href: string;
     label: string;
   };
+  /**
+   * @title Link
+   */
+  link?: string;
 
   /**
    * @title Container
@@ -66,7 +70,7 @@ export default function Banner(
     >
       <div
         class="relative bg-base-200 mx-5 sm:mx-0"
-        hx-on:click="openStreamShopLive('https://live.hml.streamshop.com.br/trident/loja?v=WSkU9DFr')"
+        hx-on:click={`openStreamShopLive('${link}')`}
       >
         { images?.desktop?.src ? (
           <Picture>
