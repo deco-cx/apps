@@ -449,12 +449,19 @@ export interface PickupStoreInfo {
   dockId: null;
 }
 
+export interface PickupHolidays {
+  date?: string;
+  hourBegin?: string;
+  hourEnd?: string;
+}
+
 export interface PickupPoint {
   friendlyName: string;
   address: Address;
   additionalInfo: string;
   id: string;
   businessHours: BusinessHour[];
+  pickupHolidays?: PickupHolidays[];
 }
 
 export interface BusinessHour {
