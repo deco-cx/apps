@@ -27,6 +27,7 @@ export default async function loader(
         clientEmail,
         page,
         per_page,
+        includeProfileLastPurchases: true,
       },
       {
         headers: {
