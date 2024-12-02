@@ -1,22 +1,20 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { Anthropic } from "./deps.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-
+import { type App, type AppContext as AC } from "@deco/deco";
 export interface Props {
   /**
    * @title Anthropic API Key
    */
   apiKey?: Secret;
 }
-
 export interface State {
   anthropic: Anthropic;
   token?: string;
 }
-
 /**
  * @title Anthropic
+ * @description Interact with the Anthropic API.
  */
 export default function App(state: Props): App<Manifest, State> {
   const getToken = state?.apiKey?.get;

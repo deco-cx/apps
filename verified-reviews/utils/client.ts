@@ -1,15 +1,10 @@
-import { context } from "deco/live.ts";
-
 import { fetchAPI } from "../../utils/fetch.ts";
-import { Product } from "../../commerce/types.ts";
-
-import { ConfigVerifiedReviews } from "../mod.ts";
-
-import { getRatingProduct, toReview } from "./transform.ts";
 import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
-
+import { Product } from "../../commerce/types.ts";
+import { ConfigVerifiedReviews } from "../mod.ts";
+import { getRatingProduct, toReview } from "./transform.ts";
+import { context } from "@deco/deco";
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
-
 export interface PaginationOptions {
   count?: number;
   offset?: number;
@@ -20,7 +15,6 @@ export interface PaginationOptions {
     | "rate_asc"
     | "most_helpful";
 }
-
 const MessageError = {
   ratings:
     "🔴⭐ Error on call ratings of Verified Review - probably unidentified product",
@@ -29,29 +23,27 @@ const MessageError = {
   fullReview:
     "🔴⭐ Error on call Full Review of Verified Review - probably unidentified product",
 };
-
 const baseUrl = "https://awsapis3.netreviews.eu/product";
-
 export const createClient = (params: ConfigVerifiedReviews | undefined) => {
-  if (!params) return;
-
+  if (!params) {
+    return;
+  }
   const { idWebsite } = params;
-
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#338f8f1b-4379-40a2-8893-080fe5234679 */
-  const rating = async ({ productId }: { productId: string }) => {
+  const rating = async ({ productId }: {
+    productId: string;
+  }) => {
     const payload = {
       query: "average",
       products: [productId],
       idWebsite: idWebsite,
       plateforme: "br",
     };
-
     try {
       const data = await fetchAPI<Ratings>(`${baseUrl}`, {
         method: "POST",
         body: JSON.stringify(payload),
       });
-
       return Object.keys(data).length ? data : undefined;
     } catch (error) {
       if (context.isDeploy) {
@@ -62,9 +54,10 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return undefined;
     }
   };
-
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#6d8ab05a-28b6-48b3-9e8f-6bbbc046619a */
-  const ratings = async ({ productsIds }: { productsIds: string[] }) => {
+  const ratings = async ({ productsIds }: {
+    productsIds: string[];
+  }) => {
     const payload = {
       query: "average",
       products: productsIds,
@@ -76,7 +69,6 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
         method: "POST",
         body: JSON.stringify(payload),
       });
-
       return Object.keys(data).length ? data : undefined;
     } catch (error) {
       if (context.isDeploy) {
@@ -88,16 +80,14 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return undefined;
     }
   };
-
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
-  const reviews = ({
-    productId,
-    count = 5,
-    offset = 0,
-    order = "date_desc",
-  }: PaginationOptions & {
-    productId: string;
-  }) => {
+  const reviews = (
+    { productId, count = 5, offset = 0, order = "date_desc" }:
+      & PaginationOptions
+      & {
+        productId: string;
+      },
+  ) => {
     const payload = {
       query: "reviews",
       product: productId,
@@ -127,12 +117,10 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
         rating({ productId }),
         reviews({ productId, count, offset, order }),
       ]);
-
       const [responseRating, responseReview] = response.flat() as [
         Ratings,
         Reviews | null,
       ];
-
       return {
         aggregateRating: getRatingProduct({
           ratings: responseRating,
@@ -152,7 +140,6 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       };
     }
   };
-
   const storeReview = async (): Promise<Reviews["reviews"] | null> => {
     try {
       const response = await fetchAPI<Reviews["reviews"]>(
@@ -161,10 +148,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
           method: "GET",
         },
       );
-
-      return (
-        response ? response : []
-      );
+      return (response ? response : []);
     } catch (error) {
       if (context.isDeploy) {
         console.error(MessageError.ratings, error);
@@ -174,7 +158,6 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return null;
     }
   };
-
   return {
     rating,
     ratings,
@@ -183,6 +166,5 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     storeReview,
   };
 };
-
 export const getProductId = (product: Product) =>
   product.isVariantOf!.productGroupID;

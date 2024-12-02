@@ -7,4 +7,6 @@ export interface Props {
 const loader = ({ items }: Props): SiteNavigationElement[] | null =>
   items ?? null;
 
+export const cache = "no-cache";
+
 export default loader;

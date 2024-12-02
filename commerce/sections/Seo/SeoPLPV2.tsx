@@ -7,6 +7,14 @@ import { ProductListingPage } from "../../types.ts";
 import { canonicalFromBreadcrumblist } from "../../utils/canonical.ts";
 import { AppContext } from "../../mod.ts";
 
+export interface ConfigJsonLD {
+  /**
+   * @title Remove videos
+   * @description Remove product videos from structured data
+   */
+  removeVideos?: boolean;
+}
+
 export interface Props {
   /** @title Data Source */
   jsonLD: ProductListingPage | null;
@@ -21,10 +29,12 @@ export interface Props {
    * @description In testing, you can use this to prevent search engines from indexing your site
    */
   noIndexing?: boolean;
+  configJsonLD?: ConfigJsonLD;
 }
 
 /** @title Product listing */
-export function loader(props: Props, _req: Request, ctx: AppContext) {
+export function loader(_props: Props, _req: Request, ctx: AppContext) {
+  const props = _props as Partial<Props>;
   const {
     titleTemplate = "",
     descriptionTemplate = "",
@@ -34,11 +44,11 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 
   const title = renderTemplateString(
     titleTemplate,
-    titleProp || jsonLD?.seo?.title || "",
+    titleProp || jsonLD?.seo?.title || ctx.seo?.title || "",
   );
   const description = renderTemplateString(
     descriptionTemplate,
-    descriptionProp || jsonLD?.seo?.description || "",
+    descriptionProp || jsonLD?.seo?.description || ctx.seo?.description || "",
   );
   const canonical = props.canonical
     ? props.canonical
@@ -53,6 +63,15 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
     !jsonLD.products.length ||
     jsonLD.seo?.noIndexing;
 
+  if (props.configJsonLD?.removeVideos) {
+    jsonLD?.products.forEach((product) => {
+      product.video = undefined;
+      product.isVariantOf?.hasVariant.forEach((variant) => {
+        variant.video = undefined;
+      });
+    });
+  }
+
   return {
     ...seoSiteProps,
     title,
@@ -64,6 +83,10 @@ export function loader(props: Props, _req: Request, ctx: AppContext) {
 }
 
 function Section(props: Props): SEOSection {
+  return <Seo {...props} />;
+}
+
+export function LoadingFallback(props: Partial<Props>) {
   return <Seo {...props} />;
 }
 

@@ -1,5 +1,6 @@
 import type { AppContext } from "../../mod.ts";
-import type { Cart } from "../../utils/types/basketJSON.ts";
+import { toLinxHeaders } from "../../utils/headers.ts";
+import type { CartResponse } from "../../utils/types/basketJSON.ts";
 
 export interface Props {
   BasketItemID: number;
@@ -10,23 +11,25 @@ const action = async (
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Cart | null> => {
-  const Response = props.Quantity > 0
-    ? await ctx.api["POST /carrinho/alterar-quantidade"]({}, {
+): Promise<CartResponse | null> => {
+  const response = props.Quantity > 0
+    ? await ctx.api["POST /web-api/v1/Shopping/Basket/UpdateBasketItem"]({}, {
       body: props,
-      headers: req.headers,
+      headers: toLinxHeaders(req.headers),
     }).then((res) => res.json())
-    : await ctx.api["POST /carrinho/remover-produto"]({}, {
+    : await ctx.api["POST /web-api/v1/Shopping/Basket/RemoveBasketItem"]({}, {
       body: props,
-      headers: req.headers,
+      headers: toLinxHeaders(req.headers),
     }).then((res) => res.json());
+
+  if (!response.IsValid) {
+    console.error("Error Updating cart item", response.Errors);
+    return null;
+  }
 
   const cart = await ctx.invoke("linx/loaders/cart.ts");
 
-  return {
-    ...cart,
-    Response,
-  };
+  return cart;
 };
 
 export default action;

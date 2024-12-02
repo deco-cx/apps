@@ -1,7 +1,6 @@
-import type { LoaderFunction } from "deco/types.ts";
 import type { Product } from "../../../commerce/types.ts";
 import type { AppContext } from "../mod.ts";
-
+import { type LoaderFunction } from "@deco/deco";
 export interface Props {
   /** @description total number of items to display */
   count: number;
@@ -13,17 +12,12 @@ export interface Props {
    */
   collection?: string[];
 }
-
 /**
  * @title VTEX Legacy - Search Products (deprecated)
  * @description Useful for shelves and static galleries.
  * @deprecated true
  */
-const loaderV0: LoaderFunction<
-  Props,
-  Product[] | null,
-  AppContext
-> = async (
+const loaderV0: LoaderFunction<Props, Product[] | null, AppContext> = async (
   _req,
   ctx,
   props,
@@ -31,11 +25,8 @@ const loaderV0: LoaderFunction<
   const p = props.query
     ? { term: props.query, count: props.count }
     : { collection: props.collection?.[0], count: props.count };
-
   const data = await ctx.state.invoke["deco-sites/std"].loaders.vtex.legacy
     .productList({ props: p });
-
   return { data, status: data ? 200 : 404 };
 };
-
 export default loaderV0;

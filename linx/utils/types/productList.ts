@@ -1,3 +1,13 @@
+import {
+  BrowsingImage,
+  CategoryItem,
+  LinxMetadata,
+  SellerInfo,
+  SortOption,
+  Spell,
+  Tag,
+} from "./shared.ts";
+
 export interface ProductListResponse {
   HasPreviousPage: boolean;
   HasNextPage: boolean;
@@ -98,7 +108,7 @@ export interface Product {
   PropertyPath: string;
   CurrentSkuID: number;
   HasCurrentSkuID: boolean;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   MininumOfDistinctSKUs: number;
   MininumOfSKUsQuantity: number;
   QuantityReturned: null;
@@ -109,48 +119,9 @@ export interface Product {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   ProductDefinition: null;
-}
-
-export interface BrowsingImage {
-  MaxWidth: number;
-  MaxHeight: number;
-  Width: number;
-  Height: number;
-  MediaSizeType: string;
-  MediaPath: string;
-  VariationPath: string;
-  ProductPath: string;
-  MediaType: string;
-  Index: number;
-  Title: null;
-  Url: null;
-  Attributes: unknown[];
-  HasMediaPath: boolean;
-}
-
-export interface CategoryItem {
-  ID: string;
-  ParentID: string;
-  Name: string;
-}
-
-export interface Description {
-  PropertyMetadataID: number;
-  Alias: string;
-  Name: string;
-  Value: string;
-  Title: string;
-  PropertyPath: string;
-  ValueAlias: string;
-  Reference: null | string;
-  Color: null | string;
-  ImagePath: null | string;
-  Order: number;
-  GroupName: null | string;
-  GroupType: string;
 }
 
 export interface Item {
@@ -201,11 +172,11 @@ export interface Item {
   BackorderLimit: null;
   OutOfStockFrom: null;
   OutOfStockTo: null;
-  UPC: null;
+  UPC: string | null;
   EstimatedReorderDate: null;
   HasEstimatedReorderDate: boolean;
   Options: Option[];
-  SKUOptions: Description[];
+  SKUOptions: LinxMetadata[];
   BundleHierarchyPrice: null;
   IntegrationID: null | string;
   Edit: null;
@@ -218,7 +189,7 @@ export interface Item {
   ProductTypeID: number;
   CatalogItemTypeID: number;
   CatalogItemBehavior: string;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   LoyaltyProgramPoints: unknown[];
   Price: null;
   ProductDefinition: null;
@@ -281,14 +252,9 @@ export interface Price {
   SalesPriceWithTaxDiscount: number;
   TaxationAmount: number;
   HasBuyBox: boolean;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   IsNullPrice: boolean;
-}
-
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
 }
 
 export interface MaxInstallmentsNoInterest {
@@ -310,11 +276,6 @@ export interface ProductSelection {
   Quantity: number;
 }
 
-export interface Tag {
-  TagID: number;
-  Label: string;
-}
-
 export interface ProviderCapabilities {
   Provider: string;
   CanSort: boolean;
@@ -322,15 +283,4 @@ export interface ProviderCapabilities {
   CanPage: boolean;
   CanTerm: boolean;
   CanSpell: boolean;
-}
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
 }

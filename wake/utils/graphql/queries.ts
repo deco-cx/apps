@@ -2,25 +2,277 @@ import { gql } from "../../../utils/graphql.ts";
 
 const Checkout = gql`
 fragment Checkout on Checkout {
-  checkoutId
-  shippingFee
-  subtotal
-  total
-  completed
-  coupon
-  products {
-    imageUrl
-    brand
-    ajustedPrice
-    listPrice
-    price
-    name
-    productId
-    productVariantId
-    quantity
-    sku
-    url
+	checkoutId
+	shippingFee
+	subtotal
+	total
+	completed
+	coupon
+  customer {
+    customerId
   }
+	products {
+		imageUrl
+		brand
+		ajustedPrice
+		listPrice
+    totalListPrice
+    totalAdjustedPrice
+    productAttributes {
+        name
+        type
+        value
+      }
+    adjustments {
+        observation
+        type
+        value
+      }
+		price
+		name
+		productId
+		productVariantId
+		quantity
+		sku
+		url
+    category
+    kit
+    gift
+    subscription {
+        availableSubscriptions {
+          name
+          recurringDays
+          recurringTypeId
+          selected
+          subscriptionGroupDiscount
+          subscriptionGroupId
+        }
+        selected {
+          selected
+          name
+          recurringDays
+          recurringTypeId
+          subscriptionGroupDiscount
+          subscriptionGroupId
+        }
+      }
+		customization {
+			availableCustomizations {
+				cost
+				customizationId
+				groupName
+				id
+				maxLength
+				name
+				order
+				type
+				values
+			}
+			id
+			values {
+				cost
+				name
+				value
+			}
+		}
+    attributeSelections {
+        selectedVariant {
+          id
+          alias
+          available
+          images {
+            fileName
+            url
+          }
+          prices {
+            listPrice
+            price
+            discountPercentage
+            installmentPlans {
+              displayName
+              name
+              installments {
+                discount
+                fees
+                number
+                value
+              }
+            }
+            bestInstallment {
+              name
+              displayName
+              discount
+              fees
+              number
+              value
+            }
+            wholesalePrices {
+              price
+              quantity
+            }
+          }
+          productId
+          productVariantId
+          stock
+        }
+        selections {
+          attributeId
+          displayType
+          name
+          varyByParent
+          values {
+            alias
+            available
+            printUrl
+            selected
+            value
+          }
+        }
+      }
+	}
+	selectedAddress {
+    addressNumber
+    cep
+    city
+    complement
+    id
+    neighborhood
+    referencePoint
+    state
+    street
+  }
+	selectedShipping {
+		deadline
+		deadlineInHours
+		deliverySchedule {
+			date
+			endDateTime
+			endTime
+			startDateTime
+			startTime
+		}
+		name
+		shippingQuoteId
+		type
+		value
+	}
+	selectedPaymentMethod {
+		html
+		id
+		installments {
+			adjustment
+			number
+			total
+			value
+		}
+		paymentMethodId
+		scripts
+		selectedInstallment {
+			adjustment
+			number
+			total
+			value
+		}
+		suggestedCards {
+			brand
+			key
+			name
+			number
+		}
+	}
+	orders {
+		adjustments {
+			name
+			type
+			value
+		}
+		date
+		delivery {
+			address {
+				address
+				cep
+				city
+				complement
+				isPickupStore
+				name
+				neighborhood
+				pickupStoreText
+			}
+			cost
+			deliveryTime
+			deliveryTimeInHours
+			name
+		}
+		discountValue
+		dispatchTimeText
+		interestValue
+		orderId
+		orderStatus
+		payment {
+			card {
+				brand
+				cardInterest
+				installments
+				name
+				number
+			}
+			invoice {
+				digitableLine
+				paymentLink
+			}
+			name
+			pix {
+				qrCode
+				qrCodeExpirationDate
+				qrCodeUrl
+			}
+		}
+		products {
+			adjustments {
+				additionalInformation
+				name
+				type
+				value
+			}
+			attributes {
+				name
+				value
+			}
+			imageUrl
+			name
+			productVariantId
+			quantity
+			unitValue
+			value
+		}
+		shippingValue
+		totalValue
+    
+	}
+  kits {
+      kitId
+      kitGroupId
+      alias
+      imageUrl
+      listPrice
+      price
+      totalListPrice
+      totalAdjustedPrice
+      name
+      quantity
+      products {
+        productId
+        productVariantId
+        imageUrl
+        name
+        url
+        quantity
+        productAttributes {
+          name
+          value
+        }
+      }
+    }
 }
 `;
 
@@ -35,6 +287,7 @@ fragment Product on Product {
     name
   }
   productCategories {
+    id
     name
     url
     hierarchy
@@ -219,13 +472,15 @@ fragment ProductVariant on ProductVariant {
         }
 }`;
 
-const SingleProductPart = gql`
-fragment SingleProductPart on SingleProduct {
-  mainVariant
+const BuyList = gql`
+fragment BuyList on BuyList {
+ 
+      mainVariant
   productName
   productId
   alias
   collection
+  kit
   attributes {
     name
     type
@@ -236,6 +491,7 @@ fragment SingleProductPart on SingleProduct {
   }
   numberOfVotes
   productCategories {
+    id
     name
     url
     hierarchy
@@ -370,6 +626,227 @@ fragment SingleProductPart on SingleProduct {
           }
         }
       }
+  },
+  buyTogether {
+    productId
+  } 
+  promotions {
+    content
+    disclosureType
+    id
+    fullStampUrl
+    stamp
+    title
+  }
+      alias
+    buyListId
+    kit
+    available
+    variantName
+    buyListProducts {
+      productId
+      quantity
+      includeSameParent
+    }
+    images{
+      url
+      fileName
+      print
+    }
+    informations{
+      id
+      title
+      type
+      value
+    }
+    promotions{
+      content
+      id
+      stamp
+      fullStampUrl
+      title
+      disclosureType
+    }
+    productName
+    prices {
+      listPrice
+      price
+      discountPercentage
+      installmentPlans{
+          displayName
+          name
+          installments{
+            discount
+            fees
+            number
+            value
+          }
+      }
+      bestInstallment {
+        name
+        displayName
+        discount
+        fees
+        number
+        value
+      }
+    }
+    
+}
+`;
+
+const SingleProductPart = gql`
+fragment SingleProductPart on SingleProduct {
+  mainVariant
+  productName
+  productId
+  alias
+  collection
+  attributes {
+    name
+    type
+    value
+    attributeId
+    displayType
+    id
+  }
+  numberOfVotes
+  productCategories {
+    id
+    name
+    url
+    hierarchy
+    main
+    googleCategories
+  }
+  informations {
+    title
+    value
+    type
+  }
+  available
+  averageRating
+  breadcrumbs {
+    text
+    link
+  }
+  condition
+  createdAt
+  ean
+  id
+  images {
+    url
+    fileName
+    print
+  }
+  minimumOrderQuantity
+  prices {
+    bestInstallment {
+      discount
+      displayName
+      fees
+      name
+      number
+      value
+    }
+    discountPercentage
+    discounted
+    installmentPlans {
+      displayName
+      installments {
+        discount
+        fees
+        number
+        value
+      }
+      name
+    }
+    listPrice
+    multiplicationFactor
+    price
+    priceTables {
+      discountPercentage
+      id
+      listPrice
+      price
+    }
+    wholesalePrices {
+      price
+      quantity
+    }
+  }
+  productBrand {
+    fullUrlLogo
+    logoUrl
+    name
+    alias
+  }
+  productVariantId
+  seller {
+    name
+  }
+  seo {
+    name
+    scheme
+    type
+    httpEquiv
+    content
+  }
+  sku
+  stock
+  variantName
+  parallelOptions
+  urlVideo
+  reviews {
+    rating
+    review
+    reviewDate
+    email
+    customer
+  }
+  similarProducts {
+    alias
+    image
+    imageUrl
+    name
+  }
+  attributeSelections(includeParentIdVariants: $includeParentIdVariants) {
+    selections {
+      attributeId
+      displayType
+      name
+      varyByParent
+      values {
+        alias
+        available
+        value
+        selected
+        printUrl
+      }
+    }
+    canBeMatrix
+    matrix {
+        column {
+          displayType
+          name
+          values {
+            value
+          }
+        }
+        data {
+          available
+          productVariantId
+          stock
+        }
+        row {
+          displayType
+          name
+          values {
+            value
+            printUrl
+          }
+        }
+      }
     selectedVariant {
       ...ProductVariant
     }
@@ -466,10 +943,10 @@ export const WishlistReducedProduct = gql`
 
 export const GetProduct = {
   fragments: [SingleProductPart, SingleProduct, ProductVariant],
-  query: gql`query GetProduct($productId: Long!) { 
-    product(productId: $productId) { 
+  query:
+    gql`query GetProduct($productId: Long!, $includeParentIdVariants: Boolean, $partnerAccessToken: String) { 
+    product(productId: $productId , partnerAccessToken: $partnerAccessToken) { 
       ...SingleProduct 
-     
     } 
   }`,
 };
@@ -489,7 +966,7 @@ export const CreateCart = {
 export const GetProducts = {
   fragments: [Product],
   query:
-    gql`query GetProducts($filters: ProductExplicitFiltersInput!, $first: Int!, $sortDirection: SortDirection!, $sortKey: ProductSortKeys, $after: String) { products(filters: $filters, first: $first, sortDirection: $sortDirection, sortKey: $sortKey, after: $after) { 
+    gql`query GetProducts($filters: ProductExplicitFiltersInput!, $first: Int!, $sortDirection: SortDirection!, $sortKey: ProductSortKeys, $after: String, $partnerAccessToken: String) { products(filters: $filters, first: $first, sortDirection: $sortDirection, sortKey: $sortKey, after: $after, partnerAccessToken: $partnerAccessToken) { 
       nodes { ...Product } 
       totalCount
       pageInfo{
@@ -504,8 +981,8 @@ export const GetProducts = {
 export const Search = {
   fragments: [Product],
   query:
-    gql`query Search($operation: Operation!, $query: String, $onlyMainVariant: Boolean, $minimumPrice: Decimal, $maximumPrice: Decimal , $limit: Int, $offset: Int,  $sortDirection: SortDirection, $sortKey: ProductSearchSortKeys, $filters: [ProductFilterInput]) { 
-       result: search(query: $query, operation: $operation) { 
+    gql`query Search($operation: Operation!, $query: String, $onlyMainVariant: Boolean, $minimumPrice: Decimal, $maximumPrice: Decimal , $limit: Int, $offset: Int,  $sortDirection: SortDirection, $sortKey: ProductSearchSortKeys, $filters: [ProductFilterInput], $partnerAccessToken: String) { 
+       result: search(query: $query, operation: $operation, partnerAccessToken: $partnerAccessToken) { 
           aggregations {
             maximumPrice
             minimumPrice
@@ -666,7 +1143,7 @@ export const GetUser = {
 
 export const GetWishlist = {
   fragments: [WishlistReducedProduct],
-  query: gql`query getWislist($customerAccessToken: String){
+  query: gql`query getWishlist($customerAccessToken: String){
       customer(customerAccessToken: $customerAccessToken) {
         wishlist {
           products {
@@ -721,8 +1198,9 @@ export const Hotsite = {
     $onlyMainVariant: Boolean
     $offset: Int,
     $sortDirection: SortDirection,
-    $sortKey: ProductSortKeys) {
-    result: hotsite(url: $url) {
+    $sortKey: ProductSortKeys,
+    $partnerAccessToken: String) {
+    result: hotsite(url: $url,  partnerAccessToken: $partnerAccessToken) {
       aggregations {
         filters {
           field
@@ -816,6 +1294,78 @@ export const Shop = {
       mobileUrl
       modifiedName
       name
+    }
+  }`,
+};
+
+export const GetBuyList = {
+  fragments: [BuyList],
+  query: gql`query BuyList($id: Long!,  $partnerAccessToken: String) {
+     buyList(id: $id,  partnerAccessToken: $partnerAccessToken){
+      ...BuyList
+     }
+  }`,
+};
+
+export const AddKit = {
+  fragments: [Checkout],
+  query:
+    gql`mutation AddKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
+   checkout: checkoutAddKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
+    }
+  }`,
+};
+
+export const RemoveKit = {
+  fragments: [Checkout],
+  query:
+    gql`mutation RemoveKit($input: CheckoutKitInput!, $customerAccessToken: String, $recaptchaToken: String) {
+    checkout: checkoutRemoveKit(input: $input, customerAccessToken: $customerAccessToken, recaptchaToken: $recaptchaToken) {
+      ...Checkout
+    }
+  }`,
+};
+
+export const GetPartners = {
+  query:
+    gql`query GetPartners($first: Int,$last: Int,$names: [String],$priceTableIds: [Int!],$sortDirection: SortDirection! = ASC,$sortKey: PartnerSortKeys! = ID,$before: String,$alias: [String],$after: String) {
+    partners(first:$first,last:$last,names:$names,priceTableIds:$priceTableIds,sortDirection:$sortDirection,sortKey:$sortKey ,before:$before,alias:$alias,after:$after){
+    edges{
+      node{
+        partnerId
+        priceTableId
+        portfolioId
+        type
+        startDate
+        endDate
+        name
+        alias
+        fullUrlLogo
+        origin
+        partnerAccessToken
+      }
+    }
+  }
+  }`,
+};
+
+export const CheckoutPartnerAssociate = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutPartnerAssociate($checkoutId: Uuid!,$customerAccessToken: String, $partnerAccessToken: String!){
+    checkout: checkoutPartnerAssociate(checkoutId: $checkoutId ,customerAccessToken: $customerAccessToken ,partnerAccessToken: $partnerAccessToken ){
+      ...Checkout
+    }
+  }`,
+};
+
+export const CheckoutPartnerDisassociate = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutPartnerDisassociate($checkoutId: Uuid!, $customerAccessToken: String){
+    checkout: checkoutPartnerDisassociate(checkoutId: $checkoutId , customerAccessToken: $customerAccessToken ){
+      ...Checkout
     }
   }`,
 };

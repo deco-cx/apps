@@ -1,23 +1,10 @@
-<h1>
-  <p align="center">
-    <a href="https://typesense.org/">
-      <img alt="Typesense" src="https://github.com/deco-cx/apps/assets/1753396/616062d6-3b23-4af0-bda9-1480a90c1fa1" width="250" />
-    </a>
-  </p>
-</h1>
 
-<p align="center">
-  <strong>
-    Lightning-fast, Open Source Search. No PhD required.
-  </strong>
-</p>
-<p align="center">
-  Loaders, actions and workflows for adding Typesense search, a typo-tolerant open source search engine, to your deco.cx website.
-</p>
 
-<p align="center">
+Lightning-fast, Open Source Search. No PhD required.
+
+Loaders, actions and workflows for adding Typesense search, a typo-tolerant open source search engine, to your deco.cx website.
+
 Typesense is a general purpose indexer. This means you can save any Json document and later retrieve it using the Search API. Although being a simpler solution than competing alternatives like Elastic Search or Solar, setting up an index on Typesense still requires some software engineering, like setting up searchable fields, facet fields and sorting indices. Hopefully, deco.cx introduces canonical types, like Product, ProductGroup, etc. These schemas allow this app to built solutions for common use-cases, like indexing Products for a Product Listing Page. 
-</p>
 
 # Installation
 1. Install via decohub

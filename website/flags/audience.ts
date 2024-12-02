@@ -1,9 +1,6 @@
-import { FlagObj } from "deco/blocks/flag.ts";
-import { Handler } from "deco/blocks/handler.ts";
-import { Matcher } from "deco/blocks/matcher.ts";
-import JsonViewer from "deco/components/JsonViewer.tsx";
-import { Resolvable } from "deco/engine/core/resolver.ts";
-import { metabasePreview } from "deco/utils/metabase.tsx";
+import { type Resolvable } from "@deco/deco";
+import { type FlagObj, type Handler, type Matcher } from "@deco/deco/blocks";
+import { JsonViewer, metabasePreview } from "@deco/deco/utils";
 import Flag from "./flag.ts";
 export { onBeforeResolveProps } from "./everyone.ts";
 /**
@@ -17,7 +14,9 @@ export interface Route {
    */
   isHref?: boolean;
   // FIXME this should be placed at nested level 3 of the object to avoid being resolved before the routeSelection is executed.
-  handler: { value: Resolvable<Handler> };
+  handler: {
+    value: Resolvable<Handler>;
+  };
   /**
    * @title Priority
    * @description higher priority means that this route will be used in favor of other routes with less or none priority
@@ -43,16 +42,13 @@ export interface Audience {
   name: string;
   routes?: Routes;
 }
-
 /**
  * @title Audience
  * @description Select routes based on the matched audience.
  */
-export default function Audience({
-  matcher,
-  routes,
-  name,
-}: Audience): FlagObj<Route[]> {
+export default function Audience(
+  { matcher, routes, name }: Audience,
+): FlagObj<Route[]> {
   return Flag<Route[]>({
     matcher,
     true: routes ?? [],
@@ -60,8 +56,9 @@ export default function Audience({
     name,
   });
 }
-
-export const preview = (result: unknown, ctx: { request: Request }) => {
+export const preview = (result: unknown, ctx: {
+  request: Request;
+}) => {
   const url = new URL(ctx.request.url);
   const metabaseUrl = url.searchParams.get("metabase");
   return metabaseUrl ? metabasePreview(metabaseUrl) : {

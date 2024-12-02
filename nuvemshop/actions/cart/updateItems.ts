@@ -11,7 +11,7 @@ const action = async (
   { quantity, itemId }: UpdateProps,
   req: Request,
   ctx: AppContext,
-): Promise<UpdateCartResponse | null> => {
+): Promise<UpdateCartResponse["cart"] | null> => {
   const { publicUrl } = ctx;
 
   const myHeaders = new Headers();

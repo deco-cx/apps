@@ -1,2 +1,5 @@
-export * from "npm:@libsql/client@0.6.0/node";
-export * from "https://esm.sh/drizzle-orm@0.30.10/libsql";
+import { context } from "@deco/deco";
+export * from "npm:drizzle-orm@0.30.10/libsql";
+export * from "npm:@libsql/client@0.7.0";
+export const createLocalClient = !context.isDeploy &&
+  (await import("npm:@libsql/client@0.7.0/node")).createClient;

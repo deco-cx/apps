@@ -1,18 +1,22 @@
-import type { ProductDetailsPage } from "../../commerce/types.ts";
+import type { Product, ProductDetailsPage } from "../../commerce/types.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { MAXIMUM_REQUEST_QUANTITY } from "../utils/getVariations.ts";
-import { GetProduct } from "../utils/graphql/queries.ts";
+import { GetBuyList, GetProduct } from "../utils/graphql/queries.ts";
 import {
+  BuyListQuery,
+  BuyListQueryVariables,
   GetProductQuery,
   GetProductQueryVariables,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 import { parseSlug, toBreadcrumbList, toProduct } from "../utils/transform.ts";
 
 export interface Props {
   slug: RequestURLParam;
   buyTogether?: boolean;
+  includeSameParent?: boolean;
 }
 
 /**
@@ -22,11 +26,13 @@ export interface Props {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
-  const { slug, buyTogether } = props;
+  const { slug, buyTogether, includeSameParent } = props;
   const { storefront } = ctx;
+
+  const partnerAccessToken = getPartnerCookie(req.headers);
 
   const headers = parseHeaders(req.headers);
 
@@ -39,67 +45,126 @@ async function loader(
     throw new Error("Missing product id");
   }
 
+  const { buyList: wakeBuyList } = await storefront.query<
+    BuyListQuery,
+    BuyListQueryVariables
+  >(
+    {
+      variables: { id: productId, partnerAccessToken },
+      ...GetBuyList,
+    },
+    {
+      headers,
+    }
+  );
+
+  const buyListProducts = await Promise.all(
+    wakeBuyList?.buyListProducts?.map(async (buyListProduct) => {
+      if (!buyListProduct) return;
+
+      const { productId, includeSameParent, quantity } = buyListProduct;
+
+      const buyListProductPage =
+        await ctx.invoke.wake.loaders.productDetailsPage({
+          // 'slug' its just to fit the parse function of loader
+          slug: `slug-${productId}`,
+          includeSameParent,
+        });
+
+      if (!buyListProductPage) return;
+
+      buyListProductPage.product.additionalProperty?.push({
+        "@type": "PropertyValue",
+        name: "SuggestedQuantity",
+        value: String(quantity),
+        alternateName: "Buy List Suggested Quantity",
+      });
+
+      return buyListProductPage.product;
+    }) ?? []
+  ).then((maybeProductList) =>
+    maybeProductList.filter((node): node is Product => Boolean(node))
+  );
+
   const { product: wakeProduct } = await storefront.query<
     GetProductQuery,
     GetProductQueryVariables
-  >({
-    variables: { productId },
-    ...GetProduct,
-  }, {
-    headers,
-  });
+  >(
+    {
+      variables: {
+        productId,
+        includeParentIdVariants: includeSameParent,
+        partnerAccessToken,
+      },
+      ...GetProduct,
+    },
+    {
+      headers,
+    }
+  );
 
-  if (!wakeProduct) {
+  const wakeProductOrBuyList = wakeProduct || wakeBuyList;
+
+  if (!wakeProductOrBuyList) {
     return null;
   }
 
-  const variantsItems = await ctx.invoke.wake.loaders.productList({
-    first: MAXIMUM_REQUEST_QUANTITY,
-    sortDirection: "ASC",
-    sortKey: "RANDOM",
-    filters: { productId: [productId] },
-  }) ?? [];
-
-  const buyTogetherItens = buyTogether && !!wakeProduct.buyTogether?.length
-    ? await ctx.invoke.wake.loaders.productList({
+  const variantsItems =
+    (await ctx.invoke.wake.loaders.productList({
       first: MAXIMUM_REQUEST_QUANTITY,
       sortDirection: "ASC",
       sortKey: "RANDOM",
-      filters: {
-        productId: wakeProduct.buyTogether.map((bt) => bt!.productId),
-        mainVariant: true,
-      },
-      getVariations: true,
-    }) ?? []
-    : [];
+      filters: { productId: [productId] },
+    })) ?? [];
+
+  const buyTogetherItens =
+    buyTogether && !!wakeProductOrBuyList.buyTogether?.length
+      ? (await ctx.invoke.wake.loaders.productList({
+          first: MAXIMUM_REQUEST_QUANTITY,
+          sortDirection: "ASC",
+          sortKey: "RANDOM",
+          filters: {
+            productId: wakeProductOrBuyList.buyTogether?.map(
+              (bt) => bt!.productId
+            ),
+            mainVariant: true,
+          },
+          getVariations: true,
+        })) ?? []
+      : [];
 
   const product = toProduct(
-    wakeProduct,
+    wakeProductOrBuyList,
     { base: url },
     variantsItems,
-    variantId,
+    variantId
   );
   return {
     "@type": "ProductDetailsPage",
-    breadcrumbList: toBreadcrumbList(wakeProduct.breadcrumbs, {
-      base: url,
-    }, product),
+    breadcrumbList: toBreadcrumbList(
+      wakeProductOrBuyList.breadcrumbs ?? [],
+      {
+        base: url,
+      },
+      product
+    ),
     product: {
       ...product,
-      isRelatedTo: buyTogetherItens?.map(
-        (buyItem) => {
+      isAccessoryOrSparePartFor: buyListProducts,
+      isRelatedTo:
+        buyTogetherItens?.map((buyItem) => {
           return {
             ...buyItem,
             additionalType: "BuyTogether",
           };
-        },
-      ) ?? [],
+        }) ?? [],
     },
     seo: {
       canonical: product.isVariantOf?.url ?? "",
-      title: wakeProduct.productName ?? "",
+      title: wakeProductOrBuyList.productName ?? "",
       description:
-        wakeProduct.seo?.find((m) => m?.name === "description")?.content ?? "",
+        wakeProductOrBuyList.seo?.find((m) => m?.name === "description")
+          ?.content ?? "",
     },
   };
 }

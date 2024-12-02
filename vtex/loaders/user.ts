@@ -4,11 +4,13 @@ import { parseCookie } from "../utils/vtexId.ts";
 
 interface User {
   id: string;
+  userId: string;
   email: string;
   firstName?: string;
   lastName?: string;
   profilePicture?: string;
   gender?: string;
+  document?: string;
 }
 
 async function loader(
@@ -24,7 +26,7 @@ async function loader(
   }
 
   const query =
-    "query getUserProfile { profile { id email firstName lastName profilePicture gender }}";
+    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document }}";
 
   try {
     const { profile: user } = await io.query<{ profile: User }, null>(
@@ -33,10 +35,11 @@ async function loader(
     );
 
     return {
-      "@id": user.id,
+      "@id": user.userId ?? user.id,
       email: user.email,
       givenName: user.firstName,
       familyName: user.lastName,
+      taxID: user?.document?.replace(/[^\d]/g, ""),
       gender: user.gender === "f"
         ? "https://schema.org/Female"
         : "https://schema.org/Male",
