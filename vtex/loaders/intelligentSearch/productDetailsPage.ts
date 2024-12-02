@@ -93,7 +93,6 @@ const loader = async (
 
   const facets = withDefaultFacets([], ctx);
   const params = withDefaultParams({ query, count: 1, locale });
-  console.log({ params, locale });
 
   const { products: [product] } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({

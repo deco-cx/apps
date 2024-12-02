@@ -207,7 +207,6 @@ const loader = async (
   const { selectedFacets, ...args } = fromProps({ props });
   const params = withDefaultParams({ ...args, locale });
   const facets = withDefaultFacets(selectedFacets, ctx);
-  console.log({ params, localeList: locale });
 
   const { products: vtexProducts } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
