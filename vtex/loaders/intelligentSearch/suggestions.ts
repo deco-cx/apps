@@ -68,7 +68,7 @@ const loaders = async (
       .then((res) => res.json());
   };
 
-  const [{ searches }, { products }] = await Promise.all([
+  const [{ searches }, { products, recordsFiltered }] = await Promise.all([
     query ? suggestions() : topSearches(),
     productSearch(),
   ]);
@@ -88,6 +88,7 @@ const loaders = async (
           withIsSimilarTo(req, ctx, p)
         ),
     ),
+    hits: recordsFiltered,
   };
 };
 

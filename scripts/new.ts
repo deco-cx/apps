@@ -1,34 +1,37 @@
-import { join } from "std/path/mod.ts";
+import { join } from "@std/path";
 
-const appName = Deno.args[0];
-const decoTsPath = join(Deno.cwd(), "deco.ts");
-const decoTs = await Deno.readTextFile(decoTsPath);
+const init = async (appName: string) => {
+  const repoUrl = "https://github.com/deco-cx/app-template";
+  const appPath = join(Deno.cwd(), appName);
+  const decoTsPath = join(Deno.cwd(), "deco.ts");
+  const decoTs = await Deno.readTextFile(decoTsPath);
 
-await Deno.mkdir(join(Deno.cwd(), appName));
-await Deno.writeTextFile(
-  decoTsPath,
-  decoTs.replace(`  apps: [`, `  apps: [\n    app("${appName}"),`),
-);
+  await Deno.mkdir(appPath);
 
-await Deno.writeTextFile(
-  join(Deno.cwd(), appName, "mod.ts"),
-  `
-import type { App, AppContext as AC } from "deco/mod.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
+  const gitClone = new Deno.Command("git", {
+    args: ["clone", "--depth", "1", repoUrl, appPath],
+  });
 
-export interface State {
-    // you can freely change this to accept new properties when installing this app
-    exampleProp: string
+  await gitClone.output();
+
+  await Deno.writeTextFile(
+    decoTsPath,
+    decoTs.replace(`  apps: [`, `  apps: [\n    app("${appName}"),`),
+  );
+
+  const denoJsonPath = join(appPath, "deno.json");
+  await Deno.remove(denoJsonPath);
+
+  const gitDirPath = join(appPath, ".git");
+  await Deno.remove(gitDirPath, { recursive: true });
 };
-/**
- * @title ${appName}
- */
-export default function App(
-  state: State,
-): App<Manifest, State> {
-  return { manifest, state };
-}
 
-export type AppContext = AC<ReturnType<typeof App>>;
-`,
-);
+if (import.meta.main) {
+  const name = prompt("What's the app name?:");
+
+  if (name) {
+    await init(name);
+  } else {
+    console.error("app name is required");
+  }
+}

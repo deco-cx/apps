@@ -26,7 +26,7 @@ const loader = async (
   }
 
   const cart = await storefront.query<GetCartQuery, GetCartQueryVariables>({
-    variables: { id: cartId },
+    variables: { id: decodeURIComponent(cartId) },
     ...GetCart,
   }).then((data) => data.cart);
 

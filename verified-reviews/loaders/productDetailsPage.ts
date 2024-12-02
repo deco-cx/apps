@@ -20,12 +20,9 @@ export default function productDetailsPage(
   ctx: AppContext,
 ): ExtensionOf<ProductDetailsPage | null> {
   const client = createClient({ ...ctx });
-  return async (productDetailsPage: ProductDetailsPage | null) => {
-    if (!productDetailsPage) {
-      return null;
-    }
 
-    if (!client) {
+  return async (productDetailsPage: ProductDetailsPage | null) => {
+    if (!productDetailsPage || !client) {
       return null;
     }
 
@@ -40,7 +37,7 @@ export default function productDetailsPage(
     }
 
     const fullReview = await client.fullReview({
-      productsIds: productsToGetReviews,
+      productId: productsToGetReviews,
       count: config?.count,
       offset: config?.offset,
       order: config?.order,

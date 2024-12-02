@@ -1,37 +1,39 @@
 import { Head } from "$fresh/runtime.ts";
-import { Section } from "deco/blocks/section.ts";
-import { ComponentMetadata } from "deco/engine/block.ts";
-import { Context } from "deco/live.ts";
 import {
+  Context,
+  HttpError,
+  isDeferred,
+  type SectionProps,
   usePageContext as useDecoPageContext,
   useRouterContext,
-} from "deco/runtime/fresh/routes/entrypoint.tsx";
-import { JSX } from "preact";
+} from "@deco/deco";
+import {
+  type ComponentFunc,
+  type ComponentMetadata,
+  type Page,
+  type Section,
+} from "@deco/deco/blocks";
+import { logger } from "@deco/deco/o11y";
+import { Component, JSX } from "preact";
+import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
+import Clickhouse, {
+  generateSessionId,
+  generateUserId,
+} from "../components/Clickhouse.tsx";
 import Events from "../components/Events.tsx";
+import { SEOSection } from "../components/Seo.tsx";
 import LiveControls from "../components/_Controls.tsx";
 import { AppContext } from "../mod.ts";
-import type { Page } from "deco/blocks/page.tsx";
-import { Component } from "preact";
-import { ComponentFunc } from "deco/engine/block.ts";
-import { HttpError } from "deco/engine/errors.ts";
-import { logger } from "deco/observability/otel/config.ts";
-import { isDeferred } from "deco/mod.ts";
-import ErrorPageComponent from "../../utils/defaultErrorPage.tsx";
-import { SEOSection } from "../components/Seo.tsx";
-
 const noIndexedDomains = ["decocdn.com", "deco.site", "deno.dev"];
-
 /**
  * @title Sections
  * @label hidden
  * @changeable true
  */
 export type Sections = Section[];
-
 export interface DefaultPathProps {
   possiblePaths: string[];
 }
-
 /**
  * @titleBy name
  * @label rootHidden
@@ -48,23 +50,22 @@ export interface Props {
   /** @hide true */
   unindexedDomain?: boolean;
 }
-
 export function renderSection(section: Props["sections"][number]) {
-  if (section === undefined || section === null) return <></>;
+  if (section === undefined || section === null) {
+    return <></>;
+  }
   const { Component, props } = section;
-
   return <Component {...props} />;
 }
-
-class ErrorBoundary // deno-lint-ignore no-explicit-any
-  extends Component<{ fallback: ComponentFunc<any> }> {
-  state = { error: null as Error | null };
-
+class ErrorBoundary extends Component<{
   // deno-lint-ignore no-explicit-any
-  static getDerivedStateFromError(error: any) {
+  fallback: ComponentFunc<any>;
+}> {
+  override state = { error: null as Error | null };
+  // deno-lint-ignore no-explicit-any
+  static override getDerivedStateFromError(error: any) {
     return { error };
   }
-
   render() {
     if (this.state.error) {
       const err = this?.state?.error;
@@ -79,7 +80,6 @@ class ErrorBoundary // deno-lint-ignore no-explicit-any
       : this.props.fallback(this.state.error);
   }
 }
-
 const useDeco = () => {
   const metadata = useDecoPageContext()?.metadata;
   const routerCtx = useRouterContext();
@@ -92,26 +92,25 @@ const useDeco = () => {
     },
   };
 };
-
 /**
  * @title Page
  */
-function Page({
-  sections,
-  errorPage,
-  devMode,
-  seo,
-  unindexedDomain,
-  avoidRedirectingToEditor,
-}: Props & {
-  errorPage?: Page;
-  devMode: boolean;
-  avoidRedirectingToEditor?: boolean;
-}): JSX.Element {
+function Page(
+  {
+    sections,
+    errorPage,
+    devMode,
+    seo,
+    unindexedDomain,
+    avoidRedirectingToEditor,
+    sendToClickHouse,
+    userId,
+    sessionId,
+  }: SectionProps<typeof loader>,
+): JSX.Element {
   const context = Context.active();
   const site = { id: context.siteId, name: context.site };
   const deco = useDeco();
-
   return (
     <>
       {unindexedDomain && (
@@ -120,7 +119,7 @@ function Page({
         </Head>
       )}
       <ErrorBoundary
-        fallback={(error) =>
+        fallback={(error: unknown) =>
           error instanceof HttpError &&
             errorPage !== undefined &&
             errorPage !== null &&
@@ -141,12 +140,27 @@ function Page({
           {...deco}
         />
         <Events deco={deco} />
+        {sendToClickHouse && (
+          <Clickhouse
+            siteId={site.id}
+            siteName={site.name}
+            userId={userId}
+            sessionId={sessionId}
+          />
+        )}
         {sections.map(renderSection)}
       </ErrorBoundary>
     </>
   );
 }
-
+const getClientIp = (req: Request): string => {
+  return req.headers.get("CF-Connecting-IP") ||
+    req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") ||
+    "";
+};
+const getUserAgent = (req: Request): string => {
+  return req.headers.get("user-agent") || "";
+};
 export const loader = async (
   { sections, ...restProps }: Props,
   req: Request,
@@ -154,27 +168,45 @@ export const loader = async (
 ) => {
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
-
   const unindexedDomain = noIndexedDomains.some((domain) =>
     url.origin.includes(domain)
   );
-
+  const global = ctx.global || [];
+  const resolvedGlobals = await Promise.all(
+    global?.map(async (section) => {
+      return await ctx.get(section, {
+        resolveChain: [{ value: ctx.resolverId ?? "root", type: "resolver" }],
+      });
+    }),
+  );
+  const globalSections = ctx.theme
+    ? [ctx.theme, ...resolvedGlobals]
+    : resolvedGlobals;
+  const context = Context.active();
+  const site = { id: context.siteId, name: context.site };
+  const userId = await generateUserId(
+    site.name,
+    getClientIp(req),
+    getUserAgent(req),
+  );
+  const sessionId = generateSessionId();
   return {
     ...restProps,
-    sections,
+    sections: [...globalSections, ...sections],
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
     devMode,
     unindexedDomain,
     avoidRedirectingToEditor: ctx.avoidRedirectingToEditor,
+    sendToClickHouse: ctx.sendToClickHouse,
+    userId,
+    sessionId,
   };
 };
-
-export function Preview(props: Props) {
+export function Preview(props: SectionProps<typeof loader>) {
   const { sections, seo } = props;
   const deco = useDeco();
-
   return (
     <>
       <Head>
@@ -187,23 +219,19 @@ export function Preview(props: Props) {
     </>
   );
 }
-
 const PAGE_NOT_FOUND = -1;
 export const pageIdFromMetadata = (metadata: ComponentMetadata | undefined) => {
   if (!metadata) {
     return PAGE_NOT_FOUND;
   }
-
   const { resolveChain, component } = metadata;
-  const pageResolverIndex = resolveChain.findLastIndex(
-    (chain) => chain.type === "resolver" && chain.value === component,
-  ) || PAGE_NOT_FOUND;
-
+  const pageResolverIndex =
+    resolveChain.findLastIndex((chain) =>
+      chain.type === "resolver" && chain.value === component
+    ) || PAGE_NOT_FOUND;
   const pageParent = pageResolverIndex > 0
     ? resolveChain[pageResolverIndex - 1]
     : null;
-
   return pageParent?.value ?? PAGE_NOT_FOUND;
 };
-
 export default Page;

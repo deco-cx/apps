@@ -1,15 +1,13 @@
-import { JSONSchema7 } from "deco/deps.ts";
-
-const isJSONSchema = (
-  v: unknown | JSONSchema7,
-): v is JSONSchema7 & {
+import { type JSONSchema7 } from "@deco/deco";
+const isJSONSchema = (v: unknown | JSONSchema7): v is JSONSchema7 & {
   $ref: string;
 } => {
   return (typeof v === "object" && ((v as JSONSchema7)?.$ref !== undefined));
 };
-
 export function dereferenceJsonSchema(
-  schema: JSONSchema7 & { definitions?: Record<string, JSONSchema7> },
+  schema: JSONSchema7 & {
+    definitions?: Record<string, JSONSchema7>;
+  },
 ) {
   const resolveReference = (
     obj: unknown,
@@ -30,6 +28,5 @@ export function dereferenceJsonSchema(
     }
     return obj as JSONSchema7;
   };
-
   return resolveReference(schema, {});
 }

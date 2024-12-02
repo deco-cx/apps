@@ -3,12 +3,14 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/code.ts";
-import * as $$$$$$$$$1 from "./actions/stream.ts";
+import * as $$$$$$$$$1 from "./actions/invoke.ts";
+import * as $$$$$$$$$2 from "./actions/stream.ts";
 
 const manifest = {
   "actions": {
     "anthropic/actions/code.ts": $$$$$$$$$0,
-    "anthropic/actions/stream.ts": $$$$$$$$$1,
+    "anthropic/actions/invoke.ts": $$$$$$$$$1,
+    "anthropic/actions/stream.ts": $$$$$$$$$2,
   },
   "name": "anthropic",
   "baseUrl": import.meta.url,

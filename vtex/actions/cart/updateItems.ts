@@ -12,6 +12,7 @@ export interface Item {
 export interface Props {
   orderItems: Item[];
   allowedOutdatedData?: Array<"paymentData">;
+  noSplitItem?: boolean;
 }
 
 /**
@@ -26,6 +27,7 @@ const action = async (
   const {
     orderItems,
     allowedOutdatedData = ["paymentData"],
+    noSplitItem,
   } = props;
   const { orderFormId } = parseCookie(req.headers);
   const cookie = req.headers.get("cookie") ?? "";
@@ -37,7 +39,7 @@ const action = async (
       allowedOutdatedData,
       sc: segment?.payload.channel,
     }, {
-      body: { orderItems },
+      body: { orderItems, noSplitItem: Boolean(noSplitItem) },
       headers: {
         "content-type": "application/json",
         accept: "application/json",

@@ -1,5 +1,5 @@
 import {
-  AggregateRating,
+  AggregateRating as CommerceAggregateRating,
   Review as CommerceReview,
 } from "../../commerce/types.ts";
 
@@ -45,7 +45,11 @@ export interface Reviews {
   stats: number[];
 }
 
+export interface AggregateRating extends CommerceAggregateRating {
+  stats?: number[];
+}
+
 export interface VerifiedReviewsFullReview {
-  aggregateRating?: AggregateRating;
   review: CommerceReview[];
+  aggregateRating?: AggregateRating;
 }

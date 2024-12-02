@@ -1,61 +1,59 @@
-import { MatchContext } from "deco/blocks/matcher.ts";
-
+import { type MatchContext } from "@deco/deco/blocks";
 interface BaseCase {
   value: string;
 }
-
 /**
  * @title Equals
  */
 interface Equals extends BaseCase {
   /**
    * @readonly
+   * @hide true
    */
   type: "Equals";
 }
-
 interface Greater extends BaseCase {
   /**
    * @readonly
+   * @hide true
    */
   type: "Greater";
 }
-
 interface Lesser extends BaseCase {
   /**
    * @readonly
+   * @hide true
    */
   type: "Lesser";
 }
-
 interface GreaterOrEquals extends BaseCase {
   /**
    * @readonly
+   * @hide true
    */
   type: "GreaterOrEquals";
 }
-
 interface LesserOrEquals extends BaseCase {
   /**
    * @readonly
+   * @hide true
    */
   type: "LesserOrEquals";
 }
-
 interface Includes extends BaseCase {
   /**
    * @readonly
+   * @hide true
    */
   type: "Includes";
 }
-
 interface Exists {
   /**
    * @readonly
+   * @hide true
    */
   type: "Exists";
 }
-
 /*
  * @title {{{param}}} {{{case.type}}} {{{case.value}}}
  */
@@ -70,26 +68,23 @@ interface Condition {
     | Includes
     | Exists;
 }
-
 /**
  * @title Query String Matcher
  */
 export interface Props {
   conditions: Condition[];
 }
-
 const matchesAtLeastOne = (
   params: string[],
   condition: Condition,
   compare: (a: string, b: string) => boolean,
 ) => {
-  if (condition.case.type === "Exists") return false;
-
+  if (condition.case.type === "Exists") {
+    return false;
+  }
   const value = condition.case.value as string;
-
   return params.filter((param) => compare(param, value)).length > 0;
 };
-
 const operations: Record<
   Condition["case"]["type"],
   (param: string[], condition: Condition) => boolean
@@ -108,30 +103,22 @@ const operations: Record<
     matchesAtLeastOne(params, condition, (a, b) => a <= b),
   Exists: (_params, _condition) => true,
 });
-
 /**
  * @title Query String
  * @description Match with a specific querystring
  * @icon question-mark
  */
-const MatchQueryString = (
-  props: Props,
-  { request }: MatchContext,
-) => {
+const MatchQueryString = (props: Props, { request }: MatchContext) => {
   let matches = true;
   const url = new URL(request.url);
-
   props.conditions.forEach((condition) => {
     const params = url.searchParams.getAll(condition.param);
     if (!params.length) {
       matches = false;
       return;
     }
-
     matches = matches && operations[condition.case.type](params, condition);
   });
-
   return matches;
 };
-
 export default MatchQueryString;

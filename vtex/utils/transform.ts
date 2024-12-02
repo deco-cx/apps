@@ -2,10 +2,13 @@ import type {
   AggregateOffer,
   Brand,
   BreadcrumbList,
+  DayOfWeek,
   Filter,
   FilterToggleValue,
   Offer,
+  OpeningHoursSpecification,
   PageType,
+  Place,
   Product,
   ProductDetailsPage,
   ProductGroup,
@@ -15,6 +18,7 @@ import type {
 } from "../../commerce/types.ts";
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
+import type { PickupPoint as PickupPointVCS } from "./openapi/vcs.openapi.gen.ts";
 import { slugify } from "./slugify.ts";
 import type {
   Brand as BrandVTEX,
@@ -28,7 +32,9 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   PageType as PageTypeVTEX,
+  PickupPoint,
   Product as ProductVTEX,
+  ProductInventoryData,
   ProductRating,
   ProductReviewData,
   SelectedFacet,
@@ -39,7 +45,8 @@ import type {
 const DEFAULT_CATEGORY_SEPARATOR = ">";
 
 const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
-  typeof (sku as LegacySkuVTEX).variations?.[0] === "string";
+  typeof (sku as LegacySkuVTEX).variations?.[0] === "string" ||
+  !!(sku as LegacySkuVTEX).Videos;
 
 const isLegacyProduct = (
   product: ProductVTEX | LegacyProductVTEX,
@@ -89,14 +96,13 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
 ): T["items"][number] => {
   const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
-
   for (const item of product.items) {
     if (item.itemId === skuId) {
       return item;
     }
   }
 
-  throw new Error(`Missing sku ${skuId} on product ${product.productName}`);
+  return product.items[0];
 };
 
 const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -340,6 +346,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     itemId: skuId,
     referenceId = [],
     kitItems,
+    estimatedDateArrival,
   } = sku;
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
@@ -348,7 +355,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     items
       .flatMap((i) => i.images)
       .reduce((map, img) => {
-        map.set(getImageKey(img.imageUrl), img.imageUrl);
+        img?.imageUrl && map.set(getImageKey(img.imageUrl), img.imageUrl);
         return map;
       }, new Map<string, string>());
 
@@ -422,12 +429,19 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
 
+  estimatedDateArrival && additionalProperty.push({
+    "@type": "PropertyValue",
+    name: "Estimated Date Arrival",
+    value: estimatedDateArrival,
+  });
+
   return {
     "@type": "Product",
     category: categoriesString,
     productID: skuId,
     url: getProductURL(baseUrl, product, sku.itemId).href,
     name,
+    alternateName: sku.complementName,
     description,
     brand: {
       "@type": "Brand",
@@ -458,6 +472,7 @@ const toBreadcrumbList = (
 ): BreadcrumbList => {
   const { categories, productName } = product;
   const names = categories[0]?.split("/").filter(Boolean);
+
   const segments = names.map(slugify);
 
   return {
@@ -485,25 +500,48 @@ const toBreadcrumbList = (
   };
 };
 
-const legacyToProductGroupAdditionalProperties = (product: LegacyProductVTEX) =>
-  product.allSpecifications?.flatMap((name) => {
+const legacyToProductGroupAdditionalProperties = (
+  product: LegacyProductVTEX,
+) => {
+  const groups = product.allSpecificationsGroups ?? [];
+  const allSpecifications = product.allSpecifications ?? [];
+
+  const specByGroup: Record<string, string> = {};
+
+  groups.forEach((group) => {
+    const groupSpecs = (product as unknown as Record<string, string[]>)[group];
+    groupSpecs.forEach((specName) => {
+      specByGroup[specName] = group;
+    });
+  });
+
+  return allSpecifications.flatMap((name) => {
     const values = (product as unknown as Record<string, string[]>)[name];
-
     return values.map((value) =>
-      toAdditionalPropertySpecification({ name, value })
+      toAdditionalPropertySpecification({
+        name,
+        value,
+        propertyID: specByGroup[name],
+      })
     );
-  }) ?? [];
+  });
+};
 
-const toProductGroupAdditionalProperties = ({ properties = [] }: ProductVTEX) =>
-  properties.flatMap(({ name, values }) =>
-    values.map(
-      (value) =>
-        ({
-          "@type": "PropertyValue",
-          name,
-          value,
-          valueReference: "PROPERTY" as string,
-        }) as const,
+const toProductGroupAdditionalProperties = (
+  { specificationGroups = [] }: ProductVTEX,
+) =>
+  specificationGroups.flatMap(({ name: groupName, specifications }) =>
+    specifications.flatMap(({ name, values }) =>
+      values.map(
+        (value) =>
+          ({
+            "@type": "PropertyValue",
+            name,
+            value,
+            propertyID: groupName,
+            valueReference: "PROPERTY" as string,
+          }) as const,
+      )
     )
   );
 
@@ -552,10 +590,14 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   return [...specificationProperties, ...attachmentProperties];
 };
 
-const toOffer = (
-  { commertialOffer: offer, sellerId, sellerName }: SellerVTEX,
-): Offer => ({
+const toOffer = ({
+  commertialOffer: offer,
+  sellerId,
+  sellerName,
+  sellerDefault,
+}: SellerVTEX): Offer => ({
   "@type": "Offer",
+  identifier: sellerDefault ? "default" : undefined,
   price: offer.spotPrice ?? offer.Price,
   seller: sellerId,
   sellerName,
@@ -656,6 +698,7 @@ export const legacyFacetToFilter = (
   term: string,
   behavior: "dynamic" | "static",
   ignoreCaseSelected?: boolean,
+  fullPath = false,
 ): Filter | null => {
   const mapSegments = map.split(",").filter((x) => x.length > 0);
   const pathSegments = term.replace(/^\//, "").split("/").slice(
@@ -675,7 +718,9 @@ export const legacyFacetToFilter = (
   // category2/123?map=c,productClusterIds -> DO NOT WORK
   // category1/category2/123?map=c,c,productClusterIds -> WORK
   const hasProductClusterIds = mapSegments.includes("productClusterIds");
-  const hasToBeFullpath = hasProductClusterIds || mapSegments.includes("ft") ||
+  const hasToBeFullpath = fullPath ||
+    hasProductClusterIds ||
+    mapSegments.includes("ft") ||
     mapSegments.includes("b");
 
   const getLink = (facet: LegacyFacet, selected: boolean) => {
@@ -773,6 +818,8 @@ export const legacyFacetToFilter = (
             map,
             term,
             behavior,
+            ignoreCaseSelected,
+            fullPath,
           )
           : undefined,
       };
@@ -926,11 +973,12 @@ export const categoryTreeToNavbar = (
 
 export const toBrand = (
   { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+  baseUrl: string,
 ): Brand => ({
   "@type": "Brand",
   "@id": `${id}`,
   name,
-  logo: imageUrl ?? undefined,
+  logo: imageUrl?.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}`,
   description: metaTagDescription,
 });
 
@@ -980,6 +1028,30 @@ export const toReview = (
   });
 };
 
+export const toInventories = (
+  products: Product[],
+  inventoriesData: ProductInventoryData[],
+): Product[] => {
+  return products.map((p, index) => {
+    const balance = inventoriesData[index].balance || [];
+
+    const additionalProperty = Array.from(p.additionalProperty || []);
+
+    const inventories: PropertyValue[] = balance.map((b) => ({
+      "@type": "PropertyValue",
+      valueReference: "INVENTORY",
+      propertyID: b.warehouseId,
+      name: b.warehouseName,
+      value: b.totalQuantity?.toString(),
+    }));
+
+    return {
+      ...p,
+      additionalProperty: [...additionalProperty, ...inventories],
+    };
+  });
+};
+
 type ProductMap = Record<string, Product>;
 
 export const sortProducts = (
@@ -1011,3 +1083,103 @@ export const parsePageType = (p: PageTypeVTEX): PageType => {
 
   return type;
 };
+
+function dayOfWeekIndexToString(day?: number): DayOfWeek | undefined {
+  switch (day) {
+    case 0:
+      return "Sunday";
+    case 1:
+      return "Monday";
+    case 2:
+      return "Tuesday";
+    case 3:
+      return "Wednesday";
+    case 4:
+      return "Thursday";
+    case 5:
+      return "Friday";
+    case 6:
+      return "Saturday";
+    default:
+      return undefined;
+  }
+}
+
+interface Hours {
+  dayOfWeek?: number;
+  openingTime?: string;
+  closingTime?: string;
+}
+
+function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
+  return {
+    "@type": "OpeningHoursSpecification",
+    opens: hours.openingTime,
+    closes: hours.closingTime,
+    dayOfWeek: dayOfWeekIndexToString(hours.dayOfWeek),
+  };
+}
+
+function isPickupPointVCS(
+  pickupPoint: PickupPoint | PickupPointVCS,
+): pickupPoint is PickupPointVCS {
+  return "name" in pickupPoint;
+}
+
+export function toPlace(
+  pickupPoint: PickupPoint & { distance?: number } | PickupPointVCS,
+): Place {
+  const {
+    name,
+    country,
+    latitude,
+    longitude,
+    openingHoursSpecification,
+  } = isPickupPointVCS(pickupPoint)
+    ? {
+      name: pickupPoint.name,
+      country: pickupPoint.address?.country?.acronym,
+      latitude: pickupPoint.address?.location?.latitude,
+      longitude: pickupPoint.address?.location?.longitude,
+      openingHoursSpecification: pickupPoint.businessHours?.map(
+        toHoursSpecification,
+      ),
+    }
+    : {
+      name: pickupPoint.friendlyName,
+      country: pickupPoint.address?.country,
+      latitude: pickupPoint.address?.geoCoordinates[0],
+      longitude: pickupPoint.address?.geoCoordinates[1],
+      openingHoursSpecification: pickupPoint.businessHours?.map((
+        { ClosingTime, DayOfWeek, OpeningTime },
+      ) =>
+        toHoursSpecification({
+          closingTime: ClosingTime,
+          dayOfWeek: DayOfWeek,
+          openingTime: OpeningTime,
+        })
+      ),
+    };
+
+  return {
+    "@id": pickupPoint.id,
+    "@type": "Place",
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: country,
+      addressLocality: pickupPoint.address?.city,
+      addressRegion: pickupPoint.address?.state,
+      postalCode: pickupPoint.address?.postalCode,
+      streetAddress: pickupPoint.address?.street,
+    },
+    latitude,
+    longitude,
+    name,
+    openingHoursSpecification,
+    additionalProperty: [{
+      "@type": "PropertyValue",
+      name: "distance",
+      value: `${pickupPoint.distance}`,
+    }],
+  };
+}

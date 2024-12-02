@@ -1,16 +1,19 @@
-import { ConnInfo } from "std/http/mod.ts";
 import { isFreshCtx } from "./fresh.ts";
 
+type ConnInfo = Deno.ServeHandlerInfo;
 export interface RedirectConfig {
   to: string;
   type?: "permanent" | "temporary";
+  discardQueryParameters?: boolean;
 }
 
 /**
  * @title Redirect
  * @description Redirect request to another url
  */
-export default function Redirect({ to, type = "temporary" }: RedirectConfig) {
+export default function Redirect(
+  { to, type = "temporary", discardQueryParameters }: RedirectConfig,
+) {
   /** https://archive.is/kWvxu */
   const statusByRedirectType: Record<
     NonNullable<RedirectConfig["type"]>,
@@ -39,7 +42,7 @@ export default function Redirect({ to, type = "temporary" }: RedirectConfig) {
      *
      * (Useful for tracking parameters e.g Google's gclid, utm_source...)
      */
-    const finalLocation = !queryString
+    const finalLocation = !queryString || discardQueryParameters
       ? location
       : location.includes("?")
       ? `${location}&${queryString}`

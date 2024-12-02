@@ -4,7 +4,7 @@ import { createClient, PaginationOptions } from "../utils/client.ts";
 import { toReview } from "../utils/transform.ts";
 
 export type Props = PaginationOptions & {
-  productsIds: string[];
+  productId: string | string[];
 };
 
 /**
@@ -22,7 +22,7 @@ export default async function productReviews(
   }
 
   const reviewsResponse = await client.reviews({
-    productsIds: config.productsIds,
+    productId: config.productId,
     count: config?.count,
     offset: config?.offset,
     order: config?.order,

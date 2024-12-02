@@ -1,7 +1,6 @@
-import type { LoaderFunction } from "deco/types.ts";
 import type { Product } from "../../../commerce/types.ts";
 import type { AppContext } from "../mod.ts";
-
+import { type LoaderFunction } from "@deco/deco";
 export interface Props {
   /** @description query to use on search */
   query: string;
@@ -20,7 +19,6 @@ export interface Props {
     | "name:asc"
     | "release:desc"
     | "discount:desc";
-
   // TODO: pattern property isn't being handled by RJSF
   /**
    * @title Collection ID
@@ -28,31 +26,23 @@ export interface Props {
    */
   collection?: string[];
 }
-
 /**
  * @title VTEX Intelligent Search - Search Products (deprecated)
  * @description Use it in Shelves and static Galleries.
  * @deprecated true
  */
-const loaderV0: LoaderFunction<
-  Props,
-  Product[] | null,
-  AppContext
-> = async (
+const loaderV0: LoaderFunction<Props, Product[] | null, AppContext> = async (
   _req,
   ctx,
   props,
 ) => {
   const { query, collection, count, sort } = props;
   const p = query ? { query } : { collection: collection?.[0] };
-
   const data = await ctx.state.invoke["deco-sites/std"].loaders.vtex
     .intelligentSearch.productList(
       // deno-lint-ignore no-explicit-any
       { ...p, count, sort } as any,
     );
-
   return { data, status: data ? 200 : 404 };
 };
-
 export default loaderV0;

@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
-import { ConnInfo } from "std/http/server.ts";
 
+type ConnInfo = Deno.ServeHandlerInfo;
 const xmlHeader =
   '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 

@@ -1,9 +1,7 @@
-import { logger } from "deco/observability/otel/config.ts";
-import { meter } from "deco/observability/otel/metrics.ts";
 import { AssistantIds } from "../types.ts";
-import { ValueType } from "deco/deps.ts";
 import { AppContext } from "../mod.ts";
-import { shortcircuit } from "deco/engine/errors.ts";
+import { logger, meter, ValueType } from "@deco/deco/o11y";
+import { shortcircuit } from "@deco/deco";
 
 const stats = {
   promptTokens: meter.createHistogram("assistant_image_prompt_tokens", {
@@ -20,13 +18,11 @@ const stats = {
     valueType: ValueType.INT,
   }),
 };
-
 export interface DescribeImageProps {
   uploadURL: string;
   userPrompt: string;
   assistantIds?: AssistantIds;
 }
-
 // TODO(ItamarRocha): Rate limit
 // TODO(@ItamarRocha): Refactor to use https://github.com/deco-cx/apps/blob/main/openai/loaders/vision.ts
 export default async function describeImage(
@@ -83,13 +79,18 @@ export default async function describeImage(
     });
     return response;
   } catch (error) {
+    const errorObj = error as {
+      error: { message: string };
+      status: number;
+      headers: Headers;
+    };
     stats.describeImageError.add(1, {
       assistantId,
     });
     shortcircuit(
-      new Response(JSON.stringify({ error: error.error.message }), {
-        status: error.status,
-        headers: error.headers,
+      new Response(JSON.stringify({ error: errorObj.error.message }), {
+        status: errorObj.status,
+        headers: errorObj.headers,
       }),
     );
   }

@@ -6,7 +6,7 @@ import { Context, state as storeState } from "./context.ts";
 
 const { cart, loading } = storeState;
 
-type Item = NonNullable<NonNullable<Context["cart"]>["Basket"]>;
+type Item = NonNullable<NonNullable<Context["cart"]>["Shopper"]["Basket"]>;
 
 export const itemToAnalyticsItem = (
   item: NonNullable<Item>["Items"][number],
