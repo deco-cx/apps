@@ -10,11 +10,21 @@ export interface PaginationOptions {
   offset?: number;
   order?:
     | "date_desc"
-    | "date_asc"
-    | "rate_desc"
-    | "rate_asc"
-    | "most_helpful";
+    | "date_ASC"
+    | "rate_DESC"
+    | "rate_ASC"
+    | "helpfulrating_DESC";
 }
+
+// creating an object to keep backward compatibility
+const orderMap = {
+  date_desc: "date_desc",
+  date_ASC: "date_asc",
+  rate_DESC: "rate_desc",
+  rate_ASC: "rate_asc",
+  helpfulrating_DESC: "most_helpful",
+} as const;
+
 const MessageError = {
   ratings:
     "🔴⭐ Error on call ratings of Verified Review - probably unidentified product",
@@ -82,12 +92,14 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
   };
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
   const reviews = (
-    { productId, count = 5, offset = 0, order = "date_desc" }:
+    { productId, count = 5, offset = 0, order: _order = "date_desc" }:
       & PaginationOptions
       & {
         productId: string;
       },
   ) => {
+    const order = orderMap[_order];
+
     const payload = {
       query: "reviews",
       product: productId,
