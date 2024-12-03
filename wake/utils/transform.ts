@@ -19,10 +19,10 @@ import {
 export const FILTER_PARAM = "filtro";
 
 export const CONDITIONS: Record<string, OfferItemCondition> = {
-  "Novo": "https://schema.org/NewCondition",
-  "Usado": "https://schema.org/UsedCondition",
-  "Renovado": "https://schema.org/RefurbishedCondition",
-  "Danificado": "https://schema.org/DamagedCondition",
+  Novo: "https://schema.org/NewCondition",
+  Usado: "https://schema.org/UsedCondition",
+  Renovado: "https://schema.org/RefurbishedCondition",
+  Danificado: "https://schema.org/DamagedCondition",
 };
 
 export const camposAdicionais = [
@@ -65,15 +65,10 @@ export const getVariantUrl = (
 };
 
 type WakeFilterItem = NonNullable<
-  NonNullable<
-    NonNullable<SearchQuery["result"]>["aggregations"]
-  >["filters"]
+  NonNullable<NonNullable<SearchQuery["result"]>["aggregations"]>["filters"]
 >[0];
 
-export const toFilterItem = (
-  filter: WakeFilterItem,
-  base: URL,
-) => ({
+export const toFilterItem = (filter: WakeFilterItem, base: URL) => ({
   "@type": "FilterToggle" as const,
   key: filter?.origin ?? "",
   label: filter?.field ?? "",
@@ -82,11 +77,11 @@ export const toFilterItem = (
     const url = new URL(base);
     const { name, quantity } = filterValue!;
 
-    const filterParams = url.searchParams
-      .getAll(FILTER_PARAM);
+    const filterParams = url.searchParams.getAll(FILTER_PARAM);
 
-    const index = filterParams
-      .findIndex((f) => (f.split("__")[1] || f.split(":")[1]) === name);
+    const index = filterParams.findIndex(
+      (f) => (f.split("__")[1] || f.split(":")[1]) === name,
+    );
 
     const selected = index > -1;
 
@@ -132,13 +127,15 @@ export const toPriceFilter = (
 
     const isDirectParam = url.searchParams.getAll("precoPor");
 
-    const filterParams = isDirectParam ? isDirectParam : url.searchParams
-      .getAll(FILTER_PARAM);
+    const filterParams = isDirectParam
+      ? isDirectParam
+      : url.searchParams.getAll(FILTER_PARAM);
 
     const index = isDirectParam
       ? filterParams.findIndex((f) => f === name)
-      : filterParams
-        .findIndex((f) => (f.split("__")[1] || f.split(":")[1]) === name);
+      : filterParams.findIndex(
+        (f) => (f.split("__")[1] || f.split(":")[1]) === name,
+      );
 
     const selected = index > -1;
 
@@ -146,7 +143,8 @@ export const toPriceFilter = (
       const params = new URLSearchParams();
       url.searchParams.forEach((value, key) => {
         if (
-          (key !== FILTER_PARAM && key !== "precoPor") || !value.endsWith(name)
+          (key !== FILTER_PARAM && key !== "precoPor") ||
+          !value.endsWith(name)
         ) {
           params.append(key, value);
         }
@@ -203,12 +201,14 @@ export const toBreadcrumbList = (
   product?: Product,
 ): BreadcrumbList => {
   const itemListElement = [
-    ...(breadcrumbs ?? []).map((item, i): ListItem<string> => ({
-      "@type": "ListItem",
-      name: item!.text!,
-      position: i + 1,
-      item: new URL(item!.link!, base).href,
-    })),
+    ...(breadcrumbs ?? []).map(
+      (item, i): ListItem<string> => ({
+        "@type": "ListItem",
+        name: item!.text!,
+        position: i + 1,
+        item: new URL(item!.link!, base).href,
+      }),
+    ),
   ];
 
   if (product) {
@@ -242,21 +242,31 @@ export const toProduct = (
   const additionalProperty: PropertyValue[] = [];
 
   if ((variant as SingleProductFragment)?.attributeSelections) {
-    (variant as SingleProductFragment)?.attributeSelections?.selections
-      ?.forEach((selection) => {
-        if (selection?.name == "Outras Opções") {
-          selection.values?.forEach((value) => {
-            additionalProperty.push({
-              "@type": "PropertyValue",
-              url: value?.alias ?? undefined,
-              value: value?.selected ? "true" : "false",
-              name: value?.value ?? undefined,
-              valueReference: "SELECTIONS",
-            });
+    (
+      variant as SingleProductFragment
+    )?.attributeSelections?.selections?.forEach((selection) => {
+      if (selection?.name == "Outras Opções") {
+        selection.values?.forEach((value) => {
+          additionalProperty.push({
+            "@type": "PropertyValue",
+            url: value?.alias ?? undefined,
+            value: value?.selected ? "true" : "false",
+            name: value?.value ?? undefined,
+            valueReference: "SELECTIONS",
           });
-        }
-      });
+        });
+      }
+    });
   }
+
+  variant.productCategories?.forEach((category) =>
+    additionalProperty.push({
+      "@type": "PropertyValue" as const,
+      name: "category",
+      propertyID: String(category?.id) ?? "",
+      value: category?.name ?? "",
+    })
+  );
 
   variant.informations?.forEach((info) =>
     additionalProperty.push({
@@ -267,6 +277,7 @@ export const toProduct = (
       valueReference: "INFORMATION",
     })
   );
+
   variant.attributes?.forEach((attr) =>
     additionalProperty.push({
       "@type": "PropertyValue",
@@ -293,11 +304,13 @@ export const toProduct = (
         value: promotion!.content ?? undefined,
         identifier: promotion!.id,
         image: promotion!.fullStampUrl
-          ? [{
-            "@type": "ImageObject",
-            encodingFormat: "image",
-            url: promotion!.fullStampUrl,
-          }]
+          ? [
+            {
+              "@type": "ImageObject",
+              encodingFormat: "image",
+              url: promotion!.fullStampUrl,
+            },
+          ]
           : undefined,
         valueReference: "PROMOTION",
       });
@@ -309,6 +322,15 @@ export const toProduct = (
       "@type": "PropertyValue",
       name: "kit",
       value: String((variant as BuyList).kit),
+      valueReference: "PROPERTY",
+    });
+  }
+
+  if ((variant as BuyList).buyListId) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "buyListId",
+      value: String((variant as BuyList).buyListId),
       valueReference: "PROPERTY",
     });
   }
@@ -385,17 +407,17 @@ export const toProduct = (
     return Number(v.productID) === Number(variantId);
   }) ?? {};
 
-  const aggregateRating = (variant.numberOfVotes ||
-      (variant as SingleProductFragment).reviews?.length)
-    ? {
-      "@type": "AggregateRating" as const,
-      bestRating: 5,
-      ratingCount: variant.numberOfVotes || undefined,
-      ratingValue: variant.averageRating ?? undefined,
-      reviewCount: (variant as SingleProductFragment).reviews?.length,
-      worstRating: 1,
-    }
-    : undefined;
+  const aggregateRating =
+    variant.numberOfVotes || (variant as SingleProductFragment).reviews?.length
+      ? {
+        "@type": "AggregateRating" as const,
+        bestRating: 5,
+        ratingCount: variant.numberOfVotes || undefined,
+        ratingValue: variant.averageRating ?? undefined,
+        reviewCount: (variant as SingleProductFragment).reviews?.length,
+        worstRating: 1,
+      }
+      : undefined;
 
   return {
     "@type": "Product",
@@ -415,8 +437,7 @@ export const toProduct = (
       url: variant.productBrand?.alias
         ? new URL(`/${variant.productBrand.alias}`, base).href
         : undefined,
-      logo: variant.productBrand?.fullUrlLogo ??
-        undefined,
+      logo: variant.productBrand?.fullUrlLogo ?? undefined,
     },
     offers: {
       "@type": "AggregateOffer",
@@ -424,20 +445,22 @@ export const toProduct = (
       lowPrice: variant.prices?.price,
       priceCurrency: "BRL",
       offerCount: 1,
-      offers: [{
-        "@type": "Offer",
-        seller: variant.seller?.name ?? undefined,
-        price: variant.prices?.price,
-        priceSpecification,
-        itemCondition: CONDITIONS[variant.condition!],
-        availability: variant.available
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-        inventoryLevel: { value: variant.stock },
-      }],
+      offers: [
+        {
+          "@type": "Offer",
+          seller: variant.seller?.name ?? undefined,
+          price: variant.prices?.price,
+          priceSpecification,
+          itemCondition: CONDITIONS[variant.condition!],
+          availability: variant.available
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+          inventoryLevel: { value: variant.stock },
+        },
+      ],
     },
-    ...variantSelected,
     additionalProperty,
+    ...variantSelected,
     isSimilarTo,
     review,
     aggregateRating,

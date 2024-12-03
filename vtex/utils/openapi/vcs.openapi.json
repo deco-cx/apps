@@ -149,6 +149,118 @@
         }
       }
     },
+    "/api/logistics/pvt/inventory/skus/{skuId}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "Type of the content being sent.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "HTTP Client Negotiation _Accept_ Header. Indicates the types of responses the client can understand.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "application/json"
+            }
+          },
+          {
+            "name": "skuId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "skuId": {
+                      "type": "string",
+                      "description": "Unique identifier of the SKU."
+                    },
+                    "balance": {
+                      "type": "array",
+                      "description": "List of warehouses.",
+                      "items": {
+                        "type": "object",
+                        "description": "Object representing each document.",
+                        "properties": {
+                          "hasUnlimitedQuantity": {
+                            "type": "boolean"
+                          },
+                          "leadTime": {
+                            "type": "string"
+                          },
+                          "reservedQuantity": {
+                            "type": "integer"
+                          },
+                          "totalQuantity": {
+                            "type": "integer"
+                          },
+                          "warehouseId": {
+                            "type": "string",
+                            "description": "Warehouse ID."
+                          },
+                          "warehouseName": {
+                            "type": "string",
+                            "description": "Warehouse name."
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "skuId": "44",
+                  "balance": [
+                    {
+                      "warehouseId": "1_1",
+                      "warehouseName": "Inventário principal",
+                      "totalQuantity": 1000000,
+                      "reservedQuantity": 0,
+                      "hasUnlimitedQuantity": true,
+                      "timeToRefill": null,
+                      "dateOfSupplyUtc": null,
+                      "leadTime": "00:00:00"
+                    },
+                    {
+                      "warehouseId": "11c479c",
+                      "warehouseName": "Estoque Virtual 11 dias uteis",
+                      "totalQuantity": 0,
+                      "reservedQuantity": 0,
+                      "hasUnlimitedQuantity": false,
+                      "timeToRefill": null,
+                      "dateOfSupplyUtc": null,
+                      "leadTime": "00:00:00"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable. Wildcard queries temporarily blocked due to excessive usage. Consider adjusting your code to remove them or reduce the rate of search requests with wildcards (*). This temporary block may also be due to excessive use of requests with the parameter `keyword`."
+          }
+        }
+      }
+    },
     "/api/logistics/pvt/configuration/pickuppoints": {
       "get": {
         "tags": [
@@ -20145,6 +20257,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "noSplitItem": {
+                    "type": "boolean",
+                    "description": "Avoid split items on cart"
+                  },
                   "orderItems": {
                     "type": "array",
                     "description": "Array containing the cart items. Each object inside this array corresponds to a different item.",

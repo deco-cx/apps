@@ -1,5 +1,7 @@
+import { LinxError, ResponseCallBack } from "./shared.ts";
+
 export interface CartOperation {
-  Errors: unknown[];
+  Errors: LinxError[];
   IsValid: boolean;
   RefreshBasket: boolean;
   ResponseCallBack: ResponseCallBack;
@@ -8,8 +10,18 @@ export interface CartOperation {
   Warnings: unknown[];
 }
 
-export interface ResponseCallBack {
-  Code: string;
-  Parameters: unknown[];
+export interface Meta {
+  PropertyMetadataID: number;
+  PropertyName: string;
   Value: string;
+}
+
+export interface CartProduct {
+  ProductID: string;
+  SkuID: string;
+  Quantity: number;
+  Metas?: Meta[];
+  Name?: string;
+  Url?: string;
+  RetailPrice?: number;
 }

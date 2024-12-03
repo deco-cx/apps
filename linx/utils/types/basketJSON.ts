@@ -1,170 +1,181 @@
-export type Cart = Partial<WebPage>;
+import { CategoryItem, LinxError, LinxMetadata, Path } from "./shared.ts";
 
-export interface WebPage {
-  Response: Response;
-  Model: Basket;
-  PageInfo: PageInfo;
+export interface CartResponse {
+  Shopper: Shopper;
+  StateChanged: boolean;
+  IsValid: boolean;
+  Errors: LinxError[];
+}
+
+export interface Shopper {
   Basket: Basket;
+  ShopperTicket: ShopperTicket;
 }
 
 export interface Basket {
-  Awards: unknown[];
-  BasketHash: string;
+  BasketAuthorityToken: string;
   BasketID: number;
-  Coupons: { Code: string }[];
-  CreditCompetence: CreditCompetence;
-  DeliveryAmount: number;
-  DeliveryDiscountAmount: number;
-  DeliveryDiscounts: unknown[];
-  DeliveryETADays: number;
-  DeliveryGroups: unknown[];
-  DeliveryLoyaltyProgramPoints: number;
+  Items: DeliveryDiscountItem[];
+  DeliveryGroups: DeliveryGroup[];
   DeliveryTotal: DeliveryTotal;
-  DiscountAmount: number;
-  Discounts: unknown[];
-  GiftCertificates: unknown[];
-  HasAllUndeliverableItems: boolean;
-  HasunknownAdditionalService: boolean;
-  HasunknownAvailableWrapping: boolean;
-  HasunknownCustomization: boolean;
-  HasunknownOutOfStockItem: boolean;
-  HasunknownUndeliverableItem: boolean;
-  HasunknownWishlist: boolean;
-  HasCompetenceDiscount: boolean;
-  HasLoyaltyProgram: boolean;
-  HasPartiallyunknownOutOfStockItem: boolean;
-  HasSeller: boolean;
-  IsFreeShipping: boolean;
-  IsPostalCodeReadonly: boolean;
-  IsReadOnly: boolean;
-  IsValid: boolean;
-  ItemAwards: unknown[];
-  ItemDiscounts: Discount[];
-  Items: ItemDiscountItem[];
-  LoyaltyCardAmount: number;
-  LoyaltyCardPaymentAmount: number;
-  LoyaltyCardsList: unknown[];
-  LoyaltyProgramMode: string;
-  LoyaltyProgramTotalOfProductPoints: number;
-  MaxETADays: number;
-  MinETADays: number;
-  Navigation: Navigation[];
-  OrderTypeID: number;
-  Payments: unknown[];
-  PaymentTerms: unknown[];
+  SplitDeliveryGroups: unknown[];
+  SingleDeliveryOption: boolean;
+  SelectedDeliveryOption: SelectedDeliveryOption;
+  SelectedDeliveryOptionList: SelectedDeliveryOption[];
   PostalCode: string;
   PostalCodeAddress: string;
-  ProductAdditionals: unknown[];
-  ProductAdditionalServices: unknown[];
-  Quote: null;
-  SelectedDeliveryOption: null;
-  SelectedDeliveryOptionList: unknown[];
-  Sellers: unknown[];
-  SingleDeliveryOption: boolean;
-  SplitDeliveryGroups: unknown[];
+  IsPostalCodeReadonly: boolean;
+  Awards: Award[];
+  ItemAwards: unknown[];
+  Discounts: unknown[];
+  Upsells: unknown[];
+  PaymentTerms: unknown[];
+  Payments: unknown[];
+  CreditCompetence: CreditCompetence;
+  ItemDiscounts: Discount[];
+  DeliveryDiscounts: Discount[];
+  GiftCertificates: unknown[];
+  Coupons: { Code: string }[];
+  DeliveryAmount: number;
+  DeliveryDiscountAmount: number;
+  DeliveryLoyaltyProgramPoints: null;
+  DiscountAmount: number;
+  TotalWithoutDiscounts: number;
   SubTotal: number;
+  Total: number;
+  IsFreeShipping: boolean;
   TaxAmount: number;
   TaxationAmount: number;
-  Total: number;
-  TotalWithoutDiscounts: number;
-  Upsells: unknown[];
+  LoyaltyCardsList: unknown[];
+  LoyaltyCardAmount: number;
+  LoyaltyCardPaymentAmount: number;
+  MinETADays: number;
+  MaxETADays: number;
+  DeliveryETADays: number;
+  HasAnyAvailableWrapping: boolean;
+  HasAnyAdditionalService: boolean;
+  HasAnyWishlist: boolean;
+  HasAnyCustomization: boolean;
+  HasLoyaltyProgram: boolean;
   Wishlist: null;
+  ProductAdditionals: ProductAdditional[];
+  ProductAdditionalServices: unknown[];
+  IsValid: boolean;
+  HasAnyOutOfStockItem: boolean;
+  HasPartiallyAnyOutOfStockItem: boolean;
+  HasAnyUndeliverableItem: boolean;
+  Sellers: unknown[];
+  HasSeller: boolean;
+  LoyaltyProgramTotalOfProductPoints: number;
+  LoyaltyProgramMode: string;
+  HasAllUndeliverableItems: boolean;
+  IsReadOnly: boolean;
+  OrderTypeID: number;
+  HasCompetenceDiscount: boolean;
+  Quote: null;
+  BasketHash: string;
+  ExternalDiscounts: unknown;
+  Pos: null;
+  OpenPosModal: boolean;
+}
+
+export interface Award {
+  PromotionID: number;
+  Amount: number;
+  Message: string;
+  BasketAwardType: string;
+  RangeType: null;
+  FreeItemDataSource: unknown[];
+  MustRequireFreeItemSelection: boolean;
+  MustSelectFreeItemWhenAvailable: boolean;
 }
 
 export interface CreditCompetence {
-  Amount: number;
-  AvailableAmount: number;
-  ClaimedAmount: number;
   Reference: null;
+  Amount: number;
+  ClaimedAmount: number;
+  AvailableAmount: number;
 }
 
-export interface DeliveryTotal {
-  AmountTotal: number;
-  EstimatedUnit: null;
-  ETAHighest: null;
-  ETATotalSeconds: number;
-  IsMarketPlacleEnableAndViewTypeList: boolean;
-}
-
-export interface ItemDiscountItem {
-  Additionals: unknown[];
-  Awards: unknown[];
+export interface DeliveryDiscountItem {
   BasketItemID: number;
-  BasketItemValidation: BasketItemValidation;
+  Quantity: number;
   BasketPrice: number;
+  SubTotal: number;
+  Nested: unknown[];
+  HasNestedServices: boolean;
+  Additionals: unknown[];
+  IsFreeShipping: boolean;
+  IsPreviousItem: boolean;
+  IsMergedItem: boolean;
+  Discounts: Discount[];
+  Awards: unknown[];
+  Customizations: Customization[];
+  HasCustomization: boolean;
+  IsWishlistItem: boolean;
+  Wishlist: Wishlist;
+  BasketItemValidation: BasketItemValidation;
+  ListPrice: number;
+  RetailPrice: number;
+  HasPromotion: boolean;
+  Tax: number;
+  TaxationAmount: number;
+  ProductID: number;
+  SkuID: number;
+  ProductPath: string;
+  VariationPath: Path;
+  Name: string;
+  ProductTypeID: number;
+  CatalogItemType: number;
+  SkuName: string;
+  SKU: string;
+  SkuOptions: unknown[];
+  HasSkuOptions: boolean;
+  UrlFriendly: string;
+  ImagePath: string;
+  CategoryName: string;
+  SubCategoryName: string;
   BrandName: string;
+  PaymentTermID: number;
   BundleAdjustType: string;
   BundleAdjustValue: number;
+  BundleType: string;
+  BundlePriceType: string;
   BundleKitDiscount: string;
   BundleKitDiscountValue: number;
-  BundlePriceType: string;
-  BundleType: string;
-  CatalogItemType: number;
-  CategoryName: string;
-  CustomerRelation: CustomerRelation;
-  Customizations: unknown[];
-  DeliveryGroupKey: null;
-  DirectProductID: number;
-  Discounts: Discount[];
-  GiftCertificateProductData: GiftCertificateProductData;
-  HasCustomization: boolean;
-  HasLoyaltyProgram: boolean;
-  HasNestedServices: boolean;
-  HasPromotion: boolean;
-  HasSkuOptions: boolean;
-  ImagePath: string;
-  IsDeliverable: boolean;
-  IsEditableItem: boolean;
-  IsFreeShipping: boolean;
-  IsMergedItem: boolean;
-  IsPreviousItem: boolean;
-  IsRemovableItem: boolean;
-  IsWishlistItem: boolean;
-  ListPrice: number;
-  LoyaltyProgramPoints: number;
-  Name: string;
-  Nested: unknown[];
-  PaymentTermID: number;
-  Priority: number;
-  Product: Product;
+  SpecialType: string;
   ProductAdditionalID: number;
   ProductAdditionalIndex: number;
   ProductAuctionID: number;
-  ProductID: number;
-  ProductItem: Item;
-  ProductPath: string;
-  ProductTypeID: number;
-  PurchasingFormData: unknown[];
-  Quantity: number;
-  RetailPrice: number;
+  IsEditableItem: boolean;
+  IsRemovableItem: boolean;
   Seller: Seller;
-  SKU: string;
-  SkuID: number;
+  ProductItem: Item;
   SkuItem: Item;
-  SkuName: string;
-  SkuOptions: unknown[];
-  SpecialType: string;
-  SubCategoryName: string;
-  SubTotal: number;
-  Tax: number;
-  TaxationAmount: number;
-  UrlFriendly: string;
-  VariationPath: string;
+  Priority: number;
+  DirectProductID: number;
+  LoyaltyProgramPoints: number;
+  HasLoyaltyProgram: boolean;
+  GiftCertificateProductData: GiftCertificateProductData;
+  CustomerRelation: CustomerRelation;
+  Product: Product;
   Warehouses: number[];
-  Wishlist: Wishlist;
+  DeliveryGroupKey: null;
+  IsDeliverable: boolean;
+  PurchasingFormData: unknown[];
 }
 
 export interface Discount {
+  Reference: string;
   Amount: number;
-  CouponCode: string;
-  ExternalItemsIdentifier: null;
-  ExternalPromotionName: null;
-  Item?: ItemDiscountItem;
   Message: string;
+  CouponCode: string;
+  Type: string;
   ProductID: number;
   PromotionID: number;
-  Reference: string;
-  Type: string;
+  ExternalItemsIdentifier: null;
+  ExternalPromotionName: null;
+  Item?: DeliveryDiscountItem;
 }
 
 export interface BasketItemValidation {
@@ -175,352 +186,442 @@ export interface BasketItemValidation {
 }
 
 export interface CustomerRelation {
-  AddressID: number;
   CustomerID: number;
+  AddressID: number;
   Name: null;
   TradingName: null;
 }
 
+export interface Customization {
+  PropertyMetadataID: number;
+  PropertyName: string;
+  InputType: string;
+  DisplayName: string;
+  IsRequired: boolean;
+  ValidationRule: null;
+  MaxLength: number;
+  Value: string;
+  IsSelected: boolean;
+  Hint: null;
+  Options: unknown[];
+}
+
 export interface GiftCertificateProductData {
   Email: null;
-  Message: null;
   Name: null;
+  Message: null;
 }
 
 export interface Product {
-  AllowOnlyAdditionalPurchase: boolean;
-  Availability: string;
-  AvailabilityText: string;
-  Backorderable: boolean;
-  BrandID: number;
-  BrandImageUrl: string;
-  BrandName: string;
-  BrandUrl: string;
   BrowsingImage: BrowsingImage;
   BrowsingImages: BrowsingImage[];
-  CatalogItemBehavior: string;
-  CatalogItemTypeID: number;
-  CategoryItems: CategoryItem[];
-  ClickUrl: null;
-  Condition: string;
-  CurrentSellerID: number;
-  CurrentSkuID: number;
-  Descriptions: ProductDescription[];
-  DisplayCondition: boolean;
-  DisplayPrice: string;
-  DisplayStockQuantity: boolean;
-  EstimatedReorderDate: null;
-  ExtendedMetadatas: ProductDescription[];
-  Flags: Flag[];
-  HasCurrentSkuID: boolean;
-  HasEstimatedReorderDate: boolean;
-  HasPickup: boolean;
-  IntegrationID: string;
-  IsFreeShipping: boolean;
-  IsGiftCertificate: boolean;
-  IsInventoryAvailable: boolean;
-  IsNew: boolean;
-  IsPromotion: boolean;
-  IsPurchasable: boolean;
-  IsUndeliverable: boolean;
-  IsUponRequest: boolean;
-  Items: ProductItem[];
+  Price: null;
   JoinCollection: null;
-  LeafCategoryId: number;
-  LeafCategoryName: string;
-  LeafCategoryUrl: string;
-  ListPrice: number;
-  LoyaltyProgramPoints: unknown[];
-  MediaGroups: MediaGroup[];
-  Medias: BrowsingImage[];
-  MediaSmall: string;
+  Items: ProductItem[];
+  HasPickup: boolean;
+  ShortDescription: string;
+  Condition: string;
+  DisplayCondition: boolean;
+  Url: string;
+  ClickUrl: null;
+  PageTitle: string;
   MetaDescription: string;
   MetaKeywords: string;
-  MininumOfDistinctSKUs: number;
-  MininumOfSKUsQuantity: number;
-  Name: string;
-  NewFrom: string;
-  NewTo: null;
-  Options: unknown[];
-  OutOfStockFrom: null;
-  OutOfStockTo: null;
-  PageTitle: string;
-  Preorderable: boolean;
-  PreorderDate: string;
-  Price: null;
-  PriceDescription: null;
-  ProductDefinition: null;
-  ProductDefinitionID: number;
-  ProductID: number;
-  ProductSelection: ProductSelection;
-  ProductTypeID: number;
-  PromotionFrom: string;
-  PromotionOnlyCheckout: boolean;
-  PromotionPrice: number;
-  PromotionTo: string;
-  PropertyPath: string;
+  IsFreeShipping: boolean;
+  Uom: string;
+  IsUponRequest: boolean;
+  IsUndeliverable: boolean;
+  IsGiftCertificate: boolean;
+  IntegrationID: string;
   PurchasingFormID: number;
-  QuantityReturned: null;
-  RatingAverage: number;
-  RatingCount: number;
-  ReplenishmentStatus: string;
-  RetailPrice: number;
-  RetailPriceMax: number;
-  RetailPriceMin: number;
-  ReviewCount: number;
-  RootCategoryName: string;
+  CurrentSellerID: number;
+  IsNew: boolean;
+  NewFrom: null;
+  NewTo: null;
+  VisibleFrom: Date;
+  VisibleTo: null;
+  BrandID: number;
+  BrandName: string;
+  BrandUrl: string;
+  BrandImageUrl: string;
   RootCategoryUrl: string;
-  ShortDescription: string;
-  SKU: string;
+  RootCategoryName: string;
+  LeafCategoryUrl: string;
+  LeafCategoryName: string;
+  LeafCategoryId: number;
+  CategoryItems: CategoryItem[];
+  IsPurchasable: boolean;
+  AllowOnlyAdditionalPurchase: boolean;
+  ProductDefinitionID: number;
+  IsInventoryAvailable: boolean;
+  Availability: string;
+  AvailabilityText: string;
+  ReplenishmentStatus: string;
+  DisplayStockQuantity: boolean;
   StockBalance: string;
   StockOnHand: string;
-  Tags: Tag[];
+  OutOfStockFrom: null;
+  OutOfStockTo: null;
+  Preorderable: boolean;
+  PreorderDate: Date;
+  Backorderable: boolean;
+  EstimatedReorderDate: Date;
+  HasEstimatedReorderDate: boolean;
+  ListPrice: number;
+  PromotionPrice: number;
+  IsPromotion: boolean;
+  PromotionFrom: null;
+  PromotionTo: null;
+  RetailPrice: number;
   Tax: number;
   TaxationAmount: number;
-  Uom: string;
-  Url: string;
-
-  VisibleFrom: string;
-  VisibleTo: null;
+  RetailPriceMax: number;
+  RetailPriceMin: number;
+  PriceDescription: null;
+  DisplayPrice: string;
+  PromotionOnlyCheckout: boolean;
+  Flags: Flag[];
+  Tags: unknown[];
+  Medias: BrowsingImage[];
+  MediaGroups: MediaGroup[];
+  MediaSmall: string;
+  RatingAverage: number;
+  RatingCount: number;
+  ReviewCount: number;
+  Options: unknown[];
+  PropertyPath: string;
+  CurrentSkuID: number;
+  HasCurrentSkuID: boolean;
+  Descriptions: LinxMetadata[];
+  MininumOfDistinctSKUs: number;
+  MininumOfSKUsQuantity: number;
+  QuantityReturned: null;
+  ProductSelection: ProductSelection;
+  UrlHelper: unknown;
+  ProductID: number;
+  SKU: string;
+  Name: string;
+  ProductTypeID: number;
+  CatalogItemTypeID: number;
+  CatalogItemBehavior: string;
+  ExtendedMetadatas: LinxMetadata[];
+  LoyaltyProgramPoints: unknown[];
+  ProductDefinition: null;
 }
 
 export interface BrowsingImage {
-  Attributes: unknown[];
-  HasMediaPath: boolean;
-  Height: number;
-  Index: number;
-  MaxHeight: number;
   MaxWidth: number;
+  MaxHeight: number;
+  Width: number;
+  Height: number;
+  MediaSizeType: MediaSizeType;
   MediaPath: string;
-  MediaSizeType: string;
-  MediaType: string;
-  ProductPath: string;
+  VariationPath: Path;
+  ProductPath: Path;
+  MediaType: MediaType;
+  Index: number;
   Title: null;
   Url: null;
-  VariationPath: string;
-  Width: number;
+  Attributes: unknown[];
+  HasMediaPath: boolean;
 }
 
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
+export type MediaSizeType = "Small" | "Thumbnail" | "Medium" | "Large" | "Zoom";
 
-export interface ProductDescription {
-  Alias: string;
-  Color: null | string;
-  GroupName: null | string;
-  GroupType: string;
-  ImagePath: null | string;
-  Name: string;
-  Order: number;
-  PropertyMetadataID: number;
-  PropertyPath: string;
-  Reference: null | string;
-  Title: string;
-  Value: string;
-  ValueAlias: string;
-}
+export type MediaType = "Image";
+
+export type GroupType = "Description" | "Extended";
 
 export interface Flag {
-  Alias: string;
   FlagID: number;
-  ImagePath: null | string;
+  Alias: string;
   Label: string;
+  ImagePath: string;
 }
 
 export interface ProductItem {
-  Availability: string;
-  AvailabilityText: string;
-  Backorderable: boolean;
-  BackorderLimit: null;
+  Items: ProductItem[];
+  VariationPath: Path;
+  VariationLevel: number;
+  ProductPath: string;
+  ProductLevel: number;
+  MinimumQtyAllowed: number;
+  MaximumQtyAllowed: number;
+  Weight: number;
+  Height: number;
+  Width: number;
+  Depth: number;
+  Order: number;
+  UrlFriendly: string;
+  IsBundleItemRequired: boolean;
+  BundleQuantity: number;
   BundleAdjustType: string;
   BundleAdjustValue: number;
   BundleGroup: null;
-  BundleHierarchyPrice: null;
+  BundleType: string;
+  BundlePriceType: string;
   BundleKitDiscount: string;
   BundleKitDiscountValue: number;
-  BundlePriceType: string;
-  BundleQuantity: number;
-  BundleType: string;
-  BuyBox: null;
-  CatalogItemBehavior: string;
-  CatalogItemTypeID: number;
   ComposeMinPrice: boolean;
-  Depth: number;
-  Edit: null;
-  EstimatedReorderDate: null;
-  ExtendedMetadatas: ProductDescription[];
-  HandlingDays: number;
-  HasEstimatedReorderDate: boolean;
-  Height: number;
-  InStockHandlingDays: number;
-  IntegrationID: string;
-  IsBundleItemRequired: boolean;
-  IsDeliverable: boolean;
-  IsInventoryAvailable: boolean;
-  IsPromotion: boolean;
-  IsPurchasable: boolean;
-  Items: ProductItem[];
-  ListPrice: number;
-  LoyaltyProgramPoints: LoyaltyProgramPoint[];
-  MaximumQtyAllowed: number;
-  MinimumQtyAllowed: number;
-  Name: string;
-  Options: unknown[];
-  Order: number;
-  OutOfStockFrom: null;
-  OutOfStockHandlingDays: number;
-  OutOfStockTo: null;
-  Preorderable: boolean;
-  PreorderDate: string;
-  Price: null;
   PriceDescription: null;
-  ProductDefinition: null;
-  ProductID: number;
-  ProductLevel: number;
-  ProductPath: string;
-  ProductTypeID: number;
-  PromotionFrom: string;
-  PromotionPrice: number;
-  PromotionTo: string;
-  ReplenishmentStatus: string;
+  ListPrice: number;
   RetailPrice: number;
-  SKU: string;
-  SKUOptions: unknown[];
-  StockBalance: number;
   Tax: number;
   TaxationAmount: number;
+  PromotionPrice: number;
+  IsPromotion: boolean;
+  PromotionFrom: null;
+  PromotionTo: null;
+  StockBalance: number;
+  InStockHandlingDays: number;
+  OutOfStockHandlingDays: number;
+  HandlingDays: number;
+  Availability: string;
+  AvailabilityText: string;
+  ReplenishmentStatus: string;
+  IsPurchasable: boolean;
+  IsInventoryAvailable: boolean;
+  Preorderable: boolean;
+  PreorderDate: Date;
+  Backorderable: boolean;
+  BackorderLimit: null;
+  OutOfStockFrom: null;
+  OutOfStockTo: null;
   UPC: null | string;
-  UrlFriendly: string;
-
-  VariationLevel: number;
-  VariationPath: string;
-  Weight: number;
-  Width: number;
-}
-
-export interface LoyaltyProgramPoint {
-  ForceNull: boolean;
-  LoyaltyProgramID: number;
-  Points: number;
+  EstimatedReorderDate: Date;
+  HasEstimatedReorderDate: boolean;
+  Options: unknown[];
+  SKUOptions: unknown[];
+  BundleHierarchyPrice: null;
+  IntegrationID: string;
+  Edit: null;
+  BuyBox: null;
+  IsDeliverable: boolean;
+  UrlHelper: unknown;
   ProductID: number;
+  SKU: string;
+  Name: string;
+  ProductTypeID: number;
+  CatalogItemTypeID: number;
+  CatalogItemBehavior: string;
+  ExtendedMetadatas: LinxMetadata[];
+  LoyaltyProgramPoints: unknown[];
+  Price: null;
+  ProductDefinition: null;
 }
 
 export interface MediaGroup {
-  Custom: null;
   IsPurchasable: boolean;
-  Large: BrowsingImage;
-  Medias: BrowsingImage[];
-  MediaType: string;
-  Medium: BrowsingImage;
-  ProductLevel: number;
   ProductPath: string;
-  Small: BrowsingImage;
-  Thumbnail: BrowsingImage;
+  ProductLevel: number;
+  VariationPath: Path;
   VariationLevel: number;
-  VariationPath: string;
+  MediaType: MediaType;
+  Medias: BrowsingImage[];
+  Thumbnail: BrowsingImage;
+  Small: BrowsingImage;
+  Medium: BrowsingImage;
+  Large: BrowsingImage;
   Zoom: BrowsingImage;
+  Custom: null;
 }
 
 export interface ProductSelection {
+  PropertyPath: Path;
   PropertyLevel: number;
-  PropertyPath: string;
-  Quantity: number;
   SkuID: number;
-}
-
-export interface Tag {
-  Label: string;
-  TagID: number;
+  Quantity: number;
 }
 
 export interface Item {
-  Descriptions: ProductItemDescription[];
-  ExtendedMetadatas: ProductItemDescription[];
-}
-
-export interface ProductItemDescription {
-  DisplayName: string;
-  PropertyMetadataID: number;
-  PropertyName: string;
-  Value: null | string;
+  ExtendedMetadatas: unknown[];
+  Descriptions: unknown[];
 }
 
 export interface Seller {
-  DeliveryAmount: number;
+  SellerID: null;
+  HasSeller: boolean;
+  SellerName: null;
   ETA: number;
+  DeliveryAmount: number;
   HasDeliveryOptions: boolean;
   HasLimits: boolean;
-  HasSeller: boolean;
   PurchaseLimit: PurchaseLimit;
-  SellerID: null;
-  SellerName: string | null;
 }
 
 export interface PurchaseLimit {
-  Evaluation: null;
   SalesSubTotalLimit: null;
-  SalesSubTotalMaximum: null;
   SalesUnitLimit: null;
+  SalesSubTotalMaximum: null;
   SalesUnitLimitMaximum: null;
+  Evaluation: null;
 }
 
 export interface Wishlist {
-  AvailableQuantity: number;
-  DeliveryAddressID: null;
+  WishlistID: number;
   Hash: string;
   Name: null;
-  Url: string;
   UrlFriendly: null;
   WishlistDefinitionID: number;
   WishlistDefinitionName: null;
-  WishlistID: number;
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
   Url: string;
-  UrlFriendly: string;
+  AvailableQuantity: number;
+  DeliveryAddressID: null;
 }
 
-export interface PageInfo {
-  AlternateTitle: null;
-  BodyClass: string;
-  CanonicalLink: string;
-  CanonicalNextLink: string;
-  CanonicalPrevLink: string;
-  DefaultAlternateTitle: null;
-  DefaultDescription: null;
-  DefaultMetaDescription: string;
-  DefaultMetaKeywords: string;
-  DefaultPageTitle: string;
+export interface DeliveryGroup {
+  SplitGroupName: null;
+  SplittingKey: number;
+  DeliveryGroupID: number;
+  Name: string;
+  Alias: string;
+  Description: string;
+  ShowLogo: boolean;
+  Type: string;
+  GroupBidStrategy: string;
+  ListOrderStrategy: string;
+  DeliveryOptions: DeliveryOption[];
+  SellerID: number;
+  DockID: number;
+  WarehouseID: number;
+  GroupKey: null;
+  GroupSkus: unknown[];
+}
+
+export interface DeliveryOption {
+  DeliveryOptionID: string;
+  DeliveryMethodID: string;
+  DeliveryMethodType: string;
+  DeliveryOptionType: null;
+  Name: string;
   Description: null;
-  HttpStatusCode: number;
-  IndexPage: boolean;
-  MetaDescription: null;
-  MetaKeywords: null;
-  PageTitle: string;
-  RouteClass: string;
-  SectionClass: null;
+  Alias: string;
+  Amount: number;
+  OriginalAmount: number;
+  DiscountAmount: number;
+  Logo: string;
+  EstimatedTime: string;
+  EstimatedUnit: string;
+  OriginalEstimatedUnit: string;
+  ETA: string;
+  OriginalETA: string;
+  OnlyShipToStore: boolean;
+  DeliveryEstimatedDate: null;
+  IsPointOfSaleDelivery: boolean;
+  IsPickupLocker: boolean;
+  IsOMSPickupLocker: boolean;
+  IsDockWithdrawalPoint: boolean;
+  Schedule: null;
+  PointOfSales: unknown[];
+  ExtendedProperties: unknown[];
+  OnlyPickUpAllItems: boolean;
+  HasDifferentLocations: boolean;
+  ShouldLimitState: boolean;
+  ItemsETAs: null;
+  HasOMSAppliedRules: boolean;
+  MoreExpensiveOrSamePrice: boolean;
+  LongerOrSameETA: boolean;
+  ETADifferenceDays: number;
+  TotalDeliveryDays: number;
+  DeliveryGatewayMethodName: string;
 }
 
-export interface Response {
-  Errors: unknown[];
-  IsValid: boolean;
-  RefreshBasket: boolean;
-  ResponseCallBack: ResponseCallBack;
-  SuccessMessage: null;
-  Url: null;
-  Warnings: unknown[];
+export interface DeliveryTotal {
+  IsMarketPlacleEnableAndViewTypeList: boolean;
+  AmountTotal: number;
+  ETAHighest: null;
+  ETATotalSeconds: number;
+  EstimatedUnit: null;
 }
 
-export interface ResponseCallBack {
-  Code: string;
-  Parameters: unknown[];
-  Value: string;
+export interface ProductAdditional {
+  ProductAdditionalID: number;
+  Name: string;
+  IsRequired: boolean;
+  IsMultipleChoice: boolean;
+  Flow: string;
+  Type: string;
+  ConsiderInterest: boolean;
+}
+
+export interface SelectedDeliveryOption {
+  DeliveryMethodID: string;
+  Name: string;
+  Amount: number;
+  AmountWithoutDiscount: number;
+  ETA: string;
+  OriginalETA: string;
+  BasketID: number;
+  DeliveryGroupID: number;
+  DeliveryGroupName: string;
+  DeliveryOptionID: string;
+  IsDockWithdrawalPoint: boolean;
+  IsPickupLocker: boolean;
+  IsOMSPickupLocker: boolean;
+  IsPointOfSaleDelivery: boolean;
+  ScheduleDisplayName: null;
+  ScheduleTax: null;
+  ScheduleStartTime: null;
+  ScheduleEndTime: null;
+  ScheduleShiftExternalID: null;
+  ScheduleShiftID: null;
+  ScheduleDate: null;
+  Alias: string;
+  Logo: string;
+  DiscountAmount: number;
+  Discounts: SelectedDeliveryOptionDiscount[];
+  EstimatedTime: string;
+  EstimatedUnit: string;
+  OriginalEstimatedUnit: string;
+  DeliveryMethodType: string;
+  WarehouseID: number;
+  LocationID: null;
+  Location: null;
+  ExtendedProperties: unknown[];
+  DeliveryOptionType: null;
+  GroupKey: null;
+  HasDifferentLocations: boolean;
+  ShouldLimitState: boolean;
+  ItemsETAs: null;
+  HasOMSAppliedRules: boolean;
+  MoreExpensiveOrSamePrice: boolean;
+  LongerOrSameETA: boolean;
+  OriginalAmount: number;
+  ETADifferenceDays: number;
+  TotalDeliveryDays: number;
+  DeliveryGatewayMethodName: string;
+}
+
+export interface SelectedDeliveryOptionDiscount {
+  ProductID: null;
+  PromotionID: null;
+  Amount: number;
+  CouponCode: string;
+}
+
+export interface ShopperTicket {
+  ShopperTicketID: string;
+  WebSiteID: number;
+  CustomerID: number;
+  CommingFromUrl: null;
+  UtmSource: null;
+  UtmMedium: null;
+  UtmCampaign: null;
+  UtmTerm: null;
+  UtmContent: null;
+  LastTicketID: string;
+  CreatedDate: Date;
+  TrafficSourceID: null;
+  BasketID: number;
+  CustomerGroupIDs: null;
+  IsAuthenticated: boolean;
+  Name: string;
+  IsGuest: boolean;
+  Email: string;
+  SessionID: string;
+  IsActive: boolean;
+  IsNewShopper: boolean;
+  LastOrderID: null;
+  CustomerImpersonation: null;
+  JsonWebToken: null;
 }

@@ -1,6 +1,3 @@
-<p align="center">
-  <img align="center" src="https://1000logos.net/wp-content/uploads/2023/04/Mailchimp-logo.png" alt="Mailchimp" width="300px" />
-</p>
 
 Mailchimp is an email and marketing automations platform for growing businesses. We empower millions of customers around the world to start and grow their businesses with world-class marketing technology, award-winning customer support, and inspiring content. Mailchimp puts data-backed recommendations at the heart of your marketing, so you can find and engage customers across email, social media, landing pages, and advertising—automatically and with the power of AI
 

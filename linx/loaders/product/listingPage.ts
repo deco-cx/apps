@@ -35,6 +35,7 @@ const getPageInfo = ({ page, nbPages, recordPerPage, records, url }: {
     currentPage: page,
     records,
     recordPerPage,
+    totalPages: nbPages,
   };
 };
 
@@ -52,17 +53,11 @@ const loader = async (
 
   const page = Number(url.searchParams.get("pg")) ?? 0;
 
-  const [
-    forFacets,
-    forProducts,
-  ] = await Promise.all([
-    ctx.invoke("linx/loaders/path.ts", { f: "", fc: "true" }),
-    ctx.invoke("linx/loaders/path.ts"),
-  ]);
+  const forProducts = await ctx.invoke("linx/loaders/path.ts", { fc: "true" });
 
   if (
-    !forFacets || !forProducts ||
-    !isGridProductsModel(forProducts) || !isGridProductsModel(forFacets)
+    !forProducts ||
+    !isGridProductsModel(forProducts)
   ) {
     throw new Error("Expected GridProducts model");
   }
@@ -80,7 +75,7 @@ const loader = async (
       },
     },
   } = forProducts;
-  const { Model: { Grid: { Facets } } } = forFacets;
+  const { Model: { Grid: { Facets } } } = forProducts;
 
   const products = Products.map((product) =>
     toProduct(product, product.ProductSelection?.SkuID, {

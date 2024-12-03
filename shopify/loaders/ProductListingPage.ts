@@ -6,6 +6,7 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
+  HasMetafieldsMetafieldsArgs,
   Product,
   ProductConnection,
   QueryRoot,
@@ -14,6 +15,7 @@ import {
   SearchResultItemConnection,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
+import { Metafield } from "../utils/types.ts";
 import {
   getFiltersByUrl,
   searchSortOptions,
@@ -37,6 +39,16 @@ export interface Props {
    * @description number of products per page to display
    */
   count: number;
+  /**
+   * @title Metafields
+   * @description search for metafields
+   */
+  metafields?: Metafield[];
+  /**
+   * @title Starting page query parameter offset.
+   * @description Set the starting page offset. Default to 1.
+   */
+  pageOffset?: number;
   /**
    * @hide
    * @description it is hidden because only page prop is not sufficient, we need cursors
@@ -73,10 +85,15 @@ const loader = async (
 
   const count = props.count ?? 12;
   const query = props.query || url.searchParams.get("q") || "";
-  const page = props.page || Number(url.searchParams.get("page")) || 0;
+  const currentPageoffset = props.pageOffset ?? 1;
+  const pageParam = url.searchParams.get("page")
+    ? Number(url.searchParams.get("page")) - currentPageoffset
+    : 0;
+  const page = props.page || pageParam;
   const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
   const startCursor = props.startCursor ||
     url.searchParams.get("startCursor") || "";
+  const metafields = props.metafields || [];
 
   const isSearch = Boolean(query);
   let hasNextPage = false;
@@ -88,13 +105,15 @@ const loader = async (
     | undefined = undefined;
   let shopifyFilters = undefined;
   let records = undefined;
+  let collectionTitle = undefined;
+  let collectionDescription = undefined;
 
   const sort = url.searchParams.get("sort") ?? "";
 
   if (isSearch) {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
@@ -103,6 +122,7 @@ const loader = async (
         ...(endCursor && { before: endCursor }),
         query: query,
         productFilters: getFiltersByUrl(url),
+        identifiers: metafields,
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -122,13 +142,16 @@ const loader = async (
 
     const data = await storefront.query<
       QueryRoot,
-      QueryRootCollectionArgs & CollectionProductsArgs
+      & QueryRootCollectionArgs
+      & CollectionProductsArgs
+      & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
         ...(endCursor && { last: count }),
         ...(startCursor && { after: startCursor }),
         ...(endCursor && { before: endCursor }),
+        identifiers: metafields,
         handle: pathname,
         filters: getFiltersByUrl(url),
         ...sortShopify[sort],
@@ -144,6 +167,8 @@ const loader = async (
     hasPreviousPage = Boolean(
       data?.collection?.products.pageInfo.hasPreviousPage ?? false,
     );
+    collectionTitle = data.collection?.title;
+    collectionDescription = data.collection?.description;
   }
 
   // Transform Shopify product format into schema.org's compatible format
@@ -157,18 +182,19 @@ const loader = async (
   const previousPage = new URLSearchParams(url.searchParams);
 
   if (hasNextPage) {
-    nextPage.set("page", (page + 1).toString());
+    nextPage.set("page", (page + currentPageoffset + 1).toString());
     nextPage.set("startCursor", shopifyProducts?.pageInfo.endCursor ?? "");
     nextPage.delete("endCursor");
   }
 
   if (hasPreviousPage) {
-    previousPage.set("page", (page - 1).toString());
+    previousPage.set("page", (page + currentPageoffset - 1).toString());
     previousPage.set("endCursor", shopifyProducts?.pageInfo.startCursor ?? "");
     previousPage.delete("startCursor");
   }
 
   const filters = shopifyFilters?.map((filter) => toFilter(filter, url));
+  const currentPage = page + currentPageoffset;
 
   return {
     "@type": "ProductListingPage",
@@ -188,11 +214,55 @@ const loader = async (
     pageInfo: {
       nextPage: hasNextPage ? `?${nextPage}` : undefined,
       previousPage: hasPreviousPage ? `?${previousPage}` : undefined,
-      currentPage: page,
+      currentPage,
       records,
+      recordPerPage: count,
     },
     sortOptions: isSearch ? searchSortOptions : sortOptions,
+    seo: {
+      title: collectionTitle || "",
+      description: collectionDescription || "",
+      canonical: `${url.origin}${url.pathname}${
+        page >= 1 ? `?page=${page}` : ""
+      }`,
+    },
   };
+};
+
+export const cache = "no-cache";
+export const cacheKey = (props: Props, req: Request): string | null => {
+  const url = new URL(props.pageHref || req.url);
+
+  if (url.searchParams.get("q")) return null;
+
+  const count = (props.count ?? 12).toString();
+  const query = props.query || "";
+  const page = (props.page || Number(url.searchParams.get("page")) || 0)
+    .toString();
+  const endCursor = props.endCursor || url.searchParams.get("endCursor") || "";
+  const startCursor = props.startCursor ||
+    url.searchParams.get("startCursor") || "";
+  const sort = url.searchParams.get("sort") ?? "";
+  const searchParams = new URLSearchParams({
+    count,
+    query,
+    page,
+    endCursor,
+    startCursor,
+    sort,
+  });
+
+  url.searchParams.forEach((value, key) => {
+    if (!key.startsWith("filter.")) return;
+
+    searchParams.append(key, value);
+  });
+
+  searchParams.sort();
+
+  url.search = searchParams.toString();
+
+  return url.href;
 };
 
 export default loader;

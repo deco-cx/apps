@@ -1,23 +1,7 @@
-<h1>
-  <p align="center">
-    <a href="https://www.algolia.com/">
-      <img alt="Algolia" src="https://github.com/deco-cx/apps/assets/1753396/0ff38024-1988-442d-8415-01d16055480f" width="250" />
-    </a>
-  </p>
-</h1>
 
-<p align="center">
-  <strong>
-    AI Search & Discovery platform
-  </strong>
-</p>
-<p align="center">
-  Loaders, actions and workflows for adding Agolia search, the leader in globally scalable, secure, digital search and discovery experiences that are ultrafast and reliable, to your deco.cx website.
-</p>
+Loaders, actions and workflows for adding Agolia search, the leader in globally scalable, secure, digital search and discovery experiences that are ultrafast and reliable, to your deco.cx website.
 
-<p align="center">
 Algolia is a general purpose indexer. This means you can save any Json document and later retrieve it using the Search API. Although being a simpler solution than competing alternatives like Elastic Search or Solar, setting up an index on Algolia still requires some software engineering, like setting up searchable fields, facet fields and sorting indices. Hopefully, deco.cx introduces canonical types, like Product, ProductGroup, etc. These schemas allow this app to built solutions for common use-cases, like indexing Products for a Product Listing Page. 
-</p>
 
 # Installation
 1. Install via decohub
