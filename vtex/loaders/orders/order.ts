@@ -20,7 +20,7 @@ export default async function loader(
   const response = await vcs["GET /api/oms/user/orders/:orderId"](
     {
       orderId: slug.includes("-") ? slug : slug + "-01",
-      clientEmail: payload?.sub,
+      clientEmail: payload?.sub ?? "",
     },
     {
       headers: {

@@ -201,9 +201,11 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const { selectedFacets, ...args } = fromProps({ props });
-  const params = withDefaultParams(args);
+  const params = withDefaultParams({ ...args, locale });
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   const { products: vtexProducts } = await vcsDeprecated

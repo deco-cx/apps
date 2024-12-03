@@ -8,7 +8,9 @@ export default async function (
   _req: Request,
   ctx: AppContext,
 ): Promise<Suggestion> {
-  const locale = "pt-BR"; // config!.defaultLocale; // TODO
+  const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   return await ctx.vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/top_searches"]({

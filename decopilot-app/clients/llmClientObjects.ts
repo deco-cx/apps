@@ -1,4 +1,3 @@
-// import  getAppTools from "../../openai/actions/code.ts";
 import { AppContext as AnthropicAppContext } from "../../anthropic/mod.ts";
 import { allowedModels } from "../../anthropic/actions/code.ts";
 
@@ -6,7 +5,7 @@ import { AppContext } from "../mod.ts";
 import { Attachment, LLMResponseType, Prompt } from "../types.ts";
 import assembleFinalPrompt from "../utils/assembleComplexPrompt.ts";
 
-export const callAntropic = async (
+export const callAnthropic = async (
   prompt: Prompt,
   ctx: AppContext,
   attachments?: Attachment[],
@@ -70,28 +69,6 @@ export const callAntropic = async (
   };
   return response;
   // logica pra chamar a openai
-};
-
-export const callOpenAI = (
-  prompt: Prompt,
-  _ctx: AppContext,
-  _attachments?: Attachment[],
-): LLMResponseType => {
-  const response: LLMResponseType = {
-    id: "None",
-    created: 0,
-    provider: "OpenAI", // Provider is OpenAI
-    model: prompt.model,
-    tools: [""],
-    llm_response: [{
-      message: {
-        role: "Not Ready",
-        content: `OpenAI functions still not ready`,
-      },
-      index: 0,
-    }],
-  };
-  return response;
 };
 
 export type Caller = (

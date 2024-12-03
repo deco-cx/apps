@@ -63,6 +63,8 @@ const loader = async (
     ? slug?.toLowerCase()
     : defaultPaths?.possiblePaths[0];
   const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const pageTypePromise = vcsDeprecated
     ["GET /api/catalog_system/pub/portal/pagetype/:term"](
@@ -90,7 +92,7 @@ const loader = async (
   }
 
   const facets = withDefaultFacets([], ctx);
-  const params = withDefaultParams({ query, count: 1 });
+  const params = withDefaultParams({ query, count: 1, locale });
 
   const { products: [product] } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
