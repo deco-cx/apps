@@ -31,7 +31,8 @@ import * as $$$$$$$$$$$25 from "./apps/vtex.ts";
 import * as $$$$$$$$$$$26 from "./apps/wake.ts";
 import * as $$$$$$$$$$$27 from "./apps/wap.ts";
 import * as $$$$$$$$$$$28 from "./apps/weather.ts";
-import * as $$$$$$$$$$$29 from "./apps/workflows.ts";
+import * as $$$$$$$$$$$29 from "./apps/woocommerce.ts";
+import * as $$$$$$$$$$$30 from "./apps/workflows.ts";
 
 const manifest = {
   "apps": {
@@ -64,7 +65,8 @@ const manifest = {
     "decohub/apps/wake.ts": $$$$$$$$$$$26,
     "decohub/apps/wap.ts": $$$$$$$$$$$27,
     "decohub/apps/weather.ts": $$$$$$$$$$$28,
-    "decohub/apps/workflows.ts": $$$$$$$$$$$29,
+    "decohub/apps/woocommerce.ts": $$$$$$$$$$$29,
+    "decohub/apps/workflows.ts": $$$$$$$$$$$30,
   },
   "name": "decohub",
   "baseUrl": import.meta.url,
