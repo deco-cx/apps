@@ -1,6 +1,8 @@
 import { Attachment, FileURL } from "../types.ts";
 
-export async function handleAnthropicAttachments(
+// currently handles using anthropic suggested method
+
+export async function handleAttachments(
   attachments: Attachment[],
 ): Promise<string> {
   const treated_Attachments: string[] = [];

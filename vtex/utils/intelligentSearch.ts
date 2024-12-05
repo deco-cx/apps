@@ -58,7 +58,7 @@ export const withDefaultParams = ({
   count = 12,
   sort = "",
   fuzzy = "auto",
-  // locale,
+  locale = "pt-BR",
   hideUnavailableItems,
 }: Partial<Params>) => ({
   page: page + 1,
@@ -66,6 +66,7 @@ export const withDefaultParams = ({
   query,
   sort,
   fuzzy,
+  locale,
   // locale: locale ?? ctx.configVTEX!.defaultLocale,
   hideUnavailableItems: hideUnavailableItems ?? false,
 });
