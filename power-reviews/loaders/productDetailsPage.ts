@@ -78,3 +78,5 @@ export default function productDetailsPage(
     };
   };
 }
+
+export const cache = "no-cache";
