@@ -109,7 +109,6 @@ export const pageTypesToSeo = (
   currentPage?: number,
 ): Seo | null => {
   const current = pages.at(-1);
-
   const url = new URL(baseUrl);
   const fullTextSearch = url.searchParams.get("q");
   const hasMapTermOrSkuId =
