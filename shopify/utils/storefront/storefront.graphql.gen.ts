@@ -7789,6 +7789,17 @@ export type AddItemToCartMutationVariables = Exact<{
 
 export type AddItemToCartMutation = { payload?: { cart?: { id: string, checkoutUrl: any, totalQuantity: number, lines: { nodes: Array<{ id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<{ code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } } | {}>, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } } | { id: string, quantity: number, merchandise: { id: string, title: string, image?: { url: any, altText?: string | null } | null, product: { title: string, onlineStoreUrl?: any | null, handle: string }, price: { amount: any, currencyCode: CurrencyCode } }, discountAllocations: Array<{ code: string, discountedAmount: { amount: any, currencyCode: CurrencyCode } } | {}>, cost: { totalAmount: { amount: any, currencyCode: CurrencyCode }, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, amountPerQuantity: { amount: any, currencyCode: CurrencyCode }, compareAtAmountPerQuantity?: { amount: any, currencyCode: CurrencyCode } | null } }> }, cost: { totalTaxAmount?: { amount: any, currencyCode: CurrencyCode } | null, subtotalAmount: { amount: any, currencyCode: CurrencyCode }, totalAmount: { amount: any, currencyCode: CurrencyCode }, checkoutChargeAmount: { amount: any, currencyCode: CurrencyCode } }, discountCodes: Array<{ code: string, applicable: boolean }>, discountAllocations: Array<{ discountedAmount: { amount: any, currencyCode: CurrencyCode } } | { discountedAmount: { amount: any, currencyCode: CurrencyCode } } | { discountedAmount: { amount: any, currencyCode: CurrencyCode } }> } | null } | null };
 
+export type RegisterAccountMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  acceptsMarketing?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type RegisterAccountMutation = { customerCreate?: { customer?: { id: string } | null, customerUserErrors: Array<{ code?: CustomerErrorCode | null, message: string }> } | null };
+
 export type AddCouponMutationVariables = Exact<{
   cartId: Scalars['ID']['input'];
   discountCodes: Array<Scalars['String']['input']> | Scalars['String']['input'];

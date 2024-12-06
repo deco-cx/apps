@@ -285,8 +285,10 @@ const loader = async (
   if (!isInSeachFormat && !pathQuery) {
     return null;
   }
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
-  const params = withDefaultParams({ ...searchArgs, page });
+  const params = withDefaultParams({ ...searchArgs, page, locale });
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
