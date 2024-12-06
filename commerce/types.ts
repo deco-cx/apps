@@ -559,6 +559,20 @@ export interface OpeningHoursSpecification extends Omit<Thing, "@type"> {
   /** The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours. */
   validThrough?: string;
 }
+export interface PickupHolidays {
+  /**
+   * This represents the day when the pickup service will not be available.
+   */
+  date?: string;
+  /** .
+   * Indicates when the service begins operating, if applicable.
+   */
+  hourBegin?: string;
+  /**
+   * Indicates when the service stops operating, if applicable.
+   */
+  hourEnd?: string;
+}
 export interface ContactPoint extends Omit<Thing, "@type"> {
   "@type": "ContactPoint";
   /** The geographic area where a service or offered item is provided. */
@@ -734,6 +748,8 @@ export interface PlaceLeaf extends Omit<Thing, "@type"> {
   longitude?: number;
   /** The total number of individuals that may attend an event or venue. */
   maximumAttendeeCapacity?: number;
+  /** The opening hours of a particular location on public holidays  */
+  pickupHolidays?: PickupHolidays[];
   /** The opening hours of a certain place. */
   openingHoursSpecification?: OpeningHoursSpecification[];
   /** A photograph of this place. */

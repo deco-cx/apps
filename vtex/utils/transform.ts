@@ -32,6 +32,7 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   PageType as PageTypeVTEX,
+  PickupHolidays,
   PickupPoint,
   Product as ProductVTEX,
   ProductInventoryData,
@@ -1120,6 +1121,15 @@ function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
   };
 }
 
+function toHolidayHoursSpecification(holiday: PickupHolidays) {
+  return {
+    "@type": "PickupHolidays",
+    date: holiday.date,
+    hourBegin: holiday.hourBegin,
+    hourEnd: holiday.hourEnd,
+  };
+}
+
 function isPickupPointVCS(
   pickupPoint: PickupPoint | PickupPointVCS,
 ): pickupPoint is PickupPointVCS {
@@ -1135,12 +1145,16 @@ export function toPlace(
     latitude,
     longitude,
     openingHoursSpecification,
+    pickupHolidays,
   } = isPickupPointVCS(pickupPoint)
     ? {
       name: pickupPoint.name,
       country: pickupPoint.address?.country?.acronym,
       latitude: pickupPoint.address?.location?.latitude,
       longitude: pickupPoint.address?.location?.longitude,
+      pickupHolidays: pickupPoint.pickupHolidays?.map(
+        toHolidayHoursSpecification,
+      ),
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
       ),
@@ -1150,6 +1164,9 @@ export function toPlace(
       country: pickupPoint.address?.country,
       latitude: pickupPoint.address?.geoCoordinates[0],
       longitude: pickupPoint.address?.geoCoordinates[1],
+      pickupHolidays: pickupPoint.pickupHolidays?.map(
+        toHolidayHoursSpecification,
+      ),
       openingHoursSpecification: pickupPoint.businessHours?.map((
         { ClosingTime, DayOfWeek, OpeningTime },
       ) =>
@@ -1175,6 +1192,7 @@ export function toPlace(
     latitude,
     longitude,
     name,
+    pickupHolidays,
     openingHoursSpecification,
     additionalProperty: [{
       "@type": "PropertyValue",
