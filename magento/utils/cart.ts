@@ -1,4 +1,4 @@
-import { getCookies } from "std/http/cookie.ts";
+import { getCookies, setCookie } from "std/http/cookie.ts";
 import { ImageObject } from "../../commerce/types.ts";
 import { HttpError } from "../../utils/http.ts";
 import cart, { Cart } from "../loaders/cart.ts";
@@ -14,7 +14,9 @@ import {
 } from "./clientGraphql/types.ts";
 import { GetProductImages } from "./clientGraphql/queries.ts";
 
-export const CART_COOKIE = "dataservices_cart_id";
+export const CART_COOKIE = "gql_cart_cookie";
+
+const HUNDRED_YEARS_MS = 100 * 365 * 24 * 60 * 60 * 1000; // 100 years in milliseconds
 
 export const getCartCookie = (headers: Headers): string => {
   const cookies = getCookies(headers);
@@ -45,20 +47,29 @@ export const toCartItemsWithImages = (
   site: string,
   countProductImageInCart: number,
 ): Cart => {
+  console.log("entrou aaaaa");
+
   const itemsWithImages = cart.items.map<ItemsWithDecoImage>((product) => {
+    console.log("entrou");
+
     const productData = items.find(({ sku }) => sku === product.sku);
+    console.log("entrou aqui");
     const images = productData?.media_gallery;
-    const selectedImages = images?.sort((a, b) => a.position - b.position)
+    const selectedImages = images
+      ?.sort((a, b) => a.position - b.position)
       .reduce<ImageObject[]>((acc, media) => {
         if (acc.length === countProductImageInCart) {
           return acc;
         }
-        return [...acc, {
-          "@type": "ImageObject" as const,
-          encodingFormat: "image",
-          alternateName: product.name,
-          url: media.url,
-        }];
+        return [
+          ...acc,
+          {
+            "@type": "ImageObject" as const,
+            encodingFormat: "image",
+            alternateName: product.name,
+            url: media.url,
+          },
+        ];
       }, []);
 
     const urlKey = productData?.url_key;
@@ -124,15 +135,18 @@ export const handleCartError = (
   return error;
 };
 
-export async function handleCartActions(dontReturnCart: boolean, settings: {
-  req: Request;
-  ctx: AppContext;
-  // deno-lint-ignore no-explicit-any
-  error?: any;
-  cartId?: string;
-}) {
+export async function handleCartActions(
+  dontReturnCart: boolean,
+  settings: {
+    req: Request;
+    ctx: AppContext;
+    // deno-lint-ignore no-explicit-any
+    error?: any;
+    cartId?: string;
+  },
+) {
   const { error, cartId } = settings;
-  const handledError = error ? handleCartError(error) as Cart : undefined;
+  const handledError = error ? (handleCartError(error) as Cart) : undefined;
 
   if (dontReturnCart) {
     return handledError ?? null;
@@ -144,20 +158,23 @@ export async function handleCartActions(dontReturnCart: boolean, settings: {
   } as Cart;
 }
 
-export async function getCartImages(
-  skus: Array<string>,
-  ctx: AppContext,
-) {
+export async function getCartImages(skus: Array<string>, ctx: AppContext) {
   return await ctx.clientGraphql.query<
     ProductWithImagesGraphQL,
     ProductImagesInputs
-  >(
-    {
-      variables: {
-        filter: { sku: { in: skus.map((sku) => sku) } },
-        pageSize: skus.length,
-      },
-      ...GetProductImages,
+  >({
+    variables: {
+      filter: { sku: { in: skus.map((sku) => sku) } },
+      pageSize: skus.length,
     },
-  );
+    ...GetProductImages,
+  });
 }
+
+export const setCartCookie = (headers: Headers, cartId: string) =>
+  setCookie(headers, {
+    name: CART_COOKIE,
+    value: cartId,
+    path: "/",
+    expires: new Date(Date.now() + HUNDRED_YEARS_MS),
+  });

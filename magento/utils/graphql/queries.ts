@@ -1,7 +1,10 @@
 import { gql } from "../../../utils/graphql.ts";
+
 //Fragments
+
 export const cart = gql`
   fragment cart on Cart {
+    id
     email
     billing_address {
       city
@@ -64,22 +67,6 @@ export const cart = gql`
         method_title
       }
     }
-    itemsV2 {
-      total_count
-      items {
-        id
-        product {
-          name
-          sku
-        }
-        quantity
-      }
-      page_info {
-        page_size
-        current_page
-        total_pages
-      }
-    }
     available_payment_methods {
       code
       title
@@ -95,6 +82,33 @@ export const cart = gql`
       grand_total {
         value
         currency
+      }
+    }
+    total_quantity
+    items {
+      id
+      quantity
+
+      product {
+        name
+        sku
+        media_gallery {
+          ...mediaGallery
+        }
+        image {
+          ...mediaGallery
+        }
+      }
+      errors {
+        code
+        message
+      }
+      uid
+      prices {
+        price {
+          value
+          currency
+        }
       }
     }
   }
@@ -256,7 +270,7 @@ export const GetProduct = (extraProps?: Array<string>) => ({
       ) {
         items {
           ...simpleProduct
-          ${extraProps ? extraProps.join(`\n`) : `\n`}
+          ${extraProps ? extraProps.join("\n") : "\n"}
         }
       }
     }
@@ -269,24 +283,15 @@ export const GetCompleteProduct = (
 ) => ({
   fragments: [completeProduct, priceRange, mediaGallery],
   query: gql`
-    query GetProduct(
+    query GetCompleteProduct(
       $search: String
       $filter: ProductAttributeFilterInput
     ) {
-      products(
-        search: $search
-        filter: $filter
-        pageSize: 1
-        currentPage: 1
-      ) {
+      products(search: $search, filter: $filter, pageSize: 1, currentPage: 1) {
         items {
           ...completeProduct
-          ${extraProps ? extraProps.join(`\n`) : `\n`}
-          ${
-    isBreadcrumbProductName
-      ? ""
-      : `categories { name \n url_key \n position \n url_path }`
-  }
+          ${extraProps ? extraProps.join("\n") : "\n"}
+         
         }
       }
     }
@@ -295,27 +300,27 @@ export const GetCompleteProduct = (
 
 export const GetExtraProps = (extraProps?: Array<string>) => ({
   query: gql`
-query GetProduct(
-  $search: String
-  $filter: ProductAttributeFilterInput
-  $sort: ProductAttributeSortInput
-  $pageSize: Int
-  $currentPage: Int
-) {
-  products(
-    search: $search
-    filter: $filter
-    sort: $sort
-    pageSize: $pageSize
-    currentPage: $currentPage
-  ) {
-    items {
-      sku
-      ${extraProps ? extraProps.join(`\n`) : `\n`}
+    query GetProductExtraProps(
+      $search: String
+      $filter: ProductAttributeFilterInput
+      $sort: ProductAttributeSortInput
+      $pageSize: Int
+      $currentPage: Int
+    ) {
+      products(
+        search: $search
+        filter: $filter
+        sort: $sort
+        pageSize: $pageSize
+        currentPage: $currentPage
+      ) {
+        items {
+          sku
+          ${extraProps ? extraProps.join("\n") : "\n"}
+        }
+      }
     }
-  }
-}
-`,
+  `,
 });
 
 export const GetCategoryUid = {
@@ -354,7 +359,7 @@ export const GetPLPItems = (extraProps?: Array<string>) => ({
     pageInfo,
   ],
   query: gql`
-    query GetProduct(
+    query GetProducts(
       $filter: ProductAttributeFilterInput
       $sort: ProductAttributeSortInput
       $pageSize: Int
@@ -369,7 +374,7 @@ export const GetPLPItems = (extraProps?: Array<string>) => ({
         total_count
         items {
           ...simpleProduct
-          ${extraProps ? extraProps.join(`\n`) : `\n`}
+          ${extraProps ? extraProps.join("\n") : "\n"}
         }
         sort_fields {
           ...sortFields
@@ -388,7 +393,10 @@ export const GetPLPItems = (extraProps?: Array<string>) => ({
 export const GetProductImages = {
   fragments: [mediaGallery],
   query: gql`
-    query GetProduct($filter: ProductAttributeFilterInput, $pageSize: Int) {
+    query GetProductImages(
+      $filter: ProductAttributeFilterInput
+      $pageSize: Int
+    ) {
       products(filter: $filter, pageSize: $pageSize, currentPage: 1) {
         items {
           name
@@ -404,11 +412,87 @@ export const GetProductImages = {
 };
 
 export const GetCart = {
-  fragments: [cart],
+  fragments: [cart, mediaGallery],
   query: gql`
     query GetCart($cart_id: String!) {
       cart(cart_id: $cart_id) {
         ...cart
+      }
+    }
+  `,
+};
+
+export const CreateGuestCartMutation = {
+  query: gql`
+    mutation CreateGuestCart {
+      createEmptyCart
+    }
+  `,
+};
+
+export const AddProductsToCart = {
+  fragments: [cart, mediaGallery],
+  query: gql`
+    mutation AddProductsToCart(
+      $cartId: String!
+      $cartItems: [CartItemInput!]!
+    ) {
+      addProductsToCart(cartId: $cartId, cartItems: $cartItems) {
+        cart {
+          ...cart
+        }
+      }
+    }
+  `,
+};
+
+export const RemoveItemFromCart = {
+  fragments: [cart, mediaGallery],
+  query: gql`
+    mutation RemoveItemFromCart($cartId: String!, $itemId: String!) {
+      removeItemFromCart(input: { cart_id: $cartId, item_id: $itemId }) {
+        cart {
+          ...cart
+        }
+      }
+    }
+  `,
+};
+
+export const ApplyCouponToCart = {
+  fragments: [cart, mediaGallery],
+  query: gql`
+    mutation ApplyCouponToCart($cartId: String!, $couponCode: String!) {
+      applyCouponToCart(input: { cart_id: $cartId, coupon_code: $couponCode }) {
+        cart {
+          ...cart
+        }
+      }
+    }
+  `,
+};
+
+export const RemoveCouponFromCart = {
+  fragments: [cart, mediaGallery],
+  query: gql`
+    mutation RemoveCouponFromCart($cartId: String!) {
+      removeCouponFromCart(input: { cart_id: $cartId }) {
+        cart {
+          ...cart
+        }
+      }
+    }
+  `,
+};
+
+export const UpdateCartItems = {
+  fragments: [cart, mediaGallery],
+  query: gql`
+    mutation UpdateCartItems($cartId: String!, $cartItems: [CartItemInput!]!) {
+      updateCartItems(input: { cart_id: $cartId, cart_items: $cartItems }) {
+        cart {
+          ...cart
+        }
       }
     }
   `,

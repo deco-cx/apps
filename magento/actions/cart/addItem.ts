@@ -2,10 +2,15 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { Cart } from "../../loaders/cart.ts";
 import { parseCookieString } from "../../middleware.ts";
 import type { AppContext } from "../../mod.ts";
-import { handleCartActions } from "../../utils/cart.ts";
+import { getCartCookie, handleCartActions } from "../../utils/cart.ts";
 import { FORM_KEY_COOKIE } from "../../utils/constants.ts";
 import { HttpError } from "../../../utils/http.ts";
 import { OverrideFeatures } from "../../utils/client/types.ts";
+import { AddProductsToCart } from "../../utils/graphql/queries.ts";
+import {
+  AddProductsToCartOutput,
+  MutationAddProductsToCartArgs,
+} from "../../utils/graphql/storefront.graphql.gen.ts";
 
 export interface Props extends OverrideFeatures {
   qty: number;
@@ -22,9 +27,9 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { qty, productId, dangerouslyOverrideReturnNull } = props;
+  const { qty, productId, dangerouslyOverrideReturnNull, sku } = props;
   const { headers, url } = req;
-  const { site, baseUrl, features } = ctx;
+  const { site, baseUrl, features, clientGraphql } = ctx;
   const dontReturnCart = dangerouslyOverrideReturnNull ??
     features.dangerouslyReturnNullAfterAction;
 
@@ -47,48 +52,68 @@ const action = async (
   urlencoded.append("form_key", formKey);
   urlencoded.append("qty", String(qty));
 
+  const cartId = getCartCookie(headers);
+
   try {
-    const fetchResult = await fetch(
-      `${baseUrl}/${site}/checkout/cart/add/uenc/${
-        btoa(baseUrl).replace(/=/g, "~")
-      }/product/${productId}`,
-      {
-        method: "POST",
-        headers: newHeaders,
-        body: urlencoded,
-      },
-    );
-
-    if (fetchResult.status != 200) {
-      throw new HttpError(
-        fetchResult.status,
-        JSON.stringify({ message: fetchResult.statusText }),
-      );
-    }
-    const fetchHeaders = fetchResult.headers;
-
-    let cartId;
-    const cookies = fetchHeaders.getSetCookie();
-    cookies.forEach((cookie) => {
-      const parsed = parseCookieString(cookie, url.includes("localhost"));
-
-      if (parsed.name === "dataservices_cart_id") {
-        cartId = parsed.value.replace(/%22/g, "");
-        setCookie(ctx.response.headers, {
-          ...parsed,
-          httpOnly: true,
-          secure: true,
-          path: "/",
-          unparsed: ["Priority=High"],
-        });
-        return;
-      }
-
-      setCookie(ctx.response.headers, {
-        ...parsed,
-        path: "/",
+    await clientGraphql
+      .query<AddProductsToCartOutput, MutationAddProductsToCartArgs>({
+        ...AddProductsToCart,
+        variables: {
+          cartId,
+          cartItems: [
+            {
+              quantity: qty,
+              sku: sku,
+            },
+          ],
+        },
+      })
+      .catch((e) => {
+        console.log(e);
       });
-    });
+
+    // const fetchResult = await fetch(
+    //   `${baseUrl}/${site}/checkout/cart/add/uenc/${btoa(baseUrl).replace(
+    //     /=/g,
+    //     "~"
+    //   )}/product/${productId}`,
+    //   {
+    //     method: "POST",
+    //     headers: newHeaders,
+    //     body: urlencoded,
+    //   }
+    // );
+
+    // if (fetchResult.status != 200) {
+    //   throw new HttpError(
+    //     fetchResult.status,
+    //     JSON.stringify({ message: fetchResult.statusText })
+    //   );
+    // }
+    // const fetchHeaders = fetchResult.headers;
+
+    // let cartId;
+    // const cookies = fetchHeaders.getSetCookie();
+    // cookies.forEach((cookie) => {
+    //   const parsed = parseCookieString(cookie, url.includes("localhost"));
+
+    //   if (parsed.name === "dataservices_cart_id") {
+    //     cartId = parsed.value.replace(/%22/g, "");
+    //     setCookie(ctx.response.headers, {
+    //       ...parsed,
+    //       httpOnly: true,
+    //       secure: true,
+    //       path: "/",
+    //       unparsed: ["Priority=High"],
+    //     });
+    //     return;
+    //   }
+
+    //   setCookie(ctx.response.headers, {
+    //     ...parsed,
+    //     path: "/",
+    //   });
+    // });
 
     return handleCartActions(dontReturnCart, {
       req,

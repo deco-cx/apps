@@ -17,13 +17,21 @@ export const handleCartImages = async (
   url: URL,
   ctx: AppContext,
 ): Promise<ProductWithImagesGraphQL["products"]> => {
+  console.log("antes do handleCachedImages");
   const { cachedImages, nonCachedImagesSkus } = await handleCachedImages(
     cart,
     url,
   );
-  const nonCachedImages = await handleNonCachedImages(
-    { skus: nonCachedImagesSkus, url, ctx },
-  );
+  console.log("apos do handleCachedImages", {
+    cachedImages,
+    nonCachedImagesSkus,
+  });
+  const nonCachedImages = await handleNonCachedImages({
+    skus: nonCachedImagesSkus,
+    url,
+    ctx,
+  });
+  console.log("apos do handleNonCachedImages");
   return {
     items: [...cachedImages, ...nonCachedImages],
   };
@@ -33,10 +41,12 @@ const handleCachedImages = async (
   { items }: CartFromAPI,
   url: URL,
 ): Promise<HandledImages> => {
-  const imagesPromises = await Promise.all(items.map(async ({ sku }) => ({
-    image: await getCachedImages(sku, url),
-    sku,
-  })));
+  const imagesPromises = await Promise.all(
+    items.map(async ({ sku }) => ({
+      image: await getCachedImages(sku, url),
+      sku,
+    })),
+  );
 
   const handledCachedImages = imagesPromises.reduce<HandledImages>(
     (acc, { image, sku }) => {
@@ -57,9 +67,15 @@ const handleCachedImages = async (
   return handledCachedImages;
 };
 
-const handleNonCachedImages = async (
-  { skus, url, ctx }: { skus?: string[]; url: URL; ctx: AppContext },
-) => {
+const handleNonCachedImages = async ({
+  skus,
+  url,
+  ctx,
+}: {
+  skus?: string[];
+  url: URL;
+  ctx: AppContext;
+}) => {
   if (!skus || skus.length === 0) {
     return [];
   }
@@ -81,7 +97,7 @@ const getCachedImages = async (
   const cachedResponse = await cache.match(cacheKey);
 
   if (cachedResponse) {
-    return await cachedResponse.json() as ProductWithImages;
+    return (await cachedResponse.json()) as ProductWithImages;
   }
   return null;
 };

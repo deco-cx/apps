@@ -208,8 +208,8 @@ const getStoreHeader = (
   storeHeader: "storeId" | "site" | "none",
 ) => {
   const HEADER = {
-    "storeId": String(storeId),
-    "site": site,
+    storeId: String(storeId),
+    site: site,
   };
 
   if (storeHeader === "none") {
@@ -217,7 +217,7 @@ const getStoreHeader = (
   }
 
   return {
-    "Store": HEADER[storeHeader],
+    Store: HEADER[storeHeader],
   };
 };
 
@@ -250,7 +250,6 @@ export default function App(props: Props): App<Manifest, State> {
     endpoint: `${apiConfig.baseUrl}/graphql`,
     headers: new Headers({
       "Content-Type": "application/json",
-      Authorization: `Bearer ${secretKey}`,
       ...headerGql,
     }),
   });

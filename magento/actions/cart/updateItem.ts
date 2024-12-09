@@ -2,6 +2,11 @@ import { Cart } from "../../loaders/cart.ts";
 import { AppContext } from "../../mod.ts";
 import { getCartCookie, handleCartActions } from "../../utils/cart.ts";
 import { OverrideFeatures } from "../../utils/client/types.ts";
+import { UpdateCartItems } from "../../utils/graphql/queries.ts";
+import {
+  UpdateCartItemsInput,
+  UpdateCartItemsOutput,
+} from "../../utils/graphql/storefront.graphql.gen.ts";
 
 export interface Props extends OverrideFeatures {
   qty: number;
@@ -19,7 +24,7 @@ const action = async (
   ctx: AppContext,
 ): Promise<Cart | null> => {
   const { qty, itemId, sku, dangerouslyOverrideReturnNull } = props;
-  const { clientAdmin, features } = ctx;
+  const { clientAdmin, features, clientGraphql } = ctx;
   const dontReturnCart = dangerouslyOverrideReturnNull ??
     features.dangerouslyReturnNullAfterAction;
 
@@ -34,14 +39,21 @@ const action = async (
   };
 
   try {
-    await clientAdmin["PUT /rest/:site/V1/carts/:cartId/items/:itemId"](
-      {
-        itemId,
-        cartId: cartId,
-        site: ctx.site,
+    await clientGraphql.query<UpdateCartItemsOutput, UpdateCartItemsInput>({
+      variables: {
+        cartId,
+        cartItems: [body.cartItem],
       },
-      { body },
-    );
+      ...UpdateCartItems,
+    });
+    // await clientAdmin["PUT /rest/:site/V1/carts/:cartId/items/:itemId"](
+    //   {
+    //     itemId,
+    //     cartId: cartId,
+    //     site: ctx.site,
+    //   },
+    //   { body },
+    // );
   } catch (error) {
     return handleCartActions(dontReturnCart, {
       req,
