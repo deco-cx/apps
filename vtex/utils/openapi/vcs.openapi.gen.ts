@@ -9680,7 +9680,7 @@ export type SkuComplement = {
     /**
      * Avoid split items on cart
      */
-    noSplitItem?: boolean;
+    noSplitItem?: boolean
     /**
      * Array containing the cart items. Each object inside this array corresponds to a different item.
      */
