@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { proxySetCookie } from "../utils/cookies.ts";
-import { hasDifferentMarketingData, parseCookie } from "../utils/orderForm.ts";
+import { hasDifferentMarketingData, parseCookie, parseCookieWithoutAuth } from "../utils/orderForm.ts";
 import { getSegmentFromBag } from "../utils/segment.ts";
 import type { MarketingData, OrderForm } from "../utils/types.ts";
 import { DEFAULT_EXPECTED_SECTIONS } from "../actions/cart/removeItemAttachment.ts";
@@ -15,11 +15,12 @@ const loader = async (
   ctx: AppContext,
 ): Promise<OrderForm> => {
   const { vcsDeprecated } = ctx;
-  const { cookie } = parseCookie(req.headers);
+  const { cookie } = parseCookieWithoutAuth(req.headers);
   const segment = getSegmentFromBag(ctx);
+  console.log(cookie)
 
   const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"](
-    { sc: segment?.payload?.channel },
+    { },
     { headers: { cookie } },
   );
 
