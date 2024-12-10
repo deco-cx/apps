@@ -2,8 +2,6 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/myAction.ts";
-import * as $$$0 from "./loaders/myLoader.ts";
 import * as $$$$$$0 from "./sections/Banner.tsx";
 import * as $$$$$$1 from "./sections/Carousel.tsx";
 import * as $$$$$$2 from "./sections/Embed.tsx";
@@ -13,9 +11,6 @@ import * as $$$$$$5 from "./sections/Stories.tsx";
 import * as $$$$$$6 from "./sections/Widget.tsx";
 
 const manifest = {
-  "loaders": {
-    "streamshop-app/loaders/myLoader.ts": $$$0,
-  },
   "sections": {
     "streamshop-app/sections/Banner.tsx": $$$$$$0,
     "streamshop-app/sections/Carousel.tsx": $$$$$$1,
@@ -24,9 +19,6 @@ const manifest = {
     "streamshop-app/sections/Reels.tsx": $$$$$$4,
     "streamshop-app/sections/Stories.tsx": $$$$$$5,
     "streamshop-app/sections/Widget.tsx": $$$$$$6,
-  },
-  "actions": {
-    "streamshop-app/actions/myAction.ts": $$$$$$$$$0,
   },
   "name": "streamshop-app",
   "baseUrl": import.meta.url,

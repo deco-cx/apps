@@ -1,8 +1,6 @@
 import { ComponentChildren } from "preact";
 import { useId } from "preact/hooks";
 import HTMXSection from "apps/htmx/sections/htmx.tsx";
-import Slider from "../../../utils/components/Slider";
-import SliderJS from "../../../utils/components/SliderJS";
 
 interface Props {
   name: string;
@@ -53,15 +51,8 @@ export function PreviewContainer(props: Props) {
       </style>
       <div class="flex flex-col">
         {/* Carousel */}
-        <div style="width: 100%;" class="w-full px-5 pt-5 sm:px-0">
-          {/* @ts-ignore */}
-          <liveshop-ads-carousel
-            videos-width="100%"
-            height="400px"
-            slugs-video={"y7CsjIQW,hgkY4Jep,zaz69CFN,5BIW6TxE"}
-          >
-            {/* @ts-ignore */}
-          </liveshop-ads-carousel>
+        <div style="width: 100%;" class="w-full px-5 pt-5 sm:px-0 flex items-center justify-center">
+          <iframe style="border-radius: 16px; overflow: hidden" frameborder="0" src="https://lite.streamshop.com.br/videos/YW9HwZbU,hOok12Xu,9zCcxtSH,CS2UU3tJ" height="640" width="1080" allow="fullscreen; autoplay; picture-in-picture"></iframe>
         </div>
 
         {/*  */}
@@ -90,17 +81,10 @@ export function PreviewContainer(props: Props) {
           {images.length > 0 && (
             <div class="flex flex-col gap-6 w-full" id={id}>
               <div class="flex">
-                {images.length > 1 && (
-                  <div class="relative">
-                    <Slider.PrevButton class="disabled:hidden rotate-180 -translate-y-1/2 flex justify-center items-center bg-[#0D1717] w-12 h-12 rounded-lg absolute left-4 z-10 top-1/2 shadow-sm">
-                      <ArrowSvg />
-                    </Slider.PrevButton>
-                  </div>
-                )}
-                <Slider class="carousel carousel-center gap-2">
+                <ul class="carousel carousel-center gap-2 flex">
                   {images.map((image, index) => {
                     return (
-                      <Slider.Item
+                      <div
                         index={index}
                         class="carousel-item w-full flex items-center justify-center gap-1"
                       >
@@ -110,29 +94,12 @@ export function PreviewContainer(props: Props) {
                           height="660"
                           class="rounded-2xl w-full h-full object-cover"
                         />
-                      </Slider.Item>
+                      </div>
                     );
                   })}
-                </Slider>
-                {images.length > 1 && (
-                  <div class="relative">
-                    <Slider.NextButton class="disabled:hidden bg-[#0D1717] -translate-y-1/2 flex justify-center items-center w-12 h-12 rounded-lg absolute right-4 z-10 top-1/2 shadow-sm">
-                      <ArrowSvg />
-                    </Slider.NextButton>
-                  </div>
-                )}
+                </ul>
               </div>
-              <ul class="carousel items-end w-full justify-center col-span-full gap-4 z-10 row-start-4">
-                {images.length > 1 &&
-                  images?.map((_, index) => (
-                    <li class="carousel-item">
-                      <Slider.Dot index={index}>
-                        <div class="w-[10px] h-[10px] rounded-full group-disabled:bg-[#0D1717]  bg-[#C9CFCF]" />
-                      </Slider.Dot>
-                    </li>
-                  ))}
-              </ul>
-              <SliderJS rootId={id} interval={5000} infinite />
+              
             </div>
           )}
         </div>
@@ -157,7 +124,7 @@ export function PreviewContainer(props: Props) {
                 height="80px"
                 border-radius="50%"
                 gap="25px"
-                slugs-video="dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J,dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J,dBXLVDZM,B9hKEmHZ,2FMdPkiN,sBLteawk,DfnZOD3J"
+                slugs-video="MMcAo2T,XVIsYAtf,3CmDPspJ,tWt0D0uj,f6RBZxbv,ZEE475P0,cMuOWvSY,7zFgxuWN,ngeDUus8,6s4UeqGx,cYRz77Iq,6SAl8AeO,4aMF9tRs,wLVxzDYe,TC8ns1RE,VnpZF5Rn,s7QFXi2S,ER5Io3H4,iC7cmu2g,qT0Vydla,TTzeJvYv,TTzeJvYv,R1Yf913S,i8QFKUqA,JPAVHsLx,0pyHCynl,Rm7y6eVs,YW9HwZbU,InvkiyUq,hOok12Xu,CS2UU3tJ,knPoh3sQ,v4Jt9MLI,2sX96JB5,Tgc7HJVk,PFhMtOni,vvtui7Q7,BFs9VOoA"
               >
               </liveshop-ads-carousel>
             </div>
@@ -210,7 +177,7 @@ export function PreviewContainer(props: Props) {
           id="3434522839-00"
           data-manifest-key="streamshop-app/sections/Info&amp;Reels.tsx"
         >
-          <div class="container flex flex-col gap-4 sm:gap-6 w-full py-5 sm:py-10">
+          <div class="container flex flex-col gap-4 sm:gap-6 w-full py-5 sm:py-10 sm:px-5">
             <div class="w-full flex justify-between items-start flex-col sm:flex-row gap-4 !px-5 md:!px-0">
               <div class="w-full">
                 <div class="text-white lynx-subtitle">
@@ -224,11 +191,11 @@ export function PreviewContainer(props: Props) {
                     Incorpore Reels interativos no seu ecommerce ou distribua por whatsapp 🚀
                   </span>
                 </h2>
-                <p class="lynx-paragraph !text-white">
+                <p class="lynx-paragraph !text-white mt-5">
                   <strong>
                     <span
-                      style="font-size: 18pt;color: white"
-                      data-mce-style="font-size: 18pt;"
+                      style="font-size: 16pt;font-weight:500; color: white"
+                      data-mce-style="font-size: 16pt;"
                     >
                       O Video Commerce da StreamShop é uma solução inovadora de simples implementação que eleva a experiência dos seus clientes com a sua marca.
 
