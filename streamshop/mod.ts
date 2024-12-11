@@ -8,7 +8,7 @@ export type AppContext = FnContext< Manifest>;
  * @title Video Commerce - Stream shop
  * @description Integration of streamshop services.
  * @category Tools
- * @logo https://cdn.prod.website-files.com/6445b237edd0d4b3293ec173/670720b11f2da2ecb605d38b_STREAMSHOPLOGO.png
+ * @logo https://cdn.prod.website-files.com/6445b237edd0d4b3293ec173/6707f86b939ac3eaea62fe44_SSHOP_AVATAR%20copy%202.png
  */
 export default function App(): App<Manifest> {
 
