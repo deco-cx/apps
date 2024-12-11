@@ -227,13 +227,13 @@ Incorpore os vídeos que você já produz para as redes sociais às páginas do 
                 class="w-full px-5 sm:px-0 flex justify-center items-center"
               >
                 <iframe
-                  style="border-radius: 16px; overflow: hidden"
+                  style="border-radius: 16px; overflow: hidden; aspect-ratio: 9 / 16;"
                   frameborder="0"
                   src="https://lite.streamshop.com.br/streamshopdemo"
-                  height="400px"
-                  width="100%"
+                  height="500px"
+                  width="auto"
                   allow="fullscreen; autoplay; picture-in-picture"
-                  class="max-w-[380px] md:max-w-[440px] aspect-[9/16]"
+                  class="max-h-[300px] md:max-h-[500px] aspect-[9/15]"
                 >
                 </iframe>
               </div>

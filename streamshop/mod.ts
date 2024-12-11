@@ -5,10 +5,10 @@ import manifest, { Manifest } from "./manifest.gen.ts";
 export type AppContext = FnContext< Manifest>;
 
 /**
- * @title Stream shop app
+ * @title Video Commerce - Stream shop
  * @description Integration of streamshop services.
  * @category Tools
- * @logo https://
+ * @logo https://cdn.prod.website-files.com/6445b237edd0d4b3293ec173/670720b11f2da2ecb605d38b_STREAMSHOPLOGO.png
  */
 export default function App(): App<Manifest> {
 
@@ -22,9 +22,9 @@ export const preview = () => {
   return {
     Component: PreviewContainer,
     props: {
-      name: "Stream Shop",
-      owner: "Stream Shop",
-      description: "This is an app from the Stream Shop",
+      name: "Video Commerce",
+      owner: "StreamShop Technologies",
+      description: "Powered by StreamShop",
       logo:
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAA8FBMVEWbkdCkjcqsicS1hb6+gbjGfbPPea3VdqjYd6XaeKHdeZ7gepvie5jle5XofJHqfY7tfovwf4jygIXzgoLzhIDzhn7ziHzzinrzjHjzjnbzkHTzknLbeprVhqThg5fccJjdqsLz8/j////k1N/Tk6nZcZ3mtcjttcPsnav98PHikKvhcpLpb4LqwdLs4+zeg5LWlLzt4efnjIzDc67ixNruv83zwMf5z8/rzt/SaqHyd3jzjI3ei5Dw3OjbkJfdttHbnaTYpsfcqrLdt7/OhLPnoLbexMz83t27erX5x8X4urn2ravi1un1n5zQq87Rhq/xiwRQAAABEElEQVR4AaXS06IDMRAA0Nq228wWa29tu///NTWSa8zrCUYmk9litdkdTpfb4/X5A8FQOBKNxRPJVDqT/Tnm8vnCJ1gsIQCq/CFWqlAr0Awqf3gTWM4f4Bkq/B6dgli8ZESDFImSKIsiIPESCigKpeKo6agqGIZRv0YDSGw2W5Wil7vW2e5Al8CeXsGaAH0CxQHWoTYMCUSjC3IPHBMI8hlzg9wNmQmJ0zPOQCz5rzgn6gTHFQHE4BkXFI7yAxn6crNBxV+4HKHWFWf89c+VguMAtbBso2vUwVAXW/gmbJCKYXNL4A4+x/YF8Wz308Mhn8+zbEGSaCDq1EaAxypGbkLrPLIix/E8H2m3v9zb/+MJLe5Gr8K2TA8AAAAASUVORK5CYII=",
       images: [
