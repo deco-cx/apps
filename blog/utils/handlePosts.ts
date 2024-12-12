@@ -43,10 +43,21 @@ export const sortPosts = (blogPosts: BlogPost[], sortBy: SortBy) => {
  * @param posts Posts to be handled
  * @param slug Category Slug to be filter
  */
-export const filterPostsByCategory = (posts: BlogPost[], slug?: string) =>
+export const filterPostsByCategory = (
+  posts: BlogPost[],
+  slug?: string,
+  term?: string,
+) => (
   slug
-    ? posts.filter(({ categories }) => categories.find((c) => c.slug === slug))
-    : posts;
+    ? posts.filter(({ categories }) => categories.some((c) => c.slug === slug))
+    : term
+    ? posts.filter(({ content, excerpt, title }) =>
+      [content, excerpt, title].some((field) =>
+        field.toLowerCase()?.includes(term.toLowerCase())
+      )
+    )
+    : posts
+);
 
 /**
  * Returns an filtered and sorted BlogPost list
@@ -76,8 +87,9 @@ export default function handlePosts(
   posts: BlogPost[],
   sortBy: SortBy,
   slug?: string,
+  term?: string,
 ) {
-  const filteredPosts = filterPostsByCategory(posts, slug);
+  const filteredPosts = filterPostsByCategory(posts, slug, term);
 
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;
