@@ -12,6 +12,8 @@ export const getRatingProduct = ({
   productId: string;
 }): AggregateRating | undefined => {
   const rating = ratings?.[productId]?.[0];
+  const MAX_RATING_VALUE = 5;
+  const MIN_RATING_VALUE = 0;
   if (!rating) {
     return undefined;
   }
@@ -20,6 +22,8 @@ export const getRatingProduct = ({
     "@type": "AggregateRating",
     ratingCount: Number(rating.count),
     ratingValue: Number(parseFloat(rating.rate).toFixed(1)),
+    bestRating: MAX_RATING_VALUE,
+    worstRating: MIN_RATING_VALUE,
   };
 };
 
