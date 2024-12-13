@@ -248,7 +248,7 @@ export interface VTEXCommerceStable {
   "GET /api/oms/user/orders": {
     response: Userorderslist;
   };
-  "GET /api/vtexid/credential/validate": {
+  "POST /api/vtexid/credential/validate": {
     response: {
       authStatus: string;
       id: string;
