@@ -15,7 +15,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<OrderForm> => {
   const { vcsDeprecated } = ctx;
-  const { cookie } = parseCookie(req.headers);
+  const cookie = req.headers.get("cookie") ?? "";
   const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated["POST /api/checkout/pub/orderForm"](
