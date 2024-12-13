@@ -52,7 +52,7 @@ async function loader(
   const response = await vcsDeprecated
     ["GET /api/catalog_system/pub/products/search/:slug/p"](
       { ...params, slug: lowercaseSlug },
-      { ...STALE, headers: withSegmentCookie(segment) },
+      { ...STALE, headers: withSegmentCookie(segment, req.headers) },
     ).then((res) => res.json());
   if (response && !Array.isArray(response)) {
     throw new Error(
