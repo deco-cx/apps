@@ -18,7 +18,7 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Person | null> {
-  const { io } = ctx;
+  const { io, vcsDeprecated } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
@@ -33,6 +33,33 @@ async function loader(
       { query },
       { headers: { cookie } },
     );
+
+    if (!user) {
+      const vtexIdClientAutCookie = req.headers.get("cookie")?.split(";").find(
+        (cookie) => cookie.trim().startsWith("VtexIdclientAutCookie_"),
+      );
+      if (vtexIdClientAutCookie) {
+        const response =
+          await (await vcsDeprecated["GET /api/vtexid/credential/validate"](
+            {},
+            {
+              body: { token: vtexIdClientAutCookie?.split("=")[1] },
+              headers: {
+                "content-type": "application/json",
+                accept: "application/json",
+              },
+            },
+          )).json();
+        if (response.authStatus === "Success") {
+          return {
+            "@id": response.id,
+            email: response.user,
+            givenName: response.user.split("@")[0],
+            familyName: "",
+          };
+        }
+      }
+    }
 
     return {
       "@id": user.userId ?? user.id,
