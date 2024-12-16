@@ -36,16 +36,24 @@ export const sortPosts = (blogPosts: BlogPost[], sortBy: SortBy) => {
   });
 };
 
+export const filterPosts = (
+  posts: BlogPost[],
+  slug?: string,
+  term?: string,
+): BlogPost[] => {
+  if (term) return filterPostsByTerm(posts, term);
+  if (slug) return filterPostsByCategory(posts, slug);
+  return posts;
+};
+
 /**
  * Returns an filtered BlogPost list
  *
  * @param posts Posts to be handled
  * @param slug Category Slug to be filter
  */
-export const filterPostsByCategory = (posts: BlogPost[], slug?: string) =>
-  slug
-    ? posts.filter(({ categories }) => categories.find((c) => c.slug === slug))
-    : posts;
+export const filterPostsByCategory = (posts: BlogPost[], slug: string) =>
+  posts.filter(({ categories }) => categories.find((c) => c.slug === slug));
 
 /**
  * Returns an filtered BlogPost list
@@ -53,14 +61,12 @@ export const filterPostsByCategory = (posts: BlogPost[], slug?: string) =>
  * @param posts Posts to be handled
  * @param term Term to be filter
  */
-export const filterPostsByTerm = (posts: BlogPost[], term?: string) =>
-  term
-    ? posts.filter(({ content, excerpt, title }) =>
-      [content, excerpt, title].some((field) =>
-        field.toLowerCase().includes(term.toLowerCase())
-      )
+export const filterPostsByTerm = (posts: BlogPost[], term: string) =>
+  posts.filter(({ content, excerpt, title }) =>
+    [content, excerpt, title].some((field) =>
+      field.toLowerCase().includes(term.toLowerCase())
     )
-    : posts;
+  );
 
 /**
  * Returns an filtered and sorted BlogPost list
