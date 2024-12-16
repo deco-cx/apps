@@ -22,33 +22,8 @@ async function loader(
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    const vtexIdClientAutCookie = req.headers.get("cookie")?.split(";").find(
-      (cookie) => cookie.trim().startsWith("VtexIdclientAutCookie_"),
-    );
-    if (vtexIdClientAutCookie) {
-      const response =
-        await (await vcsDeprecated["POST /api/vtexid/credential/validate"](
-          {},
-          {
-            body: { token: vtexIdClientAutCookie?.split("=")[1] },
-            headers: {
-              "content-type": "application/json",
-              accept: "application/json",
-            },
-          },
-        )).json();
-      if (response.authStatus === "Success") {
-        return {
-          "@id": response.id,
-          email: response.user,
-          givenName: response.user.split("@")[0],
-          familyName: "",
-        };
-      }
-    }
     return null;
   }
-
   const query =
     "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document }}";
 
