@@ -78,12 +78,12 @@ export const slicePosts = (
 export const filterPosts = (
   posts: BlogPost[],
   slug?: string,
-  term?: string
+  term?: string,
 ): BlogPost[] => {
-  if (term) return filterPostsByTerm(posts, term)
-  if (slug) return filterPostsByCategory(posts, slug)
-  return posts
-}
+  if (term) return filterPostsByTerm(posts, term);
+  if (slug) return filterPostsByCategory(posts, slug);
+  return posts;
+};
 
 /**
  * Returns an filtered and sorted BlogPost list. It dont slice
