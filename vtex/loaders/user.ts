@@ -18,8 +18,8 @@ async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<Person | null> {
-  const { io, vcsDeprecated } = ctx;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+  const { io } = ctx;
+  const { cookie, payload } = parseCookie(req.headers);
 
   if (!payload?.sub || !payload?.userId) {
     return null;
