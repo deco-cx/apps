@@ -64,7 +64,7 @@ export default async function BlogPostList(
   const pageSort = sortBy ?? params.get("sortBy") as SortBy ??
     "date_desc";
   const term = query ?? params.get("q") ?? undefined;
-  
+
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
