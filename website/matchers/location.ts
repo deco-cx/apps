@@ -81,14 +81,25 @@ const matchLocation =
     result &&= !target.country || target.country === source.country;
     return result;
   };
+
+function fixEncoding(input: string): string {
+  // Interpret the misencoded string as Latin-1 (cf-headers), then decode it as UTF-8
+  try {
+    const latin1Bytes = [...input].map((char) => char.charCodeAt(0));
+    return new TextDecoder("utf-8").decode(Uint8Array.from(latin1Bytes));
+  } catch (_) {
+    return input;
+  }
+}
+
 const escaped = (
   { city, country, regionCode, coordinates }: MapLocation,
 ): MapLocation => {
   return {
     coordinates,
     regionCode,
-    city: city ? decodeURIComponent(escape(city)) : city,
-    country: country ? decodeURIComponent(escape(country)) : country,
+    city: city ? fixEncoding(city) : city,
+    country: country ? fixEncoding(country) : country,
   };
 };
 /**
