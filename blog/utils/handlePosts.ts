@@ -36,16 +36,6 @@ export const sortPosts = (blogPosts: BlogPost[], sortBy: SortBy) => {
   });
 };
 
-export const filterPosts = (
-  posts: BlogPost[],
-  slug?: string,
-  term?: string,
-): BlogPost[] => {
-  if (term) return filterPostsByTerm(posts, term);
-  if (slug) return filterPostsByCategory(posts, slug);
-  return posts;
-};
-
 /**
  * Returns an filtered BlogPost list
  *
@@ -85,6 +75,16 @@ export const slicePosts = (
   return posts.slice(startIndex, endIndex);
 };
 
+export const filterPosts = (
+  posts: BlogPost[],
+  slug?: string,
+  term?: string
+): BlogPost[] => {
+  if (term) return filterPostsByTerm(posts, term)
+  if (slug) return filterPostsByCategory(posts, slug)
+  return posts
+}
+
 /**
  * Returns an filtered and sorted BlogPost list. It dont slice
  *
@@ -99,11 +99,7 @@ export default function handlePosts(
   slug?: string,
   term?: string,
 ) {
-  const filteredPosts = slug
-    ? filterPostsByCategory(posts, slug)
-    : term
-    ? filterPostsByTerm(posts, term)
-    : posts;
+  const filteredPosts = filterPosts(posts, slug, term);
 
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;
