@@ -19,10 +19,12 @@ interface Props {
 }
 
 export type AppContext = AC<ReturnType<typeof Logicommerce>>;
+export const color = 0x4091a5;
 
 /**
  * @title Logicommerce
  * @description Loaders, actions and workflows for adding Logicommerce to your website.
+ * @logo https://raw.githubusercontent.com/deco-cx/apps/refs/heads/feat--logicommerce/logicommerce/logo.png
  * @category Ecommerce
  */
 export default function Logicommerce(
@@ -49,6 +51,8 @@ export const preview = () => {
       owner: "deco.cx",
       description:
         "Loaders, actions and workflows for adding Wap Commerce Platform to your website.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/refs/heads/feat--logicommerce/logicommerce/logo.png",
       images: [
         "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/starting/235b17e1-6f7a-4077-98cf-dad53ef075e5/2.Home-Galeria-de-topicos-principais-575x455px.jpg",
       ],
