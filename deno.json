@@ -56,8 +56,14 @@
   "exclude": [
     "static",
     "README.md",
-    "**/README.md"
+    "**/README.md",
+    "**/openapi/api.openapi.gen.ts"
   ],
+  "lint": {
+    "exclude": [
+      "**/openapi/api.openapi.gen.ts"
+    ]
+  },
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
