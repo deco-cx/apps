@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { BlogPost } from "../types.ts";
-import { getRecordsByPath } from "../utils/records.ts";
+import { getRecordsByPath } from "../core/records.ts";
 import type { RequestURLParam } from "../../website/functions/requestToParam.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
