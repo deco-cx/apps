@@ -9,7 +9,7 @@ interface Props {
  * @title StreamShop Embed
  */
 export default function Stories(
-  { slugs = ["YW9HwZbU","hOok12Xu","9zCcxtSH","CS2UU3tJ"] }: Props,
+  { slugs = ["YW9HwZbU", "hOok12Xu", "9zCcxtSH", "CS2UU3tJ"] }: Props,
 ) {
   return (
     <div class="w-screen h-auto py-24 max-w-full flex items-center justify-center">

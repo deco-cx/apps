@@ -2,7 +2,9 @@ import type { App, FnContext } from "@deco/deco";
 import { PreviewContainer } from "./components/ui/Preview.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
 
-export type AppContext = FnContext< Manifest>;
+// deno-lint-ignore ban-types
+export type State = {};
+export type AppContext = FnContext<Manifest>;
 
 /**
  * @title Video Commerce - Stream shop
@@ -10,11 +12,8 @@ export type AppContext = FnContext< Manifest>;
  * @category Tools
  * @logo https://cdn.prod.website-files.com/6445b237edd0d4b3293ec173/6707f86b939ac3eaea62fe44_SSHOP_AVATAR%20copy%202.png
  */
-export default function App(): App<Manifest> {
-
-  return {
-    manifest,
-  };
+export default function App(state: State): App<Manifest, State> {
+  return { manifest, state };
 }
 
 // It is important to use the same name as the default export of the app

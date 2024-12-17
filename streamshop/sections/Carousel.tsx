@@ -5,7 +5,6 @@ import Section, {
 import { type LoadingFallbackProps } from "@deco/deco";
 import { useDevice } from "@deco/deco/hooks";
 
-
 interface StyleDesktop {
   /**
    * @title Altura do vídeo
@@ -75,8 +74,23 @@ interface Props extends SectionHeaderProps {
 export default function Carousel({
   title = "Title",
   cta,
-  slugs =
-   [ "lnSWxBFj","E5hUMpXl","o8GbO1r7","g31wys57","4J8mqGAD","Q41wyj80","NJ6WxSZp","lCx1dr89","ZI2NBKS7","ximkLtuV","AG6Fhvn0","YLohX8FM","lUwLnDpx","5ur2WIIU","PdfbAvpP"],
+  slugs = [
+    "lnSWxBFj",
+    "E5hUMpXl",
+    "o8GbO1r7",
+    "g31wys57",
+    "4J8mqGAD",
+    "Q41wyj80",
+    "NJ6WxSZp",
+    "lCx1dr89",
+    "ZI2NBKS7",
+    "ximkLtuV",
+    "AG6Fhvn0",
+    "YLohX8FM",
+    "lUwLnDpx",
+    "5ur2WIIU",
+    "PdfbAvpP",
+  ],
   style = {
     styleDesktop: {
       videoWidth: "300px",

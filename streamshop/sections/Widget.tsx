@@ -76,6 +76,9 @@ interface Props {
   options?: WidgetOptions;
 }
 
+// deno-lint-ignore no-explicit-any
+declare const ss_widget_btn: (options: any) => void;
+
 const serviceWorkerScript = (
   {
     live,
@@ -93,7 +96,7 @@ const serviceWorkerScript = (
 ) =>
   addEventListener("load", () => {
     console.log("Running on load - StreamShop Widget");
-    var liveshopSdkWidgetOptions = {
+    const liveshopSdkWidgetOptions = {
       live,
       bg,
       positionX: positionX || "right",
@@ -108,20 +111,20 @@ const serviceWorkerScript = (
     };
 
     // Core Script (do not touch)
-    (function (i, s, o, g, r, a, m) {
-      var p = new Promise(function (rs) {
+    (function (_i: Window, s: Document, o: string, g: string): void {
+      const p = new Promise<void>(function (rs) {
         return rs();
       });
-      a = s.createElement(o);
-      m = s.getElementsByTagName(o)[0];
-      a.async = 1;
+      const a = s.createElement(o) as HTMLScriptElement;
+      const m = s.getElementsByTagName(o)[0];
+      a.async = true;
       a.src = g;
       a.onload = function () {
         return p.then(function () {
           return ss_widget_btn(liveshopSdkWidgetOptions);
         });
       };
-      m.parentNode.insertBefore(a, m);
+      m.parentNode?.insertBefore(a, m);
     })(
       window,
       document,
