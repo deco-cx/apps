@@ -1,4 +1,4 @@
-import type { PDPReview } from "./types.ts";
+import type { PDPReview, WriteReview } from "./types.ts";
 
 export interface API {
   "GET /:customer/:sku/summary": {
@@ -8,4 +8,12 @@ export interface API {
       pageSize: number;
     };
   };
+
+  "POST /:customer/:sku/review": {
+    searchParams: {
+      sku: string;
+      customer: string;
+    };
+    body: WriteReview;
+  }
 }
