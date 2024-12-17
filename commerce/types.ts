@@ -351,6 +351,8 @@ export interface Review extends Omit<Thing, "@type"> {
   id?: string;
   /** Author of the */
   author?: Author[];
+  /** The date that the order was created, in ISO 8601 date format.*/
+  dateCreated?: string;
   /** The date that the review was published, in ISO 8601 date format.*/
   datePublished?: string;
   /** The item that is being reviewed/rated. */

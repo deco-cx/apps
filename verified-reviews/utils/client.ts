@@ -2,6 +2,11 @@ import { fetchAPI } from "../../utils/fetch.ts";
 import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
 import { Product } from "../../commerce/types.ts";
 import { ConfigVerifiedReviews } from "../mod.ts";
+import {
+  getRatingProduct,
+  getWeightedRatingProduct,
+  toReview,
+} from "./transform.ts";
 import { context } from "@deco/deco";
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
 export interface PaginationOptions {
@@ -14,6 +19,16 @@ export interface PaginationOptions {
     | "rate_ASC"
     | "helpfulrating_DESC";
 }
+
+// creating an object to keep backward compatibility
+const orderMap = {
+  date_desc: "date_desc",
+  date_ASC: "date_asc",
+  rate_DESC: "rate_desc",
+  rate_ASC: "rate_asc",
+  helpfulrating_DESC: "most_helpful",
+} as const;
+
 const MessageError = {
   ratings:
     "🔴⭐ Error on call ratings of Verified Review - probably unidentified product",
@@ -81,68 +96,64 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
   };
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
   const reviews = (
-    { productId, count = 5, offset = 0, order = "date_desc" }:
+    { productId, count = 5, offset = 0, order: _order = "date_desc" }:
       & PaginationOptions
       & {
-        productId: string;
+        productId: string | string[];
       },
   ) => {
+    const order = orderMap[_order];
+
     const payload = {
       query: "reviews",
-      product: productId,
+      product: Array.isArray(productId) ? productId : [productId],
       idWebsite: idWebsite,
       plateforme: "br",
       offset: offset,
       limit: count,
       order: order,
     };
-    return fetchAPI<Reviews>(`${baseUrl}`, {
+
+    return fetchAPI<Reviews[]>(`${baseUrl}`, {
       method: "POST",
       body: JSON.stringify(payload),
     });
   };
-  const fullReview = async (
-    { productId, count = 5, offset = 0 }: PaginationOptions & {
-      productId: string;
-    },
-  ): Promise<VerifiedReviewsFullReview> => {
+
+  const fullReview = async ({
+    productId,
+    count = 5,
+    offset = 0,
+    order,
+  }: PaginationOptions & {
+    productId: string | string[];
+  }): Promise<VerifiedReviewsFullReview> => {
     try {
+      const isMultiProduct = Array.isArray(productId);
+
       const response = await Promise.all([
-        rating({ productId }),
-        reviews({ productId, count, offset }),
+        ratings({
+          productsIds: isMultiProduct ? productId : [productId],
+        }),
+        reviews({ productId, count, offset, order }),
       ]);
       const [responseRating, responseReview] = response.flat() as [
         Ratings,
         Reviews | null,
       ];
-      const currentRating = responseRating?.[productId]?.[0];
+
+      const aggregateRating = isMultiProduct
+        ? getWeightedRatingProduct(responseRating)
+        : getRatingProduct({ ratings: responseRating, productId });
+
       return {
-        aggregateRating: currentRating
+        aggregateRating: aggregateRating
           ? {
-            "@type": "AggregateRating",
-            ratingValue: Number(parseFloat(currentRating.rate).toFixed(1)),
-            reviewCount: Number(currentRating.count),
+            ...aggregateRating,
+            stats: responseReview?.stats,
           }
           : undefined,
-        review: responseReview
-          ? responseReview.reviews?.map((item) => ({
-            "@type": "Review",
-            author: [
-              {
-                "@type": "Author",
-                name: `${item.firstname} ${item.lastname}`,
-              },
-            ],
-            datePublished: item.review_date,
-            reviewBody: item.review,
-            reviewRating: {
-              "@type": "AggregateRating",
-              ratingValue: Number(item.rate),
-              // this api does not support multiple reviews
-              reviewCount: 1,
-            },
-          }))
-          : [],
+        review: responseReview ? responseReview.reviews?.map(toReview) : [],
       };
     } catch (error) {
       if (context.isDeploy) {
