@@ -52,17 +52,17 @@ export interface WriteReview {
 }
 
 export interface ResponseWriteReview {
-  helpful: number;       // Quantidade de votos úteis para a avaliação
-  unhelpful: number;     // Quantidade de votos não úteis para a avaliação
-  verified: boolean;     // Indica se a compra foi verificada
-  status: string;        // Status da avaliação (ex.: "sent")
-  _id: string;           // Identificador único da avaliação
-  created: string;       // Data de criação da avaliação (formato ISO)
-  customer: string;      // Identificador do cliente (ex.: "tokstok")
-  userId: string;        // Identificador único do usuário
-  name: string;          // Nome do autor da avaliação
-  sku: string;           // Identificador SKU do produto avaliado
-  text: string;          // Texto da avaliação
-  recommended: boolean;  // Indica se o produto foi recomendado
-  rating: number;        // Nota de avaliação do produto (ex.: 5)
+  helpful: number;      
+  unhelpful: number;     
+  verified: boolean;     
+  status: string;       
+  _id: string;        
+  created: string;       
+  customer: string;     
+  userId: string;       
+  name: string;          
+  sku: string;           
+  text: string;          
+  recommended: boolean;  
+  rating: number;        
 }
