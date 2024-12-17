@@ -1121,12 +1121,27 @@ function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
   };
 }
 
-function toHolidayHoursSpecification(holiday: PickupHolidays) {
+function toSpecialHoursSpecification(
+  holiday: PickupHolidays,
+): OpeningHoursSpecification {
+  const days: DayOfWeek[] = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const date = new Date(holiday.date ?? "");
+  const dayIndex = date.getDay();
+  const dayOfWeek = days[dayIndex];
+
   return {
-    "@type": "PickupHolidays",
-    date: holiday.date,
-    hourBegin: holiday.hourBegin,
-    hourEnd: holiday.hourEnd,
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek,
+    opens: holiday.hourBegin,
+    closes: holiday.hourEnd,
   };
 }
 
@@ -1145,15 +1160,15 @@ export function toPlace(
     latitude,
     longitude,
     openingHoursSpecification,
-    pickupHolidays,
+    specialOpeningHoursSpecification,
   } = isPickupPointVCS(pickupPoint)
     ? {
       name: pickupPoint.name,
       country: pickupPoint.address?.country?.acronym,
       latitude: pickupPoint.address?.location?.latitude,
       longitude: pickupPoint.address?.location?.longitude,
-      pickupHolidays: pickupPoint.pickupHolidays?.map(
-        toHolidayHoursSpecification,
+      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+        toSpecialHoursSpecification,
       ),
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
@@ -1164,8 +1179,8 @@ export function toPlace(
       country: pickupPoint.address?.country,
       latitude: pickupPoint.address?.geoCoordinates[0],
       longitude: pickupPoint.address?.geoCoordinates[1],
-      pickupHolidays: pickupPoint.pickupHolidays?.map(
-        toHolidayHoursSpecification,
+      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+        toSpecialHoursSpecification,
       ),
       openingHoursSpecification: pickupPoint.businessHours?.map((
         { ClosingTime, DayOfWeek, OpeningTime },
@@ -1192,7 +1207,7 @@ export function toPlace(
     latitude,
     longitude,
     name,
-    pickupHolidays,
+    specialOpeningHoursSpecification,
     openingHoursSpecification,
     additionalProperty: [{
       "@type": "PropertyValue",
