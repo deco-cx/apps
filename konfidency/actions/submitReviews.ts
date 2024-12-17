@@ -24,7 +24,7 @@ export default async function action(props: Props, _req: Request, ctx: AppContex
         ...review,
       },
     }).then((r) => r.json())
-    return await response as ResponseWriteReview
+    return await response
   } catch (error) {
     const errorObj = error as { name: string; message: string };
     logger.error(`{ errorName: ${errorObj.name},  

@@ -48,7 +48,7 @@ export interface WriteReview {
   email: string;
   rating: number;
   text: string;
-  recommended: boolean;
+  recommended?: boolean;
 }
 
 export interface ResponseWriteReview {
