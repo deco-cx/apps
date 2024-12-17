@@ -1124,24 +1124,11 @@ function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
 function toSpecialHoursSpecification(
   holiday: PickupHolidays,
 ): OpeningHoursSpecification {
-  const days: DayOfWeek[] = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  const date = new Date(holiday.date ?? "");
-  const dayIndex = date.getDay();
-  const dayOfWeek = days[dayIndex];
-
   return {
     "@type": "OpeningHoursSpecification",
-    dayOfWeek,
     opens: holiday.hourBegin,
     closes: holiday.hourEnd,
+    validFrom: holiday.date,
   };
 }
 
