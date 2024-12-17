@@ -6,12 +6,17 @@ export const proxySetCookie = (
   to: Headers,
   toDomain?: URL | string,
 ) => {
-  const newDomain = toDomain && new URL(toDomain);
+  const domain = toDomain && new URL(toDomain);
+  const newDomain = domain && !domain.hostname.includes("localhost")
+    ? new URL(getTopDomain(domain.hostname))
+    : domain;
+
+  console.log({ newDomain });
 
   for (const cookie of getSetCookies(from)) {
-    if (cookie.name === SESSION_COOKIE) {
-      continue;
-    }
+    // if (cookie.name === SESSION_COOKIE) {
+    //   continue;
+    // }
     const newCookie = newDomain
       ? {
         ...cookie,
@@ -44,3 +49,17 @@ export const sortSearchParams = (url: URL) => {
 };
 
 export const sanitizePath = (path: string) => path.replace(/^\/?(rest\/)?/, "");
+
+export const getTopDomain = (domain: string): string => {
+  // Remove protocol and any trailing slash
+  const cleanDomain = domain.replace(/^(https?:)?\/\//, "").replace(/\/$/, "");
+
+  // Split by dots and get the last two parts
+  const parts = cleanDomain.split(".");
+  if (parts.length <= 2) return cleanDomain;
+  if (parts.length > 3) {
+    return parts.slice(-3).join(".");
+  }
+
+  return parts.slice(-2).join(".");
+};

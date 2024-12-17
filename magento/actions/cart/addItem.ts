@@ -6,6 +6,7 @@ import { handleCartActions } from "../../utils/cart.ts";
 import { FORM_KEY_COOKIE } from "../../utils/constants.ts";
 import { HttpError } from "../../../utils/http.ts";
 import { OverrideFeatures } from "../../utils/client/types.ts";
+import { proxySetCookie } from "../../utils/utils.ts";
 
 export interface Props extends OverrideFeatures {
   qty: number;
@@ -69,26 +70,30 @@ const action = async (
 
     let cartId;
     const cookies = fetchHeaders.getSetCookie();
-    cookies.forEach((cookie) => {
-      const parsed = parseCookieString(cookie, url.includes("localhost"));
 
-      if (parsed.name === "dataservices_cart_id") {
-        cartId = parsed.value.replace(/%22/g, "");
-        setCookie(ctx.response.headers, {
-          ...parsed,
-          httpOnly: true,
-          secure: true,
-          path: "/",
-          unparsed: ["Priority=High"],
-        });
-        return;
-      }
+    proxySetCookie(fetchHeaders, ctx.response.headers, new URL(url).origin);
 
-      setCookie(ctx.response.headers, {
-        ...parsed,
-        path: "/",
-      });
-    });
+    console.log({ cookies });
+    // cookies.forEach((cookie) => {
+    //   const parsed = parseCookieString(cookie, url.includes("localhost"));
+
+    //   if (parsed.name === "dataservices_cart_id") {
+    //     cartId = parsed.value.replace(/%22/g, "");
+    //     setCookie(ctx.response.headers, {
+    //       ...parsed,
+    //       httpOnly: true,
+    //       secure: true,
+    //       path: "/",
+    //       unparsed: ["Priority=High"],
+    //     });
+    //     return;
+    //   }
+
+    //   setCookie(ctx.response.headers, {
+    //     ...parsed,
+    //     path: "/",
+    //   });
+    // });
 
     return handleCartActions(dontReturnCart, {
       req,
