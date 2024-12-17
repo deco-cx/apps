@@ -20,3 +20,7 @@ const MatchRandom = (
 };
 
 export default MatchRandom;
+
+export const sessionKey = (props: Props) => {
+  return `${props.traffic}`;
+};
