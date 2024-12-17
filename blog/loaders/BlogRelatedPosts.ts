@@ -1,10 +1,10 @@
 /**
- * Retrieves a list of blog posts.
+ * Retrieves a list of blog related posts.
  *
- * @param props - The props for the blog post list.
+ * @param props - The props for the blog related post list.
  * @param req - The request object.
  * @param ctx - The application context.
- * @returns A promise that resolves to an array of blog posts.
+ * @returns A promise that resolves to an array of blog related posts.
  */
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
@@ -30,7 +30,7 @@ export interface Props {
    * @title Category Slug
    * @description Filter by a specific category slug.
    */
-  slug?: RequestURLParam;
+  slug?: RequestURLParam | RequestURLParam[];
   /**
    * @title Page sorting parameter
    * @description The sorting option. Default is "date_desc"
@@ -40,26 +40,31 @@ export interface Props {
    * @description Overrides the query term at url
    */
   query?: string;
+  /**
+   * @title Exclude Slug
+   * @description Excludes a slug from the list
+   */
+  excludeSlug?: string;
 }
 
 /**
- * @title BlogPostList
- * @description Retrieves a list of blog posts.
+ * @title BlogRelatedPosts
+ * @description Retrieves a list of blog related posts.
  *
- * @param props - The props for the blog post list.
+ * @param props - The props for the blog related post list.
  * @param req - The request object.
  * @param ctx - The application context.
- * @returns A promise that resolves to an array of blog posts.
+ * @returns A promise that resolves to an array of blog related posts.
  */
-export default async function BlogPostList(
-  { page, count, slug, sortBy, query }: Props,
+export default async function BlogRelatedPosts(
+  { page, count, slug, sortBy, query, excludeSlug }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<BlogPost[] | null> {
   const url = new URL(req.url);
   const postsPerPage = Number(count ?? url.searchParams.get("count") ?? 12);
   const pageNumber = Number(page ?? url.searchParams.get("page") ?? 1);
-  const pageSort = sortBy ?? url.searchParams.get("sortBy") as SortBy ??
+  const pageSort = sortBy ?? (url.searchParams.get("sortBy") as SortBy) ??
     "date_desc";
   const term = query ?? url.searchParams.get("q") ?? undefined;
 
@@ -69,7 +74,7 @@ export default async function BlogPostList(
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(posts, pageSort, slug, term);
+  const handledPosts = handlePosts(posts, pageSort, slug, term, excludeSlug);
 
   if (!handledPosts) {
     return null;

@@ -59,6 +59,22 @@ export const filterPostsByTerm = (posts: BlogPost[], term: string) =>
   );
 
 /**
+ * Returns an filtered BlogPost list
+ *
+ * @param posts Posts to be handled
+ * @param slug Category Slug to be filter
+ */
+export const filterRelatedPosts = (
+  posts: BlogPost[],
+  slug: string[],
+  excludeSlug?: string,
+) =>
+  posts.filter(
+    ({ categories, slug: postSlug }) =>
+      categories.find((c) => slug.includes(c.slug)) && postSlug !== excludeSlug,
+  );
+
+/**
  * Returns an filtered and sorted BlogPost list
  *
  * @param posts Posts to be handled
@@ -77,11 +93,14 @@ export const slicePosts = (
 
 export const filterPosts = (
   posts: BlogPost[],
-  slug?: string,
+  slug?: string | string[],
   term?: string,
+  excludeSlug?: string,
 ): BlogPost[] => {
   if (term) return filterPostsByTerm(posts, term);
-  if (slug) return filterPostsByCategory(posts, slug);
+  if (typeof slug === "string") return filterPostsByCategory(posts, slug);
+  if (Array.isArray(slug)) return filterRelatedPosts(posts, slug, excludeSlug);
+
   return posts;
 };
 
@@ -96,10 +115,11 @@ export const filterPosts = (
 export default function handlePosts(
   posts: BlogPost[],
   sortBy: SortBy,
-  slug?: string,
+  slug?: string | string[],
   term?: string,
+  excludeSlug?: string,
 ) {
-  const filteredPosts = filterPosts(posts, slug, term);
+  const filteredPosts = filterPosts(posts, slug, term, excludeSlug);
 
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;

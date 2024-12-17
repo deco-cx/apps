@@ -10,12 +10,13 @@ import * as $$$5 from "./loaders/BlogpostListing.ts";
 import * as $$$2 from "./loaders/BlogPostPage.ts";
 import * as $$$6 from "./loaders/Category.ts";
 import * as $$$7 from "./loaders/GetCategories.ts";
+import * as $$$8 from "./loaders/BlogRelatedPosts.ts";
 import * as $$$$$$0 from "./sections/Seo/SeoBlogPost.tsx";
 import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
 import * as $$$$$$2 from "./sections/Template.tsx";
 
 const manifest = {
-  "loaders": {
+  loaders: {
     "blog/loaders/Author.ts": $$$0,
     "blog/loaders/Blogpost.ts": $$$3,
     "blog/loaders/BlogPostItem.ts": $$$1,
@@ -24,14 +25,15 @@ const manifest = {
     "blog/loaders/BlogPostPage.ts": $$$2,
     "blog/loaders/Category.ts": $$$6,
     "blog/loaders/GetCategories.ts": $$$7,
+    "blog/loaders/BlogRelatedPosts.ts": $$$8,
   },
-  "sections": {
+  sections: {
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
     "blog/sections/Template.tsx": $$$$$$2,
   },
-  "name": "blog",
-  "baseUrl": import.meta.url,
+  name: "blog",
+  baseUrl: import.meta.url,
 };
 
 export type Manifest = typeof manifest;
