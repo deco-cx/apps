@@ -20,7 +20,7 @@ export const proxySetCookie = (
     const newCookie = newDomain
       ? {
         ...cookie,
-        domain: newDomain.hostname,
+        domain: newDomain.hostname && `.${newDomain.hostname}`,
       }
       : cookie;
 
