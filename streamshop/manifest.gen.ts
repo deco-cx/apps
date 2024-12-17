@@ -12,15 +12,15 @@ import * as $$$$$$6 from "./sections/Widget.tsx";
 
 const manifest = {
   "sections": {
-    "streamshop-app/sections/Banner.tsx": $$$$$$0,
-    "streamshop-app/sections/Carousel.tsx": $$$$$$1,
-    "streamshop-app/sections/Embed.tsx": $$$$$$2,
-    "streamshop-app/sections/Info&Reels.tsx": $$$$$$3,
-    "streamshop-app/sections/Reels.tsx": $$$$$$4,
-    "streamshop-app/sections/Stories.tsx": $$$$$$5,
-    "streamshop-app/sections/Widget.tsx": $$$$$$6,
+    "streamshop/sections/Banner.tsx": $$$$$$0,
+    "streamshop/sections/Carousel.tsx": $$$$$$1,
+    "streamshop/sections/Embed.tsx": $$$$$$2,
+    "streamshop/sections/Info&Reels.tsx": $$$$$$3,
+    "streamshop/sections/Reels.tsx": $$$$$$4,
+    "streamshop/sections/Stories.tsx": $$$$$$5,
+    "streamshop/sections/Widget.tsx": $$$$$$6,
   },
-  "name": "streamshop-app",
+  "name": "streamshop",
   "baseUrl": import.meta.url,
 };
 
