@@ -16,7 +16,7 @@ import * as $$$$$$1 from "./sections/Seo/SeoBlogPostListing.tsx";
 import * as $$$$$$2 from "./sections/Template.tsx";
 
 const manifest = {
-  loaders: {
+  "loaders": {
     "blog/loaders/Author.ts": $$$0,
     "blog/loaders/Blogpost.ts": $$$3,
     "blog/loaders/BlogPostItem.ts": $$$1,
@@ -27,13 +27,13 @@ const manifest = {
     "blog/loaders/GetCategories.ts": $$$7,
     "blog/loaders/BlogRelatedPosts.ts": $$$8,
   },
-  sections: {
+  "sections": {
     "blog/sections/Seo/SeoBlogPost.tsx": $$$$$$0,
     "blog/sections/Seo/SeoBlogPostListing.tsx": $$$$$$1,
     "blog/sections/Template.tsx": $$$$$$2,
   },
-  name: "blog",
-  baseUrl: import.meta.url,
+  "name": "blog",
+  "baseUrl": import.meta.url,
 };
 
 export type Manifest = typeof manifest;

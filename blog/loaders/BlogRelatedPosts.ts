@@ -30,7 +30,7 @@ export interface Props {
    * @title Category Slug
    * @description Filter by a specific category slug.
    */
-  slug?: RequestURLParam | RequestURLParam[];
+  slug?: RequestURLParam | string[];
   /**
    * @title Page sorting parameter
    * @description The sorting option. Default is "date_desc"
@@ -41,10 +41,10 @@ export interface Props {
    */
   query?: string;
   /**
-   * @title Exclude Slug
-   * @description Excludes a slug from the list
+   * @title Exclude Post Slug
+   * @description Excludes a post slug from the list
    */
-  excludeSlug?: string;
+  excludePostSlug?: RequestURLParam | string;
 }
 
 /**
@@ -56,11 +56,14 @@ export interface Props {
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog related posts.
  */
+
+export type BlogRelatedPosts = BlogPost[] | null;
+
 export default async function BlogRelatedPosts(
-  { page, count, slug, sortBy, query, excludeSlug }: Props,
+  { page, count, slug, sortBy, query, excludePostSlug }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<BlogPost[] | null> {
+): Promise<BlogRelatedPosts> {
   const url = new URL(req.url);
   const postsPerPage = Number(count ?? url.searchParams.get("count") ?? 12);
   const pageNumber = Number(page ?? url.searchParams.get("page") ?? 1);
@@ -74,7 +77,7 @@ export default async function BlogRelatedPosts(
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(posts, pageSort, slug, term, excludeSlug);
+  const handledPosts = handlePosts(posts, pageSort, slug, term, excludePostSlug);
 
   if (!handledPosts) {
     return null;
