@@ -154,7 +154,7 @@ export async function getCartImages(
   >(
     {
       variables: {
-        filter: { sku: { in: skus.map((sku) => sku) } },
+        search: `${skus.join(" ")}`,
         pageSize: skus.length,
       },
       ...GetProductImages,

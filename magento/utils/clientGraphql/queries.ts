@@ -289,10 +289,12 @@ export const GetProductImages = {
   fragments: [mediaGallery],
   query: gql`
     query GetProduct(
+      $search: String
       $filter: ProductAttributeFilterInput
       $pageSize: Int
     ) {
       products(
+        search: $search
         filter: $filter
         pageSize: $pageSize
         currentPage: 1
