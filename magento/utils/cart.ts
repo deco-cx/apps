@@ -13,6 +13,7 @@ import {
   ProductWithImagesGraphQL,
 } from "./clientGraphql/types.ts";
 import { GetProductImages } from "./clientGraphql/queries.ts";
+import { setCookie } from "@std/http/cookie";
 
 export const CART_COOKIE = "dataservices_cart_id";
 
@@ -160,4 +161,15 @@ export async function getCartImages(
       ...GetProductImages,
     },
   );
+}
+
+
+export const setCartCookie = (headers: Headers, cartId: string) => {
+  setCookie(headers, {
+    name: CART_COOKIE,
+    value: cartId,
+    path: "/",
+    httpOnly: false,
+    secure: false,
+  });
 }

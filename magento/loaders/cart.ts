@@ -1,7 +1,7 @@
 import { default as extend } from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
 import { handleCartImages } from "../utils/cache.ts";
-import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
+import { getCartCookie, setCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
 import {
   BASE_CURRENCY_CODE,
@@ -34,10 +34,32 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { clientAdmin, site, cartConfigs } = ctx;
+  const { clientAdmin, site, cartConfigs, clientAdminAuthenticated } = ctx;
   const { countProductImageInCart, extensions } = cartConfigs;
   const url = new URL(req.url);
-  const cartId = _cartId ?? getCartCookie(req.headers);
+  let cartId = _cartId ?? getCartCookie(req.headers);
+
+
+  try {
+    if(!_cartId) {
+      const headers = new Headers();
+      headers.append("Cookie", req.headers.get("Cookie") ?? "");
+      
+      const cartAuthenticated = await clientAdminAuthenticated["GET /rest/:site/V1/carts/mine"]({
+        site,
+      }, {
+        headers
+      }).then((totalizers) => totalizers.json())
+
+      if(cartAuthenticated.id) {
+        console.log("cartAuthenticated", cartAuthenticated);
+        cartId = cartAuthenticated.id;  
+        setCartCookie(ctx.response.headers, cartId);
+      }
+    }
+  } catch (error) {
+    console.error("Error getting cart", error);
+  }
 
   if (!cartId) {
     return null;

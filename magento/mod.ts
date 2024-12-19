@@ -245,6 +245,13 @@ export default function App(props: Props): App<Manifest, State> {
     }),
   });
 
+  const clientAdminAuthenticated = createHttpClient<API>({
+    base: apiConfig.baseUrl,
+    headers: new Headers({
+      "x-requested-with": "XMLHttpRequest",
+    }),
+  });
+
   const clientGraphql = createGraphqlClient({
     fetcher: fetchSafe,
     endpoint: `${apiConfig.baseUrl}/graphql`,
@@ -265,6 +272,7 @@ export default function App(props: Props): App<Manifest, State> {
       cartConfigs,
       clientAdmin,
       clientGraphql,
+      clientAdminAuthenticated
     },
     middleware,
   };
