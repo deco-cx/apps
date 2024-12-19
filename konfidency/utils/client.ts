@@ -1,7 +1,7 @@
 import type { PDPReview, WriteReview, ResponseWriteReview } from "./types.ts";
 
 export interface API {
-  "GET /:customer/:sku/summary": {
+  "GET /:customer/:sku/summary/:sortField,:sortOrder": {
     response: PDPReview;
     searchParams: {
       page: number;
