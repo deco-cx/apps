@@ -38,6 +38,7 @@ const config = {
     app("linx-impulse"),
     app("shopify"),
     app("nuvemshop"),
+    app("streamshop"),
     app("website"),
     app("commerce"),
     app("workflows"),
