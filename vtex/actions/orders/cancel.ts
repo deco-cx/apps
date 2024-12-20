@@ -13,7 +13,7 @@ async function action(
   req: Request,
   ctx: AppContext,
 ): Promise<CanceledOrder | null> {
-  const { vcsDeprecated } = ctx;
+  const { vcs } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
@@ -22,7 +22,7 @@ async function action(
 
   const { orderId, reason, requestedByUser } = props;
 
-  const response = await vcsDeprecated
+  const response = await vcs
     ["POST /api/oms/pvt/orders/:orderId/cancel"](
       { orderId },
       {
