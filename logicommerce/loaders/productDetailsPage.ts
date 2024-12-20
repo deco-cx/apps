@@ -20,8 +20,6 @@ const loader = async (
     headers: req.headers,
   }).then((res) => res.json());
 
-  Deno.writeTextFileSync("products.json", JSON.stringify(products, null, 2));
-
   return {
     "@type": "ProductDetailsPage",
     breadcrumbList: {

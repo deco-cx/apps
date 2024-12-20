@@ -50,8 +50,6 @@ const loader = (
 
   // const products = await ctx.api['GET /products'](params, { headers: req.headers }).then(res => res.json())
 
-  // Deno.writeTextFileSync('products.json', JSON.stringify(products, null, 2))
-
   // return products.items?.map(toProduct) ?? []
 };
 
