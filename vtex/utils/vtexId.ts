@@ -13,23 +13,31 @@ interface CookiePayload {
   userId: string;
 }
 
-export const parseCookie = (headers: Headers, account: string) => {
+export const parseCookie = (headers: Headers) => {
   const cookies = getCookies(headers);
-  const cookie = cookies[VTEX_ID_CLIENT_COOKIE] ||
-    cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`];
-  const decoded = cookie ? decode(cookie) : null;
 
-  const payload = decoded?.[1] as CookiePayload | undefined;
+  //const decoded = cookie ? decode(cookie) : null;
+  const authCookieNames = Object.keys(cookies).filter((cookieName) =>
+    cookieName.startsWith("VtexIdclientAutCookie")
+  );
+
+  const authCookies = authCookieNames
+    ? authCookieNames.map((cookieName) => ({
+      [cookieName]: cookies[cookieName],
+    }))
+    : [];
+
+  const firstAuthCookie = authCookies.length > 0
+    ? Object.values(authCookies[0])[0]
+    : null;
+
+  const payload = firstAuthCookie
+    ? decode(firstAuthCookie)?.[1] as CookiePayload
+    : undefined;
 
   return {
     cookie: stringify({
-      ...(cookies[VTEX_ID_CLIENT_COOKIE] &&
-        { [VTEX_ID_CLIENT_COOKIE]: cookies[VTEX_ID_CLIENT_COOKIE] }),
-      ...(cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`] &&
-        {
-          [`${VTEX_ID_CLIENT_COOKIE}_${account}`]:
-            cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`],
-        }),
+      ...Object.assign({}, ...authCookies),
     }),
     payload,
   };
