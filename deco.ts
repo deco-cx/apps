@@ -48,6 +48,7 @@ const config = {
     app("decohub"),
     app("htmx"),
     app("sap"),
+    app("logicommerce"),
     ...compatibilityApps,
   ],
 };

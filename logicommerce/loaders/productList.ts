@@ -1,0 +1,58 @@
+import type { Product } from "../../commerce/types.ts";
+import type { AppContext } from "../mod.ts";
+import type { LogicommerceProductSorts } from "../types.ts";
+import { toProduct } from "../utils/transform.ts";
+
+/** @title {{{name}}} - {{{value}}} */
+interface Filter {
+  name: string;
+  value: string;
+}
+
+interface Props {
+  /**
+   * @title query
+   * @description query to use on search
+   */
+  q?: string;
+  /** @description total number of items to display */
+  count?: number;
+  /** @description sort variable */
+  sort?: LogicommerceProductSorts;
+  /** @description Possible values: https://devcenter.logicommerce.com/apiCore/359#operation/getProducts (Query Parameters) */
+  filters?: Filter[];
+}
+
+/**
+ * @title Shelf - Logicommerce Integration
+ * @description Product List loader
+ */
+const loader = async (
+  props: Props,
+  req: Request,
+  ctx: AppContext,
+): Promise<Product[] | null> => {
+  const { filters = [], ...params } = props;
+
+  Object.assign(
+    params,
+    filters.reduce(
+      (acc, filter) => {
+        acc[filter.name] = filter.value;
+        return acc;
+      },
+      {} as Record<string, string>,
+    ),
+  );
+
+  console.log(params);
+  console.log(params);
+
+  const products = await ctx.api["GET /products"](params, {
+    headers: req.headers,
+  }).then((res) => res.json());
+
+  return products.items?.map(toProduct) ?? [];
+};
+
+export default loader;
