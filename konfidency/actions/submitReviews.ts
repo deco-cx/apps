@@ -10,10 +10,13 @@ export interface Props {
   review: WriteReview;
 }
 
-export default async function action(props: Props, _req: Request, ctx: AppContext): Promise<ResponseWriteReview | null> {
-
-  const { customer, api } = ctx
-  const { review, sku } = props
+export default async function action(
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<ResponseWriteReview | null> {
+  const { customer, api } = ctx;
+  const { review, sku } = props;
 
   try {
     const response = await api[`POST /:customer/:sku/review`]({
@@ -23,13 +26,12 @@ export default async function action(props: Props, _req: Request, ctx: AppContex
       body: {
         ...review,
       },
-    }).then((r) => r.json())
-    return await response
+    }).then((r) => r.json());
+    return await response;
   } catch (error) {
     const errorObj = error as { name: string; message: string };
     logger.error(`{ errorName: ${errorObj.name},  
     errorMessage: ${errorObj.message} }`);
-    return null
+    return null;
   }
-
 }
