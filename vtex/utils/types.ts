@@ -1470,9 +1470,9 @@ export interface OrderItem {
 }
 
 export interface CanceledOrder {
-  date: string;
-  orderId: string;
-  receipt: string | null;
+  date?: string;
+  orderId?: string;
+  receipt?: string | null;
 }
 
 interface Marketplace {
