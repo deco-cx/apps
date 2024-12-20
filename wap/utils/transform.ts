@@ -188,6 +188,18 @@ export const toProduct = (
     });
   });
 
+  product?.caracteristicas?.forEach((item) => {
+    item.itens.forEach((carac) => {
+      additionalProperty.push({
+        "@type": "PropertyValue",
+        name: carac.label,
+        value: carac.valor,
+        valueReference: item.nome,
+      });
+
+    })
+  });
+
   if (product?.filtros) {
     product?.filtros.forEach((filtro) => {
       additionalProperty.push({
@@ -272,7 +284,7 @@ export const toProduct = (
   const isVariantOf: ProductGroup = {
     "@type": "ProductGroup",
     hasVariant,
-    productGroupID: product.id.toString(),
+    productGroupID: product?.id?.toString(),
     additionalProperty,
   };
 
@@ -283,10 +295,10 @@ export const toProduct = (
     description: product.descricoes.longa,
     brand: {
       "@type": "Brand",
-      identifier: product.marca.id.toString(),
-      name: product.marca.nome,
-      logo: product.marca.imagem,
-      url: new URL(product.marca.rota.path, baseUrl).href,
+      identifier: product.marca?.id?.toString(),
+      name: product.marca?.nome,
+      logo: product.marca?.imagem,
+      url: new URL(product.marca?.rota?.path, baseUrl).href,
     },
     url: `${getUrl(`/${product.rota.params.produto}`, baseUrl).href}.html`,
     image: images.length ? images : [DEFAULT_IMAGE],
