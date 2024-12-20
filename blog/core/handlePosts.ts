@@ -116,6 +116,19 @@ export const filterPostsBySlugs = (posts: BlogPost[], postSlugs: string[]) =>
   posts.filter(({ slug }) => postSlugs.includes(slug));
 
 /**
+ * Returns an filtered BlogPost list
+ *
+ * @param posts Posts to be handled
+ * @param term Term to be filter
+ */
+export const filterPostsByTerm = (posts: BlogPost[], term: string) =>
+  posts.filter(({ content, excerpt, title }) =>
+    [content, excerpt, title].some((field) =>
+      field.toLowerCase().includes(term.toLowerCase())
+    )
+  );
+
+/**
  * Returns an filtered and sorted BlogPost list
  *
  * @param posts Posts to be handled
@@ -132,6 +145,22 @@ export const slicePosts = (
   return posts.slice(startIndex, endIndex);
 };
 
+const filterPosts = (
+  posts: BlogPost[],
+  slug?: string,
+  postSlugs?: string[],
+  term?: string,
+): BlogPost[] => {
+  const firstFilter = postSlugs && postSlugs.length > 0
+    ? filterPostsBySlugs(posts, postSlugs)
+    : filterPostsByCategory(posts, slug);
+
+  const filteredByTerm = term
+    ? filterPostsByTerm(firstFilter, term)
+    : firstFilter;
+  return filteredByTerm;
+};
+
 /**
  * Returns an filtered and sorted BlogPost list. It dont slice
  *
@@ -146,10 +175,9 @@ export default async function handlePosts(
   ctx: AppContext,
   slug?: string,
   postSlugs?: string[],
+  term?: string,
 ) {
-  const filteredPosts = postSlugs && postSlugs.length > 0
-    ? filterPostsBySlugs(posts, postSlugs)
-    : filterPostsByCategory(posts, slug);
+  const filteredPosts = filterPosts(posts, slug, postSlugs, term);
 
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;

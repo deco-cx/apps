@@ -42,6 +42,10 @@ export interface Props {
    * @description The sorting option. Default is "date_desc"
    */
   sortBy?: SortBy;
+  /**
+   * @description Overrides the query term at url
+   */
+  query?: string;
 }
 
 /**
@@ -54,7 +58,7 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-  { page, count, slug, sortBy, postSlugs }: Props,
+  { page, count, slug, sortBy, postSlugs, query }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<BlogPost[] | null> {
@@ -63,6 +67,8 @@ export default async function BlogPostList(
   const pageNumber = Number(page ?? url.searchParams.get("page") ?? 1);
   const pageSort = sortBy ?? url.searchParams.get("sortBy") as SortBy ??
     "date_desc";
+  const term = query ?? url.searchParams.get("q") ?? undefined;
+
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
@@ -76,6 +82,7 @@ export default async function BlogPostList(
       ctx,
       slug,
       postSlugs,
+      term,
     );
 
     if (!handledPosts) {
