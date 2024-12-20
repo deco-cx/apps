@@ -42,3 +42,27 @@ export interface Composition {
 export interface CustomerSettings {
   minStarsHighlightPDP: number;
 }
+
+export interface WriteReview {
+  userId: string;
+  email: string;
+  rating: number;
+  text: string;
+  recommended?: boolean;
+}
+
+export interface ResponseWriteReview {
+  helpful: number;
+  unhelpful: number;
+  verified: boolean;
+  status: string;
+  _id: string;
+  created: string;
+  customer: string;
+  userId: string;
+  name: string;
+  sku: string;
+  text: string;
+  recommended: boolean;
+  rating: number;
+}

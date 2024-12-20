@@ -5,6 +5,16 @@ import { toReview } from "../utils/transform.ts";
 import { logger } from "@deco/deco/o11y";
 export interface Props {
   /**
+   * @description Rating type, default: helpfulScore
+   * @default "helpfulScore"
+   */
+  sortField?: "helpfulScore" | "created" | "rating";
+  /**
+   * @description Default value: asc
+   * @default "asc"
+   */
+  sortOrder?: "asc" | "desc";
+  /**
    * @description The default value is 5
    */
   pageSize?: number;
@@ -14,7 +24,8 @@ export interface Props {
   page?: number;
 }
 export default function productDetailsPage(
-  { pageSize = 5, page = 1 }: Props,
+  { pageSize = 5, page = 1, sortField = "helpfulScore", sortOrder = "asc" }:
+    Props,
   _req: Request,
   ctx: AppContext,
 ): ExtensionOf<ProductDetailsPage | null> {
@@ -24,12 +35,14 @@ export default function productDetailsPage(
       return null;
     }
     try {
-      const reviews = await api["GET /:customer/:sku/summary"]({
-        customer,
-        page,
-        pageSize,
-        sku: productDetailsPage.product.inProductGroupWithID as string,
-      }).then((res) => res.json());
+      const reviews = await api
+        ["GET /:customer/:sku/summary/:sortField,:sortOrder"]({
+          customer,
+          "sortField,:sortOrder": `${sortField},${sortOrder}`,
+          page,
+          pageSize,
+          sku: productDetailsPage.product.inProductGroupWithID as string,
+        }).then((res) => res.json());
       const { aggregateRating, review } = toReview(reviews.reviews[0]);
       return {
         ...productDetailsPage,
