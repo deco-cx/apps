@@ -9,8 +9,11 @@ interface Filter {
 }
 
 interface Props {
-  /** @description overides the query term */
-  query?: string;
+  /**
+   * @title Query
+   * @description overides the query term
+   */
+  q?: string;
   /**
    * @title Items per page
    * @description number of products per page to display
@@ -18,11 +21,12 @@ interface Props {
   count?: number;
   /** @description sort variable */
   sort?: LogicommerceProductSorts;
+  /** @description Possible values: https://devcenter.logicommerce.com/apiCore/359#operation/getProducts (Query Parameters) */
   filters?: Filter[];
 }
 
 /**
- * @title PLP - Logicommerce Integration
+ * @title (Not implemented) PLP - Logicommerce Integration
  * @description Product Listing Page loader
  */
 const loader = (

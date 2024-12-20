@@ -10,12 +10,16 @@ interface Filter {
 }
 
 interface Props {
-  /** @description query to use on search */
-  query?: string;
+  /**
+   * @title query
+   * @description query to use on search
+   */
+  q?: string;
   /** @description total number of items to display */
   count?: number;
   /** @description sort variable */
   sort?: LogicommerceProductSorts;
+  /** @description Possible values: https://devcenter.logicommerce.com/apiCore/359#operation/getProducts (Query Parameters) */
   filters?: Filter[];
 }
 
@@ -40,6 +44,9 @@ const loader = async (
       {} as Record<string, string>,
     ),
   );
+
+  console.log(params);
+  console.log(params);
 
   const products = await ctx.api["GET /products"](params, {
     headers: req.headers,
