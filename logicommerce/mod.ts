@@ -3,7 +3,12 @@ import type { OpenAPI } from "./utils/openapi/api.openapi.gen.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import manifest, { type Manifest } from "./manifest.gen.ts";
 import { PreviewContainer } from "../utils/preview.tsx";
-import type { App, AppContext as AC } from "@deco/deco";
+import type {
+  App,
+  AppContext as AC,
+  AppMiddlewareContext as AMC,
+} from "@deco/deco";
+import { middleware } from "./middleware.ts";
 
 interface Props {
   appId: string;
@@ -19,6 +24,8 @@ interface Props {
 }
 
 export type AppContext = AC<ReturnType<typeof Logicommerce>>;
+export type AppMiddlewareContext = AMC<ReturnType<typeof Logicommerce>>;
+
 export const color = 0x4091a5;
 
 /**
@@ -31,16 +38,19 @@ export default function Logicommerce(
   { appId, appKey }: Props,
 ): App<Manifest, Props> {
   const headers = new Headers();
-  headers.set("X-App-id", appId);
-  headers.set("X-App-key", appKey);
+  headers.set("ip", "127.0.0.1");
 
   const api = createHttpClient<OpenAPI>({
-    base: "https://api.logicommerce.com",
+    base: "https://api-studio.logicommerce.cloud",
     headers,
     fetcher: fetchSafe,
   });
 
-  return { manifest, state: { api, appId, appKey, platform: "logicommerce" } };
+  return {
+    manifest,
+    state: { api, appId, appKey, platform: "logicommerce" },
+    middleware,
+  };
 }
 
 export const preview = () => {

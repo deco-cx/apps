@@ -7,6 +7,7 @@
 // To generate this file: deno task start
 //        
 
+
 /**
  * Information about the set conditions for the applicability of the discount. Only available under license of module 'DISNV'(Discounts Navigation).
  */
@@ -904,7 +905,7 @@ response: GeneralSettingsDTO
 response: GeoIPSettingsDTO
 }
 /**
- * Get the list of available languages visible taking into account the language restrictions (if any) due to the country.
+ * Get the list of available languages ​​visible taking into account the language restrictions (if any) due to the country.
  */
 "GET /settings/languages": {
 response: LanguageCollectionDTO
@@ -1159,7 +1160,7 @@ page?: number
  */
 sort?: "dateAdded.asc,dateAdded.desc"
 /**
- * Specifies whether you want comments in all the visible languages of the blog (<em>true</em>) or only in the session language (<em>false</em>).
+ * Specifies whether you want comments in all the visible languages ​​of the blog (<em>true</em>) or only in the session language (<em>false</em>).
  */
 showAllLanguages?: boolean
 }
@@ -2268,7 +2269,7 @@ page?: number
  */
 sort?: "rating.asc,rating.desc,dateAdded.asc,dateAdded.desc"
 /**
- * Specifies whether you want to get comments in all languages or only the language active in the session.
+ * Specifies whether you want to get comments in all languages ​​or only the language active in the session.
  */
 showAllLanguages?: boolean
 }
@@ -2523,7 +2524,7 @@ filterIndexable?: ("ALL" | "INDEXABLE" | "NO_INDEXABLE")
  */
 "filterCustomTag[id]"?: string
 /**
- * Parameter for filtering ranges of numeric values for custom tags. Several can be used at once. <br> Usage: filterCustomTagInterval [<em>tag identifier</em>]? <em>start value of the range</em> & filterCustomTagInterval [<em>tag identifier</em>]? <em>end value of the range</em>.
+ * Parameter for filtering ranges of numeric values ​​for custom tags. Several can be used at once. <br> Usage: filterCustomTagInterval [<em>tag identifier</em>]? <em>start value of the range</em> & filterCustomTagInterval [<em>tag identifier</em>]? <em>end value of the range</em>.
  */
 "filterCustomTagInterval[id]"?: string
 showFilters?: boolean
@@ -4514,7 +4515,7 @@ allowPostSubscriptions?: boolean
 maxIpComments?: number
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface BlogLanguageDTO {
 /**
@@ -4618,7 +4619,7 @@ defaultLanguage?: number
  */
 currencies?: CurrencyDTO[]
 /**
- * Information on the languages available for the country.
+ * Information on the languages ​​available for the country.
  */
 languages?: LanguageDTO[]
 }
@@ -4644,7 +4645,7 @@ symbol?: string
  */
 codeNumber?: string
 /**
- * Currency exchange value in USD. Currency exchange values are updated every hour.
+ * Currency exchange value in USD. Currency exchange values ​​are updated every hour.
  */
 USDValue?: number
 }
@@ -4953,7 +4954,7 @@ export interface SitemapSettingsDTO {
  */
 active?: boolean
 /**
- * Specifies whether the different items (categories, products, information pages or news) activated must be separated into different site maps. <br> <strong> true </strong>: It implies that as many site maps will be generated as there are active items. If <em>splitLanguages</em> is also active, it means that the number of site maps will be multiplied by the number of languages visible in the Commerce.
+ * Specifies whether the different items (categories, products, information pages or news) activated must be separated into different site maps. <br> <strong> true </strong>: It implies that as many site maps will be generated as there are active items. If <em>splitLanguages</em> is also active, it means that the number of site maps will be multiplied by the number of languages​ visible in the Commerce.
  */
 splitTypes?: boolean
 /**
@@ -5117,7 +5118,7 @@ priority?: number
 language?: AreaLanguageDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface AreaLanguageDTO {
 /**
@@ -5252,7 +5253,7 @@ featured?: boolean
 offer?: boolean
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface CategoryLanguageDTO {
 /**
@@ -5435,7 +5436,7 @@ featured?: boolean
 offer?: boolean
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface CategoryTreeLanguageDTO {
 /**
@@ -5527,7 +5528,7 @@ priority?: number
 language?: BannerLanguageDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface BannerLanguageDTO {
 /**
@@ -5687,7 +5688,7 @@ value?: string
 language?: BlogTagLanguageDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface BlogTagLanguageDTO {
 /**
@@ -5713,7 +5714,7 @@ value?: string
 linkFollowing?: boolean
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface BlogPostLanguageDTO {
 /**
@@ -5797,7 +5798,7 @@ id?: number
  */
 answers?: BlogPostCommentDTO[]
 /**
- * Alias of the user who wrote the post comment.
+ * Alias ​​of the user who wrote the post comment.
  */
 nick?: string
 /**
@@ -5976,7 +5977,7 @@ largeImage?: string
 language?: NewsLanguageDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface NewsLanguageDTO {
 /**
@@ -6060,7 +6061,7 @@ active?: boolean
 subpages?: PageDTO[]
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface PageLanguageDTO {
 /**
@@ -6277,7 +6278,7 @@ featured?: boolean
 offer?: boolean
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface BrandLanguageDTO {
 /**
@@ -6383,7 +6384,7 @@ showAsGrid?: boolean
  */
 priority?: number
 /**
- * Specifies whether the values of this option are used to generate combinations of options.
+ * Specifies whether the values ​​of this option are used to generate combinations of options.
  */
 combinable?: boolean
 /**
@@ -6414,7 +6415,7 @@ values?: OptionValueDTO[]
 type?: ("BOOLEAN" | "SHORT_TEXT" | "SINGLE_SELECTION" | "MULTIPLE_SELECTION" | "SINGLE_SELECTION_IMAGE" | "MULTIPLE_SELECTION_IMAGE" | "SELECTOR" | "DATE" | "LONG_TEXT" | "ATTACHMENT")
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface OptionLanguageDTO {
 /**
@@ -6457,7 +6458,7 @@ pricesWithTaxes?: ItemPricesDTO
 images?: MediaDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface OptionValueLanguageDTO {
 /**
@@ -6725,7 +6726,7 @@ id?: number
 pId?: string
 codes?: CodesDTO
 /**
- * Information about the option values that make up the combinations.
+ * Information about the option values ​​that make up the combinations.
  */
 values?: CombinationValueDTO[]
 /**
@@ -6759,7 +6760,7 @@ ean?: string
 upc?: string
 }
 /**
- * Information about the option values that make up the combinations.
+ * Information about the option values ​​that make up the combinations.
  */
 export interface CombinationValueDTO {
 /**
@@ -6814,7 +6815,7 @@ incomingDate?: string
 previsionType?: ("RESERVE" | "PREVISION" | "AVAILABLE")
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface ProductLanguageDTO {
 /**
@@ -7025,7 +7026,7 @@ language?: BlogCategoryLanguageDTO
 featured?: boolean
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface BlogCategoryLanguageDTO {
 /**
@@ -7451,7 +7452,7 @@ language?: DiscountLanguageDTO
 conditions?: BaseDiscountConditionDTO[]
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface DiscountLanguageDTO {
 /**
@@ -7602,7 +7603,7 @@ logo?: string
 language?: ShipperLanguageDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface ShipperLanguageDTO {
 /**
@@ -7615,7 +7616,7 @@ name?: string
 url?: string
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface ShippingTypeLanguageDTO {
 /**
@@ -7912,7 +7913,7 @@ location?: LocationDTO
  */
 visibleOnMap?: boolean
 /**
- * Specifies the radius of distance (in km) of the area of influence of the physical location.
+ * Specifies the radius of distance (in km) of the area of ​​influence of the physical location.
  */
 zoneRadius?: number
 /**
@@ -7956,7 +7957,7 @@ latitude?: number
 longitude?: number
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface PhysicalLocationLanguageDTO {
 /**
@@ -8028,7 +8029,7 @@ pluginAccountId?: number
 pluginAccountModule?: string
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface PickupPointProviderLanguageDTO {
 /**
@@ -8484,7 +8485,7 @@ export interface BasketProductOptionParam {
  */
 id: number
 /**
- * List of values to set for the specified product option. Must contain at least one value. If the product option is not multiple it can only have one value.<br><em>Array[...]</em>: <br> - <b>value</b> <br>&emsp; - Type: <em>String</em> <br>&emsp; - Required: <em>true</em> <br>&emsp; - Description: Value to set for the specified product option.<br>&emsp;&emsp; - If product option is of type 'selector', then it must be an internal identifier of an enabled value of this product option. In case of setting an option value for a pack item, the indicated value must additionally be one of those allowed for the pack item.<br>&emsp;&emsp; - Otherwise it must be a value according to the type of the product option.<br>&emsp;&emsp;&emsp; - Format for Boolean option: 'true','false'<br>&emsp;&emsp;&emsp; - Format for Date option: 'yyyy-mm-dd'<br>&emsp;&emsp;&emsp; - Format for Attachment option: 'data:text/plain;base64,base64OfTheFile'<br> - <b>fileName</b> <br>&emsp; - Type: <em>String</em> <br>&emsp; - Required: <em>false</em> <br>&emsp; - Description: Specifies a name for the attachment. Only applicable for product options of type 'Attachment' if value is provided in Base64. Only admits characters: A-Za-z (supported accents À-ÿ), 0-9, _, -, ., and spaces. <br> - <b>extension</b><br>&emsp; - Type: <em>String</em> <br>&emsp; - Required: <em>false</em> <br>&emsp; - Description:Specifies the extension of the attachment. Only applicable for product options of type 'Attachment'.<br>&emsp;&emsp;- Forbidden extensions: 'ade', 'adp', 'apk', 'appx', 'appxbundle', 'bat', 'cab', 'chm', 'cmd', 'com', 'cpl', 'dll', 'dmg', 'ex', 'ex_', 'exe', 'hta', 'ins', 'isp', 'iso', 'jar', 'js', 'jse', 'lib', 'lnk', 'mde', 'msc', 'msi', 'msix', 'msixbundle', 'msp', 'mst', 'nsh', 'pif', 'ps1', 'scr', 'sct', 'shb', 'sys', 'vb', 'vbe', 'vbs', 'vxd', 'wsc', 'wsf', 'wsh'
+ * List of values ​​to set for the specified product option. Must contain at least one value. If the product option is not multiple it can only have one value.<br><em>Array[...]</em>: <br> - <b>value</b> <br>&emsp; - Type: <em>String</em> <br>&emsp; - Required: <em>true</em> <br>&emsp; - Description: Value to set for the specified product option.<br>&emsp;&emsp; - If product option is of type 'selector', then it must be an internal identifier of an enabled value of this product option. In case of setting an option value for a pack item, the indicated value must additionally be one of those allowed for the pack item.<br>&emsp;&emsp; - Otherwise it must be a value according to the type of the product option.<br>&emsp;&emsp;&emsp; - Format for Boolean option: 'true','false'<br>&emsp;&emsp;&emsp; - Format for Date option: 'yyyy-mm-dd'<br>&emsp;&emsp;&emsp; - Format for Attachment option: 'data:text/plain;base64,base64OfTheFile'<br> - <b>fileName</b> <br>&emsp; - Type: <em>String</em> <br>&emsp; - Required: <em>false</em> <br>&emsp; - Description: Specifies a name for the attachment. Only applicable for product options of type 'Attachment' if value is provided in Base64. Only admits characters: A-Za-z (supported accents À-ÿ), 0-9, _, -, ., and spaces. <br> - <b>extension</b><br>&emsp; - Type: <em>String</em> <br>&emsp; - Required: <em>false</em> <br>&emsp; - Description:Specifies the extension of the attachment. Only applicable for product options of type 'Attachment'.<br>&emsp;&emsp;- Forbidden extensions: 'ade', 'adp', 'apk', 'appx', 'appxbundle', 'bat', 'cab', 'chm', 'cmd', 'com', 'cpl', 'dll', 'dmg', 'ex', 'ex_', 'exe', 'hta', 'ins', 'isp', 'iso', 'jar', 'js', 'jse', 'lib', 'lnk', 'mde', 'msc', 'msi', 'msix', 'msixbundle', 'msp', 'mst', 'nsh', 'pif', 'ps1', 'scr', 'sct', 'shb', 'sys', 'vb', 'vbe', 'vbs', 'vxd', 'wsc', 'wsf', 'wsh'
  */
 values: {
 
@@ -9045,7 +9046,7 @@ indexable?: boolean
 language?: MetadataLanguageDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface MetadataLanguageDTO {
 /**
@@ -10435,7 +10436,7 @@ required?: []
 additionalProperties?: never
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface PaymentSystemLanguageDTO {
 /**
@@ -11333,13 +11334,13 @@ maxValue?: string
  */
 nameOnFeed?: string
 /**
- * Information about the values of custom tags of type <em>selectable</em>.
+ * Information about the values ​​of custom tags of type <em>selectable</em>.
  */
 selectableValues?: CustomTagSelectableValueDTO[]
 defaultValue?: string
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface CustomTagLanguageDTO {
 /**
@@ -11348,7 +11349,7 @@ export interface CustomTagLanguageDTO {
 name?: string
 }
 /**
- * Information about the values of custom tags of type <em>selectable</em>.
+ * Information about the values ​​of custom tags of type <em>selectable</em>.
  */
 export interface CustomTagSelectableValueDTO {
 /**
@@ -12425,7 +12426,7 @@ previousPriceWithTaxes?: string
  */
 optionPId?: string
 /**
- * Specifies whether the values of this option are used to generate combinations of options.
+ * Specifies whether the values ​​of this option are used to generate combinations of options.
  */
 combinable?: boolean
 }
@@ -13619,7 +13620,7 @@ location?: LocationDTO
  */
 visibleOnMap?: boolean
 /**
- * Specifies the radius of distance (in km) of the area of influence of the physical location.
+ * Specifies the radius of distance (in km) of the area of ​​influence of the physical location.
  */
 zoneRadius?: number
 /**
@@ -14703,7 +14704,7 @@ value?: string
  */
 uniquePrice?: boolean
 /**
- * Specifies whether the values of this option are used to generate combinations of options.
+ * Specifies whether the values ​​of this option are used to generate combinations of options.
  */
 combinable?: boolean
 /**
@@ -15505,7 +15506,7 @@ requiresComment?: boolean
 language?: RMAReasonLanguageDTO
 }
 /**
- * Information about language. The values in this block may be different depending on the language that is returned.
+ * Information about language. The values ​​in this block may be different depending on the language that is returned.
  */
 export interface RMAReasonLanguageDTO {
 /**
@@ -15603,7 +15604,7 @@ bundles?: number
 }
 /**
  * @deprecated
- * Information about calculated values from the wish list.
+ * Information about calculated values ​​from the wish list.
  */
 export interface SessionAggregateWishlistDTO {
 /**
@@ -16317,7 +16318,7 @@ mobile?: string
  */
 fax?: string
 /**
- * Alias for the address.
+ * Alias ​​for the address.
  */
 alias?: string
 /**
@@ -16400,7 +16401,7 @@ mobile?: string
  */
 fax?: string
 /**
- * Alias for the address.
+ * Alias ​​for the address.
  */
 alias?: string
 /**
@@ -16468,7 +16469,7 @@ mobile?: string
  */
 fax?: string
 /**
- * Alias for the address.
+ * Alias ​​for the address.
  */
 alias?: string
 /**
@@ -17322,12 +17323,12 @@ export interface ProductCombinationDTO {
 id?: number
 codes?: ProductCodesDTO
 /**
- * Information about the option values that make up the combinations.
+ * Information about the option values ​​that make up the combinations.
  */
 combinationValues?: ProductCombinationValueDTO[]
 }
 /**
- * Information about the option values that make up the combinations.
+ * Information about the option values ​​that make up the combinations.
  */
 export interface ProductCombinationValueDTO {
 /**

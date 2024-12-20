@@ -2,7 +2,16 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$0 from "./loaders/productDetailsPage.ts";
+import * as $$$1 from "./loaders/productList.ts";
+import * as $$$2 from "./loaders/productListingPage.ts";
+
 const manifest = {
+  "loaders": {
+    "logicommerce/loaders/productDetailsPage.ts": $$$0,
+    "logicommerce/loaders/productList.ts": $$$1,
+    "logicommerce/loaders/productListingPage.ts": $$$2,
+  },
   "name": "logicommerce",
   "baseUrl": import.meta.url,
 };
