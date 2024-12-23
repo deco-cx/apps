@@ -90,6 +90,25 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     return originalSrc;
   }
 
+  if (
+    isImageOptmizationEnabled() ||
+    originalSrc.startsWith(
+      "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
+    ) ||
+    originalSrc.startsWith(
+      "https://deco-sites-assets.s3.sa-east-1.amazonaws.com/",
+    )
+  ) {
+    const params = new URLSearchParams();
+
+    params.set("src", originalSrc);
+    params.set("fit", fit);
+    params.set("width", `${width}`);
+    height && params.set("height", `${height}`);
+
+    return `${PATH}?${params}`;
+  }
+
   if (!isImageOptmizationEnabled()) {
     if (originalSrc.startsWith("https://cdn.vnda.")) {
       return optmizeVNDA(opts);
@@ -106,26 +125,7 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     ) {
       return optimizeVTEX(opts);
     }
-
-    if (
-      !originalSrc.startsWith(
-        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage",
-      )
-    ) {
-      console.warn(
-        `The following image ${originalSrc} requires automatic image optimization, but it's currently disabled. This may incur in additional costs. Please contact deco.cx for more information.`,
-      );
-    }
   }
-
-  const params = new URLSearchParams();
-
-  params.set("src", originalSrc);
-  params.set("fit", fit);
-  params.set("width", `${width}`);
-  height && params.set("height", `${height}`);
-
-  return `${PATH}?${params}`;
 };
 
 export const getSrcSet = (
