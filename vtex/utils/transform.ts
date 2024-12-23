@@ -1124,11 +1124,17 @@ function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
 function toSpecialHoursSpecification(
   holiday: PickupHolidays,
 ): OpeningHoursSpecification {
+  const dateHoliday = new Date(holiday.date ?? "");
+  // VTEX provide date in ISO format, at 00h on the day
+  const validThrough = dateHoliday.setDate(dateHoliday.getDate() + 1)
+    .toString();
+
   return {
     "@type": "OpeningHoursSpecification",
     opens: holiday.hourBegin,
     closes: holiday.hourEnd,
     validFrom: holiday.date,
+    validThrough,
   };
 }
 
