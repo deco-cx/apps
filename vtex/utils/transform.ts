@@ -32,6 +32,7 @@ import type {
   LegacyProduct as LegacyProductVTEX,
   OrderForm,
   PageType as PageTypeVTEX,
+  PickupHolidays,
   PickupPoint,
   Product as ProductVTEX,
   ProductInventoryData,
@@ -1120,6 +1121,23 @@ function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
   };
 }
 
+function toSpecialHoursSpecification(
+  holiday: PickupHolidays,
+): OpeningHoursSpecification {
+  const dateHoliday = new Date(holiday.date ?? "");
+  // VTEX provide date in ISO format, at 00h on the day
+  const validThrough = dateHoliday.setDate(dateHoliday.getDate() + 1)
+    .toString();
+
+  return {
+    "@type": "OpeningHoursSpecification",
+    opens: holiday.hourBegin,
+    closes: holiday.hourEnd,
+    validFrom: holiday.date,
+    validThrough,
+  };
+}
+
 function isPickupPointVCS(
   pickupPoint: PickupPoint | PickupPointVCS,
 ): pickupPoint is PickupPointVCS {
@@ -1135,12 +1153,16 @@ export function toPlace(
     latitude,
     longitude,
     openingHoursSpecification,
+    specialOpeningHoursSpecification,
   } = isPickupPointVCS(pickupPoint)
     ? {
       name: pickupPoint.name,
       country: pickupPoint.address?.country?.acronym,
       latitude: pickupPoint.address?.location?.latitude,
       longitude: pickupPoint.address?.location?.longitude,
+      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+        toSpecialHoursSpecification,
+      ),
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
       ),
@@ -1150,6 +1172,9 @@ export function toPlace(
       country: pickupPoint.address?.country,
       latitude: pickupPoint.address?.geoCoordinates[0],
       longitude: pickupPoint.address?.geoCoordinates[1],
+      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+        toSpecialHoursSpecification,
+      ),
       openingHoursSpecification: pickupPoint.businessHours?.map((
         { ClosingTime, DayOfWeek, OpeningTime },
       ) =>
@@ -1175,6 +1200,7 @@ export function toPlace(
     latitude,
     longitude,
     name,
+    specialOpeningHoursSpecification,
     openingHoursSpecification,
     additionalProperty: [{
       "@type": "PropertyValue",
