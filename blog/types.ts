@@ -59,7 +59,7 @@ export interface BlogPost {
    */
   extraProps?: ExtraProps[];
   /** @hide true */
-  id: string;
+  id?: string;
 }
 
 export interface ExtraProps {
