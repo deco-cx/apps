@@ -64,8 +64,6 @@ const snippet = () => {
     }
     globalThis.window.trackCustomEvent?.(name, values);
   });
-
-  trackPageview();
 };
 
 function Component({ collectorAddress }: Props) {
