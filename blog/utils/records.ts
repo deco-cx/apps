@@ -11,5 +11,11 @@ export async function getRecordsByPath<T>(
   const current = Object.entries(resolvables).flatMap(([key, value]) => {
     return key.startsWith(path) ? value : [];
   });
-  return (current as Record<string, T>[]).map((item) => item[accessor]);
+  return (current as Record<string, T>[]).map((item) => {
+    const id = (item.name as string).split(path)[1]?.replace("/", "");
+    return {
+      ...item[accessor],
+      id,
+    };
+  });
 }
