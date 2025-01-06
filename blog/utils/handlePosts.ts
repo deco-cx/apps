@@ -59,6 +59,20 @@ export const filterPostsByTerm = (posts: BlogPost[], term: string) =>
   );
 
 /**
+ * Returns an filtered BlogPost list
+ *
+ * @param posts Posts to be handled
+ * @param slug Category Slug to be filter
+ */
+export const filterRelatedPosts = (
+  posts: BlogPost[],
+  slug: string[],
+) =>
+  posts.filter(
+    ({ categories }) => categories.find((c) => slug.includes(c.slug)),
+  );
+
+/**
  * Returns an filtered and sorted BlogPost list
  *
  * @param posts Posts to be handled
@@ -77,11 +91,15 @@ export const slicePosts = (
 
 export const filterPosts = (
   posts: BlogPost[],
-  slug?: string,
+  slug?: string | string[],
   term?: string,
 ): BlogPost[] => {
   if (term) return filterPostsByTerm(posts, term);
-  if (slug) return filterPostsByCategory(posts, slug);
+  if (typeof slug === "string") return filterPostsByCategory(posts, slug);
+  if (Array.isArray(slug)) {
+    return filterRelatedPosts(posts, slug);
+  }
+
   return posts;
 };
 
@@ -90,16 +108,20 @@ export const filterPosts = (
  *
  * @param posts Posts to be handled
  * @param sortBy Sort option (must be: "date_desc" | "date_asc" | "title_asc" | "title_desc" )
- * @param slug Category slug to be filter
+ * @param slug Category slug or an array of slugs to be filtered
  * @param term Term to be filter
+ * @param excludePostSlug Post slug to be excluded
  */
 export default function handlePosts(
   posts: BlogPost[],
   sortBy: SortBy,
-  slug?: string,
+  slug?: string | string[],
   term?: string,
+  excludePostSlug?: string,
 ) {
-  const filteredPosts = filterPosts(posts, slug, term);
+  const filteredPosts = filterPosts(posts, slug, term).filter(
+    ({ slug: postSlug }) => postSlug !== excludePostSlug,
+  );
 
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;
