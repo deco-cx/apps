@@ -78,7 +78,13 @@ export default async function BlogRelatedPosts(
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(posts, pageSort, slug, term, excludePostSlug);
+  const handledPosts = handlePosts(
+    posts,
+    pageSort,
+    slug,
+    term,
+    excludePostSlug,
+  );
 
   if (!handledPosts) {
     return null;
