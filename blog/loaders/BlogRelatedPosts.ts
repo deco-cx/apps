@@ -1,5 +1,6 @@
 /**
- * Retrieves a list of blog related posts.
+ * @title BlogRelatedPosts
+ * @description Retrieves a list of blog related posts.
  *
  * @param props - The props for the blog related post list.
  * @param req - The request object.
