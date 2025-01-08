@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("meuapp"),
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),

@@ -5,7 +5,7 @@ import wishlistLoader from "../../loaders/wishlist.ts";
 import { SESSION_COOKIE } from "../../utils/constants.ts";
 
 export interface Props {
-  itemId: string;
+  productId: string;
 }
 
 /**
@@ -13,20 +13,29 @@ export interface Props {
  * @description Remove from wishlist action
  */
 const action = async (
-  { itemId }: Props,
+  { productId }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Wishlist | null> => {
   try {
     const { clientAdmin, site } = ctx;
     const id = getUserCookie(req.headers);
-    const headers = new Headers({ Cookie: `${SESSION_COOKIE}=${id}` });
-    const { success } = await clientAdmin["POST /:site/wishlist/index/add/"]({
-      site,
-    }, {
-      body: { product: itemId },
-      headers,
-    }).then((res) => res.json());
+    const headers = new Headers({
+      Cookie: `${SESSION_COOKIE}=${id}`,
+      "x-requested-with": "XMLHttpRequest",
+    });
+    const body = new FormData();
+    body.append("product", productId);
+
+    const { success } = await clientAdmin["POST /:site/wishlist/index/remove/"](
+      {
+        site,
+      },
+      {
+        body,
+        headers,
+      },
+    ).then((res) => res.json());
     if (success) return wishlistLoader(null, req, ctx);
 
     return null;

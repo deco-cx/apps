@@ -163,7 +163,6 @@ export async function getCartImages(
   );
 }
 
-
 export const setCartCookie = (headers: Headers, cartId: string) => {
   setCookie(headers, {
     name: CART_COOKIE,
@@ -172,4 +171,4 @@ export const setCartCookie = (headers: Headers, cartId: string) => {
     httpOnly: false,
     secure: false,
   });
-}
+};

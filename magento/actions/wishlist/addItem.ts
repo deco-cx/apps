@@ -18,11 +18,16 @@ const action = async (
   try {
     const { clientAdmin, site } = ctx;
     const id = getUserCookie(req.headers);
-    const headers = new Headers({ Cookie: `${SESSION_COOKIE}=${id}` });
+    const headers = new Headers({
+      Cookie: `${SESSION_COOKIE}=${id}`,
+      "x-requested-with": "XMLHttpRequest",
+    });
+    const body = new FormData();
+    body.append("product", productId);
     const { success } = await clientAdmin["POST /:site/wishlist/index/add/"]({
       site,
     }, {
-      body: { product: productId },
+      body,
       headers,
     }).then((res) => res.json());
     if (success) return wishlistLoader(null, req, ctx);

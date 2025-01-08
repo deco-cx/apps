@@ -272,7 +272,7 @@ export default function App(props: Props): App<Manifest, State> {
       cartConfigs,
       clientAdmin,
       clientGraphql,
-      clientAdminAuthenticated
+      clientAdminAuthenticated,
     },
     middleware,
   };

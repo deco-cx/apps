@@ -19,8 +19,8 @@ const enqueue = <
     invoke({ wishlist: { key, props } } as any, { signal }) as any
   );
 
-const getItem = (item: Partial<Wishlist["items"]>) =>
-  wishlist.value.items?.find((id) => id?.product_id == item?.product_id);
+const getItem = (item: Partial<Wishlist["items"][number]>) =>
+  wishlist.value?.items?.find((id) => id?.product_id == item?.product_id);
 
 const state = {
   wishlist,

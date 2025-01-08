@@ -384,6 +384,7 @@ export const toProductGraphQL = (
     (defaultPath ?? "") + product.url_key || product?.canonical_url,
     originURL.origin,
   ).href;
+
   const additionalProperty = toAddPropertiesGraphQL(
     product,
     options.customAttributes,
