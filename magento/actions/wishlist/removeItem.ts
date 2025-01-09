@@ -3,6 +3,7 @@ import { getUserCookie } from "../../utils/user.ts";
 import { Wishlist } from "../../utils/client/types.ts";
 import wishlistLoader from "../../loaders/wishlist.ts";
 import { SESSION_COOKIE } from "../../utils/constants.ts";
+import { getCookies } from "std/http/cookie.ts";
 
 export interface Props {
   productId: string;
@@ -20,12 +21,15 @@ const action = async (
   try {
     const { clientAdmin, site } = ctx;
     const id = getUserCookie(req.headers);
+    const form_key = getCookies(req.headers)["form_key"];
+
     const headers = new Headers({
       Cookie: `${SESSION_COOKIE}=${id}`,
       "x-requested-with": "XMLHttpRequest",
     });
     const body = new FormData();
     body.append("product", productId);
+    body.append("form_key", form_key);
 
     const { success } = await clientAdmin["POST /:site/wishlist/index/remove/"](
       {
