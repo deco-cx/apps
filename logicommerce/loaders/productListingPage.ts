@@ -83,8 +83,9 @@ const loader = async (
 ): Promise<ProductListingPage | null> => {
   const url = new URL(req.url);
 
-  props.q = props.q ?? url.searchParams.get(props.customQueryParam ?? "q") ??
-    undefined;
+  const search = url.searchParams.get(props.customQueryParam ?? "q");
+
+  props.q = props.q ?? search ?? undefined;
 
   const oldSort = props.sort;
   props.sort = url.searchParams.get(
@@ -105,7 +106,9 @@ const loader = async (
     },
   };
 
-  if (categories.length) {
+  let categoryId: number | undefined = undefined;
+
+  if (categories.length && !search) {
     const r = await ctx.api["GET /categories/tree"](
       { q: categories[0] },
       {
@@ -119,7 +122,6 @@ const loader = async (
 
     let cat = r.items?.[0];
     let n = 1;
-    let categoryId: number | undefined = undefined;
 
     while (true) {
       if (n === categories.length) {
@@ -141,28 +143,26 @@ const loader = async (
     if (categoryId === undefined) {
       return emptyResponse;
     }
-
-    // You can't use filters with same type, like, filterOption[size]=01 and filterOption[size]=02
-    // It will become filterOption[size]=02
-    // It occurs because `createHttpClient` accepts only object as params
-    // And you can't have two keys with the same name in an object
-    const customFilters = Object.fromEntries(
-      props.filters?.map(({ name, value }) => [name, value]) ?? [],
-    );
-
-    const filtersFromUrl = Object.fromEntries(
-      [...url.searchParams.entries()].filter(([key]) =>
-        key.startsWith("filter")
-      ),
-    );
-
-    props.page ??= Number(url.searchParams.get("page"));
-
-    products = await ctx.api["GET /products"](
-      { ...props, categoryId, ...filtersFromUrl, ...customFilters },
-      { headers: req.headers },
-    ).then((res) => res.json());
   }
+
+  // You can't use filters with same type, like, filterOption[size]=01 and filterOption[size]=02
+  // It will become filterOption[size]=02
+  // It occurs because `createHttpClient` accepts only object as params
+  // And you can't have two keys with the same name in an object
+  const customFilters = Object.fromEntries(
+    props.filters?.map(({ name, value }) => [name, value]) ?? [],
+  );
+
+  const filtersFromUrl = Object.fromEntries(
+    [...url.searchParams.entries()].filter(([key]) => key.startsWith("filter")),
+  );
+
+  props.page ??= Number(url.searchParams.get("page"));
+
+  products = await ctx.api["GET /products"](
+    { ...props, categoryId, ...filtersFromUrl, ...customFilters },
+    { headers: req.headers },
+  ).then((res) => res.json());
 
   const nextPage = new URL(req.url);
   const previousPage = new URL(req.url);
