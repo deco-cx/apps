@@ -52,17 +52,17 @@ export interface WriteReview {
 }
 
 export interface ResponseWriteReview {
-  helpful: number;      
-  unhelpful: number;     
-  verified: boolean;     
-  status: string;       
-  _id: string;        
-  created: string;       
-  customer: string;     
-  userId: string;       
-  name: string;          
-  sku: string;           
-  text: string;          
-  recommended: boolean;  
-  rating: number;        
+  helpful: number;
+  unhelpful: number;
+  verified: boolean;
+  status: string;
+  _id: string;
+  created: string;
+  customer: string;
+  userId: string;
+  name: string;
+  sku: string;
+  text: string;
+  recommended: boolean;
+  rating: number;
 }
