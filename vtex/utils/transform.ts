@@ -436,6 +436,14 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     value: estimatedDateArrival,
   });
 
+  if (sku.modalType) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "Modal Type",
+      value: sku.modalType,
+    });
+  }
+
   return {
     "@type": "Product",
     category: categoriesString,
