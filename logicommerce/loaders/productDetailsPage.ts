@@ -16,9 +16,14 @@ const loader = async (
   req: Request,
   ctx: AppContext,
 ): Promise<ProductDetailsPage | null> => {
-  const products = await ctx.api["GET /products/:id"]({ id: slug }, {
-    headers: req.headers,
-  }).then((res) => res.json());
+  const skuId = new URL(req.url).searchParams.get("skuId");
+
+  const product = await ctx.api["GET /products/:id"](
+    { id: slug },
+    {
+      headers: req.headers,
+    },
+  ).then((res) => res.json());
 
   return {
     "@type": "ProductDetailsPage",
@@ -27,11 +32,11 @@ const loader = async (
       itemListElement: [],
       numberOfItems: 0,
     },
-    product: toProduct(products),
+    product: toProduct(product, skuId),
     seo: {
-      title: products.language?.name ?? "",
-      description: products.language?.longDescription ?? "",
-      canonical: products.language?.urlSeo ?? "",
+      title: product.language?.name ?? "",
+      description: product.language?.longDescription ?? "",
+      canonical: product.language?.urlSeo ?? "",
     },
   };
 };

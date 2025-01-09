@@ -45,14 +45,11 @@ const loader = async (
     ),
   );
 
-  console.log(params);
-  console.log(params);
-
   const products = await ctx.api["GET /products"](params, {
     headers: req.headers,
   }).then((res) => res.json());
 
-  return products.items?.map(toProduct) ?? [];
+  return products.items?.map((p) => toProduct(p)) ?? [];
 };
 
 export default loader;

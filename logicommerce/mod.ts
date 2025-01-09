@@ -39,6 +39,7 @@ export default function Logicommerce(
 ): App<Manifest, Props> {
   const headers = new Headers();
   headers.set("ip", "127.0.0.1");
+  headers.set("countryCode", "br");
 
   const api = createHttpClient<OpenAPI>({
     base: "https://api-studio.logicommerce.cloud",
