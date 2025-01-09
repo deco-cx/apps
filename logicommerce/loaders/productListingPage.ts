@@ -106,9 +106,12 @@ const loader = async (
   };
 
   if (categories.length) {
-    const r = await ctx.api["GET /categories/tree"]({ q: categories[0] }, {
-      headers: req.headers,
-    }).then((res) => res.json());
+    const r = await ctx.api["GET /categories/tree"](
+      { q: categories[0] },
+      {
+        headers: req.headers,
+      },
+    ).then((res) => res.json());
 
     if (r.items?.length === 0) {
       return emptyResponse;
@@ -161,13 +164,19 @@ const loader = async (
     ).then((res) => res.json());
   }
 
-  const nextPage = new URLSearchParams(req.url);
-  const previousPage = new URLSearchParams(req.url);
+  const nextPage = new URL(req.url);
+  const previousPage = new URL(req.url);
   const currentPage = products.pagination?.page ?? 0;
-  const pagesCount = products.pagination?.totalItems ?? 0;
+  const pagesCount = products.pagination?.totalPages ?? 0;
 
-  nextPage.set("page", (products.pagination?.page ?? 0 + 1).toString());
-  previousPage.set("page", (products.pagination?.page ?? 0 - 1).toString());
+  nextPage.searchParams.set(
+    "page",
+    (products.pagination?.page ?? 0 + 1).toString(),
+  );
+  previousPage.searchParams.set(
+    "page",
+    (products.pagination?.page ?? 0 - 1).toString(),
+  );
 
   const filters: Filter[] = [];
 
@@ -262,7 +271,7 @@ const loader = async (
       numberOfItems: categories.length,
     },
     pageInfo: {
-      records: pagesCount,
+      records: products.pagination?.totalItems ?? 0,
       recordPerPage: products.pagination?.perPage ?? 0,
       currentPage,
       nextPage: currentPage + 1 < pagesCount ? nextPage.toString() : undefined,
