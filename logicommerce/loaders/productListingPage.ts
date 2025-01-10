@@ -5,7 +5,7 @@ import type { LogicommerceProductSorts } from "../types.ts";
 import type { ProductCollectionDTO } from "../utils/openapi/api.openapi.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 
-/** @title {{{name}}} - {{{value}}} */
+/** @title {{{name}}}={{{value}}} */
 interface FilterParam {
   name: string;
   value: string;
@@ -14,7 +14,7 @@ interface FilterParam {
 interface Props {
   /**
    * @title Query
-   * @description overrides the query term
+   * @description overrides the query term on SearchPage, do not use it on PLP, it will be ignored
    */
   q?: string;
   sort?: LogicommerceProductSorts;
@@ -28,7 +28,7 @@ interface Props {
   customQueryParam?: string;
   /** @description Overrides the ?sort= */
   customSortParam?: string;
-  /** @description Ignore if pathname has a language prefix like, (0) /en/department... -> (1) /department... */
+  /** @description Remove initial pathnames like, (0) /en/department. -> (1) /department */
   pathnameOffset?: number;
 }
 
