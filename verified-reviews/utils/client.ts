@@ -108,7 +108,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
         productId: string | string[];
       },
   ) => {
-    const order = customizeOrder ? orderMap[_order as keyof typeof orderMap] : _order;
+    const order = customizeOrder ? _order : orderMap[_order as keyof typeof orderMap];
 
     const payload = {
       query: "reviews",
