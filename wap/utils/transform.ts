@@ -11,6 +11,7 @@ import {
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import {
+  Atributos,
   Breadcrumb,
   ConteudoMidias,
   Detalhes,
@@ -218,7 +219,13 @@ export const toProduct = (
 
   const sku = new URL(baseUrl).searchParams.get("sku");
 
-  const images = product.midias.imagens.map((image) => ({
+  const atributoSimples = (product.atributos as Atributos)?.simples?.valores?.find((v) => v.sku === sku)
+
+  const attributeImages = atributoSimples ? product.midias.imagens.filter(image => image.idAtributoValor === atributoSimples.idAtributoValor) : []
+
+  console.log('LOG: product.midias', product.midias);
+
+  const images = (attributeImages.length ? attributeImages : product.midias.imagens).map((image) => ({
     "@type": "ImageObject" as const,
     name: image.label,
     description: image.descricao,
