@@ -12,13 +12,20 @@ export type ClientVerifiedReviews = ReturnType<typeof createClient>;
 export interface PaginationOptions {
   count?: number;
   offset?: number;
+  // legacy compatible parameters that will map to "orderMap" parameters, but we generally recommend using a custom parameter.
   order?:
     | "date_desc"
     | "date_ASC"
     | "rate_DESC"
     | "rate_ASC"
-    | "helpfulrating_DESC";
-  useOrdenationCompatibility?: boolean;
+    | "helpfulrating_DESC"
+    | string;
+  /**
+   * @description Indicates whether to customize the order of the results.
+   * If true, the order will be based on the provided order parameter.
+   * If false, the default order will be used.
+   */
+  customizeOrder?: boolean;
 }
 
 // creating an object to keep backward compatibility
@@ -27,8 +34,8 @@ const orderMap = {
   date_ASC: "date_asc",
   rate_DESC: "rate_desc",
   rate_ASC: "rate_asc",
-  helpfulrating_DESC: "helpfulrating_desc",
-};
+  helpfulrating_DESC: "most_helpful",
+} as const;
 
 const MessageError = {
   ratings:
@@ -97,13 +104,13 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
   };
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
   const reviews = (
-    { productId, count = 5, offset = 0, order: _order = "date_desc", useOrdenationCompatibility = false }:
+    { productId, count = 5, offset = 0, order: _order = "date_desc", customizeOrder = false }:
       & PaginationOptions
       & {
         productId: string | string[];
       },
   ) => {
-    const order = useOrdenationCompatibility ? orderMap[_order] : _order;
+    const order = customizeOrder ? orderMap[_order as keyof typeof orderMap] : _order;
 
     const payload = {
       query: "reviews",
