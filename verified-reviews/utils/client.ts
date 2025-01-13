@@ -21,9 +21,7 @@ export interface PaginationOptions {
     | "helpfulrating_DESC"
     | string;
   /**
-   * @description Indicates whether to customize the order of the results.
-   * If true, the order will be based on the provided order parameter.
-   * If false, the default order will be used.
+   * @description Determines if the order of results should be customized based on the provided parameter.
    */
   customizeOrder?: boolean;
 }
