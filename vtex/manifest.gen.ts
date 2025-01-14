@@ -61,11 +61,12 @@ import * as $$$30 from "./loaders/product/extensions/list.ts";
 import * as $$$31 from "./loaders/product/extensions/listingPage.ts";
 import * as $$$32 from "./loaders/product/extensions/suggestions.ts";
 import * as $$$33 from "./loaders/product/wishlist.ts";
-import * as $$$34 from "./loaders/proxy.ts";
-import * as $$$35 from "./loaders/user.ts";
-import * as $$$36 from "./loaders/wishlist.ts";
-import * as $$$37 from "./loaders/workflow/product.ts";
-import * as $$$38 from "./loaders/workflow/products.ts";
+import * as $$$34 from "./loaders/promotion/getPromotionById.ts";
+import * as $$$35 from "./loaders/proxy.ts";
+import * as $$$36 from "./loaders/user.ts";
+import * as $$$37 from "./loaders/wishlist.ts";
+import * as $$$38 from "./loaders/workflow/product.ts";
+import * as $$$39 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -106,11 +107,12 @@ const manifest = {
     "vtex/loaders/product/extensions/listingPage.ts": $$$31,
     "vtex/loaders/product/extensions/suggestions.ts": $$$32,
     "vtex/loaders/product/wishlist.ts": $$$33,
-    "vtex/loaders/proxy.ts": $$$34,
-    "vtex/loaders/user.ts": $$$35,
-    "vtex/loaders/wishlist.ts": $$$36,
-    "vtex/loaders/workflow/product.ts": $$$37,
-    "vtex/loaders/workflow/products.ts": $$$38,
+    "vtex/loaders/promotion/getPromotionById.ts": $$$34,
+    "vtex/loaders/proxy.ts": $$$35,
+    "vtex/loaders/user.ts": $$$36,
+    "vtex/loaders/wishlist.ts": $$$37,
+    "vtex/loaders/workflow/product.ts": $$$38,
+    "vtex/loaders/workflow/products.ts": $$$39,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
