@@ -74,6 +74,7 @@ export interface BlogPost {
   contentRating?: Rating[];
   /** @hide true */
   interactionStatistic?: InteractionCounter;
+  id?: string;
 }
 
 export interface ExtraProps {

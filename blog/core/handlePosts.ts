@@ -129,6 +129,20 @@ export const filterPostsByTerm = (posts: BlogPost[], term: string) =>
   );
 
 /**
+ * Returns an filtered BlogPost list
+ *
+ * @param posts Posts to be handled
+ * @param slug Category Slug to be filter
+ */
+export const filterRelatedPosts = (
+  posts: BlogPost[],
+  slug: string[],
+) =>
+  posts.filter(
+    ({ categories }) => categories.find((c) => slug.includes(c.slug)),
+  );
+
+/**
  * Returns an filtered and sorted BlogPost list
  *
  * @param posts Posts to be handled
@@ -147,18 +161,25 @@ export const slicePosts = (
 
 const filterPosts = (
   posts: BlogPost[],
-  slug?: string,
+  slug?: string | string[],
   postSlugs?: string[],
   term?: string,
 ): BlogPost[] => {
-  const firstFilter = postSlugs && postSlugs.length > 0
-    ? filterPostsBySlugs(posts, postSlugs)
-    : filterPostsByCategory(posts, slug);
+  if (typeof slug === "string") {
+    const firstFilter = postSlugs && postSlugs.length > 0
+      ? filterPostsBySlugs(posts, postSlugs)
+      : filterPostsByCategory(posts, slug);
 
-  const filteredByTerm = term
-    ? filterPostsByTerm(firstFilter, term)
-    : firstFilter;
-  return filteredByTerm;
+    const filteredByTerm = term
+      ? filterPostsByTerm(firstFilter, term)
+      : firstFilter;
+    return filteredByTerm;
+  }
+  if (Array.isArray(slug)) {
+    return filterRelatedPosts(posts, slug);
+  }
+
+  return posts;
 };
 
 /**
@@ -167,17 +188,23 @@ const filterPosts = (
  * @param posts Posts to be handled
  * @param sortBy Sort option (must be: "date_desc" | "date_asc" | "title_asc" | "title_desc")
  * @param ctx AppContext
- * @param slug Category slug to be filter
+ * @param slug Category slug or an array of slugs to be filtered
+ * @param postSlugs Specific slugs to be filtered
+ * @param term Term to be filtered
+ * @param excludePostSlug Slug to be excluded
  */
 export default async function handlePosts(
   posts: BlogPost[],
   sortBy: SortBy,
   ctx: AppContext,
-  slug?: string,
+  slug?: string | string[],
   postSlugs?: string[],
   term?: string,
+  excludePostSlug?: string,
 ) {
-  const filteredPosts = filterPosts(posts, slug, postSlugs, term);
+  const filteredPosts = filterPosts(posts, slug, postSlugs, term).filter(
+    ({ slug: postSlug }) => postSlug !== excludePostSlug,
+  );
 
   if (!filteredPosts || filteredPosts.length === 0) {
     return null;
