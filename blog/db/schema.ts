@@ -2,7 +2,7 @@ import {
   integer,
   sqliteTable,
   text,
-} from "https://esm.sh/drizzle-orm@0.30.10/sqlite-core";
+} from "npm:drizzle-orm@0.30.10/sqlite-core";
 
 export const rating = sqliteTable("rating", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),

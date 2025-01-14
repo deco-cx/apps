@@ -1,13 +1,7 @@
 import { rating, review } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { type Resolvable } from "@deco/deco";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  notInArray,
-} from "https://esm.sh/drizzle-orm@0.30.10";
+import { and, asc, desc, eq, notInArray } from "npm:drizzle-orm@0.30.10";
 import { BlogPost, Ignore, Rating, Review } from "../types.ts";
 import { logger } from "@deco/deco/o11y";
 

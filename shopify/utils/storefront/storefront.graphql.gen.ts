@@ -7781,13 +7781,6 @@ export type FetchCustomerInfoQueryVariables = Exact<{
 
 export type FetchCustomerInfoQuery = { customer?: { id: string, email?: string | null, firstName?: string | null, lastName?: string | null } | null };
 
-export type FetchCustomerInfoQueryVariables = Exact<{
-  customerAccessToken: Scalars['String']['input'];
-}>;
-
-
-export type FetchCustomerInfoQuery = { customer?: { id: string, email?: string | null, firstName?: string | null, lastName?: string | null } | null };
-
 export type AddItemToCartMutationVariables = Exact<{
   cartId: Scalars['ID']['input'];
   lines: Array<CartLineInput> | CartLineInput;

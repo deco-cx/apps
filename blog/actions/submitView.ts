@@ -1,4 +1,4 @@
-import { eq } from "https://esm.sh/v135/drizzle-orm@0.30.10";
+import { eq } from "npm:drizzle-orm@0.30.10";
 import { postViews } from "../db/schema.ts";
 import { AppContext } from "../mod.ts";
 import { ViewFromDatabase } from "../types.ts";
