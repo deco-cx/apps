@@ -61,9 +61,9 @@ class ErrorBoundary extends Component<{
   // deno-lint-ignore no-explicit-any
   fallback: ComponentFunc<any>;
 }> {
-  state = { error: null as Error | null };
+  override state = { error: null as Error | null };
   // deno-lint-ignore no-explicit-any
-  static getDerivedStateFromError(error: any) {
+  static override getDerivedStateFromError(error: any) {
     return { error };
   }
   render() {

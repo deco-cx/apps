@@ -57,7 +57,7 @@ export const itemToAnalyticsItem = (
   item_name: item.name ?? item.skuName ?? "",
   item_variant: item.skuName,
   item_brand: item.additionalInfo.brandName ?? "",
-  item_url: new URL(item.detailUrl, globalThis.window.location.href).href,
+  item_url: new URL(item.detailUrl, globalThis.location.href).href,
   ...(mapItemCategoriesToAnalyticsCategories(item)),
 });
 

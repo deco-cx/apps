@@ -40,8 +40,9 @@ export default function productDetailsPage(
         },
       };
     } catch (error) {
-      logger.error(`{ errorName: ${error.name},  
-      errorMessage: ${error.message} }`);
+      const errorObj = error as { name: string; message: string };
+      logger.error(`{ errorName: ${errorObj.name},  
+      errorMessage: ${errorObj.message} }`);
       return productDetailsPage;
     }
   };

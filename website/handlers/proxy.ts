@@ -67,6 +67,12 @@ export interface Props {
     includes?: Script[];
   };
   /**
+   * @description Scripts to be included in the body of the html
+   */
+  includeScriptsToBody?: {
+    includes?: Script[];
+  };
+  /**
    * @description follow redirects
    * @default 'manual'
    */
@@ -91,6 +97,7 @@ export default function Proxy({
   customHeaders = [],
   excludeHeaders = [],
   includeScriptsToHead,
+  includeScriptsToBody,
   avoidAppendPath,
   redirect = "manual",
   replaces,
@@ -104,8 +111,11 @@ export default function Proxy({
       ? url.pathname.replace(basePath, "")
       : url.pathname;
     const to = new URL(
-      `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}?${qs}`,
+      `${proxyUrl}${avoidAppendPath ? "" : sanitize(path)}`,
     );
+
+    to.search = qs;
+
     const headers = new Headers(req.headers);
     HOP_BY_HOP.forEach((h) => headers.delete(h));
     if (isFreshCtx<DecoSiteState>(_ctx)) {
@@ -121,6 +131,7 @@ export default function Proxy({
     headers.set("origin", req.headers.get("origin") ?? url.origin);
     headers.set("host", hostToUse ?? to.host);
     headers.set("x-forwarded-host", url.host);
+
     for (const { key, value } of customHeaders) {
       if (key === "cookie") {
         const existingCookie = headers.get("cookie");
@@ -145,28 +156,51 @@ export default function Proxy({
     });
     const contentType = response.headers.get("Content-Type");
     let newBody: ReadableStream<Uint8Array> | string | null = response.body;
-    if (
-      contentType?.includes("text/html") &&
-      includeScriptsToHead?.includes &&
-      includeScriptsToHead.includes.length > 0
-    ) {
-      // Use a more efficient approach to insert scripts
+    if (contentType?.includes("text/html")) {
       newBody = await response.text();
-      // Find the position of <head> tag
-      const headEndPos = newBody.indexOf("</head>");
-      if (headEndPos !== -1) {
-        // Split the response body at </head> position
-        const beforeHeadEnd = newBody.substring(0, headEndPos);
-        const afterHeadEnd = newBody.substring(headEndPos);
-        // Prepare scripts to insert
-        let scriptsInsert = "";
-        for (const script of (includeScriptsToHead?.includes ?? [])) {
-          scriptsInsert += typeof script.src === "string"
-            ? script.src
-            : script.src(req);
+
+      if (
+        includeScriptsToHead?.includes &&
+        includeScriptsToHead.includes.length > 0
+      ) {
+        // Find the position of <head> tag
+        const headEndPos = newBody.indexOf("</head>");
+        if (headEndPos !== -1) {
+          // Split the response body at </head> position
+          const beforeHeadEnd = newBody.substring(0, headEndPos);
+          const afterHeadEnd = newBody.substring(headEndPos);
+          // Prepare scripts to insert
+          let scriptsInsert = "";
+          for (const script of (includeScriptsToHead?.includes ?? [])) {
+            scriptsInsert += typeof script.src === "string"
+              ? script.src
+              : script.src(req);
+          }
+          // Combine the new response body
+          newBody = beforeHeadEnd + scriptsInsert + afterHeadEnd;
         }
-        // Combine the new response body
-        newBody = beforeHeadEnd + scriptsInsert + afterHeadEnd;
+      }
+
+      if (
+        includeScriptsToBody?.includes &&
+        includeScriptsToBody.includes.length > 0
+      ) {
+        // Find the position of <body> tag
+        const bodyEndPos = newBody.indexOf("</body>");
+        if (bodyEndPos !== -1) {
+          // Split the response body at </body> position
+          const beforeBodyEnd = newBody.substring(0, bodyEndPos);
+          const afterBodyEnd = newBody.substring(bodyEndPos);
+          // Prepare scripts to insert
+          let scriptsInsert = "";
+          for (const script of (includeScriptsToBody?.includes ?? [])) {
+            scriptsInsert += typeof script.src === "string"
+              ? script.src
+              : script.src(req);
+          }
+          // Combine the new response body
+          newBody = beforeBodyEnd + scriptsInsert + afterBodyEnd;
+        }
       }
     }
     // Change cookies domain

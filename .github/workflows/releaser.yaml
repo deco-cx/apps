@@ -9,9 +9,9 @@ on:
       - main
 
 permissions:
-  contents: write  # Necessary for accessing and modifying repository content
-  pull-requests: write  # Necessary for interacting with pull requests
-  actions: write  # Necessary for triggering other workflows
+  contents: write # Necessary for accessing and modifying repository content
+  pull-requests: write # Necessary for interacting with pull requests
+  actions: write # Necessary for triggering other workflows
 
 jobs:
   tag-discussion:
@@ -21,9 +21,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.base.ref }}  # Checkout the base branch (target repository)
-          repository: ${{ github.event.pull_request.base.repo.full_name }}  # Checkout from the target repo
-          
+          ref: ${{ github.event.pull_request.base.ref }} # Checkout the base branch (target repository)
+          repository: ${{ github.event.pull_request.base.repo.full_name }} # Checkout from the target repo
+
       - name: Calculate new versions
         id: calculate_versions
         run: |
@@ -162,7 +162,7 @@ jobs:
         run: |
           git tag ${{ steps.determine_version.outputs.new_version }}
           git push origin ${{ steps.determine_version.outputs.new_version }}
-  
+
       - name: Trigger Release Workflow
         run: |
           curl -X POST \

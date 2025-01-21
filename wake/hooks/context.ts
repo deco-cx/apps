@@ -85,7 +85,7 @@ const enqueue2 = (
         return;
       }
 
-      const isLocalhost = window.location.hostname === "localhost";
+      const isLocalhost = globalThis.location.hostname === "localhost";
 
       if (!isLocalhost) {
         const url = new URL("/api/carrinho", shop.checkoutUrl);
@@ -129,7 +129,6 @@ const load = (signal: AbortSignal) =>
     wishlist: invoke.wake.loaders.wishlist(),
   }, { signal });
 
-
 async function setMetaData() {
   const metadata = getUTMMetadata(globalThis.location.search);
 
@@ -143,7 +142,6 @@ async function setMetaData() {
 
   await invoke.wake.actions.cart.addMetadata({ metadata });
 }
-  
 
 if (IS_BROWSER) {
   enqueue2(load2);

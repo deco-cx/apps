@@ -20,7 +20,7 @@ interface AccessTokenResponse {
 
 /**
  * @title Shopify Integration
- * @description SignInWithEmailAndPassword Action
+ * @description Sign In With Email And Password Action
  */
 const action = async (
   props: Props,

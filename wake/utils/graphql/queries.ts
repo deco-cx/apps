@@ -948,8 +948,8 @@ export const WishlistReducedProduct = gql`
 export const GetProduct = {
   fragments: [SingleProductPart, SingleProduct, ProductVariant],
   query:
-    gql`query GetProduct($productId: Long!, $includeParentIdVariants: Boolean) { 
-    product(productId: $productId) { 
+    gql`query GetProduct($productId: Long!, $includeParentIdVariants: Boolean, $partnerAccessToken: String) { 
+    product(productId: $productId , partnerAccessToken: $partnerAccessToken) { 
       ...SingleProduct 
     } 
   }`,
@@ -970,7 +970,7 @@ export const CreateCart = {
 export const GetProducts = {
   fragments: [Product],
   query:
-    gql`query GetProducts($filters: ProductExplicitFiltersInput!, $first: Int!, $sortDirection: SortDirection!, $sortKey: ProductSortKeys, $after: String) { products(filters: $filters, first: $first, sortDirection: $sortDirection, sortKey: $sortKey, after: $after) { 
+    gql`query GetProducts($filters: ProductExplicitFiltersInput!, $first: Int!, $sortDirection: SortDirection!, $sortKey: ProductSortKeys, $after: String, $partnerAccessToken: String) { products(filters: $filters, first: $first, sortDirection: $sortDirection, sortKey: $sortKey, after: $after, partnerAccessToken: $partnerAccessToken) { 
       nodes { ...Product } 
       totalCount
       pageInfo{

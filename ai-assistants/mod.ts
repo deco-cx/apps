@@ -1,4 +1,4 @@
-import AWS from "https://esm.sh/aws-sdk@2.1585.0";
+import AWS from "npm:aws-sdk@2.1585.0";
 import { deferred } from "std/async/deferred.ts";
 import openai, {
   Props as OpenAIProps,

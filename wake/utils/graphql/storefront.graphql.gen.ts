@@ -5012,6 +5012,7 @@ export type WishlistReducedProductFragment = { productId?: any | null, productNa
 export type GetProductQueryVariables = Exact<{
   productId: Scalars['Long']['input'];
   includeParentIdVariants?: InputMaybe<Scalars['Boolean']['input']>;
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -5035,6 +5036,7 @@ export type GetProductsQueryVariables = Exact<{
   sortDirection: SortDirection;
   sortKey?: InputMaybe<ProductSortKeys>;
   after?: InputMaybe<Scalars['String']['input']>;
+  partnerAccessToken?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 

@@ -15,7 +15,7 @@ interface ISCookies {
   session: any;
 }
 const snippet = (account: string, agent: string, cookies: ISCookies | null) => {
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   const isSearch = url.searchParams.get("q");
   const apiUrl = `https://sp.vtex.com/event-api/v1/${account}/event`;
   const eventFetch = (props: SPEvent) => {

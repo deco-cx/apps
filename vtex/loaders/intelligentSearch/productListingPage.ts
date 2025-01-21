@@ -132,6 +132,11 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+
+  /**
+   * @title Include price in facets
+   */
+  priceFacets?: boolean;
 }
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
@@ -264,14 +269,19 @@ const loader = async (
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
   const selected = withDefaultFacets(selectedFacets, ctx);
-  const fselected = selected.filter((f) => f.key !== "price");
+  const fselected = props.priceFacets
+    ? selected
+    : selected.filter((f) => f.key !== "price");
   const isInSeachFormat = Boolean(selected.length) || Boolean(args.query);
   const pathQuery = queryFromPathname(isInSeachFormat, pageTypes, url.pathname);
   const searchArgs = { ...args, query: args.query || pathQuery };
   if (!isInSeachFormat && !pathQuery) {
     return null;
   }
-  const params = withDefaultParams({ ...searchArgs, page });
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
+
+  const params = withDefaultParams({ ...searchArgs, page, locale });
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
@@ -385,6 +395,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
     return null;
   }
   const segment = getSegmentFromBag(ctx)?.token ?? "";
+
   const params = new URLSearchParams([
     ["query", props.query ?? ""],
     ["count", (props.count || url.searchParams.get("count") || 12).toString()],

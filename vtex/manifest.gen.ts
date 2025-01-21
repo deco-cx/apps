@@ -44,25 +44,28 @@ import * as $$$13 from "./loaders/legacy/productList.ts";
 import * as $$$14 from "./loaders/legacy/productListingPage.ts";
 import * as $$$15 from "./loaders/legacy/relatedProductsLoader.ts";
 import * as $$$16 from "./loaders/legacy/suggestions.ts";
-import * as $$$17 from "./loaders/logistics/listPickupPoints.ts";
-import * as $$$18 from "./loaders/logistics/listPickupPointsByLocation.ts";
-import * as $$$19 from "./loaders/masterdata/searchDocuments.ts";
-import * as $$$20 from "./loaders/navbar.ts";
-import * as $$$21 from "./loaders/options/productIdByTerm.ts";
-import * as $$$22 from "./loaders/orders/list.ts";
-import * as $$$23 from "./loaders/paths/PDPDefaultPath.ts";
-import * as $$$24 from "./loaders/paths/PLPDefaultPath.ts";
-import * as $$$25 from "./loaders/product/extend.ts";
-import * as $$$26 from "./loaders/product/extensions/detailsPage.ts";
-import * as $$$27 from "./loaders/product/extensions/list.ts";
-import * as $$$28 from "./loaders/product/extensions/listingPage.ts";
-import * as $$$29 from "./loaders/product/extensions/suggestions.ts";
-import * as $$$30 from "./loaders/product/wishlist.ts";
-import * as $$$31 from "./loaders/proxy.ts";
-import * as $$$32 from "./loaders/user.ts";
-import * as $$$33 from "./loaders/wishlist.ts";
-import * as $$$34 from "./loaders/workflow/product.ts";
-import * as $$$35 from "./loaders/workflow/products.ts";
+import * as $$$17 from "./loaders/logistics/getSalesChannelById.ts";
+import * as $$$18 from "./loaders/logistics/listPickupPoints.ts";
+import * as $$$19 from "./loaders/logistics/listPickupPointsByLocation.ts";
+import * as $$$20 from "./loaders/logistics/listSalesChannelById.ts";
+import * as $$$21 from "./loaders/logistics/listStockByStore.ts";
+import * as $$$22 from "./loaders/masterdata/searchDocuments.ts";
+import * as $$$23 from "./loaders/navbar.ts";
+import * as $$$24 from "./loaders/options/productIdByTerm.ts";
+import * as $$$25 from "./loaders/orders/list.ts";
+import * as $$$26 from "./loaders/paths/PDPDefaultPath.ts";
+import * as $$$27 from "./loaders/paths/PLPDefaultPath.ts";
+import * as $$$28 from "./loaders/product/extend.ts";
+import * as $$$29 from "./loaders/product/extensions/detailsPage.ts";
+import * as $$$30 from "./loaders/product/extensions/list.ts";
+import * as $$$31 from "./loaders/product/extensions/listingPage.ts";
+import * as $$$32 from "./loaders/product/extensions/suggestions.ts";
+import * as $$$33 from "./loaders/product/wishlist.ts";
+import * as $$$34 from "./loaders/proxy.ts";
+import * as $$$35 from "./loaders/user.ts";
+import * as $$$36 from "./loaders/wishlist.ts";
+import * as $$$37 from "./loaders/workflow/product.ts";
+import * as $$$38 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -86,25 +89,28 @@ const manifest = {
     "vtex/loaders/legacy/productListingPage.ts": $$$14,
     "vtex/loaders/legacy/relatedProductsLoader.ts": $$$15,
     "vtex/loaders/legacy/suggestions.ts": $$$16,
-    "vtex/loaders/logistics/listPickupPoints.ts": $$$17,
-    "vtex/loaders/logistics/listPickupPointsByLocation.ts": $$$18,
-    "vtex/loaders/masterdata/searchDocuments.ts": $$$19,
-    "vtex/loaders/navbar.ts": $$$20,
-    "vtex/loaders/options/productIdByTerm.ts": $$$21,
-    "vtex/loaders/orders/list.ts": $$$22,
-    "vtex/loaders/paths/PDPDefaultPath.ts": $$$23,
-    "vtex/loaders/paths/PLPDefaultPath.ts": $$$24,
-    "vtex/loaders/product/extend.ts": $$$25,
-    "vtex/loaders/product/extensions/detailsPage.ts": $$$26,
-    "vtex/loaders/product/extensions/list.ts": $$$27,
-    "vtex/loaders/product/extensions/listingPage.ts": $$$28,
-    "vtex/loaders/product/extensions/suggestions.ts": $$$29,
-    "vtex/loaders/product/wishlist.ts": $$$30,
-    "vtex/loaders/proxy.ts": $$$31,
-    "vtex/loaders/user.ts": $$$32,
-    "vtex/loaders/wishlist.ts": $$$33,
-    "vtex/loaders/workflow/product.ts": $$$34,
-    "vtex/loaders/workflow/products.ts": $$$35,
+    "vtex/loaders/logistics/getSalesChannelById.ts": $$$17,
+    "vtex/loaders/logistics/listPickupPoints.ts": $$$18,
+    "vtex/loaders/logistics/listPickupPointsByLocation.ts": $$$19,
+    "vtex/loaders/logistics/listSalesChannelById.ts": $$$20,
+    "vtex/loaders/logistics/listStockByStore.ts": $$$21,
+    "vtex/loaders/masterdata/searchDocuments.ts": $$$22,
+    "vtex/loaders/navbar.ts": $$$23,
+    "vtex/loaders/options/productIdByTerm.ts": $$$24,
+    "vtex/loaders/orders/list.ts": $$$25,
+    "vtex/loaders/paths/PDPDefaultPath.ts": $$$26,
+    "vtex/loaders/paths/PLPDefaultPath.ts": $$$27,
+    "vtex/loaders/product/extend.ts": $$$28,
+    "vtex/loaders/product/extensions/detailsPage.ts": $$$29,
+    "vtex/loaders/product/extensions/list.ts": $$$30,
+    "vtex/loaders/product/extensions/listingPage.ts": $$$31,
+    "vtex/loaders/product/extensions/suggestions.ts": $$$32,
+    "vtex/loaders/product/wishlist.ts": $$$33,
+    "vtex/loaders/proxy.ts": $$$34,
+    "vtex/loaders/user.ts": $$$35,
+    "vtex/loaders/wishlist.ts": $$$36,
+    "vtex/loaders/workflow/product.ts": $$$37,
+    "vtex/loaders/workflow/products.ts": $$$38,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,

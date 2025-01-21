@@ -16,7 +16,7 @@ const listener = (
     ReturnType<typeof loader>,
 ) => {
   const prodURL = new URL(publicUrl);
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   url.host = prodURL.host;
   url.port = "";
   const pageType =

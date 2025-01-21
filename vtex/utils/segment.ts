@@ -4,6 +4,7 @@ import type { Segment } from "./types.ts";
 import { removeNonLatin1Chars } from "../../utils/normalize.ts";
 
 const SEGMENT_COOKIE_NAME = "vtex_segment";
+const SALES_CHANNEL_COOKIE = "VTEXSC";
 const SEGMENT = Symbol("segment");
 
 export interface WrappedSegment {
@@ -123,7 +124,7 @@ const SEGMENT_QUERY_PARAMS = [
   "utm_medium" as const,
 ];
 
-export const buildSegmentCookie = (req: Request): Partial<Segment> => {
+export const buildSegmentFromRequest = (req: Request): Partial<Segment> => {
   const url = new URL(req.url);
   const partialSegment: Partial<Segment> = {};
   for (const qs of SEGMENT_QUERY_PARAMS) {
@@ -131,6 +132,11 @@ export const buildSegmentCookie = (req: Request): Partial<Segment> => {
     if (param) {
       partialSegment[qs] = param;
     }
+  }
+
+  const sc = url.searchParams.get("sc");
+  if (sc) {
+    partialSegment.channel = sc;
   }
 
   return partialSegment;
@@ -159,17 +165,33 @@ export const setSegmentBag = (
 ) => {
   const vtex_segment = cookies[SEGMENT_COOKIE_NAME];
   const segmentFromCookie = vtex_segment && parse(vtex_segment);
-  const segmentFromRequest = buildSegmentCookie(req);
+  const segmentFromSalesChannelCookie = cookies[SALES_CHANNEL_COOKIE]
+    ? {
+      channel: cookies[SALES_CHANNEL_COOKIE]?.split("=")[1],
+    }
+    : {};
+  const segmentFromRequest = buildSegmentFromRequest(req);
 
   const segment = {
     channel: ctx.salesChannel,
     ...DEFAULT_SEGMENT,
     ...ctx.defaultSegment,
     ...segmentFromCookie,
+    ...segmentFromSalesChannelCookie,
     ...segmentFromRequest,
   };
   const token = serialize(segment);
   setSegmentInBag(ctx, { payload: segment, token });
+
+  // If the user came from a sales channel in the URL, we set the cookie
+  if (segmentFromRequest.channel) {
+    setCookie(ctx.response.headers, {
+      value: `sc=${segmentFromRequest.channel}`,
+      name: SALES_CHANNEL_COOKIE,
+      path: "/",
+      secure: true,
+    });
+  }
 
   // Avoid setting cookie when segment from request matches the one generated
   if (vtex_segment !== token) {

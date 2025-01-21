@@ -182,7 +182,7 @@ export default async (
   req: Request,
   ctx: AppContext,
 ): Promise<Product[]> => {
-  let p = products;
+  let p = products.filter((p) => p);
 
   if (variants) {
     p = await variantsExt(p, req, ctx);

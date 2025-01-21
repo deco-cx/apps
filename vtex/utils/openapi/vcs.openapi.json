@@ -20257,6 +20257,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "noSplitItem": {
+                    "type": "boolean",
+                    "description": "Avoid split items on cart"
+                  },
                   "orderItems": {
                     "type": "array",
                     "description": "Array containing the cart items. Each object inside this array corresponds to a different item.",
