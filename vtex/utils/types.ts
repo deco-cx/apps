@@ -752,7 +752,7 @@ export interface Item {
   referenceId?: Array<{ Key: string; Value: string }>;
   measurementUnit: string;
   unitMultiplier: number;
-  modalType: unknown | null;
+  modalType: string | null;
   images: Image[];
   videos: string[];
   variations: Array<{
