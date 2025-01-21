@@ -6,7 +6,7 @@ export interface Props {
   /**
    * @title Product Id
    */
-  id: string;
+  sku: string;
   review: WriteReview;
 }
 
@@ -16,11 +16,11 @@ export default async function action(
   ctx: AppContext,
 ): Promise<ResponseWriteReview | null> {
   const { customer, api } = ctx;
-  const { review, id } = props
+  const { review, sku } = props
 
   try {
     const response = await api[`POST /:customer/:sku/review`]({
-      sku: id,
+      sku,
       customer,
     }, {
       body: {
