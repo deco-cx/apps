@@ -83,10 +83,10 @@ const matchLocation =
   };
 
 function fixEncoding(input: string): string {
-  // Interpret the misencoded string as Latin-1 (cf-headers), then decode it as UTF-8
+  // interpret the received ascii string (cf-headers) as UTF-8
   try {
-    const latin1Bytes = [...input].map((char) => char.charCodeAt(0));
-    return new TextDecoder("utf-8").decode(Uint8Array.from(latin1Bytes));
+    const utf8bytes = [...input].map((char) => char.charCodeAt(0));
+    return new TextDecoder("utf-8").decode(Uint8Array.from(utf8bytes));
   } catch (_) {
     return input;
   }
