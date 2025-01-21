@@ -50,6 +50,7 @@ const enqueue = (
       context.wishlist.value = wishlist || context.wishlist.value;
 
       loading.value = false;
+      setMetaData();
     } catch (error) {
       if (error.name === "AbortError") return;
 
@@ -127,6 +128,22 @@ const load = (signal: AbortSignal) =>
     user: invoke.wake.loaders.user(),
     wishlist: invoke.wake.loaders.wishlist(),
   }, { signal });
+
+
+async function setMetaData() {
+  const metadata = getUTMMetadata(globalThis.location.search);
+
+  try {
+    await invoke.wake.actions.cart.removeMetadata({
+      keys: metadata.map((meta) => meta.key),
+    });
+  } catch (error) {
+    console.error(error);
+  }
+
+  await invoke.wake.actions.cart.addMetadata({ metadata });
+}
+  
 
 if (IS_BROWSER) {
   enqueue2(load2);
