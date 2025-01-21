@@ -16,11 +16,11 @@ export default async function action(
   ctx: AppContext,
 ): Promise<ResponseWriteReview | null> {
   const { customer, api } = ctx;
-  const { review, sku } = props
+  const { review, sku } = props;
 
   try {
     const response = await api[`POST /:customer/:sku/review`]({
-      sku,
+      sku: sku,
       customer,
     }, {
       body: {
