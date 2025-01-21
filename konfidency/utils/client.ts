@@ -1,7 +1,7 @@
-import type { PDPReview, WriteReview, ResponseWriteReview } from "./types.ts";
+import type { PDPReview, ResponseWriteReview, WriteReview } from "./types.ts";
 
 export interface API {
-  "GET /:customer/:sku/summary": {
+  "GET /:customer/:sku/summary/:sortField,:sortOrder": {
     response: PDPReview;
     searchParams: {
       page: number;
@@ -10,7 +10,7 @@ export interface API {
   };
 
   "POST /:customer/:sku/review": {
-    response: ResponseWriteReview
+    response: ResponseWriteReview;
     body: WriteReview;
-  }
+  };
 }

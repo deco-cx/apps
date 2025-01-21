@@ -2,17 +2,13 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/submitReviews.ts";
-import * as $$$0 from "./loaders/productDetailsPage.ts";
+import * as $$$0 from "./loaders/doc.ts";
 
 const manifest = {
   "loaders": {
-    "konfidency/loaders/productDetailsPage.ts": $$$0,
+    "google-sheets/loaders/doc.ts": $$$0,
   },
-  "actions": {
-    "konfidency/actions/submitReviews.ts": $$$$$$$$$0,
-  },
-  "name": "konfidency",
+  "name": "google-sheets",
   "baseUrl": import.meta.url,
 };
 
