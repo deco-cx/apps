@@ -102,13 +102,21 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
   };
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
   const reviews = (
-    { productId, count = 5, offset = 0, order: _order = "date_desc", customizeOrder = false }:
+    {
+      productId,
+      count = 5,
+      offset = 0,
+      order: _order = "date_desc",
+      customizeOrder = false,
+    }:
       & PaginationOptions
       & {
         productId: string | string[];
       },
   ) => {
-    const order = customizeOrder ? _order : orderMap[_order as keyof typeof orderMap];
+    const order = customizeOrder
+      ? _order
+      : orderMap[_order as keyof typeof orderMap];
 
     const payload = {
       query: "reviews",

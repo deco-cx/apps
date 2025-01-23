@@ -9,7 +9,7 @@ interface Props {
   idCalculatorConfiguration: string;
 }
 
-export const defaultVisibility = 'private' 
+export const defaultVisibility = "private";
 
 export default async function loader(
   props: Props,
