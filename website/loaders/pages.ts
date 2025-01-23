@@ -35,20 +35,16 @@ async function getAllPages(ctx: AppContext): Promise<Route[]> {
   return routes;
 }
 
-export interface ExternalProps {
-  /**
-   * @title Prioritize External Routes
-   * @description If there is the same route on the deco and externally, as in proxies, the EXTERNAL route will be used. You can also test with the parameter "rdc=true"
-   */
-  preferRoutes?: boolean;
-  /**
-   * @description Deco routes that will ignore the previous rule. If the same route exists on the deco and externally, the DECO route will be used
-   */
-  exceptionRoutes?: SiteRoute[];
-}
-
 export interface Props {
-  external?: ExternalProps;
+  /**
+   * @title Hide pages in deco
+   * @description Don't route the client to any deco page. Important: those page are still accessible if you set the "rdc=true" query string.
+   */
+  hidePagesInDeco?: boolean;
+  /**
+   * @description Deco routes that will ignore the previous rule. If the same route exists on other routes loader, the deco page will be used.
+   */
+  alwaysVisiblePages?: SiteRoute[];
 }
 
 /**
@@ -66,9 +62,9 @@ export default async function Pages(
     __resolveType: "once",
   });
 
-  if (props?.external?.preferRoutes) {
+  if (props?.hidePagesInDeco) {
     return allPages.map(({ pathTemplate, ...pageProps }: Route) => {
-      const isException = props.external?.exceptionRoutes?.some((path) =>
+      const isException = props.alwaysVisiblePages?.some((path) =>
         path === pathTemplate
       );
       const url = new URL(pathTemplate, req.url);
