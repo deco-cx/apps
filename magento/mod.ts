@@ -182,17 +182,15 @@ export interface Props {
   features: Features;
 }
 
-export type State =
-  & {
-    clientAdmin: ReturnType<typeof createHttpClient<API>>;
-    clientGraphql: ReturnType<typeof createGraphqlClient>;
-    cartConfigs: CartConfigs;
-    features: Features;
-  }
-  & APIConfig
-  & ImagesConfig
-  & CustomProps
-  & PricingConfig;
+export type State = {
+  clientAdmin: ReturnType<typeof createHttpClient<API>>;
+  clientGraphql: ReturnType<typeof createGraphqlClient>;
+  cartConfigs: CartConfigs;
+  features: Features;
+} & APIConfig &
+  ImagesConfig &
+  CustomProps &
+  PricingConfig;
 
 /**
  * @title Magento
@@ -205,11 +203,11 @@ export type AppType = ReturnType<typeof App>;
 const getStoreHeader = (
   storeId: number,
   site: string,
-  storeHeader: "storeId" | "site" | "none",
+  storeHeader: "storeId" | "site" | "none"
 ) => {
   const HEADER = {
-    "storeId": String(storeId),
-    "site": site,
+    storeId: String(storeId),
+    site: site,
   };
 
   if (storeHeader === "none") {
@@ -217,7 +215,7 @@ const getStoreHeader = (
   }
 
   return {
-    "Store": HEADER[storeHeader],
+    Store: HEADER[storeHeader],
   };
 };
 
@@ -242,6 +240,7 @@ export default function App(props: Props): App<Manifest, State> {
     base: apiConfig.baseUrl,
     headers: new Headers({
       Authorization: `Bearer ${secretKey}`,
+      Referer: apiConfig.baseUrl,
     }),
   });
 
