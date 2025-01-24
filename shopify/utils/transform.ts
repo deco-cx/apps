@@ -254,8 +254,8 @@ export const toProduct = (
     video: media.nodes.filter((media) => media.mediaContentType === "VIDEO")
       .map((video) => ({
         "@type": "VideoObject",
-        contentUrl: "sources" in video ? video.sources?.[0]?.url ?? "" : "",
-        description: video.alt ?? "",
+        contentUrl: video.sources?.[0]?.url,
+        description: video.alt,
         thumbnailUrl: video.previewImage?.url,
       })),
     offers: {
