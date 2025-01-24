@@ -182,15 +182,17 @@ export interface Props {
   features: Features;
 }
 
-export type State = {
-  clientAdmin: ReturnType<typeof createHttpClient<API>>;
-  clientGraphql: ReturnType<typeof createGraphqlClient>;
-  cartConfigs: CartConfigs;
-  features: Features;
-} & APIConfig &
-  ImagesConfig &
-  CustomProps &
-  PricingConfig;
+export type State =
+  & {
+    clientAdmin: ReturnType<typeof createHttpClient<API>>;
+    clientGraphql: ReturnType<typeof createGraphqlClient>;
+    cartConfigs: CartConfigs;
+    features: Features;
+  }
+  & APIConfig
+  & ImagesConfig
+  & CustomProps
+  & PricingConfig;
 
 /**
  * @title Magento
@@ -203,7 +205,7 @@ export type AppType = ReturnType<typeof App>;
 const getStoreHeader = (
   storeId: number,
   site: string,
-  storeHeader: "storeId" | "site" | "none"
+  storeHeader: "storeId" | "site" | "none",
 ) => {
   const HEADER = {
     storeId: String(storeId),
