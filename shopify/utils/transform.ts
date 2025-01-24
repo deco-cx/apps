@@ -252,12 +252,15 @@ export const toProduct = (
       url: img?.url,
     })) ?? [DEFAULT_IMAGE],
     video: media.nodes.filter((media) => media.mediaContentType === "VIDEO")
-      .map((video) => ({
-        "@type": "VideoObject",
-        contentUrl: video.sources?.[0]?.url,
-        description: video.alt,
-        thumbnailUrl: video.previewImage?.url,
-      })),
+      .map((video) => {
+        const contentUrl = 'sources' in video ? video.sources?.[0]?.url : undefined;
+        return {
+          "@type": "VideoObject",
+          contentUrl,
+          description: video.alt ?? undefined,
+          thumbnailUrl: video.previewImage?.url,
+        };
+      }),
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: price.currencyCode,
