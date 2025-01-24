@@ -82,6 +82,12 @@ fragment Product on Product {
         url
       }
       mediaContentType
+      ... on Video {
+        alt
+        sources {
+          url
+        }
+      }
     }
   }
   onlineStoreUrl
