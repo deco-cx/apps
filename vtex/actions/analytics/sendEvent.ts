@@ -16,7 +16,9 @@ export type Props =
   }
   | {
     type: "page.empty_cart";
-    products: [];
+    // Empty array is converted to a invalid json schema... so, let it be anything.
+    // deno-lint-ignore ban-types
+    products: {};
   }
   | {
     type: "page.confirmation";
