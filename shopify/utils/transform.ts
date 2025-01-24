@@ -128,6 +128,7 @@ export const toProduct = (
     createdAt,
     description,
     images,
+    media,
     id: productGroupID,
     variants,
     vendor,
@@ -250,6 +251,13 @@ export const toProduct = (
       alternateName: img?.altText ?? "",
       url: img?.url,
     })) ?? [DEFAULT_IMAGE],
+    video: media.nodes.filter((media) => media.mediaContentType === "VIDEO")
+      .map((video) => ({
+        "@type": "VideoObject",
+        contentUrl: "sources" in video ? video.sources?.[0]?.url ?? "" : "",
+        description: video.alt ?? "",
+        thumbnailUrl: video.previewImage?.url,
+      })),
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: price.currencyCode,
