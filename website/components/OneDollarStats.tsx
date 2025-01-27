@@ -30,7 +30,7 @@ const snippet = () => {
   // Flags and additional dimentions
   const props: Record<string, string> = {};
   const trackPageview = () =>
-    globalThis.window.trackCustomEvent?.("pageview", props);
+    globalThis.window.trackCustomEvent?.("PageView", props);
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
   if (originalPushState) {
@@ -43,6 +43,22 @@ const snippet = () => {
   }
   // 2000 bytes limit
   const truncate = (str: string) => `${str}`.slice(0, 990);
+
+  globalThis.window.DECO.events.subscribe((event) => {
+    if (!event || event.name !== "deco") {
+      return;
+    }
+    if (event.params) {
+      const { flags, page } = event.params;
+      if (Array.isArray(flags)) {
+        for (const flag of flags) {
+          props[flag.name] = truncate(flag.value.toString());
+        }
+      }
+      props["pageId"] = truncate(`${page.id}`);
+    }
+    trackPageview();
+  })();
 
   globalThis.window.DECO.events.subscribe((event) => {
     if (!event) {
