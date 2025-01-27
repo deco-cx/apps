@@ -4,7 +4,7 @@ import { logger } from "@deco/deco/o11y";
 
 export interface Props {
   /**
-   * @title Product SKU
+   * @title Product Id
    */
   sku: string;
   review: WriteReview;
