@@ -1514,3 +1514,10 @@ export interface Promotion {
   maxNumberOfAffectedItems: number;
   maxNumberOfAffectedItemsGroupKey: string;
 }
+
+export interface AdvancedLoaderConfig {
+  /** @description Specifies an array of attribute names from the original object to be directly included in the transformed object. */
+  includeOriginalAttributes: string[];
+}
+
+export type Maybe<T> = T | null | undefined;

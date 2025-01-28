@@ -9,6 +9,7 @@ import {
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
+import type { AdvancedLoaderConfig } from "../../utils/types.ts";
 
 export interface Props {
   query?: string;
@@ -23,6 +24,11 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 
 /**
@@ -79,6 +85,7 @@ const loaders = async (
   const options = {
     baseUrl: url,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+    includeOriginalAttributes: props.advancedConfigs?.includeOriginalAttributes,
   };
 
   return {
