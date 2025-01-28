@@ -253,7 +253,9 @@ export const toProduct = (
     })) ?? [DEFAULT_IMAGE],
     video: media.nodes.filter((media) => media.mediaContentType === "VIDEO")
       .map((video) => {
-        const contentUrl = 'sources' in video ? video.sources?.[0]?.url : undefined;
+        const contentUrl = "sources" in video
+          ? video.sources?.[0]?.url
+          : undefined;
         return {
           "@type": "VideoObject",
           contentUrl,
