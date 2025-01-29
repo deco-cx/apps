@@ -26,6 +26,7 @@ import {
   toProduct,
 } from "../../utils/transform.ts";
 import type {
+  AdvancedLoaderConfig,
   Facet,
   Fuzzy,
   PageType,
@@ -142,6 +143,11 @@ export interface Props {
    * @title Include price in facets
    */
   priceFacets?: boolean;
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
@@ -362,6 +368,8 @@ const loader = async (
         toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
           baseUrl: baseUrl,
           priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+          includeOriginalAttributes: props.advancedConfigs
+            ?.includeOriginalAttributes,
         })
       )
       .map((product) =>
