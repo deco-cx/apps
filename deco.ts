@@ -10,7 +10,6 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
-    app("google-sheets"),
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),
