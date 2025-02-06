@@ -871,6 +871,168 @@ DocumentId?: string
 }
 }
 /**
+ * Creates a partial document, sending only some of the fields.
+ * 
+ * > You can use this request to create documents in any given data entity. Because of this, you are not restricted to using the fields exemplified below in your requests. But you should be aware of the fields allowed or required for each document you wish to update. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"PATCH /api/dataentities/:acronym/documents": {
+body: {
+/**
+ * Unique identifier of the document to be created.
+ */
+id?: string
+/**
+ * Field(s) to be filled in and its respective value(s).
+ */
+"{fieldName}"?: string
+[k: string]: any
+}
+response: IdHrefDocumentID
+}
+/**
+ * Retrieves a document.
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Read only documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"GET /api/dataentities/:acronym/documents/:id": {
+searchParams: {
+/**
+ * Names of the fields that will be returned per document, separated by a comma `,`. It is possible to fetch all fields using `_all` as the value of this query parameter. However, in order to avoid permission errors, we strongly recommend informing only the names of the exact fields that will be used.
+ */
+_fields?: string
+}
+response: Document
+}
+/**
+ * Creates a new document with a custom ID, or updates an entire document if there is already a document with the informed ID.
+ * 
+ * >ℹ️ You can use this request to create or update documents in any given data entity. Because of this, you are not restricted to using the fields exemplified below in your requests. But you should be aware of the fields allowed or required for each document you wish to update.
+ * 
+ * ## Custom field types
+ * 
+ * The table below presents the types of custom fields you can use when creating or updating documents in Master Data v1 and example values.
+ * 
+ * | Field Type| Example value |
+ * | - | - |
+ * | Boolean | `true` |
+ * | Currency | `2.5` |
+ * | Date | `1992-11-17` |
+ * | Date_Time | `2016-09-14T19:21:01.3163733Z` |
+ * | Decimal | `2.5` |
+ * | Email | `meu@email.com` |
+ * | Integer | `1000000` |
+ * | Long | `1000000000` |
+ * | Percent | `85.42` |
+ * | Time | `23:50` |
+ * | URL | `https://www.vtex.com` |
+ * | Varchar10 | `Lorem ipsu` |
+ * | Varchar50 | `Lorem ipsum dolor sit amet, consectetur adipiscing` |
+ * | Varchar750  | `Lorem ipsum dolor sit amet, consectetur adipiscing elit...` |
+ * | Varchar100  | `Lorem ipsum dolor sit amet, consectetur adipiscing elit...` |
+ * | Relationship | `5eb31afb-7ab0-11e6-94b4-0a44686e393f` |
+ * | Text | `Lorem ipsum dolor sit amet, consectetur adipiscing elit...` |
+ *  
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"PUT /api/dataentities/:acronym/documents/:id": {
+/**
+ * Object with document fields and their respective values.
+ */
+body: {
+/**
+ * Field name and value.
+ */
+"{fieldName}"?: string
+[k: string]: any
+}
+}
+/**
+ * Deletes a document. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"DELETE /api/dataentities/:acronym/documents/:id": {
+
+}
+/**
+ * Updates a subset of fields of a document, without impacting the other fields.
+ * 
+ * >ℹ️ You can use this request to update documents in any given data entity. Because of this, you are not restricted to using the fields exemplified below in your requests. But you should be aware of the fields allowed or required for each document you wish to update. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"PATCH /api/dataentities/:acronym/documents/:id": {
+/**
+ * Object with the fields to be updated and their respective values.
+ */
+body: {
+
+}
+}
+/**
  * Retrieves a specific Product by its ID. This information is exactly what is needed to create a new Product. 
  * > 📘 Onboarding guide 
  * >
@@ -19538,6 +19700,48 @@ parentAccountName?: string
  * Original ID.
  */
 originalId?: string
+}
+/**
+ * Document information.
+ */
+export interface IdHrefDocumentID {
+/**
+ * ID of the document that was created, with data entity prefix.
+ */
+Id?: string
+/**
+ * Document reference URL.
+ */
+Href?: string
+/**
+ * Unique identifier of the document.
+ */
+DocumentId?: string
+}
+/**
+ * Object representing each document.
+ */
+export interface Document {
+/**
+ * Custom property.
+ */
+"{customProperty}"?: string
+/**
+ * Unique identifier of the document.
+ */
+id: string
+/**
+ * Unique identifier of the account.
+ */
+accountId: string
+/**
+ * Account name.
+ */
+accountName: string
+/**
+ * Two-letter string that identifies the data entity.
+ */
+dataEntityId: string
 }
 export interface GetorUpdateProductSpecification {
 /**
