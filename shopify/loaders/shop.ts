@@ -14,6 +14,8 @@ export interface Props {
   metafields?: Metafield[];
 }
 
+export const defaultVisibility = "private";
+
 const loader = async (
   props: Props,
   _req: Request,
