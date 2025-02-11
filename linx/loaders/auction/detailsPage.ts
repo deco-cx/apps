@@ -19,7 +19,7 @@ const loader = async (
   const splat = upstream.pathname.slice(1);
 
   const headers = new Headers(req.headers);
-  removeCFHeaders(headers)
+  removeCFHeaders(headers);
 
   const response = await api["GET /*splat"]({
     splat,
@@ -29,7 +29,7 @@ const loader = async (
     },
   }).catch(nullOnNotFound);
 
-  console.log(response)
+  console.log(response);
 
   if (response === null) {
     return null;

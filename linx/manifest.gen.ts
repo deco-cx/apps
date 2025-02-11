@@ -20,6 +20,7 @@ import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$1 from "./loaders/auction/detailsPage.ts";
 import * as $$$2 from "./loaders/auction/list.ts";
 import * as $$$0 from "./loaders/auction/ListBids.ts";
+import * as $$$100000 from "./loaders/auction/apiList.ts";
 import * as $$$3 from "./loaders/cart.ts";
 import * as $$$4 from "./loaders/page.ts";
 import * as $$$5 from "./loaders/pages.ts";
@@ -40,6 +41,7 @@ const manifest = {
     "linx/loaders/auction/detailsPage.ts": $$$1,
     "linx/loaders/auction/list.ts": $$$2,
     "linx/loaders/auction/ListBids.ts": $$$0,
+    "linx/loaders/auction/apiList.ts": $$$100000,
     "linx/loaders/cart.ts": $$$3,
     "linx/loaders/page.ts": $$$4,
     "linx/loaders/pages.ts": $$$5,

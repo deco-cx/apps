@@ -32,6 +32,7 @@ import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
 import { Associations } from "./types/associationsJSON.ts";
+import type { AppContext } from "../mod.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -57,6 +58,45 @@ const pickVariant = (variants: LinxProduct[], variantId: number | null) => {
   }
 
   return variants[0];
+};
+
+export const addAuctions = async (product: Product, ctx: AppContext) => {
+  const leiloes = await ctx.invoke.linx.loaders.auction.apiList();
+
+  const auctionPropertyIndex = product.additionalProperty?.findIndex(
+    (prop) => prop.name === "id_leilao",
+  );
+
+  if (auctionPropertyIndex !== undefined && auctionPropertyIndex !== -1) {
+    product.additionalProperty?.splice(auctionPropertyIndex, 1);
+  }
+
+  const now = new Date().getTime() - (3 * 60 * 60 * 1000);
+
+  const parseDate = (dateString: string) => {
+    const match = dateString.match(/\/Date\((\d+)([-+]\d{4})?\)\//);
+    return match ? parseInt(match[1], 10) : null;
+  };
+
+  leiloes?.find((leilao) => {
+    const visibleFrom = parseDate(leilao.VisibleFrom);
+    const visibleTo = parseDate(leilao.VisibleTo);
+
+    let isVisible = (visibleFrom !== null && now >= visibleFrom) ||
+      (visibleFrom === null);
+    isVisible &&= (visibleTo !== null && now <= visibleTo) ||
+      (visibleTo === null);
+    isVisible &&= visibleTo !== null && visibleFrom !== null;
+    if (`${leilao.SkuID}` === product.productID && isVisible) {
+      product.additionalProperty = product.additionalProperty || [];
+      product.additionalProperty.push({
+        "@type": "PropertyValue",
+        name: "id_leilao",
+        value: `${leilao.ProductAuctionID}`,
+      });
+    }
+  });
+  return product;
 };
 
 const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
