@@ -131,6 +131,7 @@ export const toProduct = (
     id: productGroupID,
     variants,
     vendor,
+    productType,
   } = product;
   const {
     id: productID,
@@ -148,6 +149,12 @@ export const toProduct = (
     "name": "descriptionHtml",
     "value": product.descriptionHtml,
   };
+
+  const productTypeValue: PropertyValue = {
+    "@type": "PropertyValue",
+    "name": "productType",
+    "value": productType,
+  }
 
   const metafields = (product.metafields ?? [])
     .filter((metafield) => metafield && metafield.key && metafield.value)
@@ -175,6 +182,7 @@ export const toProduct = (
   const additionalProperty: PropertyValue[] = selectedOptions
     .map(toPropertyValue)
     .concat(descriptionHtml)
+    .concat(productTypeValue)
     .concat(metafields);
 
   const skuImages = nonEmptyArray([image]);
