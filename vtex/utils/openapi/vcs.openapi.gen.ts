@@ -66,6 +66,591 @@ export type OptinNewsLetter = boolean
 
 export interface OpenAPI {
 /**
+ * Retrieves a specific promotion by its Promotion ID or a specific tax by its tax ID.
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Rates and Benefits | Manage benefits and rates | **GerenciarPromocoesETarifas** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint. To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"GET /api/rnb/pvt/calculatorconfiguration/:idCalculatorConfiguration": {
+response: {
+/**
+ * Promotion ID.
+ */
+idCalculatorConfiguration?: string
+/**
+ * Promotion Name.
+ */
+name?: string
+/**
+ * Promotion internal description.
+ */
+description?: string
+/**
+ * Promotion Begin Date (UTC).
+ */
+beginDateUtc?: string
+/**
+ * Promotion End Date (UTC).
+ */
+endDateUtc?: string
+/**
+ * When the Promotion was last modified.
+ */
+lastModified?: string
+/**
+ * Number of days that are considered to add the purchase history.
+ */
+daysAgoOfPurchases?: number
+/**
+ * If set as `true` the Promotion is activated. If set as `false` the Promotion is deactivated.
+ */
+isActive?: boolean
+/**
+ * If set as `true` the Promotion is archived. If set as `false` the Promotion is not archived.
+ */
+isArchived?: boolean
+/**
+ * Insert a flag with the promotion name used in the product's window display and page.
+ */
+isFeatured?: boolean
+/**
+ * @deprecated
+ * Indicates whether a deal is disabled (`true`) or not (`false`).
+ */
+disableDeal?: boolean
+/**
+ * Defines which days of the week the promotion will applied.
+ */
+activeDaysOfWeek?: string[]
+/**
+ * Time offset from UTC in seconds.
+ */
+offset?: number
+/**
+ * If set as `true`, it activates gifts Multiplier.
+ */
+activateGiftsMultiplier?: boolean
+/**
+ * New time offset from UTC in seconds.
+ */
+newOffset?: number
+/**
+ * @deprecated
+ * List of max price per items.
+ */
+maxPricesPerItems?: string[]
+/**
+ * Defines if a promotion can accumulate with another one. (`true`) or not (`false`).
+ */
+cumulative?: boolean
+/**
+ * The type of discount that will apply to the promotion.
+ */
+discountType?: string
+/**
+ * Exact discount to be applied for the shipping value.
+ */
+nominalShippingDiscountValue?: number
+/**
+ * Maximum value for the shipping.
+ */
+absoluteShippingDiscountValue?: number
+/**
+ * Exact discount to be applied for the total purchase value.
+ */
+nominalDiscountValue?: number
+/**
+ * Controls the behavior of the `NominalDiscount` effect. This field only accepts two string values:
+ * 
+ *  -`item`: applies the intended nominal discount on every item present on the cart. 
+ * 
+ *  -`cart`: keeps the behavior as it currently is: the whole order/cart receives a nominal discount that is distributed among the items.
+ */
+nominalDiscountType?: string
+/**
+ * The maximum price for each item of the purchase will be the price set up.
+ */
+maximumUnitPriceDiscount?: number
+/**
+ * Percentage discount to be applied for total purchase value.
+ */
+percentualDiscountValue?: number
+/**
+ * Percentual Shipping Discount Value.
+ */
+rebatePercentualDiscountValue?: number
+/**
+ * Percentage discount to be applied for shipping value.
+ */
+percentualShippingDiscountValue?: number
+/**
+ * Percentual tax over purchase total value.
+ */
+percentualTax?: number
+/**
+ * Shipping Percentual tax over purchase total value.
+ */
+shippingPercentualTax?: number
+/**
+ * Valid discounts for the SKUs in `listSku1BuyTogether`, discount list used for Buy Together Promotions.
+ */
+percentualDiscountValueList1?: number
+/**
+ * Equivalent to `percentualDiscountValueList1`.
+ */
+percentualDiscountValueList2?: number
+/**
+ * SKU Gift Object. Total discount on the product value set as a gift.
+ */
+skusGift?: {
+/**
+ * Quantity of SKU Gifts.
+ */
+quantitySelectable?: number
+/**
+ * Array with SKU Gifts IDs.
+ */
+gifts?: number
+}
+/**
+ * Nominal value for rewards program.
+ */
+nominalRewardValue?: number
+/**
+ * Percentage value for rewards program.
+ */
+percentualRewardValue?: number
+/**
+ * Order status reward value.
+ */
+orderStatusRewardValue?: string
+/**
+ * The maximum number of affected items for a promotion.
+ */
+maxNumberOfAffectedItems?: number
+/**
+ * The maximum number of affected items by group key for a promotion.
+ */
+maxNumberOfAffectedItemsGroupKey?: string
+/**
+ * Promotion will be applied to all kind of shipping.
+ */
+applyToAllShippings?: boolean
+/**
+ * Nominal tax.
+ */
+nominalTax?: number
+/**
+ * Origin of the promotion, `marketplace` or `Fulfillment`. Read [Difference between orders with marketplace and fulfillment sources](https://help.vtex.com/en/tutorial/what-are-orders-with-marketplace-source-and-orders-with-fulfillment-source--6eVYrmUAwMOeKICU2KuG06) for more information.
+ */
+origin?: string
+/**
+ * Seller Name.
+ */
+idSeller?: string
+/**
+ * If set to `true`, this promotion will be applied to any seller present on the idSeller field. If set to `false`, sellers present on that field will make this promotion not to be applied.
+ */
+idSellerIsInclusive?: boolean
+/**
+ * List of Trade Policies that activate this promotion.
+ */
+idsSalesChannel?: string[]
+/**
+ * If set to `false`, this promotion will be applied to any trade policies present on the `idsSalesChannel` field. If set to `true`, trade policies present on that field will make this promotion not to be applied.
+ */
+areSalesChannelIdsExclusive?: boolean
+/**
+ * Promotion Marketing tags.
+ */
+marketingTags?: string[]
+/**
+ * If set to `false`, this promotion will be applied to any marketing tag present on the `marketingTags` field. If set to `true`, marketing tags present on that field will make this promotion not to be applied.
+ */
+marketingTagsAreNotInclusive?: boolean
+/**
+ * Array composed by all the Payments Methods.
+ */
+paymentsMethods?: {
+/**
+ * Payment Method ID.
+ */
+id?: string
+/**
+ * Payment Method Name.
+ */
+name?: string
+}[]
+/**
+ * @deprecated
+ * List of stores.
+ */
+stores?: string[]
+/**
+ * Campaign Audiences that activate this promotion.
+ */
+campaigns?: string[]
+/**
+ * Array with conditions IDs.
+ */
+conditionsIds?: string[]
+/**
+ * @deprecated
+ * If set to `true`, this promotion will be applied to any store present on the `stores` field. If set to `false`, stores present on that field will make this promotion not to be applied.
+ */
+storesAreInclusive?: boolean
+/**
+ * Object composed by the categories that will activate or deactivate the promotion.
+ */
+categories?: {
+/**
+ * Category ID.
+ */
+id?: string
+/**
+ * Category Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any category present on the `categories` field. If set to `false`, categories present on that field will make this promotion not to be applied.
+ */
+categoriesAreInclusive?: boolean
+/**
+ * Object composed by the brands that will activate or deactivate the promotion.
+ */
+brands?: {
+/**
+ * Brand ID.
+ */
+id?: string
+/**
+ * Brand Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any brand present on the `brands` field. If set to `false`, brands present on that field will make this promotion not to be applied.
+ */
+brandsAreInclusive?: boolean
+/**
+ * Object composed by the products that will activate or deactivate the promotion.
+ */
+products?: {
+/**
+ * Product ID.
+ */
+id?: string
+/**
+ * Product Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any product present on the `products` field. If set to `false`, products present on that field will make this promotion not to be applied.
+ */
+productsAreInclusive?: boolean
+/**
+ * Object composed by the SKUs that will activate or deactivate the promotion.
+ */
+skus?: {
+/**
+ * SKU ID.
+ */
+id: string
+/**
+ * SKU Name.
+ */
+name: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any SKU present on the `skus` field. If set to `false`, SKUs present on that field will make this promotion not to be applied.
+ */
+skusAreInclusive?: boolean
+/**
+ * Coupon utmSource code.
+ */
+utmSource?: string
+/**
+ * Coupon utmCampaign code.
+ */
+utmCampaign?: string
+/**
+ * Collections that will generate the promotion, type **Buy Together**, **More for less**, **Progressive Discount**, **Buy One Get One**.
+ */
+collections1BuyTogether?: {
+/**
+ * ID of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * @deprecated
+ * Collections that will generate the promotion, type **Buy Together**, **More for less**, **Progressive Discount** or **Buy One Get One**.
+ */
+collections2BuyTogether?: {
+/**
+ * ID of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * Minimum quantity for **Buy Together** promotion.
+ */
+minimumQuantityBuyTogether?: number
+/**
+ * Quantity to affect **Buy Together** promotion.
+ */
+quantityToAffectBuyTogether?: number
+/**
+ * Enable **Buy Together** per SKU.
+ */
+enableBuyTogetherPerSku?: boolean
+/**
+ * Array of objects, each containing ID and Name of an SKU to be added in the first list of the **Buy Together** promotion. Learn more about this type of promotion in the [Creating a Buy Together promotion](https://help.vtex.com/en/tutorial/buy-together--tutorials_323) documentation.
+ */
+listSku1BuyTogether?: {
+/**
+ * ID of the SKU to be added to the first list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the SKU to be added to the first list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * Array of objects, each containing ID and Name of an SKU to be added to the second list of the **Buy Together** promotion. Learn more about this type of promotion in the [Creating a Buy Together promotion](https://help.vtex.com/en/tutorial/buy-together--tutorials_323) documentation.
+ */
+listSku2BuyTogether?: {
+/**
+ * ID of the SKU to be added to the second list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the SKU to be added to the second list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * @deprecated
+ * List of coupons.
+ */
+coupon?: string[]
+/**
+ * Minimum chart value to activate the promotion.
+ */
+totalValueFloor?: number
+/**
+ * Maximum chart value to activate the promotion.
+ */
+totalValueCeling?: number
+/**
+ * @deprecated
+ * Total value including all items.
+ */
+totalValueIncludeAllItems?: boolean
+/**
+ * If products that already are receiving a promotion, will be considered on the chart total value. There are three options available: `IncludeMatchedItems`, `ExcludeMatchedItems`, `AllItems`.
+ */
+totalValueMode?: string
+/**
+ * Array composed by the collections that will be activated or deactivated the promotion.
+ */
+collections?: {
+/**
+ * Collection ID.
+ */
+id?: string
+/**
+ * Collection Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any collection present on the `collections` field. If set to `false`, collections present on that field will make this promotion not to be applied.
+ */
+collectionsIsInclusive?: boolean
+/**
+ * The discount will be granted if the card's BIN is given.
+ */
+restrictionsBins?: string[]
+/**
+ * @deprecated
+ * List of card issuers.
+ */
+cardIssuers?: string[]
+/**
+ * Total value a client must have in past orders to active the promotion.
+ */
+totalValuePurchase?: number
+/**
+ * The discount will be granted if the shipping method is the same as the one given.
+ */
+slasIds?: string[]
+/**
+ * Applies selected discount only when one of the defined shipping method is selected by the customer.
+ */
+isSlaSelected?: boolean
+/**
+ * Applies the discount only if it's a first buy.
+ */
+isFirstBuy?: boolean
+/**
+ * Applies the discount even if the user is not logged.
+ */
+firstBuyIsProfileOptimistic?: boolean
+/**
+ * If the **List Price** and **Price** are the same.
+ */
+compareListPriceAndPrice?: boolean
+/**
+ * Applies the promotion only if the list price and price is different.
+ */
+isDifferentListPriceAndPrice?: boolean
+/**
+ * Range of the zip code that applies the promotion.
+ */
+zipCodeRanges?: {
+/**
+ * Initial Zip Code.
+ */
+zipCodeFrom?: string
+/**
+ * Final Zip Code.
+ */
+zipCodeTo?: string
+/**
+ * Defines if the zip code range is included in the promotion.
+ */
+inclusive?: boolean
+}[]
+/**
+ * List of countries that are activated for this promotion.
+ */
+countries?: string[]
+/**
+ * Maximum price of the item.
+ */
+itemMaxPrice?: number
+/**
+ * Minimum price of the item.
+ */
+itemMinPrice?: number
+/**
+ * @deprecated
+ * Installment.
+ */
+installment?: number
+/**
+ * Set if the promotion will be applied considering a minimum and maximum values for installments.
+ */
+isMinMaxInstallments?: boolean
+/**
+ * Minimum value for installment.
+ */
+minInstallment?: number
+/**
+ * Maximum value for installment.
+ */
+maxInstallment?: number
+/**
+ * @deprecated
+ * List of merchants.
+ */
+merchants?: string[]
+/**
+ * Criteria to select a customer cluster. Each item in this array should follow the format of an equality function (`{propertyname}={value}`) or the format of a contains function (`{propertyname} contains {value}`). In both options, `{propertyname}` must be replaced with the name of the field in the data entity, and `{value}` must be replaced with the value determined in Master Data. Find more information about these criteria in [Filling in the Customer cluster field](https://help.vtex.com/tutorial/creating-promotion-for-a-customer-cluster--tutorials_342#filling-in-the-customer-cluster-field).
+ */
+clusterExpressions?: string[]
+/**
+ * Object composed by a list of SKUs on a Multiple Effects promotion. Structure: `"{SkuId}": {PercentageDiscount}`. There is a limit of 400 SKUs for this type of promotion.
+ */
+multipleSkusCause?: {
+/**
+ * SKU ID.
+ */
+[k: string]: string
+}
+/**
+ * @deprecated
+ * List of payment rules.
+ */
+paymentsRules?: string[]
+/**
+ * Gifts List Type.
+ */
+giftListTypes?: string[]
+/**
+ * @deprecated
+ * List of product specifications.
+ */
+productsSpecifications?: string[]
+/**
+ * Marketplace order identifier. The discount will apply to selected affiliates.
+ */
+affiliates?: {
+/**
+ * Affiliate ID.
+ */
+id?: string
+/**
+ * Affiliate Name.
+ */
+name?: string
+}[]
+/**
+ * Defines how many times the promotion can be used.
+ */
+maxUsage?: number
+/**
+ * Defines if the promotion can be used multiple times per client.
+ */
+maxUsagePerClient?: number
+/**
+ * Should distribute discount among matched items.
+ */
+shouldDistributeDiscountAmongMatchedItems?: boolean
+/**
+ * Defines if the promotion can be used multiple times per client.
+ */
+multipleUsePerClient?: boolean
+/**
+ * Allows the promotion to apply to products whose prices have been manually added by a call center operator.
+ */
+accumulateWithManualPrice?: boolean
+/**
+ * Defines what is the type of the promotion or indicates if it is a tax. Possible values: `regular` ([Regular Promotion](https://help.vtex.com/tutorial/regular-promotion--tutorials_327)), `combo` ([Buy Together](https://help.vtex.com/en/tutorial/buy-together--tutorials_323)), `forThePriceOf` ([More for Less](https://help.vtex.com/en/tutorial/creating-a-more-for-less-promotion--tutorials_325)), `progressive` ([Progressive Discount](https://help.vtex.com/en/tutorial/progressive-discount--tutorials_324)), `buyAndWin` ([Buy One Get One](https://help.vtex.com/en/tutorial/buy-one-get-one--tutorials_322)), `maxPricePerItem` (Deprecated), `campaign` ([Campaign Promotion](https://help.vtex.com/en/tutorial/campaign-promotion--1ChYXhK2AQGuS6wAqS8Ume)), `tax` (Tax), `multipleEffects` (Multiple Effects).
+ */
+type?: string
+/**
+ * Use new progressive algorithm.
+ */
+useNewProgressiveAlgorithm?: boolean
+/**
+ * Percentual discount value list.
+ */
+percentualDiscountValueList?: number[]
+}
+}
+/**
  * Searches Master Data v1 documents with highly customizable filters.
  * 
  * > Learn more about [Master Data v1 search queries](https://developers.vtex.com/vtex-rest-api/docs/how-the-queries-in-master-data-v1-work).
@@ -185,6 +770,31 @@ accountName?: string
  */
 dataEntityId?: string
 }[]
+}
+"GET /api/logistics/pvt/inventory/skus/:skuId": {
+response: {
+/**
+ * Unique identifier of the SKU.
+ */
+skuId?: string
+/**
+ * List of warehouses.
+ */
+balance?: {
+hasUnlimitedQuantity?: boolean
+leadTime?: string
+reservedQuantity?: number
+totalQuantity?: number
+/**
+ * Warehouse ID.
+ */
+warehouseId?: string
+/**
+ * Warehouse name.
+ */
+warehouseName?: string
+}[]
+}
 }
 /**
  * Retrieves information about [pickup points](https://help.vtex.com/en/tutorial/pickup-points--2fljn6wLjn8M4lJHA6HP3R) of your store.
@@ -9643,6 +10253,10 @@ searchParams: {
 allowedOutdatedData?: any[]
 }
 body: {
+/**
+ * Avoid split items on cart
+ */
+noSplitItem?: boolean
 /**
  * Array containing the cart items. Each object inside this array corresponds to a different item.
  */

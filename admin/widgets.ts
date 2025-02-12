@@ -25,6 +25,16 @@ export type SiteRoute = string;
 export type MapWidget = string;
 
 /**
+ * @format date
+ */
+export type DateWidget = string;
+
+/**
+ * @format date-time
+ */
+export type DateTimeWidget = string;
+
+/**
  * @format textarea
  */
 export type TextArea = string;
@@ -57,3 +67,15 @@ export type TypeScript = string;
  * @language json
  */
 export type Json = string;
+
+/**
+ * @format file-uri
+ * @accept text/csv
+ */
+export type CSVWidget = string;
+
+/**
+ * @format file-uri
+ * @accept application/pdf
+ */
+export type PDFWidget = string;

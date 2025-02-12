@@ -19,6 +19,7 @@ import type {
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import type { PickupPoint as PickupPointVCS } from "./openapi/vcs.openapi.gen.ts";
+import { pick } from "./pickAndOmit.ts";
 import { slugify } from "./slugify.ts";
 import type {
   Brand as BrandVTEX,
@@ -29,11 +30,15 @@ import type {
   Item as SkuVTEX,
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
+  LegacyProduct,
   LegacyProduct as LegacyProductVTEX,
+  Maybe,
   OrderForm,
   PageType as PageTypeVTEX,
+  PickupHolidays,
   PickupPoint,
   Product as ProductVTEX,
+  ProductInventoryData,
   ProductRating,
   ProductReviewData,
   SelectedFacet,
@@ -44,7 +49,8 @@ import type {
 const DEFAULT_CATEGORY_SEPARATOR = ">";
 
 const isLegacySku = (sku: LegacySkuVTEX | SkuVTEX): sku is LegacySkuVTEX =>
-  typeof (sku as LegacySkuVTEX).variations?.[0] === "string";
+  typeof (sku as LegacySkuVTEX).variations?.[0] === "string" ||
+  !!(sku as LegacySkuVTEX).Videos;
 
 const isLegacyProduct = (
   product: ProductVTEX | LegacyProductVTEX,
@@ -78,6 +84,8 @@ interface ProductOptions {
   /** Price coded currency, e.g.: USD, BRL */
   priceCurrency: string;
   imagesByKey?: Map<string, string>;
+  /** Original attributes to be included in the transformed product */
+  includeOriginalAttributes?: string[];
 }
 
 /** Returns first available sku */
@@ -94,14 +102,13 @@ export const pickSku = <T extends ProductVTEX | LegacyProductVTEX>(
 ): T["items"][number] => {
   const skuId = maybeSkuId ?? findFirstAvailable(product.items)?.itemId ??
     product.items[0]?.itemId;
-
   for (const item of product.items) {
     if (item.itemId === skuId) {
       return item;
     }
   }
 
-  throw new Error(`Missing sku ${skuId} on product ${product.productName}`);
+  return product.items[0];
 };
 
 const toAccessoryOrSparePartFor = <T extends ProductVTEX | LegacyProductVTEX>(
@@ -345,6 +352,7 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     itemId: skuId,
     referenceId = [],
     kitItems,
+    estimatedDateArrival,
   } = sku;
 
   const videos = isLegacySku(sku) ? sku.Videos : sku.videos;
@@ -353,13 +361,18 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     items
       .flatMap((i) => i.images)
       .reduce((map, img) => {
-        map.set(getImageKey(img.imageUrl), img.imageUrl);
+        img?.imageUrl && map.set(getImageKey(img.imageUrl), img.imageUrl);
         return map;
       }, new Map<string, string>());
 
   const groupAdditionalProperty = isLegacyProduct(product)
     ? legacyToProductGroupAdditionalProperties(product)
     : toProductGroupAdditionalProperties(product);
+  const originalAttributesAdditionalProperties =
+    toOriginalAttributesAdditionalProperties(
+      options.includeOriginalAttributes,
+      product,
+    );
   const specificationsAdditionalProperty = isLegacySku(sku)
     ? toAdditionalPropertiesLegacy(sku)
     : toAdditionalProperties(sku);
@@ -380,7 +393,10 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       ),
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
-      additionalProperty: groupAdditionalProperty,
+      additionalProperty: [
+        ...groupAdditionalProperty,
+        ...originalAttributesAdditionalProperties,
+      ],
       model: productReference,
     } satisfies ProductGroup)
     : undefined;
@@ -427,6 +443,20 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
     .concat(clusterAdditionalProperties ?? [])
     .concat(referenceIdAdditionalProperty ?? []);
 
+  estimatedDateArrival && additionalProperty.push({
+    "@type": "PropertyValue",
+    name: "Estimated Date Arrival",
+    value: estimatedDateArrival,
+  });
+
+  if (sku.modalType) {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: "Modal Type",
+      value: sku.modalType,
+    });
+  }
+
   return {
     "@type": "Product",
     category: categoriesString,
@@ -464,6 +494,7 @@ const toBreadcrumbList = (
 ): BreadcrumbList => {
   const { categories, productName } = product;
   const names = categories[0]?.split("/").filter(Boolean);
+
   const segments = names.map(slugify);
 
   return {
@@ -536,6 +567,27 @@ const toProductGroupAdditionalProperties = (
     )
   );
 
+const toOriginalAttributesAdditionalProperties = (
+  originalAttributes: Maybe<string[]>,
+  product: ProductVTEX | LegacyProduct,
+) => {
+  if (!originalAttributes) {
+    return [];
+  }
+
+  const attributes =
+    pick(originalAttributes as Array<keyof typeof product>, product) ?? {};
+
+  return Object.entries(attributes).map(([name, value]) =>
+    ({
+      "@type": "PropertyValue",
+      name,
+      value,
+      valueReference: "ORIGINAL_PROPERTY" as string,
+    }) as const
+  ) as unknown as PropertyValue[];
+};
+
 const toAdditionalProperties = (sku: SkuVTEX): PropertyValue[] =>
   sku.variations?.flatMap(({ name, values }) =>
     values.map((value) => toAdditionalPropertySpecification({ name, value }))
@@ -581,10 +633,14 @@ const toAdditionalPropertiesLegacy = (sku: LegacySkuVTEX): PropertyValue[] => {
   return [...specificationProperties, ...attachmentProperties];
 };
 
-const toOffer = (
-  { commertialOffer: offer, sellerId, sellerName }: SellerVTEX,
-): Offer => ({
+const toOffer = ({
+  commertialOffer: offer,
+  sellerId,
+  sellerName,
+  sellerDefault,
+}: SellerVTEX): Offer => ({
   "@type": "Offer",
+  identifier: sellerDefault ? "default" : undefined,
   price: offer.spotPrice ?? offer.Price,
   seller: sellerId,
   sellerName,
@@ -960,11 +1016,12 @@ export const categoryTreeToNavbar = (
 
 export const toBrand = (
   { id, name, imageUrl, metaTagDescription }: BrandVTEX,
+  baseUrl: string,
 ): Brand => ({
   "@type": "Brand",
   "@id": `${id}`,
   name,
-  logo: imageUrl ?? undefined,
+  logo: imageUrl?.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}`,
   description: metaTagDescription,
 });
 
@@ -1010,6 +1067,30 @@ export const toReview = (
           ratingValue: productReviews[reviewIndex]?.rating || 0,
         },
       })),
+    };
+  });
+};
+
+export const toInventories = (
+  products: Product[],
+  inventoriesData: ProductInventoryData[],
+): Product[] => {
+  return products.map((p, index) => {
+    const balance = inventoriesData[index].balance || [];
+
+    const additionalProperty = Array.from(p.additionalProperty || []);
+
+    const inventories: PropertyValue[] = balance.map((b) => ({
+      "@type": "PropertyValue",
+      valueReference: "INVENTORY",
+      propertyID: b.warehouseId,
+      name: b.warehouseName,
+      value: b.totalQuantity?.toString(),
+    }));
+
+    return {
+      ...p,
+      additionalProperty: [...additionalProperty, ...inventories],
     };
   });
 };
@@ -1082,6 +1163,23 @@ function toHoursSpecification(hours: Hours): OpeningHoursSpecification {
   };
 }
 
+function toSpecialHoursSpecification(
+  holiday: PickupHolidays,
+): OpeningHoursSpecification {
+  const dateHoliday = new Date(holiday.date ?? "");
+  // VTEX provide date in ISO format, at 00h on the day
+  const validThrough = dateHoliday.setDate(dateHoliday.getDate() + 1)
+    .toString();
+
+  return {
+    "@type": "OpeningHoursSpecification",
+    opens: holiday.hourBegin,
+    closes: holiday.hourEnd,
+    validFrom: holiday.date,
+    validThrough,
+  };
+}
+
 function isPickupPointVCS(
   pickupPoint: PickupPoint | PickupPointVCS,
 ): pickupPoint is PickupPointVCS {
@@ -1097,12 +1195,16 @@ export function toPlace(
     latitude,
     longitude,
     openingHoursSpecification,
+    specialOpeningHoursSpecification,
   } = isPickupPointVCS(pickupPoint)
     ? {
       name: pickupPoint.name,
       country: pickupPoint.address?.country?.acronym,
       latitude: pickupPoint.address?.location?.latitude,
       longitude: pickupPoint.address?.location?.longitude,
+      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+        toSpecialHoursSpecification,
+      ),
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
       ),
@@ -1112,6 +1214,9 @@ export function toPlace(
       country: pickupPoint.address?.country,
       latitude: pickupPoint.address?.geoCoordinates[0],
       longitude: pickupPoint.address?.geoCoordinates[1],
+      specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
+        toSpecialHoursSpecification,
+      ),
       openingHoursSpecification: pickupPoint.businessHours?.map((
         { ClosingTime, DayOfWeek, OpeningTime },
       ) =>
@@ -1137,6 +1242,7 @@ export function toPlace(
     latitude,
     longitude,
     name,
+    specialOpeningHoursSpecification,
     openingHoursSpecification,
     additionalProperty: [{
       "@type": "PropertyValue",

@@ -1,15 +1,12 @@
 import { AppContext } from "../mod.ts";
-
-import { badRequest, notFound } from "deco/mod.ts";
 import { messageProcessorFor } from "../chat/messages.ts";
 import { Notify, Queue } from "../deps.ts";
-
+import { badRequest, notFound } from "@deco/deco";
 export interface Props {
   thread?: string;
   assistant: string;
   message?: string;
 }
-
 /**
  * Processes messages from the message queue.
  * @param {Queue<ChatMessage>} q - The message queue.
@@ -35,18 +32,15 @@ const process = async (
     ]);
   }
 };
-
 export interface MessageContentText {
   type: "text";
   value: string;
   options?: string[];
 }
-
 export interface MessageContentFile {
   type: "file";
   fileId: string;
 }
-
 export interface ReplyMessage {
   threadId: string;
   messageId: string;
@@ -54,16 +48,13 @@ export interface ReplyMessage {
   content: Array<MessageContentText | MessageContentFile>;
   role: "user" | "assistant";
 }
-
 export interface FunctionCall {
   name: string;
   props: unknown;
 }
-
 export interface FunctionCallReply<T> extends FunctionCall {
   response: T;
 }
-
 export interface ReplyStartFunctionCall {
   threadId: string;
   messageId: string;
@@ -76,17 +67,14 @@ export interface ReplyFunctionCalls<T> {
   type: "function_calls";
   content: FunctionCallReply<T>[];
 }
-
 export type Reply<T> =
   | ReplyMessage
   | ReplyFunctionCalls<T>
   | ReplyStartFunctionCall;
-
 export interface ChatMessage {
   text: string;
   reply: <T = unknown>(reply: Reply<T>) => void;
 }
-
 /**
  * Initializes a WebSocket chat connection and processes incoming messages.
  * @param {Props} props - The properties for the chat session.
@@ -98,7 +86,12 @@ export default async function openChat(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Response | { replies: Reply<unknown>[]; thread: string }> {
+): Promise<
+  Response | {
+    replies: Reply<unknown>[];
+    thread: string;
+  }
+> {
   if (!props.assistant) {
     notFound();
   }
@@ -106,13 +99,11 @@ export default async function openChat(
   if (!assistant) {
     notFound();
   }
-
   const threads = ctx.openAI.beta.threads;
   const threadId = props.thread;
   const threadPromise = threadId
     ? threads.retrieve(threadId)
     : threads.create();
-
   const processorPromise = assistant.then(async (aiAssistant) =>
     messageProcessorFor(aiAssistant, ctx, await threadPromise)
   );
@@ -128,7 +119,6 @@ export default async function openChat(
     });
     return { replies, thread: (await threadPromise).id };
   }
-
   const { socket, response } = Deno.upgradeWebSocket(req);
   const abort = new Notify();
   const messagesQ = new Queue<ChatMessage>();
@@ -138,7 +128,6 @@ export default async function openChat(
       reply: (replyMsg) => socket.send(JSON.stringify(replyMsg)),
     });
   }
-
   /**
    * Handles the WebSocket connection on open event.
    */
@@ -156,19 +145,17 @@ export default async function openChat(
       }),
     );
     assistant.then((aiAssistant) => {
-      socket.send(
-        JSON.stringify({
-          isWelcomeMessage: true,
-          threadId: aiAssistant.threadId,
-          assistantId: aiAssistant.id,
-          type: "message",
-          content: [{
-            type: "text",
-            value: aiAssistant.welcomeMessage ?? "Welcome to the chat!",
-          }],
-          role: "assistant",
-        }),
-      );
+      socket.send(JSON.stringify({
+        isWelcomeMessage: true,
+        threadId: aiAssistant.threadId,
+        assistantId: aiAssistant.id,
+        type: "message",
+        content: [{
+          type: "text",
+          value: aiAssistant.welcomeMessage ?? "Welcome to the chat!",
+        }],
+        role: "assistant",
+      }));
     });
   };
   /**
@@ -177,7 +164,6 @@ export default async function openChat(
   socket.onclose = () => {
     abort.notifyAll();
   };
-
   /**
    * Handles the WebSocket connection on message event.
    * @param {MessageEvent} event - The WebSocket message event.

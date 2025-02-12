@@ -5,11 +5,18 @@ import type { RequestURLParam } from "../../website/functions/requestToParam.ts"
 import {
   GetProductQuery,
   GetProductQueryVariables,
+  HasMetafieldsMetafieldsArgs,
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { GetProduct } from "../utils/storefront/queries.ts";
+import { Metafield } from "../utils/types.ts";
 
 export interface Props {
   slug: RequestURLParam;
+  /**
+   * @title Metafields
+   * @description search for metafields
+   */
+  metafields?: Metafield[];
 }
 
 /**
@@ -23,6 +30,7 @@ const loader = async (
 ): Promise<ProductDetailsPage | null> => {
   const { storefront } = ctx;
   const { slug } = props;
+  const metafields = props.metafields || [];
 
   const splitted = slug?.split("-");
   const maybeSkuId = Number(splitted[splitted.length - 1]);
@@ -31,9 +39,9 @@ const loader = async (
 
   const data = await storefront.query<
     GetProductQuery,
-    GetProductQueryVariables
+    GetProductQueryVariables & HasMetafieldsMetafieldsArgs
   >({
-    variables: { handle },
+    variables: { handle, identifiers: metafields },
     ...GetProduct,
   });
 

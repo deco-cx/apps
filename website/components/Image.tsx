@@ -100,7 +100,9 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     }
 
     if (
-      /(vteximg.com.br|vtexassets.com)\/arquivos\/ids\/\d+/.test(originalSrc)
+      /(vteximg.com.br|vtexassets.com|myvtex.com)\/arquivos\/ids\/\d+/.test(
+        originalSrc,
+      )
     ) {
       return optimizeVTEX(opts);
     }

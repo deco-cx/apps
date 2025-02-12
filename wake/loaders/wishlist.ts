@@ -2,8 +2,8 @@ import { AppContext } from "../mod.ts";
 import authenticate from "../utils/authenticate.ts";
 import { GetWishlist } from "../utils/graphql/queries.ts";
 import {
-  GetWislistQuery,
-  GetWislistQueryVariables,
+  GetWishlistQuery,
+  GetWishlistQueryVariables,
   WishlistReducedProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
@@ -12,7 +12,7 @@ import { parseHeaders } from "../utils/parseHeaders.ts";
  * @title Wake Integration
  * @description Product Wishlist loader
  */
-const action = async (
+const loader = async (
   _props: unknown,
   req: Request,
   ctx: AppContext,
@@ -26,8 +26,8 @@ const action = async (
   if (!customerAccessToken) return [];
 
   const data = await storefront.query<
-    GetWislistQuery,
-    GetWislistQueryVariables
+    GetWishlistQuery,
+    GetWishlistQueryVariables
   >({
     variables: { customerAccessToken },
     ...GetWishlist,
@@ -40,4 +40,4 @@ const action = async (
   ): p is WishlistReducedProductFragment => Boolean(p)) ?? [];
 };
 
-export default action;
+export default loader;

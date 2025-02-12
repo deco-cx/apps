@@ -1,15 +1,14 @@
-import { SectionProps } from "deco/blocks/section.ts";
 import { scriptAsDataURI } from "../../utils/dataURI.ts";
 import { AppContext } from "../mod.ts";
-
+import { type SectionProps } from "@deco/deco";
 declare global {
   interface Window {
-    _trustvox_colt: Array<
-      [string, string | number | Array<string | undefined> | undefined]
-    >;
+    _trustvox_colt: Array<[
+      string,
+      string | number | Array<string | undefined> | undefined,
+    ]>;
   }
 }
-
 export default function TrustvoxStoreReviewsCarousel(
   { storeId, enableStaging, numberOfReviewsInStoreCarousel }: SectionProps<
     typeof loader
@@ -18,7 +17,6 @@ export default function TrustvoxStoreReviewsCarousel(
   const scriptUrl = enableStaging
     ? "https://storage.googleapis.com/trustvox-colt-staging/colt.min.js"
     : "https://colt.trustvox.com.br/colt.min.js";
-
   function setupTrustvoxStoreReviewsCarousel(
     storeId: string,
     numberOfReviewsInStoreCarousel?: number,
@@ -30,7 +28,6 @@ export default function TrustvoxStoreReviewsCarousel(
       numberOfReviewsInStoreCarousel,
     ]);
   }
-
   return (
     <>
       <script
@@ -41,17 +38,12 @@ export default function TrustvoxStoreReviewsCarousel(
           numberOfReviewsInStoreCarousel,
         )}
       />
-      <script
-        defer
-        type="text/javascript"
-        src={scriptUrl}
-      />
+      <script defer type="text/javascript" src={scriptUrl} />
 
       <div id="_trustvox_colt" class="my-8" />
     </>
   );
 }
-
 export const loader = (_props: unknown, _req: Request, ctx: AppContext) => {
   return {
     storeId: ctx.storeId,

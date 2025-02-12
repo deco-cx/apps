@@ -68,10 +68,11 @@ const handler = async (
 
     return response;
   } catch (error) {
+    const errorObj = error as { message?: string; status: number };
     console.error(error);
 
-    return new Response(error.message ?? Deno.inspect(error), {
-      status: error instanceof HttpError ? error.status : 500,
+    return new Response(errorObj.message ?? Deno.inspect(error), {
+      status: error instanceof HttpError ? errorObj.status : 500,
       headers: {
         "cache-control": "no-cache, no-store",
         "vary": "Accept",

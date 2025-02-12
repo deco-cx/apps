@@ -1,1 +1,1 @@
-export { default, Preview } from "../../nuvemshop/mod.ts";
+export { default, preview } from "../../nuvemshop/mod.ts";

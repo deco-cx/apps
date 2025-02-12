@@ -1,5 +1,5 @@
 import { existsSync } from "https://deno.land/std@0.201.0/fs/exists.ts";
-import { createClient as createSQLClient } from "../deps.ts";
+import { createClient as createSQLClient, createLocalClient } from "../deps.ts";
 import { getLocalDbFilename, getLocalSQLClientConfig } from "../utils.ts";
 import { brightGreen, brightYellow } from "std/fmt/colors.ts";
 import { getDbCredentials } from "./checkDbCredential.ts";
@@ -38,6 +38,10 @@ function extractStatements(sql: string) {
 }
 
 async function run() {
+  if (createLocalClient === false) {
+    throw new Error("client is not defined. run it locally");
+  }
+
   const { sitename, token } = getDbCredentials();
 
   const productionDumpUrl = `https://${sitename}-decocx.turso.io/dump`;
@@ -77,7 +81,7 @@ async function run() {
     }
   }
 
-  const sqlClient = createSQLClient(
+  const sqlClient = createLocalClient(
     getLocalSQLClientConfig(),
   );
 
@@ -86,6 +90,8 @@ async function run() {
   await sqlClient.batch(sliced, "write");
 
   await checkDumpInsertedTables(sqlClient);
+
+  return "sqlite.db updated";
 }
 
 run()

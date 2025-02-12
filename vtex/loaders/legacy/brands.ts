@@ -18,7 +18,8 @@ const loaders = async (
   ctx: AppContext,
 ): Promise<Brand[] | null> => {
   const { filterInactive = false } = props;
-  const { vcsDeprecated } = ctx;
+  const { vcsDeprecated, account } = ctx;
+  const baseUrl = `https://${account}.vteximg.com.br/arquivos/ids`;
 
   const brands = await vcsDeprecated["GET /api/catalog_system/pub/brand/list"](
     {},
@@ -31,10 +32,16 @@ const loaders = async (
   }
 
   if (filterInactive) {
-    return brands.filter((brand) => brand.isActive).map(toBrand);
+    return brands.filter((brand) => brand.isActive).map((brand) =>
+      toBrand(brand, baseUrl)
+    );
   }
 
-  return brands.map(toBrand);
+  return brands.map((brand) => toBrand(brand, baseUrl));
 };
 
 export default loaders;
+
+export const cache = "stale-while-revalidate";
+export const cacheKey = (props: Props) =>
+  props.filterInactive ? "brands-filtered" : "brands";

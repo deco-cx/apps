@@ -1036,16 +1036,30 @@ store_coupon_code?: string
  */
 "POST /api/v2/carts/:cartId/items/bulk": {
 body: {
-sku: string
-quantity: number
-extra?: {
-
-}
-place_id?: number
 /**
  * Itens do carrinho
  */
-items?: any[][]
+items?: {
+/**
+ * Código SKU da variante do produto
+ */
+sku: string
+/**
+ * Unidades do produto
+ */
+quantity: number
+/**
+ * [Personalização](http://ajuda.vnda.com.br/pt-BR/articles/1763398-funcionalidades-produtos-personalizados) do produto
+ */
+customizations?: {
+/**
+ * Adicione a customização de acordo com a [personalização](http://ajuda.vnda.com.br/pt-BR/articles/1763398-funcionalidades-produtos-personalizados) incluídas no Admin da loja. 
+ * Se por exemplo a customização do produto é a cor, o parâmetro para a requisição deve ser `Color` ao invés de `CUstomization`.  
+ * Saiba mais sobre como utilizar esse parâmetro pelo exemplo de requsição localizado na seção de **Request Example** (ao lado do código da requisição).
+ */
+Customization?: string
+}[]
+}[]
 minItems?: 0
 }
 response: CartItem[]

@@ -3,36 +3,42 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/cart/addItem.ts";
-import * as $$$$$$$$$1 from "./actions/cart/simulation.ts";
-import * as $$$$$$$$$2 from "./actions/cart/updateCart.ts";
-import * as $$$$$$$$$3 from "./actions/cart/updateItem.ts";
-import * as $$$$$$$$$4 from "./actions/notifyme.ts";
+import * as $$$$$$$$$1 from "./actions/cart/addItems.ts";
+import * as $$$$$$$$$2 from "./actions/cart/simulation.ts";
+import * as $$$$$$$$$3 from "./actions/cart/updateCart.ts";
+import * as $$$$$$$$$4 from "./actions/cart/updateItem.ts";
+import * as $$$$$$$$$5 from "./actions/notifyme.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
-import * as $$$1 from "./loaders/productDetailsPage.ts";
-import * as $$$2 from "./loaders/productDetailsPageVideo.ts";
-import * as $$$3 from "./loaders/productList.ts";
-import * as $$$4 from "./loaders/productListingPage.ts";
-import * as $$$5 from "./loaders/proxy.ts";
+import * as $$$1 from "./loaders/extensions/price/list.ts";
+import * as $$$2 from "./loaders/extensions/price/listingPage.ts";
+import * as $$$3 from "./loaders/productDetailsPage.ts";
+import * as $$$4 from "./loaders/productDetailsPageVideo.ts";
+import * as $$$5 from "./loaders/productList.ts";
+import * as $$$6 from "./loaders/productListingPage.ts";
+import * as $$$7 from "./loaders/proxy.ts";
 
 const manifest = {
   "loaders": {
     "vnda/loaders/cart.ts": $$$0,
-    "vnda/loaders/productDetailsPage.ts": $$$1,
-    "vnda/loaders/productDetailsPageVideo.ts": $$$2,
-    "vnda/loaders/productList.ts": $$$3,
-    "vnda/loaders/productListingPage.ts": $$$4,
-    "vnda/loaders/proxy.ts": $$$5,
+    "vnda/loaders/extensions/price/list.ts": $$$1,
+    "vnda/loaders/extensions/price/listingPage.ts": $$$2,
+    "vnda/loaders/productDetailsPage.ts": $$$3,
+    "vnda/loaders/productDetailsPageVideo.ts": $$$4,
+    "vnda/loaders/productList.ts": $$$5,
+    "vnda/loaders/productListingPage.ts": $$$6,
+    "vnda/loaders/proxy.ts": $$$7,
   },
   "handlers": {
     "vnda/handlers/sitemap.ts": $$$$0,
   },
   "actions": {
     "vnda/actions/cart/addItem.ts": $$$$$$$$$0,
-    "vnda/actions/cart/simulation.ts": $$$$$$$$$1,
-    "vnda/actions/cart/updateCart.ts": $$$$$$$$$2,
-    "vnda/actions/cart/updateItem.ts": $$$$$$$$$3,
-    "vnda/actions/notifyme.ts": $$$$$$$$$4,
+    "vnda/actions/cart/addItems.ts": $$$$$$$$$1,
+    "vnda/actions/cart/simulation.ts": $$$$$$$$$2,
+    "vnda/actions/cart/updateCart.ts": $$$$$$$$$3,
+    "vnda/actions/cart/updateItem.ts": $$$$$$$$$4,
+    "vnda/actions/notifyme.ts": $$$$$$$$$5,
   },
   "name": "vnda",
   "baseUrl": import.meta.url,

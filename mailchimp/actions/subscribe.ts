@@ -1,4 +1,4 @@
-import { setCookie } from "deco/deps.ts";
+import { setCookie } from "std/http/cookie.ts";
 import { AppContext } from "../mod.ts";
 import { toMd5 } from "../utils/transform.ts";
 

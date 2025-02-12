@@ -26,11 +26,11 @@ jobs:
           path: |
             /home/runner/.deno
             /home/runner/.cache/deno/deps/https/deno.land
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
       - name: Bundle Apps
-        run: deno run -A --lock=deno.lock --lock-write --reload scripts/start.ts
+        run: deno run -A --lock=deno.lock --frozen=false --reload scripts/start.ts
 
       - name: Check
         run: deno task check
@@ -47,8 +47,8 @@ jobs:
 
       - name: Test
         continue-on-error: true
-        run: deno test --lock=deno.lock --lock-write -A .
+        run: deno test --lock=deno.lock --frozen=false -A .
 
       - name: Benchmark
         continue-on-error: true
-        run: deno bench --lock=deno.lock --lock-write -A .
+        run: deno bench --lock=deno.lock --frozen=false -A .

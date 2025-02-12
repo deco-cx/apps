@@ -2,20 +2,38 @@ import { fetchAPI } from "../../utils/fetch.ts";
 import { Ratings, Reviews, VerifiedReviewsFullReview } from "./types.ts";
 import { Product } from "../../commerce/types.ts";
 import { ConfigVerifiedReviews } from "../mod.ts";
-import { context } from "deco/live.ts";
-
+import {
+  getRatingProduct,
+  getWeightedRatingProduct,
+  toReview,
+} from "./transform.ts";
+import { context } from "@deco/deco";
 export type ClientVerifiedReviews = ReturnType<typeof createClient>;
-
 export interface PaginationOptions {
   count?: number;
   offset?: number;
+  // legacy compatible parameters that will map to "orderMap" parameters, but we generally recommend using a custom parameter.
   order?:
     | "date_desc"
     | "date_ASC"
     | "rate_DESC"
     | "rate_ASC"
-    | "helpfulrating_DESC";
+    | "helpfulrating_DESC"
+    | string;
+  /**
+   * @description Determines if the order of results should be customized based on the provided parameter.
+   */
+  customizeOrder?: boolean;
 }
+
+// creating an object to keep backward compatibility
+const orderMap = {
+  date_desc: "date_desc",
+  date_ASC: "date_asc",
+  rate_DESC: "rate_desc",
+  rate_ASC: "rate_asc",
+  helpfulrating_DESC: "most_helpful",
+} as const;
 
 const MessageError = {
   ratings:
@@ -25,29 +43,27 @@ const MessageError = {
   fullReview:
     "🔴⭐ Error on call Full Review of Verified Review - probably unidentified product",
 };
-
 const baseUrl = "https://awsapis3.netreviews.eu/product";
-
 export const createClient = (params: ConfigVerifiedReviews | undefined) => {
-  if (!params) return;
-
+  if (!params) {
+    return;
+  }
   const { idWebsite } = params;
-
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#338f8f1b-4379-40a2-8893-080fe5234679 */
-  const rating = async ({ productId }: { productId: string }) => {
+  const rating = async ({ productId }: {
+    productId: string;
+  }) => {
     const payload = {
       query: "average",
       products: [productId],
       idWebsite: idWebsite,
       plateforme: "br",
     };
-
     try {
       const data = await fetchAPI<Ratings>(`${baseUrl}`, {
         method: "POST",
         body: JSON.stringify(payload),
       });
-
       return Object.keys(data).length ? data : undefined;
     } catch (error) {
       if (context.isDeploy) {
@@ -58,9 +74,10 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return undefined;
     }
   };
-
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#6d8ab05a-28b6-48b3-9e8f-6bbbc046619a */
-  const ratings = async ({ productsIds }: { productsIds: string[] }) => {
+  const ratings = async ({ productsIds }: {
+    productsIds: string[];
+  }) => {
     const payload = {
       query: "average",
       products: productsIds,
@@ -72,7 +89,6 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
         method: "POST",
         body: JSON.stringify(payload),
       });
-
       return Object.keys(data).length ? data : undefined;
     } catch (error) {
       if (context.isDeploy) {
@@ -84,19 +100,27 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return undefined;
     }
   };
-
   /** @description https://documenter.getpostman.com/view/2336519/SVzw6MK5#daf51360-c79e-451a-b627-33bdd0ef66b8 */
-  const reviews = ({
-    productId,
-    count = 5,
-    offset = 0,
-    order = "date_desc",
-  }: PaginationOptions & {
-    productId: string;
-  }) => {
+  const reviews = (
+    {
+      productId,
+      count = 5,
+      offset = 0,
+      order: _order = "date_desc",
+      customizeOrder = false,
+    }:
+      & PaginationOptions
+      & {
+        productId: string | string[];
+      },
+  ) => {
+    const order = customizeOrder
+      ? _order
+      : orderMap[_order as keyof typeof orderMap];
+
     const payload = {
       query: "reviews",
-      product: productId,
+      product: Array.isArray(productId) ? productId : [productId],
       idWebsite: idWebsite,
       plateforme: "br",
       offset: offset,
@@ -104,7 +128,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       order: order,
     };
 
-    return fetchAPI<Reviews>(`${baseUrl}`, {
+    return fetchAPI<Reviews[]>(`${baseUrl}`, {
       method: "POST",
       body: JSON.stringify(payload),
     });
@@ -114,48 +138,36 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     productId,
     count = 5,
     offset = 0,
+    order,
   }: PaginationOptions & {
-    productId: string;
+    productId: string | string[];
   }): Promise<VerifiedReviewsFullReview> => {
     try {
-      const response = await Promise.all([
-        rating({ productId }),
-        reviews({ productId, count, offset }),
-      ]);
+      const isMultiProduct = Array.isArray(productId);
 
+      const response = await Promise.all([
+        ratings({
+          productsIds: isMultiProduct ? productId : [productId],
+        }),
+        reviews({ productId, count, offset, order }),
+      ]);
       const [responseRating, responseReview] = response.flat() as [
         Ratings,
         Reviews | null,
       ];
 
-      const currentRating = responseRating?.[productId]?.[0];
+      const aggregateRating = isMultiProduct
+        ? getWeightedRatingProduct(responseRating)
+        : getRatingProduct({ ratings: responseRating, productId });
+
       return {
-        aggregateRating: currentRating
+        aggregateRating: aggregateRating
           ? {
-            "@type": "AggregateRating",
-            ratingValue: Number(parseFloat(currentRating.rate).toFixed(1)),
-            reviewCount: Number(currentRating.count),
+            ...aggregateRating,
+            stats: responseReview?.stats,
           }
           : undefined,
-        review: responseReview
-          ? responseReview.reviews?.map((item) => ({
-            "@type": "Review",
-            author: [
-              {
-                "@type": "Author",
-                name: `${item.firstname} ${item.lastname}`,
-              },
-            ],
-            datePublished: item.review_date,
-            reviewBody: item.review,
-            reviewRating: {
-              "@type": "AggregateRating",
-              ratingValue: Number(item.rate),
-              // this api does not support multiple reviews
-              reviewCount: 1,
-            },
-          }))
-          : [],
+        review: responseReview ? responseReview.reviews?.map(toReview) : [],
       };
     } catch (error) {
       if (context.isDeploy) {
@@ -169,7 +181,6 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       };
     }
   };
-
   const storeReview = async (): Promise<Reviews["reviews"] | null> => {
     try {
       const response = await fetchAPI<Reviews["reviews"]>(
@@ -178,10 +189,7 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
           method: "GET",
         },
       );
-
-      return (
-        response ? response : []
-      );
+      return (response ? response : []);
     } catch (error) {
       if (context.isDeploy) {
         console.error(MessageError.ratings, error);
@@ -191,7 +199,6 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
       return null;
     }
   };
-
   return {
     rating,
     ratings,
@@ -200,6 +207,5 @@ export const createClient = (params: ConfigVerifiedReviews | undefined) => {
     storeReview,
   };
 };
-
 export const getProductId = (product: Product) =>
   product.isVariantOf!.productGroupID;

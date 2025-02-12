@@ -5,14 +5,6 @@ export default function Preview() {
 
   return (
     <div class="flex flex-col items-center justify-center h-full">
-      <a href="https://www.nuvemshop.com.br/" style={{ marginTop: "16px" }}>
-        <img
-          alt="Nuvemshop"
-          src="https://github.com/deco-cx/apps/assets/76620866/6b747615-2889-40a9-8349-46814f90dd50"
-          width="120"
-          height="90"
-        />
-      </a>
       <div class="w-full flex flex-wrap justify-center p-4 gap-4">
         <div
           class="w-full flex flex-col items-center gap-2"
@@ -21,7 +13,8 @@ export default function Preview() {
             color: "white",
             borderRadius: "16px",
             padding: "24px",
-            maxWidth: "450px",
+            maxWidth: "600px",
+            fontSize: "24px",
           }}
         >
           <h1>Nuvemshop Settings</h1>

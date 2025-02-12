@@ -23,9 +23,10 @@ interface Props {
 
   /** @description Full text search query */
   term?: string;
+  indexName?: string;
 }
 
-const indexName: Indices = "products";
+export const INDEX_NAME: Indices = "products";
 
 /**
  * @title Algolia Integration
@@ -36,6 +37,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const { client } = ctx;
+  const { indexName = INDEX_NAME } = props;
 
   const { results } = await client.search([{
     indexName,

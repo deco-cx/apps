@@ -1,28 +1,11 @@
-<h1>
-  <p align="center">
-    <a href="https://www.linx.com.br/">
-      <img alt="linx" src="https://www.linx.com.br/app/themes/linx/assets/crystals/static/logo.png" width="250" />
-    </a>
-  </p>
-</h1>
 
-<p align="center">
-  <strong>
-    Ecommerce platform
-  </strong>
-</p>
-<p align="center">
-  Loaders, actions and workflows for adding Linx Commerce Platform to your deco.cx website.
-</p>
+Loaders, actions and workflows for adding Linx Commerce Platform to your deco.cx website.
 
-<p align="center">
 Linx is a popular e-commerce platform that allows businesses to set up and run their online stores. It provides a wide range of tools and services to help entrepreneurs and retailers sell products and services on the internet.
 
 This app wrapps Linx API into a comprehensive set of
 loaders/actions/workflows empowering non technical users to interact and act
 upon their headless commerce.
-
-</p>
 
 # Supported features
 This app currently supports:

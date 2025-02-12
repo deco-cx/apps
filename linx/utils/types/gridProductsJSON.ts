@@ -3,8 +3,21 @@
  */
 
 import { LinxInstallment } from "./installments.ts";
-import { LinxError } from "./common.ts";
-import { Facet } from "./facets.ts";
+import {
+  CategoryItem,
+  Facet,
+  LinxError,
+  LinxMetadata,
+  NavigationInfo,
+  ProductSelectionItem,
+  PropertyItem,
+  ProviderCapabilities,
+  ResponseCallBack,
+  SellerInfo,
+  SortOption,
+  Spell,
+  Tag,
+} from "./shared.ts";
 
 export interface WebPage {
   Response: Response;
@@ -19,7 +32,7 @@ export interface Model {
   GroupName: string;
   Message: null;
   Name: string;
-  Navigation: Navigation[];
+  Navigation: NavigationInfo[];
   Provider: string;
   SearchId: string;
   SortAlias: null;
@@ -72,12 +85,12 @@ export interface Product {
   Condition: string;
   CurrentSellerID: number;
   CurrentSkuID: number;
-  Descriptions: Description[];
+  Descriptions: LinxMetadata[];
   DisplayCondition: boolean;
   DisplayPrice: string;
   DisplayStockQuantity: boolean;
   EstimatedReorderDate: null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   Flags: unknown[];
   HasCurrentSkuID: boolean;
   HasEstimatedReorderDate: boolean;
@@ -119,7 +132,7 @@ export interface Product {
   ProductDefinition: null;
   ProductDefinitionID: number;
   ProductID: number;
-  ProductSelection: ProductSelection;
+  ProductSelection: ProductSelectionItem;
   ProductTypeID: number;
   PromotionFrom: null | string;
   PromotionOnlyCheckout: boolean;
@@ -167,28 +180,6 @@ export interface BrowsingImage {
   Width: number;
 }
 
-export interface CategoryItem {
-  ID: string;
-  Name: string;
-  ParentID: string;
-}
-
-export interface Description {
-  Alias: string;
-  Color: null | string;
-  GroupName: null | string;
-  GroupType: string;
-  ImagePath: null | string;
-  Name: string;
-  Order: number;
-  PropertyMetadataID: number;
-  PropertyPath: string;
-  Reference: null | string;
-  Title: string;
-  Value: string;
-  ValueAlias: string;
-}
-
 export interface Item {
   Availability: string;
   AvailabilityText: string;
@@ -210,7 +201,7 @@ export interface Item {
   Depth: number;
   Edit: null;
   EstimatedReorderDate: null;
-  ExtendedMetadatas: Description[];
+  ExtendedMetadatas: LinxMetadata[];
   HandlingDays: number;
   HasEstimatedReorderDate: boolean;
   Height: number;
@@ -247,7 +238,7 @@ export interface Item {
   ReplenishmentStatus: string;
   RetailPrice: number;
   SKU: string;
-  SKUOptions: Description[];
+  SKUOptions: LinxMetadata[];
   StockBalance: number;
   Tax: number;
   TaxationAmount: number;
@@ -265,22 +256,8 @@ export interface Option {
   Label: string;
   PropertyMetadataID: number;
   PropertyName: string;
-  Values: Value[];
+  Values: PropertyItem[];
   VariationLayoutTemplate: string;
-}
-
-export interface Value {
-  Color: null | string;
-  GroupName: null;
-  HasItems: boolean;
-  ImagePath: null | string;
-  IsSelected: boolean;
-  OptionID: number;
-  Order: number;
-  PropertyPath: string;
-  Reference: null;
-  Text: string;
-  Value: string;
 }
 
 export interface MediaGroup {
@@ -302,7 +279,7 @@ export interface MediaGroup {
 export interface Price {
   BestInstallment: LinxInstallment | null;
   BestInstallmentCreditCard: null;
-  BuyBox: BuyBox;
+  BuyBox: SellerInfo;
   CurrentPaymentTerm: null;
   HasBuyBox: boolean;
   HasMunknownSkus: boolean;
@@ -319,52 +296,6 @@ export interface Price {
   SalesPriceWithTaxDiscount: number;
   Tax: number;
   TaxationAmount: number;
-}
-
-export interface BuyBox {
-  SellerID: number;
-  SellerName: null;
-}
-
-export interface ProductSelection {
-  PropertyLevel: number;
-  PropertyPath: string;
-  Quantity: number;
-  SkuID: number;
-}
-
-export interface Tag {
-  Label: string;
-  TagID: number;
-}
-
-export interface ProviderCapabilities {
-  CanFacet: boolean;
-  CanPage: boolean;
-  CanSort: boolean;
-  CanSpell: boolean;
-  CanTerm: boolean;
-  Provider: string;
-}
-
-export interface SortOption {
-  Alias: string;
-  Label: string;
-  Selected: boolean;
-}
-
-export interface Spell {
-  Collation: string;
-  Options: unknown[];
-}
-
-export interface Navigation {
-  CustomUrl: null;
-  Depth: number;
-  ID: number;
-  Text: string;
-  Url: string;
-  UrlFriendly: string;
 }
 
 export interface PageInfo {
@@ -396,10 +327,4 @@ export interface Response {
   SuccessMessage: null;
   Url: null;
   Warnings: unknown[];
-}
-
-export interface ResponseCallBack {
-  Code: string;
-  Parameters: unknown[];
-  Value: string;
 }

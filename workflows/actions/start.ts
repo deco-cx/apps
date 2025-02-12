@@ -1,13 +1,16 @@
 // deno-lint-ignore-file no-explicit-any
-import { Workflow, WorkflowFn } from "deco/blocks/workflow.ts";
-import { Arg, RuntimeParameters, WorkflowExecutionBase } from "deco/deps.ts";
-import { BlockFromKey, BlockFunc, BlockKeys } from "deco/engine/block.ts";
-import { Resolvable } from "deco/engine/core/resolver.ts";
-import { Context } from "deco/live.ts";
-import { AppManifest } from "deco/mod.ts";
 import { start } from "../initializer.ts"; // side-effect initialize
 import { toExecution, WorkflowExecution, WorkflowMetadata } from "../types.ts";
-
+import { Workflow, WorkflowFn } from "@deco/deco/blocks";
+import { Arg, RuntimeParameters, WorkflowExecutionBase } from "@deco/durable";
+import {
+  type AppManifest,
+  type BlockFromKey,
+  type BlockFunc,
+  type BlockKeys,
+  Context,
+  type Resolvable,
+} from "@deco/deco";
 export interface CommonProps<
   TMetadata extends WorkflowMetadata = WorkflowMetadata,
 > {
@@ -23,19 +26,23 @@ export interface AnyWorkflow extends CommonProps {
     __resolveType: "resolved";
   }; // TODO(mcandeia) generics is not working Resolved<Workflow>;
 }
-
 export type WorkflowProps<
   key extends string = string,
   TManifest extends AppManifest = AppManifest,
   block extends BlockFromKey<key, TManifest> = BlockFromKey<key, TManifest>,
 > = key extends BlockKeys<TManifest> & `${string}/workflows/${string}`
   ? BlockFunc<key, TManifest, block> extends
-    WorkflowFn<infer TProps, any, infer TArgs>
-    ? TArgs["length"] extends 0 ? { key: key; props: TProps } & CommonProps
-    : { args: TArgs; key: key; props: TProps } & CommonProps
+    WorkflowFn<infer TProps, any, infer TArgs> ? TArgs["length"] extends 0 ? {
+        key: key;
+        props: TProps;
+      } & CommonProps
+    : {
+      args: TArgs;
+      key: key;
+      props: TProps;
+    } & CommonProps
   : AnyWorkflow
   : AnyWorkflow;
-
 const fromWorkflowProps = <
   key extends string = string,
   TManifest extends AppManifest = AppManifest,
@@ -50,10 +57,12 @@ const fromWorkflowProps = <
   ) {
     return anyProps.workflow;
   }
-  const wkflowProps = props as any as { key: string; props: any };
+  const wkflowProps = props as any as {
+    key: string;
+    props: any;
+  };
   return { ...(wkflowProps.props ?? {}), __resolveType: wkflowProps?.key };
 };
-
 const WORKFLOW_QS = "workflow";
 export const WorkflowQS = {
   buildFromProps: (workflow: ReturnType<typeof fromWorkflowProps>): string => {
@@ -61,9 +70,7 @@ export const WorkflowQS = {
       encodeURIComponent(btoa(JSON.stringify(workflow)))
     }`;
   },
-  extractFromUrl: (
-    urlString: string,
-  ): Resolvable<Workflow> | undefined => {
+  extractFromUrl: (urlString: string): Resolvable<Workflow> | undefined => {
     const url = new URL(urlString);
     const qs = url.searchParams.get(WORKFLOW_QS);
     if (!qs) {
@@ -89,11 +96,9 @@ export default async function startWorkflow<
     (context.isDeploy
       ? `wss://deco-sites-${context.site}-${context.deploymentId}.deno.dev`
       : "ws://localhost:8000");
-
   const url = new URL(
     `${service}/live/workflows/run?${WorkflowQS.buildFromProps(workflow)}`,
   );
-
   for (
     const [key, value] of Object.entries(
       runtimeParameters?.websocket?.defaultQueryParams ?? {},

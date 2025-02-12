@@ -28,6 +28,7 @@ const buildProxyRoutes = (
     generateDecoSiteMap,
     excludePathsFromDecoSiteMap,
     includeScriptsToHead,
+    includeScriptsToBody,
   }: {
     publicUrl?: string;
     extraPaths: string[];
@@ -35,6 +36,9 @@ const buildProxyRoutes = (
     generateDecoSiteMap?: boolean;
     excludePathsFromDecoSiteMap: string[];
     includeScriptsToHead?: {
+      includes?: Script[];
+    };
+    includeScriptsToBody?: {
       includes?: Script[];
     };
   },
@@ -59,18 +63,39 @@ const buildProxyRoutes = (
     const urlToProxy = `https://${hostname}`;
     const hostToUse = hostname;
 
-    const routeFromPath = (pathTemplate: string): Route => ({
-      pathTemplate,
-      handler: {
-        value: {
-          __resolveType: "website/handlers/proxy.ts",
-          url: urlToProxy,
-          host: hostToUse,
-          includeScriptsToHead,
-          removeDirtyCookies: true,
+    const routeFromPath = (pathTemplate: string): Route => {
+      const handlerValue = {
+        __resolveType: "website/handlers/proxy.ts",
+        url: urlToProxy,
+        host: hostToUse,
+        includeScriptsToHead,
+        includeScriptsToBody,
+        removeDirtyCookies: true,
+      };
+      // we have this check because we need to add
+      // the referer header to the AviseMe route
+      if (pathTemplate.includes("AviseMe")) {
+        return {
+          pathTemplate,
+          handler: {
+            value: {
+              ...handlerValue,
+              customHeaders: [{
+                key: "referer",
+                value: urlToProxy,
+              }],
+            },
+          },
+        };
+      }
+
+      return ({
+        pathTemplate,
+        handler: {
+          value: handlerValue,
         },
-      },
-    });
+      });
+    };
     const routesFromPaths = [...PATHS_TO_PROXY, ...extraPaths].map(
       routeFromPath,
     );
@@ -135,6 +160,12 @@ export interface Props {
   includeScriptsToHead?: {
     includes?: Script[];
   };
+  /**
+   * @title Scripts to include on Html body
+   */
+  includeScriptsToBody?: {
+    includes?: Script[];
+  };
 }
 
 /**
@@ -147,6 +178,7 @@ function loader(
     generateDecoSiteMap = true,
     excludePathsFromDecoSiteMap = [],
     includeScriptsToHead = { includes: [] },
+    includeScriptsToBody = { includes: [] },
   }: Props,
   _req: Request,
   ctx: AppContext,
@@ -158,6 +190,7 @@ function loader(
     publicUrl: ctx.publicUrl,
     extraPaths: extraPathsToProxy,
     includeScriptsToHead,
+    includeScriptsToBody,
   });
 }
 

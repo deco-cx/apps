@@ -6,6 +6,7 @@ import {
 } from "../utils/storefront/queries.ts";
 import {
   CollectionProductsArgs,
+  HasMetafieldsMetafieldsArgs,
   Product as ProductShopify,
   ProductConnection,
   QueryRoot,
@@ -20,6 +21,7 @@ import {
   searchSortShopify,
   sortShopify,
 } from "../utils/utils.ts";
+import { Metafield } from "../utils/types.ts";
 
 export interface QueryProps {
   /** @description search term to use on search */
@@ -63,6 +65,11 @@ export type Props = {
   props: QueryProps | CollectionProps;
 
   filters?: FilterProps;
+  /**
+   * @title Metafields
+   * @description search for metafields
+   */
+  metafields?: Metafield[];
 };
 
 // deno-lint-ignore no-explicit-any
@@ -84,6 +91,7 @@ const loader = async (
     (expandedProps as unknown as Props["props"]);
 
   const count = props.count ?? 12;
+  const metafields = expandedProps.metafields || [];
 
   let shopifyProducts:
     | SearchResultItemConnection
@@ -113,12 +121,13 @@ const loader = async (
   if (isQueryList(props)) {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         first: count,
         query: props.query,
         productFilters: filters,
+        identifiers: metafields,
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -127,12 +136,15 @@ const loader = async (
   } else {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootCollectionArgs & CollectionProductsArgs
+      & QueryRootCollectionArgs
+      & CollectionProductsArgs
+      & HasMetafieldsMetafieldsArgs
     >({
       variables: {
         first: count,
         handle: props.collection,
         filters,
+        identifiers: metafields,
         ...sortShopify[sort],
       },
       ...ProductsByCollection,

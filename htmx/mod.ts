@@ -1,9 +1,8 @@
-import { App, FnContext } from "deco/mod.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
-
+import { type App, type FnContext } from "@deco/deco";
 export type AppContext = FnContext<Props, Manifest>;
-
 export type Extension =
   | "ajax-header"
   | "alpine-morph"
@@ -27,18 +26,14 @@ export type Extension =
   | "ws"
   | "path-params"
   | "sse";
-
 export interface Props {
   /** @default 1.9.11 */
   version?: string;
-
   /** @defaul https://cdn.jsdelivr.net/npm  */
   cdn?: string;
-
   /** @title HTMX extensions to include */
   extensions?: Extension[];
 }
-
 /**
  * @title HTMX
  * @description high power tools for HTML.
@@ -55,7 +50,24 @@ export default function Site(state: Props): App<Manifest, Required<Props>> {
     manifest,
   };
 }
-
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "HTMX",
+      owner: "deco.cx",
+      description: "High power tools for HTML",
+      logo: "https://raw.githubusercontent.com/deco-cx/apps/main/htmx/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

@@ -1,13 +1,21 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
 import { SortOption } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
+import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import type { AppContext } from "../mod.ts";
 import {
   getVariations,
   MAXIMUM_REQUEST_QUANTITY,
 } from "../utils/getVariations.ts";
-import { GetURL, Hotsite, Search } from "../utils/graphql/queries.ts";
 import {
+  GetPartners,
+  GetURL,
+  Hotsite,
+  Search,
+} from "../utils/graphql/queries.ts";
+import {
+  GetPartnersQuery,
+  GetPartnersQueryVariables,
   GetUrlQuery,
   GetUrlQueryVariables,
   HotsiteQuery,
@@ -19,6 +27,7 @@ import {
   SortDirection,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 import {
   FILTER_PARAM,
   toBreadcrumbList,
@@ -26,6 +35,7 @@ import {
   toProduct,
 } from "../utils/transform.ts";
 import { Filters } from "./productList.ts";
+import { logger } from "@deco/deco/o11y";
 
 export type Sort =
   | "NAME:ASC"
@@ -96,6 +106,19 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+
+  /**
+   * @title Partner Param
+   * @description page param to partners page
+   * @deprecated
+   */
+  slug?: RequestURLParam;
+
+  /**
+   * @title Partner Param
+   * @description page param to partners page
+   */
+  partnerAlias?: RequestURLParam;
 }
 
 const OUTSIDE_ATTRIBUTES_FILTERS = ["precoPor"];
@@ -133,6 +156,10 @@ const searchLoader = async (
 
   const { storefront } = ctx;
 
+  const partnerAlias = props.partnerAlias ?? props.slug;
+
+  const partnerAccessTokenCookie = getPartnerCookie(req.headers);
+
   const headers = parseHeaders(req.headers);
 
   const limit = Number(url.searchParams.get("tamanho") ?? props.limit ?? 12);
@@ -142,8 +169,10 @@ const searchLoader = async (
     (url.searchParams.get("ordenacao") as SortValue | null) ??
     props.sort ??
     "SALES:DESC";
-  const page = props.page ?? Number(url.searchParams.get("page")) ??
-    Number(url.searchParams.get("pagina")) ?? 0;
+  const page = props.page ??
+    Number(url.searchParams.get("page")) ??
+    Number(url.searchParams.get("pagina")) ??
+    0;
   const query = props.query ?? url.searchParams.get("busca");
   const operation = props.operation ?? "AND";
 
@@ -153,21 +182,52 @@ const searchLoader = async (
   ];
 
   const onlyMainVariant = props.onlyMainVariant ?? true;
-  const [minimumPrice, maximumPrice] =
-    url.searchParams.getAll("filtro")?.find((i) => i.startsWith("precoPor"))
-      ?.split(":")[1]?.split(";").map(Number) ??
-      url.searchParams.get("precoPor")?.split(";").map(Number) ?? [];
+  const [minimumPrice, maximumPrice] = url.searchParams
+    .getAll("filtro")
+    ?.find((i) => i.startsWith("precoPor"))
+    ?.split(":")[1]
+    ?.split(";")
+    .map(Number) ??
+    url.searchParams.get("precoPor")?.split(";").map(Number) ??
+    [];
 
   const offset = page <= 1 ? 0 : (page - 1) * limit;
 
-  const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>({
-    variables: {
-      url: url.pathname,
+  const partnerData = partnerAlias
+    ? await storefront.query<GetPartnersQuery, GetPartnersQueryVariables>(
+      {
+        variables: { first: 1, alias: [partnerAlias] },
+        ...GetPartners,
+      },
+      { headers },
+    )
+    : null;
+
+  const partnerAccessToken =
+    partnerData?.partners?.edges?.[0]?.node?.partnerAccessToken ??
+      partnerAccessTokenCookie;
+
+  if (partnerAccessToken) {
+    try {
+      await ctx.invoke.wake.actions.cart.partnerAssociate({
+        partnerAccessToken,
+      });
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>(
+    {
+      variables: {
+        url: url.pathname,
+      },
+      ...GetURL,
     },
-    ...GetURL,
-  }, {
-    headers,
-  });
+    {
+      headers,
+    },
+  );
 
   const isHotsite = urlData.uri?.kind === "HOTSITE";
 
@@ -180,9 +240,10 @@ const searchLoader = async (
     onlyMainVariant,
     minimumPrice,
     maximumPrice,
+    partnerAccessToken,
   };
 
-  if (!query && !isHotsite) return null;
+  if (!query && !isHotsite && !partnerAccessToken) return null;
 
   const data = isHotsite
     ? await storefront.query<HotsiteQuery, HotsiteQueryVariables>({
@@ -207,14 +268,13 @@ const searchLoader = async (
   const previousPage = new URLSearchParams(url.searchParams);
 
   const hasNextPage = Boolean(
-    (data?.result?.productsByOffset?.totalCount ?? 0) /
-        (data?.result?.pageSize ?? limit) >
+    (data?.result?.productsByOffset?.totalCount ?? 0) / limit >
       (data?.result?.productsByOffset?.page ?? 0),
   );
 
   const hasPreviousPage = page > 1;
 
-  const pageOffset = props.pageOffset ?? 1;
+  const pageOffset = props.pageOffset ?? 0;
 
   if (hasNextPage) {
     nextPage.set("page", (page + pageOffset + 1).toString());
@@ -239,13 +299,14 @@ const searchLoader = async (
       ?.content
     : capitalize(query || "");
   const description = isHotsite
-    ? (data as HotsiteQuery)?.result?.seo?.find((i) =>
-      i?.name === "description"
+    ? (data as HotsiteQuery)?.result?.seo?.find(
+      (i) => i?.name === "description",
     )?.content
     : capitalize(query || "");
-  const canonical =
-    new URL(isHotsite ? `/${(data as HotsiteQuery)?.result?.url}` : url, url)
-      .href;
+  const canonical = new URL(
+    isHotsite ? `/${(data as HotsiteQuery)?.result?.url}` : url,
+    url,
+  ).href;
 
   return {
     "@type": "ProductListingPage",
@@ -267,8 +328,8 @@ const searchLoader = async (
     products: products
       ?.filter((p): p is ProductFragment => Boolean(p))
       .map((variant) => {
-        const productVariations = variations?.filter((v) =>
-          v.inProductGroupWithID === variant.productId
+        const productVariations = variations?.filter(
+          (v) => v.inProductGroupWithID === variant.productId,
         );
 
         return toProduct(variant, { base: url }, productVariations);

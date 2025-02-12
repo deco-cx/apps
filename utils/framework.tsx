@@ -1,6 +1,5 @@
-import { PreactComponent } from "deco/engine/block.ts";
-import { useFramework } from "deco/runtime/handler.tsx";
 import { green } from "std/fmt/colors.ts";
+import { PreactComponent, useFramework } from "@deco/deco";
 export const errorIfFrameworkMismatch = (
   flavor: string,
   page: PreactComponent,

@@ -1,54 +1,44 @@
-import type { App, AppContext as AC } from "deco/mod.ts";
 import Typesense from "npm:typesense@1.7.1";
+import { Markdown } from "../decohub/components/Markdown.tsx";
+import { PreviewContainer } from "../utils/preview.tsx";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import {
   ProductsCollectionName,
   setupProductsCollection,
 } from "./utils/product.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
-
+import { type App, type AppContext as AC } from "@deco/deco";
 export type AppContext = AC<ReturnType<typeof App>>;
-
 export interface State {
   /**
    * @title Your TypeSense location
    * @description e.g.: https://dry-pond-5415.fly.dev
    */
   apiUrls: string[];
-
   /**
    * @title API Key
    * @description https://dashboard.algolia.com/account/api-keys/all
    */
   apiKey: Secret;
 }
-
 export type Collections = ProductsCollectionName;
-
 /**
  * @title TypeSense
  * @description Open source search engine meticulously engineered for performance & ease-of-use.
  * @category Search
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/typesense/logo.png
  */
-export default function App(
-  props: State,
-) {
+export default function App(props: State) {
   const { apiKey, apiUrls } = props;
-
   if (!apiKey) {
     throw new Error("Missing API key");
   }
-
   const stringApiKey = typeof apiKey === "string"
     ? apiKey
     : apiKey?.get?.() ?? "";
-
   const options = {
     nodes: apiUrls.map((href) => {
       const url = new URL(href);
-
       return {
         protocol: url.protocol.replace(":", ""),
         host: url.host,
@@ -63,7 +53,6 @@ export default function App(
     healthcheckIntervalSeconds: 5,
     logLevel: "error" as const,
   };
-
   const client = new Typesense.Client({
     ...options,
     numRetries: 10,
@@ -76,17 +65,33 @@ export default function App(
     connectionTimeoutSeconds: 5,
     retryIntervalSeconds: 0.1,
   });
-
   const state = {
     ...props,
     products: setupProductsCollection(client, searchClient),
   };
-
   const app: App<Manifest, typeof state> = { manifest, state };
-
   return app;
 }
-
-export const preview = previewFromMarkdown(
-  new URL("./README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "TypeSense",
+      owner: "deco.cx",
+      description:
+        "Open source search engine meticulously engineered for performance & ease-of-use.",
+      logo:
+        "https://raw.githubusercontent.com/deco-cx/apps/main/typesense/logo.png",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

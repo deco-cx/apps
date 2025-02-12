@@ -1,5 +1,3 @@
-# Power Reviews Integration
-
 # Installation
 
 1. Install via decohub

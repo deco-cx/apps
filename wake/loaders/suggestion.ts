@@ -7,6 +7,7 @@ import {
   ProductFragment,
 } from "../utils/graphql/storefront.graphql.gen.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 import { toProduct } from "../utils/transform.ts";
 
 export interface Props {
@@ -18,7 +19,7 @@ export interface Props {
  * @title Wake Integration
  * @description Product Suggestion loader
  */
-const action = async (
+const loader = async (
   props: Props,
   req: Request,
   ctx: AppContext,
@@ -26,6 +27,7 @@ const action = async (
   const { storefront } = ctx;
   const { query, limit = 10 } = props;
 
+  const partnerAccessToken = getPartnerCookie(req.headers);
   const headers = parseHeaders(req.headers);
 
   if (!query) return null;
@@ -34,7 +36,7 @@ const action = async (
     AutocompleteQuery,
     AutocompleteQueryVariables
   >({
-    variables: { query, limit },
+    variables: { query, limit, partnerAccessToken },
     ...Autocomplete,
   }, {
     headers,
@@ -56,4 +58,4 @@ const action = async (
   };
 };
 
-export default action;
+export default loader;

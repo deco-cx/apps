@@ -1,13 +1,3 @@
-<h1>
-  <a href="https://resend.com/">
-    <p align="center">
-      <strong>
-        RESEND
-      </strong>
-    </p>
-  </a>
-</h1>
-
 
 Resend is an email platform that helps developers build and send transactional and marketing emails. It is designed to be easy to use and reliable, with a focus on deliverability. Resend offers a variety of features to help improve email deliverability, including dedicated IPs, email authentication, and spam tracking. Additionally, Resend integrates with React to allow developers to create beautiful email templates.
 
@@ -24,7 +14,7 @@ Resend is an email platform that helps developers build and send transactional a
 
     ```typescript
       // runtime.ts
-      import { proxy } from "deco/clients/withManifest.ts";
+      import { proxy } from "@deco/deco/web";
       import type { Manifest } from "./manifest.gen.ts";
       import type { Manifest as ManifestVNDA } from "apps/vnda/manifest.gen.ts";
       import type { Manifest as ManifestVTEX } from "apps/vtex/manifest.gen.ts";

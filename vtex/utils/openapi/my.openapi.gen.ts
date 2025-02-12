@@ -19,30 +19,295 @@ totalCount?: number
 }
 }
 /**
- * Get List Reviews
+ * Retrieves a list of reviews related to a product.
+ * ## Permissions
+ * 
+ * This endpoint does not require [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
  */
 "GET /reviews-and-ratings/api/reviews": {
+searchParams: {
+/**
+ * Returns Reviews that contain the search term in `productId`, `sku`, `shopperId`, or `reviewerName`.
+ */
+search_term: string
+/**
+ * Zero base starting record number, `0` is the default value.
+ */
+from: string
+/**
+ * Zero base ending record number, `3` is the default value.
+ */
+to: string
+/**
+ * Field name to order records. The field name must have the first letter uppercase. Allowed field names: `ProductId`, `ShopperId`, `Approved`, `ReviewDateTime`, `SearchDate`, `Rating`, `Locale`. Optionally add `:asc` or `:desc`.
+ */
+order_by: string
+/**
+ * Status of the review, approved (`true`) or not (`false`).
+ */
+status: boolean
+/**
+ * Filter the reviews by product ID.
+ */
+product_id: string
+}
+/**
+ * Response body object.
+ */
 response: {
+/**
+ * Array of reviews.
+ */
 data?: {
+/**
+ * Review ID.
+ */
 id?: string
-cacheId?: number
+/**
+ * Product ID.
+ */
 productId?: string
+/**
+ * Customer rating.
+ */
 rating?: number
+/**
+ * Review's title.
+ */
 title?: string
+/**
+ * Review's text.
+ */
 text?: string
+/**
+ * Reviewer name.
+ */
 reviewerName?: string
+/**
+ * Shopper email.
+ */
 shopperId?: string
+/**
+ * Review's date and time.
+ */
 reviewDateTime?: string
+/**
+ * Review's search date.
+ */
+searchDate?: string
+/**
+ * Indicates if the reviewer is a verified purchaser (`true`) or not (`false`).
+ */
 verifiedPurchaser?: boolean
-sku?: null
+/**
+ * SKU ID.
+ */
+sku?: (null | string)
+/**
+ * Indicates if the review was approved (`true`) or not (`false`).
+ */
 approved?: boolean
-location?: null
+/**
+ * Review's origin location.
+ */
+location?: (null | string)
+/**
+ * Review's locale.
+ */
+locale?: (null | string)
+/**
+ * Past reviews of the same product.
+ */
+pastReviews?: (null | string)
 }[]
+/**
+ * Range of the reviews list.
+ */
 range?: {
+/**
+ * Total number of reviews on the list.
+ */
 total?: number
+/**
+ * Zero base starting record number.
+ */
 from?: number
+/**
+ * Zero base ending record number.
+ */
 to?: number
 }
 }
 }
+/**
+ * Creates multiple reviews for more than one product in a single operation.
+ * ## Permissions
+ * 
+ * This endpoint does not require [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). 
+ *  For authentication, you must generate and use only the Application Key and the Application Token to work with this endpoint. Refer to the [API authentication using application keys](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) and [Generating internal application keys](https://help.vtex.com/en/tutorial/application-keys--2iffYzlvvz4BDMr6WGUtet#generating-internal-application-keys) guide for more information.
+ */
+"POST /reviews-and-ratings/api/reviews": {
+/**
+ * List of reviews.
+ */
+body: SaveMultipleReviewsRequest[]
+/**
+ * List of review IDs.
+ */
+response: string[]
+}
+/**
+ * Deletes multiple reviews at once. 
+ * 
+ *  ## Permissions
+ * 
+ * This endpoint does not require [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).
+ */
+"DELETE /reviews-and-ratings/api/reviews": {
+/**
+ * Array of reviews IDs.
+ */
+body: string[]
+/**
+ * Indicates if the review was deleted (`true`) or not (`false`).
+ */
+response: boolean
+}
+/**
+ * Creates a single review. 
+ * ## Permissions
+ * 
+ * This endpoint does not require [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). 
+ *  For authentication, you must generate and use only your `VtexidClientAutCookie` to work with this endpoint. Refer to the [Generating user tokens](https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens#generating-a-user-token-with-the-vtex-io-cli) guide for more information.
+ */
+"POST /reviews-and-ratings/api/review": {
+body: SaveReviewRequest
+/**
+ * Response body object.
+ */
+response: {
+/**
+ * Review ID.
+ */
+id?: string
+/**
+ * Product ID.
+ */
+productId?: string
+/**
+ * Customer rating.
+ */
+rating?: number
+/**
+ * Review's title.
+ */
+title?: string
+/**
+ * Review's text.
+ */
+text?: string
+/**
+ * Reviewer name.
+ */
+reviewerName?: string
+/**
+ * Shopper email.
+ */
+shopperId?: string
+/**
+ * Review's date and time.
+ */
+reviewDateTime?: string
+/**
+ * Review's search date.
+ */
+searchDate?: string
+/**
+ * Indicates if the reviewer is a verified purchaser (`true`) or not (`false`).
+ */
+verifiedPurchaser?: boolean
+/**
+ * SKU ID.
+ */
+sku?: (null | string)
+/**
+ * Indicates if the review was approved (`true`) or not (`false`).
+ */
+approved?: boolean
+/**
+ * Review's origin location.
+ */
+location?: (null | string)
+/**
+ * Review's locale.
+ */
+locale?: (null | string)
+/**
+ * Past reviews of the same product.
+ */
+pastReviews?: (null | string)
+}
+}
+}
+/**
+ * Request body.
+ */
+export interface SaveMultipleReviewsRequest {
+/**
+ * Review ID.
+ */
+id?: string
+/**
+ * Product ID.
+ */
+productId: string
+/**
+ * Customer rating.
+ */
+rating: number
+/**
+ * Review's title.
+ */
+title: string
+/**
+ * Review's text.
+ */
+text: string
+/**
+ * Reviewer name.
+ */
+reviewerName: string
+/**
+ * Defines if the review was approved (`true`) or not (`false`).
+ */
+approved: boolean
+}
+/**
+ * Request body.
+ */
+export interface SaveReviewRequest {
+/**
+ * Product ID.
+ */
+productId: string
+/**
+ * Customer rating.
+ */
+rating: number
+/**
+ * Review's title.
+ */
+title: string
+/**
+ * Review's text.
+ */
+text: string
+/**
+ * Reviewer name.
+ */
+reviewerName: string
+/**
+ * Indicates if the review was approved (`true`) or not (`false`).
+ */
+approved: boolean
 }

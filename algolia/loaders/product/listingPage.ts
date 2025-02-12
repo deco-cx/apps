@@ -224,7 +224,7 @@ const loader = async (
   ]);
 
   const [
-    { hits, page, nbPages, queryID, nbHits, hitsPerPage },
+    { hits, page = 0, nbPages = 1, queryID, nbHits = 12, hitsPerPage = 12 },
     { facets },
   ] = results as SearchResponse<IndexedProduct>[];
 

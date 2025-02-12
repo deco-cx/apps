@@ -23,6 +23,10 @@ export interface BlogPost {
   excerpt: string;
   image?: ImageWidget;
   /**
+   * @title Alt text for the image
+   */
+  alt?: string;
+  /**
    * @widget blog
    * @collection authors
    */
@@ -54,6 +58,8 @@ export interface BlogPost {
    * @title Extra Props
    */
   extraProps?: ExtraProps[];
+  /** @hide true */
+  id?: string;
 }
 
 export interface ExtraProps {

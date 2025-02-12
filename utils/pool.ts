@@ -17,6 +17,8 @@ export const createPool = <T>(resources: T[]) => {
 
       const index = free.values().next().value;
 
+      if (index === undefined) return;
+
       taken.add(index);
       free.delete(index);
 

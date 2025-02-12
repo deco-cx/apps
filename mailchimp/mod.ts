@@ -1,14 +1,17 @@
-import type { App as A, AppContext as AC, ManifestOf } from "deco/mod.ts";
+import { Markdown } from "../decohub/components/Markdown.tsx";
 import { createHttpClient } from "../utils/http.ts";
+import { PreviewContainer } from "../utils/preview.tsx";
+import { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client.ts";
-import { Secret } from "../website/loaders/secret.ts";
-import { previewFromMarkdown } from "../utils/preview.ts";
-
+import {
+  type App as A,
+  type AppContext as AC,
+  type ManifestOf,
+} from "@deco/deco";
 export type App = ReturnType<typeof Mailchimp>;
 export type AppContext = AC<App>;
 export type AppManifest = ManifestOf<App>;
-
 export interface Props {
   apiKey: Secret;
   /**
@@ -21,25 +24,39 @@ export interface Props {
  */
 export default function Mailchimp(props: Props) {
   const { serverPrefix, apiKey } = props;
-
   const headers = new Headers();
   headers.set("Authorization", `Basic ${btoa(`anystring:${apiKey.get()}`)}`);
-
   const api = createHttpClient<API>({
     base: `https://${serverPrefix}.api.mailchimp.com`,
     headers,
   });
-
   const state = { api };
-
   const app: A<Manifest, typeof state> = {
     state,
     manifest,
   };
-
   return app;
 }
-
-export const preview = previewFromMarkdown(
-  new URL("README.md", import.meta.url),
-);
+export const preview = async () => {
+  const markdownContent = await Markdown(
+    new URL("./README.md", import.meta.url).href,
+  );
+  return {
+    Component: PreviewContainer,
+    props: {
+      name: "Mailchimp",
+      owner: "deco.cx",
+      description:
+        "Mailchimp is an email and marketing automations platform for growing businesses.",
+      logo:
+        "https://s3.amazonaws.com/www-inside-design/uploads/2018/10/mailchimp-sq.jpg",
+      images: [],
+      tabs: [
+        {
+          title: "About",
+          content: markdownContent(),
+        },
+      ],
+    },
+  };
+};

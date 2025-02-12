@@ -1,23 +1,7 @@
-<h1>
-  <p align="center">
-    <a href="https://www.konfidency.com.br/">
-      <img alt="Konfidency" src="https://github.com/deco-cx/apps/assets/Konfidency.svg" width="100" height="100" />
-    </a>
-  </p>
-</h1>
 
-<p align="center">
-  <strong>
-    Product's reviews and store reviews.
-  </strong>
-</p>
-<p align="center">
-  Extensions to inprove your experience in deco.cx.
-</p>
+Extensions to inprove your experience in deco.cx.
 
-<p align="center">
 Konfidency is a solution to verify the authenticity of the review and return the desired reviews quantity in your store.
-</p>
 
 # Installation
 1. Install via decohub

@@ -1,7 +1,7 @@
-import { Context } from "deco/deco.ts";
 import * as colors from "std/fmt/colors.ts";
 import { once } from "../../typesense/utils/once.ts";
 import { decryptFromHex, hasLocalCryptoKey } from "../utils/crypto.ts";
+import { Context } from "@deco/deco";
 /**
  * @title Secret
  * @hideOption true
@@ -12,7 +12,6 @@ export interface Secret {
    */
   get: () => string | null;
 }
-
 export interface Props {
   /**
    * @title Secret Value
@@ -26,9 +25,7 @@ export interface Props {
    */
   name?: string;
 }
-
 const cache: Record<string, Promise<string | null>> = {};
-
 const showWarningOnce = once(() => {
   console.warn(
     colors.brightYellow(
@@ -62,9 +59,7 @@ const getSecret = async (props: Props): Promise<string | null> => {
 /**
  * @title Secret
  */
-export default async function Secret(
-  props: Props,
-): Promise<Secret> {
+export default async function Secret(props: Props): Promise<Secret> {
   const secretValue = await getSecret(props);
   return {
     get: (): string | null => {
