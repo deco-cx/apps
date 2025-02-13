@@ -78,18 +78,18 @@ const loader = async (
   } = forProducts;
   const { Model: { Grid: { Facets } } } = forProducts;
 
-  const products = [];
-  for (const product of Products) {
-    const transformedProduct = await addAuctions(
+  const leiloes = await ctx.invoke.linx.loaders.auction.apiList();
+
+  const products = Products.map((product) => {
+    return addAuctions(
       toProduct(product, product.ProductSelection?.SkuID, {
         cdn,
         currency: "BRL",
         url,
       }),
-      ctx,
+      leiloes,
     );
-    products.push(transformedProduct);
-  }
+  });
 
   return {
     "@type": "ProductListingPage",

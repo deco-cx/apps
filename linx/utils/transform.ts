@@ -31,7 +31,7 @@ import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
 import { Associations } from "./types/associationsJSON.ts";
-import type { AppContext } from "../mod.ts";
+import { Auction } from "./types/auctionAPI.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -59,9 +59,10 @@ const pickVariant = (variants: LinxProduct[], variantId: number | null) => {
   return variants[0];
 };
 
-export const addAuctions = async (product: Product, ctx: AppContext) => {
-  const leiloes = await ctx.invoke.linx.loaders.auction.apiList();
-
+export const addAuctions = (
+  product: Product,
+  leiloes: Auction[] | null,
+) => {
   const auctionPropertyIndex = product.additionalProperty?.findIndex(
     (prop) => prop.name === "id_leilao",
   );

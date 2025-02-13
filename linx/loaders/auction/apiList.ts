@@ -1,35 +1,25 @@
 import { Auction } from "../../utils/types/auctionAPI.ts";
 import type { AppContext } from "../../../linx/mod.ts";
 
-let cachedPromise: Promise<Auction[]> | null = null;
-let lastUpdate: number = Date.now();
 /**
  * @title Linx Integration
  * @description Search Wishlist loader
  */
-const loader = (
+const loader = async (
   _props: unknown,
   _req: Request,
   ctx: AppContext,
 ): Promise<Auction[] | null> => {
   const { layer } = ctx;
 
-  if (cachedPromise && Date.now() - lastUpdate < (60 * 1000)) {
-    return cachedPromise;
-  }
-
-  lastUpdate = Date.now();
-  const responsePromise = layer
+  const responsePromise = await layer
     ["POST /v1/Catalog/API.svc/web/SearchProductAuctions"](
       {},
       // @ts-ignore body is required
       { body: {} },
-    ).then(async (response) => {
-      return await response.json();
-    });
+    );
 
-  cachedPromise = responsePromise;
-  return responsePromise;
+  return await responsePromise.json();
 };
 
 export const cache = "stale-while-revalidate";
