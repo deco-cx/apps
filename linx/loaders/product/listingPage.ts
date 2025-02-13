@@ -78,18 +78,13 @@ const loader = async (
   } = forProducts;
   const { Model: { Grid: { Facets } } } = forProducts;
 
-  const products = await Promise.all(
-    Products.map(async (product) =>
-      await addAuctions(
-        toProduct(product, product.ProductSelection?.SkuID, {
-          cdn,
-          currency: "BRL",
-          url,
-        }),
-        ctx,
-      )
-    ),
-  );
+  const products = Products.map((product) => {
+    return toProduct(product, product.ProductSelection?.SkuID, {
+      cdn,
+      currency: "BRL",
+      url,
+    })
+  })
 
   return {
     "@type": "ProductListingPage",

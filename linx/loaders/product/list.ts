@@ -39,6 +39,14 @@ const loader = async (
 
   const products = response?.Model?.Grid?.Products ?? [];
 
+  return products.map((product) => {
+    return toProduct(product, product.ProductSelection?.SkuID, {
+      cdn,
+      url,
+      currency: "BRL",
+    })
+  })
+
   return await Promise.all(
     products.map(async (product) =>
       await addAuctions(
