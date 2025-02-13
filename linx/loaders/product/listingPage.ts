@@ -2,6 +2,7 @@ import type { ProductListingPage } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { isGridProductsModel } from "../../utils/paths.ts";
 import {
+  addAuctions,
   toBreadcrumbList,
   toFilters,
   toProduct,
@@ -77,12 +78,17 @@ const loader = async (
   } = forProducts;
   const { Model: { Grid: { Facets } } } = forProducts;
 
-  const products = Products.map((product) =>
-    toProduct(product, product.ProductSelection?.SkuID, {
-      cdn,
-      currency: "BRL",
-      url,
-    })
+  const products = await Promise.all(
+    Products.map(async (product) =>
+      await addAuctions(
+        toProduct(product, product.ProductSelection?.SkuID, {
+          cdn,
+          currency: "BRL",
+          url,
+        }),
+        ctx,
+      )
+    ),
   );
 
   return {
