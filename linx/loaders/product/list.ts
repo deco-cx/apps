@@ -39,18 +39,20 @@ const loader = async (
 
   const products = response?.Model?.Grid?.Products ?? [];
 
-  return await Promise.all(
-    products.map(async (product) =>
-      await addAuctions(
-        toProduct(product, product.ProductSelection?.SkuID, {
-          cdn,
-          url,
-          currency: "BRL",
-        }),
-        ctx,
-      )
-    ),
-  );
+  const transformedProducts = [];
+  for (const product of products) {
+    const transformedProduct = await addAuctions(
+      toProduct(product, product.ProductSelection?.SkuID, {
+        cdn,
+        url,
+        currency: "BRL",
+      }),
+      ctx,
+    );
+    transformedProducts.push(transformedProduct);
+  }
+
+  return transformedProducts;
 };
 
 export default loader;
