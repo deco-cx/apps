@@ -39,20 +39,18 @@ const loader = async (
 
   const products = response?.Model?.Grid?.Products ?? [];
 
-  const transformedProducts = [];
-  for (const product of products) {
-    const transformedProduct = await addAuctions(
+  const leiloes = await ctx.invoke.linx.loaders.auction.apiList();
+
+  return products.map((product) => {
+    return addAuctions(
       toProduct(product, product.ProductSelection?.SkuID, {
         cdn,
         url,
         currency: "BRL",
       }),
-      ctx,
+      leiloes,
     );
-    transformedProducts.push(transformedProduct);
-  }
-
-  return transformedProducts;
+  });
 };
 
 export default loader;
