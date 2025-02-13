@@ -246,7 +246,7 @@ export const toProduct = (
   }));
 
   const displayPrice = {
-    "@type": "PropertyValue",
+    "@type": "PropertyValue" as const,
     name: product.DisplayPrice,
     value: product.DisplayPrice,
     additionalType: "displayPrice",

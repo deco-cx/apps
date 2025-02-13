@@ -22,6 +22,7 @@ const loader = (
   const responsePromise = layer
     ["POST /v1/Catalog/API.svc/web/SearchProductAuctions"](
       {},
+      // @ts-ignore body is required
       { body: {} },
     ).then(async (response) => {
       return await response.json();
