@@ -29,8 +29,6 @@ const loader = async (
     },
   }).catch(nullOnNotFound);
 
-  console.log(response);
-
   if (response === null) {
     return null;
   }
