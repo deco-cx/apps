@@ -71,7 +71,7 @@ export const addAuctions = (
     product.additionalProperty?.splice(auctionPropertyIndex, 1);
   }
 
-  const now = new Date().getTime() - (3 * 60 * 60 * 1000);
+  const now = new Date().getTime();
 
   const parseDate = (dateString: string) => {
     const match = dateString.match(/\/Date\((\d+)([-+]\d{4})?\)\//);
