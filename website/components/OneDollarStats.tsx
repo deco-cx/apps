@@ -18,8 +18,7 @@ declare global {
       view: (
         params: Record<string, string | boolean>,
       ) => void;
-    }
-    
+    };
   }
 }
 
@@ -33,8 +32,7 @@ const trackerOriginal =
 const snippet = () => {
   // Flags and additional dimentions
   const props: Record<string, string> = {};
-  const trackPageview = () =>
-    globalThis.window.stonks?.view?.(props);
+  const trackPageview = () => globalThis.window.stonks?.view?.(props);
   // Attach pushState and popState listeners
   const originalPushState = history.pushState;
   if (originalPushState) {
