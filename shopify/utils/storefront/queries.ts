@@ -267,10 +267,10 @@ const Customer = gql`
 
 export const CreateCart = {
   query: gql`mutation CreateCart {
-  payload: cartCreate { 
-    cart { id } 
-  }
-}`,
+    payload: cartCreate { 
+      cart { id } 
+    }
+  }`,
 };
 
 export const GetCart = {
@@ -282,8 +282,8 @@ export const GetProduct = {
   fragments: [Product, ProductVariant, Collection],
   query:
     gql`query GetProduct($handle: String, $identifiers: [HasMetafieldsIdentifier!]!) {
-    product(handle: $handle) { ...Product }
-  }`,
+      product(handle: $handle) { ...Product }
+    }`,
 };
 
 export const ListProducts = {
@@ -388,6 +388,60 @@ export const ProductRecommendations = {
     gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!) {
     productRecommendations(productId: $productId) {
       ...Product
+    }
+  }`,
+};
+
+export const GetShopInfo = {
+  query: gql`query GetShopInfo($identifiers: [HasMetafieldsIdentifier!]!) {
+    shop {
+      name
+      description
+      privacyPolicy {
+        title
+        body
+      }
+      refundPolicy {
+        title
+        body
+      }
+      shippingPolicy {
+        title
+        body
+      }
+      subscriptionPolicy {
+        title
+        body
+      }
+      termsOfService {
+        title
+        body
+      }
+      metafields(identifiers: $identifiers) {
+        description
+        key
+        namespace
+        type
+        value
+        reference {
+          ... on MediaImage {
+            image {
+              url
+            }
+          }
+        }
+        references(first: 250) {
+          edges {
+            node {
+              ... on MediaImage {
+                image {
+                  url
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }`,
 };
