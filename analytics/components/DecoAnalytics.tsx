@@ -9,7 +9,6 @@ export interface Props {
 }
 declare global {
   interface Window {
-    plausibleInitialized: boolean;
     plausible: (name: string, params: {
       props: Record<string, string | boolean>;
     }) => void;
@@ -17,10 +16,11 @@ declare global {
 }
 // This function should be self contained, because it is stringified!
 const snippet = (() => {
-  globalThis.window.plausibleInitialized = false;
+  const gThis = (globalThis as unknown as { plausibleInitialized: boolean});
+  gThis.plausibleInitialized = false;
   return () => {
-    if (globalThis.window.plausibleInitialized) return;
-    globalThis.window.plausibleInitialized = true;
+    if (gThis.plausibleInitialized) return;
+    gThis.plausibleInitialized = true;
 
     // Flags and additional dimensions
     const props: Record<string, string> = {};
