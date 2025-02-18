@@ -16,7 +16,7 @@ declare global {
 }
 // This function should be self contained, because it is stringified!
 const snippet = (() => {
-  const gThis = (globalThis as unknown as { plausibleInitialized: boolean});
+  const gThis = globalThis as unknown as { plausibleInitialized: boolean };
   gThis.plausibleInitialized = false;
   return () => {
     if (gThis.plausibleInitialized) return;
