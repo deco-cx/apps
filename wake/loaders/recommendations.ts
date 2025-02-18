@@ -10,6 +10,7 @@ import {
 import { parseSlug, toProduct } from "../utils/transform.ts";
 import { parseHeaders } from "../utils/parseHeaders.ts";
 import { getVariations } from "../utils/getVariations.ts";
+import { getPartnerCookie } from "../utils/partner.ts";
 
 export interface Props {
   /**
@@ -35,6 +36,7 @@ const productRecommendationsLoader = async (
   const url = new URL(req.url);
   const { storefront } = ctx;
   const { slug, quantity, algorithm = "DEFAULT" } = props;
+  const partnerAccessToken = getPartnerCookie(req.headers);
 
   const headers = parseHeaders(req.headers);
 
@@ -44,7 +46,7 @@ const productRecommendationsLoader = async (
     ProductRecommendationsQuery,
     ProductRecommendationsQueryVariables
   >({
-    variables: { quantity, productId, algorithm },
+    variables: { quantity, productId, algorithm, partnerAccessToken },
     ...ProductRecommendations,
   }, { headers });
 
