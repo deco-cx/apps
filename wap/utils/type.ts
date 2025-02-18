@@ -45,16 +45,18 @@ export interface Detalhes {
   filtrosPreco: FiltrosPreco[];
   filtrosDescontoPrecoPor: FiltroDescontoPrecoPor;
   selos: Selo[];
-  atributos: Atributo[];
+  atributos: Atributo;
   ordenacao: Ordenacao[];
 }
 
 export interface Atributo {
-  id: number;
-  nome: string;
-  tipo: string;
-  valores: AtributoValores[];
-  dominio?: string;
+  simples?: {
+    id: number;
+    nome: string;
+    tipo: string;
+    valores: AtributoValores[];
+    dominio?: string;
+  }
 }
 
 export interface AtributoValores {
