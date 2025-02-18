@@ -81,6 +81,10 @@ async function run() {
     }
   }
 
+  if (!createLocalClient) {
+    return "local client not defined!";
+  }
+
   const sqlClient = createLocalClient(
     getLocalSQLClientConfig(),
   );
@@ -91,7 +95,7 @@ async function run() {
 
   await checkDumpInsertedTables(sqlClient);
 
-  return "sqlite.db updated";
+  return "sqlite.db updated sucessfully!";
 }
 
 run()
