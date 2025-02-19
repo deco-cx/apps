@@ -17876,7 +17876,51 @@ ClosingTime?: string
  * This request can be used to implement auto complete functionality when a customer needs to fill in an address.
  */
 "GET /api/checkout/pub/postal-code/:countryCode/:postalCode": {
-
+/**
+ * Address.
+ */
+response: {
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City.
+ */
+city?: string
+/**
+ * State.
+ */
+state?: string
+/**
+ * Country.
+ */
+country?: string
+/**
+ * Street.
+ */
+street?: string
+/**
+ * Number.
+ */
+number?: string
+/**
+ * Neighborhood.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Reference.
+ */
+reference?: string
+/**
+ * Geo coordinates.
+ */
+geoCoordinates?: number[]
+}
 }
 /**
  * This endpoint places an order from an existing `orderForm` object, meaning an existing cart.

@@ -9,6 +9,7 @@ import type {
   OpeningHoursSpecification,
   PageType,
   Place,
+  PostalAddress,
   Product,
   ProductDetailsPage,
   ProductGroup,
@@ -22,6 +23,7 @@ import type { PickupPoint as PickupPointVCS } from "./openapi/vcs.openapi.gen.ts
 import { pick } from "./pickAndOmit.ts";
 import { slugify } from "./slugify.ts";
 import type {
+  Address,
   Brand as BrandVTEX,
   Category,
   Facet as FacetVTEX,
@@ -1251,3 +1253,18 @@ export function toPlace(
     }],
   };
 }
+
+export const toPostalAddress = (address: Address): PostalAddress => {
+  return {
+    "@type": "PostalAddress",
+    "@id": address.addressId,
+    addressCountry: address.country,
+    addressLocality: address.city,
+    addressRegion: address.state,
+    postalCode: address.postalCode,
+    streetAddress: address.street,
+    name: address.addressName || undefined,
+    alternateName: address.receiverName || undefined,
+    description: address.complement || undefined,
+  };
+};
