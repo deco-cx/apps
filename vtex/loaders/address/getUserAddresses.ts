@@ -37,4 +37,5 @@ async function loader(
   }
 }
 
+export const defaultVisibility = "private";
 export default loader;
