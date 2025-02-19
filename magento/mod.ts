@@ -197,7 +197,7 @@ export type State =
 /**
  * @title Magento
  * @description Loaders, actions and workflows for adding Magento Commerce Platform to your website.
- * @category Ecommmerce
+ * @category Ecommerce
  * @logo https://avatars.githubusercontent.com/u/168457?s=200&v=4
  */
 export type AppType = ReturnType<typeof App>;
