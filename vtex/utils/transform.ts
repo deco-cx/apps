@@ -1214,8 +1214,8 @@ export function toPlace(
     : {
       name: pickupPoint.friendlyName,
       country: pickupPoint.address?.country,
-      latitude: pickupPoint.address?.geoCoordinates[0],
-      longitude: pickupPoint.address?.geoCoordinates[1],
+      latitude: pickupPoint.address?.geoCoordinates?.[0],
+      longitude: pickupPoint.address?.geoCoordinates?.[1],
       specialOpeningHoursSpecification: pickupPoint.pickupHolidays?.map(
         toSpecialHoursSpecification,
       ),
