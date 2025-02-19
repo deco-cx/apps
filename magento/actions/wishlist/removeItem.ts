@@ -40,6 +40,7 @@ const action = async (
         headers,
       },
     ).then((res) => res.json());
+
     if (success) return wishlistLoader(null, req, ctx);
 
     return null;

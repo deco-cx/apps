@@ -311,3 +311,60 @@ export const GetProductImages = {
     }
   `,
 };
+
+export const GetRelatedProducts = (
+  type: "related" | "upsell" | "crosssell",
+  extraProps?: Array<string>,
+) => ({
+  fragments: [
+    simpleProduct,
+    priceRange,
+    mediaGallery,
+  ],
+  query: gql`
+    query GetRelatedProducts(
+      $search: String
+      $filter: ProductAttributeFilterInput
+      $sort: ProductAttributeSortInput
+      $pageSize: Int
+      $currentPage: Int
+    ) {
+      products(
+        search: $search
+        filter: $filter
+        sort: $sort
+        pageSize: $pageSize
+        currentPage: $currentPage
+      ) {
+        items {
+
+          ${
+    type === "related"
+      ? `related_products {
+            ...simpleProduct
+            ${extraProps ? extraProps.join(`\n`) : `\n`}
+          }`
+      : ``
+  }
+          ${
+    type === "upsell"
+      ? `upsell_products {
+            ...simpleProduct
+            ${extraProps ? extraProps.join(`\n`) : `\n`}
+          }`
+      : ``
+  }
+          ${
+    type === "crosssell"
+      ? `crosssell_products {
+            ...simpleProduct
+            ${extraProps ? extraProps.join(`\n`) : `\n`}
+          }`
+      : ``
+  }
+
+        }
+      }
+    }
+  `,
+});

@@ -10,7 +10,7 @@ import { getUserCookie } from "../utils/user.ts";
 async function loader(
   _props: unknown,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Person | null> {
   const { clientAdmin, site } = ctx;
 
@@ -22,7 +22,7 @@ async function loader(
         site,
         sections: "customer,carbono-customer",
       },
-      { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) }
+      { headers: new Headers({ Cookie: `${SESSION_COOKIE}=${id}` }) },
     ).then((res) => res.json());
     const user = response["carbono-customer"];
     const customer = response.customer;

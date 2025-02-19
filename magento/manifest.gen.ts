@@ -31,9 +31,10 @@ import * as $$$11 from "./loaders/product/detailsPage.ts";
 import * as $$$12 from "./loaders/product/detailsPageGQL.ts";
 import * as $$$13 from "./loaders/product/list.ts";
 import * as $$$14 from "./loaders/product/listingPage.ts";
-import * as $$$15 from "./loaders/proxy.ts";
-import * as $$$16 from "./loaders/user.ts";
-import * as $$$17 from "./loaders/wishlist.ts";
+import * as $$$15 from "./loaders/product/relatedProducts.ts";
+import * as $$$16 from "./loaders/proxy.ts";
+import * as $$$17 from "./loaders/user.ts";
+import * as $$$18 from "./loaders/wishlist.ts";
 
 const manifest = {
   "loaders": {
@@ -52,9 +53,10 @@ const manifest = {
     "magento/loaders/product/detailsPageGQL.ts": $$$12,
     "magento/loaders/product/list.ts": $$$13,
     "magento/loaders/product/listingPage.ts": $$$14,
-    "magento/loaders/proxy.ts": $$$15,
-    "magento/loaders/user.ts": $$$16,
-    "magento/loaders/wishlist.ts": $$$17,
+    "magento/loaders/product/relatedProducts.ts": $$$15,
+    "magento/loaders/proxy.ts": $$$16,
+    "magento/loaders/user.ts": $$$17,
+    "magento/loaders/wishlist.ts": $$$18,
   },
   "handlers": {
     "magento/handlers/proxy.ts": $$$$0,
