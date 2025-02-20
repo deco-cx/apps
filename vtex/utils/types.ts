@@ -1706,3 +1706,9 @@ export interface StartAuthentication {
   selectedProvider: string | null;
   samlProviders: unknown[];
 }
+
+export interface CanceledOrder {
+  date?: string;
+  orderId?: string;
+  receipt?: string | null;
+}
