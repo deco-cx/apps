@@ -24,8 +24,6 @@ const action = async (
     {},
   );
 
-  console.log(rowObject);
-
   const sheet = await ctx.doc.addSheet({ headerValues: headerRows });
   const row = await sheet.addRow(rowObject);
 
