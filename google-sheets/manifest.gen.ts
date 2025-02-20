@@ -2,11 +2,15 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $$$$$$$$$0 from "./actions/addRow.ts";
 import * as $$$0 from "./loaders/doc.ts";
 
 const manifest = {
   "loaders": {
     "google-sheets/loaders/doc.ts": $$$0,
+  },
+  "actions": {
+    "google-sheets/actions/addRow.ts": $$$$$$$$$0,
   },
   "name": "google-sheets",
   "baseUrl": import.meta.url,
