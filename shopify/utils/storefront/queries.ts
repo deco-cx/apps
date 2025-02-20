@@ -468,3 +468,47 @@ export const SignInWithEmailAndPassword = {
     }
   }`,
 };
+
+export const SendPasswordResetEmail = {
+  query: gql`mutation SendPasswordResetEmail($email: String!) {
+    customerRecover(email: $email) {
+      customerUserErrors {
+        code
+        message
+      }
+      userErrors {
+        message
+      }
+    }
+  }`,
+};
+
+export const CreateAddress = {
+  query: gql`mutation CreateAddress(
+    $customerAccessToken: String!,
+    $address1: String!,
+    $country: String!,
+    $province: String!,
+    $city: String!,
+    $zip: String!
+  ) {
+    customerAddressCreate(
+      customerAccessToken: $customerAccessToken,
+      address: {
+        address1: $address1, 
+        country: $country, 
+        province: $province, 
+        city: $city, 
+        zip: $zip
+      }
+    ) {
+      customerAddress {
+        id
+      }
+      customerUserErrors {
+        code
+        message
+      }
+    }
+  }`,
+};
