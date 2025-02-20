@@ -155,7 +155,7 @@ export const toProduct = (
     "@type": "PropertyValue",
     "name": "productType",
     "value": productType,
-  }
+  };
 
   const metafields = (product.metafields ?? [])
     .filter((metafield) => metafield && metafield.key && metafield.value)

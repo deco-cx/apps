@@ -25,9 +25,9 @@ const loader = async (
   const { metafields = [] } = props;
 
   const shop = await storefront.query<{ shop: Shop }, ShopMetafieldsArgs>({
-      variables: { identifiers: metafields },
-      ...GetShopInfo,
-    }).then((data) => data.shop);
+    variables: { identifiers: metafields },
+    ...GetShopInfo,
+  }).then((data) => data.shop);
 
   return shop;
 };
