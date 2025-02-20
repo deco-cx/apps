@@ -137,6 +137,21 @@ export default function Carousel({
             {/* @ts-ignore */}
           </liveshop-ads-carousel>
         </div>
+        <script
+          async
+          src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js"
+        >
+        </script>
+        <script
+          async
+          src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js"
+        >
+        </script>
+        <script
+          async
+          src="https://assets.streamshop.com.br/sdk/liveshop-web-sdk.min.js"
+        >
+        </script>
       </Section.Container>
     </>
   );
