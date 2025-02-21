@@ -1613,3 +1613,43 @@ export interface SessionPublic {
   utmi_pc?: { value: string };
   utmi_p?: { value: string };
 }
+
+export interface ProfileCustomField {
+  key?: Maybe<string>;
+  value?: Maybe<string>;
+}
+
+export interface PaymentProfile {
+  cacheId?: Maybe<string>;
+  id?: Maybe<string>;
+  paymentSystem?: Maybe<string>;
+  paymentSystemName?: Maybe<string>;
+  cardNumber?: Maybe<string>;
+  address?: Maybe<Address>;
+  isExpired?: Maybe<boolean>;
+  expirationDate?: Maybe<string>;
+  accountStatus?: Maybe<string>;
+}
+
+export interface Profile {
+  cacheId?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  profilePicture?: Maybe<string>;
+  email?: Maybe<string>;
+  document?: Maybe<string>;
+  userId?: Maybe<string>;
+  birthDate?: Maybe<string>;
+  gender?: Maybe<string>;
+  homePhone?: Maybe<string>;
+  businessPhone?: Maybe<string>;
+  addresses?: Maybe<Address[]>;
+  isCorporate?: Maybe<boolean>;
+  corporateName?: Maybe<string>;
+  corporateDocument?: Maybe<string>;
+  stateRegistration?: Maybe<string>;
+  payments?: Maybe<PaymentProfile[]>;
+  customFields?: Maybe<ProfileCustomField[]>;
+  passwordLastUpdate?: Maybe<string>;
+  pii?: Maybe<boolean>;
+}
