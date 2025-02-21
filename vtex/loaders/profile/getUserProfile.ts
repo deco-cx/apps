@@ -17,8 +17,9 @@ complement
 reference
 geoCoordinates
 `;
-const query = `query getUserProfile {
-  profile {
+const query = `query getUserProfile($customFields: String) {
+  profile(customFields: $customFields) {
+    id
     cacheId
     email
     firstName
@@ -54,8 +55,12 @@ const query = `query getUserProfile {
   }
 }`;
 
+interface Props {
+  customFields?: string[];
+}
+
 async function loader(
-  _props: unknown,
+  props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<Profile | null> {
@@ -67,8 +72,11 @@ async function loader(
   }
 
   try {
-    const { profile } = await io.query<{ profile: Profile }, null>(
-      { query },
+    const { profile } = await io.query<
+      { profile: Profile },
+      { customFields?: string }
+    >(
+      { query, variables: { customFields: props.customFields?.join(",") } },
       { headers: { cookie } },
     );
 
