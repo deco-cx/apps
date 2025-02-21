@@ -26,9 +26,11 @@ const action = async (
     const headers = new Headers({
       Cookie: `${SESSION_COOKIE}=${id}`,
       "x-requested-with": "XMLHttpRequest",
+      "Content-Type": "application/x-www-form-urlencoded",
     });
     const body = new FormData();
-    body.append("product", productId);
+    body.append("item", productId);
+    body.append("uenc", "")
     body.append("form_key", form_key);
 
     const { success } = await clientAdmin["POST /:site/wishlist/index/remove/"](
@@ -39,13 +41,13 @@ const action = async (
         body,
         headers,
       },
-    ).then((res) => res.json());
+    ).then((res) => res.json())
 
     if (success) return wishlistLoader(null, req, ctx);
 
     return null;
   } catch (error) {
-    console.log(error);
+    console.log('REMOVE', error);
     return null;
   }
 };
