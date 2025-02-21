@@ -1563,3 +1563,20 @@ export interface Profile {
   passwordLastUpdate?: Maybe<string>;
   pii?: Maybe<boolean>;
 }
+
+export interface ProfileInput {
+  email: string;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  document?: Maybe<string>;
+  phone?: Maybe<string>;
+  birthDate?: Maybe<string>;
+  gender?: Maybe<string>;
+  homePhone?: Maybe<string>;
+  businessPhone?: Maybe<string>;
+  tradeName?: Maybe<string>;
+  corporateName?: Maybe<string>;
+  corporateDocument?: Maybe<string>;
+  stateRegistration?: Maybe<string>;
+  isCorporate?: Maybe<boolean>;
+}
