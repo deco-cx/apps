@@ -1523,3 +1523,64 @@ export interface AdvancedLoaderConfig {
 }
 
 export type Maybe<T> = T | null | undefined;
+
+export enum DeviceType {
+  Mobile = "MOBILE",
+  Tablet = "TABLET",
+  Desktop = "DESKTOP",
+}
+
+export interface LoginSession {
+  id: string;
+  cacheId: string;
+  deviceType: DeviceType;
+  city?: Maybe<string>;
+  lastAccess: string;
+  browser?: Maybe<string>;
+  os?: Maybe<string>;
+  ip?: Maybe<string>;
+  fullAddress?: Maybe<string>;
+  firstAccess: string;
+}
+
+export interface LoginSessionsInfo {
+  currentLoginSessionId?: Maybe<string>;
+  loginSessions?: Maybe<LoginSession[]>;
+}
+
+export interface Session {
+  id: string;
+  namespaces?: {
+    profile: SessionProfile;
+    impersonate: SessionImpersonate;
+    authentication: Record<string, string>;
+    public: SessionPublic;
+  };
+}
+
+export interface SessionProfile {
+  id?: { value: string };
+  email?: { value: string };
+  firstName?: { value: string };
+  lastName?: { value: string };
+  phone?: { value: string };
+  isAuthenticated?: { value: string };
+  priceTables?: { value: string };
+}
+
+export interface SessionImpersonate {
+  storeUserEmail?: { value: string };
+  storeUserId?: { value: string };
+}
+
+export interface SessionPublic {
+  orderFormId?: { value: string };
+  utm_source?: { value: string };
+  utm_medium?: { value: string };
+  utm_campaign?: { value: string };
+  utm_term?: { value: string };
+  utm_content?: { value: string };
+  utmi_cp?: { value: string };
+  utmi_pc?: { value: string };
+  utmi_p?: { value: string };
+}
