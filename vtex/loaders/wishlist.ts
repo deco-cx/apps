@@ -23,7 +23,7 @@ const loader = async (
   const url = new URL(req.url);
   const page = Number(url.searchParams.get("page")) || 0;
   const count = props.count || Infinity;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+  const { cookie, payload } = parseCookie(req.headers);
   const user = payload?.sub;
 
   if (!user) {
