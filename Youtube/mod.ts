@@ -13,7 +13,7 @@ interface OAuthCredentials {
 
 export interface Props {
   accessToken?: Secret;
-  config: OAuthCredentials
+  config: OAuthCredentials;
 }
 
 export interface State extends Omit<Props, "accessToken"> {
@@ -24,7 +24,9 @@ export type AppContext = FnContext<State, Manifest>;
 
 export default function App(props: Props) {
   const { accessToken } = props;
-  const _accessToken = typeof accessToken === "string" ? accessToken : accessToken?.get?.() ?? "";
+  const _accessToken = typeof accessToken === "string"
+    ? accessToken
+    : accessToken?.get?.() ?? "";
 
   const api = createHttpClient<YoutubeClient>({
     base: "https://www.googleapis.com/youtube/v3",

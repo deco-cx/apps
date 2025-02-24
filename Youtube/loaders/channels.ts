@@ -22,4 +22,4 @@ export default async function loader(
 
   const result = await response.json();
   return result;
-};
+}
