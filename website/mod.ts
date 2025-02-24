@@ -12,6 +12,7 @@ import {
   type FnContext,
   type Site,
 } from "@deco/deco";
+
 declare global {
   interface Window {
     LIVE: {
