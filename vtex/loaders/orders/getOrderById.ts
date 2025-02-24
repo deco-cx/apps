@@ -15,14 +15,10 @@ export default async function loader(
   const { orderId } = props;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
-  if (!payload?.sub) {
-    return null;
-  }
-
   const response = await vcs["GET /api/oms/user/orders/:orderId"](
     {
       orderId: orderId.includes("-") ? orderId : `${orderId}-01`,
-      clientEmail: payload.sub,
+      clientEmail: payload?.sub ?? "",
     },
     {
       headers: { cookie },
