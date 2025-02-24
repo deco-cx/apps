@@ -38,10 +38,17 @@ async function loader(
   }
 
   try {
-    const data = await io.query<{ profile: { payments: Payment[] } }, null>(
+    const data = await io.query<
+      { profile: { payments: Payment[] } | null },
+      null
+    >(
       { query },
       { headers: { cookie } },
     );
+
+    if (!data.profile?.payments) {
+      return null;
+    }
 
     return data.profile.payments;
   } catch (e) {
