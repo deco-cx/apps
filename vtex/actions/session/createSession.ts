@@ -3,7 +3,7 @@ import { proxySetCookie } from "../../utils/cookies.ts";
 import type { CreateEditSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
 
 interface Props {
-  publicProperties: Record<string, unknown>;
+  publicProperties: Record<string, { value: string }>;
 }
 
 async function action(
