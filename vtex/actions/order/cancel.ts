@@ -1,5 +1,4 @@
 import { AppContext } from "../../mod.ts";
-import { CanceledOrder } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
 interface Props {
@@ -7,29 +6,62 @@ interface Props {
   reason: string;
 }
 
+const mutation = `mutation cancelOrder($orderId: ID!, $reason: String!) {
+  cancelOrder(input: { orderId: $orderId, reason: $reason }) @context(provider: "vtex.orders-graphql@0.107.3") {
+    order {
+      cacheId
+      clientProfileData {
+        email
+        firstName
+        lastName
+      }
+      status
+    }
+  }
+}`;
+
+interface CancelOrderResult {
+  order: {
+    cacheId: string;
+    clientProfileData: {
+      email: string;
+      firstName: string;
+      lastName: string;
+    };
+    status: string;
+  };
+}
+
 async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<CanceledOrder | null> {
-  const { vcs } = ctx;
+): Promise<CancelOrderResult | null> {
+  const { io } = ctx;
   const { orderId, reason } = props;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers, ctx.account);
 
-  if (!payload?.sub || !payload?.userId) {
+  try {
+    const result = await io.query<
+      CancelOrderResult,
+      { orderId: string; reason: string }
+    >(
+      {
+        query: mutation,
+        operationName: "cancelOrder",
+        variables: {
+          orderId,
+          reason,
+        },
+      },
+      { headers: { cookie } },
+    );
+
+    return result;
+  } catch (error) {
+    console.error(error);
     return null;
   }
-
-  const result = await vcs["POST /api/oms/pvt/orders/:orderId/cancel"](
-    { orderId },
-    {
-      body: { reason },
-      headers: { cookie },
-    },
-  ).then((res) => res.json());
-
-  return result;
 }
 
-export const defaultVisibility = "private";
 export default action;
