@@ -1,6 +1,5 @@
 import type { AppContext } from "../../mod.ts";
 import type { GetSessionResponse } from "../../utils/openapi/vcs.openapi.gen.ts";
-import { parseCookie } from "../../utils/vtexId.ts";
 
 interface Props {
   /**
@@ -19,13 +18,12 @@ async function loader(
   ctx: AppContext,
 ): Promise<GetSessionResponse | null> {
   const { vcs } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
 
   try {
     const response = await vcs["GET /api/sessions"]({
-      items: props.items.join(","),
+      items: props.items?.join(",") || "*",
     }, {
-      headers: { cookie },
+      headers: { cookie: req.headers.get("cookie") || "" },
     });
 
     if (!response.ok) {
