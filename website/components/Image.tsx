@@ -23,6 +23,8 @@ export type Props =
     fetchPriority?: "high" | "low" | "auto";
     /** @description Object-fit */
     fit?: FitOptions;
+    /** @description Controls whether VTEX images should be optimized */
+    optimizeVtex?: "auto" | "manual";
   };
 
 const FACTORS = [1, 2];
@@ -41,6 +43,7 @@ interface OptimizationOptions {
   height?: number;
   factor: number;
   fit: FitOptions;
+  optimizeVtex?: "auto" | "manual";
 }
 
 const optmizeVNDA = (opts: OptimizationOptions) => {
@@ -102,7 +105,8 @@ export const getOptimizedMediaUrl = (opts: OptimizationOptions) => {
     if (
       /(vteximg.com.br|vtexassets.com|myvtex.com)\/arquivos\/ids\/\d+/.test(
         originalSrc,
-      )
+      ) && 
+      opts.optimizeVtex !== "manual"
     ) {
       return optimizeVTEX(opts);
     }
@@ -133,6 +137,7 @@ export const getSrcSet = (
   width: number,
   height?: number,
   fit?: FitOptions,
+  optimizeVtex?: "auto" | "manual",
 ) => {
   const srcSet = [];
 
@@ -147,6 +152,7 @@ export const getSrcSet = (
       height: h,
       factor,
       fit: fit || "cover",
+      optimizeVtex,
     });
 
     if (src) {
@@ -158,7 +164,7 @@ export const getSrcSet = (
 };
 
 const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
-  const { preload, loading = "lazy" } = props;
+  const { preload, loading = "lazy", optimizeVtex = "auto" } = props;
 
   if (!props.height) {
     console.warn(
@@ -166,7 +172,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
     );
   }
 
-  const srcSet = getSrcSet(props.src, props.width, props.height, props.fit);
+  const srcSet = getSrcSet(props.src, props.width, props.height, props.fit, optimizeVtex);
   const linkProps = srcSet && {
     imagesrcset: srcSet,
     imagesizes: props.sizes,
