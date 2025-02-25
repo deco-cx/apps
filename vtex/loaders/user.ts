@@ -11,6 +11,8 @@ interface User {
   profilePicture?: string;
   gender?: string;
   document?: string;
+  homePhone?: string;
+  businessPhone?: string;
 }
 
 async function loader(
@@ -26,7 +28,7 @@ async function loader(
   }
 
   const query =
-    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document }}";
+    "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document homePhone businessPhone }}";
 
   try {
     const { profile: user } = await io.query<{ profile: User }, null>(
@@ -40,9 +42,12 @@ async function loader(
       givenName: user.firstName,
       familyName: user.lastName,
       taxID: user?.document?.replace(/[^\d]/g, ""),
-      gender: user.gender === "f"
-        ? "https://schema.org/Female"
-        : "https://schema.org/Male",
+      gender: user.gender
+        ? user.gender === "f"
+          ? "https://schema.org/Female"
+          : "https://schema.org/Male"
+        : undefined,
+      telephone: user.homePhone ?? user.businessPhone,
     };
   } catch (_) {
     return null;
