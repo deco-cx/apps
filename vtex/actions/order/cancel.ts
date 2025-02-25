@@ -64,5 +64,4 @@ async function action(
   }
 }
 
-export const defaultVisibility = "private";
 export default action;
