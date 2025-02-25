@@ -4,7 +4,7 @@ import type { CreateEditSessionResponse } from "../../utils/openapi/vcs.openapi.
 import { parseCookie } from "../../utils/vtexId.ts";
 
 interface Props {
-  publicProperties: Record<string, unknown>;
+  publicProperties: Record<string, { value: string }>;
 }
 
 async function action(
