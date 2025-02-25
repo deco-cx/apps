@@ -8,6 +8,7 @@ import {
   useRouterContext,
 } from "@deco/deco";
 import {
+Matcher,
   type ComponentFunc,
   type ComponentMetadata,
   type Page,
@@ -51,6 +52,10 @@ export interface Props {
   sections: Sections;
   /** @hide true */
   unindexedDomain?: boolean;
+  /**
+   * @hide true
+   */
+  matcher?: Matcher;
 }
 export function renderSection(section: Props["sections"][number]) {
   if (section === undefined || section === null) {
@@ -155,6 +160,11 @@ export const loader = async (
   req: Request,
   ctx: AppContext,
 ) => {
+  const _matcher = restProps.matcher?.({
+    request: req,
+    device: "desktop",
+    siteId: 123
+  })
   const url = new URL(req.url);
   const devMode = url.searchParams.has("__d");
   const unindexedDomain = noIndexedDomains.some((domain) =>
