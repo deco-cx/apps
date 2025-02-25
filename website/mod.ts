@@ -140,6 +140,7 @@ export interface Props {
    * @hide true
    */
   sendToClickHouse?: boolean;
+  testAsyncRender?: Matcher;
 }
 /**
  * @title Website
@@ -225,6 +226,7 @@ export const onBeforeResolveProps = <
     abTesting: AbTesting;
     global: Section[];
     theme: Section;
+    testAsyncRender: Matcher;
   },
 >(props: T): T => {
   if (Array.isArray(props?.routes)) {
@@ -238,6 +240,7 @@ export const onBeforeResolveProps = <
         ? asResolved(props.abTesting, false)
         : undefined,
       routes: props.routes.map(deferPropsResolve),
+      testAsyncRender: asResolved(props.testAsyncRender, true)
     };
     return newRoutes;
   }
