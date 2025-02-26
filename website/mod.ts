@@ -185,7 +185,7 @@ const getAbTestAudience = (abTesting: AbTesting) => {
       includeScriptsToHead: abTesting.includeScriptsToHead,
       includeScriptsToBody: abTesting.includeScriptsToBody,
       replaces: abTesting.replaces,
-      pathsThatRequiresSameReferer: ["/no-cache/AviseMe.aspx"],
+      pathsThatRequireSameReferer: ["/no-cache/AviseMe.aspx"],
     },
   };
   if (abTesting.enabled) {
