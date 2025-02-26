@@ -1196,6 +1196,7 @@ export function toPlace(
     longitude,
     openingHoursSpecification,
     specialOpeningHoursSpecification,
+    isActive,
   } = isPickupPointVCS(pickupPoint)
     ? {
       name: pickupPoint.name,
@@ -1208,6 +1209,7 @@ export function toPlace(
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
       ),
+      isActive: pickupPoint.isActive ?? false,
     }
     : {
       name: pickupPoint.friendlyName,
@@ -1226,6 +1228,8 @@ export function toPlace(
           openingTime: OpeningTime,
         })
       ),
+      // this object comes from the checkout api, that should only show the active pickup points, let's hope it's true
+      isActive: true,
     };
 
   return {
@@ -1244,10 +1248,17 @@ export function toPlace(
     name,
     specialOpeningHoursSpecification,
     openingHoursSpecification,
-    additionalProperty: [{
-      "@type": "PropertyValue",
-      name: "distance",
-      value: `${pickupPoint.distance}`,
-    }],
+    additionalProperty: [
+      {
+        "@type": "PropertyValue",
+        name: "distance",
+        value: `${pickupPoint.distance}`,
+      },
+      {
+        "@type": "PropertyValue",
+        name: "isActive",
+        value: `${isActive}`,
+      },
+    ],
   };
 }
