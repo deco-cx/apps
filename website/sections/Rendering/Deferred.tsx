@@ -84,7 +84,9 @@ const Deferred = (props: Props) => {
   if (display) {
     return (
       <>
-        {sections.map(({ Component, props }) => <Component {...props} />)}
+        {sections.map(({ Component, props }, index) => (
+          <Component key={index} {...props} />
+        ))}
       </>
     );
   }
