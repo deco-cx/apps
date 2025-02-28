@@ -36,6 +36,8 @@ export default function Stories({
 }: Props) {
   return (
     <>
+    <script async src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js" ></script>
+    <script async src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js" ></script>
       <Section.Container>
         <Section.Header title={title} cta={cta} />
 
@@ -52,21 +54,6 @@ export default function Stories({
           </liveshop-ads-carousel>
         </div>
       </Section.Container>
-      <script
-        async
-        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js"
-      >
-      </script>
-      <script
-        async
-        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js"
-      >
-      </script>
-      <script
-        async
-        src="https://assets.streamshop.com.br/sdk/liveshop-web-sdk.min.js"
-      >
-      </script>
     </>
   );
 }
