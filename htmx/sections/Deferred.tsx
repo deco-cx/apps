@@ -40,7 +40,9 @@ const Deferred = (props: Props) => {
   if (loading === "eager") {
     return (
       <>
-        {sections.map((section) => <section.Component {...section.props} />)}
+        {sections.map((section, index) => (
+          <section.Component key={index} {...section.props} />
+        ))}
       </>
     );
   }
@@ -60,8 +62,8 @@ const Deferred = (props: Props) => {
         hx-swap="outerHTML"
         style={{ height: "100vh" }}
       />
-      {props.fallbacks?.map((section) =>
-        section ? <section.Component {...section.props} /> : null
+      {props.fallbacks?.map((section, index) =>
+        section ? <section.Component key={index} {...section.props} /> : null
       )}
     </>
   );
