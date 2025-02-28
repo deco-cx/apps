@@ -54,7 +54,7 @@ export interface Props {
 }
 export function renderSection(section: Props["sections"][number]) {
   if (section === undefined || section === null) {
-    return <></>;
+    return;
   }
   const { Component, props } = section;
   return <Component {...props} />;
