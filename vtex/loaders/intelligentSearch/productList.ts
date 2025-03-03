@@ -298,8 +298,8 @@ export const cacheKey = (
   const url = new URL(req.url);
 
   if (
-    (!isQueryList(props) && url.searchParams.has("q")) ||
-    ctx.isInvoke && isProductIDList(props)
+    // Avoid cache on loader call over call and on search pages
+    (!isQueryList(props) && url.searchParams.has("q")) || ctx.isInvoke
   ) {
     return null;
   }
