@@ -58,7 +58,7 @@ const loader = async (
       if (cartAuthenticated.id) {
         console.log("cartAuthenticated", cartAuthenticated);
         cartId = cartAuthenticated.id;
-        setCartCookie(ctx.response.headers, cartId);
+        setCartCookie(ctx.response.headers, encodeURIComponent(`"${cartId}"`));
       }
     }
   } catch (error) {
