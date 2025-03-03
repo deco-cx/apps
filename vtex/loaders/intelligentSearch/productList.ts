@@ -296,8 +296,9 @@ export const cacheKey = (
     (expandedProps as unknown as Props["props"]);
 
   const url = new URL(req.url);
+
   if (
-    url.searchParams.has("q") ||
+    (!isQueryList(props) && url.searchParams.has("q")) ||
     ctx.isInvoke && isProductIDList(props)
   ) {
     return null;
