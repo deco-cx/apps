@@ -287,9 +287,8 @@ export const cacheKey = (
   const url = new URL(req.url);
 
   if (
-    url.searchParams.has("q") ||
-    // loader is invoked directly should not vary
-    ctx.isInvoke && (isSKUIDProps(props) || isProductIDProps(props))
+    // Avoid cache on loader call over call and on search pages
+    (!isTermProps(props) && url.searchParams.has("q")) || ctx.isInvoke
   ) {
     return null;
   }
