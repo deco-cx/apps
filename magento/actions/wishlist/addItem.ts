@@ -34,7 +34,7 @@ const action = async (
     }, {
       body,
       headers,
-    }).then((res) => res.json())
+    }).then((res) => res.json());
 
     if (success) return wishlistLoader(null, req, ctx);
     return null;

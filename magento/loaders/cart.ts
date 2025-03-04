@@ -48,18 +48,12 @@ const loader = async (
       const headers = new Headers();
       headers.append("Cookie", req.headers.get("Cookie") ?? "");
 
-      const cartAuthenticated = await clientAdminAuthenticated
+      await clientAdminAuthenticated
         ["GET /rest/:site/V1/carts/mine"]({
           site,
         }, {
           headers,
         }).then((totalizers) => totalizers.json());
-
-      if (cartAuthenticated.id) {
-        console.log("cartAuthenticated", cartAuthenticated);
-        cartId = cartAuthenticated.id;
-        setCartCookie(ctx.response.headers, cartId);
-      }
     }
   } catch (error) {
     console.error("Error getting cart", error);
