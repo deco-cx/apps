@@ -19,7 +19,7 @@ export interface Props {
   /**
    * @title Include product custom attributes
    */
-  customFields: CustomFields;
+  customFields?: CustomFields;
 
   /**
    * @title Type of related products

@@ -33,7 +33,7 @@ export interface CommomProps {
   /**
    * @title Include product custom attributes
    */
-  customFields: CustomFields;
+  customFields?: CustomFields;
 
   /** @title Sort options */
   sort?: ProductSort;

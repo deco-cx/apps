@@ -42,7 +42,7 @@ export interface Props {
    * @title Product custom attributes
    * @default false
    */
-  customFields: CustomFields;
+  customFields?: CustomFields;
 
   categoryProps?: CategoryProps;
 }

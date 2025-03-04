@@ -16,7 +16,7 @@ export interface Props {
   /**
    * @title Product custom attributes
    */
-  customFields: CustomFields;
+  customFields?: CustomFields;
   /**
    * @description Use product name as breadcrumb, ignoring categories
    */

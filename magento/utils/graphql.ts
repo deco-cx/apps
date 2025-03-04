@@ -93,10 +93,13 @@ export const formatUrlSuffix = (str: string) => {
   return str;
 };
 
-export const getCustomFields = ({
-  active,
-  overrideList,
-}: CustomFields, customFiels?: Array<string>): Array<string> | undefined => {
+export const getCustomFields = (
+  {
+    active,
+    overrideList,
+  } = { active: false, overrideList: [] } as CustomFields,
+  customFiels?: Array<string>,
+): Array<string> | undefined => {
   if (!active) {
     return undefined;
   }
