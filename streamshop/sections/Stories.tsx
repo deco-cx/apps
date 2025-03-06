@@ -50,7 +50,7 @@ export default function Stories({
             gap="25px"
             slugs-video={slugs.join(",")}
           >
-            {/* @ts-ignore */}
+            {/* @ts-ignore */} 
           </liveshop-ads-carousel>
         </div>
       </Section.Container>
