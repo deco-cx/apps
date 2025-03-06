@@ -213,10 +213,6 @@ const loader = async (
       ...url.searchParams.getAll("fq"),
     ]),
   ];
-
-  console.log(url.searchParams.getAll("fq"));
-
-  console.log({ fq });
   const _from = page * count;
   const _to = (page + 1) * count - 1;
 
