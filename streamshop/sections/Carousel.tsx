@@ -3,7 +3,7 @@ import Section, {
   Props as SectionHeaderProps,
 } from "../components/ui/StreamshopSection.tsx";
 import { type LoadingFallbackProps } from "@deco/deco";
-import { useDevice, useScript } from "@deco/deco/hooks";
+import { useDevice } from "@deco/deco/hooks";
 
 interface StyleDesktop {
   /**
