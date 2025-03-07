@@ -63,8 +63,10 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     !jsonLD.products.length ||
     jsonLD.seo?.noIndexing;
 
+  let slimJsonLD = JSON.parse(JSON.stringify(jsonLD)) as ProductListingPage | null | undefined;
+
   if (props.configJsonLD?.removeVideos) {
-    jsonLD?.products.forEach((product) => {
+    slimJsonLD?.products.forEach((product) => {
       product.video = undefined;
       product.isVariantOf?.hasVariant.forEach((variant) => {
         variant.video = undefined;
@@ -72,12 +74,24 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     });
   }
 
+  if(slimJsonLD){
+    slimJsonLD.filters = [];
+    
+    slimJsonLD?.products.forEach((product) => {
+      product.additionalProperty = [];
+      product.isVariantOf?.hasVariant.forEach((variant) => {
+        variant.additionalProperty = [];
+      });
+    });
+  }
+
+
   return {
     ...seoSiteProps,
     title,
     description,
     canonical,
-    jsonLDs: [jsonLD],
+    jsonLDs: [slimJsonLD],
     noIndexing,
   };
 }
