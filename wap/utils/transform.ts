@@ -271,7 +271,7 @@ export const toProduct = (
     })) ?? [];
 
   console.log("LOG:", "aaaa", product?.atributos);
-  console.log("LOG:", "hasVariant", hasVariant);
+  console.log('LOG:','product.nome', product.nome);
 
   (product as WapProductDatiled).atributos?.unico?.valores.forEach((v) => {
     hasVariant.push({
