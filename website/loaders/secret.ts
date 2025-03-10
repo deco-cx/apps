@@ -47,9 +47,7 @@ const getSecret = async (props: Props): Promise<string | null> => {
     await showWarningOnce();
     return Promise.resolve(null);
   }
-  return moduleCache[encrypted] ??= decryptFromHex(encrypted).then((d) =>
-    d.decrypted
-  )
+  return moduleCache[encrypted] ??= decryptFromHex(encrypted).then((d) => d.decrypted)
     .catch((err) => {
       const prettyName = name ? colors.brightRed(name) : "anonymous secret";
       console.error(

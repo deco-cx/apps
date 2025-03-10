@@ -246,7 +246,7 @@ const getSearchParams = (
 ): Entry[] => {
   if (isFacetsList(props)) {
     return [
-      ["query", props.query ?? searchParams.get("q") ?? ""],
+      ["query", props.query ?? searchParams.get("q")],
       ["count", (props.count || searchParams.get("count") || 12).toString()],
       ["sort", props.sort || searchParams.get("sort") || ""],
       ["selectedFacets", props.facets],
