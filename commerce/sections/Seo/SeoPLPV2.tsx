@@ -38,7 +38,7 @@ export interface Props {
 }
 
 /** @title Product listing */
-export function loader(_props: Props, req: Request, ctx: AppContext) {
+export function loader(_props: Props, _req: Request, ctx: AppContext) {
   const props = _props as Partial<Props>;
   const {
     titleTemplate = "",
@@ -82,9 +82,7 @@ export function loader(_props: Props, req: Request, ctx: AppContext) {
     });
   }
 
-  const url = new URL(req.url);
-  const shouldShowJsonLDs = url.searchParams.has("__d") || ctx.isBot ||
-    configJsonLD?.forceJsonLDs;
+  const shouldShowJsonLDs = ctx.isBot || configJsonLD?.forceJsonLDs;
   const jsonLDs = shouldShowJsonLDs && jsonLD ? [jsonLD] : [];
 
   return {

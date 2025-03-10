@@ -28,7 +28,7 @@ export interface Props {
 }
 
 /** @title Product details */
-export function loader(_props: Props, req: Request, ctx: AppContext) {
+export function loader(_props: Props, _req: Request, ctx: AppContext) {
   const props = _props as Partial<Props>;
   const {
     titleTemplate = "",
@@ -62,9 +62,7 @@ export function loader(_props: Props, req: Request, ctx: AppContext) {
     jsonLD.product.isVariantOf.hasVariant = [];
   }
 
-  const url = new URL(req.url);
-  const shouldShowJsonLDs = url.searchParams.has("__d") || ctx.isBot ||
-    props.forceJsonLDs;
+  const shouldShowJsonLDs = ctx.isBot || props.forceJsonLDs;
   const jsonLDs = shouldShowJsonLDs && jsonLD ? [jsonLD] : [];
 
   return {
