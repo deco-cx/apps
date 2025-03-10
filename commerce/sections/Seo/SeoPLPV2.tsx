@@ -13,6 +13,11 @@ export interface ConfigJsonLD {
    * @description Remove product videos from structured data
    */
   removeVideos?: boolean;
+  /**
+   * @title Force JSON-LDs
+   * @description By default, JSON-LDs are only shown to crawlers. Use this to force JSON-LDs to be shown to all users
+   */
+  forceJsonLDs?: boolean;
 }
 
 export interface Props {
@@ -40,7 +45,12 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     descriptionTemplate = "",
     ...seoSiteProps
   } = ctx.seo ?? {};
-  const { title: titleProp, description: descriptionProp, jsonLD } = props;
+  const {
+    title: titleProp,
+    description: descriptionProp,
+    jsonLD,
+    configJsonLD,
+  } = props;
 
   const title = renderTemplateString(
     titleTemplate,
@@ -72,12 +82,15 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     });
   }
 
+  const shouldShowJsonLDs = ctx.isBot || configJsonLD?.forceJsonLDs;
+  const jsonLDs = shouldShowJsonLDs && jsonLD ? [jsonLD] : [];
+
   return {
     ...seoSiteProps,
     title,
     description,
     canonical,
-    jsonLDs: [jsonLD],
+    jsonLDs,
     noIndexing,
   };
 }

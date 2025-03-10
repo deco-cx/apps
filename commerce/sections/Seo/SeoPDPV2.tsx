@@ -20,6 +20,11 @@ export interface Props {
    * @description In testing, you can use this to prevent search engines from indexing your site
    */
   noIndexing?: boolean;
+  /**
+   * @title Force JSON-LDs
+   * @description By default, JSON-LDs are only shown to crawlers. Use this to force JSON-LDs to be shown to all users
+   */
+  forceJsonLDs?: boolean;
 }
 
 /** @title Product details */
@@ -57,6 +62,9 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     jsonLD.product.isVariantOf.hasVariant = [];
   }
 
+  const shouldShowJsonLDs = ctx.isBot || props.forceJsonLDs;
+  const jsonLDs = shouldShowJsonLDs && jsonLD ? [jsonLD] : [];
+
   return {
     ...seoSiteProps,
     title,
@@ -64,7 +72,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     image,
     canonical,
     noIndexing,
-    jsonLDs: [jsonLD],
+    jsonLDs,
   };
 }
 
