@@ -1526,3 +1526,9 @@ export interface AdvancedLoaderConfig {
 }
 
 export type Maybe<T> = T | null | undefined;
+
+export interface CanceledOrder {
+  date?: string;
+  orderId?: string;
+  receipt?: string | null;
+}
