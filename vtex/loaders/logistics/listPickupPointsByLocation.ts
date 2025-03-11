@@ -41,6 +41,9 @@ export default async function loader(
     toPlace({
       distance,
       ...pickupPoint,
+    }, {
+      // this object comes from the checkout api, that should only show the active pickup points
+      isActive: true,
     })
   ) ?? [];
 }

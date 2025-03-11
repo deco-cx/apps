@@ -13,5 +13,5 @@ export default async function loader(
     ["GET /api/logistics/pvt/configuration/pickuppoints"]({})
     .then((r) => r.json());
 
-  return pickupPoints.map(toPlace);
+  return pickupPoints.map((pickup) => toPlace(pickup));
 }
