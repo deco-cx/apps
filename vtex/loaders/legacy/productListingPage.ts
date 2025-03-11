@@ -205,6 +205,7 @@ const loader = async (
   const page = props.page || pageParam;
   const O = (url.searchParams.get("O") as LegacySort) ??
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
+    url.searchParams.get("sort") ??
     props.sort ??
     sortOptions[0].value;
   const fq = [
