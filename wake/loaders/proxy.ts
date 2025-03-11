@@ -3,10 +3,13 @@ import { AppContext } from "../mod.ts";
 
 const PATHS_TO_PROXY = [
   ["/checkout", "/checkout"],
+  ["/checkout"],
+  ["/checkout/*"],
   ["/Fechamento"],
   ["/Fechamento/*"],
   ["/Login"],
   ["/Login/*"],
+  ["/login"],
   ["/login/*"],
   ["/Login/Authenticate"],
   ["/Carrinho/*"],
@@ -14,6 +17,7 @@ const PATHS_TO_PROXY = [
   ["/MinhaConta"],
   ["/MinhaConta/*"],
 ];
+
 
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
