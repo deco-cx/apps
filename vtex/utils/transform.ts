@@ -1209,7 +1209,7 @@ export function toPlace(
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
       ),
-      isActive: pickupPoint.isActive ?? false,
+      isActive: pickupPoint.isActive,
     }
     : {
       name: pickupPoint.friendlyName,
@@ -1228,8 +1228,7 @@ export function toPlace(
           openingTime: OpeningTime,
         })
       ),
-      // this object comes from the checkout api, that should only show the active pickup points, let's hope it's true
-      isActive: true,
+      isActive: undefined,
     };
 
   return {
@@ -1257,7 +1256,7 @@ export function toPlace(
       {
         "@type": "PropertyValue",
         name: "isActive",
-        value: `${isActive}`,
+        value: typeof isActive === "boolean" ? `${isActive}` : undefined,
       },
     ],
   };
