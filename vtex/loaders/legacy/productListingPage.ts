@@ -462,6 +462,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
       "sort",
       (url.searchParams.get("O") as LegacySort) ??
         IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
+        url.searchParams.get("sort") ??
         props.sort ?? "",
     ],
     ["filters", props.filters ?? ""],
