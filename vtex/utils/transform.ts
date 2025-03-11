@@ -1186,8 +1186,13 @@ function isPickupPointVCS(
   return "name" in pickupPoint;
 }
 
+interface ToPlaceOptions {
+  isActive?: boolean;
+}
+
 export function toPlace(
   pickupPoint: PickupPoint & { distance?: number } | PickupPointVCS,
+  options?: ToPlaceOptions,
 ): Place {
   const {
     name,
@@ -1228,7 +1233,7 @@ export function toPlace(
           openingTime: OpeningTime,
         })
       ),
-      isActive: undefined,
+      isActive: options?.isActive,
     };
 
   return {
