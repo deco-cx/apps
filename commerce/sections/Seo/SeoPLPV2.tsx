@@ -14,10 +14,10 @@ export interface ConfigJsonLD {
    */
   removeVideos?: boolean;
   /**
-   * @title Force JSON-LDs
-   * @description By default, JSON-LDs are only shown to crawlers. Use this to force JSON-LDs to be shown to all users
+   * @title Ignore JSON-LDs
+   * @description By default, JSON-LDs are sent to everyone. Use this to prevent JSON-LDs from being sent to your customers. Be aware that some integrations may not work if JSON-LDs are not sent.
    */
-  forceJsonLDs?: boolean;
+  ignoreJsonLds?: boolean;
 }
 
 export interface Props {
@@ -38,7 +38,7 @@ export interface Props {
 }
 
 /** @title Product listing */
-export function loader(_props: Props, req: Request, ctx: AppContext) {
+export function loader(_props: Props, _req: Request, ctx: AppContext) {
   const props = _props as Partial<Props>;
   const {
     titleTemplate = "",
@@ -82,10 +82,9 @@ export function loader(_props: Props, req: Request, ctx: AppContext) {
     });
   }
 
-  const url = new URL(req.url);
-  const shouldShowJsonLDs = url.searchParams.has("__d") || ctx.isBot ||
-    configJsonLD?.forceJsonLDs;
-  const jsonLDs = shouldShowJsonLDs && jsonLD ? [jsonLD] : [];
+  const jsonLDs = (configJsonLD?.ignoreJsonLds && !ctx.isBot) || !jsonLD
+    ? []
+    : [jsonLD];
 
   return {
     ...seoSiteProps,
