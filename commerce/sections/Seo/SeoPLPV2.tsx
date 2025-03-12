@@ -14,10 +14,10 @@ export interface ConfigJsonLD {
    */
   removeVideos?: boolean;
   /**
-   * @title Ignore JSON-LDs
-   * @description By default, JSON-LDs are sent to everyone. Use this to prevent JSON-LDs from being sent to your customers. Be aware that some integrations may not work if JSON-LDs are not sent.
+   * @title Ignore Structured Data
+   * @description By default, Structured Data is sent to everyone. Use this to prevent Structured Data from being sent to your customers, it will still be sent to crawlers and bots. Be aware that some integrations may not work if Structured Data is not sent.
    */
-  ignoreJsonLds?: boolean;
+  ignoreStructuredData?: boolean;
 }
 
 export interface Props {
@@ -82,7 +82,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     });
   }
 
-  const jsonLDs = (configJsonLD?.ignoreJsonLds && !ctx.isBot) || !jsonLD
+  const jsonLDs = (configJsonLD?.ignoreStructuredData && !ctx.isBot) || !jsonLD
     ? []
     : [jsonLD];
 

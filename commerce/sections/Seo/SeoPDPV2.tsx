@@ -21,10 +21,10 @@ export interface Props {
    */
   noIndexing?: boolean;
   /**
-   * @title Ignore JSON-LDs
-   * @description By default, JSON-LDs are sent to everyone. Use this to prevent JSON-LDs from being sent to your customers. Be aware that some integrations may not work if JSON-LDs are not sent.
+   * @title Ignore Structured Data
+   * @description By default, Structured Data is sent to everyone. Use this to prevent Structured Data from being sent to your customers, it will still be sent to crawlers and bots. Be aware that some integrations may not work if Structured Data is not sent.
    */
-  ignoreJsonLds?: boolean;
+  ignoreStructuredData?: boolean;
 }
 
 /** @title Product details */
@@ -40,7 +40,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     description: descriptionProp,
     jsonLD,
     omitVariants,
-    ignoreJsonLds,
+    ignoreStructuredData,
   } = props;
 
   const title = renderTemplateString(
@@ -63,7 +63,9 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     jsonLD.product.isVariantOf.hasVariant = [];
   }
 
-  const jsonLDs = (ignoreJsonLds && !ctx.isBot) || !jsonLD ? [] : [jsonLD];
+  const jsonLDs = (ignoreStructuredData && !ctx.isBot) || !jsonLD
+    ? []
+    : [jsonLD];
 
   return {
     ...seoSiteProps,
