@@ -63,7 +63,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     !jsonLD.products.length ||
     jsonLD.seo?.noIndexing;
 
-  let slimJsonLD = JSON.parse(JSON.stringify(jsonLD)) as ProductListingPage | null | undefined;
+  const slimJsonLD = structuredClone(jsonLD) as ProductListingPage | null | undefined;
 
   if (props.configJsonLD?.removeVideos) {
     slimJsonLD?.products.forEach((product) => {
@@ -79,9 +79,12 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     
     slimJsonLD?.products.forEach((product) => {
       product.additionalProperty = [];
-      product.isVariantOf?.hasVariant.forEach((variant) => {
-        variant.additionalProperty = [];
-      });
+      if(product.isVariantOf){
+        product.isVariantOf.additionalProperty = [];
+        product.isVariantOf.hasVariant.forEach((variant) => {
+          variant.additionalProperty = [];
+        });
+      }
     });
   }
 
