@@ -56,11 +56,14 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
   if (omitVariants && jsonLD?.product.isVariantOf?.hasVariant) {
     jsonLD.product.isVariantOf.hasVariant = [];
   }
-  const slimJsonLD = structuredClone(jsonLD) as ProductDetailsPage | null | undefined;
+  const slimJsonLD = structuredClone(jsonLD) as
+    | ProductDetailsPage
+    | null
+    | undefined;
 
-  if(slimJsonLD){
+  if (slimJsonLD) {
     slimJsonLD.product.additionalProperty = [];
-    if(slimJsonLD.product.isVariantOf){
+    if (slimJsonLD.product.isVariantOf) {
       slimJsonLD.product.isVariantOf.additionalProperty = [];
       slimJsonLD.product.isVariantOf.hasVariant.forEach((variant) => {
         variant.additionalProperty = [];

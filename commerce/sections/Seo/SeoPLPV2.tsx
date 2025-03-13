@@ -63,7 +63,10 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     !jsonLD.products.length ||
     jsonLD.seo?.noIndexing;
 
-  const slimJsonLD = structuredClone(jsonLD) as ProductListingPage | null | undefined;
+  const slimJsonLD = structuredClone(jsonLD) as
+    | ProductListingPage
+    | null
+    | undefined;
 
   if (props.configJsonLD?.removeVideos) {
     slimJsonLD?.products.forEach((product) => {
@@ -74,12 +77,12 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     });
   }
 
-  if(slimJsonLD){
+  if (slimJsonLD) {
     slimJsonLD.filters = [];
-    
+
     slimJsonLD?.products.forEach((product) => {
       product.additionalProperty = [];
-      if(product.isVariantOf){
+      if (product.isVariantOf) {
         product.isVariantOf.additionalProperty = [];
         product.isVariantOf.hasVariant.forEach((variant) => {
           variant.additionalProperty = [];
@@ -87,7 +90,6 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
       }
     });
   }
-
 
   return {
     ...seoSiteProps,
