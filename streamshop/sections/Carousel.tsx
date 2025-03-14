@@ -104,16 +104,8 @@ export default function Carousel({
     : style.styleMobile;
   return (
     <>
-      <script
-        async
-        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js"
-      >
-      </script>
-      <script
-        async
-        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js"
-      >
-      </script>
+      <script async src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js"></script>
+      <script async src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js"></script>
       <Section.Container
         class={clx(
           style?.containerWidth == "full" && "w-full !max-w-full",
