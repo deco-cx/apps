@@ -166,6 +166,11 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
     );
   }
 
+  if (!props.src) {
+    console.error("Missing src. This image will NOT be rendered");
+    return null;
+  }
+
   const srcSet = getSrcSet(props.src, props.width, props.height, props.fit);
   const linkProps = srcSet && {
     imagesrcset: srcSet,
