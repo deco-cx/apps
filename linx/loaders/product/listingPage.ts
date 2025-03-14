@@ -8,6 +8,16 @@ import {
   toProduct,
 } from "../../utils/transform.ts";
 
+export interface Props {
+  /**
+   * @ignore
+   * @maximum 2
+   */
+  retryCount?: number;
+}
+
+const MAX_ATTEMPTS = 2;
+
 const getPageInfo = ({ page, nbPages, recordPerPage, records, url }: {
   page: number;
   nbPages: number;
@@ -45,7 +55,7 @@ const getPageInfo = ({ page, nbPages, recordPerPage, records, url }: {
  * @description Product Listing Page loader
  */
 const loader = async (
-  _props: unknown,
+  { retryCount = 0 }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<ProductListingPage | null> => {
@@ -60,7 +70,12 @@ const loader = async (
     !forProducts ||
     !isGridProductsModel(forProducts)
   ) {
-    throw new Error("Expected GridProducts model");
+    if (retryCount <= MAX_ATTEMPTS) {
+      return ctx.invoke("linx/loaders/product/listingPage.ts", {
+        retryCount: retryCount + 1,
+      });
+    }
+    return null;
   }
 
   const {
