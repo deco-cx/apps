@@ -9,6 +9,7 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
+  OrderItem,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -242,11 +243,18 @@ export interface VTEXCommerceStable {
     response: CreateNewDocument;
     body: Record<string, unknown>;
   };
+  "PATCH /api/dataentities/:acronym/documents/:documentId": {
+    response: CreateNewDocument;
+    body: Record<string, unknown>;
+  };
   "GET /api/catalog_system/pub/brand/list": {
     response: Brand[];
   };
   "GET /api/oms/user/orders": {
     response: Userorderslist;
+  };
+  "GET /api/oms/user/orders/:orderId": {
+    response: OrderItem;
   };
 }
 
