@@ -193,7 +193,6 @@ export default function Proxy({
 
     // Change cookies domain
     const responseHeaders = new Headers(response.headers);
-    responseHeaders.delete("set-cookie");
 
     proxySetCookie(response.headers, responseHeaders, url);
 
