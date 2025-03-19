@@ -17,43 +17,45 @@ import * as $$$$$$$$$11 from "./actions/wishlist/removeWishlist.ts";
 import * as $$$$$$$$$12 from "./actions/wishlist/shareWishlist.ts";
 import * as $$$$$$$$$13 from "./actions/wishlist/updateWishlist.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
-import * as $$$1 from "./loaders/auction/detailsPage.ts";
-import * as $$$2 from "./loaders/auction/list.ts";
+import * as $$$1 from "./loaders/auction/apiList.ts";
+import * as $$$2 from "./loaders/auction/detailsPage.ts";
+import * as $$$3 from "./loaders/auction/list.ts";
 import * as $$$0 from "./loaders/auction/ListBids.ts";
-import * as $$$3 from "./loaders/cart.ts";
-import * as $$$4 from "./loaders/page.ts";
-import * as $$$5 from "./loaders/pages.ts";
-import * as $$$6 from "./loaders/path.ts";
-import * as $$$7 from "./loaders/product/associations.ts";
-import * as $$$8 from "./loaders/product/byId.ts";
-import * as $$$9 from "./loaders/product/detailsPage.ts";
-import * as $$$10 from "./loaders/product/list.ts";
-import * as $$$11 from "./loaders/product/listingPage.ts";
-import * as $$$12 from "./loaders/product/suggestions.ts";
-import * as $$$13 from "./loaders/proxy.ts";
-import * as $$$14 from "./loaders/user.ts";
-import * as $$$15 from "./loaders/widget.ts";
-import * as $$$16 from "./loaders/wishlist/search.ts";
+import * as $$$4 from "./loaders/cart.ts";
+import * as $$$5 from "./loaders/page.ts";
+import * as $$$6 from "./loaders/pages.ts";
+import * as $$$7 from "./loaders/path.ts";
+import * as $$$8 from "./loaders/product/associations.ts";
+import * as $$$9 from "./loaders/product/byId.ts";
+import * as $$$10 from "./loaders/product/detailsPage.ts";
+import * as $$$11 from "./loaders/product/list.ts";
+import * as $$$12 from "./loaders/product/listingPage.ts";
+import * as $$$13 from "./loaders/product/suggestions.ts";
+import * as $$$14 from "./loaders/proxy.ts";
+import * as $$$15 from "./loaders/user.ts";
+import * as $$$16 from "./loaders/widget.ts";
+import * as $$$17 from "./loaders/wishlist/search.ts";
 
 const manifest = {
   "loaders": {
-    "linx/loaders/auction/detailsPage.ts": $$$1,
-    "linx/loaders/auction/list.ts": $$$2,
+    "linx/loaders/auction/apiList.ts": $$$1,
+    "linx/loaders/auction/detailsPage.ts": $$$2,
+    "linx/loaders/auction/list.ts": $$$3,
     "linx/loaders/auction/ListBids.ts": $$$0,
-    "linx/loaders/cart.ts": $$$3,
-    "linx/loaders/page.ts": $$$4,
-    "linx/loaders/pages.ts": $$$5,
-    "linx/loaders/path.ts": $$$6,
-    "linx/loaders/product/associations.ts": $$$7,
-    "linx/loaders/product/byId.ts": $$$8,
-    "linx/loaders/product/detailsPage.ts": $$$9,
-    "linx/loaders/product/list.ts": $$$10,
-    "linx/loaders/product/listingPage.ts": $$$11,
-    "linx/loaders/product/suggestions.ts": $$$12,
-    "linx/loaders/proxy.ts": $$$13,
-    "linx/loaders/user.ts": $$$14,
-    "linx/loaders/widget.ts": $$$15,
-    "linx/loaders/wishlist/search.ts": $$$16,
+    "linx/loaders/cart.ts": $$$4,
+    "linx/loaders/page.ts": $$$5,
+    "linx/loaders/pages.ts": $$$6,
+    "linx/loaders/path.ts": $$$7,
+    "linx/loaders/product/associations.ts": $$$8,
+    "linx/loaders/product/byId.ts": $$$9,
+    "linx/loaders/product/detailsPage.ts": $$$10,
+    "linx/loaders/product/list.ts": $$$11,
+    "linx/loaders/product/listingPage.ts": $$$12,
+    "linx/loaders/product/suggestions.ts": $$$13,
+    "linx/loaders/proxy.ts": $$$14,
+    "linx/loaders/user.ts": $$$15,
+    "linx/loaders/widget.ts": $$$16,
+    "linx/loaders/wishlist/search.ts": $$$17,
   },
   "handlers": {
     "linx/handlers/sitemap.ts": $$$$0,

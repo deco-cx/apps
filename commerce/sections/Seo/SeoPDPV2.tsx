@@ -20,6 +20,11 @@ export interface Props {
    * @description In testing, you can use this to prevent search engines from indexing your site
    */
   noIndexing?: boolean;
+  /**
+   * @title Ignore Structured Data
+   * @description By default, Structured Data is sent to everyone. Use this to prevent Structured Data from being sent to your customers, it will still be sent to crawlers and bots. Be aware that some integrations may not work if Structured Data is not sent.
+   */
+  ignoreStructuredData?: boolean;
 }
 
 /** @title Product details */
@@ -35,6 +40,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     description: descriptionProp,
     jsonLD,
     omitVariants,
+    ignoreStructuredData,
   } = props;
 
   const title = renderTemplateString(
@@ -57,6 +63,10 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     jsonLD.product.isVariantOf.hasVariant = [];
   }
 
+  const jsonLDs = (ignoreStructuredData && !ctx.isBot) || !jsonLD
+    ? []
+    : [jsonLD];
+
   return {
     ...seoSiteProps,
     title,
@@ -64,7 +74,7 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     image,
     canonical,
     noIndexing,
-    jsonLDs: [jsonLD],
+    jsonLDs,
   };
 }
 

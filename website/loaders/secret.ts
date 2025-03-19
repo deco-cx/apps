@@ -25,7 +25,7 @@ export interface Props {
    */
   name?: string;
 }
-const cache: Record<string, Promise<string | null>> = {};
+const moduleCache: Record<string, Promise<string | null>> = {};
 const showWarningOnce = once(() => {
   console.warn(
     colors.brightYellow(
@@ -47,7 +47,9 @@ const getSecret = async (props: Props): Promise<string | null> => {
     await showWarningOnce();
     return Promise.resolve(null);
   }
-  return cache[encrypted] ??= decryptFromHex(encrypted).then((d) => d.decrypted)
+  return moduleCache[encrypted] ??= decryptFromHex(encrypted).then((d) =>
+    d.decrypted
+  )
     .catch((err) => {
       const prettyName = name ? colors.brightRed(name) : "anonymous secret";
       console.error(
@@ -67,3 +69,5 @@ export default async function Secret(props: Props): Promise<Secret> {
     },
   };
 }
+
+export const cache = "no-cache";

@@ -3,7 +3,7 @@ import { STALE } from "../../../utils/fetch.ts";
 import { nullOnNotFound } from "../../../utils/http.ts";
 import type { AppContext } from "../../mod.ts";
 import { isGridProductsModel } from "../../utils/paths.ts";
-import { toProduct } from "../../utils/transform.ts";
+import { addAuctions, toProduct } from "../../utils/transform.ts";
 
 export interface Props {
   /** @description e.g.: /listas/vitrine-destaque */
@@ -39,13 +39,18 @@ const loader = async (
 
   const products = response?.Model?.Grid?.Products ?? [];
 
-  return products.map((product) =>
-    toProduct(product, product.ProductSelection?.SkuID, {
-      cdn,
-      url,
-      currency: "BRL",
-    })
-  );
+  const leiloes = await ctx.invoke.linx.loaders.auction.apiList();
+
+  return products.map((product) => {
+    return addAuctions(
+      toProduct(product, product.ProductSelection?.SkuID, {
+        cdn,
+        url,
+        currency: "BRL",
+      }),
+      leiloes,
+    );
+  });
 };
 
 export default loader;
