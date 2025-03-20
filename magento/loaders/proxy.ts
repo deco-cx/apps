@@ -1,6 +1,7 @@
 import { Route } from "../../website/flags/audience.ts";
 import { TextReplace } from "../handlers/proxy.ts";
 import { AppContext } from "../mod.ts";
+import { Script } from "../../website/types.ts";
 
 interface RedirectRouteProps {
   enableRedirectRoutes?: boolean;
@@ -52,6 +53,8 @@ const buildProxyRoutes = ({
   prefix,
   redirectRoutesProps,
   replaces = [],
+  includeScriptsToHead,
+  includeScriptsToBody,
 }: {
   extraPagePaths: string[];
   includeSiteMap?: string[];
@@ -63,6 +66,12 @@ const buildProxyRoutes = ({
   prefix: string;
   redirectRoutesProps: RedirectRouteProps;
   replaces?: TextReplace[];
+  includeScriptsToHead?: {
+    includes?: Script[];
+  };
+  includeScriptsToBody?: {
+    includes?: Script[];
+  };
 }) => {
   const publicUrl = new URL(
     ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
@@ -83,6 +92,8 @@ const buildProxyRoutes = ({
           url: urlToProxy,
           host: hostToUse,
           replaces,
+          includeScriptsToHead,
+          includeScriptsToBody,
           customHeaders: [
             {
               key: "x-forwarded-for",
@@ -203,6 +214,18 @@ export interface Props {
   excludePathsFromDecoSiteMap?: string[];
 
   replaces?: TextReplace[];
+  /**
+   * @title Scripts to include on Html head
+   */
+  includeScriptsToHead?: {
+    includes?: Script[];
+  };
+  /**
+   * @title Scripts to include on Html body
+   */
+  includeScriptsToBody?: {
+    includes?: Script[];
+  };
 }
 
 /**
@@ -218,6 +241,8 @@ function loader(
     prefix = "",
     redirectRoutesProps,
     replaces = [],
+    includeScriptsToHead,
+    includeScriptsToBody,
   }: Props,
   req: Request,
   ctx: AppContext,
@@ -234,6 +259,8 @@ function loader(
     prefix,
     redirectRoutesProps,
     replaces,
+    includeScriptsToHead,
+    includeScriptsToBody,
   });
 }
 
