@@ -16,7 +16,7 @@ export interface Props {
   retryCount?: number;
 }
 
-const MAX_ATTEMPTS = 2;
+const MAX_ATTEMPTS = 1;
 
 const getPageInfo = ({ page, nbPages, recordPerPage, records, url }: {
   page: number;
