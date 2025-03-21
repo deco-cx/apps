@@ -416,7 +416,7 @@ export interface Person extends Omit<Thing, "@type"> {
 }
 // NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {
-  "@type": "Author";
+  "@type": "Person";
   /** The name of the author. */
   name?: string;
   /** A link to a web page that uniquely identifies the author of the article. For example, the author's social media page, an about me page, or a bio page. */
