@@ -80,19 +80,23 @@ export const getMapAndTerm = (
   return [map, term];
 };
 
+
+const SEARCH_PAGE_NAME = "search"
 export const pageTypesToBreadcrumbList = (
   pages: PageType[],
   baseUrl: string,
 ) => {
   const filteredPages = pages
-    .filter(({ pageType }) =>
+    .filter(({ pageType, name }) =>
       pageType === "Category" || pageType === "Department" ||
-      pageType === "SubCategory" || pageType === "Brand" || pageType === "FullText"
+      pageType === "SubCategory" || pageType === "Brand" || (pageType === "FullText" && name !== SEARCH_PAGE_NAME)
     );
 
   return filteredPages.map((page, index) => {
+
     const position = index + 1;
     const slug = filteredPages.slice(0, position).map((x) => slugify(x.name!));
+
 
     return ({
       "@type": "ListItem" as const,
