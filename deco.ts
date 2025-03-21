@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("google-sheets"),
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),
@@ -38,6 +39,7 @@ const config = {
     app("linx-impulse"),
     app("shopify"),
     app("nuvemshop"),
+    app("streamshop"),
     app("website"),
     app("commerce"),
     app("workflows"),

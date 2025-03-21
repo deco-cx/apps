@@ -166,7 +166,8 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
     );
   }
 
-  const srcSet = getSrcSet(props.src, props.width, props.height, props.fit);
+  const srcSet = props.srcSet ?? getSrcSet(props.src, props.width, props.height, props.fit);
+
   const linkProps = srcSet && {
     imagesrcset: srcSet,
     imagesizes: props.sizes,
@@ -183,7 +184,7 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
       )}
       <img
         {...props}
-        data-fresh-disable-lock={true}
+        data-fresh-disable-lock
         preload={undefined}
         src={props.src}
         srcSet={srcSet}

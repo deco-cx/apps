@@ -6,7 +6,7 @@ import { toSegmentParams } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
-import type { LegacyProduct } from "../../utils/types.ts";
+import type { AdvancedLoaderConfig, LegacyProduct } from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
@@ -22,6 +22,11 @@ export interface Props {
    * @description Index of product pages with the `skuId` parameter
    */
   indexingSkus?: boolean;
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 
 /**
@@ -86,6 +91,7 @@ async function loader(
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+    includeOriginalAttributes: props.advancedConfigs?.includeOriginalAttributes,
   });
 
   return {
@@ -95,7 +101,9 @@ async function loader(
       : page.product,
     seo: {
       title: product.productTitle || product.productName,
-      description: product.metaTagDescription,
+      description: props.advancedConfigs?.preferDescription
+        ? product.description
+        : product.metaTagDescription,
       canonical: new URL(`/${product.linkText}/p`, url.origin).href,
       noIndexing: props.indexingSkus ? false : !!skuId,
     },

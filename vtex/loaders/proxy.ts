@@ -15,6 +15,9 @@ const PATHS_TO_PROXY = [
   "/XMLData/*",
   "/_v/*",
 ];
+
+export const VTEX_PATHS_THAT_REQUIRES_SAME_REFERER = ["/no-cache/AviseMe.aspx"];
+
 const decoSiteMapUrl = "/sitemap/deco.xml";
 
 const buildProxyRoutes = (
@@ -68,23 +71,8 @@ const buildProxyRoutes = (
         includeScriptsToHead,
         includeScriptsToBody,
         removeDirtyCookies: true,
+        pathsThatRequireSameReferer: VTEX_PATHS_THAT_REQUIRES_SAME_REFERER,
       };
-      // we have this check because we need to add
-      // the referer header to the AviseMe route
-      if (pathTemplate.includes("AviseMe")) {
-        return {
-          pathTemplate,
-          handler: {
-            value: {
-              ...handlerValue,
-              customHeaders: [{
-                key: "referer",
-                value: urlToProxy,
-              }],
-            },
-          },
-        };
-      }
 
       return ({
         pathTemplate,

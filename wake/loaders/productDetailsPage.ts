@@ -26,7 +26,7 @@ export interface Props {
 async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductDetailsPage | null> {
   const url = new URL(req.url);
   const { slug, buyTogether, includeSameParent } = props;
@@ -55,7 +55,7 @@ async function loader(
     },
     {
       headers,
-    }
+    },
   );
 
   const buyListProducts = await Promise.all(
@@ -64,8 +64,8 @@ async function loader(
 
       const { productId, includeSameParent, quantity } = buyListProduct;
 
-      const buyListProductPage =
-        await ctx.invoke.wake.loaders.productDetailsPage({
+      const buyListProductPage = await ctx.invoke.wake.loaders
+        .productDetailsPage({
           // 'slug' its just to fit the parse function of loader
           slug: `slug-${productId}`,
           includeSameParent,
@@ -81,7 +81,7 @@ async function loader(
       });
 
       return buyListProductPage.product;
-    }) ?? []
+    }) ?? [],
   ).then((maybeProductList) =>
     maybeProductList.filter((node): node is Product => Boolean(node))
   );
@@ -100,7 +100,7 @@ async function loader(
     },
     {
       headers,
-    }
+    },
   );
 
   const wakeProductOrBuyList = wakeProduct || wakeBuyList;
@@ -109,35 +109,34 @@ async function loader(
     return null;
   }
 
-  const variantsItems =
-    (await ctx.invoke.wake.loaders.productList({
-      first: MAXIMUM_REQUEST_QUANTITY,
-      sortDirection: "ASC",
-      sortKey: "RANDOM",
-      filters: { productId: [productId] },
-    })) ?? [];
+  const variantsItems = (await ctx.invoke.wake.loaders.productList({
+    first: MAXIMUM_REQUEST_QUANTITY,
+    sortDirection: "ASC",
+    sortKey: "RANDOM",
+    filters: { productId: [productId] },
+  })) ?? [];
 
   const buyTogetherItens =
     buyTogether && !!wakeProductOrBuyList.buyTogether?.length
       ? (await ctx.invoke.wake.loaders.productList({
-          first: MAXIMUM_REQUEST_QUANTITY,
-          sortDirection: "ASC",
-          sortKey: "RANDOM",
-          filters: {
-            productId: wakeProductOrBuyList.buyTogether?.map(
-              (bt) => bt!.productId
-            ),
-            mainVariant: true,
-          },
-          getVariations: true,
-        })) ?? []
+        first: MAXIMUM_REQUEST_QUANTITY,
+        sortDirection: "ASC",
+        sortKey: "RANDOM",
+        filters: {
+          productId: wakeProductOrBuyList.buyTogether?.map(
+            (bt) => bt!.productId,
+          ),
+          mainVariant: true,
+        },
+        getVariations: true,
+      })) ?? []
       : [];
 
   const product = toProduct(
     wakeProductOrBuyList,
     { base: url },
     variantsItems,
-    variantId
+    variantId,
   );
   return {
     "@type": "ProductDetailsPage",
@@ -146,18 +145,17 @@ async function loader(
       {
         base: url,
       },
-      product
+      product,
     ),
     product: {
       ...product,
       isAccessoryOrSparePartFor: buyListProducts,
-      isRelatedTo:
-        buyTogetherItens?.map((buyItem) => {
-          return {
-            ...buyItem,
-            additionalType: "BuyTogether",
-          };
-        }) ?? [],
+      isRelatedTo: buyTogetherItens?.map((buyItem) => {
+        return {
+          ...buyItem,
+          additionalType: "BuyTogether",
+        };
+      }) ?? [],
     },
     seo: {
       canonical: product.isVariantOf?.url ?? "",

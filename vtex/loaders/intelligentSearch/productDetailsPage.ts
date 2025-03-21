@@ -11,7 +11,11 @@ import { pageTypesToSeo } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
-import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
+import type {
+  AdvancedLoaderConfig,
+  PageType,
+  Product as VTEXProduct,
+} from "../../utils/types.ts";
 import { LegacyProduct } from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
@@ -27,6 +31,11 @@ export interface Props {
    * @description Index of product pages with the `skuId` parameter
    */
   indexingSkus?: boolean;
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 
 /**
@@ -138,6 +147,7 @@ const loader = async (
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+    includeOriginalAttributes: props.advancedConfigs?.includeOriginalAttributes,
   });
 
   const isPageProduct = pageType.pageType === "Product";

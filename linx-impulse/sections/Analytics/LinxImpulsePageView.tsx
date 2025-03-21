@@ -1,6 +1,7 @@
 import {
   PageInfo,
   Person,
+  Product as ProductType,
   ProductDetailsPage,
   ProductListingPage,
 } from "../../../commerce/types.ts";
@@ -129,11 +130,12 @@ interface Props {
 }
 /** @title Linx Impulse Integration - Events */
 export const script = async (props: SectionProps<typeof loader>) => {
-  const { event, source, apiKey, salesChannel, url: urlStr, deviceId } = props;
-  if (!event) {
+  const { eventBody, source, apiKey, salesChannel, deviceId } = props;
+
+  if (!eventBody) {
     return;
   }
-  const { page } = event;
+
   const user: LinxUser | undefined = props.user
     ? {
       id: props.user["@id"] ?? props.user.email ?? "",
@@ -167,33 +169,58 @@ export const script = async (props: SectionProps<typeof loader>) => {
       }),
     });
   };
-  const getSearchIdFromPageInfo = (pageInfo?: PageInfo | null) => {
-    const searchIdInPageTypes = pageInfo?.pageTypes?.find((pageType) =>
-      pageType?.startsWith("SearchId:")
-    );
-    return searchIdInPageTypes?.replace("SearchId:", "");
-  };
-  const getCategoriesFromPage = (page: ProductListingPage) => {
-    if (page.breadcrumb.itemListElement.length) {
-      return page.breadcrumb.itemListElement.map((item) => item.name!);
-    } else {
-      const departmentsFilter = page.filters.find((filter) =>
-        filter.key === "Departments"
-      )?.values;
-      if (Array.isArray(departmentsFilter)) {
-        return departmentsFilter.map((value) => value.label);
-      }
+
+  await sendViewEvent(eventBody);
+};
+
+const isResultPage = (event: Props["event"]): event is Search => {
+  return "result" in event && event.result !== null;
+};
+
+const isProductPage = (event: Props["event"]): event is Product => {
+  return "details" in event && event.details !== null;
+};
+
+const isCategoryPage = (event: Props["event"]): event is Category => {
+  return "products" in event && event.products !== null;
+};
+
+const getSearchIdFromPageInfo = (pageInfo?: PageInfo | null) => {
+  const searchIdInPageTypes = pageInfo?.pageTypes?.find((pageType) =>
+    pageType?.startsWith("SearchId:")
+  );
+  return searchIdInPageTypes?.replace("SearchId:", "");
+};
+const getCategoriesFromPage = (page: ProductListingPage) => {
+  if (page.breadcrumb.itemListElement.length) {
+    return page.breadcrumb.itemListElement.map((item) => item.name!);
+  } else {
+    const departmentsFilter = page.filters.find((filter) =>
+      filter.key === "Departments"
+    )?.values;
+    if (Array.isArray(departmentsFilter)) {
+      return departmentsFilter.map((value) => value.label);
     }
-  };
-  const getItemsFromProducts = (products?: ProductListingPage["products"]) => {
-    return (products?.map((product) => {
-      return {
-        pid: product.isVariantOf?.productGroupID ?? product.productID,
-        sku: product.sku,
-      };
-    }) ?? []);
-  };
-  const url = new URL(urlStr);
+  }
+};
+const getItemsFromProducts = (products?: ProductType[]) => {
+  return (products?.map((product) => {
+    return {
+      pid: product.isVariantOf?.productGroupID ?? product.productID,
+      sku: product.sku,
+    };
+  }) ?? []);
+};
+
+const getEventBody = (event: Props["event"], url: URL) => {
+  let eventBody: SendViewEventParams | undefined;
+
+  if (!event) {
+    return undefined;
+  }
+
+  const { page } = event;
+
   switch (page) {
     case "category": {
       let searchId: string | undefined;
@@ -207,26 +234,26 @@ export const script = async (props: SectionProps<typeof loader>) => {
         // If page has a search term
         if (searchIndex > 0 || query) {
           const items = getItemsFromProducts(event.products.products);
-          await sendViewEvent({
+          eventBody = {
             page: "search",
             body: {
               query: query || url.pathname.split("/").at(-1) || "",
               items,
               searchId,
             },
-          });
+          };
           break;
         }
         searchId = getSearchIdFromPageInfo(event.products.pageInfo);
         categories = getCategoriesFromPage(event.products);
       }
-      await sendViewEvent({
+      eventBody = {
         page: (categories?.length ?? 1) === 1 ? "category" : "subcategory",
         body: {
           categories,
           searchId,
         },
-      });
+      };
       break;
     }
     case "subcategory": {
@@ -236,13 +263,13 @@ export const script = async (props: SectionProps<typeof loader>) => {
         searchId = getSearchIdFromPageInfo(event.products.pageInfo);
         categories = getCategoriesFromPage(event.products);
       }
-      await sendViewEvent({
+      eventBody = {
         page: "subcategory",
         body: {
           categories,
           searchId,
         },
-      });
+      };
       break;
     }
     case "product": {
@@ -250,7 +277,7 @@ export const script = async (props: SectionProps<typeof loader>) => {
         break;
       }
       const { details } = event;
-      await sendViewEvent({
+      eventBody = {
         page,
         body: {
           pid: details.product.isVariantOf?.productGroupID ??
@@ -258,7 +285,7 @@ export const script = async (props: SectionProps<typeof loader>) => {
           price: details.product.offers?.lowPrice,
           sku: details.product.sku,
         },
-      });
+      };
       break;
     }
     case "search": {
@@ -272,57 +299,80 @@ export const script = async (props: SectionProps<typeof loader>) => {
         !event.result ||
         !event.result.products.length
       ) {
-        return sendViewEvent({
+        eventBody = {
           page: "emptysearch",
           body: {
             query,
             items: [],
             searchId,
           },
-        });
+        };
+        break;
       }
       const { result } = event;
       const items = getItemsFromProducts(result.products);
-      await sendViewEvent({
+      eventBody = {
         page,
         body: {
           query,
           items,
           searchId,
         },
-      });
+      };
       break;
     }
     case "landingpage": {
-      await sendViewEvent({
+      eventBody = {
         page: "landing_page",
-      });
+      };
       break;
     }
     case "notfound": {
-      await sendViewEvent({
+      eventBody = {
         page: "not_found",
-      });
+      };
       break;
     }
     default: {
-      await sendViewEvent({
+      eventBody = {
         page,
-      });
+      };
       break;
     }
   }
+
+  return eventBody;
 };
+
+const getProductData = (event: Props["event"]) => {
+  if (isResultPage(event)) {
+    return event.result?.products.length;
+  }
+  if (isProductPage(event)) {
+    return event.details?.product.productID;
+  }
+  if (isCategoryPage(event)) {
+    return event.products?.products?.length;
+  }
+};
+
 /** @title Linx Impulse - Page View Events */
-export const loader = (props: Props, req: Request, ctx: AppContext) => ({
-  ...props,
-  apiKey: ctx.apiKey,
-  salesChannel: ctx.salesChannel,
-  source: getSource(ctx),
-  url: req.url,
-  deviceId: getDeviceIdFromBag(ctx),
-  origin: ctx.origin,
-});
+export const loader = (props: Props, req: Request, ctx: AppContext) => {
+  const eventBody = getEventBody(props.event, new URL(req.url));
+
+  const productData = getProductData(props.event);
+
+  return ({
+    productData,
+    eventBody,
+    user: props.user,
+    apiKey: ctx.apiKey,
+    salesChannel: ctx.salesChannel,
+    source: getSource(ctx),
+    deviceId: getDeviceIdFromBag(ctx),
+    origin: ctx.origin,
+  });
+};
 export default function LinxImpulsePageView(
   props: SectionProps<typeof loader>,
 ) {
@@ -333,9 +383,7 @@ export default function LinxImpulsePageView(
         {/* The props from loaders come undefined when Async Rendering is active. */}
         {/* Calling them below forces them to be recognized as "being used" */}
         {!!props.user?.email && "user ok"}
-        {"details" in props.event && props.event.details?.product?.productID}
-        {"result" in props.event && props.event.result?.products?.length}
-        {"products" in props.event && props.event.products?.products?.length}
+        {props.productData}
       </span>
     </div>
   );

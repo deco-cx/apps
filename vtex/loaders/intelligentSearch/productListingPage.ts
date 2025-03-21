@@ -25,6 +25,7 @@ import {
   toProduct,
 } from "../../utils/transform.ts";
 import type {
+  AdvancedLoaderConfig,
   Facet,
   Fuzzy,
   PageType,
@@ -114,6 +115,11 @@ export interface Props {
    */
   selectedFacets?: SelectedFacet[];
   /**
+   * @title Use collection name
+   * @description Overwrite the page title with the collection name
+   */
+  useCollectionName?: boolean;
+  /**
    * @title Hide Unavailable Items
    * @description Do not return out of stock items
    */
@@ -146,6 +152,11 @@ export interface Props {
     label: string;
     value: string;
   }[];
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 const searchArgsOf = (props: Props, url: URL) => {
   const hideUnavailableItems = props.hideUnavailableItems;
@@ -292,9 +303,10 @@ const loader = async (
     const result = await PLPDefaultPath({ level: 1 }, req, ctx);
     pathToUse = result?.possiblePaths[0] ?? pathToUse;
   }
-  const pageTypesPromise = pageTypesFromUrl(pathToUse, ctx);
-  const allPageTypes = await pageTypesPromise;
+
+  const allPageTypes = await pageTypesFromUrl(pathToUse, ctx);
   const pageTypes = getValidTypesFromPageTypes(allPageTypes);
+
   const selectedFacets = baseSelectedFacets.length === 0
     ? filtersFromPathname(pageTypes)
     : baseSelectedFacets;
@@ -334,6 +346,22 @@ const loader = async (
     }, { ...STALE, headers: segment ? withSegmentCookie(segment) : undefined })
       .then((res) => res.json()),
   ]);
+
+  const currentPageTypes = !props.useCollectionName
+    ? pageTypes
+    : pageTypes.map((pageType) => {
+      if (pageType.id !== pageTypes.at(-1)?.id) return pageType;
+
+      const name = productsResult?.products?.[0]?.productClusters?.find(
+        (collection) => collection.id === pageType.name,
+      )?.name ?? pageType.name;
+
+      return {
+        ...pageType,
+        name,
+      };
+    });
+
   // It is a feature from Intelligent Search on VTEX panel
   // redirect to a specific page based on configured rules
   if (productsResult.redirect) {
@@ -380,6 +408,8 @@ const loader = async (
         toProduct(p, p.items.find(getFirstItemAvailable) || p.items[0], 0, {
           baseUrl: baseUrl,
           priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+          includeOriginalAttributes: props.advancedConfigs
+            ?.includeOriginalAttributes,
         })
       )
       .map((product) =>
@@ -429,7 +459,7 @@ const loader = async (
     },
     sortOptions,
     seo: pageTypesToSeo(
-      pageTypes,
+      currentPageTypes,
       baseUrl,
       hasPreviousPage ? paramnPage : undefined,
     ),

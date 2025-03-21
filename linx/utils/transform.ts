@@ -31,6 +31,7 @@ import { ProductAuction } from "./types/auctionJSON.ts";
 import { Model as ProductAuctionDetail } from "./types/auctionDetailJSON.ts";
 import { Product as LinxProductGetByIdJSON } from "./types/productByIdJSON.ts";
 import { Associations } from "./types/associationsJSON.ts";
+import { Auction } from "./types/auctionAPI.ts";
 
 type LinxProductGroup =
   | LinxProductGroupList
@@ -56,6 +57,46 @@ const pickVariant = (variants: LinxProduct[], variantId: number | null) => {
   }
 
   return variants[0];
+};
+
+export const addAuctions = (
+  product: Product,
+  leiloes: Auction[] | null,
+) => {
+  const auctionPropertyIndex = product.additionalProperty?.findIndex(
+    (prop) => prop.name === "id_leilao",
+  );
+
+  if (auctionPropertyIndex !== undefined && auctionPropertyIndex !== -1) {
+    product.additionalProperty?.splice(auctionPropertyIndex, 1);
+  }
+
+  const now = new Date().getTime();
+
+  const parseDate = (dateString: string) => {
+    const match = dateString.match(/\/Date\((\d+)([-+]\d{4})?\)\//);
+    return match ? parseInt(match[1], 10) : null;
+  };
+
+  leiloes?.find((leilao) => {
+    const visibleFrom = parseDate(leilao.VisibleFrom);
+    const visibleTo = parseDate(leilao.VisibleTo);
+
+    let isVisible = (visibleFrom !== null && now >= visibleFrom) ||
+      (visibleFrom === null);
+    isVisible &&= (visibleTo !== null && now <= visibleTo) ||
+      (visibleTo === null);
+    isVisible &&= visibleTo !== null && visibleFrom !== null;
+    if (`${leilao.SkuID}` === product.productID && isVisible) {
+      product.additionalProperty = product.additionalProperty || [];
+      product.additionalProperty.push({
+        "@type": "PropertyValue",
+        name: "id_leilao",
+        value: `${leilao.ProductAuctionID}`,
+      });
+    }
+  });
+  return product;
 };
 
 const toOffer = (variant: LinxProduct, product: LinxProductGroup): Offer => {
@@ -205,12 +246,20 @@ export const toProduct = (
     additionalType: "categoryItem",
   }));
 
+  const displayPrice = {
+    "@type": "PropertyValue" as const,
+    name: product.DisplayPrice,
+    value: product.DisplayPrice,
+    additionalType: "displayPrice",
+  };
+
   const additionalProperty = [
     ...skuOptions,
     ...metadatas,
     ...descriptions,
     ...prodOptions,
     ...categoryItems,
+    displayPrice,
   ];
 
   const hasVariant = level < 1
