@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<roblox xmlns:xmine="http://www.w3.org/2005/05/xmlmime" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" version="4">
+  <External>null</External>
+  <External>nil</External>
+  <Item class="Workspace" referent="RBX0">
+    <Properties>
+      <bool name="AllowThirdPartySales">false</bool>
+      <token name="StreamingEnabled">0</token>
+      <string name="Name">Workspace</string>
+    </Properties>
+    <Item class="Part" referent="RBX1">
+      <Properties>
+        <string name="Name">Baseplate</string>
+        <Vector3 name="Position">
+          <X>0</X>
+          <Y>-10</Y>
+          <Z>0</Z>
+        </Vector3>
+        <Vector3 name="Size">
+          <X>512</X>
+          <Y>20</Y>
+          <Z>512</Z>
+        </Vector3>
+        <BinaryString name="Tags"></BinaryString>
+        <bool name="Anchored">true</bool>
+        <Color3 name="Color">
+          <R>0.388235</R>
+          <G>0.372549</G>
+          <B>0.384314</B>
+        </Color3>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="Lighting" referent="RBX2">
+    <Properties>
+      <string name="Name">Lighting</string>
+      <Color3 name="Ambient">
+        <R>0</R>
+        <G>0</G>
+        <B>0</B>
+      </Color3>
+      <float name="Brightness">2</float>
+      <Color3 name="ColorShift_Bottom">
+        <R>0</R>
+        <G>0</G>
+        <B>0</B>
+      </Color3>
+      <Color3 name="ColorShift_Top">
+        <R>0</R>
+        <G>0</G>
+        <B>0</B>
+      </Color3>
+      <float name="ExposureCompensation">0</float>
+      <Color3 name="OutdoorAmbient">
+        <R>0.5</R>
+        <G>0.5</G>
+        <B>0.5</B>
+      </Color3>
+    </Properties>
+  </Item>
+  <Item class="SoundService" referent="RBX3">
+    <Properties>
+      <string name="Name">SoundService</string>
+      <bool name="RespectFilteringEnabled">true</bool>
+    </Properties>
+  </Item>
+</roblox> 
