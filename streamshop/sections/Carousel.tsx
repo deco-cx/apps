@@ -104,6 +104,16 @@ export default function Carousel({
     : style.styleMobile;
   return (
     <>
+      <script
+        async
+        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js"
+      >
+      </script>
+      <script
+        async
+        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js"
+      >
+      </script>
       <Section.Container
         class={clx(
           style?.containerWidth == "full" && "w-full !max-w-full",
@@ -132,26 +142,11 @@ export default function Carousel({
               : style?.radius == "pílula"
               ? "500px"
               : "5px"}
-            slugs-video={slugs.join(",")}
+            slugs-video={`${slugs.join(",")}`}
           >
             {/* @ts-ignore */}
           </liveshop-ads-carousel>
         </div>
-        <script
-          async
-          src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js"
-        >
-        </script>
-        <script
-          async
-          src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js"
-        >
-        </script>
-        <script
-          async
-          src="https://assets.streamshop.com.br/sdk/liveshop-web-sdk.min.js"
-        >
-        </script>
       </Section.Container>
     </>
   );

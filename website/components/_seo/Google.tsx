@@ -30,7 +30,7 @@ function Google(
               {url.hostname.replace(/^www./, "")}
             </span>
             <span class="text-xs font-normal leading-[18px]">
-              {url.protocol}//{url.hostname}{" "}
+              {`${url.protocol}//${url.hostname} `}
               <span class="text-common ml-2 font-semibold">&#8942;</span>
             </span>
           </div>

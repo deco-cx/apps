@@ -85,6 +85,7 @@ export interface Props {
    */
   removeDirtyCookies?: boolean;
   excludeHeaders?: string[];
+  pathsThatRequireSameReferer?: string[];
 }
 /**
  * @title Proxy
@@ -102,6 +103,7 @@ export default function Proxy({
   redirect = "manual",
   replaces,
   removeDirtyCookies = false,
+  pathsThatRequireSameReferer = [],
 }: Props): Handler {
   return async (req, _ctx) => {
     const url = new URL(req.url);
@@ -146,6 +148,9 @@ export default function Proxy({
     }
     for (const key of excludeHeaders) {
       headers.delete(key);
+    }
+    if (pathsThatRequireSameReferer.includes(to.pathname)) {
+      headers.set("referer", to.href);
     }
     const response = await fetch(to, {
       headers,

@@ -1520,6 +1520,9 @@ export interface Promotion {
 export interface AdvancedLoaderConfig {
   /** @description Specifies an array of attribute names from the original object to be directly included in the transformed object. */
   includeOriginalAttributes: string[];
+
+  /** @description Allow this field if you prefer to use description instead of metaTagDescription */
+  preferDescription?: boolean;
 }
 
 export type Maybe<T> = T | null | undefined;
