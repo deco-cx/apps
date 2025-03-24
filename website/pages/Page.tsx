@@ -54,7 +54,7 @@ export interface Props {
 }
 export function renderSection(section: Props["sections"][number]) {
   if (section === undefined || section === null) {
-    return <></>;
+    return <div></div>;
   }
   const { Component, props } = section;
   return <Component {...props} />;
@@ -144,7 +144,7 @@ function Page(
             collectorAddress={ONEDOLLAR_COLLECTOR}
           />
         )}
-        {sections.map(renderSection)}
+        {sections?.map(renderSection)}
       </ErrorBoundary>
     </>
   );
@@ -174,7 +174,7 @@ export const loader = async (
 
   return {
     ...restProps,
-    sections: [...globalSections, ...sections],
+    sections: [...globalSections, ...(Array.isArray(sections) ? sections : [])],
     errorPage: isDeferred<Page>(ctx.errorPage)
       ? await ctx.errorPage()
       : undefined,
@@ -194,7 +194,7 @@ export function Preview(props: SectionProps<typeof loader>) {
 
       {seo && renderSection(seo)}
       <Events deco={deco} />
-      {sections.map(renderSection)}
+      {sections?.map(renderSection)}
     </>
   );
 }

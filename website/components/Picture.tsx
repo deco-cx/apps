@@ -53,7 +53,7 @@ export const Source = forwardRef<HTMLSourceElement, SourceProps>(
         )}
         <source
           {...props}
-          data-fresh-disable-lock={true}
+          data-fresh-disable-lock
           preload={undefined}
           src={undefined} // Avoid deprecated api lighthouse warning
           srcSet={srcSet}

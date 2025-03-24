@@ -6,6 +6,7 @@ import { type LoadingFallbackProps } from "@deco/deco";
 interface Props extends SectionHeaderProps {
   /**
    * @title Slug da sua loja
+   * @description Slug da sua loja, não de videos únicos
    */
   storeSlug?: string;
 

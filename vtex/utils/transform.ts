@@ -1186,8 +1186,13 @@ function isPickupPointVCS(
   return "name" in pickupPoint;
 }
 
+interface ToPlaceOptions {
+  isActive?: boolean;
+}
+
 export function toPlace(
   pickupPoint: PickupPoint & { distance?: number } | PickupPointVCS,
+  options?: ToPlaceOptions,
 ): Place {
   const {
     name,
@@ -1196,6 +1201,7 @@ export function toPlace(
     longitude,
     openingHoursSpecification,
     specialOpeningHoursSpecification,
+    isActive,
   } = isPickupPointVCS(pickupPoint)
     ? {
       name: pickupPoint.name,
@@ -1208,6 +1214,7 @@ export function toPlace(
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
       ),
+      isActive: pickupPoint.isActive,
     }
     : {
       name: pickupPoint.friendlyName,
@@ -1226,6 +1233,7 @@ export function toPlace(
           openingTime: OpeningTime,
         })
       ),
+      isActive: options?.isActive,
     };
 
   return {
@@ -1244,10 +1252,17 @@ export function toPlace(
     name,
     specialOpeningHoursSpecification,
     openingHoursSpecification,
-    additionalProperty: [{
-      "@type": "PropertyValue",
-      name: "distance",
-      value: `${pickupPoint.distance}`,
-    }],
+    additionalProperty: [
+      {
+        "@type": "PropertyValue",
+        name: "distance",
+        value: `${pickupPoint.distance}`,
+      },
+      {
+        "@type": "PropertyValue",
+        name: "isActive",
+        value: typeof isActive === "boolean" ? `${isActive}` : undefined,
+      },
+    ],
   };
 }
