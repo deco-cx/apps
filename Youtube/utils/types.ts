@@ -71,3 +71,16 @@ export interface YoutubeVideoResponse {
     };
   }>;
 }
+
+export interface UpdateThumbnailResponse {
+  kind: string;
+  etag: string;
+  videoId: string;
+  items: Array<{
+    default: { url: string; width: number; height: number };
+    medium?: { url: string; width: number; height: number };
+    high?: { url: string; width: number; height: number };
+    standard?: { url: string; width: number; height: number };
+    maxres?: { url: string; width: number; height: number };
+  }>;
+}

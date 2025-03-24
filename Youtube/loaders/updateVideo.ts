@@ -20,7 +20,6 @@ export default async function loader(
   _ctx: AppContext,
 ): Promise<{ success: boolean; message: string; video?: any }> {
   console.log("............................................................");
-  console.log("Iniciando atualização de vídeo do YouTube:", options);
   console.log("............................................................");
 
   // Verificar se o ID do vídeo foi fornecido

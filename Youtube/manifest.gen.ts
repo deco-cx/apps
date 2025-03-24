@@ -3,7 +3,8 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/myAction.ts";
-import * as $$$$$$$$$1 from "./actions/updateVideo.ts";
+import * as $$$$$$$$$1 from "./actions/updateThumbnail.ts";
+import * as $$$$$$$$$2 from "./actions/updateVideo.ts";
 import * as $$$0 from "./loaders/authentication.ts";
 import * as $$$1 from "./loaders/channels.ts";
 import * as $$$2 from "./loaders/updateVideo.ts";
@@ -22,7 +23,8 @@ const manifest = {
   },
   "actions": {
     "Youtube/actions/myAction.ts": $$$$$$$$$0,
-    "Youtube/actions/updateVideo.ts": $$$$$$$$$1,
+    "Youtube/actions/updateThumbnail.ts": $$$$$$$$$1,
+    "Youtube/actions/updateVideo.ts": $$$$$$$$$2,
   },
   "name": "Youtube",
   "baseUrl": import.meta.url,

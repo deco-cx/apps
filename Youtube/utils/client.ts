@@ -3,6 +3,7 @@ import {
   VideoQuery,
   YoutubeChannelResponse,
   YoutubeVideoResponse,
+  UpdateThumbnailResponse,
 } from "./types.ts";
 
 export interface YoutubeClient {
@@ -17,5 +18,9 @@ export interface YoutubeClient {
   "GET /videos": {
     response: YoutubeVideoResponse;
     query: { part: string; id: string };
+  };
+  "POST /thumbnails/set": {
+    response: UpdateThumbnailResponse;
+    query: { videoId: string; uploadType: string };
   };
 }

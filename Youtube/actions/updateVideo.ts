@@ -20,7 +20,7 @@ export interface UpdateVideoOptionsAction {
  */
 export default async function action(
   props: UpdateVideoOptionsAction,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<UpdateVideoResult> {
   console.log("Executando ação de atualização de vídeo");
@@ -56,10 +56,8 @@ export default async function action(
 
   if (props.privacyStatus) updateOptions.privacyStatus = props.privacyStatus;
 
-  // Chamar o loader para atualizar o vídeo
   const result: UpdateVideoResult = await ctx.invoke.Youtube.loaders
     .updateVideo(updateOptions);
 
-  // Retornar o resultado da operação
   return result;
 }
