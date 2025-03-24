@@ -6,7 +6,7 @@ const CLIENT_ID = Deno.env.get("YOUTUBE_CLIENT_ID") ||
 const REDIRECT_URI = Deno.env.get("YOUTUBE_REDIRECT_URI") ||
   "http://localhost:8000/";
 const SCOPES = Deno.env.get("YOUTUBE_SCOPES") ||
-  "https://www.googleapis.com/auth/youtube.readonly";
+  "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl";
 
 // Tempo de expiração do cookie - 1 dia em milissegundos
 const COOKIE_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
@@ -32,7 +32,7 @@ export default async function loader(
 
   // Obter cookies dos cabeçalhos da requisição em vez da resposta
   const cookies = getCookies(req.headers);
-  let accessToken = cookies.accessToken || null;
+  let accessToken = cookies.youtube_access_token || null;
 
   // Sempre definir a URL de autorização, será usada se não houver token
   const authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
@@ -41,8 +41,6 @@ export default async function loader(
     `response_type=code&` +
     `scope=${SCOPES}&` +
     `state=state_parameter_passthrough_value`;
-
-  console.log("accessToken da requisição:", accessToken);
 
   if (!accessToken && code) {
     try {
@@ -62,12 +60,11 @@ export default async function loader(
 
       const tokenData = await tokenResponse.json();
       accessToken = tokenData.access_token;
-      console.log("Novo token obtido:", accessToken);
 
       if (accessToken) {
         // Define o cookie apenas se tivermos um token válido
         setCookie(ctx.response.headers, {
-          name: "accessToken",
+          name: "youtube_access_token",
           value: accessToken,
           path: "/",
           // Expira em 1 dia
@@ -91,7 +88,6 @@ export default async function loader(
 
           const channelResult = await channelResponse.json();
           channelData = channelResult.items;
-          console.log("Dados de canal obtidos:", channelData);
         } catch (error) {
           console.error("Erro ao buscar dados do canal:", error);
         }
@@ -114,13 +110,12 @@ export default async function loader(
       if (testResponse.ok) {
         const channelResult = await testResponse.json();
         channelData = channelResult.items;
-        console.log("Dados de canal obtidos com token existente:", channelData);
       } else {
         // Token expirado ou inválido, removemos o cookie
         console.error("Token existente inválido, redirecionando para login");
         accessToken = null;
         setCookie(ctx.response.headers, {
-          name: "accessToken",
+          name: "youtube_access_token",
           value: "",
           path: "/",
           expires: new Date(0), // Expira imediatamente
@@ -133,7 +128,7 @@ export default async function loader(
       // Em caso de erro, invalidamos o token para forçar novo login
       accessToken = null;
       setCookie(ctx.response.headers, {
-        name: "accessToken",
+        name: "youtube_access_token",
         value: "",
         path: "/",
         expires: new Date(0),
@@ -148,12 +143,6 @@ export default async function loader(
     login: accessToken ? "Usuário YouTube" : "Visitante",
     avatar_url: "https://example.com/avatar.jpg",
   };
-
-  console.log("Retornando dados da autenticação:", {
-    usuarioLogado: !!accessToken,
-    temURL: !!authorizationUrl,
-    temCanais: Array.isArray(channelData) && channelData.length > 0,
-  });
 
   return {
     user: user,

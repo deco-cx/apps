@@ -8,7 +8,7 @@ import { getCookies } from "@std/http";
 export default async function loader(
   _props: unknown,
   req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<YoutubeChannelResponse | null> {
   // Verifica se há um token de acesso nos cookies
   const cookies = getCookies(req.headers);
@@ -20,11 +20,6 @@ export default async function loader(
   }
 
   try {
-    console.log(
-      "Buscando canais do YouTube com token:",
-      accessToken.substring(0, 10) + "...",
-    );
-
     // Fazemos uma chamada direta com fetch usando o token de acesso
     const response = await fetch(
       "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
@@ -45,7 +40,6 @@ export default async function loader(
     }
 
     const result = await response.json();
-    console.log("Canais obtidos com sucesso:", result.items?.length || 0);
     return result;
   } catch (error) {
     console.error("Erro ao processar requisição de canais:", error);

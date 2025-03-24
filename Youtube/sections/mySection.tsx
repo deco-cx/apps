@@ -16,8 +16,8 @@ interface Props {
 
 export async function loader(
   props: { tab?: string },
-  req: Request, 
-  ctx: AppContext
+  req: Request,
+  ctx: AppContext,
 ) {
   console.log("Iniciando carregamento da seção YouTube...");
   const dataUser = await ctx.invoke.Youtube.loaders.authentication();
@@ -29,13 +29,17 @@ export async function loader(
 
   // Se temos um token de acesso, também buscamos os vídeos
   let videoData = null;
-  if (dataUser.accessToken && dataUser.channelData && dataUser.channelData.length > 0) {
+  if (
+    dataUser.accessToken && dataUser.channelData &&
+    dataUser.channelData.length > 0
+  ) {
     try {
       // Usa o primeiro canal para buscar os vídeos
       const channelId = dataUser.channelData[0].id;
-      videoData = await ctx.invoke.Youtube.loaders.videos({ 
+      videoData = await ctx.invoke.Youtube.loaders.videos({
         channelId: channelId,
-        maxResults: 10
+        maxResults: 10,
+        includePrivate: true,
       });
       console.log("Vídeos carregados:", videoData ? "sim" : "não");
     } catch (error) {
@@ -55,7 +59,8 @@ export async function loader(
 }
 
 export default function Section(
-  { authorizationUrl, channelData, videoData, accessToken, tab = "channels" }: Props,
+  { authorizationUrl, channelData, videoData, accessToken, tab = "channels" }:
+    Props,
 ) {
   // Estilos CSS inline
   const styles = {
@@ -169,10 +174,10 @@ export default function Section(
       fontWeight: "bold" as const,
     },
   };
-  
+
   // Função para formatar números (ex: 1500 -> 1.5K)
   const formatNumber = (num: string | number) => {
-    const n = typeof num === 'string' ? parseInt(num, 10) : num;
+    const n = typeof num === "string" ? parseInt(num, 10) : num;
     if (n >= 1000000) {
       return `${(n / 1000000).toFixed(1)}M`;
     } else if (n >= 1000) {
@@ -180,14 +185,14 @@ export default function Section(
     }
     return n.toString();
   };
-  
+
   // Função para formatar data (ex: "10 dias atrás")
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) {
       return "Hoje";
     } else if (diffDays === 1) {
@@ -196,10 +201,10 @@ export default function Section(
       return `${diffDays} dias atrás`;
     } else if (diffDays < 365) {
       const months = Math.floor(diffDays / 30);
-      return `${months} ${months === 1 ? 'mês' : 'meses'} atrás`;
+      return `${months} ${months === 1 ? "mês" : "meses"} atrás`;
     } else {
       const years = Math.floor(diffDays / 365);
-      return `${years} ${years === 1 ? 'ano' : 'anos'} atrás`;
+      return `${years} ${years === 1 ? "ano" : "anos"} atrás`;
     }
   };
 
@@ -213,8 +218,8 @@ export default function Section(
           <div style={styles.loginContainer}>
             <h2 style={styles.heading}>Acesse seus canais do YouTube</h2>
             <p>
-              Faça login com sua conta do Google para visualizar seus canais e vídeos do
-              YouTube.
+              Faça login com sua conta do Google para visualizar seus canais e
+              vídeos do YouTube.
             </p>
             {authorizationUrl
               ? (
@@ -274,8 +279,7 @@ export default function Section(
                 {Array.isArray(channelData) ? channelData.length : "Nenhum"}
               </p>
               <p>
-                <strong>Vídeos:</strong>{" "}
-                {videoData?.items?.length || "Nenhum"}
+                <strong>Vídeos:</strong> {videoData?.items?.length || "Nenhum"}
               </p>
               <p>
                 <strong>Aba Ativa:</strong> {activeTab}
@@ -284,7 +288,7 @@ export default function Section(
 
             {/* Abas para navegação usando links com parâmetros de URL */}
             <div style={styles.tabs}>
-              <a 
+              <a
                 href="?tab=channels"
                 style={{
                   ...styles.tab,
@@ -293,7 +297,7 @@ export default function Section(
               >
                 Canais
               </a>
-              <a 
+              <a
                 href="?tab=videos"
                 style={{
                   ...styles.tab,
@@ -305,150 +309,225 @@ export default function Section(
             </div>
 
             {/* Seção de Canais */}
-            {activeTab === "channels" && Array.isArray(channelData) && channelData.length > 0 ? (
-              <div>
-                <h3 style={styles.heading}>Seus Canais</h3>
-                {channelData.map((channel: any) => (
-                  <div key={channel.id} style={styles.channel}>
-                    <h3>{channel.snippet.title}</h3>
-                    {channel.snippet.thumbnails?.high?.url && (
-                      <img
-                        src={channel.snippet.thumbnails.high.url}
-                        alt="Thumbnail do Canal"
-                        style={styles.avatar}
-                      />
-                    )}
-                    {channel.snippet.customUrl && (
-                      <p>
-                        <strong>URL Personalizada:</strong>{" "}
-                        {channel.snippet.customUrl}
-                      </p>
-                    )}
-                    {channel.snippet.country && (
-                      <p>
-                        <strong>País:</strong> {channel.snippet.country}
-                      </p>
-                    )}
-                    <p>
-                      <strong>Descrição:</strong>{" "}
-                      {channel.snippet.description || "Sem descrição"}
-                    </p>
-                    {channel.snippet.publishedAt && (
-                      <p>
-                        <strong>Publicado em:</strong>{" "}
-                        {new Date(channel.snippet.publishedAt)
-                          .toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : activeTab === "channels" && (
-              <div
-                style={{
-                  padding: "20px",
-                  backgroundColor: "#f8f8f8",
-                  borderRadius: "8px",
-                }}
-              >
-                <p>
-                  Nenhum canal encontrado. Isso pode ocorrer pelos seguintes
-                  motivos:
-                </p>
-                <ul>
-                  <li>Você não possui canais no YouTube</li>
-                  <li>Ocorreu um erro ao buscar seus canais</li>
-                  <li>A autenticação não foi concluída corretamente</li>
-                </ul>
-                <a
-                  href={authorizationUrl}
-                  style={{
-                    ...styles.loginButton,
-                    backgroundColor: "#4285F4",
-                  }}
-                >
-                  Tentar novamente
-                </a>
-              </div>
-            )}
-
-            {/* Seção de Vídeos */}
-            {activeTab === "videos" && videoData?.items?.length > 0 ? (
-              <div>
-                <h3 style={styles.heading}>Seus Vídeos</h3>
-                <div style={styles.videoGrid}>
-                  {videoData.items.map((video: any) => (
-                    <div 
-                      key={video.id} 
-                      style={styles.videoCard}
-                      onMouseEnter={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        target.style.transform = "translateY(-5px)";
-                        target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.1)";
-                      }}
-                      onMouseLeave={(e) => {
-                        const target = e.currentTarget as HTMLElement;
-                        target.style.transform = "translateY(0)";
-                        target.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
-                      }}
-                    >
-                      <a
-                        href={`https://www.youtube.com/watch?v=${video.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: "none", color: "inherit" }}
-                      >
+            {activeTab === "channels" && Array.isArray(channelData) &&
+                channelData.length > 0
+              ? (
+                <div>
+                  <h3 style={styles.heading}>Seus Canais</h3>
+                  {channelData.map((channel: any) => (
+                    <div key={channel.id} style={styles.channel}>
+                      <h3>{channel.snippet.title}</h3>
+                      {channel.snippet.thumbnails?.high?.url && (
                         <img
-                          src={
-                            video.snippet.thumbnails.high?.url ||
-                            video.snippet.thumbnails.medium?.url ||
-                            video.snippet.thumbnails.default.url
-                          }
-                          alt={video.snippet.title}
-                          style={styles.videoThumbnail}
+                          src={channel.snippet.thumbnails.high.url}
+                          alt="Thumbnail do Canal"
+                          style={styles.avatar}
                         />
-                        <div style={styles.videoInfo}>
-                          <h4 style={styles.videoTitle}>{video.snippet.title}</h4>
-                          <p style={{ fontSize: "14px", color: "#666", margin: "5px 0" }}>
-                            {video.snippet.channelTitle}
-                          </p>
-                          <div style={styles.videoStats}>
-                            <span>
-                              {video.statistics?.viewCount
-                                ? `${formatNumber(video.statistics.viewCount)} visualizações`
-                                : ""}
-                            </span>
-                            <span>
-                              {video.snippet.publishedAt
-                                ? formatDate(video.snippet.publishedAt)
-                                : ""}
-                            </span>
-                          </div>
-                        </div>
-                      </a>
+                      )}
+                      {channel.snippet.customUrl && (
+                        <p>
+                          <strong>URL Personalizada:</strong>{" "}
+                          {channel.snippet.customUrl}
+                        </p>
+                      )}
+                      {channel.snippet.country && (
+                        <p>
+                          <strong>País:</strong> {channel.snippet.country}
+                        </p>
+                      )}
+                      <p>
+                        <strong>Descrição:</strong>{" "}
+                        {channel.snippet.description || "Sem descrição"}
+                      </p>
+                      {channel.snippet.publishedAt && (
+                        <p>
+                          <strong>Publicado em:</strong>{" "}
+                          {new Date(channel.snippet.publishedAt)
+                            .toLocaleDateString()}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
-              </div>
-            ) : activeTab === "videos" && (
-              <div
-                style={{
-                  padding: "20px",
-                  backgroundColor: "#f8f8f8",
-                  borderRadius: "8px",
-                }}
-              >
-                <p>
-                  Nenhum vídeo encontrado. Isso pode ocorrer pelos seguintes
-                  motivos:
-                </p>
-                <ul>
-                  <li>Você não possui vídeos no YouTube</li>
-                  <li>Ocorreu um erro ao buscar seus vídeos</li>
-                  <li>A autenticação não permite acesso aos seus vídeos</li>
-                </ul>
-              </div>
-            )}
+              )
+              : activeTab === "channels" && (
+                <div
+                  style={{
+                    padding: "20px",
+                    backgroundColor: "#f8f8f8",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <p>
+                    Nenhum canal encontrado. Isso pode ocorrer pelos seguintes
+                    motivos:
+                  </p>
+                  <ul>
+                    <li>Você não possui canais no YouTube</li>
+                    <li>Ocorreu um erro ao buscar seus canais</li>
+                    <li>A autenticação não foi concluída corretamente</li>
+                  </ul>
+                  <a
+                    href={authorizationUrl}
+                    style={{
+                      ...styles.loginButton,
+                      backgroundColor: "#4285F4",
+                    }}
+                  >
+                    Tentar novamente
+                  </a>
+                </div>
+              )}
+
+            {/* Seção de Vídeos */}
+            {activeTab === "videos" && videoData?.items?.length > 0
+              ? (
+                <div>
+                  <h3 style={styles.heading}>Seus Vídeos</h3>
+                  <div style={styles.videoGrid}>
+                    {videoData.items.map((video: any) => (
+                      <div
+                        key={video.id}
+                        style={styles.videoCard}
+                        onMouseEnter={(e) => {
+                          const target = e.currentTarget as HTMLElement;
+                          target.style.transform = "translateY(-5px)";
+                          target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          const target = e.currentTarget as HTMLElement;
+                          target.style.transform = "translateY(0)";
+                          target.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "10px",
+                          }}
+                        >
+                          <a
+                            href={`/youtube/sections/editVideo?videoId=${video.id}`}
+                            style={{
+                              display: "inline-block",
+                              padding: "3px 8px",
+                              backgroundColor: "#4285F4",
+                              color: "white",
+                              borderRadius: "3px",
+                              textDecoration: "none",
+                              fontSize: "12px",
+                            }}
+                          >
+                            Editar
+                          </a>
+                          <a
+                            href={`https://www.youtube.com/watch?v=${video.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "inline-block",
+                              padding: "3px 8px",
+                              backgroundColor: "#FF0000",
+                              color: "white",
+                              borderRadius: "3px",
+                              textDecoration: "none",
+                              fontSize: "12px",
+                            }}
+                          >
+                            Ver no YouTube
+                          </a>
+                        </div>
+                        <a
+                          href={`/youtube/sections/editVideo?videoId=${video.id}`}
+                          style={{ textDecoration: "none", color: "inherit" }}
+                        >
+                          <img
+                            src={video.snippet.thumbnails.high?.url ||
+                              video.snippet.thumbnails.medium?.url ||
+                              video.snippet.thumbnails.default.url}
+                            alt={video.snippet.title}
+                            style={styles.videoThumbnail}
+                          />
+                          <div style={styles.videoInfo}>
+                            <h4 style={styles.videoTitle}>
+                              {video.snippet.title}
+                            </h4>
+                            <p
+                              style={{
+                                fontSize: "14px",
+                                color: "#666",
+                                margin: "5px 0",
+                              }}
+                            >
+                              {video.snippet.channelTitle}
+                            </p>
+                            <div style={styles.videoStats}>
+                              <span>
+                                {video.statistics?.viewCount
+                                  ? `${
+                                    formatNumber(video.statistics.viewCount)
+                                  } visualizações`
+                                  : ""}
+                              </span>
+                              <span>
+                                {video.snippet.publishedAt
+                                  ? formatDate(video.snippet.publishedAt)
+                                  : ""}
+                              </span>
+                            </div>
+                            {video.status && (
+                              <div
+                                style={{
+                                  display: "inline-block",
+                                  margin: "8px 0 0 0",
+                                  padding: "3px 8px",
+                                  borderRadius: "3px",
+                                  fontSize: "11px",
+                                  fontWeight: "bold",
+                                  backgroundColor:
+                                    video.status.privacyStatus === "public"
+                                      ? "#4CAF50"
+                                      : video.status.privacyStatus ===
+                                          "unlisted"
+                                      ? "#FF9800"
+                                      : "#F44336",
+                                  color: "white",
+                                }}
+                              >
+                                {video.status.privacyStatus === "public"
+                                  ? "Público"
+                                  : video.status.privacyStatus === "unlisted"
+                                  ? "Não listado"
+                                  : "Privado"}
+                              </div>
+                            )}
+                          </div>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+              : activeTab === "videos" && (
+                <div
+                  style={{
+                    padding: "20px",
+                    backgroundColor: "#f8f8f8",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <p>
+                    Nenhum vídeo encontrado. Isso pode ocorrer pelos seguintes
+                    motivos:
+                  </p>
+                  <ul>
+                    <li>Você não possui vídeos no YouTube</li>
+                    <li>Ocorreu um erro ao buscar seus vídeos</li>
+                    <li>A autenticação não permite acesso aos seus vídeos</li>
+                  </ul>
+                </div>
+              )}
           </div>
         )}
     </div>
