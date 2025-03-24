@@ -1,5 +1,6 @@
 import {
   Query,
+  VideoQuery,
   YoutubeChannelResponse,
   YoutubeVideoResponse,
 } from "./types.ts";
@@ -9,7 +10,12 @@ export interface YoutubeClient {
     response: YoutubeChannelResponse;
     query: Query;
   };
-  "POST /videos": {
+  "GET /search": {
     response: YoutubeVideoResponse;
+    query: VideoQuery;
+  };
+  "GET /videos": {
+    response: YoutubeVideoResponse;
+    query: { part: string; id: string };
   };
 }

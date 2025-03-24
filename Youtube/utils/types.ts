@@ -6,6 +6,13 @@ export interface Query {
   mine: boolean;
 }
 
+export interface VideoQuery {
+  part: string;
+  channelId?: string;
+  maxResults?: number;
+  order?: string;
+}
+
 export interface YoutubeChannelResponse {
   kind: string;
   items: Array<{
@@ -13,8 +20,13 @@ export interface YoutubeChannelResponse {
     snippet: {
       title: string;
       description: string;
+      customUrl?: string;
+      publishedAt?: string;
+      country?: string;
       thumbnails: {
         default: { url: string };
+        medium?: { url: string };
+        high?: { url: string };
       };
     };
   }>;
@@ -22,14 +34,40 @@ export interface YoutubeChannelResponse {
 
 export interface YoutubeVideoResponse {
   kind: string;
+  pageInfo?: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+  nextPageToken?: string;
   items: Array<{
     id: string;
     snippet: {
+      publishedAt: string;
+      channelId: string;
       title: string;
       description: string;
+      channelTitle?: string;
       thumbnails: {
-        default: { url: string };
+        default: { url: string; width: number; height: number };
+        medium?: { url: string; width: number; height: number };
+        high?: { url: string; width: number; height: number };
+        standard?: { url: string; width: number; height: number };
+        maxres?: { url: string; width: number; height: number };
       };
+      tags?: string[];
+      categoryId?: string;
+      liveBroadcastContent?: string;
+      defaultLanguage?: string;
+      localized?: {
+        title: string;
+        description: string;
+      };
+    };
+    statistics?: {
+      viewCount: string;
+      likeCount: string;
+      favoriteCount: string;
+      commentCount: string;
     };
   }>;
 }

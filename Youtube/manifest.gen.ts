@@ -5,12 +5,14 @@
 import * as $$$$$$$$$0 from "./actions/myAction.ts";
 import * as $$$0 from "./loaders/authentication.ts";
 import * as $$$1 from "./loaders/channels.ts";
+import * as $$$2 from "./loaders/videos.ts";
 import * as $$$$$$0 from "./sections/mySection.tsx";
 
 const manifest = {
   "loaders": {
     "Youtube/loaders/authentication.ts": $$$0,
     "Youtube/loaders/channels.ts": $$$1,
+    "Youtube/loaders/videos.ts": $$$2,
   },
   "sections": {
     "Youtube/sections/mySection.tsx": $$$$$$0,
