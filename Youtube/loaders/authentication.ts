@@ -29,11 +29,11 @@ export default async function loader(
   const urlParams = new URL(req.url).searchParams;
   const code = urlParams.get("code");
   let channelData = null;
-  
+
   // Obter cookies dos cabeçalhos da requisição em vez da resposta
   const cookies = getCookies(req.headers);
   let accessToken = cookies.accessToken || null;
-  
+
   // Sempre definir a URL de autorização, será usada se não houver token
   const authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${CLIENT_ID}&` +
@@ -41,9 +41,9 @@ export default async function loader(
     `response_type=code&` +
     `scope=${SCOPES}&` +
     `state=state_parameter_passthrough_value`;
-  
+
   console.log("accessToken da requisição:", accessToken);
-  
+
   if (!accessToken && code) {
     try {
       const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
@@ -108,9 +108,9 @@ export default async function loader(
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
-        }
+        },
       );
-      
+
       if (testResponse.ok) {
         const channelResult = await testResponse.json();
         channelData = channelResult.items;
@@ -152,7 +152,7 @@ export default async function loader(
   console.log("Retornando dados da autenticação:", {
     usuarioLogado: !!accessToken,
     temURL: !!authorizationUrl,
-    temCanais: Array.isArray(channelData) && channelData.length > 0
+    temCanais: Array.isArray(channelData) && channelData.length > 0,
   });
 
   return {

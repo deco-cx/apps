@@ -13,15 +13,18 @@ export default async function loader(
   // Verifica se há um token de acesso nos cookies
   const cookies = getCookies(req.headers);
   const accessToken = cookies.accessToken;
-  
+
   if (!accessToken) {
     console.log("Nenhum token de acesso disponível para buscar canais");
     return null;
   }
-  
+
   try {
-    console.log("Buscando canais do YouTube com token:", accessToken.substring(0, 10) + "...");
-    
+    console.log(
+      "Buscando canais do YouTube com token:",
+      accessToken.substring(0, 10) + "...",
+    );
+
     // Fazemos uma chamada direta com fetch usando o token de acesso
     const response = await fetch(
       "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
@@ -30,13 +33,15 @@ export default async function loader(
           "Authorization": `Bearer ${accessToken}`,
           "Accept": "application/json",
         },
-      }
+      },
     );
 
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Erro ao buscar canais:", errorData);
-      throw new Error(`Falha ao buscar canais: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Falha ao buscar canais: ${response.status} ${response.statusText}`,
+      );
     }
 
     const result = await response.json();
