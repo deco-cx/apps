@@ -1,6 +1,6 @@
 import { type App, type AppContext as AC } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { createVertex } from "npm:@ai-sdk/google-vertex/edge";
+import { createVertex } from "npm:@ai-sdk/google-vertex/edge@2.2.1";
 import { Secret } from "../website/loaders/secret.ts";
 
 interface State {
@@ -12,18 +12,18 @@ interface Props {
    * @title Google Cloud Credentials
    */
   googleCredentials: {
-    clientEmail: Secret;
-    privateKeyId: Secret;
-    privateKey: Secret;
+    clientEmail: Secret | string;
+    privateKeyId: Secret | string;
+    privateKey: Secret | string;
   };
   /**
    * @title Location
    */
-  location: Secret;
+  location: Secret | string;
   /**
    * @title Project
    */
-  project: Secret;
+  project: Secret | string;
 }
 /**
  * @title Vertex
@@ -36,12 +36,18 @@ export default function Vertex(props: Props): App<Manifest, State> {
   const { googleCredentials, location, project } = props;
   const vertex = createVertex({
     googleCredentials: {
-      clientEmail: googleCredentials.clientEmail.get(),
-      privateKeyId: googleCredentials.privateKeyId.get(),
-      privateKey: googleCredentials.privateKey.get(),
+      clientEmail: typeof googleCredentials.clientEmail === "string"
+        ? googleCredentials.clientEmail
+        : googleCredentials.clientEmail.get(),
+      privateKeyId: typeof googleCredentials.privateKeyId === "string"
+        ? googleCredentials.privateKeyId
+        : googleCredentials.privateKeyId.get(),
+      privateKey: typeof googleCredentials.privateKey === "string"
+        ? googleCredentials.privateKey
+        : googleCredentials.privateKey.get(),
     },
-    location: location.get(),
-    project: project.get(),
+    location: typeof location === "string" ? location : location.get(),
+    project: typeof project === "string" ? project : project.get(),
   });
 
   return {

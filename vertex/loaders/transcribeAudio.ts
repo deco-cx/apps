@@ -1,4 +1,4 @@
-import { generateText } from "npm:ai";
+import { generateText } from "npm:ai@4.2.0";
 import { Buffer } from "node:buffer";
 import { AppContext } from "../mod.ts";
 
