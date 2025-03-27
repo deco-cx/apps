@@ -8,9 +8,10 @@ import { AppContext } from "../mod.ts";
  */
 export interface Props {
   audioUrl: string;
+  model?: string;
 }
 export default async function transcribeAudio(
-  { audioUrl }: Props,
+  { audioUrl, model = "gemini-1.5-pro" }: Props,
   _request: Request,
   ctx: AppContext,
 ) {
@@ -18,7 +19,7 @@ export default async function transcribeAudio(
   const response = await fetch(audioUrl);
   const audioData = await response.arrayBuffer();
 
-  const transcriptionModel = vertexClient("gemini-1.5-pro", {
+  const transcriptionModel = vertexClient(model, {
     audioTimestamp: true,
   });
 
