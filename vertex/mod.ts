@@ -1,6 +1,6 @@
 import { type App, type AppContext as AC } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import { createVertex } from "npm:@ai-sdk/google-vertex/edge@2.2.1";
+import { createVertex } from "npm:@ai-sdk/google-vertex@2.2.1/edge";
 import { Secret } from "../website/loaders/secret.ts";
 
 interface State {
