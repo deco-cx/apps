@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("vertex"),
     app("google-sheets"),
     app("posthog"),
     app("decopilot-app"),
