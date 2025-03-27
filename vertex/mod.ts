@@ -12,6 +12,8 @@ interface Props {
     privateKeyId: string;
     privateKey: string;
   };
+  location: string;
+  project: string;
 }
 /**
  * @title Vertex
@@ -23,8 +25,8 @@ interface Props {
 export default function Vertex(props: Props): App<Manifest, State> {
   const vertex = createVertex({
     googleCredentials: props.googleCredentials,
-    location: "us-central1",
-    project: "flawless-empire-447101-h3",
+    location: props.location,
+    project: props.project,
   });
 
   return {
