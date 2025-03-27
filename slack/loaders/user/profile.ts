@@ -9,6 +9,7 @@ export interface Props {
 }
 
 /**
+ * @name USER_PROFILE
  * @title User Profile
  * @description Gets detailed profile information for a specific user including their status, display name, and contact information
  */

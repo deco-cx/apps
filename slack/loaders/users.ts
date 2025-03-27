@@ -14,6 +14,7 @@ export interface Props {
 }
 
 /**
+ * @name LIST_USERS
  * @title List Users
  * @description Gets a list of all users in the workspace with their basic profile information and roles
  */

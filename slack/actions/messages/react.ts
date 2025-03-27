@@ -18,6 +18,7 @@ export interface Props {
 }
 
 /**
+ * @name MESSAGES_REACT
  * @title Add Reaction
  * @description Adds an emoji reaction to a message in a Slack channel
  */

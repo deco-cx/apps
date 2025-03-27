@@ -13,6 +13,7 @@ export interface Props {
 }
 
 /**
+ * @name THREAD_REPLIES
  * @title Thread Replies
  * @description Retrieves all replies in a message thread including reactions and metadata
  */

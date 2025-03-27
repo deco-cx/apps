@@ -13,6 +13,7 @@ export interface Props {
 }
 
 /**
+ * @name MESSAGES_POST
  * @title Post Message
  * @description Posts a new message to a Slack channel and returns the message details
  */

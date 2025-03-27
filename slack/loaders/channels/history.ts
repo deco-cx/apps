@@ -14,6 +14,7 @@ export interface Props {
 }
 
 /**
+ * @name CHANNELS_HISTORY
  * @title Channel History
  * @description Retrieves recent messages from a Slack channel including reactions and thread information
  */

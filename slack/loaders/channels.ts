@@ -14,6 +14,7 @@ export interface Props {
 }
 
 /**
+ * @name LIST_CHANNELS
  * @title List Channels
  * @description Lists all public channels in the workspace with pagination
  */

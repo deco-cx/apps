@@ -17,6 +17,7 @@ export interface Props {
 }
 
 /**
+ * @name THREADS_REPLY
  * @title Reply to Thread
  * @description Posts a reply message to an existing thread in a Slack channel
  */
