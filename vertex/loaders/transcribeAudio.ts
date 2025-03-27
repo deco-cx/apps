@@ -3,7 +3,7 @@ import { Buffer } from "node:buffer";
 import { AppContext } from "../mod.ts";
 
 /**
- * @name transcribe_audio
+ * @name TRANSCRIBE_AUDIO
  * @description Transcribes an audio file
  */
 export interface Props {
