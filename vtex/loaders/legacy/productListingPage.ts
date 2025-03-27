@@ -452,7 +452,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
       ...(props.fq ? [props.fq] : []),
       ...url.searchParams.getAll("fq"),
     ]),
-  ];
+  ].sort();
   const segment = getSegmentFromBag(ctx)?.token ?? "";
   const params = new URLSearchParams([
     ["term", props.term ?? url.pathname ?? ""],
