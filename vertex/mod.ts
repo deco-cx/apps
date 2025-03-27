@@ -14,12 +14,12 @@ interface Props {
   };
 }
 /**
- * @title Vertex MCP
- * @description Vertex MCP
+ * @title Vertex
+ * @description Vertex
  * @category Tool
  * @logo https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8
  */
-export default function VertexMCP(props: Props): App<Manifest, State> {
+export default function Vertex(props: Props): App<Manifest, State> {
   const vertex = createVertex({
     googleCredentials: props.googleCredentials,
     location: "us-central1",
@@ -34,5 +34,5 @@ export default function VertexMCP(props: Props): App<Manifest, State> {
     dependencies: [],
   };
 }
-export type VertexMCPApp = ReturnType<typeof VertexMCP>;
-export type AppContext = AC<VertexMCPApp>;
+export type VertexApp = ReturnType<typeof Vertex>;
+export type AppContext = AC<VertexApp>;
