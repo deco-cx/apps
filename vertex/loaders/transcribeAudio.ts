@@ -4,10 +4,17 @@ import { AppContext } from "../mod.ts";
 
 /**
  * @name TRANSCRIBE_AUDIO
- * @description Transcribes an audio file
+ * @description Transcribes an audio file from a public URL using any google model that supports audio transcription
  */
 export interface Props {
+  /**
+   * @description The public URL of the audio file to transcribe
+   */
   audioUrl: string;
+  /**
+   * @description The google model to use for transcription
+   * @default gemini-1.5-pro
+   */
   model?: string;
 }
 export default async function transcribeAudio(
