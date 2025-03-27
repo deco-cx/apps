@@ -6,6 +6,8 @@ import { Script } from "../../website/types.ts";
 interface RedirectRouteProps {
   enableRedirectRoutes?: boolean;
   subdomain?: string;
+
+  extraPathsToRedirect?: string[];
 }
 
 const PAGE_PATHS_TO_PROXY = [
@@ -77,7 +79,7 @@ const buildProxyRoutes = ({
     ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
   );
 
-  const { enableRedirectRoutes, subdomain } = redirectRoutesProps;
+  const { enableRedirectRoutes, subdomain, extraPathsToRedirect = [] } = redirectRoutesProps;
 
   try {
     const urlToProxy = publicUrl.href;
@@ -128,11 +130,11 @@ const buildProxyRoutes = ({
       .map((route) => routeFromPath(route, false));
 
     const suffixedCheckoutRoutes = enableRedirectRoutes
-      ? CHECKOUT_PATHS_TO_PROXY.map((path) => redirectFromPath(path, true))
+      ? [...CHECKOUT_PATHS_TO_PROXY, ...extraPathsToRedirect ].map((path) => redirectFromPath(path, true))
       : CHECKOUT_PATHS_TO_PROXY.map((path) => routeFromPath(path, true));
 
     const nonSuffixedCheckoutRoutes = enableRedirectRoutes
-      ? CHECKOUT_PATHS_TO_PROXY.map((path) => redirectFromPath(path, false))
+      ? [...CHECKOUT_PATHS_TO_PROXY, ...extraPathsToRedirect].map((path) => redirectFromPath(path, false))
       : CHECKOUT_PATHS_TO_PROXY.map((path) => routeFromPath(path, false));
 
     const [include, routes] = generateDecoSiteMap
