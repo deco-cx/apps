@@ -9,7 +9,7 @@ interface State {
 
 interface Props {
   /**
-   * @title Google Cloud Credentials
+   * @description The Google Cloud credentials to use
    */
   googleCredentials: {
     clientEmail: Secret | string;
@@ -17,18 +17,18 @@ interface Props {
     privateKey: Secret | string;
   };
   /**
-   * @title Location
+   * @description The Google Cloud region to use
    */
   location: Secret | string;
   /**
-   * @title Project
+   * @description The Google Cloud project to use
    */
   project: Secret | string;
 }
 /**
  * @title Vertex
  * @name Vertex
- * @description Vertex tools
+ * @description This uses the Google Vertex AI API to transcribe audio files.
  * @category Tool
  * @logo https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8
  */
@@ -38,16 +38,16 @@ export default function Vertex(props: Props): App<Manifest, State> {
     googleCredentials: {
       clientEmail: typeof googleCredentials.clientEmail === "string"
         ? googleCredentials.clientEmail
-        : googleCredentials.clientEmail.get(),
+        : googleCredentials.clientEmail.get() || undefined,
       privateKeyId: typeof googleCredentials.privateKeyId === "string"
         ? googleCredentials.privateKeyId
-        : googleCredentials.privateKeyId.get(),
+        : googleCredentials.privateKeyId.get() || undefined,
       privateKey: typeof googleCredentials.privateKey === "string"
         ? googleCredentials.privateKey
-        : googleCredentials.privateKey.get(),
+        : googleCredentials.privateKey.get() || undefined,
     },
-    location: typeof location === "string" ? location : location.get(),
-    project: typeof project === "string" ? project : project.get(),
+    location: typeof location === "string" ? location : location.get() || undefined,
+    project: typeof project === "string" ? project : project.get() || undefined,
   });
 
   return {
