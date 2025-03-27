@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("slack"),
     app("vertex"),
     app("google-sheets"),
     app("posthog"),
