@@ -38,16 +38,16 @@ export default function Vertex(props: Props): App<Manifest, State> {
     googleCredentials: {
       clientEmail: typeof googleCredentials.clientEmail === "string"
         ? googleCredentials.clientEmail
-        : googleCredentials.clientEmail.get() || undefined,
+        : googleCredentials.clientEmail.get() || "",
       privateKeyId: typeof googleCredentials.privateKeyId === "string"
         ? googleCredentials.privateKeyId
-        : googleCredentials.privateKeyId.get() || undefined,
+        : googleCredentials.privateKeyId.get() || "",
       privateKey: typeof googleCredentials.privateKey === "string"
         ? googleCredentials.privateKey
-        : googleCredentials.privateKey.get() || undefined,
+        : googleCredentials.privateKey.get() || "",
     },
-    location: typeof location === "string" ? location : location.get() || undefined,
-    project: typeof project === "string" ? project : project.get() || undefined,
+    location: typeof location === "string" ? location : location.get() || "",
+    project: typeof project === "string" ? project : project.get() || "",
   });
 
   return {
