@@ -22,21 +22,16 @@ export default async function whatsappWebhook(
     return;
   }
 
-  const mastraMessage = toMastraMessage(message);
+  const bridgeMessage = ctx.state.toBridgeMessage(message);
 
-  const reply = await sendToAgent(triggerUrl.value as string, mastraMessage);
+  const reply = await sendToAgent(triggerUrl.value as string, bridgeMessage);
 }
 
-function toMastraMessage(message: WhatsappMessage) {
-  return {
-    message: message.content,
-  };
-}
 
-async function sendToAgent(triggerUrl: string, mastraMessage: any) {
+async function sendToAgent(triggerUrl: string, bridgeMessage: BridgeMessage) {
   const response = await fetch(triggerUrl, {
     method: "POST",
-    body: JSON.stringify(mastraMessage),
+    body: JSON.stringify(bridgeMessage),
   });
 
   return response.json();

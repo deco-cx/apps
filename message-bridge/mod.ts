@@ -10,6 +10,15 @@ try {
 
 interface State {
   kv: Deno.Kv;
+  toBridgeMessage: (message: unknown) => BridgeMessage;
+}
+
+interface BridgeMessage {
+  content: string
+}
+
+interface Props {
+  toBridgeMessage: (message: unknown) => BridgeMessage;
 }
 
 /**
@@ -19,7 +28,9 @@ interface State {
  * @category Tool
  * @logo https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8
  */
-export default function MessageBridge(): App<Manifest, State> {
+export default function MessageBridge({
+  toBridgeMessage,
+}: Props): App<Manifest, State> {
   if (!kv) {
     throw new Error("please run with `--unstable` to enable deno kv support");
   }
@@ -27,6 +38,7 @@ export default function MessageBridge(): App<Manifest, State> {
   return {
     state: {
       kv,
+      toBridgeMessage,
     },
     manifest,
     dependencies: [],
