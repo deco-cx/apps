@@ -11,6 +11,10 @@ fragment Checkout on Checkout {
   customer {
     customerId
   }
+  metadata {
+    key
+    value
+  }
 	products {
 		imageUrl
 		brand
@@ -1327,6 +1331,16 @@ export const RemoveKit = {
   }`,
 };
 
+export const CheckoutAddMetadata = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutAddMetadata($checkoutId: Uuid!, $metadata: [CheckoutMetadataInput]!) {
+    checkout: checkoutAddMetadata(checkoutId: $checkoutId, metadata: $metadata){
+      ...Checkout
+    }
+  }`,
+};
+
 export const GetPartners = {
   query:
     gql`query GetPartners($first: Int,$last: Int,$names: [String],$priceTableIds: [Int!],$sortDirection: SortDirection! = ASC,$sortKey: PartnerSortKeys! = ID,$before: String,$alias: [String],$after: String) {
@@ -1360,11 +1374,22 @@ export const CheckoutPartnerAssociate = {
   }`,
 };
 
+export const CheckoutRemoveMetadata = {
+  fragments: [Checkout],
+  query:
+    gql`mutation CheckoutRemoveMetadata($checkoutId: Uuid!, $keys: [String]!) {
+    checkout: checkoutRemoveMetadata(checkoutId: $checkoutId, keys: $keys){
+      ...Checkout
+    }
+  }`,
+};
+
 export const CheckoutPartnerDisassociate = {
   fragments: [Checkout],
   query:
     gql`mutation CheckoutPartnerDisassociate($checkoutId: Uuid!, $customerAccessToken: String){
     checkout: checkoutPartnerDisassociate(checkoutId: $checkoutId , customerAccessToken: $customerAccessToken ){
+
       ...Checkout
     }
   }`,
