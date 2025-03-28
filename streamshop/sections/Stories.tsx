@@ -36,16 +36,8 @@ export default function Stories({
 }: Props) {
   return (
     <>
-      <script
-        async
-        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js"
-      >
-      </script>
-      <script
-        async
-        src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js"
-      >
-      </script>
+    <script async src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-video.min.js" ></script>
+    <script async src="https://assets.streamshop.com.br/sdk-ads/liveshop-ads-carousel.min.js" ></script>
       <Section.Container>
         <Section.Header title={title} cta={cta} />
 
@@ -58,11 +50,11 @@ export default function Stories({
             gap="25px"
             slugs-video={slugs.join(",")}
           >
-            {/* @ts-ignore */}
+            {/* @ts-ignore */} 
           </liveshop-ads-carousel>
         </div>
       </Section.Container>
-    </>
+    </> 
   );
 }
 
