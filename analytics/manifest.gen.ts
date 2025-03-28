@@ -3,11 +3,13 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/DecoAnalyticsScript.ts";
+import * as $$$1 from "./loaders/OneDollarScript.ts";
 import * as $$$$$$0 from "./sections/Analytics/DecoAnalytics.tsx";
 
 const manifest = {
   "loaders": {
     "analytics/loaders/DecoAnalyticsScript.ts": $$$0,
+    "analytics/loaders/OneDollarScript.ts": $$$1,
   },
   "sections": {
     "analytics/sections/Analytics/DecoAnalytics.tsx": $$$$$$0,
