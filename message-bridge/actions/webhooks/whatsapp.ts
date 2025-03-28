@@ -1,14 +1,6 @@
-import { AppContext } from "../../mod.ts";
-
-interface WhatsappMessage {
-  id: string;
-  from: string;
-  to: string;
-  content: string;
-}
-
+import { AppContext, BridgeMessage } from "../../mod.ts";
 interface Props {
-  message: WhatsappMessage;
+  message: unknown;
 }
 
 export default async function whatsappWebhook(
@@ -22,11 +14,10 @@ export default async function whatsappWebhook(
     return;
   }
 
-  const bridgeMessage = ctx.state.toBridgeMessage(message);
+  const bridgeMessage = ctx.toBridgeMessage(message);
 
   const reply = await sendToAgent(triggerUrl.value as string, bridgeMessage);
 }
-
 
 async function sendToAgent(triggerUrl: string, bridgeMessage: BridgeMessage) {
   const response = await fetch(triggerUrl, {

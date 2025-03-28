@@ -13,8 +13,8 @@ interface State {
   toBridgeMessage: (message: unknown) => BridgeMessage;
 }
 
-interface BridgeMessage {
-  content: string
+export interface BridgeMessage {
+  content: string;
 }
 
 interface Props {
