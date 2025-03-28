@@ -1,5 +1,6 @@
 import type { AppContext } from "../mod.ts";
 import { getCookies } from "@std/http";
+import { UpdateThumbnailResponse } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -20,10 +21,9 @@ const action = async (
   props: Props,
   req: Request,
   _ctx: AppContext,
-): Promise<{ success: boolean; message: string; thumbnail?: any }> => {
-  console.log("Atualizando thumbnail do vídeo:", props.videoId);
-  console.log("............................................................");
-  console.log(" imageData",props.imageData);
+): Promise<
+  { success: boolean; message: string; thumbnail?: UpdateThumbnailResponse }
+> => {
   const { videoId, imageData } = props;
 
   // Validar dados
@@ -53,17 +53,17 @@ const action = async (
   try {
     // Preparar o arquivo/blob para upload
     let imageBlob: Blob;
-    
+
     if (typeof imageData === "string") {
       // Se for uma string base64, converter para Blob
       const base64Data = imageData.split(",")[1] || imageData;
       const byteCharacters = atob(base64Data);
       const byteArrays = [];
-      
+
       for (let i = 0; i < byteCharacters.length; i++) {
         byteArrays.push(byteCharacters.charCodeAt(i));
       }
-      
+
       const byteArray = new Uint8Array(byteArrays);
       imageBlob = new Blob([byteArray], { type: "image/jpeg" });
     } else {
@@ -83,7 +83,7 @@ const action = async (
           "Content-Type": "image/jpeg", // Assumindo que é uma imagem JPEG
         },
         body: imageBlob,
-      }
+      },
     );
 
     if (!updateResponse.ok) {
@@ -91,7 +91,8 @@ const action = async (
       console.error("Erro ao atualizar thumbnail:", errorData);
       return {
         success: false,
-        message: `Erro ao atualizar thumbnail: ${updateResponse.status} ${updateResponse.statusText}`,
+        message:
+          `Erro ao atualizar thumbnail: ${updateResponse.status} ${updateResponse.statusText}`,
       };
     }
 
@@ -107,9 +108,11 @@ const action = async (
     console.error("Erro durante a atualização do thumbnail:", error);
     return {
       success: false,
-      message: `Erro durante a atualização do thumbnail: ${error.message || error}`,
+      message: `Erro durante a atualização do thumbnail: ${
+        error.message || error
+      }`,
     };
   }
 };
 
-export default action; 
+export default action;

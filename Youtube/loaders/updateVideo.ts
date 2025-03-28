@@ -1,5 +1,7 @@
 import type { AppContext } from "../mod.ts";
 import { getCookies } from "@std/http";
+import { PrivacyStatus } from "../utils/types.ts";
+import { Video } from "../../wap/utils/type.ts";
 
 // Interface de entrada para atualização de vídeo
 export interface UpdateVideoOptions {
@@ -8,7 +10,7 @@ export interface UpdateVideoOptions {
   description?: string;
   tags?: string[];
   categoryId?: string;
-  privacyStatus?: "public" | "private" | "unlisted";
+  privacyStatus?: PrivacyStatus;
 }
 
 /**
@@ -18,11 +20,7 @@ export default async function loader(
   options: UpdateVideoOptions,
   req: Request,
   _ctx: AppContext,
-): Promise<{ success: boolean; message: string; video?: any }> {
-  console.log("............................................................");
-  console.log("............................................................");
-
-  // Verificar se o ID do vídeo foi fornecido
+): Promise<{ success: boolean; message: string; video?: Video }> {
   if (!options.videoId) {
     console.error("ID do vídeo não fornecido");
     return { success: false, message: "ID do vídeo é obrigatório" };

@@ -1,9 +1,9 @@
 import {
   Query,
+  UpdateThumbnailResponse,
   VideoQuery,
   YoutubeChannelResponse,
   YoutubeVideoResponse,
-  UpdateThumbnailResponse,
 } from "./types.ts";
 
 export interface YoutubeClient {

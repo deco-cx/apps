@@ -40,7 +40,9 @@ export default async function loader(
     `redirect_uri=${REDIRECT_URI}&` +
     `response_type=code&` +
     `scope=${SCOPES}&` +
-    `state=state_parameter_passthrough_value`;
+    `state=state_parameter_passthrough_value&` +
+    `access_type=offline&` +
+    `prompt=consent`;
 
   if (!accessToken && code) {
     try {
@@ -59,6 +61,7 @@ export default async function loader(
       });
 
       const tokenData = await tokenResponse.json();
+      console.log(tokenData);
       accessToken = tokenData.access_token;
 
       if (accessToken) {
