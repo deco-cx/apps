@@ -5,6 +5,7 @@
 import * as $$$$$$$$$0 from "./actions/messages/post.ts";
 import * as $$$$$$$$$1 from "./actions/messages/react.ts";
 import * as $$$$$$$$$2 from "./actions/messages/threads/reply.ts";
+import * as $$$$$$$$$3 from "./actions/webhook/broker.ts";
 import * as $$$0 from "./loaders/channels.ts";
 import * as $$$1 from "./loaders/channels/history.ts";
 import * as $$$2 from "./loaders/thread/replies.ts";
@@ -23,6 +24,7 @@ const manifest = {
     "slack/actions/messages/post.ts": $$$$$$$$$0,
     "slack/actions/messages/react.ts": $$$$$$$$$1,
     "slack/actions/messages/threads/reply.ts": $$$$$$$$$2,
+    "slack/actions/webhook/broker.ts": $$$$$$$$$3,
   },
   "name": "slack",
   "baseUrl": import.meta.url,
