@@ -12,6 +12,11 @@ export interface Props {
    * @description Slack Team/Workspace ID
    */
   teamId: string;
+
+  /**
+   * @description An url that new messages will be sent to
+   */
+  webhookUrl?: string;
 }
 
 export interface State extends Props {
