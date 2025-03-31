@@ -12,16 +12,25 @@ export interface WebhookPayload {
  */
 export default function webhookPayload(
   props: WebhookPayload,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<{ challenge: string }> {
-  console.log("webhook-payload", props, ctx.webhookUrl);
+  console.log("webhookPayload", props, ctx.webhookUrl);
   const response = Promise.resolve({ challenge: props.challenge });
   if (!ctx.webhookUrl) {
     return response;
   }
+
+  const webhookUrl = new URL(ctx.webhookUrl);
+  const reqUrl = new URL(req.url);
+  const threadId = reqUrl.searchParams.get("threadId");
+  const resourceId = reqUrl.searchParams.get("resourceId");
+
+  threadId && webhookUrl.searchParams.set("threadId", threadId);
+  resourceId && webhookUrl.searchParams.set("resourceId", resourceId);
+
   // cannot await since slack has a tight timeout for webhook responses
-  fetch(ctx.webhookUrl, {
+  fetch(webhookUrl.toString(), {
     method: "POST",
     body: JSON.stringify(props),
     headers: {
