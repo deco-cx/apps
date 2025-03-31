@@ -12,6 +12,7 @@ import { middleware } from "./middleware.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { ExtensionOf } from "../website/loaders/extension.ts";
 import { Cart } from "./loaders/cart.ts";
+import { Message } from "../website/flags/multivariate/message.ts";
 
 export interface FiltersGraphQL {
   value: string;
@@ -24,7 +25,7 @@ export interface APIConfig {
    * @description The base URL of the Magento API, If you have stores, put the name of the store at the end.
    * @example https://magento.com/rest/store1 or https://magento.com/rest
    */
-  baseUrl: string;
+  baseUrl: Message;
 
   /** @title Magento API key */
   apiKey: Secret;
