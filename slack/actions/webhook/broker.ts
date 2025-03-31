@@ -15,6 +15,7 @@ export default function webhookPayload(
   _req: Request,
   ctx: AppContext,
 ): Promise<{ challenge: string }> {
+  console.log("webhook-payload", props, ctx.webhookUrl);
   const response = Promise.resolve({ challenge: props.challenge });
   if (!ctx.webhookUrl) {
     return response;
