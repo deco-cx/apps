@@ -1,7 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import type { GrainHook } from "../../client.ts";
 
-
 /**
  * @name GetHooks
  * @title List Webhooks
