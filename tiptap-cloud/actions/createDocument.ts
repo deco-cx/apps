@@ -18,7 +18,15 @@ type NodeAttrs = {
 };
 
 type NodeContent = {
-  type: "paragraph" | "heading" | "bulletList" | "orderedList" | "listItem" | "codeBlock" | "blockquote" | "horizontalRule";
+  type:
+    | "paragraph"
+    | "heading"
+    | "bulletList"
+    | "orderedList"
+    | "listItem"
+    | "codeBlock"
+    | "blockquote"
+    | "horizontalRule";
   attrs?: NodeAttrs;
   content?: Array<NodeContent | TextContent>;
 };
