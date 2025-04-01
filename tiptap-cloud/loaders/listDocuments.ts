@@ -35,7 +35,9 @@ export default async function listDocuments(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to list documents: ${response.status} ${response.statusText}. ${errorText}`);
+      throw new Error(
+        `Failed to list documents: ${response.status} ${response.statusText}. ${errorText}`,
+      );
     }
 
     const documents = await response.json();
@@ -54,4 +56,4 @@ export default async function listDocuments(
       error: error,
     };
   }
-} 
+}

@@ -36,7 +36,9 @@ export default async function updateDocument(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to update document: ${response.status} ${response.statusText}. ${errorText}`);
+      throw new Error(
+        `Failed to update document: ${response.status} ${response.statusText}. ${errorText}`,
+      );
     }
 
     return {
@@ -51,4 +53,4 @@ export default async function updateDocument(
       error: error,
     };
   }
-} 
+}

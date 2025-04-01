@@ -2,11 +2,11 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/createDocument.ts";
+import * as $$$0 from "./actions/createDocument.ts";
 import * as $$$1 from "./loaders/getDocument.ts";
 import * as $$$2 from "./loaders/listDocuments.ts";
-import * as $$$3 from "./loaders/updateDocument.ts";
-import * as $$$4 from "./loaders/deleteDocument.ts";
+import * as $$$3 from "./actions/updateDocument.ts";
+import * as $$$4 from "./actions/deleteDocument.ts";
 import * as $$$5 from "./loaders/searchDocuments.ts";
 
 const manifest = {
@@ -24,4 +24,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export default manifest; 
+export default manifest;

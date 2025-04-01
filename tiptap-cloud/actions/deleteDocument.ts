@@ -30,7 +30,9 @@ export default async function deleteDocument(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to delete document: ${response.status} ${response.statusText}. ${errorText}`);
+      throw new Error(
+        `Failed to delete document: ${response.status} ${response.statusText}. ${errorText}`,
+      );
     }
 
     return {
@@ -45,4 +47,4 @@ export default async function deleteDocument(
       error: error,
     };
   }
-} 
+}

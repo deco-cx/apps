@@ -13,7 +13,7 @@ export interface Props {
    * @description The format to return the document in
    * @default json
    */
-  format?: "json" | "yjs" | "base64" | "text";
+  format?: "json" | "base64" | "text";
   /**
    * @description The fragments to include in the response (only applicable for json or text format)
    */
@@ -27,10 +27,13 @@ export default async function getDocument(
 ) {
   const { baseUrl, apiSecret } = ctx;
   const encodedIdentifier = encodeURIComponent(identifier);
-  
+
   let url = `${baseUrl}/api/documents/${encodedIdentifier}?format=${format}`;
-  
-  if (fragments && fragments.length > 0 && (format === "json" || format === "text")) {
+
+  if (
+    fragments && fragments.length > 0 &&
+    (format === "json" || format === "text")
+  ) {
     for (const fragment of fragments) {
       url += `&fragment=${encodeURIComponent(fragment)}`;
     }
@@ -46,26 +49,17 @@ export default async function getDocument(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to get document: ${response.status} ${response.statusText}. ${errorText}`);
+      throw new Error(
+        `Failed to get document: ${response.status} ${response.statusText}. ${errorText}`,
+      );
     }
 
-    if (format === "yjs") {
-      // Return ArrayBuffer for yjs format
-      const arrayBuffer = await response.arrayBuffer();
-      return {
-        success: true,
-        data: arrayBuffer,
-        format: "yjs",
-      };
-    } else {
-      // Return JSON for other formats
-      const data = await response.json();
-      return {
-        success: true,
-        data,
-        format,
-      };
-    }
+    const data = await response.json();
+    return {
+      success: true,
+      data,
+      format,
+    };
   } catch (error) {
     console.error("Error getting document:", error);
     return {
@@ -73,4 +67,4 @@ export default async function getDocument(
       error: error,
     };
   }
-} 
+}

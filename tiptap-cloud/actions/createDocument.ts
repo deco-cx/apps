@@ -41,19 +41,21 @@ export default async function createDocument(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to create document: ${response.status} ${response.statusText}. ${errorText}`);
+      throw new Error(
+        `Failed to create document: ${response.status} ${response.statusText}. ${errorText}`,
+      );
     }
 
     return {
       success: true,
       status: response.status,
-      message: "Document created successfully"
+      message: "Document created successfully",
     };
   } catch (error) {
     console.error("Error creating document:", error);
     return {
       success: false,
-      error: error
+      error: error,
     };
   }
-} 
+}

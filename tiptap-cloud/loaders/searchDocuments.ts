@@ -41,7 +41,9 @@ export default async function searchDocuments(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Failed to search documents: ${response.status} ${response.statusText}. ${errorText}`);
+      throw new Error(
+        `Failed to search documents: ${response.status} ${response.statusText}. ${errorText}`,
+      );
     }
 
     const results = await response.json();
@@ -61,4 +63,4 @@ export default async function searchDocuments(
       error: error,
     };
   }
-} 
+}
