@@ -8,29 +8,32 @@ try {
   console.warn("please run with `--unstable` to enable deno kv support");
 }
 
-interface State {
-  kv: Deno.Kv;
-  toBridgeMessage: (message: unknown) => BridgeMessage;
+interface BridgeConnector<TIn = unknown, TOut = unknown> {
+  toBridgeMessage: (message: TIn) => Promise<BridgeRequest>;
+  replyMessage: (resp: BridgeRequest) => Promise<TOut>;
 }
 
-export interface BridgeMessage {
-  content: string;
+interface State {
+  kv: Deno.Kv;
+  // connector: BridgeConnector;
+}
+
+export interface BridgeRequest {
+  prompt: string;
 }
 
 interface Props {
-  toBridgeMessage: (message: unknown) => BridgeMessage;
+  // connector: BridgeConnector;
 }
 
 /**
  * @title Message Bridge
- * @name Message Bridge
+ * @name MessageBridge
  * @description This is a message bridge that allows you to bridge messages between two different channels.
  * @category Tool
  * @logo https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8
  */
-export default function MessageBridge({
-  toBridgeMessage,
-}: Props): App<Manifest, State> {
+export default function MessageBridge({  }: Props): App<Manifest, State> {
   if (!kv) {
     throw new Error("please run with `--unstable` to enable deno kv support");
   }
@@ -38,7 +41,7 @@ export default function MessageBridge({
   return {
     state: {
       kv,
-      toBridgeMessage,
+      // connector,
     },
     manifest,
     dependencies: [],
