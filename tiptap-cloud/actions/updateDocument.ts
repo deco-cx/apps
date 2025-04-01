@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-
+import { Content } from "./createDocument.ts";
 /**
  * @name UPDATE_DOCUMENT
  * @description Updates a document in Tiptap Cloud
@@ -12,7 +12,7 @@ export interface Props {
   /**
    * @description The document content in JSON format
    */
-  content: Record<string, unknown>;
+  content: Content;
 }
 
 export default async function updateDocument(
