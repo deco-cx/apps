@@ -7,7 +7,7 @@ import type { GrainHook } from "../../client.ts";
  * @description Fetches a list of webhooks (REST Hooks) created by the authenticated user.
  */
 export default async function listHooks(
-  _props: undefined,
+  _props: unknown,
   _req: Request,
   ctx: AppContext,
 ): Promise<{ hooks: GrainHook[] }> {

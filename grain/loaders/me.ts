@@ -7,7 +7,7 @@ import type { GrainMe } from "../client.ts";
  * @description Fetches the profile information for the authenticated user associated with the provided token.
  */
 export default async function getMe(
-  _props: undefined,
+  _props: unknown,
   _req: Request,
   ctx: AppContext,
 ): Promise<GrainMe> {
