@@ -2,21 +2,23 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./actions/createDocument.ts";
-import * as $$$1 from "./loaders/getDocument.ts";
-import * as $$$2 from "./loaders/listDocuments.ts";
-import * as $$$3 from "./actions/updateDocument.ts";
-import * as $$$4 from "./actions/deleteDocument.ts";
-import * as $$$5 from "./loaders/searchDocuments.ts";
+import * as $$$$$$$$$0 from "./actions/createDocument.ts";
+import * as $$$$$$$$$1 from "./actions/deleteDocument.ts";
+import * as $$$$$$$$$2 from "./actions/updateDocument.ts";
+import * as $$$0 from "./loaders/getDocument.ts";
+import * as $$$1 from "./loaders/listDocuments.ts";
+import * as $$$2 from "./loaders/searchDocuments.ts";
 
 const manifest = {
   "loaders": {
-    "tiptap-cloud/loaders/createDocument.ts": $$$0,
-    "tiptap-cloud/loaders/getDocument.ts": $$$1,
-    "tiptap-cloud/loaders/listDocuments.ts": $$$2,
-    "tiptap-cloud/loaders/updateDocument.ts": $$$3,
-    "tiptap-cloud/loaders/deleteDocument.ts": $$$4,
-    "tiptap-cloud/loaders/searchDocuments.ts": $$$5,
+    "tiptap-cloud/loaders/getDocument.ts": $$$0,
+    "tiptap-cloud/loaders/listDocuments.ts": $$$1,
+    "tiptap-cloud/loaders/searchDocuments.ts": $$$2,
+  },
+  "actions": {
+    "tiptap-cloud/actions/createDocument.ts": $$$$$$$$$0,
+    "tiptap-cloud/actions/deleteDocument.ts": $$$$$$$$$1,
+    "tiptap-cloud/actions/updateDocument.ts": $$$$$$$$$2,
   },
   "name": "tiptap-cloud",
   "baseUrl": import.meta.url,
