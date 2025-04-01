@@ -5,7 +5,7 @@ type TextContent = {
   text: string;
   marks?: Array<{
     type: "bold" | "italic" | "underline" | "strike" | "code" | "link";
-    attrs?: Record<string, any>;
+    attrs?: Record<string, string | number | boolean>;
   }>;
 };
 
@@ -14,7 +14,7 @@ type NodeAttrs = {
   indent?: number;
   textAlign?: "left" | "center" | "right" | "justify";
   start?: number;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 };
 
 type NodeContent = {
