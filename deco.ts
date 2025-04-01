@@ -51,6 +51,7 @@ const config = {
     app("decohub"),
     app("htmx"),
     app("sap"),
+    app("tiptap-cloud"),
     ...compatibilityApps,
   ],
 };
