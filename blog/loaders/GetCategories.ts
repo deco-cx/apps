@@ -9,7 +9,7 @@
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { Category } from "../types.ts";
-import { getRecordsByPath } from "../utils/records.ts";
+import { getRecordsByPath } from "../core/records.ts";
 
 const COLLECTION_PATH = "collections/blog/categories";
 const ACCESSOR = "category";

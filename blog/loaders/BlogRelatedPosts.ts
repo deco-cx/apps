@@ -8,10 +8,10 @@
  * @returns A promise that resolves to an array of blog related posts.
  */
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
+import handlePosts, { slicePosts } from "../core/handlePosts.ts";
+import { getRecordsByPath } from "../core/records.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy } from "../types.ts";
-import handlePosts, { slicePosts } from "../utils/handlePosts.ts";
-import { getRecordsByPath } from "../utils/records.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -78,10 +78,12 @@ export default async function BlogRelatedPosts(
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(
+  const handledPosts = await handlePosts(
     posts,
     pageSort,
+    ctx,
     slug,
+    undefined,
     term,
     excludePostSlug,
   );

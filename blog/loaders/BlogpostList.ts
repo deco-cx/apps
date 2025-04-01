@@ -6,11 +6,12 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
+import { logger } from "@deco/deco/o11y";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, SortBy } from "../types.ts";
-import handlePosts, { slicePosts } from "../utils/handlePosts.ts";
-import { getRecordsByPath } from "../utils/records.ts";
+import handlePosts, { slicePosts } from "../core/handlePosts.ts";
+import { getRecordsByPath } from "../core/records.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -32,6 +33,11 @@ export interface Props {
    */
   slug?: RequestURLParam;
   /**
+   * @title Specific post slugs
+   * @description Filter by specific post slugs.
+   */
+  postSlugs?: string[];
+  /**
    * @title Page sorting parameter
    * @description The sorting option. Default is "date_desc"
    */
@@ -52,7 +58,7 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-  { page, count, slug, sortBy, query }: Props,
+  { page, count, slug, sortBy, postSlugs, query }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<BlogPost[] | null> {
@@ -69,13 +75,25 @@ export default async function BlogPostList(
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(posts, pageSort, slug, term);
+  try {
+    const handledPosts = await handlePosts(
+      posts,
+      pageSort,
+      ctx,
+      slug,
+      postSlugs,
+      term,
+    );
 
-  if (!handledPosts) {
+    if (!handledPosts) {
+      return null;
+    }
+
+    const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
+
+    return slicedPosts.length > 0 ? slicedPosts : null;
+  } catch (e) {
+    logger.error(e);
     return null;
   }
-
-  const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
-
-  return slicedPosts.length > 0 ? slicedPosts : null;
 }
