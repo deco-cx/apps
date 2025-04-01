@@ -1,6 +1,6 @@
 # Tiptap Cloud Integration
 
-This module provides integration with the Tiptap Cloud Collaboration API for document management.
+This module provides integration with the Tiptap Cloud Collaboration API for document management!
 
 ## Features
 
