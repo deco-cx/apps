@@ -1,12 +1,8 @@
-interface GatewayError {
-  toResponse: () => Response;
-}
-
 interface ErrorOpts {
   details?: Record<string, unknown>;
 }
 
-class GatewayError implements GatewayError {
+class ProviderError {
   private error: Error;
   public code: string;
   public status: number;
@@ -35,7 +31,7 @@ class GatewayError implements GatewayError {
   }
 }
 
-export class SensitiveContentError extends GatewayError {
+export class SensitiveContentError extends ProviderError {
   constructor(message: string, opts: ErrorOpts = {}) {
     super(message);
     this.code = "sensitive_content";
@@ -44,7 +40,7 @@ export class SensitiveContentError extends GatewayError {
   }
 }
 
-export class EnglishOnlyError extends GatewayError {
+export class EnglishOnlyError extends ProviderError {
   constructor(message: string, opts: ErrorOpts = {}) {
     super(message);
     this.code = "english_only";
@@ -53,7 +49,7 @@ export class EnglishOnlyError extends GatewayError {
   }
 }
 
-export class RateLimitError extends GatewayError {
+export class RateLimitError extends ProviderError {
   constructor(message: string, opts: ErrorOpts = {}) {
     super(message);
     this.code = "rate_limit";
@@ -61,7 +57,7 @@ export class RateLimitError extends GatewayError {
     this.status = 429;
   }
 }
-export class InvalidParametersError extends GatewayError {
+export class InvalidParametersError extends ProviderError {
   constructor(message: string, opts: ErrorOpts = {}) {
     super(message);
     this.code = "invalid_parameters";

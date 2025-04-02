@@ -1,15 +1,43 @@
 import type { ImagePayload, ImageResponse } from "./types.ts";
 
-export function mapSdkToStabilityRequest(
-  payload: ImagePayload,
-): FormData {
-  const formData = new FormData();
-  const { prompt, negativePrompt, providerOptions } = payload;
+interface StabilityOptions {
+  strength?: number;
+  cfgScale?: number;
+  steps?: number;
+  seed?: number;
+  width?: number;
+  height?: number;
+  samples?: number;
+  mask?: string;
+  subject_image?: string;
+  style_preset?: string;
+  output_format?: string;
+}
 
-  if (!prompt && !payload.image) {
-    throw new Error("A prompt is required for image generation");
+export async function mapSdkToStabilityRequest(
+  payload: ImagePayload,
+): Promise<FormData> {
+  const formData = new FormData();
+  const { prompt, negativePrompt, image, model, providerOptions } = payload;
+  const stabilityOpts = (providerOptions?.stability || {}) as StabilityOptions;
+
+  // Validate required fields based on model type
+  if (model.startsWith("stability:inpaint") && !stabilityOpts.mask) {
+    throw new Error("Mask is required for inpainting models");
   }
 
+  if (
+    model.startsWith("stability:search-and-replace") &&
+    !stabilityOpts.subject_image
+  ) {
+    throw new Error("Subject image is required for search-and-replace models");
+  }
+
+  if (!prompt && !image) {
+    throw new Error("Either prompt or image must be provided");
+  }
+
+  // Handle common fields
   if (prompt) {
     formData.append("prompt", prompt);
   }
@@ -18,36 +46,74 @@ export function mapSdkToStabilityRequest(
     formData.append("negative_prompt", negativePrompt);
   }
 
-  const settings = providerOptions?.stability;
-  if (settings) {
-    if (typeof settings.strength === "number") {
-      formData.append("image_strength", settings.strength.toString());
-    }
-    if (typeof settings.cfgScale === "number") {
-      formData.append("cfg_scale", settings.cfgScale.toString());
-    }
-    if (typeof settings.steps === "number") {
-      formData.append("steps", settings.steps.toString());
-    }
-    if (typeof settings.seed === "number") {
-      formData.append("seed", settings.seed.toString());
-    }
-    if (typeof settings.width === "number") {
-      formData.append("width", settings.width.toString());
-    }
-    if (typeof settings.height === "number") {
-      formData.append("height", settings.height.toString());
-    }
-    if (typeof settings.samples === "number") {
-      formData.append("samples", settings.samples.toString());
-    }
+  if (image) {
+    const imageFile = typeof image === "string"
+      ? await convertBase64ToBlob(image)
+      : image;
+    formData.append("image", imageFile);
   }
 
-  if (payload.image) {
-    formData.append("image", payload.image);
+  // Handle Stability-specific options
+  if (stabilityOpts.strength) {
+    formData.append("image_strength", stabilityOpts.strength.toString());
+  }
+
+  if (stabilityOpts.cfgScale) {
+    formData.append("cfg_scale", stabilityOpts.cfgScale.toString());
+  }
+
+  if (stabilityOpts.steps) {
+    formData.append("steps", stabilityOpts.steps.toString());
+  }
+
+  if (stabilityOpts.seed) {
+    formData.append("seed", stabilityOpts.seed.toString());
+  }
+
+  if (stabilityOpts.width) {
+    formData.append("width", stabilityOpts.width.toString());
+  }
+
+  if (stabilityOpts.height) {
+    formData.append("height", stabilityOpts.height.toString());
+  }
+
+  if (stabilityOpts.samples) {
+    formData.append("samples", stabilityOpts.samples.toString());
+  }
+
+  if (stabilityOpts.mask) {
+    const maskFile = await convertBase64ToBlob(stabilityOpts.mask);
+    formData.append("mask", maskFile);
+  }
+
+  if (stabilityOpts.subject_image) {
+    const subjectImageFile = await convertBase64ToBlob(
+      stabilityOpts.subject_image,
+    );
+    formData.append("subject_image", subjectImageFile);
+  }
+
+  if (stabilityOpts.style_preset) {
+    formData.append("style_preset", stabilityOpts.style_preset);
+  }
+
+  if (stabilityOpts.output_format) {
+    formData.append("output_format", stabilityOpts.output_format);
   }
 
   return formData;
+}
+
+async function convertBase64ToBlob(base64: string): Promise<Blob> {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return new Blob([bytes], { type: "image/png" });
 }
 
 export async function mapStabilityToSdkResponse(

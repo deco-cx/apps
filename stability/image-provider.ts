@@ -7,6 +7,7 @@ import type { ImageResponse } from "./types.ts";
 export interface ExtendedImageModelCallOptions
   extends Omit<ImageModelV1CallOptions, "prompt" | "headers"> {
   prompt?: string;
+  negativePrompt?: string;
   image?: string | Blob;
   headers?: Record<string, string>;
 }

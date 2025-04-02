@@ -64,7 +64,6 @@ export default async function generateImage(
   _request: Request,
   ctx: AppContext,
 ) {
-  console.log({ prompt, negativePrompt });
   const { stabilityClient } = ctx;
   const imageModel = stabilityClient(model, {
     width,
@@ -79,16 +78,12 @@ export default async function generateImage(
       prompt,
       providerOptions: {
         stability: {
-          negativePrompt: negativePrompt ? negativePrompt : undefined,
+          negativePrompt,
         },
       },
     });
 
-    console.log({ generateImageResult: result });
-
     const url = await uploadImage(result.image, presignedUrl);
-
-    console.log({ url });
 
     return {
       content: [
