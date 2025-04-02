@@ -7,6 +7,7 @@ import {
 } from "./mapper.ts";
 import {
   type ExtendedImageModel,
+  ExtendedImageModelCallOptions,
   GetImageError,
 } from "./image-provider.ts";
 import {
@@ -73,7 +74,6 @@ export class StabilityImageModel implements ExtendedImageModel {
       abortSignal,
     }: ExtendedImageModelCallOptions,
   ): Promise<ImageResponse> {
-    console.log({prompt, negativePrompt})
     const endpointPath = this.getEndpoint(this.modelId);
     const url = `${this.config.baseURL}/stable-image/${endpointPath}`;
 

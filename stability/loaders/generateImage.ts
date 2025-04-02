@@ -74,8 +74,6 @@ export default async function generateImage(
     seed,
   });
 
-  console.log({ imageModel });
-
   try {
     const result = await imageModel.doGenerate({
       prompt,
@@ -86,13 +84,17 @@ export default async function generateImage(
       },
     });
 
-    await uploadImage(result.images[0], presignedUrl);
+    console.log({ generateImageResult: result });
+
+    const url = await uploadImage(result.image, presignedUrl);
+
+    console.log({ url });
 
     return {
       content: [
         {
           type: "text",
-          text: "Image successfully generated and uploaded",
+          text: `Uploaded image to ${url}`,
         },
       ],
     };
@@ -101,7 +103,7 @@ export default async function generateImage(
   }
 }
 
-async function uploadImage(image: string, presignedUrl: string) {
+export async function uploadImage(image: string, presignedUrl: string) {
   const imageBuffer = Buffer.from(image, "base64");
 
   const response = await fetch(presignedUrl, {
@@ -109,5 +111,15 @@ async function uploadImage(image: string, presignedUrl: string) {
     body: imageBuffer,
   });
 
-  console.log({ response });
+  if (!response.ok) {
+    throw new Error("Failed to upload image");
+  }
+
+  const data: {
+    url: string;
+  } = await response.json();
+
+  console.log({ data });
+
+  return data.url;
 }

@@ -3,10 +3,13 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$0 from "./loaders/generateImage.ts";
-
+import * as $$$1 from "./loaders/upscaleFast.ts";
+import * as $$$2 from "./loaders/upscaleCreative.ts";
 const manifest = {
   "loaders": {
     "stability/loaders/generateImage.ts": $$$0,
+    "stability/loaders/upscaleFast.ts": $$$1,
+    "stability/loaders/upscaleCreative.ts": $$$2,
   },
   "name": "stability",
   "baseUrl": import.meta.url,

@@ -1,6 +1,6 @@
-type ProviderOptions = Record<string, Record<string, any>>;
+export type ProviderOptions = Record<string, Record<string, unknown>>;
 
-type ImageModel =
+export type ImageModel =
   | "stability:core"
   | "stability:ultra"
   | "stability:conservative"
@@ -18,7 +18,7 @@ type ImageModel =
   | "stability:style";
 
 export interface ImagePayload {
-  model: string;
+  model: ImageModel;
   /**
    * At least one of prompt or image must be provided.
    * Most image generation tasks require a prompt.
@@ -30,7 +30,7 @@ export interface ImagePayload {
    * Negative prompt to specify what should not be in the generated image
    */
   negativePrompt?: string;
-  image?: string;
+  image?: string | Blob;
   /**
    * Number of images to generate. Defaults to 1.
    */
@@ -46,7 +46,7 @@ export interface ImagePayload {
   /**
    * Provider-specific options
    */
-  providerOptions?: Record<string, Record<string, any>>;
+  providerOptions?: ProviderOptions;
   /**
    * Optional headers to pass to the provider
    */
@@ -58,7 +58,7 @@ export interface ImagePayload {
 }
 
 export interface ImageSyncResponse {
-  images: Array<string>;
+  image: string;
   warnings: Array<string>;
 }
 

@@ -14,6 +14,10 @@ export function mapSdkToStabilityRequest(
     formData.append("prompt", prompt);
   }
 
+  if (negativePrompt) {
+    formData.append("negative_prompt", negativePrompt);
+  }
+
   const settings = providerOptions?.stability;
   if (settings) {
     if (settings.strength !== undefined) {
@@ -40,7 +44,7 @@ export function mapSdkToStabilityRequest(
   }
 
   if (payload.image) {
-    formData.append("init_image", payload.image);
+    formData.append("image", payload.image);
   }
 
   return formData;
@@ -52,13 +56,28 @@ export async function mapStabilityToSdkResponse(
 ): Promise<ImageResponse> {
   const result = await response.json();
 
-  console.log({ result });
+  console.log({ mapperResult: result });
 
   if (type === "image") {
-    return {
-      images: [result.image],
-      warnings: [],
-    };
+    console.log({ result2: result });
+    console.log(!result.id);
+    // Handle async response with id
+    if (result.id) {
+      return {
+        id: result.id,
+        status: result.status || "pending",
+        warnings: result.warnings || [],
+      };
+    }
+
+    // Handle sync response with image
+    if (!result.id || result.result || result.image) {
+      console.log("here");
+      return {
+        image: result.image || result.result,
+        warnings: result.warnings || [],
+      };
+    }
   }
 
   throw new Error(`Unsupported response type: ${type}`);
