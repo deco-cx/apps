@@ -31,9 +31,10 @@ export interface State extends Props {
   apiWrite: ReturnType<typeof createHttpClient<ResendApi>>;
 }
 /**
+ * @name Resend
  * @title Resend
- * @description app for sending emails using https://resend.com/
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/resend/logo.png
+ * @description Send emails using resend.com
+ * @logo https://mintlify.s3-us-west-1.amazonaws.com/resend/_generated/favicon/apple-touch-icon.png?v=3
  */
 export default function App({
   apiKey,
