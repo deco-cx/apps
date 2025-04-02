@@ -1,10 +1,10 @@
 import { type App, type AppContext as AC } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { Secret } from "../website/loaders/secret.ts";
-import { createStability } from "./provider.ts";
+import { StabilityAiClient } from "./stabilityAiClient.ts";
 
-interface State {
-  stabilityClient: ReturnType<typeof createStability>;
+export interface State {
+  stabilityClient: StabilityAiClient;
 }
 
 interface Props {
@@ -23,9 +23,9 @@ interface Props {
  */
 export default function Stability(props: Props): App<Manifest, State> {
   const { apiKey } = props;
-  const stability = createStability({
-    apiKey: typeof apiKey === "string" ? apiKey : apiKey.get() || "",
-  });
+  const stability = new StabilityAiClient(
+    typeof apiKey === "string" ? apiKey : apiKey.get() || ""
+  );
 
   return {
     state: {
@@ -37,4 +37,6 @@ export default function Stability(props: Props): App<Manifest, State> {
 }
 
 export type StabilityApp = ReturnType<typeof Stability>;
-export type AppContext = AC<StabilityApp>;
+export type AppContext = AC<StabilityApp> & {
+  stabilityClient: StabilityAiClient;
+};

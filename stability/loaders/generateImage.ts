@@ -1,5 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
+import { ASPECT_RATIOS, STYLE_PRESETS } from "../stabilityAiClient.ts";
 
 /**
  * @name GENERATE_IMAGE
@@ -19,71 +20,43 @@ export interface Props {
    */
   negativePrompt?: string;
   /**
-   * @description The width of the generated image
-   * @default 1024
+   * @description The aspect ratio of the generated image
+   * @default "1:1"
    */
-  width?: number;
+  aspectRatio?: typeof ASPECT_RATIOS[number];
   /**
-   * @description The height of the generated image
-   * @default 1024
+   * @description The style preset to use for generation
    */
-  height?: number;
-  /**
-   * @description The number of steps for image generation
-   * @default 30
-   */
-  steps?: number;
-  /**
-   * @description The CFG scale for image generation
-   * @default 7
-   */
-  cfgScale?: number;
+  stylePreset?: typeof STYLE_PRESETS[number];
   /**
    * @description The seed for deterministic generation
    */
   seed?: number;
-  /**
-   * @description The model to use for generation
-   * @default core
-   */
-  model?: "core" | "ultra";
 }
 
 export default async function generateImage(
   {
     presignedUrl,
     prompt,
-    negativePrompt = "",
-    width = 1024,
-    height = 1024,
-    steps = 30,
-    cfgScale = 7,
+    negativePrompt,
+    aspectRatio = "1:1",
+    stylePreset,
     seed,
-    model = "core",
   }: Props,
   _request: Request,
   ctx: AppContext,
 ) {
   const { stabilityClient } = ctx;
-  const imageModel = stabilityClient(model, {
-    width,
-    height,
-    steps,
-    cfgScale,
-    seed,
-  });
 
   try {
-    const result = await imageModel.doGenerate({
-      prompt,
-      providerOptions: {
-        stability: {
-          negativePrompt,
-        },
-      },
+    const result = await stabilityClient.generateImageCore(prompt, {
+      aspectRatio,
+      negativePrompt,
+      stylePreset,
+      seed,
     });
 
-    const url = await uploadImage(result.image, presignedUrl);
+    const url = await uploadImage(result.base64Image, presignedUrl);
 
     return {
       content: [
@@ -95,26 +68,38 @@ export default async function generateImage(
     };
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }
 
 export async function uploadImage(image: string, presignedUrl: string) {
-  const imageBuffer = Buffer.from(image, "base64");
+  console.log("Starting image upload...");
+  console.log("Presigned URL:", presignedUrl);
+  console.log("Image length:", image.length);
+
+  const imageBuffer = new Uint8Array(Buffer.from(image, "base64"));
+  console.log("Image buffer length:", imageBuffer.length);
 
   const response = await fetch(presignedUrl, {
     method: "PUT",
     body: imageBuffer,
   });
 
+  console.log("Upload response status:", response.status);
+  console.log("Upload response headers:", Object.fromEntries(response.headers.entries()));
+
   if (!response.ok) {
-    throw new Error("Failed to upload image");
+    const errorText = await response.text();
+    console.error("Upload failed with response:", errorText);
+    throw new Error(`Failed to upload image: ${response.status} ${errorText}`);
   }
 
-  const data: {
-    url: string;
-  } = await response.json();
-
-  console.log({ data });
-
-  return data.url;
+  try {
+    const data = await response.json();
+    console.log("Upload response data:", data);
+    return data.url;
+  } catch (error) {
+    console.error("Failed to parse upload response:", error);
+    throw new Error("Failed to parse upload response");
+  }
 }
