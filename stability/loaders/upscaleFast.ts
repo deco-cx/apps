@@ -1,8 +1,8 @@
 import { type StabilityImageModelId } from "../settings.ts";
-import { type ImagePayload, type ImageResponse } from "../types.ts";
+import { type ImagePayload } from "../types.ts";
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { ExtendedImageModel } from "../image-provider.ts";
+import { pollForResult } from "./upscaleCreative.ts";
 
 /**
  * @name UPSCALE_FAST
@@ -32,46 +32,12 @@ export const upscaleFastToolDefinition = {
   },
 };
 
-async function pollForResult(
-  imageModel: ExtendedImageModel,
-  id: string,
-  maxAttempts = 30,
-  delayMs = 1000,
-): Promise<ImageResponse> {
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const result = await imageModel.getImage(id);
-
-    if ("image" in result) {
-      return result;
-    }
-
-    if (result.status === "failed") {
-      throw new Error("Image generation failed");
-    }
-
-    if (result.status === "succeeded") {
-      // If status is succeeded but no image, try one more time
-      const finalResult = await imageModel.getImage(id);
-      if ("image" in finalResult) {
-        return finalResult;
-      }
-      throw new Error("Image generation completed but no image was returned");
-    }
-
-    // Wait before next attempt
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
-  }
-
-  throw new Error("Timeout waiting for image generation");
-}
-
 export default async function upscaleFast(
   { imageUrl, presignedUrl }: UpscaleFastProps,
   _request: Request,
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -84,7 +50,6 @@ export default async function upscaleFast(
       cfgScale: 7,
     });
 
-    // Prepare the payload
     const payload: ImagePayload = {
       model: "stability:fast",
       image: imageBlob,
@@ -95,18 +60,13 @@ export default async function upscaleFast(
       },
     };
 
-    // Generate the upscaled image
     const result = await imageModel.doGenerate(payload);
 
-    // Handle both sync and async responses
     if ("id" in result) {
-      // Async response - poll for the result
       const finalResult = await pollForResult(imageModel, result.id);
       if ("image" in finalResult) {
-        // Upload the result
         const url = await uploadImage(finalResult.image, presignedUrl);
 
-        // Return the result with a suggestion for further enhancement
         return {
           content: [
             {

@@ -20,25 +20,25 @@ export function mapSdkToStabilityRequest(
 
   const settings = providerOptions?.stability;
   if (settings) {
-    if (settings.strength !== undefined) {
+    if (typeof settings.strength === "number") {
       formData.append("image_strength", settings.strength.toString());
     }
-    if (settings.cfgScale !== undefined) {
+    if (typeof settings.cfgScale === "number") {
       formData.append("cfg_scale", settings.cfgScale.toString());
     }
-    if (settings.steps !== undefined) {
+    if (typeof settings.steps === "number") {
       formData.append("steps", settings.steps.toString());
     }
-    if (settings.seed !== undefined) {
+    if (typeof settings.seed === "number") {
       formData.append("seed", settings.seed.toString());
     }
-    if (settings.width !== undefined) {
+    if (typeof settings.width === "number") {
       formData.append("width", settings.width.toString());
     }
-    if (settings.height !== undefined) {
+    if (typeof settings.height === "number") {
       formData.append("height", settings.height.toString());
     }
-    if (settings.samples !== undefined) {
+    if (typeof settings.samples === "number") {
       formData.append("samples", settings.samples.toString());
     }
   }
@@ -56,12 +56,7 @@ export async function mapStabilityToSdkResponse(
 ): Promise<ImageResponse> {
   const result = await response.json();
 
-  console.log({ mapperResult: result });
-
   if (type === "image") {
-    console.log({ result2: result });
-    console.log(!result.id);
-    // Handle async response with id
     if (result.id) {
       return {
         id: result.id,
@@ -70,9 +65,7 @@ export async function mapStabilityToSdkResponse(
       };
     }
 
-    // Handle sync response with image
     if (!result.id || result.result || result.image) {
-      console.log("here");
       return {
         image: result.image || result.result,
         warnings: result.warnings || [],

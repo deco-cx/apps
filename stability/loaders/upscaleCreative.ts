@@ -51,7 +51,7 @@ export const upscaleCreativeToolDefinition = {
   },
 };
 
-async function pollForResult(
+export async function pollForResult(
   imageModel: ExtendedImageModel,
   id: string,
   maxAttempts = 120,
@@ -72,20 +72,6 @@ async function pollForResult(
       return result;
     }
 
-    if (result.status === "failed") {
-      throw new Error("Image generation failed");
-    }
-
-    if (result.status === "succeeded") {
-      // If status is succeeded but no image, try one more time
-      const finalResult = await imageModel.getImage(id);
-      if ("image" in finalResult) {
-        return finalResult;
-      }
-      throw new Error("Image generation completed but no image was returned");
-    }
-
-    // Wait before next attempt
     await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
 
