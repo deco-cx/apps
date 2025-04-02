@@ -24,7 +24,7 @@ interface Props {
 export default function Stability(props: Props): App<Manifest, State> {
   const { apiKey } = props;
   const stability = new StabilityAiClient(
-    typeof apiKey === "string" ? apiKey : apiKey.get() || ""
+    typeof apiKey === "string" ? apiKey : apiKey.get() || "",
   );
 
   return {

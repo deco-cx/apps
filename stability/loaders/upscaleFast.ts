@@ -45,12 +45,15 @@ export default async function upscaleFast(
         },
         {
           type: "text",
-          text: `If you need even higher quality, you can use the upscale-creative model which provides better results but takes longer to process.`,
+          text:
+            `If you need even higher quality, you can use the upscale-creative model which provides better results but takes longer to process.`,
         },
       ],
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown error";
     return {
       content: [
         {

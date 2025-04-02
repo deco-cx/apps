@@ -55,7 +55,7 @@ export class StabilityAiClient {
 
   async generateImageCore(
     prompt: string,
-    options?: GenerateImageCoreOptions
+    options?: GenerateImageCoreOptions,
   ): Promise<{ base64Image: string }> {
     const formData = new FormData();
     formData.append("prompt", prompt);
@@ -83,13 +83,13 @@ export class StabilityAiClient {
           Accept: "application/json",
         },
         body: formData,
-      }
+      },
     );
 
     if (!response.ok) {
       const error = await response.json();
       throw new Error(
-        `API error (${response.status}): ${JSON.stringify(error)}`
+        `API error (${response.status}): ${JSON.stringify(error)}`,
       );
     }
 
@@ -111,13 +111,13 @@ export class StabilityAiClient {
           Accept: "application/json",
         },
         body: formData,
-      }
+      },
     );
 
     if (!response.ok) {
       const error = await response.json();
       throw new Error(
-        `API error (${response.status}): ${JSON.stringify(error)}`
+        `API error (${response.status}): ${JSON.stringify(error)}`,
       );
     }
 
@@ -136,7 +136,7 @@ export class StabilityAiClient {
               Authorization: `Bearer ${this.apiKey}`,
               Accept: "application/json",
             },
-          }
+          },
         );
 
         console.log("Poll response status:", response.status);
@@ -149,7 +149,11 @@ export class StabilityAiClient {
           await new Promise((resolve) => setTimeout(resolve, 10000));
         } else {
           const errorText = await response.text();
-          console.error("Unexpected status response:", response.status, errorText);
+          console.error(
+            "Unexpected status response:",
+            response.status,
+            errorText,
+          );
           throw new Error(`Unexpected status: ${response.status}`);
         }
       }
@@ -164,7 +168,7 @@ export class StabilityAiClient {
 
   async upscaleCreative(
     imageBuffer: Uint8Array,
-    options: UpscaleCreativeOptions
+    options: UpscaleCreativeOptions,
   ): Promise<{ id: string }> {
     const formData = new FormData();
     formData.append("image", new Blob([imageBuffer]));
@@ -187,17 +191,17 @@ export class StabilityAiClient {
           Accept: "application/json",
         },
         body: formData,
-      }
+      },
     );
 
     if (!response.ok) {
       const error = await response.json();
       throw new Error(
-        `API error (${response.status}): ${JSON.stringify(error)}`
+        `API error (${response.status}): ${JSON.stringify(error)}`,
       );
     }
 
     const data = await response.json();
     return { id: data.id };
   }
-} 
+}

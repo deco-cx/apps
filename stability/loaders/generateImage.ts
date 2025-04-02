@@ -86,7 +86,10 @@ export async function uploadImage(image: string, presignedUrl: string) {
   });
 
   console.log("Upload response status:", response.status);
-  console.log("Upload response headers:", Object.fromEntries(response.headers.entries()));
+  console.log(
+    "Upload response headers:",
+    Object.fromEntries(response.headers.entries()),
+  );
 
   if (!response.ok) {
     const errorText = await response.text();

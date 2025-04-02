@@ -33,7 +33,7 @@ async function handleUpscaleCreative(
   imageBuffer: Uint8Array,
   options: UpscaleCreativeOptions,
   presignedUrl: string,
-  ctx: AppContext
+  ctx: AppContext,
 ) {
   try {
     console.log("Starting creative upscaling process...");
@@ -47,7 +47,10 @@ async function handleUpscaleCreative(
 
     console.log("Starting to poll for results...");
     const finalResult = await stabilityClient.fetchGenerationResult(result.id);
-    console.log("Received final result, image length:", finalResult.base64Image.length);
+    console.log(
+      "Received final result, image length:",
+      finalResult.base64Image.length,
+    );
 
     console.log("Starting image upload...");
     await uploadImage(finalResult.base64Image, presignedUrl);
@@ -82,7 +85,7 @@ export default async function upscaleCreative(
       imageBuffer,
       { prompt, negativePrompt, creativity },
       presignedUrl,
-      ctx
+      ctx,
     );
 
     // Return the final URL immediately
@@ -91,12 +94,15 @@ export default async function upscaleCreative(
       content: [
         {
           type: "text",
-          text: `Started creative upscaling process. The result will be available at ${finalUrl} when complete.`,
+          text:
+            `Started creative upscaling process. The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown error";
     return {
       content: [
         {
