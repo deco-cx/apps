@@ -270,7 +270,7 @@ export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
     undefined;
 
   if (term) {
-    return;
+    return null;
   }
 
   const typeTags = [...url.searchParams.entries()]
