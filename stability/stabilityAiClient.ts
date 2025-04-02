@@ -45,6 +45,11 @@ export interface UpscaleCreativeOptions {
   creativity?: number;
 }
 
+export interface SearchAndReplaceOptions {
+  searchPrompt: string;
+  prompt: string;
+}
+
 export class StabilityAiClient {
   private readonly apiKey: string;
   private readonly baseUrl = "https://api.stability.ai";
@@ -203,5 +208,38 @@ export class StabilityAiClient {
 
     const data = await response.json();
     return { id: data.id };
+  }
+
+  async searchAndReplace(
+    imageBuffer: Uint8Array,
+    options: SearchAndReplaceOptions,
+  ): Promise<{ base64Image: string }> {
+    const formData = new FormData();
+    formData.append("image", new Blob([imageBuffer]));
+    formData.append("output_format", "png");
+    formData.append("search_prompt", options.searchPrompt);
+    formData.append("prompt", options.prompt);
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/edit/search-and-replace`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { base64Image: data.image };
   }
 }
