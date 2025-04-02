@@ -48,7 +48,7 @@ export async function mapSdkToStabilityRequest(
 
   if (image) {
     const imageFile = typeof image === "string"
-      ? await convertBase64ToBlob(image)
+      ? convertBase64ToBlob(image)
       : image;
     formData.append("image", imageFile);
   }
@@ -105,7 +105,7 @@ export async function mapSdkToStabilityRequest(
   return formData;
 }
 
-async function convertBase64ToBlob(base64: string): Promise<Blob> {
+function convertBase64ToBlob(base64: string): Blob {
   const binaryString = atob(base64);
   const len = binaryString.length;
   const bytes = new Uint8Array(len);
