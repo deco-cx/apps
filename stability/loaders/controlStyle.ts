@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { ControlStyleOptions, ASPECT_RATIOS } from "../stabilityAiClient.ts";
+import { ASPECT_RATIOS, ControlStyleOptions } from "../stabilityAiClient.ts";
 
 /**
  * @name CONTROL_STYLE
@@ -47,7 +47,10 @@ async function handleControlStyle(
     const { stabilityClient } = ctx;
     console.log("Initiating control style request...");
     const result = await stabilityClient.controlStyle(imageBuffer, options);
-    console.log("Control style completed, image length:", result.base64Image.length);
+    console.log(
+      "Control style completed, image length:",
+      result.base64Image.length,
+    );
 
     console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
@@ -64,7 +67,8 @@ async function handleControlStyle(
 }
 
 export default async function controlStyle(
-  { imageUrl, presignedUrl, prompt, negativePrompt, aspectRatio, fidelity }: Props,
+  { imageUrl, presignedUrl, prompt, negativePrompt, aspectRatio, fidelity }:
+    Props,
   _request: Request,
   ctx: AppContext,
 ) {
@@ -109,4 +113,4 @@ export default async function controlStyle(
       ],
     };
   }
-} 
+}
