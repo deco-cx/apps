@@ -6,12 +6,19 @@ import * as $$$0 from "./loaders/generateImage.ts";
 import * as $$$1 from "./loaders/upscaleFast.ts";
 import * as $$$2 from "./loaders/upscaleCreative.ts";
 import * as $$$3 from "./loaders/searchAndReplace.ts";
+import * as $$$4 from "./loaders/searchAndRecolor.ts";
+import * as $$$5 from "./loaders/replaceBackgroundAndRelight.ts";
+import * as $$$6 from "./loaders/removeBackground.ts";
+
 const manifest = {
   "loaders": {
     "stability/loaders/generateImage.ts": $$$0,
     "stability/loaders/upscaleFast.ts": $$$1,
     "stability/loaders/upscaleCreative.ts": $$$2,
     "stability/loaders/searchAndReplace.ts": $$$3,
+    "stability/loaders/searchAndRecolor.ts": $$$4,
+    "stability/loaders/replaceBackgroundAndRelight.ts": $$$5,
+    "stability/loaders/removeBackground.ts": $$$6,
   },
   "name": "stability",
   "baseUrl": import.meta.url,

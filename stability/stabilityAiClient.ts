@@ -50,6 +50,30 @@ export interface SearchAndReplaceOptions {
   prompt: string;
 }
 
+export interface SearchAndRecolorOptions {
+  selectPrompt: string;
+  prompt: string;
+  growMask?: number;
+  negativePrompt?: string;
+  seed?: number;
+  outputFormat?: "png" | "jpeg" | "webp";
+}
+
+export interface ReplaceBackgroundAndRelightOptions {
+  backgroundPrompt?: string;
+  backgroundReference?: string;
+  foregroundPrompt?: string;
+  negativePrompt?: string;
+  preserveOriginalSubject?: number;
+  originalBackgroundDepth?: number;
+  keepOriginalBackground?: boolean;
+  lightSourceDirection?: "above" | "below" | "left" | "right";
+  lightReference?: string;
+  lightSourceStrength?: number;
+  seed?: number;
+  outputFormat?: "png" | "jpeg" | "webp";
+}
+
 export class StabilityAiClient {
   private readonly apiKey: string;
   private readonly baseUrl = "https://api.stability.ai";
@@ -222,6 +246,159 @@ export class StabilityAiClient {
 
     const response = await fetch(
       `${this.baseUrl}/v2beta/stable-image/edit/search-and-replace`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { base64Image: data.image };
+  }
+
+  async searchAndRecolor(
+    imageBuffer: Uint8Array,
+    options: SearchAndRecolorOptions,
+  ): Promise<{ base64Image: string }> {
+    const formData = new FormData();
+    formData.append("image", new Blob([imageBuffer]));
+    formData.append("output_format", "png");
+    formData.append("select_prompt", options.selectPrompt);
+    formData.append("prompt", options.prompt);
+
+    if (options.growMask !== undefined) {
+      formData.append("grow_mask", options.growMask.toString());
+    }
+    if (options.negativePrompt) {
+      formData.append("negative_prompt", options.negativePrompt);
+    }
+    if (options.seed !== undefined) {
+      formData.append("seed", options.seed.toString());
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/edit/search-and-recolor`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { base64Image: data.image };
+  }
+
+  async replaceBackgroundAndRelight(
+    imageBuffer: Uint8Array,
+    options: ReplaceBackgroundAndRelightOptions,
+  ): Promise<{ id: string }> {
+    const formData = new FormData();
+    formData.append("subject_image", new Blob([imageBuffer]));
+    formData.append("output_format", "png");
+
+    if (options.backgroundPrompt) {
+      formData.append("background_prompt", options.backgroundPrompt);
+    }
+    if (options.backgroundReference) {
+      formData.append(
+        "background_reference",
+        new Blob([options.backgroundReference]),
+      );
+    }
+    if (options.foregroundPrompt) {
+      formData.append("foreground_prompt", options.foregroundPrompt);
+    }
+    if (options.negativePrompt) {
+      formData.append("negative_prompt", options.negativePrompt);
+    }
+    if (options.preserveOriginalSubject !== undefined) {
+      formData.append(
+        "preserve_original_subject",
+        options.preserveOriginalSubject.toString(),
+      );
+    }
+    if (options.originalBackgroundDepth !== undefined) {
+      formData.append(
+        "original_background_depth",
+        options.originalBackgroundDepth.toString(),
+      );
+    }
+    if (options.keepOriginalBackground !== undefined) {
+      formData.append(
+        "keep_original_background",
+        options.keepOriginalBackground.toString(),
+      );
+    }
+    if (options.lightSourceDirection) {
+      formData.append("light_source_direction", options.lightSourceDirection);
+    }
+    if (options.lightReference) {
+      formData.append("light_reference", new Blob([options.lightReference]));
+    }
+    if (options.lightSourceStrength !== undefined) {
+      formData.append(
+        "light_source_strength",
+        options.lightSourceStrength.toString(),
+      );
+    }
+    if (options.seed !== undefined) {
+      formData.append("seed", options.seed.toString());
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/edit/replace-background-and-relight`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { id: data.id };
+  }
+
+  async removeBackground(
+    imageBuffer: Uint8Array,
+  ): Promise<{ base64Image: string }> {
+    const formData = new FormData();
+    formData.append("image", new Blob([imageBuffer]));
+    formData.append("output_format", "png");
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/edit/remove-background`,
       {
         method: "POST",
         headers: {
