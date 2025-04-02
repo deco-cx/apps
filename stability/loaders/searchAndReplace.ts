@@ -58,7 +58,7 @@ export default async function searchAndReplace(
     console.log("Image upload completed successfully");
 
     // Return the final URL
-    const finalUrl = presignedUrl.replaceAll("_presigned_url", "");
+    const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [
         {

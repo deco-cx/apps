@@ -1,10 +1,10 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { SearchAndRecolorOptions } from "../stabilityAiClient.ts";
+import { OutpaintOptions } from "../stabilityAiClient.ts";
 
 /**
- * @name SEARCH_AND_RECOLOR
- * @description Search and recolor object(s) in an image by describing what to recolor and what colors to use.
+ * @name OUTPAINT
+ * @description Extends an image in any direction while maintaining visual consistency.
  */
 export interface Props {
   /**
@@ -16,43 +16,52 @@ export interface Props {
    */
   presignedUrl: string;
   /**
-   * @description Short description of what to search for and recolor in the image
+   * @description The number of pixels to extend the image to the left
    */
-  selectPrompt: string;
+  left?: number;
   /**
-   * @description What colors you wish to see in the output image
+   * @description The number of pixels to extend the image to the right
    */
-  prompt: string;
+  right?: number;
   /**
-   * @description Optional value to grow the mask around the selected area
+   * @description The number of pixels to extend the image upwards
    */
-  growMask?: number;
+  up?: number;
+  /**
+   * @description The number of pixels to extend the image downwards
+   */
+  down?: number;
+  /**
+   * @description The creativity of the outpaint operation (0-1)
+   */
+  creativity?: number;
+  /**
+   * @description The prompt to use for the outpaint operation
+   */
+  prompt?: string;
 }
 
-async function handleSearchAndRecolor(
+async function handleOutpaint(
   imageBuffer: Uint8Array,
-  options: SearchAndRecolorOptions,
+  options: OutpaintOptions,
   presignedUrl: string,
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting search and recolor process...");
+    console.log("Starting outpaint process...");
     console.log("Options:", options);
     console.log("Image buffer length:", imageBuffer.length);
 
     const { stabilityClient } = ctx;
-    console.log("Initiating search and recolor request...");
-    const result = await stabilityClient.searchAndRecolor(imageBuffer, options);
-    console.log(
-      "Search and recolor completed, image length:",
-      result.base64Image.length,
-    );
+    console.log("Initiating outpaint request...");
+    const result = await stabilityClient.outpaint(imageBuffer, options);
+    console.log("Outpaint completed, image length:", result.base64Image.length);
 
     console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
     console.log("Image upload completed successfully");
   } catch (error) {
-    console.error("Error in search and recolor:", error);
+    console.error("Error in outpaint:", error);
     if (error instanceof Error) {
       console.error("Error details:", {
         message: error.message,
@@ -62,12 +71,19 @@ async function handleSearchAndRecolor(
   }
 }
 
-export default async function searchAndRecolor(
-  { imageUrl, presignedUrl, selectPrompt, prompt, growMask }: Props,
+export default async function outpaint(
+  { imageUrl, presignedUrl, left, right, up, down, creativity, prompt }: Props,
   _request: Request,
   ctx: AppContext,
 ) {
   try {
+    // Ensure at least one direction is specified
+    if (!left && !right && !up && !down) {
+      throw new Error(
+        "At least one direction (left, right, up, or down) must be specified",
+      );
+    }
+
     // Fetch the image from the URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
@@ -76,10 +92,10 @@ export default async function searchAndRecolor(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Start the search and recolor process in the background
-    handleSearchAndRecolor(
+    // Start the outpaint process in the background
+    handleOutpaint(
       imageBuffer,
-      { selectPrompt, prompt, growMask },
+      { left, right, up, down, creativity, prompt },
       presignedUrl,
       ctx,
     );
@@ -91,7 +107,7 @@ export default async function searchAndRecolor(
         {
           type: "text",
           text:
-            `Started search and recolor process. The result will be available at ${finalUrl} when complete.`,
+            `Started outpaint process. The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };
@@ -103,8 +119,7 @@ export default async function searchAndRecolor(
       content: [
         {
           type: "text",
-          text:
-            `Error: Failed to start search and recolor process: ${errorMessage}`,
+          text: `Error: Failed to start outpaint process: ${errorMessage}`,
         },
       ],
     };

@@ -74,6 +74,42 @@ export interface ReplaceBackgroundAndRelightOptions {
   outputFormat?: "png" | "jpeg" | "webp";
 }
 
+export interface OutpaintOptions {
+  left?: number;
+  right?: number;
+  up?: number;
+  down?: number;
+  creativity?: number;
+  prompt?: string;
+  seed?: number;
+  outputFormat?: "png" | "jpeg" | "webp";
+}
+
+export interface ControlSketchOptions {
+  prompt: string;
+  controlStrength?: number;
+  negativePrompt?: string;
+  seed?: number;
+  outputFormat?: "png" | "jpeg" | "webp";
+}
+
+export interface ControlStructureOptions {
+  prompt: string;
+  controlStrength?: number;
+  negativePrompt?: string;
+  seed?: number;
+  outputFormat?: "png" | "jpeg" | "webp";
+}
+
+export interface ControlStyleOptions {
+  prompt: string;
+  negativePrompt?: string;
+  aspectRatio?: typeof ASPECT_RATIOS[number];
+  fidelity?: number;
+  seed?: number;
+  outputFormat?: "png" | "jpeg" | "webp";
+}
+
 export class StabilityAiClient {
   private readonly apiKey: string;
   private readonly baseUrl = "https://api.stability.ai";
@@ -399,6 +435,188 @@ export class StabilityAiClient {
 
     const response = await fetch(
       `${this.baseUrl}/v2beta/stable-image/edit/remove-background`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { base64Image: data.image };
+  }
+
+  async outpaint(
+    imageBuffer: Uint8Array,
+    options: OutpaintOptions,
+  ): Promise<{ base64Image: string }> {
+    const formData = new FormData();
+    formData.append("image", new Blob([imageBuffer]));
+    formData.append("output_format", options.outputFormat || "png");
+
+    if (options.left !== undefined) {
+      formData.append("left", options.left.toString());
+    }
+    if (options.right !== undefined) {
+      formData.append("right", options.right.toString());
+    }
+    if (options.up !== undefined) {
+      formData.append("up", options.up.toString());
+    }
+    if (options.down !== undefined) {
+      formData.append("down", options.down.toString());
+    }
+    if (options.creativity !== undefined) {
+      formData.append("creativity", options.creativity.toString());
+    }
+    if (options.prompt) {
+      formData.append("prompt", options.prompt);
+    }
+    if (options.seed !== undefined) {
+      formData.append("seed", options.seed.toString());
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/edit/outpaint`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { base64Image: data.image };
+  }
+
+  async controlSketch(
+    imageBuffer: Uint8Array,
+    options: ControlSketchOptions,
+  ): Promise<{ base64Image: string }> {
+    const formData = new FormData();
+    formData.append("image", new Blob([imageBuffer]));
+    formData.append("output_format", options.outputFormat || "png");
+    formData.append("prompt", options.prompt);
+
+    if (options.controlStrength !== undefined) {
+      formData.append("control_strength", options.controlStrength.toString());
+    }
+    if (options.negativePrompt) {
+      formData.append("negative_prompt", options.negativePrompt);
+    }
+    if (options.seed !== undefined) {
+      formData.append("seed", options.seed.toString());
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/control/sketch`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { base64Image: data.image };
+  }
+
+  async controlStructure(
+    imageBuffer: Uint8Array,
+    options: ControlStructureOptions,
+  ): Promise<{ base64Image: string }> {
+    const formData = new FormData();
+    formData.append("image", new Blob([imageBuffer]));
+    formData.append("output_format", options.outputFormat || "png");
+    formData.append("prompt", options.prompt);
+
+    if (options.controlStrength !== undefined) {
+      formData.append("control_strength", options.controlStrength.toString());
+    }
+    if (options.negativePrompt) {
+      formData.append("negative_prompt", options.negativePrompt);
+    }
+    if (options.seed !== undefined) {
+      formData.append("seed", options.seed.toString());
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/control/structure`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json",
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error)}`,
+      );
+    }
+
+    const data = await response.json();
+    return { base64Image: data.image };
+  }
+
+  async controlStyle(
+    imageBuffer: Uint8Array,
+    options: ControlStyleOptions,
+  ): Promise<{ base64Image: string }> {
+    const formData = new FormData();
+    formData.append("image", new Blob([imageBuffer]));
+    formData.append("output_format", options.outputFormat || "png");
+    formData.append("prompt", options.prompt);
+
+    if (options.negativePrompt) {
+      formData.append("negative_prompt", options.negativePrompt);
+    }
+    if (options.aspectRatio) {
+      formData.append("aspect_ratio", options.aspectRatio);
+    }
+    if (options.fidelity !== undefined) {
+      formData.append("fidelity", options.fidelity.toString());
+    }
+    if (options.seed !== undefined) {
+      formData.append("seed", options.seed.toString());
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/stable-image/control/style`,
       {
         method: "POST",
         headers: {

@@ -9,6 +9,10 @@ import * as $$$3 from "./loaders/searchAndReplace.ts";
 import * as $$$4 from "./loaders/searchAndRecolor.ts";
 import * as $$$5 from "./loaders/replaceBackgroundAndRelight.ts";
 import * as $$$6 from "./loaders/removeBackground.ts";
+import * as $$$7 from "./loaders/outpaint.ts";
+import * as $$$8 from "./loaders/controlSketch.ts";
+import * as $$$9 from "./loaders/controlStructure.ts";
+import * as $$$10 from "./loaders/controlStyle.ts";
 
 const manifest = {
   "loaders": {
@@ -19,6 +23,10 @@ const manifest = {
     "stability/loaders/searchAndRecolor.ts": $$$4,
     "stability/loaders/replaceBackgroundAndRelight.ts": $$$5,
     "stability/loaders/removeBackground.ts": $$$6,
+    "stability/loaders/outpaint.ts": $$$7,
+    "stability/loaders/controlSketch.ts": $$$8,
+    "stability/loaders/controlStructure.ts": $$$9,
+    "stability/loaders/controlStyle.ts": $$$10,
   },
   "name": "stability",
   "baseUrl": import.meta.url,

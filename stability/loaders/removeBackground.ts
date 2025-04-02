@@ -65,7 +65,7 @@ export default async function removeBackground(
     handleRemoveBackground(imageBuffer, presignedUrl, ctx);
 
     // Return the final URL immediately
-    const finalUrl = presignedUrl.replaceAll("_presigned_url", "");
+    const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [
         {

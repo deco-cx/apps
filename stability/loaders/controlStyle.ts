@@ -1,14 +1,14 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { SearchAndRecolorOptions } from "../stabilityAiClient.ts";
+import { ControlStyleOptions, ASPECT_RATIOS } from "../stabilityAiClient.ts";
 
 /**
- * @name SEARCH_AND_RECOLOR
- * @description Search and recolor object(s) in an image by describing what to recolor and what colors to use.
+ * @name CONTROL_STYLE
+ * @description Generate a new image in the style of a reference image
  */
 export interface Props {
   /**
-   * @description The URL of the image to modify
+   * @description The URL of the style reference image
    */
   imageUrl: string;
   /**
@@ -16,43 +16,44 @@ export interface Props {
    */
   presignedUrl: string;
   /**
-   * @description Short description of what to search for and recolor in the image
-   */
-  selectPrompt: string;
-  /**
-   * @description What colors you wish to see in the output image
+   * @description What you wish to see in the output image
    */
   prompt: string;
   /**
-   * @description Optional value to grow the mask around the selected area
+   * @description Optional description of what you don't want to see
    */
-  growMask?: number;
+  negativePrompt?: string;
+  /**
+   * @description Optional aspect ratio for the generated image
+   */
+  aspectRatio?: typeof ASPECT_RATIOS[number];
+  /**
+   * @description How closely the output image's style should match the input (0-1)
+   */
+  fidelity?: number;
 }
 
-async function handleSearchAndRecolor(
+async function handleControlStyle(
   imageBuffer: Uint8Array,
-  options: SearchAndRecolorOptions,
+  options: ControlStyleOptions,
   presignedUrl: string,
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting search and recolor process...");
+    console.log("Starting control style process...");
     console.log("Options:", options);
     console.log("Image buffer length:", imageBuffer.length);
 
     const { stabilityClient } = ctx;
-    console.log("Initiating search and recolor request...");
-    const result = await stabilityClient.searchAndRecolor(imageBuffer, options);
-    console.log(
-      "Search and recolor completed, image length:",
-      result.base64Image.length,
-    );
+    console.log("Initiating control style request...");
+    const result = await stabilityClient.controlStyle(imageBuffer, options);
+    console.log("Control style completed, image length:", result.base64Image.length);
 
     console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
     console.log("Image upload completed successfully");
   } catch (error) {
-    console.error("Error in search and recolor:", error);
+    console.error("Error in control style:", error);
     if (error instanceof Error) {
       console.error("Error details:", {
         message: error.message,
@@ -62,8 +63,8 @@ async function handleSearchAndRecolor(
   }
 }
 
-export default async function searchAndRecolor(
-  { imageUrl, presignedUrl, selectPrompt, prompt, growMask }: Props,
+export default async function controlStyle(
+  { imageUrl, presignedUrl, prompt, negativePrompt, aspectRatio, fidelity }: Props,
   _request: Request,
   ctx: AppContext,
 ) {
@@ -76,22 +77,22 @@ export default async function searchAndRecolor(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Start the search and recolor process in the background
-    handleSearchAndRecolor(
+    // Start the control style process in the background
+    handleControlStyle(
       imageBuffer,
-      { selectPrompt, prompt, growMask },
+      { prompt, negativePrompt, aspectRatio, fidelity },
       presignedUrl,
       ctx,
     );
 
     // Return the final URL immediately
-    const finalUrl = presignedUrl.replaceAll("_presigned/", "");
+    const finalUrl = presignedUrl.replaceAll("_presigned_url", "");
     return {
       content: [
         {
           type: "text",
           text:
-            `Started search and recolor process. The result will be available at ${finalUrl} when complete.`,
+            `Started control style process with prompt "${prompt}". The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };
@@ -103,10 +104,9 @@ export default async function searchAndRecolor(
       content: [
         {
           type: "text",
-          text:
-            `Error: Failed to start search and recolor process: ${errorMessage}`,
+          text: `Error: Failed to start control style process: ${errorMessage}`,
         },
       ],
     };
   }
-}
+} 
