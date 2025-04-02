@@ -28,9 +28,9 @@ interface Props {
 /**
  * @title Vertex
  * @name Vertex
- * @description This uses the Google Vertex AI API to transcribe audio files.
+ * @description Google Vertex AI APIs
  * @category Tool
- * @logo https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8
+ * @logo https://techcrunch.com/wp-content/uploads/2021/05/VertexAI-512-color.png
  */
 export default function Vertex(props: Props): App<Manifest, State> {
   const { googleCredentials, location, project } = props;

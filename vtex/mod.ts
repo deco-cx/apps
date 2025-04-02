@@ -79,8 +79,9 @@ export interface Props {
 }
 export const color = 0xf71963;
 /**
+ * @name VTEX
  * @title VTEX
- * @description Loaders, actions and workflows for adding VTEX Commerce Platform to your website.
+ * @description Interact with VTEX Commerce Platform account
  * @category Ecommmerce
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vtex/logo.png
  */
