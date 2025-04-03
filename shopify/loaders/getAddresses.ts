@@ -1,6 +1,6 @@
 import { PostalAddress } from "../../commerce/types.ts";
 import type { AppContext } from "../mod.ts";
-import { FetchCustomerInfo } from "../utils/storefront/queries.ts";
+import { FetchCustomerAddresses } from "../utils/storefront/queries.ts";
 import { Customer } from "../utils/storefront/storefront.graphql.gen.ts";
 import { getUserCookie } from "../utils/user.ts";
 
@@ -25,7 +25,7 @@ const loader = async (
       { customerAccessToken: string }
     >({
       variables: { customerAccessToken },
-      ...FetchCustomerInfo,
+      ...FetchCustomerAddresses,
     }).then((data) => data.customer);
 
     if (!customer) return null;
