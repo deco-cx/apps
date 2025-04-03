@@ -490,6 +490,37 @@ export const RegisterAccount = {
   }`,
 };
 
+export const UpdateCustomerInfo = {
+  query: gql`mutation UpdateCustomerInfo(
+      $customerAccessToken: String!, 
+      $email: String,
+      $firstName: String,
+      $lastName: String,
+      $acceptsMarketing: Boolean,
+    ) {
+    customerUpdate(
+      customerAccessToken: $customerAccessToken,
+      customer: {
+        email: $email,
+        firstName: $firstName,
+        lastName: $lastName,
+        acceptsMarketing: $acceptsMarketing,
+      }
+    ) {
+      customer {
+        id
+      }
+      customerUserErrors {
+        code
+        message
+      }
+      userErrors {
+        message
+      }
+    }
+  }`,
+};
+
 export const AddCoupon = {
   fragments: [Cart],
   query: gql`mutation AddCoupon($cartId: ID!, $discountCodes: [String!]!) {
@@ -567,6 +598,84 @@ export const CreateAddress = {
       }
       customerUserErrors {
         code
+        message
+      }
+    }
+  }`,
+};
+
+export const UpdateAddress = {
+  query: gql`mutation UpdateAddress(
+    $addressId: ID!,
+    $customerAccessToken: String!, 
+    $address1: String!,
+    $country: String!,
+    $province: String!,
+    $city: String!,
+    $zip: String!
+  ) {
+    customerAddressUpdate(
+      id: $addressId,
+      customerAccessToken: $customerAccessToken,
+      address: {
+        address1: $address1, 
+        country: $country, 
+        province: $province, 
+        city: $city, 
+        zip: $zip
+      }
+    ) {
+      customerAddress {
+          id
+      }
+      customerUserErrors {
+          code
+          message
+      }
+      userErrors {
+          message
+      }
+    }
+  }`,
+};
+
+export const SetDefaultAddress = {
+  query: gql`mutation SetDefaultAddress(
+    $customerAccessToken: String!,
+    $addressId: ID!
+  ) {
+    customerDefaultAddressUpdate(
+      customerAccessToken: $customerAccessToken,
+      addressId: $addressId
+    ) {
+      customer {
+        defaultAddress {
+          id
+        }
+      }
+      customerUserErrors {
+        code
+        message
+      }
+    }
+  }`,
+};
+
+export const DeleteAddress = {
+  query: gql`mutation DeleteAddress(
+    $customerAccessToken: String!,
+    $addressId: ID!
+  ) {
+    customerAddressDelete(
+      customerAccessToken: $customerAccessToken,
+      id: $addressId
+    ) {
+      deletedCustomerAddressId
+      customerUserErrors {
+        code
+        message
+      }
+      userErrors {
         message
       }
     }
