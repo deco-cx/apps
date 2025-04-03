@@ -19,7 +19,7 @@ interface Props {
  * @name Stability
  * @description This uses the Stability AI API to generate images from text descriptions.
  * @category Tool
- * @logo https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/1/0ac02239-61e6-4289-8a36-e78c0975bcc8
+ * @logo https://logowik.com/content/uploads/images/stability-ai-icon3444.logowik.com.webp
  */
 export default function Stability(props: Props): App<Manifest, State> {
   const { apiKey } = props;
