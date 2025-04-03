@@ -455,6 +455,25 @@ export const FetchCustomerInfo = {
   }`,
 };
 
+export const FetchCustomerAddresses = {
+  query: gql`query FetchCustomerAddresses($customerAccessToken: String!) {
+    customer(customerAccessToken: $customerAccessToken) {
+      addresses(first: 10) {
+        edges {
+          node {
+            address1
+            city
+            country
+            id
+            province
+            zip
+          }
+        }
+      }
+    }
+  }`,
+};
+
 export const AddItemToCart = {
   fragments: [Cart],
   query: gql`mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
