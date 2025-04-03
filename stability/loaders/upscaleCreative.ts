@@ -12,7 +12,7 @@ export interface Props {
    */
   imageUrl: string;
   /**
-   * @description The presigned URL to upload the upscaled image to
+   * @description The presigned URL to upload the upscaled image to. Probably can be created with a tool like CREATE_PRESIGNED_URL.
    */
   presignedUrl: string;
   /**
