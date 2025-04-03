@@ -40,21 +40,10 @@ async function handleControlStyle(
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting control style process...");
-    console.log("Options:", options);
-    console.log("Image buffer length:", imageBuffer.length);
-
     const { stabilityClient } = ctx;
-    console.log("Initiating control style request...");
     const result = await stabilityClient.controlStyle(imageBuffer, options);
-    console.log(
-      "Control style completed, image length:",
-      result.base64Image.length,
-    );
 
-    console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
-    console.log("Image upload completed successfully");
   } catch (error) {
     console.error("Error in control style:", error);
     if (error instanceof Error) {
@@ -73,7 +62,6 @@ export default async function controlStyle(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from the URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -81,7 +69,6 @@ export default async function controlStyle(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Start the control style process in the background
     handleControlStyle(
       imageBuffer,
       { prompt, negativePrompt, aspectRatio, fidelity },
@@ -89,7 +76,6 @@ export default async function controlStyle(
       ctx,
     );
 
-    // Return the final URL immediately
     const finalUrl = presignedUrl.replaceAll("_presigned_url", "");
     return {
       content: [

@@ -36,23 +36,11 @@ async function handleControlStructure(
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting control structure process...");
-    console.log("Options:", options);
-    console.log("Image buffer length:", imageBuffer.length);
-
     const { stabilityClient } = ctx;
-    console.log("Initiating control structure request...");
     const result = await stabilityClient.controlStructure(imageBuffer, options);
-    console.log(
-      "Control structure completed, image length:",
-      result.base64Image.length,
-    );
 
-    console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
-    console.log("Image upload completed successfully");
   } catch (error) {
-    console.error("Error in control structure:", error);
     if (error instanceof Error) {
       console.error("Error details:", {
         message: error.message,
@@ -68,7 +56,6 @@ export default async function controlStructure(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from the URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -76,7 +63,6 @@ export default async function controlStructure(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Start the control structure process in the background
     handleControlStructure(
       imageBuffer,
       { prompt, controlStrength, negativePrompt },
@@ -84,7 +70,6 @@ export default async function controlStructure(
       ctx,
     );
 
-    // Return the final URL immediately
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [

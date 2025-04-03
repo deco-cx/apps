@@ -36,23 +36,10 @@ async function handleControlSketch(
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting control sketch process...");
-    console.log("Options:", options);
-    console.log("Image buffer length:", imageBuffer.length);
-
     const { stabilityClient } = ctx;
-    console.log("Initiating control sketch request...");
     const result = await stabilityClient.controlSketch(imageBuffer, options);
-    console.log(
-      "Control sketch completed, image length:",
-      result.base64Image.length,
-    );
-
-    console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
-    console.log("Image upload completed successfully");
   } catch (error) {
-    console.error("Error in control sketch:", error);
     if (error instanceof Error) {
       console.error("Error details:", {
         message: error.message,
@@ -68,7 +55,6 @@ export default async function controlSketch(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from the URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -76,7 +62,6 @@ export default async function controlSketch(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Start the control sketch process in the background
     handleControlSketch(
       imageBuffer,
       { prompt, controlStrength, negativePrompt },
@@ -84,7 +69,6 @@ export default async function controlSketch(
       ctx,
     );
 
-    // Return the final URL immediately
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [

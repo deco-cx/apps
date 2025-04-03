@@ -36,23 +36,11 @@ async function handleSearchAndRecolor(
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting search and recolor process...");
-    console.log("Options:", options);
-    console.log("Image buffer length:", imageBuffer.length);
-
     const { stabilityClient } = ctx;
-    console.log("Initiating search and recolor request...");
     const result = await stabilityClient.searchAndRecolor(imageBuffer, options);
-    console.log(
-      "Search and recolor completed, image length:",
-      result.base64Image.length,
-    );
 
-    console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
-    console.log("Image upload completed successfully");
   } catch (error) {
-    console.error("Error in search and recolor:", error);
     if (error instanceof Error) {
       console.error("Error details:", {
         message: error.message,
@@ -68,7 +56,6 @@ export default async function searchAndRecolor(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from the URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -76,7 +63,6 @@ export default async function searchAndRecolor(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Start the search and recolor process in the background
     handleSearchAndRecolor(
       imageBuffer,
       { selectPrompt, prompt, growMask },
@@ -84,7 +70,6 @@ export default async function searchAndRecolor(
       ctx,
     );
 
-    // Return the final URL immediately
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [

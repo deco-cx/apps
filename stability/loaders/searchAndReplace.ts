@@ -38,26 +38,14 @@ export default async function searchAndReplace(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    console.log("Starting search and replace process...");
-    console.log("Options:", { searchPrompt, prompt });
-    console.log("Image buffer length:", imageBuffer.length);
-
     const { stabilityClient } = ctx;
-    console.log("Initiating search and replace request...");
     const result = await stabilityClient.searchAndReplace(imageBuffer, {
       searchPrompt,
       prompt,
     });
-    console.log(
-      "Search and replace completed, image length:",
-      result.base64Image.length,
-    );
 
-    console.log("Starting image upload...");
     await uploadImage(result.base64Image, presignedUrl);
-    console.log("Image upload completed successfully");
 
-    // Return the final URL
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [

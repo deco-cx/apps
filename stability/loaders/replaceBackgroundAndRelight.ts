@@ -16,11 +16,11 @@ export interface Props {
    */
   presignedUrl: string;
   /**
-   * @description Description of the desired background
+   * @description Description of the desired background. If not provided, must use backgroundReferenceUrl.
    */
   backgroundPrompt?: string;
   /**
-   * @description Optional URL to a reference image for background style
+   * @description Optional URL to a reference image for background style. If not provided, must use backgroundPrompt.
    */
   backgroundReferenceUrl?: string;
   /**
@@ -44,7 +44,7 @@ export interface Props {
    */
   keepOriginalBackground?: boolean;
   /**
-   * @description Direction of the light source
+   * @description Direction of the light source. Can be "above", "below", "left", or "right"
    */
   lightSourceDirection?: "above" | "below" | "left" | "right";
   /**
@@ -66,12 +66,7 @@ async function handleReplaceBackgroundAndRelight(
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting background replacement and relighting process...");
-    console.log("Options:", options);
-    console.log("Image buffer length:", imageBuffer.length);
-
     const { stabilityClient } = ctx;
-    console.log("Initiating background replacement request...");
     const result = await stabilityClient.replaceBackgroundAndRelight(
       imageBuffer,
       {
@@ -84,20 +79,10 @@ async function handleReplaceBackgroundAndRelight(
           : undefined,
       },
     );
-    console.log("Background replacement initiated, generation ID:", result.id);
-
-    console.log("Starting to poll for results...");
     const finalResult = await stabilityClient.fetchGenerationResult(result.id);
-    console.log(
-      "Received final result, image length:",
-      finalResult.base64Image.length,
-    );
 
-    console.log("Starting image upload...");
     await uploadImage(finalResult.base64Image, presignedUrl);
-    console.log("Image upload completed successfully");
   } catch (error) {
-    console.error("Error in background replacement:", error);
     if (error instanceof Error) {
       console.error("Error details:", {
         message: error.message,
@@ -126,7 +111,6 @@ export default async function replaceBackgroundAndRelight(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the subject image
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(
@@ -136,7 +120,6 @@ export default async function replaceBackgroundAndRelight(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Fetch background reference image if provided
     let backgroundReferenceBuffer: Uint8Array | undefined;
     if (backgroundReferenceUrl) {
       const backgroundResponse = await fetch(backgroundReferenceUrl);
@@ -149,7 +132,6 @@ export default async function replaceBackgroundAndRelight(
       backgroundReferenceBuffer = new Uint8Array(backgroundArrayBuffer);
     }
 
-    // Fetch light reference image if provided
     let lightReferenceBuffer: Uint8Array | undefined;
     if (lightReferenceUrl) {
       const lightResponse = await fetch(lightReferenceUrl);
@@ -162,7 +144,6 @@ export default async function replaceBackgroundAndRelight(
       lightReferenceBuffer = new Uint8Array(lightArrayBuffer);
     }
 
-    // Start the background replacement process in the background
     handleReplaceBackgroundAndRelight(
       imageBuffer,
       backgroundReferenceBuffer,
@@ -181,7 +162,6 @@ export default async function replaceBackgroundAndRelight(
       ctx,
     );
 
-    // Return the final URL immediately
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [

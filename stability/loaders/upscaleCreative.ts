@@ -36,25 +36,12 @@ async function handleUpscaleCreative(
   ctx: AppContext,
 ) {
   try {
-    console.log("Starting creative upscaling process...");
-    console.log("Options:", options);
-    console.log("Image buffer length:", imageBuffer.length);
-
     const { stabilityClient } = ctx;
-    console.log("Initiating upscale request...");
     const result = await stabilityClient.upscaleCreative(imageBuffer, options);
-    console.log("Upscale request initiated, generation ID:", result.id);
 
-    console.log("Starting to poll for results...");
     const finalResult = await stabilityClient.fetchGenerationResult(result.id);
-    console.log(
-      "Received final result, image length:",
-      finalResult.base64Image.length,
-    );
 
-    console.log("Starting image upload...");
     await uploadImage(finalResult.base64Image, presignedUrl);
-    console.log("Image upload completed successfully");
   } catch (error) {
     console.error("Error in background upscaling:", error);
     if (error instanceof Error) {
@@ -72,7 +59,6 @@ export default async function upscaleCreative(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from the URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -80,7 +66,6 @@ export default async function upscaleCreative(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Start the upscaling process in the background
     handleUpscaleCreative(
       imageBuffer,
       { prompt, negativePrompt, creativity },
@@ -88,7 +73,6 @@ export default async function upscaleCreative(
       ctx,
     );
 
-    // Return the final URL immediately
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [

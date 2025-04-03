@@ -22,7 +22,6 @@ export default async function upscaleFast(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from the URL
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
@@ -30,11 +29,9 @@ export default async function upscaleFast(
     const imageArrayBuffer = await imageResponse.arrayBuffer();
     const imageBuffer = new Uint8Array(imageArrayBuffer);
 
-    // Use the Stability AI client to upscale the image
     const { stabilityClient } = ctx;
     const result = await stabilityClient.upscaleFast(imageBuffer);
 
-    // Upload the upscaled image
     const url = await uploadImage(result.base64Image, presignedUrl);
 
     return {
