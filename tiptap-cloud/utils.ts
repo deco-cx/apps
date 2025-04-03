@@ -73,6 +73,18 @@ export function htmlToTiptapJson(htmlString: string): Content {
             attrs: { level: 2 },
             content: children,
           };
+        case "h1":
+          return {
+            type: "heading",
+            attrs: { level: 1 },
+            content: children,
+          };
+        case "h3":
+          return {
+            type: "heading",
+            attrs: { level: 3 },
+            content: children,
+          };
         case "p":
           return {
             type: "paragraph",
