@@ -96,11 +96,11 @@ const serialize = ({
     priceTables,
     regionId,
     utm_campaign: utm_campaign &&
-      removeNonLatin1Chars(utm_campaign).replace(/[\[\]{}()<>]/g, ""),
+      removeNonLatin1Chars(utm_campaign).replace(/[\/\[\]{}()<>.]/g, ""),
     utm_source: utm_source &&
-      removeNonLatin1Chars(utm_source).replace(/[\[\]{}()<>]/g, ""),
+      removeNonLatin1Chars(utm_source).replace(/[\/\[\]{}()<>.]/g, ""),
     utm_medium: utm_medium &&
-      removeNonLatin1Chars(utm_medium).replace(/[\[\]{}()<>]/g, ""),
+      removeNonLatin1Chars(utm_medium).replace(/[\/\[\]{}()<>.]/g, ""),
     utmi_campaign: utmi_campaign && removeNonLatin1Chars(utmi_campaign),
     utmi_page: utmi_page && removeNonLatin1Chars(utmi_page),
     utmi_part: utmi_part && removeNonLatin1Chars(utmi_part),

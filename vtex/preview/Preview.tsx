@@ -66,7 +66,10 @@ export function Indexing() {
             name="props"
             value="eyJrZXkiOiJ2dGV4L3dvcmtmbG93cy9wcm9kdWN0L2luZGV4LnRzIn0"
           />
-          <button style="color: white; background-color: #F71963; border-radius: 4px; padding: 4px 8px">
+          <button
+            type="submit"
+            style="color: white; background-color: #F71963; border-radius: 4px; padding: 4px 8px"
+          >
             Start indexing workflow
           </button>
         </form>

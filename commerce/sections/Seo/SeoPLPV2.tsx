@@ -13,6 +13,11 @@ export interface ConfigJsonLD {
    * @description Remove product videos from structured data
    */
   removeVideos?: boolean;
+  /**
+   * @title Ignore Structured Data
+   * @description By default, Structured Data is sent to everyone. Use this to prevent Structured Data from being sent to your customers, it will still be sent to crawlers and bots. Be aware that some integrations may not work if Structured Data is not sent.
+   */
+  ignoreStructuredData?: boolean;
 }
 
 export interface Props {
@@ -40,7 +45,12 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     descriptionTemplate = "",
     ...seoSiteProps
   } = ctx.seo ?? {};
-  const { title: titleProp, description: descriptionProp, jsonLD } = props;
+  const {
+    title: titleProp,
+    description: descriptionProp,
+    jsonLD,
+    configJsonLD,
+  } = props;
 
   const title = renderTemplateString(
     titleTemplate,
@@ -72,12 +82,16 @@ export function loader(_props: Props, _req: Request, ctx: AppContext) {
     });
   }
 
+  const jsonLDs = (configJsonLD?.ignoreStructuredData && !ctx.isBot) || !jsonLD
+    ? []
+    : [jsonLD];
+
   return {
     ...seoSiteProps,
     title,
     description,
     canonical,
-    jsonLDs: [jsonLD],
+    jsonLDs,
     noIndexing,
   };
 }

@@ -19,6 +19,7 @@ import type {
 import { DEFAULT_IMAGE } from "../../commerce/utils/constants.ts";
 import { formatRange } from "../../commerce/utils/filters.ts";
 import type { PickupPoint as PickupPointVCS } from "./openapi/vcs.openapi.gen.ts";
+import { pick } from "./pickAndOmit.ts";
 import { slugify } from "./slugify.ts";
 import type {
   Brand as BrandVTEX,
@@ -29,7 +30,9 @@ import type {
   Item as SkuVTEX,
   LegacyFacet,
   LegacyItem as LegacySkuVTEX,
+  LegacyProduct,
   LegacyProduct as LegacyProductVTEX,
+  Maybe,
   OrderForm,
   PageType as PageTypeVTEX,
   PickupHolidays,
@@ -81,6 +84,8 @@ interface ProductOptions {
   /** Price coded currency, e.g.: USD, BRL */
   priceCurrency: string;
   imagesByKey?: Map<string, string>;
+  /** Original attributes to be included in the transformed product */
+  includeOriginalAttributes?: string[];
 }
 
 /** Returns first available sku */
@@ -363,6 +368,11 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
   const groupAdditionalProperty = isLegacyProduct(product)
     ? legacyToProductGroupAdditionalProperties(product)
     : toProductGroupAdditionalProperties(product);
+  const originalAttributesAdditionalProperties =
+    toOriginalAttributesAdditionalProperties(
+      options.includeOriginalAttributes,
+      product,
+    );
   const specificationsAdditionalProperty = isLegacySku(sku)
     ? toAdditionalPropertiesLegacy(sku)
     : toAdditionalProperties(sku);
@@ -383,7 +393,10 @@ export const toProduct = <P extends LegacyProductVTEX | ProductVTEX>(
       ),
       url: getProductGroupURL(baseUrl, product).href,
       name: product.productName,
-      additionalProperty: groupAdditionalProperty,
+      additionalProperty: [
+        ...groupAdditionalProperty,
+        ...originalAttributesAdditionalProperties,
+      ],
       model: productReference,
     } satisfies ProductGroup)
     : undefined;
@@ -553,6 +566,27 @@ const toProductGroupAdditionalProperties = (
       )
     )
   );
+
+const toOriginalAttributesAdditionalProperties = (
+  originalAttributes: Maybe<string[]>,
+  product: ProductVTEX | LegacyProduct,
+) => {
+  if (!originalAttributes) {
+    return [];
+  }
+
+  const attributes =
+    pick(originalAttributes as Array<keyof typeof product>, product) ?? {};
+
+  return Object.entries(attributes).map(([name, value]) =>
+    ({
+      "@type": "PropertyValue",
+      name,
+      value,
+      valueReference: "ORIGINAL_PROPERTY" as string,
+    }) as const
+  ) as unknown as PropertyValue[];
+};
 
 const toAdditionalProperties = (sku: SkuVTEX): PropertyValue[] =>
   sku.variations?.flatMap(({ name, values }) =>
@@ -1152,8 +1186,13 @@ function isPickupPointVCS(
   return "name" in pickupPoint;
 }
 
+interface ToPlaceOptions {
+  isActive?: boolean;
+}
+
 export function toPlace(
   pickupPoint: PickupPoint & { distance?: number } | PickupPointVCS,
+  options?: ToPlaceOptions,
 ): Place {
   const {
     name,
@@ -1162,6 +1201,7 @@ export function toPlace(
     longitude,
     openingHoursSpecification,
     specialOpeningHoursSpecification,
+    isActive,
   } = isPickupPointVCS(pickupPoint)
     ? {
       name: pickupPoint.name,
@@ -1174,6 +1214,7 @@ export function toPlace(
       openingHoursSpecification: pickupPoint.businessHours?.map(
         toHoursSpecification,
       ),
+      isActive: pickupPoint.isActive,
     }
     : {
       name: pickupPoint.friendlyName,
@@ -1192,6 +1233,7 @@ export function toPlace(
           openingTime: OpeningTime,
         })
       ),
+      isActive: options?.isActive,
     };
 
   return {
@@ -1210,10 +1252,17 @@ export function toPlace(
     name,
     specialOpeningHoursSpecification,
     openingHoursSpecification,
-    additionalProperty: [{
-      "@type": "PropertyValue",
-      name: "distance",
-      value: `${pickupPoint.distance}`,
-    }],
+    additionalProperty: [
+      {
+        "@type": "PropertyValue",
+        name: "distance",
+        value: `${pickupPoint.distance}`,
+      },
+      {
+        "@type": "PropertyValue",
+        name: "isActive",
+        value: typeof isActive === "boolean" ? `${isActive}` : undefined,
+      },
+    ],
   };
 }

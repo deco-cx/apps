@@ -2,6 +2,7 @@ import type { ProductListingPage } from "../../../commerce/types.ts";
 import { AppContext } from "../../mod.ts";
 import { isGridProductsModel } from "../../utils/paths.ts";
 import {
+  addAuctions,
   toBreadcrumbList,
   toFilters,
   toProduct,
@@ -77,13 +78,18 @@ const loader = async (
   } = forProducts;
   const { Model: { Grid: { Facets } } } = forProducts;
 
-  const products = Products.map((product) =>
-    toProduct(product, product.ProductSelection?.SkuID, {
-      cdn,
-      currency: "BRL",
-      url,
-    })
-  );
+  const leiloes = await ctx.invoke.linx.loaders.auction.apiList();
+
+  const products = Products.map((product) => {
+    return addAuctions(
+      toProduct(product, product.ProductSelection?.SkuID, {
+        cdn,
+        currency: "BRL",
+        url,
+      }),
+      leiloes,
+    );
+  });
 
   return {
     "@type": "ProductListingPage",

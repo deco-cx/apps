@@ -16,6 +16,7 @@ import { withIsSimilarTo } from "../../utils/similars.ts";
 import { parsePageType } from "../../utils/transform.ts";
 import { legacyFacetToFilter, toProduct } from "../../utils/transform.ts";
 import type {
+  AdvancedLoaderConfig,
   Item,
   LegacyFacet,
   LegacyProduct,
@@ -92,6 +93,12 @@ export interface Props {
    * @title Ignore case by checking for selected filter
    */
   ignoreCaseSelected?: boolean;
+
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 
 export const sortOptions = [
@@ -277,6 +284,8 @@ const loader = async (
           {
             baseUrl,
             priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+            includeOriginalAttributes: props.advancedConfigs
+              ?.includeOriginalAttributes,
           },
         )
       )

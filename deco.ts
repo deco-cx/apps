@@ -10,6 +10,9 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("grain"),
+    app("slack"),
+    app("vertex"),
     app("google-sheets"),
     app("posthog"),
     app("decopilot-app"),
@@ -49,6 +52,7 @@ const config = {
     app("decohub"),
     app("htmx"),
     app("sap"),
+    app("tiptap-cloud"),
     ...compatibilityApps,
   ],
 };

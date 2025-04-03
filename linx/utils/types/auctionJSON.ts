@@ -181,7 +181,6 @@ export type Alias =
   | "WarrantyDescription"
   | "LongDescription"
   | "Specifications"
-  | "id_leilao"
   | "SelecionarAro"
   | "Pedra"
   | "rank_products_mostseen"
