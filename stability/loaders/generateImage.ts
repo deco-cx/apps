@@ -8,7 +8,7 @@ import { ASPECT_RATIOS, STYLE_PRESETS } from "../stabilityAiClient.ts";
  */
 export interface Props {
   /**
-   * @description The presigned URL to upload the image to after generation.
+   * @description The presigned URL to upload the image to after generation. Probably can be created with a tool like CREATE_PRESIGNED_URL.
    */
   presignedUrl: string;
   /**

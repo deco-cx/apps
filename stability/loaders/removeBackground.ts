@@ -11,7 +11,7 @@ export interface Props {
    */
   imageUrl: string;
   /**
-   * @description The presigned URL to upload the modified image to
+   * @description The presigned URL to upload the modified image to. Probably can be created with a tool like CREATE_PRESIGNED_URL.
    */
   presignedUrl: string;
 }
