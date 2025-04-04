@@ -35,14 +35,15 @@ export default async function loader(
   const params = new URLSearchParams({
     client_id: CLIENT_ID,
     redirect_uri: REDIRECT_URI,
-    response_type: 'code',
+    response_type: "code",
     scope: SCOPES,
-    state: 'state_parameter_passthrough_value',
-    access_type: 'offline',
-    prompt: 'consent'
+    state: "state_parameter_passthrough_value",
+    access_type: "offline",
+    prompt: "consent",
   });
 
-  const authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  const authorizationUrl =
+    `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 
   if (!accessToken && code) {
     try {

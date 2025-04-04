@@ -18,12 +18,17 @@ export interface VideoListOptions {
   /**
    * Ordenação dos vídeos
    */
-  order?: "date" | "rating" | "relevance" | "title" | "videoCount" | "viewCount";
+  order?:
+    | "date"
+    | "rating"
+    | "relevance"
+    | "title"
+    | "videoCount"
+    | "viewCount";
   /**
    * Filtro por palavra-chave
    */
   q?: string;
-
 
   tokenYoutube?: string;
 }
@@ -52,7 +57,7 @@ export default async function loader(
       part: "snippet,statistics,status",
       id: videoId,
     }, { headers: { Authorization: `Bearer ${accessToken}` } });
-    
+
     return await videoResponse.json();
   }
 
@@ -65,21 +70,21 @@ export default async function loader(
     type: "video",
     pageToken,
   }, { headers: { Authorization: `Bearer ${accessToken}` } });
-  
+
   const searchData = await searchResponse.json();
-  
+
   if (searchData.items && searchData.items.length > 0) {
-    const videoIds = searchData.items.map((item: any) => 
-      item.id.videoId
-    ).join(",");
-    
+    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(
+      ",",
+    );
+
     const detailsResponse = await client["GET /videos"]({
       part: "snippet,statistics,status",
       id: videoIds,
     }, { headers: { Authorization: `Bearer ${accessToken}` } });
-    
+
     const detailsData = await detailsResponse.json();
-    
+
     return {
       kind: "youtube#videoListResponse",
       items: detailsData.items,
@@ -87,6 +92,6 @@ export default async function loader(
       pageInfo: searchData.pageInfo,
     };
   }
-  
+
   return searchData;
-} 
+}

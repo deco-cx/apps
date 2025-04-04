@@ -33,7 +33,9 @@ const action = async (
 
   try {
     // O endereço correto conforme a documentação da API
-    const url = new URL("https://youtube.googleapis.com/youtube/v3/comments/rate");
+    const url = new URL(
+      "https://youtube.googleapis.com/youtube/v3/comments/rate",
+    );
     url.searchParams.append("id", commentId);
     url.searchParams.append("rating", rating);
 
@@ -59,10 +61,14 @@ const action = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Erro ao avaliar comentário: ${response.status} ${response.statusText}`, errorText);
+      console.error(
+        `Erro ao avaliar comentário: ${response.status} ${response.statusText}`,
+        errorText,
+      );
       return {
         success: false,
-        message: `Erro ao avaliar comentário: ${response.status} ${response.statusText}`,
+        message:
+          `Erro ao avaliar comentário: ${response.status} ${response.statusText}`,
         details: errorText || "API retornou erro sem detalhes",
         apiStatus: response.status,
       };
@@ -81,4 +87,4 @@ const action = async (
   }
 };
 
-export default action; 
+export default action;

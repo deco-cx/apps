@@ -20,22 +20,30 @@ const loader = async (
   req: Request,
   _ctx: AppContext,
 ): Promise<YouTubeCommentThreadListResponse | null> => {
-  const { videoId, maxResults = 20, pageToken, order = "time", tokenYoutube } = props;
+  const { videoId, maxResults = 20, pageToken, order = "time", tokenYoutube } =
+    props;
   const cookies = getCookies(req.headers);
-  const accessToken = getAccessToken(req) || tokenYoutube || cookies.youtube_access_token;
+  const accessToken = getAccessToken(req) || tokenYoutube ||
+    cookies.youtube_access_token;
 
   if (!accessToken) {
-    console.error("Autenticação necessária para carregar threads de comentários");
+    console.error(
+      "Autenticação necessária para carregar threads de comentários",
+    );
     return null;
   }
 
   if (!videoId) {
-    console.error("ID do vídeo é obrigatório para carregar threads de comentários");
+    console.error(
+      "ID do vídeo é obrigatório para carregar threads de comentários",
+    );
     return null;
   }
 
   try {
-    const url = new URL("https://youtube.googleapis.com/youtube/v3/commentThreads");
+    const url = new URL(
+      "https://youtube.googleapis.com/youtube/v3/commentThreads",
+    );
     url.searchParams.set("part", "snippet,replies");
     url.searchParams.set("videoId", videoId);
     url.searchParams.set("maxResults", maxResults.toString());
@@ -57,20 +65,26 @@ const loader = async (
           etag: "",
           items: [],
           // Adiciona uma propriedade para indicar que os comentários estão desativados
-          commentsDisabled: true
+          commentsDisabled: true,
         } as YouTubeCommentThreadListResponse;
       }
-      
+
       // Outros erros
-      console.error(`Erro ao carregar threads de comentários: ${response.status} ${response.statusText}`, errorData);
+      console.error(
+        `Erro ao carregar threads de comentários: ${response.status} ${response.statusText}`,
+        errorData,
+      );
       return null;
     }
 
     return await response.json();
   } catch (error) {
-    console.error(`Erro ao carregar threads de comentários para o vídeo ${videoId}:`, error);
+    console.error(
+      `Erro ao carregar threads de comentários para o vídeo ${videoId}:`,
+      error,
+    );
     return null;
   }
 };
 
-export default loader; 
+export default loader;

@@ -52,25 +52,25 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<YoutubeVideoResponse | null> {
-  const { 
+  const {
     videoCategoryId,
-    maxResults = 20, 
+    maxResults = 20,
     pageToken,
     order = "viewCount", // Por padrão, ordenamos por contagem de visualizações para descoberta
     regionCode = "BR", // Por padrão, usamos Brasil como região
     relevanceLanguage = "pt",
     tokenYoutube,
     maxDuration = 60,
-    q = ""
+    q = "",
   } = props;
 
   // Termos de busca específicos para Shorts dependendo da categoria
   let searchQuery = "#shorts";
-  
+
   if (q) {
     searchQuery = `${q} ${searchQuery}`;
   }
-  
+
   // Adiciona termos específicos baseados na categoria
   if (videoCategoryId) {
     switch (videoCategoryId) {
@@ -117,16 +117,20 @@ export default async function loader(
   }
 
   // Utiliza o loader de busca com parâmetros específicos para Shorts
-  return searchVideos({
-    q: searchQuery,
-    maxResults,
-    pageToken,
-    order,
-    videoCategoryId,
-    regionCode,
-    relevanceLanguage,
-    tokenYoutube,
-    onlyShorts: true,
-    maxDuration
-  }, req, ctx);
-} 
+  return searchVideos(
+    {
+      q: searchQuery,
+      maxResults,
+      pageToken,
+      order,
+      videoCategoryId,
+      regionCode,
+      relevanceLanguage,
+      tokenYoutube,
+      onlyShorts: true,
+      maxDuration,
+    },
+    req,
+    ctx,
+  );
+}

@@ -22,11 +22,11 @@ export interface Live {
 
 export enum LiveStatus {
   SCHEDULED = "scheduled", // Agendada, ainda não iniciada
-  LIVE = "live",           // Transmissão em andamento
-  PAUSED = "paused",       // Temporariamente pausada
-  ENDED = "ended",         // Encerrada normalmente
+  LIVE = "live", // Transmissão em andamento
+  PAUSED = "paused", // Temporariamente pausada
+  ENDED = "ended", // Encerrada normalmente
   CANCELLED = "cancelled", // Cancelada antes de iniciar
-  FAILED = "failed"        // Falha técnica
+  FAILED = "failed", // Falha técnica
 }
 
 export interface LiveStats {
@@ -47,4 +47,4 @@ export interface LiveComment {
   timestamp: Date;
   isHighlighted?: boolean;
   isHidden?: boolean;
-} 
+}

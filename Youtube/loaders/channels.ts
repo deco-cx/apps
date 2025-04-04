@@ -25,5 +25,7 @@ export default async function loader(
   }
   const { part = "snippet", id, mine = true } = props;
 
-  return (await client["GET /channels"]({ part, id, mine }, { headers: { Authorization: `Bearer ${accessToken}` } })).json();
+  return (await client["GET /channels"]({ part, id, mine }, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })).json();
 }

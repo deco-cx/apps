@@ -12,7 +12,7 @@ export interface UpdateCategoryOptions {
    * @description ID do vídeo a ser atualizado
    */
   videoId: string;
-  
+
   /**
    * @description ID da categoria do vídeo
    * Categorias comuns:
@@ -34,7 +34,7 @@ export interface UpdateCategoryOptions {
    * 29 - Sem fins lucrativos/ativismo
    */
   categoryId: string;
-  
+
   /**
    * @description Token de acesso do YouTube (opcional)
    */
@@ -98,7 +98,7 @@ export default async function action(
     // Obter o snippet atual para fazer atualizações parciais
     const currentVideo = videoData.items[0];
     const snippet = { ...currentVideo.snippet };
-    
+
     // Atualizar a categoria
     snippet.categoryId = props.categoryId;
 
@@ -146,4 +146,4 @@ export default async function action(
       message: `Erro ao processar a solicitação: ${error.message}`,
     };
   }
-} 
+}

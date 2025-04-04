@@ -1,6 +1,9 @@
 import type { AppContext } from "../../mod.ts";
 import getAccessToken from "../../utils/getAccessToken.ts";
-import type { YoutubeVideoResponse, YouTubeCaptionListResponse } from "../../utils/types.ts";
+import type {
+  YouTubeCaptionListResponse,
+  YoutubeVideoResponse,
+} from "../../utils/types.ts";
 
 export interface VideoDetailsOptions {
   /**
@@ -10,7 +13,15 @@ export interface VideoDetailsOptions {
   /**
    * @description Partes adicionais a serem incluídas na resposta
    */
-  parts?: Array<"snippet" | "statistics" | "contentDetails" | "status" | "player" | "topicDetails" | "recordingDetails">;
+  parts?: Array<
+    | "snippet"
+    | "statistics"
+    | "contentDetails"
+    | "status"
+    | "player"
+    | "topicDetails"
+    | "recordingDetails"
+  >;
 
   /**
    * @description Incluir vídeos privados
@@ -47,7 +58,11 @@ export default async function loader(
     return null;
   }
 
-  const { videoId, parts = ["snippet", "statistics", "status"], includeCaptions = true } = props;
+  const {
+    videoId,
+    parts = ["snippet", "statistics", "status"],
+    includeCaptions = true,
+  } = props;
 
   if (!videoId) {
     console.error("ID do vídeo é obrigatório");
@@ -59,7 +74,9 @@ export default async function loader(
   const videoData = await client["GET /videos"]({
     part: partString,
     id: videoId,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then(res => res.json());
+  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
+    res.json()
+  );
 
   if (!videoData.items || videoData.items.length === 0) {
     console.error(`Vídeo não encontrado: ${videoId}`);
@@ -67,7 +84,7 @@ export default async function loader(
   }
 
   const response: VideoDetailsResponse = {
-    video: videoData
+    video: videoData,
   };
 
   if (includeCaptions) {
@@ -75,8 +92,10 @@ export default async function loader(
       const captionsData = await client["GET /captions"]({
         part: "snippet",
         videoId,
-      }, { headers: { Authorization: `Bearer ${accessToken}` } }).then(res => res.json());
-      
+      }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
+        res.json()
+      );
+
       response.captions = captionsData;
     } catch (error) {
       console.error(`Erro ao buscar legendas para o vídeo ${videoId}:`, error);
@@ -84,4 +103,4 @@ export default async function loader(
   }
 
   return response;
-} 
+}

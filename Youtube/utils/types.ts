@@ -238,22 +238,22 @@ export interface YouTubeCaption {
 }
 
 // Tipos para transmissões ao vivo
-export type LiveBroadcastLifeCycleStatus = 
-  | "complete"     // A transmissão está concluída
-  | "created"      // A transmissão foi criada, mas não está agendada
-  | "live"         // A transmissão está ao vivo
+export type LiveBroadcastLifeCycleStatus =
+  | "complete" // A transmissão está concluída
+  | "created" // A transmissão foi criada, mas não está agendada
+  | "live" // A transmissão está ao vivo
   | "liveStarting" // A transmissão está começando (apenas adquirível, não configurável)
-  | "ready"        // A transmissão está agendada para começar
-  | "revoked"      // A transmissão foi removida
+  | "ready" // A transmissão está agendada para começar
+  | "revoked" // A transmissão foi removida
   | "testStarting" // O teste da transmissão está começando (apenas adquirível, não configurável)
-  | "testing";     // A transmissão está em teste
+  | "testing"; // A transmissão está em teste
 
 export type LiveBroadcastPrivacyStatus = "private" | "public" | "unlisted";
 
-export type LiveStreamStatusState = 
-  | "active"    // O stream está ativo e pronto para uso
-  | "created"   // O stream foi criado, mas não está ativo
-  | "error"     // Houve um erro na criação do stream
+export type LiveStreamStatusState =
+  | "active" // O stream está ativo e pronto para uso
+  | "created" // O stream foi criado, mas não está ativo
+  | "error" // Houve um erro na criação do stream
   | "inactive"; // O stream está inativo
 
 export interface LiveBroadcastSnippet {

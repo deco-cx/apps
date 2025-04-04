@@ -22,7 +22,8 @@ const loader = async (
   const { parentId, maxResults = 20, pageToken, tokenYoutube } = props;
 
   const cookies = getCookies(req.headers);
-  const accessToken = getAccessToken(req) || tokenYoutube || cookies.youtube_access_token;
+  const accessToken = getAccessToken(req) || tokenYoutube ||
+    cookies.youtube_access_token;
 
   if (!accessToken) {
     console.error("Autenticação necessária para carregar comentários");
@@ -35,7 +36,9 @@ const loader = async (
   }
 
   try {
-    const url = new URL("https://youtube.googleapis.com/youtube/v3/commentThreads");
+    const url = new URL(
+      "https://youtube.googleapis.com/youtube/v3/commentThreads",
+    );
     url.searchParams.set("part", "snippet,replies");
     url.searchParams.set("videoId", parentId);
     url.searchParams.set("maxResults", maxResults.toString());
@@ -56,21 +59,27 @@ const loader = async (
           etag: "",
           items: [],
           // Adiciona uma propriedade para indicar que os comentários estão desativados
-          commentsDisabled: true
+          commentsDisabled: true,
         } as YouTubeCommentThreadListResponse;
       }
-      
+
       // Outros erros
-      console.error(`Erro ao carregar comentários: ${response.status} ${response.statusText}`, errorData);
+      console.error(
+        `Erro ao carregar comentários: ${response.status} ${response.statusText}`,
+        errorData,
+      );
       return null;
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(`Erro ao carregar comentários para o vídeo ${parentId}:`, error);
+    console.error(
+      `Erro ao carregar comentários para o vídeo ${parentId}:`,
+      error,
+    );
     return null;
   }
 };
 
-export default loader; 
+export default loader;

@@ -26,7 +26,9 @@ export interface State extends Omit<Props, "apiKey"> {
 export type AppContext = FnContext<State, Manifest>;
 
 export default function App(props: Props) {
-  const apiKey = typeof props.apiKey === "string" ? props.apiKey : props.apiKey?.get?.() ?? "";
+  const apiKey = typeof props.apiKey === "string"
+    ? props.apiKey
+    : props.apiKey?.get?.() ?? "";
   const client = createHttpClient<YoutubeClient>({
     base: "https://www.googleapis.com/youtube/v3",
     headers: new Headers({

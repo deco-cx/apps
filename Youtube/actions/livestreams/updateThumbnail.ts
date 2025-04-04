@@ -7,22 +7,22 @@ export interface UpdateLiveBroadcastThumbnailParams {
    * @description ID da transmissão ao vivo
    */
   broadcastId: string;
-  
+
   /**
    * @description URL da imagem ou base64 da imagem para a miniatura
    */
   thumbnailUrl?: string;
-  
+
   /**
    * @description Dados binários da imagem (se não usar URL)
    */
   thumbnailData?: Uint8Array;
-  
+
   /**
    * @description Tipo MIME da imagem (e.g., 'image/jpeg', 'image/png')
    */
   mimeType?: string;
-  
+
   /**
    * @description Token de autorização do YouTube (opcional)
    */
@@ -46,50 +46,51 @@ export default async function action(
   req: Request,
   _ctx: AppContext,
 ): Promise<UpdateLiveBroadcastThumbnailResult> {
-  const { 
+  const {
     broadcastId,
     thumbnailUrl,
     thumbnailData,
     mimeType = "image/jpeg",
-    tokenYoutube
+    tokenYoutube,
   } = props;
-  
+
   const accessToken = tokenYoutube || getAccessToken(req);
-  
+
   if (!accessToken) {
     return {
       success: false,
-      message: "Token de autenticação não encontrado"
+      message: "Token de autenticação não encontrado",
     };
   }
-  
+
   if (!broadcastId) {
     return {
       success: false,
-      message: "ID da transmissão é obrigatório"
+      message: "ID da transmissão é obrigatório",
     };
   }
-  
+
   if (!thumbnailUrl && !thumbnailData) {
     return {
       success: false,
-      message: "É necessário fornecer URL ou dados da imagem"
+      message: "É necessário fornecer URL ou dados da imagem",
     };
   }
-  
+
   try {
     let imageData: Uint8Array;
-    
+
     // Obter os dados da imagem, seja de URL ou diretamente
     if (thumbnailUrl) {
       const imageResponse = await fetch(thumbnailUrl);
       if (!imageResponse.ok) {
         return {
           success: false,
-          message: `Erro ao baixar imagem da URL: ${imageResponse.status} ${imageResponse.statusText}`
+          message:
+            `Erro ao baixar imagem da URL: ${imageResponse.status} ${imageResponse.statusText}`,
         };
       }
-      
+
       const buffer = await imageResponse.arrayBuffer();
       imageData = new Uint8Array(buffer);
     } else if (thumbnailData) {
@@ -97,50 +98,54 @@ export default async function action(
     } else {
       return {
         success: false,
-        message: "Dados da imagem não disponíveis"
+        message: "Dados da imagem não disponíveis",
       };
     }
-    
+
     // Construir a URL para upload da miniatura
-    const url = new URL(`https://youtube.googleapis.com/upload/youtube/v3/liveBroadcasts/thumbnails`);
+    const url = new URL(
+      `https://youtube.googleapis.com/upload/youtube/v3/liveBroadcasts/thumbnails`,
+    );
     url.searchParams.append("uploadType", "media");
     url.searchParams.append("broadcastId", broadcastId);
-    
+
     // Enviar a imagem
     const uploadResponse = await fetch(url.toString(), {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${accessToken}`,
         "Content-Type": mimeType,
-        "Content-Length": imageData.length.toString()
+        "Content-Length": imageData.length.toString(),
       },
-      body: imageData
+      body: imageData,
     });
-    
+
     if (!uploadResponse.ok) {
       const errorData = await uploadResponse.text();
       console.error("Erro ao enviar miniatura:", errorData);
       return {
         success: false,
-        message: `Erro ao enviar miniatura: ${uploadResponse.status} ${uploadResponse.statusText}`,
-        error: errorData
+        message:
+          `Erro ao enviar miniatura: ${uploadResponse.status} ${uploadResponse.statusText}`,
+        error: errorData,
       };
     }
-    
+
     const responseData = await uploadResponse.json();
-    
+
     return {
       success: true,
       message: "Miniatura atualizada com sucesso",
-      thumbnails: responseData.items?.[0] || responseData
+      thumbnails: responseData.items?.[0] || responseData,
     };
-    
   } catch (error) {
     console.error("Erro ao atualizar miniatura:", error);
     return {
       success: false,
-      message: `Erro ao atualizar miniatura: ${error.message || "Erro desconhecido"}`,
-      error
+      message: `Erro ao atualizar miniatura: ${
+        error.message || "Erro desconhecido"
+      }`,
+      error,
     };
   }
-} 
+}

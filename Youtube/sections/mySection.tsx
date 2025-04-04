@@ -26,14 +26,14 @@ export async function loader(
     dataUser.channelData.length > 0
   ) {
     console.log("iniciando loader mySection, dataUser: ", dataUser);
-      videoData = await ctx.invoke.Youtube.loaders.videos.listChannel({
-        channelId: dataUser.channelData[0].id,
-        maxResults: 10,
-        includePrivate: true,
-        pageToken: "",
-        order: "date",
-      });
-      console.log("videoData", videoData);
+    videoData = await ctx.invoke.Youtube.loaders.videos.listChannel({
+      channelId: dataUser.channelData[0].id,
+      maxResults: 10,
+      includePrivate: true,
+      pageToken: "",
+      order: "date",
+    });
+    console.log("videoData", videoData);
   }
 
   // Define a aba ativa a partir dos parâmetros da requisição ou usa "channels" como padrão

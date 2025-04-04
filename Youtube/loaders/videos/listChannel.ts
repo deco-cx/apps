@@ -19,7 +19,13 @@ export interface ChannelVideosOptions {
   /**
    * @description Order the videos
    */
-  order?: "date" | "rating" | "relevance" | "title" | "videoCount" | "viewCount";
+  order?:
+    | "date"
+    | "rating"
+    | "relevance"
+    | "title"
+    | "videoCount"
+    | "viewCount";
   /**
    * @description Include private videos (requires appropriate authorization)
    */
@@ -45,7 +51,13 @@ export default async function loader(
     return null;
   }
 
-  const { channelId, maxResults = 10, pageToken, order = "date", includePrivate = true } = props;
+  const {
+    channelId,
+    maxResults = 10,
+    pageToken,
+    order = "date",
+    includePrivate = true,
+  } = props;
 
   if (!channelId) {
     console.error("ID do canal é obrigatório");
@@ -59,47 +71,54 @@ export default async function loader(
         maxResults,
         pageToken,
         order,
-        q: "" 
+        q: "",
       },
       req,
-      ctx
+      ctx,
     );
   }
 
   const channelData = await client["GET /channels"]({
     part: "contentDetails",
     id: channelId,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then(res => res.json());
-  
+  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
+    res.json()
+  );
+
   if (!channelData.items || channelData.items.length === 0) {
     console.error(`Canal não encontrado: ${channelId}`);
     return null;
   }
-  
-  const uploadsPlaylistId = channelData?.items[0]?.contentDetails?.relatedPlaylists?.uploads;
+
+  const uploadsPlaylistId = channelData?.items[0]?.contentDetails
+    ?.relatedPlaylists?.uploads;
 
   if (!uploadsPlaylistId) {
-    console.error(`Playlist de uploads não encontrada para o canal: ${channelId}`);
+    console.error(
+      `Playlist de uploads não encontrada para o canal: ${channelId}`,
+    );
     return null;
   }
-  
+
   // Busca os vídeos da playlist de uploads
   const data = await client["GET /playlistItems"]({
     part: "snippet,status",
     playlistId: uploadsPlaylistId,
     maxResults,
     pageToken,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then(res => res.json());
-  
+  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
+    res.json()
+  );
+
   // Certifica que temos items antes de processar
   if (!data.items || data.items.length === 0) {
     return {
       kind: "youtube#videoListResponse",
       items: [],
-      pageInfo: { totalResults: 0, resultsPerPage: 0 }
+      pageInfo: { totalResults: 0, resultsPerPage: 0 },
     };
   }
-  
+
   // Formata a resposta
   const response = {
     kind: "youtube#videoListResponse",
@@ -110,16 +129,18 @@ export default async function loader(
     nextPageToken: data.nextPageToken,
     pageInfo: data.pageInfo,
   };
-  
+
   // Busca detalhes adicionais (estatísticas) para todos os vídeos em uma única chamada
   if (response.items.length > 0) {
     const videoIds = response.items.map((item) => item.id).join(",");
-    
+
     const detailsData = await client["GET /videos"]({
       part: "snippet,statistics,status",
       id: videoIds,
-    }, { headers: { Authorization: `Bearer ${accessToken}` } }).then(res => res.json());
-    
+    }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
+      res.json()
+    );
+
     if (detailsData.items && detailsData.items.length > 0) {
       response.items = detailsData.items;
     }

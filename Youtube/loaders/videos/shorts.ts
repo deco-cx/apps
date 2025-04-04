@@ -52,29 +52,33 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<YoutubeVideoResponse | null> {
-  const { 
-    q, 
-    maxResults = 10, 
+  const {
+    q,
+    maxResults = 10,
     pageToken,
     order = "relevance",
     channelId,
     tokenYoutube,
     maxDuration = 60,
     publishedAfter,
-    publishedBefore
+    publishedBefore,
   } = props;
 
   // Utiliza o loader de busca com parâmetros específicos para Shorts
-  return searchVideos({
-    q,
-    maxResults,
-    pageToken,
-    order,
-    channelId,
-    tokenYoutube,
-    onlyShorts: true,
-    maxDuration,
-    publishedAfter,
-    publishedBefore
-  }, req, ctx);
-} 
+  return searchVideos(
+    {
+      q,
+      maxResults,
+      pageToken,
+      order,
+      channelId,
+      tokenYoutube,
+      onlyShorts: true,
+      maxDuration,
+      publishedAfter,
+      publishedBefore,
+    },
+    req,
+    ctx,
+  );
+}

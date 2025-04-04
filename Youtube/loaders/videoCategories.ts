@@ -6,7 +6,7 @@ export interface VideoCategoriesOptions {
    * @description Código de região (padrão: BR)
    */
   regionCode?: string;
-  
+
   /**
    * @description Token de acesso do YouTube (opcional)
    */
@@ -38,7 +38,7 @@ export default async function loader(
   _ctx: AppContext,
 ): Promise<VideoCategoriesResponse | null> {
   const { regionCode = "BR", tokenYoutube } = props;
-  
+
   // Obter o token de acesso
   const accessToken = getAccessToken(req) || tokenYoutube;
 
@@ -49,8 +49,9 @@ export default async function loader(
 
   try {
     // Construir a URL para buscar as categorias de vídeos
-    const url = `https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=${regionCode}`;
-    
+    const url =
+      `https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=${regionCode}`;
+
     // Buscar as categorias
     const response = await fetch(url, {
       headers: {
@@ -60,23 +61,26 @@ export default async function loader(
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error(`Erro ao buscar categorias de vídeos: ${response.status} ${response.statusText}`, errorData);
+      console.error(
+        `Erro ao buscar categorias de vídeos: ${response.status} ${response.statusText}`,
+        errorData,
+      );
       return null;
     }
 
     // Retornar os dados das categorias
     const categoriesData = await response.json();
-    
+
     // Ordenar categorias por ID numérico
     if (categoriesData.items) {
-      categoriesData.items.sort((a: VideoCategory, b: VideoCategory) => 
+      categoriesData.items.sort((a: VideoCategory, b: VideoCategory) =>
         parseInt(a.id, 10) - parseInt(b.id, 10)
       );
     }
-    
+
     return categoriesData;
   } catch (error) {
     console.error("Erro ao buscar categorias de vídeos:", error);
     return null;
   }
-} 
+}

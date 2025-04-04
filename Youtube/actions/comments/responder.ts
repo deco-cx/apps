@@ -51,10 +51,14 @@ const action = async (
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Erro ao responder comentário: ${response.status} ${response.statusText}`, errorText);
+      console.error(
+        `Erro ao responder comentário: ${response.status} ${response.statusText}`,
+        errorText,
+      );
       return {
         success: false,
-        message: `Erro ao responder comentário: ${response.status} ${response.statusText}`,
+        message:
+          `Erro ao responder comentário: ${response.status} ${response.statusText}`,
         details: errorText,
       };
     }
@@ -74,4 +78,4 @@ const action = async (
   }
 };
 
-export default action; 
+export default action;

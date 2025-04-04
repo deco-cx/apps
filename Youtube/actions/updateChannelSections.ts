@@ -5,33 +5,46 @@ export interface ChannelSection {
   /**
    * @description Tipo da seção (uploads, singlePlaylist, recentUploads, etc.)
    */
-  type: "allPlaylists" | "completedEvents" | "likedPlaylists" | "likes" | "liveEvents" | "multipleChannels" | "multiplePlaylists" | "popularUploads" | "recentUploads" | "singlePlaylist" | "subscriptions" | "upcomingEvents" | "uploads";
-  
+  type:
+    | "allPlaylists"
+    | "completedEvents"
+    | "likedPlaylists"
+    | "likes"
+    | "liveEvents"
+    | "multipleChannels"
+    | "multiplePlaylists"
+    | "popularUploads"
+    | "recentUploads"
+    | "singlePlaylist"
+    | "subscriptions"
+    | "upcomingEvents"
+    | "uploads";
+
   /**
    * @description Estilo da seção (horizontalRow, verticalList)
    */
   style?: "horizontalRow" | "verticalList";
-  
+
   /**
    * @description Título da seção (opcional)
    */
   title?: string;
-  
+
   /**
    * @description ID(s) da(s) playlist(s) para a seção (obrigatório para tipo singlePlaylist e multiplePlaylists)
    */
   playlists?: string[];
-  
+
   /**
    * @description ID(s) do(s) canal(is) para a seção (obrigatório para tipo multipleChannels)
    */
   channels?: string[];
-  
+
   /**
    * @description Posição da seção (0 = topo, as seções são exibidas em ordem crescente)
    */
   position?: number;
-  
+
   /**
    * @description A seção deve ser visível para usuários não inscritos no canal
    */
@@ -43,12 +56,12 @@ export interface UpdateChannelSectionsOptions {
    * @description Seções a serem configuradas para o canal (adicionar ou atualizar)
    */
   sections: ChannelSection[];
-  
+
   /**
    * @description IDs de seções a serem removidas (opcional)
    */
   removeSectionIds?: string[];
-  
+
   /**
    * @description Token de acesso do YouTube (opcional)
    */
@@ -73,20 +86,24 @@ export default async function action(
   _ctx: AppContext,
 ): Promise<UpdateChannelSectionsResult> {
   const { sections, removeSectionIds, tokenYoutube } = props;
-  
+
   if (!sections || sections.length === 0) {
     console.error("Nenhuma seção fornecida");
-    return { success: false, message: "É necessário fornecer pelo menos uma seção para adicionar/atualizar" };
+    return {
+      success: false,
+      message:
+        "É necessário fornecer pelo menos uma seção para adicionar/atualizar",
+    };
   }
-  
+
   // Obter o token de acesso
   const accessToken = tokenYoutube || getAccessToken(req);
-  
+
   if (!accessToken) {
     console.error("Token de acesso não encontrado");
     return { success: false, message: "Autenticação necessária" };
   }
-  
+
   try {
     // Primeiro, obter as seções atuais para saber quais adicionar e quais atualizar
     const getResponse = await fetch(
@@ -95,26 +112,27 @@ export default async function action(
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      }
+      },
     );
-    
+
     if (!getResponse.ok) {
       const errorText = await getResponse.text();
       console.error("Erro ao obter seções do canal:", errorText);
       return {
         success: false,
-        message: `Erro ao obter seções do canal: ${getResponse.status} ${getResponse.statusText}`,
+        message:
+          `Erro ao obter seções do canal: ${getResponse.status} ${getResponse.statusText}`,
       };
     }
-    
+
     const sectionsData = await getResponse.json();
     const currentSections = sectionsData.items || [];
-    
+
     // Arrays para armazenar os resultados das operações
     const addedSections: any[] = [];
     const updatedSections: any[] = [];
     const removeResults: string[] = [];
-    
+
     // Processar cada seção fornecida
     for (const section of sections) {
       // Preparar o objeto de seção para a API
@@ -125,41 +143,45 @@ export default async function action(
         },
         contentDetails: {},
       };
-      
+
       // Adicionar propriedades opcionais
       if (section.title) {
         sectionBody.snippet.title = section.title;
       }
-      
+
       if (section.position !== undefined) {
         sectionBody.snippet.position = section.position;
       }
-      
+
       // Por padrão, mostrar para todos
       const localizable = {
-        defaultLanguage: "pt-BR"
+        defaultLanguage: "pt-BR",
       };
       sectionBody.localizations = { "pt-BR": localizable };
-      
+
       // Configurar visibilidade da seção
-      sectionBody.snippet.targetChannelId = "UC";  // Representa o próprio canal
-      
+      sectionBody.snippet.targetChannelId = "UC"; // Representa o próprio canal
+
       // Configurar para mostrar para usuários não inscritos (opcional)
       if (section.showForNotSubscribed !== undefined) {
         // Se for true, configuramos para mostrar para todos
         // Se for false, só mostra para inscritos
-        sectionBody.snippet.showForNonSubscribers = section.showForNotSubscribed;
+        sectionBody.snippet.showForNonSubscribers =
+          section.showForNotSubscribed;
       }
-      
+
       // Adicionar playlists ou canais conforme o tipo da seção
-      if ((section.type === "singlePlaylist" || section.type === "multiplePlaylists") && section.playlists?.length) {
+      if (
+        (section.type === "singlePlaylist" ||
+          section.type === "multiplePlaylists") && section.playlists?.length
+      ) {
         sectionBody.contentDetails.playlists = section.playlists;
       }
-      
+
       if (section.type === "multipleChannels" && section.channels?.length) {
         sectionBody.contentDetails.channels = section.channels;
       }
-      
+
       // Enviar a requisição para adicionar ou atualizar a seção
       // Por simplicidade, sempre adicionamos novas seções
       const addResponse = await fetch(
@@ -171,18 +193,21 @@ export default async function action(
             "Content-Type": "application/json",
           },
           body: JSON.stringify(sectionBody),
-        }
+        },
       );
-      
+
       if (!addResponse.ok) {
-        console.error(`Erro ao adicionar seção de tipo ${section.type}:`, await addResponse.text());
+        console.error(
+          `Erro ao adicionar seção de tipo ${section.type}:`,
+          await addResponse.text(),
+        );
         continue; // Continuar com as outras seções
       }
-      
+
       const addedSection = await addResponse.json();
       addedSections.push(addedSection);
     }
-    
+
     // Processar remoções de seções, se solicitado
     if (removeSectionIds && removeSectionIds.length > 0) {
       for (const sectionId of removeSectionIds) {
@@ -193,41 +218,48 @@ export default async function action(
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-          }
+          },
         );
-        
+
         if (deleteResponse.ok) {
           removeResults.push(sectionId);
         } else {
-          console.error(`Erro ao remover seção ${sectionId}:`, await deleteResponse.text());
+          console.error(
+            `Erro ao remover seção ${sectionId}:`,
+            await deleteResponse.text(),
+          );
         }
       }
     }
-    
+
     // Preparar o resultado da operação
     const result: UpdateChannelSectionsResult = {
       success: true,
-      message: `Operação concluída: ${addedSections.length} seções adicionadas, ${removeResults.length} seções removidas`,
+      message:
+        `Operação concluída: ${addedSections.length} seções adicionadas, ${removeResults.length} seções removidas`,
     };
-    
+
     if (addedSections.length > 0) {
       result.addedSections = addedSections;
     }
-    
+
     if (updatedSections.length > 0) {
       result.updatedSections = updatedSections;
     }
-    
+
     if (removeResults.length > 0) {
       result.removedSections = removeResults;
     }
-    
+
     return result;
   } catch (error) {
-    console.error("Erro ao processar a configuração das seções do canal:", error);
+    console.error(
+      "Erro ao processar a configuração das seções do canal:",
+      error,
+    );
     return {
       success: false,
       message: `Erro ao processar a solicitação: ${error.message}`,
     };
   }
-} 
+}

@@ -6,27 +6,27 @@ export interface AudienceAnalyticsOptions {
    * @description ID do canal no formato "channel==CANAL_ID"
    */
   channelId: string;
-  
+
   /**
    * @description Data de início da consulta (formato: YYYY-MM-DD)
    */
   startDate: string;
-  
+
   /**
    * @description Data de término da consulta (formato: YYYY-MM-DD)
    */
   endDate: string;
-  
+
   /**
    * @description Dimensões para segmentação demográfica (age,gender,country)
    */
   dimensions?: string;
-  
+
   /**
    * @description Campo para ordenação dos resultados
    */
   sort?: string;
-  
+
   /**
    * @description Token de acesso do YouTube (opcional)
    */
@@ -65,7 +65,7 @@ export default async function loader(
     sort = "-viewerPercentage",
     tokenYoutube,
   } = props;
-  
+
   // Obter o token de acesso
   const accessToken = getAccessToken(req) || tokenYoutube;
 
@@ -103,17 +103,17 @@ export default async function loader(
         countries: {},
       },
     };
-    
+
     // Separar dimensões para fazer chamadas independentes
-    const dimensionsArray = dimensions.split(",").map(d => d.trim());
-    
+    const dimensionsArray = dimensions.split(",").map((d) => d.trim());
+
     for (const dimension of dimensionsArray) {
       // Construir URL da requisição para cada dimensão
       let url = "https://youtubeanalytics.googleapis.com/v2/reports";
-      
+
       // Métricas específicas para dados demográficos
       const metrics = "viewerPercentage";
-      
+
       // Adicionar parâmetros obrigatórios
       const params = new URLSearchParams({
         ids: channelId,
@@ -123,9 +123,9 @@ export default async function loader(
         dimensions: dimension,
         sort,
       });
-      
+
       url += `?${params.toString()}`;
-      
+
       // Fazer a requisição para a API do YouTube Analytics
       const response = await fetch(url, {
         headers: {
@@ -134,22 +134,24 @@ export default async function loader(
       });
 
       if (!response.ok) {
-        console.error(`Erro ao buscar dados de ${dimension}: ${response.status} ${response.statusText}`);
+        console.error(
+          `Erro ao buscar dados de ${dimension}: ${response.status} ${response.statusText}`,
+        );
         continue;
       }
 
       // Processar os dados desta dimensão
       const dimensionData = await response.json();
-      
+
       if (dimensionData.rows && dimensionData.rows.length > 0) {
         // Guardar os headers e rows originais apenas na primeira chamada bem-sucedida
         if (audienceData.columnHeaders.length === 0) {
           audienceData.columnHeaders = dimensionData.columnHeaders;
         }
-        
+
         // Adicionar todas as linhas aos dados brutos
         audienceData.rows = audienceData.rows.concat(dimensionData.rows);
-        
+
         // Processar os dados específicos para cada tipo de dimensão
         if (dimension === "ageGroup") {
           dimensionData.rows.forEach((row: any[]) => {
@@ -172,10 +174,10 @@ export default async function loader(
         }
       }
     }
-    
+
     return audienceData;
   } catch (error) {
     console.error("Erro ao buscar dados de audiência:", error);
     return null;
   }
-} 
+}

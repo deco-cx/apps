@@ -44,23 +44,25 @@ export default async function loader(
     const captionsData = await client["GET /captions"]({
       part: "snippet",
       videoId,
-    }, { headers: { Authorization: `Bearer ${accessToken}` } }).then(res => res.json());
+    }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
+      res.json()
+    );
 
     if (!captionsData.items || captionsData.items.length === 0) {
       return {
         kind: "youtube#captionListResponse",
         etag: "",
-        items: []
+        items: [],
       };
     }
-    
+
     return captionsData;
   } catch (error) {
     console.error(`Erro ao buscar legendas para o vídeo ${videoId}:`, error);
     return {
       kind: "youtube#captionListResponse",
       etag: "",
-      items: []
+      items: [],
     };
   }
-} 
+}

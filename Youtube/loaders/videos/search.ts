@@ -1,6 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import getAccessToken from "../../utils/getAccessToken.ts";
-import type { YoutubeVideoResponse, VideoQuery } from "../../utils/types.ts";
+import type { VideoQuery, YoutubeVideoResponse } from "../../utils/types.ts";
 import { getCookies } from "@std/http";
 
 export interface VideoSearchOptions {
@@ -76,15 +76,16 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<YoutubeVideoResponse | null> {
   const client = ctx.api;
-  
+
   const cookies = getCookies(req.headers);
-  const accessToken = props.tokenYoutube || getAccessToken(req) || cookies.youtube_access_token;
-  
-  const { 
-    q, 
-    maxResults = 10, 
-    pageToken, 
-    order = "relevance", 
+  const accessToken = props.tokenYoutube || getAccessToken(req) ||
+    cookies.youtube_access_token;
+
+  const {
+    q,
+    maxResults = 10,
+    pageToken,
+    order = "relevance",
     channelId,
     publishedAfter,
     publishedBefore,
@@ -94,7 +95,7 @@ export default async function loader(
     includePrivate = false,
     onlyShorts = false,
     excludeShorts = false,
-    maxDuration
+    maxDuration,
   } = props;
 
   if (!q) {
@@ -104,7 +105,9 @@ export default async function loader(
 
   // Validação para evitar configurações conflitantes
   if (onlyShorts && excludeShorts) {
-    console.error("Configuração inválida: não é possível definir onlyShorts e excludeShorts simultaneamente");
+    console.error(
+      "Configuração inválida: não é possível definir onlyShorts e excludeShorts simultaneamente",
+    );
     return null;
   }
 
@@ -123,29 +126,29 @@ export default async function loader(
   if (videoCategoryId) searchParams.videoCategoryId = videoCategoryId;
   if (regionCode) searchParams.regionCode = regionCode;
   if (relevanceLanguage) searchParams.relevanceLanguage = relevanceLanguage;
-  
+
   // Aplicar videoDuration=short na busca quando filtrando por Shorts
   if (onlyShorts) {
     searchParams.videoDuration = "short"; // Vídeos curtos (< 4 minutos)
   }
-  
+
   // Se tem token de acesso e quer incluir vídeos privados
   if (accessToken && includePrivate) {
     searchParams.forMine = true;
   }
 
   try {
-    const requestOptions = accessToken 
-      ? { headers: { Authorization: `Bearer ${accessToken}` } } 
+    const requestOptions = accessToken
+      ? { headers: { Authorization: `Bearer ${accessToken}` } }
       : undefined;
-      
+
     if (onlyShorts) console.log("Filtrando apenas por Shorts");
     if (excludeShorts) console.log("Excluindo Shorts dos resultados");
-      
+
     const searchData = await client["GET /search"](
-      searchParams, 
-      requestOptions
-    ).then(res => res.json());
+      searchParams,
+      requestOptions,
+    ).then((res) => res.json());
 
     if (!searchData.items || searchData.items.length === 0) {
       console.log("Nenhum resultado encontrado para a busca");
@@ -153,14 +156,16 @@ export default async function loader(
         kind: "youtube#videoListResponse",
         items: [],
         pageInfo: searchData.pageInfo || { totalResults: 0, resultsPerPage: 0 },
-        regionCode: searchData.regionCode
+        regionCode: searchData.regionCode,
       };
     }
 
-    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(",");
+    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(
+      ",",
+    );
 
-    const detailsOptions = accessToken 
-      ? { headers: { Authorization: `Bearer ${accessToken}` } } 
+    const detailsOptions = accessToken
+      ? { headers: { Authorization: `Bearer ${accessToken}` } }
       : undefined;
 
     // Para identificar Shorts corretamente, precisamos das dimensões e duração do vídeo
@@ -170,48 +175,48 @@ export default async function loader(
     };
 
     const detailsData = await client["GET /videos"](
-      detailsParams, 
-      detailsOptions
-    ).then(res => res.json());
+      detailsParams,
+      detailsOptions,
+    ).then((res) => res.json());
 
     let items = detailsData.items || [];
-    
+
     // Processa itens para identificar e filtrar Shorts
     if (items.length > 0) {
       // Marca os itens que são Shorts baseado na duração e dimensões do vídeo
-      items = items.map(item => {
+      items = items.map((item) => {
         // Extrai a duração em segundos do formato ISO 8601 (PT1M30S)
         const duration = item.contentDetails?.duration || "PT0S";
         const durationInSeconds = calculateDurationInSeconds(duration);
-        
+
         // Um vídeo é considerado Short se tiver menos de 60 segundos
         const isShort = durationInSeconds <= 60;
-        
+
         // Adiciona informação se é Short
         return {
           ...item,
           isShort,
-          durationInSeconds
+          durationInSeconds,
         };
       });
-      
+
       // Filtrar apenas Shorts
       if (onlyShorts) {
-        items = items.filter(item => item.isShort);
+        items = items.filter((item) => item.isShort);
         items = items.slice(0, maxResults); // Limita ao número original solicitado
       }
-      
+
       // Excluir Shorts dos resultados
       if (excludeShorts) {
-        items = items.filter(item => !item.isShort);
+        items = items.filter((item) => !item.isShort);
       }
-      
+
       // Filtrar por duração máxima
       if (maxDuration) {
-        items = items.filter(item => item.durationInSeconds <= maxDuration);
+        items = items.filter((item) => item.durationInSeconds <= maxDuration);
       }
     }
-    
+
     const response: YoutubeVideoResponse = {
       kind: "youtube#videoListResponse",
       items,
@@ -219,12 +224,12 @@ export default async function loader(
       prevPageToken: searchData.prevPageToken,
       pageInfo: {
         totalResults: items.length,
-        resultsPerPage: items.length
+        resultsPerPage: items.length,
       },
       regionCode: searchData.regionCode,
-      isAuthenticated: !!accessToken
+      isAuthenticated: !!accessToken,
     };
-    
+
     return response;
   } catch (error) {
     console.error("Erro ao buscar vídeos:", error);
@@ -238,19 +243,19 @@ export default async function loader(
 function calculateDurationInSeconds(isoDuration: string): number {
   // Remove o prefixo PT
   const duration = isoDuration.substring(2);
-  
+
   let seconds = 0;
   let minutes = 0;
   let hours = 0;
-  
+
   // Extrai horas, minutos e segundos
   const hoursMatch = duration.match(/(\d+)H/);
   const minutesMatch = duration.match(/(\d+)M/);
   const secondsMatch = duration.match(/(\d+)S/);
-  
+
   if (hoursMatch) hours = parseInt(hoursMatch[1]);
   if (minutesMatch) minutes = parseInt(minutesMatch[1]);
   if (secondsMatch) seconds = parseInt(secondsMatch[1]);
-  
+
   return hours * 3600 + minutes * 60 + seconds;
-} 
+}
