@@ -22,11 +22,13 @@ import * as $$$$$$$$$16 from "./actions/cart/updateUser.ts";
 import * as $$$$$$$$$17 from "./actions/masterdata/createDocument.ts";
 import * as $$$$$$$$$18 from "./actions/masterdata/updateDocument.ts";
 import * as $$$$$$$$$19 from "./actions/newsletter/subscribe.ts";
-import * as $$$$$$$$$20 from "./actions/notifyme.ts";
-import * as $$$$$$$$$21 from "./actions/review/submit.ts";
-import * as $$$$$$$$$22 from "./actions/trigger.ts";
-import * as $$$$$$$$$23 from "./actions/wishlist/addItem.ts";
-import * as $$$$$$$$$24 from "./actions/wishlist/removeItem.ts";
+import * as $$$$$$$$$20 from "./actions/newsletter/updateNewsletterOptIn.ts";
+import * as $$$$$$$$$21 from "./actions/notifyme.ts";
+import * as $$$$$$$$$22 from "./actions/profile/updateProfile.ts";
+import * as $$$$$$$$$23 from "./actions/review/submit.ts";
+import * as $$$$$$$$$24 from "./actions/trigger.ts";
+import * as $$$$$$$$$25 from "./actions/wishlist/addItem.ts";
+import * as $$$$$$$$$26 from "./actions/wishlist/removeItem.ts";
 import * as $$$$0 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/cart.ts";
 import * as $$$1 from "./loaders/categories/tree.ts";
@@ -62,12 +64,13 @@ import * as $$$30 from "./loaders/product/extensions/list.ts";
 import * as $$$31 from "./loaders/product/extensions/listingPage.ts";
 import * as $$$32 from "./loaders/product/extensions/suggestions.ts";
 import * as $$$33 from "./loaders/product/wishlist.ts";
-import * as $$$34 from "./loaders/promotion/getPromotionById.ts";
-import * as $$$35 from "./loaders/proxy.ts";
-import * as $$$36 from "./loaders/user.ts";
-import * as $$$37 from "./loaders/wishlist.ts";
-import * as $$$38 from "./loaders/workflow/product.ts";
-import * as $$$39 from "./loaders/workflow/products.ts";
+import * as $$$34 from "./loaders/profile/getUserProfile.ts";
+import * as $$$35 from "./loaders/promotion/getPromotionById.ts";
+import * as $$$36 from "./loaders/proxy.ts";
+import * as $$$37 from "./loaders/user.ts";
+import * as $$$38 from "./loaders/wishlist.ts";
+import * as $$$39 from "./loaders/workflow/product.ts";
+import * as $$$40 from "./loaders/workflow/products.ts";
 import * as $$$$$$0 from "./sections/Analytics/Vtex.tsx";
 import * as $$$$$$$$$$0 from "./workflows/events.ts";
 import * as $$$$$$$$$$1 from "./workflows/product/index.ts";
@@ -108,12 +111,13 @@ const manifest = {
     "vtex/loaders/product/extensions/listingPage.ts": $$$31,
     "vtex/loaders/product/extensions/suggestions.ts": $$$32,
     "vtex/loaders/product/wishlist.ts": $$$33,
-    "vtex/loaders/promotion/getPromotionById.ts": $$$34,
-    "vtex/loaders/proxy.ts": $$$35,
-    "vtex/loaders/user.ts": $$$36,
-    "vtex/loaders/wishlist.ts": $$$37,
-    "vtex/loaders/workflow/product.ts": $$$38,
-    "vtex/loaders/workflow/products.ts": $$$39,
+    "vtex/loaders/profile/getUserProfile.ts": $$$34,
+    "vtex/loaders/promotion/getPromotionById.ts": $$$35,
+    "vtex/loaders/proxy.ts": $$$36,
+    "vtex/loaders/user.ts": $$$37,
+    "vtex/loaders/wishlist.ts": $$$38,
+    "vtex/loaders/workflow/product.ts": $$$39,
+    "vtex/loaders/workflow/products.ts": $$$40,
   },
   "handlers": {
     "vtex/handlers/sitemap.ts": $$$$0,
@@ -142,11 +146,13 @@ const manifest = {
     "vtex/actions/masterdata/createDocument.ts": $$$$$$$$$17,
     "vtex/actions/masterdata/updateDocument.ts": $$$$$$$$$18,
     "vtex/actions/newsletter/subscribe.ts": $$$$$$$$$19,
-    "vtex/actions/notifyme.ts": $$$$$$$$$20,
-    "vtex/actions/review/submit.ts": $$$$$$$$$21,
-    "vtex/actions/trigger.ts": $$$$$$$$$22,
-    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$23,
-    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$24,
+    "vtex/actions/newsletter/updateNewsletterOptIn.ts": $$$$$$$$$20,
+    "vtex/actions/notifyme.ts": $$$$$$$$$21,
+    "vtex/actions/profile/updateProfile.ts": $$$$$$$$$22,
+    "vtex/actions/review/submit.ts": $$$$$$$$$23,
+    "vtex/actions/trigger.ts": $$$$$$$$$24,
+    "vtex/actions/wishlist/addItem.ts": $$$$$$$$$25,
+    "vtex/actions/wishlist/removeItem.ts": $$$$$$$$$26,
   },
   "workflows": {
     "vtex/workflows/events.ts": $$$$$$$$$$0,
