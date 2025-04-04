@@ -3,7 +3,7 @@
 
 export interface Query {
   part: string;
-  mine: boolean;
+  mine?: boolean;
 }
 
 export interface VideoQuery {
@@ -11,6 +11,16 @@ export interface VideoQuery {
   channelId?: string;
   maxResults?: number;
   order?: string;
+  type?: string;
+  pageToken?: string;
+  q?: string;
+  publishedAfter?: string;
+  publishedBefore?: string;
+  videoCategoryId?: string;
+  regionCode?: string;
+  relevanceLanguage?: string;
+  forMine?: boolean;
+  videoDuration?: "short" | "medium" | "long"; // short: <4min, medium: 4-20min, long: >20min
 }
 
 export type PrivacyStatus = "public" | "private" | "unlisted";
@@ -95,6 +105,14 @@ export interface YoutubeChannelResponse {
   items: Array<{
     id: string;
     snippet: Snippet;
+    contentDetails?: {
+      relatedPlaylists: {
+        uploads: string;
+        likes?: string;
+        favorites?: string;
+        watchHistory?: string;
+      };
+    };
   }>;
 }
 
@@ -105,6 +123,9 @@ export interface YoutubeVideoResponse {
     resultsPerPage: number;
   };
   nextPageToken?: string;
+  prevPageToken?: string;
+  regionCode?: string;
+  isAuthenticated?: boolean;
   items: Array<{
     id: string;
     snippet: {
@@ -130,6 +151,16 @@ export interface YoutubeVideoResponse {
       };
     };
     statistics?: Statistics;
+    contentDetails?: {
+      duration: string;
+      dimension: string;
+      definition: string;
+      caption: string;
+      licensedContent: boolean;
+      projection: string;
+    };
+    isShort?: boolean;
+    durationInSeconds?: number;
   }>;
 }
 
@@ -144,4 +175,290 @@ export interface UpdateThumbnailResponse {
     standard?: Thumbnail;
     maxres?: Thumbnail;
   }>;
+}
+
+export interface YouTubeCommentThread {
+  kind: "youtube#commentThread";
+  etag: string;
+  id: string;
+  snippet: {
+    videoId: string;
+    topLevelComment: {
+      kind: "youtube#comment";
+      etag: string;
+      id: string;
+      snippet: {
+        authorDisplayName: string;
+        authorProfileImageUrl: string;
+        authorChannelUrl: string;
+        textOriginal: string;
+        likeCount: number;
+        publishedAt: string;
+        updatedAt: string;
+      };
+    };
+    totalReplyCount: number;
+  };
+}
+
+export interface YouTubeCommentThreadListResponse {
+  kind: "youtube#commentThreadListResponse";
+  etag: string;
+  items: YouTubeCommentThread[];
+  nextPageToken?: string;
+  pageInfo?: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+  commentsDisabled?: boolean;
+}
+
+export interface YouTubeCaptionListResponse {
+  kind: "youtube#captionListResponse";
+  etag: string;
+  items: YouTubeCaption[];
+}
+
+export interface YouTubeCaption {
+  kind: "youtube#caption";
+  etag: string;
+  id: string;
+  snippet: {
+    videoId: string;
+    language: string;
+    name: string;
+    audioTrackType: string; // "standard" ou "ASR" (auto-generated)
+    isDraft: boolean;
+    isAutoSynced: boolean;
+    isCC: boolean; // Closed captions (legendas ocultas)
+    trackKind: string; // "standard" ou "ASR" (auto-generated)
+    status: string; // "serving" ou "syncing" ou "failed"
+    lastUpdated: string;
+  };
+}
+
+// Tipos para transmissões ao vivo
+export type LiveBroadcastLifeCycleStatus = 
+  | "complete"     // A transmissão está concluída
+  | "created"      // A transmissão foi criada, mas não está agendada
+  | "live"         // A transmissão está ao vivo
+  | "liveStarting" // A transmissão está começando (apenas adquirível, não configurável)
+  | "ready"        // A transmissão está agendada para começar
+  | "revoked"      // A transmissão foi removida
+  | "testStarting" // O teste da transmissão está começando (apenas adquirível, não configurável)
+  | "testing";     // A transmissão está em teste
+
+export type LiveBroadcastPrivacyStatus = "private" | "public" | "unlisted";
+
+export type LiveStreamStatusState = 
+  | "active"    // O stream está ativo e pronto para uso
+  | "created"   // O stream foi criado, mas não está ativo
+  | "error"     // Houve um erro na criação do stream
+  | "inactive"; // O stream está inativo
+
+export interface LiveBroadcastSnippet {
+  title: string;
+  description?: string;
+  publishedAt?: string;
+  channelId?: string;
+  thumbnails?: {
+    default?: Thumbnail;
+    medium?: Thumbnail;
+    high?: Thumbnail;
+    standard?: Thumbnail;
+    maxres?: Thumbnail;
+  };
+  scheduledStartTime?: string;
+  scheduledEndTime?: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  isDefaultBroadcast?: boolean;
+  liveChatId?: string;
+}
+
+export interface LiveBroadcastContentDetails {
+  boundStreamId?: string;
+  boundStreams?: Array<{
+    streamId: string;
+  }>;
+  monitorStream?: {
+    enableMonitorStream?: boolean;
+    broadcastStreamDelayMs?: number;
+    embedHtml?: string;
+  };
+  enableAutoStart?: boolean;
+  enableAutoStop?: boolean;
+  enableDvr?: boolean;
+  enableContentEncryption?: boolean;
+  enableEmbed?: boolean;
+  recordFromStart?: boolean;
+  startWithSlate?: boolean;
+  closedCaptionsType?: string;
+  projection?: string;
+  enableLowLatency?: boolean;
+  latencyPreference?: string;
+  enableAutoStartStopForDVR?: boolean;
+}
+
+export interface LiveBroadcastStatusInfo {
+  lifeCycleStatus: LiveBroadcastLifeCycleStatus;
+  privacyStatus: LiveBroadcastPrivacyStatus;
+  recordingStatus?: string;
+  madeForKids?: boolean;
+  selfDeclaredMadeForKids?: boolean;
+}
+
+export interface LiveBroadcast {
+  kind: "youtube#liveBroadcast";
+  etag: string;
+  id: string;
+  snippet: {
+    publishedAt: string;
+    channelId: string;
+    title: string;
+    description: string;
+    thumbnails: {
+      default?: Thumbnail;
+      medium?: Thumbnail;
+      high?: Thumbnail;
+      standard?: Thumbnail;
+      maxres?: Thumbnail;
+    };
+    scheduledStartTime: string;
+    scheduledEndTime?: string;
+    actualStartTime?: string;
+    actualEndTime?: string;
+    isDefaultBroadcast?: boolean;
+    liveChatId?: string;
+  };
+  status: {
+    lifeCycleStatus: LiveBroadcastLifeCycleStatus;
+    privacyStatus: LiveBroadcastPrivacyStatus;
+    recordingStatus: "notRecording" | "recording" | "recorded";
+    madeForKids?: boolean;
+    selfDeclaredMadeForKids?: boolean;
+  };
+  contentDetails: {
+    boundStreamId?: string;
+    boundStreamLastUpdateTimeMs?: string;
+    monitorStream?: {
+      enableMonitorStream: boolean;
+      broadcastStreamDelayMs?: number;
+      embedHtml?: string;
+    };
+    enableEmbed?: boolean;
+    enableDvr?: boolean;
+    enableContentEncryption?: boolean;
+    startWithSlate?: boolean;
+    recordFromStart?: boolean;
+    enableClosedCaptions?: boolean;
+    closedCaptionsType?: string;
+    projection?: string;
+    enableLowLatency?: boolean;
+    latencyPreference?: string;
+    enableAutoStart?: boolean;
+    enableAutoStop?: boolean;
+  };
+  statistics?: {
+    totalChatCount?: number;
+    concurrentViewers?: string;
+  };
+}
+
+export interface LiveBroadcastListResponse {
+  kind: "youtube#liveBroadcastListResponse";
+  etag: string;
+  nextPageToken?: string;
+  prevPageToken?: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+  items: LiveBroadcast[];
+  infoMessage?: string; // Mensagem informativa adicional
+}
+
+export interface LiveStreamSnippet {
+  title: string;
+  description?: string;
+  publishedAt?: string;
+  channelId?: string;
+  isDefaultStream?: boolean;
+}
+
+export interface LiveStreamCdn {
+  ingestionType: "rtmp" | "dash" | "webrtc";
+  ingestionInfo?: {
+    streamName: string;
+    ingestionAddress: string;
+    backupIngestionAddress?: string;
+    rtmpsIngestionAddress?: string;
+    rtmpsBackupIngestionAddress?: string;
+  };
+  resolution?: string;
+  frameRate?: string;
+}
+
+export interface LiveStreamContentDetails {
+  closedCaptionsIngestionUrl?: string;
+  isReusable?: boolean;
+}
+
+export interface LiveStreamStatusInfo {
+  streamStatus: LiveStreamStatusState;
+  healthStatus?: {
+    status: "good" | "acceptable" | "bad" | "noData";
+    lastUpdateTimeSeconds?: string;
+    reason?: string;
+  };
+}
+
+export interface LiveStream {
+  kind: "youtube#liveStream";
+  etag: string;
+  id: string;
+  snippet: {
+    publishedAt: string;
+    channelId: string;
+    title: string;
+    description: string;
+    isDefaultStream?: boolean;
+  };
+  cdn: {
+    format?: string;
+    ingestionType: "rtmp" | "dash" | "webrtc";
+    ingestionInfo?: {
+      streamName: string;
+      ingestionAddress: string;
+      backupIngestionAddress?: string;
+      rtmpsIngestionAddress?: string;
+      rtmpsBackupIngestionAddress?: string;
+    };
+    resolution?: string;
+    frameRate?: string;
+  };
+  status: {
+    streamStatus: "active" | "created" | "error" | "inactive" | "ready";
+    healthStatus: {
+      status: "good" | "ok" | "bad" | "noData";
+      lastUpdateTimeSeconds?: string;
+    };
+  };
+  contentDetails: {
+    closedCaptionsIngestionUrl?: string;
+    isReusable: boolean;
+  };
+}
+
+export interface LiveStreamListResponse {
+  kind: "youtube#liveStreamListResponse";
+  etag: string;
+  nextPageToken?: string;
+  prevPageToken?: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+  items: LiveStream[];
+  infoMessage?: string; // Mensagem informativa adicional
 }

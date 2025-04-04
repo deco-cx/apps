@@ -29,20 +29,20 @@ export default async function loader(
   const urlParams = new URL(req.url).searchParams;
   const code = urlParams.get("code");
   let channelData = null;
-
-  // Obter cookies dos cabeçalhos da requisição em vez da resposta
   const cookies = getCookies(req.headers);
   let accessToken = cookies.youtube_access_token || null;
 
-  // Sempre definir a URL de autorização, será usada se não houver token
-  const authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-    `client_id=${CLIENT_ID}&` +
-    `redirect_uri=${REDIRECT_URI}&` +
-    `response_type=code&` +
-    `scope=${SCOPES}&` +
-    `state=state_parameter_passthrough_value&` +
-    `access_type=offline&` +
-    `prompt=consent`;
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID,
+    redirect_uri: REDIRECT_URI,
+    response_type: 'code',
+    scope: SCOPES,
+    state: 'state_parameter_passthrough_value',
+    access_type: 'offline',
+    prompt: 'consent'
+  });
+
+  const authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 
   if (!accessToken && code) {
     try {
@@ -61,7 +61,6 @@ export default async function loader(
       });
 
       const tokenData = await tokenResponse.json();
-      console.log(tokenData);
       accessToken = tokenData.access_token;
 
       if (accessToken) {

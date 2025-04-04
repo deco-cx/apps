@@ -1,0 +1,92 @@
+import type { AppContext } from "../../mod.ts";
+import getAccessToken from "../../utils/getAccessToken.ts";
+
+export interface DeleteLiveBroadcastParams {
+  /**
+   * @description ID da transmissão ao vivo a ser excluída
+   */
+  broadcastId: string;
+  
+  /**
+   * @description Token de autorização do YouTube (opcional)
+   */
+  tokenYoutube?: string;
+}
+
+export interface DeleteLiveBroadcastResult {
+  success: boolean;
+  message: string;
+  error?: any;
+}
+
+/**
+ * @title Excluir Transmissão ao Vivo
+ * @description Remove uma transmissão ao vivo do YouTube
+ */
+export default async function action(
+  props: DeleteLiveBroadcastParams,
+  req: Request,
+  _ctx: AppContext,
+): Promise<DeleteLiveBroadcastResult> {
+  const { 
+    broadcastId,
+    tokenYoutube
+  } = props;
+  
+  const accessToken = tokenYoutube || getAccessToken(req);
+  
+  if (!accessToken) {
+    return {
+      success: false,
+      message: "Token de autenticação não encontrado"
+    };
+  }
+  
+  if (!broadcastId) {
+    return {
+      success: false,
+      message: "ID da transmissão é obrigatório"
+    };
+  }
+  
+  try {
+    // Construir a URL para exclusão
+    const url = new URL("https://youtube.googleapis.com/youtube/v3/liveBroadcasts");
+    
+    // Adicionar parâmetro de ID
+    url.searchParams.append("id", broadcastId);
+    
+    // Fazer a requisição para excluir a transmissão
+    const response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+    
+    // A API retorna 204 No Content quando a exclusão é bem-sucedida
+    if (response.status === 204) {
+      return {
+        success: true,
+        message: "Transmissão excluída com sucesso"
+      };
+    }
+    
+    // Se a resposta não for 204, temos um erro
+    const errorData = await response.text();
+    console.error("Erro ao excluir transmissão:", errorData);
+    
+    return {
+      success: false,
+      message: `Erro ao excluir transmissão: ${response.status} ${response.statusText}`,
+      error: errorData
+    };
+  } catch (error) {
+    console.error("Erro ao excluir transmissão:", error);
+    return {
+      success: false,
+      message: `Erro ao excluir transmissão: ${error.message || "Erro desconhecido"}`,
+      error
+    };
+  }
+} 

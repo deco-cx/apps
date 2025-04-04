@@ -19,32 +19,21 @@ export async function loader(
   req: Request,
   ctx: AppContext,
 ) {
-  console.log("Iniciando carregamento da seção YouTube...");
   const dataUser = await ctx.invoke.Youtube.loaders.authentication();
-  console.log("Dados de autenticação carregados:", {
-    accessToken: dataUser.accessToken ? "presente" : "ausente",
-    canais: dataUser.channelData ? "carregados" : "não carregados",
-    authURL: dataUser.authorizationUrl ? "configurada" : "não configurada",
-  });
-
-  // Se temos um token de acesso, também buscamos os vídeos
   let videoData = null;
   if (
     dataUser.accessToken && dataUser.channelData &&
     dataUser.channelData.length > 0
   ) {
-    try {
-      // Usa o primeiro canal para buscar os vídeos
-      const channelId = dataUser.channelData[0].id;
-      videoData = await ctx.invoke.Youtube.loaders.videos({
-        channelId: channelId,
+    console.log("iniciando loader mySection, dataUser: ", dataUser);
+      videoData = await ctx.invoke.Youtube.loaders.videos.listChannel({
+        channelId: dataUser.channelData[0].id,
         maxResults: 10,
         includePrivate: true,
+        pageToken: "",
+        order: "date",
       });
-      console.log("Vídeos carregados:", videoData ? "sim" : "não");
-    } catch (error) {
-      console.error("Erro ao carregar vídeos:", error);
-    }
+      console.log("videoData", videoData);
   }
 
   // Define a aba ativa a partir dos parâmetros da requisição ou usa "channels" como padrão

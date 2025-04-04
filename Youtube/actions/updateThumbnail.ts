@@ -1,6 +1,6 @@
 import type { AppContext } from "../mod.ts";
-import { getCookies } from "@std/http";
 import { UpdateThumbnailResponse } from "../utils/types.ts";
+import getAccessToken from "../utils/getAccessToken.ts";
 
 export interface Props {
   /**
@@ -11,6 +11,16 @@ export interface Props {
    * URL da imagem ou dados base64 da imagem para o thumbnail
    */
   imageData: string;
+
+  /**
+   * Dados base64 da imagem para o thumbnail
+   */
+  imageBase64: string;
+
+  /**
+   * Token de acesso do YouTube
+   */
+  tokenYoutube?: string;
 }
 
 /**
@@ -24,7 +34,7 @@ const action = async (
 ): Promise<
   { success: boolean; message: string; thumbnail?: UpdateThumbnailResponse }
 > => {
-  const { videoId, imageData } = props;
+  const { videoId, imageData, imageBase64, tokenYoutube } = props;
 
   // Validar dados
   if (!videoId) {
@@ -34,7 +44,7 @@ const action = async (
     };
   }
 
-  if (!imageData) {
+  if (!imageData && !imageBase64) {
     return {
       success: false,
       message: "Dados da imagem são obrigatórios",
@@ -42,8 +52,7 @@ const action = async (
   }
 
   // Obter o token de acesso dos cookies
-  const cookies = getCookies(req.headers);
-  const accessToken = cookies.youtube_access_token;
+  const accessToken = tokenYoutube || getAccessToken(req);
 
   if (!accessToken) {
     console.error("Token de acesso não encontrado nos cookies");
@@ -80,9 +89,9 @@ const action = async (
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "image/jpeg", // Assumindo que é uma imagem JPEG
+          "Content-Type": "image/jpeg, image/png, image/webp",
         },
-        body: imageBlob,
+        body: imageBase64 ? imageBase64 : imageBlob,
       },
     );
 
@@ -97,7 +106,6 @@ const action = async (
     }
 
     const thumbnailData = await updateResponse.json();
-    console.log("Thumbnail atualizado com sucesso:", thumbnailData);
 
     return {
       success: true,

@@ -12,32 +12,30 @@ interface OAuthCredentials {
 }
 
 export interface Props {
-  accessToken?: Secret;
-  config: OAuthCredentials;
+  apiKey?: Secret;
+  channelId?: Secret;
+  youtubeClientId?: Secret;
+  youtubeClientSecret?: Secret;
+  youtubeRedirectUri?: Secret;
 }
 
-export interface State extends Omit<Props, "accessToken"> {
+export interface State extends Omit<Props, "apiKey"> {
   api: ReturnType<typeof createHttpClient<YoutubeClient>>;
 }
 
 export type AppContext = FnContext<State, Manifest>;
 
 export default function App(props: Props) {
-  const { accessToken } = props;
-  const _accessToken = typeof accessToken === "string"
-    ? accessToken
-    : accessToken?.get?.() ?? "";
-
-  const api = createHttpClient<YoutubeClient>({
+  const apiKey = typeof props.apiKey === "string" ? props.apiKey : props.apiKey?.get?.() ?? "";
+  const client = createHttpClient<YoutubeClient>({
     base: "https://www.googleapis.com/youtube/v3",
     headers: new Headers({
-      "Authorization": `Bearer ${_accessToken}`,
       "Accept": "application/json",
     }),
     fetcher: fetchSafe,
   });
 
-  const state = { ...props, api };
+  const state = { ...props, api: client, apiKey };
 
   return {
     state,

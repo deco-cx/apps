@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import { UpdateVideoOptions } from "../loaders/updateVideo.ts";
+import getAccessToken from "../utils/getAccessToken.ts";
 
 interface UpdateVideoResult {
   success: boolean;
@@ -13,6 +13,7 @@ export interface UpdateVideoOptionsAction {
   description?: string;
   tags?: string | string[];
   privacyStatus?: "public" | "private" | "unlisted";
+  tokenYoutube?: string;
 }
 
 /**
@@ -20,44 +21,98 @@ export interface UpdateVideoOptionsAction {
  */
 export default async function action(
   props: UpdateVideoOptionsAction,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<UpdateVideoResult> {
-  console.log("Executando ação de atualização de vídeo");
-
-  // Validar dados
   if (!props.videoId) {
+    console.error("ID do vídeo não fornecido");
+    return { success: false, message: "ID do vídeo é obrigatório" };
+  }
+
+  // Obter o token de acesso dos cookies
+  const accessToken = props.tokenYoutube || getAccessToken(req);
+
+  if (!accessToken) {
+    console.error("Token de acesso não encontrado nos cookies");
+    return { success: false, message: "Autenticação necessária" };
+  }
+
+  // Primeiro, obter os dados atuais do vídeo para não perder informações
+  const getResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?part=snippet,status&id=${props.videoId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!getResponse.ok) {
+    const errorText = await getResponse.text();
+    console.error("Erro ao obter dados do vídeo:", errorText);
     return {
       success: false,
-      message: "ID do vídeo é obrigatório",
+      message:
+        `Erro ao obter dados do vídeo: ${getResponse.status} ${getResponse.statusText}`,
     };
   }
 
-  // Preparar dados para a atualização
-  const updateOptions: UpdateVideoOptions = {
-    videoId: props.videoId,
-  };
+  const videoData = await getResponse.json();
 
-  // Adicionar campos opcionais apenas se forem fornecidos
-  if (props.title) updateOptions.title = props.title;
-  if (props.description) updateOptions.description = props.description;
-
-  // Processar tags, que podem ser uma string ou um array
-  if (props.tags) {
-    if (typeof props.tags === "string") {
-      updateOptions.tags = props.tags.split(",").map((tag: string) =>
-        tag.trim()
-      ).filter(Boolean);
-    } else {
-      // Se já for um array, usamos diretamente
-      updateOptions.tags = props.tags;
-    }
+  if (!videoData.items || videoData.items.length === 0) {
+    return { success: false, message: "Vídeo não encontrado" };
   }
 
-  if (props.privacyStatus) updateOptions.privacyStatus = props.privacyStatus;
+  // Obter o snippet atual para fazer atualizações parciais
+  const currentVideo = videoData.items[0];
+  const snippet = { ...currentVideo.snippet };
+  const status = { ...currentVideo.status };
 
-  const result: UpdateVideoResult = await ctx.invoke.Youtube.loaders
-    .updateVideo(updateOptions);
+  // Atualizar apenas os campos fornecidos
+  if (props.title !== undefined) snippet.title = props.title;
+  if (props.description !== undefined) {
+    snippet.description = props.description;
+  }
+  if (props.tags !== undefined) snippet.tags = props.tags;
+  if (props.privacyStatus !== undefined) {
+    status.privacyStatus = props.privacyStatus;
+  }
 
-  return result;
+  // Montar o corpo da requisição
+  const requestBody = {
+    id: props.videoId,
+    snippet,
+    status,
+  };
+
+  // Enviar a requisição de atualização
+  const updateResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/videos?part=snippet,status`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    },
+  );
+
+  if (!updateResponse.ok) {
+    const errorText = await updateResponse.text();
+    console.error("Erro ao atualizar vídeo:", errorText);
+    return {
+      success: false,
+      message:
+        `Erro ao atualizar vídeo: ${updateResponse.status} ${updateResponse.statusText}`,
+    };
+  }
+
+  const updatedVideoData = await updateResponse.json();
+
+  return {
+    success: true,
+    message: "Vídeo atualizado com sucesso",
+    video: updatedVideoData,
+  };
 }
