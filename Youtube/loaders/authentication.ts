@@ -1,12 +1,6 @@
-import { getCookies, setCookie } from "@std/http";
+import { setCookie } from "@std/http";
 import type { AppContext } from "../mod.ts";
-
-const CLIENT_ID = Deno.env.get("YOUTUBE_CLIENT_ID") ||
-  "1030232647128-t3lept0ser9ik2oq333pfs53l2pnkon0.apps.googleusercontent.com";
-const REDIRECT_URI = Deno.env.get("YOUTUBE_REDIRECT_URI") ||
-  "http://localhost:8000/";
-const SCOPES = Deno.env.get("YOUTUBE_SCOPES") ||
-  "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl";
+import getAccessToken from "../utils/getAccessToken.ts";
 
 // Tempo de expiração do cookie - 1 dia em milissegundos
 const COOKIE_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
@@ -21,26 +15,58 @@ export type AuthenticationResult = {
   accessToken: string | null;
 };
 
+export type AuthenticationError = {
+  message: string;
+  error: boolean;
+};
+
 export default async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<AuthenticationResult> {
+): Promise<AuthenticationResult | AuthenticationError> {
   const urlParams = new URL(req.url).searchParams;
   const code = urlParams.get("code");
-  let channelData = null;
-  const cookies = getCookies(req.headers);
-  let accessToken = cookies.youtube_access_token || null;
+  const { scopes, redirectUri, clientIdSecret } = ctx.apiConfig;
+  const client = ctx.client;
+  const clientId = typeof clientIdSecret === "string"
+    ? clientIdSecret
+    : clientIdSecret?.get?.() ?? "";
 
-  const params = new URLSearchParams({
-    client_id: CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
+  if (!clientId) {
+    return {
+      message: "clientId is required",
+      error: true,
+    };
+  }
+  if (!redirectUri) {
+    return {
+      message: "redirectUri is required",
+      error: true,
+    };
+  }
+  if (!scopes) {
+    return {
+      message: "scopes is required",
+      error: true,
+    };
+  }
+
+  const baseParams = {
+    client_id: clientId,
+    redirect_uri: redirectUri,
     response_type: "code",
-    scope: SCOPES,
+    scope: scopes,
     state: "state_parameter_passthrough_value",
     access_type: "offline",
     prompt: "consent",
-  });
+    include_granted_scopes: "true",
+  }
+  
+  
+  let channelData = null;
+  let accessToken = getAccessToken(req);
+  const params = new URLSearchParams(baseParams);
 
   const authorizationUrl =
     `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
@@ -52,33 +78,23 @@ export default async function loader(
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: new URLSearchParams({
-          code,
-          client_id: CLIENT_ID,
-          client_secret: "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",
-          redirect_uri: REDIRECT_URI,
-          grant_type: "authorization_code",
-        }),
+        body: new URLSearchParams(baseParams),
       });
 
       const tokenData = await tokenResponse.json();
       accessToken = tokenData.access_token;
 
       if (accessToken) {
-        // Define o cookie apenas se tivermos um token válido
         setCookie(ctx.response.headers, {
           name: "youtube_access_token",
           value: accessToken,
           path: "/",
-          // Expira em 1 dia
-          // Isso precisa ser uma data no futuro baseada no timestamp atual
           expires: new Date(Date.now() + COOKIE_EXPIRATION_TIME),
           httpOnly: true,
-          secure: true, // Apenas em HTTPS
+          secure: true,
           sameSite: "Lax",
         });
 
-        // Busca os dados do canal diretamente aqui
         try {
           const channelResponse = await fetch(
             "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
@@ -91,15 +107,20 @@ export default async function loader(
 
           const channelResult = await channelResponse.json();
           channelData = channelResult.items;
-        } catch (error) {
-          console.error("Erro ao buscar dados do canal:", error);
+        } catch (_) {
+          return {
+            message: "Erro ao buscar dados do canal:",
+            error: true,
+          };
         }
       }
-    } catch (error) {
-      console.error("Erro ao obter token de acesso:", error);
+    } catch (_) {
+      return {
+        message: "Erro ao obter token de acesso:",
+        error: true,
+      };
     }
   } else if (accessToken) {
-    // Se já temos um token, vamos testar se ele ainda é válido
     try {
       const testResponse = await fetch(
         "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
@@ -114,22 +135,14 @@ export default async function loader(
         const channelResult = await testResponse.json();
         channelData = channelResult.items;
       } else {
-        // Token expirado ou inválido, removemos o cookie
-        console.error("Token existente inválido, redirecionando para login");
-        accessToken = null;
         setCookie(ctx.response.headers, {
           name: "youtube_access_token",
           value: "",
           path: "/",
-          expires: new Date(0), // Expira imediatamente
-          secure: true,
-          httpOnly: true,
+          expires: new Date(0)
         });
       }
-    } catch (error) {
-      console.error("Erro ao verificar token existente:", error);
-      // Em caso de erro, invalidamos o token para forçar novo login
-      accessToken = null;
+    } catch (_) {
       setCookie(ctx.response.headers, {
         name: "youtube_access_token",
         value: "",
@@ -141,7 +154,6 @@ export default async function loader(
     }
   }
 
-  // Informações do usuário mais significativas quando está logado
   const user = {
     login: accessToken ? "Usuário YouTube" : "Visitante",
     avatar_url: "https://example.com/avatar.jpg",

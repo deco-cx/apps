@@ -20,6 +20,7 @@ import * as $$$$$$$$$14 from "./actions/updateChannelDefaults.ts";
 import * as $$$$$$$$$15 from "./actions/updateChannelSections.ts";
 import * as $$$$$$$$$16 from "./actions/updateThumbnail.ts";
 import * as $$$$$$$$$17 from "./actions/updateVideo.ts";
+import * as $$$$$$$$$18 from "./actions/videos/delete.ts";
 import * as $$$0 from "./loaders/analytics/audience.ts";
 import * as $$$1 from "./loaders/analytics/channelStats.ts";
 import * as $$$2 from "./loaders/analytics/videoStats.ts";
@@ -39,7 +40,6 @@ import * as $$$15 from "./loaders/videos/listChannel.ts";
 import * as $$$16 from "./loaders/videos/search.ts";
 import * as $$$17 from "./loaders/videos/shorts.ts";
 import * as $$$$$$0 from "./sections/login.tsx";
-import * as $$$$$$1 from "./sections/mySection.tsx";
 
 const manifest = {
   "loaders": {
@@ -64,7 +64,6 @@ const manifest = {
   },
   "sections": {
     "Youtube/sections/login.tsx": $$$$$$0,
-    "Youtube/sections/mySection.tsx": $$$$$$1,
   },
   "actions": {
     "Youtube/actions/comments/like.ts": $$$$$$$$$0,
@@ -85,6 +84,7 @@ const manifest = {
     "Youtube/actions/updateChannelSections.ts": $$$$$$$$$15,
     "Youtube/actions/updateThumbnail.ts": $$$$$$$$$16,
     "Youtube/actions/updateVideo.ts": $$$$$$$$$17,
+    "Youtube/actions/videos/delete.ts": $$$$$$$$$18,
   },
   "name": "Youtube",
   "baseUrl": import.meta.url,
