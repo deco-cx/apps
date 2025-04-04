@@ -1,6 +1,6 @@
 import type { YoutubeClient } from "./utils/client.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import type { App, FnContext } from "@deco/deco";
+import type { FnContext } from "@deco/deco";
 import { Secret } from "../website/loaders/secret.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { fetchSafe } from "../utils/fetch.ts";
@@ -12,11 +12,11 @@ interface OAuthCredentials {
 }
 
 export interface Props {
-  apiConfig: { 
+  apiConfig: {
     clientIdSecret?: Secret;
     scopes?: string;
     redirectUri?: string;
-  }
+  };
 }
 
 export interface State extends Props {
@@ -34,11 +34,15 @@ export default function App(props: Props) {
     fetcher: fetchSafe,
   });
 
-  const state = { ...props, client, apiConfig: {
-    clientId: props.apiConfig.clientIdSecret,
-    scopes: props.apiConfig.scopes,
-    redirectUri: props.apiConfig.redirectUri,
-  } };
+  const state = {
+    ...props,
+    client,
+    apiConfig: {
+      clientId: props.apiConfig.clientIdSecret,
+      scopes: props.apiConfig.scopes,
+      redirectUri: props.apiConfig.redirectUri,
+    },
+  };
 
   return {
     state,

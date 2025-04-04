@@ -74,9 +74,10 @@ export default async function loader(
   const searchData = await searchResponse.json();
 
   if (searchData.items && searchData.items.length > 0) {
-    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(
-      ",",
-    );
+    const videoIds = searchData.items.map((item: unknown) => item.id.videoId)
+      .join(
+        ",",
+      );
 
     const detailsResponse = await client["GET /videos"]({
       part: "snippet,statistics,status",

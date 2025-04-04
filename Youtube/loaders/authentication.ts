@@ -11,7 +11,7 @@ export type AuthenticationResult = {
     avatar_url: string;
   };
   authorizationUrl: string;
-  channelData: any;
+  channelData: unknown;
   accessToken: string | null;
 };
 
@@ -28,7 +28,7 @@ export default async function loader(
   const urlParams = new URL(req.url).searchParams;
   const code = urlParams.get("code");
   const { scopes, redirectUri, clientIdSecret } = ctx.apiConfig;
-  const client = ctx.client;
+  //const client = ctx.client;
   const clientId = typeof clientIdSecret === "string"
     ? clientIdSecret
     : clientIdSecret?.get?.() ?? "";
@@ -61,9 +61,8 @@ export default async function loader(
     access_type: "offline",
     prompt: "consent",
     include_granted_scopes: "true",
-  }
-  
-  
+  };
+
   let channelData = null;
   let accessToken = getAccessToken(req);
   const params = new URLSearchParams(baseParams);
@@ -139,7 +138,7 @@ export default async function loader(
           name: "youtube_access_token",
           value: "",
           path: "/",
-          expires: new Date(0)
+          expires: new Date(0),
         });
       }
     } catch (_) {

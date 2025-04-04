@@ -1,5 +1,5 @@
-import type { AppContext } from "../../mod.ts";
-import getAccessToken from "../../utils/getAccessToken.ts";
+import { AppContext } from "../../../Youtube/mod.ts";
+import getAccessToken from "../../../Youtube/utils/getAccessToken.ts";
 
 export interface VideoAnalyticsOptions {
   /**
@@ -172,7 +172,7 @@ export default async function loader(
 
       // Criar objetos estruturados para cada vídeo
       for (const row of formattedResponse.rows) {
-        const videoObject: any = {
+        const videoObject: unknown = {
           videoId: row[headerIndexMap["video"]],
           metrics: {},
         };

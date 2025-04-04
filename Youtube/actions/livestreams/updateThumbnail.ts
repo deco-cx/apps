@@ -33,8 +33,8 @@ export interface UpdateLiveBroadcastThumbnailResult {
   success: boolean;
   message: string;
   broadcast?: LiveBroadcast;
-  thumbnails?: Record<string, any>;
-  error?: any;
+  thumbnails?: Record<string, unknown>;
+  error?: unknown;
 }
 
 /**

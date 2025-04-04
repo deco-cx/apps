@@ -160,9 +160,10 @@ export default async function loader(
       };
     }
 
-    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(
-      ",",
-    );
+    const videoIds = searchData.items.map((item: unknown) => item.id.videoId)
+      .join(
+        ",",
+      );
 
     const detailsOptions = accessToken
       ? { headers: { Authorization: `Bearer ${accessToken}` } }

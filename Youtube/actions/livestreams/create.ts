@@ -61,7 +61,7 @@ export interface CreateLiveBroadcastResult {
   success: boolean;
   message: string;
   broadcast?: LiveBroadcast;
-  error?: any;
+  error?: unknown;
 }
 
 /**

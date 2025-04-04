@@ -1,7 +1,6 @@
 import type { AppContext } from "../../mod.ts";
 import getAccessToken from "../../utils/getAccessToken.ts";
 import type { YoutubeVideoResponse } from "../../utils/types.ts";
-import searchVideos from "./search.ts";
 
 export interface ChannelVideosOptions {
   /**
@@ -122,7 +121,7 @@ export default async function loader(
   // Formata a resposta
   const response = {
     kind: "youtube#videoListResponse",
-    items: data.items.map((item: any) => ({
+    items: data.items.map((item: unknown) => ({
       id: item.snippet.resourceId.videoId,
       snippet: item.snippet,
     })),

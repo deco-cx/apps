@@ -4,7 +4,7 @@ import getAccessToken from "../utils/getAccessToken.ts";
 interface UpdateCategoryResult {
   success: boolean;
   message: string;
-  video?: any;
+  video?: unknown;
 }
 
 export interface UpdateCategoryOptions {
@@ -48,7 +48,7 @@ export interface UpdateCategoryOptions {
 export default async function action(
   props: UpdateCategoryOptions,
   req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<UpdateCategoryResult> {
   if (!props.videoId) {
     console.error("ID do vídeo não fornecido");

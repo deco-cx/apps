@@ -33,7 +33,7 @@ export interface ListLiveStreamsParams {
 export interface LiveStreamListErrorResponse {
   error: true;
   message: string;
-  details?: any;
+  details?: unknown;
   code?: number;
 }
 
@@ -44,7 +44,7 @@ export interface LiveStreamListErrorResponse {
 export default async function loader(
   props: ListLiveStreamsParams,
   req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<LiveStreamListResponse | LiveStreamListErrorResponse> {
   const {
     streamId,
@@ -53,7 +53,7 @@ export default async function loader(
     pageToken,
   } = props;
 
-  const client = ctx.api;
+  //const client = ctx.client;
   const cookies = getCookies(req.headers);
   const accessToken = props.tokenYoutube || getAccessToken(req) ||
     cookies.youtube_access_token;

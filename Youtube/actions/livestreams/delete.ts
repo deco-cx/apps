@@ -16,7 +16,7 @@ export interface DeleteLiveBroadcastParams {
 export interface DeleteLiveBroadcastResult {
   success: boolean;
   message: string;
-  error?: any;
+  error?: unknown;
 }
 
 /**

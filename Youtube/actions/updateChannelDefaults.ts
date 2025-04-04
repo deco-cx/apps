@@ -62,7 +62,7 @@ export interface ChannelDefaultOptions {
 interface UpdateChannelDefaultsResult {
   success: boolean;
   message: string;
-  defaults?: any;
+  defaults?: unknown;
 }
 
 /**

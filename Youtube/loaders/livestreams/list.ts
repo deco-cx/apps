@@ -1,4 +1,3 @@
-import type { AppContext } from "../../mod.ts";
 import getAccessToken from "../../utils/getAccessToken.ts";
 import { getCookies } from "@std/http";
 import type { LiveBroadcastListResponse } from "../../utils/types.ts";
@@ -53,7 +52,7 @@ export interface ListLiveBroadcastsParams {
 export interface LiveBroadcastListErrorResponse {
   error: true;
   message: string;
-  details?: any;
+  details?: unknown;
   code?: number;
 }
 
@@ -64,7 +63,7 @@ export interface LiveBroadcastListErrorResponse {
 export default async function loader(
   props: ListLiveBroadcastsParams,
   req: Request,
-  ctx: AppContext,
+  _ctx: unknown,
 ): Promise<LiveBroadcastListResponse | LiveBroadcastListErrorResponse> {
   const {
     broadcastId,

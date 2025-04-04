@@ -4,7 +4,7 @@ import getAccessToken from "../utils/getAccessToken.ts";
 interface UpdateVideoResult {
   success: boolean;
   message: string;
-  video?: any;
+  video?: unknown;
 }
 
 export interface UpdateVideoOptionsAction {
@@ -22,7 +22,7 @@ export interface UpdateVideoOptionsAction {
 export default async function action(
   props: UpdateVideoOptionsAction,
   req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<UpdateVideoResult> {
   if (!props.videoId) {
     console.error("ID do vídeo não fornecido");

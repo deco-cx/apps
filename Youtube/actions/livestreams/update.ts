@@ -66,7 +66,7 @@ export interface UpdateLiveBroadcastResult {
   success: boolean;
   message: string;
   broadcast?: LiveBroadcast;
-  error?: any;
+  error?: unknown;
 }
 
 /**
@@ -145,7 +145,7 @@ export default async function action(
     const broadcast = broadcastData.items[0];
 
     // Preparar o payload para atualização
-    const payload: any = {
+    const payload: unknown = {
       id: broadcastId,
       snippet: {
         title: title || broadcast.snippet.title,

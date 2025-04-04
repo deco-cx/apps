@@ -51,7 +51,7 @@ export interface UpdateChannelOptions {
 interface UpdateChannelResult {
   success: boolean;
   message: string;
-  channel?: any;
+  channel?: unknown;
 }
 
 /**

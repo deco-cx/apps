@@ -43,7 +43,7 @@ export interface CreateLiveStreamResult {
   success: boolean;
   message: string;
   stream?: LiveStream;
-  error?: any;
+  error?: unknown;
 }
 
 /**

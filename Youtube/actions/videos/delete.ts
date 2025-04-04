@@ -21,7 +21,7 @@ export interface DeleteVideoParams {
 export interface DeleteVideoResult {
   success: boolean;
   message: string;
-  error?: any;
+  error?: unknown;
 }
 
 /**

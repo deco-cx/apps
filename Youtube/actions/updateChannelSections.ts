@@ -71,8 +71,8 @@ export interface UpdateChannelSectionsOptions {
 interface UpdateChannelSectionsResult {
   success: boolean;
   message: string;
-  addedSections?: any[];
-  updatedSections?: any[];
+  addedSections?: unknown[];
+  updatedSections?: unknown[];
   removedSections?: string[];
 }
 
@@ -125,18 +125,14 @@ export default async function action(
       };
     }
 
-    const sectionsData = await getResponse.json();
-    const currentSections = sectionsData.items || [];
-
-    // Arrays para armazenar os resultados das operações
-    const addedSections: any[] = [];
-    const updatedSections: any[] = [];
+    const addedSections: unknown[] = [];
+    const updatedSections: unknown[] = [];
     const removeResults: string[] = [];
 
     // Processar cada seção fornecida
     for (const section of sections) {
       // Preparar o objeto de seção para a API
-      const sectionBody: any = {
+      const sectionBody: unknown = {
         snippet: {
           type: section.type,
           style: section.style || "horizontalRow",
