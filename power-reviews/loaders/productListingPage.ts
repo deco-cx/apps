@@ -52,17 +52,27 @@ export default function productListingPage(
       })
     );
 
-    const fullReviewsResponse = await Promise.all(fullReviewsPromises);
+    const fullReviewsResponse = await Promise.allSettled(fullReviewsPromises);
 
-    const fullReviewsResults = await Promise.all(
-      fullReviewsResponse.map((review) => review.json()),
+    const fullReviewsResults = await Promise.allSettled(
+      fullReviewsResponse.map((response) => {
+        if (response.status === "fulfilled") {
+          return response.value.json();
+        } else {
+          return null;
+        }
+      }),
     );
 
-    const productsExtendeds = fullReviewsResults.map((review, idx) => {
-      return {
-        ...products[idx],
-        aggregateRating: toAggregateRating(review.results[0].rollup),
-      };
+    const productsExtendeds = fullReviewsResults.map((result, idx) => {
+      if (result.status === "fulfilled" && result.value) {
+        return {
+          ...products[idx],
+          aggregateRating: toAggregateRating(result.value.results[0].rollup),
+        };
+      } else {
+        return products[idx];
+      }
     });
 
     return {
@@ -71,3 +81,5 @@ export default function productListingPage(
     };
   };
 }
+
+export const cache = "no-cache";
