@@ -207,7 +207,12 @@ const loader = async (
     IS_TO_LEGACY[url.searchParams.get("sort") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
-  const fq = props.fq ? [props.fq] : url.searchParams.getAll("fq");
+  const fq = [
+    ...new Set([
+      ...(props.fq ? [props.fq] : []),
+      ...url.searchParams.getAll("fq"),
+    ]),
+  ];
   const _from = page * count;
   const _to = (page + 1) * count - 1;
 
@@ -441,7 +446,12 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
   if (url.searchParams.has("ft")) {
     return null;
   }
-
+  const fq = [
+    ...new Set([
+      ...(props.fq ? [props.fq] : []),
+      ...url.searchParams.getAll("fq"),
+    ]),
+  ];
   const segment = getSegmentFromBag(ctx)?.token ?? "";
   const params = new URLSearchParams([
     ["term", props.term ?? url.pathname ?? ""],
@@ -454,7 +464,7 @@ export const cacheKey = (props: Props, req: Request, ctx: AppContext) => {
         props.sort ?? "",
     ],
     ["filters", props.filters ?? ""],
-    ["fq", props.fq ?? url.searchParams.getAll("fq").join(",") ?? ""],
+    ["fq", fq.join(",") ?? ""],
     [
       "ft",
       props.ft ?? url.searchParams.get("ft") ?? url.searchParams.get("q") ?? "",
