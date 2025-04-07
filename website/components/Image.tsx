@@ -166,7 +166,9 @@ const Image = forwardRef<HTMLImageElement, Props>((props, ref) => {
     );
   }
 
-  const srcSet = getSrcSet(props.src, props.width, props.height, props.fit);
+  const srcSet = props.srcSet ??
+    getSrcSet(props.src, props.width, props.height, props.fit);
+
   const linkProps = srcSet && {
     imagesrcset: srcSet,
     imagesizes: props.sizes,
