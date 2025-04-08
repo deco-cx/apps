@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("figma"),
     app("grain"),
     app("slack"),
     app("vertex"),
