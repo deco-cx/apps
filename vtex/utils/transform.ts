@@ -1054,7 +1054,7 @@ export const toReview = (
         "@type": "Review",
         id: productReviews[reviewIndex]?.id?.toString(),
         author: [{
-          "@type": "Person",
+          "@type": "Author",
           name: productReviews[reviewIndex]?.reviewerName,
           verifiedBuyer: productReviews[reviewIndex]?.verifiedPurchaser,
         }],
