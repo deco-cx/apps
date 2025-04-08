@@ -24,70 +24,23 @@ export function simplifyNode(node: FigmaNode): SimplifiedNode | null {
     type: node.type,
   };
 
-  // Add specific properties based on node type
+  // Adds specific properties based on node type
+  const properties = [
+    'absoluteBoundingBox', 'relativeTransform', 'layout', 'fills', 
+    'strokes', 'effects', 'opacity', 'visible', 'clipsContent', 
+    'backgroundColor', 'cornerRadius', 'paddingLeft', 'paddingRight', 
+    'paddingTop', 'paddingBottom', 'itemSpacing', 'counterAxisSizingMode', 
+    'primaryAxisSizingMode', 'primaryAxisAlignItems', 'counterAxisAlignItems'
+  ];
+
   if (
     node.type === "FRAME" || node.type === "GROUP" ||
     node.type === "COMPONENT" || node.type === "INSTANCE"
   ) {
-    if (node.absoluteBoundingBox) {
-      simplified.absoluteBoundingBox = node.absoluteBoundingBox;
-    }
-    if (node.relativeTransform) {
-      simplified.relativeTransform = node.relativeTransform;
-    }
-    if (node.layout) {
-      simplified.layout = node.layout;
-    }
-    if (node.fills) {
-      simplified.fills = node.fills;
-    }
-    if (node.strokes) {
-      simplified.strokes = node.strokes;
-    }
-    if (node.effects) {
-      simplified.effects = node.effects;
-    }
-    if (node.opacity !== undefined) {
-      simplified.opacity = node.opacity;
-    }
-    if (node.visible !== undefined) {
-      simplified.visible = node.visible;
-    }
-    if (node.clipsContent !== undefined) {
-      simplified.clipsContent = node.clipsContent;
-    }
-    if (node.backgroundColor) {
-      simplified.backgroundColor = node.backgroundColor;
-    }
-    if (node.cornerRadius !== undefined) {
-      simplified.cornerRadius = node.cornerRadius;
-    }
-    if (node.paddingLeft !== undefined) {
-      simplified.paddingLeft = node.paddingLeft;
-    }
-    if (node.paddingRight !== undefined) {
-      simplified.paddingRight = node.paddingRight;
-    }
-    if (node.paddingTop !== undefined) {
-      simplified.paddingTop = node.paddingTop;
-    }
-    if (node.paddingBottom !== undefined) {
-      simplified.paddingBottom = node.paddingBottom;
-    }
-    if (node.itemSpacing !== undefined) {
-      simplified.itemSpacing = node.itemSpacing;
-    }
-    if (node.counterAxisSizingMode) {
-      simplified.counterAxisSizingMode = node.counterAxisSizingMode;
-    }
-    if (node.primaryAxisSizingMode) {
-      simplified.primaryAxisSizingMode = node.primaryAxisSizingMode;
-    }
-    if (node.primaryAxisAlignItems) {
-      simplified.primaryAxisAlignItems = node.primaryAxisAlignItems;
-    }
-    if (node.counterAxisAlignItems) {
-      simplified.counterAxisAlignItems = node.counterAxisAlignItems;
+    for (const prop of properties) {
+      if (node[prop] !== undefined) {
+        simplified[prop] = node[prop];
+      }
     }
   }
 
@@ -98,20 +51,10 @@ export function simplifyNode(node: FigmaNode): SimplifiedNode | null {
     if (node.style) {
       simplified.style = node.style;
     }
-    if (node.absoluteBoundingBox) {
-      simplified.absoluteBoundingBox = node.absoluteBoundingBox;
-    }
-    if (node.relativeTransform) {
-      simplified.relativeTransform = node.relativeTransform;
-    }
-    if (node.fills) {
-      simplified.fills = node.fills;
-    }
-    if (node.opacity !== undefined) {
-      simplified.opacity = node.opacity;
-    }
-    if (node.visible !== undefined) {
-      simplified.visible = node.visible;
+    for (const prop of ['absoluteBoundingBox', 'relativeTransform', 'fills', 'opacity', 'visible']) {
+      if (node[prop] !== undefined) {
+        simplified[prop] = node[prop];
+      }
     }
   }
 
@@ -119,50 +62,18 @@ export function simplifyNode(node: FigmaNode): SimplifiedNode | null {
     node.type === "RECTANGLE" || node.type === "ELLIPSE" ||
     node.type === "POLYGON" || node.type === "STAR" || node.type === "VECTOR"
   ) {
-    if (node.absoluteBoundingBox) {
-      simplified.absoluteBoundingBox = node.absoluteBoundingBox;
-    }
-    if (node.relativeTransform) {
-      simplified.relativeTransform = node.relativeTransform;
-    }
-    if (node.fills) {
-      simplified.fills = node.fills;
-    }
-    if (node.strokes) {
-      simplified.strokes = node.strokes;
-    }
-    if (node.effects) {
-      simplified.effects = node.effects;
-    }
-    if (node.opacity !== undefined) {
-      simplified.opacity = node.opacity;
-    }
-    if (node.visible !== undefined) {
-      simplified.visible = node.visible;
-    }
-    if (node.cornerRadius !== undefined) {
-      simplified.cornerRadius = node.cornerRadius;
+    for (const prop of properties) {
+      if (node[prop] !== undefined) {
+        simplified[prop] = node[prop];
+      }
     }
   }
 
   if (node.type === "LINE") {
-    if (node.absoluteBoundingBox) {
-      simplified.absoluteBoundingBox = node.absoluteBoundingBox;
-    }
-    if (node.relativeTransform) {
-      simplified.relativeTransform = node.relativeTransform;
-    }
-    if (node.strokes) {
-      simplified.strokes = node.strokes;
-    }
-    if (node.effects) {
-      simplified.effects = node.effects;
-    }
-    if (node.opacity !== undefined) {
-      simplified.opacity = node.opacity;
-    }
-    if (node.visible !== undefined) {
-      simplified.visible = node.visible;
+    for (const prop of ['absoluteBoundingBox', 'relativeTransform', 'strokes', 'effects', 'opacity', 'visible']) {
+      if (node[prop] !== undefined) {
+        simplified[prop] = node[prop];
+      }
     }
   }
 
