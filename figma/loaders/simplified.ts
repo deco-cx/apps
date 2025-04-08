@@ -1,5 +1,11 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse } from "../client.ts";
+import type {
+  FigmaComponent,
+  FigmaComponentSet,
+  FigmaNode,
+  FigmaResponse,
+  FigmaStyle,
+} from "../client.ts";
 import {
   simplifyComponent,
   simplifyComponentSet,
@@ -9,50 +15,50 @@ import {
 
 export interface Props {
   /**
-   * @description A chave do arquivo Figma para obter informações
+   * @description The Figma file key to get information from
    * @example "FpnkfUhKcNS9S4JQFJexL"
    */
   fileKey: string;
 
   /**
-   * @description Versão específica do arquivo (opcional)
+   * @description Specific version of the file (optional)
    */
   version?: string;
 
   /**
-   * @description Profundidade da árvore do documento (opcional)
+   * @description Depth of the document tree (optional)
    */
   depth?: number;
 
   /**
-   * @description Incluir dados de branches (opcional)
+   * @description Include branch data (optional)
    */
   branch_data?: boolean;
 }
 
+interface SimplifiedResponse {
+  name: string;
+  role: string;
+  lastModified: string;
+  editorType: string;
+  thumbnailUrl: string;
+  version: string;
+  document: FigmaNode;
+  components: Record<string, FigmaComponent>;
+  componentSets: Record<string, FigmaComponentSet>;
+  styles: Record<string, FigmaStyle>;
+}
+
 /**
  * @name FILE_SIMPLIFIED
- * @title Arquivo Simplificado
- * @description Obtém uma versão simplificada dos dados de um arquivo do Figma, incluindo apenas as informações mais relevantes
+ * @title Simplified File
+ * @description Gets a simplified version of the data from a Figma file, including only the most relevant information
  */
 export default async function getFileSimplified(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<
-  FigmaResponse<{
-    name: string;
-    role: string;
-    lastModified: string;
-    editorType: string;
-    thumbnailUrl: string;
-    version: string;
-    document: any;
-    components: Record<string, any>;
-    componentSets: Record<string, any>;
-    styles: Record<string, any>;
-  }>
-> {
+): Promise<FigmaResponse<SimplifiedResponse>> {
   const { fileKey, version, depth, branch_data } = props;
   const response = await ctx.figma.getFile(fileKey, {
     version,
@@ -60,35 +66,48 @@ export default async function getFileSimplified(
     branch_data,
   });
 
-  // Se houver erro na resposta, retorna a resposta original
-  if (response.err) {
+  // If there's an error in the response, return the original response
+  if (response.err || !response.data) {
     return response;
   }
 
-  // Se não houver dados, retorna a resposta original
-  if (!response.data) {
-    return response;
-  }
-
-  // Simplifica os dados
-  const simplifiedComponents: Record<string, any> = {};
-  for (const [key, component] of Object.entries(response.data.components)) {
-    simplifiedComponents[key] = simplifyComponent(component);
-  }
-
-  const simplifiedComponentSets: Record<string, any> = {};
+  // Simplify the data
+  const simplifiedComponents: Record<string, FigmaComponent> = {};
   for (
-    const [key, componentSet] of Object.entries(response.data.componentSets)
+    const [key, component] of Object.entries(response.data.components || {})
   ) {
-    simplifiedComponentSets[key] = simplifyComponentSet(componentSet);
+    const simplified = simplifyComponent(component);
+    if (simplified) {
+      simplifiedComponents[key] = simplified as FigmaComponent;
+    }
   }
 
-  const simplifiedStyles: Record<string, any> = {};
-  for (const [key, style] of Object.entries(response.data.styles)) {
-    simplifiedStyles[key] = simplifyStyle(style);
+  const simplifiedComponentSets: Record<string, FigmaComponentSet> = {};
+  for (
+    const [key, componentSet] of Object.entries(
+      response.data.componentSets || {},
+    )
+  ) {
+    const simplified = simplifyComponentSet(componentSet);
+    if (simplified) {
+      simplifiedComponentSets[key] = simplified as FigmaComponentSet;
+    }
   }
 
-  // Retorna os dados simplificados
+  const simplifiedStyles: Record<string, FigmaStyle> = {};
+  for (const [key, style] of Object.entries(response.data.styles || {})) {
+    const simplified = simplifyStyle(style);
+    if (simplified) {
+      simplifiedStyles[key] = simplified as FigmaStyle;
+    }
+  }
+
+  const simplifiedDoc = simplifyDocument(response.data.document);
+  if (!simplifiedDoc) {
+    throw new Error("Failed to simplify document");
+  }
+
+  // Return the simplified data
   return {
     ...response,
     data: {
@@ -98,7 +117,7 @@ export default async function getFileSimplified(
       editorType: response.data.editorType,
       thumbnailUrl: response.data.thumbnailUrl,
       version: response.data.version,
-      document: simplifyDocument(response.data.document),
+      document: simplifiedDoc as FigmaNode,
       components: simplifiedComponents,
       componentSets: simplifiedComponentSets,
       styles: simplifiedStyles,

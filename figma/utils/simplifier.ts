@@ -5,22 +5,26 @@ import type {
   FigmaStyle,
 } from "../client.ts";
 
+type SimplifiedNode = Omit<Partial<FigmaNode>, "children"> & {
+  children?: SimplifiedNode[];
+};
+
 /**
- * @description Simplifica um nó do Figma para incluir apenas as informações mais relevantes
- * @param node O nó do Figma a ser simplificado
- * @returns O nó simplificado
+ * @description Simplifies a Figma node to include only the most relevant information
+ * @param node The Figma node to be simplified
+ * @returns The simplified node
  */
-export function simplifyNode(node: FigmaNode): any {
+export function simplifyNode(node: FigmaNode): SimplifiedNode | null {
   if (!node) return null;
 
-  // Extrair propriedades básicas
-  const simplified: any = {
+  // Extract basic properties
+  const simplified: SimplifiedNode = {
     id: node.id,
     name: node.name,
     type: node.type,
   };
 
-  // Adicionar propriedades específicas com base no tipo de nó
+  // Add specific properties based on node type
   if (
     node.type === "FRAME" || node.type === "GROUP" ||
     node.type === "COMPONENT" || node.type === "INSTANCE"
@@ -162,64 +166,97 @@ export function simplifyNode(node: FigmaNode): any {
     }
   }
 
-  // Processar filhos recursivamente
+  // Process children recursively
   if (node.children && Array.isArray(node.children)) {
-    simplified.children = node.children.map((child) => simplifyNode(child));
+    const simplifiedChildren = node.children
+      .map((child) => simplifyNode(child))
+      .filter((child): child is SimplifiedNode => child !== null);
+
+    if (simplifiedChildren.length > 0) {
+      simplified.children = simplifiedChildren;
+    }
   }
 
   return simplified;
 }
 
 /**
- * @description Simplifica um componente do Figma para incluir apenas as informações mais relevantes
- * @param component O componente do Figma a ser simplificado
- * @returns O componente simplificado
+ * @description Simplifies a Figma component to include only the most relevant information
+ * @param component The Figma component to be simplified
+ * @returns The simplified component
  */
-export function simplifyComponent(component: FigmaComponent): any {
-  if (!component) return null;
+export function simplifyComponent(component: FigmaComponent): FigmaComponent {
+  if (!component) {
+    return {
+      key: "",
+      name: "",
+      description: "",
+      remote: false,
+      documentationLinks: undefined,
+    };
+  }
 
   return {
     key: component.key,
     name: component.name,
-    description: component.description,
+    description: component.description || "",
+    remote: component.remote || false,
+    documentationLinks: component.documentationLinks,
   };
 }
 
 /**
- * @description Simplifica um conjunto de componentes do Figma para incluir apenas as informações mais relevantes
- * @param componentSet O conjunto de componentes do Figma a ser simplificado
- * @returns O conjunto de componentes simplificado
+ * @description Simplifies a Figma component set to include only the most relevant information
+ * @param componentSet The Figma component set to be simplified
+ * @returns The simplified component set
  */
-export function simplifyComponentSet(componentSet: FigmaComponentSet): any {
-  if (!componentSet) return null;
+export function simplifyComponentSet(
+  componentSet: FigmaComponentSet,
+): FigmaComponentSet {
+  if (!componentSet) {
+    return {
+      key: "",
+      name: "",
+      description: "",
+    };
+  }
 
   return {
     key: componentSet.key,
     name: componentSet.name,
+    description: componentSet.description || "",
   };
 }
 
 /**
- * @description Simplifica um estilo do Figma para incluir apenas as informações mais relevantes
- * @param style O estilo do Figma a ser simplificado
- * @returns O estilo simplificado
+ * @description Simplifies a Figma style to include only the most relevant information
+ * @param style The Figma style to be simplified
+ * @returns The simplified style
  */
-export function simplifyStyle(style: FigmaStyle): any {
-  if (!style) return null;
+export function simplifyStyle(style: FigmaStyle): FigmaStyle {
+  if (!style) {
+    return {
+      key: "",
+      name: "",
+      description: "",
+      remote: false,
+    };
+  }
 
   return {
     key: style.key,
     name: style.name,
+    description: style.description || "",
+    remote: style.remote || false,
   };
 }
 
 /**
- * @description Simplifica um documento do Figma para incluir apenas as informações mais relevantes
- * @param document O documento do Figma a ser simplificado
- * @returns O documento simplificado
+ * @description Simplifies a Figma document to include only the most relevant information
+ * @param document The Figma document to be simplified
+ * @returns The simplified document
  */
-export function simplifyDocument(document: FigmaNode): any {
+export function simplifyDocument(document: FigmaNode): SimplifiedNode | null {
   if (!document) return null;
-
   return simplifyNode(document);
 }

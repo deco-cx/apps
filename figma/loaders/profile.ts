@@ -3,31 +3,31 @@ import type { FigmaFile, FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
-   * @description A chave do arquivo Figma para obter informações
+   * @description The Figma file key to get information from
    * @example "FpnkfUhKcNS9S4JQFJexL"
    */
   fileKey: string;
 
   /**
-   * @description Versão específica do arquivo (opcional)
+   * @description Specific version of the file (optional)
    */
   version?: string;
 
   /**
-   * @description Profundidade da árvore do documento (opcional)
+   * @description Depth of the document tree (optional)
    */
   depth?: number;
 
   /**
-   * @description Incluir dados de branches (opcional)
+   * @description Include branch data (optional)
    */
   branch_data?: boolean;
 }
 
 /**
  * @name FILE_PROFILE
- * @title Perfil do Arquivo
- * @description Obtém informações detalhadas sobre um arquivo do Figma, incluindo metadados, documento e componentes
+ * @title File Profile
+ * @description Gets detailed information about a Figma file, including metadata, document and components
  */
 export default async function getFileProfile(
   props: Props,

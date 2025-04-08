@@ -3,31 +3,31 @@ import type { FigmaFile, FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
-   * @description A chave do arquivo Figma para obter informações
+   * @description The Figma file key to get information from
    * @example "FpnkfUhKcNS9S4JQFJexL"
    */
   fileKey: string;
 
   /**
-   * @description Versão específica do arquivo (opcional)
+   * @description Specific version of the file (optional)
    */
   version?: string;
 
   /**
-   * @description Profundidade da árvore do documento (opcional)
+   * @description Depth of the document tree (optional)
    */
   depth?: number;
 
   /**
-   * @description Incluir dados de branches (opcional)
+   * @description Include branch data (optional)
    */
   branch_data?: boolean;
 }
 
 /**
  * @name FILE_COMPONENTS
- * @title Componentes do Arquivo
- * @description Obtém os componentes de um arquivo do Figma, incluindo metadados e informações detalhadas
+ * @title File Components
+ * @description Gets the components of a Figma file, including metadata and detailed information
  */
 export default async function getFileComponents(
   props: Props,
@@ -41,17 +41,17 @@ export default async function getFileComponents(
     branch_data,
   });
 
-  // Se houver erro na resposta, retorna a resposta original
+  // If there's an error in the response, return the original response
   if (response.err) {
     return response;
   }
 
-  // Se não houver dados, retorna a resposta original
+  // If there's no data, return the original response
   if (!response.data) {
     return response;
   }
 
-  // Retorna apenas os componentes do arquivo
+  // Return only the components of the file
   return {
     ...response,
     data: {

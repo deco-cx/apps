@@ -3,7 +3,7 @@ import type { FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
-   * @description A chave do arquivo Figma para obter informações
+   * @description The Figma file key to get information from
    * @example "FpnkfUhKcNS9S4JQFJexL"
    */
   fileKey: string;
@@ -11,8 +11,8 @@ export interface Props {
 
 /**
  * @name FILE_IMAGE_FILLS
- * @title Preenchimentos de Imagem do Arquivo
- * @description Obtém URLs de download para todas as imagens presentes em preenchimentos de imagem em um documento
+ * @title File Image Fills
+ * @description Gets download URLs for all images present in image fills in a document
  */
 export default async function getFileImageFills(
   props: Props,

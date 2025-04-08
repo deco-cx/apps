@@ -5,7 +5,7 @@ import { Secret } from "../website/loaders/secret.ts";
 
 export interface Props {
   /**
-   * @description Token de acesso da API do Figma para autenticação
+   * @description Figma API access token for authentication
    */
   accessToken: string | Secret;
 }
@@ -19,7 +19,7 @@ export type AppContext = FnContext<State, Manifest>;
 /**
  * @name FIGMA
  * @title Figma
- * @description Um app Deco para interagir com as APIs do Figma com respostas fortemente tipadas
+ * @description A Deco app to interact with the Figma APIs with strongly typed responses
  */
 export default function App(props: Props): App<Manifest, State> {
   const figma = new FigmaClient(
@@ -37,5 +37,5 @@ export default function App(props: Props): App<Manifest, State> {
   };
 }
 
-// Re-exporta tipos do cliente para conveniência
+// Re-exports client types for convenience
 export * from "./client.ts";

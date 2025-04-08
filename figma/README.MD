@@ -1,6 +1,148 @@
+# Figma APP
+
+This Deco app allows you to interact with Figma APIs and provides a simplified interface to access Figma data.
+
+## Available Loaders
+
+### FILE_PROFILE
+
+Gets detailed information about a Figma file, including metadata, document and components.
+
+```typescript
+import { getFileProfile } from "figma/loaders/profile.ts";
+
+const profile = await getFileProfile({
+  fileKey: "your_file_key_here",
+  // optionally: version, depth, branch_data
+});
+```
+
+### FILE_COMPONENTS
+
+Gets the components of a Figma file, including metadata and detailed information.
+
+```typescript
+import { getFileComponents } from "figma/loaders/components.ts";
+
+const components = await getFileComponents({
+  fileKey: "your_file_key_here",
+  // optionally: version, depth, branch_data
+});
+```
+
+### FILE_NODES
+
+Gets specific nodes from a Figma file, including metadata and detailed information.
+
+```typescript
+import { getFileNodes } from "figma/loaders/nodes.ts";
+
+const nodes = await getFileNodes({
+  fileKey: "your_file_key_here",
+  nodeIds: ["1:2", "1:3"],
+  // optionally: version, depth, geometry
+});
+```
+
+### FILE_IMAGES
+
+Gets images from specific nodes of a Figma file.
+
+```typescript
+import { getFileImages } from "figma/loaders/images.ts";
+
+const images = await getFileImages({
+  fileKey: "your_file_key_here",
+  nodeIds: ["1:2", "1:3"],
+  // optionally: scale, format, svg_outline_text, svg_include_id, svg_include_node_id, 
+  // svg_simplify_stroke, contents_only, use_absolute_bounds, version
+});
+```
+
+### FILE_IMAGE_FILLS
+
+Gets download URLs for all images present in image fills in a document.
+
+```typescript
+import { getFileImageFills } from "figma/loaders/image-fills.ts";
+
+const imageFills = await getFileImageFills({
+  fileKey: "your_file_key_here",
+});
+```
+
+### FILE_SIMPLIFIED
+
+Gets a simplified version of the data from a Figma file, including only the most relevant information.
+
+```typescript
+import { getFileSimplified } from "figma/loaders/simplified.ts";
+
+const simplified = await getFileSimplified({
+  fileKey: "your_file_key_here",
+  // optionally: version, depth, branch_data
+});
+```
+
+### FILE_SIMPLIFIED_NODES
+
+Gets specific nodes from a Figma file in simplified format.
+
+```typescript
+import { getFileSimplifiedNodes } from "figma/loaders/simplified-nodes.ts";
+
+const simplifiedNodes = await getFileSimplifiedNodes({
+  fileKey: "your_file_key_here",
+  nodeIds: ["1:2", "1:3"],
+  // optionally: version, depth, geometry
+});
+```
+
+## Utilities
+
+### Simplifier
+
+The simplification utility (`utils/simplifier.ts`) provides functions to simplify Figma data, including only the most relevant information.
+
+```typescript
+import { simplifyNode, simplifyComponent, simplifyComponentSet, simplifyStyle, simplifyDocument } from "figma/utils/simplifier.ts";
+
+// Simplify a node
+const simplifiedNode = simplifyNode(node);
+
+// Simplify a component
+const simplifiedComponent = simplifyComponent(component);
+
+// Simplify a component set
+const simplifiedComponentSet = simplifyComponentSet(componentSet);
+
+// Simplify a style
+const simplifiedStyle = simplifyStyle(style);
+
+// Simplify a document
+const simplifiedDocument = simplifyDocument(document);
+```
+
+## Configuration
+
+To use this app, you need to provide a Figma API access token.
+
+```typescript
+import { App } from "figma/mod.ts";
+
+const figmaApp = App({
+  accessToken: "your_token_here",
+});
+```
+
+## References
+
+- [Figma API Documentation](https://www.figma.com/developers/api)
+- [Figma-Context-MCP](https://github.com/GLips/Figma-Context-MCP)
+
 ## Figma APP
 
-TODO: Implement oAuth
+## TODO: Implement oAuth
 
 Endpoints
 Files endpoints allow for a wide range of functionality to get information about files. With a specific file key, you can get the JSON and image representations of the whole file or individual nodes within the file.
@@ -60,17 +202,8 @@ Return value
    }
   ]
 }
-Try it out for yourself
-file_key 
-version (optional)
-ids (optional)
-depth (optional)
-geometry (optional)
-plugin_data (optional)
-branch_data (optional)
-figd_YFOG0pcXEpD-3EKhQgAjwq_EitgYtWLYx4rAU4Kp
-Your cURL command
-curl -H 'X-FIGMA-TOKEN: figd_YFOG0pcXEpD-3EKhQgAjwq_EitgYtWLYx4rAU4Kp' 'https://api.figma.com/v1/files/:file_key'
+
+
 Examples
 To get the JSON for specific nodes, their subtrees, and all the nodes in their ancestor chains:
 
@@ -138,16 +271,7 @@ Return value
     }
   }
 }
-Try it out for yourself
-file_key 
-ids 
-depth (optional)
-geometry (optional)
-version (optional)
-plugin_data (optional)
-figd_YFOG0pcXEpD-3EKhQgAjwq_EitgYtWLYx4rAU4Kp
-Your cURL command
-curl -H 'X-FIGMA-TOKEN: figd_YFOG0pcXEpD-3EKhQgAjwq_EitgYtWLYx4rAU4Kp' 'https://api.figma.com/v1/files/:file_key/nodes'
+
 Examples
 To get the JSON for specific nodes and their subtrees:
 

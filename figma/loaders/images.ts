@@ -3,69 +3,69 @@ import type { FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
-   * @description A chave do arquivo Figma para obter informações
+   * @description The Figma file key to get information from
    * @example "FpnkfUhKcNS9S4JQFJexL"
    */
   fileKey: string;
 
   /**
-   * @description IDs dos nós que você deseja obter imagens
+   * @description IDs of the nodes you want to get images from
    * @example ["1:2", "1:3"]
    */
   nodeIds: string[];
 
   /**
-   * @description Fator de escala da imagem (opcional)
+   * @description Image scale factor (optional)
    * @example 1
    */
   scale?: number;
 
   /**
-   * @description Formato da imagem (opcional)
+   * @description Image format (optional)
    * @example "png"
    */
   format?: "jpg" | "png" | "svg" | "pdf";
 
   /**
-   * @description Renderizar elementos de texto como contornos em SVGs (opcional)
+   * @description Render text elements as outlines in SVGs (optional)
    */
   svg_outline_text?: boolean;
 
   /**
-   * @description Incluir atributos de ID para todos os elementos SVG (opcional)
+   * @description Include ID attributes for all SVG elements (optional)
    */
   svg_include_id?: boolean;
 
   /**
-   * @description Incluir atributos de ID de nó para todos os elementos SVG (opcional)
+   * @description Include node ID attributes for all SVG elements (optional)
    */
   svg_include_node_id?: boolean;
 
   /**
-   * @description Simplificar traços internos/externos e usar o atributo de traço se possível (opcional)
+   * @description Simplify inner/outer strokes and use stroke attribute if possible (optional)
    */
   svg_simplify_stroke?: boolean;
 
   /**
-   * @description Excluir conteúdo que se sobrepõe ao nó da renderização (opcional)
+   * @description Exclude content that overlaps with the node from rendering (optional)
    */
   contents_only?: boolean;
 
   /**
-   * @description Usar as dimensões completas do nó independentemente de ser cortado ou o espaço ao redor estar vazio (opcional)
+   * @description Use the complete dimensions of the node regardless of whether it is cropped or the surrounding space is empty (optional)
    */
   use_absolute_bounds?: boolean;
 
   /**
-   * @description Versão específica do arquivo (opcional)
+   * @description Specific version of the file (optional)
    */
   version?: string;
 }
 
 /**
  * @name FILE_IMAGES
- * @title Imagens do Arquivo
- * @description Obtém imagens de nós específicos de um arquivo do Figma
+ * @title File Images
+ * @description Gets images from specific nodes of a Figma file
  */
 export default async function getFileImages(
   props: Props,

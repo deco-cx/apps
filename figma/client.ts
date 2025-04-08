@@ -1,5 +1,5 @@
 /**
- * @description Resposta da API do Figma com informações de sucesso/erro
+ * @description Figma API response with success/error information
  */
 export interface FigmaResponse<T = unknown> {
   err?: string;
@@ -8,45 +8,53 @@ export interface FigmaResponse<T = unknown> {
 }
 
 /**
- * @description Nó do documento Figma
+ * @description Figma document node
  */
 export interface FigmaNode {
   id: string;
   name: string;
   type: string;
-  [key: string]: any; // Outros campos específicos do nó
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | FigmaNode
+    | FigmaComponent
+    | FigmaComponentSet
+    | FigmaStyle
+    | undefined; // Other specific fields of the node
 }
 
 /**
- * @description Componente do Figma
+ * @description Figma component
  */
 export interface FigmaComponent {
   key: string;
   name: string;
   description: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined; // Other specific fields of the component
 }
 
 /**
- * @description Conjunto de componentes do Figma
+ * @description Figma component set
  */
 export interface FigmaComponentSet {
   key: string;
   name: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined; // Other specific fields of the component set
 }
 
 /**
- * @description Estilo do Figma
+ * @description Figma style
  */
 export interface FigmaStyle {
   key: string;
   name: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined; // Other specific fields of the style
 }
 
 /**
- * @description Arquivo do Figma
+ * @description Figma file
  */
 export interface FigmaFile {
   name: string;
@@ -71,7 +79,7 @@ export interface FigmaFile {
 }
 
 /**
- * @description Cliente para interagir com as APIs do Figma
+ * @description Client to interact with Figma APIs
  */
 export class FigmaClient {
   private headers: { "X-FIGMA-TOKEN": string };
@@ -83,9 +91,9 @@ export class FigmaClient {
   }
 
   /**
-   * @description Obtém um arquivo do Figma
-   * @param fileKey Chave do arquivo
-   * @param options Opções da requisição
+   * @description Gets a file from Figma
+   * @param fileKey File key
+   * @param options Request options
    */
   async getFile(
     fileKey: string,
@@ -120,10 +128,10 @@ export class FigmaClient {
   }
 
   /**
-   * @description Obtém nós específicos de um arquivo
-   * @param fileKey Chave do arquivo
-   * @param nodeIds IDs dos nós
-   * @param options Opções da requisição
+   * @description Gets specific nodes from a file
+   * @param fileKey File key
+   * @param nodeIds Node IDs
+   * @param options Request options
    */
   async getFileNodes(
     fileKey: string,
@@ -163,10 +171,10 @@ export class FigmaClient {
   }
 
   /**
-   * @description Renderiza imagens de um arquivo
-   * @param fileKey Chave do arquivo
-   * @param nodeIds IDs dos nós
-   * @param options Opções da renderização
+   * @description Renders images from a file
+   * @param fileKey File key
+   * @param nodeIds Node IDs
+   * @param options Rendering options
    */
   async getImages(
     fileKey: string,
@@ -233,8 +241,8 @@ export class FigmaClient {
   }
 
   /**
-   * @description Obtém URLs de download para todas as imagens presentes em image fills
-   * @param fileKey Chave do arquivo
+   * @description Gets download URLs for all images present in image fills
+   * @param fileKey File key
    */
   async getImageFills(
     fileKey: string,
