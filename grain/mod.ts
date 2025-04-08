@@ -21,7 +21,8 @@ export type AppContext = FnContext<State, Manifest>;
 /**
  * @name Grain
  * @title Grain
- * @description A Deco app for interacting with the Grain API.
+ * @description grain.com is an AI Notetaker for your meeting
+ * @logo https://images.ctfassets.net/9haz2glq4wt0/36OjNsjfRZpaR1QtYtPucU/391ae8f9716fa000508b11583fcc9ebb/Grain_AI_Logo.png
  * @version 1.0.0
  */
 export default function App(props: Props): App<Manifest, State> {

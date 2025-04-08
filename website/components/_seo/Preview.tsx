@@ -106,7 +106,7 @@ function PreviewItem(
 }
 
 function Preview(props: SeoProps) {
-  const path = useMemo(() => globalThis.window.location?.host, []);
+  const path = useMemo(() => globalThis.location?.host, []);
 
   return (
     <>
