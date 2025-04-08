@@ -26,11 +26,26 @@ export function simplifyNode(node: FigmaNode): SimplifiedNode | null {
 
   // Adds specific properties based on node type
   const properties = [
-    'absoluteBoundingBox', 'relativeTransform', 'layout', 'fills', 
-    'strokes', 'effects', 'opacity', 'visible', 'clipsContent', 
-    'backgroundColor', 'cornerRadius', 'paddingLeft', 'paddingRight', 
-    'paddingTop', 'paddingBottom', 'itemSpacing', 'counterAxisSizingMode', 
-    'primaryAxisSizingMode', 'primaryAxisAlignItems', 'counterAxisAlignItems'
+    "absoluteBoundingBox",
+    "relativeTransform",
+    "layout",
+    "fills",
+    "strokes",
+    "effects",
+    "opacity",
+    "visible",
+    "clipsContent",
+    "backgroundColor",
+    "cornerRadius",
+    "paddingLeft",
+    "paddingRight",
+    "paddingTop",
+    "paddingBottom",
+    "itemSpacing",
+    "counterAxisSizingMode",
+    "primaryAxisSizingMode",
+    "primaryAxisAlignItems",
+    "counterAxisAlignItems",
   ];
 
   if (
@@ -51,7 +66,15 @@ export function simplifyNode(node: FigmaNode): SimplifiedNode | null {
     if (node.style) {
       simplified.style = node.style;
     }
-    for (const prop of ['absoluteBoundingBox', 'relativeTransform', 'fills', 'opacity', 'visible']) {
+    for (
+      const prop of [
+        "absoluteBoundingBox",
+        "relativeTransform",
+        "fills",
+        "opacity",
+        "visible",
+      ]
+    ) {
       if (node[prop] !== undefined) {
         simplified[prop] = node[prop];
       }
@@ -70,7 +93,16 @@ export function simplifyNode(node: FigmaNode): SimplifiedNode | null {
   }
 
   if (node.type === "LINE") {
-    for (const prop of ['absoluteBoundingBox', 'relativeTransform', 'strokes', 'effects', 'opacity', 'visible']) {
+    for (
+      const prop of [
+        "absoluteBoundingBox",
+        "relativeTransform",
+        "strokes",
+        "effects",
+        "opacity",
+        "visible",
+      ]
+    ) {
       if (node[prop] !== undefined) {
         simplified[prop] = node[prop];
       }
