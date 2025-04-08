@@ -18,9 +18,11 @@ export default async function getFileImageFills(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<FigmaResponse<{
-  images: Record<string, string>;
-}>> {
+): Promise<
+  FigmaResponse<{
+    images: Record<string, string>;
+  }>
+> {
   const { fileKey } = props;
   return await ctx.figma.getImageFills(fileKey);
-} 
+}

@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse, FigmaFile } from "../client.ts";
+import type { FigmaFile, FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
@@ -40,4 +40,4 @@ export default async function getFileProfile(
     depth,
     branch_data,
   });
-} 
+}

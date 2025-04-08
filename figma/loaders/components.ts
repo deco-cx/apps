@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse, FigmaFile } from "../client.ts";
+import type { FigmaFile, FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
@@ -40,17 +40,17 @@ export default async function getFileComponents(
     depth,
     branch_data,
   });
-  
+
   // Se houver erro na resposta, retorna a resposta original
   if (response.err) {
     return response;
   }
-  
+
   // Se não houver dados, retorna a resposta original
   if (!response.data) {
     return response;
   }
-  
+
   // Retorna apenas os componentes do arquivo
   return {
     ...response,
@@ -61,4 +61,4 @@ export default async function getFileComponents(
       componentSets: response.data.componentSets,
     },
   };
-} 
+}

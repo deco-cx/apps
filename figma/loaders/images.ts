@@ -71,9 +71,11 @@ export default async function getFileImages(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<FigmaResponse<{
-  images: Record<string, string | null>;
-}>> {
+): Promise<
+  FigmaResponse<{
+    images: Record<string, string | null>;
+  }>
+> {
   const {
     fileKey,
     nodeIds,
@@ -87,7 +89,7 @@ export default async function getFileImages(
     use_absolute_bounds,
     version,
   } = props;
-  
+
   return await ctx.figma.getImages(fileKey, nodeIds, {
     scale,
     format,
@@ -99,4 +101,4 @@ export default async function getFileImages(
     use_absolute_bounds,
     version,
   });
-} 
+}

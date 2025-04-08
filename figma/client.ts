@@ -96,7 +96,7 @@ export class FigmaClient {
       geometry?: "paths";
       plugin_data?: string;
       branch_data?: boolean;
-    }
+    },
   ): Promise<FigmaResponse<FigmaFile>> {
     const params = new URLSearchParams();
 
@@ -105,11 +105,15 @@ export class FigmaClient {
     if (options?.depth) params.append("depth", options.depth.toString());
     if (options?.geometry) params.append("geometry", options.geometry);
     if (options?.plugin_data) params.append("plugin_data", options.plugin_data);
-    if (options?.branch_data) params.append("branch_data", options.branch_data.toString());
+    if (options?.branch_data) {
+      params.append("branch_data", options.branch_data.toString());
+    }
 
     const response = await fetch(
-      `https://api.figma.com/v1/files/${fileKey}${params.toString() ? `?${params}` : ""}`,
-      { headers: this.headers }
+      `https://api.figma.com/v1/files/${fileKey}${
+        params.toString() ? `?${params}` : ""
+      }`,
+      { headers: this.headers },
     );
 
     return response.json();
@@ -129,16 +133,18 @@ export class FigmaClient {
       depth?: number;
       geometry?: "paths";
       plugin_data?: string;
-    }
-  ): Promise<FigmaResponse<{
-    nodes: Record<string, {
-      document: FigmaNode;
-      components: Record<string, FigmaComponent>;
-      componentSets: Record<string, FigmaComponentSet>;
-      styles: Record<string, FigmaStyle>;
-      schemaVersion: number;
-    }>;
-  }>> {
+    },
+  ): Promise<
+    FigmaResponse<{
+      nodes: Record<string, {
+        document: FigmaNode;
+        components: Record<string, FigmaComponent>;
+        componentSets: Record<string, FigmaComponentSet>;
+        styles: Record<string, FigmaStyle>;
+        schemaVersion: number;
+      }>;
+    }>
+  > {
     const params = new URLSearchParams({
       ids: nodeIds.join(","),
     });
@@ -150,7 +156,7 @@ export class FigmaClient {
 
     const response = await fetch(
       `https://api.figma.com/v1/files/${fileKey}/nodes?${params}`,
-      { headers: this.headers }
+      { headers: this.headers },
     );
 
     return response.json();
@@ -175,34 +181,52 @@ export class FigmaClient {
       contents_only?: boolean;
       use_absolute_bounds?: boolean;
       version?: string;
-    }
-  ): Promise<FigmaResponse<{
-    images: Record<string, string | null>;
-  }>> {
+    },
+  ): Promise<
+    FigmaResponse<{
+      images: Record<string, string | null>;
+    }>
+  > {
     const params = new URLSearchParams({
       ids: nodeIds.join(","),
     });
 
     if (options?.scale) params.append("scale", options.scale.toString());
     if (options?.format) params.append("format", options.format);
-    if (options?.svg_outline_text !== undefined) 
+    if (options?.svg_outline_text !== undefined) {
       params.append("svg_outline_text", options.svg_outline_text.toString());
-    if (options?.svg_include_id !== undefined)
+    }
+    if (options?.svg_include_id !== undefined) {
       params.append("svg_include_id", options.svg_include_id.toString());
-    if (options?.svg_include_node_id !== undefined)
-      params.append("svg_include_node_id", options.svg_include_node_id.toString());
-    if (options?.svg_simplify_stroke !== undefined)
-      params.append("svg_simplify_stroke", options.svg_simplify_stroke.toString());
-    if (options?.contents_only !== undefined)
+    }
+    if (options?.svg_include_node_id !== undefined) {
+      params.append(
+        "svg_include_node_id",
+        options.svg_include_node_id.toString(),
+      );
+    }
+    if (options?.svg_simplify_stroke !== undefined) {
+      params.append(
+        "svg_simplify_stroke",
+        options.svg_simplify_stroke.toString(),
+      );
+    }
+    if (options?.contents_only !== undefined) {
       params.append("contents_only", options.contents_only.toString());
-    if (options?.use_absolute_bounds !== undefined)
-      params.append("use_absolute_bounds", options.use_absolute_bounds.toString());
-    if (options?.version)
+    }
+    if (options?.use_absolute_bounds !== undefined) {
+      params.append(
+        "use_absolute_bounds",
+        options.use_absolute_bounds.toString(),
+      );
+    }
+    if (options?.version) {
       params.append("version", options.version);
+    }
 
     const response = await fetch(
       `https://api.figma.com/v1/images/${fileKey}?${params}`,
-      { headers: this.headers }
+      { headers: this.headers },
     );
 
     return response.json();
@@ -213,15 +237,17 @@ export class FigmaClient {
    * @param fileKey Chave do arquivo
    */
   async getImageFills(
-    fileKey: string
-  ): Promise<FigmaResponse<{
-    images: Record<string, string>;
-  }>> {
+    fileKey: string,
+  ): Promise<
+    FigmaResponse<{
+      images: Record<string, string>;
+    }>
+  > {
     const response = await fetch(
       `https://api.figma.com/v1/files/${fileKey}/images`,
-      { headers: this.headers }
+      { headers: this.headers },
     );
 
     return response.json();
   }
-} 
+}

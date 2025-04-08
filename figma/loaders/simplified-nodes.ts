@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse, FigmaNode } from "../client.ts";
+import type { FigmaNode, FigmaResponse } from "../client.ts";
 import { simplifyNode } from "../utils/simplifier.ts";
 
 export interface Props {
@@ -40,38 +40,40 @@ export default async function getFileSimplifiedNodes(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<FigmaResponse<{
-  nodes: Record<string, {
-    document: any;
-    components: Record<string, any>;
-    componentSets: Record<string, any>;
-    styles: Record<string, any>;
-    schemaVersion: number;
-  }>;
-}>> {
+): Promise<
+  FigmaResponse<{
+    nodes: Record<string, {
+      document: any;
+      components: Record<string, any>;
+      componentSets: Record<string, any>;
+      styles: Record<string, any>;
+      schemaVersion: number;
+    }>;
+  }>
+> {
   const { fileKey, nodeIds, version, depth, geometry } = props;
   const response = await ctx.figma.getFileNodes(fileKey, nodeIds, {
     version,
     depth,
     geometry,
   });
-  
+
   // Se houver erro na resposta, retorna a resposta original
   if (response.err) {
     return response;
   }
-  
+
   // Se não houver dados, retorna a resposta original
   if (!response.data) {
     return response;
   }
-  
+
   // Simplifica os nós
   const simplifiedNodes: Record<string, any> = {};
-  
+
   for (const [nodeId, nodeData] of Object.entries(response.data.nodes)) {
     if (!nodeData) continue;
-    
+
     simplifiedNodes[nodeId] = {
       document: simplifyNode(nodeData.document),
       components: nodeData.components,
@@ -80,7 +82,7 @@ export default async function getFileSimplifiedNodes(
       schemaVersion: nodeData.schemaVersion,
     };
   }
-  
+
   // Retorna os nós simplificados
   return {
     ...response,
@@ -88,4 +90,4 @@ export default async function getFileSimplifiedNodes(
       nodes: simplifiedNodes,
     },
   };
-} 
+}

@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import type { FigmaResponse, FigmaNode } from "../client.ts";
+import type { FigmaNode, FigmaResponse } from "../client.ts";
 
 export interface Props {
   /**
@@ -39,19 +39,21 @@ export default async function getFileNodes(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<FigmaResponse<{
-  nodes: Record<string, {
-    document: FigmaNode;
-    components: Record<string, any>;
-    componentSets: Record<string, any>;
-    styles: Record<string, any>;
-    schemaVersion: number;
-  }>;
-}>> {
+): Promise<
+  FigmaResponse<{
+    nodes: Record<string, {
+      document: FigmaNode;
+      components: Record<string, any>;
+      componentSets: Record<string, any>;
+      styles: Record<string, any>;
+      schemaVersion: number;
+    }>;
+  }>
+> {
   const { fileKey, nodeIds, version, depth, geometry } = props;
   return await ctx.figma.getFileNodes(fileKey, nodeIds, {
     version,
     depth,
     geometry,
   });
-} 
+}

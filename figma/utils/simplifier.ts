@@ -1,4 +1,9 @@
-import type { FigmaNode, FigmaComponent, FigmaComponentSet, FigmaStyle } from "../client.ts";
+import type {
+  FigmaComponent,
+  FigmaComponentSet,
+  FigmaNode,
+  FigmaStyle,
+} from "../client.ts";
 
 /**
  * @description Simplifica um nó do Figma para incluir apenas as informações mais relevantes
@@ -16,7 +21,10 @@ export function simplifyNode(node: FigmaNode): any {
   };
 
   // Adicionar propriedades específicas com base no tipo de nó
-  if (node.type === "FRAME" || node.type === "GROUP" || node.type === "COMPONENT" || node.type === "INSTANCE") {
+  if (
+    node.type === "FRAME" || node.type === "GROUP" ||
+    node.type === "COMPONENT" || node.type === "INSTANCE"
+  ) {
     if (node.absoluteBoundingBox) {
       simplified.absoluteBoundingBox = node.absoluteBoundingBox;
     }
@@ -103,7 +111,10 @@ export function simplifyNode(node: FigmaNode): any {
     }
   }
 
-  if (node.type === "RECTANGLE" || node.type === "ELLIPSE" || node.type === "POLYGON" || node.type === "STAR" || node.type === "VECTOR") {
+  if (
+    node.type === "RECTANGLE" || node.type === "ELLIPSE" ||
+    node.type === "POLYGON" || node.type === "STAR" || node.type === "VECTOR"
+  ) {
     if (node.absoluteBoundingBox) {
       simplified.absoluteBoundingBox = node.absoluteBoundingBox;
     }
@@ -153,7 +164,7 @@ export function simplifyNode(node: FigmaNode): any {
 
   // Processar filhos recursivamente
   if (node.children && Array.isArray(node.children)) {
-    simplified.children = node.children.map(child => simplifyNode(child));
+    simplified.children = node.children.map((child) => simplifyNode(child));
   }
 
   return simplified;
@@ -211,4 +222,4 @@ export function simplifyDocument(document: FigmaNode): any {
   if (!document) return null;
 
   return simplifyNode(document);
-} 
+}

@@ -23,7 +23,9 @@ export type AppContext = FnContext<State, Manifest>;
  */
 export default function App(props: Props): App<Manifest, State> {
   const figma = new FigmaClient(
-    typeof props.accessToken === "string" ? props.accessToken : props.accessToken.get()!,
+    typeof props.accessToken === "string"
+      ? props.accessToken
+      : props.accessToken.get()!,
   );
 
   return {
@@ -36,4 +38,4 @@ export default function App(props: Props): App<Manifest, State> {
 }
 
 // Re-exporta tipos do cliente para conveniência
-export * from "./client.ts"; 
+export * from "./client.ts";
