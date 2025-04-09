@@ -1,6 +1,9 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { fetchAndProcessImage, processImageWithCompression } from "../utils/imageProcessing.ts";
+import {
+  fetchAndProcessImage,
+  processImageWithCompression,
+} from "../utils/imageProcessing.ts";
 
 /**
  * @name SEARCH_AND_REPLACE
@@ -41,13 +44,13 @@ export default async function searchAndReplace(
           searchPrompt,
           prompt,
         });
-        
+
         // Start the async upload without awaiting
         uploadImage(result.base64Image, presignedUrl)
-          .catch(error => console.error("Error uploading image:", error));
-        
-        return result;
-      }
+          .catch((error) => console.error("Error uploading image:", error));
+
+        return result as unknown as Uint8Array;
+      },
     });
 
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
@@ -55,7 +58,8 @@ export default async function searchAndReplace(
       content: [
         {
           type: "text",
-          text: `Started replacing "${searchPrompt}" with "${prompt}" in the image. The result will be available at ${finalUrl} when complete.`,
+          text:
+            `Started replacing "${searchPrompt}" with "${prompt}" in the image. The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };

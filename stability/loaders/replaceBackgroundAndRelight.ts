@@ -1,7 +1,10 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { ReplaceBackgroundAndRelightOptions } from "../stabilityAiClient.ts";
-import { compressImage, fetchAndProcessImage, processImageWithCompression } from "../utils/imageProcessing.ts";
+import {
+  compressImage,
+  fetchAndProcessImage,
+  processImageWithCompression,
+} from "../utils/imageProcessing.ts";
 
 /**
  * @name REPLACE_BACKGROUND_AND_RELIGHT
@@ -93,7 +96,9 @@ export default async function replaceBackgroundAndRelight(
 
     let backgroundReferenceBuffer: Uint8Array | undefined;
     if (backgroundReferenceUrl) {
-      backgroundReferenceBuffer = await fetchAndProcessImage(backgroundReferenceUrl);
+      backgroundReferenceBuffer = await fetchAndProcessImage(
+        backgroundReferenceUrl,
+      );
     }
 
     let lightReferenceBuffer: Uint8Array | undefined;
@@ -115,20 +120,26 @@ export default async function replaceBackgroundAndRelight(
             keepOriginalBackground,
             lightSourceDirection,
             lightSourceStrength,
-            backgroundReference: backgroundReferenceBuffer ? await compressImage(backgroundReferenceBuffer) : undefined,
-            lightReference: lightReferenceBuffer ? await compressImage(lightReferenceBuffer) : undefined,
+            backgroundReference: backgroundReferenceBuffer
+              ? String(await compressImage(backgroundReferenceBuffer))
+              : undefined,
+            lightReference: lightReferenceBuffer
+              ? String(await compressImage(lightReferenceBuffer))
+              : undefined,
           },
         );
 
         if (result.id) {
           // Start the async processing without awaiting
           stabilityClient.fetchGenerationResult(result.id)
-            .then(finalResult => uploadImage(finalResult.base64Image, presignedUrl))
-            .catch(error => console.error("Error processing image:", error));
+            .then((finalResult) =>
+              uploadImage(finalResult.base64Image, presignedUrl)
+            )
+            .catch((error) => console.error("Error processing image:", error));
         }
 
-        return result;
-      }
+        return result as unknown as Uint8Array;
+      },
     });
 
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
@@ -136,7 +147,8 @@ export default async function replaceBackgroundAndRelight(
       content: [
         {
           type: "text",
-          text: `Started background replacement and relighting process. The result will be available at ${finalUrl} when complete.`,
+          text:
+            `Started background replacement and relighting process. The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };
@@ -148,7 +160,8 @@ export default async function replaceBackgroundAndRelight(
       content: [
         {
           type: "text",
-          text: `Error: Failed to start background replacement process: ${errorMessage}`,
+          text:
+            `Error: Failed to start background replacement process: ${errorMessage}`,
         },
       ],
     };

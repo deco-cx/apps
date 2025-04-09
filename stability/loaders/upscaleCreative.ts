@@ -1,7 +1,9 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { UpscaleCreativeOptions } from "../stabilityAiClient.ts";
-import { fetchAndProcessImage, processImageWithCompression } from "../utils/imageProcessing.ts";
+import {
+  fetchAndProcessImage,
+  processImageWithCompression,
+} from "../utils/imageProcessing.ts";
 
 /**
  * @name UPSCALE_CREATIVE
@@ -39,7 +41,7 @@ export default async function upscaleCreative(
     const imageBuffer = await fetchAndProcessImage(imageUrl);
     const { stabilityClient } = ctx;
 
-    const result = await processImageWithCompression({
+    await processImageWithCompression({
       imageBuffer,
       processFn: async (buffer) => {
         const result = await stabilityClient.upscaleCreative(buffer, {
@@ -49,14 +51,15 @@ export default async function upscaleCreative(
         });
 
         if (result.id) {
-          // Start the async processing without awaiting
           stabilityClient.fetchGenerationResult(result.id)
-            .then(finalResult => uploadImage(finalResult.base64Image, presignedUrl))
-            .catch(error => console.error("Error processing image:", error));
+            .then((finalResult) =>
+              uploadImage(finalResult.base64Image, presignedUrl)
+            )
+            .catch((error) => console.error("Error processing image:", error));
         }
 
-        return result;
-      }
+        return result as unknown as Uint8Array;
+      },
     });
 
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
@@ -64,12 +67,12 @@ export default async function upscaleCreative(
       content: [
         {
           type: "text",
-          text: `Started creative upscaling process. The result will be available at ${finalUrl} when complete.`,
+          text:
+            `Started creative upscaling process. The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };
   } catch (error) {
-    console.log({ errorName: error instanceof Error ? error.name : "Unknown" });
     const errorMessage = error instanceof Error
       ? error.message
       : "Unknown error";
