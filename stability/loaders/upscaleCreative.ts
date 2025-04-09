@@ -1,6 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
 import { UpscaleCreativeOptions } from "../stabilityAiClient.ts";
+import { fetchAndProcessImage, processImageWithCompression } from "../utils/imageProcessing.ts";
 
 /**
  * @name UPSCALE_CREATIVE
@@ -29,61 +30,46 @@ export interface Props {
   creativity?: number;
 }
 
-async function handleUpscaleCreative(
-  imageBuffer: Uint8Array,
-  options: UpscaleCreativeOptions,
-  presignedUrl: string,
-  ctx: AppContext,
-) {
-  try {
-    const { stabilityClient } = ctx;
-    const result = await stabilityClient.upscaleCreative(imageBuffer, options);
-
-    const finalResult = await stabilityClient.fetchGenerationResult(result.id);
-
-    await uploadImage(finalResult.base64Image, presignedUrl);
-  } catch (error) {
-    console.error("Error in background upscaling:", error);
-    if (error instanceof Error) {
-      console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
-      });
-    }
-  }
-}
-
 export default async function upscaleCreative(
   { imageUrl, presignedUrl, prompt, negativePrompt, creativity }: Props,
   _request: Request,
   ctx: AppContext,
 ) {
   try {
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
-    }
-    const imageArrayBuffer = await imageResponse.arrayBuffer();
-    const imageBuffer = new Uint8Array(imageArrayBuffer);
+    const imageBuffer = await fetchAndProcessImage(imageUrl);
+    const { stabilityClient } = ctx;
 
-    handleUpscaleCreative(
+    const result = await processImageWithCompression({
       imageBuffer,
-      { prompt, negativePrompt, creativity },
-      presignedUrl,
-      ctx,
-    );
+      processFn: async (buffer) => {
+        const result = await stabilityClient.upscaleCreative(buffer, {
+          prompt,
+          negativePrompt,
+          creativity,
+        });
+
+        if (result.id) {
+          // Start the async processing without awaiting
+          stabilityClient.fetchGenerationResult(result.id)
+            .then(finalResult => uploadImage(finalResult.base64Image, presignedUrl))
+            .catch(error => console.error("Error processing image:", error));
+        }
+
+        return result;
+      }
+    });
 
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [
         {
           type: "text",
-          text:
-            `Started creative upscaling process. The result will be available at ${finalUrl} when complete.`,
+          text: `Started creative upscaling process. The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };
   } catch (error) {
+    console.log({ errorName: error instanceof Error ? error.name : "Unknown" });
     const errorMessage = error instanceof Error
       ? error.message
       : "Unknown error";

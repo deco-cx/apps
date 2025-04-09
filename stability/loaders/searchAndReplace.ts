@@ -1,5 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
+import { fetchAndProcessImage, processImageWithCompression } from "../utils/imageProcessing.ts";
 
 /**
  * @name SEARCH_AND_REPLACE
@@ -30,29 +31,31 @@ export default async function searchAndReplace(
   ctx: AppContext,
 ) {
   try {
-    // Fetch the image from the URL
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
-    }
-    const imageArrayBuffer = await imageResponse.arrayBuffer();
-    const imageBuffer = new Uint8Array(imageArrayBuffer);
-
+    const imageBuffer = await fetchAndProcessImage(imageUrl);
     const { stabilityClient } = ctx;
-    const result = await stabilityClient.searchAndReplace(imageBuffer, {
-      searchPrompt,
-      prompt,
-    });
 
-    await uploadImage(result.base64Image, presignedUrl);
+    await processImageWithCompression({
+      imageBuffer,
+      processFn: async (buffer) => {
+        const result = await stabilityClient.searchAndReplace(buffer, {
+          searchPrompt,
+          prompt,
+        });
+        
+        // Start the async upload without awaiting
+        uploadImage(result.base64Image, presignedUrl)
+          .catch(error => console.error("Error uploading image:", error));
+        
+        return result;
+      }
+    });
 
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {
       content: [
         {
           type: "text",
-          text:
-            `Successfully replaced "${searchPrompt}" with "${prompt}" in the image. The result is available at ${finalUrl}`,
+          text: `Started replacing "${searchPrompt}" with "${prompt}" in the image. The result will be available at ${finalUrl} when complete.`,
         },
       ],
     };
