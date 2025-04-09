@@ -474,6 +474,64 @@ export const FetchCustomerAddresses = {
   }`,
 };
 
+export const OrdersByCustomer = {
+  query: gql`
+    query OrdersByCustomer(
+      $customerAccessToken: String!,
+      $first: Int,
+      $after: String
+    ) {
+      customer(customerAccessToken: $customerAccessToken) {
+        orders(first: $first, after: $after, reverse: true) {
+          pageInfo {
+            startCursor
+            hasPreviousPage
+            hasNextPage
+            endCursor
+          }
+          totalCount
+          nodes {
+            id
+            name
+            orderNumber
+            processedAt
+            financialStatus
+            fulfillmentStatus
+            totalPrice {
+              amount
+              currencyCode
+            }
+            lineItems(first: 10) {
+              nodes {
+                title
+                quantity
+                variant {
+                  id
+                  title
+                  image {
+                    url
+                    altText
+                  }
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  product {
+                    id
+                    title
+                    handle
+                    vendor
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+};
+
 export const AddItemToCart = {
   fragments: [Cart],
   query: gql`mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
