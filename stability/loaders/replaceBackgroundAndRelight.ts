@@ -1,10 +1,14 @@
 import { AppContext } from "../mod.ts";
 import { uploadImage } from "./generateImage.ts";
-import { ReplaceBackgroundAndRelightOptions } from "../stabilityAiClient.ts";
+import {
+  compressImage,
+  fetchAndProcessImage,
+  processImageWithCompression,
+} from "../utils/imageProcessing.ts";
 
 /**
  * @name REPLACE_BACKGROUND_AND_RELIGHT
- * @description Replace the background of an image and adjust its lighting.
+ * @description Replace the background of an image and adjust its lighting. Either backgroundPrompt or backgroundReferenceUrl is required.
  */
 export interface Props {
   /**
@@ -57,41 +61,6 @@ export interface Props {
   lightSourceStrength?: number;
 }
 
-async function handleReplaceBackgroundAndRelight(
-  imageBuffer: Uint8Array,
-  backgroundReferenceBuffer: Uint8Array | undefined,
-  lightReferenceBuffer: Uint8Array | undefined,
-  options: ReplaceBackgroundAndRelightOptions,
-  presignedUrl: string,
-  ctx: AppContext,
-) {
-  try {
-    const { stabilityClient } = ctx;
-    const result = await stabilityClient.replaceBackgroundAndRelight(
-      imageBuffer,
-      {
-        ...options,
-        backgroundReference: backgroundReferenceBuffer
-          ? new TextDecoder().decode(backgroundReferenceBuffer)
-          : undefined,
-        lightReference: lightReferenceBuffer
-          ? new TextDecoder().decode(lightReferenceBuffer)
-          : undefined,
-      },
-    );
-    const finalResult = await stabilityClient.fetchGenerationResult(result.id);
-
-    await uploadImage(finalResult.base64Image, presignedUrl);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
-      });
-    }
-  }
-}
-
 export default async function replaceBackgroundAndRelight(
   {
     imageUrl,
@@ -110,57 +79,68 @@ export default async function replaceBackgroundAndRelight(
   _request: Request,
   ctx: AppContext,
 ) {
+  if (!backgroundPrompt && !backgroundReferenceUrl) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: "Error: backgroundPrompt or backgroundReferenceUrl is required",
+        },
+      ],
+    };
+  }
+
   try {
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      throw new Error(
-        `Failed to fetch subject image: ${imageResponse.statusText}`,
-      );
-    }
-    const imageArrayBuffer = await imageResponse.arrayBuffer();
-    const imageBuffer = new Uint8Array(imageArrayBuffer);
+    const imageBuffer = await fetchAndProcessImage(imageUrl);
+    const { stabilityClient } = ctx;
 
     let backgroundReferenceBuffer: Uint8Array | undefined;
     if (backgroundReferenceUrl) {
-      const backgroundResponse = await fetch(backgroundReferenceUrl);
-      if (!backgroundResponse.ok) {
-        throw new Error(
-          `Failed to fetch background reference: ${backgroundResponse.statusText}`,
-        );
-      }
-      const backgroundArrayBuffer = await backgroundResponse.arrayBuffer();
-      backgroundReferenceBuffer = new Uint8Array(backgroundArrayBuffer);
+      backgroundReferenceBuffer = await fetchAndProcessImage(
+        backgroundReferenceUrl,
+      );
     }
 
     let lightReferenceBuffer: Uint8Array | undefined;
     if (lightReferenceUrl) {
-      const lightResponse = await fetch(lightReferenceUrl);
-      if (!lightResponse.ok) {
-        throw new Error(
-          `Failed to fetch light reference: ${lightResponse.statusText}`,
-        );
-      }
-      const lightArrayBuffer = await lightResponse.arrayBuffer();
-      lightReferenceBuffer = new Uint8Array(lightArrayBuffer);
+      lightReferenceBuffer = await fetchAndProcessImage(lightReferenceUrl);
     }
 
-    handleReplaceBackgroundAndRelight(
+    await processImageWithCompression({
       imageBuffer,
-      backgroundReferenceBuffer,
-      lightReferenceBuffer,
-      {
-        backgroundPrompt,
-        foregroundPrompt,
-        negativePrompt,
-        preserveOriginalSubject,
-        originalBackgroundDepth,
-        keepOriginalBackground,
-        lightSourceDirection,
-        lightSourceStrength,
+      processFn: async (buffer) => {
+        const result = await stabilityClient.replaceBackgroundAndRelight(
+          buffer,
+          {
+            backgroundPrompt,
+            foregroundPrompt,
+            negativePrompt,
+            preserveOriginalSubject,
+            originalBackgroundDepth,
+            keepOriginalBackground,
+            lightSourceDirection,
+            lightSourceStrength,
+            backgroundReference: backgroundReferenceBuffer
+              ? String(await compressImage(backgroundReferenceBuffer))
+              : undefined,
+            lightReference: lightReferenceBuffer
+              ? String(await compressImage(lightReferenceBuffer))
+              : undefined,
+          },
+        );
+
+        if (result.id) {
+          // Start the async processing without awaiting
+          stabilityClient.fetchGenerationResult(result.id)
+            .then((finalResult) =>
+              uploadImage(finalResult.base64Image, presignedUrl)
+            )
+            .catch((error) => console.error("Error processing image:", error));
+        }
+
+        return result as unknown as Uint8Array;
       },
-      presignedUrl,
-      ctx,
-    );
+    });
 
     const finalUrl = presignedUrl.replaceAll("_presigned/", "");
     return {

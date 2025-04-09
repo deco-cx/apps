@@ -43,6 +43,7 @@ const config = {
     app("linx"),
     app("linx-impulse"),
     app("shopify"),
+    app("stability"),
     app("nuvemshop"),
     app("streamshop"),
     app("website"),

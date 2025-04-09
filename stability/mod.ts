@@ -17,7 +17,7 @@ interface Props {
 /**
  * @title Stability
  * @name Stability
- * @description This uses the Stability AI API to generate images from text descriptions.
+ * @description This uses the Stability AI API to generate images from text descriptions. A presigned URL is required to upload the result of any tool call.
  * @category Tool
  * @logo https://logowik.com/content/uploads/images/stability-ai-icon3444.logowik.com.webp
  */

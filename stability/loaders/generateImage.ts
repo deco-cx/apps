@@ -4,13 +4,13 @@ import { ASPECT_RATIOS, STYLE_PRESETS } from "../stabilityAiClient.ts";
 
 /**
  * @name GENERATE_IMAGE
- * @description Generates an image from a text prompt using the Stability API. A presigned URL to upload the image to is required.
+ * @description Generates an image from a text prompt using the Stability API. A presigned URL to upload the image to is required. You can display the image as soon as the url is returned.
  */
 export interface Props {
   /**
    * @description The presigned URL to upload the image to after generation. Probably can be created with a tool like CREATE_PRESIGNED_URL.
    */
-  presignedUrl: string;
+  presignedUrl?: string;
   /**
    * @description The text prompt to generate the image from
    */
@@ -25,7 +25,25 @@ export interface Props {
    */
   aspectRatio?: typeof ASPECT_RATIOS[number];
   /**
-   * @description The style preset to use for generation
+   * @description The style preset to use for generation. Use one of these presets to get a specific style if it matches the style you're looking for.
+   * Can be one of the following:
+   *   "3d-model",
+   *   "analog-film",
+   *   "anime",
+   *   "cinematic",
+   *   "comic-book",
+   *   "digital-art",
+   *   "enhance",
+   *   "fantasy-art",
+   *   "isometric",
+   *   "line-art",
+   *   "low-poly",
+   *   "modeling-compound",
+   *   "neon-punk",
+   *   "origami",
+   *   "photographic",
+   *   "pixel-art",
+   *   "tile-texture",
    */
   stylePreset?: typeof STYLE_PRESETS[number];
   /**
@@ -48,6 +66,17 @@ export default async function generateImage(
 ) {
   const { stabilityClient } = ctx;
 
+  if (!presignedUrl) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: "Presigned URL is required",
+        },
+      ],
+    };
+  }
+
   try {
     const result = await stabilityClient.generateImageCore(prompt, {
       aspectRatio,
@@ -62,7 +91,7 @@ export default async function generateImage(
       content: [
         {
           type: "text",
-          text: `Uploaded image to ${url}`,
+          text: `Image available at ${url}`,
         },
       ],
     };
