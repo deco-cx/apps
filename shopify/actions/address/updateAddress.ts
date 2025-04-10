@@ -1,18 +1,18 @@
 import type { AppContext } from "../../mod.ts";
 import { UpdateAddress } from "../../utils/storefront/queries.ts";
 import {
-  MutationCustomerAddressUpdateArgs,
   CustomerAddressUpdatePayload,
+  MutationCustomerAddressUpdateArgs,
 } from "../../utils/storefront/storefront.graphql.gen.ts";
 import { getUserCookie } from "../../utils/user.ts";
 
 interface Props {
-    addressId: string;
-    address: string;
-    country: string;
-    province: string;
-    city: string;
-    zip: string;
+  addressId: string;
+  address: string;
+  country: string;
+  province: string;
+  city: string;
+  zip: string;
 }
 
 /**
@@ -28,7 +28,14 @@ const action = async (
 
   if (!customerAccessToken) return null;
 
-  const { addressId } = props;
+  const {
+    addressId,
+    address: address1,
+    country,
+    province,
+    city,
+    zip,
+  } = props;
   const { storefront } = ctx;
 
   const data = await storefront.query<
@@ -36,12 +43,15 @@ const action = async (
     MutationCustomerAddressUpdateArgs
   >({
     variables: {
-        id: addressId,
-        customerAccessToken,
-        address: {
-            address1: props.address,
-            ...props,
-        }
+      id: addressId,
+      customerAccessToken,
+      address: {
+        address1,
+        country,
+        province,
+        city,
+        zip,
+      },
     },
     ...UpdateAddress,
   });

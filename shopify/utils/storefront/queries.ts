@@ -672,38 +672,30 @@ export const CreateAddress = {
 };
 
 export const UpdateAddress = {
-  query: gql`mutation UpdateAddress(
-    $addressId: ID!,
-    $customerAccessToken: String!, 
-    $address1: String!,
-    $country: String!,
-    $province: String!,
-    $city: String!,
-    $zip: String!
-  ) {
-    customerAddressUpdate(
-      id: $addressId,
-      customerAccessToken: $customerAccessToken,
-      address: {
-        address1: $address1, 
-        country: $country, 
-        province: $province, 
-        city: $city, 
-        zip: $zip
-      }
+  query: gql`
+    mutation UpdateAddress(
+      $id: ID!,
+      $customerAccessToken: String!,
+      $address: MailingAddressInput!
     ) {
-      customerAddress {
+      customerAddressUpdate(
+        id: $id,
+        customerAccessToken: $customerAccessToken,
+        address: $address
+      ) {
+        customerAddress {
           id
-      }
-      customerUserErrors {
+        }
+        customerUserErrors {
           code
           message
-      }
-      userErrors {
+        }
+        userErrors {
           message
+        }
       }
     }
-  }`,
+  `,
 };
 
 export const SetDefaultAddress = {
