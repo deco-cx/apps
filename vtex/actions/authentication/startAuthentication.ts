@@ -12,7 +12,7 @@ export interface Props {
  * @title VTEX Integration - Start Authentication
  * @description Initiates the authentication process with VTEX.
  */
-export default async function loader(
+export default async function action(
   {
     callbackUrl = "/",
     returnUrl = "/",
