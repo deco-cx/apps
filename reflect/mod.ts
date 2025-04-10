@@ -6,7 +6,7 @@ import { Secret } from "../website/loaders/secret.ts";
 export interface Props {
   /**
    * @title Reflect OAuth Token
-   * @description OAuth Access Token for the Reflect API. Create credentials at https://reflect.app/developer/oauth.
+   * @description OAuth Access Token for the Reflect API. Create a client and get access token at https://reflect.app/developer/oauth.
    * @format password
    */
   authToken: string | Secret;
