@@ -9,7 +9,7 @@ import { getUserCookie } from "../../utils/user.ts";
 interface Props {
   address: string;
   country: string;
-  provice: string;
+  province: string;
   city: string;
   zip: string;
 }

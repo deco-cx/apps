@@ -10,7 +10,7 @@ interface Props {
     addressId: string;
     address: string;
     country: string;
-    provice: string;
+    province: string;
     city: string;
     zip: string;
 }
