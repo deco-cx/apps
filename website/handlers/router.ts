@@ -26,6 +26,12 @@ const rankRoute = (pattern: string): number =>
   pattern
     .split("/")
     .reduce((acc, routePart) => {
+      if (routePart.startsWith("}?")) {
+        if (routePart.includes("*")) {
+          return acc - 2;
+        }
+        return acc - 1;
+      }
       if (routePart === "*") {
         return acc;
       }
@@ -79,17 +85,20 @@ export const router = (
     }
     for (const { pathTemplate: routePath, handler } of routes) {
       const pattern = urlPatternCache[routePath] ??= (() => {
-        let url;
         if (URL.canParse(routePath)) {
-          url = new URL(routePath);
-        } else {
-          url = new URL(routePath, "http://localhost:8000");
+          return new URLPattern(routePath);
         }
+        const patternWithDefaultOrigin = new URLPattern(
+          routePath,
+          "http://localhost:8000",
+        );
+
         return new URLPattern({
-          pathname: url.pathname,
-          ...(url.search ? { search: url.search } : {}),
+          pathname: patternWithDefaultOrigin.pathname,
+          search: patternWithDefaultOrigin.search,
         });
       })();
+
       const res = pattern.exec(req.url);
       const groups = res?.pathname.groups ?? {};
       if (res !== null) {
@@ -151,6 +160,10 @@ const prepareRoutes = (audiences: Routes[], ctx: AppContext) => {
     ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
       rankRoute(routeStringA))
   );
+
+  console.log(Deno.inspect(builtRoutes.map((route) => route[0]), {
+    iterableLimit: 200,
+  }));
   return {
     routes: builtRoutes.map((route) => ({
       pathTemplate: route[0],
