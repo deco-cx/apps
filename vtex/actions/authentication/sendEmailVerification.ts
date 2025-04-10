@@ -22,63 +22,54 @@ export default async function action(
     throw new Error("Email is missing");
   }
 
-  try {
-    const startAuthentication = await ctx.invoke.vtex.actions.authentication
-      .startAuthentication({});
+  const startAuthentication = await ctx.invoke.vtex.actions.authentication
+    .startAuthentication({});
 
-    if (!startAuthentication?.authenticationToken) {
-      console.error(
-        "No authentication token returned from startAuthentication.",
-      );
-      return false;
-    }
-
-    const authenticationToken = startAuthentication.authenticationToken;
-
-    const formData = new FormData();
-    formData.append("authenticationToken", authenticationToken);
-    formData.append("email", props.email);
-
-    const response = await vcsDeprecated[
-      "POST /api/vtexid/pub/authentication/accesskey/send"
-    ]({
-      deliveryMethod: "email",
-    }, {
-      body: formData,
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    if (!response.ok) {
-      console.error(
-        "Authentication request failed",
-        response.status,
-        response.statusText,
-      );
-      return false;
-    }
-
-    const data = await response.json();
-    if (data?.authStatus === "InvalidToken") {
-      return false;
-    }
-
-    // VtexSessionToken is valid for 10 minutes
-    const SESSION_TOKEN_EXPIRES = 600;
-    setCookie(ctx.response.headers, {
-      name: "VtexSessionToken",
-      value: authenticationToken,
-      httpOnly: true,
-      maxAge: SESSION_TOKEN_EXPIRES,
-      path: "/",
-      secure: true,
-    });
-
-    return true;
-  } catch (error) {
-    console.error("Unexpected error during authentication", error);
-    return false;
+  if (!startAuthentication?.authenticationToken) {
+    throw new Error(
+      "No authentication token returned from startAuthentication",
+    );
   }
+
+  const authenticationToken = startAuthentication.authenticationToken;
+
+  const formData = new FormData();
+  formData.append("authenticationToken", authenticationToken);
+  formData.append("email", props.email);
+
+  const response = await vcsDeprecated[
+    "POST /api/vtexid/pub/authentication/accesskey/send"
+  ]({
+    deliveryMethod: "email",
+  }, {
+    body: formData,
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Authentication request failed: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const data = await response.json();
+  if (data?.authStatus === "InvalidToken") {
+    throw new Error('"Authentication Token" is invalid');
+  }
+
+  // VtexSessionToken is valid for 10 minutes
+  const SESSION_TOKEN_EXPIRES = 600;
+  setCookie(ctx.response.headers, {
+    name: "VtexSessionToken",
+    value: authenticationToken,
+    httpOnly: true,
+    maxAge: SESSION_TOKEN_EXPIRES,
+    path: "/",
+    secure: true,
+  });
+
+  return true;
 }
