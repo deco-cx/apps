@@ -12,7 +12,7 @@ For the AI to create the necessary typings and functions, you need to provide a
 data source for the API documentation. It can be the plain text of an API docs
 or an OpenAPI specification.
 
-### PASTE HERE API DOCS, OPEN API OR ANY OTHER SOURCE
+##### PASTE HERE INSTRUCTIONS
 
 ## Instructions
 
@@ -58,6 +58,10 @@ inside `{appFolder}/actions/` or `{loaderName}.ts` inside
 
 Examples: Read `grain/actions/hooks/create.ts` for example of an action and
 `grain/loaders/recordings/get.ts` for example of an loader.
+
+### deco.ts
+
+In root `deco.ts`, add a new entry for the newly created app.
 
 ### Manifest
 

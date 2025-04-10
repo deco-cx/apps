@@ -12,6 +12,7 @@ const config = {
   apps: [
     app("figma"),
     app("unsplash"),
+    app("reflect"),
     app("grain"),
     app("slack"),
     app("vertex"),
