@@ -2,6 +2,9 @@
 
 > Use this prompt in an AI editor (Cursor, Windsurf) to create a new app
 
+**Important:** Run this alongside information about the app you're creating, be
+it a documentation or OpenAPI specification.
+
 A deco app allows a service API to be exposed using Typescript functions. After
 a service it wrapped in an app, it can be used
 
@@ -11,8 +14,6 @@ a service it wrapped in an app, it can be used
 For the AI to create the necessary typings and functions, you need to provide a
 data source for the API documentation. It can be the plain text of an API docs
 or an OpenAPI specification.
-
-##### PASTE HERE INSTRUCTIONS
 
 ## Instructions
 
@@ -27,7 +28,27 @@ The client.ts is one of the central pieces of an app. It defines:
 - Typings for the data entities that the API accepts/returns.
 - All API methods with typed input and output
 
-Example: Read `grain/client.ts` as example implementation of a client.
+Example:
+
+```typescript
+export interface GithubUser {
+  login: string;
+  id: number;
+  avatar_url: string;
+}
+
+export interface GithubClient {
+  "GET /users/:username": {
+    response: GithubUser;
+  };
+  "POST /users/:username": {
+    response: GithubUser;
+    body: {
+      filter: string;
+    };
+  };
+}
+```
 
 ### mod.ts
 
@@ -37,9 +58,68 @@ required for all methods in the API and it might be better if the user informs
 only once (when installing the app).
 
 It also instantiates the client or any other SDK/information that will be passed
-as context for every action and loader when executed
+as context for every action and loader when executed. It uses the
 
-Example: Read `grain/mod.ts` as example implementation of a client.
+Example:
+
+```typescript
+import type { App, FnContext } from "@deco/deco";
+import { fetchSafe } from "../utils/fetch.ts";
+import { createHttpClient } from "../utils/http.ts";
+import type { Secret } from "../website/loaders/secret.ts";
+import manifest, { Manifest } from "./manifest.gen.ts";
+import { ClientInterfaceExample } from "./client.ts";
+
+export type AppContext = FnContext<State, Manifest>;
+
+export interface Props {
+  /**
+   * @title Account Name
+   * @description erploja2 etc
+   */
+  account: string;
+
+  /**
+   * @title API token
+   * @description The token for accessing your API
+   */
+  token?: string | Secret;
+}
+
+// Here we define the state of the app
+// You choose what to put in the state
+export interface State extends Omit<Props, "token"> {
+  api: ReturnType<typeof createHttpClient<ClientInterfaceExample>>;
+}
+
+/**
+ * @name App Template
+ * @description This is an template of an app to be used as a reference.
+ * @category Developer Tools
+ * @logo https://
+ */
+export default function App(props: Props): App<Manifest, State> {
+  const { token, account: _account } = props;
+
+  const _stringToken = typeof token === "string" ? token : token?.get?.() ?? "";
+
+  const api = createHttpClient<ClientInterfaceExample>({
+    base: `https://api.github.com/users/guitavano`,
+    headers: new Headers({ "Authorization": `Bearer ${_stringToken}` }),
+    fetcher: fetchSafe,
+  });
+
+  // it is the state of the app, all data
+  // here will be available in the context of
+  // loaders, actions and workflows
+  const state = { ...props, api };
+
+  return {
+    state,
+    manifest,
+  };
+}
+```
 
 ### Actions and Loaders
 
@@ -56,15 +136,115 @@ To declare an action or loader, it's just needed to create a `{actionName}.ts`
 inside `{appFolder}/actions/` or `{loaderName}.ts` inside
 `{appFolder}/loaders/`. You can use intermediary folders for organization.
 
-Examples: Read `grain/actions/hooks/create.ts` for example of an action and
-`grain/loaders/recordings/get.ts` for example of an loader.
+Examples:
+
+### Loader Example
+
+```typescript
+import { AppContext } from "../mod.ts";
+import { GithubUser } from "../utils/types.ts";
+
+interface Props {
+  username: string;
+}
+
+/**
+ * @title This name will appear on the admin
+ */
+const loader = async (
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<GithubUser> => {
+  const response = await ctx.api[`GET /users/:username`]({
+    username: props.username,
+  });
+
+  const result = await response.json();
+
+  return result;
+};
+
+export default loader;
+```
+
+### Action Example
+
+```typescript
+import { AppContext } from "../mod.ts";
+import { GithubUser } from "../utils/types.ts";
+
+interface Props {
+  username: string;
+}
+
+/**
+ * @title This name will appear on the admin
+ */
+const action = async (
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<GithubUser> => {
+  const response = await ctx.api[`POST /users/:username`]({
+    username: props.username,
+  }, { body: { filter: "filter" } });
+
+  const result = await response.json();
+
+  return result;
+};
+
+export default action;
+```
 
 ### deco.ts
 
 In root `deco.ts`, add a new entry for the newly created app.
+
+```
+const config = {
+  apps: [
+    app("deno"),
+    app("figma"),
+    app("unsplash"),
+    app("reflect"),
+    app("grain"),
+    app("slack"),
+```
 
 ### Manifest
 
 In every app folder there's also a `manifest.gen.ts` that exports all actions
 and loaders from an app. You don't need to worry about this file because it will
 be automatically generated when running `deno task start` in the root folder.
+
+Generate a first version so the app doesn't break: Example
+
+```typescript
+// DO NOT EDIT. This file is generated by deco.
+// This file SHOULD be checked into source version control.
+// This file is automatically updated during development when running `dev.ts`.
+
+import * as $$$$$$$$$0 from "./actions/myAction.ts";
+import * as $$$0 from "./loaders/myLoader.ts";
+import * as $$$$$$0 from "./sections/mySection.tsx";
+
+const manifest = {
+  "loaders": {
+    "app-template/loaders/myLoader.ts": $$$0,
+  },
+  "sections": {
+    "app-template/sections/mySection.tsx": $$$$$$0,
+  },
+  "actions": {
+    "app-template/actions/myAction.ts": $$$$$$$$$0,
+  },
+  "name": "app-template",
+  "baseUrl": import.meta.url,
+};
+
+export type Manifest = typeof manifest;
+
+export default manifest;
+```

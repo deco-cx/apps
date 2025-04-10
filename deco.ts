@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("deno-deploy"),
     app("figma"),
     app("unsplash"),
     app("reflect"),
