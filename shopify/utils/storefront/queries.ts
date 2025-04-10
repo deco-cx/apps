@@ -568,34 +568,28 @@ export const RegisterAccount = {
 };
 
 export const UpdateCustomerInfo = {
-  query: gql`mutation UpdateCustomerInfo(
+  query: gql`
+    mutation UpdateCustomerInfo(
       $customerAccessToken: String!, 
-      $email: String,
-      $firstName: String,
-      $lastName: String,
-      $acceptsMarketing: Boolean,
+      $customer: CustomerUpdateInput!
     ) {
-    customerUpdate(
-      customerAccessToken: $customerAccessToken,
-      customer: {
-        email: $email,
-        firstName: $firstName,
-        lastName: $lastName,
-        acceptsMarketing: $acceptsMarketing,
-      }
-    ) {
-      customer {
-        id
-      }
-      customerUserErrors {
-        code
-        message
-      }
-      userErrors {
-        message
+      customerUpdate(
+        customerAccessToken: $customerAccessToken,
+        customer: $customer
+      ) {
+        customer {
+          id
+        }
+        customerUserErrors {
+          code
+          message
+        }
+        userErrors {
+          message
+        }
       }
     }
-  }`,
+  `,
 };
 
 export const AddCoupon = {
