@@ -654,21 +654,11 @@ export const SendPasswordResetEmail = {
 export const CreateAddress = {
   query: gql`mutation CreateAddress(
     $customerAccessToken: String!,
-    $address1: String!,
-    $country: String!,
-    $province: String!,
-    $city: String!,
-    $zip: String!
+    $address: MailingAddressInput!
   ) {
     customerAddressCreate(
       customerAccessToken: $customerAccessToken,
-      address: {
-        address1: $address1, 
-        country: $country, 
-        province: $province, 
-        city: $city, 
-        zip: $zip
-      }
+      address: $address
     ) {
       customerAddress {
         id
