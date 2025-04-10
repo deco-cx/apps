@@ -63,6 +63,18 @@ const LEGACY_TO_IS: Record<string, Sort> = {
   OrderByReleaseDateDESC: "release:desc",
   OrderByBestDiscountDESC: "discount:desc",
 };
+
+const sortValues = [
+  "price:desc",
+  "price:asc",
+  "orders:desc",
+  "name:desc",
+  "name:asc",
+  "release:desc",
+  "discount:desc",
+  "relevance:desc",
+];
+
 export const mapLabelledFuzzyToFuzzy = (
   labelledFuzzy?: LabelledFuzzy,
 ): Fuzzy | undefined => {
@@ -162,10 +174,13 @@ const searchArgsOf = (props: Props, url: URL) => {
         : 0,
       VTEX_MAX_PAGES - currentPageoffset,
     );
-  const sort = (url.searchParams.get("sort") as Sort) ??
+  let sort = (url.searchParams.get("sort") as Sort) ??
     LEGACY_TO_IS[url.searchParams.get("O") ?? ""] ??
     props.sort ??
     sortOptions[0].value;
+  if (!sort || !sortValues.includes(sort)) {
+    sort = sortOptions[0].value as Sort;
+  }
   const selectedFacets = mergeFacets(
     props.selectedFacets ?? [],
     filtersFromURL(url),
@@ -291,10 +306,12 @@ const loader = async (
   if (!isInSeachFormat && !pathQuery) {
     return null;
   }
+
   const locale = segment?.payload?.cultureInfo ??
     ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const params = withDefaultParams({ ...searchArgs, page, locale });
+
   // search products on VTEX. Feel free to change any of these parameters
   const [productsResult, facetsResult] = await Promise.all([
     vcsDeprecated
