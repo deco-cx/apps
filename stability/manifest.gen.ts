@@ -2,31 +2,31 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$0 from "./loaders/generateImage.ts";
-import * as $$$1 from "./loaders/upscaleFast.ts";
-import * as $$$2 from "./loaders/upscaleCreative.ts";
-import * as $$$3 from "./loaders/searchAndReplace.ts";
-import * as $$$4 from "./loaders/searchAndRecolor.ts";
-import * as $$$5 from "./loaders/replaceBackgroundAndRelight.ts";
-import * as $$$6 from "./loaders/removeBackground.ts";
-import * as $$$7 from "./loaders/outpaint.ts";
-import * as $$$8 from "./loaders/controlSketch.ts";
-import * as $$$9 from "./loaders/controlStructure.ts";
-import * as $$$10 from "./loaders/controlStyle.ts";
+import * as $$$0 from "./loaders/controlSketch.ts";
+import * as $$$1 from "./loaders/controlStructure.ts";
+import * as $$$2 from "./loaders/controlStyle.ts";
+import * as $$$3 from "./loaders/generateImage.ts";
+import * as $$$4 from "./loaders/outpaint.ts";
+import * as $$$5 from "./loaders/removeBackground.ts";
+import * as $$$6 from "./loaders/replaceBackgroundAndRelight.ts";
+import * as $$$7 from "./loaders/searchAndRecolor.ts";
+import * as $$$8 from "./loaders/searchAndReplace.ts";
+import * as $$$9 from "./loaders/upscaleCreative.ts";
+import * as $$$10 from "./loaders/upscaleFast.ts";
 
 const manifest = {
   "loaders": {
-    "stability/loaders/generateImage.ts": $$$0,
-    "stability/loaders/upscaleFast.ts": $$$1,
-    "stability/loaders/upscaleCreative.ts": $$$2,
-    "stability/loaders/searchAndReplace.ts": $$$3,
-    "stability/loaders/searchAndRecolor.ts": $$$4,
-    "stability/loaders/replaceBackgroundAndRelight.ts": $$$5,
-    "stability/loaders/removeBackground.ts": $$$6,
-    "stability/loaders/outpaint.ts": $$$7,
-    "stability/loaders/controlSketch.ts": $$$8,
-    "stability/loaders/controlStructure.ts": $$$9,
-    "stability/loaders/controlStyle.ts": $$$10,
+    "stability/loaders/controlSketch.ts": $$$0,
+    "stability/loaders/controlStructure.ts": $$$1,
+    "stability/loaders/controlStyle.ts": $$$2,
+    "stability/loaders/generateImage.ts": $$$3,
+    "stability/loaders/outpaint.ts": $$$4,
+    "stability/loaders/removeBackground.ts": $$$5,
+    "stability/loaders/replaceBackgroundAndRelight.ts": $$$6,
+    "stability/loaders/searchAndRecolor.ts": $$$7,
+    "stability/loaders/searchAndReplace.ts": $$$8,
+    "stability/loaders/upscaleCreative.ts": $$$9,
+    "stability/loaders/upscaleFast.ts": $$$10,
   },
   "name": "stability",
   "baseUrl": import.meta.url,
