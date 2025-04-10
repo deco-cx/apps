@@ -1,8 +1,8 @@
 import type { AppContext } from "../../mod.ts";
 import { DeleteAddress } from "../../utils/storefront/queries.ts";
 import {
-  MutationCustomerAddressDeleteArgs,
   CustomerAddressDeletePayload,
+  MutationCustomerAddressDeleteArgs,
 } from "../../utils/storefront/storefront.graphql.gen.ts";
 import { getUserCookie } from "../../utils/user.ts";
 
@@ -31,8 +31,8 @@ const action = async (
     MutationCustomerAddressDeleteArgs
   >({
     variables: {
-        customerAccessToken,
-        id: addressId
+      customerAccessToken,
+      id: addressId,
     },
     ...DeleteAddress,
   });

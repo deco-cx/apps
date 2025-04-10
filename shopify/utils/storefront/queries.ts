@@ -729,22 +729,24 @@ export const SetDefaultAddress = {
 };
 
 export const DeleteAddress = {
-  query: gql`mutation DeleteAddress(
-    $customerAccessToken: String!,
-    $addressId: ID!
-  ) {
-    customerAddressDelete(
-      customerAccessToken: $customerAccessToken,
-      id: $addressId
+  query: gql`
+    mutation DeleteAddress(
+      $customerAccessToken: String!,
+      $id: ID!
     ) {
-      deletedCustomerAddressId
-      customerUserErrors {
-        code
-        message
-      }
-      userErrors {
-        message
+      customerAddressDelete(
+        customerAccessToken: $customerAccessToken,
+        id: $id
+      ) {
+        deletedCustomerAddressId
+        customerUserErrors {
+          code
+          message
+        }
+        userErrors {
+          message
+        }
       }
     }
-  }`,
+  `,
 };
