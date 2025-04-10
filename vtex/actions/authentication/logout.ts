@@ -21,13 +21,10 @@ export default async function logout(
     }
   }
 
-  try {
-    if (payload?.sess) {
-      await ctx.invoke.vtex.actions.session.deleteSession({
-        sessionId: payload?.sess,
-      });
-    }
-  } catch (error) {
-    console.error("Error deleting session", error);
+  const sessionId = payload?.sess;
+  if (!sessionId) {
+    return;
   }
+
+  await ctx.invoke.vtex.actions.session.deleteSession({ sessionId });
 }

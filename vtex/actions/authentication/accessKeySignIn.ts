@@ -1,6 +1,5 @@
 import { getCookies } from "std/http/cookie.ts";
 import { setCookie } from "std/http/mod.ts";
-import safeParse from "../../../utils/safeParse.ts";
 import { AppContext } from "../../mod.ts";
 import { AuthResponse } from "../../utils/types.ts";
 
@@ -17,84 +16,72 @@ export default async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<AuthResponse | null> {
+): Promise<AuthResponse> {
   const { vcsDeprecated } = ctx;
 
   if (!props.email || !props.accessKey) {
-    console.error("Email and/or password is missing:", props);
-    return null;
+    throw new Error("Email and/or accessKey is missing");
   }
 
-  try {
-    const cookies = getCookies(req.headers);
-    const VtexSessionToken = cookies?.["VtexSessionToken"] ?? null;
+  const cookies = getCookies(req.headers);
+  const VtexSessionToken = cookies?.["VtexSessionToken"] ?? null;
 
-    if (!VtexSessionToken) {
-      console.error("VtexSessionToken cookie is missing", VtexSessionToken);
-      return null;
-    }
+  if (!VtexSessionToken) {
+    throw new Error('"VtexSessionToken" cookie is missing');
+  }
 
-    const body = new URLSearchParams();
-    body.append("login", props.email);
-    body.append("accessKey", props.accessKey);
-    body.append("authenticationToken", VtexSessionToken);
+  const body = new URLSearchParams();
+  body.append("login", props.email);
+  body.append("accessKey", props.accessKey);
+  body.append("authenticationToken", VtexSessionToken);
 
-    const response = await vcsDeprecated
-      ["POST /api/vtexid/pub/authentication/accesskey/validate"](
-        {},
-        {
-          body,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json",
-          },
+  const response = await vcsDeprecated
+    ["POST /api/vtexid/pub/authentication/accesskey/validate"](
+      {},
+      {
+        body,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json",
         },
-      );
+      },
+    );
 
-    if (!response.ok) {
-      console.error(
-        "Authentication request failed",
-        response.status,
-        response.statusText,
-      );
-      return null;
-    }
-
-    const data: AuthResponse = await response.json();
-    if (data.authStatus === "Success") {
-      const VTEXID_EXPIRES = data.expiresIn;
-
-      if (data.authCookie) {
-        setCookie(ctx.response.headers, {
-          name: data.authCookie.Name,
-          value: data.authCookie.Value,
-          httpOnly: true,
-          maxAge: VTEXID_EXPIRES,
-          path: "/",
-          secure: true,
-        });
-      }
-
-      if (data.accountAuthCookie) {
-        setCookie(ctx.response.headers, {
-          name: data.accountAuthCookie.Name,
-          value: data.accountAuthCookie.Value,
-          httpOnly: true,
-          maxAge: VTEXID_EXPIRES,
-          path: "/",
-          secure: true,
-        });
-      }
-    }
-
-    await ctx.invoke.vtex.actions.session.editSession({});
-
-    return data;
-  } catch (error) {
-    console.error("Unexpected error during authentication", error);
-    if (error instanceof Error) {
-      return safeParse<AuthResponse>(error.message);
-    }
-    return null;
+  if (!response.ok) {
+    throw new Error(
+      `Authentication request failed: ${response.status} ${response.statusText}`,
+    );
   }
+
+  const data: AuthResponse = await response.json();
+
+  if (data.authStatus === "Success") {
+    const VTEXID_EXPIRES = data.expiresIn;
+
+    if (data.authCookie) {
+      setCookie(ctx.response.headers, {
+        name: data.authCookie.Name,
+        value: data.authCookie.Value,
+        httpOnly: true,
+        maxAge: VTEXID_EXPIRES,
+        path: "/",
+        secure: true,
+      });
+    }
+
+    if (data.accountAuthCookie) {
+      setCookie(ctx.response.headers, {
+        name: data.accountAuthCookie.Name,
+        value: data.accountAuthCookie.Value,
+        httpOnly: true,
+        maxAge: VTEXID_EXPIRES,
+        path: "/",
+        secure: true,
+      });
+    }
+  }
+
+  await ctx.invoke.vtex.actions.session.editSession({});
+
+  return data;
 }
