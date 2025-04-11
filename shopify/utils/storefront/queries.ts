@@ -1,4 +1,5 @@
 import { gql } from "../../../utils/graphql.ts";
+import { CountryCode, LanguageCode } from "./storefront.graphql.gen.ts";
 
 const ProductVariant = gql`
 fragment ProductVariant on ProductVariant {
@@ -278,27 +279,33 @@ export const GetCart = {
   query: gql`query GetCart($id: ID!) { cart(id: $id) { ...Cart } }`,
 };
 
-export const GetProduct = {
+export const GetProduct = (language: LanguageCode, country: CountryCode) => ({
   fragments: [Product, ProductVariant, Collection],
-  query:
-    gql`query GetProduct($handle: String, $identifiers: [HasMetafieldsIdentifier!]!) {
-      product(handle: $handle) { ...Product }
-    }`,
-};
+  query: gql`
+    query GetProduct(
+      $handle: String, 
+      $identifiers: [HasMetafieldsIdentifier!]!
+    ) @inContext(language: ${language}, country: ${country}) {
+      product(handle: $handle) {
+        ...Product
+      }
+    }
+  `,
+});
 
-export const ListProducts = {
+export const ListProducts = (language: LanguageCode, country: CountryCode) => ({
   fragments: [Product, ProductVariant, Collection],
   query:
-    gql`query ListProducts($first: Int, $after: String, $query: String, $identifiers: [HasMetafieldsIdentifier!]!) {
+    gql`query ListProducts($first: Int, $after: String, $query: String, $identifiers: [HasMetafieldsIdentifier!]!) @inContext(language: ${language}, country: ${country}) {
     products(first: $first, after: $after, query: $query) {
       nodes {
         ...Product 
       }
     }
   }`,
-};
+});
 
-export const SearchProducts = {
+export const SearchProducts = (language: LanguageCode, country: CountryCode) =>  ({
   fragments: [Product, ProductVariant, Filter, Collection],
   query: gql`query searchWithFilters(
       $first: Int, 
@@ -310,7 +317,7 @@ export const SearchProducts = {
       $sortKey: SearchSortKeys, 
       $reverse: Boolean,
       $identifiers: [HasMetafieldsIdentifier!]!
-     ){
+     ) @inContext(language: ${language}, country: ${country}) {
     search(
       first: $first, 
       last: $last, 
@@ -337,9 +344,9 @@ export const SearchProducts = {
       }
     }
   }`,
-};
+});
 
-export const ProductsByCollection = {
+export const ProductsByCollection = (language: LanguageCode, country: CountryCode) => ({
   fragments: [Product, ProductVariant, Collection, Filter],
   query: gql`query AllProducts(
       $first: Int, 
@@ -351,7 +358,7 @@ export const ProductsByCollection = {
       $reverse: Boolean, 
       $filters: [ProductFilter!],
       $identifiers: [HasMetafieldsIdentifier!]!
-    ){
+    ) @inContext(language: ${language}, country: ${country}) {
     collection(handle: $handle) {
       handle
       description
@@ -380,17 +387,17 @@ export const ProductsByCollection = {
       }
     }
   }`,
-};
+});
 
-export const ProductRecommendations = {
+export const ProductRecommendations = (language: LanguageCode, country: CountryCode) => ({
   fragments: [Product, ProductVariant, Collection],
   query:
-    gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!) {
+    gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!) @inContext(language: ${language}, country: ${country}) {
     productRecommendations(productId: $productId) {
       ...Product
     }
   }`,
-};
+});
 
 export const GetShopInfo = {
   query: gql`query GetShopInfo($identifiers: [HasMetafieldsIdentifier!]!) {

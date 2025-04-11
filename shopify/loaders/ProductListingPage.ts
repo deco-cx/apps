@@ -13,6 +13,8 @@ import {
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
+  LanguageCode,
+  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
 import { Metafield } from "../utils/types.ts";
@@ -69,6 +71,18 @@ export interface Props {
    * @description The URL of the page, used to override URL from request
    */
   pageHref?: string;
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 }
 
 /**
@@ -94,6 +108,8 @@ const loader = async (
   const startCursor = props.startCursor ||
     url.searchParams.get("startCursor") || "";
   const metafields = props.metafields || [];
+  const languageCode = props?.languageCode || "PT";
+  const countryCode = props?.countryCode || "BR";
 
   const isSearch = Boolean(query);
   let hasNextPage = false;
@@ -111,6 +127,8 @@ const loader = async (
   const sort = url.searchParams.get("sort") ?? "";
 
   if (isSearch) {
+    const SearchProductsQuery = SearchProducts(languageCode, countryCode);
+
     const data = await storefront.query<
       QueryRoot,
       QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
@@ -125,7 +143,7 @@ const loader = async (
         identifiers: metafields,
         ...searchSortShopify[sort],
       },
-      ...SearchProducts,
+      ...SearchProductsQuery,
     });
 
     shopifyProducts = data.search;
@@ -139,6 +157,8 @@ const loader = async (
     // TODO: understand how accept more than one path
     // example: /collections/first-collection/second-collection
     const pathname = props.collectionName || url.pathname.split("/")[1];
+
+    const ProductsByCollectionQuery = ProductsByCollection(languageCode, countryCode);
 
     const data = await storefront.query<
       QueryRoot,
@@ -156,7 +176,7 @@ const loader = async (
         filters: getFiltersByUrl(url),
         ...sortShopify[sort],
       },
-      ...ProductsByCollection,
+      ...ProductsByCollectionQuery,
     });
 
     shopifyProducts = data.collection?.products;
