@@ -138,6 +138,10 @@ export interface MarcaFIPE {
   valor: number;
 }
 
+export interface VeiculoMarcaFIPE {
+  modelo: string;
+}
+
 export interface Corretora {
   cnpj: string;
   nome_social: string;
@@ -285,6 +289,13 @@ export interface BrasilAPIClient {
 
   "GET /fipe/preco/v1/:codigoFipe": {
     response: Fipe[];
+    searchParams?: {
+      tabela_referencia?: number;
+    };
+  };
+  
+  "GET /fipe/veiculos/v1/:tipoVeiculo/:codigoMarca": {
+    response: VeiculoMarcaFIPE[];
     searchParams?: {
       tabela_referencia?: number;
     };
