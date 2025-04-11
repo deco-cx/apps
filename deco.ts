@@ -30,6 +30,7 @@ const config = {
     app("ai-assistants"),
     app("files"),
     app("openai"),
+    app("perplexity"),
     app("brand-assistant"),
     app("implementation"),
     app("weather"),
