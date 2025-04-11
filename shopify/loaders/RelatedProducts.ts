@@ -74,7 +74,7 @@ const loader = async (
 
   const data = await storefront.query<
     ProductRecommendationsQuery,
-    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
+    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
   >({
     variables: {
       productId: query.product.id,
