@@ -17,7 +17,7 @@ import {
   CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toFilter, toProduct } from "../utils/transform.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 import {
   getFiltersByUrl,
   searchSortOptions,
@@ -129,7 +129,7 @@ const loader = async (
   if (isSearch) {
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & LanguageContextArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
