@@ -351,3 +351,7 @@ export type Manifest = typeof manifest;
 
 export default manifest;
 ```
+
+## Manifest Gen
+
+In the end, run `deno task start` to regenerate the manifest.
