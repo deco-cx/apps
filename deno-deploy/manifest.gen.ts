@@ -2,11 +2,12 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$0 from "./actions/createDeployment.ts";
-import * as $$$$$$$1 from "./actions/createKvDatabase.ts";
-import * as $$$$$$$2 from "./actions/createProject.ts";
-import * as $$$$$$$3 from "./actions/deleteDeployment.ts";
-import * as $$$$$$$4 from "./actions/redeployDeployment.ts";
+import * as $$$$$$$$$0 from "./actions/createDeployment.ts";
+import * as $$$$$$$$$1 from "./actions/createKvDatabase.ts";
+import * as $$$$$$$$$2 from "./actions/createProject.ts";
+import * as $$$$$$$$$3 from "./actions/deleteDeployment.ts";
+import * as $$$$$$$$$4 from "./actions/deployScript.ts";
+import * as $$$$$$$$$5 from "./actions/redeployDeployment.ts";
 import * as $$$0 from "./loaders/buildLogs.ts";
 import * as $$$1 from "./loaders/deployment.ts";
 import * as $$$2 from "./loaders/deployments.ts";
@@ -25,13 +26,13 @@ const manifest = {
     "deno-deploy/loaders/project.ts": $$$5,
     "deno-deploy/loaders/projects.ts": $$$6,
   },
-  "sections": {},
   "actions": {
-    "deno-deploy/actions/createDeployment.ts": $$$$$$$0,
-    "deno-deploy/actions/createKvDatabase.ts": $$$$$$$1,
-    "deno-deploy/actions/createProject.ts": $$$$$$$2,
-    "deno-deploy/actions/deleteDeployment.ts": $$$$$$$3,
-    "deno-deploy/actions/redeployDeployment.ts": $$$$$$$4,
+    "deno-deploy/actions/createDeployment.ts": $$$$$$$$$0,
+    "deno-deploy/actions/createKvDatabase.ts": $$$$$$$$$1,
+    "deno-deploy/actions/createProject.ts": $$$$$$$$$2,
+    "deno-deploy/actions/deleteDeployment.ts": $$$$$$$$$3,
+    "deno-deploy/actions/deployScript.ts": $$$$$$$$$4,
+    "deno-deploy/actions/redeployDeployment.ts": $$$$$$$$$5,
   },
   "name": "deno-deploy",
   "baseUrl": import.meta.url,
