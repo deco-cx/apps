@@ -7,13 +7,13 @@ interface Props {
    * @description The ID of the project to create the deployment in
    */
   projectId: string;
-  
+
   /**
    * @title Script Content
    * @description The content of the script to deploy. ex: "Deno.serve((req: Request) => new Response("Hello World"));"
    */
   scriptContent: string;
-  
+
   /**
    * @title Description
    * @description Optional description for the deployment
@@ -43,11 +43,11 @@ const action = async (
       [entryPoint]: {
         kind: "file",
         content: scriptContent,
-        encoding: "utf-8"
-      }
+        encoding: "utf-8",
+      },
     },
     envVars: {},
-    description: description || null
+    description: description || null,
   };
 
   // Call the API to create the deployment
@@ -61,4 +61,4 @@ const action = async (
   return result;
 };
 
-export default action; 
+export default action;
