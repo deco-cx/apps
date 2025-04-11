@@ -28,27 +28,128 @@ The client.ts is one of the central pieces of an app. It defines:
 - Typings for the data entities that the API accepts/returns.
 - All API methods with typed input and output
 
-Example:
+The client interface follows a specific pattern that works with the `createHttpClient` utility. Here's a detailed example:
 
 ```typescript
+// First, define your data types/interfaces
 export interface GithubUser {
   login: string;
   id: number;
   avatar_url: string;
 }
 
+// Then define your client interface
+// The key format must be: "HTTP_METHOD /path/to/endpoint"
+// Parameters in the URL path must be prefixed with : (e.g. :username)
+// Optional parameters must end with ? (e.g. :filter?)
 export interface GithubClient {
+  // Simple GET request with URL parameters
   "GET /users/:username": {
-    response: GithubUser;
+    response: GithubUser; // Type of the response
   };
+
+  // POST request with body and URL parameters
   "POST /users/:username": {
     response: GithubUser;
     body: {
       filter: string;
     };
   };
+
+  // GET request with query parameters (searchParams)
+  "GET /search/users": {
+    response: { users: GithubUser[] };
+    searchParams: {
+      q: string;
+      page?: number;
+      per_page?: number;
+    };
+  };
+
+  // POST with both URL params, query params and body
+  "POST /repos/:owner/:repo/issues": {
+    response: { id: number };
+    body: {
+      title: string;
+      body: string;
+    };
+    searchParams: {
+      assignee?: string;
+      labels?: string[];
+    };
+  };
 }
 ```
+
+Key points about the client interface:
+
+1. **HTTP Methods**: Must be one of: GET, PUT, POST, DELETE, PATCH, HEAD
+
+2. **URL Parameters**:
+   - Required parameters: `:paramName`
+   - Optional parameters: `:paramName?`
+   - Wildcard parameters: `*` or `*paramName`
+   
+3. **Response Type**:
+   - Always defined in the `response` property
+   - Can be any TypeScript type/interface
+   - Optional if the endpoint doesn't return data
+
+4. **Request Body**:
+   - Defined in the `body` property
+   - Required for POST/PUT/PATCH methods
+   - Must be a JSON-serializable object
+
+5. **Query Parameters**:
+   - Defined in the `searchParams` property
+   - All parameters are optional by default
+   - Can be primitive types or arrays
+
+Example usage with the client:
+
+```typescript
+const api = createHttpClient<GithubClient>({
+  base: "https://api.github.com",
+  headers: new Headers({
+    "Authorization": `Bearer ${token}`,
+  }),
+});
+
+// Using URL parameters
+const user = await api["GET /users/:username"]({
+  username: "octocat",
+});
+
+// Using query parameters
+const search = await api["GET /search/users"]({
+  q: "john",
+  page: 1,
+  per_page: 10,
+});
+
+// Using body and URL parameters
+const issue = await api["POST /repos/:owner/:repo/issues"](
+  {
+    owner: "octocat",
+    repo: "Hello-World",
+  },
+  {
+    body: {
+      title: "Found a bug",
+      body: "This is a bug report",
+    },
+  },
+);
+```
+
+The client interface is used by the `createHttpClient` utility to:
+- Type-check URL parameters
+- Type-check request bodies
+- Type-check query parameters
+- Provide type-safe responses
+- Handle URL construction
+- Handle JSON serialization
+- Manage headers and authentication
 
 ### mod.ts
 
