@@ -10,7 +10,7 @@ import {
   CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { GetProduct } from "../utils/storefront/queries.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 
 export interface Props {
   slug: RequestURLParam;
@@ -53,7 +53,7 @@ const loader = async (
 
   const data = await storefront.query<
     GetProductQuery,
-    GetProductQueryVariables & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
+    GetProductQueryVariables & HasMetafieldsMetafieldsArgs & LanguageContextArgs
   >({
     variables: { handle, identifiers: metafields, languageCode, countryCode },
     ...GetProduct,

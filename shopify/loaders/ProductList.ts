@@ -23,7 +23,7 @@ import {
   searchSortShopify,
   sortShopify,
 } from "../utils/utils.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 
 export interface QueryProps {
   /** @description search term to use on search */
@@ -138,7 +138,7 @@ const loader = async (
 
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & LanguageContextArgs
     >({
       variables: {
         first: count,
