@@ -5,7 +5,6 @@ import {
 } from "npm:@ai-sdk/provider-utils";
 import { ElevenLabsAudioModel } from "./audio-model.ts";
 
-
 /**
  * Configuration for creating an Eleven Labs provider instance.
  */
@@ -66,4 +65,4 @@ export function createElevenLabs(
 /** Optional default instance. You can create more specialized instances as needed. */
 export const elevenLabs: ElevenLabsProvider = createElevenLabs({
   headers: { Accept: "audio/mpeg" },
-}); 
+});

@@ -16,4 +16,4 @@ export function generateAudio(
   payload: Omit<AudioPayload, "model"> & { model: AudioModelV1 },
 ): Promise<AudioResponse> {
   return payload.model.doGenerate(payload);
-} 
+}

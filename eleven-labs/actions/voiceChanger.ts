@@ -120,4 +120,4 @@ export async function uploadAudio(audio: string, presignedUrl: string) {
     console.error("Failed to parse upload response:", error);
     throw new Error("Failed to parse upload response");
   }
-} 
+}

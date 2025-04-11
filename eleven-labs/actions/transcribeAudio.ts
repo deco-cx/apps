@@ -1,5 +1,4 @@
 import { AppContext } from "../mod.ts";
-import { bufferToBase64 } from "../utils.ts"; // Import the utility
 
 /**
  * @title ElevenLabs Speech to Text Transcription
@@ -79,11 +78,11 @@ export default async function transcribeAudio(
   // 1. Fetch the audio file from the URL
   const audioResponse = await fetch(audioUrl);
   // Clone the response immediately
-  const responseCloneForBody = audioResponse.clone(); 
+  const responseCloneForBody = audioResponse.clone();
 
   // Use the original response for headers and status checks
   const status = audioResponse.status;
-  const contentTypeHeader = audioResponse.headers.get('content-type') || "";
+  const contentTypeHeader = audioResponse.headers.get("content-type") || "";
   console.log(
     `Fetched audio. Status: ${status}, Content-Type: ${contentTypeHeader}`,
   );
@@ -102,17 +101,20 @@ export default async function transcribeAudio(
   let filename = "audio.webm";
   try {
     const urlPath = new URL(audioUrl).pathname;
-    const lastSegment = urlPath.substring(urlPath.lastIndexOf('/') + 1);
+    const lastSegment = urlPath.substring(urlPath.lastIndexOf("/") + 1);
     if (lastSegment) {
       // Use the content type retrieved earlier
-      if (contentTypeHeader.includes("webm") && !lastSegment.toLowerCase().endsWith(".webm")) {
+      if (
+        contentTypeHeader.includes("webm") &&
+        !lastSegment.toLowerCase().endsWith(".webm")
+      ) {
         filename = `${lastSegment}.webm`;
-      } else if (lastSegment.includes('.')) { // Use original if it has extension
-         filename = lastSegment;
+      } else if (lastSegment.includes(".")) { // Use original if it has extension
+        filename = lastSegment;
       } else { // Add .webm if no extension and content type suggests webm
-         filename = `${lastSegment}.webm`;
+        filename = `${lastSegment}.webm`;
       }
-    } 
+    }
   } catch (e) {
     console.warn("Could not parse filename from URL:", audioUrl, e);
   }
@@ -142,4 +144,4 @@ export default async function transcribeAudio(
 
   // 4. Return the JSON response from the API
   return response;
-} 
+}

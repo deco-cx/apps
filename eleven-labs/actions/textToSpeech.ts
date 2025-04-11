@@ -17,7 +17,7 @@ export interface Props {
   /**
    * @description The voice ID to use for speech generation
    * @default ceKvDJFpP9XqmH31tZxp
-   * 
+   *
    * 21m00Tcm4TlvDq8ikWAM
    */
   voiceId: string;
@@ -51,7 +51,7 @@ export default async function textToSpeech(
   const elevenLabs = ctx.elevenLabs;
   const model = elevenLabs("tts");
 
-  console.log({voiceId});
+  console.log({ voiceId });
 
   try {
     const result = await model.doGenerate({
@@ -118,4 +118,4 @@ export async function uploadAudio(audio: string, presignedUrl: string) {
     console.error("Failed to parse upload response:", error);
     throw new Error("Failed to parse upload response");
   }
-} 
+}

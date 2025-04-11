@@ -46,4 +46,4 @@ export default async function textToSoundEffects(
   return {
     audio: response.audio,
   };
-} 
+}
