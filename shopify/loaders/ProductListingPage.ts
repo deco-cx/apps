@@ -163,8 +163,7 @@ const loader = async (
       & QueryRootCollectionArgs
       & CollectionProductsArgs
       & HasMetafieldsMetafieldsArgs
-      & { languageCode: LanguageCode }
-      & { countryCode: CountryCode }
+      & LanguageContextArgs
     >({
       variables: {
         ...(!endCursor && { first: count }),
