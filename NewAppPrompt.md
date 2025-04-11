@@ -28,7 +28,8 @@ The client.ts is one of the central pieces of an app. It defines:
 - Typings for the data entities that the API accepts/returns.
 - All API methods with typed input and output
 
-The client interface follows a specific pattern that works with the `createHttpClient` utility. Here's a detailed example:
+The client interface follows a specific pattern that works with the
+`createHttpClient` utility. Here's a detailed example:
 
 ```typescript
 // First, define your data types/interfaces
@@ -89,7 +90,7 @@ Key points about the client interface:
    - Required parameters: `:paramName`
    - Optional parameters: `:paramName?`
    - Wildcard parameters: `*` or `*paramName`
-   
+
 3. **Response Type**:
    - Always defined in the `response` property
    - Can be any TypeScript type/interface
@@ -143,6 +144,7 @@ const issue = await api["POST /repos/:owner/:repo/issues"](
 ```
 
 The client interface is used by the `createHttpClient` utility to:
+
 - Type-check URL parameters
 - Type-check request bodies
 - Type-check query parameters
