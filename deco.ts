@@ -48,6 +48,7 @@ const config = {
     app("stability"),
     app("nuvemshop"),
     app("streamshop"),
+    app("brasilapi"),
     app("website"),
     app("commerce"),
     app("workflows"),
