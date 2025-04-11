@@ -15,21 +15,30 @@ interface CookiePayload {
 
 export const parseCookie = (headers: Headers, account: string) => {
   const cookies = getCookies(headers);
-  const cookie = cookies[VTEX_ID_CLIENT_COOKIE] ||
-    cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`];
+
+  const authCookieName = Object.keys(cookies).toSorted((a, z) =>
+    a.length - z.length
+  ).find((cookieName) => cookieName.startsWith("VtexIdclientAutCookie"));
+
+  if (!authCookieName) {
+    return {
+      cookie: "",
+    }
+  }
+
+  const cookie = authCookieName ? cookies[authCookieName] : undefined
+
   const decoded = cookie ? decode(cookie) : null;
 
   const payload = decoded?.[1] as CookiePayload | undefined;
 
   return {
     cookie: stringify({
-      ...(cookies[VTEX_ID_CLIENT_COOKIE] &&
-        { [VTEX_ID_CLIENT_COOKIE]: cookies[VTEX_ID_CLIENT_COOKIE] }),
-      ...(cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`] &&
-        {
-          [`${VTEX_ID_CLIENT_COOKIE}_${account}`]:
-            cookies[`${VTEX_ID_CLIENT_COOKIE}_${account}`],
-        }),
+      ...(cookies[authCookieName] &&
+      {
+        [authCookieName]:
+          cookies[authCookieName],
+      }),
     }),
     payload,
   };
