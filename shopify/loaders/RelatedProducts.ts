@@ -60,31 +60,29 @@ const loader = async (
   const handle = splitted.slice(0, maybeSkuId ? -1 : undefined).join("-");
   const metafields = props.metafields || [];
 
-  const GetProductQuery = GetProduct(languageCode, countryCode);
-
   const query = await storefront.query<
     GetProductQuery,
-    GetProductQueryVariables & HasMetafieldsMetafieldsArgs
+    GetProductQueryVariables & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
   >({
-    variables: { handle, identifiers: metafields },
-    ...GetProductQuery,
+    variables: { handle, identifiers: metafields, languageCode, countryCode },
+    ...GetProduct,
   });
 
   if (!query?.product) {
     return [];
   }
 
-  const ProductRecommendationsQuery = ProductRecommendations(languageCode, countryCode);
-
   const data = await storefront.query<
     ProductRecommendationsQuery,
-    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs
+    ProductRecommendationsQueryVariables & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
   >({
     variables: {
       productId: query.product.id,
       identifiers: metafields,
+      languageCode,
+      countryCode
     },
-    ...ProductRecommendationsQuery,
+    ...ProductRecommendations,
   });
 
   if (!data?.productRecommendations) {
