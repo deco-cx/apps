@@ -24,7 +24,7 @@ export interface State {
  * @name BrasilAPI
  * @description Acesso programático de informações do Brasil como CEP, CNPJ, feriados nacionais, IBGE e mais.
  * @category APIs Públicas
- * @logo https://brasilapi.com.br/images/api-schema.svg
+ * @logo https://i.imgur.com/jWsMvso.png
  */
 export default function App(props: Props): App<Manifest, State> {
   const { cacheDuration } = props;
