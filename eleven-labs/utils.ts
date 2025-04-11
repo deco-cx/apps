@@ -22,4 +22,4 @@ export function bufferToBase64(buffer: ArrayBuffer): string {
     binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
-} 
+}

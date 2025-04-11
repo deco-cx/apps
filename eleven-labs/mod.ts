@@ -36,7 +36,9 @@ interface Props {
  */
 export default function ElevenLabs(props: Props): App<Manifest, State> {
   const { apiKey, baseURL, headers } = props;
-  const resolvedApiKey = typeof apiKey === "string" ? apiKey : apiKey.get() || "";
+  const resolvedApiKey = typeof apiKey === "string"
+    ? apiKey
+    : apiKey.get() || "";
   const elevenLabs = createElevenLabs({
     apiKey: resolvedApiKey,
     baseURL,
@@ -54,4 +56,4 @@ export default function ElevenLabs(props: Props): App<Manifest, State> {
 }
 
 export type ElevenLabsApp = ReturnType<typeof ElevenLabs>;
-export type AppContext = AC<ElevenLabsApp>; 
+export type AppContext = AC<ElevenLabsApp>;

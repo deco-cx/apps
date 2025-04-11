@@ -58,4 +58,4 @@ export default async function textToVoiceWithTimestamps(
     audio: response.audio,
     timestamps: response.timestamps as Timestamp[],
   };
-} 
+}

@@ -41,4 +41,4 @@ export interface AudioResponse {
   voice_id?: string;
   /** Whether voice requires verification */
   requires_verification?: boolean;
-} 
+}

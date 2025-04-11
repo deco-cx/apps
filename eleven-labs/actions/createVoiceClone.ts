@@ -42,7 +42,7 @@ export default async function createVoiceClone(
   const elevenLabs = ctx.elevenLabs;
   const model = elevenLabs("voice-clone");
 
-  console.log({fileUrls});
+  console.log({ fileUrls });
 
   const response = await model.doGenerate({
     providerOptions: {
@@ -60,4 +60,4 @@ export default async function createVoiceClone(
     voice_id: response.voice_id,
     requires_verification: response.requires_verification,
   };
-} 
+}

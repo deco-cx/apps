@@ -63,7 +63,8 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
    */
   async doGenerate(
     options: Omit<AudioPayload, "model">,
-  ): Promise<any> { // Use any to bypass strict type checking for now
+  ): // deno-lint-ignore no-explicit-any
+  Promise<any> { // Use any to bypass strict type checking for now
     switch (this.modelId) {
       case "tts":
         return await this.textToSpeech(options);
@@ -209,14 +210,21 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
     const extra = options.providerOptions?.elevenLabs ?? {};
 
     // Check existence and type of name before appending
-    if (!extra.name || typeof extra.name !== 'string') { 
-      throw new Error("voice-clone requires a non-empty string `name` field in providerOptions.elevenLabs!");
+    if (!extra.name || typeof extra.name !== "string") {
+      throw new Error(
+        "voice-clone requires a non-empty string `name` field in providerOptions.elevenLabs!",
+      );
     }
     form.append("name", extra.name); // Append the validated name
-    
+
     // Check fileUrls
-    if (!extra.fileUrls || !Array.isArray(extra.fileUrls) || extra.fileUrls.length === 0) {
-      throw new Error("voice-clone requires a `fileUrls` array in providerOptions.elevenLabs!");
+    if (
+      !extra.fileUrls || !Array.isArray(extra.fileUrls) ||
+      extra.fileUrls.length === 0
+    ) {
+      throw new Error(
+        "voice-clone requires a `fileUrls` array in providerOptions.elevenLabs!",
+      );
     }
 
     // Fetch and add each audio file to the form
@@ -226,39 +234,43 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
       const responseCloneForBody = response.clone(); // Clone for body reading
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch audio file from ${url}: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch audio file from ${url}: ${response.status} ${response.statusText}`,
+        );
       }
-      
+
       // Extract filename from URL, fallback to index
       let filename = `sample_${i}.unknown`;
       let contentType = "application/octet-stream"; // Default content type
       try {
         const urlPath = new URL(url).pathname;
-        const lastSegment = urlPath.substring(urlPath.lastIndexOf('/') + 1);
+        const lastSegment = urlPath.substring(urlPath.lastIndexOf("/") + 1);
         if (lastSegment) {
           filename = lastSegment;
           // Basic content type inference from extension
           if (filename.toLowerCase().endsWith(".webm")) {
-            contentType = "video/webm"; 
+            contentType = "video/webm";
           } else if (filename.toLowerCase().endsWith(".mp3")) {
-             contentType = "audio/mpeg";
+            contentType = "audio/mpeg";
           } else if (filename.toLowerCase().endsWith(".wav")) {
-             contentType = "audio/wav";
+            contentType = "audio/wav";
           } // Add more types as needed
         }
       } catch (e) {
         console.warn("Could not parse filename/type from URL:", url, e);
       }
-      console.log(`Processing file for voice clone: ${filename} (type: ${contentType})`);
+      console.log(
+        `Processing file for voice clone: ${filename} (type: ${contentType})`,
+      );
 
       // Assume body is Base64 text
-      const audioBase64 = await responseCloneForBody.text(); 
+      const audioBase64 = await responseCloneForBody.text();
 
       // Convert Base64 text to File using the utility
       const audioFile = await base64ToFile(audioBase64, filename, contentType);
-      
+
       // Append the properly decoded File object
-      form.append("files", audioFile, filename); 
+      form.append("files", audioFile, filename);
     }
 
     if (extra.remove_background_noise) {
@@ -267,7 +279,7 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
     if (extra.description) {
       form.append("description", extra.description as string);
     }
-    if (extra.labels && typeof extra.labels === 'string') {
+    if (extra.labels && typeof extra.labels === "string") {
       form.append("labels", extra.labels);
     }
 
@@ -332,20 +344,30 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
     if (extra.num_speakers !== undefined) {
       const numSpeakers = Number(extra.num_speakers);
       if (isNaN(numSpeakers) || numSpeakers < 1 || numSpeakers > 32) {
-         console.warn("num_speakers must be a number between 1 and 32. Ignoring value:", extra.num_speakers);
+        console.warn(
+          "num_speakers must be a number between 1 and 32. Ignoring value:",
+          extra.num_speakers,
+        );
       } else {
-         form.append("num_speakers", String(numSpeakers));
+        form.append("num_speakers", String(numSpeakers));
       }
     }
     if (extra.timestamps_granularity !== undefined) {
-      form.append("timestamps_granularity", String(extra.timestamps_granularity));
+      form.append(
+        "timestamps_granularity",
+        String(extra.timestamps_granularity),
+      );
     }
     if (extra.diarize !== undefined) {
       form.append("diarize", String(extra.diarize));
     }
 
     // Use the helper method to send form and return JSON
-    return await this.sendFormAndReturnJson<SpeechToTextResponse>(endpoint, form, options);
+    return await this.sendFormAndReturnJson<SpeechToTextResponse>(
+      endpoint,
+      form,
+      options,
+    );
   }
 
   private extractElevenLabsBody(options: Omit<AudioPayload, "model">) {
@@ -486,4 +508,4 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
 
     return { audios };
   }
-} 
+}
