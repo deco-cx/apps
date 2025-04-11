@@ -135,39 +135,42 @@ const loader = async (
   });
 
   if (isQueryList(props)) {
-    const SearchProductsQuery = SearchProducts(languageCode, countryCode);
 
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
     >({
       variables: {
         first: count,
         query: props.query,
         productFilters: filters,
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...searchSortShopify[sort],
       },
-      ...SearchProductsQuery,
+      ...SearchProducts,
     });
     shopifyProducts = data.search;
   } else {
-    const ProductsByCollectionQuery = ProductsByCollection(languageCode, countryCode);
-
     const data = await storefront.query<
       QueryRoot,
       & QueryRootCollectionArgs
       & CollectionProductsArgs
       & HasMetafieldsMetafieldsArgs
+      & { languageCode: LanguageCode }
+      & { countryCode: CountryCode }
     >({
       variables: {
         first: count,
         handle: props.collection,
         filters,
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...sortShopify[sort],
       },
-      ...ProductsByCollectionQuery,
+      ...ProductsByCollection,
     });
 
     shopifyProducts = data.collection?.products;

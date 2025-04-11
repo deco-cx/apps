@@ -127,11 +127,9 @@ const loader = async (
   const sort = url.searchParams.get("sort") ?? "";
 
   if (isSearch) {
-    const SearchProductsQuery = SearchProducts(languageCode, countryCode);
-
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
     >({
       variables: {
         ...(!endCursor && { first: count }),
@@ -141,9 +139,11 @@ const loader = async (
         query: query,
         productFilters: getFiltersByUrl(url),
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...searchSortShopify[sort],
       },
-      ...SearchProductsQuery,
+      ...SearchProducts,
     });
 
     shopifyProducts = data.search;
@@ -158,13 +158,13 @@ const loader = async (
     // example: /collections/first-collection/second-collection
     const pathname = props.collectionName || url.pathname.split("/")[1];
 
-    const ProductsByCollectionQuery = ProductsByCollection(languageCode, countryCode);
-
     const data = await storefront.query<
       QueryRoot,
       & QueryRootCollectionArgs
       & CollectionProductsArgs
       & HasMetafieldsMetafieldsArgs
+      & { languageCode: LanguageCode }
+      & { countryCode: CountryCode }
     >({
       variables: {
         ...(!endCursor && { first: count }),
@@ -174,9 +174,11 @@ const loader = async (
         identifiers: metafields,
         handle: pathname,
         filters: getFiltersByUrl(url),
+        languageCode,
+        countryCode,
         ...sortShopify[sort],
       },
-      ...ProductsByCollectionQuery,
+      ...ProductsByCollection,
     });
 
     shopifyProducts = data.collection?.products;

@@ -51,14 +51,12 @@ const loader = async (
 
   const handle = splitted.slice(0, maybeSkuId ? -1 : undefined).join("-");
 
-  const GetProductQuery = GetProduct(languageCode, countryCode);
-
   const data = await storefront.query<
     GetProductQuery,
-    GetProductQueryVariables & HasMetafieldsMetafieldsArgs
+    GetProductQueryVariables & HasMetafieldsMetafieldsArgs & { languageCode: LanguageCode } & { countryCode: CountryCode }
   >({
-    variables: { handle, identifiers: metafields },
-    ...GetProductQuery,
+    variables: { handle, identifiers: metafields, languageCode, countryCode },
+    ...GetProduct,
   });
 
   if (!data?.product) {
