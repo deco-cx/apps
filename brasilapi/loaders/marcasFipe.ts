@@ -7,7 +7,7 @@ interface Props {
    * @description Tipo de veículo (carros, motos, caminhoes)
    */
   tipoVeiculo: string;
-  
+
   /**
    * @title Código Tabela Referência
    * @description Código da tabela de referência (opcional)
@@ -25,16 +25,18 @@ const loader = async (
   ctx: AppContext,
 ): Promise<MarcaFIPE[]> => {
   const { tipoVeiculo, tabela_referencia } = props;
-  
+
   if (!["carros", "motos", "caminhoes"].includes(tipoVeiculo)) {
-    throw new Error("Tipo de veículo inválido. Use 'carros', 'motos' ou 'caminhoes'");
+    throw new Error(
+      "Tipo de veículo inválido. Use 'carros', 'motos' ou 'caminhoes'",
+    );
   }
-  
+
   const options: Record<string, unknown> = {};
   if (tabela_referencia) {
     options.tabela_referencia = tabela_referencia;
   }
-  
+
   const response = await ctx.api["GET /fipe/marcas/v1/:tipoVeiculo"]({
     tipoVeiculo,
   }, options);
@@ -47,4 +49,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

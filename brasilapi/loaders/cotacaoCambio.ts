@@ -7,7 +7,7 @@ interface Props {
    * @description Símbolo da moeda (USD, EUR, GBP, etc.)
    */
   moeda: string;
-  
+
   /**
    * @title Data
    * @description Data da cotação (YYYY-MM-DD)
@@ -25,12 +25,12 @@ const loader = async (
   ctx: AppContext,
 ): Promise<CambioRetorno> => {
   const { moeda, data } = props;
-  
+
   // Verifica formato da data
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
     throw new Error("Formato de data inválido. Use YYYY-MM-DD");
   }
-  
+
   const response = await ctx.api["GET /cambio/v1/cotacao/:moeda/:data"]({
     moeda: moeda.toUpperCase(),
     data,
@@ -44,4 +44,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

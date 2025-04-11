@@ -20,4 +20,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

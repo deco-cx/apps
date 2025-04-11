@@ -19,7 +19,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Taxa> => {
   const { sigla } = props;
-  
+
   const response = await ctx.api["GET /taxas/v1/:sigla"]({
     sigla: sigla.toUpperCase(),
   });
@@ -32,4 +32,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

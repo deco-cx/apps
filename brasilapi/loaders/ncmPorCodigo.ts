@@ -19,7 +19,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<NCM> => {
   const { code } = props;
-  
+
   const response = await ctx.api["GET /ncm/v1/:code"]({
     code,
   });
@@ -32,4 +32,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

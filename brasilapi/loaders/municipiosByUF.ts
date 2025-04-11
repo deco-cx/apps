@@ -6,7 +6,7 @@ interface Props {
    * @description Sigla da Unidade Federativa (ex: SP, RJ, SC)
    */
   siglaUF: string;
-  
+
   /**
    * @title Provedores
    * @description Lista de provedores separados por vírgula (dados-abertos-br,gov,wikipedia)
@@ -24,12 +24,12 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Array<{ nome: string; codigo_ibge: string }>> => {
   const { siglaUF, providers } = props;
-  
+
   const options: Record<string, unknown> = {};
   if (providers) {
     options.providers = providers;
   }
-  
+
   const response = await ctx.api["GET /ibge/municipios/v1/:siglaUF"]({
     siglaUF: siglaUF.toUpperCase(),
   }, options);
@@ -42,4 +42,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

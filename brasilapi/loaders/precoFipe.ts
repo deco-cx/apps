@@ -7,7 +7,7 @@ interface Props {
    * @description Código FIPE do veículo (ex: 001004-9)
    */
   codigoFipe: string;
-  
+
   /**
    * @title Código Tabela Referência
    * @description Código da tabela de referência (opcional)
@@ -25,12 +25,12 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Fipe[]> => {
   const { codigoFipe, tabela_referencia } = props;
-  
+
   const options: Record<string, unknown> = {};
   if (tabela_referencia) {
     options.tabela_referencia = tabela_referencia;
   }
-  
+
   const response = await ctx.api["GET /fipe/preco/v1/:codigoFipe"]({
     codigoFipe,
   }, options);
@@ -43,4 +43,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

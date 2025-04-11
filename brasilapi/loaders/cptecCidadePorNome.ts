@@ -19,7 +19,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<City[]> => {
   const { cityName } = props;
-  
+
   const response = await ctx.api["GET /cptec/v1/cidade/:cityName"]({
     cityName,
   });
@@ -32,4 +32,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

@@ -19,7 +19,7 @@ const loader = async (
   ctx: AppContext,
 ): Promise<REGISTROBR> => {
   const { domain } = props;
-  
+
   // Certifica-se de que o domínio está no formato correto
   let domainName = domain;
   if (domainName.includes(".br")) {
@@ -29,7 +29,7 @@ const loader = async (
     // Caso contrário, adiciona .com.br como padrão
     domainName = `${domain}.com.br`;
   }
-  
+
   const response = await ctx.api["GET /registrobr/v1/:domain"]({
     domain: domainName,
   });
@@ -42,4 +42,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

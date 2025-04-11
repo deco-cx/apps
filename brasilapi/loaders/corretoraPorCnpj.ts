@@ -19,10 +19,10 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Corretora> => {
   const { cnpj } = props;
-  
+
   // Remover caracteres não numéricos
   const cleanCnpj = cnpj.replace(/\D/g, "");
-  
+
   const response = await ctx.api["GET /cvm/corretoras/v1/:cnpj"]({
     cnpj: cleanCnpj,
   });
@@ -35,4 +35,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

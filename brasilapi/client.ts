@@ -293,7 +293,7 @@ export interface BrasilAPIClient {
       tabela_referencia?: number;
     };
   };
-  
+
   "GET /fipe/veiculos/v1/:tipoVeiculo/:codigoMarca": {
     response: VeiculoMarcaFIPE[];
     searchParams?: {
