@@ -13,6 +13,8 @@ import {
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
+  LanguageCode,
+  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 import {
@@ -70,6 +72,18 @@ export type Props = {
    * @description search for metafields
    */
   metafields?: Metafield[];
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 };
 
 // deno-lint-ignore no-explicit-any
@@ -92,6 +106,8 @@ const loader = async (
 
   const count = props.count ?? 12;
   const metafields = expandedProps.metafields || [];
+  const languageCode = expandedProps?.languageCode ?? "PT";
+  const countryCode = expandedProps?.countryCode ?? "BR";
 
   let shopifyProducts:
     | SearchResultItemConnection
@@ -119,6 +135,8 @@ const loader = async (
   });
 
   if (isQueryList(props)) {
+    const SearchProductsQuery = SearchProducts(languageCode, countryCode);
+
     const data = await storefront.query<
       QueryRoot,
       QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
@@ -130,10 +148,12 @@ const loader = async (
         identifiers: metafields,
         ...searchSortShopify[sort],
       },
-      ...SearchProducts,
+      ...SearchProductsQuery,
     });
     shopifyProducts = data.search;
   } else {
+    const ProductsByCollectionQuery = ProductsByCollection(languageCode, countryCode);
+
     const data = await storefront.query<
       QueryRoot,
       & QueryRootCollectionArgs
@@ -147,7 +167,7 @@ const loader = async (
         identifiers: metafields,
         ...sortShopify[sort],
       },
-      ...ProductsByCollection,
+      ...ProductsByCollectionQuery,
     });
 
     shopifyProducts = data.collection?.products;

@@ -11,6 +11,8 @@ import {
   HasMetafieldsMetafieldsArgs,
   ProductRecommendationsQuery,
   ProductRecommendationsQueryVariables,
+  LanguageCode,
+  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 import { Metafield } from "../utils/types.ts";
@@ -27,6 +29,18 @@ export interface Props {
    * @description search for metafields
    */
   metafields?: Metafield[];
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 }
 
 /**
@@ -39,24 +53,28 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Product[] | null> => {
   const { storefront } = ctx;
-  const { slug, count } = props;
+  const { slug, count, languageCode = "PT", countryCode = "BR" } = props;
 
   const splitted = slug?.split("-");
   const maybeSkuId = Number(splitted[splitted.length - 1]);
   const handle = splitted.slice(0, maybeSkuId ? -1 : undefined).join("-");
   const metafields = props.metafields || [];
 
+  const GetProductQuery = GetProduct(languageCode, countryCode);
+
   const query = await storefront.query<
     GetProductQuery,
     GetProductQueryVariables & HasMetafieldsMetafieldsArgs
   >({
     variables: { handle, identifiers: metafields },
-    ...GetProduct,
+    ...GetProductQuery,
   });
 
   if (!query?.product) {
     return [];
   }
+
+  const ProductRecommendationsQuery = ProductRecommendations(languageCode, countryCode);
 
   const data = await storefront.query<
     ProductRecommendationsQuery,
@@ -66,7 +84,7 @@ const loader = async (
       productId: query.product.id,
       identifiers: metafields,
     },
-    ...ProductRecommendations,
+    ...ProductRecommendationsQuery,
   });
 
   if (!data?.productRecommendations) {
