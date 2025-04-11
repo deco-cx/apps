@@ -44,6 +44,7 @@ const config = {
     app("linx-impulse"),
     app("shopify"),
     app("stability"),
+    app("eleven-labs"),
     app("nuvemshop"),
     app("streamshop"),
     app("website"),
