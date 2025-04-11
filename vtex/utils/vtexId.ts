@@ -13,7 +13,7 @@ interface CookiePayload {
   userId: string;
 }
 
-export const parseCookie = (headers: Headers, account: string) => {
+export const parseCookie = (headers: Headers) => {
   const cookies = getCookies(headers);
 
   const authCookieName = Object.keys(cookies).toSorted((a, z) =>

@@ -15,7 +15,7 @@ export default async function loader(
 ): Promise<Userorderslist> {
   const { vcsDeprecated } = ctx;
   const { clientEmail, page = "0", per_page = "15" } = props;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers);
 
   const ordersResponse = await vcsDeprecated
     ["GET /api/oms/user/orders"](
