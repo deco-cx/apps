@@ -280,16 +280,24 @@ export const GetCart = {
 
 export const GetProduct = {
   fragments: [Product, ProductVariant, Collection],
-  query:
-    gql`query GetProduct($handle: String, $identifiers: [HasMetafieldsIdentifier!]!) {
-      product(handle: $handle) { ...Product }
-    }`,
+  query: gql`
+    query GetProduct(
+      $handle: String, 
+      $identifiers: [HasMetafieldsIdentifier!]!,
+      $languageCode: LanguageCode,
+      $countryCode: CountryCode
+    ) @inContext(language: $languageCode, country: $countryCode) {
+      product(handle: $handle) {
+        ...Product
+      }
+    }
+  `,
 };
 
 export const ListProducts = {
   fragments: [Product, ProductVariant, Collection],
   query:
-    gql`query ListProducts($first: Int, $after: String, $query: String, $identifiers: [HasMetafieldsIdentifier!]!) {
+    gql`query ListProducts($first: Int, $after: String, $query: String, $identifiers: [HasMetafieldsIdentifier!]!, $languageCode: LanguageCode, $countryCode: CountryCode) @inContext(language: $languageCode, country: $countryCode) {
     products(first: $first, after: $after, query: $query) {
       nodes {
         ...Product 
@@ -309,8 +317,10 @@ export const SearchProducts = {
       $productFilters: [ProductFilter!]
       $sortKey: SearchSortKeys, 
       $reverse: Boolean,
-      $identifiers: [HasMetafieldsIdentifier!]!
-     ){
+      $identifiers: [HasMetafieldsIdentifier!]!,
+      $languageCode: LanguageCode,
+      $countryCode: CountryCode
+     ) @inContext(language: $languageCode, country: $countryCode) {
     search(
       first: $first, 
       last: $last, 
@@ -350,8 +360,10 @@ export const ProductsByCollection = {
       $sortKey: ProductCollectionSortKeys, 
       $reverse: Boolean, 
       $filters: [ProductFilter!],
-      $identifiers: [HasMetafieldsIdentifier!]!
-    ){
+      $identifiers: [HasMetafieldsIdentifier!]!,
+      $languageCode: LanguageCode,
+      $countryCode: CountryCode
+    ) @inContext(language: $languageCode, country: $countryCode) {
     collection(handle: $handle) {
       handle
       description
@@ -385,7 +397,7 @@ export const ProductsByCollection = {
 export const ProductRecommendations = {
   fragments: [Product, ProductVariant, Collection],
   query:
-    gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!) {
+    gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!, $languageCode: LanguageCode, $countryCode: CountryCode) @inContext(language: $languageCode, country: $countryCode) {
     productRecommendations(productId: $productId) {
       ...Product
     }
