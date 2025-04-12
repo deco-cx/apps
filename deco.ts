@@ -50,6 +50,7 @@ const config = {
     app("nuvemshop"),
     app("streamshop"),
     app("brasilapi"),
+    app("readwise"),
     app("website"),
     app("commerce"),
     app("workflows"),
