@@ -18,12 +18,12 @@ const action = async (
   ctx: AppContext,
 ): Promise<void> => {
   const { id } = props;
-  
+
   // Make the API request
   await ctx.api["DELETE /highlights/:id"]({ id });
-  
+
   // This endpoint returns 204 No Content, so no response body to parse
   return;
 };
 
-export default action; 
+export default action;

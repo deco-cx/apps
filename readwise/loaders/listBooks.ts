@@ -73,35 +73,35 @@ const loader = async (
 
   // Prepare search parameters
   const searchParams: Record<string, string | number> = {};
-  
+
   if (pageSize) {
     searchParams.page_size = pageSize;
   }
-  
+
   if (page) {
     searchParams.page = page;
   }
-  
+
   if (category) {
     searchParams.category = category;
   }
-  
+
   if (source) {
     searchParams.source = source;
   }
-  
+
   if (updatedBefore) {
     searchParams.updated__lt = updatedBefore;
   }
-  
+
   if (updatedAfter) {
     searchParams.updated__gt = updatedAfter;
   }
-  
+
   if (lastHighlightBefore) {
     searchParams.last_highlight_at__lt = lastHighlightBefore;
   }
-  
+
   if (lastHighlightAfter) {
     searchParams.last_highlight_at__gt = lastHighlightAfter;
   }
@@ -109,8 +109,8 @@ const loader = async (
   // Make the API request
   const response = await ctx.api["GET /books/"](searchParams);
   const data = await response.json();
-  
+
   return data;
 };
 
-export default loader; 
+export default loader;

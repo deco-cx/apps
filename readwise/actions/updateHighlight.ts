@@ -19,16 +19,16 @@ const action = async (
   ctx: AppContext,
 ): Promise<Highlight> => {
   const { id, ...updateData } = props;
-  
+
   // Make the API request
   const response = await ctx.api["PATCH /highlights/:id"]({
     id,
   }, {
     body: updateData,
   });
-  
+
   const data = await response.json();
   return data;
 };
 
-export default action; 
+export default action;

@@ -49,4 +49,4 @@ export default function App(props: Props): App<Manifest, State> {
     state,
     manifest,
   };
-} 
+}

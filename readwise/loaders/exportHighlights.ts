@@ -25,11 +25,11 @@ const loader = async (
   ctx: AppContext,
 ): Promise<ExportResultItem[]> => {
   const { updatedAfter, ids } = props;
-  
+
   // Store all results from all pages
   let allResults: ExportResultItem[] = [];
   let nextPageCursor: string | null = null;
-  
+
   // Loop until we have fetched all pages
   do {
     // Prepare search parameters for the current request
@@ -43,19 +43,19 @@ const loader = async (
     if (nextPageCursor) {
       searchParams.pageCursor = nextPageCursor;
     }
-    
+
     // Make the API request
     const response = await ctx.api["GET /export/"](searchParams);
     const data = await response.json();
-    
+
     // Add the results to our collection
     allResults = [...allResults, ...data.results];
-    
+
     // Update the next page cursor for the next iteration
     nextPageCursor = data.nextPageCursor;
   } while (nextPageCursor);
-  
+
   return allResults;
 };
 
-export default loader; 
+export default loader;

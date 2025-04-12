@@ -19,12 +19,12 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Highlight> => {
   const { id } = props;
-  
+
   // Make the API request
   const response = await ctx.api["GET /highlights/:id"]({ id });
   const data = await response.json();
-  
+
   return data;
 };
 
-export default loader; 
+export default loader;

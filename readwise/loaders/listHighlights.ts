@@ -66,31 +66,31 @@ const loader = async (
 
   // Prepare search parameters
   const searchParams: Record<string, string | number> = {};
-  
+
   if (pageSize) {
     searchParams.page_size = pageSize;
   }
-  
+
   if (page) {
     searchParams.page = page;
   }
-  
+
   if (bookId) {
     searchParams.book_id = bookId;
   }
-  
+
   if (updatedBefore) {
     searchParams.updated__lt = updatedBefore;
   }
-  
+
   if (updatedAfter) {
     searchParams.updated__gt = updatedAfter;
   }
-  
+
   if (highlightedBefore) {
     searchParams.highlighted_at__lt = highlightedBefore;
   }
-  
+
   if (highlightedAfter) {
     searchParams.highlighted_at__gt = highlightedAfter;
   }
@@ -98,8 +98,8 @@ const loader = async (
   // Make the API request
   const response = await ctx.api["GET /highlights/"](searchParams);
   const data = await response.json();
-  
+
   return data;
 };
 
-export default loader; 
+export default loader;

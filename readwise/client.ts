@@ -176,7 +176,7 @@ export interface ReadwiseClient {
   "GET /auth/": {
     response: void;
   };
-  
+
   // Highlight endpoints
   "GET /highlights/": {
     response: PaginatedResponse<Highlight>;
@@ -190,25 +190,25 @@ export interface ReadwiseClient {
       highlighted_at__gt?: string;
     };
   };
-  
+
   "GET /highlights/:id": {
     response: Highlight;
   };
-  
+
   "PATCH /highlights/:id": {
     response: Highlight;
     body: HighlightUpdatePayload;
   };
-  
+
   "DELETE /highlights/:id": {
     response: void;
   };
-  
+
   "POST /highlights/": {
     response: HighlightCreateResponse[];
     body: HighlightCreatePayload;
   };
-  
+
   // Book endpoints
   "GET /books/": {
     response: PaginatedResponse<Book>;
@@ -223,11 +223,11 @@ export interface ReadwiseClient {
       last_highlight_at__gt?: string;
     };
   };
-  
+
   "GET /books/:id": {
     response: Book;
   };
-  
+
   // Export endpoint
   "GET /export/": {
     response: ExportResult;
@@ -237,12 +237,12 @@ export interface ReadwiseClient {
       pageCursor?: string;
     };
   };
-  
+
   // Daily review endpoint
   "GET /review/": {
     response: DailyReviewResponse;
   };
-  
+
   // Tag endpoints
   "GET /highlights/:highlight_id/tags": {
     response: PaginatedResponse<Tag>;
@@ -251,12 +251,12 @@ export interface ReadwiseClient {
       page?: number;
     };
   };
-  
+
   "POST /highlights/:highlight_id/tags": {
     response: Tag;
     body: { name: string };
   };
-  
+
   "GET /books/:book_id/tags": {
     response: PaginatedResponse<Tag>;
     searchParams?: {
@@ -264,9 +264,9 @@ export interface ReadwiseClient {
       page?: number;
     };
   };
-  
+
   "POST /books/:book_id/tags": {
     response: Tag;
     body: { name: string };
   };
-} 
+}

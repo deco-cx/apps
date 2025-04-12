@@ -13,8 +13,8 @@ const loader = async (
   // No parameters needed for this endpoint
   const response = await ctx.api["GET /review/"]({});
   const data = await response.json();
-  
+
   return data;
 };
 
-export default loader; 
+export default loader;

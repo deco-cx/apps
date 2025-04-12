@@ -19,14 +19,14 @@ const action = async (
   ctx: AppContext,
 ): Promise<HighlightCreateResponse[]> => {
   const { highlights } = props;
-  
+
   // Make the API request
   const response = await ctx.api["POST /highlights/"]({}, {
     body: { highlights },
   });
-  
+
   const data = await response.json();
   return data;
 };
 
-export default action; 
+export default action;
