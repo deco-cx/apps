@@ -17,23 +17,18 @@ async function action(
   { sessionId }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<DeleteSession | null> {
+): Promise<DeleteSession> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    return await io.query<DeleteSession, { sessionId: string }>({
-      query: mutation,
-      variables: { sessionId },
-    }, { headers: { cookie } });
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+  return await io.query<DeleteSession, { sessionId: string }>({
+    query: mutation,
+    variables: { sessionId },
+  }, { headers: { cookie } });
 }
 
 export default action;
