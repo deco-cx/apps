@@ -25,37 +25,32 @@ async function action(
   props: Omit<ProfileInput, "email">,
   req: Request,
   ctx: AppContext,
-): Promise<Profile | null> {
+): Promise<Profile> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    const { updateProfile } = await io.query<
-      { updateProfile: Profile },
-      { input: ProfileInput }
-    >(
-      {
-        query: mutation,
-        operationName: "UpdateProfile",
-        variables: {
-          input: {
-            ...props,
-            email: payload.sub,
-          },
+  const { updateProfile } = await io.query<
+    { updateProfile: Profile },
+    { input: ProfileInput }
+  >(
+    {
+      query: mutation,
+      operationName: "UpdateProfile",
+      variables: {
+        input: {
+          ...props,
+          email: payload.sub,
         },
       },
-      { headers: { cookie } },
-    );
+    },
+    { headers: { cookie } },
+  );
 
-    return updateProfile;
-  } catch (error) {
-    console.error("Error updating user profile:", error);
-    return null;
-  }
-};
+  return updateProfile;
+}
 
 export default action;
