@@ -17,32 +17,27 @@ async function loader(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<{ subscribed: boolean } | null> {
+): Promise<{ subscribed: boolean }> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    await io.query<unknown, { email: string; isNewsletterOptIn: boolean }>(
-      {
-        query: mutation,
-        operationName: "SubscribeNewsletter",
-        variables: {
-          email: payload.sub,
-          isNewsletterOptIn: props.subscribe,
-        },
+  await io.query<unknown, { email: string; isNewsletterOptIn: boolean }>(
+    {
+      query: mutation,
+      operationName: "SubscribeNewsletter",
+      variables: {
+        email: payload.sub,
+        isNewsletterOptIn: props.subscribe,
       },
-      { headers: { cookie } },
-    );
+    },
+    { headers: { cookie } },
+  );
 
-    return { subscribed: props.subscribe };
-  } catch (error) {
-    console.error("Error subscribing to newsletter:", error);
-    return null;
-  }
+  return { subscribed: props.subscribe };
 }
 
 export default loader;

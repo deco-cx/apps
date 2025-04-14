@@ -63,28 +63,23 @@ async function loader(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Profile | null> {
+): Promise<Profile> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    const { profile } = await io.query<
-      { profile: Profile },
-      { customFields?: string }
-    >(
-      { query, variables: { customFields: props.customFields?.join(",") } },
-      { headers: { cookie } },
-    );
+  const { profile } = await io.query<
+    { profile: Profile },
+    { customFields?: string }
+  >(
+    { query, variables: { customFields: props.customFields?.join(",") } },
+    { headers: { cookie } },
+  );
 
-    return profile ?? null;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+  return profile;
 }
 
 export const defaultVisibility = "private";
