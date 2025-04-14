@@ -24,28 +24,23 @@ async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<LoginSessionsInfo | null> {
+): Promise<LoginSessionsInfo> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    const data = await io.query<
-      { loginSessionsInfo: LoginSessionsInfo },
-      null
-    >(
-      { query },
-      { headers: { cookie } },
-    );
+  const data = await io.query<
+    { loginSessionsInfo: LoginSessionsInfo },
+    null
+  >(
+    { query },
+    { headers: { cookie } },
+  );
 
-    return data.loginSessionsInfo;
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
+  return data.loginSessionsInfo;
 }
 
 export default loader;

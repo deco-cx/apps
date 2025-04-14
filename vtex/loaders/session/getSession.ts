@@ -16,25 +16,20 @@ async function loader(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<GetSessionResponse | null> {
+): Promise<GetSessionResponse> {
   const { vcs } = ctx;
 
-  try {
-    const response = await vcs["GET /api/sessions"]({
-      items: props.items?.join(",") || "*",
-    }, {
-      headers: { cookie: req.headers.get("cookie") || "" },
-    });
+  const response = await vcs["GET /api/sessions"]({
+    items: props.items?.join(",") || "*",
+  }, {
+    headers: { cookie: req.headers.get("cookie") || "" },
+  });
 
-    if (!response.ok) {
-      throw new Error(`Failed to get session: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error getting VTEX session:", error);
-    return null;
+  if (!response.ok) {
+    throw new Error(`Failed to get session: ${response.status}`);
   }
+
+  return await response.json();
 }
 
 export default loader;

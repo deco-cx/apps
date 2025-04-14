@@ -10,29 +10,24 @@ async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<CreateEditSessionResponse | null> {
+): Promise<CreateEditSessionResponse> {
   const { vcs } = ctx;
 
-  try {
-    const response = await vcs["POST /api/sessions"]({}, {
-      body: {
-        public: {
-          ...props.publicProperties,
-        },
+  const response = await vcs["POST /api/sessions"]({}, {
+    body: {
+      public: {
+        ...props.publicProperties,
       },
-    });
+    },
+  });
 
-    if (!response.ok) {
-      throw new Error(`Failed to create session: ${response.status}`);
-    }
-
-    proxySetCookie(response.headers, ctx.response.headers, req.url);
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error creating VTEX session:", error);
-    return null;
+  if (!response.ok) {
+    throw new Error(`Failed to create session: ${response.status}`);
   }
+
+  proxySetCookie(response.headers, ctx.response.headers, req.url);
+
+  return await response.json();
 }
 
 export default action;
