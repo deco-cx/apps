@@ -22,18 +22,13 @@ async function loader(
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    return await io.query<DeleteCard, { tokenId: string }>({
-      query: mutation,
-      variables: { tokenId: id },
-    }, { headers: { cookie } });
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
+  return await io.query<DeleteCard, { tokenId: string }>({
+    query: mutation,
+    variables: { tokenId: id },
+  }, { headers: { cookie } });
 }
 
 export const defaultVisibility = "private";
