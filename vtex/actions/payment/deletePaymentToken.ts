@@ -17,7 +17,7 @@ async function loader(
   { id }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<DeleteCard | null> {
+): Promise<DeleteCard> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 

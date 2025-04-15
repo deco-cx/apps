@@ -29,7 +29,7 @@ async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<Payment[] | null> {
+): Promise<Payment[]> {
   const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
@@ -46,7 +46,7 @@ async function loader(
   );
 
   if (!data.profile?.payments) {
-    return null;
+    return [];
   }
 
   return data.profile.payments;
