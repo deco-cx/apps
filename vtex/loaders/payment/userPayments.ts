@@ -34,27 +34,22 @@ async function loader(
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
+    throw new Error("User cookie is invalid");
+  }
+
+  const data = await io.query<
+    { profile: { payments: Payment[] } | null },
+    null
+  >(
+    { query },
+    { headers: { cookie } },
+  );
+
+  if (!data.profile?.payments) {
     return null;
   }
 
-  try {
-    const data = await io.query<
-      { profile: { payments: Payment[] } | null },
-      null
-    >(
-      { query },
-      { headers: { cookie } },
-    );
-
-    if (!data.profile?.payments) {
-      return null;
-    }
-
-    return data.profile.payments;
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
+  return data.profile.payments;
 }
 
 export const defaultVisibility = "private";

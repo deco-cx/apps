@@ -38,20 +38,15 @@ async function loader(
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    const data = await io.query<{ paymentSystems: PaymentSystem[] }, null>(
-      { query },
-      { headers: { cookie } },
-    );
+  const data = await io.query<{ paymentSystems: PaymentSystem[] }, null>(
+    { query },
+    { headers: { cookie } },
+  );
 
-    return data.paymentSystems;
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
+  return data.paymentSystems;
 }
 
 export const defaultVisibility = "private";
