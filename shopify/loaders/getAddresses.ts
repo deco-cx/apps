@@ -34,7 +34,7 @@ const loader = async (
 
     return addresses.map((address) => ({
         "@type": "PostalAddress",
-        "@id": address.node.id,
+        "identifier": address.node.id,
         addressLine1: address.node.address1 ?? "",
         city: address.node.city ?? "",
         country: address.node.country ?? "",
