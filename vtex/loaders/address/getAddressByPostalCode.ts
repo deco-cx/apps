@@ -16,32 +16,27 @@ export default async function loader(
   props: Props,
   _req: Request,
   ctx: AppContext,
-): Promise<PostalAddress | null> {
+): Promise<PostalAddress> {
   const { countryCode, postalCode } = props;
   const { vcs } = ctx;
 
-  try {
-    const addressByPostalCode = await vcs
-      ["GET /api/checkout/pub/postal-code/:countryCode/:postalCode"]({
-        countryCode,
-        postalCode,
-      })
-      .then((r) => r.json());
+  const addressByPostalCode = await vcs
+    ["GET /api/checkout/pub/postal-code/:countryCode/:postalCode"]({
+      countryCode,
+      postalCode,
+    })
+    .then((r) => r.json());
 
-    return {
-      "@type": "PostalAddress",
-      postalCode: addressByPostalCode.postalCode,
-      addressLocality: addressByPostalCode.city,
-      addressRegion: addressByPostalCode.state,
-      addressCountry: addressByPostalCode.country,
-      streetAddress: addressByPostalCode.street || undefined,
-      identifier: addressByPostalCode.number || undefined,
-      areaServed: addressByPostalCode.neighborhood || undefined,
-      description: addressByPostalCode.complement || undefined,
-      disambiguatingDescription: addressByPostalCode.reference || undefined,
-    };
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+  return {
+    "@type": "PostalAddress",
+    postalCode: addressByPostalCode.postalCode,
+    addressLocality: addressByPostalCode.city,
+    addressRegion: addressByPostalCode.state,
+    addressCountry: addressByPostalCode.country,
+    streetAddress: addressByPostalCode.street || undefined,
+    identifier: addressByPostalCode.number || undefined,
+    areaServed: addressByPostalCode.neighborhood || undefined,
+    description: addressByPostalCode.complement || undefined,
+    disambiguatingDescription: addressByPostalCode.reference || undefined,
+  };
 }

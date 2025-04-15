@@ -7,17 +7,16 @@ interface Props {
 
 async function action({ addressId }: Props, req: Request, ctx: AppContext) {
   const { vcs } = ctx;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
-  try {
-    return await vcs["DELETE /api/dataentities/:acronym/documents/:id"]({
-      acronym: "AD",
-      id: addressId,
-    }, { headers: { cookie, accept: "application/json" } });
-  } catch (error) {
-    console.error("Error deleting address:", error);
-    return null;
+  if (!payload?.sub || !payload?.userId) {
+    throw new Error("User cookie is invalid");
   }
+
+  return await vcs["DELETE /api/dataentities/:acronym/documents/:id"]({
+    acronym: "AD",
+    id: addressId,
+  }, { headers: { cookie, accept: "application/json" } });
 }
 
 export const defaultVisibility = "private";

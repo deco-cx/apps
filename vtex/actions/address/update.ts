@@ -61,48 +61,43 @@ async function action(
   { addressId, ...props }: Props,
   req: Request,
   ctx: AppContext,
-): Promise<PostalAddress | null> {
+): Promise<PostalAddress> {
   const { vcs } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    await vcs["PATCH /api/dataentities/:acronym/documents/:id"]({
-      acronym: "AD",
-      id: addressId,
-    }, {
-      body: { ...props, userId: payload.userId } as unknown as Record<
-        string,
-        unknown
-      >,
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        cookie,
-      },
-    }).then((res) => res.json());
+  await vcs["PATCH /api/dataentities/:acronym/documents/:id"]({
+    acronym: "AD",
+    id: addressId,
+  }, {
+    body: { ...props, userId: payload.userId } as unknown as Record<
+      string,
+      unknown
+    >,
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      cookie,
+    },
+  }).then((res) => res.json());
 
-    return {
-      "@type": "PostalAddress",
-      "@id": addressId,
-      name: props.addressName ?? undefined,
-      additionalType: props.addressType ?? undefined,
-      alternateName: props.receiverName ?? undefined,
-      addressLocality: props.city ?? undefined,
-      addressRegion: props.state ?? undefined,
-      addressCountry: props.country ?? undefined,
-      postalCode: props.postalCode ?? undefined,
-      streetAddress: props.street ?? undefined,
-      description: props.complement ?? undefined,
-      disambiguatingDescription: props.reference ?? undefined,
-    };
-  } catch (error) {
-    console.error("Error updating address:", error);
-    return null;
-  }
+  return {
+    "@type": "PostalAddress",
+    "@id": addressId,
+    name: props.addressName ?? undefined,
+    additionalType: props.addressType ?? undefined,
+    alternateName: props.receiverName ?? undefined,
+    addressLocality: props.city ?? undefined,
+    addressRegion: props.state ?? undefined,
+    addressCountry: props.country ?? undefined,
+    postalCode: props.postalCode ?? undefined,
+    streetAddress: props.street ?? undefined,
+    description: props.complement ?? undefined,
+    disambiguatingDescription: props.reference ?? undefined,
+  };
 }
 
 export const defaultVisibility = "private";

@@ -8,33 +8,29 @@ async function loader(
   _props: unknown,
   req: Request,
   ctx: AppContext,
-): Promise<PostalAddress[] | null> {
+): Promise<PostalAddress[]> {
   const { vcs } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
-    return null;
+    throw new Error("User cookie is invalid");
   }
 
-  try {
-    const addresses = await vcs["GET /api/dataentities/:acronym/search"]({
-      acronym: "AD",
-      _where: `userId=${payload.userId}`,
-      _fields:
-        "addressName,addressType,city,complement,country,geoCoordinate,neighborhood,number,postalCode,receiverName,reference,state,street,userId",
-    }, { headers: { cookie } }).then((r) => r.json()) as Omit<
-      Address,
-      "isDisposable"
-    >[];
+  const addresses = await vcs["GET /api/dataentities/:acronym/search"]({
+    acronym: "AD",
+    _where: `userId=${payload.userId}`,
+    _fields:
+      "addressName,addressType,city,complement,country,geoCoordinate,neighborhood,number,postalCode,receiverName,reference,state,street,userId",
+  }, { headers: { cookie } }).then((r) => r.json()) as Omit<
+    Address,
+    "isDisposable"
+  >[];
 
-    if (!addresses?.length) {
-      return null;
-    }
-
-    return addresses.map(toPostalAddress);
-  } catch (_) {
-    return null;
+  if (!addresses?.length) {
+    return [];
   }
+
+  return addresses.map(toPostalAddress);
 }
 
 export const defaultVisibility = "private";
