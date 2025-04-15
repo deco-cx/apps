@@ -10,7 +10,7 @@ export default async function loader(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<Userorderdetails | null> {
+): Promise<Userorderdetails> {
   const { vcs } = ctx;
   const { orderId } = props;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
@@ -25,10 +25,12 @@ export default async function loader(
     },
   );
 
-  if (response.ok) {
-    const order = await response.json();
-    return order;
+  if (!response.ok) {
+    throw new Error(
+      `Failed to get order: ${response.status} ${response.statusText}`,
+    );
   }
 
-  return null;
+  const order = await response.json();
+  return order;
 }
