@@ -36,32 +36,31 @@ async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
-): Promise<CancelOrderResult | null> {
+): Promise<CancelOrderResult> {
   const { io } = ctx;
   const { orderId, reason } = props;
-  const { cookie } = parseCookie(req.headers, ctx.account);
+  const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
-  try {
-    const result = await io.query<
-      CancelOrderResult,
-      { orderId: string; reason: string }
-    >(
-      {
-        query: mutation,
-        operationName: "cancelOrder",
-        variables: {
-          orderId,
-          reason,
-        },
-      },
-      { headers: { cookie } },
-    );
-
-    return result;
-  } catch (error) {
-    console.error(error);
-    return null;
+  if (!payload?.sub || !payload?.userId) {
+    throw new Error("User cookie is invalid");
   }
+
+  const result = await io.query<
+    CancelOrderResult,
+    { orderId: string; reason: string }
+  >(
+    {
+      query: mutation,
+      operationName: "cancelOrder",
+      variables: {
+        orderId,
+        reason,
+      },
+    },
+    { headers: { cookie } },
+  );
+
+  return result;
 }
 
 export default action;
