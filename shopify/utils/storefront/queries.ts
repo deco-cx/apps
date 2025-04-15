@@ -405,7 +405,8 @@ export const ProductRecommendations = {
 };
 
 export const GetShopInfo = {
-  query: gql`query GetShopInfo($identifiers: [HasMetafieldsIdentifier!]!) {
+  query:
+    gql`query GetShopInfo($identifiers: [HasMetafieldsIdentifier!]!, $languageCode: LanguageCode, $countryCode: CountryCode) @inContext(language: $languageCode, country: $countryCode) {
     shop {
       name
       description
