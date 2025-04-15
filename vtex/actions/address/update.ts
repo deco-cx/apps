@@ -1,6 +1,31 @@
 import type { PostalAddress } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
+import { toPostalAddress } from "../../utils/transform.ts";
+import { Address } from "../../utils/types.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
+
+const mutation =
+  `mutation UpdateAddress($addressId: String!, $addressFields: AddressInput) {
+  updateAddress(id: $addressId, fields: $addressFields) @context(provider: "vtex.store-graphql") {
+    cacheId
+    addresses: address {
+      addressId: id
+      addressType
+      addressName
+      city
+      complement
+      country
+      neighborhood
+      number
+      postalCode
+      geoCoordinates
+      receiverName
+      reference
+      state
+      street
+    }
+  }
+}`;
 
 interface Props {
   /**
@@ -10,51 +35,55 @@ interface Props {
   /**
    * Address name.
    */
-  addressName: string | null;
+  addressName?: string;
   /**
    * Type of address. For example, Residential or Pickup, among others.
    */
-  addressType: string | null;
+  addressType?: string;
   /**
    * Name of the person who is going to receive the order.
    */
-  receiverName: string | null;
+  receiverName?: string;
   /**
    * City of the shipping address.
    */
-  city: string | null;
+  city?: string;
   /**
    * State of the shipping address.
    */
-  state: string | null;
+  state?: string;
   /**
    * Three letter ISO code of the country of the shipping address.
    */
-  country: string | null;
+  country?: string;
   /**
    * Postal Code.
    */
-  postalCode: string | null;
+  postalCode?: string;
   /**
    * Street of the address.
    */
-  street: string | null;
+  street?: string;
   /**
    * Number of the building, house or apartment in the shipping address.
    */
-  number: string | null;
+  number?: string;
   /**
    * Neighborhood of the address.
    */
-  neighborhood: string | null;
+  neighborhood?: string;
   /**
    * Complement to the shipping address in case it applies.
    */
-  complement: string | null;
+  complement?: string;
   /**
    * Complement that might help locate the shipping address more precisely in case of delivery.
    */
-  reference: string | null;
+  reference?: string;
+  /**
+   * Latitude and longitude of the shipping address.
+   */
+  geoCoordinates?: number[];
 }
 
 async function action(
@@ -62,42 +91,33 @@ async function action(
   req: Request,
   ctx: AppContext,
 ): Promise<PostalAddress> {
-  const { vcs } = ctx;
+  const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
     throw new Error("User cookie is invalid");
   }
 
-  await vcs["PATCH /api/dataentities/:acronym/documents/:id"]({
-    acronym: "AD",
-    id: addressId,
-  }, {
-    body: { ...props, userId: payload.userId } as unknown as Record<
-      string,
-      unknown
-    >,
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      cookie,
+  const { updateAddress: updatedAddress } = await io.query<
+    { updateAddress: Address },
+    { addressId: string; addressFields: Omit<Address, "addressId"> }
+  >(
+    {
+      query: mutation,
+      operationName: "UpdateAddress",
+      variables: {
+        addressId,
+        addressFields: {
+          ...props,
+          receiverName: props.receiverName || null,
+          complement: props.complement || null,
+        },
+      },
     },
-  }).then((res) => res.json());
+    { headers: { cookie } },
+  );
 
-  return {
-    "@type": "PostalAddress",
-    "@id": addressId,
-    name: props.addressName ?? undefined,
-    additionalType: props.addressType ?? undefined,
-    alternateName: props.receiverName ?? undefined,
-    addressLocality: props.city ?? undefined,
-    addressRegion: props.state ?? undefined,
-    addressCountry: props.country ?? undefined,
-    postalCode: props.postalCode ?? undefined,
-    streetAddress: props.street ?? undefined,
-    description: props.complement ?? undefined,
-    disambiguatingDescription: props.reference ?? undefined,
-  };
+  return toPostalAddress(updatedAddress);
 }
 
 export const defaultVisibility = "private";

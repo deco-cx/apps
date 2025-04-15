@@ -2,96 +2,144 @@ import { PostalAddress } from "../../../commerce/types.ts";
 import type { AppContext } from "../../mod.ts";
 import { parseCookie } from "../../utils/vtexId.ts";
 
+interface AddressInput {
+  name?: string;
+  addressName: string;
+  addressType?: string;
+  city?: string;
+  complement?: string;
+  country?: string;
+  geoCoordinates?: number[];
+  neighborhood?: string;
+  number?: string;
+  postalCode?: string;
+  receiverName?: string;
+  reference?: string;
+  state?: string;
+  street?: string;
+}
+
+interface SavedAddress extends AddressInput {
+  id: string;
+  cacheId: string;
+}
+
 interface Props {
   /**
    * Address name.
    */
-  addressName: string | null;
+  addressName: string;
   /**
    * Type of address. For example, Residential or Pickup, among others.
    */
-  addressType: string | null;
+  addressType?: string;
   /**
    * Name of the person who is going to receive the order.
    */
-  receiverName: string | null;
+  receiverName?: string;
   /**
    * City of the shipping address.
    */
-  city: string | null;
+  city?: string;
   /**
    * State of the shipping address.
    */
-  state: string | null;
+  state?: string;
   /**
    * Three letter ISO code of the country of the shipping address.
    */
-  country: string | null;
+  country?: string;
   /**
    * Postal Code.
    */
-  postalCode: string | null;
+  postalCode?: string;
   /**
    * Street of the address.
    */
-  street: string | null;
+  street?: string;
   /**
    * Number of the building, house or apartment in the shipping address.
    */
-  number: string | null;
+  number?: string;
   /**
    * Neighborhood of the address.
    */
-  neighborhood: string | null;
+  neighborhood?: string;
   /**
    * Complement to the shipping address in case it applies.
    */
-  complement: string | null;
+  complement?: string;
   /**
    * Complement that might help locate the shipping address more precisely in case of delivery.
    */
-  reference: string | null;
+  reference?: string;
+  /**
+   * Geo coordinates of the address.
+   */
+  geoCoordinates?: number[];
 }
+
+const mutation = `mutation SaveAddress($address: AddressInput!) {
+  saveAddress(address: $address) @context(provider: "vtex.store-graphql") {
+    addressId
+    cacheId
+    id
+    userId
+    receiverName
+    complement
+    neighborhood
+    country
+    state
+    number
+    street
+    geoCoordinates
+    postalCode
+    city
+    name
+    addressName
+    addressType
+  }
+}`;
 
 async function action(
   props: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<PostalAddress> {
-  const { vcs } = ctx;
+  const { io } = ctx;
   const { cookie, payload } = parseCookie(req.headers, ctx.account);
 
   if (!payload?.sub || !payload?.userId) {
     throw new Error("User cookie is invalid");
   }
 
-  const { Id } = await vcs["POST /api/dataentities/:acronym/documents"]({
-    acronym: "AD",
-  }, {
-    body: { ...props, userId: payload.userId } as unknown as Record<
-      string,
-      unknown
-    >,
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      cookie,
+  const { saveAddress: savedAddress } = await io.query<
+    { saveAddress: SavedAddress },
+    { address: AddressInput }
+  >(
+    {
+      query: mutation,
+      operationName: "SaveAddress",
+      variables: {
+        address: props,
+      },
     },
-  }).then((res) => res.json());
+    { headers: { cookie } },
+  );
 
   return {
     "@type": "PostalAddress",
-    "@id": Id,
-    name: props.addressName ?? undefined,
-    additionalType: props.addressType ?? undefined,
-    alternateName: props.receiverName ?? undefined,
-    addressLocality: props.city ?? undefined,
-    addressRegion: props.state ?? undefined,
-    addressCountry: props.country ?? undefined,
-    postalCode: props.postalCode ?? undefined,
-    streetAddress: props.street ?? undefined,
-    description: props.complement ?? undefined,
-    disambiguatingDescription: props.reference ?? undefined,
+    "@id": savedAddress.id,
+    name: savedAddress.addressName,
+    additionalType: savedAddress.addressType,
+    alternateName: savedAddress.receiverName,
+    addressLocality: savedAddress.city,
+    addressRegion: savedAddress.state,
+    addressCountry: savedAddress.country,
+    postalCode: savedAddress.postalCode,
+    streetAddress: savedAddress.street,
+    description: savedAddress.complement,
+    disambiguatingDescription: savedAddress.reference,
   };
 }
 
