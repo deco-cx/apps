@@ -26,7 +26,6 @@ async function loader(
   if (!payload?.sub || !payload?.userId) {
     return null;
   }
-
   const query =
     "query getUserProfile { profile { id userId email firstName lastName profilePicture gender document homePhone businessPhone }}";
 

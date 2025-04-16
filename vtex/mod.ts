@@ -91,7 +91,8 @@ export const color = 0xf71963;
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vtex/logo.png
  */
 export default function VTEX(
-  { appKey, appToken, account, publicUrl, salesChannel, subAccount, ...props }: Props,
+  { appKey, appToken, account, publicUrl, salesChannel, subAccount, ...props }:
+    Props,
 ) {
   const headers = new Headers();
   appKey &&
@@ -119,9 +120,17 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
+
+  const graphqlEndpoint = publicUrl
+    ? (`${
+      publicUrl.endsWith("/") ? publicUrl.slice(0, -1) : publicUrl
+    }/api/io/_v/private/graphql/v1`)
+    : `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`;
+
   const io = createGraphqlClient({
-    endpoint:
-      `https://${subAccount || account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+    endpoint: `https://${
+      subAccount || account
+    }.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });

@@ -14,6 +14,7 @@ interface CookiePayload {
 }
 
 export const parseCookie = (headers: Headers) => {
+export const parseCookie = (headers: Headers) => {
   const cookies = getCookies(headers);
 
   const authCookieName = Object.keys(cookies).toSorted((a, z) =>
@@ -30,7 +31,9 @@ export const parseCookie = (headers: Headers) => {
 
   const decoded = cookie ? decode(cookie) : null;
 
-  const payload = decoded?.[1] as CookiePayload | undefined;
+  const payload = firstAuthCookie
+    ? decode(firstAuthCookie)?.[1] as CookiePayload
+    : undefined;
 
   return {
     cookie: stringify({
