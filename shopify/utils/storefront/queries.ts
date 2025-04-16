@@ -275,7 +275,17 @@ export const CreateCart = {
 
 export const GetCart = {
   fragments: [Cart],
-  query: gql`query GetCart($id: ID!) { cart(id: $id) { ...Cart } }`,
+  query: gql`
+    query GetCart(
+      $id: ID!, 
+      $languageCode: LanguageCode, 
+      $countryCode: CountryCode
+    ) @inContext(language: $languageCode, country: $countryCode) {
+      cart(id: $id) {
+        ...Cart
+      }
+    }
+  `,
 };
 
 export const GetProduct = {
@@ -296,94 +306,59 @@ export const GetProduct = {
 
 export const ListProducts = {
   fragments: [Product, ProductVariant, Collection],
-  query:
-    gql`query ListProducts($first: Int, $after: String, $query: String, $identifiers: [HasMetafieldsIdentifier!]!, $languageCode: LanguageCode, $countryCode: CountryCode) @inContext(language: $languageCode, country: $countryCode) {
-    products(first: $first, after: $after, query: $query) {
-      nodes {
-        ...Product 
+  query: gql`
+    query ListProducts(
+      $first: Int, 
+      $after: String, 
+      $query: String, 
+      $identifiers: [HasMetafieldsIdentifier!]!, 
+      $languageCode: LanguageCode, 
+      $countryCode: CountryCode
+    ) @inContext(language: $languageCode, country: $countryCode) {
+      products(first: $first, after: $after, query: $query) {
+        nodes {
+          ...Product
+        }
       }
     }
-  }`,
+  `,
 };
 
 export const SearchProducts = {
   fragments: [Product, ProductVariant, Filter, Collection],
-  query: gql`query searchWithFilters(
-      $first: Int, 
-      $last: Int, 
-      $after: String, 
-      $before: String,  
-      $query: String!, 
-      $productFilters: [ProductFilter!]
-      $sortKey: SearchSortKeys, 
+  query: gql`
+    query searchWithFilters(
+      $first: Int,
+      $last: Int,
+      $after: String,
+      $before: String,
+      $query: String!,
+      $productFilters: [ProductFilter!],
+      $sortKey: SearchSortKeys,
       $reverse: Boolean,
       $identifiers: [HasMetafieldsIdentifier!]!,
       $languageCode: LanguageCode,
       $countryCode: CountryCode
-     ) @inContext(language: $languageCode, country: $countryCode) {
-    search(
-      first: $first, 
-      last: $last, 
-      after: $after, 
-      before: $before, 
-      query: $query, 
-      productFilters: $productFilters, 
-      types: PRODUCT, 
-      sortKey: $sortKey,
-      reverse: $reverse,
-    ){
-      totalCount
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        endCursor
-        startCursor
-      }
-      productFilters {
-        ...Filter
-      }
-      nodes {
-        ...Product 
-      }
-    }
-  }`,
-};
-
-export const ProductsByCollection = {
-  fragments: [Product, ProductVariant, Collection, Filter],
-  query: gql`query AllProducts(
-      $first: Int, 
-      $last: Int, 
-      $after: String, 
-      $before: String, 
-      $handle: String,
-      $sortKey: ProductCollectionSortKeys, 
-      $reverse: Boolean, 
-      $filters: [ProductFilter!],
-      $identifiers: [HasMetafieldsIdentifier!]!,
-      $languageCode: LanguageCode,
-      $countryCode: CountryCode
     ) @inContext(language: $languageCode, country: $countryCode) {
-    collection(handle: $handle) {
-      handle
-      description
-      title
-      products(
-        first: $first, 
-        last: $last, 
-        after: $after, 
-        before: $before, 
-        sortKey: $sortKey, 
-        reverse: $reverse, 
-        filters: $filters
-      ){
+      search(
+        first: $first,
+        last: $last,
+        after: $after,
+        before: $before,
+        query: $query,
+        productFilters: $productFilters,
+        types: PRODUCT,
+        sortKey: $sortKey,
+        reverse: $reverse
+      ) {
+        totalCount
         pageInfo {
           hasNextPage
           hasPreviousPage
           endCursor
           startCursor
         }
-        filters {
+        productFilters {
           ...Filter
         }
         nodes {
@@ -391,64 +366,122 @@ export const ProductsByCollection = {
         }
       }
     }
-  }`,
+  `,
+};
+
+export const ProductsByCollection = {
+  fragments: [Product, ProductVariant, Collection, Filter],
+  query: gql`
+    query AllProducts(
+      $first: Int,
+      $last: Int,
+      $after: String,
+      $before: String,
+      $handle: String,
+      $sortKey: ProductCollectionSortKeys,
+      $reverse: Boolean,
+      $filters: [ProductFilter!],
+      $identifiers: [HasMetafieldsIdentifier!]!,
+      $languageCode: LanguageCode,
+      $countryCode: CountryCode
+    ) @inContext(language: $languageCode, country: $countryCode) {
+      collection(handle: $handle) {
+        handle
+        description
+        title
+        products(
+          first: $first,
+          last: $last,
+          after: $after,
+          before: $before,
+          sortKey: $sortKey,
+          reverse: $reverse,
+          filters: $filters
+        ) {
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            endCursor
+            startCursor
+          }
+          filters {
+            ...Filter
+          }
+          nodes {
+            ...Product
+          }
+        }
+      }
+    }
+  `,
 };
 
 export const ProductRecommendations = {
   fragments: [Product, ProductVariant, Collection],
-  query:
-    gql`query productRecommendations($productId: ID!, $identifiers: [HasMetafieldsIdentifier!]!, $languageCode: LanguageCode, $countryCode: CountryCode) @inContext(language: $languageCode, country: $countryCode) {
-    productRecommendations(productId: $productId) {
-      ...Product
+  query: gql`
+    query ProductRecommendations(
+      $productId: ID!,
+      $identifiers: [HasMetafieldsIdentifier!]!,
+      $languageCode: LanguageCode,
+      $countryCode: CountryCode
+    ) @inContext(language: $languageCode, country: $countryCode) {
+      productRecommendations(productId: $productId) {
+        ...Product
+      }
     }
-  }`,
+  `,
 };
 
 export const GetShopInfo = {
-  query:
-    gql`query GetShopInfo($identifiers: [HasMetafieldsIdentifier!]!, $languageCode: LanguageCode, $countryCode: CountryCode) @inContext(language: $languageCode, country: $countryCode) {
-    shop {
-      name
-      description
-      privacyPolicy {
-        title
-        body
-      }
-      refundPolicy {
-        title
-        body
-      }
-      shippingPolicy {
-        title
-        body
-      }
-      subscriptionPolicy {
-        title
-        body
-      }
-      termsOfService {
-        title
-        body
-      }
-      metafields(identifiers: $identifiers) {
+  query: gql`
+    query GetShopInfo(
+      $identifiers: [HasMetafieldsIdentifier!]!,
+      $languageCode: LanguageCode,
+      $countryCode: CountryCode
+    ) @inContext(language: $languageCode, country: $countryCode) {
+      shop {
+        name
         description
-        key
-        namespace
-        type
-        value
-        reference {
-          ... on MediaImage {
-            image {
-              url
+        privacyPolicy {
+          title
+          body
+        }
+        refundPolicy {
+          title
+          body
+        }
+        shippingPolicy {
+          title
+          body
+        }
+        subscriptionPolicy {
+          title
+          body
+        }
+        termsOfService {
+          title
+          body
+        }
+        metafields(identifiers: $identifiers) {
+          description
+          key
+          namespace
+          type
+          value
+          reference {
+            ... on MediaImage {
+              image {
+                url
+              }
             }
           }
-        }
-        references(first: 250) {
-          edges {
-            node {
-              ... on MediaImage {
-                image {
-                  url
+          references(first: 250) {
+            edges {
+              node {
+                ... on MediaImage {
+                  image {
+                    url
+                  }
                 }
               }
             }
@@ -456,88 +489,106 @@ export const GetShopInfo = {
         }
       }
     }
-  }`,
+  `,
 };
 
 export const FetchCustomerInfo = {
   fragments: [Customer],
-  query: gql`query FetchCustomerInfo($customerAccessToken: String!) {
-    customer(customerAccessToken: $customerAccessToken) {
-      ...Customer
+  query: gql`
+    query FetchCustomerInfo($customerAccessToken: String!) {
+      customer(customerAccessToken: $customerAccessToken) {
+        ...Customer
+      }
     }
-  }`,
+  `,
 };
 
 export const AddItemToCart = {
   fragments: [Cart],
-  query: gql`mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
-    payload: cartLinesAdd(cartId: $cartId, lines: $lines) {
-      cart { ...Cart }
+  query: gql`
+    mutation AddItemToCart($cartId: ID!, $lines: [CartLineInput!]!) {
+      payload: cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart {
+          ...Cart
+        }
+      }
     }
-  }`,
+  `,
 };
 
 export const RegisterAccount = {
-  query: gql`mutation RegisterAccount(
+  query: gql`
+    mutation RegisterAccount(
       $email: String!,
       $password: String!,
       $firstName: String,
       $lastName: String,
       $acceptsMarketing: Boolean = false
     ) {
-    customerCreate(input: {
-      email: $email,
-      password: $password,
-      firstName: $firstName,
-      lastName: $lastName,
-      acceptsMarketing: $acceptsMarketing,
-    }) {
-      customer {
-        id
-      }
-      customerUserErrors {
-        code
-        message
+      customerCreate(
+        input: {
+          email: $email,
+          password: $password,
+          firstName: $firstName,
+          lastName: $lastName,
+          acceptsMarketing: $acceptsMarketing
+        }
+      ) {
+        customer {
+          id
+        }
+        customerUserErrors {
+          code
+          message
+        }
       }
     }
-  }`,
+  `,
 };
 
 export const AddCoupon = {
   fragments: [Cart],
-  query: gql`mutation AddCoupon($cartId: ID!, $discountCodes: [String!]!) {
-    payload: cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) {
-      cart { ...Cart }
-      userErrors {
-        field
-        message
+  query: gql`
+    mutation AddCoupon($cartId: ID!, $discountCodes: [String!]!) {
+      payload: cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) {
+        cart {
+          ...Cart
+        }
+        userErrors {
+          field
+          message
+        }
       }
     }
-  }`,
+  `,
 };
 
 export const UpdateItems = {
   fragments: [Cart],
-  query:
-    gql`mutation UpdateItems($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+  query: gql`
+    mutation UpdateItems($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
       payload: cartLinesUpdate(cartId: $cartId, lines: $lines) {
-        cart { ...Cart }
+        cart {
+          ...Cart
+        }
       }
-    }`,
+    }
+  `,
 };
 
 export const SignInWithEmailAndPassword = {
-  query:
-    gql`mutation SignInWithEmailAndPassword($email: String!, $password: String!) {
-    customerAccessTokenCreate(input: { email: $email, password: $password }) {
-      customerAccessToken {
-        accessToken
-        expiresAt
-      }
-      customerUserErrors {
-        code
-        message
+  query: gql`
+    mutation SignInWithEmailAndPassword($email: String!, $password: String!) {
+      customerAccessTokenCreate(input: { email: $email, password: $password }) {
+        customerAccessToken {
+          accessToken
+          expiresAt
+        }
+        customerUserErrors {
+          code
+          message
+        }
       }
     }
-  }`,
+  `,
 };
