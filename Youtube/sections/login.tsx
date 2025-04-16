@@ -10,8 +10,9 @@ export async function loader(
   _req: Request,
   ctx: AppContext,
 ) {
+  const auth = await ctx.invoke.Youtube.loaders.authentication();
   return {
-    auth: await ctx.invoke.Youtube.loaders.authentication(),
+    auth,
   };
 }
 

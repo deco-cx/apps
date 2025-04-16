@@ -25,13 +25,16 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<AuthenticationResult | AuthenticationError> {
+  console.log("init");
   const urlParams = new URL(req.url).searchParams;
   const code = urlParams.get("code");
-  const { scopes, redirectUri, clientIdSecret } = ctx.apiConfig;
-  //const client = ctx.client;
-  const clientId = typeof clientIdSecret === "string"
-    ? clientIdSecret
-    : clientIdSecret?.get?.() ?? "";
+  const { client, authenticationConfig } = ctx;
+
+  const {redirectUri, clientId, clientSecret, url } = authenticationConfig;
+  const scopes = ctx.authenticationConfig?.scopes;
+  const clientSecretString = typeof clientSecret === "string"
+    ? clientSecret
+    : clientSecret?.get?.() ?? "";
 
   if (!clientId) {
     return {
@@ -52,33 +55,50 @@ export default async function loader(
     };
   }
 
-  const baseParams = {
+  let channelData = null;
+  let accessToken = getAccessToken(req);
+  
+  const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
     response_type: "code",
     scope: scopes,
     state: "state_parameter_passthrough_value",
     access_type: "offline",
-    prompt: "consent",
     include_granted_scopes: "true",
-  };
+    prompt: "consent",
+  });
 
-  let channelData = null;
-  let accessToken = getAccessToken(req);
-  const params = new URLSearchParams(baseParams);
-
-  const authorizationUrl =
-    `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  const authorizationUrl =`${url}?${params.toString()}`;
+  console.log("authorizationUrl", authorizationUrl);
+  console.log("accessToken", accessToken);
 
   if (!accessToken && code) {
+    console.log("code", code);
     try {
-      const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams(baseParams),
+      // const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/x-www-form-urlencoded",
+      //   },
+      //   body: new URLSearchParams({
+      //     code,
+      //     client_id: clientId,
+      //     client_secret: clientSecretString,
+      //     redirect_uri: redirectUri,
+      //     grant_type: "authorization_code",
+      //   }),
+      // });
+      console.log("antes de chamar o client");
+      const tokenResponse = await client["POST /token"]({
+        code,
+        client_id: clientId,
+        client_secret: clientSecretString,
+        redirect_uri: redirectUri,
+        grant_type: "authorization_code",
       });
+      console.log("depois de chamar o client");
+      console.log("tokenResponse", tokenResponse);
 
       const tokenData = await tokenResponse.json();
       accessToken = tokenData.access_token;
@@ -95,15 +115,14 @@ export default async function loader(
         });
 
         try {
-          const channelResponse = await fetch(
-            "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
+          const channelResponse = await client["GET /youtube/v3/channels"]({
+            part: "snippet",
+            mine: true,
+          }, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
             },
-          );
-
+          });
           const channelResult = await channelResponse.json();
           channelData = channelResult.items;
         } catch (_) {
@@ -121,17 +140,16 @@ export default async function loader(
     }
   } else if (accessToken) {
     try {
-      const testResponse = await fetch(
-        "https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      const channelResponse = await client["GET /youtube/v3/channels"]({
+        part: "snippet",
+        mine: true,
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
-
-      if (testResponse.ok) {
-        const channelResult = await testResponse.json();
+      });
+      if (channelResponse.ok) {
+        const channelResult = await channelResponse.json();
         channelData = channelResult.items;
       } else {
         setCookie(ctx.response.headers, {

@@ -5,17 +5,21 @@ import { Secret } from "../website/loaders/secret.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 
-interface OAuthCredentials {
-  clientId: string;
-  clientSecret: string;
-  redirectUri: string;
-}
-
 export interface Props {
-  apiConfig: {
-    clientIdSecret?: Secret;
-    scopes?: string;
-    redirectUri?: string;
+  /**
+   * @title Authentication Configuration
+   * @description The configuration for the authentication on the Youtube API.
+   */
+  authenticationConfig: {
+    clientSecret: Secret;
+    clientId: string;
+    scopes: string;
+    redirectUri: string;
+    /**
+     * @title Authentication URL
+     * @description The URL to authenticate the user ex: https://accounts.google.com/o/oauth2/v2/auth
+     */
+    url: string;
   };
 }
 
@@ -25,7 +29,13 @@ export interface State extends Props {
 
 export type AppContext = FnContext<State, Manifest>;
 
-export default function App(props: Props) {
+/**
+ * @title Youtube
+ * @description Loaders, actions and authentication for the Youtube API for Deco.
+ * @category Social
+ * @logo https://cdn.pixabay.com/photo/2021/09/11/18/21/youtube-6616310_1280.png
+ */
+export default function App({  ...props }: Props) {
   const client = createHttpClient<YoutubeClient>({
     base: "https://www.googleapis.com/youtube/v3",
     headers: new Headers({
@@ -37,11 +47,6 @@ export default function App(props: Props) {
   const state = {
     ...props,
     client,
-    apiConfig: {
-      clientId: props.apiConfig.clientIdSecret,
-      scopes: props.apiConfig.scopes,
-      redirectUri: props.apiConfig.redirectUri,
-    },
   };
 
   return {

@@ -17,7 +17,7 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<YoutubeChannelResponse | null> {
-  const client = ctx.api;
+  const client = ctx.client;
   const accessToken = getAccessToken(req) || props.tokenYoutube;
 
   if (!accessToken && !props.tokenYoutube) {

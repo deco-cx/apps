@@ -50,7 +50,7 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<VideoDetailsResponse | null> {
-  const client = ctx.api;
+  const client = ctx.client;
   const accessToken = getAccessToken(req) || props.tokenYoutube;
 
   if (!accessToken) {
@@ -71,12 +71,11 @@ export default async function loader(
 
   const partString = parts.join(",");
 
-  const videoData = await client["GET /videos"]({
+  const videoResponse = await client["GET /videos"]({
     part: partString,
     id: videoId,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
-    res.json()
-  );
+  }, { headers: { Authorization: `Bearer ${accessToken}` } });
+  const videoData = await videoResponse.json();
 
   if (!videoData.items || videoData.items.length === 0) {
     console.error(`Vídeo não encontrado: ${videoId}`);

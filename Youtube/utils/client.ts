@@ -4,10 +4,30 @@ import {
   VideoQuery,
   YouTubeCaptionListResponse,
   YoutubeChannelResponse,
+  YoutubeTokenResponse,
   YoutubeVideoResponse,
 } from "./types.ts";
 
 export interface YoutubeClient {
+  "POST /token": {
+    response: YoutubeTokenResponse;
+    searchParams: {
+      code: string;
+      client_id: string;
+      client_secret: string;
+      redirect_uri: string;
+      grant_type: string;
+    };
+  };
+
+  "GET /youtube/v3/channels": {
+    response: YoutubeChannelResponse;
+    searchParams: Query & { id?: string; part: string };
+    headers: {
+      Authorization: string;
+    };
+  };
+
   "GET /channels": {
     response: YoutubeChannelResponse;
     searchParams: Query & { id?: string; part: string };

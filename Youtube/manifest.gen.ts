@@ -13,14 +13,13 @@ import * as $$$$$$$$$7 from "./actions/livestreams/delete.ts";
 import * as $$$$$$$$$8 from "./actions/livestreams/transition.ts";
 import * as $$$$$$$$$9 from "./actions/livestreams/update.ts";
 import * as $$$$$$$$$10 from "./actions/livestreams/updateThumbnail.ts";
-import * as $$$$$$$$$11 from "./actions/myAction.ts";
-import * as $$$$$$$$$12 from "./actions/updateCategory.ts";
-import * as $$$$$$$$$13 from "./actions/updateChannel.ts";
-import * as $$$$$$$$$14 from "./actions/updateChannelDefaults.ts";
-import * as $$$$$$$$$15 from "./actions/updateChannelSections.ts";
-import * as $$$$$$$$$16 from "./actions/updateThumbnail.ts";
-import * as $$$$$$$$$17 from "./actions/updateVideo.ts";
-import * as $$$$$$$$$18 from "./actions/videos/delete.ts";
+import * as $$$$$$$$$11 from "./actions/updateCategory.ts";
+import * as $$$$$$$$$12 from "./actions/updateChannel.ts";
+import * as $$$$$$$$$13 from "./actions/updateChannelDefaults.ts";
+import * as $$$$$$$$$14 from "./actions/updateChannelSections.ts";
+import * as $$$$$$$$$15 from "./actions/updateThumbnail.ts";
+import * as $$$$$$$$$16 from "./actions/updateVideo.ts";
+import * as $$$$$$$$$17 from "./actions/videos/delete.ts";
 import * as $$$0 from "./loaders/analytics/channelStats.ts";
 import * as $$$1 from "./loaders/analytics/videoStats.ts";
 import * as $$$2 from "./loaders/authentication.ts";
@@ -71,14 +70,13 @@ const manifest = {
     "Youtube/actions/livestreams/transition.ts": $$$$$$$$$8,
     "Youtube/actions/livestreams/update.ts": $$$$$$$$$9,
     "Youtube/actions/livestreams/updateThumbnail.ts": $$$$$$$$$10,
-    "Youtube/actions/myAction.ts": $$$$$$$$$11,
-    "Youtube/actions/updateCategory.ts": $$$$$$$$$12,
-    "Youtube/actions/updateChannel.ts": $$$$$$$$$13,
-    "Youtube/actions/updateChannelDefaults.ts": $$$$$$$$$14,
-    "Youtube/actions/updateChannelSections.ts": $$$$$$$$$15,
-    "Youtube/actions/updateThumbnail.ts": $$$$$$$$$16,
-    "Youtube/actions/updateVideo.ts": $$$$$$$$$17,
-    "Youtube/actions/videos/delete.ts": $$$$$$$$$18,
+    "Youtube/actions/updateCategory.ts": $$$$$$$$$11,
+    "Youtube/actions/updateChannel.ts": $$$$$$$$$12,
+    "Youtube/actions/updateChannelDefaults.ts": $$$$$$$$$13,
+    "Youtube/actions/updateChannelSections.ts": $$$$$$$$$14,
+    "Youtube/actions/updateThumbnail.ts": $$$$$$$$$15,
+    "Youtube/actions/updateVideo.ts": $$$$$$$$$16,
+    "Youtube/actions/videos/delete.ts": $$$$$$$$$17,
   },
   "name": "Youtube",
   "baseUrl": import.meta.url,
