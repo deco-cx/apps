@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { proxySetCookie } from "../../utils/cookies.ts";
-import { parseCookie } from "../../utils/orderForm.ts";
+import { parseCookie, parseCookieWithoutAuth } from "../../utils/orderForm.ts";
 import type { OrderForm } from "../../utils/types.ts";
 import { getSegmentFromBag } from "../../utils/segment.ts";
 
@@ -14,7 +14,7 @@ const action = async (
 ): Promise<OrderForm> => {
   const { vcsDeprecated } = ctx;
   const { orderFormId } = parseCookie(req.headers);
-  const cookie = req.headers.get("cookie") ?? "";
+  const { cookie } = parseCookieWithoutAuth(req.headers);
   const segment = getSegmentFromBag(ctx);
 
   const response = await vcsDeprecated
