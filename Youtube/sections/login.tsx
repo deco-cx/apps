@@ -1,5 +1,5 @@
-import { AuthenticationResult } from "../loaders/authentication.ts";
-import type { AppContext } from "../mod.ts";
+import { AuthenticationResult } from "../loaders/auth/authenticate.ts";
+import { AppContext } from "../mod.ts";
 
 interface Props {
   auth: AuthenticationResult;
@@ -10,8 +10,7 @@ export async function loader(
   _req: Request,
   ctx: AppContext,
 ) {
-  const auth = await ctx.invoke.Youtube.loaders.authentication();
-  console.log("auth", auth);
+  const auth = await ctx.invoke.Youtube.loaders.auth.authenticate();
   return {
     auth,
   };

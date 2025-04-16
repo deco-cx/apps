@@ -1,5 +1,4 @@
-import type { AppContext } from "../mod.ts";
-import { getAccessToken } from "../utils/cookieAccessToken.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface UpdateChannelOptions {
   /**
@@ -61,7 +60,7 @@ interface UpdateChannelResult {
 export default async function action(
   props: UpdateChannelOptions,
   req: Request,
-  _ctx: AppContext,
+  _ctx: unknown,
 ): Promise<UpdateChannelResult> {
   const {
     channelId,

@@ -1,5 +1,5 @@
-import type { AppContext } from "../mod.ts";
-import { getAccessToken } from "../utils/cookieAccessToken.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
+
 
 interface UpdateVideoResult {
   success: boolean;
@@ -23,7 +23,6 @@ export interface UpdateVideoOptionsAction {
 export default async function action(
   props: UpdateVideoOptionsAction,
   req: Request,
-  _ctx: AppContext,
 ): Promise<UpdateVideoResult> {
   if (!props.videoId) {
     console.error("ID do vídeo não fornecido");

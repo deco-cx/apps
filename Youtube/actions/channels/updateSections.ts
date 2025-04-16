@@ -1,5 +1,4 @@
-import type { AppContext } from "../mod.ts";
-import { getAccessToken } from "../utils/cookieAccessToken.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface ChannelSection {
   /**
@@ -83,7 +82,6 @@ interface UpdateChannelSectionsResult {
 export default async function action(
   props: UpdateChannelSectionsOptions,
   req: Request,
-  _ctx: AppContext,
 ): Promise<UpdateChannelSectionsResult> {
   const { sections, removeSectionIds, tokenYoutube } = props;
 

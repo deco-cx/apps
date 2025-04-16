@@ -2,38 +2,38 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/comments/like.ts";
-import * as $$$$$$$$$1 from "./actions/comments/pinComment.ts";
-import * as $$$$$$$$$2 from "./actions/comments/responder.ts";
-import * as $$$$$$$$$3 from "./actions/comments/send.ts";
-import * as $$$$$$$$$4 from "./actions/livestreams/bind.ts";
-import * as $$$$$$$$$5 from "./actions/livestreams/create.ts";
-import * as $$$$$$$$$6 from "./actions/livestreams/createStream.ts";
-import * as $$$$$$$$$7 from "./actions/livestreams/delete.ts";
-import * as $$$$$$$$$8 from "./actions/livestreams/transition.ts";
-import * as $$$$$$$$$9 from "./actions/livestreams/update.ts";
-import * as $$$$$$$$$10 from "./actions/livestreams/updateThumbnail.ts";
-import * as $$$$$$$$$11 from "./actions/updateCategory.ts";
-import * as $$$$$$$$$12 from "./actions/updateChannel.ts";
-import * as $$$$$$$$$13 from "./actions/updateChannelDefaults.ts";
-import * as $$$$$$$$$14 from "./actions/updateChannelSections.ts";
-import * as $$$$$$$$$15 from "./actions/updateThumbnail.ts";
-import * as $$$$$$$$$16 from "./actions/updateVideo.ts";
-import * as $$$$$$$$$17 from "./actions/videos/delete.ts";
+import * as $$$$$$$$$0 from "./actions/channels/update.ts";
+import * as $$$$$$$$$1 from "./actions/channels/updateDefaults.ts";
+import * as $$$$$$$$$2 from "./actions/channels/updateSections.ts";
+import * as $$$$$$$$$3 from "./actions/comments/create.ts";
+import * as $$$$$$$$$4 from "./actions/comments/pin.ts";
+import * as $$$$$$$$$5 from "./actions/comments/rate.ts";
+import * as $$$$$$$$$6 from "./actions/comments/reply.ts";
+import * as $$$$$$$$$7 from "./actions/livestreams/bind.ts";
+import * as $$$$$$$$$8 from "./actions/livestreams/create.ts";
+import * as $$$$$$$$$9 from "./actions/livestreams/createStream.ts";
+import * as $$$$$$$$$10 from "./actions/livestreams/delete.ts";
+import * as $$$$$$$$$11 from "./actions/livestreams/transition.ts";
+import * as $$$$$$$$$12 from "./actions/livestreams/update.ts";
+import * as $$$$$$$$$13 from "./actions/livestreams/updateThumbnail.ts";
+import * as $$$$$$$$$14 from "./actions/videos/delete.ts";
+import * as $$$$$$$$$15 from "./actions/videos/update.ts";
+import * as $$$$$$$$$16 from "./actions/videos/updateCategory.ts";
+import * as $$$$$$$$$17 from "./actions/videos/updateThumbnail.ts";
 import * as $$$0 from "./loaders/analytics/channelStats.ts";
 import * as $$$1 from "./loaders/analytics/videoStats.ts";
-import * as $$$2 from "./loaders/authentication.ts";
-import * as $$$3 from "./loaders/channels.ts";
+import * as $$$2 from "./loaders/auth/authenticate.ts";
+import * as $$$3 from "./loaders/channels/get.ts";
 import * as $$$4 from "./loaders/comments/list.ts";
-import * as $$$5 from "./loaders/comments/listThreads.ts";
+import * as $$$5 from "./loaders/comments/threads.ts";
 import * as $$$6 from "./loaders/livestreams/list.ts";
-import * as $$$7 from "./loaders/livestreams/listStreams.ts";
-import * as $$$8 from "./loaders/videoCategories.ts";
-import * as $$$10 from "./loaders/videos/captions.ts";
-import * as $$$9 from "./loaders/videos/captionText.ts";
-import * as $$$11 from "./loaders/videos/details.ts";
-import * as $$$12 from "./loaders/videos/list.ts";
-import * as $$$13 from "./loaders/videos/listChannel.ts";
+import * as $$$7 from "./loaders/livestreams/streams.ts";
+import * as $$$9 from "./loaders/videos/captions.ts";
+import * as $$$8 from "./loaders/videos/captionText.ts";
+import * as $$$10 from "./loaders/videos/categories.ts";
+import * as $$$11 from "./loaders/videos/channelVideos.ts";
+import * as $$$12 from "./loaders/videos/details.ts";
+import * as $$$13 from "./loaders/videos/list.ts";
 import * as $$$14 from "./loaders/videos/search.ts";
 import * as $$$$$$0 from "./sections/login.tsx";
 
@@ -41,42 +41,42 @@ const manifest = {
   "loaders": {
     "Youtube/loaders/analytics/channelStats.ts": $$$0,
     "Youtube/loaders/analytics/videoStats.ts": $$$1,
-    "Youtube/loaders/authentication.ts": $$$2,
-    "Youtube/loaders/channels.ts": $$$3,
+    "Youtube/loaders/auth/authenticate.ts": $$$2,
+    "Youtube/loaders/channels/get.ts": $$$3,
     "Youtube/loaders/comments/list.ts": $$$4,
-    "Youtube/loaders/comments/listThreads.ts": $$$5,
+    "Youtube/loaders/comments/threads.ts": $$$5,
     "Youtube/loaders/livestreams/list.ts": $$$6,
-    "Youtube/loaders/livestreams/listStreams.ts": $$$7,
-    "Youtube/loaders/videoCategories.ts": $$$8,
-    "Youtube/loaders/videos/captions.ts": $$$10,
-    "Youtube/loaders/videos/captionText.ts": $$$9,
-    "Youtube/loaders/videos/details.ts": $$$11,
-    "Youtube/loaders/videos/list.ts": $$$12,
-    "Youtube/loaders/videos/listChannel.ts": $$$13,
+    "Youtube/loaders/livestreams/streams.ts": $$$7,
+    "Youtube/loaders/videos/captions.ts": $$$9,
+    "Youtube/loaders/videos/captionText.ts": $$$8,
+    "Youtube/loaders/videos/categories.ts": $$$10,
+    "Youtube/loaders/videos/channelVideos.ts": $$$11,
+    "Youtube/loaders/videos/details.ts": $$$12,
+    "Youtube/loaders/videos/list.ts": $$$13,
     "Youtube/loaders/videos/search.ts": $$$14,
   },
   "sections": {
     "Youtube/sections/login.tsx": $$$$$$0,
   },
   "actions": {
-    "Youtube/actions/comments/like.ts": $$$$$$$$$0,
-    "Youtube/actions/comments/pinComment.ts": $$$$$$$$$1,
-    "Youtube/actions/comments/responder.ts": $$$$$$$$$2,
-    "Youtube/actions/comments/send.ts": $$$$$$$$$3,
-    "Youtube/actions/livestreams/bind.ts": $$$$$$$$$4,
-    "Youtube/actions/livestreams/create.ts": $$$$$$$$$5,
-    "Youtube/actions/livestreams/createStream.ts": $$$$$$$$$6,
-    "Youtube/actions/livestreams/delete.ts": $$$$$$$$$7,
-    "Youtube/actions/livestreams/transition.ts": $$$$$$$$$8,
-    "Youtube/actions/livestreams/update.ts": $$$$$$$$$9,
-    "Youtube/actions/livestreams/updateThumbnail.ts": $$$$$$$$$10,
-    "Youtube/actions/updateCategory.ts": $$$$$$$$$11,
-    "Youtube/actions/updateChannel.ts": $$$$$$$$$12,
-    "Youtube/actions/updateChannelDefaults.ts": $$$$$$$$$13,
-    "Youtube/actions/updateChannelSections.ts": $$$$$$$$$14,
-    "Youtube/actions/updateThumbnail.ts": $$$$$$$$$15,
-    "Youtube/actions/updateVideo.ts": $$$$$$$$$16,
-    "Youtube/actions/videos/delete.ts": $$$$$$$$$17,
+    "Youtube/actions/channels/update.ts": $$$$$$$$$0,
+    "Youtube/actions/channels/updateDefaults.ts": $$$$$$$$$1,
+    "Youtube/actions/channels/updateSections.ts": $$$$$$$$$2,
+    "Youtube/actions/comments/create.ts": $$$$$$$$$3,
+    "Youtube/actions/comments/pin.ts": $$$$$$$$$4,
+    "Youtube/actions/comments/rate.ts": $$$$$$$$$5,
+    "Youtube/actions/comments/reply.ts": $$$$$$$$$6,
+    "Youtube/actions/livestreams/bind.ts": $$$$$$$$$7,
+    "Youtube/actions/livestreams/create.ts": $$$$$$$$$8,
+    "Youtube/actions/livestreams/createStream.ts": $$$$$$$$$9,
+    "Youtube/actions/livestreams/delete.ts": $$$$$$$$$10,
+    "Youtube/actions/livestreams/transition.ts": $$$$$$$$$11,
+    "Youtube/actions/livestreams/update.ts": $$$$$$$$$12,
+    "Youtube/actions/livestreams/updateThumbnail.ts": $$$$$$$$$13,
+    "Youtube/actions/videos/delete.ts": $$$$$$$$$14,
+    "Youtube/actions/videos/update.ts": $$$$$$$$$15,
+    "Youtube/actions/videos/updateCategory.ts": $$$$$$$$$16,
+    "Youtube/actions/videos/updateThumbnail.ts": $$$$$$$$$17,
   },
   "name": "Youtube",
   "baseUrl": import.meta.url,

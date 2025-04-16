@@ -1,6 +1,5 @@
-import type { AppContext } from "../mod.ts";
-import { getAccessToken } from "../utils/cookieAccessToken.ts";
-import type { PrivacyStatus } from "../utils/types.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
+import type { PrivacyStatus } from "../../utils/types.ts";
 
 export interface ChannelDefaultOptions {
   /**
@@ -72,7 +71,7 @@ interface UpdateChannelDefaultsResult {
 export default async function action(
   props: ChannelDefaultOptions,
   req: Request,
-  _ctx: AppContext,
+  _ctx: unknown,
 ): Promise<UpdateChannelDefaultsResult> {
   const {
     privacyStatus,

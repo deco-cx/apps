@@ -1,6 +1,5 @@
-import type { AppContext } from "../mod.ts";
-import { getAccessToken } from "../utils/cookieAccessToken.ts";
-import type { UpdateThumbnailResponse } from "../utils/types.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
+import type { UpdateThumbnailResponse } from "../../utils/types.ts";
 
 export interface Props {
   /**
@@ -30,7 +29,6 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  _ctx: AppContext,
 ): Promise<
   { success: boolean; message: string; thumbnail?: UpdateThumbnailResponse }
 > => {

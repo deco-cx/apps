@@ -1,5 +1,4 @@
-import type { AppContext } from "../mod.ts";
-import { getAccessToken } from "../utils/cookieAccessToken.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 interface UpdateCategoryResult {
   success: boolean;
@@ -48,7 +47,6 @@ export interface UpdateCategoryOptions {
 export default async function action(
   props: UpdateCategoryOptions,
   req: Request,
-  _ctx: AppContext,
 ): Promise<UpdateCategoryResult> {
   if (!props.videoId) {
     console.error("ID do vídeo não fornecido");

@@ -1,6 +1,6 @@
-import type { AppContext } from "../mod.ts";
-import  { getAccessToken, setAccessTokenCookie } from "../utils/cookieAccessToken.ts";
-import type { YoutubeTokenResponse } from "../utils/types.ts";
+import { AppContext } from "../../mod.ts";
+import { getAccessToken, setAccessTokenCookie } from "../../utils/cookieAccessToken.ts";
+import type { YoutubeTokenResponse } from "../../utils/types.ts";
 
 // Constantes
 const DEFAULT_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -57,6 +57,7 @@ export default async function loader(
   const authorizationUrl = `${url}?${authParams.toString()}`;
 
   if (!accessToken && code) {
+    console.log("entrou no if exchangeCodeForToken");
     try {
       const tokenData = await exchangeCodeForToken({
         authClient,
@@ -80,16 +81,17 @@ export default async function loader(
       return { message: "Erro ao obter token de acesso", error: true };
     }
   } else if (accessToken) {
-      channelData = await ctx.invoke.Youtube.loaders.channels({
+    console.log("entrou no else if accessToken");
+      channelData = await ctx.invoke.Youtube.loaders.channels.get({
         accessToken,
       });
   }
-
+  console.log("channelData", channelData);
   const user = {
     login: accessToken ? "YouTube User" : "Visitante",
     avatar_url: channelData?.items?.[0]?.snippet?.thumbnails?.default?.url ?? "",
   };
-
+  console.log("authorizationUrl", authorizationUrl);
   return {
     user,
     authorizationUrl,
