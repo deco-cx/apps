@@ -1,9 +1,7 @@
 import { AppContext } from "../../mod.ts";
+import { DEFAULT_AUTH_URL } from "../../utils/constant.ts";
 import { getAccessToken, setAccessTokenCookie } from "../../utils/cookieAccessToken.ts";
 import type { YoutubeTokenResponse } from "../../utils/types.ts";
-
-// Constantes
-const DEFAULT_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 
 export type AuthenticationResult = {
   user: {
@@ -43,8 +41,7 @@ export default async function loader(
   if (!redirectUri) return { message: "redirectUri is required", error: true };
   if (!scopes) return { message: "scopes is required", error: true };
 
-  let channelData = null;
-  let accessToken = getAccessToken(req);
+  const initialAccessToken = getAccessToken(req);
   
   const authParams = new URLSearchParams({
     client_id: clientId,
@@ -56,48 +53,153 @@ export default async function loader(
   });
   const authorizationUrl = `${url}?${authParams.toString()}`;
 
-  if (!accessToken && code) {
-    console.log("entrou no if exchangeCodeForToken");
-    try {
-      const tokenData = await exchangeCodeForToken({
-        authClient,
-        code,
-        clientId,
-        clientSecret: clientSecretString,
-        redirectUri
-      });
-      
-      if ("error" in tokenData) {
-        return tokenData;
-      }
+  const accessToken = await getAccessTokenForRequest({
+    initialAccessToken,
+    code,
+    ctx,
+    authClient,
+    clientId,
+    clientSecret: clientSecretString,
+    redirectUri
+  });
 
-      setAccessTokenCookie(ctx.response, tokenData.access_token);
-      accessToken = tokenData.access_token;
+  const channelData = await getChannelData({
+    accessToken,
+    ctx,
+    req
+  });
 
-      channelData = await ctx.invoke.Youtube.loaders.channels({
-        accessToken,
-      });
-    } catch (_error) {
-      return { message: "Erro ao obter token de acesso", error: true };
-    }
-  } else if (accessToken) {
-    console.log("entrou no else if accessToken");
-      channelData = await ctx.invoke.Youtube.loaders.channels.get({
-        accessToken,
-      });
-  }
-  console.log("channelData", channelData);
+  const avatarUrl = getAvatarUrl(channelData);
+
   const user = {
     login: accessToken ? "YouTube User" : "Visitante",
-    avatar_url: channelData?.items?.[0]?.snippet?.thumbnails?.default?.url ?? "",
+    avatar_url: avatarUrl,
   };
-  console.log("authorizationUrl", authorizationUrl);
+  
   return {
     user,
     authorizationUrl,
     channelData,
     accessToken,
   };
+}
+
+function getAvatarUrl(channelData: unknown): string {
+  if (!channelData || typeof channelData !== 'object') {
+    return "";
+  }
+  
+  try {
+    // @ts-ignore - Tratamos as propriedades do channelData de forma segura em runtime
+    const items = (channelData as any).items;
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return "";
+    }
+    
+    const channel = items[0];
+    if (!channel || typeof channel !== 'object') {
+      return "";
+    }
+    
+    const snippet = channel.snippet;
+    if (!snippet || typeof snippet !== 'object') {
+      return "";
+    }
+    
+    const thumbnails = snippet.thumbnails;
+    if (!thumbnails || typeof thumbnails !== 'object') {
+      return "";
+    }
+    
+    const defaultThumb = thumbnails.default;
+    if (!defaultThumb || typeof defaultThumb !== 'object') {
+      return "";
+    }
+    
+    return defaultThumb.url || "";
+  } catch {
+    return "";
+  }
+}
+
+async function getAccessTokenForRequest({
+  initialAccessToken,
+  code,
+  ctx,
+  authClient,
+  clientId,
+  clientSecret,
+  redirectUri
+}: {
+  initialAccessToken: string | null;
+  code: string | null;
+  ctx: AppContext;
+  authClient: AppContext["invoke"]["Youtube"];
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+}): Promise<string | null> {
+  // Se já temos um token, simplesmente o retornamos
+  if (initialAccessToken) {
+    return initialAccessToken;
+  }
+  
+  // Se não temos token, mas temos código de autorização, obtemos um novo token
+  if (code) {
+    try {
+      const tokenData = await exchangeCodeForToken({
+        authClient,
+        code,
+        clientId,
+        clientSecret,
+        redirectUri
+      });
+      
+      if ("error" in tokenData) {
+        return null;
+      }
+
+      const newAccessToken = tokenData.access_token;
+      setAccessTokenCookie(ctx.response, newAccessToken);
+      return newAccessToken;
+    } catch (_error) {
+      return null;
+    }
+  }
+  
+  // Não temos nem token nem código
+  return null;
+}
+
+async function getChannelData({
+  accessToken,
+  ctx,
+  req
+}: {
+  accessToken: string | null;
+  ctx: AppContext;
+  req: Request;
+}): Promise<unknown> {
+  if (!accessToken) {
+    return null;
+  }
+  
+  try {
+    // Seleciona qual endpoint chamar dependendo do URL do pedido
+    const isNewRequest = new URL(req.url).searchParams.has("code");
+    
+    if (isNewRequest) {
+      return await ctx.invoke.Youtube.loaders.channels({
+        accessToken,
+      });
+    } else {
+      return await ctx.invoke.Youtube.loaders.channels.get({
+        accessToken,
+      });
+    }
+  } catch (_error) {
+    return null;
+  }
 }
 
 async function exchangeCodeForToken({
