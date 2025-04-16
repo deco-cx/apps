@@ -121,12 +121,6 @@ export default function VTEX(
     fetcher: fetchSafe,
   });
 
-  const graphqlEndpoint = publicUrl
-    ? (`${
-      publicUrl.endsWith("/") ? publicUrl.slice(0, -1) : publicUrl
-    }/api/io/_v/private/graphql/v1`)
-    : `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`;
-
   const io = createGraphqlClient({
     endpoint: `https://${
       subAccount || account
