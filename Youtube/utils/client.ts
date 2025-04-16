@@ -8,18 +8,7 @@ import {
   YoutubeVideoResponse,
 } from "./types.ts";
 
-export interface YoutubeClient {
-  "POST /token": {
-    response: YoutubeTokenResponse;
-    searchParams: {
-      code: string;
-      client_id: string;
-      client_secret: string;
-      redirect_uri: string;
-      grant_type: string;
-    };
-  };
-
+export interface Client {
   "GET /youtube/v3/channels": {
     response: YoutubeChannelResponse;
     searchParams: Query & { id?: string; part: string };
@@ -89,6 +78,19 @@ export interface YoutubeClient {
     searchParams: { videoId: string; uploadType: string };
     headers: {
       Authorization: string;
+    };
+  };
+}
+
+export interface AuthClient {
+  "POST /token": {
+    response: YoutubeTokenResponse;
+    searchParams: {
+      code: string;
+      client_id: string;
+      client_secret: string;
+      redirect_uri: string;
+      grant_type: string;
     };
   };
 }
