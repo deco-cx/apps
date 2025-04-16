@@ -144,6 +144,8 @@ const loader = async (
 
   const filters = toFilters(data.conteudo.detalhes, baseUrl);
 
+  Deno.writeTextFileSync("produtosApp.json", JSON.stringify(data.conteudo.produtos));
+
   const products = data.conteudo.produtos.map((produto) =>
     toProduct(produto, baseUrl)
   );
