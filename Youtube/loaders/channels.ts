@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import getAccessToken from "../utils/getAccessToken.ts";
+import { getAccessToken } from "../utils/cookieAccessToken.ts";
 import type { YoutubeChannelResponse } from "../utils/types.ts";
 
 interface ChannelOptions {

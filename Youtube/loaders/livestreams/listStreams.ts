@@ -1,6 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import getAccessToken from "../../utils/getAccessToken.ts";
-import { getCookies } from "@std/http";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { LiveStreamListResponse } from "../../utils/types.ts";
 
 export interface ListLiveStreamsParams {
@@ -54,9 +53,7 @@ export default async function loader(
   } = props;
 
   //const client = ctx.client;
-  const cookies = getCookies(req.headers);
-  const accessToken = props.tokenYoutube || getAccessToken(req) ||
-    cookies.youtube_access_token;
+  const accessToken = props.tokenYoutube || getAccessToken(req);
 
   if (!accessToken) {
     return {

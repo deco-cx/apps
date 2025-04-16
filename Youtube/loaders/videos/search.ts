@@ -1,7 +1,6 @@
 import type { AppContext } from "../../mod.ts";
-import getAccessToken from "../../utils/getAccessToken.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { VideoQuery, YoutubeVideoResponse } from "../../utils/types.ts";
-import { getCookies } from "@std/http";
 
 export interface VideoSearchOptions {
   /**
@@ -77,9 +76,7 @@ export default async function loader(
 ): Promise<YoutubeVideoResponse | null> {
   const client = ctx.api;
 
-  const cookies = getCookies(req.headers);
-  const accessToken = props.tokenYoutube || getAccessToken(req) ||
-    cookies.youtube_access_token;
+  const accessToken = props.tokenYoutube || getAccessToken(req);
 
   const {
     q,

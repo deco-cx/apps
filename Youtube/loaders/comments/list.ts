@@ -1,6 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import { getCookies } from "@std/http";
-import getAccessToken from "../../utils/getAccessToken.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { YouTubeCommentThreadListResponse } from "../../utils/types.ts";
 
 export interface CommentListParams {
@@ -21,9 +20,7 @@ const loader = async (
 ): Promise<YouTubeCommentThreadListResponse | null> => {
   const { parentId, maxResults = 20, pageToken, tokenYoutube } = props;
 
-  const cookies = getCookies(req.headers);
-  const accessToken = getAccessToken(req) || tokenYoutube ||
-    cookies.youtube_access_token;
+  const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
     console.error("Autenticação necessária para carregar comentários");

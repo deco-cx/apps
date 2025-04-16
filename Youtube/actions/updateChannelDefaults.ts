@@ -1,5 +1,5 @@
 import type { AppContext } from "../mod.ts";
-import getAccessToken from "../utils/getAccessToken.ts";
+import { getAccessToken } from "../utils/cookieAccessToken.ts";
 import type { PrivacyStatus } from "../utils/types.ts";
 
 export interface ChannelDefaultOptions {

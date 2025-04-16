@@ -1,5 +1,5 @@
 import { AppContext } from "../../../Youtube/mod.ts";
-import getAccessToken from "../../../Youtube/utils/getAccessToken.ts";
+import { getAccessToken } from "../../../Youtube/utils/cookieAccessToken.ts";
 
 export interface VideoAnalyticsOptions {
   /**

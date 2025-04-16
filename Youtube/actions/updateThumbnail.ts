@@ -1,6 +1,6 @@
 import type { AppContext } from "../mod.ts";
-import { UpdateThumbnailResponse } from "../utils/types.ts";
-import getAccessToken from "../utils/getAccessToken.ts";
+import { getAccessToken } from "../utils/cookieAccessToken.ts";
+import type { UpdateThumbnailResponse } from "../utils/types.ts";
 
 export interface Props {
   /**

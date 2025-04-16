@@ -1,9 +1,9 @@
 import type { AppContext } from "../../mod.ts";
-import getAccessToken from "../../utils/getAccessToken.ts";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface PinCommentProps {
   /**
-   * @description ID do comentário a ser pinado
+   * @description ID do comentário a ser pinado 
    */
   commentId: string;
 

@@ -11,6 +11,7 @@ export async function loader(
   ctx: AppContext,
 ) {
   const auth = await ctx.invoke.Youtube.loaders.authentication();
+  console.log("auth", auth);
   return {
     auth,
   };

@@ -1,5 +1,4 @@
-import getAccessToken from "../../utils/getAccessToken.ts";
-import { getCookies } from "@std/http";
+import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { LiveBroadcastListResponse } from "../../utils/types.ts";
 
 export interface ListLiveBroadcastsParams {
@@ -76,9 +75,7 @@ export default async function loader(
     includeVideoDetails = false,
   } = props;
 
-  const cookies = getCookies(req.headers);
-  const accessToken = props.tokenYoutube || getAccessToken(req) ||
-    cookies.youtube_access_token;
+  const accessToken = props.tokenYoutube || getAccessToken(req);
 
   if (!accessToken) {
     return {
