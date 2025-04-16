@@ -59,7 +59,7 @@ const endPoint = {
 const loader = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductListingPage | null> => {
   const { api } = ctx;
   const { url: baseUrl } = req;
@@ -76,22 +76,25 @@ const loader = async (
 
   const offset = page <= 1 ? 0 : (page - 1) * limit;
 
-  const filterParams = props.filterParams?.reduce((acc, { key, value }) => {
-    if (acc[key]) {
-      acc[key] = [...acc[key], value];
-    } else {
-      acc[key] = value;
-    }
+  const filterParams =
+    props.filterParams?.reduce((acc, { key, value }) => {
+      if (acc[key]) {
+        acc[key] = [...acc[key], value];
+      } else {
+        acc[key] = value;
+      }
 
-    return acc;
-  }, {} as Record<string, string | string[]>) ?? {};
+      return acc;
+    }, {} as Record<string, string | string[]>) ?? {};
 
   if (!busca && url.pathname.startsWith("%2F_fresh")) return null;
 
-  const { nivel } = await api
-    ["GET /api/v2/front/url/verify"]({
+  const { nivel } =
+    (await api["GET /api/v2/front/url/verify"]({
       url: url.pathname,
-    }).then((response) => response.json()).catch(() => {}) ?? {};
+    })
+      .then((response) => response.json())
+      .catch(() => {})) ?? {};
 
   if (!busca && !nivel) return null;
 
@@ -112,31 +115,30 @@ const loader = async (
 
   const endpoint = nivel && endPoint[nivel as keyof typeof endPoint];
 
+  console.log(busca, limit, offset, order, params);
+
   const data = endpoint
-    ? await api[endpoint]({
-      url: url.pathname,
-      limit: String(limit),
-      offset: String(offset),
-      order,
-      ...params,
-    }).then((response: TypedResponse<unknown>) =>
-      response.json()
-    ) as WapProductsListPage
-    : await api
-      ["GET /api/v2/front/url/product/listing/search"]({
+    ? ((await api[endpoint]({
+        url: url.pathname,
+        limit: String(limit),
+        offset: String(offset),
+        order,
+        ...params,
+      }).then((response: TypedResponse<unknown>) =>
+        response.json()
+      )) as WapProductsListPage)
+    : ((await api["GET /api/v2/front/url/product/listing/search"]({
         busca,
         limit: String(limit),
         offset: String(offset),
         order,
         ...params,
-      }).then((response) => response.json()) as WapProductsListPage;
+      }).then((response) => response.json())) as WapProductsListPage);
 
-  const sortOptions = data.conteudo.detalhes.ordenacao.map((order) => (
-    {
-      label: order.label,
-      value: order.rota.query.order!,
-    }
-  ));
+  const sortOptions = data.conteudo.detalhes.ordenacao.map((order) => ({
+    label: order.label,
+    value: order.rota.query.order!,
+  }));
 
   const itemListElement = toBreadcrumbList(data.estrutura.breadcrumb, baseUrl);
 
@@ -175,8 +177,10 @@ const loader = async (
       title: data.estrutura.seo.title,
       description: data.estrutura.seo.description,
       // TODO canonical
-      canonical:
-        getUrl(new URL(data.estrutura.seo.canonical).pathname, url.origin).href,
+      canonical: getUrl(
+        new URL(data.estrutura.seo.canonical).pathname,
+        url.origin
+      ).href,
     },
   };
 };

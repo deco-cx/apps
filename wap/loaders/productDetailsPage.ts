@@ -31,7 +31,7 @@ const loader = async (
     }).then((response) => response.json()) as WapProductDatailsPage;
 
   const itemListElement = toBreadcrumbList(data.estrutura.breadcrumb, baseUrl);
-
+  
   const product = toProduct(data.conteudo, baseUrl);
 
   return {

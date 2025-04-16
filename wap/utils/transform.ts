@@ -15,6 +15,7 @@ import {
   Breadcrumb,
   ConteudoMidias,
   Detalhes,
+  Personalizacao,
   ValorSimples,
   WapProductDatiled,
   WapProduto,
@@ -202,6 +203,32 @@ export const toProduct = (
     });
   });
 
+  // {
+  //   obrigatorio: "n",
+  //   limitarValores: "n",
+  //   precoDefault: "s",
+  //   preco: 0,
+  //   multiplicarPreco: "s",
+  //   grupo: [],
+  //   escolhaDoCliente: "",
+  //   valores: [],
+  //   configuracaoUpload: []
+  // }
+
+  (product?.personalizacoes as Personalizacao[])?.forEach((personalizacao) => {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: personalizacao.nome,
+      value: personalizacao.preco,
+      description: personalizacao.descricao,
+      maxValue: personalizacao.valorMaximo,
+      minValue: personalizacao.valorMinimo,
+      additionalType: personalizacao.tipo,
+      identifier: String(personalizacao.id), 
+      valueReference: "PERSONALIZACOES",
+    });
+  });
+
   if (product?.filtros) {
     product?.filtros.forEach((filtro) => {
       additionalProperty.push({
@@ -270,8 +297,6 @@ export const toProduct = (
       ],
     })) ?? [];
 
-  console.log("LOG:", "aaaa", product?.atributos);
-  console.log("LOG:", "hasVariant", hasVariant);
 
   (product as WapProductDatiled).atributos?.unico?.valores.forEach((v) => {
     hasVariant.push({
