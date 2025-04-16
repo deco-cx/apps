@@ -65,8 +65,8 @@ export interface CreateLiveBroadcastResult {
 }
 
 /**
- * @title Criar Transmissão ao Vivo
- * @description Cria uma nova transmissão ao vivo no YouTube
+ * @title Create Live Broadcast
+ * @description Creates a new live broadcast on YouTube
  */
 export default async function action(
   props: CreateLiveBroadcastParams,

@@ -15,8 +15,8 @@ export interface SendCommentProps {
 }
 
 /**
- * @title Enviar Comentário
- * @description Envia um novo comentário em um vídeo do YouTube com opção de pinar o comentário
+ * @title Send YouTube Comment
+ * @description Sends a new comment on a YouTube video with an option to pin the comment
  */
 const action = async (
   props: SendCommentProps,

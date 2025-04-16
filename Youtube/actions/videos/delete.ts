@@ -25,8 +25,8 @@ export interface DeleteVideoResult {
 }
 
 /**
- * @title Excluir Vídeo
- * @description Remove um vídeo do canal do YouTube
+ * @title Delete Video
+ * @description Removes a video from the YouTube channel
  */
 export default async function action(
   props: DeleteVideoParams,

@@ -29,8 +29,8 @@ interface VideoCategoriesResponse {
 }
 
 /**
- * @title Listar Categorias de Vídeos
- * @description Obtém a lista de categorias de vídeos disponíveis no YouTube para uma região específica
+ * @title List Video Categories
+ * @description Gets the list of video categories available on YouTube for a specific region
  */
 export default async function loader(
   props: VideoCategoriesOptions,

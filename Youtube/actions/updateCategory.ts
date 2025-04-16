@@ -42,8 +42,8 @@ export interface UpdateCategoryOptions {
 }
 
 /**
- * @title Alterar Categoria do Vídeo
- * @description Atualiza a categoria de um vídeo do YouTube
+ * @title Update Video Category
+ * @description Updates the category of a YouTube video
  */
 export default async function action(
   props: UpdateCategoryOptions,

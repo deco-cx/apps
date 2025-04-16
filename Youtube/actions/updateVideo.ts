@@ -17,7 +17,8 @@ export interface UpdateVideoOptionsAction {
 }
 
 /**
- * @title Ação para atualizar vídeo do YouTube
+ * @title Update YouTube Video
+ * @description Updates video information like title, description, tags and privacy status
  */
 export default async function action(
   props: UpdateVideoOptionsAction,

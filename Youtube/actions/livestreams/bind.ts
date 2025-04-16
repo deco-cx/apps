@@ -27,8 +27,8 @@ export interface BindStreamResult {
 }
 
 /**
- * @title Vincular Stream à Transmissão
- * @description Vincula um stream de vídeo a uma transmissão ao vivo
+ * @title Bind Stream to Broadcast
+ * @description Links a video stream to a live broadcast
  */
 export default async function action(
   props: BindStreamParams,

@@ -8,8 +8,8 @@ export interface LikeCommentProps {
 }
 
 /**
- * @title Dar Like em Comentário
- * @description Define a avaliação (like/dislike) em um comentário do YouTube
+ * @title Like YouTube Comment
+ * @description Sets the rating (like/dislike) on a YouTube comment
  */
 const action = async (
   props: LikeCommentProps,

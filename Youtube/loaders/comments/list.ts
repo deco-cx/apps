@@ -10,8 +10,8 @@ export interface CommentListParams {
 }
 
 /**
- * @title Carregar Comentários
- * @description Carrega os comentários de um thread específico do YouTube
+ * @title Load YouTube Comments
+ * @description Loads comments from a specific YouTube video thread
  */
 const loader = async (
   props: CommentListParams,

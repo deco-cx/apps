@@ -14,10 +14,10 @@ export interface VideoCaptionsOptions {
 }
 
 /**
- * @title Legendas de Vídeo do YouTube
- * @description Busca as legendas disponíveis para um vídeo específico.
- * Para obter o texto completo de uma legenda específica, use o ID retornado
- * nesta resposta com o loader `captionText.ts` passando o `captionId`.
+ * @title YouTube Video Captions
+ * @description Fetches available captions for a specific video.
+ * To get the full text of a specific caption, use the ID returned
+ * in this response with the `captionText.ts` loader by passing the `captionId`.
  */
 export default async function loader(
   props: VideoCaptionsOptions,

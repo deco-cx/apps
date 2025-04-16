@@ -34,8 +34,8 @@ export interface VideoListOptions {
 }
 
 /**
- * @title Listar Vídeos do YouTube
- * @description Busca vídeos do YouTube com diversos filtros
+ * @title List YouTube Videos
+ * @description Searches for YouTube videos with various filters
  */
 export default async function loader(
   props: VideoListOptions,

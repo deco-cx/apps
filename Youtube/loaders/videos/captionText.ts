@@ -32,8 +32,8 @@ interface ParsedCaption {
 }
 
 /**
- * @title Buscar Texto de Legenda
- * @description Obtém o texto completo de uma legenda específica no formato escolhido
+ * @title Get Caption Text
+ * @description Retrieves the complete text of a specific caption in the chosen format
  */
 export default async function loader(
   props: CaptionTextOptions,

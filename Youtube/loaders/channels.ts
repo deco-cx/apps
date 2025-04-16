@@ -11,6 +11,7 @@ interface ChannelOptions {
 
 /**
  * @title Fetch YouTube Channels
+ * @description Retrieves information about YouTube channels for the authenticated user or by specific ID
  */
 export default async function loader(
   props: ChannelOptions,

@@ -55,8 +55,8 @@ interface UpdateChannelResult {
 }
 
 /**
- * @title Configurar Canal do YouTube
- * @description Atualiza diversas informações do canal como descrição, trailer e outras configurações
+ * @title Configure YouTube Channel
+ * @description Updates various channel information such as description, trailer and other settings
  */
 export default async function action(
   props: UpdateChannelOptions,

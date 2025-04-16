@@ -42,8 +42,8 @@ interface VideoDetailsResponse {
 }
 
 /**
- * @title Detalhes de Vídeo do YouTube
- * @description Busca informações detalhadas de um vídeo específico pelo ID
+ * @title YouTube Video Details
+ * @description Fetches detailed information about a specific video by ID
  */
 export default async function loader(
   props: VideoDetailsOptions,

@@ -66,8 +66,8 @@ export interface VideoSearchOptions {
 }
 
 /**
- * @title Pesquisar Vídeos no YouTube
- * @description Busca vídeos no YouTube com vários critérios de filtragem, com ou sem autenticação, incluindo filtros para Shorts
+ * @title Search YouTube Videos
+ * @description Searches YouTube videos with various filtering criteria, with or without authentication, including filters for Shorts
  */
 export default async function loader(
   props: VideoSearchOptions,

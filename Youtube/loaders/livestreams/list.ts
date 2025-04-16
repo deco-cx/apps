@@ -56,8 +56,8 @@ export interface LiveBroadcastListErrorResponse {
 }
 
 /**
- * @title Listar Transmissões ao Vivo
- * @description Recupera uma lista de transmissões ao vivo para o canal autenticado ou um canal específico
+ * @title List Live Broadcasts
+ * @description Retrieves a list of live broadcasts for the authenticated channel or a specific channel
  */
 export default async function loader(
   props: ListLiveBroadcastsParams,

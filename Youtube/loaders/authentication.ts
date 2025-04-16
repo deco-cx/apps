@@ -22,6 +22,10 @@ export type AuthenticationError = {
 
 type AuthenticationResponse = AuthenticationResult | AuthenticationError;
 
+/**
+ * @title Youtube Authentication
+ * @description Authenticate the user with the Youtube API
+ */
 export default async function loader(
   _props: unknown,
   req: Request,

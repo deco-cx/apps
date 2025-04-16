@@ -24,8 +24,8 @@ export interface Props {
 }
 
 /**
- * @title Atualizar Thumbnail de Vídeo do YouTube
- * @description Atualiza a miniatura (thumbnail) personalizada de um vídeo do YouTube
+ * @title Update YouTube Video Thumbnail
+ * @description Updates the custom thumbnail for a YouTube video
  */
 const action = async (
   props: Props,
