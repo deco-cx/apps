@@ -4,6 +4,7 @@ import type { FnContext } from "@deco/deco";
 import { Secret } from "../website/loaders/secret.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import type { YoutubeTokenResponse } from "./utils/types.ts";
 
 export interface Props {
   /**
@@ -23,8 +24,10 @@ export interface Props {
   };
 }
 
+// Interface para o cliente de autenticação OAuth
 export interface State extends Props {
   client: ReturnType<typeof createHttpClient<YoutubeClient>>;
+  authClient: ReturnType<typeof createHttpClient<YoutubeClient>>;
 }
 
 export type AppContext = FnContext<State, Manifest>;
@@ -36,6 +39,7 @@ export type AppContext = FnContext<State, Manifest>;
  * @logo https://cdn.pixabay.com/photo/2021/09/11/18/21/youtube-6616310_1280.png
  */
 export default function App({  ...props }: Props) {
+  // Cliente para a API do YouTube
   const client = createHttpClient<YoutubeClient>({
     base: "https://www.googleapis.com/youtube/v3",
     headers: new Headers({
@@ -44,9 +48,20 @@ export default function App({  ...props }: Props) {
     fetcher: fetchSafe,
   });
 
+  // Cliente específico para autenticação OAuth
+  const authClient = createHttpClient<YoutubeClient>({
+    base: "https://oauth2.googleapis.com",
+    headers: new Headers({
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    }),
+    fetcher: fetchSafe,
+  });
+
   const state = {
     ...props,
     client,
+    authClient,
   };
 
   return {

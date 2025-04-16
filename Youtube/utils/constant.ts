@@ -1,0 +1,1 @@
+export const COOKIE_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
