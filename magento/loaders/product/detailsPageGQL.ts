@@ -55,20 +55,22 @@ async function loader(
   const customAttributes = getCustomFields(customFields, ctx.customAttributes);
   const defaultPath = useSuffix ? formatUrlSuffix(site) : undefined;
 
+  const formattedSlug = slug.replace(/^\//, "");
+
   const { products } = await clientGraphql.query<
     ProductDetailsGraphQL,
     ProductDetailsInputs
   >(
     {
       variables: {
-        filter: { url_key: { eq: slug } },
+        filter: { url_key: { eq: formattedSlug } },
       },
       ...GetCompleteProduct(customAttributes, isBreadcrumbProductName),
     },
     STALE,
   );
 
-  const product = products.items.find((p) => p.url_key === slug);
+  const product = products.items.find((p) => p.url_key === formattedSlug);
 
   if (!product) {
     return null;

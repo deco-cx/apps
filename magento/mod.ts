@@ -2,7 +2,7 @@ import {
   type App,
   type AppMiddlewareContext as AMC,
   type FnContext,
-} from "deco/mod.ts";
+} from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { API } from "./utils/client/client.ts";
 import { createHttpClient } from "../utils/http.ts";

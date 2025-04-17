@@ -1,4 +1,4 @@
-import type { FunctionContext, LoaderFunction } from "deco/types.ts";
+import type { FunctionContext, LoaderFunction } from "@deco/deco";
 import { RequestURLParam } from "./requestToParam.ts";
 
 export interface Props {

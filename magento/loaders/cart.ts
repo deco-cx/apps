@@ -1,11 +1,7 @@
 import { default as extend } from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
 import { handleCartImages } from "../utils/cache.ts";
-import {
-  getCartCookie,
-  setCartCookie,
-  toCartItemsWithImages,
-} from "../utils/cart.ts";
+import { getCartCookie, toCartItemsWithImages } from "../utils/cart.ts";
 import { Cart as CartFromDeco } from "../utils/client/types.ts";
 import {
   BASE_CURRENCY_CODE,
@@ -41,7 +37,7 @@ const loader = async (
   const { clientAdmin, site, cartConfigs, clientAdminAuthenticated } = ctx;
   const { countProductImageInCart, extensions } = cartConfigs;
   const url = new URL(req.url);
-  let cartId = _cartId ?? getCartCookie(req.headers);
+  const cartId = _cartId ?? getCartCookie(req.headers);
 
   try {
     if (!_cartId) {

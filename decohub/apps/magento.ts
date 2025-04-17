@@ -1,4 +1,4 @@
-import { AppRuntime } from "deco/mod.ts";
+import { AppRuntime } from "@deco/deco";
 import { Markdown } from "../components/Markdown.tsx";
 import { PreviewMagento } from "../../magento/preview/Preview.tsx";
 

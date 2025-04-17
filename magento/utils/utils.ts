@@ -61,7 +61,7 @@ export function extractLastPath(slug: string) {
 }
 
 export function extractInitialPath(slug: string) {
-  return slug.replace(/\/[^\/]*$/, "");
+  return slug.replace(/\/[^\/]*$/, "").replace(/^[\/]+/, "");
 }
 
 export const sortSearchParams = (url: URL) => {

@@ -1,4 +1,4 @@
-import { DecoSiteState } from "deco/mod.ts";
+import { DecoSiteState } from "@deco/deco";
 import { Handler } from "std/http/mod.ts";
 import { Script } from "../../website/types.ts";
 import { isFreshCtx } from "../../website/handlers/fresh.ts";
