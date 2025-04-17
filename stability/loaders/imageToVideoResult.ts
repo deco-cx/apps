@@ -1,7 +1,5 @@
 import { AppContext } from "../mod.ts";
-import {
-  ImageToVideoResultResponse,
-} from "../stabilityAiClient.ts";
+import { ImageToVideoResultResponse } from "../stabilityAiClient.ts";
 
 /**
  * @title Get Image to Video Status & Upload Result

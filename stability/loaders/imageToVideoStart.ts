@@ -1,7 +1,5 @@
 import { AppContext } from "../mod.ts";
-import {
-  ImageToVideoOptions,
-} from "../stabilityAiClient.ts";
+import { ImageToVideoOptions } from "../stabilityAiClient.ts";
 import {
   detectImageType,
   resizeImageToSupportedVideoDimensions,
@@ -77,7 +75,7 @@ export default async function imageToVideoStart(
   _request: Request,
   ctx: AppContext,
 ): Promise<Output> {
-  const { stabilityClient } = ctx;
+  const { stabilityClient, previewUrl } = ctx;
 
   if (!stabilityClient) {
     throw new Error(
@@ -137,7 +135,7 @@ export default async function imageToVideoStart(
 
     return {
       previewUrl:
-        `http://localhost:3000/poll-preview/${result.id}?presignedUrl=${presignedUrl}`,
+        `${previewUrl}/${result.id}?presignedUrl=${presignedUrl}`,
     };
   } catch (error) {
     console.error("Error starting image-to-video generation:", error);
