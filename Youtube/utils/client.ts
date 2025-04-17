@@ -8,6 +8,7 @@ import {
   YoutubeTokenResponse,
   YoutubeVideoListResponse,
   YoutubeVideoResponse,
+  YoutubeCategoryListResponse,
 } from "./types.ts";
 
 type Headers = {
@@ -70,6 +71,11 @@ export interface Client {
   "POST /thumbnails/set": {
     response: UpdateThumbnailResponse;
     searchParams: { videoId: string; uploadType: string };
+    headers: Headers;
+  };
+  "GET /videoCategories": {
+    response: YoutubeCategoryListResponse;
+    searchParams: { part: string; regionCode?: string };
     headers: Headers;
   };
 }

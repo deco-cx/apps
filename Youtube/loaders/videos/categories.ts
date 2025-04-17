@@ -1,6 +1,7 @@
 import { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { STALE } from "../../../utils/fetch.ts";
+import { YoutubeCategoryListResponse } from "../../utils/types.ts";
 
 export interface VideoCategoriesOptions {
   /**
@@ -19,26 +20,6 @@ export interface VideoCategoriesOptions {
   skipCache?: boolean;
 }
 
-interface VideoCategory {
-  id: string;
-  snippet: {
-    title: string;
-    assignable: boolean;
-    channelId: string;
-  };
-}
-
-interface VideoCategoriesResponse {
-  kind: string;
-  etag: string;
-  items: VideoCategory[];
-  error?: {
-    code: number;
-    message: string;
-    details?: unknown;
-  };
-}
-
 /**
  * @title List Video Categories
  * @description Obtém a lista de categorias de vídeos disponíveis no YouTube para uma região específica
@@ -46,98 +27,91 @@ interface VideoCategoriesResponse {
 export default async function loader(
   props: VideoCategoriesOptions,
   req: Request,
-  _ctx: AppContext,
-): Promise<VideoCategoriesResponse | null> {
-  const { regionCode = "BR", tokenYoutube, skipCache = false } = props;
+  ctx: AppContext,
+): Promise<YoutubeCategoryListResponse | null> {
+  const { regionCode = "BR", tokenYoutube } = props;
+  const client = ctx.client;
 
-  // Obter o token de acesso
   const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
-    return {
-      kind: "youtube#videoCategoryListResponse",
-      etag: "",
-      items: [],
-      error: {
-        code: 401,
-        message: "Autenticação necessária para obter categorias de vídeos"
-      }
-    };
+    return createErrorResponse(401, "Autenticação necessária para obter categorias de vídeos");
   }
 
   try {
-    // Construir a URL para buscar as categorias de vídeos
-    const url = new URL("https://www.googleapis.com/youtube/v3/videoCategories");
-    url.searchParams.append("part", "snippet");
-    url.searchParams.append("regionCode", regionCode);
-
-    // Opções de fetch compatíveis com STALE
-    const fetchOptions = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+    const response = await client["GET /videoCategories"]({
+      part: "snippet",
+      regionCode,
+    }, { 
+      headers: { Authorization: `Bearer ${accessToken}` },
       ...STALE
-    };
-
-    // Buscar as categorias
-    const response = await fetch(url.toString(), fetchOptions);
+    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => response.text());
-      return {
-        kind: "youtube#videoCategoryListResponse",
-        etag: "",
-        items: [],
-        error: {
-          code: response.status,
-          message: `Erro ao buscar categorias de vídeos: ${response.status} ${response.statusText}`,
-          details: errorData
-        }
-      };
+      
+      if (response.status === 401) {
+        ctx.response.headers.set("X-Token-Expired", "true");
+        
+        ctx.response.headers.set("Cache-Control", "no-store");
+      }
+      
+      return createErrorResponse(
+        response.status, 
+        `Erro ao buscar categorias de vídeos: ${response.status} ${response.statusText}`,
+        errorData
+      );
     }
 
-    // Retornar os dados das categorias
-    const categoriesData = await response.json();
+    const categoriesData = await response.json() as YoutubeCategoryListResponse;
 
-    // Ordenar categorias por ID numérico
     if (categoriesData.items) {
-      categoriesData.items.sort((a: VideoCategory, b: VideoCategory) =>
+      categoriesData.items.sort((a, b) =>
         parseInt(a.id, 10) - parseInt(b.id, 10)
       );
     }
 
     return categoriesData;
   } catch (error) {
-    return {
-      kind: "youtube#videoCategoryListResponse",
-      etag: "",
-      items: [],
-      error: {
-        code: 500,
-        message: "Erro ao buscar categorias de vídeos",
-        details: error instanceof Error ? error.message : String(error)
-      }
-    };
+    return createErrorResponse(
+      500, 
+      "Erro ao buscar categorias de vídeos",
+      error instanceof Error ? error.message : String(error)
+    );
   }
 }
 
-// Define a estratégia de cache como stale-while-revalidate
+function createErrorResponse(code: number, message: string, details?: unknown): YoutubeCategoryListResponse {
+  return {
+    kind: "youtube#videoCategoryListResponse",
+    etag: "",
+    items: [],
+    error: {
+      code,
+      message,
+      details
+    }
+  };
+}
+
 export const cache = "stale-while-revalidate";
 
-// Define a chave de cache com base nos parâmetros da requisição
-export const cacheKey = (props: VideoCategoriesOptions, req: Request, _ctx: AppContext) => {
+export const cacheKey = (props: VideoCategoriesOptions, req: Request) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
   
-  // Não usar cache se não houver token ou se skipCache for verdadeiro
-  if (!accessToken || props.skipCache) {
+  const tokenExpired = req.headers.get("X-Token-Expired") === "true";
+  
+  if (!accessToken || props.skipCache || tokenExpired) {
     return null;
   }
+
+  const tokenFragment = accessToken.slice(-8);
   
   const params = new URLSearchParams([
     ["regionCode", props.regionCode || "BR"],
+    ["tokenId", tokenFragment],
   ]);
   
-  // Ordenamos os parâmetros para garantir consistência na chave de cache
   params.sort();
   
   return `youtube-video-categories-${params.toString()}`;

@@ -161,7 +161,16 @@ export default async function loader(
     const searchData = await client["GET /search"](
       searchParams,
       requestOptions,
-    ).then((res: Response) => res.json());
+    ).then((res: Response) => {
+      // Verificar erro de autenticação
+      if (res.status === 401) {
+        // Sinalizar que o token está expirado
+        ctx.response.headers.set("X-Token-Expired", "true");
+        ctx.response.headers.set("Cache-Control", "no-store");
+        throw new Error("Token de autenticação expirado ou inválido");
+      }
+      return res;
+    }).then((res: Response) => res.json());
 
     if (!searchData.items || searchData.items.length === 0) {
       console.log("Nenhum resultado encontrado para a busca");
@@ -285,10 +294,17 @@ function calculateDurationInSeconds(isoDuration: string): number {
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: VideoSearchOptions, req: Request, ctx: AppContext) => {
-  // Não usar cache para buscas que dependem da autenticação do usuário
-  if (props.includePrivate || props.skipCache) {
+  // Verificar se há flag de token expirado
+  const tokenExpired = req.headers.get("X-Token-Expired") === "true";
+
+  // Não usar cache para buscas que dependem da autenticação do usuário ou quando o token expirou
+  if (props.includePrivate || props.skipCache || tokenExpired) {
     return null;
   }
+  
+  // Incluir fragmento do token na chave de cache, se disponível
+  const accessToken = getAccessToken(req) || props.tokenYoutube;
+  const tokenFragment = accessToken ? accessToken.slice(-8) : "";
   
   // Cria parâmetros para a chave de cache
   const params = new URLSearchParams([
@@ -305,6 +321,7 @@ export const cacheKey = (props: VideoSearchOptions, req: Request, ctx: AppContex
     ["onlyShorts", (props.onlyShorts || false).toString()],
     ["excludeShorts", (props.excludeShorts || false).toString()],
     ["maxDuration", props.maxDuration?.toString() || ""],
+    ["tokenId", tokenFragment],
   ]);
   
   // Ordenamos os parâmetros para garantir consistência na chave de cache

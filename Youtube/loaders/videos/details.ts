@@ -82,6 +82,16 @@ export default async function loader(
     ...STALE
   });
   
+  // Verificar se houve erro de autenticação (token expirado)
+  if (videoResponse.status === 401) {
+    // Sinalizar que o token está expirado
+    ctx.response.headers.set("X-Token-Expired", "true");
+    ctx.response.headers.set("Cache-Control", "no-store");
+    
+    console.error("Token de autenticação expirado ou inválido");
+    return null;
+  }
+  
   const videoData = await videoResponse.json();
 
   if (!videoData.items || videoData.items.length === 0) {
@@ -117,20 +127,24 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: VideoDetailsOptions, req: Request, ctx: AppContext) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
   
-  if (!accessToken || !props.videoId) {
+  // Verificar se há flag de token expirado
+  const tokenExpired = req.headers.get("X-Token-Expired") === "true";
+  
+  // Não usar cache se não houver token, se skipCache for verdadeiro ou se o token estiver expirado
+  if (!accessToken || !props.videoId || props.skipCache || tokenExpired) {
     return null;
   }
+  
+  // Incluir um fragmento do token na chave de cache
+  const tokenFragment = accessToken.slice(-8);
   
   const params = new URLSearchParams([
     ["videoId", props.videoId],
     ["parts", (props.parts || ["snippet", "statistics", "status"]).join(",")],
     ["includeCaptions", (props.includeCaptions ?? true).toString()],
     ["includePrivate", (props.includePrivate ?? false).toString()],
+    ["tokenId", tokenFragment],
   ]);
-  
-  if (props.skipCache) {
-    return null;
-  }
   
   params.sort();
   

@@ -573,3 +573,23 @@ export interface YoutubeTokenResponse {
   token_type: string;
   expires_in: number;
 }
+
+export interface VideoCategory {
+  id: string;
+  snippet: {
+    title: string;
+    assignable: boolean;
+    channelId: string;
+  };
+}
+
+export interface YoutubeCategoryListResponse {
+  kind: string;
+  etag: string;
+  items: VideoCategory[];
+  error?: {
+    code: number;
+    message: string;
+    details?: unknown;
+  };
+}

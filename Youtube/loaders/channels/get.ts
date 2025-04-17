@@ -28,10 +28,25 @@ export default async function loader(
   }
   const { part = "snippet", id, mine = true } = props;
 
-  return (await client["GET /channels"]({ part, id, mine }, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    ...STALE
-  })).json();
+  try {
+    const response = await client["GET /channels"]({ part, id, mine }, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      ...STALE
+    });
+    
+    // Verificar erro de autenticação
+    if (response.status === 401) {
+      // Sinalizar que o token está expirado
+      ctx.response.headers.set("X-Token-Expired", "true");
+      ctx.response.headers.set("Cache-Control", "no-store");
+      return null;
+    }
+    
+    return (await response.json());
+  } catch (error) {
+    console.error("Erro ao buscar dados do canal:", error);
+    return null;
+  }
 }
 
 export const cache = "stale-while-revalidate";
@@ -39,24 +54,23 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: ChannelOptions, req: Request, ctx: AppContext) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
   
-  if (!accessToken) {
+  // Verificar se há flag de token expirado
+  const tokenExpired = req.headers.get("X-Token-Expired") === "true";
+  
+  // Não usar cache se não houver token, for canal do usuário autenticado, skipCache for verdadeiro
+  // ou se o token estiver expirado
+  if (!accessToken || (props.mine === true && !props.id) || props.skipCache || tokenExpired) {
     return null;
   }
   
-  // Não fazemos cache para canais do usuário autenticado,
-  // pois os dados podem mudar com frequência
-  if (props.mine === true && !props.id) {
-    return null;
-  }
-  
-  if (props.skipCache) {
-    return null;
-  }
+  // Incluir fragmento do token na chave de cache
+  const tokenFragment = accessToken.slice(-8);
   
   const params = new URLSearchParams([
     ["id", props.id || ""],
     ["part", props.part || "snippet"],
     ["mine", (props.mine || false).toString()],
+    ["tokenId", tokenFragment],
   ]);
   
   params.sort();

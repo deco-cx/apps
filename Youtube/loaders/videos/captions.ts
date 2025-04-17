@@ -55,34 +55,16 @@ export interface ParsedCaption {
 }
 
 export interface CaptionResponse {
-  /**
-   * Available captions list for the video
-   */
   available: YouTubeCaptionListResponse;
   
-  /**
-   * Clean caption text without formatting, numbers or timestamps
-   */
   plainText?: string;
   
-  /**
-   * Parsed captions with timing information
-   */
   parsed?: ParsedCaption[];
   
-  /**
-   * ID of the loaded caption
-   */
   loadedCaptionId?: string;
   
-  /**
-   * Format of the loaded caption
-   */
   format?: "srt" | "sbv" | "vtt";
 
-  /**
-   * Error information if any occurred
-   */
   error?: {
     code: number;
     message: string;
