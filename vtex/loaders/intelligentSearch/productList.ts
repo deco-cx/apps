@@ -47,7 +47,7 @@ export interface FacetsProps extends CommonProps {
    * @description query to use on search
    * @examples "shoes"\n"blue shoes"
    */
-  query: string;
+  query?: string;
   /**
    * @title Facets string
    * @description (e.g.: 'catergory-1/moda-feminina/category-2/calcados')
@@ -201,9 +201,11 @@ const loader = async (
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const { selectedFacets, ...args } = fromProps({ props });
-  const params = withDefaultParams(args);
+  const params = withDefaultParams({ ...args, locale });
   const facets = withDefaultFacets(selectedFacets, ctx);
 
   const { products: vtexProducts } = await vcsDeprecated
@@ -244,7 +246,7 @@ const getSearchParams = (
 ): Entry[] => {
   if (isFacetsList(props)) {
     return [
-      ["query", props.query ?? searchParams.get("q")],
+      ["query", props?.query || searchParams.get("q") || ""],
       ["count", (props.count || searchParams.get("count") || 12).toString()],
       ["sort", props.sort || searchParams.get("sort") || ""],
       ["selectedFacets", props.facets],
@@ -294,9 +296,10 @@ export const cacheKey = (
     (expandedProps as unknown as Props["props"]);
 
   const url = new URL(req.url);
+
   if (
-    url.searchParams.has("q") ||
-    ctx.isInvoke && isProductIDList(props)
+    // Avoid cache on loader call over call and on search pages
+    (!isQueryList(props) && url.searchParams.has("q")) || ctx.isInvoke
   ) {
     return null;
   }

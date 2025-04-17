@@ -9,6 +9,7 @@ import {
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { toProduct } from "../../utils/transform.ts";
+import type { AdvancedLoaderConfig } from "../../utils/types.ts";
 
 export interface Props {
   query?: string;
@@ -23,6 +24,11 @@ export interface Props {
    * @deprecated Use product extensions instead
    */
   similars?: boolean;
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 
 /**
@@ -37,8 +43,9 @@ const loaders = async (
   const { vcsDeprecated } = ctx;
   const { url } = req;
   const { count, query } = props;
-  const locale = "pt-BR"; // config!.defaultLocale; // TODO
   const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const suggestions = () =>
     vcsDeprecated["GET /api/io/_v/api/intelligent-search/search_suggestions"]({
@@ -78,6 +85,7 @@ const loaders = async (
   const options = {
     baseUrl: url,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+    includeOriginalAttributes: props.advancedConfigs?.includeOriginalAttributes,
   };
 
   return {

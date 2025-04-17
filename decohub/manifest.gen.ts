@@ -25,14 +25,15 @@ import * as $$$$$$$$$$$19 from "./apps/resend.ts";
 import * as $$$$$$$$$$$20 from "./apps/shopify.ts";
 import * as $$$$$$$$$$$21 from "./apps/smarthint.ts";
 import * as $$$$$$$$$$$22 from "./apps/sourei.ts";
-import * as $$$$$$$$$$$23 from "./apps/typesense.ts";
-import * as $$$$$$$$$$$24 from "./apps/verified-reviews.ts";
-import * as $$$$$$$$$$$25 from "./apps/vnda.ts";
-import * as $$$$$$$$$$$26 from "./apps/vtex.ts";
-import * as $$$$$$$$$$$27 from "./apps/wake.ts";
-import * as $$$$$$$$$$$28 from "./apps/wap.ts";
-import * as $$$$$$$$$$$29 from "./apps/weather.ts";
-import * as $$$$$$$$$$$30 from "./apps/workflows.ts";
+import * as $$$$$$$$$$$23 from "./apps/streamshop.ts";
+import * as $$$$$$$$$$$24 from "./apps/typesense.ts";
+import * as $$$$$$$$$$$25 from "./apps/verified-reviews.ts";
+import * as $$$$$$$$$$$26 from "./apps/vnda.ts";
+import * as $$$$$$$$$$$27 from "./apps/vtex.ts";
+import * as $$$$$$$$$$$28 from "./apps/wake.ts";
+import * as $$$$$$$$$$$29 from "./apps/wap.ts";
+import * as $$$$$$$$$$$30 from "./apps/weather.ts";
+import * as $$$$$$$$$$$31 from "./apps/workflows.ts";
 
 const manifest = {
   "apps": {
@@ -59,14 +60,15 @@ const manifest = {
     "decohub/apps/shopify.ts": $$$$$$$$$$$20,
     "decohub/apps/smarthint.ts": $$$$$$$$$$$21,
     "decohub/apps/sourei.ts": $$$$$$$$$$$22,
-    "decohub/apps/typesense.ts": $$$$$$$$$$$23,
-    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$24,
-    "decohub/apps/vnda.ts": $$$$$$$$$$$25,
-    "decohub/apps/vtex.ts": $$$$$$$$$$$26,
-    "decohub/apps/wake.ts": $$$$$$$$$$$27,
-    "decohub/apps/wap.ts": $$$$$$$$$$$28,
-    "decohub/apps/weather.ts": $$$$$$$$$$$29,
-    "decohub/apps/workflows.ts": $$$$$$$$$$$30,
+    "decohub/apps/streamshop.ts": $$$$$$$$$$$23,
+    "decohub/apps/typesense.ts": $$$$$$$$$$$24,
+    "decohub/apps/verified-reviews.ts": $$$$$$$$$$$25,
+    "decohub/apps/vnda.ts": $$$$$$$$$$$26,
+    "decohub/apps/vtex.ts": $$$$$$$$$$$27,
+    "decohub/apps/wake.ts": $$$$$$$$$$$28,
+    "decohub/apps/wap.ts": $$$$$$$$$$$29,
+    "decohub/apps/weather.ts": $$$$$$$$$$$30,
+    "decohub/apps/workflows.ts": $$$$$$$$$$$31,
   },
   "name": "decohub",
   "baseUrl": import.meta.url,

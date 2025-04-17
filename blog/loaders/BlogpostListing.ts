@@ -6,12 +6,13 @@
  * @param ctx - The application context.
  * @returns A promise that resolves to an array of blog posts.
  */
+import { logger } from "@deco/deco/o11y";
 import { PageInfo } from "../../commerce/types.ts";
 import { RequestURLParam } from "../../website/functions/requestToParam.ts";
 import { AppContext } from "../mod.ts";
 import { BlogPost, BlogPostListingPage, SortBy } from "../types.ts";
-import handlePosts, { slicePosts } from "../utils/handlePosts.ts";
-import { getRecordsByPath } from "../utils/records.ts";
+import handlePosts, { slicePosts } from "../core/handlePosts.ts";
+import { getRecordsByPath } from "../core/records.ts";
 
 const COLLECTION_PATH = "collections/blog/posts";
 const ACCESSOR = "post";
@@ -37,6 +38,10 @@ export interface Props {
    * @description The sorting option. Default is "date_desc"
    */
   sortBy?: SortBy;
+  /**
+   * @description Overrides the query term at url
+   */
+  query?: string;
 }
 
 /**
@@ -49,7 +54,7 @@ export interface Props {
  * @returns A promise that resolves to an array of blog posts.
  */
 export default async function BlogPostList(
-  { page, count, slug, sortBy }: Props,
+  { page, count, slug, sortBy, query }: Props,
   req: Request,
   ctx: AppContext,
 ): Promise<BlogPostListingPage | null> {
@@ -59,33 +64,47 @@ export default async function BlogPostList(
   const pageNumber = Number(page ?? params.get("page") ?? 1);
   const pageSort = sortBy ?? params.get("sortBy") as SortBy ??
     "date_desc";
+  const term = query ?? params.get("q") ?? undefined;
+
   const posts = await getRecordsByPath<BlogPost>(
     ctx,
     COLLECTION_PATH,
     ACCESSOR,
   );
 
-  const handledPosts = handlePosts(posts, pageSort, slug);
+  try {
+    const handledPosts = await handlePosts(
+      posts,
+      pageSort,
+      ctx,
+      slug,
+      undefined,
+      term,
+    );
 
-  if (!handledPosts) {
+    if (!handledPosts) {
+      return null;
+    }
+
+    const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
+
+    if (slicedPosts.length === 0) {
+      return null;
+    }
+
+    const category = slicedPosts[0].categories.find((c) => c.slug === slug);
+    return {
+      posts: slicedPosts,
+      pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
+      seo: {
+        title: category?.name ?? "",
+        canonical: new URL(url.pathname, url.origin).href,
+      },
+    };
+  } catch (e) {
+    logger.error(e);
     return null;
   }
-
-  const slicedPosts = slicePosts(handledPosts, pageNumber, postsPerPage);
-
-  if (slicedPosts.length === 0) {
-    return null;
-  }
-
-  const category = slicedPosts[0].categories.find((c) => c.slug === slug);
-  return {
-    posts: slicedPosts,
-    pageInfo: toPageInfo(handledPosts, postsPerPage, pageNumber, params),
-    seo: {
-      title: category?.name ?? "",
-      canonical: new URL(url.pathname, url.origin).href,
-    },
-  };
 }
 
 const toPageInfo = (

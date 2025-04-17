@@ -66,6 +66,591 @@ export type OptinNewsLetter = boolean
 
 export interface OpenAPI {
 /**
+ * Retrieves a specific promotion by its Promotion ID or a specific tax by its tax ID.
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Rates and Benefits | Manage benefits and rates | **GerenciarPromocoesETarifas** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint. To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"GET /api/rnb/pvt/calculatorconfiguration/:idCalculatorConfiguration": {
+response: {
+/**
+ * Promotion ID.
+ */
+idCalculatorConfiguration?: string
+/**
+ * Promotion Name.
+ */
+name?: string
+/**
+ * Promotion internal description.
+ */
+description?: string
+/**
+ * Promotion Begin Date (UTC).
+ */
+beginDateUtc?: string
+/**
+ * Promotion End Date (UTC).
+ */
+endDateUtc?: string
+/**
+ * When the Promotion was last modified.
+ */
+lastModified?: string
+/**
+ * Number of days that are considered to add the purchase history.
+ */
+daysAgoOfPurchases?: number
+/**
+ * If set as `true` the Promotion is activated. If set as `false` the Promotion is deactivated.
+ */
+isActive?: boolean
+/**
+ * If set as `true` the Promotion is archived. If set as `false` the Promotion is not archived.
+ */
+isArchived?: boolean
+/**
+ * Insert a flag with the promotion name used in the product's window display and page.
+ */
+isFeatured?: boolean
+/**
+ * @deprecated
+ * Indicates whether a deal is disabled (`true`) or not (`false`).
+ */
+disableDeal?: boolean
+/**
+ * Defines which days of the week the promotion will applied.
+ */
+activeDaysOfWeek?: string[]
+/**
+ * Time offset from UTC in seconds.
+ */
+offset?: number
+/**
+ * If set as `true`, it activates gifts Multiplier.
+ */
+activateGiftsMultiplier?: boolean
+/**
+ * New time offset from UTC in seconds.
+ */
+newOffset?: number
+/**
+ * @deprecated
+ * List of max price per items.
+ */
+maxPricesPerItems?: string[]
+/**
+ * Defines if a promotion can accumulate with another one. (`true`) or not (`false`).
+ */
+cumulative?: boolean
+/**
+ * The type of discount that will apply to the promotion.
+ */
+discountType?: string
+/**
+ * Exact discount to be applied for the shipping value.
+ */
+nominalShippingDiscountValue?: number
+/**
+ * Maximum value for the shipping.
+ */
+absoluteShippingDiscountValue?: number
+/**
+ * Exact discount to be applied for the total purchase value.
+ */
+nominalDiscountValue?: number
+/**
+ * Controls the behavior of the `NominalDiscount` effect. This field only accepts two string values:
+ * 
+ *  -`item`: applies the intended nominal discount on every item present on the cart. 
+ * 
+ *  -`cart`: keeps the behavior as it currently is: the whole order/cart receives a nominal discount that is distributed among the items.
+ */
+nominalDiscountType?: string
+/**
+ * The maximum price for each item of the purchase will be the price set up.
+ */
+maximumUnitPriceDiscount?: number
+/**
+ * Percentage discount to be applied for total purchase value.
+ */
+percentualDiscountValue?: number
+/**
+ * Percentual Shipping Discount Value.
+ */
+rebatePercentualDiscountValue?: number
+/**
+ * Percentage discount to be applied for shipping value.
+ */
+percentualShippingDiscountValue?: number
+/**
+ * Percentual tax over purchase total value.
+ */
+percentualTax?: number
+/**
+ * Shipping Percentual tax over purchase total value.
+ */
+shippingPercentualTax?: number
+/**
+ * Valid discounts for the SKUs in `listSku1BuyTogether`, discount list used for Buy Together Promotions.
+ */
+percentualDiscountValueList1?: number
+/**
+ * Equivalent to `percentualDiscountValueList1`.
+ */
+percentualDiscountValueList2?: number
+/**
+ * SKU Gift Object. Total discount on the product value set as a gift.
+ */
+skusGift?: {
+/**
+ * Quantity of SKU Gifts.
+ */
+quantitySelectable?: number
+/**
+ * Array with SKU Gifts IDs.
+ */
+gifts?: number
+}
+/**
+ * Nominal value for rewards program.
+ */
+nominalRewardValue?: number
+/**
+ * Percentage value for rewards program.
+ */
+percentualRewardValue?: number
+/**
+ * Order status reward value.
+ */
+orderStatusRewardValue?: string
+/**
+ * The maximum number of affected items for a promotion.
+ */
+maxNumberOfAffectedItems?: number
+/**
+ * The maximum number of affected items by group key for a promotion.
+ */
+maxNumberOfAffectedItemsGroupKey?: string
+/**
+ * Promotion will be applied to all kind of shipping.
+ */
+applyToAllShippings?: boolean
+/**
+ * Nominal tax.
+ */
+nominalTax?: number
+/**
+ * Origin of the promotion, `marketplace` or `Fulfillment`. Read [Difference between orders with marketplace and fulfillment sources](https://help.vtex.com/en/tutorial/what-are-orders-with-marketplace-source-and-orders-with-fulfillment-source--6eVYrmUAwMOeKICU2KuG06) for more information.
+ */
+origin?: string
+/**
+ * Seller Name.
+ */
+idSeller?: string
+/**
+ * If set to `true`, this promotion will be applied to any seller present on the idSeller field. If set to `false`, sellers present on that field will make this promotion not to be applied.
+ */
+idSellerIsInclusive?: boolean
+/**
+ * List of Trade Policies that activate this promotion.
+ */
+idsSalesChannel?: string[]
+/**
+ * If set to `false`, this promotion will be applied to any trade policies present on the `idsSalesChannel` field. If set to `true`, trade policies present on that field will make this promotion not to be applied.
+ */
+areSalesChannelIdsExclusive?: boolean
+/**
+ * Promotion Marketing tags.
+ */
+marketingTags?: string[]
+/**
+ * If set to `false`, this promotion will be applied to any marketing tag present on the `marketingTags` field. If set to `true`, marketing tags present on that field will make this promotion not to be applied.
+ */
+marketingTagsAreNotInclusive?: boolean
+/**
+ * Array composed by all the Payments Methods.
+ */
+paymentsMethods?: {
+/**
+ * Payment Method ID.
+ */
+id?: string
+/**
+ * Payment Method Name.
+ */
+name?: string
+}[]
+/**
+ * @deprecated
+ * List of stores.
+ */
+stores?: string[]
+/**
+ * Campaign Audiences that activate this promotion.
+ */
+campaigns?: string[]
+/**
+ * Array with conditions IDs.
+ */
+conditionsIds?: string[]
+/**
+ * @deprecated
+ * If set to `true`, this promotion will be applied to any store present on the `stores` field. If set to `false`, stores present on that field will make this promotion not to be applied.
+ */
+storesAreInclusive?: boolean
+/**
+ * Object composed by the categories that will activate or deactivate the promotion.
+ */
+categories?: {
+/**
+ * Category ID.
+ */
+id?: string
+/**
+ * Category Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any category present on the `categories` field. If set to `false`, categories present on that field will make this promotion not to be applied.
+ */
+categoriesAreInclusive?: boolean
+/**
+ * Object composed by the brands that will activate or deactivate the promotion.
+ */
+brands?: {
+/**
+ * Brand ID.
+ */
+id?: string
+/**
+ * Brand Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any brand present on the `brands` field. If set to `false`, brands present on that field will make this promotion not to be applied.
+ */
+brandsAreInclusive?: boolean
+/**
+ * Object composed by the products that will activate or deactivate the promotion.
+ */
+products?: {
+/**
+ * Product ID.
+ */
+id?: string
+/**
+ * Product Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any product present on the `products` field. If set to `false`, products present on that field will make this promotion not to be applied.
+ */
+productsAreInclusive?: boolean
+/**
+ * Object composed by the SKUs that will activate or deactivate the promotion.
+ */
+skus?: {
+/**
+ * SKU ID.
+ */
+id: string
+/**
+ * SKU Name.
+ */
+name: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any SKU present on the `skus` field. If set to `false`, SKUs present on that field will make this promotion not to be applied.
+ */
+skusAreInclusive?: boolean
+/**
+ * Coupon utmSource code.
+ */
+utmSource?: string
+/**
+ * Coupon utmCampaign code.
+ */
+utmCampaign?: string
+/**
+ * Collections that will generate the promotion, type **Buy Together**, **More for less**, **Progressive Discount**, **Buy One Get One**.
+ */
+collections1BuyTogether?: {
+/**
+ * ID of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * @deprecated
+ * Collections that will generate the promotion, type **Buy Together**, **More for less**, **Progressive Discount** or **Buy One Get One**.
+ */
+collections2BuyTogether?: {
+/**
+ * ID of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the collection to be added to the first list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * Minimum quantity for **Buy Together** promotion.
+ */
+minimumQuantityBuyTogether?: number
+/**
+ * Quantity to affect **Buy Together** promotion.
+ */
+quantityToAffectBuyTogether?: number
+/**
+ * Enable **Buy Together** per SKU.
+ */
+enableBuyTogetherPerSku?: boolean
+/**
+ * Array of objects, each containing ID and Name of an SKU to be added in the first list of the **Buy Together** promotion. Learn more about this type of promotion in the [Creating a Buy Together promotion](https://help.vtex.com/en/tutorial/buy-together--tutorials_323) documentation.
+ */
+listSku1BuyTogether?: {
+/**
+ * ID of the SKU to be added to the first list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the SKU to be added to the first list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * Array of objects, each containing ID and Name of an SKU to be added to the second list of the **Buy Together** promotion. Learn more about this type of promotion in the [Creating a Buy Together promotion](https://help.vtex.com/en/tutorial/buy-together--tutorials_323) documentation.
+ */
+listSku2BuyTogether?: {
+/**
+ * ID of the SKU to be added to the second list of the **Buy Together** promotion.
+ */
+id?: string
+/**
+ * Name of the SKU to be added to the second list of the **Buy Together** promotion.
+ */
+name?: string
+}[]
+/**
+ * @deprecated
+ * List of coupons.
+ */
+coupon?: string[]
+/**
+ * Minimum chart value to activate the promotion.
+ */
+totalValueFloor?: number
+/**
+ * Maximum chart value to activate the promotion.
+ */
+totalValueCeling?: number
+/**
+ * @deprecated
+ * Total value including all items.
+ */
+totalValueIncludeAllItems?: boolean
+/**
+ * If products that already are receiving a promotion, will be considered on the chart total value. There are three options available: `IncludeMatchedItems`, `ExcludeMatchedItems`, `AllItems`.
+ */
+totalValueMode?: string
+/**
+ * Array composed by the collections that will be activated or deactivated the promotion.
+ */
+collections?: {
+/**
+ * Collection ID.
+ */
+id?: string
+/**
+ * Collection Name.
+ */
+name?: string
+}[]
+/**
+ * If set to `true`, this promotion will be applied to any collection present on the `collections` field. If set to `false`, collections present on that field will make this promotion not to be applied.
+ */
+collectionsIsInclusive?: boolean
+/**
+ * The discount will be granted if the card's BIN is given.
+ */
+restrictionsBins?: string[]
+/**
+ * @deprecated
+ * List of card issuers.
+ */
+cardIssuers?: string[]
+/**
+ * Total value a client must have in past orders to active the promotion.
+ */
+totalValuePurchase?: number
+/**
+ * The discount will be granted if the shipping method is the same as the one given.
+ */
+slasIds?: string[]
+/**
+ * Applies selected discount only when one of the defined shipping method is selected by the customer.
+ */
+isSlaSelected?: boolean
+/**
+ * Applies the discount only if it's a first buy.
+ */
+isFirstBuy?: boolean
+/**
+ * Applies the discount even if the user is not logged.
+ */
+firstBuyIsProfileOptimistic?: boolean
+/**
+ * If the **List Price** and **Price** are the same.
+ */
+compareListPriceAndPrice?: boolean
+/**
+ * Applies the promotion only if the list price and price is different.
+ */
+isDifferentListPriceAndPrice?: boolean
+/**
+ * Range of the zip code that applies the promotion.
+ */
+zipCodeRanges?: {
+/**
+ * Initial Zip Code.
+ */
+zipCodeFrom?: string
+/**
+ * Final Zip Code.
+ */
+zipCodeTo?: string
+/**
+ * Defines if the zip code range is included in the promotion.
+ */
+inclusive?: boolean
+}[]
+/**
+ * List of countries that are activated for this promotion.
+ */
+countries?: string[]
+/**
+ * Maximum price of the item.
+ */
+itemMaxPrice?: number
+/**
+ * Minimum price of the item.
+ */
+itemMinPrice?: number
+/**
+ * @deprecated
+ * Installment.
+ */
+installment?: number
+/**
+ * Set if the promotion will be applied considering a minimum and maximum values for installments.
+ */
+isMinMaxInstallments?: boolean
+/**
+ * Minimum value for installment.
+ */
+minInstallment?: number
+/**
+ * Maximum value for installment.
+ */
+maxInstallment?: number
+/**
+ * @deprecated
+ * List of merchants.
+ */
+merchants?: string[]
+/**
+ * Criteria to select a customer cluster. Each item in this array should follow the format of an equality function (`{propertyname}={value}`) or the format of a contains function (`{propertyname} contains {value}`). In both options, `{propertyname}` must be replaced with the name of the field in the data entity, and `{value}` must be replaced with the value determined in Master Data. Find more information about these criteria in [Filling in the Customer cluster field](https://help.vtex.com/tutorial/creating-promotion-for-a-customer-cluster--tutorials_342#filling-in-the-customer-cluster-field).
+ */
+clusterExpressions?: string[]
+/**
+ * Object composed by a list of SKUs on a Multiple Effects promotion. Structure: `"{SkuId}": {PercentageDiscount}`. There is a limit of 400 SKUs for this type of promotion.
+ */
+multipleSkusCause?: {
+/**
+ * SKU ID.
+ */
+[k: string]: string
+}
+/**
+ * @deprecated
+ * List of payment rules.
+ */
+paymentsRules?: string[]
+/**
+ * Gifts List Type.
+ */
+giftListTypes?: string[]
+/**
+ * @deprecated
+ * List of product specifications.
+ */
+productsSpecifications?: string[]
+/**
+ * Marketplace order identifier. The discount will apply to selected affiliates.
+ */
+affiliates?: {
+/**
+ * Affiliate ID.
+ */
+id?: string
+/**
+ * Affiliate Name.
+ */
+name?: string
+}[]
+/**
+ * Defines how many times the promotion can be used.
+ */
+maxUsage?: number
+/**
+ * Defines if the promotion can be used multiple times per client.
+ */
+maxUsagePerClient?: number
+/**
+ * Should distribute discount among matched items.
+ */
+shouldDistributeDiscountAmongMatchedItems?: boolean
+/**
+ * Defines if the promotion can be used multiple times per client.
+ */
+multipleUsePerClient?: boolean
+/**
+ * Allows the promotion to apply to products whose prices have been manually added by a call center operator.
+ */
+accumulateWithManualPrice?: boolean
+/**
+ * Defines what is the type of the promotion or indicates if it is a tax. Possible values: `regular` ([Regular Promotion](https://help.vtex.com/tutorial/regular-promotion--tutorials_327)), `combo` ([Buy Together](https://help.vtex.com/en/tutorial/buy-together--tutorials_323)), `forThePriceOf` ([More for Less](https://help.vtex.com/en/tutorial/creating-a-more-for-less-promotion--tutorials_325)), `progressive` ([Progressive Discount](https://help.vtex.com/en/tutorial/progressive-discount--tutorials_324)), `buyAndWin` ([Buy One Get One](https://help.vtex.com/en/tutorial/buy-one-get-one--tutorials_322)), `maxPricePerItem` (Deprecated), `campaign` ([Campaign Promotion](https://help.vtex.com/en/tutorial/campaign-promotion--1ChYXhK2AQGuS6wAqS8Ume)), `tax` (Tax), `multipleEffects` (Multiple Effects).
+ */
+type?: string
+/**
+ * Use new progressive algorithm.
+ */
+useNewProgressiveAlgorithm?: boolean
+/**
+ * Percentual discount value list.
+ */
+percentualDiscountValueList?: number[]
+}
+}
+/**
  * Searches Master Data v1 documents with highly customizable filters.
  * 
  * > Learn more about [Master Data v1 search queries](https://developers.vtex.com/vtex-rest-api/docs/how-the-queries-in-master-data-v1-work).
@@ -128,7 +713,8 @@ export interface OpenAPI {
  * /dataentities/CL/search?_where=date<2001-01-01
  * ```
  * 
- * > Avoid sending too many requests with wildcards (`*`) in the search parameters or that use the `keyword` parameter. This may lead to this endpoint being temporarily blocked for your account. If this happens you will receive an error with status code `503`. 
+ * 
+> Avoid sending too many requests with wildcards (`*`) in the search parameters or that use the `keyword` parameter. This may lead to this endpoint being temporarily blocked for your account. If this happens you will receive an error with status code `503`. 
  * 
  * ## Permissions
  * 
@@ -283,6 +869,168 @@ response: {
 Id?: string
 Href?: string
 DocumentId?: string
+}
+}
+/**
+ * Creates a partial document, sending only some of the fields.
+ * 
+ * > You can use this request to create documents in any given data entity. Because of this, you are not restricted to using the fields exemplified below in your requests. But you should be aware of the fields allowed or required for each document you wish to update. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"PATCH /api/dataentities/:acronym/documents": {
+body: {
+/**
+ * Unique identifier of the document to be created.
+ */
+id?: string
+/**
+ * Field(s) to be filled in and its respective value(s).
+ */
+"{fieldName}"?: string
+[k: string]: any
+}
+response: IdHrefDocumentID
+}
+/**
+ * Retrieves a document.
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Read only documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"GET /api/dataentities/:acronym/documents/:id": {
+searchParams: {
+/**
+ * Names of the fields that will be returned per document, separated by a comma `,`. It is possible to fetch all fields using `_all` as the value of this query parameter. However, in order to avoid permission errors, we strongly recommend informing only the names of the exact fields that will be used.
+ */
+_fields?: string
+}
+response: Document
+}
+/**
+ * Creates a new document with a custom ID, or updates an entire document if there is already a document with the informed ID.
+ * 
+ * >ℹ️ You can use this request to create or update documents in any given data entity. Because of this, you are not restricted to using the fields exemplified below in your requests. But you should be aware of the fields allowed or required for each document you wish to update.
+ * 
+ * ## Custom field types
+ * 
+ * The table below presents the types of custom fields you can use when creating or updating documents in Master Data v1 and example values.
+ * 
+ * | Field Type| Example value |
+ * | - | - |
+ * | Boolean | `true` |
+ * | Currency | `2.5` |
+ * | Date | `1992-11-17` |
+ * | Date_Time | `2016-09-14T19:21:01.3163733Z` |
+ * | Decimal | `2.5` |
+ * | Email | `meu@email.com` |
+ * | Integer | `1000000` |
+ * | Long | `1000000000` |
+ * | Percent | `85.42` |
+ * | Time | `23:50` |
+ * | URL | `https://www.vtex.com` |
+ * | Varchar10 | `Lorem ipsu` |
+ * | Varchar50 | `Lorem ipsum dolor sit amet, consectetur adipiscing` |
+ * | Varchar750  | `Lorem ipsum dolor sit amet, consectetur adipiscing elit...` |
+ * | Varchar100  | `Lorem ipsum dolor sit amet, consectetur adipiscing elit...` |
+ * | Relationship | `5eb31afb-7ab0-11e6-94b4-0a44686e393f` |
+ * | Text | `Lorem ipsum dolor sit amet, consectetur adipiscing elit...` |
+ *  
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"PUT /api/dataentities/:acronym/documents/:id": {
+/**
+ * Object with document fields and their respective values.
+ */
+body: {
+/**
+ * Field name and value.
+ */
+"{fieldName}"?: string
+[k: string]: any
+}
+}
+/**
+ * Deletes a document. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"DELETE /api/dataentities/:acronym/documents/:id": {
+
+}
+/**
+ * Updates a subset of fields of a document, without impacting the other fields.
+ * 
+ * >ℹ️ You can use this request to update documents in any given data entity. Because of this, you are not restricted to using the fields exemplified below in your requests. But you should be aware of the fields allowed or required for each document you wish to update. 
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Dynamic Storage | Dynamic storage generic resources | **Insert or update document (not remove)** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Full access to all documents** |
+ * | Dynamic Storage | Dynamic storage generic resources | **Master Data administrator** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint.To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"PATCH /api/dataentities/:acronym/documents/:id": {
+/**
+ * Object with the fields to be updated and their respective values.
+ */
+body: {
+
 }
 }
 /**
@@ -3407,7 +4155,8 @@ SkuId?: number
 }
 /**
  * Associates attachments to an SKU based on a given SKU ID and attachment names.
- * This request removes existing SKU attachment associations and recreates the associations with the attachments being sent. 
+ * 
+This request removes existing SKU attachment associations and recreates the associations with the attachments being sent. 
  * ## Request body example
  * 
  * ```json
@@ -8841,7 +9590,8 @@ searchParams: {
 /**
  * This parameter defines which promotions apply to the simulation. Use `0` for simulations at cart stage, which means all promotions apply. In case of window simulation use `1`, which indicates promotions that apply nominal discounts over the total purchase value shouldn't be considered on the simulation.
  * 
- * Note that if this not sent, the parameter is `1`.
+ * 
+Note that if this not sent, the parameter is `1`.
  */
 RnbBehavior?: number
 /**
@@ -9591,7 +10341,8 @@ assemblyOptions?: any[]
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` obtained in response is the identification code of the newly created cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "GET /api/checkout/pub/orderForm": {
 searchParams: {
@@ -9606,7 +10357,8 @@ forceNewCart?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "GET /api/checkout/pub/orderForm/:orderFormId": {
 searchParams: {
@@ -9649,21 +10401,25 @@ response: {
 /**
  * You can use this request to:
  * 
- * 1. Change the quantity of one or more items in a specific cart.
- * 2. Remove an item from the cart (by sending the `quantity` value = `0` in the request body).
+ * 
+1. Change the quantity of one or more items in a specific cart.
+ * 
+2. Remove an item from the cart (by sending the `quantity` value = `0` in the request body).
  * 
  * **Important**: To remove all items from the cart at the same time, use the [Remove all items](https://developers.vtex.com/vtex-rest-api/reference/removeallitems) endpoint.
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure that represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/items/update": {
 searchParams: {
 /**
  * In order to optimize performance, this parameter allows some information to not be updated when there are changes in the minicart. For instance, if a shopper adds another unit of a given SKU to the cart, it may not be necessary to recalculate payment information, which could impact performance.
  * 
- * This array accepts strings and currently the only possible value is `”paymentData”`.
+ * 
+This array accepts strings and currently the only possible value is `”paymentData”`.
  */
 allowedOutdatedData?: any[]
 }
@@ -10774,14 +11530,16 @@ ascending?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/items": {
 searchParams: {
 /**
  * In order to optimize performance, this parameter allows some information to not be updated when there are changes in the minicart. For instance, if a shopper adds another unit of a given SKU to the cart, it may not be necessary to recalculate payment information, which could impact performance.
  * 
- * This array accepts strings and currently the only possible value is `”paymentData”`.
+ * 
+This array accepts strings and currently the only possible value is `”paymentData”`.
  */
 allowedOutdatedData?: any[]
 }
@@ -11898,14 +12656,17 @@ ascending?: boolean
 /**
  * You can use this request to:
  * 
- * 1. Change the quantity or price of one or more items to the shopping cart.
- * 2. Add a new item to the shopping cart.
+ * 
+1. Change the quantity or price of one or more items to the shopping cart.
+ * 
+2. Add a new item to the shopping cart.
  * 
  * **Important**: To add a new item to the shopping cart, do not send the string `index` in the request body.
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure that represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 45 seconds.
+ * 
+> This request has a time out of 45 seconds.
  */
 "PATCH /api/checkout/pub/orderForm/:orderFormId/items": {
 body: {
@@ -13046,13 +13807,17 @@ ascending?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * You need to inform which cart you are referring to, by sending its `orderFormId` and what is the item whose price you want to change, by sending its `itemIndex`.
  * 
- * You also need to pass the new price value in the body.
+You need to inform which cart you are referring to, by sending its `orderFormId` and what is the item whose price you want to change, by sending its `itemIndex`.
  * 
- * Remember that, to use this endpoint, the feature of *manual price* must be active. To check if it's active, use the [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm) endpoint. To make it active, use the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) endpoint, making the `allowManualPrice` field `true`.
  * 
- * > Whenever you use this request to change the price of an item, all items in that cart with the same SKU are affected by this change. This applies even to items that share the SKU but have been separated into different objects in the `items` array due to customizations or attachments, for example.
+You also need to pass the new price value in the body.
+ * 
+ * 
+Remember that, to use this endpoint, the feature of *manual price* must be active. To check if it's active, use the [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm) endpoint. To make it active, use the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) endpoint, making the `allowManualPrice` field `true`.
+ * 
+ * 
+> Whenever you use this request to change the price of an item, all items in that cart with the same SKU are affected by this change. This applies even to items that share the SKU but have been separated into different objects in the `items` array due to customizations or attachments, for example.
  */
 "PUT /api/checkout/pub/orderForm/:orderFormId/items/:itemIndex/price": {
 body: PriceChangeRequest
@@ -13075,10 +13840,13 @@ ignoreProfileData?: boolean
 /**
  * Retrieve a client's profile information by providing an email address.
  * 
- * If the response body fields are empty, the following situations may have occurred:
  * 
- * 1. There is no client registered with the email address provided in your store, or;
- * 2. Client profile is invalid or incomplete. However, you can use the query parameter `ensureComplete=false` to get incomplete profiles. For more information, see [SmartCheckout - Customer information automatic fill-in](https://help.vtex.com/en/tutorial/smartcheckout-customer-information-automatic-fill-in--2Nuu3xAFzdhIzJIldAdtan).
+If the response body fields are empty, the following situations may have occurred:
+ * 
+ * 
+1. There is no client registered with the email address provided in your store, or;
+ * 
+2. Client profile is invalid or incomplete. However, you can use the query parameter `ensureComplete=false` to get incomplete profiles. For more information, see [SmartCheckout - Customer information automatic fill-in](https://help.vtex.com/en/tutorial/smartcheckout-customer-information-automatic-fill-in--2Nuu3xAFzdhIzJIldAdtan).
  * 
  * >⚠️ The authentication of this endpoint can change depending on the customer context. If you are consulting information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.
  */
@@ -13239,7 +14007,8 @@ isComplete?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  * 
  * >⚠️ The authentication of this endpoint can change depending on the customer context. If you are modifying information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.
  */
@@ -13305,7 +14074,8 @@ isCorporate?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  * 
  * >⚠️ The authentication of this endpoint can change depending on the customer context. If you are modifying information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.
  */
@@ -14452,7 +15222,8 @@ itemsOrdination?: (null | {
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/clientPreferencesData": {
 body: {
@@ -14472,14 +15243,16 @@ response: any
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/marketingData": {
 body: {
 /**
  * Sending an existing coupon code in this field will return the corresponding discount in the purchase. Use the [cart simulation](https://developers.vtex.com/vtex-rest-api/reference/orderform#orderformsimulation) request to check which coupons might apply before placing the order.
  * 
- * To send more than one coupon code to the same cart, use commas. E.g.`"sales25, blackfriday30"`.
+ * 
+To send more than one coupon code to the same cart, use commas. E.g.`"sales25, blackfriday30"`.
  */
 coupon?: string
 /**
@@ -14517,7 +15290,8 @@ utmiCampaign?: string
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/paymentData": {
 body: {
@@ -14569,7 +15343,8 @@ hasDefaultBillingAddress?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * > This request has a time out of 12 seconds.
+ * 
+> This request has a time out of 12 seconds.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/attachments/merchantContextData": {
 body: {
@@ -14593,9 +15368,11 @@ salesAssociateId?: string
 /**
  * Your account may create `apps`, which contain custom fields, through the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) request. The values of these custom fields can then be updated by this request.
  * 
- * To do that, you need to inform the ID of the app you created with the configuration API (`appId`).
  * 
- * In the body of the request, for each field created in this app (`appFieldName`) you will inform a value (`appFieldValue`).
+To do that, you need to inform the ID of the app you created with the configuration API (`appId`).
+ * 
+ * 
+In the body of the request, for each field created in this app (`appFieldName`) you will inform a value (`appFieldValue`).
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  */
@@ -14611,9 +15388,11 @@ response: any
 /**
  * Your account may create `apps`, which contain custom fields, through the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) request. The value of a specific custom field can then be updated by this request.
  * 
- * To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
  * 
- * In the body of the request, you will inform the new value (`appFieldValue`, passed through the body) of the specific field created in this app (identified by the `appFieldName` parameter, passed through the URL).
+To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
+ * 
+ * 
+In the body of the request, you will inform the new value (`appFieldValue`, passed through the body) of the specific field created in this app (identified by the `appFieldName` parameter, passed through the URL).
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  */
@@ -14623,9 +15402,11 @@ body: SetsinglecustomfieldvalueRequest
 /**
  * Your account may create `apps`, which contain custom fields, through the [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm) request. The value of a specific custom field can be removed by this request.
  * 
- * To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
  * 
- * You also need to iform the specific field created in this app (identified by the `appFieldName` parameter, also passed through the URL) whose value you want to remove.
+To do that, you need to inform in the URL the ID of the app you created with the configuration API (`appId`).
+ * 
+ * 
+You also need to iform the specific field created in this app (identified by the `appFieldName` parameter, also passed through the URL) whose value you want to remove.
  */
 "DELETE /api/checkout/pub/orderForm/:orderFormId/customData/:appId/:appFieldName": {
 
@@ -14633,9 +15414,11 @@ body: SetsinglecustomfieldvalueRequest
 /**
  * Retrieves the settings that are currently applied to every orderForm in the account.
  * 
- * These settings are defined by the request [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm).
  * 
- * Always use this request to retrieve the current configuration before performing an update. By doing so you ensure that you are modifying only the properties you want.
+These settings are defined by the request [Update orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm).
+ * 
+ * 
+Always use this request to retrieve the current configuration before performing an update. By doing so you ensure that you are modifying only the properties you want.
  */
 "GET /api/checkout/pvt/configuration/orderForm": {
 response: {
@@ -14721,10 +15504,14 @@ maskFirstPurchaseData?: (null | boolean)
 /**
  * Configures reCAPTCHA validation for the account, defining in which situations the shopper will be prompted to validate a purchase with reCAPTCHA. Learn more about [reCAPTCHA validation for VTEX stores](https://help.vtex.com/en/tutorial/using-recaptcha-at-checkout--18Te3oDd7f4qcjKu9jhNzP)
  * 
- * Possible values are:
- * - `"never"`: no purchases are validated with reCAPTCHA.
- * - `"always"`: every purchase is validated with reCAPTCHA.
- * - `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX's algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
+ * 
+Possible values are:
+ * 
+- `"never"`: no purchases are validated with reCAPTCHA.
+ * 
+- `"always"`: every purchase is validated with reCAPTCHA.
+ * 
+- `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX's algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
  */
 recaptchaValidation?: string
 /**
@@ -14744,9 +15531,11 @@ cartAgeToUseNewCardSeconds?: number
 /**
  * Determines settings that will apply to every orderForm in the account.
  * 
- * For example, if you create an app using this request, every orderForm of this account will have the custom fields created though it.
  * 
- * >ℹ️ Always retrieve the current configuration before performing an update to ensure that you are modifying only the properties you want. Otherwise, old values can be overwritten. To retrieve the current configuration, use the request [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm).
+For example, if you create an app using this request, every orderForm of this account will have the custom fields created though it.
+ * 
+ * 
+>ℹ️ Always retrieve the current configuration before performing an update to ensure that you are modifying only the properties you want. Otherwise, old values can be overwritten. To retrieve the current configuration, use the request [Get orderForm configuration](https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pvt/configuration/orderForm).
  */
 "POST /api/checkout/pvt/configuration/orderForm": {
 body: UpdateorderFormconfigurationRequest
@@ -14754,7 +15543,8 @@ body: UpdateorderFormconfigurationRequest
 /**
  * Retrieves a marketplace’s window to change seller, that is, the period when it is possible to choose another seller to fulfill a given order after the original seller has canceled it.
  * 
- * The default period for this window is of 2 days, but it can be configured by the request Update window to change seller.
+ * 
+The default period for this window is of 2 days, but it can be configured by the request Update window to change seller.
  */
 "GET /api/checkout/pvt/configuration/window-to-change-seller": {
 
@@ -14762,7 +15552,8 @@ body: UpdateorderFormconfigurationRequest
 /**
  * Updates a marketplace’s window to change seller, that is, the period when it is possible to choose another seller to fulfill a given order after the original seller has canceled it.
  * 
- * It is possible to check the current window using the request Get window to change seller.
+ * 
+It is possible to check the current window using the request Get window to change seller.
  */
 "POST /api/checkout/pvt/configuration/window-to-change-seller": {
 body: WaitingTime
@@ -15867,9 +16658,11 @@ ascending?: boolean
  * 
  * The [orderForm](https://developers.vtex.com/docs/guides/orderform-fields) is the data structure which represents a shopping cart and contains all information pertaining to it. Hence, the `orderFormId` is the identification code of a given cart.
  * 
- * This endpoint can be used to get the installment options for only one payment method at a time.
  * 
- * This endpoint should be called only after the selected `orderForm` already has a `paymentData`.
+This endpoint can be used to get the installment options for only one payment method at a time.
+ * 
+ * 
+This endpoint should be called only after the selected `orderForm` already has a `paymentData`.
  */
 "GET /api/checkout/pub/orderForm/:orderFormId/installments": {
 searchParams: {
@@ -15882,10 +16675,13 @@ paymentSystem: number
 /**
  * Use this request to add coupons to a given shopping cart.
  * 
- * To add multiple coupons to the same cart, you need to:
  * 
- * 1. Request the activation of this feature through the [Support VTEX](https://help.vtex.com/support) if this is the first time you perform this action on your store.
- * 2. Submit all coupon codes in the same requisition separated by commas. E.g.: {"text": "freeshipping, discount10, holiday30"}.
+To add multiple coupons to the same cart, you need to:
+ * 
+ * 
+1. Request the activation of this feature through the [Support VTEX](https://help.vtex.com/support) if this is the first time you perform this action on your store.
+ * 
+2. Submit all coupon codes in the same requisition separated by commas. E.g.: {"text": "freeshipping, discount10, holiday30"}.
  * 
  * For more information on multiple coupons, access the [coupons tutorial](https://help.vtex.com/en/tutorial/creating-a-coupon-beta--7lMk3MmhNp2IEccyGApxU).
  */
@@ -16978,7 +17774,8 @@ ascending?: boolean
 /**
  * Retrieves information on pickup points close to a given location determined by geocoordinates or postal code.
  * 
- * The pickup points returned are not necessarily all active ones. Make sure to validate the information consumed by integrations.
+ * 
+The pickup points returned are not necessarily all active ones. Make sure to validate the information consumed by integrations.
  */
 "GET /api/checkout/pub/pickup-points": {
 searchParams: {
@@ -17134,7 +17931,8 @@ ClosingTime?: string
 /**
  * This endpoint places an order from an existing `orderForm` object, meaning an existing cart.
  * 
- * After the creation of an order with this request, you have five minutes to send payment information and then request payment processing.
+ * 
+After the creation of an order with this request, you have five minutes to send payment information and then request payment processing.
  */
 "POST /api/checkout/pub/orderForm/:orderFormId/transaction": {
 body: {
@@ -17278,9 +18076,11 @@ isGift?: boolean
 /**
  * Customer's profile information. The `email` functions as a customer's ID.
  * 
- * For customers already in your database, sending only the email address is enough to register the order to the shopper’s existing account.
  * 
- * > If the shopper exists in you database but is not logged in, sending other profile information along with the email will cause the platform to fail placing the order. This happens because this action is interpreted as an attempt to edit profile data, which is not possible unless the customer is logged in to the store.
+For customers already in your database, sending only the email address is enough to register the order to the shopper’s existing account.
+ * 
+ * 
+> If the shopper exists in you database but is not logged in, sending other profile information along with the email will cause the platform to fail placing the order. This happens because this action is interpreted as an attempt to edit profile data, which is not possible unless the customer is logged in to the store.
  */
 clientProfileData: {
 /**
@@ -17339,7 +18139,8 @@ shippingData: {
 /**
  * Shipping address.
  * 
- * For customers already in your data base, it is enough to send this object only with an `addressId`, which you may obtain from a [Cart simulation request](https://developers.vtex.com/vtex-rest-api/reference/shopping-cart#cartsimulation), for example.
+ * 
+For customers already in your data base, it is enough to send this object only with an `addressId`, which you may obtain from a [Cart simulation request](https://developers.vtex.com/vtex-rest-api/reference/shopping-cart#cartsimulation), for example.
  */
 address?: {
 /**
@@ -18694,7 +19495,8 @@ salesAssociateId?: string
 /**
  * Order processing callback request, which is made after an order's payment is approved.
  * 
- * > This request has to be made within five minutes after the [Place order](https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders) or [Place order from existing cart](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/transaction) request has been made, or else, the order will not be processed.
+ * 
+> This request has to be made within five minutes after the [Place order](https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders) or [Place order from existing cart](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/transaction) request has been made, or else, the order will not be processed.
  */
 "POST /api/checkout/pub/gatewayCallback/:orderGroup": {
 
@@ -18702,12 +19504,16 @@ salesAssociateId?: string
 /**
  * Retrieves a list of sellers that cater to a specific region or address, according to your setup of our [regionalization feature](https://help.vtex.com/en/tutorial/setting-up-price-and-availability-of-skus-by-region--12ne58BmvYsYuGsimmugoc#). Learn more about [Region v2](https://developers.vtex.com/docs/guides/region-v2-release).
  * 
- * To access the list of sellers, you must choose one of the following methods:
  * 
- * 1. Send the identification of the list of sellers (`regionId`) as a path parameter through the URL. Or;
- * 2. Send the `country` (3-digit ISO code) and at least one of the two values (`postal Code` or `geo Coordinates`) as query parameters through the URL. For this method, it is also allowed to send both values (`postalCode` or `geoCoordinates`) in the same request.
+To access the list of sellers, you must choose one of the following methods:
  * 
- * > The `regionId` and `country` parameters are indicated as required in this documentation. However, only one of them should be sent in the request according to one of the methods mentioned above.
+ * 
+1. Send the identification of the list of sellers (`regionId`) as a path parameter through the URL. Or;
+ * 
+2. Send the `country` (3-digit ISO code) and at least one of the two values (`postal Code` or `geo Coordinates`) as query parameters through the URL. For this method, it is also allowed to send both values (`postalCode` or `geoCoordinates`) in the same request.
+ * 
+ * 
+> The `regionId` and `country` parameters are indicated as required in this documentation. However, only one of them should be sent in the request according to one of the methods mentioned above.
  */
 "GET /api/checkout/pub/regions/:regionId": {
 searchParams: {
@@ -18953,6 +19759,48 @@ parentAccountName?: string
  * Original ID.
  */
 originalId?: string
+}
+/**
+ * Document information.
+ */
+export interface IdHrefDocumentID {
+/**
+ * ID of the document that was created, with data entity prefix.
+ */
+Id?: string
+/**
+ * Document reference URL.
+ */
+Href?: string
+/**
+ * Unique identifier of the document.
+ */
+DocumentId?: string
+}
+/**
+ * Object representing each document.
+ */
+export interface Document {
+/**
+ * Custom property.
+ */
+"{customProperty}"?: string
+/**
+ * Unique identifier of the document.
+ */
+id: string
+/**
+ * Unique identifier of the account.
+ */
+accountId: string
+/**
+ * Account name.
+ */
+accountName: string
+/**
+ * Two-letter string that identifies the data entity.
+ */
+dataEntityId: string
 }
 export interface GetorUpdateProductSpecification {
 /**
@@ -20930,10 +21778,14 @@ maskFirstPurchaseData?: boolean
 /**
  * Configures reCAPTCHA validation for the account, defining in which situations the shopper will be prompted to validate a purchase with reCAPTCHA. Learn more about [reCAPTCHA validation for VTEX stores](https://help.vtex.com/tutorial/recaptcha-no-checkout--18Te3oDd7f4qcjKu9jhNzP)
  * 
- * Possible values are:
- * - `"never"`: no purchases are validated with reCAPTCHA.
- * - `"always"`: every purchase is validated with reCAPTCHA.
- * - `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX’s algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
+ * 
+Possible values are:
+ * 
+- `"never"`: no purchases are validated with reCAPTCHA.
+ * 
+- `"always"`: every purchase is validated with reCAPTCHA.
+ * 
+- `"vtexCriteria"`: only some purchases are validated with reCAPTCHA in order to minimize friction and improve shopping experience. VTEX’s algorithm determines which sessions are trustworthy and which should be validated with reCAPTCHA. This is the recommended option.
  */
 recaptchaValidation?: string
 /**

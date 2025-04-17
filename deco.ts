@@ -10,6 +10,14 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("deno-deploy"),
+    app("figma"),
+    app("unsplash"),
+    app("reflect"),
+    app("grain"),
+    app("slack"),
+    app("vertex"),
+    app("google-sheets"),
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),
@@ -22,6 +30,7 @@ const config = {
     app("ai-assistants"),
     app("files"),
     app("openai"),
+    app("perplexity"),
     app("brand-assistant"),
     app("implementation"),
     app("weather"),
@@ -38,7 +47,11 @@ const config = {
     app("linx-impulse"),
     app("shopify"),
     app("magento"),
+    app("stability"),
     app("nuvemshop"),
+    app("streamshop"),
+    app("brasilapi"),
+    app("readwise"),
     app("website"),
     app("commerce"),
     app("workflows"),
@@ -48,6 +61,7 @@ const config = {
     app("decohub"),
     app("htmx"),
     app("sap"),
+    app("tiptap-cloud"),
     ...compatibilityApps,
   ],
 };

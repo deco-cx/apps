@@ -11,7 +11,11 @@ import { pageTypesToSeo } from "../../utils/legacy.ts";
 import { getSegmentFromBag, withSegmentCookie } from "../../utils/segment.ts";
 import { withIsSimilarTo } from "../../utils/similars.ts";
 import { pickSku, toProductPage } from "../../utils/transform.ts";
-import type { PageType, Product as VTEXProduct } from "../../utils/types.ts";
+import type {
+  AdvancedLoaderConfig,
+  PageType,
+  Product as VTEXProduct,
+} from "../../utils/types.ts";
 import PDPDefaultPath from "../paths/PDPDefaultPath.ts";
 
 export interface Props {
@@ -26,6 +30,11 @@ export interface Props {
    * @description Index of product pages with the `skuId` parameter
    */
   indexingSkus?: boolean;
+  /**
+   * @title Advanced Configuration
+   * @description Further change loader behaviour
+   */
+  advancedConfigs?: AdvancedLoaderConfig;
 }
 
 /**
@@ -63,6 +72,8 @@ const loader = async (
     ? slug?.toLowerCase()
     : defaultPaths?.possiblePaths[0];
   const segment = getSegmentFromBag(ctx);
+  const locale = segment?.payload?.cultureInfo ??
+    ctx.defaultSegment?.cultureInfo ?? "pt-BR";
 
   const pageTypePromise = vcsDeprecated
     ["GET /api/catalog_system/pub/portal/pagetype/:term"](
@@ -90,7 +101,7 @@ const loader = async (
   }
 
   const facets = withDefaultFacets([], ctx);
-  const params = withDefaultParams({ query, count: 1 });
+  const params = withDefaultParams({ query, count: 1, locale });
 
   const { products: [product] } = await vcsDeprecated
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
@@ -128,6 +139,7 @@ const loader = async (
   const page = toProductPage(product, sku, kitItems, {
     baseUrl,
     priceCurrency: segment?.payload?.currencyCode ?? "BRL",
+    includeOriginalAttributes: props.advancedConfigs?.includeOriginalAttributes,
   });
 
   const isPageProduct = pageType.pageType === "Product";

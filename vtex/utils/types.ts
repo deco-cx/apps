@@ -449,12 +449,19 @@ export interface PickupStoreInfo {
   dockId: null;
 }
 
+export interface PickupHolidays {
+  date?: string;
+  hourBegin?: string;
+  hourEnd?: string;
+}
+
 export interface PickupPoint {
   friendlyName: string;
   address: Address;
   additionalInfo: string;
   id: string;
   businessHours: BusinessHour[];
+  pickupHolidays?: PickupHolidays[];
 }
 
 export interface BusinessHour {
@@ -745,7 +752,7 @@ export interface Item {
   referenceId?: Array<{ Key: string; Value: string }>;
   measurementUnit: string;
   unitMultiplier: number;
-  modalType: unknown | null;
+  modalType: string | null;
   images: Image[];
   videos: string[];
   variations: Array<{
@@ -1128,7 +1135,9 @@ export type SPEvent =
   }
   | {
     type: "page.empty_cart";
-    products: [];
+    // Empty array is converted to a invalid json schema... so, let it be anything.
+    // deno-lint-ignore ban-types
+    products: {};
   }
   | {
     type: "page.confirmation";
@@ -1339,3 +1348,181 @@ export interface Orders {
     };
   };
 }
+
+export interface SalesChannel {
+  Id?: number;
+  Name?: string;
+  IsActive?: boolean;
+  ProductClusterId?: number | null;
+  CountryCode?: string;
+  CultureInfo?: string;
+  TimeZone?: string;
+  CurrencyCode?: string;
+  CurrencySymbol?: string;
+  CurrencyLocale?: number;
+  CurrencyFormatInfo?: {
+    CurrencyDecimalDigits?: number;
+    CurrencyDecimalSeparator?: string;
+    CurrencyGroupSeparator?: string;
+    CurrencyGroupSize?: number;
+    StartsWithCurrencySymbol?: boolean;
+  };
+  Origin?: string | null;
+  Position?: number | null;
+  ConditionRule?: string | null;
+  CurrencyDecimalDigits?: number;
+}
+
+export interface Promotion {
+  idCalculatorConfiguration: string;
+  name: string;
+  beginDateUtc: string;
+  endDateUtc: string;
+  lastModified: string;
+  daysAgoOfPurchases: number;
+  isActive: boolean;
+  isArchived: boolean;
+  isFeatured: boolean;
+  disableDeal: boolean;
+  activeDaysOfWeek: number[];
+  offset: number;
+  activateGiftsMultiplier: boolean;
+  newOffset: number;
+  maxPricesPerItems: string[];
+  cumulative: boolean;
+  nominalShippingDiscountValue: number;
+  absoluteShippingDiscountValue: number;
+  nominalDiscountValue: number;
+  nominalDiscountType: string;
+  maximumUnitPriceDiscount: number;
+  percentualDiscountValue: number;
+  rebatePercentualDiscountValue: number;
+  percentualShippingDiscountValue: number;
+  percentualTax: number;
+  shippingPercentualTax: number;
+  percentualDiscountValueList1: number;
+  percentualDiscountValueList2: number;
+  skusGift: {
+    quantitySelectable: number;
+    gifts: number;
+  };
+  nominalRewardValue: number;
+  percentualRewardValue: number;
+  orderStatusRewardValue: string;
+  applyToAllShippings: boolean;
+  nominalTax: number;
+  maxPackValue: number;
+  origin: string;
+  idSellerIsInclusive: boolean;
+  idsSalesChannel: string[];
+  areSalesChannelIdsExclusive: boolean;
+  marketingTags: string[];
+  marketingTagsAreNotInclusive: boolean;
+  paymentsMethods: {
+    id: string;
+    name: string;
+  }[];
+  stores: string[];
+  campaigns: string[];
+  storesAreInclusive: boolean;
+  categories: {
+    id: string;
+    name: string;
+  }[];
+  categoriesAreInclusive: boolean;
+  brands: {
+    id: string;
+    name: string;
+  }[];
+  brandsAreInclusive: boolean;
+  products: {
+    id: string;
+    name: string;
+  }[];
+  productsAreInclusive: boolean;
+  skus: {
+    id: string;
+    name: string;
+  }[];
+  skusAreInclusive: boolean;
+  collections1BuyTogether: {
+    id: string;
+    name: string;
+  }[];
+  collections2BuyTogether: {
+    id: string;
+    name: string;
+  }[];
+  minimumQuantityBuyTogether: number;
+  quantityToAffectBuyTogether: number;
+  enableBuyTogetherPerSku: boolean;
+  listSku1BuyTogether: {
+    id: string;
+    name: string;
+  }[];
+  listSku2BuyTogether: {
+    id: string;
+    name: string;
+  }[];
+  coupon: string[];
+  totalValueFloor: number;
+  totalValueCeling: number;
+  totalValueIncludeAllItems: boolean;
+  totalValueMode: string;
+  collections: {
+    id: string;
+    name: string;
+  }[];
+  collectionsIsInclusive: boolean;
+  restrictionsBins: string[];
+  cardIssuers: string[];
+  totalValuePurchase: number;
+  slasIds: string[];
+  isSlaSelected: boolean;
+  isFirstBuy: boolean;
+  firstBuyIsProfileOptimistic: boolean;
+  compareListPriceAndPrice: boolean;
+  isDifferentListPriceAndPrice: boolean;
+  zipCodeRanges: {
+    zipCodeFrom: string;
+    zipCodeTo: string;
+    inclusive: string;
+  }[];
+  itemMaxPrice: number;
+  itemMinPrice: number;
+  installment: number;
+  isMinMaxInstallments: boolean;
+  minInstallment: number;
+  maxInstallment: number;
+  merchants: string[];
+  clusterExpressions: string[];
+  clusterOperator: string;
+  paymentsRules: string[];
+  giftListTypes: string[];
+  productsSpecifications: string[];
+  affiliates: {
+    id: string;
+    name: string;
+  }[];
+  maxUsage: number;
+  maxUsagePerClient: number;
+  shouldDistributeDiscountAmongMatchedItems: boolean;
+  multipleUsePerClient: boolean;
+  accumulateWithManualPrice: boolean;
+  type: string;
+  useNewProgressiveAlgorithm: boolean;
+  percentualDiscountValueList: number[];
+  isAppliedToMostExpensive: boolean;
+  maxNumberOfAffectedItems: number;
+  maxNumberOfAffectedItemsGroupKey: string;
+}
+
+export interface AdvancedLoaderConfig {
+  /** @description Specifies an array of attribute names from the original object to be directly included in the transformed object. */
+  includeOriginalAttributes: string[];
+
+  /** @description Allow this field if you prefer to use description instead of metaTagDescription */
+  preferDescription?: boolean;
+}
+
+export type Maybe<T> = T | null | undefined;

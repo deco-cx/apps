@@ -262,4 +262,52 @@ const searchLoader = async (
   };
 };
 
+export const cache = "stale-while-revalidate";
+export const cacheKey = (props: Props, req: Request, _ctx: AppContext) => {
+  const url = new URL(props.pageHref || req.url);
+  const qQueryString = url.searchParams.get("q");
+  const term = props.term || qQueryString ||
+    undefined;
+
+  if (term) {
+    return null;
+  }
+
+  const typeTags = [...url.searchParams.entries()]
+    .filter(([key]) => key.includes("type_tags"))
+    .reduce(
+      (prev, [key, value]) => [...prev, `${key}:${value}`],
+      [] as string[],
+    )
+    .join("\\");
+
+  const priceFilterRegex = /de-(\d+)-a-(\d+)/;
+  const filterMatch = url.href.match(priceFilterRegex);
+  const filterOperators = [
+    props.filterOperator?.property1 ?? "and",
+    props.filterOperator?.property2 ?? "and",
+    props.filterOperator?.property3 ?? "and",
+    props.filterOperator?.type_tags ?? "and",
+  ];
+
+  const params = new URLSearchParams([
+    ["count", (props.count || url.searchParams.get("count") || 12).toString()],
+    ["sort", url.searchParams.get("sort") ?? ""],
+    ["type_tags", typeTags],
+    ["tags", props?.tags?.join("\\") ?? ""],
+    [
+      "price",
+      filterMatch ? `min:${filterMatch[1]}_max:${filterMatch[2]}` : "",
+    ],
+    ["filterByTags", props.filterByTags ? "true" : "false"],
+    ["filterOperator", filterOperators.join("\\")],
+    ["page", (url.searchParams.get("page") ?? 1).toString()],
+  ]);
+
+  params.sort();
+
+  url.search = params.toString();
+  return url.href;
+};
+
 export default searchLoader;

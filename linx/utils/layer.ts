@@ -7,6 +7,8 @@ import {
   ShareWishlistResponse,
 } from "./types/wishlistJSON.ts";
 
+import { Auction } from "./types/auctionAPI.ts";
+
 export interface LayerAPI {
   "POST /v1/Profile/API.svc/web/SearchWishlist": {
     response: SearchWishlistResponse;
@@ -19,6 +21,10 @@ export interface LayerAPI {
       WhereMetadata?: string;
       OrderBy?: string;
     };
+  };
+
+  "POST /v1/Catalog/API.svc/web/SearchProductAuctions": {
+    response: Auction[];
   };
 
   "POST /v1/Profile/API.svg/web/ShareWishlist": {

@@ -351,6 +351,8 @@ export interface Review extends Omit<Thing, "@type"> {
   id?: string;
   /** Author of the */
   author?: Author[];
+  /** The date that the order was created, in ISO 8601 date format.*/
+  dateCreated?: string;
   /** The date that the review was published, in ISO 8601 date format.*/
   datePublished?: string;
   /** The item that is being reviewed/rated. */
@@ -409,6 +411,8 @@ export interface Person extends Omit<Thing, "@type"> {
   image?: ImageObject[] | null;
   /** The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain. */
   taxID?: string;
+  /** The telephone number. */
+  telephone?: string;
 }
 // NON SCHEMA.ORG Compliant. Should be removed ASAP
 export interface Author extends Omit<Thing, "@type"> {
