@@ -11,6 +11,7 @@ export interface VideoDetailsOptions {
    * @description ID do vídeo para buscar detalhes
    */
   videoId: string;
+  
   /**
    * @description Partes adicionais a serem incluídas na resposta
    */
@@ -34,19 +35,30 @@ export interface VideoDetailsOptions {
    */
   includeCaptions?: boolean;
 
+  /**
+   * @description Token de acesso do YouTube (opcional)
+   */
   tokenYoutube?: string;
 
+  /**
+   * @description Ignorar cache para esta solicitação
+   */
   skipCache?: boolean;
 }
 
-interface VideoDetailsResponse {
+export interface VideoDetailsResponse {
   video: YoutubeVideoResponse;
   captions?: YouTubeCaptionListResponse;
+  error?: {
+    code: number;
+    message: string;
+    details?: unknown;
+  };
 }
 
 /**
  * @title YouTube Video Details
- * @description Fetches detailed information about a specific video by ID
+ * @description Obtém informações detalhadas sobre um vídeo específico pelo ID
  */
 export default async function loader(
   props: VideoDetailsOptions,
@@ -57,8 +69,7 @@ export default async function loader(
   const accessToken = getAccessToken(req) || props.tokenYoutube;
 
   if (!accessToken) {
-    console.error("Autenticação necessária para obter detalhes do vídeo");
-    return null;
+    return createErrorResponse(401, "Autenticação necessária para obter detalhes do vídeo");
   }
 
   const {
@@ -68,74 +79,97 @@ export default async function loader(
   } = props;
 
   if (!videoId) {
-    console.error("ID do vídeo é obrigatório");
-    return null;
+    return createErrorResponse(400, "ID do vídeo é obrigatório");
   }
 
-  const partString = parts.join(",");
+  try {
+    const partString = parts.join(",");
 
-  const videoResponse = await client["GET /videos"]({
-    part: partString,
-    id: videoId,
-  }, { 
-    headers: { Authorization: `Bearer ${accessToken}` },
-    ...STALE
-  });
-  
-  // Verificar se houve erro de autenticação (token expirado)
-  if (videoResponse.status === 401) {
-    // Sinalizar que o token está expirado
-    ctx.response.headers.set("X-Token-Expired", "true");
-    ctx.response.headers.set("Cache-Control", "no-store");
+    const videoResponse = await client["GET /videos"]({
+      part: partString,
+      id: videoId,
+    }, { 
+      headers: { Authorization: `Bearer ${accessToken}` },
+      ...STALE
+    });
     
-    console.error("Token de autenticação expirado ou inválido");
-    return null;
-  }
-  
-  const videoData = await videoResponse.json();
-
-  if (!videoData.items || videoData.items.length === 0) {
-    console.error(`Vídeo não encontrado: ${videoId}`);
-    return null;
-  }
-
-  const response: VideoDetailsResponse = {
-    video: videoData,
-  };
-
-  if (includeCaptions) {
-    try {
-      const captionsData = await client["GET /captions"]({
-        part: "snippet",
-        videoId,
-      }, { 
-        headers: { Authorization: `Bearer ${accessToken}` },
-        ...STALE 
-      }).then((res) => res.json());
-
-      response.captions = captionsData;
-    } catch (error) {
-      console.error(`Erro ao buscar legendas para o vídeo ${videoId}:`, error);
+    if (videoResponse.status === 401) {
+      ctx.response.headers.set("X-Token-Expired", "true");
+      ctx.response.headers.set("Cache-Control", "no-store");
+      return createErrorResponse(401, "Token de autenticação expirado ou inválido");
     }
-  }
+    
+    if (!videoResponse.ok) {
+      return createErrorResponse(
+        videoResponse.status,
+        `Erro ao buscar detalhes do vídeo: ${videoResponse.status}`,
+        await videoResponse.text()
+      );
+    }
+    
+    const videoData = await videoResponse.json();
 
-  return response;
+    if (!videoData.items || videoData.items.length === 0) {
+      return createErrorResponse(404, `Vídeo não encontrado: ${videoId}`);
+    }
+
+    const response: VideoDetailsResponse = {
+      video: videoData,
+    };
+
+    if (includeCaptions) {
+      try {
+        const captionsResponse = await client["GET /captions"]({
+          part: "snippet",
+          videoId,
+        }, { 
+          headers: { Authorization: `Bearer ${accessToken}` },
+          ...STALE 
+        });
+        
+        if (captionsResponse.ok) {
+          response.captions = await captionsResponse.json();
+        }
+      } catch (error) {
+        // Ignora erros de legenda - não são críticos para o resultado
+      }
+    }
+
+    return response;
+  } catch (error) {
+    return createErrorResponse(
+      500,
+      "Erro ao processar detalhes do vídeo",
+      error instanceof Error ? error.message : String(error)
+    );
+  }
+}
+
+function createErrorResponse(code: number, message: string, details?: unknown): VideoDetailsResponse {
+  return {
+    video: {
+      kind: "youtube#videoListResponse",
+      items: [],
+      pageInfo: { totalResults: 0, resultsPerPage: 0 }
+    },
+    error: {
+      code,
+      message,
+      details
+    }
+  };
 }
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: VideoDetailsOptions, req: Request, ctx: AppContext) => {
+export const cacheKey = (props: VideoDetailsOptions, req: Request) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
-  
-  // Verificar se há flag de token expirado
   const tokenExpired = req.headers.get("X-Token-Expired") === "true";
   
-  // Não usar cache se não houver token, se skipCache for verdadeiro ou se o token estiver expirado
   if (!accessToken || !props.videoId || props.skipCache || tokenExpired) {
     return null;
   }
   
-  // Incluir um fragmento do token na chave de cache
   const tokenFragment = accessToken.slice(-8);
   
   const params = new URLSearchParams([
