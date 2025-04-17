@@ -13,6 +13,8 @@ import {
   QueryRootCollectionArgs,
   QueryRootSearchArgs,
   SearchResultItemConnection,
+  LanguageCode,
+  CountryCode
 } from "../utils/storefront/storefront.graphql.gen.ts";
 import { toProduct } from "../utils/transform.ts";
 import {
@@ -21,7 +23,7 @@ import {
   searchSortShopify,
   sortShopify,
 } from "../utils/utils.ts";
-import { Metafield } from "../utils/types.ts";
+import { LanguageContextArgs, Metafield } from "../utils/types.ts";
 
 export interface QueryProps {
   /** @description search term to use on search */
@@ -70,6 +72,18 @@ export type Props = {
    * @description search for metafields
    */
   metafields?: Metafield[];
+  /**
+   * @title Language Code
+   * @description Language code for the storefront API
+   * @example "EN" for English, "FR" for French, etc.
+   */
+  languageCode?: LanguageCode;
+  /**
+   * @title Country Code
+   * @description Country code for the storefront API
+   * @example "US" for United States, "FR" for France, etc.
+   */
+  countryCode?: CountryCode;
 };
 
 // deno-lint-ignore no-explicit-any
@@ -92,6 +106,8 @@ const loader = async (
 
   const count = props.count ?? 12;
   const metafields = expandedProps.metafields || [];
+  const languageCode = expandedProps?.languageCode ?? "PT";
+  const countryCode = expandedProps?.countryCode ?? "BR";
 
   let shopifyProducts:
     | SearchResultItemConnection
@@ -119,15 +135,18 @@ const loader = async (
   });
 
   if (isQueryList(props)) {
+
     const data = await storefront.query<
       QueryRoot,
-      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs
+      QueryRootSearchArgs & HasMetafieldsMetafieldsArgs & LanguageContextArgs
     >({
       variables: {
         first: count,
         query: props.query,
         productFilters: filters,
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...searchSortShopify[sort],
       },
       ...SearchProducts,
@@ -139,12 +158,15 @@ const loader = async (
       & QueryRootCollectionArgs
       & CollectionProductsArgs
       & HasMetafieldsMetafieldsArgs
+      & LanguageContextArgs
     >({
       variables: {
         first: count,
         handle: props.collection,
         filters,
         identifiers: metafields,
+        languageCode,
+        countryCode,
         ...sortShopify[sort],
       },
       ...ProductsByCollection,
