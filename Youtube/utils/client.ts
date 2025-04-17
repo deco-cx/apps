@@ -10,28 +10,26 @@ import {
   YoutubeVideoResponse,
 } from "./types.ts";
 
+type Headers = {
+  Authorization: string;
+};
+
 export interface Client {
   "GET /youtube/v3/channels": {
     response: YoutubeChannelResponse;
     searchParams: Query & { id?: string; part: string };
-    headers: {
-      Authorization: string;
-    };
+    headers: Headers;
   };
 
   "GET /channels": {
     response: YoutubeChannelResponse;
     searchParams: Query & { id?: string; part: string };
-    headers: {
-      Authorization: string;
-    };
+      headers: Headers;
   };
   "GET /search": {
     response: YoutubeVideoResponse;
     searchParams: VideoQuery;
-    headers: {
-      Authorization: string;
-    };
+    headers: Headers;
   };
   "GET /videos": {
     response: YoutubeVideoListResponse;
@@ -48,9 +46,7 @@ export interface Client {
       maxResults?: number;
       pageToken?: string;
     };
-    headers: {
-      Authorization: string;
-    };
+    headers: Headers;
   };
   "GET /captions": {
     response: YouTubeCaptionListResponse;
@@ -58,9 +54,7 @@ export interface Client {
       part: string;
       videoId: string;
     };
-    headers: {
-      Authorization: string;
-    };
+    headers: Headers;
   };
   "GET /captions/:id": {
     response: string;
@@ -71,16 +65,12 @@ export interface Client {
       tfmt?: "srt" | "sbv" | "vtt";
       tlang?: string;
     };
-    headers: {
-      Authorization: string;
-    };
+    headers: Headers;
   };
   "POST /thumbnails/set": {
     response: UpdateThumbnailResponse;
     searchParams: { videoId: string; uploadType: string };
-    headers: {
-      Authorization: string;
-    };
+    headers: Headers;
   };
 }
 
