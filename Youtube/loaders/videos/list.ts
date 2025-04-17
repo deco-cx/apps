@@ -1,22 +1,25 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-import type { YoutubeVideoResponse } from "../../utils/types.ts";
+import type { YoutubeVideoListResponse, YoutubeVideoResponse } from "../../utils/types.ts";
 
 export interface VideoListOptions {
   /**
-   * ID do vídeo (opcional)
+   * @title ID do vídeo (opcional)
    */
   videoId?: string;
+  
   /**
-   * Número máximo de resultados por página
+   * @title Número máximo de resultados por página
    */
   maxResults?: number;
+
   /**
-   * Token para buscar a próxima página
+   * @title Token para buscar a próxima página
    */
   pageToken?: string;
+
   /**
-   * Ordenação dos vídeos
+   * @title Ordenação dos vídeos
    */
   order?:
     | "date"
@@ -25,10 +28,16 @@ export interface VideoListOptions {
     | "title"
     | "videoCount"
     | "viewCount";
+
   /**
-   * Filtro por palavra-chave
+   * @title Filtro por palavra-chave
    */
   q?: string;
+
+  /**
+   * @title 
+   */
+  part?: string;
 
   tokenYoutube?: string;
 }
@@ -41,29 +50,26 @@ export default async function loader(
   props: VideoListOptions,
   req: Request,
   ctx: AppContext,
-): Promise<YoutubeVideoResponse | null> {
-  const client = ctx.api;
+): Promise<YoutubeVideoListResponse | null> {
+  const { client } = ctx;
   const accessToken = getAccessToken(req) || props.tokenYoutube;
-
   if (!accessToken && !props.tokenYoutube) {
     return null;
   }
 
-  const { videoId, maxResults = 10, pageToken, order = "relevance", q } = props;
+  const { videoId, maxResults = 10, pageToken, order = "relevance", q, part } = props;
 
-  // Se temos um ID específico, buscamos apenas esse vídeo
   if (videoId) {
     const videoResponse = await client["GET /videos"]({
-      part: "snippet,statistics,status",
+      part: part || "snippet,statistics,status",
       id: videoId,
     }, { headers: { Authorization: `Bearer ${accessToken}` } });
 
     return await videoResponse.json();
   }
 
-  // Caso contrário, realizamos uma busca
   const searchResponse = await client["GET /search"]({
-    part: "snippet",
+    part: part || "snippet",
     q,
     maxResults,
     order,
@@ -71,28 +77,41 @@ export default async function loader(
     pageToken,
   }, { headers: { Authorization: `Bearer ${accessToken}` } });
 
-  const searchData = await searchResponse.json();
+  const searchData = await searchResponse.json() as YoutubeVideoResponse;
 
   if (searchData.items && searchData.items.length > 0) {
-    const videoIds = searchData.items.map((item: unknown) => item.id.videoId)
-      .join(
-        ",",
-      );
+    const videoIds = searchData.items
+      .map((item) => {
+        return typeof item.id === 'object' && 'videoId' in item.id 
+          ? item.id.videoId 
+          : typeof item.id === 'string' 
+            ? item.id 
+            : '';
+      })
+      .filter(id => id)
+      .join(",");
 
     const detailsResponse = await client["GET /videos"]({
       part: "snippet,statistics,status",
       id: videoIds,
     }, { headers: { Authorization: `Bearer ${accessToken}` } });
 
-    const detailsData = await detailsResponse.json();
+    const detailsData = await detailsResponse.json() as YoutubeVideoListResponse;
 
     return {
       kind: "youtube#videoListResponse",
       items: detailsData.items,
       nextPageToken: searchData.nextPageToken,
-      pageInfo: searchData.pageInfo,
+      pageInfo: searchData.pageInfo || { totalResults: 0, resultsPerPage: 0 },
+      etag: detailsData.etag,
     };
   }
 
-  return searchData;
+  const defaultPageInfo = { totalResults: 0, resultsPerPage: 0 };
+  return {
+    kind: "youtube#videoListResponse",
+    items: [],
+    pageInfo: searchData.pageInfo ? searchData.pageInfo : defaultPageInfo,
+    etag: "",
+  };
 }

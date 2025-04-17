@@ -5,6 +5,7 @@ import {
   YouTubeCaptionListResponse,
   YoutubeChannelResponse,
   YoutubeTokenResponse,
+  YoutubeVideoListResponse,
   YoutubeVideoResponse,
 } from "./types.ts";
 
@@ -32,7 +33,7 @@ export interface Client {
     };
   };
   "GET /videos": {
-    response: YoutubeVideoResponse;
+    response: YoutubeVideoListResponse;
     searchParams: { part: string; id: string };
     headers: {
       Authorization: string;

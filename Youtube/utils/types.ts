@@ -89,6 +89,7 @@ interface Status {
   license: string;
   embeddable: boolean;
   publicStatsViewable: boolean;
+  madeForKids?: boolean;
 }
 
 interface Video extends Base {
@@ -98,6 +99,57 @@ interface Video extends Base {
   snippet: Snippet;
   status: Status;
   statistics: Statistics;
+}
+
+export interface YoutubeVideoListResponse {
+  kind: "youtube#videoListResponse";
+  etag: string;
+  items: Array<{
+    kind: "youtube#video";
+    etag: string;
+    id: string;
+    snippet: {
+      publishedAt: string;
+      channelId: string;
+      title: string;
+      description: string;
+      thumbnails: {
+        default: Thumbnail;
+        medium: Thumbnail;
+        high: Thumbnail;
+        standard?: Thumbnail;
+        maxres?: Thumbnail;
+      };
+      channelTitle: string;
+      tags?: string[];
+      categoryId: string;
+      liveBroadcastContent: string;
+      localized: {
+        title: string;
+        description: string;
+      };
+    };
+    status: {
+      uploadStatus: string;
+      privacyStatus: string;
+      license: string;
+      embeddable: boolean;
+      publicStatsViewable: boolean;
+      madeForKids: boolean;
+    };
+    statistics: {
+      viewCount: string;
+      likeCount: string;
+      favoriteCount: string;
+      commentCount: string;
+    };
+  }>;
+  nextPageToken?: string;
+  prevPageToken?: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
 }
 
 export interface YoutubeChannelResponse {
@@ -127,7 +179,10 @@ export interface YoutubeVideoResponse {
   regionCode?: string;
   isAuthenticated?: boolean;
   items: Array<{
-    id: string;
+    id: string | {
+      kind: string;
+      videoId: string;
+    };
     snippet: {
       publishedAt: string;
       channelId: string;
