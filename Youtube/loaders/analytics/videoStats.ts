@@ -1,5 +1,6 @@
 import { AppContext } from "../../../Youtube/mod.ts";
 import { getAccessToken } from "../../../Youtube/utils/cookieAccessToken.ts";
+import { STALE } from "../../../utils/fetch.ts";
 
 export interface VideoAnalyticsOptions {
   /**
@@ -48,9 +49,14 @@ export interface VideoAnalyticsOptions {
    * @description Token de acesso do YouTube (opcional)
    */
   tokenYoutube?: string;
+  
+  /**
+   * @description Ignorar cache para esta solicitação
+   */
+  skipCache?: boolean;
 }
 
-interface AnalyticsResponse {
+export interface AnalyticsResponse {
   kind: string;
   columnHeaders: Array<{
     name: string;
@@ -63,6 +69,11 @@ interface AnalyticsResponse {
     title?: string;
     metrics: Record<string, number>;
   }>;
+  error?: {
+    code: number;
+    message: string;
+    details?: unknown;
+  };
 }
 
 /**
@@ -85,36 +96,33 @@ export default async function loader(
     sort = "-views",
     maxResults,
     tokenYoutube,
+    skipCache = false
   } = props;
 
   // Obter o token de acesso
   const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
-    console.error("Autenticação necessária para obter dados de analytics");
-    return null;
+    return createErrorResponse(401, "Autenticação necessária para obter dados de analytics");
   }
 
   if (!channelId) {
-    console.error("ID do canal é obrigatório");
-    return null;
+    return createErrorResponse(400, "ID do canal é obrigatório");
   }
 
   if (!startDate || !endDate) {
-    console.error("Datas de início e término são obrigatórias");
-    return null;
+    return createErrorResponse(400, "Datas de início e término são obrigatórias");
   }
 
   // Validar formato das datas (YYYY-MM-DD)
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
-    console.error("Datas devem estar no formato YYYY-MM-DD");
-    return null;
+    return createErrorResponse(400, "Datas devem estar no formato YYYY-MM-DD");
   }
 
   try {
     // Construir URL da requisição com os parâmetros
-    let url = "https://youtubeanalytics.googleapis.com/v2/reports";
+    const url = new URL("https://youtubeanalytics.googleapis.com/v2/reports");
 
     // Adicionar parâmetros obrigatórios
     const params = new URLSearchParams({
@@ -132,22 +140,23 @@ export default async function loader(
     // Adicionar limite de resultados se fornecido
     if (maxResults) params.append("maxResults", maxResults.toString());
 
-    url += `?${params.toString()}`;
+    url.search = params.toString();
 
     // Fazer a requisição para a API do YouTube Analytics
-    const response = await fetch(url, {
+    const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      ...STALE
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error(
+      const errorData = await response.json().catch(() => response.text());
+      return createErrorResponse(
+        response.status,
         `Erro ao buscar dados de analytics: ${response.status} ${response.statusText}`,
-        errorData,
+        errorData
       );
-      return null;
     }
 
     // Processar e retornar os dados
@@ -172,7 +181,10 @@ export default async function loader(
 
       // Criar objetos estruturados para cada vídeo
       for (const row of formattedResponse.rows) {
-        const videoObject: unknown = {
+        const videoObject: {
+          videoId: string | number;
+          metrics: Record<string, number>;
+        } = {
           videoId: row[headerIndexMap["video"]],
           metrics: {},
         };
@@ -180,7 +192,7 @@ export default async function loader(
         // Adicionar cada métrica ao objeto do vídeo
         for (const header of formattedResponse.columnHeaders) {
           if (header.name !== "video") {
-            videoObject.metrics[header.name] = row[headerIndexMap[header.name]];
+            videoObject.metrics[header.name] = row[headerIndexMap[header.name]] as number;
           }
         }
 
@@ -192,7 +204,53 @@ export default async function loader(
 
     return formattedResponse;
   } catch (error) {
-    console.error("Erro ao buscar dados de analytics para vídeos:", error);
-    return null;
+    return createErrorResponse(
+      500,
+      "Erro ao buscar dados de analytics para vídeos",
+      error instanceof Error ? error.message : String(error)
+    );
   }
 }
+
+// Função auxiliar para criar respostas de erro
+function createErrorResponse(code: number, message: string, details?: unknown): AnalyticsResponse {
+  return {
+    kind: "youtube#analyticData",
+    columnHeaders: [],
+    rows: [],
+    error: {
+      code,
+      message,
+      details
+    }
+  };
+}
+
+// Define a estratégia de cache como stale-while-revalidate
+export const cache = "stale-while-revalidate";
+
+// Define a chave de cache com base nos parâmetros da requisição
+export const cacheKey = (props: VideoAnalyticsOptions, req: Request, _ctx: AppContext) => {
+  const accessToken = getAccessToken(req) || props.tokenYoutube;
+  
+  // Não usar cache se não houver token ou se skipCache for verdadeiro
+  if (!accessToken || props.skipCache) {
+    return null;
+  }
+  
+  const params = new URLSearchParams([
+    ["channelId", props.channelId],
+    ["videoId", props.videoId || ""],
+    ["startDate", props.startDate],
+    ["endDate", props.endDate],
+    ["metrics", props.metrics || "views,estimatedMinutesWatched,likes,comments,shares,averageViewDuration"],
+    ["dimensions", props.dimensions || "video"],
+    ["sort", props.sort || "-views"],
+    ["maxResults", props.maxResults?.toString() || ""],
+  ]);
+  
+  // Ordenamos os parâmetros para garantir consistência na chave de cache
+  params.sort();
+  
+  return `youtube-analytics-video-${params.toString()}`;
+};
