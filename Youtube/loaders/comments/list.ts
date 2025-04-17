@@ -1,35 +1,62 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { YouTubeCommentThreadListResponse } from "../../utils/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 
 export interface CommentListParams {
+  /**
+   * @description ID do vídeo para carregar comentários
+   */
   parentId: string;
+  
+  /**
+   * @description Número máximo de resultados
+   */
   maxResults?: number;
+  
+  /**
+   * @description Token de paginação
+   */
   pageToken?: string;
+  
+  /**
+   * @description Token de acesso do YouTube (opcional)
+   */
   tokenYoutube?: string;
+  
+  /**
+   * @description Ignorar cache para esta solicitação
+   */
+  skipCache?: boolean;
+}
+
+export interface CommentListResponse extends YouTubeCommentThreadListResponse {
+  error?: {
+    code: number;
+    message: string;
+    details?: unknown;
+  };
 }
 
 /**
  * @title Load YouTube Comments
- * @description Loads comments from a specific YouTube video thread
+ * @description Carrega comentários de um vídeo específico do YouTube
  */
-const loader = async (
+export default async function loader(
   props: CommentListParams,
   req: Request,
   _ctx: AppContext,
-): Promise<YouTubeCommentThreadListResponse | null> => {
-  const { parentId, maxResults = 20, pageToken, tokenYoutube } = props;
+): Promise<CommentListResponse | null> {
+  const { parentId, maxResults = 20, pageToken, tokenYoutube, skipCache = false } = props;
 
   const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
-    console.error("Autenticação necessária para carregar comentários");
-    return null;
+    return createErrorResponse(401, "Autenticação necessária para carregar comentários");
   }
 
   if (!parentId) {
-    console.error("ID do vídeo é obrigatório para carregar comentários");
-    return null;
+    return createErrorResponse(400, "ID do vídeo é obrigatório para carregar comentários");
   }
 
   try {
@@ -41,15 +68,17 @@ const loader = async (
     url.searchParams.set("maxResults", maxResults.toString());
     if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-    const response = await fetch(url, {
+    const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      ...STALE
     });
 
     if (!response.ok) {
       // Verifica se o erro é porque os comentários estão desativados
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => response.text());
+      
       if (errorData?.error?.errors?.[0]?.reason === "commentsDisabled") {
         return {
           kind: "youtube#commentThreadListResponse",
@@ -57,26 +86,62 @@ const loader = async (
           items: [],
           // Adiciona uma propriedade para indicar que os comentários estão desativados
           commentsDisabled: true,
-        } as YouTubeCommentThreadListResponse;
+        } as CommentListResponse;
       }
 
       // Outros erros
-      console.error(
+      return createErrorResponse(
+        response.status,
         `Erro ao carregar comentários: ${response.status} ${response.statusText}`,
-        errorData,
+        errorData
       );
-      return null;
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(
-      `Erro ao carregar comentários para o vídeo ${parentId}:`,
-      error,
+    return createErrorResponse(
+      500,
+      `Erro ao carregar comentários para o vídeo ${parentId}`,
+      error instanceof Error ? error.message : String(error)
     );
+  }
+}
+
+// Função auxiliar para criar respostas de erro
+function createErrorResponse(code: number, message: string, details?: unknown): CommentListResponse {
+  return {
+    kind: "youtube#commentThreadListResponse",
+    etag: "",
+    items: [],
+    error: {
+      code,
+      message,
+      details
+    }
+  };
+}
+
+// Define a estratégia de cache como stale-while-revalidate
+export const cache = "stale-while-revalidate";
+
+// Define a chave de cache com base nos parâmetros da requisição
+export const cacheKey = (props: CommentListParams, req: Request, _ctx: AppContext) => {
+  const accessToken = getAccessToken(req) || props.tokenYoutube;
+  
+  // Não usar cache se não houver token ou se skipCache for verdadeiro
+  if (!accessToken || props.skipCache) {
     return null;
   }
+  
+  const params = new URLSearchParams([
+    ["parentId", props.parentId],
+    ["maxResults", (props.maxResults || 20).toString()],
+    ["pageToken", props.pageToken || ""],
+  ]);
+  
+  // Ordenamos os parâmetros para garantir consistência na chave de cache
+  params.sort();
+  
+  return `youtube-comments-${params.toString()}`;
 };
-
-export default loader;
