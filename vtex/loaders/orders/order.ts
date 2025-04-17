@@ -1,3 +1,4 @@
+import { HttpError } from "@deco/deco";
 import { RequestURLParam } from "../../../website/functions/requestToParam.ts";
 import { AppContext } from "../../mod.ts";
 import { Userorderdetails } from "../../utils/openapi/vcs.openapi.gen.ts";
@@ -13,14 +14,19 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<Userorderdetails | null> {
   const { vcs } = ctx;
-  const { cookie, payload } = parseCookie(req.headers, ctx.account);
+  const { cookie } = parseCookie(req.headers, ctx.account);
 
   const { slug } = props;
+
+  const user = await ctx.invoke.vtex.loaders.user();
+  if (!user) {
+    throw new HttpError(new Response("Unauthorized", { status: 403 }));
+  }
 
   const response = await vcs["GET /api/oms/user/orders/:orderId"](
     {
       orderId: slug.includes("-") ? slug : slug + "-01",
-      clientEmail: payload?.sub,
+      clientEmail: user.email,
     },
     {
       headers: {
@@ -29,10 +35,15 @@ export default async function loader(
     },
   );
 
-  if (response.ok) {
-    const order = await response.json();
-    return order;
+  if (!response.ok) {
+    throw new Error(`Failed to get order: ${response.status} ${response.statusText}`);
   }
 
-  return null;
+  const order = await response.json();
+  
+  if (order.clientProfileData?.email !== user.email) {
+    throw new HttpError(new Response("Unauthorized", { status: 403 }));
+  }
+
+  return order;
 }
