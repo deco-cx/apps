@@ -13,7 +13,8 @@ import * as $$$7 from "./loaders/searchAndRecolor.ts";
 import * as $$$8 from "./loaders/searchAndReplace.ts";
 import * as $$$9 from "./loaders/upscaleCreative.ts";
 import * as $$$10 from "./loaders/upscaleFast.ts";
-
+import * as $$$11 from "./loaders/imageToVideoStart.ts";
+import * as $$$12 from "./loaders/imageToVideoResult.ts";
 const manifest = {
   "loaders": {
     "stability/loaders/controlSketch.ts": $$$0,
@@ -27,6 +28,8 @@ const manifest = {
     "stability/loaders/searchAndReplace.ts": $$$8,
     "stability/loaders/upscaleCreative.ts": $$$9,
     "stability/loaders/upscaleFast.ts": $$$10,
+    "stability/loaders/imageToVideoStart.ts": $$$11,
+    "stability/loaders/imageToVideoResult.ts": $$$12,
   },
   "name": "stability",
   "baseUrl": import.meta.url,

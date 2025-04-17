@@ -1,6 +1,6 @@
 import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
-import { ASPECT_RATIOS, STYLE_PRESETS } from "../stabilityAiClient.ts";
+import { STYLE_PRESETS } from "../stabilityAiClient.ts";
 
 /**
  * @name GENERATE_IMAGE
@@ -22,8 +22,9 @@ export interface Props {
   /**
    * @description The aspect ratio of the generated image
    * @default "1:1"
+   * @allowedValues "16:9", "1:1", "21:9", "2:3", "3:2", "4:5", "5:4", "9:16", "9:21"
    */
-  aspectRatio?: typeof ASPECT_RATIOS[number];
+  aspectRatio?: string;
   /**
    * @description The style preset to use for generation. Use one of these presets to get a specific style if it matches the style you're looking for.
    * Can be one of the following:
