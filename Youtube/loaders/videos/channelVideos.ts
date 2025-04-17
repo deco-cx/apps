@@ -1,148 +1,148 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-import type { YoutubeVideoResponse } from "../../utils/types.ts";
+import type { YoutubePlaylistItemsResponse, YoutubeVideoListResponse } from "../../utils/types.ts";
 
 export interface ChannelVideosOptions {
   /**
-   * @description ID of the channel to search videos
-   */
-  channelId: string;
-  /**
-   * @description Maximum number of results per page
+   * @description Número máximo de resultados por página
    */
   maxResults?: number;
+
   /**
-   * @description Token to search the next page
+   * @description Token para buscar a próxima página
    */
   pageToken?: string;
-  /**
-   * @description Order the videos
-   */
-  order?:
-    | "date"
-    | "rating"
-    | "relevance"
-    | "title"
-    | "videoCount"
-    | "viewCount";
-  /**
-   * @description Include private videos (requires appropriate authorization)
-   */
-  includePrivate?: boolean;
 
+  /**
+   * @description Token de acesso do YouTube (opcional)
+   */
   tokenYoutube?: string;
 }
 
 /**
- * @title List Videos of a Channel
- * @description Search videos of a specific YouTube channel
+ * @title Listar Vídeos do Canal
+ * @description Busca todos os vídeos do canal do usuário autenticado, incluindo vídeos privados
  */
 export default async function loader(
   props: ChannelVideosOptions,
   req: Request,
   ctx: AppContext,
-): Promise<YoutubeVideoResponse | null> {
-  const client = ctx.api;
+): Promise<YoutubeVideoListResponse | null> {
+  const { client } = ctx;
   const accessToken = getAccessToken(req) || props.tokenYoutube;
 
   if (!accessToken) {
-    console.error("Autenticação necessária para listar vídeos do canal");
     return null;
   }
 
   const {
-    channelId,
-    maxResults = 10,
+    maxResults = 50,
     pageToken,
-    order = "date",
-    includePrivate = true,
   } = props;
 
-  if (!channelId) {
-    console.error("ID do canal é obrigatório");
-    return null;
-  }
+  try {
+    const channelResponse = await client["GET /channels"]({
+      part: "contentDetails",
+      mine: true,
+    }, { headers: { Authorization: `Bearer ${accessToken}` } });
+    
+    const channelData = await channelResponse.json();
+    
+    if (!channelData.items || channelData.items.length === 0) {
+      return {
+        kind: "youtube#videoListResponse",
+        items: [],
+        pageInfo: { totalResults: 0, resultsPerPage: 0 },
+        etag: "",
+      };
+    }
+    
+    const uploadsPlaylistId = channelData.items[0]?.contentDetails
+      ?.relatedPlaylists?.uploads;
 
-  if (!includePrivate) {
-    return await ctx.invoke.loaders.videos.search(
-      {
-        channelId,
-        maxResults,
-        pageToken,
-        order,
-        q: "",
-      },
-      req,
-      ctx,
-    );
-  }
+    if (!uploadsPlaylistId) {
+      return {
+        kind: "youtube#videoListResponse",
+        items: [],
+        pageInfo: { totalResults: 0, resultsPerPage: 0 },
+        etag: "",
+      };
+    }
+    
+    const playlistResponse = await client["GET /playlistItems"]({
+      part: "snippet,status",
+      playlistId: uploadsPlaylistId,
+      maxResults,
+      pageToken,
+    }, { headers: { Authorization: `Bearer ${accessToken}` } });
+    
+    const playlistData = await playlistResponse.json()
 
-  const channelData = await client["GET /channels"]({
-    part: "contentDetails",
-    id: channelId,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
-    res.json()
-  );
-
-  if (!channelData.items || channelData.items.length === 0) {
-    console.error(`Canal não encontrado: ${channelId}`);
-    return null;
-  }
-
-  const uploadsPlaylistId = channelData?.items[0]?.contentDetails
-    ?.relatedPlaylists?.uploads;
-
-  if (!uploadsPlaylistId) {
-    console.error(
-      `Playlist de uploads não encontrada para o canal: ${channelId}`,
-    );
-    return null;
-  }
-
-  // Busca os vídeos da playlist de uploads
-  const data = await client["GET /playlistItems"]({
-    part: "snippet,status",
-    playlistId: uploadsPlaylistId,
-    maxResults,
-    pageToken,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
-    res.json()
-  );
-
-  // Certifica que temos items antes de processar
-  if (!data.items || data.items.length === 0) {
+    if (!playlistData.items || playlistData.items.length === 0) {
+      return {
+        kind: "youtube#videoListResponse",
+        items: [],
+        pageInfo: { totalResults: 0, resultsPerPage: 0 },
+        etag: "",
+      };
+    }
+    
+    return {
+      kind: "youtube#videoListResponse",
+      items: playlistData.items.map((item) => {
+        const thumbnails = {
+          default: item.snippet.thumbnails.default,
+          medium: item.snippet.thumbnails.medium || item.snippet.thumbnails.default,
+          high: item.snippet.thumbnails.high || item.snippet.thumbnails.default,
+          standard: item.snippet.thumbnails.standard,
+          maxres: item.snippet.thumbnails.maxres
+        };
+        
+        return {
+          kind: "youtube#video",
+          etag: item.etag,
+          id: item.snippet.resourceId.videoId,
+          snippet: {
+            publishedAt: item.snippet.publishedAt,
+            channelId: item.snippet.channelId,
+            title: item.snippet.title,
+            description: item.snippet.description,
+            thumbnails,
+            channelTitle: item.snippet.channelTitle,
+            categoryId: "",
+            liveBroadcastContent: "none",
+            localized: {
+              title: item.snippet.title,
+              description: item.snippet.description
+            }
+          },
+          statistics: {
+            viewCount: "0",
+            likeCount: "0",
+            favoriteCount: "0",
+            commentCount: "0"
+          },
+          status: {
+            uploadStatus: "processed",
+            privacyStatus: item.status?.privacyStatus || "public",
+            license: "youtube",
+            embeddable: true,
+            publicStatsViewable: true,
+            madeForKids: false
+          }
+        };
+      }),
+      pageInfo: playlistData.pageInfo,
+      etag: "",
+      nextPageToken: playlistData.nextPageToken,
+    };
+    
+  } catch (_error) {
     return {
       kind: "youtube#videoListResponse",
       items: [],
       pageInfo: { totalResults: 0, resultsPerPage: 0 },
+      etag: "",
     };
   }
-
-  // Formata a resposta
-  const response = {
-    kind: "youtube#videoListResponse",
-    items: data.items.map((item: unknown) => ({
-      id: item.snippet.resourceId.videoId,
-      snippet: item.snippet,
-    })),
-    nextPageToken: data.nextPageToken,
-    pageInfo: data.pageInfo,
-  };
-
-  // Busca detalhes adicionais (estatísticas) para todos os vídeos em uma única chamada
-  if (response.items.length > 0) {
-    const videoIds = response.items.map((item) => item.id).join(",");
-
-    const detailsData = await client["GET /videos"]({
-      part: "snippet,statistics,status",
-      id: videoIds,
-    }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
-      res.json()
-    );
-
-    if (detailsData.items && detailsData.items.length > 0) {
-      response.items = detailsData.items;
-    }
-  }
-  return response;
 }

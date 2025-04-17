@@ -4,6 +4,7 @@ import {
   VideoQuery,
   YouTubeCaptionListResponse,
   YoutubeChannelResponse,
+  YoutubePlaylistItemsResponse,
   YoutubeTokenResponse,
   YoutubeVideoListResponse,
   YoutubeVideoResponse,
@@ -40,7 +41,7 @@ export interface Client {
     };
   };
   "GET /playlistItems": {
-    response: YoutubeVideoResponse;
+    response: YoutubePlaylistItemsResponse;
     searchParams: {
       part: string;
       playlistId: string;

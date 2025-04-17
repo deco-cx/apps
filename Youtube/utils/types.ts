@@ -518,6 +518,53 @@ export interface LiveStreamListResponse {
   infoMessage?: string; // Mensagem informativa adicional
 }
 
+export interface YoutubePlaylistItemsResponse {
+  kind: "youtube#playlistItemListResponse";
+  etag: string;
+  items: Array<{
+    kind: "youtube#playlistItem";
+    etag: string;
+    id: string;
+    snippet: {
+      publishedAt: string;
+      channelId: string;
+      title: string;
+      description: string;
+      thumbnails: {
+        default: Thumbnail;
+        medium?: Thumbnail;
+        high?: Thumbnail;
+        standard?: Thumbnail;
+        maxres?: Thumbnail;
+      };
+      channelTitle: string;
+      playlistId: string;
+      position: number;
+      resourceId: {
+        kind: string;
+        videoId: string;
+      };
+      videoOwnerChannelTitle?: string;
+      videoOwnerChannelId?: string;
+    };
+    contentDetails?: {
+      videoId: string;
+      startAt?: string;
+      endAt?: string;
+      note?: string;
+      videoPublishedAt: string;
+    };
+    status?: {
+      privacyStatus: PrivacyStatus;
+    };
+  }>;
+  nextPageToken?: string;
+  prevPageToken?: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+}
 
 export interface YoutubeTokenResponse {
   access_token: string;
