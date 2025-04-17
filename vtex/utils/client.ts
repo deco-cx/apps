@@ -10,6 +10,7 @@ import {
   LegacySort,
   OrderForm,
   OrderItem,
+  OrderPlaced,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -21,6 +22,9 @@ import {
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
+  "GET /api/checkout/pub/orders/:orderId": {
+    response: OrderPlaced;
+  };
   "POST /api/checkout/pub/orderForm/:orderFormId/messages/clear": {
     // deno-lint-ignore no-explicit-any
     body: Record<any, never>;

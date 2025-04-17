@@ -1477,6 +1477,71 @@ export interface CanceledOrder {
   receipt?: string | null;
 }
 
+interface OrderPlacedSeller {
+  id: string;
+  name: string;
+  logo: string;
+}
+
+export interface OrderPlaced {
+  sellers: OrderPlacedSeller[];
+  orderId: string;
+  orderGroup: string;
+  state: string;
+  isCheckedIn: boolean;
+  sellerOrderId: string;
+  storeId: string | null;
+  checkedInPickupPointId: string | null;
+  value: number;
+  items: OrderFormItem[];
+  totals: Total[];
+  clientProfileData: ClientProfileData;
+  ratesAndBenefitsData: RatesAndBenefitsData;
+  shippingData: ShippingData;
+  paymentData: PaymentData;
+  clientPreferencesData: ClientPreferencesData;
+  commercialConditionData: null;
+  giftRegistryData: null;
+  marketingData: MarketingData | null;
+  storePreferencesData: StorePreferencesData;
+  openTextField: null;
+  invoiceData: null;
+  itemMetadata: ItemMetadata;
+  taxData: null;
+  customData: null;
+  hooksData: null;
+  changeData: null;
+  subscriptionData: null;
+  merchantContextData: null;
+  purchaseAgentData: null;
+  salesChannel: string;
+  followUpEmail: string;
+  creationDate: string;
+  lastChange: string;
+  timeZoneCreationDate: string;
+  timeZoneLastChange: string;
+  isCompleted: boolean;
+  hostName: string;
+  merchantName: string | null;
+  userType: string;
+  roundingError: number;
+  allowEdition: boolean;
+  allowCancellation: boolean;
+  isUserDataVisible: boolean;
+  cancellationData: CancelattionData;
+  orderFormCreationDate: string;
+  marketplaceRequestedCancellationWindow: null;
+}
+
+interface CancelattionData {
+  requestedByUser: true;
+  reason: string;
+  cancellationDate: string;
+  cancellationRequestId: string;
+  requestedBy: null;
+  cancellationSource: null;
+}
+
 interface Marketplace {
   baseURL: string;
   // deno-lint-ignore no-explicit-any
