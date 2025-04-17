@@ -1,86 +1,184 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-import type { VideoQuery, YoutubeVideoResponse, YoutubeVideoItem } from "../../utils/types.ts";
+import type { VideoQuery, YoutubeVideoResponse } from "../../utils/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
 export interface VideoSearchOptions {
   /**
-   * @description Termo de busca para pesquisar vídeos
+   * @description Search query term for videos
    */
   q: string;
+  
   /**
-   * @description Número máximo de resultados por página
+   * @description Maximum number of results per page
    */
   maxResults?: number;
+  
   /**
-   * @description Token para buscar a próxima página
+   * @description Token for fetching the next page
    */
   pageToken?: string;
+  
   /**
-   * @description Ordenação dos vídeos
+   * @description Video ordering method
    */
   order?: "date" | "rating" | "relevance" | "title" | "viewCount";
+  
   /**
-   * @description ID do canal para filtrar resultados (opcional)
+   * @description Channel ID to filter results
    */
   channelId?: string;
+  
   /**
-   * @description Data de publicação mínima (formato ISO 8601)
+   * @description Minimum publication date (ISO 8601 format)
    */
   publishedAfter?: string;
+  
   /**
-   * @description Data de publicação máxima (formato ISO 8601)
+   * @description Maximum publication date (ISO 8601 format)
    */
   publishedBefore?: string;
+  
   /**
-   * @description Categoria do vídeo
+   * @description Video category ID
    */
   videoCategoryId?: string;
+  
   /**
-   * @description Região para pesquisa (código de país ISO 3166-1 alpha-2)
+   * @description Region code for search (ISO 3166-1 alpha-2)
    */
   regionCode?: string;
+  
   /**
-   * @description Código de idioma (ISO 639-1)
+   * @description Language code (ISO 639-1)
    */
   relevanceLanguage?: string;
+  
   /**
-   * @description Token de autenticação do YouTube (opcional)
+   * @description YouTube authentication token (optional)
    */
   tokenYoutube?: string;
+  
   /**
-   * @description Buscar também vídeos privados (quando autenticado)
+   * @description Include private videos (when authenticated)
    */
   includePrivate?: boolean;
+  
   /**
-   * @description Filtrar apenas Shorts (vídeos verticais curtos)
+   * @description Filter only Shorts videos
    */
   onlyShorts?: boolean;
+  
   /**
-   * @description Excluir Shorts dos resultados
+   * @description Exclude Shorts from results
    */
   excludeShorts?: boolean;
+  
   /**
-   * @description Duração máxima dos vídeos em segundos (útil para Shorts)
+   * @description Maximum video duration in seconds
    */
   maxDuration?: number;
+  
+  /**
+   * @description Skip cache for this request
+   */
   skipCache?: boolean;
 }
 
+export interface SearchError {
+  code: number;
+  message: string;
+  details?: unknown;
+}
+
 interface SearchResponseItem {
+  kind: string;
+  etag: string;
   id: {
+    kind: string;
     videoId: string;
+  } | string;
+  snippet: {
+    publishedAt: string;
+    channelId: string;
+    title: string;
+    description: string;
+    channelTitle?: string;
+    thumbnails: {
+      default: { url: string; width: number; height: number };
+      medium?: { url: string; width: number; height: number };
+      high?: { url: string; width: number; height: number };
+    };
   };
 }
 
-interface VideoWithDuration extends YoutubeVideoItem {
+interface YoutubeSearchResponse {
+  kind: string;
+  etag: string;
+  nextPageToken?: string;
+  prevPageToken?: string;
+  regionCode?: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+  items: SearchResponseItem[];
+}
+
+interface VideoDetailsWithShorts {
+  kind: string;
+  etag: string;
+  id: string;
+  snippet: {
+    publishedAt: string;
+    channelId: string;
+    title: string;
+    description: string;
+    thumbnails: {
+      default: { url: string; width: number; height: number };
+      medium?: { url: string; width: number; height: number };
+      high?: { url: string; width: number; height: number };
+      standard?: { url: string; width: number; height: number };
+      maxres?: { url: string; width: number; height: number };
+    };
+    channelTitle: string;
+    tags?: string[];
+    categoryId: string;
+    liveBroadcastContent?: string;
+    localized?: {
+      title: string;
+      description: string;
+    };
+  };
+  contentDetails?: {
+    duration: string;
+    dimension: string;
+    definition: string;
+    caption: string;
+    licensedContent: boolean;
+    projection: string;
+  };
+  statistics?: {
+    viewCount: string;
+    likeCount: string;
+    favoriteCount: string;
+    commentCount: string;
+  };
+  status?: {
+    uploadStatus: string;
+    privacyStatus: string;
+    license: string;
+    embeddable: boolean;
+    publicStatsViewable: boolean;
+    madeForKids: boolean;
+  };
   isShort: boolean;
   durationInSeconds: number;
 }
 
 /**
  * @title Search YouTube Videos
- * @description Searches YouTube videos with various filtering criteria, with or without authentication, including filters for Shorts
+ * @description Searches YouTube videos with various filtering criteria, including advanced options for Shorts
  */
 export default async function loader(
   props: VideoSearchOptions,
@@ -88,7 +186,6 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<YoutubeVideoResponse | null> {
   const client = ctx.client;
-
   const accessToken = props.tokenYoutube || getAccessToken(req);
 
   const {
@@ -109,45 +206,32 @@ export default async function loader(
   } = props;
 
   if (!q) {
-    console.error("Nenhum termo de busca fornecido");
-    return null;
+    return createErrorResponse(400, "Search query is required");
   }
 
-  // Validação para evitar configurações conflitantes
   if (onlyShorts && excludeShorts) {
-    console.error(
-      "Configuração inválida: não é possível definir onlyShorts e excludeShorts simultaneamente",
-    );
-    return null;
-  }
-
-  const searchParams: VideoQuery = {
-    part: "snippet",
-    q,
-    maxResults: onlyShorts ? Math.max(maxResults * 2, 50) : maxResults, // Busca mais resultados quando filtrando shorts
-    order,
-    type: "video",
-  };
-
-  if (pageToken) searchParams.pageToken = pageToken;
-  if (channelId) searchParams.channelId = channelId;
-  if (publishedAfter) searchParams.publishedAfter = publishedAfter;
-  if (publishedBefore) searchParams.publishedBefore = publishedBefore;
-  if (videoCategoryId) searchParams.videoCategoryId = videoCategoryId;
-  if (regionCode) searchParams.regionCode = regionCode;
-  if (relevanceLanguage) searchParams.relevanceLanguage = relevanceLanguage;
-
-  // Aplicar videoDuration=short na busca quando filtrando por Shorts
-  if (onlyShorts) {
-    searchParams.videoDuration = "short"; // Vídeos curtos (< 4 minutos)
-  }
-
-  // Se tem token de acesso e quer incluir vídeos privados
-  if (accessToken && includePrivate) {
-    searchParams.forMine = true;
+    return createErrorResponse(400, "Invalid configuration: cannot set both onlyShorts and excludeShorts");
   }
 
   try {
+    const searchParams: VideoQuery = {
+      part: "snippet",
+      q,
+      maxResults: onlyShorts ? Math.max(maxResults * 2, 50) : maxResults,
+      order,
+      type: "video",
+    };
+
+    if (pageToken) searchParams.pageToken = pageToken;
+    if (channelId) searchParams.channelId = channelId;
+    if (publishedAfter) searchParams.publishedAfter = publishedAfter;
+    if (publishedBefore) searchParams.publishedBefore = publishedBefore;
+    if (videoCategoryId) searchParams.videoCategoryId = videoCategoryId;
+    if (regionCode) searchParams.regionCode = regionCode;
+    if (relevanceLanguage) searchParams.relevanceLanguage = relevanceLanguage;
+    if (onlyShorts) searchParams.videoDuration = "short";
+    if (accessToken && includePrivate) searchParams.forMine = true;
+
     const requestOptions = accessToken
       ? { 
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -155,25 +239,25 @@ export default async function loader(
         }
       : { ...STALE };
 
-    if (onlyShorts) console.log("Filtrando apenas por Shorts");
-    if (excludeShorts) console.log("Excluindo Shorts dos resultados");
+    const searchResponse = await client["GET /search"](searchParams, requestOptions);
+    
+    if (searchResponse.status === 401) {
+      ctx.response.headers.set("X-Token-Expired", "true");
+      ctx.response.headers.set("Cache-Control", "no-store");
+      return createErrorResponse(401, "Authentication token expired or invalid");
+    }
+    
+    if (!searchResponse.ok) {
+      return createErrorResponse(
+        searchResponse.status,
+        `Error searching videos: ${searchResponse.status}`,
+        await searchResponse.text()
+      );
+    }
 
-    const searchData = await client["GET /search"](
-      searchParams,
-      requestOptions,
-    ).then((res: Response) => {
-      // Verificar erro de autenticação
-      if (res.status === 401) {
-        // Sinalizar que o token está expirado
-        ctx.response.headers.set("X-Token-Expired", "true");
-        ctx.response.headers.set("Cache-Control", "no-store");
-        throw new Error("Token de autenticação expirado ou inválido");
-      }
-      return res;
-    }).then((res: Response) => res.json());
+    const searchData = await searchResponse.json() as YoutubeSearchResponse;
 
     if (!searchData.items || searchData.items.length === 0) {
-      console.log("Nenhum resultado encontrado para a busca");
       return {
         kind: "youtube#videoListResponse",
         items: [],
@@ -182,41 +266,43 @@ export default async function loader(
       };
     }
 
-    const videoIds = (searchData.items as SearchResponseItem[]).map((item) => item.id.videoId)
+    const videoIds = searchData.items
+      .map((item) => {
+        if (typeof item.id === 'object' && 'videoId' in item.id) {
+          return item.id.videoId;
+        }
+        return null;
+      })
+      .filter((id): id is string => id !== null)
       .join(",");
 
-    const detailsOptions = accessToken
-      ? { 
-          headers: { Authorization: `Bearer ${accessToken}` },
-          ...STALE
-        }
-      : { ...STALE };
-
-    // Para identificar Shorts corretamente, precisamos das dimensões e duração do vídeo
     const detailsParams = {
       part: "snippet,statistics,status,contentDetails",
       id: videoIds,
     };
 
-    const detailsData = await client["GET /videos"](
-      detailsParams,
-      detailsOptions,
-    ).then((res: Response) => res.json());
+    const detailsResponse = await client["GET /videos"](detailsParams, requestOptions);
+    
+    if (!detailsResponse.ok) {
+      return createErrorResponse(
+        detailsResponse.status,
+        `Error fetching video details: ${detailsResponse.status}`,
+        await detailsResponse.text()
+      );
+    }
+    
+    const detailsData = await detailsResponse.json() as {
+      items: Array<Omit<VideoDetailsWithShorts, 'isShort' | 'durationInSeconds'>>;
+    };
+    
+    let items: VideoDetailsWithShorts[] = [];
 
-    let items = detailsData.items || [];
-
-    // Processa itens para identificar e filtrar Shorts
-    if (items.length > 0) {
-      // Marca os itens que são Shorts baseado na duração e dimensões do vídeo
-      items = items.map((item: YoutubeVideoItem) => {
-        // Extrai a duração em segundos do formato ISO 8601 (PT1M30S)
+    if (detailsData.items && detailsData.items.length > 0) {
+      items = detailsData.items.map((item) => {
         const duration = item.contentDetails?.duration || "PT0S";
         const durationInSeconds = calculateDurationInSeconds(duration);
-
-        // Um vídeo é considerado Short se tiver menos de 60 segundos
         const isShort = durationInSeconds <= 60;
 
-        // Adiciona informação se é Short
         return {
           ...item,
           isShort,
@@ -224,24 +310,18 @@ export default async function loader(
         };
       });
 
-      // Filtrar apenas Shorts
       if (onlyShorts) {
-        items = items.filter((item: VideoWithDuration) => item.isShort);
-        items = items.slice(0, maxResults); // Limita ao número original solicitado
+        items = items.filter((item) => item.isShort).slice(0, maxResults);
+      } else if (excludeShorts) {
+        items = items.filter((item) => !item.isShort);
       }
 
-      // Excluir Shorts dos resultados
-      if (excludeShorts) {
-        items = items.filter((item: VideoWithDuration) => !item.isShort);
-      }
-
-      // Filtrar por duração máxima
       if (maxDuration) {
-        items = items.filter((item: VideoWithDuration) => item.durationInSeconds <= maxDuration);
+        items = items.filter((item) => item.durationInSeconds <= maxDuration);
       }
     }
 
-    const response: YoutubeVideoResponse = {
+    return {
       kind: "youtube#videoListResponse",
       items,
       nextPageToken: searchData.nextPageToken,
@@ -253,60 +333,56 @@ export default async function loader(
       regionCode: searchData.regionCode,
       isAuthenticated: !!accessToken,
     };
-
-    return response;
   } catch (error) {
-    console.error("Erro ao buscar vídeos:", error);
-    return null;
+    return createErrorResponse(
+      500,
+      "Error processing video search",
+      error instanceof Error ? error.message : String(error)
+    );
   }
 }
 
-/**
- * Converte uma duração ISO 8601 (PT1M30S) para segundos
- */
 function calculateDurationInSeconds(isoDuration: string): number {
-  // Remove o prefixo PT
   const duration = isoDuration.substring(2);
+  let seconds = 0, minutes = 0, hours = 0;
 
-  let seconds = 0;
-  let minutes = 0;
-  let hours = 0;
-
-  // Extrai horas, minutos e segundos
   const hoursMatch = duration.match(/(\d+)H/);
-  if (hoursMatch) {
-    hours = parseInt(hoursMatch[1], 10);
-  }
+  if (hoursMatch) hours = parseInt(hoursMatch[1], 10);
 
   const minutesMatch = duration.match(/(\d+)M/);
-  if (minutesMatch) {
-    minutes = parseInt(minutesMatch[1], 10);
-  }
+  if (minutesMatch) minutes = parseInt(minutesMatch[1], 10);
 
   const secondsMatch = duration.match(/(\d+)S/);
-  if (secondsMatch) {
-    seconds = parseInt(secondsMatch[1], 10);
-  }
+  if (secondsMatch) seconds = parseInt(secondsMatch[1], 10);
 
   return hours * 3600 + minutes * 60 + seconds;
 }
 
+function createErrorResponse(
+  code: number, 
+  message: string, 
+  details?: unknown
+): YoutubeVideoResponse {
+  return {
+    kind: "youtube#videoListResponse",
+    items: [],
+    pageInfo: { totalResults: 0, resultsPerPage: 0 },
+    error: { code, message, details }
+  } as YoutubeVideoResponse;
+}
+
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: VideoSearchOptions, req: Request, ctx: AppContext) => {
-  // Verificar se há flag de token expirado
+export const cacheKey = (props: VideoSearchOptions, req: Request) => {
   const tokenExpired = req.headers.get("X-Token-Expired") === "true";
 
-  // Não usar cache para buscas que dependem da autenticação do usuário ou quando o token expirou
   if (props.includePrivate || props.skipCache || tokenExpired) {
     return null;
   }
   
-  // Incluir fragmento do token na chave de cache, se disponível
   const accessToken = getAccessToken(req) || props.tokenYoutube;
   const tokenFragment = accessToken ? accessToken.slice(-8) : "";
   
-  // Cria parâmetros para a chave de cache
   const params = new URLSearchParams([
     ["q", props.q || ""],
     ["maxResults", (props.maxResults || 10).toString()],
@@ -324,8 +400,6 @@ export const cacheKey = (props: VideoSearchOptions, req: Request, ctx: AppContex
     ["tokenId", tokenFragment],
   ]);
   
-  // Ordenamos os parâmetros para garantir consistência na chave de cache
   params.sort();
-  
   return `youtube-search-${params.toString()}`;
 };
