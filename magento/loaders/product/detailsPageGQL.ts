@@ -77,7 +77,7 @@ async function loader(
   }
 
   const productCanonicalUrl = new URL(
-    (defaultPath ?? "") + product?.canonical_url ?? "",
+    (defaultPath ?? "") + product?.canonical_url || "",
     url.origin,
   );
 

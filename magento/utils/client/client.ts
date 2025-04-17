@@ -65,6 +65,11 @@ export interface API {
     response: CartFromAPI;
   };
 
+  /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/carts#operation/GetV1CartsMine */
+  "GET /rest/:site/V1/carts/mine": {
+    response: CartFromAPI;
+  };
+
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/guest-cartscartId#operation/GetV1GuestcartsCartId */
   "GET /rest/:site/V1/guest-carts/:cartId": {
     response: CartFromAPI;

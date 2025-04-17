@@ -187,6 +187,7 @@ export type State =
   & {
     clientAdmin: ReturnType<typeof createHttpClient<API>>;
     clientGraphql: ReturnType<typeof createGraphqlClient>;
+    clientAdminAuthenticated: ReturnType<typeof createHttpClient<API>>;
     cartConfigs: CartConfigs;
     features: Features;
   }
