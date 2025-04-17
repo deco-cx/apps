@@ -1,6 +1,7 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-import type { VideoQuery, YoutubeVideoResponse } from "../../utils/types.ts";
+import type { VideoQuery, YoutubeVideoResponse, YoutubeVideoItem } from "../../utils/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 
 export interface VideoSearchOptions {
   /**
@@ -63,6 +64,18 @@ export interface VideoSearchOptions {
    * @description Duração máxima dos vídeos em segundos (útil para Shorts)
    */
   maxDuration?: number;
+  skipCache?: boolean;
+}
+
+interface SearchResponseItem {
+  id: {
+    videoId: string;
+  };
+}
+
+interface VideoWithDuration extends YoutubeVideoItem {
+  isShort: boolean;
+  durationInSeconds: number;
 }
 
 /**
@@ -74,7 +87,7 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<YoutubeVideoResponse | null> {
-  const client = ctx.api;
+  const client = ctx.client;
 
   const accessToken = props.tokenYoutube || getAccessToken(req);
 
@@ -136,8 +149,11 @@ export default async function loader(
 
   try {
     const requestOptions = accessToken
-      ? { headers: { Authorization: `Bearer ${accessToken}` } }
-      : undefined;
+      ? { 
+          headers: { Authorization: `Bearer ${accessToken}` },
+          ...STALE
+        }
+      : { ...STALE };
 
     if (onlyShorts) console.log("Filtrando apenas por Shorts");
     if (excludeShorts) console.log("Excluindo Shorts dos resultados");
@@ -145,7 +161,7 @@ export default async function loader(
     const searchData = await client["GET /search"](
       searchParams,
       requestOptions,
-    ).then((res) => res.json());
+    ).then((res: Response) => res.json());
 
     if (!searchData.items || searchData.items.length === 0) {
       console.log("Nenhum resultado encontrado para a busca");
@@ -157,14 +173,15 @@ export default async function loader(
       };
     }
 
-    const videoIds = searchData.items.map((item: unknown) => item.id.videoId)
-      .join(
-        ",",
-      );
+    const videoIds = (searchData.items as SearchResponseItem[]).map((item) => item.id.videoId)
+      .join(",");
 
     const detailsOptions = accessToken
-      ? { headers: { Authorization: `Bearer ${accessToken}` } }
-      : undefined;
+      ? { 
+          headers: { Authorization: `Bearer ${accessToken}` },
+          ...STALE
+        }
+      : { ...STALE };
 
     // Para identificar Shorts corretamente, precisamos das dimensões e duração do vídeo
     const detailsParams = {
@@ -175,14 +192,14 @@ export default async function loader(
     const detailsData = await client["GET /videos"](
       detailsParams,
       detailsOptions,
-    ).then((res) => res.json());
+    ).then((res: Response) => res.json());
 
     let items = detailsData.items || [];
 
     // Processa itens para identificar e filtrar Shorts
     if (items.length > 0) {
       // Marca os itens que são Shorts baseado na duração e dimensões do vídeo
-      items = items.map((item) => {
+      items = items.map((item: YoutubeVideoItem) => {
         // Extrai a duração em segundos do formato ISO 8601 (PT1M30S)
         const duration = item.contentDetails?.duration || "PT0S";
         const durationInSeconds = calculateDurationInSeconds(duration);
@@ -200,18 +217,18 @@ export default async function loader(
 
       // Filtrar apenas Shorts
       if (onlyShorts) {
-        items = items.filter((item) => item.isShort);
+        items = items.filter((item: VideoWithDuration) => item.isShort);
         items = items.slice(0, maxResults); // Limita ao número original solicitado
       }
 
       // Excluir Shorts dos resultados
       if (excludeShorts) {
-        items = items.filter((item) => !item.isShort);
+        items = items.filter((item: VideoWithDuration) => !item.isShort);
       }
 
       // Filtrar por duração máxima
       if (maxDuration) {
-        items = items.filter((item) => item.durationInSeconds <= maxDuration);
+        items = items.filter((item: VideoWithDuration) => item.durationInSeconds <= maxDuration);
       }
     }
 
@@ -248,12 +265,50 @@ function calculateDurationInSeconds(isoDuration: string): number {
 
   // Extrai horas, minutos e segundos
   const hoursMatch = duration.match(/(\d+)H/);
-  const minutesMatch = duration.match(/(\d+)M/);
-  const secondsMatch = duration.match(/(\d+)S/);
+  if (hoursMatch) {
+    hours = parseInt(hoursMatch[1], 10);
+  }
 
-  if (hoursMatch) hours = parseInt(hoursMatch[1]);
-  if (minutesMatch) minutes = parseInt(minutesMatch[1]);
-  if (secondsMatch) seconds = parseInt(secondsMatch[1]);
+  const minutesMatch = duration.match(/(\d+)M/);
+  if (minutesMatch) {
+    minutes = parseInt(minutesMatch[1], 10);
+  }
+
+  const secondsMatch = duration.match(/(\d+)S/);
+  if (secondsMatch) {
+    seconds = parseInt(secondsMatch[1], 10);
+  }
 
   return hours * 3600 + minutes * 60 + seconds;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: VideoSearchOptions, req: Request, ctx: AppContext) => {
+  // Não usar cache para buscas que dependem da autenticação do usuário
+  if (props.includePrivate || props.skipCache) {
+    return null;
+  }
+  
+  // Cria parâmetros para a chave de cache
+  const params = new URLSearchParams([
+    ["q", props.q || ""],
+    ["maxResults", (props.maxResults || 10).toString()],
+    ["pageToken", props.pageToken || ""],
+    ["order", props.order || "relevance"],
+    ["channelId", props.channelId || ""],
+    ["publishedAfter", props.publishedAfter || ""],
+    ["publishedBefore", props.publishedBefore || ""],
+    ["videoCategoryId", props.videoCategoryId || ""],
+    ["regionCode", props.regionCode || ""],
+    ["relevanceLanguage", props.relevanceLanguage || ""],
+    ["onlyShorts", (props.onlyShorts || false).toString()],
+    ["excludeShorts", (props.excludeShorts || false).toString()],
+    ["maxDuration", props.maxDuration?.toString() || ""],
+  ]);
+  
+  // Ordenamos os parâmetros para garantir consistência na chave de cache
+  params.sort();
+  
+  return `youtube-search-${params.toString()}`;
+};

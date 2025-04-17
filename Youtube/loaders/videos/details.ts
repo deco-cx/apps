@@ -4,6 +4,7 @@ import type {
   YouTubeCaptionListResponse,
   YoutubeVideoResponse,
 } from "../../utils/types.ts";
+import { STALE } from "../../../utils/fetch.ts";
 
 export interface VideoDetailsOptions {
   /**
@@ -34,6 +35,8 @@ export interface VideoDetailsOptions {
   includeCaptions?: boolean;
 
   tokenYoutube?: string;
+
+  skipCache?: boolean;
 }
 
 interface VideoDetailsResponse {
@@ -74,7 +77,11 @@ export default async function loader(
   const videoResponse = await client["GET /videos"]({
     part: partString,
     id: videoId,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } });
+  }, { 
+    headers: { Authorization: `Bearer ${accessToken}` },
+    ...STALE
+  });
+  
   const videoData = await videoResponse.json();
 
   if (!videoData.items || videoData.items.length === 0) {
@@ -91,9 +98,10 @@ export default async function loader(
       const captionsData = await client["GET /captions"]({
         part: "snippet",
         videoId,
-      }, { headers: { Authorization: `Bearer ${accessToken}` } }).then((res) =>
-        res.json()
-      );
+      }, { 
+        headers: { Authorization: `Bearer ${accessToken}` },
+        ...STALE 
+      }).then((res) => res.json());
 
       response.captions = captionsData;
     } catch (error) {
@@ -103,3 +111,28 @@ export default async function loader(
 
   return response;
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: VideoDetailsOptions, req: Request, ctx: AppContext) => {
+  const accessToken = getAccessToken(req) || props.tokenYoutube;
+  
+  if (!accessToken || !props.videoId) {
+    return null;
+  }
+  
+  const params = new URLSearchParams([
+    ["videoId", props.videoId],
+    ["parts", (props.parts || ["snippet", "statistics", "status"]).join(",")],
+    ["includeCaptions", (props.includeCaptions ?? true).toString()],
+    ["includePrivate", (props.includePrivate ?? false).toString()],
+  ]);
+  
+  if (props.skipCache) {
+    return null;
+  }
+  
+  params.sort();
+  
+  return `youtube-video-details-${params.toString()}`;
+};
