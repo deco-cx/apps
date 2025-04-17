@@ -4,6 +4,7 @@ import { stringify } from "./cookies.ts";
 
 export const VTEX_ID_CLIENT_COOKIE = "VtexIdclientAutCookie";
 export const CHECKOUT_DATA_ACCESS_COOKIE = "CheckoutDataAccess";
+export const VTEX_CHKO_AUTH = "Vtex_CHKO_Auth";
 
 interface CookiePayload {
   sub: string; // user email
@@ -18,7 +19,8 @@ export const parseCookie = (headers: Headers, account: string) => {
   const cookies = Object.fromEntries(
     Object.entries(getCookies(headers)).filter(([key]) =>
       key.startsWith(VTEX_ID_CLIENT_COOKIE) ||
-      key.startsWith(CHECKOUT_DATA_ACCESS_COOKIE)
+      key.startsWith(CHECKOUT_DATA_ACCESS_COOKIE) ||
+      key.startsWith(VTEX_CHKO_AUTH)
     ),
   );
   const cookie = cookies[VTEX_ID_CLIENT_COOKIE] ||
