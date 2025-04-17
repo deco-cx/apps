@@ -4,12 +4,7 @@ import { getAccessToken, setAccessTokenCookie } from "../../utils/cookieAccessTo
 import type { YoutubeTokenResponse } from "../../utils/types.ts";
 
 export type AuthenticationResult = {
-  user: {
-    login: string;
-    avatar_url: string;
-  };
   authorizationUrl: string;
-  channelData: unknown;
   accessToken: string | null;
 };
 
@@ -62,64 +57,11 @@ export default async function loader(
     clientSecret: clientSecretString,
     redirectUri
   });
-
-  const channelData = await getChannelData({
-    accessToken,
-    ctx,
-    req
-  });
-
-  const avatarUrl = getAvatarUrl(channelData);
-
-  const user = {
-    login: accessToken ? "YouTube User" : "Visitante",
-    avatar_url: avatarUrl,
-  };
   
   return {
-    user,
     authorizationUrl,
-    channelData,
     accessToken,
   };
-}
-
-function getAvatarUrl(channelData: unknown): string {
-  if (!channelData || typeof channelData !== 'object') {
-    return "";
-  }
-  
-  try {
-    // @ts-ignore - Tratamos as propriedades do channelData de forma segura em runtime
-    const items = (channelData as any).items;
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return "";
-    }
-    
-    const channel = items[0];
-    if (!channel || typeof channel !== 'object') {
-      return "";
-    }
-    
-    const snippet = channel.snippet;
-    if (!snippet || typeof snippet !== 'object') {
-      return "";
-    }
-    
-    const thumbnails = snippet.thumbnails;
-    if (!thumbnails || typeof thumbnails !== 'object') {
-      return "";
-    }
-    
-    const defaultThumb = thumbnails.default;
-    if (!defaultThumb || typeof defaultThumb !== 'object') {
-      return "";
-    }
-    
-    return defaultThumb.url || "";
-  } catch {
-    return "";
-  }
 }
 
 async function getAccessTokenForRequest({
@@ -139,12 +81,10 @@ async function getAccessTokenForRequest({
   clientSecret: string;
   redirectUri: string;
 }): Promise<string | null> {
-  // Se já temos um token, simplesmente o retornamos
   if (initialAccessToken) {
     return initialAccessToken;
   }
-  
-  // Se não temos token, mas temos código de autorização, obtemos um novo token
+
   if (code) {
     try {
       const tokenData = await exchangeCodeForToken({
@@ -167,39 +107,7 @@ async function getAccessTokenForRequest({
     }
   }
   
-  // Não temos nem token nem código
   return null;
-}
-
-async function getChannelData({
-  accessToken,
-  ctx,
-  req
-}: {
-  accessToken: string | null;
-  ctx: AppContext;
-  req: Request;
-}): Promise<unknown> {
-  if (!accessToken) {
-    return null;
-  }
-  
-  try {
-    // Seleciona qual endpoint chamar dependendo do URL do pedido
-    const isNewRequest = new URL(req.url).searchParams.has("code");
-    
-    if (isNewRequest) {
-      return await ctx.invoke.Youtube.loaders.channels({
-        accessToken,
-      });
-    } else {
-      return await ctx.invoke.Youtube.loaders.channels.get({
-        accessToken,
-      });
-    }
-  } catch (_error) {
-    return null;
-  }
 }
 
 async function exchangeCodeForToken({

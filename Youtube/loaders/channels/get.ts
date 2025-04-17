@@ -18,6 +18,8 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<YoutubeChannelResponse | null> {
+  console.log(req.credentials);
+  console.log(req);
   const client = ctx.client;
   const accessToken = getAccessToken(req) || props.tokenYoutube;
 
