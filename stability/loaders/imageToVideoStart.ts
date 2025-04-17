@@ -134,8 +134,7 @@ export default async function imageToVideoStart(
     console.log("Image-to-video generation started. ID:", result.id);
 
     return {
-      previewUrl:
-        `${previewUrl}/${result.id}?presignedUrl=${presignedUrl}`,
+      previewUrl: `${previewUrl}/${result.id}?presignedUrl=${presignedUrl}`,
     };
   } catch (error) {
     console.error("Error starting image-to-video generation:", error);
