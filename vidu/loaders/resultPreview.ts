@@ -5,8 +5,11 @@ export interface Props {
   presignedUrl?: string;
 }
 
+export const PREVIEW_URL =
+  "https://mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
+
 const RESULT_URL =
-  "https://localhost-franca--mcp.deco.site/live/invoke/vidu/loaders/getGenerationResult.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
+  "https://mcp.deco.site/live/invoke/vidu/loaders/getGenerationResult.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
 
 /**
  * @title Preview Loader
