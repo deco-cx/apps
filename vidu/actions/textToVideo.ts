@@ -5,6 +5,7 @@ import type {
   TextToVideoResponseBody,
 } from "../client.ts";
 import { PREVIEW_URL } from "../loaders/resultPreview.ts";
+import { getInstallId } from "../utils.ts";
 
 export type Props = TextToVideoRequestBody;
 
@@ -41,7 +42,8 @@ const action = async (
   };
 
   const url = new URL(req.url);
-  const installId = url.searchParams.get("installId");
+
+  const installId = getInstallId(url);
 
   const response = await ctx.api["POST /ent/v2/text2video"]({}, {
     body: payload,

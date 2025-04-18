@@ -4,6 +4,8 @@ import type {
   StartEndToVideoResponseBody,
 } from "../client.ts";
 import { PREVIEW_URL } from "../loaders/resultPreview.ts";
+import { getInstallId } from "../utils.ts";
+
 export type Props = StartEndToVideoRequestBody;
 
 export interface Result {
@@ -52,7 +54,7 @@ const action = async (
   }
 
   const url = new URL(req.url);
-  const installId = url.searchParams.get("installId");
+  const installId = getInstallId(url);
 
   const payload = {
     ...props,
