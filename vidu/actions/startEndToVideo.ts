@@ -3,11 +3,8 @@ import type {
   StartEndToVideoRequestBody,
   StartEndToVideoResponseBody,
 } from "../client.ts";
-
+import { PREVIEW_URL } from "../loaders/resultPreview.ts";
 export type Props = StartEndToVideoRequestBody;
-
-const PREVIEW_URL =
-  "https://localhost-franca--mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
 
 export interface Result {
   /**
@@ -29,6 +26,7 @@ export interface Result {
 
 /**
  * @title Start-End to Video
+ * @name START_END_TO_VIDEO
  * @description Generates a video that smoothly transitions from a start frame to an end frame using the Vidu API.
  *
  * This action requires exactly two images:

@@ -4,11 +4,9 @@ import type {
   TextToVideoRequestBody,
   TextToVideoResponseBody,
 } from "../client.ts";
+import { PREVIEW_URL } from "../loaders/resultPreview.ts";
 
 export type Props = TextToVideoRequestBody;
-
-const PREVIEW_URL =
-  "https://localhost-franca--mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
 
 export interface Result {
   /**
@@ -30,6 +28,7 @@ export interface Result {
 /**
  * @title Text to Video
  * @description Generates a video from a text prompt using the Vidu API. The result will be available in a preview page.
+ * @name TEXT_TO_VIDEO
  */
 const action = async (
   props: Props,

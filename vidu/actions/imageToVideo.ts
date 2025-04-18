@@ -3,11 +3,9 @@ import type {
   ImageToVideoRequestBody,
   ImageToVideoResponseBody,
 } from "../client.ts";
+import { PREVIEW_URL } from "../loaders/resultPreview.ts";
 
 export type Props = ImageToVideoRequestBody;
-
-const PREVIEW_URL =
-  "https://localhost-franca--mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
 
 export interface Result {
   /**
@@ -30,14 +28,13 @@ export interface Result {
 /**
  * @title Image to Video
  * @description Generates a video from a starting image using the Vidu API.
+ * @name IMAGE_TO_VIDEO
  */
 const action = async (
   props: Props,
   _req: Request,
   ctx: AppContext,
 ): Promise<ImageToVideoResponseBody | Result> => {
-  console.log({ props, ctx });
-
   const payload = {
     ...props,
     model: props.model ?? "vidu2.0",
