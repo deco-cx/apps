@@ -32,9 +32,12 @@ export interface Result {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<ReferenceToVideoResponseBody | Result> => {
+  const url = new URL(req.url);
+  const installId = url.searchParams.get("installId");
+
   const payload = {
     ...props,
     model: props.model ?? "vidu2.0",
@@ -50,7 +53,7 @@ const action = async (
     return {
       status: "success",
       previewUrl:
-        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${ctx.installId}`,
+        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${installId}`,
       message:
         "Video generation started. The video will be available at the previewUrl.",
     };

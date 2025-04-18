@@ -32,13 +32,16 @@ export interface Result {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
 ): Promise<TextToVideoResponseBody | Result> => {
   const payload = {
     ...props,
     model: props.model ?? "vidu1.5" as TextToVideoModel,
   };
+
+  const url = new URL(req.url);
+  const installId = url.searchParams.get("installId");
 
   const response = await ctx.api["POST /ent/v2/text2video"]({}, {
     body: payload,
@@ -50,7 +53,7 @@ const action = async (
     return {
       status: "success",
       previewUrl:
-        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${ctx.installId}`,
+        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${installId}`,
       message:
         "Video generation started. The video will be available at the previewUrl.",
     };

@@ -18,7 +18,6 @@ export interface Props {
 
 export interface State {
   api: ReturnType<typeof createHttpClient<ViduClient>>;
-  installId: string;
 }
 
 /**
@@ -29,7 +28,6 @@ export interface State {
  */
 export default function App(
   props: Props,
-  req: Request,
 ): App<Manifest, State> {
   const { apiKey } = props;
   const stringToken = typeof apiKey === "string"
@@ -45,14 +43,7 @@ export default function App(
     fetcher: fetchSafe,
   });
 
-  const url = new URL(req.url);
-  const installId = url.searchParams.get("installId");
-
-  if (!installId) {
-    throw new Error("Install ID is required");
-  }
-
-  const state = { api, installId };
+  const state = { api };
 
   return {
     state,
