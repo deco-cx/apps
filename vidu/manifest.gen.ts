@@ -3,21 +3,22 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/imageToVideo.ts";
-import * as $$$$$$$$$$0 from "./actions/textToVideo.ts";
-import * as $$$$$$$$$$1 from "./actions/referenceToVideo.ts";
-import * as $$$$$$$$$$2 from "./actions/startEndToVideo.ts";
+import * as $$$$$$$$$1 from "./actions/referenceToVideo.ts";
+import * as $$$$$$$$$2 from "./actions/startEndToVideo.ts";
+import * as $$$$$$$$$3 from "./actions/textToVideo.ts";
 import * as $$$0 from "./loaders/getGenerationResult.ts";
-import * as $$$$0 from "./loaders/resultPreview.ts";
+import * as $$$1 from "./loaders/resultPreview.ts";
+
 const manifest = {
-  "actions": {
-    "vidu/actions/imageToVideo.ts": $$$$$$$$$0,
-    "vidu/actions/textToVideo.ts": $$$$$$$$$$0,
-    "vidu/actions/referenceToVideo.ts": $$$$$$$$$$1,
-    "vidu/actions/startEndToVideo.ts": $$$$$$$$$$2,
-  },
   "loaders": {
     "vidu/loaders/getGenerationResult.ts": $$$0,
-    "vidu/loaders/resultPreview.ts": $$$$0,
+    "vidu/loaders/resultPreview.ts": $$$1,
+  },
+  "actions": {
+    "vidu/actions/imageToVideo.ts": $$$$$$$$$0,
+    "vidu/actions/referenceToVideo.ts": $$$$$$$$$1,
+    "vidu/actions/startEndToVideo.ts": $$$$$$$$$2,
+    "vidu/actions/textToVideo.ts": $$$$$$$$$3,
   },
   "name": "vidu",
   "baseUrl": import.meta.url,
