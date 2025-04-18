@@ -44,8 +44,6 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<StartEndToVideoResponseBody | Result> => {
-  console.log({ props, ctx });
-
   // Validate that exactly 2 images are provided
   if (props.images.length !== 2) {
     throw new Error(
@@ -68,7 +66,7 @@ const action = async (
     return {
       status: "success",
       previewUrl:
-        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}`,
+        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${ctx.installId}`,
       message:
         "Video generation started. The video will transition smoothly from the start frame to the end frame and will be available at the previewUrl.",
     };
