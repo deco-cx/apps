@@ -1,4 +1,4 @@
-import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
+import { Userorderdetails, Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
   Category,
@@ -9,7 +9,6 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
-  OrderPlaced,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -17,13 +16,10 @@ import {
   SimulationItem,
   SimulationOrderForm,
   SPEvent,
-  Suggestion
+  Suggestion,
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
-  "GET /api/checkout/pub/orders/:orderId": {
-    response: OrderPlaced;
-  }
   "POST /api/checkout/pub/orderForm/:orderFormId/messages/clear": {
     // deno-lint-ignore no-explicit-any
     body: Record<any, never>;
@@ -251,6 +247,12 @@ export interface VTEXCommerceStable {
   };
   "GET /api/oms/user/orders": {
     response: Userorderslist;
+  };
+  "GET /api/oms/user/orders/:orderId": {
+    searchParams: {
+      clientEmail?: string;
+    };
+    response: Userorderdetails;
   };
 }
 
