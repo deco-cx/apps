@@ -32,7 +32,7 @@ export default async function loader(
   );
   const cookie = stringify(cookies);
 
-  const order = await vcsDeprecated["GET /api/checkout/pub/orders/:orderId"]({
+  const order = await vcsDeprecated["GET /api/oms/user/orders/:orderId"]({
     orderId,
   }, {
     headers: { cookie },
