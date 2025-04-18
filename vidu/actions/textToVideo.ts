@@ -40,8 +40,6 @@ const action = async (
     model: props.model ?? "vidu1.5" as TextToVideoModel,
   };
 
-  console.log({ payload });
-
   const response = await ctx.api["POST /ent/v2/text2video"]({}, {
     body: payload,
   });
@@ -52,7 +50,7 @@ const action = async (
     return {
       status: "success",
       previewUrl:
-        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}`,
+        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${ctx.installId}`,
       message:
         "Video generation started. The video will be available at the previewUrl.",
     };
