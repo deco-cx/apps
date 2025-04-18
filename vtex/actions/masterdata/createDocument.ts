@@ -44,4 +44,5 @@ const action = async (
   return response.json();
 };
 
+export const defaultVisibility = "private";
 export default action;
