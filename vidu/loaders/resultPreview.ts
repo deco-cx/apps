@@ -6,10 +6,10 @@ export interface Props {
 }
 
 export const PREVIEW_URL =
-  "https://mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
+  "https://mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=Vidu&installId=0c0a25e6-269e-4cfb-b7d0-0356e47dde8f";
 
 const RESULT_URL =
-  "https://mcp.deco.site/live/invoke/vidu/loaders/getGenerationResult.ts?appName=site-apps-deco-vidu-ts&installId=cdc1a2d0-079a-4c50-9683-e8ac15326ec0";
+  "https://mcp.deco.site/live/invoke/vidu/loaders/getGenerationResult.ts?appName=Vidu&installId=0c0a25e6-269e-4cfb-b7d0-0356e47dde8f";
 
 /**
  * @title Preview Loader
