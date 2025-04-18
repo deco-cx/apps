@@ -47,6 +47,7 @@ const config = {
     app("linx-impulse"),
     app("shopify"),
     app("stability"),
+    app("vidu"),
     app("nuvemshop"),
     app("streamshop"),
     app("brasilapi"),
