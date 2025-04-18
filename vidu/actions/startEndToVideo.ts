@@ -30,11 +30,11 @@ export interface Result {
 /**
  * @title Start-End to Video
  * @description Generates a video that smoothly transitions from a start frame to an end frame using the Vidu API.
- * 
+ *
  * This action requires exactly two images:
  * - The first image is used as the starting frame of the video
  * - The second image is used as the ending frame of the video
- * 
+ *
  * The model will create a smooth, fluid transition between these two frames.
  * For best results:
  * - The pixel density of both images should be similar (ratio between 0.8 and 1.25)
@@ -50,7 +50,9 @@ const action = async (
 
   // Validate that exactly 2 images are provided
   if (props.images.length !== 2) {
-    throw new Error("Start-End to Video requires exactly 2 images - the first is used as the start frame and the second as the end frame.");
+    throw new Error(
+      "Start-End to Video requires exactly 2 images - the first is used as the start frame and the second as the end frame.",
+    );
   }
 
   const payload = {
@@ -67,7 +69,8 @@ const action = async (
   if (result.state !== "failed") {
     return {
       status: "success",
-      previewUrl: `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}`,
+      previewUrl:
+        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}`,
       message:
         "Video generation started. The video will transition smoothly from the start frame to the end frame and will be available at the previewUrl.",
     };
@@ -76,4 +79,4 @@ const action = async (
   return result;
 };
 
-export default action; 
+export default action;
