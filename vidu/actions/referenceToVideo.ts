@@ -4,7 +4,7 @@ import type {
   ReferenceToVideoResponseBody,
 } from "../client.ts";
 import { PREVIEW_URL } from "../loaders/resultPreview.ts";
-
+import { getInstallId } from "../utils.ts";
 export type Props = ReferenceToVideoRequestBody;
 
 export interface Result {
@@ -36,7 +36,7 @@ const action = async (
   ctx: AppContext,
 ): Promise<ReferenceToVideoResponseBody | Result> => {
   const url = new URL(req.url);
-  const installId = url.searchParams.get("installId");
+  const installId = getInstallId(url);
 
   const payload = {
     ...props,
