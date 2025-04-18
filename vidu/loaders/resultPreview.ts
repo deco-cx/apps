@@ -6,10 +6,10 @@ export interface Props {
 }
 
 export const PREVIEW_URL =
-  "https://mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=Vidu&installId=0c0a25e6-269e-4cfb-b7d0-0356e47dde8f";
+  "https://mcp.deco.site/live/invoke/vidu/loaders/resultPreview.ts?appName=Vidu";
 
 const RESULT_URL =
-  "https://mcp.deco.site/live/invoke/vidu/loaders/getGenerationResult.ts?appName=Vidu&installId=0c0a25e6-269e-4cfb-b7d0-0356e47dde8f";
+  "https://mcp.deco.site/live/invoke/vidu/loaders/getGenerationResult.ts?appName=Vidu";
 
 /**
  * @title Preview Loader
@@ -17,13 +17,16 @@ const RESULT_URL =
  */
 export default function PreviewLoader(
   props: Props,
-  _req: Request,
+  req: Request,
   _ctx: AppContext,
 ): Response {
   const {
     generationId,
     presignedUrl,
   } = props;
+
+  const url = new URL(req.url);
+  const installId = url.searchParams.get("installId");
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -70,7 +73,9 @@ export default function PreviewLoader(
 
     <script>
         const generationId = ${JSON.stringify(generationId)};
-        const targetUrl = ${JSON.stringify(RESULT_URL)};
+        const targetUrl = ${
+    JSON.stringify(RESULT_URL + "&installId=" + installId)
+  };
         const presignedUrl = ${JSON.stringify(presignedUrl)};
         const elements = {
             container: document.getElementById('container'),

@@ -50,7 +50,7 @@ const action = async (
     return {
       status: "success",
       previewUrl:
-        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}`,
+        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${ctx.installId}`,
       message:
         "Video generation started. The video will be available at the previewUrl.",
     };

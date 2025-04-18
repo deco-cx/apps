@@ -18,6 +18,7 @@ export interface Props {
 
 export interface State {
   api: ReturnType<typeof createHttpClient<ViduClient>>;
+  installId: string;
 }
 
 /**
@@ -26,7 +27,10 @@ export interface State {
  * @category AI & Generative
  * @logo https://asset.swimm.io/Users/user-l0dshhh3e7f6y2y2/logo-vidu.png?א=0
  */
-export default function App(props: Props): App<Manifest, State> {
+export default function App(
+  props: Props,
+  req: Request,
+): App<Manifest, State> {
   const { apiKey } = props;
   const stringToken = typeof apiKey === "string"
     ? apiKey
@@ -41,7 +45,14 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  const state = { api };
+  const url = new URL(req.url);
+  const installId = url.searchParams.get("installId");
+
+  if (!installId) {
+    throw new Error("Install ID is required");
+  }
+
+  const state = { api, installId };
 
   return {
     state,

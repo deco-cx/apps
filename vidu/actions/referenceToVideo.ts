@@ -35,8 +35,6 @@ const action = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<ReferenceToVideoResponseBody | Result> => {
-  console.log({ props, ctx });
-
   const payload = {
     ...props,
     model: props.model ?? "vidu2.0",
@@ -52,7 +50,7 @@ const action = async (
     return {
       status: "success",
       previewUrl:
-        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}`,
+        `${PREVIEW_URL}&generationId=${result.task_id}&presignedUrl=${props.presignedUrl}&installId=${ctx.installId}`,
       message:
         "Video generation started. The video will be available at the previewUrl.",
     };
