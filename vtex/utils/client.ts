@@ -1,4 +1,4 @@
-import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
+import { Userorderdetails, Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
   Category,
@@ -247,6 +247,12 @@ export interface VTEXCommerceStable {
   };
   "GET /api/oms/user/orders": {
     response: Userorderslist;
+  };
+  "GET /api/oms/user/orders/:orderId": {
+    searchParams: {
+      clientEmail?: string;
+    };
+    response: Userorderdetails;
   };
 }
 
