@@ -19,7 +19,7 @@ export type AppContext = FnContext<State, Manifest>;
 /**
  * @name Figma
  * @title Figma
- * @description A Deco app to interact with the Figma APIs with strongly typed responses
+ * @description A Deco app to interact with the Figma APIs with strongly typed responses.
  * @logo https://upload.wikimedia.org/wikipedia/commons/a/ad/Figma-1-logo.png
  */
 export default function App(props: Props): App<Manifest, State> {
