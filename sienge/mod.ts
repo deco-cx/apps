@@ -35,6 +35,7 @@ export interface State extends Props {
  * @name Sienge
  * @description Integração com a plataforma Sienge para acesso a APIs de gestão de construção e imobiliário
  * @category ERP
+ * @logo https://media.licdn.com/dms/image/v2/D4D0BAQE7QJ0HviVfDQ/company-logo_200_200/company-logo_200_200/0/1724160303900/sienge_logo?e=2147483647&v=beta&t=TCwObJ02XhVO6HNoVjU8zMFJHtrMGVY6TQHFFE0Cmno
  */
 export default function App(props: Props): App<Manifest, State> {
   const { subdomain, username, password: _password } = props;
