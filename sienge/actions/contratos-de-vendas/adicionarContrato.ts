@@ -1,8 +1,8 @@
 import { AppContext } from "../../mod.ts";
 import {
   ContractAttachment,
-  ContractInstallment,
   ContractGuarantor,
+  ContractInstallment,
   createSalesContractsClient,
   SalesContractInsert,
 } from "../../clients/salesContracts.ts";
