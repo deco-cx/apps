@@ -1,0 +1,284 @@
+swagger: "2.0"
+info:
+  description: API de listagem de bens móveis
+  version: "1.0"
+  title: Bens móveis
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Bens móveis
+    description: API de listagem de bens móveis
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /patrimony/movable:
+    get:
+      operationId: getPatrimonyMovable
+      tags:
+        - Bens móveis
+      description: Lista os bens ordenados por código do patrimônio.
+      produces:
+        - application/json
+      parameters:
+        - name: patrimonyId
+          in: query
+          type: integer
+          description: Código do patrimônio.
+        - name: barCode
+          in: query
+          type: string
+          description: Código de barras/RFID.
+        - name: costCenter
+          in: query
+          type: string
+          description: Empreendimento/Centro de custo
+        - name: model
+          in: query
+          type: integer
+          description: Modelo
+        - name: plateId
+          in: query
+          type: string
+          description: Plaqueta/Placa
+        - name: situation
+          in: query
+          type: string
+          enum: [A, B]
+          description: Situação do bem podendo ser A - Ativo ou B - Baixados
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/PaginationResult"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  PaginationResult:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista dos bens retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/MovableAssets"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  MovableAssets:
+    type: object
+    properties:
+      patrimonyId:
+        type: integer
+        description: Código do patrimônio
+        example: 10
+      detail:
+        type: string
+        description: Detalhamento
+        example: Detalhe do bem
+      prefix:
+        type: string
+        description: Prefixo
+      brand:
+        type: string
+        description: Marca
+      model:
+        type: string
+        description: Modelo
+      observation:
+        type: string
+        description: Observação
+      barCode:
+        type: string
+        description: Código de barras/RFID
+        example: "55699815"
+      costCenter:
+        type: integer
+        description: Centro de custo
+        example: 5
+      plateId:
+        type: string
+        description: Plaqueta/Placa
+        example: AAA-1234
+      situation:
+        type: string
+        description: Situação do bem
+        example: A
+      preservation:
+        type: string
+        description: Estado de conservação
+      color:
+        type: string
+        description: Cor
+        example: Azul
+      useFuel:
+        type: boolean
+        description: Utiliza combustível
+      fuel:
+        type: string
+        description: Combustível
+        example: Gasolina
+      serialNumber:
+        type: string
+        description: Nº de série/chassi
+        example: AABBCCDDEE
+      modelYear:
+        type: string
+        description: Ano do modelo
+        example: "2020"
+      manufactureYear:
+        type: integer
+        description: Ano de fabricação
+        example: 2021
+      initialDepartment:
+        type: string
+        description: Setor/Obra inicial
+        example: "2"
+      actualDepartment:
+        type: string
+        description: Setor/Obra atual
+        example: "3"
+      incorporationForm:
+        type: string
+        description: Forma de incorporação
+        example: Compra
+      incorporationDate:
+        type: string
+        description: Data da incorporação
+        example: 2021-01-05
+      incorporationValue:
+        type: number
+        description: Valor da incorporação
+        example: 5000
+      incorporationNoteNumber:
+        type: string
+        description: Número da nota
+        example: "15566388511"
+      incorporationProvider:
+        type: integer
+        description: Fornecedor
+        example: 4
+      accountancyIncorporationAccount:
+        type: string
+        description: Conta de incorporação
+        example: 1.01.02.01
+      accountancyIdentity:
+        type: string
+        description: Identificação
+        example: Máquinas
+      accountancyOrigin:
+        type: string
+        description: Origem
+        example: Aquisição no Mercado Interno
+      accountancyUsageIndicator:
+        type: string
+        description: Indicador da utilização
+        example: Produção de Bens Destinados a Venda
+      accountancyLifetime:
+        type: integer
+        description: Vida útil em meses
+        example: 36
+      depreciationInitialDate:
+        type: string
+        description: Data de início da depreciação
+        example: 2020-11-10
+      depreciationDebitAccount:
+        type: string
+        description: Despesa de depreciação (Débito)
+        example: 1.01.02.01
+      depreciationCreditAccount:
+        type: string
+        description: Depreciação acumulada (Crédito)
+        example: 1.01.02.01
+      depreciationValue:
+        type: number
+        description: Depreciação (%)
+        example: 32
+      depreciationLastDate:
+        type: string
+        description: Data da última depreciação
+        example: 2022-02-01
+      depreciationActualValue:
+        type: number
+        description: Valor atual da depreciação
+        example: 600.50

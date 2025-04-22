@@ -1,0 +1,351 @@
+swagger: "2.0"
+info:
+  title: Itens de Orçamentos de Obra
+  description: API bulk data de orçamentos de obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+paths:
+  "/building-cost-estimation-items":
+    get:
+      operationId: getBuildingCostEstimationItems
+      tags:
+        - Itens de Orçamento
+      summary: >-
+        Retorna um array com todos os itens de todas as planilhas de todas as versões de orçamento de todas as obras.
+      consumes:
+        - application/json
+      parameters:
+        - name: dataDate
+          in: query
+          description: >-
+            Data de referência para o cálculo dos seguintes campos:
+              - scheduledPercentComplete
+              - percentComplete
+              - measuredQuantity
+
+            Formato da data: yyyy-mm-dd (notação full-date definida no RFC 3339)
+
+            Default value: data atual do sistema no formato yyyy-mm-dd
+          required: false
+          type: string
+          format: date
+        - name: buildingId
+          in: query
+          description: >-
+            Código de obra. Se esse parâmetro for utilizado informando o código de uma obra, apenas os itens de orçamento dessa obra serão retornados. Caso não exista uma obra com esse código ou essa obra não possuir orçamento, retornará um array vazio.
+          required: false
+          type: integer
+          format: int32
+        - name: adjustmentIndexId
+          in: query
+          description: >-
+            Código do indexador de correção monetária cadastrado no Sienge.
+
+            Os preços e valores monetários retornados pela API serão corrigidos por este indexador, exceto os preços base.
+
+            - Se este parâmetro não for informado, nenhuma correção será realizada.
+
+            - Se este parâmetro for informado, o parâmetro "adjustmentDate" deve ser informado obrigatoriamente.
+          required: false
+          type: integer
+          format: int32
+        - name: adjustmentDate
+          in: query
+          description: >-
+            Data para correção monetária do indexador. Os preços e valores monetários retornados pela API serão corrigidos para essa data, exceto os preços base.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: bdi
+          in: query
+          description: >-
+            Tipo de BDI ou percentual específico a ser utilizado no cálculo dos preços orçados.
+
+            - Para o tipo de BDI os valores válidos são:
+              - BUILDING (Obra)
+              - RESOURCE_GROUPS (Grupos de insumo)
+              - WORK_ITEMS (Serviços)
+            - Para um percentual específico de BDI informar um valor numérico no formato "###.##" entre 0.00 e 999.99.
+          required: false
+          type: string
+          default: "0.00"
+        - name: laborBurden
+          in: query
+          description: >-
+            Tipo de encargos sociais ou percentual específico a ser utilizado no cálculo dos preços orçados.
+
+            - Para o tipo de encargos sociais os valores válidos são:
+              - BUILDING (Obra)
+              - RESOURCE_GROUPS (Grupos de insumo)
+            - Para um percentual específico de encargos sociais informar um valor numérico no formato "###.##" entre 0.00 e 999.99.
+          required: false
+          type: string
+          default: ¨0.00"
+        - name: includeDisbursments
+          in: query
+          description: >-
+            Parâmetro para trazer os desembolsos das tarefas relacionadas à Itens de Orçamento cujo preço é definido pela composição de Insumos. Não serão apresentadas informações de desembolso para Itens do Orçamento com preço informado.
+            Caso esse parâmetro seja informado como true, é obrigatório também informar o parâmetro do Código da Obra (buildingId).
+            Esse parâmetro é falso como padrão.
+          required: false
+          type: boolean
+          default: false
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todos os itens de todas as planilhas de todas as versões de orçamento de todas as obras.
+            Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseBuildingCostEstimationItemDto"
+        "422":
+          description: >-
+            Ocorreu um dos seguintes erros:
+              - O valor informado como BDI é inválido: {valor informado}.
+              - O valor informado como encargos sociais é inválido: {valor informado}.
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponseBuildingCostEstimationItemDto:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/BuildingCostEstimationItemDto"
+  BuildingCostEstimationItemDto:
+    type: object
+    properties:
+      buildingId:
+        description: Código da obra.
+        type: integer
+        example: 7
+      buildingName:
+        description: Nome da obra.
+        type: string
+        example: Condomínio da Felicidade
+      buildingStatus:
+        description: Situação da obra.
+        type: string
+        example: IN_PROGRESS
+        enum:
+          - COST_ESTIMATING
+          - IN_PROGRESS
+          - FINISHED_WITH_FINANCIAL_PENDENCIES
+          - FINISHED_WITHOUT_FINANCIAL_PENDENCIES
+      projects:
+        description: >-
+          Projetos vinculados aos centros de custo associados à obra do item de orçamento. Se a obra não possuir centros de custo associados, ou se estes não estiverem vinculados a projetos, este array estará vazio.
+        type: array
+        items:
+          $ref: "#/definitions/ProjectDto"
+      versionNumber:
+        description: Número da respectiva versão do orçamento.
+        type: integer
+        example: 3
+      buildingUnitId:
+        description: Identificador único imutável da unidade construtiva.
+        type: integer
+        example: 1
+      buildingUnitName:
+        description: Nome da unidade construtiva.
+        type: string
+        example: Salão de festas
+      id:
+        description: Identificador único imutável do item de orçamento no contexto da planilha (unidade construtiva).
+        type: integer
+        example: 45
+      wbsCode:
+        description: >-
+          Código de referência do item de orçamento,  representando a posição do
+          mesmo na Estrutura de Decomposição do Trabalho (EDT).
+        type: string
+        example: 01.001.000.001
+      workItemId:
+        description: Código do serviço. Em itens agrupadores, esse campo será null.
+        type: integer
+        example: 2344
+      description:
+        description: Descrição do item de orçamento.
+        type: string
+        example: Alvenaria de Tijolo Furado
+      unitOfMeasure:
+        description: Unidade de medida usada para o item de orçamento.
+        type: string
+        example: m2
+      quantity:
+        description: Quantidade orçada para o item de orçamento, com precisão de 4 casas decimais. Esse valor leva em consideração o número de repetições da respectiva unidade construtiva.
+        type: number
+        example: 560.3205
+      unitPrice:
+        description: >-
+          Preço unitário do item de orçamento com precisão de 4 casas.
+          Equivalente a soma dos preços unitários de cada tipo de preço do
+          serviço.
+        type: number
+        example: 9.0009
+      totalPrice:
+        description: >-
+          Preço total do item de orçamento com precisão de 2 casas. Equivalente a soma dos preços totais de cada tipo de preço do item.
+        type: number
+        example: 5043.39
+      baseTotalPrice:
+        description: >-
+          Preço total base do item de orçamento com precisão de 2
+          casas.
+          Equivalente a soma dos preços totais base de cada tipo de preço do item.
+          Neste preço base são considerados apenas os preços "puros" dos insumos e serviços que compõem o item de orçamento, ou seja, neste preço não é aplicado BDI, encargos sociais nem correção por indexador.
+        type: number
+        example: 5000.05
+      scheduledPercentComplete:
+        description: >-
+          Percentual previsto (planejado) de execução do item de orçamento, considerando a data informada no parâmetro "dataDate". Esse percentual é calculado com base na ligação do respectivo item de orçamento com as tarefas do planejamento da obra. O valor desse campo tem precisão de até 12 casas decimais. Esse campo só será preenchido em itens da versão atual do orçamento de cada obra, já a ligação do orçamento com o planejamento de obra só exise na versão atual (essa ligação não é versionada). Ou seja, em versões anteriores esse campo será null. Em itens agrupadores, esse campo também será null.
+        type: number
+        example: 26.4987
+      percentComplete:
+        description: >-
+          Percentual medido do item de orçamento, considerando a data informada no parâmetro "dataDate". Esse percentual é calculado com base na ligação do respectivo item de orçamento com as tarefas do planejamento da obra e com as medições do acompanhamento de obra. Para o cálculo, serão consideradas todas as medições da obra cadastradas até a data informada no parâmetro "dataDate". O valor desse campo tem precisão de até 12 casas decimais. Esse campo só será preenchido em itens da versão atual do orçamento de cada obra, já a ligação do orçamento com o planejamento de obra só exise na versão atual (essa ligação não é versionada). Ou seja, em versões anteriores esse campo será null. Em itens agrupadores, esse campo também será null.
+        type: number
+        example: 24.9879
+      measuredQuantity:
+        description: >-
+          Quantidade medida do item de orçamento, considerando a data informada no parâmetro "dataDate". Essa quantidade é calculada com base na ligação do respectivo item de orçamento com as tarefas do planejamento da obra e com as medições do acompanhamento de obra. Para o cálculo, serão consideradas todas as medições da obra cadastradas até a data informada no parâmetro "dataDate". O valor desse campo tem precisão de até 4 casas decimais. Esse campo só será preenchido em itens da versão atual do orçamento de cada obra, já a ligação do orçamento com o planejamento de obra só exise na versão atual (essa ligação não é versionada). Ou seja, em versões anteriores esse campo será null. Em itens agrupadores, esse campo também será null.
+        type: number
+        example: 140.0123
+      pricesByCategory:
+        type: array
+        description: >-
+          Preços do item de orçamento detalhados por tipo de insumo (por exemplo
+          material e mão de obra).
+        items:
+          $ref: "#/definitions/PriceByCategoryDto"
+      tasks:
+        type: array
+        description: >-
+          Relação de tarefas associadas ao item de orçamento, detalhando a descrição,
+          seu percentual representativo e seu valor.
+        items:
+          $ref: "#/definitions/TaskDto"
+      api-error:
+        description: Quando não ocorrer nenhuma falha no carregamento dos itens de orçamento, esse campo não estará presente nos objetos retornados. Se durante o carregamento ocorrer alguma falha no lado do servidor, o array de itens de orçamento será fechado com os itens carregados até então, e um objeto extra será adicionado ao final do array contendo apenas este campo preenchido com a respectiva mensagem de erro.
+        type: string
+  ProjectDto:
+    type: object
+    properties:
+      id:
+        description: Código do projeto
+        type: integer
+        example: 7
+      name:
+        description: Nome do projeto
+        type: string
+        example: Empreendimento Condomínio da Felicidade
+  PriceByCategoryDto:
+    type: object
+    properties:
+      category:
+        description: Tipo de insumo correspondente aos preços.
+        type: string
+        enum:
+          - EQUIPMENT
+          - LABOR
+          - INCREMENTAL_COST_ITEM
+          - MATERIAL
+          - TRANSPORT_ITEM
+          - OTHER
+          - OFFICE_SUPPLY
+          - FUELS_AND_LUBRICANTS
+          - MAINTENANCE_MATERIAL
+        example: MATERIAL
+      unitPrice:
+        description: >-
+          Preço unitário para o tipo de insumo correspondente com precisão de 4
+          casas
+        type: number
+        example: 9.0009
+      totalPrice:
+        description: >-
+          Preço total para o tipo de insumo correspondente com precisão de 2
+          casas
+        type: number
+        example: 5043.39
+      baseTotalPrice:
+        description: >-
+          Preço total base para o tipo de insumo correspondente com precisão de 2
+          casas. Neste preço base são considerados apenas os preços "puros" dos insumos e serviços que compõem o item de orçamento, ou seja, neste preço não é aplicado BDI, encargos sociais nem correção por indexador.
+        type: number
+        example: 5000.05
+  TaskDto:
+    type: object
+    properties:
+      id:
+        description: Identificador único imutável da tarefa
+        type: number
+        example: 10
+      presentationId:
+        description: Código visível da tarefa, representa a posição dela na estrutura do planejamento
+        type: number
+        example: 1
+      description:
+        description: Descrição da Tarefa
+        type: string
+        example: Colocação de rejunto
+      percentage:
+        description: Percentual representativo do item na tarefa
+        type: number
+        example: 50.00
+      value:
+        description: Valor da tarefa
+        type: number
+        example: 2500.00
+      remainingDisbursments:
+        description: Desembolsos restantes ou Desembolsos não vinculados no Período. Valor que não pôde ser associado a um mês de execução.
+          Cenário pode acontecer quando o intervalo de entrega do insumo é maior do que o período de planejamento que ele está vinculado. Pode ocorrer também quando pula um mês que tem execução
+        type: number
+        example: 0.00
+      Disbursments:
+        $ref: "#/definitions/Disbursments"
+  Disbursments:
+    type: array
+    description: >-
+      Relação de desembolsos associados à tarefa. Cada item possui o ano, mês e valor do desembolso.
+      O cálculo de Desembolso vai considerar percentuais de execução dos serviços. Não serão apresentadas informações de desembolso para Tarefas vinculadas à Itens do Orçamento com preço informado.
+    items:
+      $ref: "#/definitions/Disburment"
+  Disburment:
+    type: object
+    properties:
+      year:
+        description: Ano do Desembolso
+        type: number
+        example: 2022
+      month:
+        description: Mês do Desembolso
+        type: number
+        example: 10
+      value:
+        description: Valor do Desembolso
+        type: number
+        example: 2500.00
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: array
+        description: Lista contendo mensagem de erros relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

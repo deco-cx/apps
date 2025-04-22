@@ -1,0 +1,186 @@
+swagger: "2.0"
+info:
+  description: A API de Imposto de Renda disponibiliza o relatório de extrato de IR para envio ao cliente por e-mail ou retornando a URL referente ao relatório gerado.
+  version: 1.0.0
+  title: Informe de Rendimentos - Imposto de Renda
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Imposto de renda
+    description: API para envio de relatório de extrato do cliente
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /customer-income-tax/report:
+    post:
+      tags:
+        - Imposto de renda
+      summary: Envia relatório de imposto de renda por e-mail
+      operationId: emailCustomerIncomeTaxReport
+      parameters:
+        - in: body
+          name: body
+          description: Dados para envio do relatório de extrato de cliente por e-mail
+          required: true
+          schema:
+            $ref: "#/definitions/IncomeReportBody"
+      responses:
+        "200":
+          description: Relatório Gerado
+        "204":
+          description: Não há dados para gerar o relatório com os parâmetros informados
+        "400":
+          description: Relatório não foi gerado devido a um erro de validação
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  /customer-income-tax/report/pdf:
+    get:
+      tags:
+        - Imposto de renda
+      summary: Gera o link para o download do PDF referente ao Imposto de Renda do cliente. O link expira em 5 minutos.
+      operationId: customerIncomeTaxReportURL
+      parameters:
+        - name: customerId
+          in: query
+          description: ID do cliente
+          required: true
+          type: integer
+          format: int32
+        - name: companyId
+          in: query
+          description: ID da empresa
+          required: true
+          type: integer
+          format: int32
+        - name: year
+          in: query
+          description: "Ano base do imposto de renda. O padrão é: <i>ano atual - 1</i>"
+          type: integer
+          required: false
+        - name: subject
+          in: query
+          description: "Assunto do e-mail. O padrão é: Relatório de Imposto de Renda"
+          type: string
+          required: false
+        - name: message
+          in: query
+          description: Mensagem do corpo do e-mail. O padrão é uma string vazia.
+          type: string
+          required: false
+        - name: paymentTerms
+          in: query
+          description: Condições de pagamento que devem ser consideradas para envio do relatório. O padrão são todas as condições do contrato. Exemplo de utilização - [PM, AT].
+          type: array
+          items:
+            type: string
+          required: false
+        - name: documentsIn
+          in: query
+          description: Tipos de documentos que devem ser considerados para envio do relatório. O padrão são todos os documentos. Exemplo de utilização - [CT, NF].
+          type: array
+          items:
+            type: string
+          required: false
+        - name: receiptTypeNotIn
+          in: query
+          description: Tipos de baixa que não devem ser consideradas para envio do relatório. O padrão são todos os tipos de baixa. Exemplo de utilização - [RECEBIMENTO, ADIANTAMENTO, BENS, BONIFICACAO, OUTROS].
+          type: array
+          items:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Relatório Gerado
+        "204":
+          description: Não há dados para gerar o relatório com os parâmetros informados
+        "400":
+          description: Relatório não foi gerado devido a um erro de validação
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+  IncomeReportBody:
+    type: object
+    properties:
+      customerId:
+        type: integer
+        format: int32
+        example: 1
+      companyId:
+        description: ID da empresa
+        type: integer
+        format: int32
+        example: 2
+      year:
+        description: "Ano base do imposto de renda. O padrão é: <i>ano atual - 1</i>"
+        type: integer
+        format: int32
+        example: 2024
+      subject:
+        description: "Assunto do e-mail. O padrão é: Relatório de Imposto de Renda"
+        type: string
+        example: "Relatório de Imposto de Renda"
+      message:
+        description: Mensagem do corpo do e-mail. O padrão é uma string vazia.
+        type: string
+        example: "Exemplo de corpo de email"
+      paymentTerms:
+        description: >-
+          Condições de pagamento que devem ser consideradas para envio do relatório. O padrão são todas as condições do contrato. Exemplo de utilização - (Exemplo: AT, PM).
+        type: array
+        items:
+          type: string
+          enum:
+            - PM
+            - PP
+            - PR
+            - RC
+            - AT
+            - ME
+            - RP
+      documentsIn:
+        description: >-
+          Tipos de documentos que devem ser considerados para envio do relatório. O padrão são todos os documentos. Exemplo de utilização - (Exemplo: CT, NF).
+        type: array
+        items:
+          type: string
+      receiptTypeNotIn:
+        description: >-
+          Tipos de baixa que não devem ser consideradas para envio do relatório. O padrão são todos os tipos de baixa. Exemplo de utilização - (Exemplo: RECEBIMENTO, ADIANTAMENTO, BENS, BONIFICACAO, OUTROS).
+        type: array
+        items:
+          type: string
+          enum:
+            - RECEBIMENTO
+            - ADIANTAMENTO
+            - BENS
+            - BONIFICACAO
+            - OUTROS
+    required:
+      - customerId
+      - companyId

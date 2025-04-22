@@ -1,0 +1,285 @@
+swagger: "2.0"
+info:
+  description: "API para controle de comissões de vendas."
+  version: "1.0"
+  title: Comissões (Antigo)
+host: "api.sienge.com.br"
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: "Previsão de comissão"
+    description: "Previsão de comissão de venda"
+schemes:
+  - "https"
+securityDefinitions:
+  basicAuth:
+    type: "basic"
+    description: "HTTP Basic Authentication. Works over `HTTP` and `HTTPS`"
+security:
+  - basicAuth: []
+paths:
+  /sales-commissions:
+    get:
+      operationId: getSalesComissions
+      tags:
+        - "Previsão de comissão"
+      summary: "Busca uma lista de comissões de venda."
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default são 100 e o valor máximo permitdo são 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default são 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: contractId
+          in: query
+          description: >-
+            O código do contrato de vendas da comissão.
+          required: false
+          type: integer
+          format: int32
+        - name: brokerId
+          in: query
+          description: >-
+            O código do corretor da comissão.
+          required: false
+          type: integer
+          format: int32
+        - name: customerId
+          in: query
+          description: >-
+            O código do cliente do contrato de vendas da comissão.
+          required: false
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Comissões encontradas
+          schema:
+            $ref: "#/definitions/SalesCommissionGet"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  /sales-commissions-forecasts:
+    post:
+      operationId: postSalesComissionForecasts
+      tags:
+        - "Previsão de comissão"
+      summary: "Insere uma previsão de comissão de venda."
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Previsão de comissão para inserção"
+          required: true
+          schema:
+            $ref: "#/definitions/CommissionForecast"
+      responses:
+        "201":
+          description: "Previsão de comissão foi criada"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: "Erro interno no servidor"
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  SalesCommissionGet:
+    type: "object"
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de comissões retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/SalesCommissions"
+  SalesCommissions:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+        description: "Código da comissão"
+      contractId:
+        type: "integer"
+        format: "int32"
+        description: "Código do contrato de vendas da comissão"
+      brokerId:
+        type: "integer"
+        format: "int32"
+        description: "Código do corretor da comissão."
+      customerId:
+        type: "integer"
+        format: "int32"
+        description: "Código do cliente do contrato de vendas da comissão."
+      installmentsNumber:
+        type: "integer"
+        format: "int32"
+        description: "Número de parcelas da comissão."
+      billId:
+        type: "integer"
+        format: "int32"
+        description: "Número do título da comissão."
+      rate:
+        type: "integer"
+        format: "int32"
+        description: "Percentual de comissão."
+      value:
+        type: "integer"
+        format: "int32"
+        description: "Valor da comissão."
+      baseValue:
+        type: "integer"
+        format: "int32"
+        description: "Valor base da comissão."
+      type:
+        type: "string"
+        description: "Tipo de comissão ('V' - Vendas, 'G' - Gerenciamento)."
+      installments:
+        type: "array"
+        description: "Parcelas da comissão"
+        items:
+          $ref: "#/definitions/Installments"
+  Installments:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: "Número da parcela."
+      dueDate:
+        type: string
+        description: "Data de vencimento da parcela."
+      amount:
+        type: number
+        format: double
+        description: "Valor da parcela."
+      status:
+        type: string
+        description: "Situação atual da parcela (Aguardando autorização, Autorizada, Liberada, Totalmente paga, Cancelada)."
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default são 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default são 100 e o valor máximo permitdo são 200.
+        minimum: 1
+        maximum: 200
+  CommissionForecast:
+    type: "object"
+    required:
+      - "contractId"
+      - "brokerId"
+      - "dueDate"
+    properties:
+      contractId:
+        type: "integer"
+        format: "int32"
+        description: "Código do contrato de vendas que será vinculado."
+      brokerId:
+        type: "integer"
+        format: "int32"
+        description: "Código do corretor que será vinculado."
+      rate:
+        type: "number"
+        format: "double"
+        description: >-
+          Percentual de comissão. Formato -> 00.00 <br/>
+          Não é obrigatório informar caso o 'value' seja informado, porém um dos dois devem ser informados. <br/>
+          Se os dois campos ('rate' e 'value') forem informados será validado se os valores estão corretos, com base no valor total do contrato.
+        minimum: 0.01
+        maximum: 100
+      value:
+        type: "number"
+        format: "double"
+        description: >-
+          Valor de comissão. Formato -> 0000000000.00 <br/>
+          Não é obrigatório informar caso o 'rate' seja informado, porém um dos dois devem ser informados. <br/>
+          Se os dois campos ('rate' e 'value') forem informados será validado se os valores estão corretos, com base no valor total do contrato.
+      dueDate:
+        type: "string"
+        format: "date"
+        description: >-
+          Data de vencimento da primeira parcela. <br/>
+          Formato YYYY-MM-DD. Exemplo -> 2019-06-01. <br/>
+      indexerId:
+        type: "integer"
+        format: "int32"
+        description: "Código do indexador para correção. Caso não seja informado, será considerado o indexador neutro."
+      baseDate:
+        type: "string"
+        format: "date"
+        description: >-
+          Data base pra correção. <br/>
+          Formato YYYY-MM-DD. Exemplo -> 2019-06-01. <br/>
+          Caso não seja informado ou seja informado uma data que não possua valor cadastrado para o indexador ('indexerId'), será considerado a última data dísponível.
+      installmentsNumber:
+        type: "integer"
+        format: "int32"
+        description: >-
+          Quantidade de parcelas. <br/>
+          Caso não seja informado, será considerado uma parcela.
+      type:
+        type: "string"
+        description: >-
+          Tipo de comissão. Valores possíveis: <br/>
+          'V' - Vendas <br/>
+          'G' - Gerenciamento <br/>
+          Caso não seja informado, será considerado 'V'.
+        maxLength: 1
+        minLength: 1
+  ResponseMessage:
+    type: "object"
+    properties:
+      status:
+        type: "integer"
+        description: Status Http
+      developerMessage:
+        type: "string"
+        description: "Mensagem de resposta para análise do desenvolvedor."
+        example: "Developer description message"
+      clientMessage:
+        type: "string"
+        description: "Mensagem de resposta para o usuário."
+        example: "Client description message."
