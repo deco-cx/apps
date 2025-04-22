@@ -1,0 +1,1106 @@
+swagger: "2.0"
+info:
+  description: API que permite realizar o cadastro de uma cotação de preço.
+  version: "1.0"
+  title: Cotações de Preços
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+paths:
+  "/purchase-quotations":
+    post:
+      operationId: postPurchaseQuotations
+      tags:
+        - Cotação de Preço
+      summary: Cria uma cotação de preço
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Cotação de preço a ser cadastrada
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseQuotationInsert"
+      responses:
+        "201":
+          description: Cotação de preço cadastrada
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/all/negotiations":
+    get:
+      operationId: getPurchaseQuotationsAllNegotiations
+      tags:
+        - Cotação de Preço
+      summary: Busca todas as cotações com negociações
+      consumes:
+        - application/json
+      parameters:
+        - name: quotationNumber
+          required: false
+          in: query
+          description: >-
+            Código da cotação
+
+
+            Obs.: Caso seja informado o parametro <code>quotationNumber</code> não devem ser informados os campos <code>startDate</code> e <code>endDate</code>.
+          type: integer
+        - name: supplierId
+          required: false
+          in: query
+          description: >-
+            Código do fornecedor
+          type: integer
+        - name: buyerId
+          required: false
+          in: query
+          description: >-
+            Código do comprador
+          type: string
+        - name: startDate
+          in: query
+          description: >-
+            Data de inicio da busca.
+
+
+            *Parametro obrigatório quando <code>quotationNumber</code> não for informado.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: >-
+            Data de fim da busca.
+
+
+            *Parametro obrigatório quando <code>quotationNumber</code> não for informado.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseQuotationWithNegotiation"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/purchase-quotations/{purchaseQuotationId}/items":
+    post:
+      operationId: postPurchaseQuotationsIdItems
+      tags:
+        - Item de Cotação de Preço
+      summary: Cria um item de cotação de preço
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          in: path
+          description: Id da Cotação
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Item de cotação de preço a ser cadastrada
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseQuotationItemInsert"
+      responses:
+        "201":
+          description: Item de cotação de preço cadastrado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/{purchaseQuotationId}/items/from-purchase-request":
+    post:
+      operationId: postPurchaseQuotationsIdItemsFromsPurchaseRequest
+      tags:
+        - Item de Cotação de Preço
+      summary: Cria um item de cotação de preço a partir da entrega do item de solicitação de compra
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          in: path
+          description: Id da Cotação
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Entrega do item da solicitação de compra a ser utilizado para criar um item de cotação de preço
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseRequestItemDeliveryRequirementInsert"
+      responses:
+        "201":
+          description: Item de cotação de preço cadastrado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/{purchaseQuotationId}/items/{purchaseQuotationItemNumber}/suppliers":
+    post:
+      operationId: postPurchaseQuotationsIdItemsFromsPurchaseRequestSuppliers
+      tags:
+        - Fornecedor de Item de Cotação de Preço
+      summary: Inclui um fornecedor no item da cotação de preço
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          in: path
+          description: Id da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+        - name: purchaseQuotationItemNumber
+          in: path
+          description: Número do Item da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: body
+          description: Fornecedor a ser incluído no item da cotação de preço
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseQuotationItemSupplierInsert"
+      responses:
+        "201":
+          description: Fornecedor adicionado ao item da cotação de preço
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/{purchaseQuotationId}/suppliers/{supplierId}/negotiations":
+    post:
+      operationId: postPurchaseQuotationsIdSuppliersId
+      tags:
+        - Negociação de Cotação de Preço com o Fornecedor
+      summary: Inclui uma nova negociação de cotação de preço para um fornecedor
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          in: path
+          description: Id da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+        - name: supplierId
+          in: path
+          description: Id do Fornecedor do Item da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+      responses:
+        "201":
+          description: Negociação da Cotação de Preço com Fornecedor incluída com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/{purchaseQuotationId}/suppliers/{supplierId}/negotiations/latest/authorize":
+    patch:
+      operationId: patchPurchaseQuotationsIdSuppliersIdNegotiationsLatestAuthorize
+      tags:
+        - Negociação de Cotação de Preço com o Fornecedor
+      summary: Autoriza a última negociação de cotação de preços para o fornecedor
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          in: path
+          description: Id da Cotação de Preço
+          required: true
+          type: integer
+          format: int32
+        - name: supplierId
+          in: path
+          description: Id do fornecedor
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Operação bem sucedida
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Não foi possível autorizar os itens da cotação
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/{purchaseQuotationId}/suppliers/{supplierId}/negotiations/{negotiationNumber}":
+    put:
+      operationId: putPurchaseQuotationsIdSuppliersIdNegotiationsId
+      tags:
+        - Negociação de Cotação de Preço com o Fornecedor
+      summary: Atualiza uma negociação de cotação de preço de um fornecedor
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          in: path
+          description: Id da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+        - name: supplierId
+          in: path
+          description: Id do Fornecedor da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+        - name: negotiationNumber
+          in: path
+          description: Número da negociação a ser atualizada
+          required: true
+          type: integer
+          format: int64
+        - name: body
+          in: body
+          description: Dados da negociação a ser atualizada
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseQuotationNegotiationUpdate"
+      responses:
+        "204":
+          description: Negociação da Cotação de Preço com Fornecedor atualizada com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/{purchaseQuotationId}/suppliers/{supplierId}/negotiations/{negotiationNumber}/items/{quotationItemNumber}":
+    put:
+      operationId: putPurchaseQuotationsIdSuppliersIdNegotiationsIdItemsId
+      tags:
+        - Item de Negociação de Cotação de Preço com Fornecedor
+      summary: Atualiza item de negociação de cotação de preço com fornecedor
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          in: path
+          description: Id da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+        - name: supplierId
+          in: path
+          description: Código do Fornecedor
+          required: true
+          type: integer
+          format: int64
+        - name: negotiationNumber
+          in: path
+          description: Número da Negociação com o Fornecedor
+          required: true
+          type: integer
+          format: int64
+        - name: quotationItemNumber
+          in: path
+          description: Número do Item da Cotação de Preço
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: body
+          description: Item da Negociação a ser atualizado. Podem ser incluídas novas entregas ou atualizar as existentes
+          required: true
+          schema:
+            $ref: "#/definitions/PurchaseQuotationNegotiationItemUpdate"
+      responses:
+        "204":
+          description: Item da Negociação atualizada com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/purchase-quotations/comparison-map/pdf":
+    get:
+      operationId: getPurchaseQuotationsComparisonMapPDF
+      tags:
+        - Relatório de Mapa de Cotações
+      summary: Gera relatório e retorna url para download do PDF referente ao mapa de cotações.
+      consumes:
+        - application/json
+      parameters:
+        - name: purchaseQuotationId
+          required: false
+          in: query
+          description: >-
+            Código da cotação
+
+
+            Obs.: Caso seja informado o parametro <code>purchaseQuotationId</code> não devem ser enviados os campos <code>buyerId</code>, <code>startDate</code> e <code>endDate</code>.
+          type: integer
+        - name: supplierId
+          required: false
+          in: query
+          description: >-
+            Código do fornecedor
+          type: integer
+        - name: buyerId
+          required: false
+          in: query
+          description: >-
+            Código do comprador
+          type: string
+        - name: buildingId
+          required: false
+          in: query
+          description: >-
+            Código da obra
+          type: integer
+        - name: startDate
+          in: query
+          description: >-
+            Data de inicio do relatório de Mapa de Cotação.
+
+
+            *Parametro obrigatório quando <code>purchaseQuotationId</code> não for informado.
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: >-
+            Data de fim do relatório de Mapa de Cotação.
+
+
+            *Parametro obrigatório quando <code>purchaseQuotationId</code> não for informado.
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: shortPrintFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: Imprime o relatorio resumido do mapa de cotações.
+        - name: printGeneralDataFlag
+          in: query
+          type: boolean
+          required: true
+          default: true
+          description: >-
+            Imprime os dados gerais do mapa de cotações.
+
+
+            *Parametro obrigatório quando <code>shortPrintFlag</code> estiver como <code>false</code>
+        - name: printNumberRequestsOriginatedQuotationsFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: Imprimir número das solicitações que originaram as cotações.
+        - name: highlightHighestAndLowestPriceFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: >-
+            Destacar maior e menor preço.
+
+
+            Obs: O parametro deve estar marcado como <code>false</code> caso <code>shortPrintFlag</code> esteja como <code>true</code>
+        - name: highlightChosenSupplierFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: >-
+            Destacar fornecedor escolhido.
+
+
+            Obs: O parametro deve estar marcado como <code>false</code> caso <code>shortPrintFlag</code> esteja como <code>true</code>
+        - name: displayTradingAuthorizationHistoryFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: >-
+            Apresentar o histórico de autorização de negociação.
+
+
+            Obs: O parametro deve estar marcado como <code>false</code> caso <code>shortPrintFlag</code> esteja como <code>true</code>
+        - name: displaySupplierGroupPerPageFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: >-
+            Apresentar bloco de fornecedores por página.
+
+
+            Obs: O parametro deve estar marcado como <code>false</code> caso <code>shortPrintFlag</code> esteja como <code>true</code>
+        - name: printQuotedPriceFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: >-
+            Imprimir preço orçado.
+
+
+            Obs: O parametro deve estar marcado como <code>false</code> caso <code>shortPrintFlag</code> esteja como <code>true</code>
+        - name: printInternalObservationFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: >-
+            Imprimir observação interna dos insumos nas cotações.
+        - name: showTheBestAndLastPriceConsideringDetailAndBrandFlag
+          in: query
+          type: boolean
+          required: false
+          default: false
+          description: >-
+            Apresentar o melhor e último preço considerando detalhe/marca.
+
+
+            Obs: O parametro deve estar marcado como <code>false</code> caso <code>shortPrintFlag</code> esteja como <code>true</code>
+      responses:
+        "200":
+          description: Item da Negociação atualizada com sucesso
+          schema:
+            $ref: "#/definitions/PurchaseQuotationComparisonMapReportPdfUrl"
+        "422":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  PurchaseQuotationInsert:
+    type: object
+    required:
+      - buyerId
+      - date
+      - createdBy
+    properties:
+      buyerId:
+        type: string
+        example: USER
+        description: Id do comprador (Usuário do Sienge)
+      date:
+        type: string
+        format: date
+        example: "2019-01-21"
+        description: "Data da cotação no formato ISO 8601 com a máscara: yyyy-MM-dd"
+  PaginatedResponseOfPurchaseQuotationWithNegotiation:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de cotações com negociações retornadas como resultado da requisição
+        items:
+          $ref: "#/definitions/PurchaseQuotationWithNegotiation"
+  PurchaseQuotationWithNegotiation:
+    type: object
+    properties:
+      purchaseQuotationId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id da cotação de preços.
+      buyerId:
+        type: string
+        example: ANON_BUYER
+        description: Id do comprador cadastrado na cotação.
+      consistent:
+        type: boolean
+        example: true
+        description: Retornará verdadeiro se a cotação estiver consistente, caso contrário retornará falso.
+      status:
+        type: string
+        example: "Registrada"
+        description: >
+          Os status da cotação são:
+            * `Registrada`,
+            * `Negociação em andamento`,
+            * `Negociação fechada`,
+            * `Aquisição encaminhada`,
+            * `Enviada para serviço`,
+            * `Enviada para o portal do fornecedor`,
+            * `Cancelada`,
+      quotationDate:
+        type: string
+        example: "2018-03-11"
+        description: "Data da cotação no formato: yyyy-MM-dd."
+      responseDate:
+        type: string
+        example: "2018-03-11"
+        description: "Data limite para retorno no formato: yyyy-MM-dd."
+      suppliers:
+        type: array
+        description: Fornecedores da cotação.
+        items:
+          $ref: "#/definitions/QuotationSupplierDTO"
+  QuotationSupplierDTO:
+    type: object
+    description: Fornecedor da cotação e sua última negociação.
+    properties:
+      supplierId:
+        description: Código do fornecedor.
+        type: integer
+        example: 77
+      supplierName:
+        description: Nome do fornecedor.
+        type: string
+        example: "Fornecedor"
+      latestNegotiation:
+        description: Última negociação com o fornecedor.
+        type: array
+        items:
+          $ref: "#/definitions/QuotationSupplierNegotiationDTO"
+  QuotationSupplierNegotiationDTO:
+    type: object
+    description: Negociação do fornecedor.
+    properties:
+      negotiationId:
+        description: Código da negociação com o fornecedor.
+        type: integer
+        example: 1
+      responseDate:
+        description: Data da resposta da negociação no formato yyyy-MM-dd.
+        type: string
+        example: "2022-08-11"
+      discount:
+        description: Desconto da negociação.
+        type: number
+        example: 10.1
+      shippingCosts:
+        description: Frete geral.
+        type: number
+        example: 0
+      itemsShipping:
+        description: Frete dos itens negociados.
+        type: number
+        example: 0
+      ipiShippingFlag:
+        description: Indica se está sendo aplicado IPI sobre o frete "S"/"N".
+        type: string
+        example: "S"
+      ipiShippingCosts:
+        description: Custos de frete para IPIs.
+        type: number
+        example: 12.99
+      otherCosts:
+        description: Outros custos presentes na negociação.
+        type: number
+        example: 12.99
+      totalItemsCosts:
+        description: Custo total dos itens da negociação.
+        type: number
+        example: 12.99
+      authorized:
+        description: Retornará verdadeiro se a negociação estiver autorizada, caso contrário retornará falso.
+        type: boolean
+        example: true
+  PurchaseQuotationNegotiationUpdate:
+    type: object
+    properties:
+      supplierAnswerDate:
+        type: string
+        format: date
+        example: "2020-12-31"
+        description: "Data da resposta desta negociação no formato ISO 8601 com a máscara: yyyy-MM-dd"
+      validity:
+        type: string
+        format: date
+        example: "2020-12-31"
+        description: "Data de validade para os valores e condições negociados no formato ISO 8601 com a máscara: yyyy-MM-dd"
+      seller:
+        type: string
+        example: João da Silva
+        description: Nome do vendedor responsável por esta neciação
+      discount:
+        type: number
+        format: double
+        default: 0.0
+        example: 10.1
+        description: Valor de desconto
+      freightType:
+        type: string
+        enum: ["NONE", "INCLUDED", "PAID"]
+        default: NONE
+        example: INCLUDED
+        description: >
+          Tipo do frete
+          * NONE - Não incide
+          * INCLUDED - Incluso
+          * PAID - A pagar
+      freightTypeForGeneratedPurchaseOrder:
+        type: string
+        enum: ["PROPORTIONAL", "TOTAL"]
+        default: TOTAL
+        example: PROPORTIONAL
+        description: >
+          Tipo de frete para pedidos de compra
+          * PROPORTIONAL - Valor proporcional aos insumos
+          * TOTAL - Valor total
+      freightPrice:
+        type: number
+        format: double
+        default: 0.0
+        example: 120.50
+        description: Valor do frete
+      valueOtherExpenses:
+        type: number
+        format: double
+        default: 0.0
+        example: 20.36
+        description: Valor de outras despesas
+      applyIpiFreight:
+        type: boolean
+        default: false
+        example: true
+        description: Aplica IPI sobre frete
+      internalNotes:
+        type: string
+        description: Observação interna sobre a negociação
+        example: Observação interna
+        maxLength: 4000
+      supplierNotes:
+        type: string
+        description: Observação sobre o fornecedor da negociação
+        example: Observação do fornecedor
+        maxLength: 4000
+      paymentTerms:
+        type: array
+        description: Condições de pagamento
+        items:
+          $ref: "#/definitions/PaymentTerms"
+  PurchaseQuotationItemInsert:
+    type: object
+    required:
+      - buildingId
+      - productId
+      - quantity
+      - unitySymbol
+      - buildingsApropriations
+      - deliveryRequirements
+    properties:
+      buildingId:
+        type: integer
+        format: int32
+        example: 500
+        description: Código da obra
+      productId:
+        type: integer
+        format: int32
+        example: 1002
+        description: Código do insumo
+      detailId:
+        type: integer
+        format: int32
+        example: 1
+        description: Código do detalhe
+      trademarkId:
+        type: integer
+        format: int32
+        example: 2
+        description: Código da marca
+      quantity:
+        type: number
+        format: double
+        example: 80
+        description: Quantidade
+      unitySymbol:
+        type: string
+        example: sc
+        description: Unidade de medida
+      notes:
+        type: string
+        example: Observação do item da cotação
+        description: Observação do item de cotação com restrição de 4000 caracteres.
+      deliveryRequirements:
+        type: array
+        description: Entregas
+        items:
+          $ref: "#/definitions/DeliveryRequirement"
+  DeliveryRequirement:
+    type: object
+    required:
+      - requirementDate
+      - requirementQuantity
+    properties:
+      requirementDate:
+        type: string
+        format: date
+        example: "2019-01-25"
+        description: "Data da necessidade no formato ISO 8601 com a máscara: yyyy-MM-dd"
+      requirementQuantity:
+        type: number
+        format: double
+        example: 80
+        description: Quantidade necessitada
+  PurchaseQuotationItemSupplierInsert:
+    type: object
+    required:
+      - supplierId
+    properties:
+      supplierId:
+        type: integer
+        format: int32
+        example: 15
+        description: Código do fornecedor
+  PurchaseQuotationNegotiationItemUpdate:
+    type: object
+    required:
+      - quotedQuantity
+      - negotiatedQuantity
+      - unitPrice
+      - discount
+      - discountPercentage
+      - increasePercentage
+      - ipiTaxPercentage
+      - issTaxPercentage
+      - icmsTaxPercentage
+      - freightUnitPrice
+      - selectedOption
+    properties:
+      detailId:
+        type: integer
+        format: int32
+        example: 1
+        description: Código do detalhe
+      trademarkId:
+        type: integer
+        format: int32
+        example: 2
+        description: Código da marca
+      quotedQuantity:
+        type: number
+        format: double
+        example: 10.5
+        description: Quantidade cotada
+      negotiatedQuantity:
+        type: number
+        format: double
+        example: 10.5
+        description: Quantidade negociada
+      unitPrice:
+        type: number
+        format: double
+        example: 5.5
+        description: Preço Unitário
+      discount:
+        type: number
+        format: double
+        example: 10
+        description: Valor de desconto
+      discountPercentage:
+        type: number
+        format: double
+        example: 1
+        description: Percentual de desconto
+      increasePercentage:
+        type: number
+        format: double
+        example: 2
+        description: Percentual de acréscimo
+      ipiTaxPercentage:
+        type: number
+        format: double
+        example: 1
+        description: Percentual de IPI (Imposto sobre Produtos Industrializados)
+      issTaxPercentage:
+        type: number
+        format: double
+        example: 2
+        description: Percentual de ISS (Imposto Sobre Serviços)
+      icmsTaxPercentage:
+        type: number
+        format: double
+        example: 8
+        description: >-
+          Percentual de ICMS (Imposto sobre Circulação de Mercadorias e
+          Serviços)
+      freightUnitPrice:
+        type: number
+        format: double
+        example: 5
+        description: Preço do frete unitário
+      reference:
+        type: string
+        example: Insumo 245
+        description: Referência do item da negociação
+        maxLength: 30
+      selectedOption:
+        type: boolean
+        example: true
+        description: Opção escolhida para compra
+      internalNotes:
+        type: string
+        example: Observação interna sobre o insumo deste fornecedor
+        description: Observação interna
+        maxLength: 4000
+      supplierNotes:
+        type: string
+        example: Observação sobre o fornecedor da negociação
+        description: Observação do fornecedor
+        maxLength: 4000
+      negotiationDeliveries:
+        type: array
+        description: Entregas da negociação
+        items:
+          $ref: "#/definitions/PurchaseQuotationNegotiationDeliveryUpdate"
+        example:
+          - negotiationDeliveryNumber: 1
+            deliveryDate: "2019-02-15"
+            deliveryQuantity: 5.5
+          - deliveryDate: "2019-02-16"
+            deliveryQuantity: 5
+  PurchaseQuotationNegotiationDeliveryUpdate:
+    type: object
+    required:
+      - deliveryDate
+      - deliveryQuantity
+    properties:
+      negotiationDeliveryNumber:
+        type: integer
+        format: int32
+        description: Número da entrega do item da negociação
+      deliveryDate:
+        type: string
+        format: date
+        description: "Data da entrega no formato ISO 8601 com a máscara: yyyy-MM-dd"
+      deliveryQuantity:
+        type: number
+        format: double
+        description: Quantidade da entrega
+  PurchaseQuotationComparisonMapReportPdfUrl:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de links para download dos relatórios de mapa de comparação.
+        items:
+          $ref: "#/definitions/UrlReportResults"
+  PurchaseRequestItemDeliveryRequirementInsert:
+    type: object
+    required:
+      - purchaseRequestId
+      - purchaseRequestItemNumber
+      - deliveryRequirementNumber
+    properties:
+      purchaseRequestId:
+        type: integer
+        format: int32
+        example: 375
+        description: Número da solicitação de compra
+      purchaseRequestItemNumber:
+        type: integer
+        format: int32
+        example: 1
+        description: Número do item da solicitação de compra
+      deliveryRequirementNumber:
+        type: integer
+        format: int32
+        example: 2
+        description: Número da entrega do item da solicitação de compra
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  PaymentTerms:
+    type: object
+    required:
+      - paymentTerms
+    properties:
+      description:
+        type: string
+        example: Descrição da condição de pagamento do Fornededor X
+        description: Texto livre para a descrição da condição de pagamento
+      selected:
+        type: boolean
+        default: false
+        example: true
+        description: True ou False para indicar a condição selecionada
+      paymentTerms:
+        type: array
+        description: Lista das parcelas da condição de pagamento
+        items:
+          $ref: "#/definitions/PaymentTerm"
+  PaymentTerm:
+    type: object
+    required:
+      - numberOfdays
+      - percentage
+    properties:
+      numberOfdays:
+        type: integer
+        format: int32
+        example: 10
+        description: Quantidade de dias que será usado para calcular as parcelas, a partir da data de previsão de entrega
+      percentage:
+        type: number
+        format: double
+        example: 100.0
+        description: Percentual da parcela referente ao valor total do pedido. A soma dos valores dos percentuais das parcelas deve ser 100%
+  ResultSetMetadata:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 100
+  UrlReportResults:
+    type: object
+    properties:
+      urlReport:
+        type: string
+        example: "https://cliente.sienge.com.br/sienge/visualizar-relatorio?arquivo=6470620993408717174&formato=pdf"
+        description: Url do relatório em PDF do Mapa de Comparação.

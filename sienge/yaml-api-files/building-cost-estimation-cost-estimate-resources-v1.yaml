@@ -1,0 +1,201 @@
+swagger: "2.0"
+info:
+  title: Insumos Orçados da Obra
+  description: API de Insumos Orçados da Obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Insumos Orçados.
+    description: API de insumos orçados.
+paths:
+  "/building-cost-estimations/{buildingId}/cost-estimate-resources":
+    get:
+      tags:
+        - Insumos
+      operationId: getBuildingCostEstimationsCostEstimateResources
+      summary: >-
+        Retorno um array com todos os insumos orçados
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: buildingUnitId
+          in: query
+          description: >-
+            Código da unidade construtiva.
+          required: false
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todos os insumos orçados.
+            Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseCostEstimateResources"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponseCostEstimateResources:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/CostEstimateResource"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  CostEstimateResource:
+    type: object
+    properties:
+      id:
+        description: Identificador único imutável do insumo.
+        example: 15
+        type: integer
+      sheetItemId:
+        description: Identificador único imutável do item de orçamento.
+        example: 25
+        type: integer
+      sheetItemWbsCode:
+        description: >-
+          Código de referência do item de orçamento,
+          representando a posição do mesmo na Estrutura de Decomposição do Trabalho (EDT).
+        example: 00.000.000.001
+        type: string
+      resourceCode:
+        description: Código auxiliar do insumo.
+        example: QTU123
+        type: string
+      description:
+        description: Descrição do insumo.
+        example: Tinta Acrílica
+        type: string
+      unitOfMeasure:
+        description: Símbolo da unidade de medida básica do insumo.
+        example: m2
+        type: string
+      quantity:
+        description: Quantidade de insumos com precisão de 6 casas.
+        example: 23.323022
+        type: number
+      unitPrice:
+        description: Preço unitário do insumo com precisão de 4 casas.
+        example: 9.0009
+        type: number
+      totalPrice:
+        description: >-
+          Preço total do insumo com precisão de 4 casas.
+        example: 209.9111
+        type: number
+      priceDate:
+        description: Data do preço unitário do insumo.
+        example: 2020-01-01
+        type: string
+      detailId:
+        type: integer
+        example: 5
+        description: Código do detalhe. Pode ser nulo.
+      detailDescription:
+        type: string
+        example: CP II-E-32
+        description: Descrição do detalhe. Pode ser nulo.
+      trademarkId:
+        type: integer
+        example: 42
+        description: Código da marca. Pode ser nulo.
+      trademarkDescription:
+        type: string
+        example: ACME SA
+        description: Descrição da marca. Pode ser nulo.
+      buildingUnitId:
+        type: integer
+        example: 5
+        description: Código da unidade construtiva.
+
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

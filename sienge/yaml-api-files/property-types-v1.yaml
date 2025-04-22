@@ -1,0 +1,159 @@
+swagger: "2.0"
+info:
+  description: API de Tipo de imóveis.
+  version: 1.0.0
+  title: Tipo de Imóveis
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /property-types:
+    get:
+      tags:
+        - Tipo de Imóveis
+      summary: Busca uma lista de tipos de imóveis
+      operationId: getPropertyTypes
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: name
+          in: query
+          description: >-
+            Filtro por tipo de imóvel.
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Tipo de imóveis encontrados
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/property-types/{id}":
+    get:
+      tags:
+        - Tipo de Imóveis
+      summary: Busca um tipo de imóvel.
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          description: Id do tipo de imóvel.
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Tipo de imóvel encontrado.
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  PropertyType:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do tipo de imóvel.
+      name:
+        type: string
+        description: Nome do tipo de imóvel.
+      residential:
+        type: boolean
+        description: True se o tipo de imóvel é residencial.
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de tipo de imóveis retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/PropertyType"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message

@@ -1,0 +1,943 @@
+swagger: "2.0"
+info:
+  title: Custos Unitários
+  description: API do Custos Unitários.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+paths:
+  "/cost-databases":
+    get:
+      operationId: getCostDatabases
+      tags:
+        - Tabelas
+      summary: >-
+        Retorna um array com todas as tabelas ativas do custos unitários
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          description: Código da tabela
+          required: false
+          type: integer
+          format: int32
+        - in: query
+          name: description
+          description: Descrição da tabela
+          required: false
+          type: string
+        - in: query
+          name: status
+          description: Status da tabela. Indica se a tabela está ativa (ACTIVE) ou inativa (INACTIVE)
+          required: false
+          type: string
+          default: ACTIVE
+          enum:
+            - ACTIVE
+            - INACTIVE
+        - in: query
+          name: costDatabaseEnabledForIntegration
+          description: Indica se a tabela está habilitada para integração
+          type: boolean
+          required: false
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento do primeiro item do resultado em relação ao primeiro item
+            da série total de resultados válidos. Valor default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default 100, valor mínimo permitido 1 e valor máximo permitido 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todas as tabelas existentes que se enquadram nos parâmetros fornecidos. Se não existir nenhuma, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseCostDatabases"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/cost-databases/{id}/resources":
+    get:
+      operationId: getCostDatabasesIdResources
+      tags:
+        - Insumos
+      summary: >-
+        Retorna um array com todos os insumos ativos de uma tabela do custos
+        unitários (cost-database)
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Código da tabela
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: resourceCode
+          description: Código Auxiliar do insumo
+          required: false
+          type: string
+        - in: query
+          name: description
+          description: Descrição do insumo
+          required: false
+          type: string
+        - in: query
+          name: resourceGroups
+          description: Códigos dos Grupos de insumo
+          required: false
+          type: array
+          items:
+            type: string
+        - in: query
+          name: status
+          description: >-
+            Status do Insumo. Indica se o insumo está ativo (ACTIVE) ou inativo (INACTIVE).
+          required: false
+          type: string
+          default: ACTIVE
+        - in: query
+          name: unitOfMeasureId
+          description: >-
+            Código da Unidade de Medida do Insumo. Realiza a busca por uma Unidade de Medida específica.
+          required: false
+          type: integer
+          format: int32
+        - in: query
+          name: onlyResourcesWithoutComposition
+          description: >-
+            Filtra apenas insumos que não foram vinculados em composições de serviços.
+          required: false
+          type: boolean
+          default: false
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento do primeiro item do resultado em relação ao primeiro item
+            da série total de resultados válidos. Valor default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default 100, valor mínimo permitido 1 e valor máximo permitido 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todos os insumos ativos existentes para a
+            respectiva tabela. Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseResources"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Tabela do custos unitários não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/cost-databases/{id}/resources/{resourceId}":
+    get:
+      operationId: getCostDatabasesIdResourcesId
+      tags:
+        - Insumos
+      summary: >-
+        Retorna o insumo correspondente ao id informado da tabela do custos unitários
+        (cost-database)
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Código da tabela
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: resourceId
+          description: Código do insumo
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna o insumo correspondente ao id informado para a
+            respectiva tabela.
+          schema:
+            $ref: "#/definitions/ResourceDTO"
+        "404":
+          description: >-
+            Ocorrou um dos seguintes erros:
+            <br/><br/>
+            Tabela do custos unitários não encontrada
+            <br/>
+            Insumo não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/cost-databases/{id}/work-items":
+    get:
+      operationId: getCostDatabasesIdWorkItems
+      tags:
+        - Serviços
+      summary: >-
+        Retorna um array com todos os serviços ativos de uma tabela do custos
+        unitários (cost-database)
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Código da tabela
+          required: true
+          type: integer
+          format: int32
+        - name: buildingTypeId
+          in: query
+          description: >-
+            Código do tipo de obra dos serviços
+          required: false
+          type: integer
+          format: int32
+        - name: id
+          in: query
+          description: >-
+            Código do serviço
+          required: false
+          type: string
+        - name: description
+          in: query
+          description: >-
+            Descrição do serviço
+          required: false
+          type: string
+        - name: status
+          in: query
+          description: >-
+            Status do serviço. Pode ser ativo (ACTIVE) ou inativo (INACTIVE)
+          required: false
+          default: ACTIVE
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento do primeiro item do resultado em relação ao primeiro item
+            da série total de resultados válidos. Valor default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default 100, valor mínimo permitido 1 e valor máximo permitido 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todos os serviços ativos existentes para a
+            respectiva tabela. Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseWorkItems"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Tabela do custos unitários não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/cost-databases/{id}/work-items-assemblies":
+    get:
+      operationId: getCostDatabasesIdWorkItemsAssemblies
+      tags:
+        - Composições
+      summary: >-
+        Retorna um array com todas as composições dos serviços ativos para a respectiva tabela.
+        Se não existir nenhuma, retorna um array vazio.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Código da tabela
+          required: true
+          type: integer
+          format: int32
+        - name: buildingTypeId
+          in: query
+          description: >-
+            Código do tipo de obra
+          required: false
+          type: integer
+          format: int32
+        - name: description
+          in: query
+          description: >-
+            Descrição do serviço
+          required: false
+          type: string
+        - name: workItemIds
+          in: query
+          description: >-
+            Códigos dos serviços
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento do primeiro item do resultado em relação ao primeiro item
+            da série total de resultados válidos. Valor default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default 100, valor mínimo permitido 1 e valor máximo permitido 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todas as composições dos serviços ativos para a respectiva tabela.
+            Se não existir nenhuma, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseWorkItemsAssemblies"
+        "400":
+          description: Requisição mal formada ou tipo de obra não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Tabela do custos unitários não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  GetResponseCostDatabases:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/CostDatabaseDTO"
+  GetResponseResources:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/ResourceDTO"
+  GetResponseWorkItems:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/WorkItemDTO"
+  GetResponseWorkItemsAssemblies:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/AssemblyDTO"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados para a
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento do primeiro item retornado em relação ao primeiro item
+          da série total de resultados válidos conforme informado no filtro
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados retornados conforme informado no filtro
+  ResourceDetailDTO:
+    type: object
+    properties:
+      id:
+        description: Id do detalhe
+        type: integer
+        example: 1
+      description:
+        description: Descrição do detalhe
+        type: string
+        example: CP-320
+      detailCode:
+        description: Código auxiliar do detalhe
+        type: string
+        example: DT-01
+  ResourceTrademarkDTO:
+    type: object
+    properties:
+      id:
+        description: Id da marca
+        type: integer
+        example: 123
+      description:
+        description: Descrição da marca
+        type: string
+        example: Lorem ipsum
+  ResourcePriceDTO:
+    type: object
+    properties:
+      id:
+        description: Id do preço
+        type: integer
+        example: 10
+      description:
+        description: Descrição do preço
+        type: string
+        example: "Detalhe: CP I / Marca: Nassau"
+      unitPrice:
+        description: Preço unitário do insumo com precisão de 4 casas decimais
+        type: number
+        example: 1.2304
+      date:
+        description: Data do preço no formato yyyy-MM-dd
+        type: string
+        example: "2024-06-12"
+  ResourceGroupDTO:
+    type: object
+    properties:
+      id:
+        description: Código do grupo de insumo
+        type: string
+        example: "1"
+      description:
+        description: Descrição do grupo de insumo
+        type: string
+        example: Material
+      referenceId:
+        description: Código de referência do grupo de insumo
+        type: string
+        example: "02"
+  ResourceFamilyDTO:
+    type: object
+    properties:
+      id:
+        description: Código da família do insumo
+        type: string
+        example: "2"
+      description:
+        description: Descrição da família do insumo
+        type: string
+        example: Material Civil
+      referenceId:
+        description: Código de referência da família do insumo
+        type: string
+        example: "02.003"
+  FinancialCategoryDTO:
+    type: object
+    properties:
+      id:
+        description: Código do plano financeiro
+        type: string
+        example: "2010101"
+      description:
+        description: Descrição do plano financeiro
+        type: string
+        example: Terrenos
+  ResourceDTO:
+    type: object
+    properties:
+      id:
+        description: Código do insumo
+        type: integer
+        example: 1001
+      description:
+        description: Descrição do insumo
+        type: string
+        example: Cimento Portland
+      unitOfMeasure:
+        description: Símbolo da unidade de medida básica do insumo
+        type: string
+        example: kg
+      unitOfMeasureDescription:
+        description: Descrição da unidade de medida básica do insumo
+        type: string
+        example: Quilograma
+      category:
+        description: >-
+          Tipo do insumo:
+          - EQUIPMENT (EQUIPAMENTO)
+          - LABOR (MÃO DE OBRA)
+          - INCREMENTAL_COST_ITEM (ITEM INCIDÊNCIA)
+          - MATERIAL (MATEIRAL DE CONSUMO)
+          - TRANSPORT_ITEM (ITEM TRANSPORTE)
+          - OTHER (OUTROS)
+          - OFFICE_SUPPLY (MATERIAL EXPEDIENTE)
+          - FUELS_AND_LUBRICANTS (COMBUSTÍVEIS E LUBRIFICANTES)
+          - MAINTENANCE_MATERIAL (MATERIAL MANUTENÇÃO)
+        type: string
+        enum:
+          - EQUIPMENT
+          - LABOR
+          - INCREMENTAL_COST_ITEM
+          - MATERIAL
+          - TRANSPORT_ITEM
+          - OTHER
+          - OFFICE_SUPPLY
+          - FUELS_AND_LUBRICANTS
+          - MAINTENANCE_MATERIAL
+        example: MATERIAL
+      resourceCode:
+        description: Código auxiliar do insumo
+        type: string
+        example: M1354
+      barcode:
+        description: >-
+          Código de barras do insumo, considerando a unidade de medida básica,
+          sem detalhe nem marca especificados.
+        type: string
+        example: "7613033174728"
+      resourceGroup:
+        $ref: "#/definitions/ResourceGroupDTO"
+      resourceFamily:
+        $ref: "#/definitions/ResourceFamilyDTO"
+      financialCategory:
+        $ref: "#/definitions/FinancialCategoryDTO"
+      status:
+        description: Status do insumo
+        type: string
+        example: ACTIVE
+      details:
+        description: Detalhes ativos do insumo
+        type: array
+        items:
+          $ref: "#/definitions/ResourceDetailDTO"
+      trademarks:
+        description: Marcas ativas do insumo
+        type: array
+        items:
+          $ref: "#/definitions/ResourceTrademarkDTO"
+      prices:
+        description: Preços do insumo
+        type: array
+        items:
+          $ref: "#/definitions/ResourcePriceDTO"
+  WorkItemDTO:
+    type: object
+    properties:
+      id:
+        description: Código do serviço
+        type: integer
+        example: 2405
+      description:
+        description: Descrição do serviço
+        type: string
+        example: Assentamento de alvenaria
+      unitOfMeasure:
+        description: Símbolo da unidade de medida do serviço
+        type: string
+        example: kg
+      unitOfMeasureDescription:
+        description: Descrição da unidade de medida do serviço
+        type: string
+        example: Quilograma
+      auxiliaryCode:
+        description: Código auxiliar do serviço
+        type: string
+        example: M1354
+      buildingTypeId:
+        description: Código do tipo de obra do serviço
+        type: integer
+        example: 2
+      priceCategory:
+        description: Tipo de preço. Pode ser composto (COMPOSITE) ou informado (INFORMED_BY_UNIT_PRICE)
+        type: string
+        example: COMPOSITE
+        enum:
+          - COMPOSITE
+          - INFORMED_BY_UNIT_PRICE
+      firstLevelWorkItemGroupId:
+        description: Referência da Etapa do Grupo de serviço
+        type: string
+        example: "001"
+      firstLevelWorkItemGroup:
+        description: Descrição da Etapa do Grupo de serviço
+        type: string
+        example: Alvenarias, fechamentos e divisórias
+      lastLevelWorkItemGroupId:
+        description: Referência da Subetapa do Grupo de serviço
+        type: string
+        example: "001.001"
+      lastLevelWorkItemGroup:
+        description: Descrição da Subetapa do Grupo de serviço
+        type: string
+        example: Estruturas
+      unitPrice:
+        description: >-
+          Preço unitário do serviço com precisão de 4 casas. Equivalente a soma dos preços unitários de cada tipo de insumo.
+        type: number
+        example: 9.0009
+      status:
+        description: Status do serviço. Pode ser ativo (ACTIVE) ou inativo (INACTIVE)
+        type: string
+        example: ACTIVE
+        enum:
+          - ACTIVE
+          - INACTIVE
+      pricesByResourceGroup:
+        type: array
+        description: >-
+          Preços unitários detalhados por grupo de insumo
+        items:
+          $ref: "#/definitions/PriceByResourceGroupDTO"
+      pricesByCategory:
+        type: array
+        description: >-
+          Preços unitários detalhados por tipo de insumo (por exemplo material e mão de obra).
+        items:
+          $ref: "#/definitions/PriceByCategoryDTO"
+  PriceByCategoryDTO:
+    type: object
+    properties:
+      category:
+        description: >-
+          Tipo de insumo do preço correspondente:
+            - EQUIPMENT (EQUIPAMENTO)
+            - LABOR (MÃO DE OBRA)
+            - INCREMENTAL_COST_ITEM (ITEM INCIDÊNCIA)
+            - MATERIAL (MATEIRAL DE CONSUMO)
+            - TRANSPORT_ITEM (ITEM TRANSPORTE)
+            - OTHER (OUTROS)
+            - OFFICE_SUPPLY (MATERIAL EXPEDIENTE)
+            - FUELS_AND_LUBRICANTS (COMBUSTÍVEIS E LUBRIFICANTES)
+            - MAINTENANCE_MATERIAL (MATERIAL MANUTENÇÃO)
+        type: string
+        enum:
+          - EQUIPMENT
+          - LABOR
+          - INCREMENTAL_COST_ITEM
+          - MATERIAL
+          - TRANSPORT_ITEM
+          - OTHER
+          - OFFICE_SUPPLY
+          - FUELS_AND_LUBRICANTS
+          - MAINTENANCE_MATERIAL
+        example: MATERIAL
+      unitPrice:
+        description: >-
+          Preço unitário para o tipo de insumo correspondente com precisão de 4
+          casas
+        type: number
+        example: 9.0009
+  PriceByResourceGroupDTO:
+    type: object
+    properties:
+      referenceId:
+        description: Referência do grupo de insumo
+        type: string
+        example: "01"
+      description:
+        description: Descrição do grupo de insumo
+        type: string
+        example: "MATERIAIS APLICADOS EM OBRA"
+      unitPrice:
+        description: Preço unitário para o grupo de insumo correspondente com precisão de 4 casas
+        type: number
+        example: 100.0001
+      date:
+        description: Data do preço. Será nula para preços do tipo composto
+        type: string
+        example: "2025-03-05"
+  AssemblyDTO:
+    type: object
+    properties:
+      id:
+        description: Código do serviço
+        type: integer
+        example: 123
+      auxiliaryCode:
+        description: Código auxiliar do serviço
+        type: string
+        example: "SER123"
+      description:
+        description: Descrição do serviço
+        type: string
+        example: "Serviço da composição"
+      workItemGroup:
+        description: Código de referência do grupo de serviço
+        type: string
+        example: "001.001"
+      workItemGroupDescription:
+        description: Descrição do grupo de serviço
+        type: string
+        example: "Serviços preliminares"
+      unitOfMeasure:
+        description: Unidade de medida
+        type: string
+        example: "m2"
+      unitPrice:
+        description: Preço unitário do serviço com precisão de 4 casas decimais
+        type: number
+        example: 1200.1234
+      buildingTypeId:
+        description: Código do tipo de obra
+        type: integer
+        example: 1
+      priceCategory:
+        description: >-
+          Tipo de preço:
+            - COMPOSITE: COMPOSTO
+            - INFORMED_BY_UNIT_PRICE: INFORMADO
+        type: string
+        enum:
+          - COMPOSITE
+          - INFORMED_BY_UNIT_PRICE
+        example: "COMPOSITE"
+      items:
+        type: array
+        description: Itens da composição. Podem ser dos tipos insumo ou serviço auxiliar
+        items:
+          $ref: "#/definitions/AssemblyItemDTO"
+  AssemblyItemDTO:
+    type: object
+    properties:
+      id:
+        description: Código do insumo ou serviço auxiliar
+        type: integer
+        example: 456
+      auxiliaryCode:
+        description: Código auxiliar do insumo ou serviço auxiliar
+        type: string
+        example: "SER456"
+      category:
+        description: >-
+          Tipo do insumo, exceto no caso de serviço auxiliar, em que o valor é "WORK_ITEM":
+            - EQUIPMENT: EQUIPAMENTO
+            - LABOR: MÃO DE OBRA
+            - INCREMENTAL_COST_ITEM: ITEM DE INCIDÊNCIA
+            - MATERIAL: MATERIAL DE CONSUMO
+            - TRANSPORT_ITEM: ITEM DE TRANSPORTE
+            - OTHER: OUTROS
+            - OFFICE_SUPPLY: MATERIAL DE EXPEDIENTE
+            - FUELS_AND_LUBRICANTS: COMBUSTÍVEIS E LUBRIFICANTES
+            - MAINTENANCE_MATERIAL: MATERIAL DE MANUTENÇÃO
+            - WORK_ITEM: SERVIÇO
+        type: string
+        enum:
+          - EQUIPMENT
+          - LABOR
+          - INCREMENTAL_COST_ITEM
+          - MATERIAL
+          - TRANSPORT_ITEM
+          - OTHER
+          - OFFICE_SUPPLY
+          - FUELS_AND_LUBRICANTS
+          - MAINTENANCE_MATERIAL
+          - WORK_ITEM
+        example: WORK_ITEM
+      description:
+        description: Descrição do insumo ou serviço auxiliar
+        type: string
+        example: "Serviço da composição"
+      group:
+        description: Código de referência do grupo de insumo ou serviço
+        type: string
+        example: "001.001"
+      groupDescription:
+        description: Descrição do grupo de insumo ou serviço
+        type: string
+        example: "Serviços preliminares"
+      unitOfMeasure:
+        description: Unidade de medida do insumo ou serviço auxiliar
+        type: string
+        example: "m2"
+      quantity:
+        description: Quantidade do insumo ou serviço auxiliar com precisão de 6 casas decimais
+        type: number
+        example: 635.489001
+      unitPrice:
+        description: Preço unitário do insumo ou serviço auxiliar com precisão de 4 casas decimais
+        type: number
+        example: 13.1452
+      priceCategory:
+        description: >-
+          Tipo de preço do insumo ou serviço auxiliar:
+            - COMPOSITE: COMPOSTO
+            - CALCULATED: CALCULADO
+            - INFORMED_BY_UNIT_PRICE: INFORMADO
+            - INFORMED_BY_HOUR: INFORMADO POR HORA PRODUTIVA / IMPRODUTIVA
+        type: string
+        enum:
+          - COMPOSITE
+          - CALCULATED
+          - INFORMED_BY_UNIT_PRICE
+          - INFORMED_BY_HOUR
+        example: "COMPOSITE"
+      trademark:
+        description: Marca do insumo. Campo virá nulo quando o item da composição é do tipo serviço auxiliar
+        type: object
+        properties:
+          id:
+            description: Código da marca do insumo. Campo virá nulo quando o insumo não possuir marca
+            type: number
+            example: 10
+          description:
+            description: Descrição da marca do insumo. Campo virá nulo quando o insumo não possuir marca
+            type: string
+            example: Suvinil
+      detail:
+        description: Detalhe do insumo. Campo virá nulo quando o item da composição é do tipo serviço auxiliar
+        type: object
+        properties:
+          id:
+            description: Código do detalhe do insumo. Campo virá nulo quando o insumo não possuir detalhe
+            type: number
+            example: 12
+          description:
+            description: Descrição do detalhe do insumo. Campo virá nulo quando o insumo não possuir detalhe
+            type: string
+            example: Detalhe
+          detailCode:
+            description: Código auxiliar do detalhe do insumo. Campo virá nulo quando o insumo não possuir detalhe
+            type: string
+            example: DET1
+      priceId:
+        description: Código do preço do insumo. Campo virá nulo quando o item da composição é do tipo serviço auxiliar
+        type: number
+        example: 120010
+  CostDatabaseDTO:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Código da tabela
+        example: 1
+      description:
+        type: string
+        description: Descrição da tabela
+        example: Tabela Geral
+      isDefault:
+        type: boolean
+        description: Indica se a tabela é a tabela padrão
+        example: true
+      isReference:
+        type: boolean
+        description: Indica se a tabela é de equivalência, considerada como referência para as Equivalências entre Insumos
+        example: true
+      status:
+        type: string
+        description: Status da tabela. Indica se a tabela está ativa (ACTIVE) ou inativa (INACTIVE)
+        example: ACTIVE
+        enum:
+          - ACTIVE
+          - INACTIVE
+      costDatabaseEnabledForIntegration:
+        type: boolean
+        description: Indica se a tabela está habilitada para integração
+        example: false
+
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

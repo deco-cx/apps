@@ -1,0 +1,1798 @@
+swagger: "2.0"
+info:
+  title: Diário de Obra
+  description: API de Diário de Obra
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+paths:
+  /construction-daily-report:
+    get:
+      operationId: getConstructionDailyReport
+      tags:
+        - Diário de Obra
+      summary: >-
+        Retorna os Diários das Obras paginados.
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: buildingId
+          required: false
+          description: Id da Obra
+          type: integer
+        - in: query
+          name: startDate
+          required: false
+          description: >-
+            Data de início da busca (data do Diário de Obra) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-01
+          type: string
+        - in: query
+          name: endDate
+          required: false
+          description: >-
+            Data de fim da busca (data do Diário de Obra) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-11
+          type: string
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/ConstructionDailyReportsDtoPaginated"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Parametro obrigatório não informado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+    post:
+      operationId: postConstructionDailyReport
+      tags:
+        - Diário de Obra
+      summary: >-
+        Cadastra um Diário de Obra, com informações de tarefas, ocorrências,
+        equipes e equipamentos.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Dados para cadastro de um Diário de Obra
+          required: true
+          schema:
+            $ref: "#/definitions/ConstructionDailyReportDto"
+      responses:
+        "201":
+          description: um novo diário de obra cadastrado com sucesso
+          schema:
+            $ref: "#/definitions/ConstructionDailyReportsDtoForReponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Parametro obrigatório não informado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/construction-daily-report/{buildingId}/{constructionDailyId}":
+    get:
+      operationId: getConstructionDailyReportIdId
+      tags:
+        - Diário de Obra
+      summary: >-
+        Retorna todos os dados de um Diário de Obra específico
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: constructionDailyId
+          description: Código do diário de obra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/ConstructionDailyReportDtoGet"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Parametro obrigatório não informado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+    delete:
+      operationId: deleteConstructionDailyReportIdId
+      tags:
+        - Diário de Obra
+      summary: >-
+        Deleta um Diário de Obra, exceto aqueles que tenham sido usados em uma
+        Integração.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: constructionDailyId
+          description: Código do diário de obra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "204":
+          description: Sem conteúdo.
+        "400":
+          description: >-
+            Requisição mal formada. Pode ser causada por algum campo obrigatório
+            ausente ou fora da formatação.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/construction-daily-report/{buildingId}/{constructionDailyId}/attachments":
+    post:
+      operationId: getConstructionDailyReportIdIdAttachments
+      tags:
+        - Anexos do Diário de Obra
+      summary: Inclui anexo em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - $ref: "#/parameters/description"
+        - $ref: "#/parameters/file"
+        - $ref: "#/parameters/localId"
+        - $ref: "#/parameters/showInReports"
+      responses:
+        "201":
+          description: Anexo inserido com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/construction-daily-report/{buildingId}/{constructionDailyId}/attachments/{attachmentId}":
+    get:
+      operationId: getConstructionDailyReportIdIdAttachmentsID
+      tags:
+        - Anexos do Diário de Obra
+      summary: Retorna o anexo de um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - $ref: "#/parameters/attachmentId"
+      produces:
+        - file
+        - application/json
+      responses:
+        "200":
+          description: Anexo retornado com sucesso
+          schema:
+            type: file
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/construction-daily-report/{buildingId}/{constructionDailyId}/events":
+    post:
+      operationId: postConstructionDailyReportIdIdEvents
+      tags:
+        - Ocorrências do Diário de Obra
+      responses:
+        "201":
+          description: Ocorrências inseridas com sucesso
+          schema:
+            $ref: "#/definitions/EventsDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Inclui ocorrências em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Ocorrências que serão adicionadas
+          required: true
+          schema:
+            $ref: "#/definitions/EventsDtoForPost"
+    put:
+      operationId: putConstructionDailyReportIdIdEvents
+      tags:
+        - Ocorrências do Diário de Obra
+      responses:
+        "200":
+          description: Retorna um objeto JSON com as Ocorrências atualizadas
+          schema:
+            $ref: "#/definitions/EventsDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Atualiza Ocorrências em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Ocorrências que serão atualizadas
+          required: true
+          schema:
+            $ref: "#/definitions/EventsDtoForPut"
+  "/construction-daily-report/{buildingId}/{constructionDailyId}/tasks":
+    post:
+      operationId: postConstructionDailyReportIdIdTasks
+      tags:
+        - Tarefas do Diário de Obra
+      responses:
+        "201":
+          description: Tarefas inseridas com sucesso
+          schema:
+            $ref: "#/definitions/TaskDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Inclui tarefas em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Tarefas que serão adicionadas
+          required: true
+          schema:
+            $ref: "#/definitions/TasksDtoForPost"
+    put:
+      operationId: putConstructionDailyReportIdIdTasks
+      tags:
+        - Tarefas do Diário de Obra
+      responses:
+        "200":
+          description: Retorna um objeto JSON com as Tarefas atualizadas
+          schema:
+            $ref: "#/definitions/TaskDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Atualiza tarefas em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Tarefas que serão atualizadas
+          required: true
+          schema:
+            $ref: "#/definitions/TasksDtoForPut"
+  "/construction-daily-report/{buildingId}/{constructionDailyId}/crews":
+    post:
+      operationId: postConstructionDailyReportIdIdCrews
+      tags:
+        - Equipes do Diário de Obra
+      responses:
+        "201":
+          description: Equipes inseridas com sucesso
+          schema:
+            $ref: "#/definitions/CrewsDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Inclui equipes em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Equipes que serão adicionadas
+          required: true
+          schema:
+            $ref: "#/definitions/CrewsDtoForPost"
+    put:
+      operationId: putConstructionDailyReportIdIdCrews
+      tags:
+        - Equipes do Diário de Obra
+      responses:
+        "200":
+          description: Retorna um objeto JSON com as Equipes atualizadas
+          schema:
+            $ref: "#/definitions/CrewsDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Atualiza Equipes em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Equipes que serão atualizadas
+          required: true
+          schema:
+            $ref: "#/definitions/CrewsDtoForPut"
+  "/construction-daily-report/{buildingId}/{constructionDailyId}/equipments":
+    post:
+      operationId: postConstructionDailyReportIdIdEquipments
+      tags:
+        - Equipamentos do Diário de Obra
+      responses:
+        "201":
+          description: Equipamentos inseridos com sucesso
+          schema:
+            $ref: "#/definitions/EquipmentsDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Inclui equipamentos em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Equipamentos que serão adicionadas
+          required: true
+          schema:
+            $ref: "#/definitions/EquipmentsDtoForPost"
+    put:
+      operationId: putConstructionDailyReportIdIdEquipments
+      tags:
+        - Equipamentos do Diário de Obra
+      responses:
+        "200":
+          description: Retorna um objeto JSON com os Equipamentos atualizados
+          schema:
+            $ref: "#/definitions/EquipmentsDtoForResponse"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável, por parâmetro obrigatório não informado ou
+            validação de regra de negócio
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+      summary: Atualiza Equipamentos em um Diário de Obra
+      parameters:
+        - $ref: "#/parameters/buildingId"
+        - $ref: "#/parameters/constructionDailyId"
+        - in: body
+          name: body
+          description: Equipamentos que serão atualizados
+          required: true
+          schema:
+            $ref: "#/definitions/EquipmentsDtoForPut"
+  /construction-daily-report/event-type:
+    get:
+      operationId: getConstructionDailyReportEventType
+      tags:
+        - Tipos de Ocorrência
+      summary: Retorna a lista de Tipos de Ocorrência.
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - in: query
+          name: sort
+          description: >-
+            Atributo para ordenação, permitidos são: id,description,isActive.
+            Obs: ordenação padrão pelo id
+          required: false
+          type: string
+        - in: query
+          name: order
+          description: "Posição para ordenação. Valores permitidos são: ASC e DESC. Valor padrão é ASC"
+          required: false
+          type: string
+        - in: query
+          name: id
+          description: Filtro por id
+          required: false
+          type: number
+        - in: query
+          name: description
+          description: Filtro por descrição
+          required: false
+          type: string
+        - in: query
+          name: isActive
+          description: Filtro por status ativo
+          required: false
+          type: boolean
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/GetResponseEventType"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  /construction-daily-report/types:
+    get:
+      operationId: getConstructionDailyReportTypes
+      tags:
+        - Tipos
+      summary: Retorna a lista de Tipos de Ocorrência, Equipe e Equipamento do Diário de Obra.
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: types
+          description: >-
+            Permite informar quais Tipos serão retornados pelo endpoint. Valores aceitos são Event, Crew e Equipment.
+            É possível informar mais de um valor, desde que sejam separados por vírgula. Se este parâmetro não for informado, serão retornados todos os registros dos três Tipos.
+          required: false
+          type: array
+          items:
+            type: string
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - in: query
+          name: sort
+          description: >-
+            Atributo para ordenação, permitidos são: id,description,isActive.
+            Obs: ordenação padrão pelo id
+          required: false
+          type: string
+        - in: query
+          name: order
+          description: "Posição para ordenação. Valores permitidos são: ASC e DESC. Valor padrão é ASC"
+          required: false
+          type: string
+        - in: query
+          name: id
+          description: Filtro por id
+          required: false
+          type: number
+        - in: query
+          name: description
+          description: Filtro por descrição
+          required: false
+          type: string
+        - in: query
+          name: isActive
+          description: Filtro por status ativo
+          required: false
+          type: boolean
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/GetResponseType"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponseEventType:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de tipos de Ocorrência
+        items:
+          $ref: "#/definitions/EventTypeDto"
+  GetResponseType:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Tipos de Ocorrência, Equipe e Equipamento
+        items:
+          $ref: "#/definitions/TypeDto"
+  ResultSetMetadata:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.  Valor padrão
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados.  Valor
+          padrão é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  EventTypeDto:
+    type: object
+    properties:
+      id:
+        description: Código do tipo de Ocorrência
+        type: number
+        example: 1
+      description:
+        description: Descrição do tipo de Ocorrência
+        type: string
+        example: alagamento no subsolo garagem
+      isActive:
+        type: boolean
+        description: Informa true se o Tipo de Ocorrência está ativo ou false se está inativo.
+        example: true
+  TypeDto:
+    type: object
+    properties:
+      id:
+        description: Código do Tipo
+        type: number
+        example: 1
+      description:
+        description: Descrição do Tipo
+        type: string
+        example: Recebimento de material
+      isActive:
+        type: boolean
+        description: Informa true se o Tipo está ativo ou false se está inativo.
+        example: true
+      type:
+        description: Informa Event se o registro for um Tipo de Ocorrência, Crew se for de Equipe e Equipment se for de Equipamento.
+        type: string
+        example: Event
+  ConstructionDailyReportsDtoPaginated:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Diários de Obra
+        items:
+          $ref: "#/definitions/ConstructionDailyReportDtoForGetPaginated"
+  ConstructionDailyReportDtoForGetPaginated:
+    type: object
+    description: Diário de Obra
+    properties:
+      id:
+        description: Código do Diário de Obra
+        type: number
+        example: 1
+      buildingId:
+        description: Código da Obra
+        type: number
+        example: 10
+      date:
+        description: Data do registro de Diário de Obra
+        type: string
+        format: yyyy-MM-dd
+        example: "2023-07-15"
+      responsibleId:
+        description: Código do Responsável pelo Diário de Obras
+        type: string
+        example: "ADMIN"
+      shifts:
+        type: array
+        description: >-
+          Lista de Turnos do Diário de Obra.
+        items:
+          type: object
+          properties:
+            description:
+              description: >-
+                Descrição do turno (Morning, Afternoon ou Night) (Matutino, Vespertino
+                ou Noturno)
+              type: string
+              example: Morning
+  ConstructionDailyReportDtoGet:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Código do Diário de Obra
+        example: 10
+      buildingId:
+        type: integer
+        description: Código de obra.
+        example: 1
+      date:
+        type: string
+        description: Data do Registro do Diário de Obra
+        example: "2023-11-24"
+      responsibleId:
+        type: string
+        description: código do responsável pelo Diário de Obras
+        example: "JOAO"
+      rainfallIndex:
+        description: Índice Pluviométrico
+        type: number
+        example: 9999.99
+      weekDay:
+        type: string
+        description: Dia da semana
+        example: "segunda-feira"
+      notes:
+        type: string
+        description: Observação do Diário de Obra, limitado a 4000 caracteres
+        example: "Registro dos ocorridos no dia 15/07/2023."
+      createdBy:
+        type: string
+        description: Nome do Usuário que cadastrou o diário
+        example: "JOAO"
+      createdAt:
+        type: string
+        description: Data e hora da criação do diário no formato yyyy-MM-ddTHH:mm:ss.
+        example: "2023-11-24T14:20:00.000-03:00"
+      modifiedBy:
+        type: string
+        description: Nome do último usuário que modificou o diário
+        example: "MARIA"
+      modifiedAt:
+        type: string
+        description: Data e hora da modificação do diário no formato yyyy-MM-ddTHH:mm:ss
+        example: "2023-11-25T15:15:00.000-03:00"
+      shifts:
+        type: array
+        description: Lista de Turnos do Diário de Obra.
+        items:
+          $ref: "#/definitions/ShiftDto"
+      plannedTasks:
+        type: array
+        description: Lista de Tarefas Planejadas do Diário de Obra.
+        items:
+          $ref: "#/definitions/PlannedTaskDtoForGet"
+      detachedTasks:
+        type: array
+        description: Lista de Tarefas Avulsas do Diário de Obra.
+        items:
+          $ref: "#/definitions/DetachedTaskDtoForResponse"
+      events:
+        type: array
+        description: Lista de Ocorrências
+        items:
+          $ref: "#/definitions/EventDtoForGet"
+      crews:
+        type: array
+        description: Lista de Equipe Envolvida
+        items:
+          $ref: "#/definitions/CrewDtoForGet"
+      equipments:
+        type: array
+        description: Lista de equipamentos
+        items:
+          $ref: "#/definitions/EquipmentDtoForGet"
+      attachments:
+        type: array
+        description: Lista de anexos
+        items:
+          $ref: "#/definitions/AttachmentDtoForGet"
+  ConstructionDailyReportDto:
+    type: object
+    required:
+      - buildingId
+      - date
+      - shifts
+    properties:
+      buildingId:
+        description: Código da Obra
+        type: number
+        example: 1
+      date:
+        description: Data do registro de Diário de Obra
+        type: string
+        format: yyyy-MM-dd
+        example: "2023-07-15"
+      notes:
+        description: "Observação do Diário de Obra, limitado a 4000 caracteres"
+        type: string
+        example: Registro dos ocorridos no dia 15/07/2023...
+      responsibleId:
+        description: Código do Responsável pelo Diário de Obras
+        type: string
+        example: "ADMIN"
+      rainfallIndex:
+        description: Índice Pluviométrico, deve ser maior ou igual a zero e menor que 9999.99
+        type: number
+        example: 9999.99
+      shifts:
+        type: array
+        description: >-
+          Lista de Turnos do Diário de Obra. É obrigatório informar pelo menos um
+          turno com hora de inicio, hora de fim e condição climática.
+        items:
+          $ref: "#/definitions/ShiftDto"
+      plannedTasks:
+        type: array
+        description: Lista de Tarefas Planejadas do Diário de Obra.
+        items:
+          $ref: "#/definitions/PlannedTaskDto"
+      detachedTasks:
+        type: array
+        description: Lista de Tarefas Avulsas do Diário de Obra.
+        items:
+          $ref: "#/definitions/DetachedTaskDto"
+      events:
+        type: array
+        description: Lista de Ocorrências do Diário de Obra.
+        items:
+          $ref: "#/definitions/EventDto"
+      crews:
+        type: array
+        description: Lista de equipes
+        items:
+          $ref: "#/definitions/CrewDto"
+      equipments:
+        type: array
+        description: Lista de equipamentos
+        items:
+          $ref: "#/definitions/EquipmentDto"
+  ConstructionDailyReportsDtoForReponse:
+    type: object
+    properties:
+      id:
+        description: Código do Diário de Obras
+        type: number
+        example: 12
+      buildingId:
+        description: Código da Obra
+        type: number
+        example: 1
+      date:
+        description: Data do registro de Diário de Obra
+        type: string
+        format: yyyy-MM-dd
+        example: "2023-07-15"
+      notes:
+        description: "Observação do Diário de Obra, limitado a 4000 caracteres"
+        type: string
+        example: Registro dos ocorridos no dia 15/07/2023...
+      responsibleId:
+        description: Código do Responsável pelo Diário de Obras
+        type: string
+        example: "ADMIN"
+      rainfallIndex:
+        description: Índice Pluviométrico
+        type: number
+        example: 9999.99
+      shifts:
+        type: array
+        description: >-
+          Lista de Turnos do Diário de Obra.
+        items:
+          $ref: "#/definitions/ShiftDto"
+      plannedTasks:
+        type: array
+        description: >-
+          Lista de Tarefas Planejadas do Diário de Obra.
+        items:
+          $ref: "#/definitions/PlannedTaskDtoForResponse"
+      detachedTasks:
+        type: array
+        description: >-
+          Lista de Tarefas Avulsas do Diário de Obra.
+        items:
+          $ref: "#/definitions/DetachedTaskDtoForResponse"
+      events:
+        type: array
+        description: >-
+          Lista de Ocorrências do Diário de Obra.
+        items:
+          $ref: "#/definitions/EventDtoForResponse"
+      crews:
+        type: array
+        description: >-
+          Lista de Equipes do Diário de Obra.
+        items:
+          $ref: "#/definitions/CrewDtoForResponse"
+      equipments:
+        type: array
+        description: >-
+          Lista de Equipamentos do Diário de Obra.
+        items:
+          $ref: "#/definitions/EquipmentDtoForResponse"
+  EventsDtoForPost:
+    type: array
+    description: >-
+      Lista de Ocorrências do Diário de Obra. Deve conter pelo menos uma
+      Ocorrência.
+    items:
+      $ref: "#/definitions/EventDto"
+  EventsDtoForPut:
+    type: array
+    description: Lista de Ocorrências do Diário de Obra.
+    items:
+      $ref: "#/definitions/EventDtoForResponse"
+  EventsDtoForResponse:
+    type: object
+    properties:
+      buildingId:
+        description: Código da Obra
+        type: number
+        example: 661
+      constructionDailyId:
+        description: Código do Diário de Obras
+        type: number
+        example: 1
+      events:
+        type: array
+        description: >-
+          Lista de Ocorrências do Diário de Obra.
+        items:
+          $ref: "#/definitions/EventDtoForResponse"
+  EventDtoForResponse:
+    type: object
+    properties:
+      id:
+        description: Código da Ocorrência
+        type: number
+        example: 9
+      description:
+        description: Descrição da Ocorrência
+        type: string
+        example: Visita do fiscal da prefeitura
+      eventTypeId:
+        description: Código do tipo da Ocorrência
+        type: number
+        example: 1
+  EventDtoForGet:
+    type: object
+    properties:
+      id:
+        description: Código da Ocorrência
+        type: number
+        example: 9
+      description:
+        description: Descrição da Ocorrência
+        type: string
+        example: Visita do fiscal da prefeitura
+      eventTypeId:
+        description: Código do tipo da Ocorrência
+        type: number
+        example: 1
+      eventTypeDescription:
+        description: Descrição do tipo da Ocorrência
+        type: string
+        example: "Visitas"
+  TasksDtoForPost:
+    type: object
+    properties:
+      plannedTasks:
+        $ref: "#/definitions/plannedTasks"
+      detachedTasks:
+        $ref: "#/definitions/detachedTasks"
+  TasksDtoForPut:
+    type: object
+    properties:
+      plannedTasks:
+        $ref: "#/definitions/plannedTasksForPut"
+      detachedTasks:
+        $ref: "#/definitions/detachedTasksForPut"
+  TaskDtoForResponse:
+    type: object
+    properties:
+      buildingId:
+        description: Código da Obra
+        type: number
+        example: 661
+      constructionDailyId:
+        description: Código do Diário de Obras
+        type: number
+        example: 1
+      plannedTasks:
+        type: array
+        description: >-
+          Lista de Tarefas Planejadas do Diário de Obra.
+        items:
+          $ref: "#/definitions/PlannedTaskDtoForResponse"
+      detachedTasks:
+        type: array
+        description: >-
+          Lista de Tarefas Avulsas do Diário de Obra.
+        items:
+          $ref: "#/definitions/DetachedTaskDtoForResponse"
+  PlannedTaskDtoForResponse:
+    type: object
+    properties:
+      id:
+        description: Código da Tarefa.
+        type: number
+        example: 7
+      buildingUnitId:
+        type: integer
+        description: Código da Unidade Construtiva.
+        example: 1
+      taskId:
+        description: Código identificador da Tarefa.
+        type: number
+        example: 109
+      notes:
+        type: string
+        description: Observação da Tarefa.
+        example: Tarefa será realizada pelos ajudantes...
+      quantity:
+        type: number
+        description: >-
+          Quantidade referente a medição da tarefa.
+        example: 1234567891234.5679
+      supplierId:
+        type: integer
+        description: Código identificador do fornecedor da tarefa
+        example: 2
+      siteId:
+        type: integer
+        description: Código identificador do local da tarefa
+        example: 3
+  PlannedTaskDtoForGet:
+    type: object
+    properties:
+      id:
+        description: Código da Tarefa.
+        type: number
+        example: 7
+      buildingUnitId:
+        type: integer
+        description: Código da Unidade Construtiva.
+        example: 1
+      taskId:
+        description: Código identificador da Tarefa.
+        type: number
+        example: 109
+      notes:
+        type: string
+        description: Observação da Tarefa.
+        example: Tarefa será realizada pelos ajudantes...
+      quantity:
+        type: number
+        description: >-
+          Quantidade referente a medição da tarefa.
+        example: 1234.5679
+      unitOfMeasure:
+        type: string
+        description: Unidade de medida usada para a tarefa
+        example: "m2"
+      supplierId:
+        type: integer
+        description: Código identificador do fornecedor da tarefa
+        example: 2
+      siteId:
+        type: integer
+        description: Código identificador do local da tarefa
+        example: 3
+
+  DetachedTaskDtoForResponse:
+    type: object
+    properties:
+      id:
+        description: Código da Tarefa.
+        type: number
+        example: 8
+      description:
+        type: string
+        description: Descrição da Tarefa.
+        example: Tarefa xyz
+      notes:
+        type: string
+        description: Observação da Tarefa.
+        example: Tarefa será realizada pelos ajudantes...
+      quantity:
+        type: number
+        description: >-
+          Quantidade referente a medição da Tarefa.
+        example: 9876.5432
+      unitOfMeasure:
+        type: string
+        example: m2
+        description: Unidade de medida usada para a Tarefa.
+      siteId:
+        type: integer
+        description: Código identificador do local da tarefa
+        example: 3
+
+  CrewsDtoForPost:
+    type: array
+    description: Lista de Equipes do Diário de Obra.
+    items:
+      $ref: "#/definitions/CrewDto"
+  CrewsDtoForPut:
+    type: array
+    description: Lista de Equipes do Diário de Obra.
+    items:
+      $ref: "#/definitions/CrewDtoForResponse"
+  CrewsDtoForResponse:
+    type: object
+    properties:
+      buildingId:
+        description: Código da Obra
+        type: number
+        example: 661
+      constructionDailyId:
+        description: Código do Diário de Obras
+        type: number
+        example: 1
+      crews:
+        type: array
+        description: Equipes do Diário de Obras
+        items:
+          $ref: "#/definitions/CrewDtoForResponse"
+  CrewDtoForResponse:
+    type: object
+    properties:
+      id:
+        description: Código da Equipe
+        type: number
+        example: 5
+      resourceId:
+        description: >-
+          Código do Insumo do tipo Mão de Obra (atributo category=LABOR na API
+          Insumos do Orçamento da Obra -
+          /building-cost-estimations/{building-id}/resources)
+        type: number
+        example: null
+      quantity:
+        description: >-
+          Quantidade utilizada do insumo Mão de Obra. Número inteiro, positivo e
+          maior que zero.
+        type: number
+        example: 10
+      crewTypeId:
+        description: Código de Tipo Equipe
+        type: number
+        example: 9
+      origin:
+        description: Informa se a Equipe é vinculada a Tipo ou Insumo
+        type: string
+        example: "type"
+      assignment:
+        description: Definição do tipo de mão de obra prestado. Pode ser DIRECT_LABOR, INDIRECT_LABOR ou THIRD_PARTY.
+        type: string
+        example: "INDIRECT_LABOR"
+  CrewDtoForGet:
+    type: object
+    properties:
+      id:
+        description: Código da Equipe
+        type: number
+        example: 5
+      resourceId:
+        description: >-
+          Código do Insumo do tipo Mão de Obra (atributo category=LABOR na API
+          Insumos do Orçamento da Obra -
+          /building-cost-estimations/{building-id}/resources)
+        type: number
+        example: null
+      description:
+        description: >-
+          Descrição do insumo do tipo Mão de Obra (atributo category=LABOR)
+        type: string
+        example: "Pedreiro"
+      quantity:
+        description: >-
+          Quantidade utilizada do insumo Mão de Obra. Número inteiro, positivo e
+          maior que zero.
+        type: number
+        example: 10
+      crewTypeId:
+        description: Código de Tipo Equipe
+        type: number
+        example: 9
+      origin:
+        description: Informa se o Equipamento é vinculado a Tipo ou Insumo
+        type: string
+        example: "type"
+      assignment:
+        description: Definição do tipo de mão de obra prestado. Pode ser DIRECT_LABOR, INDIRECT_LABOR ou THIRD_PARTY.
+        type: string
+        example: "INDIRECT_LABOR"
+  EquipmentsDtoForPost:
+    type: array
+    description: Lista de Equipamentos do Diário de Obra.
+    items:
+      $ref: "#/definitions/EquipmentDto"
+  EquipmentsDtoForPut:
+    type: array
+    description: Lista de Equipamentos do Diário de Obra
+    items:
+      $ref: "#/definitions/EquipmentDtoForResponse"
+  EquipmentsDtoForResponse:
+    type: object
+    properties:
+      buildingId:
+        description: Código da Obra
+        type: number
+        example: 661
+      constructionDailyId:
+        description: Código do Diário de Obras
+        type: number
+        example: 1
+      equipments:
+        type: array
+        description: Equipamentos do Diário de Obras
+        items:
+          $ref: "#/definitions/EquipmentDtoForResponse"
+  EquipmentDtoForResponse:
+    type: object
+    properties:
+      id:
+        description: Código do Equipamento
+        type: number
+        example: 1
+      resourceId:
+        description: >-
+          Código do Insumo do tipo Equipamento (atributo category=EQUIPAMENT na
+          API Insumos do Orçamento da Obra -
+          /building-cost-estimations/{building-id}/resources)
+        type: number
+        example: 10
+      quantity:
+        description: >-
+          Quantidade utilizada do insumo Equipamento. Número inteiro, positivo e
+          maior que zero.
+        type: number
+        example: 2
+      equipmentTypeId:
+        description: Código de Tipo Equipamento
+        type: number
+        example: null
+      origin:
+        description: Informa se o Equipamento é vinculado a Tipo ou Insumo
+        type: string
+        example: "resource"
+      status:
+        description: Status do equipamento. Pode ser IN_USE, IDLE ou OUT_OF_ORDER;
+        type: string
+        example: "OUT_OF_ORDER"
+  EquipmentDtoForGet:
+    type: object
+    properties:
+      id:
+        description: Código do Equipamento
+        type: number
+        example: 1
+      resourceId:
+        description: >-
+          Código do Insumo do tipo Equipamento (atributo category=EQUIPAMENT na
+          API Insumos do Orçamento da Obra -
+          /building-cost-estimations/{building-id}/resources)
+        type: number
+        example: 10
+      description:
+        description: >-
+          Descrição do insumo do Equipamento  (atributo category=LABOR)
+        type: string
+        example: "Betoneira"
+      quantity:
+        description: >-
+          Quantidade utilizada do insumo Equipamento. Número inteiro, positivo e
+          maior que zero.
+        type: number
+        example: 2
+      equipmentTypeId:
+        description: Código de Tipo Equipamento
+        type: number
+        example: null
+      origin:
+        description: Informa se o Equipamento é vinculado a Tipo ou Insumo
+        type: string
+        example: "resource"
+      status:
+        description: Status do equipamento. Pode ser IN_USE, IDLE ou OUT_OF_ORDER;
+        type: string
+        example: "OUT_OF_ORDER"
+  plannedTasks:
+    type: array
+    description: Lista de Tarefas Planejadas do Diário de Obra.
+    items:
+      $ref: "#/definitions/PlannedTaskDto"
+    example:
+      - buildingUnitId: 1
+        taskId: 109
+        notes: Tarefa realizada equipe A
+        quantity: 123.4567
+        supplierId: 2
+        siteId: 3
+  plannedTasksForPut:
+    type: array
+    description: Lista de Tarefas Planejadas do Diário de Obra.
+    items:
+      $ref: "#/definitions/PlannedTaskDtoForPut"
+    example:
+      - id: 1
+        buildingUnitId: 1
+        taskId: 109
+        notes: Tarefa realizada equipe A
+        quantity: 123.4567
+        supplierId: 2
+        siteId: 3
+  detachedTasks:
+    type: array
+    description: Lista de Tarefas Avulsas do Diário de Obra.
+    items:
+      $ref: "#/definitions/DetachedTaskDto"
+    example:
+      - description: Revestimento parede quarto 1
+        notes: Tarefa realizada pela equipe B
+        quantity: 40.5
+        unitOfMeasure: m2
+        siteId: 3
+  detachedTasksForPut:
+    type: array
+    description: Lista de Tarefas Avulsas do Diário de Obra.
+    items:
+      $ref: "#/definitions/DetachedTaskDtoForPut"
+    example:
+      - id: 2
+        description: Revestimento parede quarto 1
+        notes: Tarefa realizada pela equipe B
+        quantity: 40.5
+        unitOfMeasure: m2
+        siteId: 3
+  ShiftDto:
+    type: object
+    required:
+      - description
+      - startTime
+      - finishTime
+      - weatherCondition
+    properties:
+      description:
+        description: >-
+          Descrição do turno (Morning, Afternoon ou Night) (Matutino, Vespertino
+          ou Noturno)
+        type: string
+        example: Morning
+      startTime:
+        description: Hora de inicio do turno
+        type: string
+        example: "08:00"
+      finishTime:
+        description: Hora de fim do turno
+        type: string
+        example: "12:00"
+      weatherCondition:
+        description: >-
+          Informação climática para o turno (Fine, Light rain, Heavy rain, Unworkable)
+          (Aberto, Chuva leve, Chuva forte ou Impraticável)
+        type: string
+        example: Fine
+  PlannedTaskDto:
+    type: object
+    required:
+      - buildingUnitId
+      - taskId
+    properties:
+      buildingUnitId:
+        type: integer
+        description: Código da Unidade Construtiva
+        example: 1
+      taskId:
+        description: Código identificador da Tarefa.
+        type: number
+        example: 109
+      notes:
+        type: string
+        description: "Observação da Tarefa, limitado a 4000 caracteres"
+        example: Tarefa será realizada pelos ajudantes...
+      quantity:
+        type: number
+        description: >-
+          Quantidade referente a medição da tarefa, com precisão máxima de 4
+          casas decimais (decimal(13,4)).
+        example: 1234567891234.5679
+      supplierId:
+        description: Código identificador do fornecedor da tarefa
+        type: integer
+        example: 2
+      siteId:
+        description: Código identificador do local da tarefa
+        type: integer
+        example: 3
+  PlannedTaskDtoForPut:
+    type: object
+    required:
+      - id
+      - buildingUnitId
+      - taskId
+    properties:
+      id:
+        type: integer
+        description: Id da tarefa do Diario de Obra a ser atualizada
+        example: 1
+      buildingUnitId:
+        type: integer
+        description: Código da Unidade Construtiva
+        example: 1
+      taskId:
+        description: Código identificador da Tarefa.
+        type: number
+        example: 109
+      notes:
+        type: string
+        description: "Observação da Tarefa, limitado a 4000 caracteres"
+        example: Tarefa será realizada pelos ajudantes...
+      quantity:
+        type: number
+        description: >-
+          Quantidade referente a medição da tarefa, com precisão máxima de 4
+          casas decimais (decimal(13,4)).
+        example: 1234567891234.5679
+      supplierId:
+        description: Código identificador do fornecedor da tarefa
+        type: integer
+        example: 2
+      siteId:
+        description: Código identificador do local da tarefa
+        type: integer
+        example: 3
+  DetachedTaskDto:
+    type: object
+    required:
+      - description
+    properties:
+      description:
+        type: string
+        description: "Descrição da Tarefa, limitado a 200 caracteres."
+        example: Tarefa xyz
+      notes:
+        type: string
+        description: "Observação da Tarefa, limitado a 4000 caracteres"
+        example: Tarefa será realizada pelos ajudantes...
+      quantity:
+        type: number
+        description: >-
+          Quantidade referente a medição da tarefa, com precisão máxima de 4
+          casas decimais (decimal(13,4)).
+        example: 1234567891234.5679
+      unitOfMeasure:
+        type: string
+        example: m2
+        description: Unidade de medida usada para a tarefa
+      siteId:
+        description: Código identificador do local da tarefa
+        type: integer
+        example: 3
+  DetachedTaskDtoForPut:
+    type: object
+    required:
+      - id
+      - description
+    properties:
+      description:
+        type: string
+        description: "Descrição da Tarefa, limitado a 200 caracteres."
+        example: Tarefa xyz
+      notes:
+        type: string
+        description: "Observação da Tarefa, limitado a 4000 caracteres"
+        example: Tarefa será realizada pelos ajudantes...
+      quantity:
+        type: number
+        description: >-
+          Quantidade referente a medição da tarefa, com precisão máxima de 4
+          casas decimais (decimal(13,4)).
+        example: 1234567891234.5679
+      unitOfMeasure:
+        type: string
+        example: m2
+        description: Unidade de medida usada para a tarefa
+      siteId:
+        description: Código identificador do local da tarefa
+        type: integer
+        example: 3
+  EventDto:
+    type: object
+    required:
+      - description
+      - eventTypeId
+    properties:
+      description:
+        description: Descrição da Ocorrência
+        type: string
+        example: Visita do fiscal da prefeitura
+      eventTypeId:
+        description: Código do tipo da Ocorrência
+        type: number
+        example: 1
+  CrewDto:
+    type: object
+    required:
+      - quantity
+    properties:
+      resourceId:
+        description: >-
+          Código do Insumo do tipo Mão de Obra (atributo category=LABOR na API
+          Insumos do Orçamento da Obra -
+          /building-cost-estimations/{building-id}/resources). Caso for informado, o crewTypeId deve ser omitido.
+        type: number
+        example: 2
+      quantity:
+        description: >-
+          Quantidade utilizada do insumo Mão de Obra. Número inteiro, positivo e
+          maior que zero.
+        type: number
+        example: 10
+      assignment:
+        description: Definição do tipo de mão de obra prestado. Pode ser DIRECT_LABOR, INDIRECT_LABOR ou THIRD_PARTY.
+        type: string
+        example: "INDIRECT_LABOR"
+      crewTypeId:
+        description: Código de Tipo Equipe. Caso for informado, o resourceId deve ser omitido.
+        type: number
+        example: 5
+  EquipmentDto:
+    type: object
+    required:
+      - quantity
+    properties:
+      resourceId:
+        description: >-
+          Código do Insumo do tipo Equipamento (atributo category=EQUIPAMENT na
+          API Insumos do Orçamento da Obra -
+          /building-cost-estimations/{building-id}/resources). Caso for informado, o equipmentTypeId deve ser omitido.
+        type: number
+        example: 10
+      quantity:
+        description: >-
+          Quantidade utilizada do insumo Equipamento. Número inteiro, positivo e
+          maior que zero.
+        type: number
+        example: 10
+      status:
+        description: Status do equipamento. Pode ser IN_USE, IDLE ou OUT_OF_ORDER.
+        type: string
+        example: "OUT_OF_ORDER"
+      equipmentTypeId:
+        description: Código de Tipo Equipamento. Caso for informado, o resourceId deve ser omitido.
+        type: number
+        example: 8
+  AttachmentDtoForGet:
+    type: object
+    properties:
+      attachmentNumber:
+        type: integer
+        description: Número do anexo
+        example: 1
+      name:
+        type: string
+        description: Nome do arquivo em anexo
+        example: "alvenaria.jpg"
+      description:
+        type: string
+        description: Descrição do arquivo em anexo
+        example: "Foto da execução de alvenaria do subsolo"
+      location:
+        type: string
+        description: Local atribuído para a imagem. Retorna null se nada foi atribuído
+        example: "subsolo"
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: integer
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: string
+        description: mensagem de error relavante para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+parameters:
+  buildingId:
+    in: path
+    name: buildingId
+    description: código da Obra
+    type: integer
+    format: int32
+    required: true
+  constructionDailyId:
+    in: path
+    name: constructionDailyId
+    type: integer
+    required: true
+    description: código do Diário de Obra.
+  attachmentId:
+    in: path
+    name: attachmentId
+    type: integer
+    required: true
+    description: código do anexo do Diário de Obra.
+  description:
+    in: query
+    name: description
+    description: "Descrição do anexo | Máximo: 500 caracteres "
+    required: true
+    type: string
+    maxLength: 500
+  localId:
+    in: query
+    name: localId
+    type: integer
+    description: "Só é aceito para os arquivos do tipo imagem: JPG, JPEG e PNG"
+  showInReports:
+    in: query
+    name: showInReports
+    description: "Somente aceitam true arquivos do tipo imagem: JPG, JPEG e PNG"
+    type: boolean
+  file:
+    in: formData
+    name: file
+    type: file
+    description: >-
+      Arquivo para inserção | Tipo: multipart/form-data | Tamanho máximo: 70 MB
+      | Tamanho máximo do nome do arquivo: 100 caracteres | Somente 1 Anexo por
+      requisição.  Caso seja enviado mais de 1 Anexo, o Sienge vai aceitar
+      somente o primeiro selecionado.
+    required: true

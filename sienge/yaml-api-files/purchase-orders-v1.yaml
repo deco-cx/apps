@@ -1,0 +1,1352 @@
+swagger: "2.0"
+info:
+  description: API que permite realizar consultas de pedidos de compra.
+  version: "1.0"
+  title: Pedidos de Compra
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+paths:
+  "/purchase-orders":
+    get:
+      operationId: getPurchaseOrders
+      tags:
+        - Pedidos de Compra
+      summary: Consulta pedidos de compra
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: startDate
+          required: false
+          description: >-
+            Data de início da busca (data do pedido) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-01
+          type: string
+        - in: query
+          name: endDate
+          required: false
+          description: >-
+            Data de fim da busca (data do pedido) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-11
+          type: string
+        - in: query
+          name: status
+          required: false
+          description: >-
+            As situações do pedido de compra são:  "PENDING" - Pendente,
+            "PARTIALLY_DELIVERED" - Parcialmente entregue, "FULLY_DELIVERED" -
+            Totalmente atendido, "CANCELED" - Cancelado
+          type: string
+        - in: query
+          name: authorized
+          required: false
+          description: >-
+            Para retornar apenas pedidos de compra autorizados informe o valor
+            "true" e para pedidos de compra desautorizados informe "false". Caso
+            não seja informado retornará ambos
+          type: boolean
+        - in: query
+          name: supplierId
+          required: false
+          description: Id do fornecedor
+          type: integer
+        - in: query
+          name: buildingId
+          required: false
+          description: Id da obra
+          type: integer
+        - in: query
+          name: buyerId
+          required: false
+          description: Id do comprador (Usuário do Sienge)
+          type: string
+        - in: query
+          name: statusApproval
+          required: false
+          description: >-
+            Código da situação de aprovação do pedido de compra.
+          type: string
+          enum:
+            - DISAPPROVED
+            - APPROVED
+        - in: query
+          name: consistency
+          required: false
+          type: string
+          enum:
+            - IN_INCLUSION
+            - CONSISTENT
+            - INCONSISTENT
+          description: >
+            Status da situação de consistência do Pedido de compra.
+             * IN_INCLUSION - Em inclusão,
+             * CONSISTENT - Consistente,
+             * INCONSISTENT - Inconsistente
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseOrder"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}":
+    get:
+      operationId: getPurchaseOrdersId
+      tags:
+        - Pedidos de Compra
+      summary: Consulta pedido de compra
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PurchaseOrder"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/purchase-orders/{purchaseOrderId}/items":
+    get:
+      operationId: getPurchaseOrdersIdItems
+      tags:
+        - Pedidos de Compra
+      summary: Consulta de itens do pedido de compra
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseOrderItem"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/purchase-orders/{purchaseOrderId}/items/{itemNumber}":
+    get:
+      operationId: getPurchaseOrdersIdItemsId
+      tags:
+        - Pedidos de Compra
+      summary: Consulta item do pedido de compra
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - name: itemNumber
+          in: path
+          description: Número do item do pedido de compra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PurchaseOrderItem"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/items/{itemNumber}/delivery-schedules":
+    get:
+      operationId: getPurchaseOrdersIdItemsIdDeliveryDschedules
+      tags:
+        - Pedidos de Compra
+      summary: Consulta de previsões de entregas do item do pedido de compra
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - $ref: "#/parameters/purchaseOrderItemNumberParam"
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseOrderItemDeliverySchedule"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/items/{itemNumber}/buildings-appropriations":
+    get:
+      operationId: getPurchaseOrdersIdItemsIdBuildingAppropriations
+      tags:
+        - Pedidos de Compra
+      summary: Consulta de apropriações de obra do item do pedido
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - $ref: "#/parameters/purchaseOrderItemNumberParam"
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseOrderItemBuildingAppropriation"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/purchase-orders/{purchaseOrderId}/totalization":
+    get:
+      tags:
+        - Pedidos de Compra
+      summary: Consultar a totalização do pedido de compra
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PurchaseOrderTotalization"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/purchase-orders/{purchaseOrderId}/direct-billing":
+    get:
+      tags:
+        - Pedidos de Compra
+      summary: Consultar o faturamento direto do pedido de compra
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PurchaseOrderDirectBilling"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+
+  "/purchase-orders/{purchaseOrderId}/authorize":
+    put:
+      operationId: putPurchaseOrdersIdAuthorize
+      tags:
+        - Pedidos de Compra
+      summary: Autoriza pedido de compra que está aguardando autorização
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+      responses:
+        "200":
+          description: Operação bem sucedida
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+    patch:
+      tags:
+        - Pedidos de Compra
+      summary: Autoriza pedido de compra que está aguardando autorização com a opção de informar a observação
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - in: body
+          required: true
+          name: "Observation"
+          schema:
+            $ref: "#/definitions/ObservationDTO"
+      responses:
+        "200":
+          description: Operação bem sucedida
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/disapprove":
+    put:
+      operationId: getPurchaseOrdersIdDisapprove
+      tags:
+        - Pedidos de Compra
+      summary: Reprova pedido de compra que está aguardando autorização
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+      responses:
+        "200":
+          description: Operação bem sucedida
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+    patch:
+      tags:
+        - Pedidos de Compra
+      summary: Reprova pedido de compra que está aguardando autorização com a opção de informar a observação
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - in: body
+          required: true
+          name: "Observation"
+          schema:
+            $ref: "#/definitions/ObservationDTO"
+      responses:
+        "200":
+          description: Operação bem sucedida
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/attachments":
+    post:
+      operationId: postPurchaseOrdersIdIAttachments
+      tags:
+        - Anexos
+      description: "Inserção de anexos no pedido de compra"
+      summary: "Inserção de anexos no pedido de compra"
+      produces:
+        - application/json
+      consumes:
+        - multipart/form-data
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - name: description
+          in: formData
+          required: true
+          description: "Descrição do anexo"
+          type: string
+        - name: attachment
+          in: formData
+          type: file
+          description: >-
+            Arquivo a ser inserido | Tipo: multipart/form-data |
+            Tamanho máximo: 70MB | Tamanho máximo do nome do arquivo: 100 caracteres
+          required: true
+
+      responses:
+        "201":
+          description: "Operação bem sucedida"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+    get:
+      operationId: getPurchaseOrdersIdIAttachments
+      tags:
+        - Anexos
+      description: "Busca as informações dos anexos do pedido de compra"
+      summary: "Lista de anexos do pedido de compra"
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+      responses:
+        "200":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfPurchaseOrderAttachment"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/attachments/{attachmentNumber}":
+    get:
+      operationId: getPurchaseOrdersIdIAttachmentsId
+      description: "Download de anexo do Pedido de Compra"
+      summary: "Download Anexo"
+      tags:
+        - Anexos
+      produces:
+        - file
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - name: attachmentNumber
+          in: path
+          required: true
+          type: integer
+          format: int32
+          description: "Número do anexo"
+      responses:
+        "200":
+          description: Anexo encontrado
+          schema:
+            type: file
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/supplier-evaluation-criteria":
+    get:
+      operationId: postPurchaseOrdersIdSupplierEvaluationsCriteria
+      description: "Consulta os critérios de avaliação para um pedido específico"
+      summary: "Lista de critérios de avaliação"
+      tags:
+        - Avaliação
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/SupplierEvaluationCriteria"
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/evaluation":
+    post:
+      operationId: postPurchaseOrdersIdEvaluation
+      tags:
+        - Avaliação
+      summary: Cadastra uma avaliação do fornecedor no pedido de compra
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - in: body
+          required: true
+          name: "evaluation"
+          description: "Avaliação do fornecedor"
+          schema:
+            $ref: "#/definitions/Evaluation"
+      responses:
+        "204":
+          description: Avaliação cadastrada com sucesso
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+    put:
+      operationId: putPurchaseOrdersIdEvaluation
+      tags:
+        - Avaliação
+      summary: Cadastra uma avaliação do fornecedor no pedido de compra caso não exista, ou atualiza a última avaliação cadastrada
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - in: body
+          required: true
+          name: "evaluation"
+          description: "Avaliação do fornecedor"
+          schema:
+            $ref: "#/definitions/Evaluation"
+      responses:
+        "204":
+          description: Avaliação cadastrada/atualizada com sucesso
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+        "500":
+          $ref: "#/responses/500"
+  "/purchase-orders/{purchaseOrderId}/analysis/pdf":
+    get:
+      tags:
+        - Relatório Análise de Pedido de Compra
+      summary: Gera o relatório de Análise do Pedido de Compra informado e efetua download deste em formato PDF.
+      consumes:
+        - application/json
+      produces:
+        - file
+        - application/json
+      parameters:
+        - $ref: "#/parameters/purchaseOrderIdParam"
+        - name: printPurchaseOrderAuthorizationObservationsFlag
+          required: false
+          default: false
+          in: query
+          description: >-
+            Se verdadeiro imprime as observações de autorização do Pedido de Compra
+          type: boolean
+        - name: printListOfPurchaseOrdersWithSameAppropriateItems
+          required: false
+          default: false
+          in: query
+          description: >-
+            Se verdadeiro imprime uma relação de pedidos que possuem os mesmos itens apropriados do Pedido de Compra informado
+          type: boolean
+        - name: printOnlyPurchaseInvoicesWithOutstandingInstallments
+          required: false
+          default: false
+          in: query
+          description: >-
+            Se verdadeiro imprime somente Notas Fiscais de Compra com Parcelas em aberto
+          type: boolean
+        - name: printDetailedAmountsFromPurchaseInvoices
+          required: false
+          default: false
+          in: query
+          description: >-
+            Se verdadeiro imprime quantidades detalhadas das Notas Fiscais de Compra
+          type: boolean
+        - name: printAppropriationQuantity
+          required: false
+          default: false
+          in: query
+          description: >-
+            Se verdadeiro imprime quantidades de apropriações
+          type: boolean
+      responses:
+        "200":
+          description: "Arquivo gerado"
+          schema:
+            type: file
+        "400":
+          $ref: "#/responses/400"
+        "404":
+          $ref: "#/responses/404"
+
+definitions:
+  PaginatedResponseOfPurchaseOrderAttachment:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: "Lista de anexos de Pedidos de Compra retornadas como resultado da requisição"
+        items:
+          $ref: "#/definitions/PurchaseOrderAttachment"
+  PaginatedResponseOfPurchaseOrder:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de pedidos de compras retornadas como resultado da requisição
+        items:
+          $ref: "#/definitions/PurchaseOrder"
+  PaginatedResponseOfPurchaseOrderItem:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de items de um pedido de compra retornadas como resultado da requisição
+        items:
+          $ref: "#/definitions/PurchaseOrderItem"
+  PaginatedResponseOfPurchaseOrderItemDeliverySchedule:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de entregas de um item de pedido de compra retornadas como resultado da requisição
+        items:
+          $ref: "#/definitions/PurchaseOrderItemDeliverySchedule"
+  PaginatedResponseOfPurchaseOrderItemBuildingAppropriation:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de apropriações de obra de um item do pedido de compra.
+        items:
+          $ref: "#/definitions/PurchaseOrderItemBuildingAppropriation"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  PurchaseOrderAttachment:
+    type: object
+    properties:
+      purchaseOrderId:
+        type: integer
+        format: int64
+        example: 5760
+        description: >-
+          Id do pedido de compra
+      attachmentNumber:
+        type: integer
+        format: int64
+        example: 4
+        description: >-
+          Número do Anexo do pedido de compra
+      name:
+        type: string
+        example: "document_escaneado.pdf"
+        description: >-
+          Nome do arquivo de anexo do Pedido de Compra
+      description:
+        type: string
+        example: "Document Escaneado 01/08/2019"
+        description: >-
+          Descrição do Anexo do Pedido de Compra
+  PurchaseOrder:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        example: 1
+        description: Id do pedido de compra
+      formattedPurchaseOrderId:
+        type: string
+        example: "1"
+        description: Id do pedido de compra formatado de acordo com o parâmetro 415
+      status:
+        type: string
+        example: PENDING
+        description: >
+          As situações do pedido de compra são:
+            * `PENDING` - Pendente
+            * `PARTIALLY_DELIVERED` - Parcialmente entregue
+            * `FULLY_DELIVERED` - Totalmente atendido
+            * `CANCELED` - Cancelado
+      authorized:
+        type: boolean
+        example: true
+        description: Retornará verdadeiro se pedido de compra estiver autorizado, caso contrário retornará falso.
+      disapproved:
+        type: boolean
+        example: false
+        description: Retornará verdadeiro se pedido de compra estiver reprovado, caso contrário retornará falso.
+      deliveryLate:
+        type: boolean
+        example: true
+        description: Retornará verdadeiro se um dos itens do pedido de compra estiver com alguma entrega em atraso, caso contrário retornará falso.
+      consistent:
+        type: string
+        example: CONSISTENT
+        description: >
+          Os estados de consistência do pedido de compra são:
+            * `IN_INCLUSION` - Em inclusão,
+            * `CONSISTENT` - Consistente,
+            * `INCONSISTENT` - Inconsistente
+      supplierId:
+        type: integer
+        format: int64
+        example: 10
+        description: Id do fornecedor
+      buildingId:
+        type: integer
+        format: int64
+        example: 15
+        description: Id da obra
+      buyerId:
+        type: string
+        example: comprador
+        description: Id do comprador (Usuário do Sienge)
+      date:
+        type: string
+        example: "2018-03-11"
+        description: "Data do pedido de compra no formato: yyyy-MM-dd."
+      salesRepresentativeId:
+        type: string
+        description: Id do representante de venda
+      internalNotes:
+        type: string
+        example: "Lorem ipsum dolor sit amet."
+        description: Observação interna do pedido.
+      costCenterId:
+        type: integer
+        format: int64
+        example: 100
+        description: Id do centro de custo
+      departamentId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id do departamento
+      companyBillId:
+        type: integer
+        format: int64
+        example: 5
+        description: Id da empresa de cobrança
+      transporterId:
+        type: integer
+        format: int64
+        example: 3
+        description: Id do transportador
+      forecastDocumentId:
+        type: string
+        example: PPC
+        description: Id do documento de previsão
+      forecastBillId:
+        type: integer
+        format: int64
+        example: 1990
+        description: Número do título de previsão
+      indexerId:
+        type: integer
+        format: int64
+        example: 0
+        description: Código do indexador do título de previsão
+      discount:
+        type: number
+        format: double
+        example: 30.15
+        description: Valor do desconto
+      increase:
+        type: number
+        format: double
+        example: 5.1
+        description: Outras despesas
+      totalAmount:
+        type: number
+        format: double
+        example: 15200.85
+        description: Total do pedido de compra
+      directBillingDocumentId:
+        type: string
+        example: CT
+        description: Código do documento de pré-faturamento direto
+      directBillingContractNumber:
+        type: integer
+        example: 221
+        description: Número do contrato de pré-faturamento direto
+      directBillingJustificationId:
+        type: integer
+        format: int64
+        example: 2
+        description: Id da justificativa de pré-faturamento direto
+      createdBy:
+        type: string
+        example: USER
+        description: Id do usuário que criou o pedido de compra
+      createdAt:
+        type: string
+        example: "2018-03-11T14:20:00.000-03:00"
+        description: >-
+          Data de criação do pedido de compra no formato:
+          yyyy-MM-dd'T'HH:mm:ss.SSSXXX.
+      modifiedBy:
+        type: string
+        example: ANOTHERUSER
+        description: Id do usuário que modificou o pedido de compra
+      modifiedAt:
+        type: string
+        example: "2018-04-02T18:20:00.000-03:00"
+        description: >-
+          Data de modificação do pedido de compra no formato:
+          yyyy-MM-dd'T'HH:mm:ss.SSSXXX.
+      authorizedAt:
+        type: string
+        example: "2018-04-02T18:20:00.000-03:00"
+        description: >-
+          Data da última aprovação do pedido de compra no formato:
+          yyyy-MM-dd'T'HH:mm:ss.SSSXXX.
+      sentDate:
+        type: string
+        example: "2018-04-02T18:20:00.000-03:00"
+        description: >-
+          Data do último e-mail enviado do pedido de compra no formato:
+          yyyy-MM-dd'T'HH:mm:ss.SSSXXX.
+      freightType:
+        type: string
+        example: "S"
+        description: >
+          Modalidade do frete.
+            * `NI` - Não incidente,
+            * `CIF` - Incluso,
+            * `FOB` - A pagar
+      freightAmount:
+        type: number
+        format: double
+        description: Valor do frete.
+      freightItemsAmount:
+        type: number
+        format: double
+        description: Valor dos itens do frete.
+      freightIpiFlag:
+        type: string
+        example: "N"
+        description: >
+          Considerar o valor do IPI no frete.
+            * `S` - Sim,
+            * `N` - Não
+      totalFreight:
+        type: number
+        format: double
+        description: Valor do frete adicionado o ipi;
+      notes:
+        type: string
+        example: "Lorem ipsum dolor sit amet."
+        description: Observação do pedido.
+      paymentCondition:
+        type: string
+        example: "À vista"
+        description: Descrição da condição de pagamento
+      tenantUrl:
+        type: string
+        description: URL do recurso associado
+        example: "https://api.sienge.com.br/dev.local/sienge/public/api"
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          type: object
+          properties:
+            rel:
+              type: string
+              description: Nome da recurso associado
+              example: delivery-requirements
+            href:
+              type: string
+              description: URL do recurso associado
+              example: "https://api.sienge.com.br/dev.local/sienge/public/api/v1/purchase-order/19/items/1/totalization"
+
+  PurchaseOrderItem:
+    type: object
+    properties:
+      itemNumber:
+        type: integer
+        format: int64
+        example: 1
+        description: Número do item do pedido de compra
+      buildingCostDatebaseId:
+        type: integer
+        format: int64
+        example: 1
+        description: Código da tabela de custo unitário na obra
+      resourceId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id do insumo
+      resourceDescription:
+        type: string
+        example: "Cimento"
+        description: Descrição do insumo
+      resourceCode:
+        type: string
+        example: "M0012"
+        description: Código auxiliar do insumo do item
+      resourceReference:
+        type: string
+        example: "Cimento de Exemplo"
+        description: Referência do insumo
+      detailId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id do detalhe do insumo
+      detailDescription:
+        type: string
+        example: "Detalhe X"
+        description: Descrição do detalhe do insumo
+      trademarkId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id da marca do insumo
+      trademarkDescription:
+        type: string
+        example: "Marca X"
+        description: Descrição da marca do insumo
+      unitOfMeasure:
+        type: string
+        example: "kg"
+        description: Unidade de medida do insumo
+      quantity:
+        type: number
+        format: double
+        example: 100
+        description: Quantidade
+      unitPrice:
+        type: number
+        format: double
+        example: 10.99
+        description: Preço unitário
+      netPrice:
+        type: number
+        format: double
+        example: 10.99
+        description: Preço unitário liquido
+      freightUnitPrice:
+        type: number
+        format: double
+        example: 0.00
+        description: Preço unitário de frete
+      discount:
+        type: number
+        format: double
+        example: 0.00
+        description: Valor de desconto
+      discountPercentage:
+        type: number
+        format: double
+        example: 0.00
+        description: Percentual de desconto
+      increasePercentage:
+        type: number
+        format: double
+        example: 0.00
+        description: Percentual de acréscimo
+      imcsTaxPercentage:
+        type: number
+        format: double
+        example: 0.00
+        description: Percentual de ICMS
+      ipiTaxPercentage:
+        type: number
+        format: double
+        example: 0.00
+        description: Percentual de IPI
+      issTaxPercentage:
+        type: number
+        format: double
+        example: 0.00
+        description: Percentual de ISS
+      notes:
+        type: string
+        description: Observações
+      purchaseQuotations:
+        type: array
+        description: "Lista de cotações atendidas pelo item do pedido"
+        items:
+          $ref: "#/definitions/PurchaseQuotation"
+  PurchaseQuotation:
+    type: object
+    properties:
+      purchaseQuotationId:
+        type: integer
+        format: int64
+        example: 1
+        description: Número da cotação
+      purchaseQuotationItemId:
+        type: integer
+        format: int64
+        example: 1
+        description: Número item da cotação
+  PurchaseOrderTotalization:
+    type: object
+    properties:
+      itemsTotalAmount:
+        type: integer
+        format: double
+        example: 25010.0
+        description: Valor total dos itens
+      discountAmount:
+        type: integer
+        format: double
+        example: 620.0
+        description: Valor do desconto
+      freightItemsAmount:
+        type: integer
+        format: double
+        example: 5200.0
+        description: Valor dos itens do frete.
+      transporterId:
+        type: integer
+        format: int64
+        example: 296
+        description: Id do transportador
+      paymentConditionDescription:
+        type: string
+        example: 10/20/30
+        description: Descrição da condição de pagamento
+      installmentsPaymentCondition:
+        type: array
+        description: >-
+          Lista das parcelas das condições de pagamento
+        items:
+          $ref: "#/definitions/InstallmentPaymentCondition"
+
+  InstallmentPaymentCondition:
+    type: object
+    description: Lista das parcelas das condições de pagamento
+    properties:
+      installmentId:
+        type: integer
+        example: 1
+        description: Id da parcela
+      numberOfdays:
+        type: integer
+        example: 10
+        description: Quantidade de dias
+      percentage:
+        type: number
+        format: double
+        example: 25.0
+        description: Percentual da parcela
+
+  PurchaseOrderDirectBilling:
+    type: object
+    properties:
+      supplierId:
+        type: integer
+        format: int64
+        example: 10
+        description: Id do fornecedor
+      buildingId:
+        type: integer
+        format: int64
+        example: 15
+        description: Id da obra
+      amountLinked:
+        type: integer
+        format: double
+        example: 5200.0
+        description: Valor a vincular.
+      documentId:
+        type: string
+        example: CT
+        description: Código do documento de faturamento direto
+      contractNumber:
+        type: string
+        example: 523
+        description: Número do contrato de faturamento direto
+      billingDate:
+        type: string
+        example: 2024-09-29
+        description: Data do faturamento
+      responsibleId:
+        type: string
+        example: NOME
+        description: Id do responsável
+      observation:
+        type: string
+        description: Observação
+
+  PurchaseOrderItemDeliverySchedule:
+    type: object
+    properties:
+      deliveryScheduleNumber:
+        type: integer
+        format: int64
+        example: 1
+        description: Número da previsão de entrega
+      sheduledDate:
+        type: string
+        example: "2018-03-11"
+        description: "Data da previsão de entrega no formato: yyyy-MM-dd."
+      sheduledQuantity:
+        type: number
+        format: double
+        example: 100
+        description: Quantidade prevista para entrega
+      deliveredQuantity:
+        type: number
+        format: double
+        example: 50
+        description: Quantidade já entregue
+      openQuantity:
+        type: number
+        format: double
+        example: 50
+        description: |-
+          Saldo da entrega
+          Caso a diferença entre sheduledQuantity e deliveredQuantity for maior que zero e o openQuantity estiver igual a zero, significa que o saldo foi cancelado
+  PurchaseOrderItemBuildingAppropriation:
+    type: object
+    properties:
+      buildingUnitId:
+        type: integer
+        format: int64
+        example: 1
+        description: Código da unidade construtiva da obra
+      costEstimationItemReference:
+        type: string
+        example: "08.004.001"
+        description: "Referência do item do orçamento"
+      percentage:
+        type: number
+        format: double
+        example: 5.88
+        description: Percentual apropriado
+
+  ObservationDTO:
+    type: object
+    properties:
+      observation:
+        type: string
+        maxLength: 300
+        example: Texto enviado via Api
+        description: Observação que será concatenada as observações de autorização e desautorização.
+
+  ApiError:
+    type: object
+    description: Objeto que encapsula os atributos de erros da API
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao desenvolvedor consumidor da
+          API.
+      clientMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao usuário final.
+      errors:
+        type: array
+        description: >-
+          Lista com erros de validação dos atributos de entrada da API. Este
+          campo fica visível apenas quando possuir erros de validação
+        items:
+          $ref: "#/definitions/ApiExceptionFieldError"
+  ApiExceptionFieldError:
+    type: object
+    description: Objeto que encapsula os erros de validação dos atributos de entrada da API
+    required:
+      - message
+    properties:
+      field:
+        type: string
+        description: Campo no qual foi passado o valor inválido
+      message:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API referente ao valor inválida utilizado nos dados de entrada
+  SupplierEvaluationCriteria:
+    type: object
+    properties:
+      remainderList:
+        type: array
+        items:
+          $ref: "#/definitions/SupplierEvaluationCriteriaRemainderList"
+      defaultList:
+        type: array
+        items:
+          $ref: "#/definitions/SupplierEvaluationCriteriaDefaultList"
+      rangeMin:
+        type: integer
+        format: int64
+        example: 0
+        description: Número mínimo do intervalo das avaliações
+      rangeMax:
+        type: integer
+        format: int64
+        example: 10
+        description: Número máximo do intervalo das avaliações
+  SupplierEvaluationCriteriaRemainderList:
+    type: object
+    description: Lista complementar de critérios de avaliação do fornecedor
+    required:
+      - message
+    properties:
+      id:
+        type: integer
+        example: 1
+        description: Id do critério de avaliação
+      description:
+        type: string
+        example: Qualidade do produto
+        description: Descrição do critério de avaliação
+      weight:
+        type: integer
+        example: 1
+        description: Peso do cálculo da média
+  SupplierEvaluationCriteriaDefaultList:
+    type: object
+    description: Lista padrão dos critério de avaliação do fornecedor
+    required:
+      - message
+    properties:
+      id:
+        type: integer
+        example: 2
+        description: Id do critério de avaliação
+      description:
+        type: string
+        example: Prazo de entrega
+        description: Descrição do critério de avaliação
+      weight:
+        type: integer
+        example: 1
+        description: Peso do cálculo da média
+
+  Evaluation:
+    type: object
+    description: "Avaliação do fornecedor"
+    properties:
+      notes:
+        type: string
+        description: "Observação para avaliação"
+      evaluatedCriteria:
+        type: array
+        description: "Lista de critérios a serem avaliados com suas respectivas notas."
+        items:
+          $ref: "#/definitions/EvaluatedCriterion"
+  EvaluatedCriterion:
+    type: object
+    description: "Critério a ser avaliado"
+    properties:
+      criterionId:
+        type: integer
+        format: int64
+        example: 1
+        description: Código do critério a ser avaliado
+      value:
+        type: number
+        format: double
+        example: 6.5
+        description: Nota atribuída ao critério.
+responses:
+  400:
+    description: Requisição mal formada
+    schema:
+      $ref: "#/definitions/ApiError"
+  404:
+    description: O recurso requisitado não foi encontrado
+    schema:
+      $ref: "#/definitions/ApiError"
+  500:
+    description: Erro interno do servidor
+    schema:
+      $ref: "#/definitions/ApiError"
+parameters:
+  purchaseOrderIdParam:
+    in: path
+    name: purchaseOrderId
+    type: integer
+    required: true
+    description: >-
+      Id do Pedido de Compra
+
+
+      Obs: Este campo deve seguir o padrão de acordo com o parâmetro 415 do Sienge. Esse parâmetro possui as seguintes configurações:
+
+
+      Sequêncial contínuo: Apenas inserir o número do Pedido de Compra. Ex: "/purchase-orders/123"
+
+      Sequêncial contínuo anual: O campo possui no total 8 caracteres. Os 2 primeiros corresponde ao ano do pedido. Os demais são o número do pedido preenchidos com 0 à esquerda. Ex: No sienge o pedido é representado assim: "123/19". Porém na API seria assim: "/purchase-orders/19000123"
+  purchaseOrderItemNumberParam:
+    in: path
+    name: itemNumber
+    type: integer
+    required: true
+    description: Número do item do pedido de compra
+    format: int32
+  limit:
+    in: query
+    name: limit
+    description: >-
+      Quantidade máxima de resultados da pesquisa a serem retornados.
+      Valor default é 100 e o valor máximo permitdo é 200
+    required: false
+    type: integer
+    default: 100
+    maximum: 200
+    minimum: 1
+    format: int32
+  offset:
+    in: query
+    name: offset
+    description: >-
+      Deslocamento entre o começo da lista e um dado elemento. Valor
+      default é 0
+    required: false
+    type: integer
+    default: 0
+    format: int32
