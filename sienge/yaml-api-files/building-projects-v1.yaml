@@ -1,0 +1,513 @@
+swagger: "2.0"
+info:
+  title: Planejamentos de Obra
+  description: API de Planejamentos de Obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Tarefas
+    description: Tarefas de planilhas de planejamento de obra.
+
+paths:
+  "/building-projects/{buildingId}/sheets/{buildingUnitId}/tasks":
+    get:
+      operationId: getBuildingProjectsIdSheetsIdTasks
+      tags:
+        - Tarefas
+      summary: >-
+        Retorna um array com as tarefas da versão atual da planilha de planejamento de uma obra,
+        sendo uma planilha para cada unidade construtiva (building unit).
+        O planejamento em questão é identificado pelo respectivo código da obra (buildingId),
+        considerando por padrão a versão atual do planejamento.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: buildingUnitId
+          description: Código da unidade construtiva da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com as tarefas da planilha da versão atual do planejamento da respectiva
+            obra, sendo uma planilha para cada unidade construtiva (building unit).
+            Se não existir nenhuma, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseTask"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra ou planilha não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+    put:
+      operationId: putBuildingProjectsIdSheetsIdTasks
+      tags:
+        - Tarefas
+      summary: >-
+        Insere um array de tarefas em uma nova versão da planilha de planejamento de uma obra,
+        sendo uma planilha para cada unidade construtiva (building unit).
+        O planejamento em questão é identificado pelo respectivo código da obra (buildingId),
+        considerando por padrão a versão atual do planejamento.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: buildingUnitId
+          description: Código da unidade construtiva da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: allowDeleteTaskCostItem
+          description: >-
+            Permite deletar qualquer custo tarefa vinculado à uma tarefa.
+          required: false
+          type: boolean
+          default: true
+        - in: body
+          name: body
+          description: >-
+            Tarefas que serão inseridas.
+
+              Nível das tarefas: Deve ser sempre maior que zero. Não pode haver "gaps" entre as tarefas, ou seja, uma tarefa de nível 1 deve ser sucedida por uma nível 2, porém como as tarefas são inseridas na ordem da estrutura do planejamento, uma tarefa de nível 3 pode ser sucedida por uma de nível 2, 1 ou 4, nunca por uma nível 5;
+
+              Datas de início e fim: Devem observar o intervalo de início e fim da obra;
+
+              Custos: Quando o "costItems" não for informado no body ou for informado como null, os custos não sofrerão qualquer modificação. Quando informado um array, todos os custos existentes serão excluídos e substituídos pelos custos informados no array. Portanto, se o array for vazio, irá apagar todos os custos.
+
+              Se for enviar o Custo de Tarefas, procure enviar de todas que realmente possuem. Isso permitirá realizar análises mais precisas do payload da requisição quando alguma validação ou erro ocorrer.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/TaskDtoForPut"
+            example:
+              - id: 1
+                description: "Alvenaria de tijolo vazado"
+                level: 1
+                startDate: "2019-06-20"
+                finishDate: "2019-08-13"
+              - id: 2
+                description: "Assentamento de alvenaria"
+                level: 2
+                startDate: "2019-06-20"
+                finishDate: "2019-08-13"
+                plannedExecutions:
+                  - year: 2021
+                    month: 1
+                    plannedPercentage: 3.23
+                  - year: 2021
+                    month: 2
+                    plannedPercentage: 64.51
+                  - year: 2021
+                    month: 3
+                    plannedPercentage: 32.26
+                costItems:
+                  - sheetItemId: "453"
+                    costRatio: 25.0
+                  - sheetItemId: "1687"
+                    costRatio: 50.5024
+              - id: 3
+                description: "Pintura Latex"
+                level: 1
+                startDate: "2019-06-30"
+                finishDate: "2019-07-05"
+              - id: 4
+                description: "Preparo da supefície"
+                level: 2
+                startDate: "2019-06-30"
+                finishDate: "2019-07-02"
+              - id: 5
+                description: "Aplicação de tinta"
+                level: 2
+                startDate: "2019-07-02"
+                finishDate: "2019-07-05"
+
+      responses:
+        "204":
+          description: Sem conteúdo
+        "400":
+          description: Requisição mal formada. O nível da tarefa deve ser maior que Zero.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra, unidade construtiva ou planilha não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Entidade não processável, por ids duplicados, estrutura de planejamento está referenciada com a estrutura de orçamento, data da tarefa está fora do intervalo de início e fim da Obra, intervalo entre datas inválido, gaps entre os níveis das tarefas, tarefa com custos que virou agrupador. O campo data não será retornado caso ele seja vazio, ele será retornado caso tenha um registro de controle de mão de obra associado com uma tarefa ou quando o parâmetro allowDelete for falso e existirem tarefas com custo tarefa vinculado.
+          schema:
+            $ref: "#/definitions/ApiError422"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  GetResponseTask:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/TaskDtoForGet"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  TaskDtoForGet:
+    type: object
+    properties:
+      id:
+        description: Identificador único imutável da tarefa
+        type: number
+        example: 10
+      presentationId:
+        description: >-
+          Código visível da tarefa, representa a posição dela na estrutura do planejamento
+        type: number
+        example: 1
+      description:
+        description: Descrição da tarefa
+        type: string
+        example: Alvenaria de Tijolo Furado
+      level:
+        description: Nível da tarefa no planejamento
+        type: number
+      startDate:
+        description: Data de início da tarefa no formato yyyy-MM-dd
+        type: string
+        example: "2019-05-06"
+      finishDate:
+        description: Data de término da tarefa no formato yyyy-MM-dd
+        type: string
+        example: "2019-05-10"
+      duration:
+        description: Duração da tarefa considerando apenas dias úteis. A configuração de dias úteis é feita no calendário da obra
+        type: number
+        example: 4
+      summary:
+        description: Indica se o registro representa um agrupamento de tarefas
+        type: boolean
+      location:
+        description: Localização de onde a tarefa foi planejada para ser realizada
+        type: string
+      unitOfMeasure:
+        description: Unidade de medida da tarefa
+        type: string
+        example: m2
+      quantity:
+        description: Quantidade planejada da tarefa com precisão de 4 casas
+        type: number
+        example: 23.3205
+      totalPrice:
+        description: >-
+          Preço total da tarefa com precisão de 2 casas.
+          Equivalente a soma dos preços totais por tipo de insumo
+        type: number
+        example: 209.91
+      pricesByCategory:
+        type: array
+        description: >-
+          Preços da tarefa detalhados por tipo de insumo (por exemplo
+          material, mão de obra e equipamento).
+        items:
+          $ref: "#/definitions/PriceByCategoryDTO"
+      plannedExecutions:
+        type: array
+        description: >
+          Percentuais de execução planejados por mês.
+
+          - A soma dos percentuais informados para cada tarefa deve ser igual a `100`;
+
+          - Todos os meses compreendidos no período de execução da tarefa devem ser representados neste array, mesmo que o percentual de alguns meses seja zero. Por exemplo, se uma tarefa foi planejada para iniciar no dia 05 de janeiro de 2019 e terminar no dia 20 de março de 2019, é obrigatório informar os percentuais de execuçao de janeiro, fevereiro e março;
+
+          - O preenchimento deste campo é opcional. Se o campo plannedExecutions não constar no JSON ou se seu valor for `NULL` ou um array vazio, os percentuais de execução da tarefa serão distribuídos de forma linear considerando as configurações do calendário da obra. No caso de tarefas já existentes, se as datas da tarefa forem alteradas sem passar a execução planejada por mês, o comportamento do sistema irá variar conforme as configurações do parâmetro `862`.
+
+        items:
+          $ref: "#/definitions/PlannedExecutionDtoForGet"
+        example:
+          - year: 2019
+            month: 6
+            duration: 1
+            plannedPercentage: 3.23
+          - year: 2019
+            month: 7
+            duration: 20
+            plannedPercentage: 64.51
+          - year: 2019
+            month: 8
+            duration: 10
+            plannedPercentage: 32.26
+      costItems:
+        description: >
+          Retorna as apropriações de custo da tarefa nos itens do orçamento ou um array vazio quando uma tarefa não possuir custos apropriados.
+
+          - Tarefas agrupadoras não possuem custos apropriados.
+
+          - A soma dos percentuais de apropriação de custo, referentes a um mesmo item de orçamento, não pode superar 100%;
+
+          - Uma tarefa pode ter custos apropriados em mais de um item de orçamento.
+        type: array
+        items:
+          $ref: "#/definitions/CostItemDto"
+        example:
+          - sheetItemId: "453"
+            costRatio: 25.0
+          - sheetItemId: "1687"
+            costRatio: 50.5024
+
+  PriceByCategoryDTO:
+    type: object
+    properties:
+      category:
+        description: Tipo de insumo correspondente aos preços totais e unitários.
+        type: string
+        enum:
+          - EQUIPMENT
+          - LABOR
+          - INCREMENTAL_COST_ITEM
+          - MATERIAL
+          - TRANSPORT_ITEM
+          - OTHER
+          - OFFICE_SUPPLY
+          - FUELS_AND_LUBRICANTS
+          - MAINTENANCE_MATERIAL
+        example: MATERIAL
+      totalPrice:
+        description: >-
+          Preço total para o tipo de insumo correspondente com precisão de 2
+          casas
+        type: number
+        example: 209.91
+  TaskDtoForPut:
+    type: object
+    properties:
+      id:
+        description: Identificador único imutável da tarefa
+        type: number
+        example: 2
+      description:
+        description: Descrição da tarefa
+        type: string
+        example: Alvenaria Estrutural
+      level:
+        description: Nível da tarefa no planejamento
+        type: number
+        example: 1
+      startDate:
+        description: Data de início da tarefa no formato yyyy-MM-dd
+        type: string
+        example: "2019-05-06"
+      finishDate:
+        description: Data de término da tarefa no formato yyyy-MM-dd
+        type: string
+        example: "2019-05-10"
+      plannedExecutions:
+        type: array
+        description: >
+          Percentuais de execução planejados por mês.
+
+          - A soma dos percentuais informados para cada tarefa deve ser igual a `100`;
+
+          - Todos os meses compreendidos no período de execução da tarefa devem ser representados neste array, mesmo que o percentual de alguns meses seja zero. Por exemplo, se uma tarefa foi planejada para iniciar no dia 05 de janeiro de 2019 e terminar no dia 20 de março de 2019, é obrigatório informar os percentuais de execuçao de janeiro, fevereiro e março;
+
+          - O preenchimento deste campo é opcional. Se o campo plannedExecutions não constar no JSON ou se seu valor for `NULL` ou um array vazio, os percentuais de execução da tarefa serão distribuídos de forma linear considerando as configurações do calendário da obra. No caso de tarefas já existentes, se as datas da tarefa forem alteradas sem passar a execução planejada por mês, o comportamento do sistema irá variar conforme as configurações do parâmetro `862`.
+
+        items:
+          $ref: "#/definitions/PlannedExecutionDtoForPut"
+      costItems:
+        description: >
+          Apropriação de custo da tarefa nos itens do orçamento.
+
+          - Caso o valor seja `NULL` as apropriações de custo da tarefa não serão atualizadas ou removidas;
+
+          - Caso o valor seja um array vazio (`[]`) as apropriações de custo existentes para a tarefa serão removidas;
+
+          - Itens de orçamento com unidades de medida diferentes não podem ser vinculados a uma mesma tarefa (exceto, quando permitido pelo parâmetro `869`);
+
+          - A soma dos percentuais de apropriação de custo, referentes a um mesmo item de orçamento, não pode superar 100%;
+
+          - Uma tarefa pode apropriar custos vinculados a mais de um item de orçamento.
+        type: array
+        items:
+          $ref: "#/definitions/CostItemDto"
+
+  PlannedExecutionDtoForPut:
+    type: object
+    properties:
+      year:
+        description: Ano da execução. Aceita um número inteiro com, no mínimo, quatro casas.
+        type: number
+        example: 2019
+      month:
+        description: Mês da execução. Aceita um número inteiro entre `1` (janeiro) e `12` (dezembro).
+        type: number
+        example: 4
+      plannedPercentage:
+        description: Percentual de execução planejado para o respectivo mês. Aceita um número entre `0` e `100`, com no máximo duas casas decimais.
+        type: number
+        example: 23.87
+
+  PlannedExecutionDtoForGet:
+    type: object
+    properties:
+      year:
+        description: Ano da execução. Retorna um número inteiro.
+        type: number
+      month:
+        description: Mês da execução. Retorna um número inteiro entre `1` (janeiro) e `12` (dezembro).
+        type: number
+      duration:
+        description: Duração da tarefa, dentro do mês e ano, considerando apenas dias úteis. Retorna um número inteiro entre '1' e '31' (Quantidade máxima de dias em um mês).
+        type: number
+      plannedPercentage:
+        description: Percentual de execução planejado para o respectivo mês. Retorna um número entre `0` e `100`, com no máximo duas casas decimais. A soma dos percentuais vai, sempre, totalizar 100.
+        type: number
+
+  CostItemDto:
+    type: object
+    properties:
+      sheetItemId:
+        description: Identificador único do item de orçamento
+        type: string
+      costRatio:
+        description: Percentual de apropriação do item de orçamento na tarefa
+        type: number
+
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+
+  ApiError422:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+      data:
+        type: object
+        description: Um objeto que pode conter mais detalhes do error.
+    description: Objeto que encapsula os atributos de erros da API
+    example:
+      status: "422"
+      developerMessage: Tarefas associados com controle de mão de obra
+      userMessage:
+        - Tarefas associados com controle de mão de obra
+      data:
+        productionRegistersTaskAssociated:
+          - productioRegistePresentationId: 1
+            taskId: 2
+            taskPresentationId: 22
+            taskDescription: tarefa 22
+        taskWithTaskCostItemAssociated:
+          - id: 3
+            presentationId: 33
+            description: tarefa 33
+            buildingId: 1
+            buildingUnitId: 1
+            buildingCostEstimationItemId: 123
+            buildingCostEstimationVersionNumber: 1
+            buildingProjectVersionNumber: 1

@@ -1,0 +1,1836 @@
+swagger: "2.0"
+info:
+  description: API de busca de clientes.
+  version: 1.0.0
+  title: Clientes
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Clientes
+    description: API para listagem dos clientes
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /customers:
+    get:
+      tags:
+        - Clientes
+      summary: >-
+        Busca uma lista de clientes ordenando do cadastro mais recente para o
+        mais antigo.
+      operationId: getCustomers
+      parameters:
+        - name: cpf
+          in: query
+          description: "CPF do cliente sem máscara, somente números."
+          required: false
+          type: string
+        - name: cnpj
+          in: query
+          description: "CNPJ do cliente sem máscara, somente números."
+          required: false
+          type: string
+        - name: internationalId
+          in: query
+          description: "Informação da identificação internacional."
+          required: false
+          type: string
+        - name: onlyActive
+          in: query
+          description: "True para filtrar por clientes ativos, false não aplicará o filtro e retornará todos os clientes independente de status ativo ou não."
+          required: false
+          type: boolean
+        - name: enterpriseId
+          in: query
+          description: "Id do empreendimento, somente números."
+          required: false
+          type: number
+        - name: createdAfter
+          in: query
+          description: >-
+            Data inicial para filtrar clientes pela data de criação. Formato:
+            yyyy-MM-dd.
+          required: false
+          type: string
+        - name: createdBefore
+          in: query
+          description: >-
+            Data final para filtrar clientes pela data de criação. Formato:
+            yyyy-MM-dd.
+          required: false
+          type: string
+        - name: modifiedAfter
+          in: query
+          description: >-
+            Data inicial para filtrar clientes pela data de última alteração.
+            Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: modifiedBefore
+          in: query
+          description: >-
+            Data final para filtrar clientes pela data de última alteração.
+            Formato: yyyy-MM-dd.
+          required: false
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Clientes encontrados
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    post:
+      tags:
+        - Clientes
+      summary: Persiste um cliente.
+      operationId: insertCustomers
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação do cliente
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerInsert"
+      responses:
+        "201":
+          description: Cliente criado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}":
+    get:
+      tags:
+        - Clientes
+      summary: Busca um cliente.
+      operationId: getCustomer
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente.
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Cliente encontrado
+          schema:
+            $ref: "#/definitions/CustomerGet"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    patch:
+      tags:
+        - Clientes
+      summary: Atualiza informações de um cliente.
+      operationId: updateCustomer
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Objeto para atualização do cliente. Se você não quiser atualizar um
+            campo, não insira no objeto. Se quiser remover o conteúdo de um
+            campo, envie uma string vazia como valor do campo. Campos não
+            enviados ou nulos serão ignorados.
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerUpdate"
+      responses:
+        "204":
+          description: Cliente atualizado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}/phones":
+    put:
+      tags:
+        - Telefones do cliente
+      summary: Atualiza os telefones de um cliente.
+      operationId: updatePhones
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Objeto para atualizar telefones do cliente. É necessário enviar
+            todos os telefones do cliente, pois esta ação apagará os telefones
+            antigos e irá registrar apenas os telefones enviados nessa
+            requisição.
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerPhonesUpdate"
+      responses:
+        "204":
+          description: Telefones do cliente atualizados
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}/spouse":
+    put:
+      tags:
+        - Cônjuge do cliente
+      summary: Atualiza o cônjuge de um cliente, apagando o antigo cônjuge. Se não existir, cria.
+      operationId: updateSpouse
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Objeto para atualizar cônjuge do cliente.
+          required: true
+          schema:
+            $ref: "#/definitions/Spouse"
+      responses:
+        "204":
+          description: Cônjuge do cliente atualizado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Cliente não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: >-
+            Ocorreu um dos seguintes erros:
+              - Parâmetro 1259 inválido e não foi enviado os campos obrigatórios: endereço, telefone, data de nascimento, email e nacionalidade.
+              - Tentativa de alterar cônjuge de um cliente que é pessoa jurídica.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}/familyIncomes":
+    put:
+      tags:
+        - Rendas Familiares do cliente
+      summary: Atualiza as rendas familiares de um cliente.
+      operationId: updateFamilyIncomes
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Objeto para atualizar rendas familiares do cliente. É necessário enviar
+            todas as rendas familiares do cliente, pois esta ação apagará as rendas familiares
+            antigas e irá registrar apenas as rendas familiares enviadas nessa
+            requisição.
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerFamilyIncomeUpdate"
+      responses:
+        "204":
+          description: Rendas familiares do cliente atualizadas
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: >-
+            Ocorreu um dos seguintes erros:
+              - Cliente com ID informado não encontrado.
+              - Dados incompletos ou ausentes nas rendas familiares do cliente.
+              - Formato inválido dos valores de renda.
+              - Erros de validação específicos relacionados às rendas familiares.
+            Certifique-se de fornecer todas as informações necessárias e garantir que os dados estejam de acordo com os requisitos definidos.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}/addresses/{type}":
+    put:
+      tags:
+        - Endereços do cliente
+      summary: Atualiza os endereços de um cliente. Se não existir, cria.
+      operationId: updateAddresses
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente.
+          required: true
+          type: integer
+          format: int32
+        - name: type
+          in: path
+          description: Tipo de endereço. 'C' para Comercial. 'R' para Residencial.
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: >-
+            Objeto para atualizar endereços do cliente.
+          required: true
+          schema:
+            $ref: "#/definitions/AddressUpdate"
+      responses:
+        "204":
+          description: Telefones do cliente atualizados
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}/attachments":
+    post:
+      tags:
+        - Anexos do cliente
+      summary: Inclui um anexo ao cliente.
+      operationId: insertCustomerAttachment
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente.
+          required: true
+          type: integer
+          format: int32
+        - name: description
+          in: query
+          description: >-
+            Descrição do anexo. Exemplo: "Certidão de nascimento".
+          required: true
+          type: string
+        - name: file
+          in: formData
+          description: >-
+            Arquivo para inserção | Tamanho máximo: 70 MB | Tamanho máximo do nome do arquivo: 100 caracteres | Somente 1 Anexo por requisição. Caso seja enviado mais de 1 Anexo, o Sienge vai aceitar somente o primeiro selecionado.
+          required: true
+          type: file
+      produces:
+        - application/json
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Anexo inserido com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: |
+            Entidade não processável.
+
+
+            Ocorreu algum erro semântico que impede a criação do anexo do cliente. Alguns exemplos dessas validações (podem haver outros) são:
+            * Cliente com ID informado não encontrado;
+            * Nome do anexo (contando com extensão) maior que 100 caracteres;
+            * Descrição vazia ou maior que 500 caracteres;
+            * Anexo maior que 70 MB;
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Anexos do cliente
+      summary: Busca as informações dos anexos do cliente
+      operationId: getCustomerAttachments
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Foi encontrado anexos para o cliente, caso retorne vazio foi encontrado apenas o cliente.
+          schema:
+            $ref: "#/definitions/GetResponseCostumerAttachments"
+        "404":
+          description: Anexos inexistentes
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}/attachments/{attachmentId}":
+    get:
+      tags:
+        - Anexos do cliente
+      summary: Download de anexo do cliente
+      operationId: downloadCostumerAttachment
+      parameters:
+        - name: id
+          in: path
+          description: Id do cliente
+          required: true
+          type: integer
+          format: int32
+        - name: attachmentId
+          in: path
+          description: ID do anexo
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+        - file
+      responses:
+        "200":
+          description: Anexo encontrado
+          schema:
+            type: file
+        "404":
+          description: Anexo ou cliente não foram encontrados
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/customers/{id}/procurator":
+    post:
+      tags:
+        - Procuradores do cliente
+      summary: Inclui um procurador ao cliente.
+      operationId: insertCustomerProcurators
+      parameters:
+        - in: path
+          name: id
+          description: Id do cliente
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para criação do procurador
+          required: true
+          schema:
+            $ref: "#/definitions/ProcuratorInsert"
+      responses:
+        "201":
+          description: Procurador criado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  CustomerGet:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código.
+      personType:
+        type: string
+        description: Tipo de pessoa (física ou jurídica).
+      foreigner:
+        type: string
+        description: >
+          Indica se a pessoa é estrangeira ou não:
+            * `S` - Sim
+            * `N` - Não
+        enum: ["S", "N"]
+      internationalId:
+        type: string
+        description: Id internacional para clientes estrangeiros.
+      createdAt:
+        type: string
+        description: Data de cadastramento.
+      modifiedAt:
+        type: string
+        description: Data da última alteração.
+      issuingBody:
+        type: string
+        description: Orgão emissor.
+      name:
+        type: string
+        description: Nome.
+      email:
+        type: string
+        description: E-mail.
+      birthDate:
+        type: string
+        description: Data de nascimento para pessoa física.
+      birthPlace:
+        type: string
+        description: Naturalidade para pessoa física.
+      civilStatus:
+        type: string
+        description: Estado civil para pessoa física.
+      cpf:
+        type: string
+        description: CPF para pessoa física.
+      fatherName:
+        type: string
+        description: Filiação 1.
+      motherName:
+        type: string
+        description: Filiação 2.
+      sex:
+        type: string
+        description: >
+          Sexo para pessoa física:
+              * Feminino
+              * Masculino
+              * Anônimo
+        enum: ["Feminino", "Masculino", "Anônimo"]
+      issueDateIdentityCard:
+        type: string
+        description: Data de emissão da carteira de identidade (RG) para pessoa física.
+      matrimonialRegime:
+        type: string
+        description: Regime matrimonial para pessoa física.
+      marriageDate:
+        type: string
+        description: Data de casamento para pessoa física.
+      nationality:
+        type: string
+        description: Nacionalidade para pessoa física.
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG) para pessoa física.
+      profession:
+        type: string
+        description: Profissão para pessoa física.
+      mailingAddress:
+        type: string
+        description: >
+          Endereço para correspondência:
+            * `R` - Residencial
+            * `C` - Comercial
+            * `I` - Internacional
+        enum: ["R", "C", "I"]
+      licenseNumber:
+        type: string
+        description: Número da licença.
+      licenseIssuingBody:
+        type: string
+        description: Órgão emissor da licença.
+      licenseIssueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+        description: Data de emissão da licença
+      cityRegistrationNumber:
+        type: string
+        description: Número de inscrição municipal para pessoa jurídica.
+      cnaeNumber:
+        type: string
+        description: Número do CNAE para pessoa jurídica.
+      cnpj:
+        type: string
+        description: CNPJ para pessoa jurídica.
+      contactName:
+        type: string
+        description: Nome do contato para pessoa jurídica.
+      creaNumber:
+        type: string
+        description: Número do CREA para pessoa jurídica.
+      establishmentDate:
+        type: string
+        description: Data de constituição da empresa para pessoa jurídica.
+      fantasyName:
+        type: string
+        description: Nome fantasia para pessoa jurídica.
+      note:
+        type: string
+        description: Observação para pessoa jurídica.
+      site:
+        type: string
+        description: Endereço de website para pessoa jurídica.
+      shareCapital:
+        type: number
+        description: Capital social para pessoa jurídica.
+      stateRegistrationNumber:
+        type: string
+        description: Número de inscrição estadual para pessoa jurídica.
+      technicalManager:
+        type: string
+        description: Nome do responsável técnico para pessoa jurídica.
+      clientType:
+        type: string
+        description: Tipo de cliente.
+      subTypes:
+        type: array
+        description: Subtipos do cliente.
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Id do subtipo.
+            description:
+              type: string
+              description: Descrição do subtipo.
+      activityId:
+        type: integer
+        description: Id da atividade.
+      activityDescription:
+        type: string
+        description: Descrição da atividade.
+      phones:
+        type: array
+        description: Telefones do cliente.
+        items:
+          $ref: "#/definitions/PhoneGet"
+      addresses:
+        type: array
+        description: Endereços do cliente.
+        items:
+          $ref: "#/definitions/CustomerAddressGet"
+      agents:
+        type: array
+        description: Representantes do cliente pessoa jurídica.
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Id do cliente representante.
+      procurators:
+        type: object
+        description: Procuradores do cliente.
+        properties:
+          cpf:
+            type: string
+            description: CPF do procurador.
+          email:
+            type: string
+            description: E-mail do procurador.
+          name:
+            type: string
+            description: Nome do procurador.
+          profession:
+            type: string
+            description: Profissão do procurador.
+          civilStatus:
+            type: string
+            description: Descrição estado civil do procurador.
+          nationality:
+            type: string
+            description: Nacionalidade do procurador.
+          numberIdentityCard:
+            type: string
+            description: Número da carteira de identidade (RG) do procurador.
+          proxy:
+            type: object
+            description: Procuração.
+            properties:
+              book:
+                type: string
+                description: Livro.
+              date:
+                type: string
+                description: Data da procuração.
+              expirationDate:
+                type: string
+                description: Data de validade da procuração.
+              district:
+                type: string
+                description: Comarca.
+              registry:
+                type: string
+                description: Cartório.
+              sheet:
+                type: string
+                description: Folha.
+          addresses:
+            type: array
+            description: Endereços do procurador.
+            items:
+              $ref: "#/definitions/AddressGet"
+          phones:
+            type: array
+            description: Telefones do procurador.
+            items:
+              $ref: "#/definitions/PhoneGet"
+      spouse:
+        $ref: "#/definitions/Spouse"
+      familyIncome:
+        type: array
+        description: Renda familiar.
+        items:
+          $ref: "#/definitions/FamilyIncome"
+  CustomerUpdate:
+    type: object
+    properties:
+      internationalId:
+        type: string
+        description: Id internacional para clientes estrangeiros.
+      naturalPersonData:
+        $ref: "#/definitions/NaturalPersonDataUpdate"
+      legalPersonData:
+        $ref: "#/definitions/LegalPersonDataUpdate"
+  NaturalPersonDataUpdate:
+    type: object
+    description: Dados da pessoa física.
+    properties:
+      name:
+        type: string
+        description: Nome.
+      email:
+        type: string
+        description: E-mail.
+      cpf:
+        type: string
+        description: >-
+          CPF. Formato NNNNNNNNNNN (somente números). Exemplo ->
+          41833114035.
+      sex:
+        type: string
+        description: >
+          Sexo para pessoa física:
+            * `M` - Masculino
+            * `F` - Feminino
+            * `A` - Anônimo
+        enum: ["M", "F", "A"]
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      birthPlace:
+        type: string
+        description: Naturalidade.
+      nationality:
+        type: string
+        description: Nacionalidade.
+      civilStatus:
+        type: string
+        description: >-
+          Estado civil. Deve ser informada a descrição conforme cadastro de
+          estados civis no Sienge.
+      matrimonialRegime:
+        type: string
+        description: Regime matrimonial.
+      marriageDate:
+        type: string
+        description: Data de casamento. Formato YYYY-MM-DD. Exemplo -> 2015-05-03.
+      fatherName:
+        type: string
+        description: Filiação 1.
+      motherName:
+        type: string
+        description: Filiação 2.
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG).
+      issueDateIdentityCard:
+        type: string
+        description: >-
+          Data de emissão da carteira de identidade (RG). Formato
+          YYYY-MM-DD. Exemplo -> 2010-02-05.
+      issuingBody:
+        type: string
+        description: Orgão Emissor.
+      profession:
+        type: string
+        description: >-
+          Profissão. Deve ser informada a descrição conforme cadastro de
+          profissôes no Sienge.
+      mailingAddress:
+        type: string
+        description: >
+          Endereço para correspondência:
+            * `R` - Residencial
+            * `C` - Comercial
+            * `I` - Internacional
+        enum: ["R", "C", "I"]
+      licenseNumber:
+        type: string
+        description: Número da licença.
+      licenseIssuingBody:
+        type: string
+        description: Órgão emissor da licença.
+      licenseIssueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+        description: Data de emissão da licença
+  LegalPersonDataUpdate:
+    type: object
+    description: Dados da pessoa jurídica.
+    properties:
+      name:
+        type: string
+        description: Nome.
+      fantasyName:
+        type: string
+        description: Nome fantasia.
+      email:
+        type: string
+        description: E-mail.
+      cnpj:
+        type: string
+        description: >-
+          CNPJ. Formato NNNNNNNNNNNNNN (somente números). Exemplo ->
+          87389750000185.
+      cityRegistrationNumber:
+        type: string
+        description: Número de inscrição municipal.
+      stateRegistrationNumber:
+        type: string
+        description: Número de inscrição estadual.
+      cnaeNumber:
+        type: string
+        description: Número do CNAE.
+      creaNumber:
+        type: string
+        description: Número do CREA.
+      contactName:
+        type: string
+        description: Nome do contato.
+      establishmentDate:
+        type: string
+        description: >-
+          Data de constituição da empresa. Formato YYYY-MM-DD. Exemplo ->
+          2012-12-05.
+      note:
+        type: string
+        description: Observação.
+      site:
+        type: string
+        description: Endereço de website.
+      shareCapital:
+        type: number
+        description: Capital social.
+      technicalManager:
+        type: string
+        description: Nome do responsável técnico.
+  CustomerInsert:
+    type: object
+    required:
+      - personType
+    properties:
+      personType:
+        type: string
+        description: >-
+          Tipo de pessoa. Informar F para pessoa física ou J para pessoa
+          juridica. Campo obrigatório.
+      foreigner:
+        type: string
+        description: >
+          Indica se a pessoa é estrangeira ou não:
+            * `S` - Sim
+            * `N` - Não
+        enum: ["S", "N"]
+      typeId:
+        type: integer
+        description: >-
+          Tipo de cliente. Informar código do cadastro de tipo de cliente.
+      internationalId:
+        type: string
+        description: Informação da identificação internacional.
+      subtypeIds:
+        type: array
+        description: >-
+          Subtipos de cliente. Informar lista com o código do cadastro de subtipos de cliente.
+        items:
+          type: integer
+      addresses:
+        type: array
+        description: Endereços do cliente.
+        items:
+          $ref: "#/definitions/AddressInsert"
+      phones:
+        type: array
+        description: Telefones do cliente.
+        items:
+          $ref: "#/definitions/PhoneInsertAndUpdate"
+      naturalPersonData:
+        type: object
+        required:
+          - name
+          - sex
+          - cpf
+        description: >-
+          Dados para cliente pessoa física. Informar somente quando o personType
+          for F.
+        properties:
+          name:
+            type: string
+            description: Nome.
+          email:
+            type: string
+            description: E-mail.
+          birthDate:
+            type: string
+            description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+          birthPlace:
+            type: string
+            description: Naturalidade.
+          civilStatus:
+            type: string
+            description: >-
+              Estado civil. Deve ser informada a descrição conforme cadastro de
+              estados civis no Sienge.
+          cpf:
+            type: string
+            description: >-
+              CPF. Formato NNNNNNNNNNN (somente números). Exemplo ->
+              41833114035.
+          mailingAddress:
+            type: string
+            description: >
+              Endereço para correspondência:
+                * `R` - Residencial
+                * `C` - Comercial
+                * `I` - Internacional
+            enum: ["R", "C", "I"]
+          licenseNumber:
+            type: string
+            description: Número da licença.
+          licenseIssuingBody:
+            type: string
+            description: Órgão emissor da licença.
+          licenseIssueDate:
+            type: string
+            format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2023-01-01)"
+            description: Data de emissão da licença
+          fatherName:
+            type: string
+            description: Filiação 1.
+          sex:
+            type: string
+            description: >-
+              Sexo. Informar F para feminino ou M para masculino. Campo
+              obrigatório.
+          issueDateIdentityCard:
+            type: string
+            description: >-
+              Data de emissão da carteira de identidade (RG). Formato
+              YYYY-MM-DD. Exemplo -> 2010-02-05.
+          matrimonialRegime:
+            type: string
+            description: Regime matrimonial.
+          marriageDate:
+            type: string
+            description: Data de casamento. Formato YYYY-MM-DD. Exemplo -> 2015-05-03.
+          issuingBody:
+            type: string
+            description: Orgão Emissor.
+          nationality:
+            type: string
+            description: Nacionalidade.
+          numberIdentityCard:
+            type: string
+            description: Número da carteira de identidade (RG).
+          motherName:
+            type: string
+            description: Filiação 2.
+          profession:
+            type: string
+            description: >-
+              Profissão. Deve ser informada a descrição conforme cadastro de
+              profissôes no Sienge.
+          spouse:
+            type: object
+            description: Cônjuge
+            required:
+              - name
+              - sex
+            properties:
+              foreigner:
+                type: string
+                description: Flag que indica se o cônjuge é estrangeiro.
+              internationalId:
+                type: string
+                description: Informação da identificação internacional.
+              cpf:
+                type: string
+                description: >-
+                  CPF do cônjuge. Formato NNNNNNNNNNN (somente números). Exemplo -> 41833114035.
+              name:
+                type: string
+                description: Nome do cônjuge. Campo obrigatório.
+                maxLength: 80
+              email:
+                type: string
+                description: E-mail do cônjuge.
+                maxLength: 40
+              sex:
+                type: string
+                description: Sexo do cônjuge. Informar F para feminino, M para masculino e A para anônimo. Campo obrigatório.
+              civilStatus:
+                type: string
+                description: Estado civil do cônjuge. Deve ser informada a descrição conforme cadastro de estados civis no Sienge.
+              birthDate:
+                type: string
+                description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+              numberIdentityCard:
+                type: string
+                description: Número da carteira de identidade (RG).
+              issueDateIdentityCard:
+                type: string
+                description: Data de emissão identidade. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+              profession:
+                type: string
+                description: Profissão do cônjuge. Deve ser informada a descrição conforme cadastro de profissôes no Sienge.
+              nationality:
+                type: string
+                description: Nacionalidade do cônjuge.
+                maxLength: 40
+              birthPlace:
+                type: string
+                description: Naturalidade do cônjuge.
+                maxLength: 40
+              fatherName:
+                type: string
+                description: Filiação 1 do cônjuge.
+                maxLength: 40
+              motherName:
+                type: string
+                description: Filiação 2 do cônjuge.
+                maxLength: 40
+              cellphoneNumber:
+                type: string
+                description: Número do telefone celular do cônjuge. Formato DDDNNNNNNNNN. Exemplo -> 048912345678
+                maxLength: 12
+              businessPhone:
+                type: string
+                description: Número do telefone comercial do cônjuge. Formato DDDNNNNNNNNN. Exemplo -> 048912345678
+                maxLength: 12
+              company:
+                type: string
+                description: Empresa do cônjuge.
+                maxLength: 80
+              addresses:
+                type: object
+                description: Endereço do Cônjuge
+                properties:
+                  city:
+                    type: string
+                    description: Nome do munícipio do endereço. Deve ser informada o nome conforme cadastro de munícipio no Sienge.
+                  complement:
+                    type: string
+                    description: Complemento do endereço.
+                    maxLength: 40
+                  neighborhood:
+                    type: string
+                    description: Bairro do endereço.
+                    maxLength: 40
+                  number:
+                    type: string
+                    description: Número do endereço.
+                    maxLength: 10
+                  streetName:
+                    type: string
+                    description: Logradouro do endereço.
+                    maxLength: 40
+                  zipCode:
+                    type: string
+                    description: >-
+                      Código de endereçamento postal (CEP) do endereço. Informar somente
+                      números. Exemplo -> 88000123
+                    maxLength: 8
+      legalPersonData:
+        type: object
+        description: >-
+          Dados para cliente pessoa jurídica. Informar somente quando o
+          personType for J.
+        properties:
+          name:
+            type: string
+            description: Nome.
+          email:
+            type: string
+            description: E-mail.
+          cityRegistrationNumber:
+            type: string
+            description: Número de inscrição municipal.
+          cnaeNumber:
+            type: string
+            description: Número do CNAE.
+          cnpj:
+            type: string
+            description: >-
+              CNPJ. Formato NNNNNNNNNNNNNN (somente números). Exemplo ->
+              87389750000185.
+          contactName:
+            type: string
+            description: Nome do contato.
+          creaNumber:
+            type: string
+            description: Número do CREA.
+          establishmentDate:
+            type: string
+            description: >-
+              Data de constituição da empresa. Formato YYYY-MM-DD. Exemplo ->
+              2012-12-05.
+          fantasyName:
+            type: string
+            description: Nome fantasia.
+          note:
+            type: string
+            description: Observação.
+          site:
+            type: string
+            description: Endereço de website.
+          shareCapital:
+            type: number
+            description: Capital social.
+          stateRegistrationNumber:
+            type: string
+            description: Número de inscrição estadual.
+          technicalManager:
+            type: string
+            description: Nome do responsável técnico.
+          agents:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: Id do cliente representante.
+      familyIncome:
+        type: array
+        description: Renda familiar.
+        items:
+          $ref: "#/definitions/FamilyIncomeInsert"
+  FamilyIncomeInsert:
+    type: object
+    properties:
+      kinsName:
+        type: string
+        description: Nome do parente.
+      kinship:
+        type: string
+        description: Nome do parentesco.
+      incomeValue:
+        type: number
+        description: Valore da renda.
+      observation:
+        type: string
+        description: Observação.
+  AddressInsert:
+    type: object
+    properties:
+      type:
+        type: string
+        description: >-
+          Tipo do endereço. Informar R para endereço residencial ou C para
+          endereço comercial. É permitido no máximo um de cada.
+      streetName:
+        type: string
+        description: Logradouro do endereço.
+      number:
+        type: string
+        description: Número do endereço.
+      complement:
+        type: string
+        description: Complemento do endereço.
+      neighborhood:
+        type: string
+        description: Bairro do endereço.
+      cityId:
+        type: integer
+        description: Identificador do munícipio do endereço.
+      city:
+        type: string
+        description: Nome do munícipio do endereço. Este campo será desconsiderado quando o cityId for informado.
+      state:
+        type: string
+        description: UF do estado do endereço. Exemplo -> SC.
+      zipCode:
+        type: string
+        description: >-
+          Código de endereçamento postal (CEP) do endereço. Informar somente
+          números. Exemplo -> 88000123
+  AddressUpdate:
+    type: object
+    properties:
+      streetName:
+        type: string
+        description: Logradouro do endereço.
+      number:
+        type: string
+        description: Número do endereço.
+      complement:
+        type: string
+        description: Complemento do endereço.
+      neighborhood:
+        type: string
+        description: Bairro do endereço.
+      cityId:
+        type: integer
+        description: Identificador do munícipio do endereço.
+      city:
+        type: string
+        description: Nome do munícipio do endereço. Este campo será desconsiderado quando o cityId for informado.
+      state:
+        type: string
+        description: Sigla do estado do endereço.
+      zipCode:
+        type: string
+        description: Código de endereçamento postal (CEP) do endereço.
+  AddressGet:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Tipo do endereço.
+      streetName:
+        type: string
+        description: Logradouro do endereço.
+      number:
+        type: string
+        description: Número do endereço.
+      complement:
+        type: string
+        description: Complemento do endereço.
+      neighborhood:
+        type: string
+        description: Bairro do endereço.
+      city:
+        type: string
+        description: Nome do munícipio do endereço.
+      state:
+        type: string
+        description: Nome do estado do endereço.
+      zipCode:
+        type: string
+        description: Código de endereçamento postal (CEP) do endereço.
+  CustomerAddressGet:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Tipo do endereço.
+      streetName:
+        type: string
+        description: Logradouro do endereço.
+      number:
+        type: string
+        description: Número do endereço.
+      complement:
+        type: string
+        description: Complemento do endereço.
+      neighborhood:
+        type: string
+        description: Bairro do endereço.
+      cityId:
+        type: integer
+        description: Identificador do munícipio do endereço.
+      city:
+        type: string
+        description: Nome do munícipio do endereço.
+      state:
+        type: string
+        description: Nome do estado do endereço.
+      zipCode:
+        type: string
+        description: Código de endereçamento postal (CEP) do endereço.
+      mail:
+        type: boolean
+        description: Identifica se é o endereço de correspondencia do cliente.
+  PhoneGet:
+    type: object
+    properties:
+      number:
+        type: string
+        description: Número de telefone, com o DDD.
+      main:
+        type: boolean
+        description: True quando o telefone for principal.
+      type:
+        type: string
+        description: Tipo de telefone.
+      note:
+        type: string
+        description: Observação do telefone.
+      idd:
+        type: string
+        description: DDI do Telefone.
+  FamilyIncome:
+    type: object
+    properties:
+      kinsName:
+        type: string
+        description: Nome parente.
+      kinship:
+        type: string
+        description: Nome parentesco.
+      incomeValue:
+        type: number
+        description: Valor da renda.
+      observation:
+        type: string
+        description: Observação.
+  PhoneInsertAndUpdate:
+    type: object
+    properties:
+      number:
+        type: string
+        description: Número de telefone. Formato DDDNNNNNNNNN. Exemplo -> 048912345678
+      main:
+        type: boolean
+        description: >-
+          True quando o telefone for principal. Deve ser informado um telefone
+          como principal.
+      type:
+        type: string
+        description: >-
+          Tipo de telefone. Informar CE para celular, CO para comercial ou RE
+          para residencial.
+      note:
+        type: string
+        description: >-
+          Observação do telefone.
+        maximum: 40
+      idd:
+        type: string
+        description: DDI do Telefone. Formato +NNN ou NNN. Exemplo -> +123, 123 etc.
+  CustomerPhonesUpdate:
+    type: object
+    properties:
+      phones:
+        type: array
+        description: Telefones do cliente.
+        items:
+          $ref: "#/definitions/PhoneInsertAndUpdate"
+  CustomerFamilyIncomeUpdate:
+    type: array
+    description: Renda Familiar do cliente.
+    items:
+      $ref: "#/definitions/FamilyIncome"
+  Spouse:
+    type: object
+    description: Cônjuge
+    required:
+      - name
+      - sex
+    properties:
+      cpf:
+        type: string
+        description: >-
+          CPF do cônjuge. Formato NNNNNNNNNNN (somente números). Exemplo -> 41833114035.
+      name:
+        type: string
+        description: Nome do cônjuge. Campo obrigatório.
+        maxLength: 80
+      email:
+        type: string
+        description: E-mail do cônjuge.
+        maxLength: 40
+      sex:
+        type: string
+        description: >
+          Sexo do cônjuge:
+              * `F` - Feminino
+              * `M` - Masculino
+              * `A` - Anônimo
+        enum: ["F", "M", "A"]
+      foreigner:
+        type: string
+        description: >
+          Indica se a pessoa é estrangeira ou não:
+            * `S` - Sim
+            * `N` - Não
+        enum: ["S", "N"]
+      internationalId:
+        type: string
+        description: Informação da identificação internacional.
+      civilStatus:
+        type: string
+        description: Estado civil do cônjuge. Deve ser informada a descrição conforme cadastro de estados civis no Sienge.
+      birthDate:
+        type: string
+        description: Data de nascimento. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG).
+      issueDateIdentityCard:
+        type: string
+        description: Data de emissão identidade. Formato YYYY-MM-DD. Exemplo -> 1990-12-25.
+      profession:
+        type: string
+        description: Profissão do cônjuge. Deve ser informada a descrição conforme cadastro de profissôes no Sienge.
+      nationality:
+        type: string
+        description: Nacionalidade do cônjuge.
+        maxLength: 40
+      birthPlace:
+        type: string
+        description: Naturalidade do cônjuge.
+        maxLength: 40
+      fatherName:
+        type: string
+        description: Filiação 1.
+        maxLength: 40
+      motherName:
+        type: string
+        description: Filiação 2.
+        maxLength: 40
+      cellphoneNumber:
+        type: string
+        description: Número do telefone celular do cônjuge. Formato DDDNNNNNNNNN. Exemplo -> 048912345678
+        maxLength: 12
+      businessPhone:
+        type: string
+        description: Número do telefone comercial do cônjuge. Formato DDDNNNNNNNNN. Exemplo -> 048912345678
+        maxLength: 12
+      company:
+        type: string
+        description: Empresa do cônjuge.
+        maxLength: 80
+      addresses:
+        type: object
+        description: Endereço do Cônjuge
+        properties:
+          city:
+            type: string
+            description: Nome do munícipio do endereço. Deve ser informada o nome conforme cadastro de munícipio no Sienge.
+          complement:
+            type: string
+            description: Complemento do endereço.
+            maxLength: 40
+          neighborhood:
+            type: string
+            description: Bairro do endereço.
+            maxLength: 40
+          number:
+            type: string
+            description: Número do endereço.
+            maxLength: 10
+          streetName:
+            type: string
+            description: Logradouro do endereço.
+            maxLength: 40
+          zipCode:
+            type: string
+            description: >-
+              Código de endereçamento postal (CEP) do endereço. Informar somente
+              números. Exemplo -> 88000123
+            maxLength: 8
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de clientes retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/CustomerGet"
+  GetResponseCostumerAttachments:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de anexos do cliente
+        items:
+          $ref: "#/definitions/CostumerAttachment"
+  CostumerAttachment:
+    type: object
+    properties:
+      attachmentid:
+        type: integer
+        format: int32
+        description: "ID do anexo | Exemplo: 1"
+        example: 1
+      name:
+        type: string
+        description: "Nome do arquivo | Exemplo: arquivo.pdf"
+        example: arquivo.pdf
+        maxLength: 100
+      description:
+        type: string
+        description: "Descrição do anexo | Exemplo: Documento do cliente"
+        example: Documento do cliente
+        maxLength: 500
+      size:
+        type: integer
+        format: int32
+        description: "Tamanho do arquivo em bytes | Exemplo: 320123"
+      contentType:
+        type: string
+        description: "Tipo do arquivo (MimeType) | Exemplo: application/pdf"
+        example: application/pdf
+      links:
+        type: array
+        description: Link para realizar o download do arquivo
+        items:
+          $ref: "#/definitions/LinkAttachment"
+  LinkAttachment:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Nome da recurso associado
+        example: contentDownloadLink
+      href:
+        type: string
+        description: URL do recurso associado
+        example: "http://../v1/customers/1202/attachments/1"
+  ProcuratorInsert:
+    type: object
+    description: Informações relacionadas ao procurador do cliente.
+    required:
+      - name
+      - cpf
+      - procuratorType
+      - residentialAddress
+    properties:
+      name:
+        type: string
+        description: Nome do procurador
+        maxLength: 80
+      cpf:
+        type: string
+        description: CPF do procurador.
+      procuratorType:
+        type: string
+        description: Tipos de procuradores. São aceitos "Cliente", "Conjuge" ou "Ambos".
+        enum: ["CLIENTE", "CONJUGE", "AMBOS"]
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG) do procurador.
+        maxLength: 21
+      email:
+        type: string
+        description: Endereço eletrônico (e-mail) do procurador.
+        maxLength: 100
+      birthDate:
+        type: string
+        description: Data de nascimento do procurador. Formato YYYY-MM-DD.
+      nationality:
+        type: string
+        description: Nacionalidade do procurador.
+        maxLength: 40
+      birthPlace:
+        type: string
+        description: Naturalidade do procurador.
+        maxLength: 80
+      professionId:
+        type: integer
+        format: int32
+        description: Código da profissão do procurador.
+      civilStatusId:
+        type: integer
+        format: int32
+        description: Código do estado civil do procurador.
+      marriageRegime:
+        type: string
+        description: Regime de casamento do procurador.
+        maxLength: 40
+      marriageDate:
+        type: string
+        description: Data de casamento do procurador. Formato YYYY-MM-DD.
+      residentialAddress:
+        $ref: "#/definitions/ProcuratorResidentialAddressInsert"
+      businessAddress:
+        $ref: "#/definitions/ProcuratorBusinessAddressInsert"
+      proxy:
+        $ref: "#/definitions/ProcuratorProxyInsert"
+      spouse:
+        $ref: "#/definitions/ProcuratorSpouseInsert"
+      phones:
+        type: array
+        description: Telefones do procurador.
+        items:
+          $ref: "#/definitions/PhoneInsert"
+  ProcuratorResidentialAddressInsert:
+    type: object
+    required:
+      - streetName
+      - neighborhood
+      - cityId
+    properties:
+      streetName:
+        type: string
+        description: Logradouro do endereço residencial.
+        maxLength: 80
+      neighborhood:
+        type: string
+        description: Bairro do endereço residencial.
+        maxLength: 40
+      cityId:
+        type: integer
+        format: int32
+        description: Código do município do endereço residencial.
+      zipCode:
+        type: string
+        description: Código de endereçamento postal (CEP) residencial. Formato NNNNN-NNN.
+      number:
+        type: string
+        description: Número do endereço residencial.
+        maxLength: 10
+      complement:
+        type: string
+        description: Complemento do endereço residencial.
+        maxLength: 40
+  ProcuratorBusinessAddressInsert:
+    type: object
+    properties:
+      streetName:
+        type: string
+        description: Logradouro do endereço comercial.
+        maxLength: 80
+      neighborhood:
+        type: string
+        description: Bairro do endereço comercial.
+        maxLength: 40
+      cityId:
+        type: integer
+        format: int32
+        description: Código do município do endereço comercial.
+      zipCode:
+        type: string
+        description: Código de endereçamento postal (CEP) comercial. Formato NNNNN-NNN.
+      number:
+        type: string
+        description: Número do endereço comercial.
+        maxLength: 10
+      complement:
+        type: string
+        description: Complemento do endereço comercial.
+        maxLength: 40
+  ProcuratorProxyInsert:
+    type: object
+    properties:
+      registry:
+        type: string
+        description: Nome do cartório.
+        maxLength: 40
+      district:
+        type: string
+        description: Comarca do cartório.
+        maxLength: 40
+      stateId:
+        type: integer
+        format: int32
+        description: Código da unidade federativa (UF) do cartório.
+      book:
+        type: string
+        description: Nome do livro.
+        maxLength: 20
+      sheet:
+        type: string
+        description: Número da folha.
+        maxLength: 10
+      date:
+        type: string
+        description: Data da procuração. Formato YYYY-MM-DD.
+      expirationDate:
+        type: string
+        description: Data de validade da procuração. Formato YYYY-MM-DD.
+  ProcuratorSpouseInsert:
+    type: object
+    required:
+      - name
+      - cpf
+    properties:
+      name:
+        type: string
+        description: Nome do cônjuge do procurador.
+        maxLength: 80
+      cpf:
+        type: string
+        description: CPF do cônjuge do procurador.
+      birthDate:
+        type: string
+        description: Data de nascimento do cônjuge do procurador. Formato YYYY-MM-DD.
+      birthPlace:
+        type: string
+        description: Naturalidade do cônjuge do procurador.
+        maxLength: 40
+      nationality:
+        type: string
+        description: Nacionalidade do cônjuge do procurador.
+        maxLength: 40
+      professionId:
+        type: integer
+        format: int32
+        description: Código da profissão do cônjuge do procurador.
+      numberIdentityCard:
+        type: string
+        description: Número da carteira de identidade (RG) do cônjuge do procurador.
+        maxLength: 21
+  PhoneInsert:
+    type: object
+    required:
+      - main
+      - type
+      - number
+    properties:
+      main:
+        type: boolean
+        description: Indicador de telefone principal. "True" quando for principal, "False" quando não. Deve ser informado apenas um telefone como o principal.
+      type:
+        type: string
+        description: Tipo de telefone, pode ser "Celular", "Comercial" ou "Residencial".
+        enum: ["CELULAR", "COMERCIAL", "RESIDENCIAL"]
+      number:
+        type: string
+        description: Número de telefone com DDD. Formato DDDNNNNNNNNN ou DDNNNNNNNNN.
+      extension:
+        type: string
+        description: Ramal do telefone.
+        maxLength: 4
+      note:
+        type: string
+        description: Observação do telefone.
+        maxLength: 80
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+        example: Client description message.

@@ -1,0 +1,513 @@
+swagger: "2.0"
+info:
+  description: >-
+    API  de leitura dos dados apresentados no relatório de Títulos Inadimplentes.
+  version: "1.0"
+  title: Títulos Inadimplentes
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+tags:
+  - name: Títulos Inadimplentes
+    description: Bulk data para leitura de dados de títulos e parcelas inadimplentes
+paths:
+  /defaulters-receivable-bills:
+    get:
+      tags:
+        - Títulos Inadimplentes
+      summary: >-
+        Retorna os títulos inadimplentes juntamente com as parcelas em atraso.
+      operationId: defaultersReceivableBills
+      parameters:
+        - in: query
+          name: companyId
+          description: Código da empresa.
+          required: true
+          type: integer
+        - in: query
+          name: enterpriseId
+          description: >-
+            Lista de códigos de empreendimentos (separados por vírgula).
+            <b>Exemplo</b>: 1, 2, 3
+          required: false
+          type: integer
+        - in: query
+          name: dueDateLimit
+          description: >-
+            Data de vencimento limite. Se o parâmetro não for fornecido, será considerada a data atual.
+            <b>Exemplo</b>: 2019-12-30
+          format: yyyy-MM-dd
+          required: false
+          type: string
+          default: Data Atual
+        - in: query
+          name: bearerId
+          description: Código do portador.
+          required: false
+          type: integer
+        - in: query
+          name: documentsId
+          description: >-
+            Lista de códigos de documentos (separados por vírgula).
+            <b>Exemplo</b>: CT, AT, CM
+          required: false
+          type: string
+        - in: query
+          name: billingOperationId
+          description: Código da operação de cobrança.
+          required: false
+          type: integer
+        - in: query
+          name: receivableBillId
+          description: Código do título.
+          required: false
+          type: integer
+        - in: query
+          name: customerId
+          description: Código do cliente.
+          required: false
+          type: integer
+        - in: query
+          name: cityId
+          description: Código do município.
+          required: false
+          type: integer
+        - in: query
+          name: correctionDate
+          description: >-
+            Data de correção. Se o parâmetro não for fornecido, será considerada a data atual.
+            <b>Exemplo</b>: 2019-12-20
+          format: yyyy-MM-dd
+          required: false
+          type: string
+          default: Data Atual
+        - in: query
+          name: normalReceivableBills
+          description: >-
+            Filtro para títulos com situação "Normal" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: inBillingReceivableBills
+          description: >-
+            Filtro para títulos com situação "Em Cobrança" no controle de cobrança.
+            <b>Exemplo</b>:  true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: defaultersReceivableBills
+          description: >-
+            Filtro para títulos com situação "Inadimplente" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: underJudgmentReceivableBills
+          description: >-
+            Filtro para títulos com situação "Sub judice" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: normalActivities
+          description: >-
+            Filtro para atividades com situação "Normal" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: inBillingActivities
+          description: >-
+            Filtro para atividades com situação "Em Cobrança" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: defaultersActivities
+          description: >-
+            Filtro para atividades com situação "Inadimplente" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: underJudgmentActivities
+          description: >-
+            Filtro para atividades com situação "Sub judice" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: situationBillingControlInfo
+          description: >-
+            Filtro para situação no controle de cobrança.
+            <b>Exemplo</b>: C (Concluídas), P (Pendentes) ou não informar (Todas).
+          required: false
+          type: string
+        - in: query
+          name: includeResidueInstallment
+          description: >-
+            Incluir parcelas de resíduo.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: includePartiallyPaidInstallments
+          description: >-
+            Incluir parcelas parcialmente pagas.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: showOnlyDefaulters
+          description: >-
+            Exibir somente títulos marcados como inadimplentes.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: includeUnderJudgment
+          description: >-
+            Incluir títulos sub judice.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: showSentToSPCSerasa
+          description: >-
+            Incluir parcelas enviadas ao SPC/Serasa.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: positionDate
+          description: >-
+            Data de posição do histórico. Se o parâmetro não for fornecido, será considerada a data atual.
+            <b>Exemplo</b>: 2019-12-20
+          format: yyyy-MM-dd
+          required: false
+          type: string
+          default: Data Atual
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso.
+          schema:
+            $ref: "#/definitions/GetDefaultersReceivableBills"
+        "400":
+          description: Requisição mal formada.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  /defaulters-receivable-bills/by-aging:
+    get:
+      tags:
+        - Títulos Inadimplentes
+      summary: >-
+        Retorna os títulos inadimplentes somente com a parcela com maior atraso (aging), agrupados por cliente e unidade. Ex.: caso tenham dois títulos de um mesmo cliente, na mesma unidade, será retornado apenas o título que possui a parcela mais antiga.
+      operationId: defaultersReceivableBillsByAging
+      parameters:
+        - in: query
+          name: companyId
+          description: Código da empresa.
+          required: true
+          type: integer
+        - in: query
+          name: enterpriseId
+          description: >-
+            Lista de códigos de empreendimentos (separados por vírgula).
+            <b>Exemplo</b>: 1, 2, 3
+          required: false
+          type: integer
+        - in: query
+          name: dueDateLimit
+          description: >-
+            Data de vencimento limite. Se o parâmetro não for fornecido, será considerada a data atual.
+            <b>Exemplo</b>: 2019-12-30
+          format: yyyy-MM-dd
+          required: false
+          type: string
+          default: Data Atual
+        - in: query
+          name: bearerId
+          description: Código do portador.
+          required: false
+          type: integer
+        - in: query
+          name: documentsId
+          description: >-
+            Lista de códigos de documentos (separados por vírgula).
+            <b>Exemplo</b>: CT, AT, CM
+          required: false
+          type: string
+        - in: query
+          name: billingOperationId
+          description: Código da operação de cobrança.
+          required: false
+          type: integer
+        - in: query
+          name: customerId
+          description: Código do cliente.
+          required: false
+          type: integer
+        - in: query
+          name: correctionDate
+          description: >-
+            Data de correção. Se o parâmetro não for fornecido, será considerada a data atual.
+            <b>Exemplo</b>: 2019-12-20
+          format: yyyy-MM-dd
+          required: false
+          type: string
+          default: Data Atual
+        - in: query
+          name: defaultersReceivableBills
+          description: >-
+            Filtro para títulos com situação "Inadimplente" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: underJudgmentReceivableBills
+          description: >-
+            Filtro para títulos com situação "Sub judice" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: defaultersActivities
+          description: >-
+            Filtro para atividades com situação "Inadimplente" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: underJudgmentActivities
+          description: >-
+            Filtro para atividades com situação "Sub judice" no controle de cobrança.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: situationBillingControlInfo
+          description: >-
+            Filtro para situação no controle de cobrança.
+            <b>Exemplo</b>: C (Concluídas), P (Pendentes) ou não informar (Todas).
+          required: false
+          type: string
+        - in: query
+          name: includeResidueInstallment
+          description: >-
+            Incluir parcelas de resíduo.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: includePartiallyPaidInstallments
+          description: >-
+            Incluir parcelas parcialmente pagas.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: showOnlyDefaulters
+          description: >-
+            Exibir somente títulos marcados como inadimplentes.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: includeUnderJudgment
+          description: >-
+            Incluir títulos sub judice.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: showSentToSPCSerasa
+          description: >-
+            Incluir parcelas enviadas ao SPC/Serasa.
+            <b>Exemplo</b>: true ou false.
+          required: false
+          type: boolean
+          default: false
+        - in: query
+          name: positionDate
+          description: >-
+            Data de posição do histórico. Se o parâmetro não for fornecido, será considerada a data atual.
+            <b>Exemplo</b>: 2019-12-20
+          format: yyyy-MM-dd
+          required: false
+          type: string
+          default: Data Atual
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso.
+          schema:
+            $ref: "#/definitions/GetDefaultersReceivableBills"
+        "400":
+          description: Requisição mal formada.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+  GetDefaultersReceivableBills:
+    type: object
+    required:
+      - data
+    properties:
+      data:
+        type: array
+        description: Lista de títulos inadimplentes retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/Results"
+  Results:
+    type: object
+    properties:
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa
+      clientId:
+        type: integer
+        format: int32
+        description: Código do cliente
+      clientName:
+        type: string
+        description: Nome do cliente
+      receivableBillId:
+        type: integer
+        format: int64
+        description: Número do título.
+      issueDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de emissão do título.
+      documentNumber:
+        type: string
+        description: Documento do título. Formado por código + descrição (Exemplo CT.Documento)
+      costCentersId:
+        type: array
+        items:
+          type: integer
+          format: int32
+          description: Lista dos Centros de Custo ordenados pelo percentual de participação em ordem decrescente.
+      units:
+        type: string
+        description: Unidades do título.
+      receivableBillValue:
+        type: number
+        format: double
+        description: Valor total do título.
+      defaulterInstallments:
+        type: array
+        items:
+          $ref: "#/definitions/DefaulterInstallment"
+        description: Lista de parcelas inadimplentes.
+      defaulterJudicialActivities:
+        type: array
+        items:
+          $ref: "#/definitions/DefaulterJudicialActivity"
+        description: Lista de atividades judiciais.
+  DefaulterInstallment:
+    description: Parcela
+    type: object
+    properties:
+      installmentId:
+        type: integer
+        format: int64
+        description: Número da parcela.
+      conditionType:
+        type: string
+        description: Tipo de condição.
+      dueDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de vencimento.
+      daysOfDelay:
+        type: integer
+        format: int64
+        description: Dias de atraso.
+      correctedValueWithoutAdditions:
+        type: string
+        description: Valor corrigido sem acréscimos.
+      proRata:
+        type: string
+        description: Valor do pro-rata.
+      interest:
+        type: string
+        description: Valor do juros.
+      fine:
+        type: string
+        description: Valor da multa.
+      totalAdditions:
+        type: string
+        description: Valor total dos acréscimos.
+      correctedValueWithAdditions:
+        type: string
+        description: Valor corrigido com acréscimos.
+      installmentNumber:
+        type: string
+        description: Numero "sequencial" das parcelas 1, 2, 3, ou por "Condição de Pagamento" 1/2, 2/2... (Resultado será apresentado conforme Parâmetro 651).
+      installmentSentToSPCSerasa:
+        type: string
+        description: Indica se a parcela foi enviada ou não para o Serasa ou para o SPC. “S” para "Sim, foi enviada" e “N” para "Não foi enviada".
+  DefaulterJudicialActivity:
+    description: Atividade judicial
+    type: object
+    properties:
+      recordDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de gravação.
+      situation:
+        type: string
+        description: Situação da atividade (N- normal, C- em cobrança, J- sub-judice, I- inadimplente).
+      concluded:
+        type: string
+        description: Situação da conclusão.
+      observation:
+        type: string
+        description: Observação.

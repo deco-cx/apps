@@ -1,0 +1,421 @@
+swagger: "2.0"
+info:
+  title: Acompanhamentos de Obra
+  description: API de Acompanhamentos de Obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Registro de Medição
+    description: Medição de avanço de Tarefas de Planejamento de Obra.
+paths:
+  "/building-projects/{buildingId}/progress-logs":
+    post:
+      operationId: getBuildingProjectsIdProgressLogs
+      tags:
+        - Registro de Medição
+      summary: >-
+        Atualiza percentual de avanço físico das Tarefas do Planejamento de uma Obra.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da Obra
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Dados para geração da Medição, com data e itens a serem medidos. É necessário passar apenas as Tarefas que tenham tido algum avanço físico realizado.
+          required: true
+          schema:
+            $ref: "#/definitions/ProgressLogDtoForPost"
+      responses:
+        "201":
+          description: >-
+            Uma nova Medição foi criada com sucesso.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra, Planilha ou Tarefa não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Data da Medição inválida
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/building-projects/progress-logs":
+    get:
+      operationId: getBuildingProjectsProgressLogs
+      tags:
+        - Registro de Medição
+      summary: >-
+        Consulta progressos do Planejamento de Obras.
+      parameters:
+        - in: query
+          name: buildingId
+          description: Código da Obra
+          required: false
+          type: integer
+          format: int32
+        - in: query
+          name: buildingUnitId
+          description: >-
+            Unidade Construtiva da Obra.
+            Ao informar uma Unidade Construtiva, o resultado da consulta será somente as Medições que possuirem Itens medidos para a Unidade Construtiva informada.
+            O uso desse parâmetro obriga que seja informado um valor no parâmetro buildingId.
+          required: false
+          type: integer
+          format: int32
+        - in: query
+          name: measurementStartDate
+          description: >-
+            Data de início da busca (data da Medição) no formato: yyyy-MM-dd.
+            Exemplo: 2022-03-01
+          required: false
+          type: string
+        - in: query
+          name: measurementEndDate
+          description: >-
+            Data de fim da busca (data da Medição) no formato: yyyy-MM-dd.
+            Exemplo: 2022-03-11
+          required: false
+          type: string
+        - in: query
+          name: consistent
+          description: Busca somente Medições consistentes quando true ou somente inconsistentes quando false
+          required: false
+          type: boolean
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Operação bem sucedida
+          schema:
+            $ref: "#/definitions/ListOfProgressLogDtosFotGet"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/building-projects/{buildingId}/progress-logs/{measurementNumber}":
+    get:
+      operationId: getBuildingProjectsIdProgressLogsId
+      tags:
+        - Registro de Medição
+      summary: >-
+        Consulta o progresso do Planejamento de uma Obra.
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da Obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: measurementNumber
+          description: Número da Medição
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Operação bem sucedida
+          schema:
+            $ref: "#/definitions/ProgressLogDto"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/building-projects/{buildingId}/progress-logs/{measurementNumber}/items/{buildingUnitId}":
+    get:
+      operationId: getBuildingProjectsIdProgressLogsIdItemsId
+      tags:
+        - Registro de Medição
+      summary: >-
+        Consulta informações dos itens de uma medição específica.
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da Obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: measurementNumber
+          description: Número da Medição
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: buildingUnitId
+          description: Código da Unidade Construtiva da Obra
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Operação bem sucedida
+          schema:
+            $ref: "#/definitions/ListOfMeasurementItemDtos"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra, Medicao ou Unidade Construtiva não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ProgressLogDtoForPost:
+    type: object
+    properties:
+      date:
+        description: Data da Medição
+        type: string
+        format: yyyy-MM-dd
+        example: "2019-07-15"
+      items:
+        type: array
+        description: Lista de Tarefas com percentual medido. Não é necessário informar Tarefas que não tiveram mudanças de avanço fisíco, apenas as que tiverem um percentual atualizado desde a última Medição registrada.
+        items:
+          $ref: "#/definitions/ProgressLogItemDtoForPost"
+  ProgressLogItemDtoForPost:
+    type: object
+    properties:
+      buildingUnitId:
+        description: Identificador único da Planilha de Tarefas (sheetId), que é representado pelo código da Unidade Construtiva.
+        type: number
+        example: 1
+      taskId:
+        description: Código identificador da Tarefa.
+        type: number
+        example: 109
+      cumulativePercentage:
+        description: Percentual acumulado de avanço da Tarefa
+        type: number
+        example: 80
+  ProgressLogDtoForGet:
+    type: object
+    properties:
+      buildingId:
+        type: integer
+        example: 1
+        description: Id da Obra
+      measurementNumber:
+        type: integer
+        example: 2
+        description: Número da Medição
+      date:
+        type: string
+        example: "2022-03-11"
+        description: "Data da Medição no formato: yyyy-MM-dd."
+      responsibleId:
+        type: string
+        example: NOME
+        description: Id do responsável pela Medição.
+      responsibleName:
+        type: string
+        example: NOME SOBRENOME
+        description: Nome do responsável pela Medição.
+      consistent:
+        type: boolean
+        example: false
+        description: >-
+          Retornará verdadeiro se Medição estiver consistente, caso contrário
+          retornará falso.
+      statusApproval:
+        type: string
+        example: APROVADA
+        description: Código da situação de aprovação da Medição. [APROVADA, REPROVADA, EM_ELABORACAO, EM_APROVACAO]
+  ListOfProgressLogDtosFotGet:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de progresso do Planejamento de Obras retornadas como resultado da Requisição
+        items:
+          $ref: "#/definitions/ProgressLogDtoForGet"
+  ProgressLogDto:
+    allOf:
+      - $ref: "#/definitions/ProgressLogDtoForGet"
+      - type: object
+        properties:
+          notes:
+            type: string
+            example: "Uma observação da Medição."
+            description: Observação da Medição
+          buildingUnits:
+            description: "Lista contendo apenas as Unidades Construtivas cujas Tarefas possuem valores medidos de avanço físico."
+            type: array
+            items:
+              $ref: "#/definitions/BuildingUnitDto"
+  BuildingUnitDto:
+    type: object
+    properties:
+      id:
+        description: Id da Unidade Construtiva
+        example: 1
+        type: number
+      description:
+        description: Descrição da Unidade Construtiva
+        example: Bloco A
+        type: string
+  ListOfMeasurementItemDtos:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de itens da Medição.
+        items:
+          $ref: "#/definitions/MeasurementItemDto"
+  MeasurementItemDto:
+    type: object
+    properties:
+      taskId:
+        type: integer
+        example: 1
+        description: Código Interno da Tarefa
+      presentationId:
+        type: integer
+        example: 1
+        description: Código Visível da Tarefa
+      summary:
+        type: boolean
+        example: true
+        description: Indica se o Item é Agrupador
+      description:
+        type: string
+        example: "Alvenaria de Tijolo Furado"
+        description: Descrição da tarefa
+      unitOfMeasurement:
+        type: string
+        example: "m2"
+        description: Unidade de medida usada para a tarefa
+      plannedQuantity:
+        type: number
+        example: 1000.3254
+        description: Quantidade total planejada para esta Tarefa com precisão de 4 casas decimais
+      measuredQuantity:
+        type: number
+        example: 102.9362
+        description: Quantidade que foi registrada nesta medição com precisão de 4 casas decimais
+      unitPrice:
+        type: number
+        example: 25.58
+        description: Preço Unitário da Tarefa, sem BDI, sem Encargos Sociais e Preço por Composição da Planilha. Com precisão de 2 casas decimais
+      cumulativeMeasuredQuantity:
+        type: number
+        example: 585.7350
+        description: Quantidade acumulada considerando a soma deste e todos os registros anteriores. Com precisão de 4 casas decimais
+      cumulativePercentage:
+        type: number
+        example: 58.56
+        description: percentual acumulado considerando  a soma de todas as quantidades já registradas para este evento dividido pela quantidade planejada. Com precisão de 2 casas decimais
+      measureBalance:
+        type: number
+        example: 325.4825
+        description: Saldo quantitativo a medir desta Tarefa com precisão de 4 casas decimais.
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: integer
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: string
+        description: mensagem de error relavante para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

@@ -1,0 +1,135 @@
+swagger: "2.0"
+info:
+  description: API de Tipos de clientes.
+  version: 1.0.0
+  title: Tipos de Clientes
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /customer-types:
+    get:
+      tags:
+        - Tipos de Clientes
+      summary: Busca uma lista de tipos de clientes
+      operationId: getCustomerTypes
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: id
+          in: query
+          description: >-
+            Filtro por código do tipo de cliente.
+          required: false
+          type:
+            integer
+        - name: description
+          in: query
+          description: >-
+            Filtro por tipos de cliente.
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Tipos de clientes encontrados
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  CustomerType:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do tipo de cliente.
+      description:
+        type: string
+        description: Nome do tipo de cliente.
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de tipos de clientes retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/CustomerType"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message

@@ -1,0 +1,195 @@
+swagger: "2.0"
+info:
+  description: |
+    ## API para antecipação de parcelas
+
+    _Esta API está disponível apenas para as cobranças geradas via Recebimentos Instantâneos. Para utilizá-la, é necessária a confirmação do time de produto dos bancos que já estão integrados, e caso o banco desejado esteja liberado, é necessária a aquisição do conector “Automação Bancária”._
+  version: 1.0.1
+  title: Antecipação de Parcelas
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Antecipação de parcelas
+    description: API para antecipação de parcelas para uso exclusivo dos clientes que tem contratado o Conector "Automação Bancária".
+schemes:
+  - https
+paths:
+  /prepayment-slip-register:
+    post:
+      operationId: postPaymentSlipRegister
+      tags:
+        - Antecipação de parcelas
+      summary: >-
+        Registra cobrança referente a antecipação de parcelas.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Informações para registrar cobrança de parcelas.
+          required: true
+          schema:
+            $ref: "#/definitions/Ticket"
+      responses:
+        "201":
+          description: Cobrança enviada com sucesso
+        "400":
+          description: Inconsistências que impedem o envio da cobrança
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Parcelas não encontradas para o envio da cobrança
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: Agrupamento por cliente somente é válido se todos os títulos forem da mesma empresa.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      operationId: getPaymentSlipRegister
+      tags:
+        - Antecipação de parcelas
+      summary: >-
+        Consulta informações para antecipação de parcelas.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Informações para consultar dados da cobrança a ser gerada
+          required: true
+          schema:
+            $ref: "#/definitions/Ticket"
+      responses:
+        "200":
+          description: Consulta realizada com sucesso
+          schema:
+            $ref: "#/definitions/GetCustomerExtractHistory"
+        "400":
+          description: Inconsistências que impedem o envio da cobrança
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Parcelas não encontradas para o envio da cobrança
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: Agrupamento por cliente somente é válido se todos os títulos forem da mesma empresa.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  Ticket:
+    type: object
+    required:
+      - installments
+      - companyId
+      - accountNumber
+      - newDueDate
+      - groupBy
+      - correctAnnualInstallment
+    properties:
+      companyId:
+        type: integer
+        format: int32
+        example: 1
+        description: Código da empresa da conta corrente
+      installments:
+        type: array
+        description: Lista das parcelas
+        items:
+          type: object
+          properties:
+            billId:
+              type: integer
+              format: int32
+              example: 10
+              description: Código do título
+            installmentId:
+              type: integer
+              format: int32
+              description: Código da parcela
+      accountNumber:
+        type: string
+        example: "6538-2"
+        description: Código da conta corrente
+      newDueDate:
+        type: string
+        description: Data do vencimento da cobrança
+        example: "2021-01-01"
+      groupBy:
+        description: O agrupamento pode ser por Cliente('CUSTOMER'), por Titulo('INSTALLMENT'), ou sem Agrupamento('NONE')
+        type: string
+        enum: [CUSTOMER, INSTALLMENT, NONE]
+      matchDueDate:
+        description: Agrupar parcelas com vencimento no mesmo dia ('SAME_DAY'), no mesmo mês ('SAME_MONTH') ou todos vencimentos das parcelas ('ALL')
+        type: string
+        enum: [ALL, SAME_DAY, SAME_MONTH]
+      percentPresentValue:
+        type: number
+        format: double
+        description: percentual para calcular o valor presente nas parcelas
+        example: 11.11
+      calculatePresentValue:
+        type: boolean
+        description: Opção para calcular o valor presente nas parcelas
+      correctAnnualInstallment:
+        type: boolean
+        description: Opção para corrigir o valor anual das parcelas
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.
+  GetCustomerExtractHistory:
+    type: object
+    properties:
+      receivableBillId:
+        type: integer
+        format: int32
+        example: 10
+        description: Código do título
+      amount:
+        type: number
+        format: double
+        example: 4000.22
+        description: Valor da cobrança
+      newDueDate:
+        type: string
+        description: Data do vencimento da cobrança
+        example: "2021-01-01"
+      installments:
+        type: array
+        description: Lista das parcelas
+        items:
+          type: object
+          properties:
+            installmentId:
+              type: integer
+              format: int32
+              description: Código da parcela
+            dueDate:
+              type: string
+              description: Data de vencimento da parcela
+              example: "2021-01-01"
+            installmentValue:
+              type: number
+              format: double
+              example: 4000.22
+              description: Valor da parcela
