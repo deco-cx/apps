@@ -1,6 +1,9 @@
 import { AppContext } from "../../mod.ts";
 import { DEFAULT_AUTH_URL } from "../../utils/constant.ts";
-import { getAccessToken, setAccessTokenCookie } from "../../utils/cookieAccessToken.ts";
+import {
+  getAccessToken,
+  setAccessTokenCookie,
+} from "../../utils/cookieAccessToken.ts";
 import type { YoutubeTokenResponse } from "../../utils/types.ts";
 
 /**
@@ -11,7 +14,7 @@ export interface AuthenticationOptions {
    * @description Código de autorização recebido do OAuth (opcional)
    */
   code?: string;
-  
+
   /**
    * @description Token de acesso predefinido (opcional)
    */
@@ -45,7 +48,9 @@ export default async function loader(
   const code = props.code || urlParams.get("code");
   const { authClient, authenticationConfig } = ctx;
   const { clientId, redirectUri, scopes, clientSecret } = authenticationConfig;
-  const clientSecretString = typeof clientSecret === "string" ? clientSecret : clientSecret?.get?.() ?? "";
+  const clientSecretString = typeof clientSecret === "string"
+    ? clientSecret
+    : clientSecret?.get?.() ?? "";
   const { url = DEFAULT_AUTH_URL } = authenticationConfig;
 
   // Validação dos parâmetros obrigatórios
@@ -61,7 +66,7 @@ export default async function loader(
 
   // Tenta obter um token de acesso existente
   const initialAccessToken = props.accessToken || getAccessToken(req);
-  
+
   // Cria a URL de autorização para o fluxo OAuth
   const authParams = new URLSearchParams({
     client_id: clientId,
@@ -69,7 +74,7 @@ export default async function loader(
     response_type: "code",
     scope: scopes,
     access_type: "offline",
-    prompt: "consent"
+    prompt: "consent",
   });
   const authorizationUrl = `${url}?${authParams.toString()}`;
 
@@ -82,18 +87,18 @@ export default async function loader(
       authClient,
       clientId,
       clientSecret: clientSecretString,
-      redirectUri
+      redirectUri,
     });
-    
+
     return {
       authorizationUrl,
       accessToken,
     };
   } catch (error) {
     return createErrorResponse(
-      500, 
-      "Erro durante o processo de autenticação", 
-      error instanceof Error ? error.message : String(error)
+      500,
+      "Erro durante o processo de autenticação",
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
@@ -105,7 +110,7 @@ async function getAccessTokenForRequest({
   authClient,
   clientId,
   clientSecret,
-  redirectUri
+  redirectUri,
 }: {
   initialAccessToken: string | null;
   code: string | null;
@@ -126,9 +131,9 @@ async function getAccessTokenForRequest({
         code,
         clientId,
         clientSecret,
-        redirectUri
+        redirectUri,
       });
-      
+
       if ("error" in tokenData) {
         return null;
       }
@@ -140,22 +145,22 @@ async function getAccessTokenForRequest({
       return null;
     }
   }
-  
+
   return null;
 }
 
 async function exchangeCodeForToken({
   authClient,
-  code, 
-  clientId, 
+  code,
+  clientId,
   clientSecret,
   redirectUri,
 }: {
-  authClient: AppContext["invoke"]["Youtube"],
-  code: string, 
-  clientId: string, 
-  clientSecret: string,
-  redirectUri: string
+  authClient: AppContext["invoke"]["Youtube"];
+  code: string;
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
 }): Promise<YoutubeTokenResponse | AuthenticationError> {
   try {
     const tokenResponse = await authClient[`POST /token`](
@@ -165,33 +170,37 @@ async function exchangeCodeForToken({
         client_secret: clientSecret,
         redirect_uri: redirectUri,
         grant_type: "authorization_code",
-      }
+      },
     );
-    
+
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       return createErrorResponse(
         tokenResponse.status,
         "Falha ao obter token de acesso",
-        errorText
+        errorText,
       );
     }
-    
+
     return await tokenResponse.json() as YoutubeTokenResponse;
   } catch (error) {
     return createErrorResponse(
       500,
       "Erro ao processar troca de código por token",
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
 
-function createErrorResponse(code: number, message: string, details?: unknown): AuthenticationError {
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: unknown,
+): AuthenticationError {
   return {
     message,
     error: true,
     code,
-    details
+    details,
   };
 }

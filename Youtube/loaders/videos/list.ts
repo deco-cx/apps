@@ -1,13 +1,16 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-import type { YoutubeVideoListResponse, YoutubeVideoResponse } from "../../utils/types.ts";
+import type {
+  YoutubeVideoListResponse,
+  YoutubeVideoResponse,
+} from "../../utils/types.ts";
 
 export interface VideoListOptions {
   /**
    * @title ID do vídeo (opcional)
    */
   videoId?: string;
-  
+
   /**
    * @title Número máximo de resultados por página
    */
@@ -35,7 +38,7 @@ export interface VideoListOptions {
   q?: string;
 
   /**
-   * @title 
+   * @title
    */
   part?: string;
 
@@ -57,7 +60,8 @@ export default async function loader(
     return null;
   }
 
-  const { videoId, maxResults = 10, pageToken, order = "relevance", q, part } = props;
+  const { videoId, maxResults = 10, pageToken, order = "relevance", q, part } =
+    props;
 
   if (videoId) {
     const videoResponse = await client["GET /videos"]({
@@ -82,13 +86,13 @@ export default async function loader(
   if (searchData.items && searchData.items.length > 0) {
     const videoIds = searchData.items
       .map((item) => {
-        return typeof item.id === 'object' && 'videoId' in item.id 
-          ? item.id.videoId 
-          : typeof item.id === 'string' 
-            ? item.id 
-            : '';
+        return typeof item.id === "object" && "videoId" in item.id
+          ? item.id.videoId
+          : typeof item.id === "string"
+          ? item.id
+          : "";
       })
-      .filter(id => id)
+      .filter((id) => id)
       .join(",");
 
     const detailsResponse = await client["GET /videos"]({
@@ -96,7 +100,8 @@ export default async function loader(
       id: videoIds,
     }, { headers: { Authorization: `Bearer ${accessToken}` } });
 
-    const detailsData = await detailsResponse.json() as YoutubeVideoListResponse;
+    const detailsData = await detailsResponse
+      .json() as YoutubeVideoListResponse;
 
     return {
       kind: "youtube#videoListResponse",

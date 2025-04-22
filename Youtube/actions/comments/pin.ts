@@ -3,7 +3,7 @@ import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface PinCommentProps {
   /**
-   * @description ID do comentário a ser pinado 
+   * @description ID do comentário a ser pinado
    */
   commentId: string;
 

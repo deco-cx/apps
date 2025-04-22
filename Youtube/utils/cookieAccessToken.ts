@@ -17,7 +17,10 @@ export function getAccessToken(req: Request) {
  * @param req - The request object
  * @param accessToken - The access token
  */
-export function setAccessTokenCookie(res: AppContext["response"], accessToken: string): void {
+export function setAccessTokenCookie(
+  res: AppContext["response"],
+  accessToken: string,
+): void {
   setCookie(res.headers, {
     name: "youtube_access_token2",
     value: accessToken,
@@ -28,4 +31,3 @@ export function setAccessTokenCookie(res: AppContext["response"], accessToken: s
     sameSite: "Lax",
   });
 }
-

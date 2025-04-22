@@ -6,12 +6,15 @@ import type {
 } from "../../utils/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
+/**
+ * Opções para buscar detalhes de um vídeo
+ */
 export interface VideoDetailsOptions {
   /**
    * @description ID do vídeo para buscar detalhes
    */
   videoId: string;
-  
+
   /**
    * @description Partes adicionais a serem incluídas na resposta
    */
@@ -46,15 +49,19 @@ export interface VideoDetailsOptions {
   skipCache?: boolean;
 }
 
-export interface VideoDetailsResponse {
+export interface VideoDetailsResult {
   video: YoutubeVideoResponse;
   captions?: YouTubeCaptionListResponse;
-  error?: {
-    code: number;
-    message: string;
-    details?: unknown;
-  };
 }
+
+export interface VideoDetailsError {
+  message: string;
+  error: boolean;
+  code?: number;
+  details?: unknown;
+}
+
+export type VideoDetailsResponse = VideoDetailsResult | VideoDetailsError;
 
 /**
  * @title YouTube Video Details
@@ -64,12 +71,15 @@ export default async function loader(
   props: VideoDetailsOptions,
   req: Request,
   ctx: AppContext,
-): Promise<VideoDetailsResponse | null> {
+): Promise<VideoDetailsResponse> {
   const client = ctx.client;
   const accessToken = getAccessToken(req) || props.tokenYoutube;
 
   if (!accessToken) {
-    return createErrorResponse(401, "Autenticação necessária para obter detalhes do vídeo");
+    return createErrorResponse(
+      401,
+      "Autenticação necessária para obter detalhes do vídeo",
+    );
   }
 
   const {
@@ -88,32 +98,35 @@ export default async function loader(
     const videoResponse = await client["GET /videos"]({
       part: partString,
       id: videoId,
-    }, { 
+    }, {
       headers: { Authorization: `Bearer ${accessToken}` },
-      ...STALE
+      ...STALE,
     });
-    
+
     if (videoResponse.status === 401) {
       ctx.response.headers.set("X-Token-Expired", "true");
       ctx.response.headers.set("Cache-Control", "no-store");
-      return createErrorResponse(401, "Token de autenticação expirado ou inválido");
+      return createErrorResponse(
+        401,
+        "Token de autenticação expirado ou inválido",
+      );
     }
-    
+
     if (!videoResponse.ok) {
       return createErrorResponse(
         videoResponse.status,
         `Erro ao buscar detalhes do vídeo: ${videoResponse.status}`,
-        await videoResponse.text()
+        await videoResponse.text(),
       );
     }
-    
+
     const videoData = await videoResponse.json();
 
     if (!videoData.items || videoData.items.length === 0) {
       return createErrorResponse(404, `Vídeo não encontrado: ${videoId}`);
     }
 
-    const response: VideoDetailsResponse = {
+    const result: VideoDetailsResult = {
       video: videoData,
     };
 
@@ -122,41 +135,39 @@ export default async function loader(
         const captionsResponse = await client["GET /captions"]({
           part: "snippet",
           videoId,
-        }, { 
+        }, {
           headers: { Authorization: `Bearer ${accessToken}` },
-          ...STALE 
+          ...STALE,
         });
-        
+
         if (captionsResponse.ok) {
-          response.captions = await captionsResponse.json();
+          result.captions = await captionsResponse.json();
         }
       } catch (error) {
         // Ignora erros de legenda - não são críticos para o resultado
       }
     }
 
-    return response;
+    return result;
   } catch (error) {
     return createErrorResponse(
       500,
       "Erro ao processar detalhes do vídeo",
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
 
-function createErrorResponse(code: number, message: string, details?: unknown): VideoDetailsResponse {
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: unknown,
+): VideoDetailsError {
   return {
-    video: {
-      kind: "youtube#videoListResponse",
-      items: [],
-      pageInfo: { totalResults: 0, resultsPerPage: 0 }
-    },
-    error: {
-      code,
-      message,
-      details
-    }
+    message,
+    error: true,
+    code,
+    details,
   };
 }
 
@@ -165,13 +176,13 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (props: VideoDetailsOptions, req: Request) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
   const tokenExpired = req.headers.get("X-Token-Expired") === "true";
-  
+
   if (!accessToken || !props.videoId || props.skipCache || tokenExpired) {
     return null;
   }
-  
+
   const tokenFragment = accessToken.slice(-8);
-  
+
   const params = new URLSearchParams([
     ["videoId", props.videoId],
     ["parts", (props.parts || ["snippet", "statistics", "status"]).join(",")],
@@ -179,8 +190,8 @@ export const cacheKey = (props: VideoDetailsOptions, req: Request) => {
     ["includePrivate", (props.includePrivate ?? false).toString()],
     ["tokenId", tokenFragment],
   ]);
-  
+
   params.sort();
-  
+
   return `youtube-video-details-${params.toString()}`;
 };

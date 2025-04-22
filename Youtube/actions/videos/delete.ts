@@ -1,6 +1,9 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
+/**
+ * Opções para exclusão de vídeo
+ */
 export interface DeleteVideoParams {
   /**
    * @description ID do vídeo a ser excluído
@@ -20,9 +23,16 @@ export interface DeleteVideoParams {
 
 export interface DeleteVideoResult {
   success: boolean;
-  message: string;
-  error?: unknown;
 }
+
+export interface DeleteVideoError {
+  message: string;
+  error: boolean;
+  code?: number;
+  details?: unknown;
+}
+
+export type DeleteVideoResponse = DeleteVideoResult | DeleteVideoError;
 
 /**
  * @title Delete Video
@@ -31,8 +41,9 @@ export interface DeleteVideoResult {
 export default async function action(
   props: DeleteVideoParams,
   req: Request,
-  _ctx: AppContext,
-): Promise<DeleteVideoResult> {
+  ctx: AppContext,
+): Promise<DeleteVideoResponse> {
+  const client = ctx.client;
   const {
     videoId,
     tokenYoutube,
@@ -42,88 +53,98 @@ export default async function action(
   const accessToken = tokenYoutube || getAccessToken(req);
 
   if (!accessToken) {
-    return {
-      success: false,
-      message: "Token de autenticação não encontrado",
-    };
+    return createErrorResponse(401, "Token de autenticação não encontrado");
   }
 
   if (!videoId) {
-    return {
-      success: false,
-      message: "ID do vídeo é obrigatório",
-    };
+    return createErrorResponse(400, "ID do vídeo é obrigatório");
   }
 
   try {
-    // Construir a URL para exclusão
-    const url = new URL("https://youtube.googleapis.com/youtube/v3/videos");
-
-    // Adicionar parâmetro de ID
-    url.searchParams.append("id", videoId);
-
-    // Adicionar parâmetro opcional para proprietários de conteúdo
-    if (onBehalfOfContentOwner) {
-      url.searchParams.append("onBehalfOfContentOwner", onBehalfOfContentOwner);
-    }
-
     // Fazer a requisição para excluir o vídeo
-    const response = await fetch(url.toString(), {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`,
+    const response = await client["DELETE /videos"](
+      {
+        id: videoId,
+        onBehalfOfContentOwner,
       },
-    });
+      {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+        },
+      },
+    );
 
     // A API retorna 204 No Content quando a exclusão é bem-sucedida
     if (response.status === 204) {
       return {
         success: true,
-        message: "Vídeo excluído com sucesso",
       };
     }
 
     // Se a resposta não for 204, temos um erro
-    const errorText = await response.text();
-    let errorData;
+    let errorText = await response.text();
+    let errorDetails;
 
     try {
       // Tentar extrair mais detalhes do erro se for um JSON
-      errorData = JSON.parse(errorText);
+      errorDetails = JSON.parse(errorText);
     } catch {
-      errorData = errorText;
+      errorDetails = errorText;
     }
-
-    console.error("Erro ao excluir vídeo:", errorData);
 
     // Mensagens personalizadas para códigos de erro comuns
-    let mensagem =
-      `Erro ao excluir vídeo: ${response.status} ${response.statusText}`;
-
     if (response.status === 401) {
-      mensagem =
-        "Token de autenticação inválido ou expirado. Faça login novamente.";
+      return createErrorResponse(
+        401,
+        "Token de autenticação inválido ou expirado. Faça login novamente.",
+        errorDetails,
+      );
     } else if (response.status === 403) {
-      mensagem =
-        "Acesso negado. Verifique se você tem permissão para excluir este vídeo.";
+      return createErrorResponse(
+        403,
+        "Acesso negado. Verifique se você tem permissão para excluir este vídeo.",
+        errorDetails,
+      );
     } else if (response.status === 404) {
-      mensagem =
-        "Vídeo não encontrado. O ID do vídeo pode estar incorreto ou o vídeo já foi excluído.";
+      return createErrorResponse(
+        404,
+        "Vídeo não encontrado. O ID do vídeo pode estar incorreto ou o vídeo já foi excluído.",
+        errorDetails,
+      );
     } else if (response.status === 400) {
-      mensagem = "Solicitação inválida. Verifique os parâmetros enviados.";
+      return createErrorResponse(
+        400,
+        "Solicitação inválida. Verifique os parâmetros enviados.",
+        errorDetails,
+      );
     }
 
-    return {
-      success: false,
-      message: mensagem,
-      error: errorData,
-    };
+    return createErrorResponse(
+      response.status,
+      `Erro ao excluir vídeo: ${response.status} ${response.statusText}`,
+      errorDetails,
+    );
   } catch (error) {
-    console.error("Erro ao excluir vídeo:", error);
-    return {
-      success: false,
-      message: `Erro ao excluir vídeo: ${error.message || "Erro desconhecido"}`,
-      error,
-    };
+    return createErrorResponse(
+      500,
+      "Erro ao processar exclusão do vídeo",
+      error instanceof Error ? error.message : String(error),
+    );
   }
+}
+
+/**
+ * Função auxiliar para criar respostas de erro
+ */
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: unknown,
+): DeleteVideoError {
+  return {
+    message,
+    error: true,
+    code,
+    details,
+  };
 }

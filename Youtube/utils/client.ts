@@ -3,12 +3,12 @@ import {
   UpdateThumbnailResponse,
   VideoQuery,
   YouTubeCaptionListResponse,
+  YoutubeCategoryListResponse,
   YoutubeChannelResponse,
   YoutubePlaylistItemsResponse,
   YoutubeTokenResponse,
   YoutubeVideoListResponse,
   YoutubeVideoResponse,
-  YoutubeCategoryListResponse,
 } from "./types.ts";
 
 type Headers = {
@@ -25,7 +25,7 @@ export interface Client {
   "GET /channels": {
     response: YoutubeChannelResponse;
     searchParams: Query & { id?: string; part: string };
-      headers: Headers;
+    headers: Headers;
   };
   "GET /search": {
     response: YoutubeVideoResponse;
@@ -76,6 +76,30 @@ export interface Client {
   "GET /videoCategories": {
     response: YoutubeCategoryListResponse;
     searchParams: { part: string; regionCode?: string };
+    headers: Headers;
+  };
+  "PUT /videos": {
+    response: YoutubeVideoResponse;
+    searchParams: { part: string };
+    body: {
+      id: string;
+      snippet?: Record<string, unknown>;
+      status?: Record<string, unknown>;
+    };
+    headers: Headers & { "Content-Type": string };
+  };
+  "POST /upload/thumbnails/set": {
+    response: UpdateThumbnailResponse;
+    searchParams: { videoId: string; uploadType: string };
+    body: Blob | string;
+    headers: Headers & { "Content-Type": string };
+  };
+  "DELETE /videos": {
+    response: void;
+    searchParams: {
+      id: string;
+      onBehalfOfContentOwner?: string;
+    };
     headers: Headers;
   };
 }

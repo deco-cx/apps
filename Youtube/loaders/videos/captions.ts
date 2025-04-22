@@ -56,13 +56,13 @@ export interface ParsedCaption {
 
 export interface CaptionResponse {
   available: YouTubeCaptionListResponse;
-  
+
   plainText?: string;
-  
+
   parsed?: ParsedCaption[];
-  
+
   loadedCaptionId?: string;
-  
+
   format?: "srt" | "sbv" | "vtt";
 
   error?: {
@@ -80,7 +80,16 @@ export interface CaptionResponse {
  * If preferredLanguage is provided, tries to load a caption in that language.
  */
 export default async function loader(
-  { videoId, captionId, format = "srt", translationLanguage, preferredLanguage, autoLoadCaption = true, tokenYoutube, skipCache = false }: VideoCaptionsOptions,
+  {
+    videoId,
+    captionId,
+    format = "srt",
+    translationLanguage,
+    preferredLanguage,
+    autoLoadCaption = true,
+    tokenYoutube,
+    skipCache = false,
+  }: VideoCaptionsOptions,
   req: Request,
   ctx: AppContext,
 ): Promise<CaptionResponse | null> {
@@ -88,7 +97,10 @@ export default async function loader(
   const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
-    return createErrorResponse(401, "Authentication required to get video captions");
+    return createErrorResponse(
+      401,
+      "Authentication required to get video captions",
+    );
   }
 
   if (!videoId) {
@@ -99,58 +111,67 @@ export default async function loader(
     const captionsListResponse = await client["GET /captions"]({
       part: "snippet",
       videoId,
-    }, { 
+    }, {
       headers: { Authorization: `Bearer ${accessToken}` },
-      ...STALE 
+      ...STALE,
     });
-    
+
     if (!captionsListResponse.ok) {
       const errorData = await captionsListResponse.json();
       return createErrorResponse(
-        captionsListResponse.status, 
-        "Failed to fetch captions list", 
-        JSON.stringify(errorData)
+        captionsListResponse.status,
+        "Failed to fetch captions list",
+        JSON.stringify(errorData),
       );
     }
 
-    const captionsList = await captionsListResponse.json() as YouTubeCaptionListResponse;
-    
+    const captionsList = await captionsListResponse
+      .json() as YouTubeCaptionListResponse;
+
     const response: CaptionResponse = {
-      available: captionsList.items?.length > 0 
-        ? captionsList 
+      available: captionsList.items?.length > 0
+        ? captionsList
         : { kind: "youtube#captionListResponse", etag: "", items: [] },
     };
 
-    const targetCaptionId = captionId || findCaptionToLoad(response.available, preferredLanguage, autoLoadCaption);
-    
+    const targetCaptionId = captionId ||
+      findCaptionToLoad(response.available, preferredLanguage, autoLoadCaption);
+
     if (targetCaptionId) {
-      await loadCaption(client, accessToken, targetCaptionId, format, translationLanguage, response);
+      await loadCaption(
+        client,
+        accessToken,
+        targetCaptionId,
+        format,
+        translationLanguage,
+        response,
+      );
     }
-    
+
     return response;
   } catch (error) {
     return createErrorResponse(
-      500, 
-      `Error fetching captions for video ${videoId}`, 
-      error instanceof Error ? error.message : String(error)
+      500,
+      `Error fetching captions for video ${videoId}`,
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
 
 function findCaptionToLoad(
-  available: YouTubeCaptionListResponse, 
-  preferredLanguage?: string, 
-  autoLoadCaption = true
+  available: YouTubeCaptionListResponse,
+  preferredLanguage?: string,
+  autoLoadCaption = true,
 ): string | undefined {
   if (!autoLoadCaption || !available.items?.length) return undefined;
-  
+
   if (preferredLanguage) {
     const preferredCaption = available.items.find(
-      item => item.snippet.language.startsWith(preferredLanguage)
+      (item) => item.snippet.language.startsWith(preferredLanguage),
     );
     if (preferredCaption) return preferredCaption.id;
   }
-  
+
   return available.items[0]?.id;
 }
 
@@ -160,7 +181,7 @@ async function loadCaption(
   captionId: string,
   format: "srt" | "sbv" | "vtt",
   translationLanguage: string | undefined,
-  response: CaptionResponse
+  response: CaptionResponse,
 ): Promise<void> {
   try {
     const captionParams: Record<string, string> = { tfmt: format };
@@ -170,10 +191,10 @@ async function loadCaption(
 
     const captionResponse = await client["GET /captions/:id"]({
       id: captionId,
-      ...captionParams
-    }, { 
+      ...captionParams,
+    }, {
       headers: { Authorization: `Bearer ${accessToken}` },
-      ...STALE
+      ...STALE,
     });
 
     if (captionResponse.ok) {
@@ -182,7 +203,7 @@ async function loadCaption(
       response.format = format;
 
       response.parsed = parseCaption(captionText, format);
-      
+
       if (response.parsed) {
         response.plainText = extractPlainText(response.parsed);
       }
@@ -198,33 +219,43 @@ async function loadCaption(
   }
 }
 
-function parseCaption(text: string, format: "srt" | "sbv" | "vtt"): ParsedCaption[] {
+function parseCaption(
+  text: string,
+  format: "srt" | "sbv" | "vtt",
+): ParsedCaption[] {
   switch (format) {
-    case "srt": return parseSrtCaption(text);
-    case "sbv": return parseSbvCaption(text);
-    case "vtt": return parseVttCaption(text);
-    default: return parseSrtCaption(text);
+    case "srt":
+      return parseSrtCaption(text);
+    case "sbv":
+      return parseSbvCaption(text);
+    case "vtt":
+      return parseVttCaption(text);
+    default:
+      return parseSrtCaption(text);
   }
 }
 
-async function handleCaptionError(captionResponse: Response, response: CaptionResponse): Promise<void> {
+async function handleCaptionError(
+  captionResponse: Response,
+  response: CaptionResponse,
+): Promise<void> {
   try {
     const errorData = await captionResponse.json() as {
       error?: {
         errors?: Array<{
           domain: string;
           reason: string;
-        }>
-      }
+        }>;
+      };
     };
-    
-    const isPermissionError = 
-      errorData?.error?.errors?.some((e) => 
-        e.domain === "youtube.caption" && e.reason === "forbidden");
-    
+
+    const isPermissionError = errorData?.error?.errors?.some((e) =>
+      e.domain === "youtube.caption" && e.reason === "forbidden"
+    );
+
     response.error = {
       code: captionResponse.status,
-      message: isPermissionError 
+      message: isPermissionError
         ? "You don't have permission to access this caption. The video owner may have restricted caption access."
         : "Failed to fetch caption text",
       details: JSON.stringify(errorData),
@@ -239,10 +270,14 @@ async function handleCaptionError(captionResponse: Response, response: CaptionRe
   }
 }
 
-function createErrorResponse(code: number, message: string, details?: string): CaptionResponse {
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: string,
+): CaptionResponse {
   return {
     available: { kind: "youtube#captionListResponse", etag: "", items: [] },
-    error: { code, message, details }
+    error: { code, message, details },
   };
 }
 
@@ -333,9 +368,9 @@ function extractPlainText(parsed: ParsedCaption[] | undefined): string {
   if (!parsed || parsed.length === 0) {
     return "";
   }
-  
-  const fullText = parsed.map(caption => caption.text.trim()).join(" ");
-  
+
+  const fullText = parsed.map((caption) => caption.text.trim()).join(" ");
+
   return fullText
     .replace(/\s+/g, " ")
     .replace(/\n+/g, " ")
@@ -350,14 +385,18 @@ function extractPlainText(parsed: ParsedCaption[] | undefined): string {
 export const cache = "stale-while-revalidate";
 
 // Define a chave de cache com base nos parâmetros da requisição
-export const cacheKey = (props: VideoCaptionsOptions, req: Request, ctx: AppContext) => {
+export const cacheKey = (
+  props: VideoCaptionsOptions,
+  req: Request,
+  ctx: AppContext,
+) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
-  
+
   // Não fazer cache se não houver token ou videoId
   if (!accessToken || !props.videoId) {
     return null;
   }
-  
+
   // Cria parâmetros para a chave de cache
   const params = new URLSearchParams([
     ["videoId", props.videoId],
@@ -367,15 +406,15 @@ export const cacheKey = (props: VideoCaptionsOptions, req: Request, ctx: AppCont
     ["preferredLanguage", props.preferredLanguage || ""],
     ["autoLoadCaption", (props.autoLoadCaption ?? true).toString()],
   ]);
-  
+
   // Se skipCache for true, não usamos cache
   if (props.skipCache) {
     return null;
   }
-  
+
   // Ordenamos os parâmetros para garantir consistência na chave de cache
   params.sort();
-  
+
   // Retornamos uma string única que identificará este conjunto de parâmetros
   return `youtube-captions-${params.toString()}`;
 };

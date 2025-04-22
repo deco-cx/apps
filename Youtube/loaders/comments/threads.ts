@@ -8,27 +8,27 @@ export interface ThreadListParams {
    * @description ID do vídeo para buscar threads de comentários
    */
   videoId: string;
-  
+
   /**
    * @description Número máximo de resultados
    */
   maxResults?: number;
-  
+
   /**
    * @description Token de paginação
    */
   pageToken?: string;
-  
+
   /**
    * @description Ordenação dos comentários (tempo ou relevância)
    */
   order?: "time" | "relevance";
-  
+
   /**
    * @description Token de acesso do YouTube (opcional)
    */
   tokenYoutube?: string;
-  
+
   /**
    * @description Ignorar cache para esta solicitação
    */
@@ -52,20 +52,27 @@ export default async function loader(
   req: Request,
   _ctx: AppContext,
 ): Promise<ThreadListResponse | null> {
-  const { videoId, maxResults = 20, pageToken, order = "time", tokenYoutube, skipCache = false } = props;
+  const {
+    videoId,
+    maxResults = 20,
+    pageToken,
+    order = "time",
+    tokenYoutube,
+    skipCache = false,
+  } = props;
   const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
     return createErrorResponse(
       401,
-      "Autenticação necessária para carregar threads de comentários"
+      "Autenticação necessária para carregar threads de comentários",
     );
   }
 
   if (!videoId) {
     return createErrorResponse(
       400,
-      "ID do vídeo é obrigatório para carregar threads de comentários"
+      "ID do vídeo é obrigatório para carregar threads de comentários",
     );
   }
 
@@ -83,7 +90,7 @@ export default async function loader(
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-      ...STALE
+      ...STALE,
     });
 
     if (!response.ok) {
@@ -103,7 +110,7 @@ export default async function loader(
       return createErrorResponse(
         response.status,
         `Erro ao carregar threads de comentários: ${response.status} ${response.statusText}`,
-        errorData
+        errorData,
       );
     }
 
@@ -112,13 +119,17 @@ export default async function loader(
     return createErrorResponse(
       500,
       `Erro ao carregar threads de comentários para o vídeo ${videoId}`,
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
 
 // Função auxiliar para criar respostas de erro
-function createErrorResponse(code: number, message: string, details?: unknown): ThreadListResponse {
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: unknown,
+): ThreadListResponse {
   return {
     kind: "youtube#commentThreadListResponse",
     etag: "",
@@ -126,8 +137,8 @@ function createErrorResponse(code: number, message: string, details?: unknown): 
     error: {
       code,
       message,
-      details
-    }
+      details,
+    },
   };
 }
 
@@ -135,23 +146,27 @@ function createErrorResponse(code: number, message: string, details?: unknown): 
 export const cache = "stale-while-revalidate";
 
 // Define a chave de cache com base nos parâmetros da requisição
-export const cacheKey = (props: ThreadListParams, req: Request, _ctx: AppContext) => {
+export const cacheKey = (
+  props: ThreadListParams,
+  req: Request,
+  _ctx: AppContext,
+) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
-  
+
   // Não usar cache se não houver token ou se skipCache for verdadeiro
   if (!accessToken || props.skipCache) {
     return null;
   }
-  
+
   const params = new URLSearchParams([
     ["videoId", props.videoId],
     ["maxResults", (props.maxResults || 20).toString()],
     ["pageToken", props.pageToken || ""],
     ["order", props.order || "time"],
   ]);
-  
+
   // Ordenamos os parâmetros para garantir consistência na chave de cache
   params.sort();
-  
+
   return `youtube-comment-threads-${params.toString()}`;
 };

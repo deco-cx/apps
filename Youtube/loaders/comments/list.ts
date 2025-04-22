@@ -8,22 +8,22 @@ export interface CommentListParams {
    * @description ID do vídeo para carregar comentários
    */
   parentId: string;
-  
+
   /**
    * @description Número máximo de resultados
    */
   maxResults?: number;
-  
+
   /**
    * @description Token de paginação
    */
   pageToken?: string;
-  
+
   /**
    * @description Token de acesso do YouTube (opcional)
    */
   tokenYoutube?: string;
-  
+
   /**
    * @description Ignorar cache para esta solicitação
    */
@@ -47,16 +47,28 @@ export default async function loader(
   req: Request,
   _ctx: AppContext,
 ): Promise<CommentListResponse | null> {
-  const { parentId, maxResults = 20, pageToken, tokenYoutube, skipCache = false } = props;
+  const {
+    parentId,
+    maxResults = 20,
+    pageToken,
+    tokenYoutube,
+    skipCache = false,
+  } = props;
 
   const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
-    return createErrorResponse(401, "Autenticação necessária para carregar comentários");
+    return createErrorResponse(
+      401,
+      "Autenticação necessária para carregar comentários",
+    );
   }
 
   if (!parentId) {
-    return createErrorResponse(400, "ID do vídeo é obrigatório para carregar comentários");
+    return createErrorResponse(
+      400,
+      "ID do vídeo é obrigatório para carregar comentários",
+    );
   }
 
   try {
@@ -72,13 +84,13 @@ export default async function loader(
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-      ...STALE
+      ...STALE,
     });
 
     if (!response.ok) {
       // Verifica se o erro é porque os comentários estão desativados
       const errorData = await response.json().catch(() => response.text());
-      
+
       if (errorData?.error?.errors?.[0]?.reason === "commentsDisabled") {
         return {
           kind: "youtube#commentThreadListResponse",
@@ -93,7 +105,7 @@ export default async function loader(
       return createErrorResponse(
         response.status,
         `Erro ao carregar comentários: ${response.status} ${response.statusText}`,
-        errorData
+        errorData,
       );
     }
 
@@ -103,13 +115,17 @@ export default async function loader(
     return createErrorResponse(
       500,
       `Erro ao carregar comentários para o vídeo ${parentId}`,
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
 
 // Função auxiliar para criar respostas de erro
-function createErrorResponse(code: number, message: string, details?: unknown): CommentListResponse {
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: unknown,
+): CommentListResponse {
   return {
     kind: "youtube#commentThreadListResponse",
     etag: "",
@@ -117,8 +133,8 @@ function createErrorResponse(code: number, message: string, details?: unknown): 
     error: {
       code,
       message,
-      details
-    }
+      details,
+    },
   };
 }
 
@@ -126,22 +142,26 @@ function createErrorResponse(code: number, message: string, details?: unknown): 
 export const cache = "stale-while-revalidate";
 
 // Define a chave de cache com base nos parâmetros da requisição
-export const cacheKey = (props: CommentListParams, req: Request, _ctx: AppContext) => {
+export const cacheKey = (
+  props: CommentListParams,
+  req: Request,
+  _ctx: AppContext,
+) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
-  
+
   // Não usar cache se não houver token ou se skipCache for verdadeiro
   if (!accessToken || props.skipCache) {
     return null;
   }
-  
+
   const params = new URLSearchParams([
     ["parentId", props.parentId],
     ["maxResults", (props.maxResults || 20).toString()],
     ["pageToken", props.pageToken || ""],
   ]);
-  
+
   // Ordenamos os parâmetros para garantir consistência na chave de cache
   params.sort();
-  
+
   return `youtube-comments-${params.toString()}`;
 };

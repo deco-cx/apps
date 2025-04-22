@@ -1,6 +1,9 @@
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-import type { LiveBroadcastListResponse } from "../../utils/types.ts";
+import { AppContext } from "../../mod.ts";
 
+/**
+ * Opções para listar transmissões ao vivo
+ */
 export interface ListLiveBroadcastsParams {
   /**
    * @description Token de autenticação do YouTube (opcional)
@@ -48,12 +51,28 @@ export interface ListLiveBroadcastsParams {
   includeVideoDetails?: boolean;
 }
 
-export interface LiveBroadcastListErrorResponse {
-  error: true;
-  message: string;
-  details?: unknown;
-  code?: number;
+export interface LiveBroadcastListResult {
+  kind: string;
+  etag: string;
+  items: Array<unknown>;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
+  nextPageToken?: string;
+  prevPageToken?: string;
 }
+
+export interface LiveBroadcastListError {
+  message: string;
+  error: boolean;
+  code?: number;
+  details?: unknown;
+}
+
+export type LiveBroadcastListResponse =
+  | LiveBroadcastListResult
+  | LiveBroadcastListError;
 
 /**
  * @title List Live Broadcasts
@@ -62,8 +81,8 @@ export interface LiveBroadcastListErrorResponse {
 export default async function loader(
   props: ListLiveBroadcastsParams,
   req: Request,
-  _ctx: unknown,
-): Promise<LiveBroadcastListResponse | LiveBroadcastListErrorResponse> {
+  ctx: AppContext,
+): Promise<LiveBroadcastListResponse> {
   const {
     broadcastId,
     mine = true,
@@ -78,11 +97,10 @@ export default async function loader(
   const accessToken = props.tokenYoutube || getAccessToken(req);
 
   if (!accessToken) {
-    return {
-      error: true,
-      message:
-        "Autenticação necessária para listar transmissões ao vivo. O token de acesso não foi encontrado.",
-    };
+    return createErrorResponse(
+      401,
+      "Autenticação necessária para listar transmissões ao vivo. O token de acesso não foi encontrado.",
+    );
   }
 
   try {
@@ -115,11 +133,10 @@ export default async function loader(
       url.searchParams.append("channelId", channelId);
 
       if (broadcastStatus === "all") {
-        return {
-          error: true,
-          message:
-            "Ao usar channelId, você deve especificar um broadcastStatus diferente de 'all'",
-        };
+        return createErrorResponse(
+          400,
+          "Ao usar channelId, você deve especificar um broadcastStatus diferente de 'all'",
+        );
       }
 
       url.searchParams.append("broadcastStatus", broadcastStatus);
@@ -175,59 +192,55 @@ export default async function loader(
         errorDetails = errorText;
       }
 
-      console.error(
-        `Erro HTTP ${response.status} ao listar transmissões:`,
-        errorDetails,
-      );
-
-      // Mensagens personalizadas para códigos de erro comuns
-      let mensagem =
-        `Erro ao listar transmissões: ${response.status} ${response.statusText}`;
-
+      // Códigos de erro mais comuns
       if (response.status === 401) {
-        mensagem =
-          "Token de autenticação inválido ou expirado. Faça login novamente.";
+        return createErrorResponse(
+          401,
+          "Token de autenticação inválido ou expirado. Faça login novamente.",
+          errorDetails,
+        );
       } else if (response.status === 403) {
-        mensagem =
-          "Acesso negado. Verifique se você tem permissão para listar transmissões e o escopo 'youtube.livestream' está autorizado.";
+        return createErrorResponse(
+          403,
+          "Acesso negado. Verifique se você tem permissão para listar transmissões.",
+          errorDetails,
+        );
       } else if (response.status === 404) {
-        mensagem =
-          "Recurso não encontrado. Verifique se os IDs das transmissões estão corretos.";
+        return createErrorResponse(
+          404,
+          "Recurso não encontrado. Verifique se os IDs das transmissões estão corretos.",
+          errorDetails,
+        );
       } else if (response.status === 400) {
-        mensagem = "Solicitação inválida. Verifique os parâmetros enviados.";
-      } else if (response.status === 500) {
-        mensagem =
-          "Erro interno do servidor YouTube. Tente novamente mais tarde.";
+        return createErrorResponse(
+          400,
+          "Solicitação inválida. Verifique os parâmetros enviados.",
+          errorDetails,
+        );
       } else if (response.status === 429) {
-        mensagem =
-          "Limite de requisições excedido. Aguarde um momento e tente novamente.";
+        return createErrorResponse(
+          429,
+          "Limite de requisições excedido. Aguarde um momento e tente novamente.",
+          errorDetails,
+        );
       }
 
-      return {
-        error: true,
-        message: mensagem,
-        details: errorDetails,
-        code: response.status,
-      };
+      return createErrorResponse(
+        response.status,
+        `Erro ao listar transmissões: ${response.status} ${response.statusText}`,
+        errorDetails,
+      );
     }
 
     const data = await response.json();
 
     // Verificar erros no formato de resposta da API
     if (data.error) {
-      console.error("Erro na API do YouTube:", data.error);
-
-      let mensagem = "Erro na API do YouTube";
-      if (data.error.message) {
-        mensagem = `Erro na API do YouTube: ${data.error.message}`;
-      }
-
-      return {
-        error: true,
-        message: mensagem,
-        details: data.error,
-        code: data.error.code,
-      };
+      return createErrorResponse(
+        data.error.code || 500,
+        `Erro na API do YouTube: ${data.error.message || "erro desconhecido"}`,
+        data.error,
+      );
     }
 
     // Verificar se a resposta contém a estrutura esperada
@@ -243,30 +256,59 @@ export default async function loader(
       };
     }
 
-    // Verificar se foi solicitado um broadcastStatus específico mas não encontrou resultados
-    if (data.items.length === 0 && broadcastStatus !== "all") {
-      return {
-        kind: "youtube#liveBroadcastListResponse",
-        etag: data.etag || "",
-        items: [],
-        pageInfo: data.pageInfo || {
-          totalResults: 0,
-          resultsPerPage: 0,
-        },
-        infoMessage:
-          `Nenhuma transmissão com status '${broadcastStatus}' encontrada. Tente outro status como 'upcoming' (agendadas), 'active' (ao vivo) ou 'completed' (finalizadas).`,
-      };
-    }
-
+    // Retornar os dados processados
     return data;
   } catch (error) {
-    console.error("Erro ao listar transmissões ao vivo:", error);
-    return {
-      error: true,
-      message: `Erro inesperado ao listar transmissões: ${
-        error.message || "Erro desconhecido"
-      }`,
-      details: error,
-    };
+    return createErrorResponse(
+      500,
+      "Erro ao processar listagem de transmissões",
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }
+
+/**
+ * Função auxiliar para criar respostas de erro
+ */
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: unknown,
+): LiveBroadcastListError {
+  return {
+    message,
+    error: true,
+    code,
+    details,
+  };
+}
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (props: ListLiveBroadcastsParams, req: Request) => {
+  const accessToken = getAccessToken(req) || props.tokenYoutube;
+
+  // Não usar cache para consultas que exigem dados em tempo real
+  if (!accessToken || props.broadcastStatus === "active") {
+    return null;
+  }
+
+  // Incluir fragmento do token na chave de cache
+  const tokenFragment = accessToken.slice(-8);
+
+  const params = new URLSearchParams([
+    ["broadcastId", props.broadcastId || ""],
+    ["channelId", props.channelId || ""],
+    ["mine", (props.mine === true).toString()],
+    ["broadcastStatus", props.broadcastStatus || "active"],
+    ["maxResults", props.maxResults?.toString() || "25"],
+    ["pageToken", props.pageToken || ""],
+    ["orderBy", props.orderBy || "startTime"],
+    ["includeVideoDetails", (props.includeVideoDetails === true).toString()],
+    ["tokenId", tokenFragment],
+  ]);
+
+  params.sort();
+
+  return `youtube-livestreams-list-${params.toString()}`;
+};

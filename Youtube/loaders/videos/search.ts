@@ -8,77 +8,77 @@ export interface VideoSearchOptions {
    * @description Search query term for videos
    */
   q: string;
-  
+
   /**
    * @description Maximum number of results per page
    */
   maxResults?: number;
-  
+
   /**
    * @description Token for fetching the next page
    */
   pageToken?: string;
-  
+
   /**
    * @description Video ordering method
    */
   order?: "date" | "rating" | "relevance" | "title" | "viewCount";
-  
+
   /**
    * @description Channel ID to filter results
    */
   channelId?: string;
-  
+
   /**
    * @description Minimum publication date (ISO 8601 format)
    */
   publishedAfter?: string;
-  
+
   /**
    * @description Maximum publication date (ISO 8601 format)
    */
   publishedBefore?: string;
-  
+
   /**
    * @description Video category ID
    */
   videoCategoryId?: string;
-  
+
   /**
    * @description Region code for search (ISO 3166-1 alpha-2)
    */
   regionCode?: string;
-  
+
   /**
    * @description Language code (ISO 639-1)
    */
   relevanceLanguage?: string;
-  
+
   /**
    * @description YouTube authentication token (optional)
    */
   tokenYoutube?: string;
-  
+
   /**
    * @description Include private videos (when authenticated)
    */
   includePrivate?: boolean;
-  
+
   /**
    * @description Filter only Shorts videos
    */
   onlyShorts?: boolean;
-  
+
   /**
    * @description Exclude Shorts from results
    */
   excludeShorts?: boolean;
-  
+
   /**
    * @description Maximum video duration in seconds
    */
   maxDuration?: number;
-  
+
   /**
    * @description Skip cache for this request
    */
@@ -210,7 +210,10 @@ export default async function loader(
   }
 
   if (onlyShorts && excludeShorts) {
-    return createErrorResponse(400, "Invalid configuration: cannot set both onlyShorts and excludeShorts");
+    return createErrorResponse(
+      400,
+      "Invalid configuration: cannot set both onlyShorts and excludeShorts",
+    );
   }
 
   try {
@@ -233,25 +236,31 @@ export default async function loader(
     if (accessToken && includePrivate) searchParams.forMine = true;
 
     const requestOptions = accessToken
-      ? { 
-          headers: { Authorization: `Bearer ${accessToken}` },
-          ...STALE
-        }
+      ? {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        ...STALE,
+      }
       : { ...STALE };
 
-    const searchResponse = await client["GET /search"](searchParams, requestOptions);
-    
+    const searchResponse = await client["GET /search"](
+      searchParams,
+      requestOptions,
+    );
+
     if (searchResponse.status === 401) {
       ctx.response.headers.set("X-Token-Expired", "true");
       ctx.response.headers.set("Cache-Control", "no-store");
-      return createErrorResponse(401, "Authentication token expired or invalid");
+      return createErrorResponse(
+        401,
+        "Authentication token expired or invalid",
+      );
     }
-    
+
     if (!searchResponse.ok) {
       return createErrorResponse(
         searchResponse.status,
         `Error searching videos: ${searchResponse.status}`,
-        await searchResponse.text()
+        await searchResponse.text(),
       );
     }
 
@@ -268,7 +277,7 @@ export default async function loader(
 
     const videoIds = searchData.items
       .map((item) => {
-        if (typeof item.id === 'object' && 'videoId' in item.id) {
+        if (typeof item.id === "object" && "videoId" in item.id) {
           return item.id.videoId;
         }
         return null;
@@ -281,20 +290,25 @@ export default async function loader(
       id: videoIds,
     };
 
-    const detailsResponse = await client["GET /videos"](detailsParams, requestOptions);
-    
+    const detailsResponse = await client["GET /videos"](
+      detailsParams,
+      requestOptions,
+    );
+
     if (!detailsResponse.ok) {
       return createErrorResponse(
         detailsResponse.status,
         `Error fetching video details: ${detailsResponse.status}`,
-        await detailsResponse.text()
+        await detailsResponse.text(),
       );
     }
-    
+
     const detailsData = await detailsResponse.json() as {
-      items: Array<Omit<VideoDetailsWithShorts, 'isShort' | 'durationInSeconds'>>;
+      items: Array<
+        Omit<VideoDetailsWithShorts, "isShort" | "durationInSeconds">
+      >;
     };
-    
+
     let items: VideoDetailsWithShorts[] = [];
 
     if (detailsData.items && detailsData.items.length > 0) {
@@ -337,7 +351,7 @@ export default async function loader(
     return createErrorResponse(
       500,
       "Error processing video search",
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
@@ -359,15 +373,15 @@ function calculateDurationInSeconds(isoDuration: string): number {
 }
 
 function createErrorResponse(
-  code: number, 
-  message: string, 
-  details?: unknown
+  code: number,
+  message: string,
+  details?: unknown,
 ): YoutubeVideoResponse {
   return {
     kind: "youtube#videoListResponse",
     items: [],
     pageInfo: { totalResults: 0, resultsPerPage: 0 },
-    error: { code, message, details }
+    error: { code, message, details },
   } as YoutubeVideoResponse;
 }
 
@@ -379,10 +393,10 @@ export const cacheKey = (props: VideoSearchOptions, req: Request) => {
   if (props.includePrivate || props.skipCache || tokenExpired) {
     return null;
   }
-  
+
   const accessToken = getAccessToken(req) || props.tokenYoutube;
   const tokenFragment = accessToken ? accessToken.slice(-8) : "";
-  
+
   const params = new URLSearchParams([
     ["q", props.q || ""],
     ["maxResults", (props.maxResults || 10).toString()],
@@ -399,7 +413,7 @@ export const cacheKey = (props: VideoSearchOptions, req: Request) => {
     ["maxDuration", props.maxDuration?.toString() || ""],
     ["tokenId", tokenFragment],
   ]);
-  
+
   params.sort();
   return `youtube-search-${params.toString()}`;
 };

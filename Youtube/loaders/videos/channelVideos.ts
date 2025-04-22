@@ -1,6 +1,9 @@
 import type { AppContext } from "../../mod.ts";
 import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-import type { YoutubePlaylistItemsResponse, YoutubeVideoListResponse } from "../../utils/types.ts";
+import type {
+  YoutubePlaylistItemsResponse,
+  YoutubeVideoListResponse,
+} from "../../utils/types.ts";
 
 export interface ChannelVideosOptions {
   /**
@@ -45,9 +48,9 @@ export default async function loader(
       part: "contentDetails",
       mine: true,
     }, { headers: { Authorization: `Bearer ${accessToken}` } });
-    
+
     const channelData = await channelResponse.json();
-    
+
     if (!channelData.items || channelData.items.length === 0) {
       return {
         kind: "youtube#videoListResponse",
@@ -56,7 +59,7 @@ export default async function loader(
         etag: "",
       };
     }
-    
+
     const uploadsPlaylistId = channelData.items[0]?.contentDetails
       ?.relatedPlaylists?.uploads;
 
@@ -68,15 +71,15 @@ export default async function loader(
         etag: "",
       };
     }
-    
+
     const playlistResponse = await client["GET /playlistItems"]({
       part: "snippet,status",
       playlistId: uploadsPlaylistId,
       maxResults,
       pageToken,
     }, { headers: { Authorization: `Bearer ${accessToken}` } });
-    
-    const playlistData = await playlistResponse.json()
+
+    const playlistData = await playlistResponse.json();
 
     if (!playlistData.items || playlistData.items.length === 0) {
       return {
@@ -86,18 +89,19 @@ export default async function loader(
         etag: "",
       };
     }
-    
+
     return {
       kind: "youtube#videoListResponse",
       items: playlistData.items.map((item) => {
         const thumbnails = {
           default: item.snippet.thumbnails.default,
-          medium: item.snippet.thumbnails.medium || item.snippet.thumbnails.default,
+          medium: item.snippet.thumbnails.medium ||
+            item.snippet.thumbnails.default,
           high: item.snippet.thumbnails.high || item.snippet.thumbnails.default,
           standard: item.snippet.thumbnails.standard,
-          maxres: item.snippet.thumbnails.maxres
+          maxres: item.snippet.thumbnails.maxres,
         };
-        
+
         return {
           kind: "youtube#video",
           etag: item.etag,
@@ -113,14 +117,14 @@ export default async function loader(
             liveBroadcastContent: "none",
             localized: {
               title: item.snippet.title,
-              description: item.snippet.description
-            }
+              description: item.snippet.description,
+            },
           },
           statistics: {
             viewCount: "0",
             likeCount: "0",
             favoriteCount: "0",
-            commentCount: "0"
+            commentCount: "0",
           },
           status: {
             uploadStatus: "processed",
@@ -128,15 +132,14 @@ export default async function loader(
             license: "youtube",
             embeddable: true,
             publicStatsViewable: true,
-            madeForKids: false
-          }
+            madeForKids: false,
+          },
         };
       }),
       pageInfo: playlistData.pageInfo,
       etag: "",
       nextPageToken: playlistData.nextPageToken,
     };
-    
   } catch (_error) {
     return {
       kind: "youtube#videoListResponse",

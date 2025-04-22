@@ -36,7 +36,7 @@ export type AppContext = FnContext<State, Manifest>;
  * @category Social
  * @logo https://cdn.pixabay.com/photo/2021/09/11/18/21/youtube-6616310_1280.png
  */
-export default function App({  ...props }: Props) {
+export default function App({ ...props }: Props) {
   const client = createHttpClient<Client>({
     base: "https://www.googleapis.com/youtube/v3",
     headers: new Headers({

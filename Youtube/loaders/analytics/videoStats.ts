@@ -2,6 +2,9 @@ import { AppContext } from "../../../Youtube/mod.ts";
 import { getAccessToken } from "../../../Youtube/utils/cookieAccessToken.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
+/**
+ * Opções para buscar analytics de vídeos
+ */
 export interface VideoAnalyticsOptions {
   /**
    * @description ID do canal no formato "channel==CANAL_ID"
@@ -49,14 +52,14 @@ export interface VideoAnalyticsOptions {
    * @description Token de acesso do YouTube (opcional)
    */
   tokenYoutube?: string;
-  
+
   /**
    * @description Ignorar cache para esta solicitação
    */
   skipCache?: boolean;
 }
 
-export interface AnalyticsResponse {
+export interface AnalyticsResult {
   kind: string;
   columnHeaders: Array<{
     name: string;
@@ -69,12 +72,16 @@ export interface AnalyticsResponse {
     title?: string;
     metrics: Record<string, number>;
   }>;
-  error?: {
-    code: number;
-    message: string;
-    details?: unknown;
-  };
 }
+
+export interface AnalyticsError {
+  message: string;
+  error: boolean;
+  code?: number;
+  details?: unknown;
+}
+
+export type AnalyticsResponse = AnalyticsResult | AnalyticsError;
 
 /**
  * @title Analytics de Vídeos do YouTube
@@ -84,7 +91,7 @@ export default async function loader(
   props: VideoAnalyticsOptions,
   req: Request,
   _ctx: AppContext,
-): Promise<AnalyticsResponse | null> {
+): Promise<AnalyticsResponse> {
   const {
     channelId,
     videoId,
@@ -96,14 +103,17 @@ export default async function loader(
     sort = "-views",
     maxResults,
     tokenYoutube,
-    skipCache = false
+    skipCache = false,
   } = props;
 
   // Obter o token de acesso
   const accessToken = getAccessToken(req) || tokenYoutube;
 
   if (!accessToken) {
-    return createErrorResponse(401, "Autenticação necessária para obter dados de analytics");
+    return createErrorResponse(
+      401,
+      "Autenticação necessária para obter dados de analytics",
+    );
   }
 
   if (!channelId) {
@@ -111,7 +121,10 @@ export default async function loader(
   }
 
   if (!startDate || !endDate) {
-    return createErrorResponse(400, "Datas de início e término são obrigatórias");
+    return createErrorResponse(
+      400,
+      "Datas de início e término são obrigatórias",
+    );
   }
 
   // Validar formato das datas (YYYY-MM-DD)
@@ -147,7 +160,7 @@ export default async function loader(
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-      ...STALE
+      ...STALE,
     });
 
     if (!response.ok) {
@@ -155,7 +168,7 @@ export default async function loader(
       return createErrorResponse(
         response.status,
         `Erro ao buscar dados de analytics: ${response.status} ${response.statusText}`,
-        errorData
+        errorData,
       );
     }
 
@@ -163,66 +176,67 @@ export default async function loader(
     const analyticsData = await response.json();
 
     // Formatação dos dados para facilitar o uso
-    const formattedResponse: AnalyticsResponse = {
+    const result: AnalyticsResult = {
       kind: analyticsData.kind,
       columnHeaders: analyticsData.columnHeaders || [],
       rows: analyticsData.rows || [],
     };
 
     // Estrutura os dados de uma forma mais fácil de usar quando a dimensão é "video"
-    if (dimensions.includes("video") && formattedResponse.rows.length > 0) {
+    if (dimensions.includes("video") && result.rows.length > 0) {
       const videoData = [];
       const headerIndexMap: Record<string, number> = {};
 
       // Mapear índices das colunas
-      formattedResponse.columnHeaders.forEach((header, index) => {
+      result.columnHeaders.forEach((header, index) => {
         headerIndexMap[header.name] = index;
       });
 
       // Criar objetos estruturados para cada vídeo
-      for (const row of formattedResponse.rows) {
+      for (const row of result.rows) {
         const videoObject: {
-          videoId: string | number;
+          videoId: string;
           metrics: Record<string, number>;
         } = {
-          videoId: row[headerIndexMap["video"]],
+          videoId: String(row[headerIndexMap["video"]]),
           metrics: {},
         };
 
         // Adicionar cada métrica ao objeto do vídeo
-        for (const header of formattedResponse.columnHeaders) {
+        for (const header of result.columnHeaders) {
           if (header.name !== "video") {
-            videoObject.metrics[header.name] = row[headerIndexMap[header.name]] as number;
+            videoObject.metrics[header.name] =
+              row[headerIndexMap[header.name]] as number;
           }
         }
 
         videoData.push(videoObject);
       }
 
-      formattedResponse.videoData = videoData;
+      result.videoData = videoData;
     }
 
-    return formattedResponse;
+    return result;
   } catch (error) {
     return createErrorResponse(
       500,
       "Erro ao buscar dados de analytics para vídeos",
-      error instanceof Error ? error.message : String(error)
+      error instanceof Error ? error.message : String(error),
     );
   }
 }
 
 // Função auxiliar para criar respostas de erro
-function createErrorResponse(code: number, message: string, details?: unknown): AnalyticsResponse {
+function createErrorResponse(
+  code: number,
+  message: string,
+  details?: unknown,
+): AnalyticsError {
   return {
-    kind: "youtube#analyticData",
-    columnHeaders: [],
-    rows: [],
-    error: {
-      code,
-      message,
-      details
-    }
+    message,
+    error: true,
+    code,
+    details,
   };
 }
 
@@ -230,27 +244,38 @@ function createErrorResponse(code: number, message: string, details?: unknown): 
 export const cache = "stale-while-revalidate";
 
 // Define a chave de cache com base nos parâmetros da requisição
-export const cacheKey = (props: VideoAnalyticsOptions, req: Request, _ctx: AppContext) => {
+export const cacheKey = (
+  props: VideoAnalyticsOptions,
+  req: Request,
+  _ctx: AppContext,
+) => {
   const accessToken = getAccessToken(req) || props.tokenYoutube;
-  
+
   // Não usar cache se não houver token ou se skipCache for verdadeiro
   if (!accessToken || props.skipCache) {
     return null;
   }
-  
+
   const params = new URLSearchParams([
     ["channelId", props.channelId],
     ["videoId", props.videoId || ""],
     ["startDate", props.startDate],
     ["endDate", props.endDate],
-    ["metrics", props.metrics || "views,estimatedMinutesWatched,likes,comments,shares,averageViewDuration"],
+    [
+      "metrics",
+      props.metrics ||
+      "views,estimatedMinutesWatched,likes,comments,shares,averageViewDuration",
+    ],
     ["dimensions", props.dimensions || "video"],
     ["sort", props.sort || "-views"],
     ["maxResults", props.maxResults?.toString() || ""],
   ]);
-  
-  // Ordenamos os parâmetros para garantir consistência na chave de cache
+
   params.sort();
-  
-  return `youtube-analytics-video-${params.toString()}`;
+
+  // Incluir fragmento do token na chave de cache
+  const tokenFragment = accessToken.slice(-8);
+  params.append("tokenId", tokenFragment);
+
+  return `youtube-video-analytics-${params.toString()}`;
 };
