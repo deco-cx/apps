@@ -26,12 +26,6 @@ const rankRoute = (pattern: string): number =>
   pattern
     .split("/")
     .reduce((acc, routePart) => {
-      if (routePart.startsWith("}?")) {
-        if (routePart.includes("*")) {
-          return acc - 2;
-        }
-        return acc - 1;
-      }
       if (routePart === "*") {
         return acc;
       }
@@ -85,20 +79,17 @@ export const router = (
     }
     for (const { pathTemplate: routePath, handler } of routes) {
       const pattern = urlPatternCache[routePath] ??= (() => {
+        let url;
         if (URL.canParse(routePath)) {
-          return new URLPattern(routePath);
+          url = new URL(routePath);
+        } else {
+          url = new URL(routePath, "http://localhost:8000");
         }
-        const patternWithDefaultOrigin = new URLPattern(
-          routePath,
-          "http://localhost:8000",
-        );
-
         return new URLPattern({
-          pathname: patternWithDefaultOrigin.pathname,
-          search: patternWithDefaultOrigin.search,
+          pathname: url.pathname,
+          ...(url.search ? { search: url.search } : {}),
         });
       })();
-
       const res = pattern.exec(req.url);
       const groups = res?.pathname.groups ?? {};
       if (res !== null) {
@@ -160,7 +151,6 @@ const prepareRoutes = (audiences: Routes[], ctx: AppContext) => {
     ((highPriorityA ? HIGH_PRIORITY_ROUTE_RANK_BASE_VALUE : 0) +
       rankRoute(routeStringA))
   );
-
   return {
     routes: builtRoutes.map((route) => ({
       pathTemplate: route[0],
