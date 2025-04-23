@@ -2,62 +2,67 @@ import type { App, FnContext } from "@deco/deco";
 import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import type { GoogleSlidesClient } from "./client.ts";
+import type { GoogleAuthClient, GoogleSlidesClient } from "./utils/client.ts";
+import { fetchSafe } from "../utils/fetch.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
 export interface Props {
-    /**
-     * @title OAuth Client ID
-     * @description The OAuth 2.0 client ID from Google Cloud Console
-     */
+  accessToken?: string | Secret;
+
+  auth: {
     clientId: string;
-
-    /**
-     * @title OAuth Client Secret
-     * @description The OAuth 2.0 client secret from Google Cloud Console
-     */
-    clientSecret: string | Secret;
-
-    /**
-     * @title Access Token
-     * @description OAuth 2.0 access token for Google Slides API
-     */
-    accessToken?: string | Secret;
+    clientSecret: Secret;
+    redirectUri: string;
+  };
 }
-
 export interface State extends Props {
-    api: ReturnType<typeof createHttpClient<GoogleSlidesClient>>;
+  clientAuth: ReturnType<typeof createHttpClient<GoogleAuthClient>>;
+  clientSlides: ReturnType<typeof createHttpClient<GoogleSlidesClient>>;
 }
 
 /**
- * @title Google Slides App
- * @description Create and manage Google Slides presentations programmatically
+ * @title Google Slides
+ * @description Create and manage Google Slides presentations
  * @category Content Management
  * @logo https://www.gstatic.com/images/branding/product/1x/slides_48dp.png
  */
-export default function GoogleSlides(props: Props): App<Manifest, State> {
-    const { clientId, clientSecret, accessToken } = props;
+export default function App(props: Props): App<Manifest, State> {
+  const { auth } = props;
 
-    const _accessToken = typeof accessToken === "string"
-        ? accessToken
-        : accessToken?.get?.() ?? "";
+  const _clientSecret = typeof auth.clientSecret === "string"
+    ? auth.clientSecret
+    : auth.clientSecret?.get?.() ?? "";
 
-    const api = createHttpClient<GoogleSlidesClient>({
-        base: "https://slides.googleapis.com",
-        headers: new Headers({
-            "Authorization": `Bearer ${_accessToken}`,
-            "Content-Type": "application/json",
-        }),
-    });
+  const clientAuth = createHttpClient<GoogleAuthClient>({
+    base: "https://oauth2.googleapis.com",
+    headers: new Headers({
+      "Accept": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    }),
+    fetcher: fetchSafe,
+  });
 
-    const state = {
-        ...props,
-        api,
-    };
+  const clientSlides = createHttpClient<GoogleSlidesClient>({
+    base: "https://slides.googleapis.com",
+    headers: new Headers({
+      "Accept": "application/json",
+    }),
+    fetcher: fetchSafe,
+  });
+  const state = {
+    ...props,
+    clientAuth,
+    auth: {
+      clientId: props.auth.clientId,
+      clientSecret: props.auth.clientSecret,
+      redirectUri: props.auth.redirectUri,
+    },
+    clientSlides,
+  };
 
-    return {
-        state,
-        manifest,
-    };
-} 
+  return {
+    state,
+    manifest,
+  };
+}

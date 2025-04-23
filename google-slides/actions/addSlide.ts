@@ -1,23 +1,30 @@
 import type { AppContext } from "../mod.ts";
+import type { Presentation } from "../utils/types.ts";
 
 interface Props {
-    /**
-     * @title Presentation ID
-     * @description The ID of the presentation to add the slide to
-     */
-    presentationId: string;
+  /**
+   * @title Presentation ID
+   * @description The ID of the presentation to add the slide to
+   */
+  presentationId: string;
 
-    /**
-     * @title Layout
-     * @description The predefined layout to use for the new slide
-     */
-    layout: "TITLE" | "MAIN" | "SECTION_HEADER" | "TITLE_AND_BODY" | "BLANK";
+  /**
+   * @title Layout
+   * @description The predefined layout to use for the new slide
+   */
+  layout: "TITLE" | "MAIN" | "SECTION_HEADER" | "TITLE_AND_BODY" | "BLANK";
 
-    /**
-     * @title Insertion Index
-     * @description The zero-based index where to insert the new slide (optional)
-     */
-    insertionIndex?: number;
+  /**
+   * @title Insertion Index
+   * @description The zero-based index where to insert the new slide (optional)
+   */
+  insertionIndex?: number;
+
+  /**
+   * @title Token
+   * @description The token to use for the request
+   */
+  token: string;
 }
 
 /**
@@ -25,28 +32,36 @@ interface Props {
  * @description Adds a new slide to an existing presentation
  */
 const action = async (
-    props: Props,
-    _req: Request,
-    ctx: AppContext,
-): Promise<{ presentationId: string; replies: any[] }> => {
-    const response = await ctx.api["POST /v1/presentations/:presentationId/batchUpdate"]({
-        presentationId: props.presentationId,
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<Presentation> => {
+  const response = await ctx.clientSlides
+    ["POST /v1/presentations/:presentationId"]({
+      presentationId: props.presentationId + ":batchUpdate",
     }, {
-        body: {
-            requests: [
-                {
-                    createSlide: {
-                        insertionIndex: props.insertionIndex,
-                        slideLayoutReference: {
-                            predefinedLayout: props.layout,
-                        },
-                    },
-                },
-            ],
-        },
+      headers: {
+        Authorization: `Bearer ${props.token}`,
+      },
+      body: {
+        requests: [
+          {
+            createSlide: {
+              insertionIndex: props.insertionIndex,
+              slideLayoutReference: {
+                predefinedLayout: props.layout,
+              },
+            },
+          },
+        ],
+      },
     });
 
-    return response.json();
+  const data = await response.json();
+  return {
+    ...data,
+    title: "",
+  };
 };
 
-export default action; 
+export default action;
