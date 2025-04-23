@@ -16,6 +16,7 @@ const config = {
     app("reflect"),
     app("grain"),
     app("slack"),
+    app("serper"),
     app("sienge"),
     app("vertex"),
     app("google-sheets"),
