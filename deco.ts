@@ -62,6 +62,7 @@ const config = {
     app("htmx"),
     app("sap"),
     app("tiptap-cloud"),
+    app("whatsapp"),
     ...compatibilityApps,
   ],
 };
