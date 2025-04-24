@@ -6,7 +6,7 @@ export interface Props {
 }
 
 export const PREVIEW_URL =
-  "https://localhost-franca--mcp.deco.site/live/invoke/openai-mcp/loaders/imagePreview.ts?appName=OpenAI";
+  "https://mcp.deco.site/live/invoke/openai-mcp/loaders/imagePreview.ts?appName=OpenAI";
 
 /**
  * @title Image Preview Loader
