@@ -31,12 +31,10 @@ const loader = async (
   return response;
 };
 
-// export const cache = "stale-while-revalidate";
+export const cache = "stale-while-revalidate";
 
-// export const cacheKey = (_props: unknown, req: Request, _ctx: AppContext) => {
-//   const url = new URL(req.url);
-//   url.pathname = "/v1/Catalog/API.svc/web/SearchProductAuctions";
-//   return url.href;
-// };
+export const cacheKey = () => {
+  return "/v1/Catalog/API.svc/web/SearchProductAuctions";
+};
 
 export default loader;
