@@ -223,8 +223,9 @@ export default async function editImageAction(
       processImageEdit(props, ctx)
         .catch((error) => {
           console.error("Async image editing failed:", error);
+          ctx.log("Async image editing failed:", error);
           // If there's an error, write the error message to the presigned URL
-          writeErrorToPresignedUrl(presignedUrl, "This generation has failed.")
+          writeErrorToPresignedUrl(presignedUrl, "This generation has failed." + error)
             .catch((err) => {
               console.error(
                 "Failed to write error message to presigned URL:",

@@ -216,10 +216,11 @@ export default async function generateImageAction(
       processImageGeneration(props, openAI, presignedUrls, format)
         .catch((error) => {
           console.error("Async image generation failed:", error);
+          ctx.log("Async image generation failed:", error);
           // If there's an error, write the error message to the presigned URLs
           Promise.all(
             presignedUrls.map((url) =>
-              writeErrorToPresignedUrl(url, "This generation has failed.")
+              writeErrorToPresignedUrl(url, "This generation has failed." + error)
             ),
           ).catch((err) => {
             console.error(
