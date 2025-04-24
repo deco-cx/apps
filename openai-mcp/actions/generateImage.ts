@@ -369,7 +369,7 @@ async function processImageGeneration(
 
   const result = await openAI.images.generate(requestParams);
 
-  if (result.data.length > 0) {
+  if (result.data && result.data.length > 0 && result.data[0]) {
     let imageData = result.data[0].b64_json;
 
     if (!imageData) {
