@@ -1,5 +1,7 @@
 import { Auction } from "../../utils/types/auctionAPI.ts";
 import type { AppContext } from "../../../linx/mod.ts";
+import { cleanResponse } from "../../../utils/http.ts";
+import { logger } from "@deco/deco/o11y";
 
 /**
  * @title Linx Integration
@@ -19,7 +21,14 @@ const loader = async (
       { body: {} },
     );
 
-  return await responsePromise.json();
+  const response = await cleanResponse<Auction[]>(responsePromise);
+
+  if (typeof response !== "object") {
+    logger.error(`Failed to parse response from linx as JSON: ${response}`);
+    return null;
+  }
+
+  return response;
 };
 
 export const cache = "stale-while-revalidate";
