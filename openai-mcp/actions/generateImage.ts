@@ -220,7 +220,10 @@ export default async function generateImageAction(
           // If there's an error, write the error message to the presigned URLs
           Promise.all(
             presignedUrls.map((url) =>
-              writeErrorToPresignedUrl(url, "This generation has failed." + error)
+              writeErrorToPresignedUrl(
+                url,
+                "This generation has failed." + error,
+              )
             ),
           ).catch((err) => {
             console.error(
