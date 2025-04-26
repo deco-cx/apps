@@ -30,7 +30,7 @@ export interface State {
 
 /**
  * @title Exa AI
- * @description Access Exa's web search API with advanced retrieval capabilities
+ * @description Search the web, Linkedin, and company websites using Exa AI
  * @category AI Tools
  * @logo https://bookface-images.s3.amazonaws.com/small_logos/9a54e5c11b9f296fb3be7980c9aaaf6ddd2f0c8c.png
  */
