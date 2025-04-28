@@ -3,8 +3,8 @@ import { AppContext } from "../mod.ts";
 interface LoginSectionProps {
   auth: {
     authorizationUrl: string;
-    accessToken: string;
   };
+  token: string;
 }
 
 export async function loader(
@@ -16,11 +16,12 @@ export async function loader(
   console.log("auth", auth);
   return {
     auth,
+    token: auth.access_token,
   };
 }
 
 export default function LoginSection(
-  { auth: { authorizationUrl, accessToken } }: LoginSectionProps,
+  { auth: { authorizationUrl }, token }: LoginSectionProps,
 ) {
   return (
     <>
@@ -35,8 +36,15 @@ export default function LoginSection(
             </a>
           )
           : (
-            <div class="text-red-500">
-              {accessToken}
+            <div>
+              <p className="text-red-500">Token:</p>
+              <div className="flex items-center gap-2">
+                <p className="font-bold">{token}</p>
+              </div>
+
+              <p className="text-sm text-gray-500">
+                Ele só é valido por 1 hora
+              </p>
             </div>
           )}
       </div>
