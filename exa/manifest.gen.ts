@@ -3,15 +3,15 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $$$$$$$$$0 from "./actions/crawl.ts";
-import * as $$$0 from "./loaders/linkedinSearch.ts";
-import * as $$$1 from "./loaders/search.ts";
-import * as $$$2 from "./loaders/companyResearch.ts";
+import * as $$$0 from "./loaders/companyResearch.ts";
+import * as $$$1 from "./loaders/linkedinSearch.ts";
+import * as $$$2 from "./loaders/search.ts";
 
 const manifest = {
   "loaders": {
-    "exa/loaders/linkedinSearch.ts": $$$0,
-    "exa/loaders/search.ts": $$$1,
-    "exa/loaders/companyResearch.ts": $$$2,
+    "exa/loaders/companyResearch.ts": $$$0,
+    "exa/loaders/linkedinSearch.ts": $$$1,
+    "exa/loaders/search.ts": $$$2,
   },
   "actions": {
     "exa/actions/crawl.ts": $$$$$$$$$0,
