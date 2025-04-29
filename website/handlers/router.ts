@@ -12,6 +12,7 @@ import { weakcache } from "../../utils/weakcache.ts";
 import { Route, Routes } from "../flags/audience.ts";
 import { isFreshCtx } from "../handlers/fresh.ts";
 import { AppContext } from "../mod.ts";
+import { logger } from "@deco/deco/o11y";
 export type ConnInfo = Deno.ServeHandlerInfo;
 export type Handler = Deno.ServeHandler;
 export interface SelectionConfig {
@@ -52,6 +53,7 @@ export const router = (
   parsedUrl?: URL,
 ): Handler => {
   return async (req: Request, connInfo: ConnInfo): Promise<Response> => {
+    logger.info("INIT RESOLVE PATH");
     const url = parsedUrl ?? new URL(req.url);
     const route = async (
       handler: Resolvable<Handler>,
@@ -80,24 +82,27 @@ export const router = (
     };
     const handler = hrefRoutes[`${url.pathname}${url.search || ""}`] ??
       hrefRoutes[url.pathname];
+    logger.info("HANDLER", { handler });
     if (handler) {
       return route(handler, `${url.pathname}${url.search || ""}`);
     }
     for (const { pathTemplate: routePath, handler } of routes) {
       const pattern = urlPatternCache[routePath] ??= (() => {
         if (URL.canParse(routePath)) {
+          logger.info("CAN PARSE", { routePath });
           return new URLPattern(routePath);
         }
         const patternWithDefaultOrigin = new URLPattern(
           routePath,
-          "http://localhost:8000",
+          "http://teste.com.br",
         );
 
         return new URLPattern({
           pathname: patternWithDefaultOrigin.pathname,
-          search: patternWithDefaultOrigin.search,
+          search: patternWithDefaultOrigin.search || "*",
         });
       })();
+      logger.info(`PATTERN hash: ${pattern.hash} , hostname: ${pattern.hostname} , pathname: ${pattern.pathname} , search: ${pattern.search}, protocol: ${pattern.protocol}, username: ${pattern.username}, password: ${pattern.password}, port: ${pattern.port}, routePath: ${routePath},  url: ${req.url},`);
 
       const res = pattern.exec(req.url);
       const groups = res?.pathname.groups ?? {};
@@ -105,6 +110,7 @@ export const router = (
         return await route(handler.value, routePath, groups);
       }
     }
+    logger.error(`NOT FOUND ${req.url}`);
     return new Response(null, {
       status: 404,
     });

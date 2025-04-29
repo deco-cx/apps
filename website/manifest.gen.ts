@@ -19,7 +19,6 @@ import * as $$$$2 from "./handlers/redirect.ts";
 import * as $$$$3 from "./handlers/router.ts";
 import * as $$$$4 from "./handlers/sitemap.ts";
 import * as $$$0 from "./loaders/asset.ts";
-import * as $$$1 from "./loaders/envoriment.ts";
 import * as $$$2 from "./loaders/extension.ts";
 import * as $$$3 from "./loaders/fonts/googleFonts.ts";
 import * as $$$4 from "./loaders/fonts/local.ts";
@@ -63,7 +62,6 @@ const manifest = {
   },
   "loaders": {
     "website/loaders/asset.ts": $$$0,
-    "website/loaders/envoriment.ts": $$$1,
     "website/loaders/extension.ts": $$$2,
     "website/loaders/fonts/googleFonts.ts": $$$3,
     "website/loaders/fonts/local.ts": $$$4,
