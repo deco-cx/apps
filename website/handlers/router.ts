@@ -95,7 +95,7 @@ export const router = (
 
         return new URLPattern({
           pathname: patternWithDefaultOrigin.pathname,
-          search: patternWithDefaultOrigin.search,
+          search: patternWithDefaultOrigin.search || "*",
         });
       })();
 
