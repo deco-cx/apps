@@ -27,7 +27,7 @@ export interface Props {
    */
   modelId?: string;
   /**
-   * @description Voice settings for customization. Example: 
+   * @description Voice settings for customization. Example:
    *  {
    *    stability: 0.5,
    *    similarity_boost: 0.5,
