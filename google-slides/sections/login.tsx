@@ -39,7 +39,7 @@ export default function LoginSection(
             <div>
               <p className="text-red-500">Token:</p>
               <div className="flex items-center gap-2">
-                <p className="font-bold">{token}</p>
+                <p>{token}</p>
               </div>
 
               <p className="text-sm text-gray-500">
