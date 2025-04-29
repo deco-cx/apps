@@ -11,7 +11,7 @@ To use this app, you need to install it in your deco project:
 ```json
 {
   "imports": {
-    "deno-deploy/": "https://denopkg.com/deco-cx/apps/deno-deploy/"
+    "deno-deploy/": "https://cdn.jsdelivr.net/gh/deco-cx/apps/deno-deploy/"
   }
 }
 ```
