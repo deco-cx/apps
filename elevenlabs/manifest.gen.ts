@@ -12,15 +12,15 @@ import * as $$$$$$$$$6 from "./actions/voiceChanger.ts";
 
 const manifest = {
   "actions": {
-    "eleven-labs/actions/audioIsolation.ts": $$$$$$$$$0,
-    "eleven-labs/actions/createVoiceClone.ts": $$$$$$$$$1,
-    "eleven-labs/actions/textToSoundEffects.ts": $$$$$$$$$2,
-    "eleven-labs/actions/textToSpeech.ts": $$$$$$$$$3,
-    "eleven-labs/actions/textToVoiceWithTimestamps.ts": $$$$$$$$$4,
-    "eleven-labs/actions/transcribeAudio.ts": $$$$$$$$$5,
-    "eleven-labs/actions/voiceChanger.ts": $$$$$$$$$6,
+    "elevenlabs/actions/audioIsolation.ts": $$$$$$$$$0,
+    "elevenlabs/actions/createVoiceClone.ts": $$$$$$$$$1,
+    "elevenlabs/actions/textToSoundEffects.ts": $$$$$$$$$2,
+    "elevenlabs/actions/textToSpeech.ts": $$$$$$$$$3,
+    "elevenlabs/actions/textToVoiceWithTimestamps.ts": $$$$$$$$$4,
+    "elevenlabs/actions/transcribeAudio.ts": $$$$$$$$$5,
+    "elevenlabs/actions/voiceChanger.ts": $$$$$$$$$6,
   },
-  "name": "eleven-labs",
+  "name": "elevenlabs",
   "baseUrl": import.meta.url,
 };
 

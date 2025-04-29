@@ -50,7 +50,7 @@ const config = {
     app("linx-impulse"),
     app("shopify"),
     app("stability"),
-    app("eleven-labs"),
+    app("elevenlabs"),
     app("vidu"),
     app("nuvemshop"),
     app("streamshop"),

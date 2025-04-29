@@ -27,7 +27,13 @@ export interface Props {
    */
   modelId?: string;
   /**
-   * @description Voice settings for customization
+   * @description Voice settings for customization. Example: 
+   *  {
+   *    stability: 0.5,
+   *    similarity_boost: 0.5,
+   *    style: 0.5,
+   *    use_speaker_boost: true
+   *  }
    */
   voiceSettings?: {
     stability?: number;
@@ -50,8 +56,6 @@ export default async function textToSpeech(
 ) {
   const elevenLabs = ctx.elevenLabs;
   const model = elevenLabs("tts");
-
-  console.log({ voiceId });
 
   try {
     const result = await model.doGenerate({
