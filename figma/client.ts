@@ -91,7 +91,7 @@ export class FigmaClient {
   }
 
   /**
-   * @description Gets a file from Figma
+   * @description Gets a file JSON from Figma
    * @param fileKey File key
    * @param options Request options
    */
@@ -128,7 +128,7 @@ export class FigmaClient {
   }
 
   /**
-   * @description Gets specific nodes from a file
+   * @description Get JSON from specific nodes in a file
    * @param fileKey File key
    * @param nodeIds Node IDs
    * @param options Request options
@@ -238,6 +238,39 @@ export class FigmaClient {
     );
 
     return response.json();
+  }
+
+  /**
+   * @description Renders images from a file. if no error occurs, `"images"` will be populated with a map from node ids to urls of the rendered images, and `"status"` will be omitted. the image assets will expire after 30 days. images up to 32 megapixels can be exported. any images that are larger will be scaled down. important: the image map may contain values that are `null`. this indicates that rendering of that specific node has failed. this may be due to the node id not existing, or other reasons such has the node having no renderable components. it is guaranteed that any node that was requested for rendering will be represented in this map whether or not the render succeeded. to render multiple images from the same file, use the `ids` query parameter to specify multiple node ids.
+   * @param fileKey File key
+   * @param nodeIds One or more node IDs (comma-separated string or array)
+   */
+  async getImageFromNode(
+    fileKey: string,
+    nodeIds: string[],
+  ): Promise<
+    FigmaResponse<{
+      images: Record<string, string>;
+    }>
+  > {
+    const ids = Array.isArray(nodeIds) ? nodeIds.join(",") : nodeIds;
+
+    const response = await fetch(
+      `https://api.figma.com/v1/images/${fileKey}?ids=${
+        encodeURIComponent(ids)
+      }`,
+      {
+        headers: this.headers,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Figma API error: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return await response.json();
   }
 
   /**
