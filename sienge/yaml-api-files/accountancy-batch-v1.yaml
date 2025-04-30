@@ -1,0 +1,237 @@
+swagger: "2.0"
+info:
+  description: API de lotes contábeis da contabilidade
+  version: "1.0"
+  title: Lotes Contábeis (Contabilidade)
+host: "api.sienge.com.br"
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: "Lotes da Contabilidade"
+    description: "API de lotes contábeis"
+schemes:
+  - "https"
+security:
+  - basicAuth: []
+paths:
+  /batch:
+    post:
+      tags:
+        - "Lotes da Contabilidade"
+      summary: "Salva lotes contábeis"
+      operationId: "postBatch"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Lista de objetos lotes"
+          required: true
+          schema:
+            $ref: "#/definitions/Entry"
+      responses:
+        "201":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/ApiSuccess"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+    get:
+      tags:
+        - "Lotes da Contabilidade"
+      summary: "Busca lotes contábeis"
+      operationId: getLotesContatabeis
+      parameters:
+        - name: companyId
+          in: query
+          type: integer
+          required: true
+          description: "Código da empresa"
+        - name: batchType
+          in: query
+          type: string
+          description: >-
+            Tipo do lote, podendo ser NORMAL, COMPANY_CLOSURE, TAX_CLOSURE ou EQUITY_EQUIVALENCE
+        - name: batchStatus
+          in: query
+          type: string
+          description: >-
+            Situação do lote, podendo ser OPENED ou CLOSED
+        - name: batchDescription
+          in: query
+          type: string
+          default: "Lote gerado via API"
+          description: "Descrição do lote."
+        - name: startDate
+          in: query
+          type: string
+          required: true
+          format: "startDate (Formato ISO 8601 yyyy-MM-dd)"
+          description: "Data inicial do lote"
+        - name: endDate
+          in: query
+          type: string
+          required: true
+          format: "endDate (Formato ISO 8601 yyyy-MM-dd)"
+          description: "Data final do lote"
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor máximo permitido é 100.
+          type: integer
+          default: 100
+          maximum: 100
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: "Lote encontrado"
+          schema:
+            $ref: "#/definitions/PaginationResultEntry"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+securityDefinitions:
+  basicAuth:
+    description: "HTTP Basic Authentication. Works over `HTTP` and `HTTPS`"
+    type: "basic"
+definitions:
+  Entry:
+    type: "object"
+    required:
+      - "companyId"
+      - "startDate"
+      - "endDate"
+    properties:
+      companyId:
+        type: "integer"
+        example: 1
+        description: "Código da empresa"
+      batchType:
+        type: "string"
+        example: "NORMAL"
+        description: "Tipo do lote, podendo ser NORMAL, COMPANY_CLOSURE, TAX_CLOSURE ou EQUITY_EQUIVALENCE."
+      batchDescription:
+        type: "string"
+        example: "Lote gerado via API"
+        description: ""
+      startDate:
+        type: "string"
+        format: "startDate (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-01)"
+        example: "2017-12-01"
+        description: "Data inicial do lote."
+      endDate:
+        type: "string"
+        format: "endDate (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+        example: "2017-12-20"
+        description: "Data final do lote."
+  ApiError:
+    type: "object"
+    required:
+      - "developerMessage"
+      - "status"
+    properties:
+      status:
+        type: "number"
+        description: "Status http"
+      developerMessage:
+        type: "string"
+        description:
+          "Mensagem de erro pertinente a ser reportada ao developer consumidor\
+          \ da API."
+      clientMessage:
+        type: "string"
+        description:
+          "Mensagem de erro relavante ao utilizador\
+          \ final"
+    description: "Objeto que encapsula os atributos de erros da API"
+
+  ApiSuccess:
+    type: "object"
+    required:
+      - "message"
+    properties:
+      successMessage:
+        type: "string"
+        example: "Lote 10 gerado com sucesso"
+        description: "Mensagem de Sucesso"
+      status:
+        type: "number"
+        example: 201
+  PaginationResultEntry:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de lotes retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/EntryResponse"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        default: 0
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 100.
+        minimum: 1
+        maximum: 100
+  EntryResponse:
+    allOf:
+      - $ref: "#/definitions/Entry"

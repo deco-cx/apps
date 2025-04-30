@@ -1,0 +1,133 @@
+swagger: "2.0"
+info:
+  description: Consulta de Tipos de Condição de Pagamento.
+  version: "1.0"
+  title: Tipos de Condição de Pagamento
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Tipos de Condição de Pagamento
+    description: API de tipos de condição de pagamento
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/payment-condition-types":
+    get:
+      operationId: getPaymentConditionTypes
+      tags:
+        - Tipos de Condição de Pagamento
+      summary: Busca os Tipos de Condição de Pagamento.
+      parameters:
+        - in: query
+          type: string
+          name: filter
+          description: Nome ou descrição do tipo de condição de pagamento.
+        - in: query
+          type: integer
+          name: offset
+          description: O número de itens a pular antes de começar a coletar o conjunto de resultados.
+        - in: query
+          type: integer
+          name: limit
+          description: O número de itens a serem devolvidos.
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Tipos de condição de pagamento retornadas.
+          schema:
+            $ref: "#/definitions/PaymentConditionTypes"
+        "500":
+          description: Erro interno no servidor.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+
+definitions:
+  PaymentConditionTypes:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de tipos de condição de pagamento retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/PaymentConditionType"
+
+  PaymentConditionType:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código da condição de pagamento.
+      description:
+        type: string
+        description: Descrição da condição de pagamento.
+      finalityType:
+        type: string
+        description: >-
+          Finalidade da condição de pagamento:
+            - Recursos Próprios
+            - Pro Soluto
+            - Financiamento
+            - Bonificação
+      interval:
+        type: integer
+        format: int32
+        description: Intervalo da condição de pagamento.
+      intervalType:
+        type: string
+        description: >-
+          Tipo de intervalo da condição de pagamento:
+            - M: Mensal
+            - S: Semanal
+      installmentsNumber:
+        type: integer
+        format: int32
+        description: Quantidade máxima de parcelas permitidas para a condição.
+
+  ResultSetMetadata:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http.
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+        example: Client description message

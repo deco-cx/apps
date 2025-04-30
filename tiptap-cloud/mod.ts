@@ -20,11 +20,11 @@ interface Props {
 }
 
 /**
- * @title Tiptap Cloud
+ * @title TipTap Cloud
  * @name TiptapCloud
- * @description Connects to Tiptap Cloud Collaboration REST API for document management.
+ * @description Tiptap Cloud Collaboration REST API for document management
  * @category Content
- * @logo https://tiptap.dev/images/tiptap-logo.svg
+ * @logo https://images.saasworthy.com/tiptap_44708_logo_1691501025_zyt0n.png
  */
 export default function TiptapCloud(props: Props): App<Manifest, State> {
   const { appId, apiSecret } = props;

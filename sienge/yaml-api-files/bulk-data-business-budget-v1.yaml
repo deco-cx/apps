@@ -1,0 +1,229 @@
+swagger: "2.0"
+info:
+  title: Orçamento empresarial.
+  description: API bulk data de orçamento empresarial.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/business-budget":
+    get:
+      operationId: getBulkBusinessBudget
+      tags:
+        - Orçamento empresarial
+      summary: >-
+        Retorna um array com todos as versões de orçamentos empresarias.
+      consumes:
+        - application/json
+      parameters:
+        - name: startDate
+          in: query
+          description: Data de início do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: Data do fim do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: id
+          in: query
+          description: Código do orçamento empresarial no Sienge
+          required: false
+          type: integer
+        - name: companyId
+          in: query
+          description: Código da empresa cadastrada no Sienge
+          required: false
+          type: integer
+        - name: companyName
+          in: query
+          description: Razão social da empresa
+          required: false
+          type: string
+        - name: baseDate
+          in: query
+          description: Data base do orçamento empresarial
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: description
+          in: query
+          description: Descrição do orçamento empresarial
+          required: false
+          type: string
+        - name: budgetType
+          in: query
+          description: >-
+            Tipo do orçamento empresarial
+              - Tipo de orçamento empresarial pode ser:
+                - C - Centro de Custo
+                - D - Departamento
+          required: false
+          type: string
+        - name: costCenterId
+          in: query
+          description: Código do centro de custo.
+          required: false
+          type: integer
+        - name: departmentId
+          in: query
+          description: Código do departamento
+          required: false
+          type: integer
+        - name: versionNumber
+          in: query
+          description: Número da versão do orçamento empresarial
+          required: false
+          type: integer
+        - name: versionDate
+          in: query
+          description: Data da versão do orçamento empresarial
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+
+      responses:
+        "200":
+          description: >-
+            Retorna um array com todos os orçamentos empresariais por versão.
+            Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseBusinessBudget"
+        "400":
+          description: >-
+            Aconteceu um dos cenarios
+            - starDate ou endDate não informado
+            - endDate maior que startDate
+            - budgetType não e do tipo correto
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponseBusinessBudget:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/BusinessBudget"
+  BusinessBudget:
+    type: object
+    properties:
+      id:
+        description: Código do orçamento empresarial.
+        type: integer
+      startDate:
+        description: Data de início do período da consulta
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+      endDate:
+        description: Data do fim do período da consulta
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+      baseDate:
+        description: Data base do orçamento empresarial
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+      description:
+        description: Descrição do orçamento empresarial
+        type: string
+      budgetType:
+        type: string
+        description: >-
+          Tipo do orçamento empresarial:
+            - C - Centro de Custo
+            - D - Departamento
+      vision:
+        description: Visão do orçamento empresarial
+        type: string
+      companyId:
+        description: Código da empresa cadastrada no Sienge
+        type: integer
+      companyName:
+        description: Razão socieal da empresa
+        type: string
+      costCenterId:
+        description: Código do centro de custo.
+        type: integer
+      costCenterName:
+        description: Nome do centro de custo
+        type: string
+      departmentId:
+        description: Código do departamento
+        type: integer
+      departmentName:
+        description: Nome do departamento
+        type: string
+      versionNumber:
+        description: Numero da versão
+        type: integer
+      versionDescription:
+        description: Descrição da versão
+        type: string
+      paymentCategories:
+        type: array
+        items:
+          $ref: "#/definitions/PaymentCategorie"
+      api-error:
+        description: Quando não ocorrer nenhuma falha no carregamento dos orçamentos, esse campo não estará presente nos objetos retornados. Se durante o carregamento ocorrer alguma falha no lado do servidor, o array de orçamento será fechado com os dados carregados até então, e um objeto extra será adicionado ao final do array contendo apenas este campo preenchido com a respectiva mensagem de erro.
+        type: string
+  PaymentCategorie:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Código do plano financeiro
+      description:
+        type: string
+        description: descrição do plano financeiro
+      type:
+        type: string
+        description: tipo de plano financeiro
+      notes:
+        type: string
+        description: observação do plano finaceiro no orçamento
+      interval:
+        type: array
+        items:
+          $ref: "#/definitions/BusinessBudgetInterval"
+  BusinessBudgetInterval:
+    type: object
+    properties:
+      monthYear:
+        description: mês e ano
+        type: string
+      totalPrice:
+        description: valor orçado para o mês
+        type: number
+  ApiError:
+    type: object
+    description: Objeto que encapsula os atributos de erros da API
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: array
+        description: Lista contendo mensagem de erros relavantes para o utilizador final
+        items:
+          type: string

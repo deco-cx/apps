@@ -26,9 +26,10 @@ export interface State extends Props {
 export type AppContext = FnContext<State, Manifest>;
 
 /**
- * @name SLACK
+ * @name Slack
  * @title Slack
- * @description A Deco app for interacting with Slack APIs with strongly typed responses
+ * @description Send messages and interact with Slack channels
+ * @logo https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/306_Slack_logo-512.png
  */
 export default function App(props: Props): App<Manifest, State> {
   const slack = new SlackClient(

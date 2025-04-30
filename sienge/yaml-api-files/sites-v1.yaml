@@ -1,0 +1,138 @@
+swagger: "2.0"
+info:
+  description: API de locais de obra
+  version: 1.0.0
+  title: Locais de Obra
+host: api.sienge.com.br
+basePath: "/{subdomain-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /sites:
+    get:
+      tags:
+        - Locais de Obras
+      summary: Busca uma lista de locais de uma obra
+      operationId: getSites
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: buildingId
+          in: query
+          description: >-
+            Código da obra.
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/GetResponseSite"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Dado não encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: Parametro obrigatório não informado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  GetResponseSite:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Locais de Obra
+        items:
+          $ref: "#/definitions/SiteDto"
+  ResultSetMetadata:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.  Valor padrão
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados.  Valor
+          padrão é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  SiteDto:
+    type: object
+    properties:
+      id:
+        description: Código do Local
+        type: number
+        example: 1
+      description:
+        description: Descrição do Local
+        type: string
+        example: Primeiro Pavimento
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: integer
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: string
+        description: mensagem de error relavante para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

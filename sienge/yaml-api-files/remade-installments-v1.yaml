@@ -1,0 +1,306 @@
+swagger: "2.0"
+info:
+  description: API de reparcelamentos.
+  version: 1.0.0
+  title: Reparcelamentos - Conta a Receber
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Remade installments
+    description: API para listagem de reparcelamentos realizados nas parcelas dos títulos.
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /remade-installments:
+    get:
+      tags:
+        - Remade installments
+      summary: Busca os reparcelamentos das parcelas no Sienge
+      operationId: findRemadeInstallments
+      parameters:
+        - name: billReceivableId
+          in: query
+          description: Número do título
+          required: false
+          type: integer
+        - name: companyId
+          in: query
+          description: Código da empresa
+          required: false
+          type: integer
+        - name: costCenterId
+          in: query
+          description: Código do centro de custo
+          required: false
+          type: integer
+        - name: customerId
+          in: query
+          description: Código do cliente
+          required: false
+          type: integer
+        - name: dueDateStart
+          format: date
+          in: query
+          description: Data inicial para filtro do reparcelamento<br>(yyyy-MM-dd)
+          required: false
+          type: string
+        - name: dueDateEnd
+          in: query
+          format: date
+          description: Data final para filtro do reparcelamento<br>(yyyy-MM-dd)
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Reparcelamento(s) encontrado(s)
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: RequisiÃ§Ã£o mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "404":
+          description: Reparcelamento(s) nÃ£o encontrado(s)
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    post:
+      tags:
+        - Reparcelamento
+      summary: Realiza um reparcelamento.
+      operationId: insertRemadeInstallment
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para realizar o reparcelamento
+          required: true
+          schema:
+            $ref: "#/definitions/RemadeInstallmentParameter"
+      responses:
+        "201":
+          description: Reparcelamento criado
+          schema:
+            $ref: "#/definitions/GeneratedInstallment"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  Results:
+    type: object
+    properties:
+      receivableBillId:
+        type: integer
+        format: int32
+        description: Código do título
+        example: 1
+      remadeDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data do reparcelamento
+        example: "2019-01-01"
+      customerDescription:
+        type: string
+        description: Nome do cliente do título
+        example: "Ana"
+      remadeInstallmentsDescription:
+        type: string
+        description: Número das parcelas reparceladas
+        example: "1, 2, 3, 4"
+      remadeValue:
+        type: number
+        format: double
+        description: Valor total das parcelas reparceladas
+        example: 100.99
+      generatedInstallmentsDescription:
+        type: string
+        description: Número das parcelas geradas pelo reparcelamento
+        example: "5, 6, 7"
+      generatedValue:
+        type: number
+        format: double
+        description: Valor total das parcelas geradas pelo reparcelamento
+        example: 155.99
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de reparcelamentos como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Results"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          Ã© 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default Ã© 100 e o valor máximo permitido Ã© 200.
+        minimum: 1
+        maximum: 200
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.
+  RemadeInstallmentParameter:
+    type: object
+    properties:
+      billReceivableId:
+        type: integer
+        format: int32
+        description: Número do Título à ser reparcelado.
+      remadeDate:
+        type: string
+        description: Data do reparcelamento. Formato yyyy-MM-dd. Exemplo -> 1990-12-25.
+      calculationDate:
+        type: string
+        description: Correção até. Formato yyyy-MM-dd. Exemplo -> 1990-12-25.
+      installments:
+        type: string
+        description: Id das parcelas que serão reparceladas.
+        example: 1/2/3/4
+      builtInterestRule:
+        type: string
+        description: Indica qual valor da parcela com juros price deve ser usado no momento do reparcelamento. <br> Informar:<br> "A" - Valor Amortizado (sem juros embutido); <br>"I" - Valor Integral (com juros embutido);<br> "V" - Valor Presente
+      interestPresentValue:
+        type: number
+        description: Valor do Juros presente, caso o atributo <code>builtInterestRule </code> enviado como "V"
+      differenceType:
+        type: string
+        description: Informar qual o tipo da diferença caso o valor de parcelas geradas for maior que o valor reparcelado. <br> Informar:<br> "A" - Aditivo <br> "J" - Juros <br> "C" - correção.
+      operationType:
+        type: string
+        description: Informar qual o tipo de operação. <br> Informar:<br> "R" - Remade para processo de reparcelamento padrão com geração de novas parcelas <br> "D" - Delete para processo de reparcelamento para exclusão de parcelas, sem a geração de novas parcelas.<br>
+      remadeType:
+        type: string
+        enum: ["R", "F", "A"]
+        default: R
+        description: Tipo de reparcelamento desejado. Caso nenhum valor seja fornecido o valor padrão "R" será assumido. <br> Informar:<br> "R" - Reparcelamento  <br> "F" - Alteração de financiamento <br> "A" - Acordo financeiro <br>
+      remadeDescription:
+        type: string
+        description: Campo de texto para detalhamento sobre o reparcelamento.
+      paymentConditions:
+        type: array
+        description: Lista de Condição de Pagamento.
+        items:
+          $ref: "#/definitions/PaymentConditions"
+  PaymentConditions:
+    type: object
+    description: Condição de Pagamento
+    properties:
+      conditionTypeId:
+        type: string
+        description: Id da condição de pagamento <br> Exemplo -> "PM" Pagamendo Mensal<br> "PA" - Pagamento Anual.
+      totalValue:
+        type: number
+        description: Total do valor do reparcelamento.
+      installmentsNumber:
+        type: integer
+        description: Quantidade de parcelas a serem geradas pelo <code>Reparcelamento</code>
+      firstPayment:
+        type: string
+        description: Data do primeiro vencimento das parcelas geradas pelo reparcelamento.
+      bearerId:
+        type: integer
+        description: Código do portador
+      matchMaturities:
+        type: string
+        description: Vencimentos podem coincidir com outras parcelas <br> Informar <br> "S" ou "N".
+      indexerId:
+        type: integer
+        description: Código do Indexador.
+      baseDate:
+        type: string
+        description: Data base de cálculo do indexador.
+      interestType:
+        type: string
+        description: Tipo do Juros <br> Informar:<br> "N" - Nenhum <br> "P" - Price <br> "A" - S.A.C <br> "S" - Simples <br> "C" - Composto <br> "F" - Fixo
+      interestPercentage:
+        type: number
+        description: Percentual ao período.
+      monthsGracePeriod:
+        type: integer
+        description: Meses de carência.
+      baseDateInterest:
+        type: string
+        description: Data base para juros. Formato yyyy-MM-dd. Exemplo -> 1990-12-25.
+  GeneratedInstallment:
+    type: object
+    description: Parcelas Geradas pelo Reparcelamento.
+    properties:
+      installmentId:
+        type: integer
+        description: Id da parcela.
+      builtInterestValue:
+        type: number
+        description: Valor do juros embutido.
+      originalValue:
+        type: number
+        description: Valor original da parcela.
+      originalDebitBalance:
+        type: number
+        description: Saldo devedor original.
+      amortizationValue:
+        type: number
+        description: Valor amortizado.
+      dueDate:
+        type: string
+        description: Data de vencimento.
+      baseDate:
+        type: string
+        description: Data Base.
+      conditionType:
+        type: string
+        description: Código do tipo de condição.
+      indexerCode:
+        type: integer
+        description: Código do indexador.

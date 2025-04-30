@@ -1,0 +1,299 @@
+swagger: "2.0"
+info:
+  description: API REST para Mapa Imobiliário Consolidado
+  version: "1.0"
+  title: Mapa Imobiliário Consolidado
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Mapa Imobiliário
+    description: API REST Mapa Imobiliário
+paths:
+  /real-estate-map:
+    get:
+      tags:
+        - Mapa Imobiliário
+      summary: >-
+        Retorna os dados do Mapa Imobiliário para os empreendimentos e período informados nos parâmetros.
+      operationId: getRealEstateMapDate
+      produces:
+        - application/json
+      parameters:
+        - name: costCentersId
+          in: query
+          description: Códigos dos centros de custo cadastrados no Sienge.
+          required: true
+          type: array
+          items:
+            type: integer
+        - name: startDate
+          in: query
+          description: Data de início do período da consulta.
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2022-01-01)"
+        - name: endDate
+          in: query
+          description: Data do fim do período da consulta.
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2022-12-01)"
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor máximo permitido é 200.
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/PaginationResultRealEstateMap"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  RealEstateMapResponse:
+    type: object
+    description: Mapa-imobiliário
+    properties:
+      enterpriseData:
+        $ref: "#/definitions/EnterpriseData"
+      vgvData:
+        $ref: "#/definitions/VgvData"
+      corporateIncome:
+        $ref: "#/definitions/CorporateIncome"
+      accumulatedReceipts:
+        $ref: "#/definitions/AccumulatedReceipts"
+      budgetedAndIncurredCost:
+        $ref: "#/definitions/BudgetedAndIncurredCost"
+      corporateCost:
+        $ref: "#/definitions/CorporateCost"
+      margin:
+        $ref: "#/definitions/Margin"
+  EnterpriseData:
+    type: object
+    description: Dados do empreendimento
+    properties:
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa
+        example: 1
+      companyName:
+        type: string
+        description: Nome da empresa
+        example: "Softplan"
+      enterpriseId:
+        type: integer
+        format: int32
+        description: Código do empreendimento
+        example: 12
+      enterpriseName:
+        type: string
+        description: Nome do empreendimento
+        example: "empreendimento softplan"
+      units:
+        type: integer
+        format: int32
+        description: Quantidade de unidades
+        example: 51
+      monthYear:
+        type: string
+        description: Mês ano
+        example: "08/2022"
+  VgvData:
+    type: object
+    description: Dados do VGV
+    properties:
+      vgv:
+        type: "number"
+        example: 10034.94
+        description: "Valor do VGV"
+      vgvVariation:
+        type: "number"
+        example: 21034.94
+        description: "Valor da variação VGV"
+      poc:
+        type: "number"
+        example: 100.00
+        description: "Valor do POC"
+      variationPoc:
+        type: "number"
+        example: 100.00
+        description: "Valor da variação do POC"
+  CorporateIncome:
+    type: object
+    description: Receita societária
+    properties:
+      appropriateIncome:
+        type: "number"
+        example: 17800.94
+        description: "Valor da receita apropriada"
+      appropriateMonthlyIncome:
+        type: "number"
+        example: 71034.94
+        description: "Valor da receita apropriada mensal"
+      customerBalance:
+        type: "number"
+        example: 69754.00
+        description: "Contas a receber e/ou adiantamento de cliente"
+  AccumulatedReceipts:
+    type: object
+    description: Recebimentos acumulados
+    properties:
+      accumulatedReceipt:
+        type: "number"
+        example: 4787800.94
+        description: "Valor do recebimento acumulado"
+      monthlyReceipt:
+        type: "number"
+        example: 21034.95
+        description: "Valor do recebimento mensal"
+      receivingDistractedUnit:
+        type: "number"
+        example: 0.00
+        description: "Valor de recebimento das unidades distratadas"
+  BudgetedAndIncurredCost:
+    type: object
+    description: Custo orçado e incorrido
+    properties:
+      budgetedCost:
+        type: "number"
+        example: 98500.94
+        description: "Valor do custo orçado"
+      variationBudgetedCost:
+        type: "number"
+        example: 1034.95
+        description: "Valor da variação do custo orçado"
+      accumulatedIncurredCost:
+        type: "number"
+        example: 87500.00
+        description: "Valor incorrido acumulado"
+      costToIncur:
+        type: "number"
+        example: 6500.00
+        description: "Custo a incorrer"
+      monthlyIncurredCost:
+        type: "number"
+        example: 500.00
+        description: "Custo incorrido mensal"
+  CorporateCost:
+    type: object
+    description: Custo societário
+    properties:
+      appropriateCost:
+        type: "number"
+        example: 48500.94
+        description: "Valor do custo apropriado"
+      monthlyAppropriateCost:
+        type: "number"
+        example: 834.95
+        description: "Valor do custo apropriado mensal"
+      stock:
+        type: "number"
+        example: 875000.00
+        description: "Estoque"
+      guarantee:
+        type: "number"
+        example: 165000.00
+        description: "Provisão de garantia"
+      commission:
+        type: "number"
+        example: 5000.00
+        description: "Comissões"
+  Margin:
+    type: object
+    description: Margem de lucro
+    properties:
+      accumulatedRevenue:
+        type: "number"
+        example: 448500.24
+        description: "Valor da receita acumulada"
+      accruedCost:
+        type: "number"
+        example: 430000.95
+        description: "Valor do custo acumulado"
+      grossProfit:
+        type: "number"
+        example: 18499.29
+        description: "Lucro bruto"
+      (%):
+        type: "number"
+        example: 0.0412
+        description: "Percentual de lucro"
+  ApiError:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Status http
+      developer-message:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao desenvolvedor
+          consumidor da API.
+      client-message:
+        type: array
+        description: Lista contendo mensagem de erros relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  PaginationResultRealEstateMap:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de mapas imobiliários retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/RealEstateMapResponse"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.  Valor padrão
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados.  Valor
+          padrão é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200

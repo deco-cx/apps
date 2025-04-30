@@ -1,40 +1,5 @@
 import { AppContext } from "../mod.ts";
-
-type TextContent = {
-  type: "text";
-  text: string;
-  marks?: Array<{
-    type: "bold" | "italic" | "underline" | "strike" | "code" | "link";
-    attrs?: Record<string, string | number | boolean>;
-  }>;
-};
-
-type NodeAttrs = {
-  level?: number;
-  indent?: number;
-  textAlign?: "left" | "center" | "right" | "justify";
-  start?: number;
-  [key: string]: string | number | boolean | undefined;
-};
-
-type NodeContent = {
-  type:
-    | "paragraph"
-    | "heading"
-    | "bulletList"
-    | "orderedList"
-    | "listItem"
-    | "codeBlock"
-    | "blockquote"
-    | "horizontalRule";
-  attrs?: NodeAttrs;
-  content?: Array<NodeContent | TextContent>;
-};
-
-export type Content = {
-  type: "doc";
-  content: Array<NodeContent>;
-};
+import { htmlToTiptapJson } from "../utils.ts";
 
 /**
  * @name CREATE_DOCUMENT
@@ -46,14 +11,14 @@ export interface Props {
    */
   identifier: string;
   /**
-   * @description The document content in Tiptap JSON format
+   * @description The document content in HTML format
    */
-  content: Content;
+  content: string;
   /**
    * @description The format of the document (json or yjs)
    * @default json
    */
-  format?: "json" | "yjs";
+  format?: "json";
 }
 
 export default async function createDocument(
@@ -65,6 +30,11 @@ export default async function createDocument(
   const encodedIdentifier = encodeURIComponent(identifier);
   const url = `${baseUrl}/api/documents/${encodedIdentifier}?format=${format}`;
 
+  // Convert HTML to Tiptap JSON if content is a string
+  const tiptapContent = typeof content === "string"
+    ? htmlToTiptapJson(content)
+    : content;
+
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -72,7 +42,7 @@ export default async function createDocument(
         "Authorization": apiSecret,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(content),
+      body: JSON.stringify(tiptapContent),
     });
 
     if (!response.ok) {

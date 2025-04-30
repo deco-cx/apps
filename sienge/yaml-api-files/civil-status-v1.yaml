@@ -1,0 +1,169 @@
+swagger: "2.0"
+info:
+  description: API de estados civis.
+  version: 1.0.0
+  title: Estados Civis
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /civil-status:
+    post:
+      tags:
+        - Estados Civis
+      summary: Persiste um estado civil.
+      operationId: insertEstCivil
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação do estado civil
+          required: true
+          schema:
+            $ref: "#/definitions/EstCivilInsert"
+      responses:
+        "201":
+          description: Estado Civil criado
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Estados Civis
+      summary: Busca uma lista de estados civis
+      operationId: getAllCivilStatus
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default são 100 e o valor máximo permitido são 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default são 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: description
+          in: query
+          description: >-
+            Descrição do estado civil.
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Estados civis encontrados
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  EstCivilInsert:
+    type: object
+    required:
+      - description
+      - type
+    properties:
+      description:
+        type: string
+        description: Descrição do estado civil que deseja cadastrar.
+      type:
+        enum: [1, 2, 3, 4, 5]
+        description: >-
+          Indica o tipo de estado civil.
+            `1` - Solteiro(a)
+            `2` - Casado(a)
+            `3` - Separado(a)
+            `4` - Divorciado(a)
+            `5` - Viúvo(a)
+  CivilStatus:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código
+      description:
+        type: string
+        description: Descrição
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de estados civis retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/CivilStatus"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default são 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default são 100 e o valor máximo permitido são 200.
+        minimum: 1
+        maximum: 200
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

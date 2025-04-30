@@ -1,0 +1,1205 @@
+swagger: "2.0"
+info:
+  description: API de Medição de Contrato.
+  version: "1.0"
+  title: Medição de Contrato
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+paths:
+  "/supply-contracts/measurements/all":
+    get:
+      tags:
+        - Medições de Contratos
+      summary: Consulta medições de contratos
+      operationId: listMeasurements
+      consumes:
+        - application/json
+      parameters:
+        - name: documentId
+          in: query
+          description: Id do Documento
+          required: false
+          type: string
+        - name: contractNumber
+          in: query
+          description: Número do Contrato
+          required: false
+          type: string
+        - name: buildingId
+          in: query
+          description: Id da Obra
+          required: false
+          type: integer
+          format: int32
+        - name: measurementNumber
+          in: query
+          description: Número da medição
+          required: false
+          type: integer
+          format: int32
+        - name: contractSupplierId
+          in: query
+          description: Id do Fornecedor do Contrato (Contratante)
+          required: false
+          type: integer
+          format: int32
+        - name: contractCustomerId
+          in: query
+          description: Id do Cliente do Contrato (Contratada)
+          required: false
+          type: integer
+          format: int32
+        - name: measurementDate
+          in: query
+          description: >-
+            Data da medição no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-01
+          required: false
+          type: string
+        - name: measurementStartDate
+          in: query
+          description: >-
+            Data de início da busca (data da medição) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-01
+          type: string
+        - name: measurementEndDate
+          in: query
+          description: >-
+            Data de fim da busca (data da medição) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-11
+          type: string
+        - name: statusApproval
+          in: query
+          description: >-
+            Código da situação de aprovação da medição. [D=DISAPPROVED, A=APPROVED]
+          type: string
+        - name: authorization
+          in: query
+          description: >-
+            Status de autorização da medição. [T=Todos, S=Reprovados, A=Aprovados, N=Aguardando autorização]
+          type: string
+        - name: consistency
+          in: query
+          description: >-
+            Status da situação de consistência da medição. [T=Todos, S=Consistente, N=Inconsistente, I=Inclusao]
+          type: string
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfMeasurements"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/supply-contracts/measurements":
+    get:
+      tags:
+        - Medição de Contrato
+      summary: Consulta medições
+      operationId: getMeasurements
+      consumes:
+        - application/json
+      parameters:
+        - name: documentId
+          in: query
+          description: Id do Documento
+          required: true
+          type: string
+        - name: contractNumber
+          in: query
+          description: Número do Contrato
+          required: true
+          type: string
+        - name: buildingId
+          in: query
+          description: Id da Obra
+          required: true
+          type: integer
+          format: int32
+        - name: measurementNumber
+          in: query
+          description: Número da medição
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/Measurement"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+    post:
+      operationId: postSupplyContractsMeasurementsAttachments
+      tags:
+        - Medição de Contrato
+      summary: >-
+        Cria uma nova medição para o respectivo contrato e obra.
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: documentId
+          description: Código do documento do contrato
+          required: true
+          type: string
+        - in: query
+          name: contractNumber
+          description: Número do contrato
+          required: true
+          type: string
+        - in: query
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Informações da medição a ser cadastrada.
+          required: true
+          schema:
+            $ref: "#/definitions/MeasurementPostDto"
+      responses:
+        "201":
+          description: >-
+            A medição foi criada com sucesso.
+          schema:
+            $ref: "#/definitions/MeasurementCreatedDto"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Contrato não encontrado ou obra não encontrada no respectivo contrato.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: |
+            Entidade não processável.
+
+
+            Ocorreu algum erro semântico que impede a criação da medição. Provavelmente, os dados informados não passaram nas validações e regras de negócio realizadas no Sienge para criação de medições. Alguns exemplos dessas validações (podem haver outros) são:
+            * A data de vencimento deve ser igual ou posterior à data da medição;
+            * Existem medições anteriores ainda não finalizadas;
+            * Já existem outras medições com data posterior à data informada nesta;
+            * Algum item está sendo medido acima da quantidade contratada (quando o contrato não está configurado para permitir isso).
+
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/supply-contracts/measurements/items":
+    get:
+      operationId: postSupplyContractsMeasurementsAttachmentsItems
+      tags:
+        - Itens da Medição de Contrato
+      summary: >-
+        Retorna um array com os itens medidos nesta medição.
+      parameters:
+        - in: query
+          name: documentId
+          description: Código do documento do contrato
+          required: true
+          type: string
+        - in: query
+          name: contractNumber
+          description: Número do contrato
+          required: true
+          type: string
+        - in: query
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: measurementNumber
+          description: Código da medição no contrato
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com os itens medidos nesta medição. Caso não existam, retorna um
+            array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseMeasurementItems"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: A Medição requisitada não foi encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/supply-contracts/measurements/clearing":
+    get:
+      operationId: getSupplyContractsMeasurementsAttachmentsClearing
+      tags:
+        - Liberação da Medição
+      summary: >-
+        Retorna a liberação de uma medição.
+      parameters:
+        - in: query
+          name: documentId
+          description: Código do documento do contrato
+          required: true
+          type: string
+        - in: query
+          name: contractNumber
+          description: Número do contrato
+          required: true
+          type: string
+        - in: query
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: measurementNumber
+          description: Código da medição no contrato
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/Clearing"
+        "404":
+          description: A medição, contrato ou obra requisitada não foi encontrada.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: |
+            Entidade não processável.
+
+            Não existe liberação para a medição requisitada.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/supply-contracts/measurements/attachments/all":
+    get:
+      operationId: getSupplyContractsMeasurementsAttachmentsItemsAll
+      tags:
+        - Anexos de Medição de Contrato
+      summary: Consulta anexos de medição de contrato
+      parameters:
+        - in: query
+          name: measurementStartDate
+          required: true
+          description: >-
+            Data de início da busca (data da medição) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-01
+          type: string
+        - in: query
+          name: measurementEndDate
+          required: true
+          description: >-
+            Data de fim da busca (data da medição) no formato: yyyy-MM-dd.
+            Exemplo: 2018-03-11
+          type: string
+        - in: query
+          name: documentId
+          required: false
+          description: >-
+            Sigla do código do documento de contrato.
+            Exemplo: "CT"
+          type: string
+        - in: query
+          name: contractNumber
+          required: false
+          description: Número do contrato
+          type: string
+        - in: query
+          name: buildingId
+          required: false
+          description: Id da obra
+          type: integer
+        - in: query
+          name: measurementNumber
+          required: false
+          description: Número da medição
+          type: integer
+        - in: query
+          name: limit
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - in: query
+          name: offset
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            $ref: "#/definitions/PaginatedResponseOfMeasurementAttachment"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/supply-contracts/measurements/attachments":
+    get:
+      operationId: getSupplyContractsMeasurementsAttachments
+      tags:
+        - Anexos de Medição de Contrato
+      summary: Download anexos de medição de contrato
+      parameters:
+        - in: query
+          name: documentId
+          required: true
+          description: >-
+            Sigla do código do documento de contrato
+            Exemplo: "CT"
+          type: string
+        - in: query
+          name: contractNumber
+          required: true
+          description: Número do contrato
+          type: string
+        - in: query
+          name: buildingId
+          required: true
+          description: Id da obra
+          type: integer
+        - in: query
+          name: measurementNumber
+          required: true
+          description: Número da medição
+          type: integer
+        - in: query
+          name: attachmentNumber
+          required: true
+          description: Número do anexo
+          type: integer
+      produces:
+        - file
+        - application/json
+      responses:
+        "200":
+          description: Operação bem sucedida
+          schema:
+            type: file
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+    post:
+      operationId: postSupplyContractsMeasurementsAttachmentsAll
+      tags:
+        - Anexos de Medição de Contrato
+      summary: Inclui anexos de medição de contrato
+      parameters:
+        - in: query
+          name: documentId
+          required: true
+          description: >-
+            Sigla do código do documento de contrato.
+            Exemplo: "CT"
+          type: string
+        - in: query
+          name: contractNumber
+          required: true
+          description: Número do contrato
+          type: string
+        - in: query
+          name: buildingId
+          required: true
+          description: Id da obra
+          type: integer
+        - in: query
+          name: measurementNumber
+          required: true
+          description: Número da medição
+          type: integer
+        - name: description
+          in: query
+          description: "Descrição do anexo | Máximo: 500 caracteres "
+          required: true
+          type: string
+          maxLength: 500
+        - in: formData
+          name: file
+          type: file
+          description: >-
+            Arquivo para inserção | Tipo: multipart/form-data | Tamanho máximo:
+            70 MB | Tamanho máximo do nome do arquivo: 100 caracteres | Somente 1 Anexo por requisição.
+            Caso seja enviado mais de 1 Anexo, o Sienge vai aceitar somente o primeiro selecionado.
+          required: true
+
+      responses:
+        "201":
+          description: Anexo inserido com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/supply-contracts/measurements/authorize":
+    patch:
+      operationId: patchSupplyContractsMeasurementsAuthorize
+      tags:
+        - Autorização da Medição
+      summary: Autoriza uma Medição que está aguardando autorização
+      description: Somente irá enviar as notificações caso esteja configurado para 'Sempre enviar aviso ao responsável'
+      parameters:
+        - in: query
+          name: documentId
+          description: Código do documento do contrato
+          required: true
+          type: string
+        - in: query
+          name: contractNumber
+          description: Número do contrato
+          required: true
+          type: string
+        - in: query
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: measurementNumber
+          description: Código da medição no contrato
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: observation
+          required: false
+          description: Observação relacionada a autorização do contrato
+          schema:
+            $ref: "#/definitions/ObservationDTO"
+      responses:
+        "204":
+          description: Autorizada com sucesso.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: |
+            Entidade não processável.
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/supply-contracts/measurements/disapprove":
+    patch:
+      operationId: patchSupplyContractsMeasurementsDisapprove
+      tags:
+        - Reprovação da Medição
+      summary: Reprova uma Medição que está aguardando autorização.
+      description: Somente irá enviar as notificações caso esteja configurado para 'Sempre enviar aviso ao responsável'
+      parameters:
+        - in: query
+          name: documentId
+          description: Código do documento do contrato
+          required: true
+          type: string
+        - in: query
+          name: contractNumber
+          description: Número do contrato
+          required: true
+          type: string
+        - in: query
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: measurementNumber
+          description: Código da medição no contrato
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: observation
+          required: false
+          description: Observação relacionada a reprovação do contrato
+          schema:
+            $ref: "#/definitions/ObservationDTO"
+      responses:
+        "204":
+          description: Reprovada com sucesso.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: |
+            Entidade não processável.
+        "404":
+          description: O recurso requisitado não foi encontrado
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  Measurement:
+    type: object
+    properties:
+      documentId:
+        type: string
+        example: CT
+        description: Id do Documento
+      contractNumber:
+        type: string
+        example: 123A
+        description: Número do Contrato
+      buildingId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id da Obra
+      measurementNumber:
+        type: integer
+        format: int64
+        example: 1
+        description: Número da Medição
+      authorized:
+        type: boolean
+        example: true
+        description: >-
+          Retornará verdadeiro se medição estiver autorizada, caso contrário
+          retornará falso.
+      statusApproval:
+        type: string
+        example: APPROVED
+        description: Código da situação de aprovação da medição. Toda medição nasce com situação *APPROVED* e somente será alterada para *DISAPPROVED* se for reprovada. [DISAPPROVED, APPROVED]
+      notes:
+        type: string
+        example: Uma observação da medição
+        description: Observação da medição.
+      responsibleId:
+        type: string
+        example: NOME
+        description: Id do responsável pela medição.
+      responsibleName:
+        type: string
+        example: NOME SOBRENOME
+        description: Nome do responsável pela medição.
+      consistent:
+        type: boolean
+        example: false
+        description: >-
+          Retornará verdadeiro se medição estiver consistente, caso contrário
+          retornará falso.
+      measurementDate:
+        type: string
+        example: "2018-03-11"
+        description: "Data da medição no formato: yyyy-MM-dd."
+      dueDate:
+        type: string
+        example: "2018-09-05"
+        description: "Data de vencimento no formato: yyyy-MM-dd."
+      materialCost:
+        type: number
+        format: double
+        example: 500.00
+        description: Total medido de material
+      laborCost:
+        type: number
+        format: double
+        example: 1000.00
+        description: Total medido de mão de obra
+      measuredTotal:
+        type: number
+        format: double
+        example: 1500.00
+        description: Total Medido = Total Medido de Material + Total Medido de Mão de Obra
+      indexesPriceChange:
+        type: number
+        format: double
+        example: 30.00
+        description: Reajuste por índices
+      directBillingValue:
+        type: number
+        format: double
+        example: 200.00
+        description: Total em descontos do faturamento direto
+      subtotal:
+        type: number
+        format: double
+        example: 1330.00
+        description: Subtotal = Total Medido + Reajuste por Índices - Desconto de Faturamento Direto
+      securityDepositValue:
+        type: number
+        format: double
+        example: 133.00
+        description: Valor retido para a caução
+      exchangeValue:
+        type: number
+        format: double
+        example: 50.0
+        description: Total em Permuta nesta medição
+      earnestMoneyValue:
+        type: number
+        format: double
+        example: 50.0
+        description: Total em Sinal nesta medição
+      discountsValue:
+        type: number
+        format: double
+        example: 50.00
+        description: Total em Descontos nesta medição
+      taxValue:
+        type: number
+        format: double
+        example: 50.00
+        description: Total em Impostos nesta medição
+      netValue:
+        type: number
+        format: double
+        example: 997.00
+        description: Total Líquido = Subtotal - (Caução + Permuta + Sinal + Descontos + Impostos)
+
+  MeasurementPostDto:
+    type: object
+    description: >-
+      Informações para inclusão de uma medição de contrato.
+    properties:
+      measurementDate:
+        description: "Data da medição no formato: yyyy-MM-dd. Campo obrigatório."
+        type: string
+        example: "2021-04-18"
+      dueDate:
+        description: "Data de vencimento no formato: yyyy-MM-dd. Campo obrigatório."
+        type: string
+        example: "2021-06-22"
+      notes:
+        description: Observação. Campo opcional.
+        type: string
+        example: "Lorem ipsum dolor sit amet."
+      makeUnauthorized:
+        description: Se for informado *true*, a medição que for criada ficará desautorizada, como se o usuário que a cadastrou não tivesse autorização para geração de medições autorizadas. Se for informado *false* ou se o campo não for informado, o estado de autorização da medição será determinado pelo Sienge seguindo as regras normais do sistema para autorização de medições, considerando o usuário utilizado pela API no Sienge. Campo opcional.
+        type: boolean
+        example: true
+        default: false
+      items:
+        description: Array com os itens (do contrato) que estão sendo medidos.
+        type: array
+        items:
+          $ref: "#/definitions/MeasurementItemPostDto"
+
+  MeasurementItemPostDto:
+    type: object
+    description: >-
+      Informações para inclusão de um item de medição de contrato.
+    properties:
+      buildingUnitId:
+        description: "Código da unidade construtiva do item de contrato que está sendo medido. Campo obrigatório."
+        type: integer
+        example: 3
+      itemId:
+        description: "Código do item de contrato que está sendo medido. Deve referenciar um item que já está cadastrado no contrato, na respectiva unidade construtiva. Este item deve ser de último nível, ou seja, deve ser um insumo ou serviço e não um item agrupador. Campo obrigatório."
+        type: integer
+        example: 25
+      measuredQuantity:
+        description: "Quantidade medida do item, com precisão de 4 casas decimais. Deve ser um número maior que zero. Campo obrigatório."
+        type: number
+        example: 45.4918
+
+  MeasurementCreatedDto:
+    type: object
+    description: Informações da medição que foi criada.
+    properties:
+      measurementNumber:
+        description: Número da medição que foi criada.
+        type: integer
+        example: 35
+
+  GetResponseMeasurementItems:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/MeasurementItemDto"
+  MeasurementItemDto:
+    type: object
+    properties:
+      buildingUnitId:
+        description:
+          Código da unidade construtiva.
+        type: integer
+        example: 2
+      itemId:
+        type: integer
+        description: código do item no contrato.
+        example: 55
+      quantity:
+        type: number
+        format: double
+        description: Quantidade contratada do item de contrato, com precisão de 4 casas
+        example: 1234.3502
+      measuredQuantity:
+        type: number
+        description: Quantidade medida nesta medição para o item de contrato, com precisão de 4 casas.
+        example: 3000.2348
+      cumulativeMeasuredQuantity:
+        type: number
+        description: Quantidade total acumulada nas medições anteriores a esta para o item de contrato, com precisão de 4 casas.
+        example: 3000.2348
+      laborPrice:
+        description: Preço unitário de mão de obra no momento da medição (com precisão de 4 casas).
+        type: number
+        example: 9.0005
+      measuredLaborValue:
+        type: number
+        description: Valor monetário medido de mão de obra nesta medição para o item de contrato, com precisão de 2 casas.
+        example: 12.50
+      materialPrice:
+        description: Preço unitário de material no momento da medição (com precisão de 4 casas).
+        type: number
+        example: 16.2314
+      measuredMaterialValue:
+        type: number
+        description: Valor monetário medido de material nesta medição para o item de contrato, com precisão de 2 casas.
+        example: 300.45
+      measuredPercentage:
+        type: number
+        description: Percentual medido nesta medição para o item de contrato, com precisão de 12 casas.
+        example: 72.521664310737
+      preMeasurement:
+        type: string
+        description: Indica se o item de medição foi marcado na pré-medição, caso tenha ocorrido.
+        example: N
+      additionalMeasurementItemInformation:
+        type: string
+        description: Observação preenchida no item de medição.
+        example: Observação
+      buildingAppropriations:
+        description: >-
+          Apropriações de obra do item de contrato.
+          Esse conjunto de itens representa um rateio
+          da quantidade contratada do item de contrato, entre um ou
+          mais itens do orçamento da obra do centro de custo do contrato.
+          Os itens de orçamento referenciados em cada item de apropriação devem
+          ser do nível (na estrutura analítica do orçamento) correspondente
+          ao nível de apropriação definido na respectiva obra
+          (por exemplo: etapa, subetapa, serviço etc.).
+          Importante: se a obra do contrato possuir nível de apropriação
+          definido como "obra" o array estará vazio.
+        type: array
+        items:
+          $ref: "#/definitions/BuildingAppropriationItemGetDto"
+  BuildingAppropriationItemGetDto:
+    type: object
+    properties:
+      buildingUnitId:
+        description:
+          Código da unidade construtiva.
+        type: integer
+        example: 2
+      sheetItemId:
+        description:
+          Identificador do item de orçamento.
+        type: integer
+        example: 42
+      percentage:
+        description:
+          Percentual de rateio do respectivo item de orçamento nas apropriações de obra sendo um número maior que zero, menor ou igual a 100, com precisão de até 12 casas decimais.
+        type: number
+        example: 100.0
+
+  PaginatedResponseOfMeasurements:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Medições de Contratos retornadas como resultado da Requisição
+        items:
+          $ref: "#/definitions/Measurements"
+  Measurements:
+    type: object
+    properties:
+      documentId:
+        type: string
+        example: CT
+        description: Id do Documento
+      contractNumber:
+        type: string
+        example: 123A
+        description: Número do Contrato
+      buildingId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id da Obra
+      measurementNumber:
+        type: integer
+        format: int64
+        example: 1
+        description: Número da Medição
+      notes:
+        type: string
+        example: Uma observação da medição
+        description: Observação da medição.
+      responsibleId:
+        type: string
+        example: NOME
+        description: Id do responsável pela medição.
+      responsibleName:
+        type: string
+        example: NOME SOBRENOME
+        description: Nome do responsável pela medição.
+      statusApproval:
+        description: Código da situação de aprovação da medição. Toda medição nasce com situação *APPROVED* e somente será alterada para *DISAPPROVED* se for reprovada.
+        type: string
+        enum:
+          - APPROVED
+          - DISAPPROVED
+        example: "APPROVED"
+      authorized:
+        type: boolean
+        example: true
+        description: >-
+          Retornará verdadeiro se medição estiver autorizado, caso contrário
+          retornará falso.
+      contractSupplierId:
+        type: number
+        format: int64
+        example: 1
+        description: Id do Fornecedor do Contrato
+      contractCustomerId:
+        type: number
+        format: int64
+        example: 1
+        description: Id do Cliente do Contrato
+      consistent:
+        type: boolean
+        example: false
+        description: >-
+          Retornará verdadeiro se medição estiver consistente, caso contrário
+          retornará falso.
+      released:
+        type: boolean
+        example: false
+        description: >-
+          Retornará verdadeiro se medição estiver liberada, caso contrário retornará falso
+      finalized:
+        type: boolean
+        example: false
+        description: >-
+          Retornará verdadeiro se medição estiver finalizada, caso contrário retornará falso
+      measurementDate:
+        type: string
+        example: "2018-03-11"
+        description: "Data da medição no formato: yyyy-MM-dd."
+      dueDate:
+        type: string
+        example: "2018-09-05"
+        description: "Data de vencimento no formato: yyyy-MM-dd."
+      totalLaborValue:
+        type: number
+        format: double
+        example: 750
+        description: Total medido de Mão de Obra
+      totalMaterialValue:
+        type: number
+        format: double
+        example: 535.47
+        description: Total medido de Material
+      netValue:
+        type: number
+        format: double
+        example: 1285.47
+        description: Total Líquido
+      valueToRelease:
+        type: number
+        format: double
+        example: 375.45
+        description: Total a liberar da medição
+  Clearing:
+    type: object
+    properties:
+      documentId:
+        type: string
+        example: CT
+        description: Id do Documento
+      contractNumber:
+        type: string
+        example: 123A
+        description: Número do Contrato
+      buildingId:
+        type: integer
+        format: int64
+        example: 1
+        description: Id da Obra
+      measurementNumber:
+        type: integer
+        format: int64
+        example: 1
+        description: Número da Medição
+      securityDepositBillId:
+        type: integer
+        format: int64
+        example: 12345
+        description: Número do título da Caução
+      exchangeBillId:
+        type: integer
+        format: int64
+        example: 12345
+        description: Número do título da Permuta
+      isFinished:
+        type: boolean
+        example: true
+        description: Indica se a liberação está ou não finalizada
+      downPaymentValue:
+        type: number
+        format: double
+        example: 12.47
+        description: Valor do adiantamento
+      bills:
+        type: array
+        items:
+          $ref: "#/definitions/Bills"
+  Bills:
+    type: object
+    properties:
+      billId:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Número do título (dependendo do tipo de contrato, o título poderá ser
+          de contas a pagar ou contas a receber)
+  ObservationDTO:
+    type: object
+    properties:
+      observation:
+        type: string
+        maxLength: 300
+        example: Texto enviado via Api
+        description: Observação que será concatenada as observações de autorização e desautorização.
+  PaginatedResponseOfMeasurementAttachment:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de anexos de medição de contrato retornadas como resultado da Requisição
+        items:
+          $ref: "#/definitions/MeasurementAttachment"
+  MeasurementAttachment:
+    type: object
+    properties:
+      documentId:
+        type: string
+        example: "CT"
+        description: Sigla do código do documento de contrato
+      buildingId:
+        type: integer
+        example: 1
+        description: Id da obra
+      contractNumber:
+        type: string
+        example: "123456"
+        description: Número do contrato
+      measurementNumber:
+        type: integer
+        example: 2
+        description: Número da medição
+      attachmentNumber:
+        type: integer
+        example: 3
+        description: Número do anexo
+      name:
+        type: string
+        example: "anexo.png"
+        description: Nome do arquivo em anexo
+      description:
+        type: string
+        example: "Foto da medição 3"
+        description: Descrição do arquivo em anexo
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+
+  ApiError:
+    type: object
+    description: Objeto que encapsula os atributos de erros da API
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+      errors:
+        type: array
+        items:
+          $ref: "#/definitions/ApiExceptionFieldError"
+
+  ApiExceptionFieldError:
+    type: object
+    description: >-
+      Objeto que encapsula os atributos de erros da API referente aos dados de
+      entrada
+    required:
+      - field
+      - message
+    properties:
+      field:
+        type: string
+        description: Campo no qual foi passado o valor inválido
+      message:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API referente ao valor inválida utilizado nos dados de entrada
