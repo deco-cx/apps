@@ -53,6 +53,8 @@ export interface AudioPayload {
       num_speakers?: number;
       timestamps_granularity?: string;
       diarize?: boolean;
+      isolation_type?: string;
+      duration_seconds?: number;
       sharedVoices?: SharedVoicesOptions;
     };
   };
