@@ -258,13 +258,11 @@ export class FigmaClient {
     const response = await fetch(
       `https://api.figma.com/v1/images/${fileKey}?ids=${
         encodeURIComponent(ids)
-      }&format=png`,
+      }`,
       {
         headers: this.headers,
       },
     );
-
-    console.log(response);
 
     if (!response.ok) {
       throw new Error(
