@@ -7,7 +7,9 @@ export interface AudioModelV1 {
   readonly specificationVersion: "v1";
   readonly modelId: string;
   readonly provider: string;
-  doGenerate(options: Omit<AudioPayload, "model">): Promise<AudioResponse | SharedVoicesResponse>;
+  doGenerate(
+    options: Omit<AudioPayload, "model">,
+  ): Promise<AudioResponse | SharedVoicesResponse>;
   getAudio?(id: string): Promise<AudioResponse>;
 }
 

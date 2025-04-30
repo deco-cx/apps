@@ -170,4 +170,4 @@ export default async function getSharedVoices(
     console.error(error);
     throw error;
   }
-} 
+}
