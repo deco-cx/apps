@@ -1,0 +1,1150 @@
+swagger: "2.0"
+info:
+  title: Estoque de Insumos
+  description: API de estoque de insumos.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+paths:
+  /stock-inventories/{costCenterId}/items:
+    get:
+      operationId: getStockInvestorIdItems
+      tags:
+        - Itens em Estoque
+      summary: >-
+        Retorna um array contendo as informações atuais de todos os insumos que estão no estoque do centro de custo informado. Insumos que estão com quantidade em estoque zerada não serão retornados. Cada item do array representa o estoque para uma combinação específica de insumo, detalhe e marca, conforme a organização desses dados no Sienge.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: costCenterId
+          description: Código do centro de custo
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array contendo as informações atuais de todos os insumos que estão no estoque do centro de custo informado. Se não houver nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseResources"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não foi encontrado nenhum centro de custo com o código informado.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  /stock-inventories/{costCenterId}/items/{resourceId}/building-appropriation:
+    get:
+      operationId: getStockInvestorIdItemsIdBuildingAppropriation
+      tags:
+        - Itens em Estoque
+      summary: >-
+        Consulta as apropriações de obra do insumo em estoque no centro de custo informado
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: costCenterId
+          description: Código do centro de custo
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: resourceId
+          description: Código do insumo
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: detailId
+          description: Código do detalhe do insumo
+          required: false
+          type: integer
+          format: int32
+        - in: query
+          name: trademarkId
+          description: Código da marca do insumo
+          required: false
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array contendo a apropriação com quantidade do insumo em estoque no centro de custo informado. Se não houver nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseAppropriationResources"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Não foi encontrado nenhum centro de custo com o código informado, ou insumo com o código informado no centro de custo informado.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  /stock-reservations:
+    get:
+      operationId: getStockReservations
+      tags:
+        - Reservas de Estoque
+      summary: >-
+        Retorna um array contendo todas as reservas consistentes de forma paginada.
+      consumes:
+        - application/json
+      parameters:
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array contendo as reservas que estão no sistema de estoque e, se não existir nenhuma, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseReservations"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  /stock-reservations/{reservationId}/items:
+    get:
+      operationId: getStockReservationsIdItems
+      tags:
+        - Reservas de Estoque
+      summary: >-
+        Retorna um array contendo todos os itens da reserva de estoque informada de forma paginada.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: reservationId
+          description: Número da reserva
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array contendo todas os itens da reserva de estoque informada, se não existir nenhuma, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseReservationItems"
+        "404":
+          description: Não foi encontrado nenhuma reserva com o código informado.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  /stock-movements:
+    post:
+      operationId: postStockMovements
+      tags:
+        - Movimentos de Estoque
+      summary: >-
+        Cria um movimento de estoque de entrada ou de saída, para um ou mais insumos.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: >-
+            Informações do movimento a ser cadastrado.
+          required: true
+          schema:
+            $ref: "#/definitions/MovementPostDto"
+      responses:
+        "201":
+          description: >-
+            O movimento de estoque foi criado com sucesso.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  /stock-reservations/{reservationId}/movements:
+    post:
+      operationId: postStockReservationsIdmovements
+      tags:
+        - Reservas de Estoque
+      summary: >-
+        Cria um movimento que atende a reserva.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: reservationId
+          description: Número da reserva
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Informações do movimento a ser criado para atender a reserva.
+          required: true
+          schema:
+            $ref: "#/definitions/ReservationMovementPostDto"
+      responses:
+        "201":
+          description: >-
+            O movimento de estoque para atender a reserva foi criado com sucesso.
+          schema:
+            $ref: "#/definitions/ReservationCreatedDto"
+        "400":
+          description: >-
+            Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Reserva não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: >-
+            Entidade não processável<br/>
+            Ocorreu um dos seguintes erros: <br/><br/>
+            Item de reserva não encontrado <br/>
+            Saída não encontrada <br/>
+            Saída duplicada <br/>
+            Saldo insuficiente para saída <br/>
+            Documento válido não encontrado <br/>
+            Documento inativo
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  "/inventory-movements/{id}":
+    get:
+      tags:
+        - Movimentações de Estoque
+      summary: >-
+        Retorna uma movimentação de estoque.
+      consumes:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: >-
+            Id da movimentação de estoque.
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: >-
+            Retorna uma movimentação de estoque.
+          schema:
+            $ref: "#/definitions/GetStockMovementItemDTO"
+        "404":
+          description: Movimentação estoque não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+  /inventory-movements:
+    get:
+      tags:
+        - Movimentações de Estoque
+      summary: >-
+        Retorna uma coleção de movimentações de estoque de forma paginada.
+      consumes:
+        - application/json
+      parameters:
+        - name: documentId
+          in: query
+          description: >-
+            Id do documento do movimento de estoque.
+          required: false
+          type: string
+        - name: movementNumber
+          in: query
+          description: >-
+            Código do movimento de estoque.
+          required: false
+          type: string
+        - name: movementTypeId
+          in: query
+          description: >-
+            Código do tipo de movimento de estoque.
+          required: false
+          type: integer
+          format: int32
+        - name: startDate
+          in: query
+          description: >-
+            Data de início da busca (data do movimento de estoque) no formato: yyyy-MM-dd. Exemplo: 2018-03-01
+          required: false
+          type: string
+        - name: endDate
+          in: query
+          description: >-
+            Data de fim da busca (data do movimento de estoque) no formato: yyyy-MM-dd. Exemplo: 2018-03-11
+          required: false
+          type: string
+        - name: costCenterId
+          in: query
+          description: >-
+            Código do centro de custo do movimento de estoque.
+          required: false
+          type: integer
+          format: int32
+        - name: buildingId
+          in: query
+          description: >-
+            Código da obra do movimento de estoque.
+          required: false
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array contendo os movimentos de estoque que obedecem os parâmetros informados. Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseStockMovement"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  GetResponseResources:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/StockInventoryItemDto"
+  GetResponseAppropriationResources:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/StockInventoryItemAppropriationDto"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  StockInventoryItemDto:
+    type: object
+    description: >-
+      Representa o estoque para uma combinação específica de insumo, detalhe e marca, conforme a organização desses dados no Sienge. Como o detalhe e a marca são informações opcionais no estoque do Sienge, esses valores podem não estar preenchidos.
+    properties:
+      itemId:
+        description: Código do item.
+        type: integer
+        example: 1
+      resourceId:
+        description: Código do insumo.
+        type: integer
+        example: 1001
+      resourceDescription:
+        description: Descrição do insumo.
+        type: string
+        example: Cimento Portland
+      detailId:
+        description: Código do detalhe. Pode ser null.
+        type: integer
+        example: 3
+      detailDescription:
+        description: Descrição do detalhe. Pode ser null.
+        type: string
+        example: CP II-E-32
+      trademarkId:
+        description: Código da marca. Pode ser null.
+        type: integer
+        example: 42
+      trademarkDescription:
+        description: Descrição da marca. Pode ser null.
+        type: string
+        example: ACME SA
+      quantity:
+        description: Quantidade em estoque.
+        type: number
+        example: 3000.2348
+      unitOfMeasure:
+        description: Símbolo da unidade de medida básica do insumo (que é a unidade utilizada no controle de estoque).
+        type: string
+        example: kg
+      averagePrice:
+        description: Custo médio (preço médio).
+        type: number
+        example: 0.44
+  StockInventoryItemAppropriationDto:
+    type: object
+    description: >-
+      Representa a apropriação de um insumo em estoque, segregado por detalhe e marca.
+    properties:
+      buildingUnitId:
+        description: Código da unidade construtiva da obra.
+        type: integer
+        format: int64
+        example: 1
+      sheetItemId:
+        description: Identificador do item de orçamento. Deve referenciar um item de orçamento já cadastrado no Sienge, na respectiva planilha de orçamento (considerando a obra do centro de custo do movimento e a unidade construtiva informada). Além disso, o item de orçamento não pode estar bloqueado para apropriações e não pode estar duplicado dentro do mesmo item de movimento.
+        type: integer
+        example: 42
+      costEstimationItemReference:
+        description: "Referência do item do orçamento"
+        type: string
+        example: "08.004.001"
+      quantity:
+        description: Quantidade apropriada do insumo.
+        type: number
+        format: double
+        example: 5.20
+  GetResponseReservations:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/StockReservationDto"
+  StockReservationDto:
+    type: object
+    description: >-
+      Dados da reserva.
+    properties:
+      id:
+        description: Número da reserva no Sienge.
+        type: integer
+        example: 223
+      responsible:
+        type: object
+        description: Responsável pela reserva.
+        properties:
+          id:
+            type: integer
+            description: Código do responsável.
+            example: 42
+          name:
+            type: string
+            description: Nome do responsável.
+            example: Guilherme da Silva
+      reservationDate:
+        description: Data da reserva no formato YYYY-MM-DD de acordo com a norma ISO 8601.
+        type: string
+        example: "2020-04-28"
+      movementType:
+        type: object
+        description: Tipo de movimento.
+        properties:
+          id:
+            description: Código do tipo de movimento.
+            type: integer
+            example: 3
+          description:
+            description: Descrição do tipo de movimento.
+            type: string
+            example: Transferência
+      sourceCostCenter:
+        type: object
+        description: Centro de custo de origem.
+        properties:
+          id:
+            description: Código do centro de custo.
+            type: integer
+            example: 1
+          description:
+            description: Nome do centro de custo.
+            type: string
+            example: "Taj Mahal"
+      destinationCostCenter:
+        type: object
+        description: Centro de custo de destino.
+        properties:
+          id:
+            description: Código do centro de custo.
+            type: integer
+            example: 6
+          description:
+            description: Nome do centro de custo.
+            type: string
+            example: "Torre Eifel"
+      status:
+        description: Situação da reserva.
+        type: string
+        example: PENDING
+        enum:
+          - PENDING
+          - PARTIALLY_FULFILLED
+          - FULFILLED
+          - CANCELLED
+      notes:
+        description: Observações do movimento.
+        type: string
+        example: "Lorem ipsum dolor sit amet."
+      createdBy:
+        description: Código do Usuário que cadastrou a reserva.
+        type: string
+        example: "JOAO"
+      createdAt:
+        description: Data e hora da criação da reserva no formato yyyy-MM-ddTHH:mm:ss.SSSXXX de acordo com a norma ISO 8601.
+        type: string
+        example: "2020-11-24T14:20:00.000-03:00"
+      modifiedBy:
+        description: Código do último usuário que modificou a reserva.
+        type: string
+        example: "MARIANA"
+      modifiedAt:
+        description: Data e hora da modificação da reserva no formato yyyy-MM-ddTHH:mm:ss.SSSXXX de acordo com a norma ISO 8601.
+        type: string
+        example: "2020-11-24T14:20:00.000-03:00"
+  GetResponseStockMovement:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/GetStockMovementDTO"
+  GetStockMovementDTO:
+    type: object
+    description: >-
+      Dados da movimentação de estoque
+    properties:
+      id:
+        description: Identificador único e imutável do movimento de estoque.
+        type: integer
+        example: 1
+      documentId:
+        description: Código do documento do movimento de estoque.
+        type: string
+        example: DOC
+      movementNumber:
+        description: Código do movimento de estoque.
+        type: string
+        example: 10
+      series:
+        description: Número de série da nota fiscal, quando o movimento de estoque for oriúndo de nota fiscal.
+        type: string
+        example: 567
+      movementTypeId:
+        description: Código do tipo de movimento de estoque
+        type: integer
+        example: 1
+      movementTypeDescription:
+        description: Descrição do tipo de movimento de estoque
+        type: string
+        example: COMPRA
+      inputOutput:
+        description: Informa se o movimento de estoque é uma entrada ou uma saída de estoque.
+        type: string
+        example: INPUT
+      movementDate:
+        description: Data do movimento de estoque no formato YYYY-MM-DD de acordo com a norma ISO 8601.
+        type: string
+        example: 2024-01-01
+      costCenterId:
+        description: Código do centro de custo do movimento de estoque.
+        type: integer
+        example: 1001
+      buildingId:
+        description: Código da obra do movimento de estoque.
+        type: integer
+        example: 100101
+      resourceId:
+        description: Código do insumo do movimento de estoque.
+        type: integer
+        example: 20
+      resourceDescription:
+        description: Descrição do insumo do movimento de estoque.
+        type: string
+        example: Insumo teste
+      detailId:
+        description: Código do detalhe do insumo do movimento de estoque.
+        type: integer
+        example: 3
+      detailDescription:
+        description: Descrição do detalhe do insumo do movimento de estoque.
+        type: string
+        example: Detalhe do insumo teste
+      trademarkId:
+        description: Código da marca do insumo do movimento de estoque.
+        type: string
+        example: 5
+      trademarkDescription:
+        description: Descrição da marca do insumo do movimento de estoque.
+        type: string
+        example: Marca do insumo teste
+      movementQuantity:
+        description: Quantidade do insumo movimentada no movimento de estoque.
+        type: number
+        example: 50
+      movementValue:
+        description: Valor do movimento de estoque.
+        type: number
+        example: 60.5
+      unitOfMeasure:
+        description: Unidade de medida do movimento de estoque
+        type: string
+        example: Metros
+      supplierId:
+        description: Código fornecedor do movimento de estoque
+        type: integer
+        example: 5
+      supplierName:
+        description: Nome fornecedor do movimento de estoque
+        type: string
+        example: Fornecedor
+
+  GetStockMovementItemDTO:
+    type: object
+    description: >-
+      Dados da movimentação de estoque
+    properties:
+      id:
+        description: Identificador único e imutável do movimento de estoque.
+        type: integer
+        example: 1
+      documentId:
+        description: Código do documento do movimento de estoque.
+        type: string
+        example: DOC
+      movementNumber:
+        description: Código do movimento de estoque.
+        type: string
+        example: 10
+      series:
+        description: Número de série da nota fiscal, quando o movimento de estoque for oriúndo de nota fiscal.
+        type: string
+        example: 567
+      movementTypeId:
+        description: Código do tipo de movimento de estoque
+        type: integer
+        example: 1
+      movementTypeDescription:
+        description: Descrição do tipo de movimento de estoque
+        type: string
+        example: COMPRA
+      inputOutput:
+        description: Informa se o movimento de estoque é uma entrada ou uma saída de estoque.
+        type: string
+        example: INPUT
+      movementDate:
+        description: Data do movimento de estoque no formato YYYY-MM-DD de acordo com a norma ISO 8601.
+        type: string
+        example: 2024-01-01
+      costCenterId:
+        description: Código do centro de custo do movimento de estoque.
+        type: integer
+        example: 1001
+      buildingId:
+        description: Código da obra do movimento de estoque.
+        type: integer
+        example: 100101
+      resourceId:
+        description: Código do insumo do movimento de estoque.
+        type: integer
+        example: 20
+      resourceDescription:
+        description: Descrição do insumo do movimento de estoque.
+        type: string
+        example: Insumo teste
+      detailId:
+        description: Código do detalhe do insumo do movimento de estoque.
+        type: integer
+        example: 3
+      detailDescription:
+        description: Descrição do detalhe do insumo do movimento de estoque.
+        type: string
+        example: Detalhe do insumo teste
+      trademarkId:
+        description: Código da marca do insumo do movimento de estoque.
+        type: string
+        example: 5
+      trademarkDescription:
+        description: Descrição da marca do insumo do movimento de estoque.
+        type: string
+        example: Marca do insumo teste
+      movementQuantity:
+        description: Quantidade do insumo movimentada no movimento de estoque.
+        type: number
+        example: 50
+      movementValue:
+        description: Valor do movimento de estoque.
+        type: number
+        example: 60.5
+      unitOfMeasure:
+        description: Unidade de medida do movimento de estoque
+        type: string
+        example: Metros
+      supplierId:
+        description: Código fornecedor do movimento de estoque
+        type: integer
+        example: 5
+      supplierName:
+        description: Nome fornecedor do movimento de estoque
+        type: string
+        example: Fornecedor
+      sourceId:
+        description: >-
+          Código identificador da origem da movimentação de estoque.
+          No caso de a movimentação ser originada de um movimento de estoque,
+          o identificador é o resultado de uma concatenação entre o código do documento, o número do movimento e o número do item do movimento.
+        type: string
+        example: NF/12575/15
+      sourceType:
+        description: Descrição da origem da movimentação de estoque.
+        type: string
+        enum:
+          - NOTA_FISCAL_COMPRA
+          - MOVIMENTO_ESTOQUE
+        example: MOVIMENTO_ESTOQUE
+
+  GetResponseReservationItems:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/StockReservationItemDto"
+  StockReservationItemDto:
+    type: object
+    description: >-
+      Dados do item da reserva.
+    properties:
+      itemId:
+        description: Identificador único e imutável do item de reserva.
+        type: integer
+        example: 3
+      resource:
+        description: Dados do insumo.
+        type: object
+        properties:
+          id:
+            description: Código do insumo.
+            type: integer
+            example: 1001
+          description:
+            description: Descrição do insumo.
+            type: string
+            example: Cimento Portland
+          detail:
+            description: Detalhe do insumo. Pode ser null.
+            type: object
+            properties:
+              id:
+                description: Código do detalhe.
+                type: integer
+                example: 3
+              description:
+                description: Descrição do detalhe.
+                type: string
+                example: CP II-E-32
+          trademark:
+            description: Marca do insumo. Pode ser null.
+            type: object
+            properties:
+              id:
+                description: Código da marca.
+                type: integer
+                example: 42
+              description:
+                description: Descrição da marca.
+                type: string
+                example: ACME SA
+      destinationResource:
+        example:
+          id: 1001
+          description: Areia
+        description: >-
+          Dados do insumo destino. Pode ser null.
+          Este campo só será preenchido caso seja uma reserva para transferência entre obras com diferentes tabelas de insumo. Nesses casos, esse campo conterá os dados do insumo na obra destino.
+        type: object
+        properties:
+          id:
+            description: Código do insumo.
+            type: integer
+            example: 1001
+          description:
+            description: Descrição do insumo.
+            type: string
+            example: Cimento Portland
+          detail:
+            description: Detalhe do insumo. Pode ser null.
+            type: object
+            properties:
+              id:
+                description: Código do detalhe.
+                type: integer
+                example: 3
+              description:
+                description: Descrição do detalhe.
+                type: string
+                example: CP II-E-32
+          trademark:
+            description: Marca do insumo. Pode ser null.
+            type: object
+            properties:
+              id:
+                description: Código da marca.
+                type: integer
+                example: 42
+              description:
+                description: Descrição da marca.
+                type: string
+                example: ACME SA
+      quantity:
+        description: Quantidade reservada para este insumo.
+        type: number
+        example: 33.4444
+      unitOfMeasure:
+        description: Símbolo da unidade de movimento a qual a quantidade se refere.
+        type: string
+        example: kg
+      notes:
+        description: Observações do item de reserva. Pode ser null.
+        type: string
+        example: "Lorem ipsum dolor sit amet."
+      deliveries:
+        description: Saídas da reserva.
+        type: array
+        items:
+          $ref: "#/definitions/DeliveryDto"
+  DeliveryDto:
+    type: object
+    description: Dados da saída para um insumo.
+    properties:
+      date:
+        description: Data da saída no formato YYYY-MM-DD de acordo com a norma ISO 8601.
+        type: string
+        example: "2020-04-28"
+      quantity:
+        description: Quantidade da saída.
+        type: number
+        example: 4.2222
+      deliveredQuantity:
+        description: Quantidade atendida para esta saída.
+        type: number
+        example: 2.1111
+      cancelled:
+        description: >-
+          Indica que o saldo restante* desta saída foi cancelada.
+
+
+          *(quantidade da saída - quantidade atendida)
+        type: boolean
+        example: false
+  MovementPostDto:
+    type: object
+    description: >-
+      Informações para inclusão de um movimento de estoque que pode ser de entrada ou de saída. O que vai determinar se o movimento é de entrada ou de saída, é o tipo de movimento que é informado no campo movementTypeId. O movimento cadastrado representa a entrada ou saída de estoque de um ou mais insumos.
+    properties:
+      documentId:
+        description: Código do (tipo de) documento. Deve referenciar um documento já cadastrado no Sienge.
+        type: string
+        example: "CONS"
+      movementNumber:
+        description: Número do movimento. Aceita valores com no máximo 12 caracteres.
+        type: string
+        example: "132"
+      movementDate:
+        description: Data do movimento no formato YYYY-MM-DD de acordo com a norma ISO 8601.
+        type: string
+        example: "2020-04-28"
+      movementTypeId:
+        description: Código do tipo de movimento. Deve referenciar um tipo de movimento ativo, já cadastrado no Sienge. É o tipo de movimento informado aqui que vai determinar se o movimento que está sendo criado é de entrada ou de saída, pois isso já estará definido no próprio cadastro do tipo de movimento. Apenas tipos de movimento que são exclusivamente de entrada ou de saída serão aceitos aqui. Ou seja, tipos que referem-se à movimentos que são simultaneamente de entrada e saída, como transferências ou realocações de estoque, não serão aceitos.
+        type: integer
+        example: 2
+      costCenterId:
+        description: Código do centro de custo do movimento. Deve referenciar um centro de custo já cadastrado no Sienge.
+        type: integer
+        example: 47
+      departmentId:
+        description: Código do departamento do movimento. Deve referenciar um departamento já cadastrado no Sienge. Essa informação só será armazenada nos movimentos do tipo "Devolução". Além disso, de acordo com as configurações definidas no parâmetro 293 do Sienge, esse campo pode ou não ser obrigatório para movimentos de devolução.
+        type: integer
+        example: 3
+      notes:
+        description: Observações do movimento. Campo opcional.
+        type: string
+        example: "Lorem ipsum dolor sit amet."
+      items:
+        description: Array com os itens (insumos) que estão sendo movimentados. Deve ser informado pelo menos um item.
+        type: array
+        items:
+          $ref: "#/definitions/MovementItemPostDto"
+  MovementItemPostDto:
+    type: object
+    description: >-
+      Informações de um insumo (combinação de insumo, detalhe e marca) que está sendo movimentado no estoque.
+    properties:
+      resourceId:
+        description: Código do insumo. Deve referenciar um insumo ativo, já cadastrado no Sienge, na obra do respectivo centro de custo do movimento.
+        type: integer
+        example: 1001
+      detailId:
+        description: Código do detalhe. Campo opcional. Se for preenchido, deve referenciar um detalhe ativo, já cadastrado no Sienge, associado ao respectivo insumo da obra.
+        type: integer
+        example: 3
+      trademarkId:
+        description: Código da marca. Campo opcional. Se for preenchido, deve referenciar uma marca ativa, já cadastrada no Sienge, associada ao respectivo insumo da obra.
+        type: integer
+        example: 18
+      quantity:
+        description: Quantidade movimentada do insumo, referindo-se à unidade de movimento que está sendo informada (ex. sacos, unidades, quilos etc.). Aceita apenas números maiores que zero, com até 4 casas decimais.
+        type: number
+        example: 3000.2348
+      unitPrice:
+        description: Preço unitário do insumo. Em movimentos de entrada o preço é obrigatorio, em movimentos de saída este campo é desconsiderado, pois considerará o preço existente no Sienge. Aceita apenas valores maiores que zero, com até 4 casas decimais.
+        type: number
+        example: 200.4321
+      unitOfMeasure:
+        description: Símbolo da unidade de movimento a qual a quantidade se refere. Deve referenciar uma unidade de movimento ativa, já cadastrada no Sienge, associada ao respectivo insumo da obra.
+        type: string
+        example: sc
+      buildingAppropriations:
+        description: >-
+          Apropriações de obra do insumo que está sendo movimentado. Esse conjunto de itens representa um rateio da quantidade movimentada do insumo, entre um ou mais itens do orçamento da obra do centro de custo do movimento. Os itens de orçamento referenciados em cada item de apropriação devem ser do nível (na estrutura analítica do orçamento) correspondente ao nível de apropriação definido na respectiva obra (por exemplo: etapa, subetapa, serviço etc.). Importante: se a obra do movimento possuir nível de apropriação definido como "obra", este campo não deve ser preenchido, ou o array deve estar vazio, já que nesses casos não pode haver apropriação a nível de itens de orçamento.
+
+          Caso o parâmetro 833 estiver configurado como apropriação automática, as apropriações serão aplicadas automaticamente para os itens de saída conforme descrição acima.
+        type: array
+        items:
+          $ref: "#/definitions/BuildingAppropriationItemPostDto"
+  BuildingAppropriationItemPostDto:
+    type: object
+    description: >-
+      Item que faz parte de um conjunto de apropriações de obra de um insumo movimentado. Referencia um item do orçamento de obra, com o respectivo percentual de rateio.
+    properties:
+      buildingUnitId:
+        description: Código da unidade construtiva. Deve referenciar uma unidade construtiva já cadastrada no Sienge, na obra do respectivo centro de custo do movimento e que esteja com a situação "Liberada".
+        type: integer
+        example: 2
+      sheetItemId:
+        description: Identificador do item de orçamento. Deve referenciar um item de orçamento já cadastrado no Sienge, na respectiva planilha de orçamento (considerando a obra do centro de custo do movimento e a unidade construtiva informada). Além disso, o item de orçamento não pode estar bloqueado para apropriações e não pode estar duplicado dentro do mesmo item de movimento.
+        type: integer
+        example: 42
+      percentage:
+        description: Percentual de rateio do respectivo item de orçamento nas apropriações de obra do insumo. Deve ser um número maior que zero, menor ou igual a 100, com precisão de até 12 casas decimais. A soma dos percentuais de todos os itens de apropriação de um insumo movimentado deve ser igual a 100.
+        type: number
+        example: 100.000000000000
+  ReservationMovementPostDto:
+    type: object
+    properties:
+      documentId:
+        description: Código do (tipo de) documento. Deve referenciar um documento já cadastrado no Sienge.
+        type: string
+        example: "CONS"
+      movementNumber:
+        description: Número do movimento. Aceita valores com no máximo 12 caracteres. Não pode existir um movimento com a mesma combinação documento/número. Caso o campo não seja informado será gerado um número para o movimento.
+        type: string
+        example: "132"
+      sourceDepartmentId:
+        description: >-
+          Código do departamento para apropriação de origem. Deve referenciar um departamento já cadastrado no Sienge. Essa informação só será armazenada em reservas de entrada e saída (exemplo transferência). Além disso, de acordo com as configurações definidas no parâmetro 293 do Sienge, esse campo pode ou não ser obrigatório.
+        type: integer
+        example: 3
+      destinationDepartmentId:
+        description: >-
+          Código do departamento para apropriação de destino. Deve referenciar um departamento já cadastrado no Sienge. Essa informação só será armazenada em reservas de entrada e saída (exemplo transferência). Além disso, de acordo com as configurações definidas no parâmetro 293 do Sienge, esse campo pode ou não ser obrigatório.
+        type: integer
+        example: 3
+      items:
+        description: Lista de insumos da reserva que estarão no movimento a ser gerado.
+        type: array
+        items:
+          description: Dados do insumo e de suas saídas que estarão no movimento a ser gerado.
+          type: object
+          properties:
+            itemId:
+              description: Identificador único e imutável do item de reserva.
+              type: integer
+              example: 3
+            deliveries:
+              description: Lista de saídas que serão atendidas.
+              type: array
+              items:
+                description: Dados do atendimento da saída.
+                type: object
+                properties:
+                  date:
+                    description: Data da saída no formato YYYY-MM-DD de acordo com a norma ISO 8601.
+                    type: string
+                    example: "2020-04-28"
+                  movementAmount:
+                    description: Quantidade atendida pelo movimento para esta saída. Deve ser maior que 0 e não pode ser maior que o valor disponível nesta saída. Com precisão de até 4 casas decimais.
+                    type: number
+                    example: 4.2222
+            buildingAppropriations:
+              description: >-
+                Apropriações de obra origem do insumo que está sendo movimentado. Esse conjunto de itens representa um rateio da quantidade movimentada do insumo, entre um ou mais itens do orçamento da obra do centro de custo do movimento. Os itens de orçamento referenciados em cada item de apropriação devem ser do nível (na estrutura analítica do orçamento) correspondente ao nível de apropriação definido na respectiva obra (por exemplo: etapa, subetapa, serviço etc.). Importante: se a obra do movimento possuir nível de apropriação definido como "obra", este campo não deve ser preenchido, ou o array deve estar vazio, já que nesses casos não pode haver apropriação a nível de itens de orçamento.
+              type: array
+              items:
+                $ref: "#/definitions/BuildingAppropriationItemPostDto"
+            destinationBuildingAppropriations:
+              description: >-
+                Apropriações da obra destino. Este campo deve ser preenchido somente quando o movimento for do tipo entrada e saída (exemplo: transferência) e a obra destino exigir apropriação em itens de orçamento (exemplo: etapa, subetapa, serviço etc.). Caso contrário, este campo não deve ser preenchido ou o array deve estar vazio.
+              type: array
+              items:
+                $ref: "#/definitions/BuildingAppropriationItemPostDto"
+  ReservationCreatedDto:
+    type: object
+    properties:
+      documentId:
+        description: Código do (tipo de) documento.
+        type: string
+        example: "CONS"
+      movementNumber:
+        description: Número do movimento.
+        type: string
+        example: "132"
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

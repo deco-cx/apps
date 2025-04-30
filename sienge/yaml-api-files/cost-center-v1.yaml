@@ -1,0 +1,294 @@
+swagger: "2.0"
+info:
+  description: API de centro de custos.
+  version: 1.0.0
+  title: Centro de Custos
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Cost Centers
+    description: API para listagem de centro de custos
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/cost-centers/{costCenterId}":
+    get:
+      tags:
+        - cost-centers
+      summary: Busca todos os centros de custo no Sienge
+      operationId: getCostCenter
+      parameters:
+        - name: costCenterId
+          in: path
+          description: Código do centro de custo a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Centro de custo encontrado
+          schema:
+            $ref: "#/definitions/DetailedCostCenter"
+        "404":
+          description: Centro de custo não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/cost-centers/{costCenterId}/available":
+    get:
+      tags:
+        - cost-centers
+      summary: Busca centro de custo no Sienge com as contas correntes disponíveis
+      operationId: getCostCenterAvailable
+      parameters:
+        - name: costCenterId
+          in: path
+          description: Código do centro de custo a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Centro de custo encontrado
+          schema:
+            $ref: "#/definitions/DetailedCostCenterAvailable"
+        "404":
+          description: Centro de custo não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /cost-centers:
+    get:
+      tags:
+        - cost-centers
+      summary: Busca todos os centros de custos no Sienge ordenados pelo codigo id
+      operationId: getAllCostCenters
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Credor encontrado
+          schema:
+            $ref: "#/definitions/GetResponseCostCenters"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/cost-centers/immediate-register-settings":
+    get:
+      tags:
+        - immediate-register-settings
+      summary: Busca as configurações de registro ATO cadastradas no centro de custo.
+      operationId: getImmediateRegisterSettings
+      parameters:
+        - name: costCenterId
+          in: query
+          description: Código do centro de custo
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Configurações de registro ATO encontradas
+          schema:
+            $ref: "#/definitions/ImmediateRegisterSettings"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "404":
+          description: Configurações de registro ATO não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  CostCenter:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do centro de custo
+      name:
+        type: string
+        description: Nome do centro de custo
+      idCompany:
+        type: integer
+        format: int32
+        description: Código da empresa relacionada ao centro de custos
+      cnpj:
+        type: string
+        description: CNPJ do centro de custos
+  ImmediateRegisterSettings:
+    type: object
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: Código do centro de custo
+      companyId:
+        type: integer
+        format: int32
+        description: Código da empresa
+      accountNumber:
+        type: string
+        description: Número da conta corrente
+      registerType:
+        type: string
+        description: Tipo de registro
+      receiveCondition:
+        type: string
+        description: Condição de recebimento
+  DetailedCostCenter:
+    type: object
+    allOf:
+      - $ref: "#/definitions/CostCenter"
+    properties:
+      buildingSectors:
+        type: array
+        items:
+          $ref: "#/definitions/BuildingSector"
+  DetailedCostCenterAvailable:
+    type: object
+    allOf:
+      - $ref: "#/definitions/CostCenter"
+    properties:
+      availables:
+        type: array
+        items:
+          $ref: "#/definitions/Available"
+  BuildingSector:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Código do setor/obra
+      name:
+        type: string
+        description: Nome do do setor/obra
+      accountableId:
+        type: string
+        description: Código do responsável do setor/obra
+      accountableName:
+        type: string
+        description: Nome do responsável do setor/obra
+  GetResponseCostCenters:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Centro de Custos retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/CostCenters"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  CostCenters:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do centro de custos
+      name:
+        type: string
+        description: Nome do centro de custos
+      idCompany:
+        type: integer
+        format: int32
+        description: Código da empresa relacionada ao centro de custos
+      cnpj:
+        type: string
+        description: CNPJ do centro de custos
+  Available:
+    type: object
+    properties:
+      accountNumber:
+        type: string
+        description: código da conta corrente disponível
+      accountName:
+        type: string
+        description: nome da conta corrente disponível
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

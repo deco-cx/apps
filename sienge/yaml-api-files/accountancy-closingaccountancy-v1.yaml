@@ -1,0 +1,183 @@
+swagger: "2.0"
+info:
+  description: API para consulta de fechamento contábil da contabilidade.
+  version: "1.0"
+  title: Fechamento Contábil (Contabilidade)
+host: "api.sienge.com.br"
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: "Saldos Consolidados Atualizados"
+    description: "API de Saldos Consolidados Atualizados."
+schemes:
+  - "https"
+security:
+  - basicAuth: []
+paths:
+  /closingaccountancy:
+    get:
+      tags:
+        - "Saldos Consolidados Atualizados"
+      description: "Busca empresas com saldos consolidados atualizados"
+      operationId: getClosingAccountancy
+      parameters:
+        - name: companyId
+          in: query
+          type: integer
+          description: "Código da empresa"
+        - name: accountId
+          in: query
+          type: string
+          description: Código contábil ou código reduzido da conta
+        - name: monthYear
+          in: query
+          type: string
+          required: true
+          format: "monthYear (Formato ISO 8601 MM-yyyy)"
+          description: "Período do saldo consolidado (mês/ano)."
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor máximo permitido é 200.
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: "Saldo consolidado encontrado"
+          schema:
+            $ref: "#/definitions/PaginationResultEntry"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+securityDefinitions:
+  basicAuth:
+    description: "HTTP Basic Authentication. Works over `HTTP` and `HTTPS`"
+    type: "basic"
+definitions:
+  Entry:
+    type: "object"
+    required:
+      - "monthYear"
+    properties:
+      companyId:
+        type: integer
+        format: int32
+        description: "Código da empresa"
+      id:
+        type: integer
+        format: int32
+        description: "Código reduzido da conta"
+      accountId:
+        type: string
+        description: "Código contábil da conta"
+      previousBalance:
+        type: number
+        format: double
+        description: "Saldo anterior"
+      previousBalanceType:
+        type: string
+        description: "Tipo saldo anterior"
+      debitBalance:
+        type: number
+        format: double
+        description: "Valor saldo debito"
+      creditBalance:
+        type: number
+        format: double
+        description: "Valor saldo crédito"
+      balanceCarriedForward:
+        type: number
+        format: double
+        description: "Valor saldo final"
+      balanceCarriedForwardType:
+        type: string
+        description: "Tipo valor saldo final"
+      monthYear:
+        type: string
+        description: "Período do saldo consolidado (mês/ano)"
+  ApiError:
+    type: "object"
+    required:
+      - "developerMessage"
+      - "status"
+    properties:
+      status:
+        type: "number"
+        description: "Status http"
+      developerMessage:
+        type: "string"
+        description:
+          "Mensagem de erro pertinente a ser reportada ao developer consumidor\
+          \ da API."
+      clientMessage:
+        type: "string"
+        description:
+          "Mensagem de erro relevante ao utilizador\
+          \ final"
+    description: "Objeto que encapsula os atributos de erros da API"
+  PaginationResultEntry:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de saldos consolidados que foram atualizados.
+        items:
+          $ref: "#/definitions/EntryResponse"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        default: 0
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  EntryResponse:
+    allOf:
+      - $ref: "#/definitions/Entry"

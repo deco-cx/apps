@@ -1,0 +1,427 @@
+swagger: "2.0"
+info:
+  title: Insumos da Obra
+  description: API Bulk Data de Insumos da Obra
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+paths:
+  "/building/resources":
+    get:
+      operationId: getBuildingResources
+      tags:
+        - Insumos
+      summary: >-
+        Retorna um array dos Insumos associados à uma Obra por detalhe e marca.
+        Observação: Não serão retornados os Insumos do tipo Item de Transporte e Item de Incidência.
+      consumes:
+        - application/json
+      parameters:
+        - name: buildingId
+          in: query
+          description: >-
+            Código de obra.
+          required: true
+          type: integer
+          format: int32
+        - name: startDate
+          in: query
+          description: >-
+            Data de início, somente aplicado nas Apropriações Atendidas.
+          required: true
+          type: string
+          format: yyyy-MM-dd
+        - name: endDate
+          in: query
+          description: >-
+            Data de Término, somente aplicado nas Apropriações Atendidas.
+          required: true
+          type: string
+          format: yyyy-MM-dd
+        - name: resourcesIds
+          in: query
+          description: >-
+            Códigos dos Insumos a serem consultados.
+            Cada código deve ser um número inteiro, positivo e com, no máximo, 5 dígitos.
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: includeDisbursement
+          in: query
+          description: >-
+            Parâmetro para trazer os desembolsos dos insumos associados à composição dos Itens de Orçamento. Não serão apresentadas informações de desembolso para Itens do Orçamento com preço informado.
+            Esse parâmetro é falso como padrão.
+          required: false
+          type: boolean
+          default: false
+        - name: bdi
+          in: query
+          description: >-
+            Tipo de BDI ou percentual específico a ser utilizado no cálculo dos preços orçados.
+
+            - Para o tipo de BDI os valores válidos são:
+              - BUILDING (Obra)
+              - RESOURCE_GROUPS (Grupos de insumo)
+            - Para um percentual específico de BDI informar um valor numérico no formato "###.##" entre 0.00 e 999.99.
+          required: false
+          type: string
+          default: "0.00"
+        - name: laborBurden
+          in: query
+          description: >-
+            Tipo de encargos sociais ou percentual específico a ser utilizado no cálculo dos preços orçados.
+
+            - Para o tipo de encargos sociais os valores válidos são:
+              - BUILDING (Obra)
+              - RESOURCE_GROUPS (Grupos de insumo)
+            - Para um percentual específico de encargos sociais informar um valor numérico no formato "###.##" entre 0.00 e 999.99.
+          required: false
+          type: string
+          default: "0.00"
+      responses:
+        "200":
+          description: >-
+            Retorna um array dos Insumos associados à uma Obra por detalhe e marca.
+            Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/ResponseBulkDataBuildingResource"
+        "404":
+          description: Obra não encontrada.
+          schema:
+            $ref: "#/definitions/ApiError"
+        "400":
+          description: Requisição mal formada. Pode ocorrer em casos onde a data final é anterior à data inicial ou o valor informado para BDI e/ou encargos sociais é inválido;
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    description: Objeto que encapsula os atributos de erros da API
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: string
+        description: Mensagem de erro
+  ResponseBulkDataBuildingResource:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/BuildingResourceDto"
+  BuildingResourceDto:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Código do Insumo.
+        example: 1
+      buildingId:
+        type: integer
+        description: Código da Obra.
+        example: 7
+      buildingName:
+        type: string
+        description: Nome da Obra.
+        example: Condomínio da Felicidade
+      description:
+        type: string
+        description: Descrição do Insumo.
+        example: Cimento
+      unitOfMeasure:
+        type: string
+        description: Unidade de Medida.
+        example: kg
+      unitPrice:
+        type: number
+        description: Preço Unitário, com precisão de 4 casas decimais.
+        example: 40.1236
+      priceDate:
+        type: string
+        description: Data do preço.
+        example: "2022-01-01"
+      priceCategory:
+        type: string
+        description: Tipo de preço. [CALCULATED, INFORMED_BY_UNIT_PRICE, COMPOSITE, INFORMED_BY_HOUR].
+        example: INFORMED_BY_UNIT_PRICE
+      resourceCode:
+        type: string
+        description: Código auxiliar.
+        example: MA001
+      category:
+        type: string
+        description: Tipo do Insumo [EQUIPMENT, LABOR, MATERIAL, OTHER, OFFICE_SUPPLY, FUELS_AND_LUBRICANTS, MAINTENANCE_MATERIAL].
+        example: MATERIAL
+      resourceGroup:
+        type: string
+        description: Descrição Grupo de Insumo.
+        example: Materiais de Consumo
+      synonym:
+        type: string
+        description: Sinônimos do Insumo.
+        example: cimento, massa, concreto
+      financialCategory:
+        type: string
+        description: Descrição da Conta Financeira.
+        example: Orçamento empresarial
+      taxClassification:
+        type: string
+        description: Classificação Fiscal.
+        example: CM001
+      productTax:
+        type: string
+        description: Descrição do Produto Fiscal.
+        example: Argamassa Pré-fabricada de Cimento
+      isActive:
+        type: boolean
+        description: Situação do Insumo (Ativo = true, Inativo = false).
+        example: true
+      detailId:
+        type: integer
+        description: Id do Detalhe.
+        example: 1
+      detailDescription:
+        type: string
+        description: Descrição do Detalhe.
+        example: CP II E 32
+      trademarkId:
+        type: integer
+        description: Id da Marca.
+        example: 1
+      trademarkDescription:
+        type: string
+        description: Descrição da Marca.
+        example: ACME
+      minimumStock:
+        type: number
+        description: Estoque mínimo.
+        example: 20
+      maximumStock:
+        type: number
+        description: Estoque máximo.
+        example: 200
+      estimatedDeliveryTime:
+        type: integer
+        description: Tempo de entrega estimado em dias.
+        example: 2
+      hasServiceFeature:
+        type: boolean
+        description: Insumo com característica de Serviço para Desembolso.
+        example: true
+      deliveryInterval:
+        type: integer
+        description: Intervalo de entregas em dias para Desembolso.
+        example: 15
+      installments:
+        type: array
+        description: Parcelas.
+        items:
+          $ref: "#/definitions/InstallmentDto"
+      movementUnits:
+        type: array
+        description: Unidades de Movimento.
+        items:
+          $ref: "#/definitions/MovementUnitDto"
+      notes:
+        type: array
+        description: Observações do Insumo.
+        items:
+          $ref: "#/definitions/NoteDto"
+      buildingCostEstimationItems:
+        type: array
+        description: >-
+          Itens do Orçamento onde o Insumo está contido.
+        items:
+          $ref: "#/definitions/CostEstimateResourceDto"
+      disbursements:
+        type: array
+        description: >-
+          Relação de desembolsos do insumo. Cada item possui o ano, mês, valor e quantidade do desembolso.
+          O cálculo de desembolso vai considerar percentuais de execução dos serviços.
+          Quando a definição do custo da tarefa no planejamento estiver incompleta, valor e quantidade dos desembolsos podem ser menores que as que constam no orçamento. A diferença também pode ser observada no "Relatório de Composições dos Custos da Tarefa".
+        items:
+          $ref: "#/definitions/DisbursementDto"
+      remainingDisbursement:
+        description: Desembolso restante ou não vinculado no período. Valor que não pôde ser associado a um mês de execução.
+          Cenário pode acontecer quando o intervalo de entrega do insumo é maior do que o período de planejamento que ele está vinculado. Pode ocorrer também quando pula um mês que tem execução. Valor monetário.
+        type: number
+        example: 0.00
+      buildingAppropriations:
+        type: object
+        description: Apropriações de Obra do Insumo.
+        properties:
+          pending:
+            type: array
+            description: >-
+              Apropriações pendentes são compostas por saldos de pedidos de compras e saldos de contratos do suprimentos. Os retornos serão em conformidade com a regra de negócio que já existe, conforme "Relatório de Apropriações de Insumos".
+            items:
+              $ref: "#/definitions/BuildingAppropriationDto"
+          attended:
+            type: array
+            description: >-
+              Apropriações atendidas são compostas por notas fiscais de compra e medições registradas. Os retornos serão em conformidade com a regra de negócio que já existe, conforme "Relatório de Apropriações de Insumos".
+            items:
+              $ref: "#/definitions/BuildingAppropriationDtoNF"
+  NoteDto:
+    type: object
+    properties:
+      description:
+        type: string
+        description: Descrição
+        example: Observação teste
+  MovementUnitDto:
+    type: object
+    properties:
+      unitOfMeasureSymbol:
+        type: string
+        description: Unidade de medida.
+        example: sc
+      unitOfMeasureDescription:
+        type: string
+        description: Descrição da unidade de medida.
+        example: Saca
+      conversionFactor:
+        type: number
+        description: Fator de conversão.
+        example: 1.00
+      isDefault:
+        type: boolean
+        description: Unidade medida padrão
+        example: TRUE
+      isActive:
+        type: boolean
+        description: Situação da unidade de medida.
+        example: TRUE
+  InstallmentDto:
+    type: object
+    properties:
+      disbursementDays:
+        type: integer
+        description: Quantidade de dias.
+        example: 30
+      disbursementPercent:
+        type: number
+        description: percentual de desembolso.
+        example: 50.00
+  DisbursementDto:
+    type: object
+    properties:
+      year:
+        description: Ano do Desembolso
+        type: number
+        example: 2022
+      month:
+        description: Mês do Desembolso
+        type: number
+        example: 10
+      value:
+        description: Valor do Desembolso
+        type: number
+        example: 2500.00
+      quantity:
+        type: number
+        description: Quantidade do Desembolso
+        example: 2.00
+  CostEstimateResourceDto:
+    type: object
+    properties:
+      buildingUnitId:
+        description: Código da Unidade Construtiva.
+        type: integer
+        example: 1
+      buildingUnitName:
+        description: Nome da Unidade Construtiva.
+        type: string
+        example: Salão de Festas
+      wbsCode:
+        description: Código de referência do item de orçamento, representando a posição do mesmo na Estrutura de Decomposição do Trabalho (EDT).
+        type: string
+        example: 01.001.000.001
+      description:
+        type: string
+        description: Descrição do item de orçamento.
+        example: Alvenaria de Tijolo Furado
+      sheetItemId:
+        type: integer
+        description: Identificador único imutável do item de orçamento no contexto da planilha (unidade construtiva).
+        example: 45
+      totalPrice:
+        type: number
+        description: Preço total calculo do insumo para o item de orçamento, com precisão de 2 casas.
+        example: 1800.50
+      quantity:
+        type: number
+        description: Quantidade total orçada do insumo para o item de orçamento, com precisão de 4 casas decimais.
+        example: 560.3205
+  BuildingAppropriationDto:
+    type: object
+    properties:
+      documentLabel:
+        type: string
+        description: Código do Documento
+        example: CT/0001
+      date:
+        type: string
+        description: Data de Emissão do Título para Apropriações de Pedido, Contratos e Notas Fiscais. Para Medições é retornado a Data da Medição.
+        example: "2023-01-01"
+      costEstimationItemReference:
+        type: string
+        description: Código de referência do item de orçamento, representando a posição do mesmo na Estrutura de Decomposição do Trabalho (EDT).
+        example: 00.000.000.001
+      costEstimationItemDescription:
+        type: string
+        description: Descrição do Item do Orçamento
+        example: Alvenaria de Tijolo Furado
+      buildingUnitId:
+        type: integer
+        description: Código da Unidade Construtiva.
+        example: 1
+      buildingUnitName:
+        type: string
+        description: Nome da Unidade Construtiva.
+        example: Observação teste
+      quantity:
+        type: number
+        description: Quantidade Apropriada.
+        example: 2000.1234
+      percentage:
+        type: number
+        description: Percentual Apropriado.
+        example: 25.00
+      value:
+        type: number
+        description: Valor Apropriado.
+        example: 2500.00
+  BuildingAppropriationDtoNF:
+    allOf:
+      - $ref: "#/definitions/BuildingAppropriationDto"
+      - type: object
+        properties:
+          movementDate:
+            type: string
+            description: Data de movimento da Nota Fiscal. *Este campo só estará presente em apropriações originadas de Notas Fiscais.
+        example: {
+          "documentLabel": "NF/001",
+          "date": "2023-01-01",
+          "movementDate": "2023-01-02",
+          "costEstimationItemReference": "00.000.000.001",
+          "costEstimationItemDescription": "Alvenaria de Tijolo Furado",
+          "buildingUnitId": 1,
+          "buildingUnitName": "Observação teste",
+          "quantity": 2000.1234,
+          "percentage": 25,
+          "value": 2500,
+        }
