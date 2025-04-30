@@ -55,6 +55,7 @@ export interface AudioPayload {
       diarize?: boolean;
       isolation_type?: string;
       duration_seconds?: number;
+      prompt_influence?: number;
       sharedVoices?: SharedVoicesOptions;
     };
   };
