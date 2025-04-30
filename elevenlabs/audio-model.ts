@@ -1,4 +1,8 @@
-import type { AudioModelV1 } from "./types/audio-provider.ts";
+import type {
+  AudioModelV1,
+  SharedVoicesOptions,
+  SharedVoicesResponse,
+} from "./types/audio-provider.ts";
 import type { AudioPayload, AudioResponse } from "./types/audio.ts";
 import { base64ToFile, bufferToBase64 } from "./utils.ts";
 
@@ -82,6 +86,8 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
         return await this.createVoiceClone(options);
       case "speech-to-text":
         return await this.speechToText(options);
+      case "shared-voices":
+        return await this.getSharedVoices(options);
       default:
         throw new Error(`Unsupported ElevenLabs modelId: ${this.modelId}`);
     }
@@ -507,5 +513,99 @@ export class ElevenLabsAudioModel implements AudioModelV1 {
       .map((p) => p.audio as string);
 
     return { audios };
+  }
+
+  /**
+   * Get Shared Voices
+   * GET /v1/shared-voices
+   */
+  private async getSharedVoices(
+    options: Omit<AudioPayload, "model">,
+  ): Promise<SharedVoicesResponse> {
+    const endpoint = "/v1/shared-voices";
+    const sharedVoicesOptions = options.providerOptions?.elevenLabs
+      ?.sharedVoices as SharedVoicesOptions || {};
+
+    // Build query parameters
+    const queryParams = new URLSearchParams();
+    if (sharedVoicesOptions.page_size !== undefined) {
+      queryParams.append("page_size", String(sharedVoicesOptions.page_size));
+    }
+    if (sharedVoicesOptions.category) {
+      queryParams.append("category", sharedVoicesOptions.category);
+    }
+    if (sharedVoicesOptions.gender) {
+      queryParams.append("gender", sharedVoicesOptions.gender);
+    }
+    if (sharedVoicesOptions.age) {
+      queryParams.append("age", sharedVoicesOptions.age);
+    }
+    if (sharedVoicesOptions.accent) {
+      queryParams.append("accent", sharedVoicesOptions.accent);
+    }
+    if (sharedVoicesOptions.language) {
+      queryParams.append("language", sharedVoicesOptions.language);
+    }
+    if (sharedVoicesOptions.locale) {
+      queryParams.append("locale", sharedVoicesOptions.locale);
+    }
+    if (sharedVoicesOptions.search) {
+      queryParams.append("search", sharedVoicesOptions.search);
+    }
+    if (sharedVoicesOptions.use_cases) {
+      queryParams.append("use_cases", sharedVoicesOptions.use_cases);
+    }
+    if (sharedVoicesOptions.descriptives) {
+      queryParams.append("descriptives", sharedVoicesOptions.descriptives);
+    }
+    if (sharedVoicesOptions.featured !== undefined) {
+      queryParams.append("featured", String(sharedVoicesOptions.featured));
+    }
+    if (sharedVoicesOptions.min_notice_period_days !== undefined) {
+      queryParams.append(
+        "min_notice_period_days",
+        String(sharedVoicesOptions.min_notice_period_days),
+      );
+    }
+    if (sharedVoicesOptions.reader_app_enabled !== undefined) {
+      queryParams.append(
+        "reader_app_enabled",
+        String(sharedVoicesOptions.reader_app_enabled),
+      );
+    }
+    if (sharedVoicesOptions.owner_id) {
+      queryParams.append("owner_id", sharedVoicesOptions.owner_id);
+    }
+    if (sharedVoicesOptions.sort) {
+      queryParams.append("sort", sharedVoicesOptions.sort);
+    }
+    if (sharedVoicesOptions.page !== undefined) {
+      queryParams.append("page", String(sharedVoicesOptions.page));
+    }
+
+    const queryString = queryParams.toString()
+      ? `?${queryParams.toString()}`
+      : "";
+    const url = `${this.config.baseURL}${endpoint}${queryString}`;
+
+    const headers = {
+      ...this.config.headers(),
+      ...options.headers,
+      "Accept": "application/json",
+    } as HeadersInit;
+
+    const resp = await (this.config.fetch ?? fetch)(url, {
+      method: "GET",
+      headers,
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(
+        `ElevenLabs shared voices request failed [${resp.status}]: ${text}`,
+      );
+    }
+
+    return await resp.json() as SharedVoicesResponse;
   }
 }
