@@ -1,6 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { isValidUrl, validateImages } from "../utils.ts";
 import { ImageConfig, VideoResolution } from "../client.ts";
+import { Buffer } from "node:buffer";
 
 export interface Props {
   /**
@@ -125,15 +126,17 @@ async function uploadToPresignedUrl(
 ): Promise<void> {
   try {
     // Create a JSON response with the video URL
-    const jsonResponse = JSON.stringify({ url: videoUrl });
+    const videoResponse = await fetch(videoUrl);
+    const arrayBuffer = await videoResponse.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     // Upload to presigned URL
     const response = await fetch(presignedUrl, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/octet-stream",
       },
-      body: jsonResponse,
+      body: buffer,
     });
 
     if (!response.ok) {
@@ -157,7 +160,7 @@ async function writeErrorToPresignedUrl(
   try {
     const errorJson = JSON.stringify({
       error: errorMessage,
-      statusCode: 500,
+      statusCode: 5,
     });
 
     const response = await fetch(presignedUrl, {
