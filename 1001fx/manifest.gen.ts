@@ -14,4 +14,4 @@ const manifest = {
 
 export type Manifest = typeof manifest;
 
-export default manifest; 
+export default manifest;

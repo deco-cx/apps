@@ -30,7 +30,10 @@ export interface FX1001Client {
   };
 }
 
-export const createFX1001Client = (apiKey: string, base = "https://api.1001fx.com") => {
+export const createFX1001Client = (
+  apiKey: string,
+  base = "https://api.1001fx.com",
+) => {
   return createHttpClient<FX1001Client>({
     base,
     headers: new Headers({
@@ -39,4 +42,4 @@ export const createFX1001Client = (apiKey: string, base = "https://api.1001fx.co
     }),
     fetcher: fetchSafe,
   });
-}; 
+};

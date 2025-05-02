@@ -41,7 +41,6 @@ interface AudioVideoResponse {
   statusCode: number;
 }
 
-
 /**
  * @title Convert MP3 to MP4 with Images
  * @description Converts an MP3 audio file into an MP4 video file with images displayed for specified durations.
@@ -53,7 +52,8 @@ export default async function audio2videoAction(
   _req: Request,
   ctx: AppContext,
 ): Promise<AudioVideoResponse> {
-  const { url, images, thumbnailImageUrl, videoResolution, presignedUrl } = props;
+  const { url, images, thumbnailImageUrl, videoResolution, presignedUrl } =
+    props;
 
   // Validate inputs
   if (!isValidUrl(url)) {
@@ -61,7 +61,9 @@ export default async function audio2videoAction(
   }
 
   if (images && !validateImages(images)) {
-    throw new Error("Invalid images array: must contain 1-10 valid image objects with URLs and durations");
+    throw new Error(
+      "Invalid images array: must contain 1-10 valid image objects with URLs and durations",
+    );
   }
 
   if (thumbnailImageUrl && !isValidUrl(thumbnailImageUrl)) {
@@ -69,7 +71,6 @@ export default async function audio2videoAction(
   }
 
   try {
-
     // Prepare request body
     const requestBody = {
       url,
@@ -81,7 +82,7 @@ export default async function audio2videoAction(
     // Make API call to 1001fx
     const response = await ctx.api["POST /audiovideo/audio2video"](
       {},
-      { body: requestBody }
+      { body: requestBody },
     );
 
     const data = await response.json();
@@ -102,15 +103,15 @@ export default async function audio2videoAction(
     };
   } catch (error) {
     console.error("Error in audio2video conversion:", error);
-    
+
     // If we have a presignedUrl, try to write error message to it
     if (presignedUrl) {
       await writeErrorToPresignedUrl(
         presignedUrl,
-        error instanceof Error ? error.message : "Unknown error occurred"
+        error instanceof Error ? error.message : "Unknown error occurred",
       );
     }
-    
+
     throw error;
   }
 }
@@ -125,7 +126,7 @@ async function uploadToPresignedUrl(
   try {
     // Create a JSON response with the video URL
     const jsonResponse = JSON.stringify({ url: videoUrl });
-    
+
     // Upload to presigned URL
     const response = await fetch(presignedUrl, {
       method: "PUT",
@@ -135,9 +136,10 @@ async function uploadToPresignedUrl(
       body: jsonResponse,
     });
 
-
     if (!response.ok) {
-      throw new Error(`Failed to upload to presigned URL: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to upload to presigned URL: ${response.status} ${response.statusText}`,
+      );
     }
   } catch (error) {
     console.error("Error uploading to presigned URL:", error);
@@ -167,9 +169,11 @@ async function writeErrorToPresignedUrl(
     });
 
     if (!response.ok) {
-      console.error(`Failed to write error to presigned URL: ${response.status} ${response.statusText}`);
+      console.error(
+        `Failed to write error to presigned URL: ${response.status} ${response.statusText}`,
+      );
     }
   } catch (error) {
     console.error("Error writing error to presigned URL:", error);
   }
-} 
+}

@@ -18,7 +18,7 @@ export function getInstallId(url: URL | string): string | null {
 
 /**
  * Helper function to validate a URL
- * 
+ *
  * @param url URL to validate
  * @returns boolean indicating if URL is valid
  */
@@ -33,19 +33,21 @@ export function isValidUrl(url: string): boolean {
 
 /**
  * Helper function to validate images array
- * 
+ *
  * @param images Array of image configs to validate
  * @returns boolean indicating if images array is valid
  */
-export function validateImages(images: Array<{imageUrl: string; duration: number}>): boolean {
+export function validateImages(
+  images: Array<{ imageUrl: string; duration: number }>,
+): boolean {
   if (!Array.isArray(images) || images.length < 1 || images.length > 10) {
     return false;
   }
-  
-  return images.every(img => 
-    typeof img === 'object' && 
-    isValidUrl(img.imageUrl) && 
-    typeof img.duration === 'number' && 
+
+  return images.every((img) =>
+    typeof img === "object" &&
+    isValidUrl(img.imageUrl) &&
+    typeof img.duration === "number" &&
     img.duration > 0
   );
-} 
+}

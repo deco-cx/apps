@@ -23,9 +23,9 @@ export interface Props {
  */
 export default function FX1001App(props: Props): App<Manifest, State> {
   const { apiKey } = props;
-  
+
   const api = createFX1001Client(
-    typeof apiKey === "string" ? apiKey : apiKey.get() || ""
+    typeof apiKey === "string" ? apiKey : apiKey.get() || "",
   );
 
   return {
@@ -38,4 +38,4 @@ export default function FX1001App(props: Props): App<Manifest, State> {
 }
 
 export type FX1001App = ReturnType<typeof FX1001App>;
-export type AppContext = AC<FX1001App>; 
+export type AppContext = AC<FX1001App>;
