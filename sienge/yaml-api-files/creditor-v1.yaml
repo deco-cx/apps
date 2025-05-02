@@ -1,0 +1,1417 @@
+swagger: "2.0"
+info:
+  description: API de credores.
+  version: 1.0.0
+  title: Credores
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Creditors
+    description: API para listagem de credores
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /creditors:
+    post:
+      tags:
+        - Creditors
+      summary: Inserção de credor no Sienge
+      operationId: insertCreditor
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação do credores
+          required: true
+          schema:
+            $ref: "#/definitions/CreditorInsert"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Credor inserido
+        "400":
+          description: Validações de regra de negócio para inserção do credor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Creditors
+      summary: Busca o credor no Sienge
+      operationId: getAllCreditors
+      parameters:
+        - name: cpf
+          in: query
+          description: "CPF do credor sem máscara, somento números."
+          required: false
+          type: string
+        - name: cnpj
+          in: query
+          description: "CNPJ do credor sem máscara, somento números."
+          required: false
+          type: string
+        - name: creditor
+          in: query
+          description: "Pode pesquisar por um desses três: nome do credor, nome fantasia do credor ou código do credor."
+          required: false
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Credor encontrado
+          schema:
+            $ref: "#/definitions/GetResponseCreditors"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}":
+    get:
+      tags:
+        - Creditors
+      summary: Busca o credor no Sienge
+      operationId: getCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Credor encontrado
+          schema:
+            $ref: "#/definitions/Creditor"
+        "404":
+          description: Credor não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    patch:
+      tags:
+        - Creditors
+      summary: Atualiza informações referentes ao credor no Sienge
+      operationId: updateCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser atualizado
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para atualização do credor, não é necessário envio de todos os campos.
+          required: true
+          schema:
+            $ref: "#/definitions/CreditorUpdate"
+      produces:
+        - application/json
+      responses:
+        "204":
+          description: Credor atualizado com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Credor não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/bank-informations":
+    post:
+      tags:
+        - Creditors
+      summary: Inserção das informações bancárias do credor no Sienge
+      operationId: insertBankInformations
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor em que será inserido as informações bancárias
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Lista de objetos para criação das informações bancárias do credor
+          required: true
+          schema:
+            $ref: "#/definitions/CreditorForBankingAccountInsert"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Informações bancárias inseridas
+        "400":
+          description: Validações de regra de negócio para inserção das informações bancárias do credor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+
+    get:
+      tags:
+        - Creditors
+      summary: Busca as informações bancárias do credor no Sienge
+      operationId: getBankInformationsCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser apresentado
+          required: true
+          type: integer
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Informação bancária encontrada
+          schema:
+            $ref: "#/definitions/GetResponseBankInformation"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/bank-informations/{banckInformationId}":
+    patch:
+      tags:
+        - Creditors
+      summary: Atualizar as informações bancárias do credor no Sienge
+      operationId: updateBankInformations
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor em que será inserido as informações bancárias
+          required: true
+          type: integer
+        - name: banckInformationId
+          in: path
+          description: Código da informação bancária do credor a ser alterado.
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para alteração das informações bancárias do credor
+          required: true
+          schema:
+            $ref: "#/definitions/CreditorForBankingAccountUpdate"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informações bancárias Alteradas
+        "400":
+          description: Validações de regra de negócio para atualização das informações bancárias do credor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/pix-informations":
+    post:
+      tags:
+        - Creditors
+      summary: Insere as informações de pix do credor no Sienge
+      operationId: insertPixInformationCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser inserido informação de pix
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para criação de informação de pix do credor
+          required: true
+          schema:
+            $ref: "#/definitions/PixInformation"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Informação inserida
+        "400":
+          description: Validações de regra de negócio para inserção das informações de pix do credor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Creditors
+      summary: Busca as informações de pix do credor no Sienge
+      operationId: getPixInformationsCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser apresentado
+          required: true
+          type: integer
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Informação pix encontrada
+          schema:
+            $ref: "#/definitions/GetResponsePixInformation"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/pix-informations/{pixInformationId}":
+    patch:
+      tags:
+        - Creditors
+      summary: Altera as informações de pix do credor no Sienge
+      operationId: updatePixInformationCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser alterada informação de pix.
+          required: true
+          type: integer
+        - name: pixInformationId
+          in: path
+          description: Código da informação de pix a ser alterada.
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para alteração de informação de pix do credor.
+          required: true
+          schema:
+            $ref: "#/definitions/PixInformation"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação alterada
+        "400":
+          description: Validações de regra de negócio para alteração das informações de pix do credor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/phone/{phoneId}":
+    patch:
+      tags:
+        - Creditors
+      summary: Atualizar as informações de um telefone do credor no Sienge
+      operationId: updateCreditorPhone
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser alterado
+          required: true
+          type: integer
+        - name: phoneId
+          in: path
+          description: Código do telefone do credor a ser alterado
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para criação do telefone do credor
+          required: true
+          schema:
+            $ref: "#/definitions/CreditorPhoneUpdate"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Telefone do credor atualizado com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/contact/{contactId}":
+    patch:
+      tags:
+        - Creditors
+      summary: Atualizar as informações de um contato do credor no Sienge
+      operationId: updateCreditorContact
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser alterado
+          required: true
+          type: integer
+        - name: contactId
+          in: path
+          description: Código do contato do credor a ser alterado
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para atualização do telefone do credor
+          required: true
+          schema:
+            $ref: "#/definitions/ContactUpdate"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Contato do credor atualizado com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/procurator/{procuratorId}":
+    patch:
+      tags:
+        - Creditors
+      summary: Atualizar as informações de um procurador do credor no Sienge
+      operationId: updateCreditorProcurator
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser alterado
+          required: true
+          type: integer
+        - name: procuratorId
+          in: path
+          description: Código do procurador do credor a ser alterado
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para atualização do procurador do credor
+          required: true
+          schema:
+            $ref: "#/definitions/ProcuratorUpdate"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Procurador do credor atualizado com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/agents":
+    put:
+      tags:
+        - Creditors
+      summary: Atualizar a lista de representantes do credor no Sienge
+      description: Enviar todos os códigos de representantes quando for atualizar
+      operationId: updateCreditorAgents
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser alterado
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para atualização dos representantes do credor
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/AgentUpdate"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Lista de representantes do credor atualizada com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/payslip-desoneration-years":
+    put:
+      tags:
+        - Creditors
+      summary: Atualizar as informações da desoneração da folha de pagamento por ano do credor no Sienge
+      operationId: updateCreditorPayslipDesonerationYears
+      description: Ao atualizar os anos referente a desoneração da folha de pagamento, todos os anos cadastrados serão excluídos e atualizados com os novos que forem enviados.
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser apresentado
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para atualização da lista de anos optantes pela desoneração na folha de pagamento do credor
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/PayslipDesonerationYearUpdate"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Lista de anos optantes pela desoneração na folha de pagamento atualizada com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/activate":
+    put:
+      tags:
+        - Creditors
+      summary: Ativar um credor desativado no Sienge
+      operationId: activateCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser ativado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Credor ativado com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/creditors/{creditorId}/deactivate":
+    put:
+      tags:
+        - Creditors
+      summary: Desativar um credor ativado no Sienge
+      operationId: deactivateCreditor
+      parameters:
+        - name: creditorId
+          in: path
+          description: Código do credor a ser desativado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Credor desativado com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  Creditor:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código do credor
+      name:
+        type: string
+        description: Nome do credor
+      tradeName:
+        type: string
+        description: Nome fantasia do credor
+      cpf:
+        type: string
+        description: CPF do credor
+      cnpj:
+        type: string
+        description: CNPJ do credor
+      supplier:
+        type: string
+        description: Fornecedor ('S' or 'N')
+      broker:
+        type: string
+        description: Corretor ('S' or 'N')
+      employee:
+        type: string
+        description: Colaborador ('S' or 'N')
+      active:
+        type: boolean
+        description: Informa se credor está ativo
+      stateRegistrationNumber:
+        type: string
+        description: "Número de inscrição estadual"
+        example: "12345"
+      stateRegistrationType:
+        type: string
+        description: "Tipo de inscrição estadual 'C' para Contribuinte, 'I' para Isento e 'N' para Não Contribuinte"
+        example: "C"
+      paymentTypeId:
+        type: integer
+        description: "Código da forma de pagamento"
+        example: 1
+      address:
+        $ref: "#/definitions/CreditorAddress"
+      phones:
+        type: array
+        items:
+          $ref: "#/definitions/CreditorPhone"
+        description: Lista de telefones do credor
+  CreditorInsert:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome do credor
+        example: "Djair Construções"
+      personType:
+        example: "F"
+        type: string
+        description: Tipo de credor 'F' para físico e 'J' para jurídico
+      typesId:
+        type: array
+        example: ["CO", "FO"]
+        items:
+          type: string
+        description: Tipo de credor 'CO' para Corretor, 'FO' para fornecedor e 'FU' para colaborador
+      registerNumber:
+        type: string
+        description: Quando pessoa física enviar CPF e para jurídica CNPJ, número sem máscara
+        example: "22853233014"
+      stateRegistrationNumber:
+        type: string
+        description: "Número de inscrição estadual"
+        example: "12345"
+      stateRegistrationType:
+        type: string
+        description: "Tipo de inscrição estadual 'C' para Contribuinte, 'I' para Isento e 'N' para Não Contribuinte"
+        example: "C"
+      municipalSubscription:
+        type: string
+        description: "Inscrição municipal, enviar somente para pessoa Jurídica"
+        example: "12345"
+      paymentTypeId:
+        type: integer
+        description: "Código da forma de pagamento"
+        example: 1
+      phone:
+        $ref: "#/definitions/CreditorPhoneInsert"
+      agents:
+        type: array
+        description: "Lista de representantes"
+        items:
+          $ref: "#/definitions/AgentInsert"
+      contacts:
+        type: array
+        description: "Lista de contatos"
+        items:
+          $ref: "#/definitions/ContactInsert"
+      procurators:
+        type: array
+        description: "Lista de procuradores"
+        items:
+          $ref: "#/definitions/ProcuratorInsert"
+      payslipDesonerationYears:
+        type: array
+        description: "Lista de anos optantes por desoneração na folha de pagamento"
+        items:
+          $ref: "#/definitions/PayslipDesonerationYearInsert"
+      address:
+        $ref: "#/definitions/CreditorAddressInsert"
+      accountStatement:
+        $ref: "#/definitions/CreditorAccountStatementInsert"
+  CreditorUpdate:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome do credor
+        example: "Djair Construções"
+      personType:
+        example: "F"
+        type: string
+        description: Tipo de credor 'F' para físico e 'J' para jurídico. Caso troque o tipo de pessoa, o CPF/CNPJ se torna obrigatório de acordo com o tipo.
+      cpf:
+        type: string
+        description: Quando pessoa física enviar CPF, número sem máscara
+        example: "22853233014"
+      cnpj:
+        type: string
+        description: Quando pessoa física enviar CNPJ, número sem máscara
+        example: "82845322000104"
+      stateRegistrationNumber:
+        type: string
+        description: "Número de inscrição estadual, somente pessoa Jurídica"
+        example: "12345"
+      stateRegistrationType:
+        type: string
+        description: "Tipo de inscrição estadual 'C' para Contribuinte, 'I' para Isento e 'N' para Não Contribuinte, somente pessoa Jurídica"
+        example: "C"
+      municipalSubscription:
+        type: string
+        description: "Inscrição municipal, enviar somente para pessoa Jurídica"
+        example: "12345"
+      address:
+        $ref: "#/definitions/CreditorAddressInsert"
+  CreditorPhone:
+    type: object
+    properties:
+      ddd:
+        type: string
+        description: "Número do DDD"
+        example: "48"
+      number:
+        example: "99999-8888"
+        type: string
+        description: "Número do telefone, com mascára"
+      main:
+        example: true
+        type: boolean
+        description: "Indica se é o número de telefone principal"
+      type:
+        example: 1
+        type: integer
+        description: >-
+          Indica o tipo de telefone:
+            - 1 - Telefone Residencial
+            - 2 - Telefone Residencial Alternativo
+            - 3 - Telefone Celular
+            - 4 - Telefone Celular Alternativo
+            - 5 - Telefone Comercial
+            - 6 - Telefone Comercial Alternativo
+            - 7 - Telefone Fax
+            - 8 - Telefone Fax Alternativo
+            - 9 - Telefone Rádio
+            - 10 - Telefone Rádio Alternativo
+      extension:
+        example: "231A"
+        type: string
+        description: "Indica o ramal do telefone"
+      observation:
+        example: "Telefone para emergência"
+        type: string
+        description: "Observação do telefone"
+  CreditorPhoneInsert:
+    type: object
+    description: "Telefone do credor"
+    properties:
+      ddd:
+        type: string
+        description: "Número do DDD"
+        example: "48"
+      number:
+        example: "999998888"
+        type: string
+        description: "Número do telefone, sem mascára"
+      type:
+        example: "1"
+        type: string
+        description: >-
+          Indica o tipo de telefone:
+            - 1 - Telefone Residencial
+            - 2 - Telefone Residencial Alternativo
+            - 3 - Telefone Celular
+            - 4 - Telefone Celular Alternativo
+            - 5 - Telefone Comercial
+            - 6 - Telefone Comercial Alternativo
+            - 7 - Telefone Fax
+            - 8 - Telefone Fax Alternativo
+            - 9 - Telefone Rádio
+            - 10 - Telefone Rádio Alternativo
+  CreditorPhoneUpdate:
+    type: object
+    properties:
+      ddd:
+        type: string
+        description: "Número do DDD"
+        example: "48"
+      number:
+        example: "999998888"
+        type: string
+        description: "Número do telefone, sem mascára"
+      main:
+        example: true
+        type: boolean
+        description: "Indica se o telefone é o principal, obrigatório ter um principal"
+      type:
+        example: "1"
+        type: string
+        description: >-
+          Indica o tipo de telefone:
+            - 1 - Telefone Residencial
+            - 2 - Telefone Residencial Alternativo
+            - 3 - Telefone Celular
+            - 4 - Telefone Celular Alternativo
+            - 5 - Telefone Comercial
+            - 6 - Telefone Comercial Alternativo
+            - 7 - Telefone Fax
+            - 8 - Telefone Fax Alternativo
+            - 9 - Telefone Rádio
+            - 10 - Telefone Rádio Alternativo
+  AgentInsert:
+    type: object
+    properties:
+      agentId:
+        type: integer
+        description: "Id do representante"
+        example: 48
+  AgentUpdate:
+    type: object
+    properties:
+      agentId:
+        type: integer
+        description: "Id do representante"
+        example: 48
+  ContactInsert:
+    type: object
+    properties:
+      name:
+        type: string
+        description: "Nome do representante"
+        example: "João da Silva"
+      phoneDdd:
+        type: string
+        description: "Número do DDD"
+        example: "48"
+      phoneNumber:
+        type: string
+        description: "Número do telefone, enviar sem máscara"
+        example: "944445555"
+      phoneExtension:
+        type: string
+        description: "Ramal do telefone"
+        example: "458A"
+      email:
+        type: string
+        description: "Email do representante"
+        example: "joaodasilva@email.com"
+      skype:
+        type: string
+        description: "Skype do representante"
+        example: "joaodasilva@skype.com"
+      msn:
+        type: string
+        description: "MSN do representante"
+        example: "joaodasilva@msn.com"
+  ContactUpdate:
+    type: object
+    properties:
+      name:
+        type: string
+        description: "Nome do representante"
+        example: "João da Silva"
+      phoneDdd:
+        type: string
+        description: "Número do DDD"
+        example: "48"
+      phoneNumber:
+        type: string
+        description: "Número do telefone, enviar sem máscara"
+        example: "944445555"
+      phoneExtension:
+        type: string
+        description: "Ramal do telefone"
+        example: "458A"
+      email:
+        type: string
+        description: "Email do representante"
+        example: "joaodasilva@email.com"
+  ProcuratorInsert:
+    type: object
+    properties:
+      name:
+        type: string
+        description: "Nome do procurador"
+        example: "João da Silva"
+      cpf:
+        type: string
+        description: "CPF do procurador, enviar sem máscara"
+        example: "22853233014"
+      rg:
+        type: string
+        description: "RG do procurador"
+        example: "6544000"
+      phoneDdd:
+        type: string
+        description: "Número do DDD"
+        example: "48"
+      phoneNumber:
+        type: string
+        description: "Número do telefone, enviar sem máscara"
+        example: "944445555"
+      phoneExtension:
+        type: string
+        description: "Ramal do telefone"
+        example: "458A"
+      cityId:
+        type: integer
+        description: "Código do município"
+        example: 1
+      streetName:
+        type: string
+        description: "Nome do logradouro"
+        example: "Rua dos Acarás"
+      addressNumber:
+        type: string
+        description: "Número do endereço"
+        example: "321"
+      neighborhood:
+        type: string
+        description: "Bairro"
+        example: "Centro"
+      complement:
+        type: string
+        description: "Complemento do endereço"
+        example: "Bloco 1"
+      zipCode:
+        type: string
+        description: "CEP sem máscara"
+        example: "88050555"
+  ProcuratorUpdate:
+    type: object
+    properties:
+      name:
+        type: string
+        description: "Nome do procurador"
+        example: "João da Silva"
+      cpf:
+        type: string
+        description: "CPF do procurador, enviar sem máscara"
+        example: "22853233014"
+      rg:
+        type: string
+        description: "RG do procurador"
+        example: "6544000"
+      phoneDdd:
+        type: string
+        description: "Número do DDD"
+        example: "48"
+      phoneNumber:
+        type: string
+        description: "Número do telefone, enviar sem máscara"
+        example: "944445555"
+      phoneExtension:
+        type: string
+        description: "Ramal do telefone"
+        example: "458A"
+      cityId:
+        type: integer
+        description: "Código do município"
+        example: 1
+      streetName:
+        type: string
+        description: "Nome do logradouro"
+        example: "Rua dos Acarás"
+      addressNumber:
+        type: string
+        description: "Número do endereço"
+        example: "321"
+      neighborhood:
+        type: string
+        description: "Bairro"
+        example: "Centro"
+      complement:
+        type: string
+        description: "Complemento do endereço"
+        example: "Bloco 1"
+      zipCode:
+        type: string
+        description: "CEP sem máscara"
+        example: "88050555"
+  PayslipDesonerationYearInsert:
+    type: object
+    properties:
+      year:
+        type: integer
+        description: "Ano optante pela desoneração em folha de pagamento"
+        example: 2022
+  PayslipDesonerationYearUpdate:
+    type: object
+    properties:
+      year:
+        type: integer
+        description: "Ano optante pela desoneração em folha de pagamento"
+        example: 2022
+  CreditorAddress:
+    type: object
+    properties:
+      cityId:
+        type: integer
+        description: "Código do município"
+        example: 1
+      cityName:
+        type: string
+        description: "Nome do município"
+        example: "Florianópolis"
+      streetName:
+        type: string
+        description: "Nome do logradouro"
+        example: "Rua dos Acarás"
+      number:
+        type: string
+        description: "Número do endereço"
+        example: "321"
+      complement:
+        type: string
+        description: "Complemento do endereço"
+        example: "Bloco 1"
+      neighborhood:
+        type: string
+        description: "Bairro"
+        example: "Centro"
+      zipCode:
+        type: string
+        description: "CEP sem máscara"
+        example: "88050555"
+  CreditorAddressInsert:
+    type: object
+    properties:
+      cityId:
+        type: integer
+        description: "Código do município"
+        example: 1
+      streetName:
+        type: string
+        description: "Nome do logradouro"
+        example: "Rua dos Acarás"
+      number:
+        type: string
+        description: "Número do endereço"
+        example: "321"
+      complement:
+        type: string
+        description: "Complemento do endereço"
+        example: "Bloco 1"
+      neighborhood:
+        type: string
+        description: "Bairro"
+        example: "Centro"
+      zipCode:
+        type: string
+        description: "CEP sem máscara"
+        example: "88050555"
+  CreditorAccountStatementInsert:
+    type: object
+    properties:
+      bankCode:
+        type: string
+        description: "Código do banco"
+        example: "001"
+      bankBranchNumber:
+        type: string
+        description: "Número da agência"
+        example: "4611"
+      bankBranchDigit:
+        type: string
+        description: "Dígito da agência"
+        example: "6"
+      accountNumber:
+        type: string
+        description: "Número da conta"
+        example: "13354"
+      accountDigit:
+        type: string
+        description: "Dígito da conta"
+        example: "6"
+      accountDac:
+        type: string
+        description: "DAC da conta"
+        example: "1"
+      accountType:
+        type: string
+        description: "Tipo de conta 'C' para corrente 'P' para poupança"
+        example: "C"
+      accountBeneficiaryName:
+        type: string
+        description: "Nome do beneficiário"
+        example: "John Doe"
+      accountBeneficiaryCpfNumber:
+        type: string
+        description: "CPF do beneficiário sem máscara"
+        example: "22853233014"
+      accountBeneficiaryCnpjNumber:
+        type: string
+        description: "CNPJ do beneficiário sem máscara"
+        example: "00506302000136"
+  AccountStatements:
+    type: object
+    description: "Objeto de informação bancaria"
+    properties:
+      bankCode:
+        type: string
+        description: "Código do banco"
+        example: "001"
+      bankBranchName:
+        type: string
+        description: "Nome da agência"
+        example: "Agência da praça"
+      bankBranchNumber:
+        type: string
+        description: "Número da agência"
+        example: "4611"
+      bankBranchDigit:
+        type: string
+        description: "Dígito da agência"
+        example: "6"
+      accountNumber:
+        type: string
+        description: "Número da conta"
+        example: "13354"
+      accountDigit:
+        type: string
+        description: "Dígito da conta"
+        example: "6"
+      accountDac:
+        type: string
+        description: "DAC da conta"
+        example: "1"
+      accountType:
+        type: string
+        description: "Tipo de conta 'C' para corrente 'P' para poupança"
+        example: "C"
+      accountBeneficiaryName:
+        type: string
+        description: "Nome do beneficiário"
+        example: "John Doe"
+      accountBeneficiaryCpfNumber:
+        type: string
+        description: "CPF do beneficiário sem máscara"
+        example: "22853233014"
+      accountBeneficiaryCnpjNumber:
+        type: string
+        description: "CNPJ do beneficiário sem máscara"
+        example: "00506302000136"
+      defaultFlag:
+        type: string
+        description: Informação bancária padrão ('S' or 'N')
+  BankInformation:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Sequencial da informação bancária
+      paymentForm:
+        type: string
+        description: Nome da forma de Pagamento
+      bank:
+        type: string
+        description: Código do banco
+      nameOfBank:
+        type: string
+        description: Nome do Banco
+      agency:
+        type: string
+        description: Código da agência
+      accountNumber:
+        type: string
+        description: Código da conta
+      accountType:
+        type: string
+        description: Corretor ('P' or 'C')
+      checkDigit:
+        type: string
+        description: Dígito verificador da conta
+      defaultFlag:
+        type: string
+        description: Informação bancária padrão ('S' or 'N')
+      cpf:
+        type: string
+        description: CPF do credor
+      cnpj:
+        type: string
+        description: CNPJ do credor
+      nameOfRecipient:
+        type: string
+        description: Nome do favorecido
+  GetPixInformation:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Sequencial da informação pix
+      type:
+        type: string
+        description: Tipo da chave pix ('C' - CNPJ/CPF, 'T' - Telefone, 'E' - E-mail e 'A' - Aleatória)
+      key:
+        type: string
+        description: Chave pix
+      beneficiary:
+        type: string
+        description: Nome do favorecido
+      cpfCnpjBeneficiary:
+        type: string
+        description: CPF ou CNPJ do favorecido
+      defaultFlag:
+        type: string
+        description: Informação pix padrão ('S' or 'N')
+  PixInformation:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Tipo da chave pix ('C' - CNPJ/CPF, 'T' - Telefone, 'E' - E-mail e 'A' - Aleatória)
+      key:
+        type: string
+        description: Chave pix
+      beneficiary:
+        type: string
+        description: Nome do favorecido
+      cpfCnpjBeneficiary:
+        type: string
+        description: CPF ou CNPJ do favorecido
+      defaultFlag:
+        type: string
+        description: Informação pix padrão ('S' or 'N')
+  CreditorForBankingAccountInsert:
+    type: array
+    description: "Lista de informações bancarias"
+    items:
+      $ref: "#/definitions/AccountStatements"
+  CreditorForBankingAccountUpdate:
+    type: object
+    properties:
+      paymentTypeId:
+        type: integer
+        description: "Código da forma de pagamento"
+        example: 1
+      accountStatement:
+        $ref: "#/definitions/AccountStatements"
+  GetResponseCreditors:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Credores retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Creditor"
+  GetResponseBankInformation:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de informações bancárias retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/BankInformation"
+  GetResponsePixInformation:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de informações de pix retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/GetPixInformation"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

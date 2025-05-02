@@ -11,11 +11,14 @@ const compatibilityApps = [{
 const config = {
   apps: [
     app("deno-deploy"),
+    app("exa"),
     app("figma"),
     app("unsplash"),
     app("reflect"),
     app("grain"),
     app("slack"),
+    app("serper"),
+    app("sienge"),
     app("vertex"),
     app("google-sheets"),
     app("posthog"),
@@ -47,6 +50,8 @@ const config = {
     app("linx-impulse"),
     app("shopify"),
     app("stability"),
+    app("elevenlabs"),
+    app("vidu"),
     app("nuvemshop"),
     app("streamshop"),
     app("brasilapi"),

@@ -1,0 +1,571 @@
+swagger: "2.0"
+info:
+  description: Bulk data de parcelas do contas a receber.
+  version: 1.0.0
+  title: Parcelas do Contas a Receber
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+tags:
+  - name: Bulk-data de parcelas a receber
+    description: Bulk data de parcelas a receber
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /income:
+    get:
+      tags:
+        - Bulk-data de parcelas a receber
+      summary: Retorna as parcelas sem baixa e seus pagamentos (caso possuam), para títulos em um período e tipo de período informados.
+      operationId: bulkdataIncome
+      parameters:
+        - name: startDate
+          in: query
+          description: Data de início do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: Data do fim do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: selectionType
+          in: query
+          description: Seleção da data do período. Para filtrar por data da emissão do título (`I`), data de vencimento da parcela (`D`), data de pagamento da parcela (`P`) ou data de competência da parcela (`B`)
+          required: true
+          type: string
+          format: "string (I, D, P ou B)"
+        - name: correctionIndexerId
+          in: query
+          description: Código do indexador de correção cadastrado no Sienge. Se o parâmetro não for fornecido, será considerado o cadastrado na parcela.
+          required: false
+          type: integer
+        - name: correctionDate
+          in: query
+          description: Data para correção do indexador. Se o parâmetro não for fornecido, será considerada a data atual.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: companyId
+          in: query
+          description: Código da empresa cadastrada no Sienge
+          required: false
+          type: integer
+        - name: costCentersId
+          in: query
+          description: Códigos de centro de custo cadastrados no Sienge
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: changeStartDate
+          in: query
+          description: Data Inicial de alteração do Título/Parcela. Buscará apenas títulos/parcelas que tiveram alteração durante um intervalo de tempo pré-definido. A data final será sempre a data atual.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: completedBills
+          in: query
+          description: Para filtrar por títulos completos
+          required: false
+          type: string
+          format: "string (S)"
+        - name: originsIds
+          in: query
+          description: Para filtrar pelos códigos dos módulos de origem dos títulos/parcelas. Podem ser passados mais de um código de origem por vez, por exemplo CR,CO,LO.
+            As opções são - CR (Contas a Receber), CO (Comercial), ME (Medições), CA (Contrapartida), CI (Controle de Investidores),
+            AR (Administração de Obras), SC (Condomínios), LO (Locações), NE (Nota Fiscal Eletrônica), NS (Nota Fiscal de Serviço Eletrônica),
+            AC (Administração de Compras), NF (Solicitação de Nota Fiscal).
+          required: false
+          type: array
+          items:
+            type: string
+        - name: bearersIdIn
+          in: query
+          description: Filtra somente parcelas que possuam o código do portador informado.
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: bearersIdNotIn
+          in: query
+          description: Filtra somente parcelas que possuam o código do portador diferentes dos informados.
+          required: false
+          type: array
+          items:
+            type: integer
+      produces:
+        - application/json
+        - file
+      responses:
+        "200":
+          description: Parcelas encontradas
+          schema:
+            $ref: "#/definitions/GetResponseBulkDataIncome"
+        "404":
+          description: Parcelas não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /income/by-bills:
+    get:
+      tags:
+        - Bulk-data de parcelas a receber
+      summary: Retorna as parcelas dos títulos informados, independente de período e tipo de período.
+      operationId: bulkdataIncomeReceivableBills
+      parameters:
+        - name: billsIds
+          in: query
+          description: Códigos dos títulos a serem consultados
+          required: true
+          type: array
+          items:
+            type: integer
+        - name: correctionIndexerId
+          in: query
+          description: Código do indexador de correção cadastrado no Sienge
+          required: false
+          type: integer
+        - name: correctionDate
+          in: query
+          description: Data para correção do indexador. Se o parâmetro não for fornecido, será considerada a data atual.
+          required: false
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+      produces:
+        - application/json
+        - file
+      responses:
+        "200":
+          description: Parcelas encontradas
+          schema:
+            $ref: "#/definitions/GetResponseBulkDataIncome"
+        "404":
+          description: Parcelas não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  GetResponseBulkDataIncome:
+    type: object
+    properties:
+      data:
+        type: array
+        description: Lista de parcelas
+        items:
+          $ref: "#/definitions/Installment"
+  Installment:
+    type: object
+    properties:
+      companyId:
+        type: integer
+        format: int32
+        description: "Código da empresa"
+      companyName:
+        type: string
+        description: "Nome da empresa"
+      businessAreaId:
+        type: integer
+        format: int32
+        description: "Código da área de negócio"
+      businessAreaName:
+        type: string
+        description: "Nome da área de negócio"
+      projectId:
+        type: integer
+        format: int32
+        description: "Código do projeto"
+      projectName:
+        type: string
+        description: "Nome do projeto"
+      groupCompanyId:
+        type: integer
+        format: int32
+        description: "Código do grupo da empresa"
+      groupCompanyName:
+        type: string
+        description: "Nome do grupo da empresa"
+      holdingId:
+        type: integer
+        format: int32
+        description: "Código da holding"
+      holdingName:
+        type: string
+        description: "Nome da holding"
+      subsidiaryId:
+        type: integer
+        format: int32
+        description: "Código da subsidiária"
+      subsidiaryName:
+        type: string
+        description: "Nome da subsidiária"
+      businessTypeId:
+        type: integer
+        format: int32
+        description: "Código do tipo de negócio"
+      businessTypeName:
+        type: string
+        description: "Nome do tipo de negócio"
+      clientId:
+        type: integer
+        format: int32
+        description: "Código do cliente"
+      clientName:
+        type: string
+        description: "Nome do cliente"
+      billId:
+        type: integer
+        format: int32
+        description: "Código do título"
+      installmentId:
+        type: integer
+        format: int32
+        description: "Código da parcela"
+      documentIdentificationId:
+        type: string
+        description: "Código do documento"
+      documentIdentificationName:
+        type: string
+        description: "Nome do documento"
+      documentNumber:
+        type: string
+        description: "Número do documento"
+      documentForecast:
+        type: string
+        format: "string (S ou N)"
+        description: "Informa se tem ou não Documento de Previsão"
+      originId:
+        type: string
+        description: "Código do módulo de origem do título/parcela - CR (Contas a Receber), CO (Comercial), ME (Medições), CA (Contrapartida),
+          CI (Controle de Investidores), AR (Administração de Obras), SC (Condomínios), LO (Locações), NE (Nota Fiscal Eletrônica),
+          NS (Nota Fiscal de Serviço Eletrônica), AC (Administração de Compras), NF (Solicitação de Nota Fiscal)"
+      originalAmount:
+        type: number
+        format: double
+        description: "Valor original da parcela"
+      discountAmount:
+        type: number
+        format: double
+        description: "Valor de desconto do título"
+      taxAmount:
+        type: number
+        format: double
+        description: "Valor total do imposto retido"
+      indexerId:
+        type: integer
+        format: int32
+        description: "Código do indexador"
+      indexerName:
+        type: string
+        description: "Nome do indexador"
+      dueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: "Data de vencimento"
+        example: "2018-12-22"
+      issueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: "Data de emissão"
+        example: "2018-12-22"
+      billDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: "Data de competência"
+        example: "2018-12-22"
+      installmentBaseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: "Data base da parcela"
+        example: "2018-12-22"
+      balanceAmount:
+        type: number
+        format: double
+        description: "Valor do saldo"
+      correctedBalanceAmount:
+        type: number
+        format: double
+        description: "Valor do saldo corrigido"
+      periodicityType:
+        type: string
+        description: "Tipo de periodicidade"
+      embeddedInterestAmount:
+        type: number
+        format: double
+        description: "Valor do juros embutido"
+      interestType:
+        type: string
+        description: "Tipo do juros"
+      interestRate:
+        type: number
+        format: double
+        description: "Porcentagem de juros embutido"
+      correctionType:
+        type: string
+        description: "Tipo de correção"
+      interestBaseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        description: "Data base dos juros"
+      defaulterSituation:
+        type: string
+        description: "Situação de inadimplência do título"
+      subJudicie:
+        type: string
+        format: "string (S ou N)"
+        description: "Informa se o título está ou não sub-judicie"
+      mainUnit:
+        type: string
+        description: "Informa qual a unidade principal vínculada ao título ao qual a parcela pertence"
+      installmentNumber:
+        type: string
+        description: Numero "sequencial" das parcelas 1, 2, 3, ou por "Condição de Pagamento" 1/2, 2/2... (Resultado será apresentado conforme Parâmetro 651).
+      paymentTerm:
+        type: object
+        properties:
+          id:
+            type: string
+            description: "identificador da condição de pagamento"
+          description:
+            type: string
+            description: "Nome da condição de pagamento"
+        description: "Condição de pagamento"
+      receiptsCategories:
+        type: array
+        items:
+          $ref: "#/definitions/ReceiptPaymentCategory"
+        description: "Categorias dos pagamentos"
+      receipts:
+        type: array
+        items:
+          $ref: "#/definitions/Receipt"
+        description: Recibos
+      bearerId:
+        type: integer
+        format: int32
+        description: "Código do portador"
+  ReceiptPaymentCategory:
+    type: object
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: "Código do centro de custo"
+      costCenterName:
+        type: string
+        description: "Nome do centro de custo"
+      financialCategoryId:
+        type: string
+        description: "Código do plano financeiro"
+      financialCategoryName:
+        type: string
+        description: "Nome do plano financeiro"
+      financialCategoryReducer:
+        type: string
+        description: "Flag conta redutora"
+      financialCategoryType:
+        type: string
+        description: "Tipo de conta do plano financeiro"
+      financialCategoryRate:
+        type: number
+        format: double
+        description: "Porcentagem"
+  Receipt:
+    type: object
+    properties:
+      operationTypeId:
+        type: integer
+        format: int32
+        description: "Código do tipo da baixa"
+      operationTypeName:
+        type: string
+        description: "Nome do tipo da baixa"
+      grossAmount:
+        type: number
+        format: double
+        description: "Valor bruto"
+      monetaryCorrectionAmount:
+        type: number
+        format: double
+        description: "Valor da correção monetária"
+      interestAmount:
+        type: number
+        format: double
+        description: "Valor do juros"
+      fineAmount:
+        type: number
+        format: double
+        description: "Valor da multa"
+      discountAmount:
+        type: number
+        format: double
+        description: "Valor do desconto"
+      taxAmount:
+        type: number
+        format: double
+        description: "Valor do imposto"
+      netAmount:
+        type: number
+        format: double
+        description: "Valor líquido"
+      additionAmount:
+        type: number
+        format: double
+        description: "Valor do acréscimo"
+      insuranceAmount:
+        type: number
+        format: double
+        description: "Valor do seguro"
+      dueAdmAmount:
+        type: number
+        format: double
+        description: "Valor da taxa administrativa"
+      calculationDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        description: "Data d"
+        example: "2018-01-01"
+      paymentDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        description: "Data de pagamento"
+        example: "2018-01-01"
+      accountCompanyId:
+        type: integer
+        format: int32
+        description: "Código da conta da empresa"
+      accountNumber:
+        type: string
+        description: "Número da conta"
+      accountType:
+        type: string
+        description: "Tipo da conta"
+      sequencialNumber:
+        type: integer
+        format: int32
+        description: "Número sequencial"
+      indexerId:
+        type: integer
+        format: int32
+        description: "Código do indexador"
+      embeddedInterestAmount:
+        type: number
+        format: double
+        description: "Valor dos juros embutido"
+      proRata:
+        type: number
+        format: double
+        description: "Valor do pro-rata"
+      bankMovements:
+        type: array
+        items:
+          $ref: "#/definitions/BankMovement"
+        description: Movimentos
+  BankMovement:
+    type: object
+    properties:
+      bankMovementDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        description: "Data do movimento"
+        example: "2018-01-01"
+      sequencialNumber:
+        type: integer
+        format: int32
+        description: "Número sequencial"
+      id:
+        type: integer
+        format: int32
+        description: "Número do lançamento"
+      amount:
+        type: number
+        format: double
+        description: "Valor do movimento"
+      historicId:
+        type: integer
+        format: int32
+        description: "Código do histórico padrão"
+      historicName:
+        type: string
+        description: "Descrição do histórico padrão"
+      operationId:
+        type: integer
+        format: int32
+        description: "Código da operação"
+      operationName:
+        type: string
+        description: "Descrição da operação"
+      operationType:
+        type: string
+        description: "Tipo de operação"
+      reconcile:
+        type: string
+        description: "Movimento conciliado"
+      correctedAmount:
+        type: number
+        format: double
+        description: "Valor do movimento corrigido"
+      originId:
+        type: string
+        description: "Código do módulo de origem do movimento - CR (Contas a Receber), CO (Comercial), ME (Medições), CA (Contrapartida),
+          CI (Controle de Investidores), AR (Administração de Obras), SC (Condomínios), LO (Locações), NE (Nota Fiscal Eletrônica),
+          NS (Nota Fiscal de Serviço Eletrônica), AC (Administração de Compras), NF (Solicitação de Nota Fiscal)"
+      financialCategories:
+        type: array
+        items:
+          $ref: "#/definitions/FinancialCategory"
+        description: Apropriação financeira do movimento
+  FinancialCategory:
+    type: object
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: "Código do centro de custo"
+      financialCategoryId:
+        type: string
+        description: "Código do plano financeiro"
+      financialCategoryName:
+        type: string
+        description: "Descrição do plano financeiro"
+      financialCategoryReducer:
+        type: string
+        description: "Indica se é plano financeiro redutor"
+      financialCategoryType:
+        type: string
+        description: "Indica plano financeiro de receita ou despesa"
+      financialCategoryRate:
+        type: number
+        format: double
+        description: "Percentual de apropriação"
+      bankMovementId:
+        type: integer
+        format: int32
+        description: "Número do lançamento"
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

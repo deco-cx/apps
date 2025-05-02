@@ -1,0 +1,256 @@
+swagger: "2.0"
+info:
+  description: API do relatório de balancete de verificação da contabilidade.
+  version: "1.0"
+  title: Balancete de verificação
+host: "api.sienge.com.br"
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+
+schemes:
+  - "https"
+security:
+  - basicAuth: []
+paths:
+  /trial-balance:
+    get:
+      operationId: getTrialBalance
+      tags:
+        - "Balancete de verificação"
+      summary: "Busca dados do balancete de verificação"
+      parameters:
+        - name: companyId
+          in: query
+          type: integer
+          required: true
+          description: "Código da empresa"
+
+        - name: initialPeriod
+          in: query
+          type: string
+          format: date
+          required: true
+          description: "Período inicial"
+
+        - name: finalPeriod
+          in: query
+          type: string
+          format: date
+          required: true
+          description: "Período final"
+
+        - name: accountId
+          in: query
+          type: string
+          description: "Código da conta, podendo ser o código contábil ou reduzido. A conta precisa ser analítica"
+
+        - name: desconsiderClosingBalance
+          in: query
+          type: boolean
+          default: false
+          description: "Flag de desconsiderar zeramento"
+
+        - name: reportType
+          in: query
+          type: string
+          enum: [CORPORATE, TAX]
+          description: "Tipo do relatório, podendo ser Societário (CORPORATE) ou Fiscal (TAX)"
+
+        - name: onlyAccountsWithMovements
+          description: "Flag para considera apenas contas com movimentação"
+          in: query
+          type: boolean
+          default: true
+
+        - name: thirdParties
+          in: query
+          description: Apresentar saldo de terceiros
+          type: boolean
+          default: false
+
+      responses:
+        "200":
+          description: "Busca com sucesso"
+          schema:
+            $ref: "#/definitions/PaginationResult"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+securityDefinitions:
+  basicAuth:
+    description: "HTTP Basic Authentication. Works over `HTTP` and `HTTPS`"
+    type: "basic"
+definitions:
+  TrialBalance:
+    type: "object"
+    required:
+      - "companyId"
+      - "iniitalPeriod"
+      - "finalPeriod"
+    properties:
+      companyId:
+        type: "integer"
+        example: 1
+        description: "Código da empresa"
+
+      reducedCode:
+        type: "integer"
+        example: 100
+        description: "Código reduzido"
+
+      accountGroup:
+        type: "string"
+        example: "ASSETS"
+        enum: ["ASSETS", "LIABILITIES", "INCOME", "EXPENSES", "TRANSITION"]
+        description: "Grupo da conta"
+
+      account:
+        type: "string"
+        example: "1.01.03.01"
+        description: "Código contábil da conta"
+
+      accountName:
+        type: "string"
+        example: "Ativo circulante"
+        description: "Nome da conta"
+
+      accountType:
+        type: "string"
+        enum: ["ANALYTICAL", "SYNTHETIC"]
+        example: "ANALYTICAL"
+        description: "Tipo da conta"
+
+      debit:
+        type: number
+        example: 414.19
+        description: "Débitos no período"
+
+      credit:
+        type: number
+        example: 455.19
+        description: "Créditos no período"
+
+      operatingBalance:
+        $ref: "#/definitions/Balance"
+      balances:
+        type: object
+        properties:
+          previous:
+            $ref: "#/definitions/Balance"
+          current:
+            $ref: "#/definitions/Balance"
+      thirdParties:
+        $ref: "#/definitions/ThirdParties"
+
+  Balance:
+    type: object
+    properties:
+      value:
+        type: number
+        example: 455.6
+        description: "Valor do saldo"
+      type:
+        description: "Tipo de saldo, podendo ser [D]ébito ou [C]rédito"
+        example: "D"
+        enum: [D, C]
+        type: string
+  ThirdParties:
+    type: object
+    properties:
+      name:
+        type: string
+        description: "Nome do terceiro"
+        example: "José Maria´"
+      code:
+        type: integer
+        description: "Código do terceiro"
+        example: 50
+      debit:
+        type: number
+        description: "Débito no período"
+      credit:
+        type: number
+        description: "Crédito no período"
+
+      previoutCredit:
+        allOf:
+          - $ref: "#/definitions/Balance"
+        description: "Valor saldo anterior a crédito"
+
+      previousDebit:
+        allOf:
+          - $ref: "#/definitions/Balance"
+        description: "Valor saldo anterior a débito"
+
+  ApiError:
+    type: "object"
+    required:
+      - "developerMessage"
+      - "status"
+    properties:
+      status:
+        type: "number"
+        description: "Status http"
+      developerMessage:
+        type: "string"
+        description:
+          "Mensagem de erro pertinente a ser reportada ao developer consumidor\
+          \ da API."
+      clientMessage:
+        type: "string"
+        description: "Mensagem de erro relavante ao utilizador\
+          \ final"
+    description: "Objeto que encapsula os atributos de erros da API"
+
+  PaginationResult:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de contas retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/TrialBalance"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        default: 0
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 200 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200

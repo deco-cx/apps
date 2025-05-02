@@ -5,6 +5,7 @@ import { StabilityAiClient } from "./stabilityAiClient.ts";
 
 export interface State {
   stabilityClient: StabilityAiClient;
+  previewUrl: string;
 }
 
 interface Props {
@@ -12,6 +13,10 @@ interface Props {
    * @description The Stability AI API key
    */
   apiKey: Secret | string;
+  /**
+   * @description The URL of the preview used to render the video.
+   */
+  previewUrl: string;
 }
 
 /**
@@ -22,7 +27,7 @@ interface Props {
  * @logo https://logowik.com/content/uploads/images/stability-ai-icon3444.logowik.com.webp
  */
 export default function Stability(props: Props): App<Manifest, State> {
-  const { apiKey } = props;
+  const { apiKey, previewUrl } = props;
   const stability = new StabilityAiClient(
     typeof apiKey === "string" ? apiKey : apiKey.get() || "",
   );
@@ -30,6 +35,7 @@ export default function Stability(props: Props): App<Manifest, State> {
   return {
     state: {
       stabilityClient: stability,
+      previewUrl,
     },
     manifest,
     dependencies: [],

@@ -32,7 +32,7 @@ export const STYLE_PRESETS = [
 ] as const;
 
 export interface GenerateImageCoreOptions {
-  aspectRatio?: typeof ASPECT_RATIOS[number];
+  aspectRatio?: string;
   negativePrompt?: string;
   seed?: number;
   stylePreset?: typeof STYLE_PRESETS[number];
@@ -109,6 +109,22 @@ export interface ControlStyleOptions {
   seed?: number;
   outputFormat?: "png" | "jpeg" | "webp";
 }
+
+// --- Image to Video ---
+export interface ImageToVideoOptions {
+  seed?: number;
+  cfgScale?: number;
+  motionBucketId?: number;
+}
+
+export interface ImageToVideoStartResponse {
+  id: string;
+}
+
+export type ImageToVideoResultResponse =
+  | { status: "in-progress" }
+  | { status: "complete"; video: ArrayBuffer };
+// --- End Image to Video ---
 
 export class StabilityAiClient {
   private readonly apiKey: string;
@@ -637,4 +653,107 @@ export class StabilityAiClient {
     const data = await response.json();
     return { base64Image: data.image };
   }
+
+  // --- Image to Video Methods ---
+
+  async imageToVideoStart(
+    image: Blob,
+    options?: ImageToVideoOptions,
+  ): Promise<ImageToVideoStartResponse> {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    if (options?.seed !== undefined) {
+      formData.append("seed", options.seed.toString());
+    }
+    if (options?.cfgScale !== undefined) {
+      formData.append("cfg_scale", options.cfgScale.toString());
+    }
+    if (options?.motionBucketId !== undefined) {
+      formData.append("motion_bucket_id", options.motionBucketId.toString());
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/image-to-video`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: "application/json", // Expecting JSON response with ID
+        },
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      let errorDetails = "Unknown error";
+      try {
+        // Try parsing JSON error first
+        const errorJson = await response.json();
+        errorDetails = JSON.stringify(errorJson);
+      } catch (_e) {
+        // Fallback to text if JSON parsing fails
+        errorDetails = await response.text();
+      }
+      throw new Error(
+        `API error (${response.status}): ${errorDetails}`,
+      );
+    }
+
+    const data = await response.json();
+    return { id: data.id };
+  }
+
+  async imageToVideoResult(
+    id: string,
+    options?: { accept?: "video/*" | "application/json" },
+  ): Promise<ImageToVideoResultResponse | { status: "error"; error: string }> {
+    const acceptHeader = options?.accept ?? "video/*"; // Default to video/*
+
+    const response = await fetch(
+      `${this.baseUrl}/v2beta/image-to-video/result/${id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: acceptHeader,
+        },
+      },
+    );
+
+    if (response.status === 202) {
+      return { status: "in-progress" };
+    }
+
+    if (response.status === 200) {
+      if (acceptHeader === "video/*") {
+        const videoArrayBuffer = await response.arrayBuffer();
+        return { status: "complete", video: videoArrayBuffer };
+      } else {
+        // Handle JSON response if needed (though the API doc primarily shows video/*)
+        // For now, we expect video/* but keep this structure flexible
+        console.warn(
+          "Received JSON response for video result, but expected video/*. Handling as error.",
+        );
+        const errorJson = await response.json();
+        return { status: "error", error: JSON.stringify(errorJson) };
+      }
+    }
+
+    // Handle other error statuses
+    let errorDetails = "Unknown error";
+    try {
+      const errorJson = await response.json();
+      errorDetails = JSON.stringify(errorJson);
+    } catch (_e) {
+      errorDetails = await response.text();
+    }
+    console.error(`API error (${response.status}): ${errorDetails}`);
+    return {
+      status: "error",
+      error: `API error (${response.status}): ${errorDetails}`,
+    };
+  }
+
+  // --- End Image to Video Methods ---
 }

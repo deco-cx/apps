@@ -66,3 +66,5 @@ export default async function loader(
 
   return documents;
 }
+
+export const defaultVisibility = "private";

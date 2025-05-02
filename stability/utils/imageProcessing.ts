@@ -206,3 +206,88 @@ export async function processImageWithCompression({
 
   throw new Error("Unexpected error in image processing");
 }
+
+// --- Image to Video Specific Resizing ---
+
+const SUPPORTED_VIDEO_DIMENSIONS = [
+  { width: 1024, height: 576 }, // 16:9 Landscape
+  { width: 576, height: 1024 }, // 9:16 Portrait
+  { width: 768, height: 768 }, // 1:1 Square
+];
+
+export async function resizeImageToSupportedVideoDimensions(
+  imageBuffer: Uint8Array,
+  imageType: ImageType, // Pass detected type to avoid re-detection
+): Promise<{ buffer: Uint8Array; type: ImageType }> {
+  const codecs = await getCodecs();
+  const codec = codecs[imageType];
+  const decode = codec?.decode;
+
+  if (!decode) {
+    throw new Error(`No decoder found for image type: ${imageType}`);
+  }
+
+  const imageData = await decode(imageBuffer.buffer as ArrayBuffer);
+  const { width: originalWidth, height: originalHeight } = imageData;
+
+  console.log("Original video input dimensions:", {
+    width: originalWidth,
+    height: originalHeight,
+  });
+
+  // Check if current dimensions are already supported
+  const isSupported = SUPPORTED_VIDEO_DIMENSIONS.some(
+    (dim) => dim.width === originalWidth && dim.height === originalHeight,
+  );
+
+  if (isSupported) {
+    console.log("Dimensions are already supported, no resize needed.");
+    return { buffer: imageBuffer, type: imageType };
+  }
+
+  console.log("Dimensions not supported, determining target dimensions...");
+
+  const aspectRatio = originalWidth / originalHeight;
+  let targetDimensions;
+
+  if (aspectRatio > 1.1) { // Treat as Landscape (allowing some tolerance)
+    targetDimensions = SUPPORTED_VIDEO_DIMENSIONS[0]; // 1024x576
+    console.log(
+      "Aspect ratio suggests Landscape, targeting:",
+      targetDimensions,
+    );
+  } else if (aspectRatio < 0.9) { // Treat as Portrait (allowing some tolerance)
+    targetDimensions = SUPPORTED_VIDEO_DIMENSIONS[1]; // 576x1024
+    console.log("Aspect ratio suggests Portrait, targeting:", targetDimensions);
+  } else { // Treat as Square
+    targetDimensions = SUPPORTED_VIDEO_DIMENSIONS[2]; // 768x768
+    console.log("Aspect ratio suggests Square, targeting:", targetDimensions);
+  }
+
+  console.log("Resizing image to:", targetDimensions);
+
+  // Use PNG for resizing output as it's lossless and widely supported
+  const targetImageType: ImageType = "image/png";
+
+  const resizedData = await transform(
+    {
+      data: imageBuffer.buffer.slice(0) as ArrayBuffer,
+      mediaType: imageType, // Use original type for decoding
+    },
+    {
+      width: targetDimensions.width,
+      height: targetDimensions.height,
+      fit: "contain", // 'contain' might add padding, 'cover' might crop. Check API preference if issues arise.
+      // quality: 95, // Quality mainly applies to lossy formats like JPEG/WebP, less critical for PNG encode
+      mediaType: targetImageType, // Encode as PNG
+    },
+  );
+
+  const resizedBuffer = new Uint8Array(resizedData.data);
+  console.log(
+    `Image resized successfully to ${targetDimensions.width}x${targetDimensions.height}. New size: ${resizedBuffer.byteLength} bytes`,
+  );
+
+  return { buffer: resizedBuffer, type: targetImageType };
+}
+// --- End Image to Video Specific Resizing ---

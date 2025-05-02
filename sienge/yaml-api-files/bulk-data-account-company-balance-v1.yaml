@@ -1,0 +1,126 @@
+swagger: "2.0"
+info:
+  description: Bulk data de saldos contábeis consolidados por empresa.
+  version: 1.0.0
+  title: Saldos Contábeis Consolidados por Empresa
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+tags:
+  - name: Bulk-data de saldos contábeis por empresa
+    description: Bulk data de saldos contábeis consolidados por empresa
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/accountancy/accountBalance":
+    get:
+      tags:
+        - Bulk-data de saldos contábeis por empresa
+      summary: Retorna movimentos financeiros, caso possua.
+      operationId: getBulkAccountBalance
+      parameters:
+        - name: startDate
+          in: query
+          description: Data de início do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: Data do fim do período da consulta
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: companyId
+          in: query
+          description: Código da empresa
+          required: false
+          type: integer
+        - name: accountId
+          in: query
+          description: Código contábil ou código reduzido da conta
+          required: false
+          type: string
+      produces:
+        - application/json
+        - file
+      responses:
+        "200":
+          description: Saldos consolidados encontrados
+          schema:
+            $ref: "#/definitions/GetResponseBulkDataAccountancyAccountBalance"
+        "404":
+          description: Saldos consolidados não encontrados
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  GetResponseBulkDataAccountancyAccountBalance:
+    type: object
+    properties:
+      data:
+        type: array
+        description: Lista de saldos contábeis consolidados
+        items:
+          $ref: "#/definitions/AccountancyAccountBalance"
+  AccountancyAccountBalance:
+    type: object
+    properties:
+      companyId:
+        type: integer
+        format: int32
+        description: "Código da empresa"
+      id:
+        type: integer
+        format: int32
+        description: "Código reduzido da conta"
+      accountId:
+        type: string
+        description: "Código contábil da conta"
+      previousBalance:
+        type: number
+        format: double
+        description: "Saldo anterior"
+      previousBalanceType:
+        type: string
+        description: "Tipo saldo anterior"
+      debitBalance:
+        type: number
+        format: double
+        description: "Valor saldo debito"
+      creditBalance:
+        type: number
+        format: double
+        description: "Valor saldo crédito"
+      balanceCarriedForward:
+        type: number
+        format: double
+        description: "Valor saldo final"
+      balanceCarriedForwardType:
+        type: string
+        description: "Tipo valor saldo final"
+      monthYear:
+        type: string
+        description: "Período do saldo consolidado (mês/ano)"
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

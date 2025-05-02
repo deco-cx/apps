@@ -1,0 +1,3100 @@
+swagger: "2.0"
+info:
+  description: API de títulos do contas a pagar.
+  version: 1.0.0
+  title: Títulos do Contas a Pagar
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Títulos a pagar
+    description: API para listagem, atualização e inserção de título
+  - name: Parcelas do título a pagar
+    description: API para listagem e atualização de parcelas do título
+  - name: Impostos do título
+    description: API para listagem de impostos do título
+  - name: Apropriação financeira do título
+    description: API para listagem das apropriações financeiras do título
+  - name: Apropriação departamento do título
+    description: API para listagem das apropriações departamento do título
+  - name: Apropriação obra do título
+    description: API para listagem das apropriações obra do título
+  - name: Informações de pagamento da parcela
+    description: API para listagem e inserção de informações de pagamento da parcela
+  - name: Anexo do título
+    description: Inserção de anexo no título
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/bills":
+    get:
+      tags:
+        - Títulos a pagar
+      summary: Busca os títulos no Sienge
+      operationId: getBills
+      parameters:
+        - name: startDate
+          in: query
+          description: Data inicial de emissão para consulta de títulos
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: Data final de emissão para consulta de títulos
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: debtorId
+          in: query
+          description: Código da empresa cadastrada no Sienge
+          required: false
+          type: integer
+        - name: creditorId
+          in: query
+          description: Código do credor cadastrado no Sienge
+          required: false
+          type: integer
+        - name: costCenterId
+          in: query
+          description: Código do centro de custo cadastrado no Sienge
+          required: false
+          type: integer
+        - name: documentsIdentificationId
+          in: query
+          description: Códigos do documento cadastrado no Sienge
+          required: false
+          type: array
+          format: "Max size 4"
+          items:
+            type: string
+        - name: documentNumber
+          in: query
+          description: Número do documento vinculado ao título cadastrado no Sienge
+          required: false
+          type: string
+          format: "Max size 20"
+
+        - name: status
+          in: query
+          description: >
+            Tipo de consistência do título cadastrado no Sienge:
+             * `S` - Completo
+             * `N` - Incompleto
+             * `I` - Em inclusão
+          enum: ["S", "N", "I"]
+          required: false
+          type: string
+          format: "Max size 1"
+        - name: originId
+          in: query
+          description: >
+            Código de origem do título cadastrado no Sienge
+             * `AC` - Administração de Compras
+             * `RA` - Administração de Obras
+             * `AI` - Apuração de Impostos
+             * `CO` - Comercial
+             * `CF` - Conhecimento de Frete
+             * `CP` - Contas a Pagar
+             * `ME` - Contratos e Medições
+             * `MO` - Controle de Mão de Obra
+             * `DV` - Devolução de Nota Fiscal
+             * `RF` - Financiamento Bancário
+             * `FP` - Folha de Pagamento
+             * `FE` - Frota de Equipamentos
+             * `GI` - Guia de Impostos
+             * `LO` - Locação de Imóveis
+             * `SE` - Sistemas Externos
+          required: false
+          enum: [AC, RA, AI, CO, CF, CP, ME, MO, DV, RF, FP, FE, GI, LO, SE]
+          type: string
+          format: "Max size 2"
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor padrão é 100 e o valor máximo permitdo é 200.
+          type: integer
+          format: int32
+          required: false
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.  Valor
+            padrão é 0.
+          type: integer
+          format: int32
+          required: false
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/Bills"
+        "404":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    post:
+      tags:
+        - Títulos a pagar
+      summary: Inserção do título no Sienge
+      operationId: insertBill
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação do título
+          required: true
+          schema:
+            $ref: "#/definitions/BillInsert"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Título inserido
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/by-change-date":
+    get:
+      tags:
+        - Títulos a pagar
+      summary: Busca os títulos no Sienge de acordo com a data de alteração
+      operationId: loadBillsFromChangeDate
+      parameters:
+        - name: startDate
+          in: query
+          description: Data inicial de alteração para consulta de títulos
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: Data final de alteração para consulta de títulos
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: debtorId
+          in: query
+          description: Código da empresa cadastrada no Sienge
+          required: false
+          type: integer
+        - name: creditorId
+          in: query
+          description: Código do credor cadastrado no Sienge
+          required: false
+          type: integer
+        - name: costCenterId
+          in: query
+          description: Código do centro de custo cadastrado no Sienge
+          required: false
+          type: integer
+        - name: documentsIdentificationId
+          in: query
+          description: Códigos do documento cadastrado no Sienge
+          required: false
+          type: array
+          format: "Max size 4"
+          items:
+            type: string
+        - name: documentNumber
+          in: query
+          description: Número do documento vinculado ao título cadastrado no Sienge
+          required: false
+          type: string
+          format: "Max size 20"
+        - name: status
+          in: query
+          description: >
+            Tipo de consistência do título cadastrado no Sienge:
+             * `S` - Completo
+             * `N` - Incompleto
+             * `I` - Em inclusão
+          enum: ["S", "N", "I"]
+          required: false
+          type: string
+          format: "Max size 1"
+        - name: originId
+          in: query
+          description: >
+            Código de origem do título cadastrado no Sienge
+             * `AC` - Administração de Compras
+             * `RA` - Administração de Obras
+             * `AI` - Apuração de Impostos
+             * `CO` - Comercial
+             * `CF` - Conhecimento de Frete
+             * `CP` - Contas a Pagar
+             * `ME` - Contratos e Medições
+             * `MO` - Controle de Mão de Obra
+             * `DV` - Devolução de Nota Fiscal
+             * `RF` - Financiamento Bancário
+             * `FP` - Folha de Pagamento
+             * `FE` - Frota de Equipamentos
+             * `GI` - Guia de Impostos
+             * `LO` - Locação de Imóveis
+             * `SE` - Sistemas Externos
+          required: false
+          enum: [AC, RA, AI, CO, CF, CP, ME, MO, DV, RF, FP, FE, GI, LO, SE]
+          type: string
+          format: "Max size 2"
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor padrão é 100 e o valor máximo permitdo é 200.
+          type: integer
+          format: int32
+          required: false
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.  Valor
+            padrão é 0.
+          type: integer
+          format: int32
+          required: false
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/Bill"
+        "404":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}":
+    get:
+      tags:
+        - Títulos a pagar
+      summary: Busca o título no Sienge
+      operationId: getBill
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título a ser apresentado
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Título encontrado
+          schema:
+            $ref: "#/definitions/Bill"
+        "404":
+          description: Título não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    patch:
+      tags:
+        - Títulos a pagar
+      summary: Atualiza o título no Sienge
+      operationId: updateBill
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título a ser atualizado
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para atualização do título
+          required: true
+          schema:
+            $ref: "#/definitions/BillUpdate"
+
+      produces:
+        - application/json
+      responses:
+        "204":
+          description: Título atualizado
+        "400":
+          description: Validações de regra de negócio para atualização do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "404":
+          description: Título não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  /eletronic-invoice-bills:
+    post:
+      tags:
+        - Títulos a pagar
+      summary: Inserção do título no Sienge com base em nota fiscal eletrônica recebida
+      operationId: insertElectronicInvoiceBill
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação do título
+          required: true
+          schema:
+            $ref: "#/definitions/ElectronicInvoiceBillInsert"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Título inserido
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments":
+    get:
+      tags:
+        - Parcelas do título a pagar
+      summary: Busca as parcelas do título
+      operationId: getBillInstallments
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Parcelas encontradas
+          schema:
+            $ref: "#/definitions/GetResponseBillInstallments"
+        "404":
+          description: Parcelas não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}":
+    patch:
+      tags:
+        - Parcelas do título a pagar
+      summary: Atualiza parcela do título
+      operationId: updateInstallment
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcela está vinculada
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela que será atualizada
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto com os campos para atualização da parcela
+          required: true
+          schema:
+            $ref: "#/definitions/BillInstallmentUpdate"
+      produces:
+        - application/json
+      responses:
+        "204":
+          description: Parcela atualizada
+        "400":
+          description: Validações de regra de negócio para atualização da parcela
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "404":
+          description: Parcela não encontrada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/bank-transfer":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: >-
+        Inserção de informação de pagamento da parcela do tipo transferência
+        bancária
+      operationId: insertBankTransfer
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/BankTransfer"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo transferência bancária
+      operationId: getBankTransfer
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/BankTransfer"
+        "404":
+          description: "Informação de pagamento da parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/boleto-bancario":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Inserção de informação de pagamento da parcela do tipo boleto bancário
+      operationId: insertBoletoBancario
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/BoletoBancario"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo boleto bancário
+      operationId: getBoletoBancario
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/BoletoBancario"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/boleto-concessionaria":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: >-
+        Inserção de informação de pagamento da parcela do tipo boleto
+        concessionária
+      operationId: insertBoletoConcessionaria
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/BoletoConcessionaria"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo boleto concessionária
+      operationId: getBoletoConcessionaria
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/BoletoConcessionaria"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/boleto-tax":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: >-
+        Inserção de informação de pagamento da parcela do tipo tributos com
+        código de barras
+      operationId: insertBoletoTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/BoletoTax"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: >-
+        Busca informação de pagamento da parcela do tipo tributos com código de
+        barras
+      operationId: getBoletoTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/BoletoTax"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/dda":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: >-
+        Inserção de informação de pagamento da parcela do tipo débito direto
+        autorizado
+      operationId: insertDDA
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/DDA"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: >-
+        Busca informação de pagamento da parcela do tipo débito direto
+        autorizado
+      operationId: getDDA
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/DDA"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/darf-tax":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Inserção de informação de pagamento da parcela do tipo tributos DARF
+      operationId: insertDarfTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/DarfTax"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo tributos DARF
+      operationId: getDarfTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/DarfTax"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/darj-tax":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Inserção de informação de pagamento da parcela do tipo tributos DARJ
+      operationId: insertDarjTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/DarjTax"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo tributos DARJ
+      operationId: getDarjTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/DarjTax"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/fgts-tax":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Inserção de informação de pagamento da parcela do tipo tributos FGTS
+      operationId: insertFgtsTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/FGTSTax"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo tributos FGTS
+      operationId: getFgtsTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/FGTSTax"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/gare-tax":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Inserção de informação de pagamento da parcela do tipo tributos GARE
+      operationId: insertGareTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/GARETax"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo tributos GARE
+      operationId: getGareTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/GARETax"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/inss-tax":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Inserção de informação de pagamento da parcela do tipo tributos INSS
+      operationId: insertInssTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela
+          required: true
+          schema:
+            $ref: "#/definitions/INSSTax"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo tributos INSS
+      operationId: getInssTax
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/INSSTax"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/installments/{installmentId}/payment-information/pix":
+    patch:
+      tags:
+        - Informações de pagamento da parcela
+      summary: >-
+        Inserção de informação de pagamento da parcela do tipo Pix
+      operationId: insertPix
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para adicionar as informações na parcela. Deve enviar isUsingCreditorData = "S" e/ou informações da chave pix (keyPix e keyPixType). Caso o parâmetro 1254 esteja inativo, obrigatoriamente deve enviar informações referente a chave pix.
+          required: true
+          schema:
+            $ref: "#/definitions/Pix"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "204":
+          description: Informação de pagamento inserida com sucesso
+        "400":
+          description: Validações de regra de negócio para inserção do título
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "422":
+          description: Validações referente a chave pix
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Informações de pagamento da parcela
+      summary: Busca informação de pagamento da parcela do tipo Pix
+      operationId: getPix
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as parcelas estão vinculadas
+          required: true
+          type: integer
+          format: int32
+        - name: installmentId
+          in: path
+          description: Número da parcela do título
+          required: true
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Informação de pagamento encontrada
+          schema:
+            $ref: "#/definitions/Pix"
+        "404":
+          description: "Informação de pagamento do título e parcela, não foi encontrado"
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/taxes":
+    get:
+      tags:
+        - Impostos do título
+      summary: Busca os impostos do título
+      operationId: getBillTaxes
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que os impostos estão vinculados
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Impostos encontrados
+          schema:
+            $ref: "#/definitions/GetResponseTaxesBill"
+        "404":
+          description: Impostos não encontrados
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/budget-categories":
+    get:
+      tags:
+        - Apropriação financeira do título
+      summary: Busca as apropriações financeiras do título
+      operationId: getBillsIDBudgetCategories
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as apropriações financeiras estão vinculados
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Apropriações financeiras encontradas
+          schema:
+            $ref: "#/definitions/GetResponseBudgetCategoriesBill"
+        "404":
+          description: Apropriações financeiras não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/departments-cost":
+    get:
+      tags:
+        - Apropriação departamento do título
+      summary: Busca as apropriações departamento do título
+      operationId: getBillDepartmentsCost
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as apropriações de departamento estão vinculados
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Apropriações departamento encontradas
+          schema:
+            $ref: "#/definitions/GetResponseDepartmentsCostBill"
+        "404":
+          description: Apropriações departamento não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/buildings-cost":
+    get:
+      tags:
+        - Apropriação obra do título
+      summary: Busca as apropriações obra do título
+      operationId: getBillBuildingsCost
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título em que as apropriações de obra estão vinculados
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Apropriações obra encontradas
+          schema:
+            $ref: "#/definitions/GetResponseBuildingsCostBill"
+        "404":
+          description: Apropriações obra não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/attachments":
+    post:
+      tags:
+        - Anexo do título
+      summary: Inserção de anexo no título
+      operationId: insertBillAttachments
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título
+          required: true
+          type: integer
+          format: int32
+        - name: description
+          in: query
+          description: "Descrição do anexo | Máximo: 500 caracteres "
+          required: true
+          type: string
+          maxLength: 500
+        - in: formData
+          name: file
+          type: file
+          description: >-
+            Arquivo para inserção | Tipo: multipart/form-data | Tamanho máximo:
+            70 MB | Tamanho máximo do nome do arquivo: 100 caracteres
+          required: true
+      produces:
+        - application/json
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Anexo inserido
+        "400":
+          description: Validações de regra de negócio para inserção de anexo
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    get:
+      tags:
+        - Anexo do título
+      summary: Busca as informações dos anexos do título
+      operationId: getBillAttachments
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Foi encontrado anexos para o título
+          schema:
+            $ref: "#/definitions/GetResponseBillAttachments"
+        "404":
+          description: Título ou anexos inexistentes
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/attachments/{attachmentId}":
+    get:
+      tags:
+        - Anexo do título
+      summary: Download de anexo do título
+      operationId: downloadBillAttachment
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título
+          required: true
+          type: integer
+          format: int32
+        - name: attachmentId
+          in: path
+          description: ID do anexo
+          required: true
+          type: integer
+          format: int32
+      produces:
+        - application/json
+        - file
+      responses:
+        "200":
+          description: Anexo encontrado
+          schema:
+            type: file
+        "404":
+          description: Anexo ou título não foram encontrados
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+  "/bills/{billId}/units":
+    get:
+      tags:
+        - Unidades do título
+      summary: Busca as unidades do título no Sienge
+      operationId: getUnits
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Unidades do título encontradas
+          schema:
+            $ref: "#/definitions/GetResponseUnits"
+        "404":
+          description: Unidades do título não encontradas
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+    put:
+      tags:
+        - Unidades do título
+      summary: Altera as unidades do título no Sienge
+      operationId: updateUnits
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Objeto para alterar as unidades do título
+          required: true
+          schema:
+            $ref: "#/definitions/BillUnitsInsert"
+      produces:
+        - application/json
+      responses:
+        "204":
+          description: Unidades do alteradas com sucesso.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "404":
+          description: Recurso não encontrado
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMenssage"
+definitions:
+  Bills:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de títulos
+        items:
+          $ref: "#/definitions/Bill"
+  Bill:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Número do título
+      debtorId:
+        type: integer
+        format: int32
+        description: Código da empresa
+      creditorId:
+        type: integer
+        format: int32
+        description: Código do credor
+      documentIdentificationId:
+        type: string
+        description: "Código do documento | Exemplo: AV"
+      documentNumber:
+        type: string
+        description: "Número do documento | Exemplo: Dez2017"
+      issueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de emissão
+        example: "2018-12-22"
+      installmentsNumber:
+        type: integer
+        format: int32
+        description: Quantidade de parcelas
+        minimum: 1
+        maximum: 840
+      totalInvoiceAmount:
+        type: number
+        format: double
+        description: "Valor do título bruto, somando impostos e desconto | Exemplo: 100.00"
+      tenantUrl:
+        type: string
+        description: URL Base das API's
+        example: "https://api.sienge.com.br/suporte/sienge/public/api"
+      notes:
+        type: string
+        description: Observação do título
+        example: Observação título Dez2017
+        maxLength: 500
+      discount:
+        type: number
+        description: "Valor de desconto | Exemplo: 10.00"
+        format: double
+      status:
+        type: string
+        description: "Tipo de consistência: 'S' - Completo | 'N' - Incompleto | 'I' - Em inclusão"
+        enum:
+          - S
+          - N
+          - I
+        example: S
+        maxLength: 1
+      originId:
+        type: string
+        description: "Código de origem: 'AC' - Administração de Compras | 'RA' - Administração de Obras | 'AI' - Apuração de Impostos | 'CO' - Comercial | 'CF' - Conhecimento de Frete | 'CP' - Contas a Pagar | 'ME' - Contratos e Medições | 'MO' - Controle de Mão de Obra | 'DV' - Devolução de Nota Fiscal | 'RF' - Financiamento Bancário | 'FP' - Folha de Pagamento | 'FE' - Frota de Equipamentos | 'GI' - Guia de Impostos | 'LO' - Locação de Imóveis | 'SE' - Sistemas Externos'"
+        enum:
+          - AC
+          - RA
+          - AI
+          - CO
+          - CF
+          - CP
+          - ME
+          - MO
+          - DV
+          - RF
+          - FP
+          - FE
+          - GI
+          - LO
+          - SE
+        maxLength: 2
+        example: AC
+      registeredUserId:
+        type: string
+        description: ID do Usuário que cadastrou o título
+        example: USER
+      registeredBy:
+        type: string
+        description: Usuário que cadastrou o título
+        example: User
+      registeredDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd HH:mm:ss | Exemplo: 2022-06-10 10:00:00)"
+        description: Data de cadastro do título
+        example: "2022-06-10 10:00:00"
+      changedUserId:
+        type: string
+        description: ID do Usuário que realizou a última alteração do título
+        example: USER
+      changedBy:
+        type: string
+        description: Usuário que realizou a última alteração do título
+        example: User
+      changedDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd HH:mm:ss | Exemplo: 2022-06-10 10:00:00)"
+        description: Data da última alteração do título
+        example: "2022-06-10 10:00:00"
+      accessKeyNumber:
+        type: string
+        description: "Chave de acesso da nota fiscal eletrônica, deve possuir 44 caracteres"
+        example: "1231231231231231231231231231231231231231231"
+      links:
+        type: array
+        items:
+          $ref: "#/definitions/Link"
+        description: Links para acessar outros recursos
+  BillInsert:
+    type: object
+    required:
+      - debtorId
+      - creditorId
+      - documentIdentificationId
+      - documentNumber
+      - issueDate
+      - installmentsNumber
+      - indexId
+      - baseDate
+      - dueDate
+      - billDate
+      - totalInvoiceAmount
+      - notes
+      - discount
+      - budgetCategories
+    properties:
+      debtorId:
+        type: integer
+        format: int32
+        description: Código da empresa
+      creditorId:
+        type: integer
+        format: int32
+        description: Código do credor
+      documentIdentificationId:
+        type: string
+        description: "Código do documento | Exemplo: AV"
+      documentNumber:
+        type: string
+        description: "Número do documento | Exemplo: Dez2017"
+        minLength: 1
+        maxLength: 20
+      issueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de emissão
+        example: "2018-12-22"
+      installmentsNumber:
+        type: integer
+        format: int32
+        description: Quantidade de parcelas
+        minimum: 1
+        maximum: 840
+      indexId:
+        type: integer
+        format: int32
+        description: Código do indexador
+      baseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data base
+        example: "2018-12-22"
+      dueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de vencimento da primeira parcela
+        example: "2018-12-22"
+      billDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de competência
+        example: "2018-12-22"
+      totalInvoiceAmount:
+        type: number
+        description: >-
+          Valor do título bruto, somando impostos e desconto | Máximo de casas
+          decimais: 2 | Exemplo: 108.75
+        format: double
+        minimum: 0.01
+        maximum: 9999999999.99
+      notes:
+        type: string
+        description: "Observação do título | Exemplo: Observação título Dez2017"
+        maxLength: 500
+      discount:
+        type: number
+        description: "Valor desconto | Máximo de casas decimais: 2 | Exemplo: 10.00"
+        format: double
+        minimum: 0
+        maximum: 9999999999.99
+      budgetCategories:
+        type: array
+        description: Apropriações financeiras do título
+        items:
+          $ref: "#/definitions/BillBudgetCategoriesInsert"
+      taxes:
+        type: array
+        description: Impostos do título
+        items:
+          $ref: "#/definitions/BillTaxInsert"
+      departmentsCost:
+        type: array
+        description: Apropriações de departamento
+        items:
+          $ref: "#/definitions/BillDepartmentCostInsert"
+      buildingsCost:
+        type: array
+        description: Apropriações de obra
+        items:
+          $ref: "#/definitions/BillBuildingsCostInsert"
+      units:
+        type: array
+        description: Unidades do título
+        items:
+          $ref: "#/definitions/BillUnitsInsert"
+
+  ElectronicInvoiceBillInsert:
+    type: object
+    required:
+      - documentIdentificationId
+      - installmentsNumber
+      - indexId
+      - baseDate
+      - dueDate
+      - billDate
+      - budgetCategories
+      - accessKeyNumber
+    properties:
+      debtorId:
+        type: integer
+        format: int32
+        description: "Código da empresa (não é obrigatório, mas servirá de critério de desempate caso exista mais uma empresa com o CNPJ do destinário da NFE)"
+      creditorId:
+        type: integer
+        format: int32
+        description: "Código do credor (não é obrigatório, mas servirá de critério de desempate caso exista mais um credor com CPF ou CNPJ do emitente da NFE)"
+      documentIdentificationId:
+        type: string
+        description: "Código do documento, documento deve ser fiscal e possuir modelo 55 no Sienge | Exemplo: NFE"
+      accessKeyNumber:
+        type: string
+        description: "Chave de acesso da nota fiscal eletrônica, deve possuir 44 caracteres"
+        example: "1231231231231231231231231231231231231231231"
+      installmentsNumber:
+        type: integer
+        format: int32
+        description: Quantidade de parcelas
+        minimum: 1
+        maximum: 840
+      indexId:
+        type: integer
+        format: int32
+        description: Código do indexador
+      baseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data base
+        example: "2018-12-22"
+      dueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de vencimento da primeira parcela
+        example: "2018-12-22"
+      billDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de competência
+        example: "2018-12-22"
+      notes:
+        type: string
+        example: "Despesa da obra"
+        description: "Observação do título | Exemplo: Observação título Dez2017"
+        maxLength: 500
+      budgetCategories:
+        type: array
+        description: Apropriações financeiras do título
+        items:
+          $ref: "#/definitions/BillBudgetCategoriesInsert"
+      departmentsCost:
+        type: array
+        description: Apropriações de departamento
+        items:
+          $ref: "#/definitions/BillDepartmentCostInsert"
+      buildingsCost:
+        type: array
+        description: Apropriações de obra
+        items:
+          $ref: "#/definitions/BillBuildingsCostInsert"
+      units:
+        type: array
+        description: Unidades do título
+        items:
+          $ref: "#/definitions/BillUnitsInsert"
+  BillUpdate:
+    type: object
+    properties:
+      documentIdentificationId:
+        type: string
+        description: Identificador do documento
+        example: "NF"
+      documentNumber:
+        type: string
+        description: Número do documento
+        example: "AX123"
+  BillInstallmentUpdate:
+    type: object
+    properties:
+      dueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de vencimento
+        example: "2018-12-22"
+      interestAmount:
+        type: number
+        description: "Valor de juros | Máximo de casas decimais: 2 | Exemplo: 10.00"
+        format: double
+        minimum: 0
+        maximum: 9999999999.99
+      fineAmount:
+        type: number
+        description: "Valor de multa | Máximo de casas decimais: 2 | Exemplo: 10.00"
+        format: double
+        minimum: 0
+        maximum: 9999999999.99
+      monetaryCorrectionAmount:
+        type: number
+        description: "Valor de correção monetária | Máximo de casas decimais: 2 | Exemplo: 10.00"
+        format: double
+        minimum: 0
+        maximum: 9999999999.99
+      discountAmount:
+        type: number
+        description: "Valor de desconto | Máximo de casas decimais: 2 | Exemplo: 10.00"
+        format: double
+        minimum: 0
+        maximum: 9999999999.99
+  BillInstallment:
+    type: object
+    properties:
+      indexId:
+        type: integer
+        format: int32
+        description: Código do indexador
+      baseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data base
+        example: "2018-12-22"
+      dueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de vencimento
+        example: "2018-12-22"
+      billDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data de competência
+        example: "2018-12-22"
+      amount:
+        type: number
+        description: "Valor da parcela | Máximo de casas decimais: 2 | Exemplo: 100.00"
+        format: double
+      numberInstallment:
+        type: integer
+        format: int32
+        description: Número da parcela
+      situation:
+        type: string
+        example: "Totalmente paga"
+        description: "Situação da parcela ('Não paga', 'Parcialmente paga', 'Totalmente paga')"
+      sentToBank:
+        type: boolean
+        example: true
+        description: "Indica se a parcela está vinculada no pagamento escritural e lote gerado"
+      batchNumber:
+        type: integer
+        format: int32
+        description: "Número do lote, se não houver lote virá nulo"
+  BillTax:
+    type: object
+    properties:
+      taxId:
+        type: integer
+        format: int32
+        description: "Código do imposto | Exemplo: IR"
+      ibgeCityId:
+        type: string
+        description: "Código do IBGE do município | Exemplo: 4205407"
+        example: "4205407"
+        minLength: 7
+        maxLength: 7
+      rate:
+        type: number
+        description: "Percentual do imposto |  Máximo de casas decimais: 4 | Exemplo: 5.4599"
+        format: double
+        maximum: 100
+      amount:
+        type: number
+        description: "Valor do imposto |  Máximo de casas decimais: 2 | Exemplo: 95.57"
+        format: double
+        maximum: 9999999999.99
+      taxableBaseAmount:
+        type: number
+        description: "Valor de incidência | Máximo de casas decimais: 2 | Exemplo: 253.75"
+        format: double
+        maximum: 9999999999.99
+      taxRateMarker:
+        type: number
+        description: >-
+          Percentual de incidência | Máximo de casas decimais: 2 | Exemplo:
+          100.00
+        format: double
+        maximum: 100
+      usesIncomeTaxTable:
+        type: boolean
+        description: Indica se o imposto utiliza a tabela de imposto de renda
+      taxGuideBill:
+        type: integer
+        format: int32
+        description: Indica o número do título de guia gerado
+  BillTaxInsert:
+    type: object
+    required:
+      - taxId
+      - ibgeCityId
+      - rate
+      - amount
+      - taxableBaseAmount
+      - taxRateMarker
+      - usesIncomeTaxTable
+    properties:
+      taxId:
+        type: integer
+        format: int32
+        description: "Código do imposto | Exemplo: IR"
+      ibgeCityId:
+        type: string
+        description: "Código do IBGE do município | Exemplo: 4205407"
+        example: "4205407"
+        minLength: 7
+        maxLength: 7
+      rate:
+        type: number
+        description: "Percentual do imposto |  Máximo de casas decimais: 4 | Exemplo: 5.4599"
+        format: double
+        maximum: 100
+      amount:
+        type: number
+        description: "Valor do imposto |  Máximo de casas decimais: 2 | Exemplo: 95.57"
+        format: double
+        maximum: 9999999999.99
+      taxableBaseAmount:
+        type: number
+        description: "Valor de incidência | Máximo de casas decimais: 2 | Exemplo: 253.75"
+        format: double
+        maximum: 9999999999.99
+      taxRateMarker:
+        type: number
+        description: >-
+          Percentual de incidência | Máximo de casas decimais: 2 | Exemplo:
+          100.00
+        format: double
+        maximum: 100
+      usesIncomeTaxTable:
+        type: boolean
+        description: Indica se o imposto utiliza a tabela de imposto de renda
+  BillDepartmentCost:
+    type: object
+    properties:
+      departmentId:
+        type: integer
+        format: int32
+        description: Código do departamento
+      departmentName:
+        type: string
+        description: "Nome do departamento"
+        maxLength: 80
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado no departamento |  Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+  BillBuildingCost:
+    type: object
+    properties:
+      buildingId:
+        type: integer
+        format: int32
+        description: Código da obra
+      buildingName:
+        type: string
+        description: "Nome da obra"
+        maxLength: 80
+      buildingUnitId:
+        type: integer
+        format: int32
+        description: Código da unidade construtiva
+      buildingUnitName:
+        type: string
+        description: "Nome da unidade construtiva"
+        maxLength: 80
+      costEstimationSheetId:
+        type: integer
+        format: int32
+        description: Código do item de orçamento
+      costEstimationSheetName:
+        type: string
+        description: "Nome do item de orçamento"
+        maxLength: 80
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado na obra |  Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+  BillBudgetCategories:
+    type: object
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: Código do centro de custo
+      paymentCategoriesId:
+        type: string
+        description: "Código do plano financeiro (sem máscara) | Exemplo: 2010101"
+        minLength: 1
+        maxLength: 9
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado do centro de custo |  Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  BillBudgetCategoriesInsert:
+    type: object
+    required:
+      - costCenterId
+      - paymentCategoriesId
+      - percentage
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: Código do centro de custo
+      paymentCategoriesId:
+        type: string
+        description: "Código do plano financeiro (sem máscara) | Exemplo: 2010101"
+        minLength: 1
+        maxLength: 9
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado do centro de custo | Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+  BillDepartmentCostInsert:
+    type: object
+    required:
+      - departmentId
+      - percentage
+    properties:
+      departmentId:
+        type: integer
+        format: int32
+        description: Código do departamento
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado no departamento | Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+  BillBuildingsCostInsert:
+    type: object
+    required:
+      - buildingId
+      - buildingUnitId
+      - costEstimationSheetId
+      - percentage
+    properties:
+      buildingId:
+        type: integer
+        format: int32
+        description: Código da obra
+      buildingUnitId:
+        type: integer
+        format: int32
+        description: Código da unidade construtiva
+      costEstimationSheetId:
+        type: string
+        description: "Código do item de orçamento (cem máscara) | Exemplo: 1.001.001"
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado a obra | Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+  BillUnitsInsert:
+    type: object
+    required:
+      - unitId
+      - costCenterId
+      - percentage
+      - principal
+    properties:
+      unitId:
+        type: string
+        description: "Código da unidade"
+      costCenterId:
+        type: integer
+        format: int32
+        description: Código do centro de custo
+      percentage:
+        type: number
+        description: >-
+          Percentual da unidade | Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+      principal:
+        type: string
+        description: >
+          Indica se é Unidade principal
+            * S - Sim
+            * N - Não
+        enum: ["S", "N"]
+  Link:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Nome da recurso associado
+        example: debtor
+      href:
+        type: string
+        description: URL do recurso associado
+        example: "http://../v1/debtor/1"
+  ResponseMenssage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.
+  GetResponseBillInstallments:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Parcelas do título
+        items:
+          $ref: "#/definitions/BillInstallment"
+  GetResponseTaxesBill:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de impostos do título
+        items:
+          $ref: "#/definitions/BillTax"
+  GetResponseBudgetCategoriesBill:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de apropriações financeiras do título
+        items:
+          $ref: "#/definitions/BillBudgetCategories"
+  GetResponseDepartmentsCostBill:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de apropriações de departamento  do título
+        items:
+          $ref: "#/definitions/BillDepartmentCost"
+  GetResponseBuildingsCostBill:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de apropriações de obra do título
+        items:
+          $ref: "#/definitions/BillBuildingCost"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  BankTransfer:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+      - beneficiaryAccountType
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      beneficiaryBankCode:
+        type: string
+        description: Código do banco destino
+        maxLength: 3
+      beneficiaryBankBranchNumber:
+        type: string
+        description: Código da agência destino
+        maxLength: 6
+      beneficiaryBankBranchDigit:
+        type: string
+        description: Digito da agência destino
+        maxLength: 1
+      beneficiaryAccountNumber:
+        type: string
+        description: Código da conta destino
+        maxLength: 14
+      beneficiaryAccountDigit:
+        type: string
+        description: Digito da conta destino
+        maxLength: 1
+      beneficiaryAccountDAC:
+        type: string
+        description: Dígito de Auto Conferência
+        maxLength: 1
+      beneficiaryAccountType:
+        type: string
+        description: 'Tipo da conta: <br /> "C" - Corrente <br />"P" - Poupança'
+        maxLength: 1
+      beneficiaryName:
+        type: string
+        description: Nome do beneficiário
+        maxLength: 80
+      beneficiaryCPFNumber:
+        type: string
+        description: "CPF do beneficiário | Obs.: Com máscara"
+        maxLength: 14
+      beneficiaryCNPJNumber:
+        type: string
+        description: "CPNJ do beneficiário | Obs.: Com máscara"
+        maxLength: 18
+      tedFinalityCode:
+        type: string
+        description: >-
+          Código de finalidade TED | De acordo com padrão do Banco Central do
+          Brasil
+        maxLength: 5
+      docFinalityCode:
+        type: string
+        description: >-
+          Código de finalidade DOC | De acordo com padrão do Banco Central do
+          Brasil
+        maxLength: 2
+  BoletoBancario:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      boletoBancarioBarCodeNumber:
+        type: string
+        description: Código de barras
+        maxLength: 44
+      boletoBancarioManualBarCodeNumber:
+        type: string
+        description: Linha digitável
+        maxLength: 47
+      documentNumber:
+        type: string
+        description: Número do documento
+        maxLength: 10
+      boletoBancarioBeneficiaryId:
+        type: integer
+        format: int32
+        description: Código ID do beneficiário
+      boletoBancarioSacadorId:
+        type: integer
+        format: int32
+        description: Código ID do sacador
+      discountDueDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Data limite para desconto
+        example: "2018-12-22"
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  BoletoConcessionaria:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      boletoConcessionariaBarCodeNumber:
+        type: string
+        description: Código de barras
+        maxLength: 44
+      boletoConcessionariaManualBarCodeNumber:
+        type: string
+        description: Linha digitável
+        maxLength: 47
+      boletoConcessionariaPaymentType:
+        type: string
+        description: >-
+          Tipo do pagamento | Descrição dos possíveis retornos:<br/> "F" -
+          FGTS;<br/> "B" -  Contas de consumo;<br/> "D" -  DARF com código de
+          barras;<br/> "I" -  IPTU/ISS;<br/> "O" -  Outros;<br/> "H" -
+          GNRE;<br/> "G" -  GPS/INSS;<br/>
+        maxLength: 1
+      documentNumber:
+        type: string
+        description: Número do documento
+        maxLength: 10
+      taxPayerType:
+        type: string
+        description: 'Tipo de contribuinte: <br /> "C" - Credor <br /> "O" - Empreendimento'
+        maxLength: 1
+      creditorTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando credor
+      costCenterTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando empreendimento
+      taxPayerCPFCNPJNumber:
+        type: string
+        description: "CPF/CPNJ do contribuinte | Obs.: Com máscara"
+        maxLength: 18
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  BoletoTax:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      taxBarCodeNumber:
+        type: string
+        description: Código de barras
+        maxLength: 44
+      taxManualBarCodeNumber:
+        type: string
+        description: Linha digitável
+        maxLength: 47
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  DDA:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      beneficiaryBankCode:
+        type: string
+        description: Código do banco destino
+        maxLength: 3
+      beneficiaryAccountNumber:
+        type: string
+        description: Código da conta destino
+        maxLength: 14
+      beneficiaryAccountDigit:
+        type: string
+        description: Digito da conta destino
+        maxLength: 1
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  DarfTax:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+      - darfTaxReceitaId
+      - darfBaseDate
+      - taxPayerType
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      darfTaxReceitaId:
+        type: string
+        description: "Código da receita | Exemplo: 2172"
+        maxLength: 4
+      darfReferenceNumber:
+        type: number
+        format: long
+        description: "Número de Referência | Exemplo: 2111100127617"
+        maxLength: 17
+      darfBaseDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-12-22)"
+        description: Período de apuração
+        example: "2018-12-22"
+      taxPayerType:
+        type: string
+        description: 'Tipo de contribuinte: <br /> "C" - Credor <br /> "O" - Empreendimento'
+        maxLength: 1
+      creditorTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando credor
+      costCenterTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando empreendimento
+      taxPayerCPFCNPJNumber:
+        type: string
+        description: "CPF/CPNJ do contribuinte | Obs.: Com máscara"
+        maxLength: 18
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  DarjTax:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+      - darjReferencePeriod
+      - inscricaoEstadualNumber
+      - taxPayerType
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      darjReferencePeriod:
+        type: string
+        format: "date (Formato yyyyMM | Exemplo: 201812)"
+        description: Período de referência
+        example: "201812"
+      inscricaoEstadualNumber:
+        type: string
+        description: "Inscrição estadual | Exemplo: 566013657780"
+        maxLength: 12
+      darjDocumentNumber:
+        type: string
+        description: "Número do documento DARJ| Exemplo: 4392184389210438"
+        maxLength: 16
+      taxPayerType:
+        type: string
+        description: 'Tipo de contribuinte: <br /> "C" - Credor <br /> "O" - Empreendimento'
+        maxLength: 1
+      creditorTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando credor
+      costCenterTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando empreendimento
+      taxPayerCPFCNPJNumber:
+        type: string
+        description: "CPF/CPNJ do contribuinte | Obs.: Com máscara"
+        maxLength: 18
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  FGTSTax:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+      - fgtsTaxReceitaId
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      fgtsTaxReceitaId:
+        type: string
+        description: "Código da receita | Exemplo: 2172"
+        maxLength: 4
+      fgtsIdNumber:
+        type: number
+        format: long
+        description: "Identificador do FGTS | Exemplo: 8932189540748465"
+        maxLength: 16
+      conectividadeSocialLacreNumber:
+        type: integer
+        format: int32
+        description: "Lacre de conectividade social | Exemplo: 892143982"
+        maxLength: 9
+      conectividadeSocialLacreDigit:
+        type: integer
+        format: int32
+        description: "Digito lacre de conectividade social | Exemplo: 12"
+        maxLength: 2
+      taxPayerType:
+        type: string
+        description: 'Tipo de contribuinte: <br /> "C" - Credor <br /> "O" - Empreendimento'
+        maxLength: 1
+      creditorTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando credor
+      costCenterTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando empreendimento
+      taxPayerCPFCNPJNumber:
+        type: string
+        description: "CPF/CPNJ do contribuinte | Obs.: Com máscara"
+        maxLength: 18
+      taxBarCodeNumber:
+        type: string
+        description: Código de barras
+        maxLength: 44
+      taxManualBarCodeNumber:
+        type: string
+        description: Linha digitável
+        maxLength: 47
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  GARETax:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+      - taxPayerType
+      - gareTaxReceitaId
+      - inscricaoEstadualNumber
+      - gareLabelNumber
+      - gareReferencePeriod
+      - gareInstallmentNumber
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      gareTaxReceitaId:
+        type: string
+        description: "Código da receita | Exemplo: 2172"
+        maxLength: 4
+      gareReferencePeriod:
+        type: string
+        format: "date (Formato yyyyMM | Exemplo: 201812)"
+        description: Período de referência
+        example: "201812"
+      inscricaoEstadualNumber:
+        type: string
+        description: "Inscrição estadual | Exemplo: 566013657780"
+        maxLength: 12
+      gareLabelNumber:
+        type: string
+        description: Número de Inscrição do débito na Dívida Ativa ou Número da Etiqueta
+        maxLength: 13
+      gareInstallmentNumber:
+        type: string
+        description: Parcela/notificação
+        maxLength: 13
+      taxPayerType:
+        type: string
+        description: 'Tipo de contribuinte: <br /> "C" - Credor <br /> "O" - Empreendimento'
+        maxLength: 1
+      creditorTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando credor
+      costCenterTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando empreendimento
+      taxPayerCPFCNPJNumber:
+        type: string
+        description: "CPF/CPNJ do contribuinte | Obs.: Com máscara"
+        maxLength: 18
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  INSSTax:
+    type: object
+    required:
+      - paymentTypeId
+      - notes
+      - taxPayerIdentificationType
+      - taxPayerIdentificationNumber
+      - inssPaymentCode
+      - inssBaseDate
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      taxPayerIdentificationType:
+        type: integer
+        format: int32
+        description: >-
+          Tipo do identificador | Possíveis retornos:  <br /> 1 - CNPJ<br /> 2 -
+          CEI<br /> 3 - DEBCAD<br /> 4 - NIT/PIS/PASEP<br /> 5 - Nº do Título<br
+          /> 6 - Referência<br /> 7 - NB<br /> 8 - CPF<br />
+        maxLength: 1
+      taxPayerIdentificationNumber:
+        type: string
+        description: Número identificador
+        maxLength: 14
+      inssPaymentCode:
+        type: string
+        description: "Código do pagamento | Exemplo: 6658"
+        maxLength: 4
+      inssBaseDate:
+        type: string
+        format: "date (Formato MMyyyy | Exemplo: 122015)"
+        description: Competência
+        example: "122015"
+      inssOtherEntitiesValue:
+        type: number
+        description: >-
+          Valor outras entidades  <br /> Máximo de casas decimais: 2 | Exemplo:
+          3.75
+        format: double
+      taxPayerType:
+        type: string
+        description: 'Tipo de contribuinte: <br /> "C" - Credor <br /> "O" - Empreendimento'
+        maxLength: 1
+      creditorTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando credor
+      costCenterTaxPayerId:
+        type: integer
+        format: int32
+        description: Código do contribuinte quando empreendimento
+      taxPayerCPFCNPJNumber:
+        type: string
+        description: "CPF/CPNJ do contribuinte | Obs.: Com máscara"
+        maxLength: 18
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  Pix:
+    type: object
+    required:
+      - paymentTypeId
+      - isUsingCreditorData
+      - keyPix
+      - keyPixType
+    properties:
+      paymentTypeId:
+        type: integer
+        format: int32
+        description: Código da forma de pagamento do Sienge
+      notes:
+        type: string
+        description: Observação da informação de pagamento
+        maxLength: 500
+      beneficiaryName:
+        type: string
+        description: Nome do beneficiário
+        maxLength: 80
+      beneficiaryCPFNumber:
+        type: string
+        description: "CPF do beneficiário | Obs.: Com máscara"
+        maxLength: 14
+      beneficiaryCNPJNumber:
+        type: string
+        description: "CPNJ do beneficiário | Obs.: Com máscara"
+        maxLength: 18
+      isUsingCreditorData:
+        type: string
+        description: '"S" - Sim <br /> "N" - Não'
+        example: "S"
+      keyPixType:
+        type: string
+        example: "C"
+        description: 'Tipo da chave pix: <br /> "C" - CPF/CNPJ <br /> "E" - E-mail <br /> "T" - Telefone <br /> "A" - Aleatória'
+        maxLength: 1
+      keyPix:
+        type: string
+        description: "Chave pix | Obs.: Com máscara"
+        maxLength: 77
+      links:
+        type: array
+        description: Links para acessar outros recursos
+        items:
+          $ref: "#/definitions/Link"
+  GetResponseBillAttachments:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de anexos do título
+        items:
+          $ref: "#/definitions/BillAttachment"
+  BillAttachment:
+    type: object
+    properties:
+      attachmentid:
+        type: integer
+        format: int32
+        description: "ID do anexo | Exemplo: 1"
+        example: 1
+      name:
+        type: string
+        description: "Nome do arquivo | Exemplo: nota_fiscal.pdf"
+        example: nota_fiscal.pdf
+        maxLength: 100
+      description:
+        type: string
+        description: "Descrição do anexo | Exemplo: Nota Fiscal Eltrônica"
+        example: Nota Fiscal Eltrônica
+        maxLength: 500
+      size:
+        type: integer
+        format: int32
+        description: "Tamanho do arquivo em bytes | Exemplo: 320123"
+      contentType:
+        type: string
+        description: "Tipo do arquivo (MimeType) | Exemplo: application/pdf"
+        example: application/pdf
+      links:
+        type: array
+        description: Link para realizar o download do arquivo
+        items:
+          $ref: "#/definitions/Link"
+  GetResponseUnits:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de unidades do título
+        items:
+          $ref: "#/definitions/Unit"
+  Unit:
+    type: object
+    properties:
+      billId:
+        type: integer
+        format: int32
+        description: "ID do título | Exemplo: 1"
+        example: 1
+      unitId:
+        type: string
+        description: "numero da unidade | Exemplo: 1"
+        example: "1"
+      costCenterId:
+        type: integer
+        format: int32
+        description: "ID do centro de custo | Exemplo: 1"
+        example: 1
+      name:
+        type: string
+        description: "Nome do empreendimento"
+        example: VILA GARDEN
+      propertyType:
+        type: string
+        description: "Tipo do imóvel"
+        example: Apartamento
+      percentage:
+        type: number
+        description: >-
+          Percentual apropriado na unidade |  Máximo de casas decimais:
+          12 | Exemplo: 100.00
+        format: double
+        maximum: 100
+      principal:
+        type: string
+        description: Unidade principal ('S' or 'N')
+      links:
+        type: array
+        description: Link para realizar busca das referências
+        items:
+          $ref: "#/definitions/Link"

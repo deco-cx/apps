@@ -1,0 +1,398 @@
+swagger: "2.0"
+info:
+  description: API de lançamentos contábeis da contabilidade
+  version: "1.0"
+  title: Lançamentos Contábeis (Contabilidade)
+host: "api.sienge.com.br"
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: "Lançamentos da Contabilidade"
+    description: "API de lançamentos contábeis"
+schemes:
+  - "https"
+security:
+  - basicAuth: []
+paths:
+  /accountancy/entries:
+    post:
+      tags:
+        - "Lançamentos da Contabilidade"
+      summary: "Salva lançamentos contábeis"
+      operationId: "patchAccountancyEntries"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Lista de objetos lançamentos"
+          required: true
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Entry"
+      responses:
+        "201":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/ApiSuccess"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+    get:
+      tags:
+        - "Lançamentos da Contabilidade"
+      summary: "Busca lançamentos contábeis"
+      operationId: getAccountancyEntries
+      parameters:
+        - name: companyId
+          in: query
+          type: integer
+          required: true
+          description: Código da empresa
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor máximo permitido é 200.
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.
+          type: integer
+          default: 0
+          format: int32
+        - name: entryBatchId
+          in: query
+          type: integer
+          format: int32
+          description: Código do lote
+        - name: entryType
+          in: query
+          type: string
+          description: >-
+            Tipo do lançamento, podendo ser (N)ormal, (S)ocietário ou (F)iscal.
+        - name: costCenter
+          in: query
+          description: Centro de custo
+          type: integer
+        - name: startDate
+          in: query
+          type: string
+          format: "startDate (Formato ISO 8601 yyyy-MM-dd)"
+          description: Data inicial do lançamento
+        - name: endDate
+          in: query
+          type: string
+          format: "endDate (Formato ISO 8601 yyyy-MM-dd)"
+          description: Data final do lançamento
+        - name: account
+          description: Conta contábil, podendo ser débito ou crédito
+          in: query
+          type: string
+      responses:
+        "200":
+          description: "Lançamento encontrado"
+          schema:
+            $ref: "#/definitions/PaginationResultEntry"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+  /accountancy/entries/async:
+    post:
+      tags:
+        - "Lançamentos da Contabilidade"
+      summary: "Salva lançamentos contábeis assíncronos"
+      operationId: "patchAccountancyEntriesAsync"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Lista de objetos lançamentos"
+          required: true
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Entry"
+      responses:
+        "201":
+          description: "Operação bem sucedida"
+          schema:
+            $ref: "#/definitions/ApiSuccess"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+  /accountancy/entries/async/status:
+    get:
+      tags:
+        - "Status do processamento"
+      summary: "Retorna o status do processamento dos lançamentos"
+      operationId: getAccountancyEntriesAsyncStatus
+      responses:
+        "200":
+          description: "Status da importação"
+          schema:
+            $ref: "#/definitions/ApiSuccess"
+        "400":
+          description: "Requisição mal formada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: "O recurso requisitado não foi encontrado"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "422":
+          description: "Entidade não processada"
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: "Erro interno"
+          schema:
+            $ref: "#/definitions/ApiError"
+
+securityDefinitions:
+  basicAuth:
+    description: "HTTP Basic Authentication. Works over `HTTP` and `HTTPS`"
+    type: "basic"
+definitions:
+  Entry:
+    type: "object"
+    required:
+      - "amount"
+      - "companyId"
+      - "date"
+      - "eventId"
+    properties:
+      companyId:
+        type: "integer"
+        example: 1
+        description: "Código da empresa"
+      eventId:
+        type: "integer"
+        example: 10
+        description: "Código da partida"
+      date:
+        type: "string"
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo:2017-12-20)"
+        example: "2017-12-20"
+        description: "Data do lançamento"
+      debitAccountId:
+        type: "string"
+        example: "1.2.03.13.00043"
+        description: "Código da conta, podendo ser o código contábil ou reduzido"
+      creditAccountId:
+        type: "string"
+        example: "4.4.02.10.00002"
+        description: "Código da conta, podendo ser o código contábil ou reduzido"
+      descriptionId:
+        type: "string"
+        example: "123"
+        description: "Código do histórico contábil"
+      description:
+        type: "string"
+        example: "Provisão do pagamento de..."
+        description: "Complemento do histórico contábil"
+      amount:
+        type: "number"
+        example: 1034.94
+        description: "Valor do lançamento"
+      creditorCode:
+        type: "number"
+        example: 1
+        description: "Código do credor"
+      clientCode:
+        type: "number"
+        example: 2
+        description: "Código do cliente"
+      entryBatchId:
+        type: "integer"
+        example: 3
+        description: "Código do lote"
+      entryType:
+        type: "string"
+        example: "Normal"
+        description: "Tipo do lançamento, podendo ser (N)ormal, (S)ocietário ou (F)iscal."
+      costCenterDebitList:
+        type: array
+        description: "Lista rateios por centro de custo débitos"
+        items:
+          $ref: "#/definitions/CostCenter"
+      costCenterCreditList:
+        type: array
+        description: "Lista rateios por centro de custo créditos"
+        items:
+          $ref: "#/definitions/CostCenter"
+  CostCenter:
+    type: "object"
+    required:
+      - "costCenterId"
+      - "amount"
+    properties:
+      costCenterId:
+        type: "integer"
+        example: 1
+        description: "Código do centro custo"
+      amount:
+        type: "number"
+        example: 1034.94
+        description: "Valor do rateio"
+  ApiError:
+    type: "object"
+    required:
+      - "developerMessage"
+      - "status"
+    properties:
+      status:
+        type: "number"
+        description: "Status http"
+      developerMessage:
+        type: "string"
+        description:
+          "Mensagem de erro pertinente a ser reportada ao developer consumidor\
+          \ da API."
+      clientMessage:
+        type: "string"
+        description:
+          "Mensagem de erro relevante ao utilizador\
+          \ final"
+      errors:
+        type: "array"
+        description:
+          "Lista com erros de validação dos atributos de entrada da API.\
+          \ Este campo fica visível apenas quando possuir erros de validação"
+        items:
+          $ref: "#/definitions/ApiExceptionFieldError"
+    description: "Objeto que encapsula os atributos de erros da API"
+  ApiExceptionFieldError:
+    type: "object"
+    required:
+      - "message"
+    properties:
+      field:
+        type: "string"
+        description: "Campo no qual foi passado o valor inválido"
+      message:
+        type: "string"
+        description:
+          "Mensagem de erro pertinente a ser reportada ao developer consumidor\
+          \ da API referente ao valor inválida utilizado nos dados de entrada"
+    description:
+      "Objeto que encapsula os erros de validação dos atributos de entrada\
+      \ da API"
+  ApiSuccess:
+    type: "object"
+    required:
+      - "message"
+    properties:
+      successMessage:
+        type: "string"
+        example: "Lote 10 criado com sucesso"
+        description: "Mensagem de Sucesso"
+      status:
+        type: "number"
+        example: 201
+
+  PaginationResultEntry:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de lançamentos retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/EntryResponse"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        default: 0
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+
+  EntryResponse:
+    allOf:
+      - $ref: "#/definitions/Entry"
+      - type: object
+        properties:
+          id:
+            type: integer
+            description: Código do lançamento
+          conciliated:
+            type: boolean
+            description: Valor que indica se o lançamento está conciliado
+          origin:
+            type: string
+            description: Sistema de origem do lançamento
+            example: "Contas a pagar"
+          originDescription:
+            type: string
+            description: Descrição da origem do lançamento
+            example: Título 123

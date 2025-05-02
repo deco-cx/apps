@@ -1,0 +1,189 @@
+swagger: "2.0"
+info:
+  description: API REST para Saldo de contas
+  version: "1.0"
+  title: Saldo de Contas Correntes
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Saldo de conta
+    description: API REST Saldo de conta
+paths:
+  /accounts-balances:
+    get:
+      tags:
+        - Saldo de conta
+      summary: >-
+        Retorna a lista de saldos das contas do Sienge, na data informada nos
+        parâmetros.
+      operationId: listBalances
+      produces:
+        - application/json
+      parameters:
+        - name: balanceDate
+          in: query
+          description: Data do saldo das contas
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: accountNumber
+          in: query
+          description: Número da conta cadastrada no Sienge
+          required: false
+          type: string
+        - name: accountStatus
+          in: query
+          description: >-
+            Os status de uma conta corrente são: "ENABLED" - Ativa, "DISABLED" - Inativa. Caso não seja passado nenhum status por padrão os valores devolvidos serão as contas ativas ("ENABLED"). Pode-se ainda passar "ALL" para trazer as contas "Ativas" e "Inativas".
+          required: false
+          type: string
+        - name: companyId
+          in: query
+          description: Código da empresa cadastrada no Sienge
+          required: false
+          type: integer
+        - name: companyGroupId
+          in: query
+          description: Código do grupo de empresas cadastrado no Sienge
+          required: false
+          type: integer
+          format: int32
+        - name: showLastBalanceIfNotExistBalance
+          in: query
+          description: >
+            Flag para mostrar saldo de data anterior a data informada, útil para quando a conta não possuir saldo na data informada
+              * `S` - Mostrar saldo da data anterior a data informada
+          enum: ["S"]
+          required: false
+          type: string
+          format: "Max size 1"
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor padrão é 100 e o valor máximo permitdo é 300.
+          type: integer
+          format: int32
+          required: false
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.  Valor
+            padrão é 0.
+          type: integer
+          format: int32
+          required: false
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/GetResponseAccountBalance"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  ApiError:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Status http
+      developer-message:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao desenvolvedor
+          consumidor da API.
+      client-message:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  GetResponseAccountBalance:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de saldos retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Balance"
+  Link:
+    type: object
+    properties:
+      href:
+        type: string
+      rel:
+        type: string
+  ResultSetMetadata:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.  Valor padrão
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados.  Valor
+          padrão é 100 e o valor máximo permitdo é 300.
+        minimum: 1
+        maximum: 300
+
+  Balance:
+    type: object
+    properties:
+      amount:
+        type: number
+        format: double
+        example: 999.99
+        description: Valor do saldo da conta
+      reconciledAmount:
+        type: number
+        format: double
+        example: 999.99
+        description: Valor do saldo da conta conciliado
+      balanceDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        example: "2018-01-01"
+        description: Data do saldo da conta
+      accountNumber:
+        type: string
+        example: CAIXA
+        description: Número da conta a qual o saldo está vinculado
+      accountStatus:
+        type: string
+        example: ENABLED
+        description: >
+          Os status de uma conta corrente são:
+            * `ENABLED` - Ativa,
+            * `DISABLED` - Inativa,
+      companyId:
+        type: number
+        format: int32
+        example: 1000
+        description: Código da empresa a qual a conta está vinculada
+      links:
+        type: array
+        description: Informação de hypermedia
+        items:
+          $ref: "#/definitions/Link"
+    description: Saldo de conta
