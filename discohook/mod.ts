@@ -6,7 +6,7 @@ import { fetchSafe } from "../utils/fetch.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
-export interface State{
+export interface State {
   api: ReturnType<typeof createHttpClient<DiscordWebhookClient>>;
 }
 

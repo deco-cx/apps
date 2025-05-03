@@ -7,6 +7,6 @@ export interface DiscordWebhookClient {
       thread_id?: string;
     };
     response: DiscordWebhookResponse;
-    body: DiscordMessage
+    body: DiscordMessage;
   };
 }

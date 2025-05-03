@@ -40,18 +40,20 @@ const action = async (
 
   const body = {
     ...messageProps,
-    embeds: Array.isArray(messageProps.embeds) ? messageProps.embeds : undefined
+    embeds: Array.isArray(messageProps.embeds)
+      ? messageProps.embeds
+      : undefined,
   };
 
   const params = {
     wait: wait ?? true,
     ...(thread_id ? { thread_id } : {}),
-  }
+  };
 
   const response = await ctx.api["POST /:webhookId/:webhookToken"]({
     webhookId,
     webhookToken,
-    ...params
+    ...params,
   }, {
     body,
   });

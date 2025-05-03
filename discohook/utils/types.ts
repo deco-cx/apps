@@ -48,6 +48,75 @@ export interface DiscordMessage {
   };
 }
 
+export interface DiscordAttachment {
+  id: string;
+  filename: string;
+  description?: string;
+  content_type?: string;
+  size: number;
+  url: string;
+  proxy_url: string;
+  height?: number;
+  width?: number;
+  ephemeral?: boolean;
+}
+
+export interface DiscordUser {
+  id: string;
+  username: string;
+  discriminator: string;
+  avatar?: string;
+  bot?: boolean;
+  system?: boolean;
+  mfa_enabled?: boolean;
+  locale?: string;
+  verified?: boolean;
+  email?: string;
+  flags?: number;
+  premium_type?: number;
+  public_flags?: number;
+}
+
+export interface DiscordRole {
+  id: string;
+  name: string;
+  color: number;
+  hoist: boolean;
+  position: number;
+  permissions: string;
+  managed: boolean;
+  mentionable: boolean;
+}
+
+export interface DiscordComponent {
+  type: number;
+  custom_id?: string;
+  disabled?: boolean;
+  style?: number;
+  label?: string;
+  emoji?: {
+    name?: string;
+    id?: string;
+    animated?: boolean;
+  };
+  url?: string;
+  options?: Array<{
+    label: string;
+    value: string;
+    description?: string;
+    emoji?: {
+      name?: string;
+      id?: string;
+      animated?: boolean;
+    };
+    default?: boolean;
+  }>;
+  placeholder?: string;
+  min_values?: number;
+  max_values?: number;
+  components?: DiscordComponent[];
+}
+
 export interface DiscordWebhookResponse {
   id: string;
   type: number;
@@ -60,16 +129,16 @@ export interface DiscordWebhookResponse {
     avatar: string;
     discriminator: string;
   };
-  attachments: any[];
+  attachments: DiscordAttachment[];
   embeds: DiscordEmbed[];
-  mentions: any[];
-  mention_roles: any[];
+  mentions: DiscordUser[];
+  mention_roles: DiscordRole[];
   pinned: boolean;
   mention_everyone: boolean;
   tts: boolean;
   timestamp: string;
   edited_timestamp: string | null;
   flags: number;
-  components: any[];
+  components: DiscordComponent[];
   webhook_id: string;
 }
