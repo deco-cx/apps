@@ -17,6 +17,7 @@ const config = {
     app("reflect"),
     app("grain"),
     app("slack"),
+    app("laps"),
     app("serper"),
     app("sienge"),
     app("vertex"),
