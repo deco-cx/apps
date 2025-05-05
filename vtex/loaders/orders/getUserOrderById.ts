@@ -17,11 +17,10 @@ export default async function loader(
   const { vcsDeprecated } = ctx;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
-  const order = await vcsDeprecated["GET /api/checkout/pub/orders/:orderId"]({
-    orderId,
-  }, {
-    headers: { cookie },
-  }).then((res) => res.json());
+  const order = await vcsDeprecated["GET /api/oms/user/orders/:orderId"](
+    { orderId },
+    { headers: { cookie } },
+  ).then((res) => res.json());
 
   return order;
 }
