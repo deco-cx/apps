@@ -13,7 +13,6 @@ export async function loader(
   ctx: AppContext,
 ) {
   const auth = await ctx.invoke["google-slides"].loaders.authClient();
-  console.log("auth", auth);
   return {
     auth,
     token: auth.access_token,
