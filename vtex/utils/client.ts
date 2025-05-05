@@ -20,6 +20,12 @@ import {
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
+  "POST /api/checkout/pub/orders/:orderId/user-cancel-request": {
+    response: unknown;
+    body: {
+      reason: string;
+    };
+  };
   "POST /api/checkout/pub/orderForm/:orderFormId/messages/clear": {
     // deno-lint-ignore no-explicit-any
     body: Record<any, never>;
