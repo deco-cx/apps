@@ -56,6 +56,7 @@ const config = {
     app("streamshop"),
     app("brasilapi"),
     app("readwise"),
+    app("rd-station-marketing"),
     app("website"),
     app("commerce"),
     app("workflows"),
