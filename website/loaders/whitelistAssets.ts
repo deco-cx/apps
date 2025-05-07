@@ -1,9 +1,9 @@
 import { AppContext } from "../mod.ts";
 
 /**
- * @title Pages
+ * @title Whitelist Assets
  */
-export default function Pages(
+export default function WhitelistAssets(
   _props: unknown,
   _req: Request,
   ctx: AppContext,
