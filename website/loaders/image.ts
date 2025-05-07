@@ -58,15 +58,16 @@ const handler = async (
       return new Response("Proxy disabled", { status: 403 });
     }
 
+    const preferredMediaType = acceptMediaType(req);
+    const params = parseParams(props);
+
     if (
       ctx.whitelistPatterns &&
-      !ctx.whitelistPatterns.some((pattern) => pattern.test(req.url))
+      !ctx.whitelistPatterns.some((pattern) => pattern.test(params.src))
     ) {
       return new Response("Proxy disabled for this source", { status: 403 });
     }
 
-    const preferredMediaType = acceptMediaType(req);
-    const params = parseParams(props);
     const engine = ENGINES.find((e) => e.accepts(params.src)) ?? passThrough;
 
     const response = await engine.resolve(params, preferredMediaType, req);
