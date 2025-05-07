@@ -1777,3 +1777,99 @@ export interface CanceledOrder {
   orderId?: string;
   receipt?: string | null;
 }
+
+export interface ReceiptData {
+  ReceiptCollection: Receipt[];
+}
+
+export interface Receipt {
+  ReceiptType: string;
+  Date: string;
+  ReceiptToken: string;
+  Source: string;
+  InvoiceNumber: string | null;
+  TransactionId: string;
+  MerchantName: string;
+  SellerOrderId: string | null;
+  ValueAsInt: number | null;
+}
+
+export interface CancellationData {
+  requestedByUser: boolean;
+  reason: string;
+  cancellationDate: string;
+  cancellationRequestId: string;
+  requestedBy: string | null;
+  cancellationSource: string | null;
+}
+
+export interface OrderFormOrder {
+  sellers: Seller[];
+  receiptData?: ReceiptData;
+  sequence?: string;
+  marketPlaceOrderId?: string;
+  origin?: number;
+  items: Item[];
+  giftRegistryData?: unknown;
+  contextData?: unknown;
+  marketPlaceOrderGroup?: string | null;
+  marketplaceServicesEndpoint?: string | null;
+  orderFormId?: string;
+  affiliateId?: string;
+  status?: string;
+  callCenterOperator?: string;
+  userProfileId?: string;
+  creationVersion?: string;
+  creationEnvironment?: string;
+  lastChangeVersion?: string;
+  workflowInstanceId?: string;
+  workflowInstanceGroupId?: string | null;
+  marketplacePaymentValue?: number | null;
+  marketplacePaymentReferenceValue?: number | null;
+  marketplace?: string | null;
+  orderId: string;
+  orderGroup: string;
+  state: string;
+  isCheckedIn: boolean;
+  sellerOrderId: string;
+  storeId?: string | null;
+  checkedInPickupPointId?: string | null;
+  value: number;
+  totals: Total[];
+  clientProfileData: ClientProfileData;
+  ratesAndBenefitsData: RatesAndBenefitsData;
+  shippingData: ShippingData;
+  paymentData: PaymentData;
+  clientPreferencesData: ClientPreferencesData;
+  commercialConditionData?: unknown;
+  marketingData?: unknown;
+  storePreferencesData: StorePreferencesData;
+  openTextField?: unknown;
+  invoiceData?: unknown;
+  itemMetadata: ItemMetadata;
+  taxData?: unknown;
+  customData?: unknown;
+  hooksData?: unknown;
+  changeData?: unknown;
+  subscriptionData?: unknown;
+  merchantContextData?: unknown;
+  purchaseAgentData?: unknown;
+  salesChannel: string;
+  followUpEmail?: string;
+  creationDate: string;
+  lastChange: string;
+  timeZoneCreationDate: string;
+  timeZoneLastChange: string;
+  isCompleted: boolean;
+  hostName: string;
+  merchantName?: string | null;
+  userType?: string;
+  roundingError?: number;
+  allowEdition?: boolean;
+  allowCancellation?: boolean;
+  isUserDataVisible?: boolean;
+  allowChangeSeller?: boolean;
+  cancellationData?: CancellationData;
+  orderFormCreationDate?: string;
+  marketplaceRequestedCancellationWindow?: unknown;
+}

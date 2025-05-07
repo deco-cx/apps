@@ -10,7 +10,7 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
-  OrderPlaced,
+  OrderFormOrder,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -23,9 +23,6 @@ import {
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
-  "GET /api/checkout/pub/orders/:orderId": {
-    response: OrderPlaced;
-  };
   "GET /api/vtexid/pub/authentication/start": {
     searchParams: {
       scope?: string;
@@ -289,10 +286,13 @@ export interface VTEXCommerceStable {
     response: Userorderslist;
   };
   "GET /api/oms/user/orders/:orderId": {
-    searchParams: {
-      clientEmail?: string;
-    };
     response: Userorderdetails;
+  };
+  "GET /api/checkout/pub/orders/:orderId": {
+    response: OrderFormOrder;
+  };
+  "GET /api/checkout/pub/orders/order-group/:orderGroupId": {
+    response: OrderFormOrder[];
   };
 }
 
