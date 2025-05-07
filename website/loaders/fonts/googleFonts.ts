@@ -120,8 +120,21 @@ const loader = async (props: Props, _req: Request): Promise<Font> => {
   }
 
   const sheets = await Promise.all([
-    fetchSafe(url, { headers: OLD_BROWSER_KEY }).then((res) => res.text()),
-    fetchSafe(url, { headers: NEW_BROWSER_KEY }).then((res) => res.text()),
+    fetchSafe(url, { headers: OLD_BROWSER_KEY }).then((res) => res.text())
+      .catch((e) => {
+        console.error(
+          `Error fetching font: ${url} -  headers: ${OLD_BROWSER_KEY} - error: ${e}`,
+        );
+        return "";
+      }),
+    fetchSafe(url, { headers: NEW_BROWSER_KEY }).then((res) => res.text())
+      .catch((e) => {
+        console.error(
+          `Error fetching font: ${url} -  headers: ${NEW_BROWSER_KEY} - error: ${e}`,
+        );
+        return "";
+      })
+      .catch(() => ""),
   ]);
 
   const styleSheet = sheets.join("\n").replaceAll(

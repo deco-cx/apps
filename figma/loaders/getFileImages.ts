@@ -65,7 +65,7 @@ export interface Props {
 /**
  * @name FILE_IMAGES
  * @title File Images
- * @description Gets images from specific nodes of a Figma file
+ * @description Renders images from a file
  */
 export default async function getFileImages(
   props: Props,
