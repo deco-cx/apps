@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("discohook"),
     app("jira"),
     app("deno-deploy"),
     app("exa"),
