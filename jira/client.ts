@@ -76,7 +76,10 @@ export class JiraClient {
     return { ok: true, data };
   }
 
-  searchIssues(
+  /**
+   * @description Run a JQL query to search for Jira issues
+   */
+  runJql(
     jql: string,
     startAt = 0,
     maxResults = 50,
