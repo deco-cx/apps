@@ -58,7 +58,10 @@ const handler = async (
       return new Response("Proxy disabled", { status: 403 });
     }
 
-    if (ctx.whitelistPatterns && !ctx.whitelistPatterns.some((pattern) => pattern.test(req.url))) {
+    if (
+      ctx.whitelistPatterns &&
+      !ctx.whitelistPatterns.some((pattern) => pattern.test(req.url))
+    ) {
       return new Response("Proxy disabled for this source", { status: 403 });
     }
 

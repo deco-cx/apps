@@ -143,7 +143,7 @@ export interface Props {
    */
   sendToClickHouse?: boolean;
 
-    /**
+  /**
    * @title Disable image/asset proxy for this site
    * @description Disable image/asset proxy for this site
    */
@@ -167,7 +167,9 @@ export default function App({ ...state }: Props): App<Manifest, Props> {
   return {
     state: {
       ...state,
-      whitelistPatterns: state.whilelistURLs?.map((pattern) => new URLPattern(pattern)),
+      whitelistPatterns: state.whilelistURLs?.map((pattern) =>
+        new URLPattern(pattern)
+      ),
     },
     manifest: {
       ...manifest,

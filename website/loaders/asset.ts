@@ -9,14 +9,21 @@ interface Props {
   src: string;
 }
 
-const loader = async (props: Props, request: Request, ctx: AppContext): Promise<Response> => {
+const loader = async (
+  props: Props,
+  request: Request,
+  ctx: AppContext,
+): Promise<Response> => {
   const url = new URL(props.src);
 
   if (ctx.disableProxy) {
     return new Response("Proxy disabled", { status: 403 });
   }
 
-  if (ctx.whitelistPatterns && !ctx.whitelistPatterns.some((pattern) => pattern.test(request.url))) {
+  if (
+    ctx.whitelistPatterns &&
+    !ctx.whitelistPatterns.some((pattern) => pattern.test(request.url))
+  ) {
     return new Response("Proxy disabled for this source", { status: 403 });
   }
 
