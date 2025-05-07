@@ -12,7 +12,7 @@ export interface Props {
   /**
    * @description The new value for the field
    */
-  value: unknown;
+  value: string;
 }
 
 /**
