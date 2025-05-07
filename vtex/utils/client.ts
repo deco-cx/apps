@@ -9,6 +9,7 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
+  OrderFormOrder,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -255,10 +256,13 @@ export interface VTEXCommerceStable {
     response: Userorderslist;
   };
   "GET /api/oms/user/orders/:orderId": {
-    searchParams: {
-      clientEmail?: string;
-    };
     response: Userorderdetails;
+  };
+  "GET /api/checkout/pub/orders/:orderId": {
+    response: OrderFormOrder;
+  };
+  "GET /api/checkout/pub/orders/order-group/:orderGroupId": {
+    response: OrderFormOrder[];
   };
 }
 
