@@ -134,4 +134,21 @@ export class JiraClient {
       body: JSON.stringify(body),
     });
   }
+
+  updateField(
+    issueKey: string,
+    field: string,
+    value: unknown,
+  ): Promise<JiraResponse<unknown>> {
+    const endpoint = `/rest/api/3/issue/${issueKey}`;
+    const body = {
+      fields: {
+        [field]: value,
+      },
+    };
+    return this.fetch(endpoint, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  }
 }
