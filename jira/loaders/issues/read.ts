@@ -1,5 +1,5 @@
-import type { AppContext } from "../mod.ts";
-import type { JiraIssue, JiraResponse } from "../client.ts";
+import type { AppContext } from "../../mod.ts";
+import type { JiraIssue, JiraResponse } from "../../client.ts";
 
 export interface Props {
   /**

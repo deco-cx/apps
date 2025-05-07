@@ -2,15 +2,19 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/addComment.ts";
-import * as $$$0 from "./loaders/issue.ts";
+import * as $$$$$$$$$0 from "./actions/issues/addComment.ts";
+import * as $$$$$$$$$1 from "./actions/issues/updateField.ts";
+import * as $$$0 from "./loaders/issues/list.ts";
+import * as $$$1 from "./loaders/issues/read.ts";
 
 const manifest = {
   "loaders": {
-    "jira/loaders/issue.ts": $$$0,
+    "jira/loaders/issues/list.ts": $$$0,
+    "jira/loaders/issues/read.ts": $$$1,
   },
   "actions": {
-    "jira/actions/addComment.ts": $$$$$$$$$0,
+    "jira/actions/issues/addComment.ts": $$$$$$$$$0,
+    "jira/actions/issues/updateField.ts": $$$$$$$$$1,
   },
   "name": "jira",
   "baseUrl": import.meta.url,
