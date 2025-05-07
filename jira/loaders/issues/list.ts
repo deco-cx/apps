@@ -1,5 +1,5 @@
-import type { AppContext } from "../../mod.ts";
 import type { JiraSearchResponse } from "../../client.ts";
+import type { AppContext } from "../../mod.ts";
 
 export interface Props {
   /**
@@ -30,6 +30,6 @@ export default async function listIssues(
 ): Promise<JiraSearchResponse> {
   const { project, startAt = 0, maxResults = 50 } = props;
   const jql = `project = ${project}`;
-  const result = await ctx.jira.searchIssues(jql, startAt, maxResults);
+  const result = await ctx.jira.runJql(jql, startAt, maxResults);
   return result.data;
 }

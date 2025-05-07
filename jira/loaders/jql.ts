@@ -29,6 +29,6 @@ export default async function jqlQuery(
   ctx: AppContext,
 ): Promise<JiraSearchResponse> {
   const { jql, startAt = 0, maxResults = 50 } = props;
-  const result = await ctx.jira.searchIssues(jql, startAt, maxResults);
+  const result = await ctx.jira.runJql(jql, startAt, maxResults);
   return result.data;
-} 
+}
