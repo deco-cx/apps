@@ -8,6 +8,7 @@ import type {
 import { Person } from "../../commerce/types.ts";
 import { setClientCookie } from "../utils/cart.ts";
 import { ShopQuery } from "../utils/graphql/storefront.graphql.gen.ts";
+import { getUTMMetadata } from "../utils/getUTMMetadata.ts";
 
 export interface Context {
   cart: Partial<CheckoutFragment>;
@@ -49,6 +50,7 @@ const enqueue = (
       context.wishlist.value = wishlist || context.wishlist.value;
 
       loading.value = false;
+      setMetaData();
     } catch (error) {
       if (error.name === "AbortError") return;
 
@@ -127,6 +129,20 @@ const load = (signal: AbortSignal) =>
     wishlist: invoke.wake.loaders.wishlist(),
   }, { signal });
 
+async function setMetaData() {
+  const metadata = getUTMMetadata(globalThis.location.search);
+
+  try {
+    await invoke.wake.actions.cart.removeMetadata({
+      keys: metadata.map((meta) => meta.key),
+    });
+  } catch (error) {
+    console.error(error);
+  }
+
+  await invoke.wake.actions.cart.addMetadata({ metadata });
+}
+
 if (IS_BROWSER) {
   enqueue2(load2);
   enqueue(load);
@@ -135,6 +151,11 @@ if (IS_BROWSER) {
     "visibilitychange",
     () => document.visibilityState === "visible" && enqueue(load),
   );
+
+  const metadata = getUTMMetadata(globalThis.location.search);
+  if (metadata) {
+    await invoke.wake.actions.cart.addMetadata({ metadata });
+  }
 }
 
 export const state = {
