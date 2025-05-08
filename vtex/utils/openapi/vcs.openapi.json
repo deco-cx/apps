@@ -38584,7 +38584,9 @@
     },
     "/api/oms/user/orders": {
       "get": {
-        "tags": ["User orders"],
+        "tags": [
+          "User orders"
+        ],
         "summary": "Retrieve user's orders",
         "description": "Lists all orders from a given customer, filtering by their email. \r\n\r\n> You can only access information from orders created in the last two years, and that same period is valid for customers through [My Account](https://help.vtex.com/en/tutorial/how-my-account-works--2BQ3GiqhqGJTXsWVuio3Xh). \r\n\r\n> Note that this request should be made by an [user](https://developers.vtex.com/docs/guides/user-authentication-and-login) or [an appKey / appToken pair](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) that is associated with the [Call center operator](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy#call-center-operator) role. Otherwise, it will return only orders from the same email informed in the `clientEmail` query parameter. \r\n\r\n## Permissions\r\n\r\nAny user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:\r\n\r\n| **Product** | **Category** | **Resource** |\r\n| --------------- | ----------------- | ----------------- |\r\n| OMS | OMS access | **View order** |\r\n\r\nYou can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):\r\n\r\n| **Role** | **Resource** | \r\n| --------------- | ----------------- | \r\n| Call center operator | View order |\r\n| OMS - Read only | View order |\r\n\r\n>❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm). \r\n\r\nTo learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).",
         "operationId": "Userorderslist",
@@ -39099,7 +39101,9 @@
     },
     "/api/oms/pvt/orders/{orderId}/cancel": {
       "post": {
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "summary": "Cancel order",
         "description": "Cancels an order using its identification code (`orderId`). A common scenario is when the seller has a problem fulfilling the order and requests the marketplace to cancel it. \r\n\r\n## Orders that cannot be canceled \r\n\r\nThe following situations do not allow order cancellation: \r\n\r\n- **Partial invoices:** [Partially invoiced](https://help.vtex.com/en/tracks/orders--2xkTisx4SXOWXQel8Jg8sa/q9GPspTb9cHlMeAZfdEUe) orders cannot be canceled. However, the customer can [change the order](https://developers.vtex.com/docs/guides/change-order) to replace or remove items from it. \r\n\r\n- **Invoiced status:** Orders with `invoiced` [status](https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196) cannot be canceled. If the order has already been invoiced, you can use the [Order invoice notification](https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/invoice) endpoint to generate a return invoice. \r\n\r\n- **Incomplete orders:** [Incomplete orders](https://help.vtex.com/en/tutorial/how-incomplete-orders-work--tutorials_294) cannot be canceled. \r\n\r\n## Declining order cancelation \r\n\r\nThe order flow has a cancellation window (grace period) in which the customer can automatically cancel the order. Except for that period, the seller can [decline an order cancellation request](https://help.vtex.com/en/tutorial/declining-order-cancelation--F2n0h1TeQ5td540Gjyff4), regardless of whether the customer or the marketplace initiated it. \r\n\r\nFor more information, see [Order canceling improvements](https://developers.vtex.com/docs/guides/order-canceling-improvements). \r\n\r\n## Permissions\r\n\r\nAny user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:\r\n\r\n| **Product** | **Category** | **Resource** |\r\n| --------------- | ----------------- | ----------------- |\r\n| OMS | OMS access | **Cancel order** | \r\n\r\nYou can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):\r\n\r\n| **Role** | **Resource** | \r\n| --------------- | ----------------- | \r\n| OMS - Full access | Cancel order |\r\n| IntegrationProfile - Fulfillment Oms | Cancel order |\r\n\r\n>❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm). \r\n\r\nTo learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).",
         "operationId": "CancelOrder",
@@ -39311,8 +39315,7 @@
                       "ean": "3256873",
                       "lockId": "00-v502556llux-01",
                       "itemAttachment": {
-                        "content": {
-                        },
+                        "content": {},
                         "name": null
                       },
                       "attachments": [],
@@ -39647,8 +39650,7 @@
                             "bankIssuedInvoiceIdentificationNumberFormatted": "32534.95739 75945.24534 54395.734214 5",
                             "bankIssuedInvoiceBarCodeNumber": "325349573975945245345439573421443986734065",
                             "bankIssuedInvoiceBarCodeType": "i25",
-                            "billingAddress": {
-                            }
+                            "billingAddress": {}
                           }
                         ]
                       }
@@ -39752,8 +39754,7 @@
                                 ]
                               }
                             },
-                            "Composition": {
-                            }
+                            "Composition": {}
                           }
                         ]
                       }
@@ -39814,6 +39815,194 @@
             }
           }
         }
+      }
+    },
+    "/api/sessions": {
+      "post": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Create new session",
+        "description": "Creates a new session and returns a session token and a segment token. Also stores `vtex_session` and `vtex_segment` cookies, with the same values returned in the response.\n\r\n\rAll parameters in the body that are not within the public namespace will be ignored. Query string items will automatically be added to the public namespace.\n\r\n\r>⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers in other requests to Session Manager API in order for it to work outside of a browser environment.\r\n\r\n## Permissions\r\n\r\nThis endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).",
+        "operationId": "Createnewsession",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEditSessionRequest"
+              },
+              "example": {
+                "public": {
+                  "variable1": {
+                    "value": "value1"
+                  },
+                  "variable2": {
+                    "value": "value2"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateEditSessionResponse"
+                },
+                "example": {
+                  "sessionToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjM5MEI4MTM1RDUzQ0MwMUY0RjA4N0YwMzA2RjhDODMzNzBDMjY4M0UiLCJ0eXAiOiJqd3QifQ.eyJhY2NvdW50LmlkIjoiYThiMjdmYjQtNjUxNi00Y2MwLTgyYjYtYTVmMmIwMTFlNmUyIiwiaWQiOiIyNmQyY2I2Yy0yMTNlLTQ5MzYtOWUyYS0xZDFlMjk5ZWMzM2IiLCJ2ZXJzaW9uIjoyLCJzdWIiOiJzZXNzaW9uIiwiYWNjb3VudCI6InNlc3Npb24iLCJleHAiOjE2OTM1Nzg5NzYsImlhdCI6MTY5Mjg4Nzc3NiwiaXNzIjoidG9rZW4tZW1pdHRlciIsImp0aSI6IjhiYWU2NzdmLWE0NTAtNGI0OC05YTBkLTViMzAwYjNiY2NkOCJ9.Ak1bn2xEA1A5dVN4qR6RI8vnZpSpLXyVxFCthMoVjmWn0HlP5BqMHEMYApDj8TPPhyxT0hGT0vkmvMQa2Mprrw",
+                  "segmentToken": "eyJjYW1wYWlnbnMiOm51bGwsImNoYW5uZWwiOiIxIiwicHJpY2VUYWJsZXMiOm51bGwsInJlZ2lvbklkIjpudWxsLCJ1dG1fY2FtcGFpZ24iOm51bGwsInV0bV9zb3VyY2UiOm51bGwsInV0bWlfY2FtcGFpZ24iOm51bGwsImN1cnJlbmN5Q29kZSI6IkJSTCIsImN1cnJlbmN5U3ltYm9sIjoiUiQiLCJjb3VudHJ5Q29kZSI6IkJSQSIsImN1bHR1cmVJbmZvIjoiZW4tVVMiLCJjaGFubmVsUHJpdmFjeSI6InB1YmxpYyJ9"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "get": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Get session",
+        "description": "Retrieves information from a previously created sesssion.\n\r\n\r>⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers to Session Manager API in order for it to work outside of a browser environment.\r\n\r\n## Permissions\r\n\r\nThis endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).",
+        "operationId": "GetSession",
+        "parameters": [
+          {
+            "name": "items",
+            "in": "query",
+            "description": "Items are the keys of the values you wish to get. They follow the format `namespace1.key1,namespace2.key2`.\n\r\n\rIf you wish to recover the data sent on [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions), it should be `public.{key}`, replacing `{key}` with the name of the custom property you created. Following the example request presented in [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions), it would be `public.variable1,public.variable2`.\n\r\n\rIf you want to retrieve all keys from Session Manager, you can use the wildcard operator (`*`) as a value for this query parameter.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "*"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSessionResponse"
+                },
+                "example": {
+                  "id": "26d2cb6c-213e-4936-9e2a-1d1e299ec33b",
+                  "namespaces": {
+                    "account": {
+                      "id": {
+                        "value": "a8b27fb4-6516-4cc0-82b6-a5f2b011e6e2",
+                        "keepAlive": true
+                      },
+                      "accountName": {
+                        "value": "apiexamples"
+                      }
+                    },
+                    "store": {
+                      "channel": {
+                        "value": "1"
+                      },
+                      "countryCode": {
+                        "value": "BRA"
+                      },
+                      "cultureInfo": {
+                        "value": "en-US"
+                      },
+                      "currencyCode": {
+                        "value": "BRL"
+                      },
+                      "currencySymbol": {
+                        "value": "R$"
+                      },
+                      "channelPrivacy": {
+                        "value": "public"
+                      }
+                    },
+                    "public": {
+                      "variable1": {
+                        "value": "value1"
+                      },
+                      "variable2": {
+                        "value": "value2"
+                      }
+                    },
+                    "checkout": {
+                      "regionId": {
+                        "value": "v2.1BB18CE648B5111D0933734ED83EC783"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "vtex_session": [],
+            "vtex_segment": []
+          }
+        ],
+        "deprecated": false
+      },
+      "patch": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Edit session",
+        "description": "Edits information from a previously created sesssion.\n\r\n\rThis endpoint works the same way as the [Create new session](https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions) endpoint, but when the request is sent with a `vtex_session` and the `vtex_segment` cookies in the header, it retrieves the session first and then applies the changes instead of generating a new one.\n\r\n\rOnly keys inside the `public` namespace in the request body are considered, and query parameters are automatically added to the public namespace.\n\r\n\r>⚠️ The Session Manager API uses the `vtex_session` and `vtex_segment` cookies to store the data required to identify the user and the session. These cookies are stored in the user's browser when the session is created and sent automatically in every request to that domain. You will have to reproduce that by sending these cookies as headers to Session Manager API in order for it to work outside of a browser environment.\r\n\r\n## Permissions\r\n\r\nThis endpoint does not require [authentication](https://developers.vtex.com/docs/guides/authentication) or [permissions](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3).",
+        "operationId": "Editsession",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEditSessionRequest"
+              },
+              "example": {
+                "public": {
+                  "variable2": {
+                    "value": "value2_patched"
+                  },
+                  "variable3": {
+                    "value": "value3"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateEditSessionResponse"
+                },
+                "example": {
+                  "sessionToken": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjM5MEI4MTM1RDUzQ0MwMUY0RjA4N0YwMzA2RjhDODMzNzBDMjY4M0UiLCJ0eXAiOiJqd3QifQ.eyJhY2NvdW50LmlkIjoiYThiMjdmYjQtNjUxNi00Y2MwLTgyYjYtYTVmMmIwMTFlNmUyIiwiaWQiOiIyNmQyY2I2Yy0yMTNlLTQ5MzYtOWUyYS0xZDFlMjk5ZWMzM2IiLCJ2ZXJzaW9uIjoyLCJzdWIiOiJzZXNzaW9uIiwiYWNjb3VudCI6InNlc3Npb24iLCJleHAiOjE2OTM1Nzg5NzYsImlhdCI6MTY5Mjg4Nzc3NiwiaXNzIjoidG9rZW4tZW1pdHRlciIsImp0aSI6IjhiYWU2NzdmLWE0NTAtNGI0OC05YTBkLTViMzAwYjNiY2NkOCJ9.Ak1bn2xEA1A5dVN4qR6RI8vnZpSpLXyVxFCthMoVjmWn0HlP5BqMHEMYApDj8TPPhyxT0hGT0vkmvMQa2Mprrw",
+                  "segmentToken": "eyJjYW1wYWlnbnMiOm51bGwsImNoYW5uZWwiOiIxIiwicHJpY2VUYWJsZXMiOm51bGwsInJlZ2lvbklkIjpudWxsLCJ1dG1fY2FtcGFpZ24iOm51bGwsInV0bV9zb3VyY2UiOm51bGwsInV0bWlfY2FtcGFpZ24iOm51bGwsImN1cnJlbmN5Q29kZSI6IkJSTCIsImN1cnJlbmN5U3ltYm9sIjoiUiQiLCJjb3VudHJ5Q29kZSI6IkJSQSIsImN1bHR1cmVJbmZvIjoiZW4tVVMiLCJjaGFubmVsUHJpdmFjeSI6InB1YmxpYyJ9"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "vtex_session": [],
+            "vtex_segment": []
+          }
+        ],
+        "deprecated": false
       }
     }
   },
@@ -39898,6 +40087,209 @@
       }
     },
     "schemas": {
+      "CreateEditSessionRequest": {
+        "title": "CreateEditSessionRequest",
+        "required": [
+          "public"
+        ],
+        "type": "object",
+        "description": "Session information.",
+        "properties": {
+          "public": {
+            "title": "Public",
+            "type": "object",
+            "description": "Public information.",
+            "additionalProperties": true,
+            "properties": {
+              "additionalProperties": {
+                "type": "object",
+                "description": "Custom property.",
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "description": "Value of the custom property.",
+                    "example": "value3"
+                  }
+                }
+              }
+            },
+            "example": {
+              "variable2": {
+                "value": "value2"
+              },
+              "variable3": {
+                "value": "value3"
+              }
+            }
+          }
+        },
+        "example": {
+          "public": {
+            "variable2": {
+              "value": "value2"
+            },
+            "variable3": {
+              "value": "value3"
+            }
+          }
+        }
+      },
+      "CreateEditSessionResponse": {
+        "type": "object",
+        "description": "Object containing session token and segment token.",
+        "properties": {
+          "sessionToken": {
+            "type": "string",
+            "description": "Token that identifies the user's individual session."
+          },
+          "segmentToken": {
+            "type": "string",
+            "description": "Token that identifies the user's segment, shared with other users with similar navigation parameters."
+          }
+        }
+      },
+      "GetSessionResponse": {
+        "type": "object",
+        "description": "Session information.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Session ID."
+          },
+          "namespaces": {
+            "type": "object",
+            "description": "Object with namespaces, each containing a set of information about the session.",
+            "properties": {
+              "account": {
+                "type": "object",
+                "description": "Account information related to the session.",
+                "properties": {
+                  "id": {
+                    "type": "object",
+                    "description": "VTEX account ID.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the VTEX account ID."
+                      },
+                      "keepAlive": {
+                        "type": "boolean",
+                        "description": "Determines whether or not the connection should be kept alive."
+                      }
+                    }
+                  },
+                  "accountName": {
+                    "type": "object",
+                    "description": "VTEX account name.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the VTEX account name."
+                      }
+                    }
+                  }
+                }
+              },
+              "store": {
+                "type": "object",
+                "description": "Store information related to the session.",
+                "properties": {
+                  "channel": {
+                    "type": "object",
+                    "description": "[Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the [Trade policy](https://help.vtex.com/en/tutorial/how-trade-policies-work--6Xef8PZiFm40kg2STrMkMV) ID."
+                      }
+                    }
+                  },
+                  "countryCode": {
+                    "type": "object",
+                    "description": "Country code.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the country code."
+                      }
+                    }
+                  },
+                  "cultureInfo": {
+                    "type": "object",
+                    "description": "Locale that provides culture-specific information, such as the language, sublanguage, country/region, calendar, and conventions associated with a particular culture. Read [this documentation](https://learn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo?view=net-7.0#culture-names-and-identifiers) for more details.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the `cultureInfo` property."
+                      }
+                    }
+                  },
+                  "currencyCode": {
+                    "type": "object",
+                    "description": "Currency code.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the currency code."
+                      }
+                    }
+                  },
+                  "currencySymbol": {
+                    "type": "object",
+                    "description": "Currency symbol.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the currency symbol."
+                      }
+                    }
+                  },
+                  "channelPrivacy": {
+                    "type": "object",
+                    "description": "Defines whether or not the channel is private.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value containing the channel's privacy option."
+                      }
+                    }
+                  }
+                }
+              },
+              "public": {
+                "type": "object",
+                "description": "Public and editable information related to the session.",
+                "additionalProperties": {
+                  "type": "object",
+                  "description": "Custom property.",
+                  "properties": {
+                    "value": {
+                      "type": "string",
+                      "description": "Value of the custom property."
+                    }
+                  }
+                }
+              },
+              "checkout": {
+                "type": "object",
+                "description": "Checkout information related to the session.",
+                "properties": {
+                  "regionId": {
+                    "type": "object",
+                    "description": "ID of the session's region.",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "description": "Value of the Region ID."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "PickupPoint": {
         "type": "object",
         "description": "Pickup point information.",
@@ -43884,7 +44276,12 @@
       },
       "Userorderslist": {
         "title": "Userorderslist",
-        "required": ["list", "facets", "paging", "stats"],
+        "required": [
+          "list",
+          "facets",
+          "paging",
+          "stats"
+        ],
         "type": "object",
         "description": "Order list object.",
         "properties": {
@@ -44212,7 +44609,9 @@
       },
       "Stats2": {
         "title": "Stats2",
-        "required": ["stats"],
+        "required": [
+          "stats"
+        ],
         "type": "object",
         "properties": {
           "stats": {
@@ -44248,7 +44647,10 @@
       },
       "Stats3": {
         "title": "Stats3",
-        "required": ["totalValue", "totalItems"],
+        "required": [
+          "totalValue",
+          "totalItems"
+        ],
         "type": "object",
         "properties": {
           "totalValue": {
@@ -45079,8 +45481,7 @@
               "ean": null,
               "lockId": "00-v502556llux-01",
               "itemAttachment": {
-                "content": {
-                },
+                "content": {},
                 "name": null
               },
               "attachments": [],
@@ -45414,8 +45815,7 @@
                     "bankIssuedInvoiceIdentificationNumberFormatted": "32534.95739 75945.24534 54395.734214 5",
                     "bankIssuedInvoiceBarCodeNumber": "325349573975945245345439573421443986734065",
                     "bankIssuedInvoiceBarCodeType": "i25",
-                    "billingAddress": {
-                    }
+                    "billingAddress": {}
                   }
                 ]
               }
@@ -45519,8 +45919,7 @@
                         ]
                       }
                     },
-                    "Composition": {
-                    }
+                    "Composition": {}
                   }
                 ]
               }
@@ -46689,8 +47088,7 @@
                   "bankIssuedInvoiceIdentificationNumberFormatted": "32534.95739 75945.24534 54395.734214 5",
                   "bankIssuedInvoiceBarCodeNumber": "325349573975945245345439573421443986734065",
                   "bankIssuedInvoiceBarCodeType": "i25",
-                  "billingAddress": {
-                  }
+                  "billingAddress": {}
                 }
               ]
             }
@@ -46770,8 +47168,7 @@
               "bankIssuedInvoiceIdentificationNumberFormatted": "32534.95739 75945.24534 54395.734214 5",
               "bankIssuedInvoiceBarCodeNumber": "325349573975945245345439573421443986734065",
               "bankIssuedInvoiceBarCodeType": "i25",
-              "billingAddress": {
-              }
+              "billingAddress": {}
             }
           ]
         }
@@ -47017,8 +47414,7 @@
           "bankIssuedInvoiceIdentificationNumberFormatted": "32534.95739 75945.24534 54395.734214 5",
           "bankIssuedInvoiceBarCodeNumber": "325349573975945245345439573421443986734065",
           "bankIssuedInvoiceBarCodeType": "i25",
-          "billingAddress": {
-          }
+          "billingAddress": {}
         }
       },
       "PackageAttachment": {
