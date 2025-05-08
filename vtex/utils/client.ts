@@ -1,5 +1,6 @@
 import { Userorderdetails, Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
+  AuthResponse,
   Brand,
   Category,
   CreateNewDocument,
@@ -17,6 +18,7 @@ import {
   SimulationItem,
   SimulationOrderForm,
   SPEvent,
+  StartAuthentication,
   Suggestion,
 } from "./types.ts";
 
@@ -26,6 +28,34 @@ export interface VTEXCommerceStable {
     body: {
       reason: string;
     };
+  };
+  "GET /api/vtexid/pub/authentication/start": {
+    searchParams: {
+      scope?: string;
+      locale?: string;
+      appStart: boolean;
+      callbackUrl?: string;
+      returnUrl?: string;
+    };
+    response: StartAuthentication;
+  };
+  "POST /api/vtexid/pub/authentication/classic/validate": {
+    body: URLSearchParams;
+    response: AuthResponse;
+  };
+  "POST /api/vtexid/pub/authentication/accesskey/validate": {
+    body: URLSearchParams;
+    response: AuthResponse;
+  };
+  "POST /api/vtexid/pub/authentication/classic/setpassword": {
+    searchParams: { scope?: string; locale?: string };
+    body: URLSearchParams;
+    response: AuthResponse;
+  };
+  "POST /api/vtexid/pub/authentication/accesskey/send": {
+    searchParams: { deliveryMethod: "email" };
+    body: FormData;
+    response: Record<string, string>;
   };
   "POST /api/checkout/pub/orderForm/:orderFormId/messages/clear": {
     // deno-lint-ignore no-explicit-any
@@ -93,7 +123,9 @@ export interface VTEXCommerceStable {
       utmi_campaign?: string;
     };
   };
-  "GET /api/catalog_system/pub/category/tree/:level": { response: Category[] };
+  "GET /api/catalog_system/pub/category/tree/:level": {
+    response: Category[];
+  };
   "GET /api/io/_v/api/intelligent-search/search_suggestions": {
     response: Suggestion;
     searchParams: { locale: string; query: string };
