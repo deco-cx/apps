@@ -11,6 +11,10 @@ export default function WhitelistAssets(
   "whitelistURLs": string[] | undefined;
   "disableProxy": boolean | undefined;
 } {
+  // Avoid cache on /live/invoke only
+  if (new URL(_req.url).pathname === ("/live/invoke/website/loaders/whitelistAssets.ts")) {
+    ctx.response.headers.set("Cache-Control", "public, max-age=60");
+  }
   return {
     "whitelistURLs": ctx.whilelistURLs,
     "disableProxy": ctx.disableProxy,
