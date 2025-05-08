@@ -99,6 +99,8 @@ export default function VTEX(
       "X-VTEX-API-AppToken",
       typeof appToken === "string" ? appToken : appToken?.get?.() ?? "",
     );
+  console.log(appKey?.get?.())
+  console.log(appToken?.get?.())
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
     processHeaders: removeDirtyCookies,
