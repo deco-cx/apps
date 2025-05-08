@@ -16,3 +16,11 @@ export default function WhitelistAssets(
     "disableProxy": ctx.disableProxy,
   };
 }
+
+export const cache = "stale-while-revalidate";
+
+export const cacheKey = (_props: unknown, req: Request, _ctx: AppContext) => {
+  const url = new URL(req.url);
+  url.pathname = "/live/invoke/website/loaders/whitelistAssets.ts";
+  return url.href;
+};
