@@ -17,6 +17,13 @@ export interface BuildOptions {
   entrypoint?: string;
 }
 
+export interface BuildResult {
+  /**
+   * @title Base64
+   * @description The base64 encoded output of the bundle
+   */
+  base64: string;
+}
 /**
  * @name JS_BUNDLER_BUILD
  * @title Build JavaScript/TypeScript code
@@ -24,7 +31,7 @@ export interface BuildOptions {
  */
 const build = async (
   options: BuildOptions,
-): Promise<string> => {
+): Promise<BuildResult> => {
   const { files, entrypoint } = options;
 
   // Create a virtual filesystem for esbuild
@@ -44,32 +51,38 @@ const build = async (
       minify: true,
       sourcemap: false,
       plugins: [
-        ...denoPlugins(),
         {
           name: "virtual-filesystem",
           setup(build) {
             // Handle virtual files
             build.onResolve({ filter: /.*/ }, (args) => {
-              if (virtualFiles[args.path]) {
+              const path = args.path.startsWith("./")
+                ? args.path.slice(2)
+                : args.path;
+              if (virtualFiles[path]) {
                 return Promise.resolve({
                   path: args.path,
                   namespace: "virtual",
                 });
               }
-              return Promise.resolve(args);
+              return Promise.resolve(undefined);
             });
 
             build.onLoad(
               { filter: /.*/, namespace: "virtual" },
               (args) => {
+                const path = args.path.startsWith("./")
+                  ? args.path.slice(2)
+                  : args.path;
                 return Promise.resolve({
-                  contents: virtualFiles[args.path],
+                  contents: virtualFiles[path],
                   loader: args.path.endsWith(".ts") ? "ts" : "js",
                 });
               },
             );
           },
         },
+        ...denoPlugins(),
       ],
     });
 
@@ -80,7 +93,7 @@ const build = async (
     }
 
     // Return the output content as a string
-    return result.outputFiles[0].text;
+    return { base64: btoa(result.outputFiles[0].text) };
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     throw new Error(`Build failed: ${err.message}`);
