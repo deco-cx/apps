@@ -6,11 +6,13 @@ import * as $$$$$$$$$0 from "./actions/issues/addComment.ts";
 import * as $$$$$$$$$1 from "./actions/issues/updateField.ts";
 import * as $$$0 from "./loaders/issues/list.ts";
 import * as $$$1 from "./loaders/issues/read.ts";
+import * as $$$2 from "./loaders/jql.ts";
 
 const manifest = {
   "loaders": {
     "jira/loaders/issues/list.ts": $$$0,
     "jira/loaders/issues/read.ts": $$$1,
+    "jira/loaders/jql.ts": $$$2,
   },
   "actions": {
     "jira/actions/issues/addComment.ts": $$$$$$$$$0,
