@@ -48,14 +48,14 @@ const action = async (
 ): Promise<UpdateResponse> => {
   // First, get the slides with templates
   const getResponse = await ctx.clientSlides
-    ["GET /v1/presentations/:presentationId"](
-      { presentationId: props.presentationId },
-      {
-        headers: {
-          Authorization: `Bearer ${props.token}`,
-        },
+  ["GET /v1/presentations/:presentationId"](
+    { presentationId: props.presentationId },
+    {
+      headers: {
+        Authorization: `Bearer ${props.token}`,
       },
-    );
+    },
+  );
 
   const presentationData = await getResponse.json();
 
@@ -101,6 +101,9 @@ const action = async (
                 }
 
                 updatedText += content;
+              } else {
+                // Preserve non-text run elements in the output
+                updatedText += textElement.textRun?.content || "";
               }
             }
 
@@ -135,17 +138,17 @@ const action = async (
   // Only proceed if there are updates to make
   if (requests.length > 0) {
     const updateResponse = await ctx.clientSlides
-      ["POST /v1/presentations/:presentationId"](
-        { presentationId: props.presentationId + ":batchUpdate" },
-        {
-          headers: {
-            Authorization: `Bearer ${props.token}`,
-          },
-          body: {
-            requests,
-          },
+    ["POST /v1/presentations/:presentationId"](
+      { presentationId: props.presentationId + ":batchUpdate" },
+      {
+        headers: {
+          Authorization: `Bearer ${props.token}`,
         },
-      );
+        body: {
+          requests,
+        },
+      },
+    );
 
     await updateResponse.json();
   }

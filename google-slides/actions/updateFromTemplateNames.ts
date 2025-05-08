@@ -67,14 +67,14 @@ const action = async (
 
     // Get the full presentation to access the elements
     const getResponse = await ctx.clientSlides
-      ["GET /v1/presentations/:presentationId"](
-        { presentationId: props.presentationId },
-        {
-          headers: {
-            Authorization: `Bearer ${props.token}`,
-          },
+    ["GET /v1/presentations/:presentationId"](
+      { presentationId: props.presentationId },
+      {
+        headers: {
+          Authorization: `Bearer ${props.token}`,
         },
-      );
+      },
+    );
 
     const presentationData = await getResponse.json();
 
@@ -107,7 +107,7 @@ const action = async (
 
                     // Only replace if this template name exists in the slide's names
                     if (
-                      templateSlide.names.includes(templateValue.name) &&
+                      templateSlide.names?.includes(templateValue.name) &&
                       content.includes(placeholder)
                     ) {
                       content = content.replace(
@@ -160,7 +160,6 @@ const action = async (
 
     // Only proceed if there are updates to make
     if (requests.length > 0) {
-      console.log("Sending batch update with", requests.length, "requests");
 
       // Ajuste para usar a API do Google Slides corretamente
       const updateUrl =

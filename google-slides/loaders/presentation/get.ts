@@ -13,7 +13,92 @@ interface Props {
 interface SlideContent {
   id: string;
   text: string;
-  names: string[]; // Renamed from 'name' to 'names' to indicate multiple template names
+}
+
+/**
+ * Função recursiva para extrair apenas o conteúdo textual relevante
+ */
+function extractTextContent(element: any): string {
+  // Caso base: se o elemento não existir
+  if (!element) return "";
+
+  // Se for um objeto com textRun.content, retorna o conteúdo
+  if (element.textRun?.content) {
+    return element.textRun.content.trim();
+  }
+
+  let result = "";
+
+  // Se for um array, processa cada elemento
+  if (Array.isArray(element)) {
+    for (const item of element) {
+      const text = extractTextContent(item);
+      if (text) {
+        result += (result ? " " : "") + text;
+      }
+    }
+    return result;
+  }
+
+  // Se for um objeto, verifica caminhos conhecidos que contêm texto
+  if (typeof element === "object") {
+    // Verifica shape.text.textElements (comum em slides)
+    if (element.shape?.text?.textElements) {
+      const text = extractTextContent(element.shape.text.textElements);
+      if (text) {
+        result += (result ? " " : "") + text;
+      }
+    }
+
+    // Verifica table.tableRows (para tabelas)
+    if (element.table?.tableRows) {
+      const text = extractTextContent(element.table.tableRows);
+      if (text) {
+        result += (result ? " " : "") + text;
+      }
+    }
+
+    // Verifica tableCells (para células dentro de tabelas)
+    if (element.tableCells) {
+      const text = extractTextContent(element.tableCells);
+      if (text) {
+        result += (result ? " " : "") + text;
+      }
+    }
+
+    // Verifica text.textElements (comum em células e outros elementos)
+    if (element.text?.textElements) {
+      const text = extractTextContent(element.text.textElements);
+      if (text) {
+        result += (result ? " " : "") + text;
+      }
+    }
+
+    // Verifica pageElements (principal elemento que contém itens do slide)
+    if (element.pageElements) {
+      const text = extractTextContent(element.pageElements);
+      if (text) {
+        result += (result ? " " : "") + text;
+      }
+    }
+
+    // Se nenhum dos caminhos conhecidos tiver conteúdo, verifica todas as propriedades
+    if (!result) {
+      for (const key in element) {
+        // Ignora propriedades que sabemos que não contêm conteúdo textual
+        if (["objectId", "width", "height", "transform", "type", "size", "style"].includes(key)) {
+          continue;
+        }
+
+        const text = extractTextContent(element[key]);
+        if (text) {
+          result += (result ? " " : "") + text;
+        }
+      }
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -26,46 +111,27 @@ const loader = async (
   ctx: AppContext,
 ): Promise<SlideContent[]> => {
   const response = await ctx.clientSlides
-    ["GET /v1/presentations/:presentationId"](
-      { presentationId: props.presentationId },
-      {
-        headers: {
-          Authorization: `Bearer ${props.token}`,
-        },
+  ["GET /v1/presentations/:presentationId"](
+    { presentationId: props.presentationId },
+    {
+      headers: {
+        Authorization: `Bearer ${props.token}`,
       },
-    );
+    },
+  );
 
   const data = await response.json();
 
-  const slides: SlideContent[] = data.slides?.flatMap((slide: any) => {
+  const slides: SlideContent[] = data.slides?.map((slide: any) => {
     const slideId = slide.objectId;
-    const contents = slide.pageElements?.map((element: any) => {
-      if (element.shape?.text?.textElements) {
-        return element.shape.text.textElements
-          .filter((textElement: any) => textElement.textRun?.content)
-          .map((textElement: any) => textElement.textRun.content)
-          .join(" ");
-      }
-      return null;
-    }).filter(Boolean).join(" ");
 
-    if (contents && contents.includes("{{")) {
-      // Extract template variables
-      const templateVarRegex = /{{([^}]+)}}/g;
-      const matches = [...contents.matchAll(templateVarRegex)];
+    // Extrair o conteúdo textual do slide usando a função recursiva
+    const slideText = extractTextContent(slide);
 
-      if (matches.length > 0) {
-        // Extract all template names found
-        const templateNames = matches.map((match) => match[1].trim());
-
-        return {
-          id: slideId,
-          text: contents,
-          names: templateNames,
-        };
-      }
-    }
-    return [];
+    return {
+      id: slideId,
+      text: slideText,
+    };
   }) || [];
 
   return slides;
