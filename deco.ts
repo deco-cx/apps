@@ -23,6 +23,7 @@ const config = {
     app("sienge"),
     app("vertex"),
     app("google-sheets"),
+    app("google-slides"),
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),
