@@ -1,4 +1,4 @@
-import { Userorderslist } from "./openapi/vcs.openapi.gen.ts";
+import { Userorderdetails, Userorderslist } from "./openapi/vcs.openapi.gen.ts";
 import {
   Brand,
   Category,
@@ -9,6 +9,7 @@ import {
   LegacyProduct,
   LegacySort,
   OrderForm,
+  OrderFormOrder,
   PageType,
   PortalSuggestion,
   ProductSearchResult,
@@ -20,6 +21,12 @@ import {
 } from "./types.ts";
 
 export interface VTEXCommerceStable {
+  "POST /api/checkout/pub/orders/:orderId/user-cancel-request": {
+    response: unknown;
+    body: {
+      reason: string;
+    };
+  };
   "POST /api/checkout/pub/orderForm/:orderFormId/messages/clear": {
     // deno-lint-ignore no-explicit-any
     body: Record<any, never>;
@@ -247,6 +254,15 @@ export interface VTEXCommerceStable {
   };
   "GET /api/oms/user/orders": {
     response: Userorderslist;
+  };
+  "GET /api/oms/user/orders/:orderId": {
+    response: Userorderdetails;
+  };
+  "GET /api/checkout/pub/orders/:orderId": {
+    response: OrderFormOrder;
+  };
+  "GET /api/checkout/pub/orders/order-group/:orderGroupId": {
+    response: OrderFormOrder[];
   };
 }
 
