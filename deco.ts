@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("js-bundler"),
     app("jira"),
     app("deno-deploy"),
     app("exa"),
