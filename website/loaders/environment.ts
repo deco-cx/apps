@@ -20,7 +20,6 @@ export interface Props {
    */
   name?: string;
 }
-const cache: Record<string, string | null> = {};
 
 const getEnvironment = (props: Props): string | null => {
   const name = props?.name;
@@ -32,7 +31,7 @@ const getEnvironment = (props: Props): string | null => {
     return null;
   }
 
-  return cache[value] ??= value;
+  return value;
 };
 /**
  * @title Environment
@@ -40,7 +39,6 @@ const getEnvironment = (props: Props): string | null => {
 export default async function Environment(props: Props): Promise<Environment> {
   const environmentValue = await getEnvironment(props);
 
-  console.log("environmentValue", environmentValue);
   return {
     get: (): string | null => {
       return environmentValue;
