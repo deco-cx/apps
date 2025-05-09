@@ -138,6 +138,7 @@ export const pageInfo = gql`
 
 //Queries
 export const GetProduct = (extraProps?: Array<string>) => ({
+  operationName: "GetProduct",
   fragments: [simpleProduct, priceRange, mediaGallery],
   query: gql`
     query GetProduct(
@@ -167,6 +168,7 @@ export const GetCompleteProduct = (
   extraProps?: Array<string>,
   isBreadcrumbProductName?: boolean,
 ) => ({
+  operationName: "GetCompleteProduct",
   fragments: [completeProduct, priceRange, mediaGallery],
   query: gql`
     query GetProduct(
@@ -194,6 +196,7 @@ export const GetCompleteProduct = (
 });
 
 export const GetExtraProps = (extraProps?: Array<string>) => ({
+  operationName: "GetExtraProps",
   query: gql`
 query GetProduct(
   $search: String
@@ -219,6 +222,7 @@ query GetProduct(
 });
 
 export const GetCategoryUid = {
+  operationName: "GetCategoryUid",
   query: gql`
     query GetCategoryUid($path: String) {
       categories(filters: { url_key: { eq: $path } }) {
@@ -245,6 +249,7 @@ export const GetCategoryUid = {
 };
 
 export const GetPLPItems = (extraProps?: Array<string>) => ({
+  operationName: "GetPLPItems",
   fragments: [
     simpleProduct,
     priceRange,
@@ -286,6 +291,7 @@ export const GetPLPItems = (extraProps?: Array<string>) => ({
 });
 
 export const GetProductImages = {
+  operationName: "GetProductImages",
   fragments: [mediaGallery],
   query: gql`
     query GetProduct(
@@ -316,6 +322,7 @@ export const GetRelatedProducts = (
   type: "related" | "upsell" | "crosssell",
   extraProps?: Array<string>,
 ) => ({
+  operationName: "GetRelatedProducts",
   fragments: [
     simpleProduct,
     priceRange,
