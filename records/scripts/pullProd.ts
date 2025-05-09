@@ -71,25 +71,7 @@ async function run() {
     getLocalSQLClientConfig(),
   );
 
-  // Split the dump query into individual statements and execute them
-  const statements = dumpQuery.split(";\n").filter(Boolean);
-
-  console.log(`Executing ${statements.length} SQL statements...`);
-
-  // Execute each statement individually
-  for (const statement of statements) {
-    if (!statement) continue;
-    try {
-      await sqlClient.execute(statement);
-    } catch (error) {
-      console.error(
-        `Error executing statement: "${statement}" - ${
-          (error as Error).message || String(error)
-        }`,
-      );
-      throw error;
-    }
-  }
+  await sqlClient.executeMultiple(dumpQuery);
 
   const result = await checkDumpInsertedTables(sqlClient);
   console.log(result);
