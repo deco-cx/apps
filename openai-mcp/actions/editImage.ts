@@ -24,7 +24,7 @@ export interface Props {
    * Can be obtained from a CREATE_PRESIGNED_URL tool or similar functionality that creates S3/cloud storage
    * presigned URLs with PUT permission.
    */
-  presignedUrl?: string;
+  presignedUrl: string;
 
   /**
    * @description The text prompt that describes how you want to edit the image or what you want the final result to look like.
@@ -92,19 +92,6 @@ export interface Props {
   referenceImageUrls?: string[];
 
   /**
-   * @description The AI model to use for image editing. Different models have different capabilities:
-   *
-   * - gpt-image-1: OpenAI's newest model with superior instruction following and detailed editing
-   * - dall-e-2: Supports inpainting through the mask parameter but with less precision
-   *
-   * Note that dall-e-3 does NOT support the edit endpoint. Use gpt-image-1 for best results with
-   * complex edits and text rendering.
-   *
-   * @default gpt-image-1
-   */
-  model?: "gpt-image-1" | "dall-e-2";
-
-  /**
    * @description The dimensions of the generated output image. Available sizes depend on the model:
    *
    * - Square (1024x1024): Standard size, works with all models
@@ -117,11 +104,7 @@ export interface Props {
    * @default 1024x1024
    */
   size?:
-    | "256x256"
-    | "512x512"
     | "1024x1024"
-    | "1792x1024"
-    | "1024x1792"
     | "1536x1024"
     | "1024x1536";
 
@@ -135,63 +118,32 @@ export interface Props {
    * - high: Most detailed images, slowest generation
    *
    * Quality setting affects the rendering detail and token consumption. For precise edits requiring
-   * fine details, use 'medium' or 'high' quality. The dall-e-2 model ignores this parameter.
+   * fine details, use 'medium' or 'high' quality.
    *
    * @default auto
    */
   quality?: "low" | "medium" | "high" | "auto";
 
   /**
-   * @description The file format for the generated image(s). Each format has different characteristics:
-   *
-   * - png: Lossless compression, supports transparency, best for images with text or sharp edges
-   * - jpeg: Smaller file size, lossy compression, good for photographs, no transparency support
-   * - webp: Modern format with good compression and quality, supports transparency
-   *
-   * When editing images with transparency or when precise edge quality is important,
-   * use PNG format for best results. For efficiency with photographic content, JPEG may be preferred.
-   *
-   * @default png
-   */
-  format?: "png" | "jpeg" | "webp";
-
-  /**
    * @description Controls whether the image has a transparent background or a solid color background.
-   * This only applies to the gpt-image-1 model and is ignored by dall-e-2.
    *
    * - opaque: Standard solid background
    * - transparent: Transparent background (only works with png and webp formats)
+   * - auto: Model automatically determines the best background type
    *
-   * Important: Transparency only works with the 'png' and 'webp' formats. If you specify 'transparent'
-   * with 'jpeg' format, the API will ignore the transparency setting. This is useful for creating
-   * compositable elements that can be layered in external editing tools.
+   * Important: Transparency only works with 'png' and 'webp' formats. If 'transparent' is specified
+   * with 'jpeg' format, the transparency setting will be ignored. When using transparency, set the
+   * output format to either png (default) or webp.
    *
-   * @default opaque
+   * Transparent backgrounds are useful for creating compositable elements that can be layered in
+   * external editing tools.
+   *
+   * @default auto
    */
-  background?: "opaque" | "transparent";
-
-  /**
-   * @description Controls the compression level for 'jpeg' and 'webp' formats only.
-   * Range is 0-100, where 0 is maximum compression (lowest quality) and 100 is minimum
-   * compression (highest quality).
-   *
-   * - Low values (0-30): Small file size, visible compression artifacts
-   * - Medium values (30-70): Balanced file size and quality
-   * - High values (70-100): Larger file size, minimal compression artifacts
-   *
-   * When editing detailed images or images with text, use higher compression values
-   * to preserve details. This parameter is ignored for 'png' format and by the dall-e-2 model.
-   */
-  compression?: number;
+  background?: "opaque" | "transparent" | "auto";
 }
 
-interface ImageResponse {
-  b64_json?: string;
-  url?: string;
-  revised_prompt?: string;
-}
-
-export default async function editImageAction(
+export default function editImageAction(
   props: Props,
   req: Request,
   ctx: AppContext,
@@ -199,149 +151,42 @@ export default async function editImageAction(
   const {
     presignedUrl,
     prompt,
-    imageUrl,
-    maskUrl,
-    referenceImageUrls = [],
-    model = "gpt-image-1",
-    size = "1024x1024",
-    quality = "auto",
-    format = "png",
-    background = "opaque",
-    compression,
   } = props;
 
-  const openAI = ctx.openAI;
   const url = new URL(req.url);
   const installId = getInstallId(url);
 
-  // If presignedUrl provided, return preview URL
-  if (presignedUrl) {
-    const cleanedUrl = presignedUrl.split("?")[0].replace("_presigned/", "");
+  const cleanedUrl = presignedUrl.split("?")[0].replace("_presigned/", "");
 
-    // Process the image editing asynchronously without awaiting
-    setTimeout(() => {
-      processImageEdit(props, ctx)
-        .catch((error) => {
-          console.error("Async image editing failed:", error);
-          ctx.log("Async image editing failed:", error);
-          // If there's an error, write the error message to the presigned URL
-          writeErrorToPresignedUrl(
-            presignedUrl,
-            "This generation has failed." + error,
-          )
-            .catch((err) => {
-              console.error(
-                "Failed to write error message to presigned URL:",
-                err,
-              );
-            });
-        });
-    }, 0);
+  // Process the image editing asynchronously without awaiting
+  setTimeout(() => {
+    processImageEdit(props, ctx)
+      .catch((error) => {
+        console.error("Async image editing failed:", error);
+        // If there's an error, write the error message to the presigned URL
+        writeErrorToPresignedUrl(
+          presignedUrl,
+          "This generation has failed." + error,
+        )
+          .catch((err) => {
+            console.error(
+              "Failed to write error message to presigned URL:",
+              err,
+            );
+          });
+      });
+  }, 0);
 
-    // Return URL to the image preview loader
-    const previewUrl = createPreviewUrl(cleanedUrl, PREVIEW_URL, installId);
+  // Return URL to the image preview loader
+  const previewUrl = createPreviewUrl(cleanedUrl, PREVIEW_URL, installId);
 
-    return {
-      success: true,
-      previewUrl,
-      message: "Image editing started. Check the previewUrl for status.",
-      model,
-      prompt,
-    };
-  }
-
-  // If no presignedUrl is provided, handle synchronously as before
-  try {
-    // Build request parameters
-    const requestParams: Record<string, unknown> = {
-      model,
-      prompt,
-      size,
-    };
-
-    // Handle model-specific parameters
-    if (model === "gpt-image-1") {
-      requestParams.quality = quality;
-      if (
-        background === "transparent" && (format === "png" || format === "webp")
-      ) {
-        requestParams.background = background;
-      }
-    }
-
-    // Add format and compression settings
-    if (format !== "png") {
-      if (
-        compression !== undefined && (format === "jpeg" || format === "webp")
-      ) {
-        requestParams.output_compression = compression;
-      }
-    }
-
-    // Fetch the primary image
-    const imageFile = await fetchImageAsFile(
-      imageUrl,
-      `image.${imageUrl.split(".").pop()?.toLowerCase() || "png"}`,
-    );
-
-    // Handle different editing scenarios
-    if (maskUrl) {
-      // Inpainting with mask
-      const maskFile = await fetchImageAsFile(maskUrl, "mask.png");
-      requestParams.image = imageFile;
-      requestParams.mask = maskFile;
-    } else if (referenceImageUrls.length > 0) {
-      // Multi-image edit
-      const images = [imageFile];
-
-      // Add reference images (up to 4 total including the main image)
-      const maxReferenceImages = 3;
-      for (
-        let i = 0;
-        i < Math.min(referenceImageUrls.length, maxReferenceImages);
-        i++
-      ) {
-        try {
-          const refFile = await fetchImageAsFile(
-            referenceImageUrls[i],
-            `ref_${i}.${
-              referenceImageUrls[i].split(".").pop()?.toLowerCase() || "png"
-            }`,
-          );
-          images.push(refFile);
-        } catch (err) {
-          console.error(`Failed to fetch reference image ${i}:`, err);
-        }
-      }
-
-      requestParams.image = images;
-    } else {
-      // Simple edit with just the main image
-      requestParams.image = imageFile;
-    }
-
-    const result = await openAI.images.edit(requestParams);
-
-    // Otherwise return base64 data as usual
-    return {
-      success: true,
-      images: result.data.map((img: ImageResponse) =>
-        img.b64_json ? `data:image/${format};base64,${img.b64_json}` : img.url
-      ),
-      model,
-      prompt,
-    };
-  } catch (error: unknown) {
-    console.error("Error editing image:", error);
-    const errorMessage = error instanceof Error
-      ? error.message
-      : "Failed to edit image";
-
-    return {
-      success: false,
-      error: errorMessage,
-    };
-  }
+  return {
+    success: true,
+    previewUrl,
+    message: "Image editing started. Check the previewUrl for status.",
+    model: "gpt-image-1",
+    prompt,
+  };
 }
 
 // Helper function to fetch image and convert to File with proper MIME type
@@ -384,12 +229,7 @@ async function processImageEdit(props: Props, ctx: AppContext) {
     imageUrl,
     maskUrl,
     referenceImageUrls = [],
-    model = "gpt-image-1",
     size = "1024x1024",
-    quality = "auto",
-    format = "png",
-    background = "opaque",
-    compression,
   } = props;
 
   if (!presignedUrl) {
@@ -397,30 +237,12 @@ async function processImageEdit(props: Props, ctx: AppContext) {
   }
 
   const openAI = ctx.openAI;
-
   // Build request parameters
   const requestParams: Record<string, unknown> = {
-    model,
+    model: "gpt-image-1",
     prompt,
     size,
   };
-
-  // Handle model-specific parameters
-  if (model === "gpt-image-1") {
-    requestParams.quality = quality;
-    if (
-      background === "transparent" && (format === "png" || format === "webp")
-    ) {
-      requestParams.background = background;
-    }
-  }
-
-  // Add format and compression settings
-  if (format !== "png") {
-    if (compression !== undefined && (format === "jpeg" || format === "webp")) {
-      requestParams.output_compression = compression;
-    }
-  }
 
   // Fetch the primary image
   const imageFile = await fetchImageAsFile(
@@ -481,7 +303,7 @@ async function processImageEdit(props: Props, ctx: AppContext) {
       }
     }
 
-    await uploadImage(imageData, presignedUrl, format);
+    await uploadImage(imageData, presignedUrl);
   }
 }
 
@@ -507,8 +329,6 @@ async function writeErrorToPresignedUrl(
     if (!response.ok) {
       throw new Error(`Failed to write error to URL: ${response.status}`);
     }
-
-    console.log("Successfully wrote error message to presigned URL");
   } catch (error) {
     console.error("Error writing to presigned URL:", error);
     throw error;
