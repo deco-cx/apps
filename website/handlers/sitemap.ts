@@ -83,8 +83,7 @@ export default function SiteMap({
         routes: Route[];
       };
     };
-    console.log("state", ctx.state);
-    console.log("routes", ctx.state.routes);
+
     const sitemap = siteMapFromRoutes(
       reqUrl.origin,
       ctx.state.routes ?? [],
