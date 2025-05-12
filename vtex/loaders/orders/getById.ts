@@ -7,7 +7,7 @@ interface Props {
 
 /**
  * @title VTEX - Get User Order By Id
- * @description Gets user order by id, the user must be authenticated or have access to the order
+ * @description The user must be authenticated or have OMS permissions to access this endpoint
  */
 export default async function loader(
   { orderId }: Props,
@@ -17,11 +17,17 @@ export default async function loader(
   const { vcsDeprecated } = ctx;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
-  const order = await vcsDeprecated["GET /api/checkout/pub/orders/:orderId"]({
-    orderId,
-  }, {
-    headers: { cookie },
-  }).then((res) => res.json());
+  const order = await vcsDeprecated["GET /api/oms/user/orders/:orderId"](
+    {
+      orderId,
+    },
+    {
+      headers: {
+        cookie,
+        accept: "application/json",
+      },
+    },
+  ).then((res) => res.json());
 
   return order;
 }
