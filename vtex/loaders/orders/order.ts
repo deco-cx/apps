@@ -19,7 +19,7 @@ export default async function loader(
   const { slug } = props;
 
   const user = await ctx.invoke.vtex.loaders.user();
-  if (!user) {
+  if (!user?.email) {
     throw new HttpError(new Response("Unauthorized", { status: 403 }));
   }
 
@@ -36,11 +36,13 @@ export default async function loader(
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to get order: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to get order: ${response.status} ${response.statusText}`,
+    );
   }
 
   const order = await response.json();
-  
+
   if (order.clientProfileData?.email !== user.email) {
     throw new HttpError(new Response("Unauthorized", { status: 403 }));
   }
