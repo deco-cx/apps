@@ -1,67 +1,111 @@
 import type { App, FnContext } from "@deco/deco";
-import { PreviewContainer } from "../utils/preview.tsx";
+import { fetchSafe } from "../utils/fetch.ts";
+import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
-import manifest, { Manifest } from "./manifest.gen.ts";
-import { GoogleSpreadsheet } from "npm:google-spreadsheet@^4.1.4";
-import { JWT } from "npm:google-auth-library@^9.14.1";
+// O arquivo manifest.gen.ts será gerado automaticamente, então vamos comentar temporariamente
+// import manifest, { Manifest } from "./manifest.gen.ts";
+// Definir um manifesto temporário até que o manifesto real seja gerado
+const manifest = {
+    "loaders": {},
+    "actions": {},
+    "name": "google-sheets2",
+    "baseUrl": import.meta.url,
+};
+
+// Definir um tipo Manifest temporário
+type Manifest = typeof manifest;
+
+import { GoogleSheetsClient } from "./utils/client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
 export interface Props {
-  client_email: string;
-  private_key: Secret;
-  sheet_id: string;
-  scopes: string[];
+    /**
+     * @title API Key
+     * @description Chave de API do Google Sheets
+     */
+    apiKey?: string | Secret;
+
+    /**
+     * @title OAuth Client ID
+     * @description ID do Cliente para OAuth
+     */
+    clientId?: string;
+
+    /**
+     * @title OAuth Client Secret
+     * @description Segredo do Cliente para OAuth
+     */
+    clientSecret?: string | Secret;
+
+    /**
+     * @title Refresh Token
+     * @description Token de atualização para OAuth (opcional se usar API Key)
+     */
+    refreshToken?: string | Secret;
+
+    /**
+     * @title Access Token
+     * @description Token de acesso para OAuth (opcional se usar API Key ou Refresh Token)
+     */
+    accessToken?: string | Secret;
 }
 
-// Here we define the state of the app
-// You choose what to put in the state
-export interface State extends Omit<Props, "token"> {
-  doc: GoogleSpreadsheet;
+export interface State {
+    api: ReturnType<typeof createHttpClient<GoogleSheetsClient>>;
+    apiKey?: string;
+    clientId?: string;
+    clientSecret?: string;
+    refreshToken?: string;
+    accessToken?: string;
 }
 
 /**
- * @title Google Sheets
- * @description This is an app that enables a google spreadsheet integration.
- * @category Tool
- * @logo https://raw.githubusercontent.com/deco-cx/apps/main/google-sheets/logo.png
+ * @name Google Sheets
+ * @description Integração com a API Google Sheets para criar, ler e modificar planilhas
+ * @category Produtividade
+ * @logo https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Google_Sheets_logo_%282014-2020%29.svg/1498px-Google_Sheets_logo_%282014-2020%29.svg.png
  */
-export default function GoogleSheet(props: Props): App<Manifest, State> {
-  const SCOPES = props.scopes;
+export default function App(props: Props): App<Manifest, State> {
+    const {
+        apiKey,
+        clientId,
+        clientSecret,
+        refreshToken,
+        accessToken,
+    } = props;
 
-  const jwt = new JWT({
-    email: props.client_email,
-    key: props.private_key?.get() || "",
-    scopes: SCOPES,
-  });
+    // Extração dos valores secretos
+    const _apiKey = typeof apiKey === "string" ? apiKey : apiKey?.get?.() ?? undefined;
+    const _clientSecret = typeof clientSecret === "string" ? clientSecret : clientSecret?.get?.() ?? undefined;
+    const _refreshToken = typeof refreshToken === "string" ? refreshToken : refreshToken?.get?.() ?? undefined;
+    const _accessToken = typeof accessToken === "string" ? accessToken : accessToken?.get?.() ?? undefined;
 
-  const doc = new GoogleSpreadsheet(
-    props.sheet_id,
-    jwt,
-  );
+    // Configuração de cabeçalhos baseada na autenticação disponível
+    const headers = new Headers();
 
-  return {
-    state: {
-      ...props,
-      doc,
-    },
-    manifest,
-  };
-}
+    if (_accessToken) {
+        headers.set("Authorization", `Bearer ${_accessToken}`);
+    }
 
-// It is important to use the same name as the default export of the app
-export const preview = () => {
-  return {
-    Component: PreviewContainer,
-    props: {
-      name: "Google Sheets",
-      owner: "deco.cx",
-      description:
-        "This is an app that enables a google spreadsheet integration.",
-      logo:
-        "https://raw.githubusercontent.com/deco-cx/apps/main/google-sheets/logo.png",
-      images: [],
-      tabs: [],
-    },
-  };
-};
+    // Criação do cliente HTTP
+    const api = createHttpClient<GoogleSheetsClient>({
+        base: "https://sheets.googleapis.com",
+        headers,
+        fetcher: fetchSafe,
+    });
+
+    const state: State = {
+        api,
+        apiKey: _apiKey,
+        clientId,
+        clientSecret: _clientSecret,
+        refreshToken: _refreshToken,
+        accessToken: _accessToken,
+    };
+
+    return {
+        state,
+        manifest,
+    };
+} 

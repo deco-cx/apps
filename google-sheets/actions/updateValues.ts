@@ -1,0 +1,137 @@
+import { AppContext } from "../mod.ts";
+import type { UpdateValuesResponse, ValueRange } from "../utils/types.ts";
+
+export interface Props {
+    /**
+     * @title ID da Planilha
+     * @description O ID da planilha do Google Sheets
+     */
+    spreadsheetId: string;
+
+    /**
+     * @title Intervalo
+     * @description O intervalo de células na notação A1 (ex: "Sheet1!A1:B10")
+     */
+    range: string;
+
+    /**
+     * @title Valores
+     * @description Os valores a serem gravados na planilha como uma matriz
+     */
+    values: unknown[][];
+
+    /**
+     * @title Dimensão Principal
+     * @description Determina como organizar os valores na matriz (por linhas ou colunas)
+     * @default "ROWS"
+     */
+    majorDimension?: "ROWS" | "COLUMNS";
+
+    /**
+     * @title Opção de Entrada de Valor
+     * @description Como interpretar os valores de entrada
+     * @default "USER_ENTERED"
+     */
+    valueInputOption?: "RAW" | "USER_ENTERED";
+
+    /**
+     * @title Incluir Valores na Resposta
+     * @description Se a resposta deve incluir os valores atualizados
+     * @default false
+     */
+    includeValuesInResponse?: boolean;
+
+    /**
+     * @title Opção de Renderização de Valores na Resposta
+     * @description Como os valores devem ser representados na resposta
+     * @default "FORMATTED_VALUE"
+     */
+    responseValueRenderOption?: "FORMATTED_VALUE" | "UNFORMATTED_VALUE" | "FORMULA";
+
+    /**
+     * @title Opção de Renderização de Data/Hora na Resposta
+     * @description Como os valores de data e hora devem ser representados na resposta
+     * @default "SERIAL_NUMBER"
+     */
+    responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+}
+
+/**
+ * @title Atualizar Valores
+ * @description Atualiza os valores de células em uma planilha do Google Sheets
+ */
+const action = async (
+    props: Props,
+    _req: Request,
+    ctx: AppContext,
+): Promise<UpdateValuesResponse> => {
+    const {
+        spreadsheetId,
+        range,
+        values,
+        majorDimension = "ROWS",
+        valueInputOption = "USER_ENTERED",
+        includeValuesInResponse = false,
+        responseValueRenderOption = "FORMATTED_VALUE",
+        responseDateTimeRenderOption = "SERIAL_NUMBER",
+    } = props;
+
+    try {
+        // Preparando o corpo da requisição
+        const body: ValueRange = {
+            range,
+            majorDimension,
+            values,
+        };
+
+        // Adiciona o API Key se estiver disponível
+        const searchParams = new URLSearchParams();
+        if (ctx.apiKey) {
+            searchParams.append("key", ctx.apiKey);
+        }
+
+        // Adiciona os parâmetros de consulta
+        searchParams.append("valueInputOption", valueInputOption);
+        if (includeValuesInResponse) {
+            searchParams.append("includeValuesInResponse", "true");
+            searchParams.append("responseValueRenderOption", responseValueRenderOption);
+            searchParams.append("responseDateTimeRenderOption", responseDateTimeRenderOption);
+        }
+
+        // Constrói a URL para atualizar os valores
+        const url = new URL(
+            `/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}`,
+            "https://sheets.googleapis.com"
+        );
+        for (const [key, value] of searchParams.entries()) {
+            url.searchParams.append(key, value);
+        }
+
+        // Se não tiver token de acesso OAuth, não pode atualizar valores com apenas API Key
+        if (!ctx.accessToken) {
+            throw new Error("Token de acesso OAuth necessário para atualizar valores");
+        }
+
+        // Faz a requisição para atualizar os valores
+        const response = await fetch(url.toString(), {
+            method: "PUT",
+            headers: new Headers({
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${ctx.accessToken}`,
+            }),
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Erro ao atualizar valores: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Erro ao atualizar valores:", error);
+        throw error;
+    }
+};
+
+export default action; 

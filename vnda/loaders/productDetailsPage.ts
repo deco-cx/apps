@@ -43,7 +43,7 @@ async function loader(
       }, STALE);
       return result.json();
     } catch (error) {
-      // Make async rendering work
+      console.log(error);
       if (error instanceof DOMException && error.name === "AbortError") {
         throw error;
       }
@@ -54,6 +54,7 @@ async function loader(
 
   // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
   const getProductPrice = async (id: number): Promise<ProductPrice | null> => {
+
     if (!priceIntl) {
       return null;
     } else {
@@ -63,6 +64,7 @@ async function loader(
         }, STALE);
         return result.json();
       } catch (error) {
+
         // Make async rendering work
         if (error instanceof DOMException && error.name === "AbortError") {
           throw error;
@@ -79,7 +81,6 @@ async function loader(
   ]);
 
   const variantsLength = maybeProduct?.variants?.length ?? 0;
-
   // 404: product not found
   if (!maybeProduct || variantsLength === 0) {
     return null;
@@ -104,13 +105,13 @@ async function loader(
 
   const seo = seoArray?.at(-1);
 
-  return {
-    "@type": "ProductDetailsPage",
+  const result = {
+    "@type": "ProductDetailsPage" as const,
     // TODO: Find out what's the right breadcrumb on vnda
     breadcrumbList: {
-      "@type": "BreadcrumbList",
+      "@type": "BreadcrumbList" as const,
       itemListElement: segments.map((s, i) => ({
-        "@type": "ListItem",
+        "@type": "ListItem" as const,
         name: s,
         position: i + 1,
         item: new URL(`/${segments.slice(0, i + 1).join("/")}`, url).href,
@@ -124,6 +125,9 @@ async function loader(
       canonical: new URL(`/${segments.join("/")}`, url).href,
     },
   };
+
+  console.log("result", result);
+  return result;
 }
 
 export default loader;
