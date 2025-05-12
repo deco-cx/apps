@@ -1,4 +1,4 @@
-import { BatchUpdateSpreadsheetRequest, BatchUpdateValuesRequest, BatchUpdateValuesResponse, DeveloperMetadata, FilterView, ProtectedRange, SheetProperties, Spreadsheet, UpdateValuesResponse, ValueRange } from "./tyoes.ts";
+import { BatchUpdateSpreadsheetRequest, BatchUpdateValuesRequest, BatchUpdateValuesResponse, DeveloperMetadata, FilterView, ProtectedRange, SheetProperties, Spreadsheet, UpdateValuesResponse, ValueRange } from "./types.ts";
 
 // Definição da interface do cliente para Google Sheets
 export interface GoogleSheetsClient {
