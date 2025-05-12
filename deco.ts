@@ -20,6 +20,7 @@ const config = {
     app("reflect"),
     app("grain"),
     app("slack"),
+    app("anbima"),
     app("serper"),
     app("sienge"),
     app("vertex"),
