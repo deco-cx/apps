@@ -11,9 +11,11 @@ import {
   UnitPriceSpecification,
 } from "../../commerce/types.ts";
 import {
+  Atributos,
   Breadcrumb,
   ConteudoMidias,
   Detalhes,
+  Personalizacao,
   ValorSimples,
   WapProductDatiled,
   WapProduto,
@@ -26,21 +28,19 @@ export const getUrl = (link: string, origin: string) => {
 
 export const toBreadcrumbList = (
   breadcrumbs: Breadcrumb[],
-  baseUrl: string,
+  baseUrl: string
 ) => {
-  return breadcrumbs.slice(1).map((breadcrumb, index) => (
-    {
-      "@type": "ListItem" as const,
-      item: getUrl(new URL(breadcrumb.url).pathname, baseUrl).href,
-      name: breadcrumb.label,
-      position: index,
-    }
-  ));
+  return breadcrumbs.slice(1).map((breadcrumb, index) => ({
+    "@type": "ListItem" as const,
+    item: getUrl(new URL(breadcrumb.url).pathname, baseUrl).href,
+    name: breadcrumb.label,
+    position: index,
+  }));
 };
 
 export const getProductStatus = (
   status: WapProduto["status"],
-  estoque: number,
+  estoque: number
 ): ItemAvailability => {
   if (status === "disponivel" && estoque > 1) {
     return "https://schema.org/InStock";
@@ -51,7 +51,7 @@ export const getProductStatus = (
 };
 
 export const getPrices = (
-  precos: WapProduto["precos"] | WapProductDatiled["precos"],
+  precos: WapProduto["precos"] | WapProductDatiled["precos"]
 ) => {
   const priceSpecification: UnitPriceSpecification[] = [];
 
@@ -97,7 +97,7 @@ export const getPrices = (
 
 export const toOffers = (
   i: WapProduto | WapProductDatiled | ValorSimples,
-  status: WapProduto["status"],
+  status: WapProduto["status"]
 ) => {
   return {
     "@type": "AggregateOffer" as const,
@@ -105,21 +105,23 @@ export const toOffers = (
     lowPrice: i.precos.vista ?? null,
     priceCurrency: "BRL",
     offerCount: 1,
-    offers: [{
-      "@type": "Offer" as const,
-      price: i.precos.por,
-      availability: getProductStatus(status, i.estoque),
-      inventoryLevel: {
-        value: i.estoque,
+    offers: [
+      {
+        "@type": "Offer" as const,
+        price: i.precos.por,
+        availability: getProductStatus(status, i.estoque),
+        inventoryLevel: {
+          value: i.estoque,
+        },
+        priceSpecification: getPrices(i.precos),
       },
-      priceSpecification: getPrices(i.precos),
-    }],
+    ],
   };
 };
 
 export const toProduct = (
   product: WapProduto | WapProductDatiled,
-  baseUrl: string,
+  baseUrl: string
 ): Product => {
   const additionalProperty: PropertyValue[] = [];
 
@@ -181,10 +183,49 @@ export const toProduct = (
       name: selo.nome,
       value: selo.label,
       valueReference: "SELOS",
-      image: [{
-        "@type": "ImageObject",
-        url: selo.imagem,
-      }],
+      image: [
+        {
+          "@type": "ImageObject",
+          url: selo.imagem,
+        },
+      ],
+    });
+  });
+
+  product?.caracteristicas?.forEach((item) => {
+    item.itens.forEach((carac) => {
+      additionalProperty.push({
+        "@type": "PropertyValue",
+        name: carac.label,
+        value: carac.valor,
+        valueReference: item.nome,
+      });
+    });
+  });
+
+  // {
+  //   obrigatorio: "n",
+  //   limitarValores: "n",
+  //   precoDefault: "s",
+  //   preco: 0,
+  //   multiplicarPreco: "s",
+  //   grupo: [],
+  //   escolhaDoCliente: "",
+  //   valores: [],
+  //   configuracaoUpload: []
+  // }
+
+  (product?.personalizacoes as Personalizacao[])?.forEach((personalizacao) => {
+    additionalProperty.push({
+      "@type": "PropertyValue",
+      name: personalizacao.nome,
+      value: personalizacao.preco,
+      description: personalizacao.descricao,
+      maxValue: personalizacao.valorMaximo,
+      minValue: personalizacao.valorMinimo,
+      additionalType: personalizacao.tipo,
+      identifier: String(personalizacao.id), 
+      valueReference: "PERSONALIZACOES",
     });
   });
 
@@ -196,25 +237,39 @@ export const toProduct = (
         value: filtro.label,
         identifier: String(filtro.idFiltro),
         valueReference: "FILTROS",
-        image: [{
-          "@type": "ImageObject",
-          url: filtro.imagem,
-        }],
+        image: [
+          {
+            "@type": "ImageObject",
+            url: filtro.imagem,
+          },
+        ],
       });
     });
   }
 
   const sku = new URL(baseUrl).searchParams.get("sku");
 
-  const images = product.midias.imagens.map((image) => ({
+  const atributoSimples = (
+    product.atributos as Atributos
+  )?.simples?.valores?.find((v) => v.sku === sku);
+
+  const attributeImages = atributoSimples
+    ? product.midias.imagens.filter(
+        (image) => image.idAtributoValor === atributoSimples.idAtributoValor
+      )
+    : [];
+
+  const images = (
+    attributeImages.length ? attributeImages : product.midias.imagens
+  ).map((image) => ({
     "@type": "ImageObject" as const,
     name: image.label,
     description: image.descricao,
     url: image.arquivos.big ?? "",
   }));
 
-  const hasVariant: ProductLeaf[] = (product as WapProductDatiled).atributos
-    ?.simples?.valores.map((v) => ({
+  const hasVariant: ProductLeaf[] =
+    (product as WapProductDatiled).atributos?.simples?.valores.map((v) => ({
       "@type": "Product",
       productID: product.id.toString(),
       sku: v.sku,
@@ -229,50 +284,56 @@ export const toProduct = (
           name: (product as WapProductDatiled).atributos?.simples.nome,
           value: v.label,
           propertyID: String(v.idAtributoValor),
-          image: [{ "@type": "ImageObject", name: "imagem", url: v.imagem }, {
-            "@type": "ImageObject",
-            name: "imagemOriginal",
-            url: v.imagemOriginal,
-          }],
+          image: [
+            { "@type": "ImageObject", name: "imagem", url: v.imagem },
+            {
+              "@type": "ImageObject",
+              name: "imagemOriginal",
+              url: v.imagemOriginal,
+            },
+          ],
           valueReference: "ATRIBUTO SIMPLES",
         },
       ],
     })) ?? [];
 
-  (product as WapProductDatiled).atributos
-    ?.unico?.valores.forEach((v) => {
-      hasVariant.push({
-        "@type": "Product",
-        productID: product.id.toString(),
-        sku: product.sku,
-        offers: toOffers(product, product.status),
-        name: product.nome,
-        url: `${
-          getUrl(`/${product.rota.params.produto}`, baseUrl).href
-        }.html?sku=${product.sku}`,
-        additionalProperty: [
-          {
-            "@type": "PropertyValue",
-            name: (product as WapProductDatiled).atributos?.unico.nome,
-            value: v.label,
-            propertyID: String(v.idAtributoValor),
-            image: [{ "@type": "ImageObject", name: "imagem", url: v.imagem }, {
+
+  (product as WapProductDatiled).atributos?.unico?.valores.forEach((v) => {
+    hasVariant.push({
+      "@type": "Product",
+      productID: product.id.toString(),
+      sku: product.sku,
+      offers: toOffers(product, product.status),
+      name: product.nome,
+      url: `${
+        getUrl(`/${product.rota.params.produto}`, baseUrl).href
+      }.html?sku=${product.sku}`,
+      additionalProperty: [
+        {
+          "@type": "PropertyValue",
+          name: (product as WapProductDatiled).atributos?.unico.nome,
+          value: v.label,
+          propertyID: String(v.idAtributoValor),
+          image: [
+            { "@type": "ImageObject", name: "imagem", url: v.imagem },
+            {
               "@type": "ImageObject",
               name: "imagemOriginal",
               url: v.imagemOriginal,
-            }],
-            valueReference: "ATRIBUTO UNICO",
-          },
-        ],
-      });
+            },
+          ],
+          valueReference: "ATRIBUTO UNICO",
+        },
+      ],
     });
+  });
 
   const selected = hasVariant.find((i) => i.sku == sku) ?? hasVariant[0];
 
   const isVariantOf: ProductGroup = {
     "@type": "ProductGroup",
     hasVariant,
-    productGroupID: product.id.toString(),
+    productGroupID: product?.id?.toString(),
     additionalProperty,
   };
 
@@ -283,31 +344,34 @@ export const toProduct = (
     description: product.descricoes.longa,
     brand: {
       "@type": "Brand",
-      identifier: product.marca.id.toString(),
-      name: product.marca.nome,
-      logo: product.marca.imagem,
-      url: new URL(product.marca.rota.path, baseUrl).href,
+      identifier: product.marca?.id?.toString(),
+      name: product.marca?.nome,
+      logo: product.marca?.imagem,
+      url: new URL(product.marca?.rota?.path, baseUrl).href,
     },
     url: `${getUrl(`/${product.rota.params.produto}`, baseUrl).href}.html`,
     image: images.length ? images : [DEFAULT_IMAGE],
     category: (product as WapProductDatiled)?.categoria?.nome,
     isVariantOf,
-    aggregateRating: product.avaliacao.quantidade > 0
-      ? {
-        "@type": "AggregateRating",
-        ratingValue: product.avaliacao.media,
-        ratingCount: product.avaliacao.quantidade,
-        reviewCount: product.avaliacao.avaliacoes?.length,
-      }
-      : undefined,
+    aggregateRating:
+      product.avaliacao.quantidade > 0
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: product.avaliacao.media,
+            ratingCount: product.avaliacao.quantidade,
+            reviewCount: product.avaliacao.avaliacoes?.length,
+          }
+        : undefined,
     review: product.avaliacao.avaliacoes?.map((avaliacao) => ({
       "@type": "Review",
       // "@id": avaliacao.id,
-      author: [{
-        "@type": "Author",
-        name: avaliacao.nome,
-        identifier: avaliacao.email,
-      }],
+      author: [
+        {
+          "@type": "Author",
+          name: avaliacao.nome,
+          identifier: avaliacao.email,
+        },
+      ],
       reviewBody: avaliacao?.comentario,
       datePublished: avaliacao?.data,
       itemReviewed: String(avaliacao?.produto?.id),
@@ -323,34 +387,38 @@ export const toProduct = (
     })),
 
     offers: toOffers(product, product.status),
-    isRelatedTo: (product as WapProductDatiled).combinacoes?.map((
-      combinacao,
-    ) => toProduct(combinacao.produto, baseUrl)),
-    questions: (product as WapProductDatiled).perguntas?.map((
-      pergunta,
-    ): Question => ({
-      "@type": "Question",
-      answerCount: pergunta.respostas.length,
-      name: pergunta.pergunta,
-      text: pergunta.pergunta,
-      datePublished: pergunta.data,
-      suggestedAnswer: pergunta.respostas.map((resposta): Answer => (
-        {
-          datePublished: resposta.data,
-          text: resposta.resposta,
-          author: [{
+    isRelatedTo: (product as WapProductDatiled).combinacoes?.map((combinacao) =>
+      toProduct(combinacao.produto, baseUrl)
+    ),
+    questions: (product as WapProductDatiled).perguntas?.map(
+      (pergunta): Question => ({
+        "@type": "Question",
+        answerCount: pergunta.respostas.length,
+        name: pergunta.pergunta,
+        text: pergunta.pergunta,
+        datePublished: pergunta.data,
+        suggestedAnswer: pergunta.respostas.map(
+          (resposta): Answer => ({
+            datePublished: resposta.data,
+            text: resposta.resposta,
+            author: [
+              {
+                "@type": "Author",
+                identifier: resposta.email,
+                name: resposta.nome,
+              },
+            ],
+          })
+        ),
+        author: [
+          {
             "@type": "Author",
-            identifier: resposta.email,
-            name: resposta.nome,
-          }],
-        }
-      )),
-      author: [{
-        "@type": "Author",
-        identifier: pergunta.email,
-        name: pergunta.nome,
-      }],
-    })),
+            identifier: pergunta.email,
+            name: pergunta.nome,
+          },
+        ],
+      })
+    ),
     ...selected,
   };
 };
@@ -358,11 +426,14 @@ export const toProduct = (
 export const toFilter = (
   filtro: {
     nome: string;
-    valores: Array<
-      { label?: string; nome?: string; url: string; ativo: boolean }
-    >;
+    valores: Array<{
+      label?: string;
+      nome?: string;
+      url: string;
+      ativo: boolean;
+    }>;
   },
-  baseUrl: string,
+  baseUrl: string
 ): Filter | null => {
   if (!filtro.valores.length) return null;
 
@@ -371,63 +442,70 @@ export const toFilter = (
     key: filtro.nome,
     label: filtro.nome,
     quantity: filtro.valores?.length ?? 0,
-    values: filtro.valores?.map((filterItem): FilterToggleValue => {
-      const filterURL = new URL(baseUrl);
-      filterURL.pathname = new URL(filterItem.url).pathname;
-      filterURL.search = new URL(filterItem.url).search;
+    values:
+      filtro.valores?.map((filterItem): FilterToggleValue => {
+        const filterURL = new URL(baseUrl);
+        filterURL.pathname = new URL(filterItem.url).pathname;
+        filterURL.search = new URL(filterItem.url).search;
 
-      return {
-        quantity: 0,
-        value: filterItem.label ?? filterItem.nome ?? "",
-        label: filterItem.label ?? filterItem.nome ?? "",
-        selected: filterItem.ativo,
-        url: filterURL.href,
-      };
-    }) ?? [],
+        return {
+          quantity: 0,
+          value: filterItem.label ?? filterItem.nome ?? "",
+          label: filterItem.label ?? filterItem.nome ?? "",
+          selected: filterItem.ativo,
+          url: filterURL.href,
+        };
+      }) ?? [],
   };
 };
 
-export const toFilters = (
-  details: Detalhes,
-  baseUrl: string,
-): Filter[] => {
+export const toFilters = (details: Detalhes, baseUrl: string): Filter[] => {
   const filters = [];
 
   const fromFiltros = details.filtros.map((filtro) =>
     toFilter(filtro, baseUrl)
   );
 
-  const fromMarcas = toFilter({
-    nome: "marca",
-    valores: details.marcas,
-  }, baseUrl);
+  const fromMarcas = toFilter(
+    {
+      nome: "marca",
+      valores: details.marcas,
+    },
+    baseUrl
+  );
 
   const fromAttributes = details.atributos.map((filtro) =>
     toFilter(filtro, baseUrl)
   );
 
-  const fromPrecos = toFilter({
-    nome: "preco",
-    valores: details.filtrosPreco.map((i) => ({
-      nome: `${i.de}-${i.ate}`,
-      ...i,
-    })),
-  }, baseUrl);
+  const fromPrecos = toFilter(
+    {
+      nome: "preco",
+      valores: details.filtrosPreco.map((i) => ({
+        nome: `${i.de}-${i.ate}`,
+        ...i,
+      })),
+    },
+    baseUrl
+  );
 
-  const fromDescontoPrecoPor = toFilter({
-    nome: "Desconto Preco Por",
-    valores: Object.values(details.filtrosDescontoPrecoPor).map((i) => ({
-      nome: `${i.de}-${i.ate}`,
-      ...i,
-    })),
-  }, baseUrl);
+  const fromDescontoPrecoPor = toFilter(
+    {
+      nome: "Desconto Preco Por",
+      valores: Object.values(details.filtrosDescontoPrecoPor).map((i) => ({
+        nome: `${i.de}-${i.ate}`,
+        ...i,
+      })),
+    },
+    baseUrl
+  );
 
   filters.push(
     ...fromFiltros,
     fromMarcas,
     ...fromAttributes,
     fromPrecos,
-    fromDescontoPrecoPor,
+    fromDescontoPrecoPor
   );
 
   return filters.filter((f): f is Filter => Boolean(f));
