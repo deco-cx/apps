@@ -60,4 +60,11 @@ export interface SheetDbNpsClient {
     response: SheetDbNpsRow[];
     searchParams: SheetDbNpsSearchParams;
   };
+
+  /**
+   * List all available sheets (tabs)
+   */
+  "GET /sheets": {
+    response: { sheets: string[] };
+  };
 } 
