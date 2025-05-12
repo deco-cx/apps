@@ -1477,63 +1477,7 @@ export interface CanceledOrder {
   receipt?: string | null;
 }
 
-interface OrderPlacedSeller {
-  id: string;
-  name: string;
-  logo: string;
-}
-
-export interface OrderPlaced {
-  sellers: OrderPlacedSeller[];
-  orderId: string;
-  orderGroup: string;
-  state: string;
-  isCheckedIn: boolean;
-  sellerOrderId: string;
-  storeId: string | null;
-  checkedInPickupPointId: string | null;
-  value: number;
-  items: OrderFormItem[];
-  totals: Total[];
-  clientProfileData: ClientProfileData;
-  ratesAndBenefitsData: RatesAndBenefitsData;
-  shippingData: ShippingData;
-  paymentData: PaymentData;
-  clientPreferencesData: ClientPreferencesData;
-  commercialConditionData: null;
-  giftRegistryData: null;
-  marketingData: MarketingData | null;
-  storePreferencesData: StorePreferencesData;
-  openTextField: null;
-  invoiceData: null;
-  itemMetadata: ItemMetadata;
-  taxData: null;
-  customData: null;
-  hooksData: null;
-  changeData: null;
-  subscriptionData: null;
-  merchantContextData: null;
-  purchaseAgentData: null;
-  salesChannel: string;
-  followUpEmail: string;
-  creationDate: string;
-  lastChange: string;
-  timeZoneCreationDate: string;
-  timeZoneLastChange: string;
-  isCompleted: boolean;
-  hostName: string;
-  merchantName: string | null;
-  userType: string;
-  roundingError: number;
-  allowEdition: boolean;
-  allowCancellation: boolean;
-  isUserDataVisible: boolean;
-  cancellationData: CancelattionData;
-  orderFormCreationDate: string;
-  marketplaceRequestedCancellationWindow: null;
-}
-
-interface CancelattionData {
+interface CancellationData {
   requestedByUser: true;
   reason: string;
   cancellationDate: string;
@@ -1782,77 +1726,6 @@ export interface AdvancedLoaderConfig {
 
 export type Maybe<T> = T | null | undefined;
 
-interface OrderPlacedSeller {
-  id: string;
-  name: string;
-  logo: string;
-}
-
-export interface OrderPlaced {
-  sellers: OrderPlacedSeller[];
-  orderId: string;
-  orderGroup: string;
-  state: string;
-  isCheckedIn: boolean;
-  sellerOrderId: string;
-  storeId: string | null;
-  checkedInPickupPointId: string | null;
-  value: number;
-  items: OrderFormItem[];
-  totals: Total[];
-  clientProfileData: ClientProfileData;
-  ratesAndBenefitsData: RatesAndBenefitsData;
-  shippingData: ShippingData;
-  paymentData: PaymentData;
-  clientPreferencesData: ClientPreferencesData;
-  commercialConditionData: null;
-  giftRegistryData: null;
-  marketingData: MarketingData | null;
-  storePreferencesData: StorePreferencesData;
-  openTextField: null;
-  invoiceData: null;
-  itemMetadata: ItemMetadata;
-  taxData: null;
-  customData: null;
-  hooksData: null;
-  changeData: null;
-  subscriptionData: null;
-  merchantContextData: null;
-  purchaseAgentData: null;
-  salesChannel: string;
-  followUpEmail: string;
-  creationDate: string;
-  lastChange: string;
-  timeZoneCreationDate: string;
-  timeZoneLastChange: string;
-  isCompleted: boolean;
-  hostName: string;
-  merchantName: string | null;
-  userType: string;
-  roundingError: number;
-  allowEdition: boolean;
-  allowCancellation: boolean;
-  isUserDataVisible: boolean;
-  cancellationData: CancelattionData;
-  orderFormCreationDate: string;
-  marketplaceRequestedCancellationWindow: null;
-}
-
-interface CancelattionData {
-  requestedByUser: true;
-  reason: string;
-  cancellationDate: string;
-  cancellationRequestId: string;
-  requestedBy: null;
-  cancellationSource: null;
-}
-
-export interface CanceledOrder {
-  date?: string;
-  orderId?: string;
-  receipt?: string | null;
-}
-
 export interface ReceiptData {
   ReceiptCollection: Receipt[];
 }
@@ -1869,22 +1742,13 @@ export interface Receipt {
   ValueAsInt: number | null;
 }
 
-export interface CancellationData {
-  requestedByUser: boolean;
-  reason: string;
-  cancellationDate: string;
-  cancellationRequestId: string;
-  requestedBy: string | null;
-  cancellationSource: string | null;
-}
-
 export interface OrderFormOrder {
   sellers: Seller[];
   receiptData?: ReceiptData;
   sequence?: string;
   marketPlaceOrderId?: string;
   origin?: number;
-  items: Item[];
+  items: OrderFormItem[];
   giftRegistryData?: unknown;
   contextData?: unknown;
   marketPlaceOrderGroup?: string | null;
@@ -1917,7 +1781,7 @@ export interface OrderFormOrder {
   paymentData: PaymentData;
   clientPreferencesData: ClientPreferencesData;
   commercialConditionData?: unknown;
-  marketingData?: unknown;
+  marketingData?: MarketingData | null;
   storePreferencesData: StorePreferencesData;
   openTextField?: unknown;
   invoiceData?: unknown;
