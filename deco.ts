@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("sheet-db-nps"),
     app("js-bundler"),
     app("jira"),
     app("deno-deploy"),
