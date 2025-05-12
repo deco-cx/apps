@@ -54,7 +54,6 @@ async function loader(
 
   // Since the Product by ID request don't return the INTL price, is necessary to search all prices and replace them
   const getProductPrice = async (id: number): Promise<ProductPrice | null> => {
-
     if (!priceIntl) {
       return null;
     } else {
@@ -64,7 +63,6 @@ async function loader(
         }, STALE);
         return result.json();
       } catch (error) {
-
         // Make async rendering work
         if (error instanceof DOMException && error.name === "AbortError") {
           throw error;
