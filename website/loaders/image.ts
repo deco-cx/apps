@@ -60,7 +60,7 @@ const handler = async (
 
     const preferredMediaType = acceptMediaType(req);
     const params = parseParams(props);
-    console.log(ctx.whitelistPatterns);
+
     if (
       ctx.whitelistPatterns &&
       ctx.whitelistPatterns.length > 0 &&
