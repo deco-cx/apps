@@ -162,8 +162,7 @@ export default function generateImageAction(
 
     return {
       success: true,
-      message:
-        "Image generation started.",
+      message: "Image generation started.",
     };
   }
 }
