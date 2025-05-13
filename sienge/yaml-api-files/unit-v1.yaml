@@ -1,0 +1,1189 @@
+swagger: "2.0"
+info:
+  description: API de Unidades de Imóveis
+  version: 1.0.0
+  title: Unidades de Imóveis
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/units/{unitId}":
+    get:
+      tags:
+        - Unidades
+      summary: Busca a unidade no Sienge
+      operationId: getUnit
+      parameters:
+        - name: unitId
+          in: path
+          description: Código da unidade a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Unidade encontrada
+          schema:
+            $ref: "#/definitions/Unit"
+        "404":
+          description: Unidade não encontrada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    patch:
+      operationId: patchUnitsId
+      tags:
+        - Unidades
+      summary: Atualiza informações da Unidade
+      parameters:
+        - name: unitId
+          in: path
+          description: Código da unidade para ser atualizada
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: Objeto para atualização da unidade.
+          required: true
+          schema:
+            $ref: "#/definitions/UnitUpdate"
+      responses:
+        "204":
+          description: Unidade atualizada com sucesso
+        "404":
+          description: Unidade não encontrada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  /units:
+    get:
+      tags:
+        - Unidades
+      summary: Busca uma lista de unidades ordenadas decrescentemente pelo código id
+      operationId: getAllUnits
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: enterpriseId
+          in: query
+          description: >-
+            Código do empreendimento (centro de custo).
+          required: false
+          type: integer
+          format: int32
+        - name: commercialStock
+          in: query
+          description: >-
+            Estoque comercial da unidade.  <br />
+            <b>Opções:</b>  <br />
+            C - Reservada  <br />
+            D - Disponível <br />
+            R - Reserva técnica <br />
+            E - Permuta <br />
+            M - Mútuo <br />
+            P - Proposta <br />
+            V - Vendida <br />
+            L - Locado <br />
+            T - Transferido
+          required: false
+          type: string
+        - name: name
+          in: query
+          description: >-
+            Nome/Identificador da unidade.
+          required: false
+          type: string
+        - name: additionalData
+          in: query
+          type: string
+          required: false
+          enum: [ALL, NONE]
+          description: >-
+            Enums:
+              `ALL` - Carrega todos os dados adicionais. Unidades Filhas, Agrupamentos e Valores Especiais.
+              `NONE` - Não carrega os dados adicionais.
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Unidade encontrada
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    post:
+      tags:
+        - Unidades
+      summary: Persiste uma Unidade.
+      operationId: insert
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação da unidade
+          required: true
+          schema:
+            $ref: "#/definitions/UnitInsert"
+      responses:
+        "201":
+          description: Unidade criada
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/units/{unitId}/child-unit":
+    post:
+      tags:
+        - Unidades filhas
+      summary: Adiciona uma ou mais unidades filhas na unidade pelo ID.
+      operationId: addChildUnit
+      produces:
+        - application/json
+      parameters:
+        - name: unitId
+          in: path
+          description: Id da unidade.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: Lista de unidades filhas a serem adicionadas.
+          required: true
+          schema:
+            $ref: "#/definitions/ChildUnitInsert"
+      responses:
+        "201":
+          description: Unidades filhas adicionadas à unidade com sucesso.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Unidade não encontrada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/units/{unitId}/groupings":
+    get:
+      tags:
+        - Agrupamentos de unidade
+      summary: Busca agrupamentos de unidade no Sienge
+      operationId: getUnitsGrouping
+      parameters:
+        - name: unitId
+          in: path
+          description: Código da unidade a ser apresentado
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Unidade encontrada
+          schema:
+            $ref: "#/definitions/UnitGrouping"
+        "404":
+          description: Unidade não encontrada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/units/{unitId}/attachments":
+    post:
+      tags:
+        - Anexos de unidade
+      summary: Inclui um anexo a unidade.
+      operationId: insertUnitAttachment
+      parameters:
+        - name: unitId
+          in: path
+          description: Id da unidade.
+          required: true
+          type: integer
+          format: int32
+        - name: description
+          in: query
+          description: >-
+            Descrição do anexo. Exemplo: "Certidão de nascimento".
+          required: true
+          type: string
+        - name: file
+          in: formData
+          description: >-
+            Arquivo para inserção | Tamanho máximo: 70 MB | Tamanho máximo do nome do arquivo: 100 caracteres | Somente 1 Anexo por requisição. Caso seja enviado mais de 1 Anexo, o Sienge vai aceitar somente o primeiro selecionado.
+          required: true
+          type: file
+      produces:
+        - application/json
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Anexo inserido com sucesso
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: |
+            Entidade não processável.
+            Ocorreu algum erro semântico que impede a criação do anexo de unidade. Alguns exemplos dessas validações (podem haver outros) são:
+            * Unidade com ID informado não encontrado;
+            * Nome do anexo (contando com extensão) maior que 100 caracteres;
+            * Descrição vazia ou maior que 500 caracteres;
+            * Anexo maior que 70 MB;
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/units/characteristics":
+    post:
+      tags:
+        - Características para unidade
+      summary: Cria uma característica da unidade.
+      operationId: insertUnitCharacteristic
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação da característica de unidade.
+          required: true
+          schema:
+            $ref: "#/definitions/UnitCharacteristicInsert"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Característica de unidade criada com sucesso
+          headers:
+            Location:
+              type: string
+              description: URL para acessar a característica de unidade criada
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: |
+            Entidade não processável.
+            Ocorreu algum erro que impede a criação da característica de unidade. Alguns exemplos dessas validações (podem haver outros) são:
+            * Não enviar o campo "description";
+            * Enviar o campo "description" vazio;
+            * Já possuir outra característica com a mesma descrição;
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Características para unidade
+      summary: Retorna todas características de unidade cadastradas
+      operationId: getAllUnitCharacteristics
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Característica de unidade encontrada
+          schema:
+            $ref: "#/definitions/GetAllUnitCharacteristicsResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/units/{unitId}/characteristics":
+    put:
+      tags:
+        - Características para unidade
+      summary: Vincula uma ou mais características já cadastradas a uma unidade
+      operationId: updateUnitCharacteristics
+      produces:
+        - application/json
+      parameters:
+        - name: unitId
+          in: path
+          description: Id da unidade.
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: body
+          description: >-
+            Array de objetos contendo as informações das características a serem vinculadas na unidade informada.
+          required: true
+          schema:
+            $ref: "#/definitions/UnitCharacteristicUpdate"
+      responses:
+        "204":
+          description: Características da unidade atualizadas.
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: >-
+            Entidade não processável.
+
+            Ocorreu algum erro semântico que impede o vínculo da característica a unidade. Alguns exemplos dessas validações (podem haver outros) são:
+            * Unidade com ID informado não encontrada;
+            * Característica com o ID informado não cadastrada;
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  "/units/situations":
+    post:
+      tags:
+        - Situações para unidade
+      summary: Cria uma situação para unidade.
+      operationId: insertUnitSituation
+      parameters:
+        - in: body
+          name: body
+          description: Objeto para criação da situação de unidade.
+          required: true
+          schema:
+            $ref: "#/definitions/UnitSituationInsert"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Situação de unidade criada com sucesso
+          headers:
+            Location:
+              type: string
+              description: URL para acessar a situação de unidade criada
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "422":
+          description: |
+            Entidade não processável.
+            Ocorreu algum erro que impede a criação da situação de unidade. Alguns exemplos dessas validações (podem haver outros) são:
+            * Não enviar o campo "description";
+            * Enviar o campo "description" vazio;
+            * Já possuir outra situação com a mesma descrição;
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Situações para unidade
+      summary: Retorna todas situaçãos de unidade cadastradas
+      operationId: getAllUnitSituations
+      parameters:
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Situação de unidade encontrada
+          schema:
+            $ref: "#/definitions/GetAllUnitSituationResponseDocument"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  GetAllUnitCharacteristicsResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de características de unidade retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/UnitCharacteristicGet"
+  UnitCharacteristicGet:
+    type: object
+    required:
+      - description
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código da característica da unidade.
+      description:
+        type: string
+        description: Descrição da característica da unidade.
+        example: "Característica da unidade"
+  UnitCharacteristicInsert:
+    type: object
+    required:
+      - description
+    properties:
+      description:
+        type: string
+        description: Descrição da característica da unidade.
+        example: "Característica da unidade"
+  UnitCharacteristicUpdate:
+    type: array
+    description: Características para vincular a uma unidade.
+    items:
+      $ref: "#/definitions/UnitCharacteristic"
+  GetAllUnitSituationResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de situações de unidade retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/UnitSituationGet"
+  UnitCharacteristic:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Identificador da característica.
+      quantity:
+        type: integer
+        format: int32
+        description: Quantidade da característica.
+  UnitSituationGet:
+    type: object
+    required:
+      - description
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código da situação da unidade.
+      description:
+        type: string
+        description: Descrição da situação da unidade.
+        example: "Situação da unidade"
+  UnitSituationInsert:
+    type: object
+    required:
+      - description
+    properties:
+      description:
+        type: string
+        description: Descrição da situação da unidade.
+        example: "Situação da unidade"
+  UnitUpdate:
+    type: object
+    properties:
+      commercialStock:
+        type: string
+        enum: [D, R, E, M, T, G]
+        maxLength: 1
+        description: >-
+          Unidades vendidas, vendidas em pré-contrato, reservadas, em proposta ou locadas não poderão ter o estoque comercial alterado.</br></br>
+          Estoques comerciais disponíveis:
+            `D` - Diponível
+            `R` - Reserva técnica
+            `E` - Permuta
+            `M` - Mútuo
+            `T` - Transferido
+            `G` - Vendido/terceiros
+      prizedCompliance:
+        type: number
+        minimum: 0
+        description: Adimplência premiada. Não pode ser um valor negativo.
+      iptuValue:
+        type: number
+        minimum: 0
+        description: Valor do IPTU. Não pode ser um valor negativo.
+      realEstateRegistration:
+        type: string
+        description: Inscrição Imobiliária.
+
+  Unit:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Código
+      enterpriseId:
+        type: integer
+        format: int32
+        description: Código do empreendimento
+      contractId:
+        type: integer
+        format: int32
+        description: Código do contrato
+      indexerId:
+        type: integer
+        format: int32
+        description: Código do indexador
+      name:
+        type: string
+        description: Nome/Identificador
+      propertyType:
+        type: string
+        description: Tipo de imóvel
+      note:
+        type: string
+        description: Observação
+      commercialStock:
+        type: string
+        description: Estoque comercial (D = Disponível, V = Vendida, L = Locada, C = Reservada, R = Reserva Técnica, E = Permuta, M = Mutuo, P = Proposta, T = Transferido, G = Vendido/Terceiros, O = Vendida em pré-contrato)
+      latitude:
+        type: string
+        description: Latitude
+      longitude:
+        type: string
+        description: Longitude
+      legalRegistrationNumber:
+        type: string
+        description: Matrícula
+      deliveryDate:
+        type: string
+        description: Data de entrega
+      privateArea:
+        type: number
+        description: Área privativa
+      commonArea:
+        type: number
+        description: Área comum
+      terrainArea:
+        type: number
+        description: Área do terreno
+      nonProportionalCommonArea:
+        type: number
+        description: Área comum de divisão não proporcional
+      idealFraction:
+        type: number
+        description: Fração ideal
+      idealFractionSquareMeter:
+        type: number
+        description: Fração ideal em m2*
+      generalSaleValueFraction:
+        type: number
+        description: Fração VGV (Valor geral de vendas)
+      indexedQuantity:
+        type: number
+        description: Quantidade indexada
+      prizedCompliance:
+        type: number
+        description: Adimplência premiada
+      terrainValue:
+        type: number
+        description: Valor do terreno
+      floor:
+        type: string
+        description: Pavimento
+      contractNumber:
+        type: string
+        description: Número do contrato
+      usableArea:
+        type: number
+        description: Área útil
+      iptuValue:
+        type: number
+        description: Valor do IPTU
+      realEstateRegistration:
+        type: string
+        description: Inscrição imobiliária
+      childUnits:
+        type: array
+        description: Unidades Filhas
+        items:
+          $ref: "#/definitions/ChildUnits"
+      groupings:
+        type: array
+        description: Agrupamentos
+        items:
+          type: object
+          properties:
+            groupingDescription:
+              type: string
+              description: Descrição do agrupador
+            valueGroupingDescription:
+              type: string
+              description: Descrição do valor do agrupamento
+      specialValues:
+        type: array
+        description: Valores especiais relacionados à unidade
+        items:
+          $ref: "#/definitions/SpecialValues"
+      links:
+        type: array
+        description: Referências de pesquisas da unidade
+        items:
+          $ref: "#/definitions/Links"
+
+  SpecialValues:
+    type: object
+    properties:
+      tablePricesID:
+        type: integer
+        description: Identificador da tabela de preços.
+      indexedQuantity:
+        type: number
+        description: Quantidade indexada.
+
+  Links:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Nome da referência
+      href:
+        type: string
+        description: Endereço URL
+  UnitGrouping:
+    type: array
+    items:
+      type: object
+      properties:
+        groupingDescription:
+          type: string
+          description: Descrição do agrupador
+        valueGroupingDescription:
+          type: string
+          description: Descrição do valor do agrupamento
+  ChildUnits:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Descrição da unidade filha
+      order:
+        type: string
+        description: Numeração
+      privateArea:
+        type: number
+        description: Área privativa
+      commonArea:
+        type: number
+        description: Área comum
+      idealFraction:
+        type: number
+        description: Fração ideal
+      idealFractionSquareMeter:
+        type: number
+        description: Fração ideal em m2*
+      locationName:
+        type: string
+        description: Localização
+      note:
+        type: string
+        description: Osbservação
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Unidades retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Unit"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  UnitInsert:
+    type: object
+    required:
+      - enterpriseId
+      - indexerId
+      - propertyTypeId
+      - commercialStock
+      - legalStock
+      - constructionStock
+      - privateArea
+      - commonArea
+      - usableArea
+      - terrainArea
+      - idealFraction
+      - idealFractionSquareMeter
+      - indexedQuantity
+      - availableDate
+    properties:
+      enterpriseId:
+        type: integer
+        format: int32
+        description: Código do empreendimento.<br><br>
+      indexerId:
+        type: integer
+        format: int32
+        description: Código do indexador<br><br>
+      classificationUnit:
+        type: integer
+        enum: [1, 2, 3, 4, 5, 6]
+        format: int32
+        description: >-
+          Classificação da unidade. <br><br>
+          Valores aceitos:
+            `1` - Padrão equivalente à habitação do mercado popular (HMP)
+            `2` - Padrão equivalente à habitação de interesse social (HIS)
+            `3` - Baixo padrão
+            `4` - Médio padrão
+            `5` - Alto padrão
+            `6` - Altíssimo padrão.
+      propertyTypeId:
+        type: integer
+        format: int32
+        description: Código do tipo de imóvel. Visível no cadastro do tipo de imóvel.<br><br>
+      situationId:
+        type: integer
+        format: int32
+        description: Código da situação. Valores aceitos 1 = Situação A e 2 = Situação B.<br><br>
+      condominiumValue:
+        type: number
+        format: double
+        description: >-
+          Valor do condomínio. Valores aceitos: numeric(8,2)<br><br>
+      privateArea:
+        type: number
+        format: double
+        description: >-
+          Área privativa. Valores aceitos: numeric(16,6)<br><br>
+      usableArea:
+        type: number
+        format: double
+        description: >-
+          Área útil. Valores aceitos: numeric(16,6)<br><br>
+      commonArea:
+        type: number
+        format: double
+        description: >-
+          Área comum. Valores aceitos: numeric(16,6)<br><br>
+      nonProportionalCommonArea:
+        type: number
+        format: double
+        description: >-
+          Área comum de divisão não proporcional. O campo será informado e obrigatório quando a categoria do empreendimento for incorporação. Valores aceitos: numeric(16,6)<br><br>
+      terrainArea:
+        type: number
+        format: double
+        description: >-
+          Área do terreno. Valores aceitos: numeric(16,6)<br><br>
+      terrainValue:
+        type: number
+        format: double
+        description: >-
+          Valor do terreno. Valores aceitos: numeric(10,2)<br><br>
+      idealFraction:
+        type: number
+        format: double
+        description: >-
+          Fração ideal. Valores aceitos: numeric(17,8)<br><br>
+      idealFractionSquareMeter:
+        type: number
+        format: double
+        description: >-
+          Fração ideal em m². Valores aceitos: numeric(18,8)<br><br>
+      indexedQuantity:
+        type: number
+        format: double
+        description: >-
+          Quantidade indexada. Valores aceitos: numeric(16,6)<br><br>
+      iptuValue:
+        type: number
+        format: double
+        description: >-
+          Valor do IPTU. Valores aceitos: numeric(8,2)<br><br>
+      generalSaleValueFraction:
+        type: number
+        format: double
+        description: >-
+          Fração VGV (Valor geral de vendas). Valores aceitos: numeric(10,8)<br><br>
+      prizedCompliance:
+        type: number
+        format: double
+        description: >-
+          Valor da adimplência premiada. Valores aceitos: numeric(16,6)<br><br>
+      realEstateRegistration:
+        type: string
+        description: >-
+          Inscrição imobiliária. Valores aceitos: varchar(30)<br><br>
+      name:
+        type: string
+        description: >-
+          Nome da unidade. Valores aceitos: varchar(50)<br><br>
+      commercialStock:
+        type: string
+        enum: [D, R, E, M, T, G]
+        description: >-
+          Esoque comercial.</br></br>
+          Valores aceitos:
+            `D` - Diponível
+            `R` - Reserva técnica
+            `E` - Permuta
+            `M` - Mútuo
+            `T` - Transferido
+            `G` - Vendido/terceiros
+      legalStock:
+        type: string
+        enum: [E, C, H, P, A, L, F, U, B, R]
+        description: >-
+          Estoque legal.<br><br>
+          Valores aceitos:
+            `E` - Escriturado
+            `C` - Caucionado
+            `H` - Hipotecado
+            `P` - Penhorado
+            `A` - Alugado
+            `L` - Livre
+            `F` - Alienação fiduciária
+            `U` - Usufruto
+            `B` - Bloqueio judicial
+            `R` - Arresto
+      constructionStock:
+        type: string
+        enum: [P, E, C]
+        description: >-
+          Estoque de obra.<br><br>
+          Valores aceitos:
+            `P` - Projeto
+            `E` - Em Construção
+            `C` - Concluido
+      location:
+        type: string
+        description: >-
+          Localização. Valores aceitos: varchar(30)<br><br>
+      floor:
+        type: string
+        description: >-
+          Pavimento. Valores aceitos: varchar(30)<br><br>
+      legalRegistrationNumber:
+        type: string
+        description: >-
+          Matrícula. Valores aceitos: varchar(15)<br><br>
+      latitude:
+        type: string
+        description: >-
+          Latitude. Valores aceitos: varchar(20)<br><br>
+      longitude:
+        type: string
+        description: >-
+          Longitude. Valores aceitos: varchar(20)<br><br>
+      note:
+        type: string
+        description: >-
+          Observação. Valores aceitos: varchar(3800)<br><br>
+      endorsement:
+        type: string
+        description: >-
+          Averbação. Informado quando o campo estoque legal for igual a livre. Valores aceitos: varchar(20)<br><br>
+      availableDate:
+        type: string
+        description: Data da criação. Formato YYYY-MM-DD. Exemplo -> 2023-12-25
+      deliveryDate:
+        type: string
+        description: Data de entrega. Formato YYYY-MM-DD. Exemplo -> 2023-12-25
+      occupancyDate:
+        type: string
+        description: Data do habite-se. Formato YYYY-MM-DD. Exemplo -> 2023-12-25
+      purchaseDeed:
+        type: array
+        description: Escritura da unidade.
+        items:
+          $ref: "#/definitions/PurchaseDeedInsert"
+      landDetails:
+        type: array
+        description: Detalhes do lote.
+        items:
+          $ref: "#/definitions/LandDetailsInsert"
+      unitGroupings:
+        type: array
+        items:
+          type: object
+          properties:
+            groupingId:
+              type: integer
+              format: int32
+              description: Código do agrupamento.
+            valueGroupingId:
+              type: integer
+              format: int32
+              description: Valor do agrupamento.
+  PurchaseDeedInsert:
+    type: object
+    description: Informações da escritura.
+    properties:
+      registry:
+        type: string
+        description: >-
+          Nome cartório. Valores aceitos: varchar(200)<br><br>
+      book:
+        type: string
+        description: >-
+          Livro. Valores aceitos: varchar(20)<br><br>
+      registrationGeneral:
+        type: string
+        description: >-
+          Registro Geral. Valores aceitos: varchar(20)<br><br>
+      actNumber:
+        type: string
+        description: >-
+          Decreto. Valores aceitos: varchar(20)<br><br>
+      licensePermit:
+        type: string
+        description: >-
+          Alvará de licença. Valores aceitos: varchar(20)<br><br>
+      registrationNumber:
+        type: string
+        description: >-
+          Número de registro. Valores aceitos: varchar(10)<br><br>
+      comment:
+        type: string
+        description: >-
+          Comentário. Valores aceitos: varchar(100)
+      taxpayerNumber:
+        type: string
+        description: >-
+          Número do contribuinte. Valores aceitos: varchar(50)
+      writDate:
+        type: string
+        description: Data da escritura. Formato YYYY-MM-DD. Exemplo -> 2023-12-25
+  LandDetailsInsert:
+    type: object
+    description: Informações do lote.
+    properties:
+      frontLimit:
+        type: string
+        description: >-
+          Limite frontal. Valores aceitos: varchar(50)<br><br>
+      backLimit:
+        type: string
+        description: >-
+          Limite fundos. Valores aceitos: varchar(50)<br><br>
+      rightSideLimit:
+        type: string
+        description: >-
+          Limite lado direito. Valores aceitos: varchar(50)<br><br>
+      leftSideLimit:
+        type: string
+        description: >-
+          Limite lado esquerdo. Valores aceitos: varchar(50)<br><br>
+      chamferLimit:
+        type: string
+        description: >-
+          Limite chanfro. Valores aceitos: varchar(50)<br><br>
+      front:
+        type: number
+        format: double
+        description: >-
+          Frente. Valores aceitos: numeric(16,6)<br><br>
+      back:
+        type: number
+        format: double
+        description: >-
+          Fundo. Valores aceitos: numeric(16,6)<br><br>
+      rightSide:
+        type: number
+        format: double
+        description: >-
+          Lado direito. Valores aceitos: numeric(16,6)<br><br>
+      leftSide:
+        type: number
+        format: double
+        description: >-
+          Lado esquerdo. Valores aceitos: numeric(16,6)<br><br>
+      chamfer:
+        type: number
+        format: double
+        description: >-
+          Chanfro. Valores aceitos: numeric(16,6)<br><br>
+  ChildUnitInsert:
+    type: object
+    required:
+      - propertyTypeId
+      - privateArea
+      - commonArea
+      - idealFraction
+      - idealFractionSquareMeter
+      - name
+    properties:
+      propertyTypeId:
+        type: integer
+        format: int32
+        description: Código do tipo de imóvel. Visível no cadastro do tipo de imóvel.<br><br>
+      privateArea:
+        type: number
+        format: double
+        description: >-
+          Área privativa. Valores aceitos: numeric(16,6)<br><br>
+      commonArea:
+        type: number
+        format: double
+        description: >-
+          Área comum. Valores aceitos: numeric(16,6)<br><br>
+      idealFraction:
+        type: number
+        format: double
+        description: >-
+          Fração ideal. Valores aceitos: numeric(17,8)<br><br>
+      idealFractionSquareMeter:
+        type: number
+        format: double
+        description: >-
+          Fração ideal em m². Valores aceitos: numeric(15,5)<br><br>
+      name:
+        type: string
+        description: >-
+          Nome da unidade. Valores aceitos: varchar(50)<br><br>
+      locationName:
+        type: string
+        description: >-
+          Localização. Valores aceitos: varchar(30)<br><br>
+      note:
+        type: string
+        description: >-
+          Observação. Valores aceitos: varchar(3800)<br><br>
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para analise do desenvolvedor
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+        example: Client description message.

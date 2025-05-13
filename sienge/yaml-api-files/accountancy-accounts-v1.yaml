@@ -1,0 +1,193 @@
+swagger: "2.0"
+info:
+  description: API de listagem de contas contábeis
+  version: "1.0"
+  title: Contas Contábeis
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Contas contábeis
+    description: API de listagem de contas contábeis
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /accountancy/accounts:
+    get:
+      tags:
+        - Contas
+      description: Lista as contas ordenadas por código.
+      operationId: loadAllAccounts
+      produces:
+        - application/json
+      parameters:
+        - name: companyId
+          in: query
+          type: integer
+          description: Código da empresa.
+        - name: id
+          in: query
+          type: integer
+          description: Código reduzido da conta.
+        - name: uniqueNumber
+          in: query
+          type: string
+          description: "Código contábil da conta com a máscara contábil. Exemplo: 1.2.01.01.0150"
+        - name: accountType
+          in: query
+          type: string
+          enum: [ANALYTICAL, SYNTHETIC]
+          description:
+            Tipo de conta contábil, podendo ser ANALYTICAL ou SYNTHETIC. Caso não seja passado
+            nenhum parametro em accountType, ambas as contas são retornadas
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/PaginationResult"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  /accountancy/accounts/{id}:
+    get:
+      tags:
+        - Conta modificada
+      description: Retorna conta modificada.
+      operationId: loadModifiedAccount
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+          description: Código da empresa e o código da conta contábil separados por "underline" (companyId_accountId).
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/Account"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+
+definitions:
+  PaginationResult:
+    type: object
+    required:
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de contas retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Account"
+
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  Account:
+    type: object
+    properties:
+      companyId:
+        type: integer
+        description: Código da empresa
+        example: 10
+      id:
+        type: integer
+        description: Código reduzido da conta
+        example: 1
+      uniqueNumber:
+        type: string
+        description: Código contábil da conta com a máscara contábil
+        example: 1.2.01.01.0150
+      name:
+        type: string
+        description: Nome da conta
+        example: Caixa geral
+      accountType:
+        type: string
+        description: Tipo da conta
+        example: ANALYTICAL

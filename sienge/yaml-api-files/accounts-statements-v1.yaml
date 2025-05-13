@@ -1,0 +1,233 @@
+swagger: "2.0"
+info:
+  description: API REST para Extrato de contas
+  version: "1.0"
+  title: Extrato de contas
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Extrato de conta
+    description: API REST Extrato de conta
+paths:
+  /accounts-statements:
+    get:
+      tags:
+        - Extrato de conta
+      summary: >-
+        Retorna a lista de movimentações financeiras associados a contas do
+        Sienge, com data dentro do periodo informado nos parâmetros.
+      operationId: listStatements
+      produces:
+        - application/json
+      parameters:
+        - name: startDate
+          in: query
+          description: Data de inicio do relatório de extrato de contas
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: endDate
+          in: query
+          description: Data de fim do relatório de extrato de contas
+          required: true
+          type: string
+          format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        - name: accountNumber
+          in: query
+          description: Número da conta cadastrada no Sienge
+          required: false
+          type: string
+        - name: companyId
+          in: query
+          description: Código da empresa cadastrada no Sienge
+          required: false
+          type: integer
+        - name: companyGroupId
+          in: query
+          description: Código do grupo de empresas cadastrado no Sienge
+          required: false
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor padrão é 100 e o valor máximo permitdo é 300.
+          type: integer
+          format: int32
+          required: false
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento.  Valor
+            padrão é 0.
+          type: integer
+          format: int32
+          required: false
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso
+          schema:
+            $ref: "#/definitions/GetResponseAccountStatement"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  ApiError:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Status http
+      developer-message:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao desenvolvedor
+          consumidor da API.
+      client-message:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  GetResponseAccountStatement:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: >-
+          Lista de movimentações financeiras retornadas como resultado da
+          pesquisa
+        items:
+          $ref: "#/definitions/Statement"
+  Link:
+    type: object
+    properties:
+      href:
+        type: string
+      rel:
+        type: string
+  ResultSetMetadata:
+    type: object
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento.  Valor padrão
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados.  Valor
+          padrão é 100 e o valor máximo permitdo é 300.
+        minimum: 1
+        maximum: 300
+  Statement:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 1
+        description: Id da movimentação financeira (Interno Sienge)
+      value:
+        type: number
+        format: double
+        example: 999.99
+        description: Valor da movimentação financeira
+      date:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        example: "2018-01-01"
+        description: Data da movimentação financeira
+      documentNumber:
+        type: string
+        description: Número do documento
+        example: Jan2018
+      description:
+        type: string
+        description: Observação do movimento
+        example: Pagamento fornecedor.
+      documentId:
+        type: string
+        description: Código do documento
+        example: NFE
+      type:
+        type: string
+        description: Tipo de movimentação financeira (Entrada ou Saída)
+        example: Income
+      reconciliationDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        example: "2018-01-01"
+        description: Data de conciliação da movimentação financeira
+      billId:
+        type: integer
+        format: int32
+        example: 1
+        description: >-
+          Número do título vinculado a movimentação financeira Contas a pagar se
+          type = Expense Contas a receber se type = Income
+      installmentNumber:
+        type: integer
+        format: int32
+        example: 1
+        description: >-
+          Número da parcela do título vinculado a movimentação financeira Contas
+          a pagar se type = Expense Contas a receber se type = Income
+      statementOrigin:
+        type: string
+        example: CP
+        description: Sistema de origem da movimentação financeira
+      statementType:
+        type: string
+        example: Pagamento
+        description: Nome da operação financeira da movimentação
+      statementTypeNotes:
+        type: string
+        example: ""
+        description: Descrição do histórico da movimentação
+      budgetCategories:
+        type: array
+        description: Apropriações financeiras da movimentação financeira
+        items:
+          $ref: "#/definitions/BudgetCategory"
+      links:
+        type: array
+        description: Informação de hypermedia
+        items:
+          $ref: "#/definitions/Link"
+    description: Movimentação financeira
+  BudgetCategory:
+    type: object
+    properties:
+      percentage:
+        type: number
+        format: double
+        example: 100
+        description: >-
+          Percentual apropriado para plano financeiro e centro de custo
+          associados
+      links:
+        type: array
+        description: Informação de hypermedia
+        items:
+          $ref: "#/definitions/Link"
+    description: Apropriações financeiras da movimentação

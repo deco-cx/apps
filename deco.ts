@@ -10,12 +10,17 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("js-bundler"),
+    app("jira"),
     app("deno-deploy"),
+    app("exa"),
     app("figma"),
     app("unsplash"),
     app("reflect"),
     app("grain"),
     app("slack"),
+    app("serper"),
+    app("sienge"),
     app("vertex"),
     app("google-sheets"),
     app("posthog"),
@@ -48,6 +53,8 @@ const config = {
     app("shopify"),
     app("magento"),
     app("stability"),
+    app("elevenlabs"),
+    app("vidu"),
     app("nuvemshop"),
     app("streamshop"),
     app("brasilapi"),
@@ -62,6 +69,7 @@ const config = {
     app("htmx"),
     app("sap"),
     app("tiptap-cloud"),
+    app("browser-use"),
     ...compatibilityApps,
   ],
 };
