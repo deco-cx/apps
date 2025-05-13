@@ -60,9 +60,10 @@ const handler = async (
 
     const preferredMediaType = acceptMediaType(req);
     const params = parseParams(props);
-
+    console.log(ctx.whitelistPatterns);
     if (
       ctx.whitelistPatterns &&
+      ctx.whitelistPatterns.length > 0 &&
       !ctx.whitelistPatterns.some((pattern) => pattern.test(params.src))
     ) {
       return new Response("Proxy disabled for this source", { status: 403 });
