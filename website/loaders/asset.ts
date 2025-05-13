@@ -22,6 +22,7 @@ const loader = async (
 
   if (
     ctx.whitelistPatterns &&
+    ctx.whitelistPatterns.length > 0 &&
     !ctx.whitelistPatterns.some((pattern) => pattern.test(url))
   ) {
     return new Response("Proxy disabled for this source", { status: 403 });
