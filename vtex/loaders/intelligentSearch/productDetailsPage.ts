@@ -107,7 +107,7 @@ const loader = async (
     ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
       ...params,
       facets: toPath(facets),
-    }, { ...STALE, headers: withSegmentCookie(segment) })
+    }, { ...STALE, headers: withSegmentCookie(segment, req.headers) })
     .then((res) => res.json());
 
   // Product not found, return the 404 status code
@@ -128,7 +128,7 @@ const loader = async (
       ["GET /api/io/_v/api/intelligent-search/product_search/*facets"]({
         ...params,
         facets: toPath(facets),
-      }, { ...STALE, headers: withSegmentCookie(segment) })
+      }, { ...STALE, headers: withSegmentCookie(segment, req.headers) })
       .then((res) => res.json());
 
     kitItems = result.products;
