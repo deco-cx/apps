@@ -1,8 +1,10 @@
+import { logger } from "@deco/deco/o11y";
 import type { AppContext } from "../../../linx/mod.ts";
-import { nullOnNotFound } from "../../../utils/http.ts";
+import { cleanResponse, nullOnNotFound } from "../../../utils/http.ts";
 import { isAuctionModel } from "../../utils/paths.ts";
 import { toAuction, toFilters } from "../../utils/transform.ts";
 import { AuctionListingPage } from "../../utils/types/auction.ts";
+import { WebPage } from "../../utils/types/gridProductsJSON.ts";
 
 /**
  * @title Linx Integration
@@ -24,7 +26,12 @@ const loader = async (
     return null;
   }
 
-  const auctions = await response.json();
+  const auctions = await cleanResponse<WebPage>(response);
+
+  if (typeof auctions !== "object") {
+    logger.error(`Failed to parse response from linx as JSON: ${auctions}`);
+    return null;
+  }
 
   if (!auctions || !isAuctionModel(auctions)) {
     throw new Error("/leilao.json returned another model than Auction");
