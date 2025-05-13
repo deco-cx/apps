@@ -7,10 +7,23 @@ import {
   ProtectedRange,
   SheetProperties,
   Spreadsheet,
+  TokenResponse,
   UpdateValuesResponse,
   ValueRange,
 } from "./types.ts";
 
+export interface GoogleAuthClient {
+  "POST /token": {
+    response: TokenResponse;
+    searchParams: {
+      code: string;
+      client_id: string;
+      client_secret: string;
+      redirect_uri: string;
+      grant_type: string;
+    };
+  };
+}
 // Definição da interface do cliente para Google Sheets
 export interface GoogleSheetsClient {
   // Endpoints para planilhas

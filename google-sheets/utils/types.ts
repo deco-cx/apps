@@ -280,3 +280,26 @@ export interface AddSheetRequest {
 export interface DeleteSheetRequest {
   sheetId?: number;
 }
+export interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+  scope: string;
+  token_type: string;
+  expires_in: number;
+}
+
+export interface SearchParamsGoogle {
+  code: string;
+  client_id: string;
+  client_secret: string;
+  redirect_uri: string;
+  grant_type: string;
+}
+
+export interface SearchParamsGoogle {
+  code: string;
+  client_id: string;
+  client_secret: string;
+  redirect_uri: string;
+  grant_type: string;
+}

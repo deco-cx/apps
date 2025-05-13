@@ -34,6 +34,12 @@ export interface Props {
    * @default "SERIAL_NUMBER"
    */
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+
+  /**
+   * @title Token de Autenticação
+   * @description O token de autenticação para acessar o Google Sheets
+   */
+  token: string;
 }
 
 /**
@@ -43,7 +49,7 @@ export interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<ValueRange> => {
   const {
     spreadsheetId,
@@ -54,55 +60,20 @@ const loader = async (
   } = props;
 
   try {
-    // Adiciona o API Key se estiver disponível
-    const searchParams = new URLSearchParams();
-    if (ctx.apiKey) {
-      searchParams.append("key", ctx.apiKey);
-    }
-
-    // Adiciona os parâmetros de consulta
-    searchParams.append("majorDimension", majorDimension);
-    searchParams.append("valueRenderOption", valueRenderOption);
-    searchParams.append("dateTimeRenderOption", dateTimeRenderOption);
-
-    // Constrói a URL com os parâmetros de pesquisa
     const url = new URL(
       `/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}`,
       "https://sheets.googleapis.com",
     );
-    for (const [key, value] of searchParams.entries()) {
-      url.searchParams.append(key, value);
-    }
 
-    // Faz a requisição diretamente se estiver usando API Key
-    // ou se o token de acesso não estiver disponível
-    if (ctx.apiKey && !ctx.accessToken) {
-      const response = await fetch(url.toString());
+    // Adiciona os parâmetros de consulta
+    url.searchParams.append("majorDimension", majorDimension);
+    url.searchParams.append("valueRenderOption", valueRenderOption);
+    url.searchParams.append("dateTimeRenderOption", dateTimeRenderOption);
 
-      if (!response.ok) {
-        throw new Error(
-          `Erro ao obter valores: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      return await response.json();
-    }
-
-    // Usa o cliente HTTP configurado com token de acesso
-    const urlWithParams = new URL(
-      `/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}`,
-      "https://sheets.googleapis.com",
-    );
-    urlWithParams.searchParams.append("majorDimension", majorDimension);
-    urlWithParams.searchParams.append("valueRenderOption", valueRenderOption);
-    urlWithParams.searchParams.append(
-      "dateTimeRenderOption",
-      dateTimeRenderOption,
-    );
-
-    const response = await fetch(urlWithParams.toString(), {
+    const response = await fetch(url.toString(), {
       headers: new Headers({
-        "Authorization": `Bearer ${ctx.accessToken}`,
+        "Authorization": `Bearer ${props.token}`,
+        "Accept": "application/json",
       }),
     });
 

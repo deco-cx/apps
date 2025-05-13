@@ -47,9 +47,9 @@ export interface Props {
    * @default "FORMATTED_VALUE"
    */
   responseValueRenderOption?:
-    | "FORMATTED_VALUE"
-    | "UNFORMATTED_VALUE"
-    | "FORMULA";
+  | "FORMATTED_VALUE"
+  | "UNFORMATTED_VALUE"
+  | "FORMULA";
 
   /**
    * @title Opção de Renderização de Data/Hora na Resposta
@@ -57,6 +57,12 @@ export interface Props {
    * @default "SERIAL_NUMBER"
    */
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+
+  /**
+   * @title Token de Autenticação
+   * @description O token de autenticação para acessar o Google Sheets
+   */
+  token: string;
 }
 
 /**
@@ -66,7 +72,7 @@ export interface Props {
 const action = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<UpdateValuesResponse> => {
   const {
     spreadsheetId,
@@ -77,6 +83,7 @@ const action = async (
     includeValuesInResponse = false,
     responseValueRenderOption = "FORMATTED_VALUE",
     responseDateTimeRenderOption = "SERIAL_NUMBER",
+    token,
   } = props;
 
   try {
@@ -87,39 +94,23 @@ const action = async (
       values,
     };
 
-    // Adiciona o API Key se estiver disponível
-    const searchParams = new URLSearchParams();
-    if (ctx.apiKey) {
-      searchParams.append("key", ctx.apiKey);
-    }
-
-    // Adiciona os parâmetros de consulta
-    searchParams.append("valueInputOption", valueInputOption);
-    if (includeValuesInResponse) {
-      searchParams.append("includeValuesInResponse", "true");
-      searchParams.append(
-        "responseValueRenderOption",
-        responseValueRenderOption,
-      );
-      searchParams.append(
-        "responseDateTimeRenderOption",
-        responseDateTimeRenderOption,
-      );
-    }
-
-    // Constrói a URL para atualizar os valores
+    // Constrói a URL com os parâmetros de consulta
     const url = new URL(
       `/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}`,
       "https://sheets.googleapis.com",
     );
-    for (const [key, value] of searchParams.entries()) {
-      url.searchParams.append(key, value);
-    }
 
-    // Se não tiver token de acesso OAuth, não pode atualizar valores com apenas API Key
-    if (!ctx.accessToken) {
-      throw new Error(
-        "Token de acesso OAuth necessário para atualizar valores",
+    // Adiciona os parâmetros de consulta
+    url.searchParams.append("valueInputOption", valueInputOption);
+    if (includeValuesInResponse) {
+      url.searchParams.append("includeValuesInResponse", "true");
+      url.searchParams.append(
+        "responseValueRenderOption",
+        responseValueRenderOption,
+      );
+      url.searchParams.append(
+        "responseDateTimeRenderOption",
+        responseDateTimeRenderOption,
       );
     }
 
@@ -128,7 +119,8 @@ const action = async (
       method: "PUT",
       headers: new Headers({
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${ctx.accessToken}`,
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
       }),
       body: JSON.stringify(body),
     });

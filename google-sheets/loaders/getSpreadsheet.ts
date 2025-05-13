@@ -7,6 +7,12 @@ export interface Props {
    * @description O ID da planilha do Google Sheets a ser obtida
    */
   spreadsheetId: string;
+
+  /**
+   * @title Token de Autenticação
+   * @description O token de autenticação para acessar o Google Sheets
+   */
+  token: string;
 }
 
 /**
@@ -16,43 +22,21 @@ export interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<Spreadsheet> => {
-  const { spreadsheetId } = props;
+  const { spreadsheetId, token } = props;
 
   try {
-    // Adiciona o API Key se estiver disponível
-    const searchParams = new URLSearchParams();
-    if (ctx.apiKey) {
-      searchParams.append("key", ctx.apiKey);
-    }
-
-    // Constrói a URL com os parâmetros de pesquisa
     const url = new URL(
       `/v4/spreadsheets/${spreadsheetId}`,
       "https://sheets.googleapis.com",
     );
-    for (const [key, value] of searchParams.entries()) {
-      url.searchParams.append(key, value);
-    }
 
-    // Faz a requisição diretamente se estiver usando API Key
-    // ou se o token de acesso não estiver disponível
-    if (ctx.apiKey && !ctx.accessToken) {
-      const response = await fetch(url.toString());
-
-      if (!response.ok) {
-        throw new Error(
-          `Erro ao obter planilha: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      return await response.json();
-    }
-
-    // Usa o cliente HTTP configurado com token de acesso
-    const response = await ctx.api["GET /v4/spreadsheets/:spreadsheetId"]({
-      spreadsheetId,
+    const response = await fetch(url.toString(), {
+      headers: new Headers({
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json",
+      }),
     });
 
     if (!response.ok) {

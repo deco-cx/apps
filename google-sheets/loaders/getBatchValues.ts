@@ -1,5 +1,5 @@
 import { AppContext } from "../mod.ts";
-import { ValueRange } from "../utils/client.ts";
+import { ValueRange } from "../utils/types.ts";
 
 export interface Props {
   /**
@@ -34,6 +34,12 @@ export interface Props {
    * @default "SERIAL_NUMBER"
    */
   dateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+
+  /**
+   * @title Token de Autenticação
+   * @description O token de autenticação para acessar o Google Sheets
+   */
+  token: string;
 }
 
 /**
@@ -43,7 +49,7 @@ export interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<{ valueRanges: ValueRange[] }> => {
   const {
     spreadsheetId,
@@ -51,56 +57,32 @@ const loader = async (
     majorDimension = "ROWS",
     valueRenderOption = "FORMATTED_VALUE",
     dateTimeRenderOption = "SERIAL_NUMBER",
+    token,
   } = props;
 
   try {
-    // Adiciona o API Key se estiver disponível
-    const searchParams = new URLSearchParams();
-    if (ctx.apiKey) {
-      searchParams.append("key", ctx.apiKey);
-    }
-
-    // Adiciona os parâmetros de consulta
-    searchParams.append("majorDimension", majorDimension);
-    searchParams.append("valueRenderOption", valueRenderOption);
-    searchParams.append("dateTimeRenderOption", dateTimeRenderOption);
-
-    // Adiciona os intervalos como parâmetros de consulta
-    for (const range of ranges) {
-      searchParams.append("ranges", range);
-    }
-
-    // Constrói a URL para obter os valores
     const url = new URL(
       `/v4/spreadsheets/${spreadsheetId}/values:batchGet`,
       "https://sheets.googleapis.com",
     );
-    for (const [key, value] of searchParams.entries()) {
-      url.searchParams.append(key, value);
+
+    // Adiciona os parâmetros de consulta
+    url.searchParams.append("majorDimension", majorDimension);
+    url.searchParams.append("valueRenderOption", valueRenderOption);
+    url.searchParams.append("dateTimeRenderOption", dateTimeRenderOption);
+
+    // Adiciona os intervalos como parâmetros de consulta
+    for (const range of ranges) {
+      url.searchParams.append("ranges", range);
     }
 
-    // Faz a requisição diretamente se estiver usando API Key
-    // ou se o token de acesso não estiver disponível
-    if (ctx.apiKey && !ctx.accessToken) {
-      const response = await fetch(url.toString());
-
-      if (!response.ok) {
-        throw new Error(
-          `Erro ao obter valores em lote: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      return await response.json();
-    }
-
-    // Monta cabeçalhos para a requisição com token de acesso
-    const headers = new Headers();
-    if (ctx.accessToken) {
-      headers.set("Authorization", `Bearer ${ctx.accessToken}`);
-    }
-
-    // Faz a requisição para obter os valores em lote
-    const response = await fetch(url.toString(), { headers });
+    // Faz a requisição com o token de acesso
+    const response = await fetch(url.toString(), {
+      headers: new Headers({
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/json",
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(

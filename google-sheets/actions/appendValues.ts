@@ -54,9 +54,9 @@ export interface Props {
    * @default "FORMATTED_VALUE"
    */
   responseValueRenderOption?:
-    | "FORMATTED_VALUE"
-    | "UNFORMATTED_VALUE"
-    | "FORMULA";
+  | "FORMATTED_VALUE"
+  | "UNFORMATTED_VALUE"
+  | "FORMULA";
 
   /**
    * @title Opção de Renderização de Data/Hora na Resposta
@@ -64,6 +64,8 @@ export interface Props {
    * @default "SERIAL_NUMBER"
    */
   responseDateTimeRenderOption?: "FORMATTED_STRING" | "SERIAL_NUMBER";
+
+  token?: string;
 }
 
 /**
@@ -118,8 +120,7 @@ const action = async (
 
     // Constrói a URL para adicionar os valores
     const url = new URL(
-      `/v4/spreadsheets/${spreadsheetId}/values/${
-        encodeURIComponent(range)
+      `/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)
       }:append`,
       "https://sheets.googleapis.com",
     );

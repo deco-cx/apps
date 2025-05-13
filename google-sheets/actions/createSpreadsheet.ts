@@ -54,6 +54,12 @@ export interface Props {
      */
     columnCount?: number;
   }>;
+
+  /**
+   * @title Token de Autenticação
+   * @description O token de autenticação para acessar o Google Sheets
+   */
+  token: string;
 }
 
 /**
@@ -63,7 +69,7 @@ export interface Props {
 const action = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  _ctx: AppContext,
 ): Promise<Spreadsheet> => {
   const {
     title,
@@ -71,6 +77,7 @@ const action = async (
     timeZone = "America/Sao_Paulo",
     autoRecalc = "ON_CHANGE",
     sheets = [{ title: "Sheet1", rowCount: 1000, columnCount: 26 }],
+    token,
   } = props;
 
   try {
@@ -93,29 +100,16 @@ const action = async (
       })),
     };
 
-    // Adiciona o API Key se estiver disponível
-    const searchParams = new URLSearchParams();
-    if (ctx.apiKey) {
-      searchParams.append("key", ctx.apiKey);
-    }
-
     // Constrói a URL para criar a planilha
     const url = new URL("/v4/spreadsheets", "https://sheets.googleapis.com");
-    for (const [key, value] of searchParams.entries()) {
-      url.searchParams.append(key, value);
-    }
-
-    // Se não tiver token de acesso OAuth, não pode criar planilhas com apenas API Key
-    if (!ctx.accessToken) {
-      throw new Error("Token de acesso OAuth necessário para criar planilhas");
-    }
 
     // Faz a requisição para criar a planilha
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: new Headers({
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${ctx.accessToken}`,
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
       }),
       body: JSON.stringify(body),
     });

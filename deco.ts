@@ -22,7 +22,6 @@ const config = {
     app("serper"),
     app("sienge"),
     app("vertex"),
-    app("google-sheets"),
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),
