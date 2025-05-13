@@ -12,8 +12,8 @@ const loader = async (
 ): Promise<SegmentationsResponse> => {
   const response = await ctx.api["GET /platform/segmentations"]({});
   const result = await response.json();
-  
+
   return result;
 };
 
-export default loader; 
+export default loader;

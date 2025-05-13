@@ -39,11 +39,11 @@ const action = async (
         tags: props.tags,
         legal_bases: props.legal_bases,
       },
-    }
+    },
   );
-  
+
   const result = await response.json();
   return result;
 };
 
-export default action; 
+export default action;

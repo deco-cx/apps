@@ -109,28 +109,28 @@ export interface RdStationMarketingClient {
   "GET /platform/segmentations": {
     response: SegmentationsResponse;
   };
-  
+
   "GET /platform/segmentations/:id/contacts": {
     response: ContactsResponse;
   };
-  
+
   // Contacts Endpoints
   "POST /platform/contacts": {
     response: Contact;
     body: CreateContactRequest;
   };
-  
+
   // Using wildcards to capture full path segments with colons
   "GET /platform/contacts/*identifier": {
     response: Contact;
   };
-  
+
   "PATCH /platform/contacts/*identifier": {
     response: Contact;
     body: UpdateContactRequest;
   };
-  
+
   "DELETE /platform/contacts/*identifier": {
     response: void;
   };
-} 
+}

@@ -34,7 +34,7 @@ export default function App(props: Props): App<Manifest, State> {
   console.log("Creating client with token", stringToken);
   const api = createHttpClient<RdStationMarketingClient>({
     base: "https://api.rd.services",
-    headers: new Headers({ 
+    headers: new Headers({
       "Authorization": `Bearer ${stringToken}`,
       "Content-Type": "application/json",
     }),
@@ -48,4 +48,4 @@ export default function App(props: Props): App<Manifest, State> {
     state,
     manifest,
   };
-} 
+}

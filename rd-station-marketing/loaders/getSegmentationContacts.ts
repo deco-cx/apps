@@ -22,8 +22,8 @@ const loader = async (
     id: props.id,
   });
   const result = await response.json();
-  
+
   return result;
 };
 
-export default loader; 
+export default loader;
