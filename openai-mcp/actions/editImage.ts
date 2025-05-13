@@ -1,8 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
 import { uploadImage } from "./generateImage.ts";
-import { PREVIEW_URL } from "../loaders/imagePreview.ts";
-import { createPreviewUrl, getInstallId } from "../utils.ts";
+
 /**
  * @title Edit Image
  * @description Modifies existing images or creates new composite images based on text prompts and reference images.
@@ -13,7 +12,6 @@ import { createPreviewUrl, getInstallId } from "../utils.ts";
  *
  * The behavior varies based on which parameters you provide (image only, image + mask, or multiple reference images).
  * Different models have different capabilities and limitations for image editing.
- * The result will be available in the previewUrl. Use the full previewUrl to render the image. Do not use the presignedUrl, but the full previewUrl.
  */
 export interface Props {
   /**
@@ -145,18 +143,13 @@ export interface Props {
 
 export default function editImageAction(
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ) {
   const {
     presignedUrl,
     prompt,
   } = props;
-
-  const url = new URL(req.url);
-  const installId = getInstallId(url);
-
-  const cleanedUrl = presignedUrl.split("?")[0].replace("_presigned/", "");
 
   // Process the image editing asynchronously without awaiting
   setTimeout(() => {
@@ -177,13 +170,9 @@ export default function editImageAction(
       });
   }, 0);
 
-  // Return URL to the image preview loader
-  const previewUrl = createPreviewUrl(cleanedUrl, PREVIEW_URL, installId);
-
   return {
     success: true,
-    previewUrl,
-    message: "Image editing started. Check the previewUrl for status.",
+    message: "Image editing started.",
     model: "gpt-image-1",
     prompt,
   };
