@@ -260,7 +260,6 @@ export default function App(props: Props): App<Manifest, State> {
     endpoint: `${apiConfig.baseUrl}/graphql`,
     headers: new Headers({
       "Content-Type": "application/json",
-      Authorization: `Bearer ${secretKey}`,
       ...headerGql,
     }),
   });
