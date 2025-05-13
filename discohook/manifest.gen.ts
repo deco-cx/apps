@@ -6,7 +6,7 @@ import * as $$$$$$$$$0 from "./actions/sendMessage.ts";
 
 const manifest = {
   "actions": {
-    "discohook/actions/sendMassege.ts": $$$$$$$$$0,
+    "discohook/actions/sendMessage.ts": $$$$$$$$$0,
   },
   "name": "discohook",
   "baseUrl": import.meta.url,
