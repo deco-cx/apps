@@ -1,4 +1,4 @@
-import { ConnInfo } from "std/http/mod.ts";
+type ConnInfo = Deno.ServeHandlerInfo;
 
 export interface RedirectConfig {
   to: string;

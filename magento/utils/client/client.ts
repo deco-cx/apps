@@ -150,16 +150,12 @@ export interface API {
 
   "POST /:site/wishlist/index/add/": {
     response: WishListReponse;
-    body: {
-      product: string;
-    };
+    body: FormData;
   };
 
   "POST /:site/wishlist/index/remove/": {
     response: Success;
-    body: {
-      product: string;
-    };
+    body: FormData;
   };
 
   "GET /rest/:reviewUrl/:productId": {

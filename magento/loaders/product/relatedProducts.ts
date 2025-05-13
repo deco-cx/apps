@@ -82,7 +82,14 @@ async function loader(
     return null;
   }
 
-  return products.items?.[0]?.[`${type}_products`]?.map((p) =>
+  const currentProduct = products.items?.[0];
+  const relatedProducts = currentProduct?.[`${type}_products`];
+
+  if (!relatedProducts) {
+    return null;
+  }
+
+  return relatedProducts.map((p) =>
     toProductGraphQL(p, {
       originURL: url,
       imagesQtd,
@@ -91,7 +98,7 @@ async function loader(
       minInstallmentValue,
       maxInstallments,
     })
-  );
+  ) ?? null;
 }
 
 export const cache = "stale-while-revalidate";

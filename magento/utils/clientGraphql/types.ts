@@ -31,6 +31,9 @@ export interface ProductLeafGraphQL {
   updated_at?: string;
   url_key?: string;
   url_rewrites?: Array<UrlRewrite>;
+  related_products?: Array<SimpleProductGraphQL>;
+  upsell_products?: Array<SimpleProductGraphQL>;
+  crosssell_products?: Array<SimpleProductGraphQL>;
 }
 
 export interface CategoryLeafGraphQL {
@@ -155,7 +158,13 @@ export type SimpleProductGraphQL =
       | "only_x_left_in_stock"
     >
   >
-  & Pick<ProductLeafGraphQL, "price_range">;
+  & Pick<
+    ProductLeafGraphQL,
+    | "price_range"
+    | "related_products"
+    | "upsell_products"
+    | "crosssell_products"
+  >;
 
 export type CompleteProductGraphQL =
   & SimpleProductGraphQL
@@ -256,9 +265,10 @@ export interface ProductDetailsInputs {
 }
 
 export interface ProductImagesInputs {
-  filter: {
-    sku: {
-      in: Array<string>;
+  search?: string;
+  filter?: {
+    sku?: {
+      in?: Array<string>;
     };
   };
   pageSize?: number;

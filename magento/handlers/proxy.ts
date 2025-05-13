@@ -1,5 +1,5 @@
 import { DecoSiteState } from "@deco/deco";
-import { Handler } from "std/http/mod.ts";
+import { type Handler } from "@deco/deco/blocks";
 import { Script } from "../../website/types.ts";
 import { isFreshCtx } from "../../website/handlers/fresh.ts";
 import { proxySetCookie } from "../utils/utils.ts";
@@ -97,7 +97,7 @@ export default function Proxy({
   avoidAppendPath,
   replaces,
 }: Props): Handler {
-  return async (req, _ctx) => {
+  return async (req, ctx) => {
     const url = new URL(req.url);
     const proxyUrl = noTrailingSlashes(rawProxyUrl);
     const qs = url.searchParams.toString();
@@ -112,12 +112,12 @@ export default function Proxy({
     const headers = new Headers(req.headers);
     HOP_BY_HOP.forEach((h) => headers.delete(h));
 
-    if (isFreshCtx<DecoSiteState>(_ctx)) {
-      _ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
+    if (isFreshCtx<DecoSiteState>(ctx)) {
+      ctx?.state?.monitoring?.logger?.log?.("proxy received headers", headers);
     }
     removeCFHeaders(headers); // cf-headers are not ASCII-compliant
-    if (isFreshCtx<DecoSiteState>(_ctx)) {
-      _ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
+    if (isFreshCtx<DecoSiteState>(ctx)) {
+      ctx?.state?.monitoring?.logger?.log?.("proxy sent headers", headers);
     }
 
     headers.set("origin", req.headers.get("origin") ?? url.origin);
