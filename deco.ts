@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("discohook"),
     app("js-bundler"),
     app("jira"),
     app("deno-deploy"),
@@ -58,6 +59,7 @@ const config = {
     app("streamshop"),
     app("brasilapi"),
     app("readwise"),
+    app("rd-station-marketing"),
     app("website"),
     app("commerce"),
     app("workflows"),
