@@ -2,9 +2,11 @@ import { AppContext } from "../mod.ts";
 
 interface LoginSectionProps {
   auth: {
-    authorizationUrl: string;
+    authorizationUrl?: string;
+    access_token?: string;
+    error?: string;
   };
-  token: string;
+  token?: string;
 }
 
 export async function loader(
@@ -20,15 +22,18 @@ export async function loader(
 }
 
 export default function LoginSection(
-  { auth: { authorizationUrl }, token }: LoginSectionProps,
+  { auth, token }: LoginSectionProps,
 ) {
+  console.log("Token de autenticação:", token);
+  console.log("Objeto auth completo:", auth);
+
   return (
     <>
       <div>
-        {authorizationUrl
+        {auth.authorizationUrl
           ? (
             <a
-              href={authorizationUrl}
+              href={auth.authorizationUrl}
               class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
             >
               Login
@@ -38,12 +43,23 @@ export default function LoginSection(
             <div>
               <p className="text-red-500">Token:</p>
               <div className="flex items-center gap-2">
-                <p>{token}</p>
+                <p>
+                  {token ||
+                    "Token não disponível ainda. Faça o login primeiro."}
+                </p>
               </div>
 
-              <p className="text-sm text-gray-500">
-                Ele só é valido por 1 hora
-              </p>
+              {token && (
+                <p className="text-sm text-gray-500">
+                  Ele só é valido por 1 hora
+                </p>
+              )}
+
+              {auth.error && (
+                <p className="text-sm text-red-500">
+                  Erro: {auth.error}
+                </p>
+              )}
             </div>
           )}
       </div>

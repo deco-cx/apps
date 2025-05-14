@@ -47,9 +47,9 @@ export interface Props {
    * @default "FORMATTED_VALUE"
    */
   responseValueRenderOption?:
-    | "FORMATTED_VALUE"
-    | "UNFORMATTED_VALUE"
-    | "FORMULA";
+  | "FORMATTED_VALUE"
+  | "UNFORMATTED_VALUE"
+  | "FORMULA";
 
   /**
    * @title Opção de Renderização de Data/Hora na Resposta
@@ -72,7 +72,7 @@ export interface Props {
 const action = async (
   props: Props,
   _req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<UpdateValuesResponse> => {
   const {
     spreadsheetId,
@@ -87,52 +87,57 @@ const action = async (
   } = props;
 
   try {
+    // Verificar se os valores estão em formato válido antes de enviar
+    const validatedValues = values.map(row =>
+      row.map(cell => {
+        if (cell === null || cell === undefined) return "";
+        if (typeof cell === "object" && Object.keys(cell).length === 0) return "";
+        return cell;
+      })
+    );
+
     // Preparando o corpo da requisição
     const body: ValueRange = {
       range,
       majorDimension,
-      values,
+      values: validatedValues,
     };
 
-    // Constrói a URL com os parâmetros de consulta
-    const url = new URL(
-      `/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}`,
-      "https://sheets.googleapis.com",
+    // Constrói os parâmetros para a chamada
+    // deno-lint-ignore no-explicit-any
+    const params: Record<string, any> = {
+      spreadsheetId,
+      range: encodeURIComponent(range),
+      valueInputOption
+    };
+
+    if (includeValuesInResponse) {
+      params.includeValuesInResponse = true;
+      params.responseValueRenderOption = responseValueRenderOption;
+      params.responseDateTimeRenderOption = responseDateTimeRenderOption;
+    }
+
+    // Faz a requisição usando o clientSheets
+    const updateResponse = await ctx.clientSheets["PUT /v4/spreadsheets/:spreadsheetId/values/:range"](
+      {
+        spreadsheetId,
+        range: encodeURIComponent(range),
+        valueInputOption,
+        ...(includeValuesInResponse ? {
+          includeValuesInResponse,
+          responseValueRenderOption,
+          responseDateTimeRenderOption
+        } : {})
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body,
+      },
     );
 
-    // Adiciona os parâmetros de consulta
-    url.searchParams.append("valueInputOption", valueInputOption);
-    if (includeValuesInResponse) {
-      url.searchParams.append("includeValuesInResponse", "true");
-      url.searchParams.append(
-        "responseValueRenderOption",
-        responseValueRenderOption,
-      );
-      url.searchParams.append(
-        "responseDateTimeRenderOption",
-        responseDateTimeRenderOption,
-      );
-    }
-
-    // Faz a requisição para atualizar os valores
-    const response = await fetch(url.toString(), {
-      method: "PUT",
-      headers: new Headers({
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": `Bearer ${token}`,
-      }),
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Erro ao atualizar valores: ${response.status} ${response.statusText} - ${errorText}`,
-      );
-    }
-
-    return await response.json();
+    return await updateResponse.json();
   } catch (error) {
     console.error("Erro ao atualizar valores:", error);
     throw error;

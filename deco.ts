@@ -25,6 +25,7 @@ const config = {
     app("posthog"),
     app("decopilot-app"),
     app("smarthint"),
+    app("google-sheets"),
     app("ra-trustvox"),
     app("anthropic"),
     app("resend"),

@@ -49,7 +49,7 @@ export interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<{ valueRanges: ValueRange[] }> => {
   const {
     spreadsheetId,
@@ -61,36 +61,33 @@ const loader = async (
   } = props;
 
   try {
-    const url = new URL(
-      `/v4/spreadsheets/${spreadsheetId}/values:batchGet`,
-      "https://sheets.googleapis.com",
-    );
+    // Construimos a URL com parâmetros
+    const url = new URL(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet`);
 
-    // Adiciona os parâmetros de consulta
+    // Adicionar parâmetros
     url.searchParams.append("majorDimension", majorDimension);
     url.searchParams.append("valueRenderOption", valueRenderOption);
     url.searchParams.append("dateTimeRenderOption", dateTimeRenderOption);
 
-    // Adiciona os intervalos como parâmetros de consulta
+    // Adicionar ranges
     for (const range of ranges) {
       url.searchParams.append("ranges", range);
     }
 
-    // Faz a requisição com o token de acesso
+    // Fazer requisição
     const response = await fetch(url.toString(), {
-      headers: new Headers({
-        "Authorization": `Bearer ${token}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
         "Accept": "application/json",
-      }),
+      },
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Erro ao obter valores em lote: ${response.status} ${response.statusText}`,
-      );
+      throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Erro ao obter valores em lote:", error);
     throw error;

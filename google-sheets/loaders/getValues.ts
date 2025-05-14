@@ -49,7 +49,7 @@ export interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<ValueRange> => {
   const {
     spreadsheetId,
@@ -60,30 +60,24 @@ const loader = async (
   } = props;
 
   try {
-    const url = new URL(
-      `/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}`,
-      "https://sheets.googleapis.com",
+    // Construindo a URL com query parameters
+    const rangeWithParams = `${encodeURIComponent(range)}?majorDimension=${majorDimension}&valueRenderOption=${valueRenderOption}&dateTimeRenderOption=${dateTimeRenderOption}`;
+
+    const response = await ctx.clientSheets
+    ["GET /v4/spreadsheets/:spreadsheetId/values/:range"](
+      {
+        spreadsheetId,
+        range: rangeWithParams,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
+      },
     );
 
-    // Adiciona os parâmetros de consulta
-    url.searchParams.append("majorDimension", majorDimension);
-    url.searchParams.append("valueRenderOption", valueRenderOption);
-    url.searchParams.append("dateTimeRenderOption", dateTimeRenderOption);
-
-    const response = await fetch(url.toString(), {
-      headers: new Headers({
-        "Authorization": `Bearer ${props.token}`,
-        "Accept": "application/json",
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Erro ao obter valores: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Erro ao obter valores:", error);
     throw error;

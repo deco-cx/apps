@@ -22,30 +22,25 @@ export interface Props {
 const loader = async (
   props: Props,
   _req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<Spreadsheet> => {
   const { spreadsheetId, token } = props;
 
   try {
-    const url = new URL(
-      `/v4/spreadsheets/${spreadsheetId}`,
-      "https://sheets.googleapis.com",
+    const response = await ctx.clientSheets
+    ["GET /v4/spreadsheets/:spreadsheetId"](
+      {
+        spreadsheetId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
 
-    const response = await fetch(url.toString(), {
-      headers: new Headers({
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/json",
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Erro ao obter planilha: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Erro ao obter planilha:", error);
     throw error;

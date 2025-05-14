@@ -10,6 +10,7 @@ import * as $$$0 from "./loaders/authClient.ts";
 import * as $$$1 from "./loaders/getBatchValues.ts";
 import * as $$$2 from "./loaders/getSpreadsheet.ts";
 import * as $$$3 from "./loaders/getValues.ts";
+import * as $$$$$$0 from "./sections/login.tsx";
 
 const manifest = {
   "loaders": {
@@ -17,6 +18,9 @@ const manifest = {
     "google-sheets/loaders/getBatchValues.ts": $$$1,
     "google-sheets/loaders/getSpreadsheet.ts": $$$2,
     "google-sheets/loaders/getValues.ts": $$$3,
+  },
+  "sections": {
+    "google-sheets/sections/login.tsx": $$$$$$0,
   },
   "actions": {
     "google-sheets/actions/appendValues.ts": $$$$$$$$$0,
