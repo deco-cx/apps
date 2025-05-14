@@ -15,9 +15,8 @@ import { uploadImage } from "./generateImage.ts";
  */
 export interface Props {
   /**
-   * @description The presigned URL to upload the edited image to. When provided, the image will be
-   * uploaded to this URL rather than returned as base64 in the response. This allows for larger images
-   * and easier integration with storage systems. If not provided, the image will be returned as base64 data.
+   * @description The presigned URL to upload the edited image to. The image will be
+   * uploaded to this URL rather than returned as base64 in the response.
    *
    * Can be obtained from a CREATE_PRESIGNED_URL tool or similar functionality that creates S3/cloud storage
    * presigned URLs with PUT permission.

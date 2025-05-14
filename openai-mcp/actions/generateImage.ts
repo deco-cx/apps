@@ -1,6 +1,7 @@
 import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
 import OpenAI from "npm:openai";
+
 /**
  * @title Generate Image
  * @description Creates high-quality images from text prompts using OpenAI's image generation models.
@@ -9,9 +10,8 @@ import OpenAI from "npm:openai";
  */
 export interface Props {
   /**
-   * @description The presigned URLs to upload the generated images to. When provided, the images will be
-   * uploaded to these URLs rather than returned as base64 in the response. This allows for larger images
-   * and easier integration with storage systems. One for each image. (n = number of images)
+   * @description The presigned URLs to upload the generated images to. The images will be
+   * uploaded to these URLs rather than returned as base64 in the response. One for each image. (n = number of images)
    *
    * Can be obtained from a CREATE_PRESIGNED_URL tool or similar functionality that creates S3/cloud storage
    * presigned URLs with PUT permission.
@@ -194,7 +194,13 @@ async function processImageGeneration(
     size,
   };
 
-  // Quality handling - gpt-image-1 uses quality, dall-e-3 uses quality_preference
+  if (
+    !(quality === "low" || quality === "medium" || quality === "high" ||
+      quality === "auto")
+  ) {
+    throw new Error("Quality must be a valid quality value");
+  }
+
   requestParams.quality = quality;
   if (
     background === "transparent" &&
