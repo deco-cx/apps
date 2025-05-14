@@ -43,7 +43,6 @@ export default function App(props: Props): App<Manifest, State> {
     ? auth.clientSecret
     : auth.clientSecret?.get?.() ?? undefined;
 
-
   const clientAuth = createHttpClient<GoogleAuthClient>({
     base: "https://oauth2.googleapis.com",
     headers: new Headers({
@@ -52,7 +51,6 @@ export default function App(props: Props): App<Manifest, State> {
     }),
     fetcher: fetchSafe,
   });
-
 
   // Criação do cliente HTTP
   const clientSheets = createHttpClient<GoogleSheetsClient>({
@@ -63,7 +61,6 @@ export default function App(props: Props): App<Manifest, State> {
     }),
     fetcher: fetchSafe,
   });
-
 
   const state: State = {
     clientAuth,
