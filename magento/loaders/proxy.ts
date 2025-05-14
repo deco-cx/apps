@@ -75,8 +75,10 @@ const buildProxyRoutes = ({
     includes?: Script[];
   };
 }) => {
+  const baseUrl = ctx.baseUrl.get() ?? "";
+
   const publicUrl = new URL(
-    ctx.baseUrl?.startsWith("http") ? ctx.baseUrl : `https://${ctx.baseUrl}`,
+    baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`,
   );
 
   const { enableRedirectRoutes, subdomain, extraPathsToRedirect = [] } =

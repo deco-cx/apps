@@ -12,7 +12,7 @@ import { middleware } from "./middleware.ts";
 import { Secret } from "../website/loaders/secret.ts";
 import { ExtensionOf } from "../website/loaders/extension.ts";
 import { Cart } from "./loaders/cart.ts";
-import { Message } from "../website/flags/multivariate/message.ts";
+import { Environment } from "../website/loaders/environment.ts";
 
 export interface FiltersGraphQL {
   value: string;
@@ -25,7 +25,7 @@ export interface APIConfig {
    * @description The base URL of the Magento API, If you have stores, put the name of the store at the end.
    * @example https://magento.com/rest/store1 or https://magento.com/rest
    */
-  baseUrl: Message;
+  baseUrl: Environment;
 
   /** @title Magento API key */
   apiKey: Secret;
@@ -240,16 +240,20 @@ export default function App(props: Props): App<Manifest, State> {
   const secretKey = typeof apiKey === "string" ? apiKey : apiKey?.get() ?? "";
   const headerGql = getStoreHeader(storeId, site, storeHeader);
 
+  console.log({ baseUrl: apiConfig.baseUrl.get() });
+
+  const baseUrl = apiConfig.baseUrl.get() ?? "";
+
   const clientAdmin = createHttpClient<API>({
-    base: apiConfig.baseUrl,
+    base: baseUrl,
     headers: new Headers({
       Authorization: `Bearer ${secretKey}`,
-      Referer: apiConfig.baseUrl,
+      Referer: baseUrl,
     }),
   });
 
   const clientAdminAuthenticated = createHttpClient<API>({
-    base: apiConfig.baseUrl,
+    base: baseUrl,
     headers: new Headers({
       "x-requested-with": "XMLHttpRequest",
     }),
@@ -257,7 +261,7 @@ export default function App(props: Props): App<Manifest, State> {
 
   const clientGraphql = createGraphqlClient({
     fetcher: fetchSafe,
-    endpoint: `${apiConfig.baseUrl}/graphql`,
+    endpoint: `${baseUrl}/graphql`,
     headers: new Headers({
       "Content-Type": "application/json",
       ...headerGql,

@@ -37,14 +37,14 @@ export default function Sitemap({ include }: Props, appCtx: AppContext) {
   return async (req: Request, ctx: ConnInfo) => {
     const prodUrl = new URL(req.url);
 
-    if (!appCtx.baseUrl) {
+    const baseUrl = appCtx.baseUrl.get() ?? "";
+
+    if (!baseUrl) {
       throw new Error("Missing publicUrl");
     }
 
     const publicUrl = new URL(
-      appCtx.baseUrl?.startsWith("http")
-        ? appCtx.baseUrl
-        : `https://${appCtx.baseUrl}`,
+      baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`,
     );
 
     const response = await Proxy({
