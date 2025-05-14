@@ -1,25 +1,22 @@
 import { AppContext } from "../mod.ts";
 import { Buffer } from "node:buffer";
-import { PREVIEW_URL } from "../loaders/imagePreview.ts";
-import { createPreviewUrl, getInstallId } from "../utils.ts";
 import OpenAI from "npm:openai";
+
 /**
  * @title Generate Image
  * @description Creates high-quality images from text prompts using OpenAI's image generation models.
  * This action allows you to generate images by providing a descriptive prompt and customizing
- * various parameters to control the output. Different models have different capabilities and limitations,
- * so parameters should be chosen accordingly. The result will be available in the previewUrls. Use the full previewUrls to render the images.
+ * various parameters to control the output.
  */
 export interface Props {
   /**
-   * @description The presigned URLs to upload the generated images to. When provided, the images will be
-   * uploaded to these URLs rather than returned as base64 in the response. This allows for larger images
-   * and easier integration with storage systems. One for each image. (n = number of images)
+   * @description The presigned URLs to upload the generated images to. The images will be
+   * uploaded to these URLs rather than returned as base64 in the response. One for each image. (n = number of images)
    *
    * Can be obtained from a CREATE_PRESIGNED_URL tool or similar functionality that creates S3/cloud storage
    * presigned URLs with PUT permission.
    */
-  presignedUrls: string[];
+  presignedUrls?: string[];
 
   /**
    * @description The text prompt that describes the image you want to generate. For best results,
@@ -71,8 +68,6 @@ export interface Props {
    * but may increase response time and costs. The maximum value depends on the model:
    *
    * - gpt-image-1: Up to 4 images per request
-   * - dall-e-3: Up to 1 image per request
-   * - dall-e-2: Up to 10 images per request
    *
    * Note: If you specify a value higher than the model supports, the API will automatically
    * use the maximum supported value for that model.
@@ -130,15 +125,9 @@ export interface Props {
   moderation?: "auto" | "low";
 }
 
-interface ImageResponse {
-  b64_json?: string;
-  url?: string;
-  revised_prompt?: string;
-}
-
 export default function generateImageAction(
   props: Props,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ) {
   const {
@@ -146,15 +135,9 @@ export default function generateImageAction(
   } = props;
 
   const openAI = ctx.openAI;
-  const url = new URL(req.url);
-  const installId = getInstallId(url);
 
   // If presigned URLs are provided, return preview URL
   if (presignedUrls && presignedUrls.length > 0) {
-    const cleanedUrls = presignedUrls.map((url) =>
-      url.split("?")[0].replace("_presigned/", "")
-    );
-
     // Run image generation asynchronously without awaiting
     setTimeout(() => {
       processImageGeneration(props, openAI, presignedUrls)
@@ -177,15 +160,9 @@ export default function generateImageAction(
         });
     }, 0);
 
-    const previewUrls = cleanedUrls.map((url) =>
-      createPreviewUrl(url, PREVIEW_URL, installId)
-    );
-
     return {
       success: true,
-      previewUrls,
-      message:
-        "Image generation started. Render the previewUrls to see the images.",
+      message: "Image generation started.",
     };
   }
 }
@@ -217,7 +194,13 @@ async function processImageGeneration(
     size,
   };
 
-  // Quality handling - gpt-image-1 uses quality, dall-e-3 uses quality_preference
+  if (
+    !(quality === "low" || quality === "medium" || quality === "high" ||
+      quality === "auto")
+  ) {
+    throw new Error("Quality must be a valid quality value");
+  }
+
   requestParams.quality = quality;
   if (
     background === "transparent" &&
@@ -311,6 +294,8 @@ export async function uploadImage(
 
   // Set the appropriate content type based on format
   const contentType = `image/${format}`;
+
+  console.log({ contentType });
 
   const response = await fetch(presignedUrl, {
     method: "PUT",

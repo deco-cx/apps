@@ -4,13 +4,11 @@
 
 import * as $$$$$$$$$0 from "./actions/editImage.ts";
 import * as $$$$$$$$$1 from "./actions/generateImage.ts";
-import * as $$$0 from "./loaders/imagePreview.ts";
-import * as $$$1 from "./loaders/vision.ts";
+import * as $$$0 from "./loaders/vision.ts";
 
 const manifest = {
   "loaders": {
-    "openai-mcp/loaders/imagePreview.ts": $$$0,
-    "openai-mcp/loaders/vision.ts": $$$1,
+    "openai-mcp/loaders/vision.ts": $$$0,
   },
   "actions": {
     "openai-mcp/actions/editImage.ts": $$$$$$$$$0,
