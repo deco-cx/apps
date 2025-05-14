@@ -32,7 +32,7 @@ export default async function loader(
   );
   const cookie = stringify(cookies);
 
-  const isOrderGroup = orderId.includes("-");
+  const isOrderGroup = !orderId.includes("-");
   if (isOrderGroup) {
     const orderGroup = await vcsDeprecated
       ["GET /api/checkout/pub/orders/order-group/:orderGroupId"]({
