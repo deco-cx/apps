@@ -22,7 +22,12 @@ const buildSiteMap = (urls: string[]) => {
   return entries.join("\n");
 };
 
-const sanitize = (url: string) => url.startsWith("/") ? url : `/${url}`;
+const sanitize = (url: string) => {
+  const withSlash = url.startsWith("/") ? url : `/${url}`;
+  // Replace & with &amp;
+  // In XML, &amp; means an actual & in the data
+  return withSlash.replace(/&(?!amp;)/g, "&amp;");
+};
 
 const siteMapFromRoutes = (
   publicUrl: string,
