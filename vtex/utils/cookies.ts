@@ -23,3 +23,6 @@ export const proxySetCookie = (
     setCookie(to, newCookie);
   }
 };
+
+export const CHECKOUT_DATA_ACCESS_COOKIE = "CheckoutDataAccess";
+export const VTEX_CHKO_AUTH = "Vtex_CHKO_Auth";
