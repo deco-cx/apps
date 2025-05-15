@@ -58,19 +58,22 @@ const action = async (
         sku: sku,
       },
     };
-
-    await clientAdmin["POST /rest/:site/V1/carts/:cartId/items"](
+    const result = await clientAdmin["POST /rest/:site/V1/carts/:cartId/items"](
       {
         cartId: cartId,
         site: ctx.site,
       },
       { body },
-    );
-
-    return handleCartActions(dontReturnCart, {
-      req,
-      ctx,
+    ).catch((e) => {
+      console.error(e);
     });
+
+    if(result?.ok) {
+      return handleCartActions(dontReturnCart, {
+        req,
+        ctx,
+      });
+    }
   }
 
   try {
