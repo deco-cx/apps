@@ -18,25 +18,33 @@ import * as $$$$$$$$$12 from "./actions/contratos-de-vendas/cancelarContrato.ts"
 import * as $$$$$$$$$13 from "./actions/contratos-de-vendas/removerAnexo.ts";
 import * as $$$$$$$$$14 from "./actions/contratos-de-vendas/removerContrato.ts";
 import * as $$$$$$$$$15 from "./actions/contratos-de-vendas/removerGarantidor.ts";
-import * as $$$$$$$$$16 from "./actions/credores/adicionarCredor.ts";
-import * as $$$$$$$$$17 from "./actions/credores/ativarCredor.ts";
-import * as $$$$$$$$$18 from "./actions/credores/atualizarCredor.ts";
-import * as $$$$$$$$$19 from "./actions/credores/desativarCredor.ts";
-import * as $$$$$$$$$20 from "./actions/estados-civis/adicionarEstadoCivil.ts";
-import * as $$$$$$$$$21 from "./actions/planejamentos-de-obra/atualizarTarefasPlanejamento.ts";
-import * as $$$$$$$$$22 from "./actions/profissoes/adicionarProfissoes.ts";
-import * as $$$$$$$$$23 from "./actions/reservas-de-unidades/adicionarReserva.ts";
-import * as $$$$$$$$$24 from "./actions/reservas-de-unidades/inativarReserva.ts";
-import * as $$$$$$$$$25 from "./actions/titulos-contas-a-pagar/adicionarTitulo.ts";
-import * as $$$$$$$$$26 from "./actions/titulos-contas-a-pagar/atualizarParcela.ts";
-import * as $$$$$$$$$27 from "./actions/titulos-contas-a-pagar/atualizarTitulo.ts";
-import * as $$$$$$$$$28 from "./actions/titulos-contas-a-receber/alterarDataVencimentoParcela.ts";
-import * as $$$$$$$$$29 from "./actions/unidades-de-imoveis/adicionarCaracteristica.ts";
-import * as $$$$$$$$$30 from "./actions/unidades-de-imoveis/adicionarSituacao.ts";
-import * as $$$$$$$$$31 from "./actions/unidades-de-imoveis/adicionarUnidade.ts";
-import * as $$$$$$$$$32 from "./actions/unidades-de-imoveis/adicionarUnidadesFilhas.ts";
-import * as $$$$$$$$$33 from "./actions/unidades-de-imoveis/atualizarCaracteristicas.ts";
-import * as $$$$$$$$$34 from "./actions/unidades-de-imoveis/atualizarUnidade.ts";
+import * as $$$$$$$$$16 from "./actions/cotacoes-de-precos/adicionarFornecedorItem.ts";
+import * as $$$$$$$$$17 from "./actions/cotacoes-de-precos/atualizarItemNegociacao.ts";
+import * as $$$$$$$$$18 from "./actions/cotacoes-de-precos/atualizarNegociacao.ts";
+import * as $$$$$$$$$19 from "./actions/cotacoes-de-precos/autorizarUltimaNegociacao.ts";
+import * as $$$$$$$$$20 from "./actions/cotacoes-de-precos/criarCotacao.ts";
+import * as $$$$$$$$$21 from "./actions/cotacoes-de-precos/criarItemCotacao.ts";
+import * as $$$$$$$$$22 from "./actions/cotacoes-de-precos/criarItemCotacaoDeSolicitacao.ts";
+import * as $$$$$$$$$23 from "./actions/cotacoes-de-precos/criarNegociacaoFornecedor.ts";
+import * as $$$$$$$$$24 from "./actions/credores/adicionarCredor.ts";
+import * as $$$$$$$$$25 from "./actions/credores/ativarCredor.ts";
+import * as $$$$$$$$$26 from "./actions/credores/atualizarCredor.ts";
+import * as $$$$$$$$$27 from "./actions/credores/desativarCredor.ts";
+import * as $$$$$$$$$28 from "./actions/estados-civis/adicionarEstadoCivil.ts";
+import * as $$$$$$$$$29 from "./actions/planejamentos-de-obra/atualizarTarefasPlanejamento.ts";
+import * as $$$$$$$$$30 from "./actions/profissoes/adicionarProfissoes.ts";
+import * as $$$$$$$$$31 from "./actions/reservas-de-unidades/adicionarReserva.ts";
+import * as $$$$$$$$$32 from "./actions/reservas-de-unidades/inativarReserva.ts";
+import * as $$$$$$$$$33 from "./actions/titulos-contas-a-pagar/adicionarTitulo.ts";
+import * as $$$$$$$$$34 from "./actions/titulos-contas-a-pagar/atualizarParcela.ts";
+import * as $$$$$$$$$35 from "./actions/titulos-contas-a-pagar/atualizarTitulo.ts";
+import * as $$$$$$$$$36 from "./actions/titulos-contas-a-receber/alterarDataVencimentoParcela.ts";
+import * as $$$$$$$$$37 from "./actions/unidades-de-imoveis/adicionarCaracteristica.ts";
+import * as $$$$$$$$$38 from "./actions/unidades-de-imoveis/adicionarSituacao.ts";
+import * as $$$$$$$$$39 from "./actions/unidades-de-imoveis/adicionarUnidade.ts";
+import * as $$$$$$$$$40 from "./actions/unidades-de-imoveis/adicionarUnidadesFilhas.ts";
+import * as $$$$$$$$$41 from "./actions/unidades-de-imoveis/atualizarCaracteristicas.ts";
+import * as $$$$$$$$$42 from "./actions/unidades-de-imoveis/atualizarUnidade.ts";
 import * as $$$0 from "./loaders/bens-imoveis/buscarBensImoveis.ts";
 import * as $$$1 from "./loaders/bens-moveis/buscarBensMoveis.ts";
 import * as $$$2 from "./loaders/calendarios-de-obra/buscarCalendario.ts";
@@ -55,45 +63,46 @@ import * as $$$14 from "./loaders/contratos-de-vendas/buscarAnexo.ts";
 import * as $$$15 from "./loaders/contratos-de-vendas/buscarContrato.ts";
 import * as $$$16 from "./loaders/contratos-de-vendas/buscarContratos.ts";
 import * as $$$17 from "./loaders/contratos-de-vendas/buscarGarantidores.ts";
-import * as $$$18 from "./loaders/credores/buscarCredor.ts";
-import * as $$$19 from "./loaders/credores/buscarCredores.ts";
-import * as $$$20 from "./loaders/credores/buscarInformacoesBancarias.ts";
-import * as $$$21 from "./loaders/credores/buscarInformacoesPix.ts";
-import * as $$$22 from "./loaders/departamentos/buscarDepartamento.ts";
-import * as $$$23 from "./loaders/departamentos/buscarDepartamentos.ts";
-import * as $$$24 from "./loaders/documentos/buscarDocumento.ts";
-import * as $$$25 from "./loaders/empreendimentos/buscarAgrupamentos.ts";
-import * as $$$26 from "./loaders/empreendimentos/buscarEmpreendimento.ts";
-import * as $$$27 from "./loaders/empreendimentos/buscarEmpreendimentos.ts";
-import * as $$$28 from "./loaders/empresas/buscarEmpresa.ts";
-import * as $$$29 from "./loaders/empresas/buscarEmpresas.ts";
-import * as $$$30 from "./loaders/estados-civis/buscarEstadosCivis.ts";
-import * as $$$31 from "./loaders/indexadores/buscarIndexadores.ts";
-import * as $$$32 from "./loaders/locais-de-obra/buscarLocais.ts";
-import * as $$$33 from "./loaders/municipios/buscarMunicipios.ts";
-import * as $$$34 from "./loaders/orcamentos-de-obra/buscarItensPlanilha.ts";
-import * as $$$35 from "./loaders/orcamentos-de-obra/buscarPlanilhas.ts";
-import * as $$$36 from "./loaders/parametros/buscarParametro.ts";
-import * as $$$37 from "./loaders/planejamentos-de-obra/buscarTarefasPlanejamento.ts";
-import * as $$$38 from "./loaders/profissoes/buscarProfissao.ts";
-import * as $$$39 from "./loaders/profissoes/buscarProfissoes.ts";
-import * as $$$40 from "./loaders/tipos-de-clientes/buscarTiposClientes.ts";
-import * as $$$41 from "./loaders/tipos-de-condicao-de-pagamento/buscarTiposCondicaoPagamento.ts";
-import * as $$$42 from "./loaders/tipos-de-imoveis/buscarTipoImovel.ts";
-import * as $$$43 from "./loaders/tipos-de-imoveis/buscarTiposImoveis.ts";
-import * as $$$44 from "./loaders/titulos-contas-a-pagar/buscarParcelas.ts";
-import * as $$$45 from "./loaders/titulos-contas-a-pagar/buscarTitulo.ts";
-import * as $$$46 from "./loaders/titulos-contas-a-pagar/buscarTitulos.ts";
-import * as $$$47 from "./loaders/titulos-contas-a-pagar/buscarTitulosPorDataAlteracao.ts";
-import * as $$$48 from "./loaders/titulos-contas-a-receber/buscarApropriacoesFinanceiras.ts";
-import * as $$$49 from "./loaders/titulos-contas-a-receber/buscarParcelas.ts";
-import * as $$$50 from "./loaders/titulos-contas-a-receber/buscarTitulo.ts";
-import * as $$$51 from "./loaders/titulos-contas-a-receber/buscarTitulos.ts";
-import * as $$$52 from "./loaders/unidades-de-imoveis/buscarCaracteristicas.ts";
-import * as $$$53 from "./loaders/unidades-de-imoveis/buscarSituacoes.ts";
-import * as $$$54 from "./loaders/unidades-de-imoveis/buscarUnidade.ts";
-import * as $$$55 from "./loaders/unidades-de-imoveis/buscarUnidades.ts";
-import * as $$$56 from "./loaders/unidades-de-movimento/buscarUnidadesDeMovimento.ts";
+import * as $$$18 from "./loaders/cotacoes-de-precos/buscarCotacoesComNegociacoes.ts";
+import * as $$$19 from "./loaders/credores/buscarCredor.ts";
+import * as $$$20 from "./loaders/credores/buscarCredores.ts";
+import * as $$$21 from "./loaders/credores/buscarInformacoesBancarias.ts";
+import * as $$$22 from "./loaders/credores/buscarInformacoesPix.ts";
+import * as $$$23 from "./loaders/departamentos/buscarDepartamento.ts";
+import * as $$$24 from "./loaders/departamentos/buscarDepartamentos.ts";
+import * as $$$25 from "./loaders/documentos/buscarDocumento.ts";
+import * as $$$26 from "./loaders/empreendimentos/buscarAgrupamentos.ts";
+import * as $$$27 from "./loaders/empreendimentos/buscarEmpreendimento.ts";
+import * as $$$28 from "./loaders/empreendimentos/buscarEmpreendimentos.ts";
+import * as $$$29 from "./loaders/empresas/buscarEmpresa.ts";
+import * as $$$30 from "./loaders/empresas/buscarEmpresas.ts";
+import * as $$$31 from "./loaders/estados-civis/buscarEstadosCivis.ts";
+import * as $$$32 from "./loaders/indexadores/buscarIndexadores.ts";
+import * as $$$33 from "./loaders/locais-de-obra/buscarLocais.ts";
+import * as $$$34 from "./loaders/municipios/buscarMunicipios.ts";
+import * as $$$35 from "./loaders/orcamentos-de-obra/buscarItensPlanilha.ts";
+import * as $$$36 from "./loaders/orcamentos-de-obra/buscarPlanilhas.ts";
+import * as $$$37 from "./loaders/parametros/buscarParametro.ts";
+import * as $$$38 from "./loaders/planejamentos-de-obra/buscarTarefasPlanejamento.ts";
+import * as $$$39 from "./loaders/profissoes/buscarProfissao.ts";
+import * as $$$40 from "./loaders/profissoes/buscarProfissoes.ts";
+import * as $$$41 from "./loaders/tipos-de-clientes/buscarTiposClientes.ts";
+import * as $$$42 from "./loaders/tipos-de-condicao-de-pagamento/buscarTiposCondicaoPagamento.ts";
+import * as $$$43 from "./loaders/tipos-de-imoveis/buscarTipoImovel.ts";
+import * as $$$44 from "./loaders/tipos-de-imoveis/buscarTiposImoveis.ts";
+import * as $$$45 from "./loaders/titulos-contas-a-pagar/buscarParcelas.ts";
+import * as $$$46 from "./loaders/titulos-contas-a-pagar/buscarTitulo.ts";
+import * as $$$47 from "./loaders/titulos-contas-a-pagar/buscarTitulos.ts";
+import * as $$$48 from "./loaders/titulos-contas-a-pagar/buscarTitulosPorDataAlteracao.ts";
+import * as $$$49 from "./loaders/titulos-contas-a-receber/buscarApropriacoesFinanceiras.ts";
+import * as $$$50 from "./loaders/titulos-contas-a-receber/buscarParcelas.ts";
+import * as $$$51 from "./loaders/titulos-contas-a-receber/buscarTitulo.ts";
+import * as $$$52 from "./loaders/titulos-contas-a-receber/buscarTitulos.ts";
+import * as $$$53 from "./loaders/unidades-de-imoveis/buscarCaracteristicas.ts";
+import * as $$$54 from "./loaders/unidades-de-imoveis/buscarSituacoes.ts";
+import * as $$$55 from "./loaders/unidades-de-imoveis/buscarUnidade.ts";
+import * as $$$56 from "./loaders/unidades-de-imoveis/buscarUnidades.ts";
+import * as $$$57 from "./loaders/unidades-de-movimento/buscarUnidadesDeMovimento.ts";
 
 const manifest = {
   "loaders": {
@@ -115,48 +124,49 @@ const manifest = {
     "sienge/loaders/contratos-de-vendas/buscarContrato.ts": $$$15,
     "sienge/loaders/contratos-de-vendas/buscarContratos.ts": $$$16,
     "sienge/loaders/contratos-de-vendas/buscarGarantidores.ts": $$$17,
-    "sienge/loaders/credores/buscarCredor.ts": $$$18,
-    "sienge/loaders/credores/buscarCredores.ts": $$$19,
-    "sienge/loaders/credores/buscarInformacoesBancarias.ts": $$$20,
-    "sienge/loaders/credores/buscarInformacoesPix.ts": $$$21,
-    "sienge/loaders/departamentos/buscarDepartamento.ts": $$$22,
-    "sienge/loaders/departamentos/buscarDepartamentos.ts": $$$23,
-    "sienge/loaders/documentos/buscarDocumento.ts": $$$24,
-    "sienge/loaders/empreendimentos/buscarAgrupamentos.ts": $$$25,
-    "sienge/loaders/empreendimentos/buscarEmpreendimento.ts": $$$26,
-    "sienge/loaders/empreendimentos/buscarEmpreendimentos.ts": $$$27,
-    "sienge/loaders/empresas/buscarEmpresa.ts": $$$28,
-    "sienge/loaders/empresas/buscarEmpresas.ts": $$$29,
-    "sienge/loaders/estados-civis/buscarEstadosCivis.ts": $$$30,
-    "sienge/loaders/indexadores/buscarIndexadores.ts": $$$31,
-    "sienge/loaders/locais-de-obra/buscarLocais.ts": $$$32,
-    "sienge/loaders/municipios/buscarMunicipios.ts": $$$33,
-    "sienge/loaders/orcamentos-de-obra/buscarItensPlanilha.ts": $$$34,
-    "sienge/loaders/orcamentos-de-obra/buscarPlanilhas.ts": $$$35,
-    "sienge/loaders/parametros/buscarParametro.ts": $$$36,
-    "sienge/loaders/planejamentos-de-obra/buscarTarefasPlanejamento.ts": $$$37,
-    "sienge/loaders/profissoes/buscarProfissao.ts": $$$38,
-    "sienge/loaders/profissoes/buscarProfissoes.ts": $$$39,
-    "sienge/loaders/tipos-de-clientes/buscarTiposClientes.ts": $$$40,
+    "sienge/loaders/cotacoes-de-precos/buscarCotacoesComNegociacoes.ts": $$$18,
+    "sienge/loaders/credores/buscarCredor.ts": $$$19,
+    "sienge/loaders/credores/buscarCredores.ts": $$$20,
+    "sienge/loaders/credores/buscarInformacoesBancarias.ts": $$$21,
+    "sienge/loaders/credores/buscarInformacoesPix.ts": $$$22,
+    "sienge/loaders/departamentos/buscarDepartamento.ts": $$$23,
+    "sienge/loaders/departamentos/buscarDepartamentos.ts": $$$24,
+    "sienge/loaders/documentos/buscarDocumento.ts": $$$25,
+    "sienge/loaders/empreendimentos/buscarAgrupamentos.ts": $$$26,
+    "sienge/loaders/empreendimentos/buscarEmpreendimento.ts": $$$27,
+    "sienge/loaders/empreendimentos/buscarEmpreendimentos.ts": $$$28,
+    "sienge/loaders/empresas/buscarEmpresa.ts": $$$29,
+    "sienge/loaders/empresas/buscarEmpresas.ts": $$$30,
+    "sienge/loaders/estados-civis/buscarEstadosCivis.ts": $$$31,
+    "sienge/loaders/indexadores/buscarIndexadores.ts": $$$32,
+    "sienge/loaders/locais-de-obra/buscarLocais.ts": $$$33,
+    "sienge/loaders/municipios/buscarMunicipios.ts": $$$34,
+    "sienge/loaders/orcamentos-de-obra/buscarItensPlanilha.ts": $$$35,
+    "sienge/loaders/orcamentos-de-obra/buscarPlanilhas.ts": $$$36,
+    "sienge/loaders/parametros/buscarParametro.ts": $$$37,
+    "sienge/loaders/planejamentos-de-obra/buscarTarefasPlanejamento.ts": $$$38,
+    "sienge/loaders/profissoes/buscarProfissao.ts": $$$39,
+    "sienge/loaders/profissoes/buscarProfissoes.ts": $$$40,
+    "sienge/loaders/tipos-de-clientes/buscarTiposClientes.ts": $$$41,
     "sienge/loaders/tipos-de-condicao-de-pagamento/buscarTiposCondicaoPagamento.ts":
-      $$$41,
-    "sienge/loaders/tipos-de-imoveis/buscarTipoImovel.ts": $$$42,
-    "sienge/loaders/tipos-de-imoveis/buscarTiposImoveis.ts": $$$43,
-    "sienge/loaders/titulos-contas-a-pagar/buscarParcelas.ts": $$$44,
-    "sienge/loaders/titulos-contas-a-pagar/buscarTitulo.ts": $$$45,
-    "sienge/loaders/titulos-contas-a-pagar/buscarTitulos.ts": $$$46,
+      $$$42,
+    "sienge/loaders/tipos-de-imoveis/buscarTipoImovel.ts": $$$43,
+    "sienge/loaders/tipos-de-imoveis/buscarTiposImoveis.ts": $$$44,
+    "sienge/loaders/titulos-contas-a-pagar/buscarParcelas.ts": $$$45,
+    "sienge/loaders/titulos-contas-a-pagar/buscarTitulo.ts": $$$46,
+    "sienge/loaders/titulos-contas-a-pagar/buscarTitulos.ts": $$$47,
     "sienge/loaders/titulos-contas-a-pagar/buscarTitulosPorDataAlteracao.ts":
-      $$$47,
-    "sienge/loaders/titulos-contas-a-receber/buscarApropriacoesFinanceiras.ts":
       $$$48,
-    "sienge/loaders/titulos-contas-a-receber/buscarParcelas.ts": $$$49,
-    "sienge/loaders/titulos-contas-a-receber/buscarTitulo.ts": $$$50,
-    "sienge/loaders/titulos-contas-a-receber/buscarTitulos.ts": $$$51,
-    "sienge/loaders/unidades-de-imoveis/buscarCaracteristicas.ts": $$$52,
-    "sienge/loaders/unidades-de-imoveis/buscarSituacoes.ts": $$$53,
-    "sienge/loaders/unidades-de-imoveis/buscarUnidade.ts": $$$54,
-    "sienge/loaders/unidades-de-imoveis/buscarUnidades.ts": $$$55,
-    "sienge/loaders/unidades-de-movimento/buscarUnidadesDeMovimento.ts": $$$56,
+    "sienge/loaders/titulos-contas-a-receber/buscarApropriacoesFinanceiras.ts":
+      $$$49,
+    "sienge/loaders/titulos-contas-a-receber/buscarParcelas.ts": $$$50,
+    "sienge/loaders/titulos-contas-a-receber/buscarTitulo.ts": $$$51,
+    "sienge/loaders/titulos-contas-a-receber/buscarTitulos.ts": $$$52,
+    "sienge/loaders/unidades-de-imoveis/buscarCaracteristicas.ts": $$$53,
+    "sienge/loaders/unidades-de-imoveis/buscarSituacoes.ts": $$$54,
+    "sienge/loaders/unidades-de-imoveis/buscarUnidade.ts": $$$55,
+    "sienge/loaders/unidades-de-imoveis/buscarUnidades.ts": $$$56,
+    "sienge/loaders/unidades-de-movimento/buscarUnidadesDeMovimento.ts": $$$57,
   },
   "actions": {
     "sienge/actions/calendarios-de-obra/adicionarFolgas.ts": $$$$$$$$$0,
@@ -176,30 +186,41 @@ const manifest = {
     "sienge/actions/contratos-de-vendas/removerAnexo.ts": $$$$$$$$$13,
     "sienge/actions/contratos-de-vendas/removerContrato.ts": $$$$$$$$$14,
     "sienge/actions/contratos-de-vendas/removerGarantidor.ts": $$$$$$$$$15,
-    "sienge/actions/credores/adicionarCredor.ts": $$$$$$$$$16,
-    "sienge/actions/credores/ativarCredor.ts": $$$$$$$$$17,
-    "sienge/actions/credores/atualizarCredor.ts": $$$$$$$$$18,
-    "sienge/actions/credores/desativarCredor.ts": $$$$$$$$$19,
-    "sienge/actions/estados-civis/adicionarEstadoCivil.ts": $$$$$$$$$20,
+    "sienge/actions/cotacoes-de-precos/adicionarFornecedorItem.ts": $$$$$$$$$16,
+    "sienge/actions/cotacoes-de-precos/atualizarItemNegociacao.ts": $$$$$$$$$17,
+    "sienge/actions/cotacoes-de-precos/atualizarNegociacao.ts": $$$$$$$$$18,
+    "sienge/actions/cotacoes-de-precos/autorizarUltimaNegociacao.ts":
+      $$$$$$$$$19,
+    "sienge/actions/cotacoes-de-precos/criarCotacao.ts": $$$$$$$$$20,
+    "sienge/actions/cotacoes-de-precos/criarItemCotacao.ts": $$$$$$$$$21,
+    "sienge/actions/cotacoes-de-precos/criarItemCotacaoDeSolicitacao.ts":
+      $$$$$$$$$22,
+    "sienge/actions/cotacoes-de-precos/criarNegociacaoFornecedor.ts":
+      $$$$$$$$$23,
+    "sienge/actions/credores/adicionarCredor.ts": $$$$$$$$$24,
+    "sienge/actions/credores/ativarCredor.ts": $$$$$$$$$25,
+    "sienge/actions/credores/atualizarCredor.ts": $$$$$$$$$26,
+    "sienge/actions/credores/desativarCredor.ts": $$$$$$$$$27,
+    "sienge/actions/estados-civis/adicionarEstadoCivil.ts": $$$$$$$$$28,
     "sienge/actions/planejamentos-de-obra/atualizarTarefasPlanejamento.ts":
-      $$$$$$$$$21,
-    "sienge/actions/profissoes/adicionarProfissoes.ts": $$$$$$$$$22,
-    "sienge/actions/reservas-de-unidades/adicionarReserva.ts": $$$$$$$$$23,
-    "sienge/actions/reservas-de-unidades/inativarReserva.ts": $$$$$$$$$24,
-    "sienge/actions/titulos-contas-a-pagar/adicionarTitulo.ts": $$$$$$$$$25,
-    "sienge/actions/titulos-contas-a-pagar/atualizarParcela.ts": $$$$$$$$$26,
-    "sienge/actions/titulos-contas-a-pagar/atualizarTitulo.ts": $$$$$$$$$27,
-    "sienge/actions/titulos-contas-a-receber/alterarDataVencimentoParcela.ts":
-      $$$$$$$$$28,
-    "sienge/actions/unidades-de-imoveis/adicionarCaracteristica.ts":
       $$$$$$$$$29,
-    "sienge/actions/unidades-de-imoveis/adicionarSituacao.ts": $$$$$$$$$30,
-    "sienge/actions/unidades-de-imoveis/adicionarUnidade.ts": $$$$$$$$$31,
+    "sienge/actions/profissoes/adicionarProfissoes.ts": $$$$$$$$$30,
+    "sienge/actions/reservas-de-unidades/adicionarReserva.ts": $$$$$$$$$31,
+    "sienge/actions/reservas-de-unidades/inativarReserva.ts": $$$$$$$$$32,
+    "sienge/actions/titulos-contas-a-pagar/adicionarTitulo.ts": $$$$$$$$$33,
+    "sienge/actions/titulos-contas-a-pagar/atualizarParcela.ts": $$$$$$$$$34,
+    "sienge/actions/titulos-contas-a-pagar/atualizarTitulo.ts": $$$$$$$$$35,
+    "sienge/actions/titulos-contas-a-receber/alterarDataVencimentoParcela.ts":
+      $$$$$$$$$36,
+    "sienge/actions/unidades-de-imoveis/adicionarCaracteristica.ts":
+      $$$$$$$$$37,
+    "sienge/actions/unidades-de-imoveis/adicionarSituacao.ts": $$$$$$$$$38,
+    "sienge/actions/unidades-de-imoveis/adicionarUnidade.ts": $$$$$$$$$39,
     "sienge/actions/unidades-de-imoveis/adicionarUnidadesFilhas.ts":
-      $$$$$$$$$32,
+      $$$$$$$$$40,
     "sienge/actions/unidades-de-imoveis/atualizarCaracteristicas.ts":
-      $$$$$$$$$33,
-    "sienge/actions/unidades-de-imoveis/atualizarUnidade.ts": $$$$$$$$$34,
+      $$$$$$$$$41,
+    "sienge/actions/unidades-de-imoveis/atualizarUnidade.ts": $$$$$$$$$42,
   },
   "name": "sienge",
   "baseUrl": import.meta.url,
