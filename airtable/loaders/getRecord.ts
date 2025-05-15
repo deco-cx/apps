@@ -1,0 +1,42 @@
+import type { AppContext } from "../mod.ts";
+import type { AirtableRecord } from "../types.ts";
+
+interface Props {
+  /**
+   * @title Base ID
+   * @description The ID of the Airtable base.
+   */
+  baseId: string;
+
+  /**
+   * @title Table ID or Name
+   * @description The ID or name of the table.
+   */
+  tableIdOrName: string;
+
+  /**
+   * @title Record ID
+   * @description The ID of the record to retrieve.
+   */
+  recordId: string;
+}
+
+/**
+ * @title Get Airtable Record
+ * @description Fetches a single record by its ID from a specific table.
+ */
+const loader = async (
+  props: Props,
+  _req: Request,
+  ctx: AppContext,
+): Promise<AirtableRecord> => {
+  const { baseId, tableIdOrName, recordId } = props;
+  const response = await ctx.api["GET /v0/:baseId/:tableIdOrName/:recordId"]({
+    baseId,
+    tableIdOrName,
+    recordId,
+  });
+  return response.json();
+};
+
+export default loader;

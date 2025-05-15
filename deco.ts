@@ -34,6 +34,7 @@ const config = {
     app("konfidency"),
     app("mailchimp"),
     app("ai-assistants"),
+    app("airtable"),
     app("files"),
     app("openai"),
     app("perplexity"),
