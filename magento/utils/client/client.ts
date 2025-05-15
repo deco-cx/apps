@@ -116,6 +116,16 @@ export interface API {
       };
     };
   };
+  "POST /rest/:site/V1/carts/:cartId/items": {
+    response: string;
+    body: {
+      cartItem: {
+        qty: number;
+        quote_id: string;
+        sku: string;
+      };
+    };
+  };
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartscartIditemsitemId#operation/DeleteV1CartsCartIdItemsItemId */
   "DELETE /rest/:site/V1/carts/:cartId/items/:itemId": {
     response: boolean;

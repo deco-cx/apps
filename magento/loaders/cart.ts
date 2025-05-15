@@ -1,3 +1,4 @@
+import { getCookies } from "std/http/cookie.ts";
 import { default as extend } from "../../website/loaders/extension.ts";
 import { AppContext } from "../mod.ts";
 import { handleCartImages } from "../utils/cache.ts";
@@ -8,6 +9,7 @@ import {
   BASE_DISCOUNT_AMOUNT,
   BASE_SHIPPING_AMOUNT,
   COUPON_CODE,
+  CUSTOMER_COOKIE,
   DISCOUNT_AMOUNT,
   GRAND_TOTAL,
   SHIPPING_AMOUNT,
@@ -37,10 +39,12 @@ const loader = async (
   const { clientAdmin, site, cartConfigs, clientAdminAuthenticated } = ctx;
   const { countProductImageInCart, extensions } = cartConfigs;
   const url = new URL(req.url);
+  const cookies = getCookies(req.headers);
   const cartId = _cartId ?? getCartCookie(req.headers);
+  const isLoggedIn = cookies[CUSTOMER_COOKIE];
 
   try {
-    if (!_cartId) {
+    if (!_cartId && isLoggedIn) {
       const headers = new Headers();
       headers.append("Cookie", req.headers.get("Cookie") ?? "");
 
