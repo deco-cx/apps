@@ -55,6 +55,7 @@ export const BASE_CURRENCY_CODE = "base_currency_code";
 export const SKU = "sku";
 export const MEDIA_GALLERY_ENTRIES = "media_gallery_entries";
 export const SESSION_COOKIE = "PHPSESSID";
+export const CUSTOMER_COOKIE = "dataservices_customer_id";
 export const FORM_KEY_COOKIE = "form_key";
 export const COUNTRY_ID = "BR";
 

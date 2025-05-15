@@ -2,7 +2,7 @@ import { getCookies, setCookie } from "std/http/cookie.ts";
 import { Cart } from "../../loaders/cart.ts";
 import { parseCookieString } from "../../middleware.ts";
 import type { AppContext } from "../../mod.ts";
-import { handleCartActions } from "../../utils/cart.ts";
+import { getCartCookie, handleCartActions } from "../../utils/cart.ts";
 import { FORM_KEY_COOKIE } from "../../utils/constants.ts";
 import { HttpError } from "../../../utils/http.ts";
 import { OverrideFeatures } from "../../utils/client/types.ts";
@@ -22,13 +22,14 @@ const action = async (
   req: Request,
   ctx: AppContext,
 ): Promise<Cart | null> => {
-  const { qty, productId, dangerouslyOverrideReturnNull } = props;
+  const { qty, productId, dangerouslyOverrideReturnNull, sku } = props;
   const { headers, url } = req;
-  const { site, baseUrl, features } = ctx;
+  const { site, baseUrl, features, clientAdmin } = ctx;
   const dontReturnCart = dangerouslyOverrideReturnNull ??
     features.dangerouslyReturnNullAfterAction;
 
   const formKey = getCookies(headers)[FORM_KEY_COOKIE] ?? "";
+  const cartId = getCartCookie(req.headers);
 
   const newHeaders = new Headers();
 
@@ -46,6 +47,29 @@ const action = async (
   urlencoded.append("product", productId);
   urlencoded.append("form_key", formKey);
   urlencoded.append("qty", String(qty));
+
+  if (cartId) {
+    const body = {
+      cartItem: {
+        qty: qty,
+        quote_id: cartId,
+        sku: sku,
+      },
+    };
+
+    await clientAdmin["POST /rest/:site/V1/carts/:cartId/items"](
+      {
+        cartId: cartId,
+        site: ctx.site,
+      },
+      { body },
+    );
+
+    return handleCartActions(dontReturnCart, {
+      req,
+      ctx,
+    });
+  }
 
   try {
     const fetchResult = await fetch(
