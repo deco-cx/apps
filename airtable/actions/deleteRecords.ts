@@ -38,6 +38,11 @@ const action = async (
   };
 
   const response = await ctx.api["DELETE /v0/:baseId/:tableIdOrName"](params);
+
+  if (!response.ok) {
+    throw new Error(`Error deleting records: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

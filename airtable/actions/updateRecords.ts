@@ -63,6 +63,11 @@ const action = async (
     { baseId, tableIdOrName },
     { body },
   );
+
+  if (!response.ok) {
+    throw new Error(`Error updating records: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

@@ -31,11 +31,17 @@ const loader = async (
   ctx: AppContext,
 ): Promise<AirtableRecord> => {
   const { baseId, tableIdOrName, recordId } = props;
+
   const response = await ctx.api["GET /v0/:baseId/:tableIdOrName/:recordId"]({
     baseId,
     tableIdOrName,
     recordId,
   });
+
+  if (!response.ok) {
+    throw new Error(`Error getting record: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

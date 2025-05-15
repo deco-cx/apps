@@ -45,6 +45,11 @@ const action = async (
     { baseId, tableIdOrName }, // URL parameters
     { body }, // Request body and other options
   );
+
+  if (!response.ok) {
+    throw new Error(`Error creating record: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

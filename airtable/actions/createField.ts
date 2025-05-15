@@ -44,6 +44,11 @@ const action = async (
       { baseId, tableId }, // URL params
       { body }, // Request body
     );
+
+  if (!response.ok) {
+    throw new Error(`Error creating field: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

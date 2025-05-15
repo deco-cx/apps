@@ -71,6 +71,11 @@ const action = async (
     { baseId }, // URL params
     { body }, // Request body
   );
+
+  if (!response.ok) {
+    throw new Error(`Error creating table: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

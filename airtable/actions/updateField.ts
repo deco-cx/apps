@@ -53,6 +53,11 @@ const action = async (
       { baseId, tableId, fieldId }, // URL params
       { body }, // Request body
     );
+
+  if (!response.ok) {
+    throw new Error(`Error updating field: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

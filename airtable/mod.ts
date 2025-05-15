@@ -1,9 +1,9 @@
 import type { App, FnContext } from "@deco/deco";
+import type { AirtableClient } from "./client.ts";
+import type { Secret } from "../website/loaders/secret.ts";
 import { createHttpClient } from "../utils/http.ts"; // Corrected path
 import { fetchSafe } from "../utils/fetch.ts"; // Corrected path
-import type { Secret } from "./types.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
-import type { AirtableClient } from "./client.ts";
 
 export type AppContext = FnContext<State, Manifest>;
 
@@ -13,14 +13,14 @@ export interface Props {
    * @description The API key for accessing your Airtable account.
    * @format password
    */
-  apiKey: Secret | string;
+  apiKey: string | Secret;
 
   /**
    * @title Airtable Base URL
    * @description The base URL for the Airtable API.
    * @default https://api.airtable.com
    */
-  baseUrl?: string;
+  baseUrl: string;
 }
 
 export interface State {
@@ -52,7 +52,7 @@ export default function App(props: Props): App<Manifest, State> {
 
   const state: State = {
     api,
-    apiKey: resolvedApiKey,
+    apiKey: resolvedApiKey || "",
     baseUrl: resolvedBaseUrl,
   };
 

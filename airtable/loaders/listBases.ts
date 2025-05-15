@@ -19,6 +19,11 @@ const loader = async (
   const response = await ctx.api["GET /v0/meta/bases"](
     props.offset ? { offset: props.offset } : {},
   );
+
+  if (!response.ok) {
+    throw new Error(`Error listing bases: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

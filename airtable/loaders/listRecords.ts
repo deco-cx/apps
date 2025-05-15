@@ -34,6 +34,11 @@ const loader = async (
     baseId, // Para o path parameter :baseId
     tableIdOrName, // Para o path parameter :tableIdOrName
   });
+
+  if (!response.ok) {
+    throw new Error(`Error listing records: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

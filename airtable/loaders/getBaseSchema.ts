@@ -25,6 +25,11 @@ const loader = async (
     params.offset = offset;
   }
   const response = await ctx.api["GET /v0/meta/bases/:baseId/tables"](params);
+
+  if (!response.ok) {
+    throw new Error(`Error getting base schema: ${response.statusText}`);
+  }
+
   return response.json();
 };
 

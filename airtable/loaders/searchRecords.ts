@@ -83,6 +83,11 @@ const loader = async (
     baseId,
     tableIdOrName,
   });
+
+  if (!response.ok) {
+    throw new Error(`Error searching records: ${response.statusText}`);
+  }
+
   return response.json();
 };
 
