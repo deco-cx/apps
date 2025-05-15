@@ -22,7 +22,6 @@ const buildSiteMap = (urls: string[]) => {
   return entries.join("\n");
 };
 
-
 const sanitize = (url: string) => {
   const withSlash = url.startsWith("/") ? url : `/${url}`;
   // Replace & with &amp;
