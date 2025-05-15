@@ -21,7 +21,7 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<PaginatedResponseOfPurchaseQuotationWithNegotiation> => {
-  const client = createPurchaseQuotationsClient(ctx.state);
+  const client = createPurchaseQuotationsClient(ctx);
   const response = await client["GET /purchase-quotations/all/negotiations"]({
     ...props,
   });

@@ -1,9 +1,11 @@
 import { type RequestInit } from "@deco/deco";
 import { fetchSafe } from "./fetch.ts";
 
-// Check if DEBUG env var is set
-const DEBUG = Deno.env.get("DEBUG") === "true";
-console.log("DEBUG mode is:", DEBUG ? "enabled" : "disabled");
+// Check if DEBUG_HTTP env var is set
+const DEBUG_HTTP = Deno.env.get("DEBUG_HTTP") === "true";
+if (DEBUG_HTTP) {
+  console.log("DEBUG_HTTP mode is:", DEBUG_HTTP ? "enabled" : "disabled");
+}
 
 const HTTP_VERBS = new Set(
   [
@@ -94,7 +96,7 @@ function debugRequest(
   headers: Headers,
   body?: BodyInit | null,
 ): void {
-  // if (!DEBUG) return;
+  // if (!DEBUG_HTTP) return;
   console.log("Calling debugRequest for URL:", url);
 
   console.log("\n----- HTTP Request -----");
@@ -133,15 +135,11 @@ export const createHttpClient = <T>(
     keepEmptySegments,
   }: HttpClientOptions,
 ): ClientOf<T> => {
-  console.log("Creating HTTP client with base:", maybeBase);
   // Base should always endwith / so when concatenating with path we get the right URL
   const base = maybeBase.at(-1) === "/" ? maybeBase : `${maybeBase}/`;
-  console.log("Normalized base URL:", base);
 
   return new Proxy({} as ClientOf<T>, {
     get: (_target, prop) => {
-      console.log("Accessing endpoint:", prop);
-
       if (prop === Symbol.toStringTag || prop === Symbol.toPrimitive) {
         return `HttpClient: ${base}`;
       }
@@ -149,7 +147,6 @@ export const createHttpClient = <T>(
         throw new TypeError(`HttpClient: Uknown path ${typeof prop}`);
       }
       const [method, path] = prop.split(" ");
-      console.log(`Method: ${method}, Path: ${path}`);
 
       // @ts-expect-error if not inside, throws
       if (!HTTP_VERBS.has(method)) {
@@ -159,28 +156,19 @@ export const createHttpClient = <T>(
         params: Record<string, string | number | string[] | number[]>,
         init?: RequestInit,
       ) => {
-        console.log("Request initiated with params:", JSON.stringify(params));
-
         const mapped = new Map(Object.entries(params));
-        console.log("Mapped params:", [...mapped.entries()]);
 
         const compiled = path
           .split("/")
           .flatMap((segment) => {
-            console.log("Processing segment:", segment);
-
             const isTemplate = segment.at(0) === ":" || segment.at(0) === "*";
             const isRequred = segment.at(-1) !== "?";
             if (!isTemplate) {
               return segment;
             }
             const name = segment.slice(1, !isRequred ? -1 : undefined);
-            console.log(`Found template: ${name}, required: ${isRequred}`);
 
             const param = mapped.get(name);
-            console.log(`Value for ${name}:`, param);
-
-            mapped.delete(name);
             if (param === undefined && isRequred) {
               throw new TypeError(`HttpClient: Missing ${name} at ${path}`);
             }
@@ -193,10 +181,7 @@ export const createHttpClient = <T>(
           )
           .join("/");
 
-        console.log("Compiled path:", compiled);
-
         const url = new URL(compiled, base);
-        console.log("Initial URL:", url.toString());
 
         mapped.forEach((value, key) => {
           if (value === undefined) {
@@ -206,8 +191,6 @@ export const createHttpClient = <T>(
           arrayed.forEach((item) => url.searchParams.append(key, `${item}`));
         });
 
-        console.log("Final URL with query params:", url.toString());
-
         const isJSON = init?.body != null &&
           typeof init.body !== "string" &&
           !(init.body instanceof ReadableStream) &&
@@ -216,28 +199,16 @@ export const createHttpClient = <T>(
           !(init.body instanceof Blob) &&
           !(init.body instanceof ArrayBuffer);
 
-        console.log("Is JSON body:", isJSON);
-
         const headers = new Headers(init?.headers);
         defaultHeaders?.forEach((value, key) => headers.set(key, value));
         isJSON && headers.set("content-type", "application/json");
 
-        console.log("Headers:", [...headers.entries()]);
-
         const body = isJSON ? JSON.stringify(init.body) : init?.body;
-        console.log("Body prepared:", body ? "present" : "none");
 
-        console.log("Final URL to fetch:", url.href);
-
-        // Debug log if DEBUG is enabled
-        if (DEBUG) {
-          console.log("DEBUG is enabled, calling debugRequest");
+        // Debug log if DEBUG_HTTP is enabled
+        if (DEBUG_HTTP) {
           debugRequest(url.href, method, headers, body);
-        } else {
-          console.log("DEBUG is disabled, skipping debugRequest");
         }
-
-        console.log("Calling fetcher with URL:", url.href);
 
         return fetcher(url.href, {
           ...init,
