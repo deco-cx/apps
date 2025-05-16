@@ -56,7 +56,6 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  // State that will be available in all loaders and actions
   const state: State = {
     phoneNumberId,
     apiVersion,
@@ -69,5 +68,4 @@ export default function App(props: Props): App<Manifest, State> {
   };
 }
 
-// Re-export types from client for convenience
 export * from "./client.ts";
