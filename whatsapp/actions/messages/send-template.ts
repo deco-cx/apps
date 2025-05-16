@@ -3,7 +3,7 @@ import type {
   MessageResponse,
   Template,
   TemplateComponent,
-} from "../../client.ts";
+} from "../../types.ts";
 
 export interface Props {
   /**

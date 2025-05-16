@@ -1,5 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import type { MessageResponse } from "../../client.ts";
+import type { MessageResponse } from "../../types.ts";
 
 export type MediaType = "image" | "audio" | "video" | "document" | "sticker";
 

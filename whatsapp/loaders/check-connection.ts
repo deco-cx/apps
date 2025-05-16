@@ -18,19 +18,14 @@ export default async function checkConnection(
   _ctx: AppContext,
 ): Promise<boolean> {
   try {
-    // Open KV store
     const kv = await Deno.openKv();
 
-    // Create key for lookup - using a namespaced approach
     const key = ["whatsapp", "connections", userId];
 
-    // Check if the key exists in KV store
     const result = await kv.get(key);
 
-    // If the value is not null, the user has a mobile number connected
     const hasConnection = result.value !== null;
 
-    // Close the KV connection
     kv.close();
 
     return hasConnection;

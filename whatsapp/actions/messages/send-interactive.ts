@@ -6,7 +6,7 @@ import type {
   InteractiveHeader,
   MessageResponse,
   Section,
-} from "../../client.ts";
+} from "../../types.ts";
 
 export type InteractiveType = "button" | "list";
 
