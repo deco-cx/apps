@@ -464,8 +464,16 @@ export interface WhatsAppClient {
     body: {
       messaging_product: "whatsapp";
       recipient_type?: "individual";
-      to: string;
-      type: MessageType;
+      to?: string;
+      type?: MessageType;
+      status?: "read";
+      message_id?: string;
+      typing_indicator?: {
+        type: "text";
+      };
+      context?: {
+        message_id: string;
+      };
       text?: TextMessage;
       image?: Media;
       audio?: Media;
@@ -486,19 +494,27 @@ export interface WhatsAppClient {
         message_id: string;
         emoji: string;
       };
-      context?: {
-        message_id: string;
-      };
     };
   };
 
-  // Mark message as read
+  // Upload Media
+  "POST /:phone_number_id/media": {
+    response: {
+      id: string;
+    };
+    body: FormData;
+  };
+
+  // Mark message as read and show typing indicator
   "POST /:phone_number_id/messages/mark_read": {
     response: MessageResponse;
     body: {
       messaging_product: "whatsapp";
       status: "read";
       message_id: string;
+      typing_indicator?: {
+        type: "text";
+      };
     };
   };
 

@@ -5,6 +5,7 @@ interface QueuedMessage {
   text: string;
   req: Request;
   ctx: AppContext;
+  replyToMessageId?: string;
 }
 
 /**
@@ -75,8 +76,14 @@ export class MessageQueue {
     message: QueuedMessage,
   ): Promise<void> {
     try {
-      const { text, req, ctx } = message;
-      await WebhookService.sendMessage(text, userId, req, ctx);
+      const { text, req, ctx, replyToMessageId } = message;
+      await WebhookService.sendMessage(
+        text,
+        userId,
+        req,
+        ctx,
+        replyToMessageId,
+      );
     } catch (error) {
       console.error(`Error processing message for user ${userId}:`, error);
     } finally {

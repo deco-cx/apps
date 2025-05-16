@@ -10,14 +10,24 @@ import { MessageQueue } from "../utils/message-queue.ts";
 // Track processed message IDs to prevent duplicates
 const processedMessageIds = new Set<string>();
 
+interface ToolResultListener {
+  (part: DataStreamPartType): void;
+}
+
+declare global {
+  var toolResultListeners: Map<string, ToolResultListener>;
+}
+
 /**
  * Service class to handle webhook-related operations
  */
 export class WebhookService {
   private static readonly WEBHOOK_URL =
-    "http://localhost:3001/actors/Trigger/invoke/run?passphrase=cc-guy&deno_isolate_instance_id=/users/d9064704-4fdd-45e1-9ae5-df90b6be42e3/Agents/bd35b510-917a-4cce-ac89-9c8aebe2b3ff/triggers/8b2e47ee-6b33-484f-97d0-5c941efbd5bc&stream=true&bypassOpenRouter=true&threadId=1234";
+    "http://localhost:3001/actors/Trigger/invoke/run?passphrase=cc-guy&deno_isolate_instance_id=/users/d9064704-4fdd-45e1-9ae5-df90b6be42e3/Agents/bd35b510-917a-4cce-ac89-9c8aebe2b3ff/triggers/8b2e47ee-6b33-484f-97d0-5c941efbd5bc&stream=true&bypassOpenRouter=true&threadId=3334";
   private static readonly MAX_RETRIES = 3;
   private static readonly RETRY_DELAY = 1000; // 1 second
+  private static readonly TYPING_INDICATOR_INTERVAL = 20000; // 20 seconds
+  private static readonly TYPING_INDICATOR_TIMEOUT = 25000; // 25 seconds
 
   /**
    * Sends a message to the webhook and processes the stream response
@@ -25,6 +35,7 @@ export class WebhookService {
    * @param from The sender's phone number
    * @param req The request object
    * @param ctx The application context
+   * @param replyToMessageId The ID of the message to reply to
    * @returns The processed message from the stream
    */
   static async sendMessage(
@@ -32,9 +43,15 @@ export class WebhookService {
     from: string,
     req: Request,
     ctx: AppContext,
+    replyToMessageId?: string,
   ): Promise<string> {
     let retries = 0;
     let lastError: Error | null = null;
+    let typingIndicatorInterval: number | null = null;
+    let typingIndicatorTimeout: number | null = null;
+    // deno-lint-ignore no-unused-vars
+    let lastMessageTime = Date.now();
+    let buffer = ""; // Buffer for incomplete JSON chunks
 
     while (retries < this.MAX_RETRIES) {
       try {
@@ -44,7 +61,13 @@ export class WebhookService {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ messages: [{ role: "user", content: text }] }),
+          body: JSON.stringify({
+            messages: [{
+              role: "user",
+              content: text,
+              id: crypto.randomUUID(),
+            }],
+          }),
         });
 
         if (!response.ok) {
@@ -77,9 +100,16 @@ export class WebhookService {
             const chunk = decoder.decode(value, { stream: true });
             console.log("Stream chunk:", chunk);
 
-            const lines = chunk.split("\n").filter((line) => line.trim());
+            // Add chunk to buffer and try to process complete lines
+            buffer += chunk;
+            const lines = buffer.split("\n");
+
+            // Keep the last line in the buffer if it's incomplete
+            buffer = lines.pop() || "";
 
             for (const line of lines) {
+              if (!line.trim()) continue;
+
               try {
                 const streamPart = parseDataStreamPart(line);
                 if (streamPart.type === "text") {
@@ -88,10 +118,12 @@ export class WebhookService {
                 } else {
                   if (textBuffer) {
                     // Send message without awaiting to avoid blocking the stream
+                    lastMessageTime = Date.now();
                     sendTextMessage(
                       {
                         to: from,
                         text: cleanMessage(textBuffer),
+                        replyToMessageId,
                       },
                       req,
                       ctx,
@@ -106,11 +138,49 @@ export class WebhookService {
                     from,
                     req,
                     ctx,
+                    replyToMessageId,
                   );
                 }
               } catch (error) {
                 console.error("Error parsing stream part:", error);
+                // If we get a parsing error, try to accumulate more data
+                buffer = line + "\n" + buffer;
               }
+            }
+          }
+
+          // Process any remaining data in the buffer
+          if (buffer.trim()) {
+            try {
+              const streamPart = parseDataStreamPart(buffer);
+              if (streamPart.type === "text") {
+                textBuffer += streamPart.value;
+                completeMessage += streamPart.value;
+              } else {
+                if (textBuffer) {
+                  lastMessageTime = Date.now();
+                  await sendTextMessage(
+                    {
+                      to: from,
+                      text: cleanMessage(textBuffer),
+                      replyToMessageId,
+                    },
+                    req,
+                    ctx,
+                  );
+                  textBuffer = "";
+                }
+                await handleStreamPart(
+                  streamPart,
+                  completeMessage,
+                  from,
+                  req,
+                  ctx,
+                  replyToMessageId,
+                );
+              }
+            } catch (error) {
+              console.error("Error parsing final buffer:", error);
             }
           }
         } catch (streamError) {
@@ -119,12 +189,24 @@ export class WebhookService {
             throw streamError;
           }
         } finally {
+          // Clear typing indicator interval and timeout
+          if (typingIndicatorInterval) {
+            clearInterval(typingIndicatorInterval);
+            typingIndicatorInterval = null;
+          }
+          if (typingIndicatorTimeout) {
+            clearTimeout(typingIndicatorTimeout);
+            typingIndicatorTimeout = null;
+          }
+
           // Send any remaining text in the buffer
           if (textBuffer) {
+            lastMessageTime = Date.now();
             await sendTextMessage(
               {
                 to: from,
                 text: cleanMessage(textBuffer),
+                replyToMessageId,
               },
               req,
               ctx,
@@ -212,6 +294,9 @@ export default async function webhook(
         setTimeout(() => {
           processedMessageIds.delete(message.id);
         }, 5 * 60 * 1000);
+
+        // Mark message as read
+        await markMessageAsRead(message.id, ctx);
       }
 
       const mediaId = message.image?.id;
@@ -232,7 +317,7 @@ export default async function webhook(
       }
 
       if (message.type === "text" && message.text) {
-        const { from, text: { body: text } } = message;
+        const { from, text: { body: text }, id: messageId } = message;
         console.log("Text", text);
         console.log({ text });
 
@@ -242,6 +327,7 @@ export default async function webhook(
             text,
             req,
             ctx,
+            replyToMessageId: messageId, // Pass the message ID for contextual replies
           });
           return ResponseHandler.success();
         } catch (error) {
@@ -267,14 +353,16 @@ export default async function webhook(
  * @param from The sender's phone number
  * @param req The request object
  * @param ctx The application context
+ * @param originalMessageId The original message ID for contextual replies
  * @returns The updated message after processing the stream part
  */
 async function handleStreamPart(
   streamPart: DataStreamPartType,
   currentMessage: string,
-  _from: string,
+  from: string,
   _req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
+  originalMessageId?: string,
 ): Promise<string> {
   switch (streamPart.type) {
     case "text":
@@ -297,6 +385,79 @@ async function handleStreamPart(
       break;
     case "tool_call":
       console.log("Tool call:", streamPart.value);
+      if (
+        streamPart.value.toolName === "RENDER" &&
+        streamPart.value.args.mediaType === "image"
+      ) {
+        console.log("Detected RENDER tool call with image mediaType");
+        try {
+          // First, download the image from the URL
+          const imageResponse = await fetch(streamPart.value.args.content);
+          if (!imageResponse.ok) {
+            throw new Error(
+              `Failed to download image: ${imageResponse.statusText}`,
+            );
+          }
+          const imageBlob = await imageResponse.blob();
+
+          // Create FormData for the upload
+          const formData = new FormData();
+          formData.append("messaging_product", "whatsapp");
+          formData.append("type", "image/png");
+          formData.append(
+            "file",
+            new File([imageBlob], "image.png", { type: "image/png" }),
+          );
+
+          // Upload the image to WhatsApp using the API client
+          console.log("Uploading image to WhatsApp...");
+          const uploadResponse = await ctx.api["POST /:phone_number_id/media"]({
+            phone_number_id: ctx.phoneNumberId,
+          }, {
+            body: formData,
+          });
+
+          if (!uploadResponse.ok) {
+            const error = await uploadResponse.json();
+            throw new Error(`Failed to upload image: ${JSON.stringify(error)}`);
+          }
+
+          const { id: mediaId } = await uploadResponse.json();
+          console.log("Image uploaded successfully, media ID:", mediaId);
+
+          // Send the image message using the media ID
+          const messageResponse = await ctx.api
+            ["POST /:phone_number_id/messages"]({
+              phone_number_id: ctx.phoneNumberId,
+            }, {
+              body: {
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: from,
+                type: "image",
+                image: {
+                  id: mediaId,
+                  caption: streamPart.value.args.title,
+                },
+                ...(originalMessageId
+                  ? {
+                    context: {
+                      message_id: originalMessageId,
+                    },
+                  }
+                  : {}),
+              },
+            });
+
+          const result = await messageResponse.json();
+          console.log("Image message sent successfully:", result);
+          if (!messageResponse.ok) {
+            console.error("Failed to send image message:", result);
+          }
+        } catch (error) {
+          console.error("Error processing image message:", error);
+        }
+      }
       break;
     case "tool_result":
       console.log("Tool result:", streamPart.value);
@@ -322,4 +483,37 @@ function cleanMessage(message: string): string {
     .replace(/\s+([.,!?])/g, "$1") // Fix spacing before punctuation
     .replace(/([.,!?])\s+/g, "$1 ") // Fix spacing after punctuation
     .trim(); // Final trim
+}
+
+/**
+ * Marks a message as read and shows typing indicator using the WhatsApp API
+ * @param messageId The ID of the message to mark as read
+ * @param ctx The application context
+ */
+async function markMessageAsRead(
+  messageId: string,
+  ctx: AppContext,
+): Promise<void> {
+  try {
+    const response = await ctx.api["POST /:phone_number_id/messages"]({
+      phone_number_id: ctx.phoneNumberId,
+    }, {
+      body: {
+        messaging_product: "whatsapp",
+        status: "read",
+        message_id: messageId,
+        typing_indicator: {
+          type: "text",
+        },
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Failed to mark message as read:", await response.json());
+    } else {
+      console.log("Message marked as read and typing indicator shown");
+    }
+  } catch (error) {
+    console.error("Error marking message as read:", error);
+  }
 }
