@@ -301,6 +301,9 @@ const action = async (
 export default action;
 ```
 
+If a method has no props, just don't type the Props. Don't export an empty
+interface.
+
 ### deco.ts
 
 In root `deco.ts`, add a new entry for the newly created app.
