@@ -814,6 +814,16 @@ export interface TinyClient {
     };
   };
 
+  "POST /notas/xml": {
+    response: {
+      idNota: number;
+    };
+    body: {
+      xml: string;
+      numeroPedido?: number;
+    };
+  };
+
   "GET /notas/:idNota/marcadores": {
     response: {
       id: number;

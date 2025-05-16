@@ -25,7 +25,13 @@ const action = async (
       body: props,
     });
 
-    return await response.json();
+    const data = await response.json();
+
+    // Transform the API response to match the expected return type
+    return {
+      id: data.idNota,
+      numero: String(data.idNota), // Using the ID as a string since the API doesn't return a numero field
+    };
   } catch (error) {
     console.error("Erro ao incluir nota fiscal a partir de XML:", error);
     throw error;
