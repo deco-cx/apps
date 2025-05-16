@@ -5,7 +5,18 @@ export interface Props {
   nome: string;
   preco: number;
   precoCusto?: number;
-  descricao?: string;
+  /**
+   * Product description - required field
+   */
+  descricao: string;
+  /**
+   * @description Product type - required field. Possible values: "S": Simples (Simple product), "K": Kit (Product kit/bundle), "V": Com variações (Product with variations), "F": Fabricado (Manufactured product) - may not be available, "M": Matéria-prima (Raw material)
+   */
+  tipo: string;
+  /**
+   * Stock Keeping Unit - required field
+   */
+  sku: string;
   unidade?: string;
   peso?: number;
   gtin?: string;
@@ -14,20 +25,28 @@ export interface Props {
   ativo?: boolean;
 }
 
+interface VariacaoProduto {
+  id: number;
+  codigo: string;
+  descricao: string;
+}
+
 interface ProdutoResponse {
   id: number;
   codigo?: string;
-  nome: string;
-  preco: number;
-  precoCusto?: number;
   descricao?: string;
+  // The other fields might not be returned in the response
+  nome?: string;
+  preco?: number;
+  precoCusto?: number;
   unidade?: string;
   peso?: number;
   gtin?: string;
   idMarca?: number;
   idCategoria?: number;
-  ativo: boolean;
-  dataCriacao: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  variacoes?: VariacaoProduto[];
 }
 
 /**
@@ -50,7 +69,8 @@ const action = async (
       );
     }
 
-    return await response.json();
+    const responseData = await response.json();
+    return responseData as ProdutoResponse;
   } catch (error) {
     console.error("Error creating product:", error);
     throw error;
