@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("sheet-db-sienge"),
     app("discohook"),
     app("js-bundler"),
     app("jira"),
