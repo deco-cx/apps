@@ -24,7 +24,7 @@ export interface Props {
 }
 
 export interface State {
-  api: ReturnType<typeof createHttpClient<AirtableClient>>;
+  api: (apiKey: string) => ReturnType<typeof createHttpClient<AirtableClient>>;
   apiKey: string; // Store the resolved API key
   baseUrl: string;
 }
@@ -41,14 +41,21 @@ export default function App(props: Props): App<Manifest, State> {
     : props.apiKey.get();
   const resolvedBaseUrl = props.baseUrl || "https://api.airtable.com";
 
-  const api = createHttpClient<AirtableClient>({
-    base: resolvedBaseUrl,
-    headers: new Headers({
-      "Authorization": `Bearer ${resolvedApiKey}`,
-      "Content-Type": "application/json",
-    }),
-    fetcher: fetchSafe,
-  });
+  const createClientWithHeaders = (headers: Headers) => {
+    return createHttpClient<AirtableClient>({
+      base: resolvedBaseUrl,
+      fetcher: fetchSafe,
+      headers,
+    });
+  };
+
+  const api = (apiKey: string) =>
+    createClientWithHeaders(
+      new Headers({
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      }),
+    );
 
   const state: State = {
     api,

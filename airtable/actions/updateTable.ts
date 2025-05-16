@@ -30,6 +30,11 @@ interface Props {
    * @description Optional. ID of an existing field to be set as the new primary field.
    */
   primaryFieldId?: string;
+
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
 }
 
 /**
@@ -38,10 +43,17 @@ interface Props {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<Table> => {
-  const { baseId, tableId, name, description, primaryFieldId } = props;
+): Promise<Table | Response> => {
+  const { baseId, tableId, name, description, primaryFieldId, apiKey } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   const body: UpdateTableBody = {};
   if (name) body.name = name;
@@ -54,7 +66,7 @@ const action = async (
     );
   }
 
-  const response = await ctx.api
+  const response = await ctx.api(resolvedApiKey)
     ["PATCH /v0/meta/bases/:baseId/tables/:tableId"](
       { baseId, tableId }, // URL params
       { body }, // Request body

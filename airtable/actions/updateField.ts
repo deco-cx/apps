@@ -18,6 +18,10 @@ interface Props extends UpdateFieldBody {
    * @description The ID of the field to update.
    */
   fieldId: string;
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
   // name, description are inherited from UpdateFieldBody
   // type and options changes are complex and generally not advised via simple updates.
 }
@@ -29,10 +33,17 @@ interface Props extends UpdateFieldBody {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<Field> => {
-  const { baseId, tableId, fieldId, name, description } = props;
+): Promise<Field | Response> => {
+  const { baseId, tableId, fieldId, name, description, apiKey } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   const body: UpdateFieldBody = {};
   if (name) {
@@ -48,7 +59,7 @@ const action = async (
     );
   }
 
-  const response = await ctx.api
+  const response = await ctx.api(resolvedApiKey)
     ["PATCH /v0/meta/bases/:baseId/tables/:tableId/fields/:fieldId"](
       { baseId, tableId, fieldId }, // URL params
       { body }, // Request body

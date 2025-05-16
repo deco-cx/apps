@@ -36,6 +36,11 @@ interface Props {
   performUpsert?: {
     fieldsToMergeOn: string[];
   };
+
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
 }
 
 /**
@@ -44,10 +49,18 @@ interface Props {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<{ records: AirtableRecord[] }> => {
-  const { baseId, tableIdOrName, records, typecast, performUpsert } = props;
+): Promise<{ records: AirtableRecord[] } | Response> => {
+  const { baseId, tableIdOrName, records, typecast, performUpsert, apiKey } =
+    props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   const body: UpdateRecordsBody = {
     records,
@@ -59,10 +72,11 @@ const action = async (
     body.performUpsert = performUpsert;
   }
 
-  const response = await ctx.api["PATCH /v0/:baseId/:tableIdOrName"](
-    { baseId, tableIdOrName },
-    { body },
-  );
+  const response = await ctx.api(resolvedApiKey)
+    ["PATCH /v0/:baseId/:tableIdOrName"](
+      { baseId, tableIdOrName },
+      { body },
+    );
 
   if (!response.ok) {
     throw new Error(`Error updating records: ${response.statusText}`);

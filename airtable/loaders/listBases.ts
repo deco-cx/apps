@@ -5,6 +5,10 @@ interface Props {
   // If the API supports pagination for bases via offset, it could be a prop here.
   // For now, let's assume we fetch all or the first page as per client default.
   offset?: string;
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
 }
 
 /**
@@ -13,11 +17,20 @@ interface Props {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<ListBasesResponse> => {
-  const response = await ctx.api["GET /v0/meta/bases"](
-    props.offset ? { offset: props.offset } : {},
+): Promise<ListBasesResponse | Response> => {
+  const { apiKey, offset } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
+
+  const response = await ctx.api(resolvedApiKey)["GET /v0/meta/bases"](
+    offset ? { offset: offset } : {},
   );
 
   if (!response.ok) {

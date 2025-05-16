@@ -13,6 +13,10 @@ interface Props extends CreateFieldBody {
    * @description The ID of the table to add the field to.
    */
   tableId: string;
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
   // name, type, description, options are inherited from CreateFieldBody
 }
 
@@ -23,10 +27,17 @@ interface Props extends CreateFieldBody {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<Field> => {
-  const { baseId, tableId, name, type, description, options } = props;
+): Promise<Field | Response> => {
+  const { baseId, tableId, name, type, description, options, apiKey } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   const body: CreateFieldBody = {
     name,
@@ -39,7 +50,7 @@ const action = async (
     body.options = options;
   }
 
-  const response = await ctx.api
+  const response = await ctx.api(resolvedApiKey)
     ["POST /v0/meta/bases/:baseId/tables/:tableId/fields"](
       { baseId, tableId }, // URL params
       { body }, // Request body

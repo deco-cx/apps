@@ -3,6 +3,11 @@ import type { AirtableRecord } from "../types.ts";
 
 interface Props {
   /**
+   * @title API Key
+   */
+  apiKey?: string;
+
+  /**
    * @title Base ID
    * @description The ID of the Airtable base.
    */
@@ -27,16 +32,24 @@ interface Props {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<AirtableRecord> => {
-  const { baseId, tableIdOrName, recordId } = props;
+): Promise<AirtableRecord | Response> => {
+  const { baseId, tableIdOrName, recordId, apiKey } = props;
 
-  const response = await ctx.api["GET /v0/:baseId/:tableIdOrName/:recordId"]({
-    baseId,
-    tableIdOrName,
-    recordId,
-  });
+  const authHeader = req?.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
+
+  const response = await ctx.api(resolvedApiKey)
+    ["GET /v0/:baseId/:tableIdOrName/:recordId"]({
+      baseId,
+      tableIdOrName,
+      recordId,
+    });
 
   if (!response.ok) {
     throw new Error(`Error getting record: ${response.statusText}`);

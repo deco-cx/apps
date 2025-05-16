@@ -13,6 +13,11 @@ interface Props extends ListRecordsOptions {
    * @description The ID or name of the table (e.g., tblXXXXXXXXXXXXXX or "Table Name").
    */
   tableIdOrName: string;
+
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
 }
 
 /**
@@ -21,19 +26,27 @@ interface Props extends ListRecordsOptions {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<ListRecordsResponse> => {
-  const { baseId, tableIdOrName, ...searchOptions } = props;
+): Promise<ListRecordsResponse | Response> => {
+  const { baseId, tableIdOrName, apiKey, ...searchOptions } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   // searchOptions já é do tipo ListRecordsOptions (ou um subconjunto dele)
   // Os parâmetros baseId e tableIdOrName são passados na URL.
   // O objeto passado para a API deve conter os parâmetros de path e os de query (searchOptions).
-  const response = await ctx.api["GET /v0/:baseId/:tableIdOrName"]({
-    ...searchOptions, // Contém os parâmetros de ListRecordsOptions
-    baseId, // Para o path parameter :baseId
-    tableIdOrName, // Para o path parameter :tableIdOrName
-  });
+  const response = await ctx.api(resolvedApiKey)
+    ["GET /v0/:baseId/:tableIdOrName"]({
+      ...searchOptions, // Contém os parâmetros de ListRecordsOptions
+      baseId, // Para o path parameter :baseId
+      tableIdOrName, // Para o path parameter :tableIdOrName
+    });
 
   if (!response.ok) {
     throw new Error(`Error listing records: ${response.statusText}`);

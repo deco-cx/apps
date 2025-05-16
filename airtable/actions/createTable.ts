@@ -37,15 +37,29 @@ interface Props {
 }
 
 /**
+ * @title API Key
+ */
+interface PropsWithApiKey extends Props {
+  apiKey?: string;
+}
+
+/**
  * @title Create Airtable Table
  * @description Creates a new table within a specified base (Metadata API).
  */
 const action = async (
-  props: Props,
-  _req: Request,
+  props: PropsWithApiKey,
+  req: Request,
   ctx: AppContext,
-): Promise<Table> => {
-  const { baseId, name, description, fields } = props;
+): Promise<Table | Response> => {
+  const { baseId, name, description, fields, apiKey } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   // The client expects `body: CreateTableBody`
   // CreateTableBody is { name: string, description?: string, fields: Field[], primaryFieldId?: string }
@@ -67,10 +81,11 @@ const action = async (
   // For now, this example will omit direct primaryFieldId setting from Props to simplify, assuming field definitions suffice or a default is used.
   // If `primaryFieldNameOrId` was intended to be `primaryFieldId` from `CreateTableBody` it should be named so in `Props`.
 
-  const response = await ctx.api["POST /v0/meta/bases/:baseId/tables"](
-    { baseId }, // URL params
-    { body }, // Request body
-  );
+  const response = await ctx.api(resolvedApiKey)
+    ["POST /v0/meta/bases/:baseId/tables"](
+      { baseId }, // URL params
+      { body }, // Request body
+    );
 
   if (!response.ok) {
     throw new Error(`Error creating table: ${response.statusText}`);

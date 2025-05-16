@@ -23,6 +23,11 @@ interface Props {
    * @description Optional. If true, Airtable will attempt to convert cell values to the appropriate type.
    */
   typecast?: boolean;
+
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
 }
 
 /**
@@ -31,20 +36,28 @@ interface Props {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<AirtableRecord> => {
-  const { baseId, tableIdOrName, fields, typecast } = props;
+): Promise<AirtableRecord | Response> => {
+  const { baseId, tableIdOrName, fields, typecast, apiKey } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   const body = {
     fields,
     ...(typecast !== undefined && { typecast }),
   };
 
-  const response = await ctx.api["POST /v0/:baseId/:tableIdOrName"](
-    { baseId, tableIdOrName }, // URL parameters
-    { body }, // Request body and other options
-  );
+  const response = await ctx.api(resolvedApiKey)
+    ["POST /v0/:baseId/:tableIdOrName"](
+      { baseId, tableIdOrName }, // URL parameters
+      { body }, // Request body and other options
+    );
 
   if (!response.ok) {
     throw new Error(`Error creating record: ${response.statusText}`);

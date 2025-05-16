@@ -16,6 +16,11 @@ interface Props {
    * @description An array of record IDs to be deleted.
    */
   recordIds: string[];
+
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
 }
 
 /**
@@ -24,10 +29,17 @@ interface Props {
  */
 const action = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<{ records: Array<{ id: string; deleted: boolean }> }> => {
-  const { baseId, tableIdOrName, recordIds } = props;
+): Promise<{ records: Array<{ id: string; deleted: boolean }> } | Response> => {
+  const { baseId, tableIdOrName, recordIds, apiKey } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   // The client expects searchParams: { "records[]": string[] }
   // The parameters to the client call should be flat, including URL params and searchParams
@@ -37,7 +49,10 @@ const action = async (
     "records[]": recordIds,
   };
 
-  const response = await ctx.api["DELETE /v0/:baseId/:tableIdOrName"](params);
+  const response = await ctx.api(resolvedApiKey)
+    ["DELETE /v0/:baseId/:tableIdOrName"](
+      params,
+    );
 
   if (!response.ok) {
     throw new Error(`Error deleting records: ${response.statusText}`);

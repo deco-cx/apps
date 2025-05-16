@@ -23,6 +23,11 @@ interface Props extends Omit<ListRecordsOptions, "filterByFormula"> {
    * @description Optional. Array of field names (or IDs) to search within. If empty, attempts to search in all text-based fields.
    */
   searchFields?: string[];
+
+  /**
+   * @title API Key
+   */
+  apiKey?: string;
 }
 
 // Helper to escape search term for formula
@@ -36,11 +41,24 @@ function escapeAirtableFormulaValue(term: string): string {
  */
 const loader = async (
   props: Props,
-  _req: Request,
+  req: Request,
   ctx: AppContext,
-): Promise<ListRecordsResponse> => {
-  const { baseId, tableIdOrName, searchTerm, searchFields, ...otherOptions } =
-    props;
+): Promise<ListRecordsResponse | Response> => {
+  const {
+    baseId,
+    tableIdOrName,
+    searchTerm,
+    searchFields,
+    apiKey,
+    ...otherOptions
+  } = props;
+
+  const authHeader = req.headers.get("Authorization")?.split(" ")[1];
+  const resolvedApiKey = authHeader || apiKey;
+
+  if (!resolvedApiKey) {
+    return new Response("API Key is required", { status: 403 });
+  }
 
   let filterByFormula = "";
   const escapedSearchTerm = escapeAirtableFormulaValue(searchTerm);
@@ -78,11 +96,12 @@ const loader = async (
     params.filterByFormula = filterByFormula;
   }
 
-  const response = await ctx.api["GET /v0/:baseId/:tableIdOrName"]({
-    ...params,
-    baseId,
-    tableIdOrName,
-  });
+  const response = await ctx.api(resolvedApiKey)
+    ["GET /v0/:baseId/:tableIdOrName"]({
+      ...params,
+      baseId,
+      tableIdOrName,
+    });
 
   if (!response.ok) {
     throw new Error(`Error searching records: ${response.statusText}`);
