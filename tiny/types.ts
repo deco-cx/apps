@@ -314,42 +314,129 @@ export interface ListagemContatoModelResponse {
 }
 
 export interface CriarContatoModelRequest {
-  codigo?: string;
   nome: string;
+  codigo?: string;
   fantasia?: string;
-  tipo: string;
-  classificacao?: string;
-  situacao?: string;
+  /**
+   * @description Allowed values: J (Pessoa Jurídica), F (Pessoa Física), E (Estrangeiro), X (Estrangeiro no Brasil)
+   */
+  tipoPessoa?: string;
   cpfCnpj?: string;
-  rgIe?: string;
-  email?: string;
+  inscricaoEstadual?: string;
+  rg?: string;
   telefone?: string;
   celular?: string;
-  fax?: string;
-  contatos?: string;
-  idVendedor?: number;
-  idListaPreco?: number;
+  email?: string;
+  endereco?: {
+    endereco: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    municipio: string;
+    cep: string;
+    uf: string;
+    pais?: string;
+  };
+  enderecoCobranca?: {
+    endereco: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    municipio: string;
+    cep: string;
+    uf: string;
+    pais?: string;
+  };
+  inscricaoMunicipal?: string;
+  telefoneAdicional?: string;
+  emailNfe?: string;
+  site?: string;
+  regimeTributario?: number;
+  estadoCivil?: number;
+  profissao?: string;
+  sexo?: string;
+  dataNascimento?: string;
+  naturalidade?: string;
+  nomePai?: string;
+  nomeMae?: string;
+  cpfPai?: string;
+  cpfMae?: string;
+  limiteCredito?: number;
+  situacao?: string;
+  observacoes?: string;
+  vendedor?: {
+    id: number;
+  };
+  tipos?: number[];
+  contatos?: Array<{
+    nome: string;
+    telefone?: string;
+    ramal?: string;
+    email?: string;
+    setor?: string;
+  }>;
 }
 
 export interface CriarContatoModelResponse {
   id: number;
-  codigo?: string;
   nome: string;
+  codigo?: string;
   fantasia?: string;
-  tipo: string;
-  classificacao?: string;
-  situacao: string;
+  tipoPessoa?: string;
   cpfCnpj?: string;
-  rgIe?: string;
-  email?: string;
+  inscricaoEstadual?: string;
+  rg?: string;
   telefone?: string;
   celular?: string;
-  fax?: string;
-  contatos?: string;
-  idVendedor?: number;
-  nomeVendedor?: string;
-  idListaPreco?: number;
-  nomeListaPreco?: string;
+  email?: string;
+  endereco?: {
+    endereco: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    municipio: string;
+    cep: string;
+    uf: string;
+    pais?: string;
+  };
+  enderecoCobranca?: {
+    endereco: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    municipio: string;
+    cep: string;
+    uf: string;
+    pais?: string;
+  };
+  inscricaoMunicipal?: string;
+  telefoneAdicional?: string;
+  emailNfe?: string;
+  site?: string;
+  regimeTributario?: number;
+  estadoCivil?: number;
+  profissao?: string;
+  sexo?: string;
+  dataNascimento?: string;
+  naturalidade?: string;
+  nomePai?: string;
+  nomeMae?: string;
+  cpfPai?: string;
+  cpfMae?: string;
+  limiteCredito?: number;
+  situacao: string;
+  observacoes?: string;
+  vendedor?: {
+    id: number;
+  };
+  tipos?: number[];
+  contatos?: Array<{
+    nome: string;
+    telefone?: string;
+    ramal?: string;
+    email?: string;
+    setor?: string;
+  }>;
   dataCriacao: string;
   dataAtualizacao?: string;
 }
