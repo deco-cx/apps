@@ -1,0 +1,561 @@
+swagger: "2.0"
+info:
+  description: API de extrato de cliente por e-mail
+  version: 1.0.0
+  title: Extrato de Cliente por E-mail
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Extrato de cliente por e-mail
+    description: API para envio de relatório de extrato do cliente
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /customer-financial-statements:
+    post:
+      tags:
+        - Extrato de cliente por e-mail
+      summary: Envia relatório de extrato de cliente por e-mail
+      operationId: sendCustomerFinancialStatements
+      parameters:
+        - in: body
+          name: body
+          description: Dados para envio do relatório de extrato de cliente por e-mail
+          required: true
+          schema:
+            $ref: "#/definitions/EmailReportBody"
+      responses:
+        "204":
+          description: Relatório Gerado
+        "400":
+          description: Relatório não foi gerado
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+    get:
+      tags:
+        - Extrato do cliente
+      summary: Exibe as informações do extrato do cliente
+      operationId: customerStatements
+      parameters:
+        - in: query
+          name: customerId
+          description: Código do cliente
+          required: true
+          type: integer
+        - in: query
+          name: billReceivableId
+          description: Número do título
+          required: false
+          type: integer
+        - in: query
+          name: monetaryCorrectionForAnnualInstallment
+          description: informe "S" caso queira que as parcelas de correção anual sejam corrigidas monetariamente
+          required: false
+          type: string
+        - in: query
+          name: includeSubJudice
+          description: informe true se desejar que as parcelas sub-judice sejam mostradas
+          required: false
+          type: boolean
+        - in: query
+          name: companyId
+          description: Código da Empresa
+          required: false
+          type: integer
+        - in: query
+          name: jointVentureId
+          description: Código do Empreendimento
+          required: false
+          type: integer
+        - in: query
+          name: unityId
+          description: >-
+            Unidades (Descrição).
+            Preenchendo este parâmetro trará somente os títulos cadastradas com as mesmas unidades informadas no parâmetro.
+          required: false
+          type: array
+          items:
+            type: string
+        - in: query
+          name: unityCode
+          description: >-
+            Códigos (IDs) das Unidades.
+            Preenchendo este parâmetro trará somente os títulos relacionados as mesmas unidades informadas no parâmetro, considerando o Código interno do sistema.
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: conditionIdIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para incluir na consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas no parâmetro.
+          type: array
+          items:
+            type: string
+        - name: conditionIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para excluir da consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs: O parâmetro 'conditionIdIn' tem prioridade sobre este, caso sejam preenchidos os parâmetros 'conditionIdIn' e 'conditionIdNotIn', será aplicado o filtro do parâmetro 'conditionIdIn' e ignorada a informação preenchida no parâmetro 'conditionIdNotIn'.
+          type: array
+          items:
+            type: string
+        - in: query
+          name: includeRemadeInstallments
+          description: informe "N" caso queira que não seja incluídas parcelas reparceladas. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: includeWriteOff
+          description: informe "N" caso queira que não seja incluídas parcelas canceladas. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: includeCancelation
+          description: informe "N" caso queira que não seja incluídas parcelas distratadas. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: includeRenegotiation
+          description: informe "N" caso queira que não seja incluídas baixas por repactuação. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: monetaryCorrectionForDueDateInstallment
+          description: informe "S" caso queira que as parcelas de correção anual sejam corrigidas até o vencimento.
+          required: false
+          type: string
+        - in: query
+          name: includeBankMovements
+          description: informe true se desejar que as movimentações bancárias das baixas sejam mostradas.
+          required: false
+          type: boolean
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Extrato do cliente carregado com sucesso
+          schema:
+            $ref: "#/definitions/GetCustomerStatement"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+  /customer-financial-statements/pdf:
+    get:
+      tags:
+        - URL do Extrato do cliente
+      summary: Gera o link para o download do PDF referente ao Extrato do Cliente. O link expira em 5 minutos.
+      operationId: customerStatementsURL
+      parameters:
+        - in: query
+          name: customerId
+          description: Código do cliente
+          required: true
+          type: integer
+        - in: query
+          name: billReceivableId
+          description: Número do título
+          required: false
+          type: integer
+        - in: query
+          name: monetaryCorrectionForAnnualInstallment
+          description: informe "S" caso queira que as parcelas de correção anual sejam corrigidas monetariamente
+          required: false
+          type: string
+        - in: query
+          name: includeSubJudice
+          description: informe true se desejar que as parcelas sub-judice sejam mostradas
+          required: false
+          type: boolean
+        - in: query
+          name: companyId
+          description: Código da Empresa
+          required: false
+          type: integer
+        - in: query
+          name: jointVentureId
+          description: Código do Empreendimento
+          required: false
+          type: integer
+        - in: query
+          name: unityId
+          description: >-
+            Unidades (Descrição).
+            Preenchendo este parâmetro trará somente os títulos cadastradas com as mesmas unidades informadas no parâmetro.
+          required: false
+          type: array
+          items:
+            type: string
+        - in: query
+          name: unityCode
+          description: >-
+            Códigos (IDs) das Unidades.
+            Preenchendo este parâmetro trará somente os títulos relacionados as mesmas unidades informadas no parâmetro, considerando o Código interno do sistema.
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: conditionIdIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para incluir na consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas no parâmetro.
+          type: array
+          items:
+            type: string
+        - name: conditionIdNotIn
+          required: false
+          in: query
+          description: >-
+            Id das condições de pagamento para excluir da consulta (Exemplo: AT, PM) |
+            Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs: O parâmetro 'conditionIdIn' tem prioridade sobre este, caso sejam preenchidos os parâmetros 'conditionIdIn' e 'conditionIdNotIn', será aplicado o filtro do parâmetro 'conditionIdIn' e ignorada a informação preenchida no parâmetro 'conditionIdNotIn'.
+          type: array
+          items:
+            type: string
+        - in: query
+          name: includeRemadeInstallments
+          description: informe "N" caso queira que não seja incluídas parcelas reparceladas. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: includeWriteOff
+          description: informe "N" caso queira que não seja incluídas parcelas canceladas. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: includeCancelation
+          description: informe "N" caso queira que não seja incluídas parcelas distratadas. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: includeRenegotiation
+          description: informe "N" caso queira que não seja incluídas baixas por repactuação. Se omitida essa flag, ou informado "S", elas são listadas na consulta.
+          required: false
+          type: string
+        - in: query
+          name: monetaryCorrectionForDueDateInstallment
+          description: informe "S" caso queira que as parcelas de correção anual sejam corrigidas até o vencimento.
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Extrato do cliente carregado com sucesso
+          schema:
+            $ref: "#/definitions/GetCustomerStatement"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário
+  EmailReportBody:
+    type: object
+    properties:
+      customerId:
+        type: integer
+        format: int32
+        example: 1
+      email:
+        description: E-mail que será enviado o relatório
+        type: string
+        example: "exemplo@email.com"
+      billReceivableId:
+        description: Número do título
+        type: integer
+        format: int32
+        example: 1234
+      subject:
+        description: "Assunto do e-mail. O padrão é: Relatório de Extrato do Cliente"
+        type: string
+        example: "Assunto teste"
+      message:
+        description: Mensagem do corpo do e-mail. O padrão é uma string vazia.
+        type: string
+        example: "Exemplo de corpo de email"
+      unityId:
+        description: >-
+          Unidades (Descrição).
+          Preenchendo este parâmetro trará somente os títulos cadastradas com as mesmas unidades informadas no parâmetro.
+        type: array
+        items:
+          type: string
+      unityCode:
+        description: >-
+          Códigos (IDs) das Unidades.
+          Preenchendo este parâmetro trará somente os títulos relacionados as mesmas unidades informadas no parâmetro, considerando o Código interno do sistema.
+        type: array
+        items:
+          type: integer
+          example: 1
+      conditionIdIn:
+        description: >-
+          Id das condições de pagamento para incluir na consulta (Exemplo: AT, PM) |
+          Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas no parâmetro.
+        type: array
+        items:
+          type: string
+      conditionIdNotIn:
+        description: >-
+          Id das condições de pagamento para excluir da consulta (Exemplo: AT, PM) |
+          Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs: O parâmetro 'conditionIdIn' tem prioridade sobre este, caso sejam preenchidos os parâmetros 'conditionIdIn' e 'conditionIdNotIn', será aplicado o filtro do parâmetro 'conditionIdIn' e ignorada a informação preenchida no parâmetro 'conditionIdNotIn'.
+        type: array
+        items:
+          type: string
+    required:
+      - customerId
+      - email
+  GetCustomerStatement:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de unidades retornadas como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/Results"
+  Results:
+    type: object
+    properties:
+      billsReceivable:
+        $ref: "#/definitions/BillReceivable"
+  BillReceivable:
+    type: object
+    properties:
+      billReceivableId:
+        type: integer
+        format: int64
+      finePercent:
+        type: number
+        format: double
+        description: Percentual de multa de mora
+      interestPercent:
+        type: number
+        format: double
+        description: Percentual de juros de mora
+      documentId:
+        type: string
+        description: Id documento do Titulo.
+      documentCode:
+        type: string
+        description: Código do Documento ex.("CT")
+      subJudice:
+        type: boolean
+        description: informa se o título está ou não sub-judice
+      installments:
+        type: array
+        items:
+          $ref: "#/definitions/Installment"
+  Installment:
+    type: object
+    properties:
+      installmentId:
+        type: integer
+        format: int64
+      dueDate:
+        type: string
+        description: Vencimento da parcela.
+      conditionType:
+        type: string
+        description: Tipo de condição.
+      originalValue:
+        type: integer
+        description: Valor da parcela.
+      currentBalance:
+        type: integer
+        description: Saldo atual corrigido.
+      interestPercent:
+        type: integer
+        description: Percentual juros mora.
+      receipts:
+        type: array
+        description: Baixas referente à parcela.
+        items:
+          $ref: "#/definitions/Receipt"
+      generatedBillet:
+        type: boolean
+        description: Parcela foi ou não enviada para cobrança.
+      installmentNumber:
+        type: string
+        description: Numero "sequencial" das parcelas 1, 2, 3, ou por "Condição de Pagamento" 1/2, 2/2... (Resultado será apresentado conforme Parâmetro 651).
+  Receipt:
+    type: object
+    description: Baixa referentes à parcela
+    properties:
+      calculationDate:
+        type: string
+        description: Data de cálculo da baixa.
+      receiptDate:
+        type: string
+        description: Data da baixa.
+      receiptValue:
+        type: integer
+        description: Valor pago.
+      interestValue:
+        type: integer
+        description: Valor mora.
+      additionalValue:
+        type: integer
+        description: Valor do acréscimo.
+      discountValue:
+        type: integer
+        description: Valor do desconto.
+      administrativeFee:
+        type: integer
+        description: Valor da taxa administrativa.
+      netReceiptValue:
+        type: integer
+        description: Valor do recebimento líquido.
+      receiptType:
+        type: string
+        description: Descrição do tipo de baixa
+      insuranceAmount:
+        type: number
+        format: double
+        description: "Valor do seguro"
+      bankMovements:
+        type: array
+        items:
+          $ref: "#/definitions/BankMovement"
+        description: Movimentos
+      accountNumber:
+        type: string
+        description: "Número da conta"
+  BankMovement:
+    type: object
+    properties:
+      bankMovementDate:
+        type: string
+        format: "date (Formato ISO 8601 yyyy-MM-dd | Exemplo: 2018-01-01)"
+        description: "Data do movimento"
+        example: "2018-01-01"
+      sequencialNumber:
+        type: integer
+        format: int32
+        description: "Número sequencial"
+      id:
+        type: integer
+        format: int32
+        description: "Número do lançamento"
+      amount:
+        type: number
+        format: double
+        description: "Valor do movimento"
+      historicId:
+        type: integer
+        format: int32
+        description: "Código do histórico padrão"
+      historicName:
+        type: string
+        description: "Descrição do histórico padrão"
+      operationId:
+        type: integer
+        format: int32
+        description: "Código da operação"
+      operationName:
+        type: string
+        description: "Descrição da operação"
+      operationType:
+        type: string
+        description: "Tipo de operação"
+      reconcile:
+        type: string
+        description: "Movimento conciliado"
+      correctedAmount:
+        type: number
+        format: double
+        description: "Valor do movimento corrigido"
+      originId:
+        type: string
+        description: "Código do módulo de origem do movimento - CR (Contas a Receber), CO (Comercial), ME (Medições), CA (Contrapartida),
+          CI (Controle de Investidores), AR (Administração de Obras), SC (Condomínios), LO (Locações), NE (Nota Fiscal Eletrônica),
+          NS (Nota Fiscal de Serviço Eletrônica), AC (Administração de Compras), NF (Solicitação de Nota Fiscal)"
+      financialCategories:
+        type: array
+        items:
+          $ref: "#/definitions/FinancialCategory"
+        description: Apropriação financeira do movimento
+  FinancialCategory:
+    type: object
+    properties:
+      costCenterId:
+        type: integer
+        format: int32
+        description: "Código do centro de custo"
+      financialCategoryId:
+        type: string
+        description: "Código do plano financeiro"
+      financialCategoryName:
+        type: string
+        description: "Descrição do plano financeiro"
+      financialCategoryReducer:
+        type: string
+        description: "Indica se é plano financeiro redutor"
+      financialCategoryType:
+        type: string
+        description: "Indica plano financeiro de receita ou despesa"
+      financialCategoryRate:
+        type: number
+        format: double
+        description: "Percentual de apropriação"
+      bankMovementId:
+        type: integer
+        format: int32
+        description: "Número do lançamento"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada.
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200

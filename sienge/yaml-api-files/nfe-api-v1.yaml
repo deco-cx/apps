@@ -1,0 +1,1552 @@
+swagger: "2.0"
+info:
+  description: >-
+    Api Rest que expõe os dados das notas fiscais eletrônicas recebidas no
+    sistema através dos processos de importação (sefaz) e upload.
+  version: 1.0.0
+  title: Notas Fiscais Eletrônicas de Produto
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+paths:
+  /nfes:
+    get:
+      tags:
+        - nfes
+      summary: >-
+        Retorna as notas fiscais em determinado período ordenadas por data de
+        emissão
+      operationId: loadAllNfeDocuments
+      produces:
+        - application/json
+      parameters:
+        - name: startDate
+          in: query
+          description: >-
+            Data de início da busca (data emissão) no formato: yyyy-MM-dd.
+            Exemplo: 2016-08-13
+          required: true
+          type: string
+        - name: endDate
+          in: query
+          description: >-
+            Data de fim da busca (data emissão) no formato: yyyy-MM-dd. Exemplo:
+            2017-08-13
+          required: true
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/GetResponseDocument"
+        "400":
+          description: Bad request
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}":
+    get:
+      tags:
+        - nfes
+      summary: Retorna uma nota fiscal
+      operationId: loadNfesByNfeKey
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/Documents"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/issuers-recipients":
+    get:
+      tags:
+        - nfes
+      summary: Retorna o emitente e destinatario de uma nota
+      operationId: loadIssuersAndRecipients
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/Emitente"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/payments":
+    get:
+      tags:
+        - nfes
+      summary: Retorna as formas de pagamento de uma nota
+      operationId: loadPayments
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/GetResponsePagamento"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/deliveries":
+    get:
+      tags:
+        - nfes
+      summary: Retorna as informações do local de entrega e retirada
+      operationId: loadDeliveries
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/EntregaRetirada"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/linked-nfes":
+    get:
+      tags:
+        - nfes
+      summary: Retorna as notas referenciadas
+      operationId: loadLinkedNfes
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitdo é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/GetResponseNotasReferenciadas"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/icms":
+    get:
+      tags:
+        - nfes
+      summary: Retorna as informações de icms total de uma nota
+      operationId: loadIcmsTotal
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/IcmsTotal"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/carriers":
+    get:
+      tags:
+        - nfes
+      summary: "Retorna as informações de transporte, presentes na nota"
+      operationId: loadCarriers
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/Transporte"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/issqn":
+    get:
+      tags:
+        - nfes
+      summary: "Retorna as informações issqn total, presentes na nota"
+      operationId: loadIssqnTotal
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/IssqnTotal"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/itens":
+    get:
+      tags:
+        - itens
+      summary: "Retorna os itens/produtos, presentes na nota"
+      operationId: loadAllItens
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/GetResponseProduct"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/itens/{itemId}/ipi":
+    get:
+      tags:
+        - itens
+      summary: "Retorna o ipi de determinado produto/serviço, presente na nota"
+      operationId: loadIpi
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+        - name: itemId
+          in: path
+          description: Código identificador do produto/serviço
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/ProdutosIpi"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/itens/{itemId}/pis-cofins":
+    get:
+      tags:
+        - itens
+      summary: "Retorna o pis-cofins de determinado produto/serviço, presente na nota"
+      operationId: loadPisCofins
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+        - name: itemId
+          in: path
+          description: Código identificador do produto/serviço
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/ProdutosPis"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/itens/{itemId}/simplified-icms":
+    get:
+      tags:
+        - itens
+      summary: >-
+        Retorna o icms simples nacional de determinado produto/serviço, presente
+        na nota
+      operationId: loadSimplifiedIcms
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+        - name: itemId
+          in: path
+          description: Código identificador do produto/serviço
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/ProdutosIcmssn"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/itens/{itemId}/issqn":
+    get:
+      tags:
+        - itens
+      summary: "Retorna o issqn de determinado produto/serviço, presente na nota"
+      operationId: loadIssqn
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+        - name: itemId
+          in: path
+          description: Código identificador do produto/serviço
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/ProdutosIssqn"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/nfes/{nfeKey}/itens/{itemId}/icms":
+    get:
+      tags:
+        - itens
+      summary: "Retorna o icms de determinado produto/serviço, presente na nota"
+      operationId: loadIcms
+      produces:
+        - application/json
+      parameters:
+        - name: nfeKey
+          in: path
+          description: Chave de acesso da nfe contendo 44 caracteres
+          required: true
+          type: string
+        - name: itemId
+          in: path
+          description: Código identificador do produto/serviço
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/ProdutosIcms"
+        "404":
+          description: Resource not found
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Internal error
+          schema:
+            $ref: "#/definitions/ApiError"
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+definitions:
+  ApiError:
+    type: object
+    required:
+      - devMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      clientMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API
+  GetResponseDocument:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Notas fiscais retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Documents"
+  GetResponsePagamento:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Notas fiscais retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Pagamento"
+  GetResponseNotasReferenciadas:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista de Notas fiscais retornadas como resultado da pesquisa
+        items:
+          $ref: "#/definitions/NotasReferenciadas"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitdo é 200.
+        minimum: 1
+        maximum: 200
+  Documents:
+    type: object
+    properties:
+      codigoNumericoNota:
+        type: integer
+        format: int64
+        example: 677
+      codigoUfEmitente:
+        type: integer
+        format: int64
+        example: 42
+      chaveAcessoNota:
+        type: string
+        example: "42170182845322000104557880000006331000006772"
+      naturezaDaOperacao:
+        type: string
+        example: teste
+      codigoModeloNfe:
+        type: integer
+        format: int64
+        example: 55
+      modeloDocumentoFiscal:
+        type: string
+        example: NF-e emitida em substituição ao modelo 1 ou 1A
+      serieDocumentoFiscal:
+        type: integer
+        format: int64
+        example: 788
+      numeroDocumentoFiscal:
+        type: integer
+        format: int64
+        example: 633
+      dataEmissaoDocumentoFiscal:
+        type: string
+        example: 25/12/2017
+      dataSaidaEntradaMercadoria:
+        type: string
+        example: 25/12/2017
+      codigoTipoOperacao:
+        type: integer
+        format: int64
+        example: 1
+      tipoOperacao:
+        type: string
+        example: Saída
+      codigoDestinoOperacao:
+        type: integer
+        format: int64
+        example: 1
+      localDestinoOperacao:
+        type: string
+        example: Operação interna
+      codigoFinalidadeDeEmissao:
+        type: integer
+        format: int64
+        example: 4
+      finalidadeEmissao:
+        type: string
+        example: Devolução de mercadoria
+      codigoIndicadorPresencaComprador:
+        type: integer
+        format: int64
+        example: 0
+      indicadorPresencaComprador:
+        type: string
+        example: Não se aplica complementar ou de ajuste
+      codigoProcessoEmissaoNfe:
+        type: integer
+        format: int64
+        example: 0
+      processoEmissao:
+        type: string
+        example: Emissão de NF-e com aplicativo do contribuinte
+      codigoTipoAmbiente:
+        type: integer
+        format: int64
+        example: 2
+      tipoAmbiente:
+        type: string
+        example: Homologação
+      ufAtendeuSolicitacao:
+        type: string
+        example: Santa Catarina
+      codigoStatusRespostaLote:
+        type: integer
+        format: int64
+        example: 100
+      statusRespostaLote:
+        type: string
+        example: Autorizado o uso da NF-e
+      codigoMunicipioFatoGerador:
+        type: integer
+        format: int64
+        example: 100
+      municipioFatoGerador:
+        type: string
+        example: Florianópolis
+      codigoOperacaoConsumidor:
+        type: integer
+        format: int64
+        example: 0
+      links:
+        type: array
+        description: >-
+          Informação de Hypermedia contendo o link para outros endpoint
+          associados a nota
+        items:
+          $ref: "#/definitions/LinkDocuments"
+  LinkDocuments:
+    type: object
+    properties:
+      rel:
+        type: string
+        example: issuers-recipients
+      href:
+        type: string
+        example: >-
+          /nfe/documents/42161182845322000104550300000000621660000100/issuers-recipients
+        description: Uri para endpoint relacionado
+  LinkProducts:
+    type: object
+    properties:
+      rel:
+        type: string
+        example: simplified-icms
+      href:
+        type: string
+        example: >-
+          /nfe/documents/42151282845322000104552350000009111000003156/products/62/simplified-icms
+        description: Uri para endpoint relacionado
+  Emitente:
+    type: object
+    properties:
+      cnpjEmitente:
+        type: string
+        example: "77173354000162"
+      municipioEmitente:
+        type: string
+        example: Florianopolis
+      uf_emitente:
+        type: string
+        example: SC
+      paisEmitente:
+        type: string
+        example: Brasil
+      cnpjDestinatario:
+        type: string
+        example: "77173354000162"
+      municipioDestinatario:
+        type: string
+        example: Florianopolis
+      paisDestinatario:
+        type: string
+        example: Brasil
+      ufDestinatario:
+        type: string
+        example: SC
+      nomeEmitente:
+        type: string
+        example: Emitente nome
+      nomeDestinatario:
+        type: string
+        example: NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL
+      crtEmitente:
+        type: integer
+        format: int64
+        example: 3
+  Pagamento:
+    type: object
+    properties:
+      codigoTipoPagamento:
+        type: string
+        example: "03"
+      valorPagamento:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      cnpjCredenciadoraCartao:
+        type: string
+        example: "7717335"
+      codigoBandeiraCartao:
+        type: string
+        example: "01"
+      numeroAutorizacaoOperacaoCartao:
+        type: string
+        example: "77173354000162"
+      tipoPagamento:
+        type: string
+        example: Cartão de crédito
+      bandeiraCartao:
+        type: string
+        example: Visa
+  EntregaRetirada:
+    type: object
+    properties:
+      cpfEntrega:
+        type: string
+        example: "83504612096"
+      cnpjEntrega:
+        type: string
+        example: "69914111000100"
+      municipioEntrega:
+        type: string
+        example: Porto Alegre
+      ufEntrega:
+        type: string
+        example: RS
+      paisEntrega:
+        type: string
+        example: Brasil
+      cpfRetirada:
+        type: string
+        example: "83504612096"
+      cnpjRetirada:
+        type: string
+        example: "54378644000147"
+      municipioRetirada;:
+        type: string
+        example: Porto Alegre
+      ufRetirada;:
+        type: string
+        example: RS
+      paisRetirada;:
+        type: string
+        example: Brasil
+  NotasReferenciadas:
+    type: object
+    properties:
+      codigoUf:
+        type: integer
+        format: int64
+        example: 42
+      mesAnoEmissao:
+        type: string
+        example: 12/15
+      cnpj:
+        type: string
+        example: "69914111000100"
+      codigoModalidade:
+        type: integer
+        format: int64
+        example: 1
+      numeroSerie:
+        type: integer
+        format: int64
+        example: 746
+      numeroNotaFIscal:
+        type: integer
+        format: int64
+        example: 54654
+      uf:
+        type: string
+        example: Santa Catarina
+  IcmsTotal:
+    type: object
+    properties:
+      valorBaseCalculoIcms:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorIcms:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorIcmsDesonerado:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      vlBaseCalculoSt:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorTotalIcmsST:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      totalProdutosEServiços:
+        type: number
+        example: 22.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 22.00"
+      totalFrete:
+        type: number
+        example: 3.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 3.00"
+      totalDesconto:
+        type: number
+        example: 0.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 0.00"
+      totalImpostoImportacao:
+        type: number
+        example: 0.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 0.00"
+      totalIpi:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      totalPis:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorCofins:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      outrasDespesas:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      totalNotaFiscal:
+        type: number
+        example: 45.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 0.45"
+      totalTributosFederais:
+        type: number
+        example: 0.44
+        description: "Valor exibido com até duas casas decimais. Exemplo: 0.44"
+  Transporte:
+    type: object
+    properties:
+      codigoModalidadeFrete:
+        type: integer
+        format: int64
+        example: 0
+      cpnjTransportador:
+        type: string
+        example: "69914111000100"
+      cpfTransportador:
+        type: string
+        example: "83504612096"
+      nomeTransporatador:
+        type: string
+        example: Nome transportador
+      ieTransportador:
+        type: string
+        example: "4992448673"
+      enderecoTransportador:
+        type: string
+        example: Rua Exemplo
+      municipioTranportador:
+        type: string
+        example: Florianópolis
+      ufTransportador:
+        type: string
+        example: SC
+      valorServico:
+        type: number
+        example: 20.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 20.00"
+      baseCalculoRetencaoIcms:
+        type: number
+        example: 1.0
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      aliquotaRetencao:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      valorIcmsRetido:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      cfopServicoTransporte:
+        type: integer
+        format: int64
+        example: 2233
+      codigoMunicipioFatoGeradorIcmsTransporte:
+        type: integer
+        format: int64
+        example: 3021
+      placaVeiculo:
+        type: string
+        example: EEE-AAADDD
+      uF:
+        type: string
+        example: SC
+      registroNacionalTransportadorCarga:
+        type: string
+        example: "1234556"
+      municipioFatoGerador:
+        type: string
+        example: Florianópolis
+      modalidadeFrete;:
+        type: string
+        example: Modalidade Exemplo
+  IssqnTotal:
+    type: object
+    properties:
+      valorTotalServicos:
+        type: number
+        example: 20.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 20.00"
+      totalBaseCalculoIss:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      valorTotalIss:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorTotalPis:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorTotalCofinsSobreServicos:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      dataPrestacaoServiço:
+        type: string
+        example: 25/10/2017
+      valorTotalDeducaoBaseCalculo:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorTotalOutrasRetencoes:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorTotalDescontoIncondicionado:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorTotalDescontoCondicionado:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorTotalRetencaoIss:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      codigoRegimeTributacao:
+        type: string
+        example: "123456"
+  GetResponseProduct:
+    type: object
+    required:
+      - links
+      - resultSetMetadata
+      - results
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        description: Lista dos produtos retornados como resultado da pesquisa
+        items:
+          $ref: "#/definitions/Produtos"
+  Produtos:
+    type: object
+    properties:
+      codigoProdutoOuServico;:
+        type: string
+        example: "123456123"
+      codigoEan:
+        type: string
+        example: "123456"
+      descricaoProdutoOuServico:
+        type: string
+        example: Descrição produto ou serviço
+      codigoNcm:
+        type: integer
+        format: int64
+        example: 12345
+      exTipi:
+        type: integer
+        format: int64
+        example: 12345
+      codigoFiscalDeOperacoes:
+        type: integer
+        format: int64
+        example: 12345
+      unidadeComercial:
+        type: string
+        example: Unidade comercial
+      quantidadeComercial:
+        type: number
+        example: 1000.1234
+        description: "Valor exibido com até quatro casas decimais. Exemplo: 1000.1234"
+      valorUnitarioComercializacao:
+        type: number
+        example: 1000.1234
+        description: "Valor exibido com até quatro casas decimais. Exemplo: 1000.1234"
+      valorTotalBrutoProdutosOuServicos:
+        type: number
+        example: 2000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2000.00"
+      codigoEanUnidadeTributavel:
+        type: string
+        example: "123456"
+      unidadeTributavel:
+        type: string
+        example: "123456"
+      quantidadeTributavel:
+        type: number
+        example: 2000.1234
+        description: "Valor exibido com até quatro casas decimais. Exemplo: 2000.1234"
+      valorUnitarioTributacao:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorTotalFrete:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorTotalSeguro:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorDesconto:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorOutrasDespesas:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorItemCompoeTotalNota:
+        type: integer
+        format: int64
+        example: 1
+      valorTotalTributos:
+        type: number
+        example: 2000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2,000.00"
+      numeroPedido:
+        type: string
+        example: "123456"
+      numeroItemPedido:
+        type: integer
+        format: int64
+        example: 1
+      links:
+        type: array
+        description: >-
+          Informação de Hypermedia contendo o link para outros endpoints
+          associados ao produto/serviço
+        items:
+          $ref: "#/definitions/LinkProducts"
+  ProdutosIpi:
+    type: object
+    properties:
+      codigoSituacaoTributaria:
+        type: string
+        example: "1234"
+      percentualIpi:
+        type: number
+        example: 1.20
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.20"
+      valorBaseCalculo:
+        type: number
+        example: 1.20
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.20"
+      valorIpi:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      qtUnid:
+        type: number
+        example: 15.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 15.00"
+      classeEnquadramento:
+        type: string
+        example: Classe enquadramento
+  ProdutosPis:
+    type: object
+    properties:
+      codigoSituacaoTributariaCofins:
+        type: string
+        example: "1234"
+      valorBaseCalculoCofins:
+        type: number
+        example: 1000.20
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.20"
+      aliquotaPercentualCofins:
+        type: number
+        example: 1.20
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.20"
+      valorCofins:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      codigoSituacaoTributariaPis:
+        type: string
+        example: "1234"
+      valorBaseCalculoPis:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      aliquotaPercentualPis:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      valorPis:
+        type: number
+        example: 2000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2,000.00"
+      quantidadeVendidaPis:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorAliquotaPis:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      quantidadeVendidaCofins:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorAliquotaCofins:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+  ProdutosIcmssn:
+    type: object
+    properties:
+      codigoOrigem:
+        type: integer
+        format: int64
+        example: 1234
+      codigoSituacaoOperacao:
+        type: string
+        example: "10"
+      codigoModalidadeDeterminacaoBc:
+        type: integer
+        format: int64
+        example: 1
+      valorBaseCalculo:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      percentualReducaoBaseCalculo:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      aliquotaIcmsPercentual:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      codigoModalidadeDeterminacaoBcSt:
+        type: integer
+        format: int64
+        example: 2
+      peMargemVast:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      margemValorAdicionadoStPercentual:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorBaseCalculoSt:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      aliquotaIcmsSt:
+        type: number
+        example: 10.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 10.00"
+      aliquotaAplicavelCalculoCredito:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorCreditoIcmsSn:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorIcmsst:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      percentualIcmsSt:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      percentualFcpStRetido:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      percentualSt:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorBaseCalculoFcpSt:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorFcpSt:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorBaseCalculoFcpRetido:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorBcIcmsRetido:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorFcpStRetido:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorIcmsSTRetido:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorIcms:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+  ProdutosIssqn:
+    type: object
+    properties:
+      valorBaseCalculo:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      percentualAliquota:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorIssqn:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      codigoMunicipioFatoGerador:
+        type: integer
+        format: int64
+        example: 10
+      codigoItemListaServicos:
+        type: integer
+        format: int64
+        example: 10
+      valorDeducao:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorOutrasRetencoes:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorDescontoCondicionado:
+        type: number
+        example: 2000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2,000.00"
+      valorDescontoIncondicionado:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorRetencaoIss:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      codigoIndicadorExigibilidadeIss:
+        type: integer
+        format: int64
+        example: 1
+      descricaoIndicadorExigibilidadeIss:
+        type: string
+        example: Descrição
+      codigoServico:
+        type: string
+        example: "123"
+      codigoMunicipioIncideImposto:
+        type: integer
+        format: int64
+        example: 1
+      cdPais:
+        type: integer
+        format: int64
+        example: 1
+      nuProcesso:
+        type: string
+        example: "12345"
+      cdIndIncentivo:
+        type: integer
+        format: int64
+        example: 1
+      deIndIncentivo:
+        type: string
+        example: Descrição
+      deMun:
+        type: string
+        example: Descrição
+      descricaoMunicipioFatoGerador:
+        type: string
+        example: Descrição
+  ProdutosIcms:
+    type: object
+    properties:
+      codigoOrigemMercadoria:
+        type: integer
+        format: int64
+        example: 1
+      cdCst:
+        type: string
+        example: "234"
+      codigoModalidadeBaseCalculo:
+        type: integer
+        format: int64
+        example: 2
+      valorBaseCalculo:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      percentualAliquotaIcms:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      valorIcms:
+        type: number
+        example: 2000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2,000.00"
+      codigoModalidadeBaseCalculoST:
+        type: integer
+        format: int64
+        example: 2
+      peMargemVast:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      peVast:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      percentualReducaoBaseCalculoSt:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      valorIcmsSt:
+        type: number
+        example: 2000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2,000.00"
+      percentualReducaoBaseCalculo:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      valorBaseCalculoSt:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      percentualDiferimento:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorIcmsDesonerado:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      codigoMotivoDesoneracao:
+        type: string
+        example: "1234"
+      peMargemBcSt:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      percentualFcp:
+        type: number
+        example: 1.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.00"
+      valorBaseCalculoFcp:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      percentualFcpSt:
+        type: number
+        example: 2.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 2.00"
+      valorBaseCalculoFcpSt:
+        type: number
+        example: 1000.00
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.00"
+      valorFcp:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorFcpSt:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorBaseCalculoFcpStRetido:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      percentualFcpStRetido:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      valorFcpStRetido:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      percentualAliquotaIcmsSt:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      cdMotDesIcms:
+        type: integer
+        example: 12
+      valorIcmsStRetido:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorIcmsDiferido:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorIcmsOperacao:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      percentualBaseCalculoOperacaoPropria:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      unidadeFederacaoSt:
+        type: string
+        example: SC
+      percentualFcpUnidadeFederacaoDestino:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      percentualAliquotaIcmsUnidadeFederacaoDestino:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      percentualAliquotaIcmsInterestadual:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      percentualAliquotaIcmsIterestadualPartilha:
+        type: number
+        example: 1.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1.50"
+      valorBaseCalculoUnidadeFederacaoDestino:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorBaseCalculoFcpUniddeFederacaoDestino:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorFcpUnidadeUnidadeFederacaoDestino:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorIcmsUnidadeFederacaoDestino:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"
+      valorIcmsUnidadeFederacaoRemetente:
+        type: number
+        example: 1000.50
+        description: "Valor exibido com até duas casas decimais. Exemplo: 1,000.50"

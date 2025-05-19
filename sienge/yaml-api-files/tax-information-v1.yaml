@@ -1,0 +1,307 @@
+swagger: "2.0"
+info:
+  description: API de informações fiscais de serviço do contas a pagar
+  version: 1.0.0
+  title: Informações Fiscais de Serviço - Contas a Pagar
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  "/bills/{billId}/tax-information":
+    post:
+      tags:
+        - Informações fiscais de serviço.
+      summary: Persiste informações fiscais do tipo "Serviço" no título informado.
+      operationId: insertTaxInformation
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título no qual as informações fiscais serão inseridas.
+          required: true
+          type: integer
+          format: int32
+        - name: body
+          in: body
+          description: Objeto para criação das informações fiscais
+          required: true
+          schema:
+            $ref: "#/definitions/TaxInformationInsert"
+      responses:
+        "201":
+          description: Informações fiscais inseridas.
+        "400":
+          description: Validações de regra de negócio para inserção das informações fiscais.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Título não encontrado.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+
+  "/bills/{billId}/tax-information/items":
+    post:
+      tags:
+        - Informações fiscais de serviço.
+      summary: Persiste um item do tipo "Serviço" nas informações fiscais do título informado.
+      operationId: insertTaxInformationItem
+      parameters:
+        - name: billId
+          in: path
+          description: Número do título no qual será inserido o item nas informações fiscais
+          required: true
+          type: integer
+          format: int32
+        - name: body
+          in: body
+          description: Objeto para criação do item das informações fiscais
+          required: true
+          schema:
+            $ref: "#/definitions/TaxInformationItemInsert"
+      responses:
+        "201":
+          description: Item inserido nas informações fiscais.
+        "400":
+          description: Validações de regra de negócio para inserção do item nas informações fiscais.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "404":
+          description: Título não encontrado.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+
+definitions:
+  TaxInformationInsert:
+    type: object
+    description: Dados necessários para inserção das informações fiscais.
+    required:
+      - status
+      - entryDate
+      - paymentType
+      - branchOfficeId
+      - cityServiceId
+      - serviceExecutionDate
+      - pisCofinsCalculationType
+      - freightType
+    properties:
+      status:
+        type: integer
+        format: int32
+        description: Situação na nota fiscal. Valores aceitos '0' - Documento regular, '1' - Documento regular extemporâneo, '2' - Documento cancelado, '3' - Documento cancelado extemporâneo, '4' - NF-e ou CT-e - Denegado, '5' - NF-e ou CT-e - Numeração inutilizada, '6' - Documento Fiscal Complementar, '7' - Documento Fiscal Complementar extemporâneo, '8' - Documento Fiscal emitido com base em Regime Especial ou Norma Específica
+      cancellationDate:
+        type: string
+        description: Data de cancelamento. Formato YYYY-MM-DD. Exemplo -> 2018-01-31.
+          Campo só deve ser informado quando o campo 'status' for '2' ou '3'
+      creditorTaxingRegime:
+        type: integer
+        format: int32
+        description: Regime de tributação do credor.  Valores aceitos '0' - Normal, '1' - Simples Nacional, '2' - Microempreendedor Individual - MEI
+      entryDate:
+        type: string
+        description: Data de entrada. Formato YYYY-MM-DD. Exemplo -> 2018-01-31. Deve ser maior ou igual data de emissão do título e anterior a data de cancelamento, quando informada
+      serialNumber:
+        type: string
+        description: Série da nota fiscal. Tamanho máximo de 3 caracteres
+      paymentType:
+        type: integer
+        format: int32
+        description: Condição de pagamento. Valores aceitos '0' - À vista, '1' - "A prazo, '2' - Sem pagamento
+      branchOfficeId:
+        type: integer
+        format: int32
+        description: Código da filial da empresa.
+      operationTaxCode:
+        type: string
+        description: Código fiscal da operação (CFOP). Preenchimento obrigatório quando o modelo do documento do título não se tratar de modelo  fiscal de prefeitura. A CFOP informada deverá iniciar com "1" para operações dentro do estado, com "2" para operações interestaduais e com "3" para operações envolvendo o exterior. Exemplo -> 1101
+      cnaeCode:
+        type: integer
+        format: int32
+        description: CNAE para serviços. Exemplo -> 3005909
+      cityServiceId:
+        type: integer
+        format: int32
+        description: Código do município de prestação de serviços
+      taxSituationServiceCode:
+        type: string
+        description: Situação tributária de serviços. A situação tributária de serviços precisa estar cadastrada para o município de prestação de serviços informado
+      serviceTaxCode:
+        type: string
+        description: Código fiscal de prestação de serviços (CFPS). A CFPS precisa estar cadastrada para o município de prestação de serviços informado. Caso não preenchido, o campo 'natureServiceId' precisará ser informado. Exemplo -> 1001
+      natureServiceId:
+        type: string
+        description: Natureza do serviço. Texto livre com tamanho máximo de 100 caracteres. Caso não preenchido, o campo 'serviceTaxCode' precisará ser informado
+      serviceExecutionDate:
+        type: string
+        description: Data de execução do serviço. Formato YYYY-MM-DD. Exemplo -> 2018-01-31
+      pisCofinsCalculationType:
+        type: integer
+        format: int32
+        description: Tipo de apuração do PIS/COFINS. Valores aceitos '1' - Cumulativo, '2' - Não-cumulativo, '3' - Não-incide. Esse campo será validado conforme o tipo de apuração do PIS/COFINS configurado na parametrização anual contábil e fiscal da empresa. Caso "Cumulativo", serão aceitos os valores '1' - Cumulativo e '3' - Não incide; caso "Não-cumulativo", serão aceitos os valores '2' - Não-cumulativo e  '3' - Não-incide; caso "Cumulativo e Não-cumulativo", as três opções poderão ser informadas
+      pisCofinsCreditBaseId:
+        type: integer
+        format: int32
+        description: Identificador base de crédito para PIS/COFINS. Opções válidas podem ser consultas na Tabela 4.3.7 - Tabela Código de Base de Cálculo do Crédito. Campo só deve ser informado quando o campo 'pisCofinsCalculationType' for '2'
+      freightType:
+        type: integer
+        format: int32
+        description: Modalidade do frete. Valores aceitos '0'- Contratação do Frete por conta do Remetente (CIF), '1' - Contratação do Frete por conta do Destinatário (FOB), '2' - Contratação do Frete por conta de Terceiros, '3' - Transporte Próprio por conta do Remetente, '4' - Transporte Próprio por conta do Destinatário, '9' - Sem Ocorrência de Transporte
+
+  TaxInformationItemInsert:
+    type: object
+    description: Dados necessários para inserção do item das informações fiscais.
+    required:
+      - taxService
+      - measurementUnit
+      - serviceCodeId
+      - quantity
+      - unitPrice
+      - pisTaxSituation
+      - cofinsTaxSituation
+    properties:
+      taxService:
+        type: integer
+        format: int32
+        description: Código do serviço fiscal. Deve corresponder a um código de produto fiscal ativo do tipo "Serviço"
+      measurementUnit:
+        type: integer
+        format: int32
+        description: Unidade de medida. Deve corresponder a um código de unidade de medida ativa.
+      serviceCodeId:
+        type: integer
+        format: int32
+        description: Código de serviço fiscal.
+      cnaeCode:
+        type: integer
+        format: int32
+        description: CNAE para serviços. Exemplo -> 4120400
+      additionalDescription:
+        type: string
+        description: Descrição complementar do serviço. Texto livre com tamanho máximo de 8000 caracteres
+      quantity:
+        type: number
+        description: Quantidade. Deve ser um valor maior que zero. Formato -> 5.0000
+      unitPrice:
+        type: number
+        description: Preço unitário. Deve ser um valor maior que zero. Formato -> 800.0000
+      employedMaterialValue:
+        type: number
+        description: Material empregado. Campo só deve ser informado se o modelo do documento do título for modelo  fiscal de prefeitura. Formato -> 800.00
+      contractedSubcontractValue:
+        type: number
+        description: Subempreitada contratada. Formato -> 800.00
+      itemDiscountValue:
+        type: number
+        description: Desconto do item. Formato -> 800.00
+      operationTaxCode:
+        type: string
+        description: Código fiscal da operação (CFOP). Preenchimento obrigatório quando o modelo do documento do título não se tratar de modelo  fiscal de prefeitura. A CFOP informada deverá iniciar com "1" para operações dentro do estado, com "2" para operações interestaduais e com "3" para operações envolvendo o exterior. Exemplo -> 1101
+      serviceTaxCode:
+        type: string
+        description: Código fiscal de prestação de serviços (CFPS). A CFPS precisa estar cadastrada para o município de prestação de serviços informado. Caso não preenchido, o campo 'natureServiceId' precisará ser informado. Exemplo -> 1001
+      natureServiceId:
+        type: string
+        description: Natureza do serviço. Texto livre com tamanho máximo de 100 caracteres. Caso não preenchido, o campo 'serviceTaxCode' precisará ser informado
+      pisTaxSituation:
+        type: string
+        description: Situação tributária do PIS. Deverá ser uma situação tributária de entrada válida para o PIS. Opções válidas podem ser consultas na Tabela 4.3.3 - Tabela Código da Situação Tributária Referente ao PIS/Pasep. Exemplo -> "70"
+      pisCalculationBasis:
+        type: number
+        description: Base de cálculo do PIS. Formato -> 800.00
+      pisRate:
+        type: number
+        description: Alíquota do PIS (%). Formato -> 0.65
+      pisWithheldCalculationBasis:
+        type: number
+        description: Base de cálculo do PIS Retido. Formato -> 800.00
+      pisWithheldRate:
+        type: number
+        description: Alíquota do PIS Retido (%). Formato -> 0.65
+      cofinsTaxSituation:
+        type: string
+        description: Situação tributária do COFINS. Deverá ser uma situação tributária de entrada válida para o COFINS. Opções válidas podem ser consultas na Tabela 4.3.4 - Tabela Código da Situação Tributária Referente à COFINS. Exemplo -> "70"
+      cofinsCalculationBasis:
+        type: number
+        description: Base de cálculo do COFINS. Formato -> 800.00
+      cofinsRate:
+        type: number
+        description: Alíquota do COFINS (%). Formato -> 3.00
+      cofinsWithheldCalculationBasis:
+        type: number
+        description: Base de cálculo do COFINS Retido. Formato -> 800.00
+      cofinsWithheldRate:
+        type: number
+        description: Alíquota do COFINS Retido (%). Formato -> 3.00
+      issTaxSituation:
+        type: string
+        description: Situação tributária de serviços (ISS). A situação tributária de serviços precisa estar cadastrada para o município de prestação de serviços informado no cadastro das informações fiscais. Exemplo -> "70"
+      issDeductionPercentage:
+        type: number
+        description: Dedução de ISS (%). Formato -> 2.00
+      issMaterialDeductionValue:
+        type: number
+        description: Dedução de material (ISS). Formato -> 100.00
+      issSubContractDeductionValue:
+        type: number
+        description: Dedução de subempreitada (ISS). Formato -> 100.00
+      issCalculationBasis:
+        type: number
+        description: Base de cálculo do ISS. Formato -> 800.00
+      issRate:
+        type: number
+        description: Alíquota do ISS (%). Formato -> 3.00
+      issOthersValue:
+        type: number
+        description: ISS outros. Formato -> 100.00
+      issWithheldCalculationBasis:
+        type: number
+        description: Base de cálculo do ISS Retido. Formato -> 800.00
+      issWithheldRate:
+        type: number
+        description: Alíquota do ISS Retido (%). Formato -> 3.00
+      inssWithheldCalculationBasis:
+        type: number
+        description: Base de cálculo do INSS Retido. Formato -> 800.00
+      inssWithheldRate:
+        type: number
+        description: Alíquota do INSS Retido (%). Formato -> 3.00
+      irffWithheldCalculationBasis:
+        type: number
+        description: Base de cálculo do IRFF Retido. Formato -> 800.00
+      irffWithheldRate:
+        type: number
+        description: Alíquota do IRFF Retido (%). Formato -> 3.00
+      csllWithheldCalculationBasis:
+        type: number
+        description: Base de cálculo do CSLL Retido. Formato -> 800.00
+      csllWithheldRate:
+        type: number
+        description: Alíquota do CSLL Retido (%). Formato -> 3.00
+
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+        example: Developer description message
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+        example: Client description message.

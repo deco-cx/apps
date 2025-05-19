@@ -1,0 +1,278 @@
+swagger: "2.0"
+info:
+  description: >-
+    API  de leitura dos dados apresentados no relatório de Notas Fiscais.
+  version: "1.0"
+  title: Relatório Notas Fiscais
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/bulk-data/v1"
+tags:
+  - name: Notas Fiscais
+    description: API REST para leitura de dados
+paths:
+  /invoice-itens:
+    get:
+      tags:
+        - Notas Fiscais
+      summary: >-
+        Realiza leitura de itens das notas fiscais.
+      operationId: invoiceItens
+      parameters:
+        - in: query
+          name: companyId
+          description: Código da empresa.
+          required: true
+          type: integer
+        - in: query
+          name: startDate
+          description: >-
+            Data de início para entrada/saída da nota fiscal.
+            <b>Exemplo</b>: 2022-01-01
+          format: yyyy-MM-dd
+          required: true
+          type: string
+        - in: query
+          name: endDate
+          description: >-
+            Data fim para entrada/saída da nota fiscal.
+            <b>Exemplo</b>: 2022-12-31
+          format: yyyy-MM-dd
+          required: true
+          type: string
+        - in: query
+          name: showCostCenterId
+          description: >-
+            Define se o código do empreendimento presente nas apropriações financeiras da nota será trazido no resultado da consulta. Valores válidos: "S" ou "N".
+          required: false
+          default: "N"
+          type: string
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: Resultado da pesquisa retornado com sucesso.
+          schema:
+            $ref: "#/definitions/GetInvoiceItens"
+        "400":
+          description: Requisição mal formada.
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
+  GetInvoiceItens:
+    type: object
+    required:
+      - data
+    properties:
+      data:
+        type: array
+        description: Lista de itens das notas fiscais retornados como resultado da pesquisa.
+        items:
+          $ref: "#/definitions/Results"
+  Results:
+    type: object
+    properties:
+      entryExitType:
+        type: integer
+        format: int32
+        description: Tipo da nota fiscal quando avulsa. Valores de retorno são 0 (Nota fiscal avulsa de saída) ou 1 (Nota fiscal avulsa de entrada).
+      itemType:
+        type: string
+        description: Tipo do item. Valores de retorno são "P" (Produto) ou "S" (Serviço).
+      entryExitDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de entrada/saída da nota fiscal.
+      costCenterId:
+        type: integer
+        format: int32
+        description: Número do empreendimento. Este atributo é retornado na consulta quando o parâmetro showCostCenterId = true.
+      documentNumber:
+        type: string
+        description: Número do documento da nota fiscal.
+      documenCode:
+        type: string
+        description: Código do documento utilizado (CT, NF, NFE).
+      seriesType:
+        type: string
+        description: Número de sério da nota fiscal.
+      issueDate:
+        type: string
+        format: yyyy-MM-dd
+        description: Data de emissão da nota fiscal.
+      participantCode:
+        type: integer
+        format: int32
+        description: Código do participante da operação, que pode ser o credor/cliente/empresa da nota fiscal.
+      participantName:
+        type: string
+        description: Nome do participante da operação.
+      participantFederatedUnit:
+        type: string
+        description: UF do participante da operação.
+      participantStateRegistration:
+        type: string
+        description: Inscrição estadual do participante da operação.
+      participantCpfCnpj:
+        type: string
+        description: CPF/CNPJ do participante da operação.
+      productCode:
+        type: integer
+        format: int32
+        description: Código do produto fiscal
+      productDescription:
+        type: string
+        description: Descrição do produto fiscal
+      unitOfMeasureSymbol:
+        type: string
+        description: Símbolo da unidade de medida (Kg, m2, m3)
+      ncm:
+        type: string
+        description: Código do NCM.
+      operationTaxCode:
+        type: string
+        description: Código fiscal da operação.
+      productOriginCode:
+        type: string
+        description: Código da origem da mercadoria (ICMS).
+      quantity:
+        type: number
+        format: "00.0000"
+        description: Quantidade do item.
+      unitPriceValue:
+        type: number
+        format: "00.0000"
+        description: Valor unitário do item.
+      freightValue:
+        type: number
+        format: "00.00"
+        description: Valor do frete do item.
+      insuranceValue:
+        type: number
+        format: "00.00"
+        description: Valor do seguro do item.
+      ipiExpensesValue:
+        type: number
+        format: "00.00"
+        description: Valor total do IPI informado na totalização do item.
+      ancillaryExpensesValue:
+        type: number
+        format: "00.00"
+        description: Valor de despesas acessórias do item.
+      discountValue:
+        type: number
+        format: "00.00"
+        description: Valor de desconto do item.
+      totalItemValue:
+        type: number
+        format: "00.00"
+        description: Valor total do item.
+      pisTaxSituation:
+        type: string
+        description: Código da situção tributária do PIS.
+      pisCalculationBasis:
+        type: number
+        format: "00.00"
+        description: Valor da base de cálculo do PIS.
+      pisRate:
+        type: number
+        format: "00.00"
+        description: Valor da alíquota do PIS.
+      pisValue:
+        type: number
+        format: "00.00"
+        description: Valor total do PIS.
+      cofinsTaxSituation:
+        type: string
+        description: Código da situção tributária do COFINS.
+      cofinsCalculationBasis:
+        type: number
+        format: "00.00"
+        description: Valor da base de cálculo do COFINS.
+      cofinsRate:
+        type: number
+        format: "00.00"
+        description: Valor da alíquota do COFINS.
+      cofinsValue:
+        type: number
+        format: "00.00"
+        description: Valor total do COFINS.
+      icmsTaxSituation:
+        type: string
+        description: Código da situção tributária do ICMS.
+      icmsCalculationBasis:
+        type: number
+        format: "00.00"
+        description: Valor da base de cálculo do ICMS.
+      icmsRate:
+        type: number
+        format: "00.00"
+        description: Valor da alíquota do ICMS.
+      icmsValue:
+        type: number
+        format: "00.00"
+        description: Valor total do ICMS.
+      icmsStCalculationBasis:
+        type: number
+        format: "00.00"
+        description: Valor da base de cálculo do ICMS-ST.
+      icmsStRate:
+        type: number
+        format: "00.00"
+        description: Valor da alíquota do ICMS-ST.
+      icmsStValue:
+        type: number
+        format: "00.00"
+        description: Valor total do ICMS-ST.
+      icmsExoneratedValue:
+        type: number
+        format: "00.00"
+        description: Valor do ICMS desonerado.
+      icmsExemptValue:
+        type: number
+        format: "00.00"
+        description: Valor do ICMS isento.
+      icmsOtherValue:
+        type: number
+        format: "00.00"
+        description: Valor do ICMS outros.
+      ipiTaxSituation:
+        type: string
+        description: Código da situção tributária do IPI.
+      ipiCalculationBasis:
+        type: number
+        format: "00.00"
+        description: Valor da base de cálculo do IPI.
+      ipiRate:
+        type: number
+        format: "00.00"
+        description: Valor da alíquota do IPI.
+      ipiValue:
+        type: number
+        format: "00.00"
+        description: Valor total do IPI.
+      ipiExemptValue:
+        type: number
+        format: "00.00"
+        description: Valor do IPI isento.
+      ipiOtherValue:
+        type: number
+        format: "00.00"
+        description: Valor do IPI outros.

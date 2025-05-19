@@ -1,0 +1,302 @@
+swagger: "2.0"
+info:
+  title: Orçamentos de Obra
+  description: API de Orçamentos de Obra.
+  version: "1.0"
+  license:
+    name: Softplan - Todos os direitos reservados
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Planilhas
+    description: Dados de planilhas de orçamento de obra.
+  - name: Itens da Planilha
+    description: Dados dos itens de uma planilha de orçamento de obra.
+paths:
+  "/building-cost-estimations/{buildingId}/sheets":
+    get:
+      tags:
+        - Planilhas
+      operationId: getBuildingCostEstimationsSheets
+      summary: >-
+        Retorna um array com as planilhas da versão atual do orçamento de uma obra,
+        sendo uma planilha para cada unidade construtiva (building unit).
+        O orçamento em questão é identificado pelo respectivo código da obra (buildingId),
+        considerando por padrão a versão atual do orçamento.
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com as planilhas da versão atual do orçamento
+            da respectiva obra, sendo uma planilha para cada unidade construtiva (building unit).
+            Se não existir nenhuma, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseSheet"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: Obra não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+  "/building-cost-estimations/{buildingId}/sheets/{building_unit_id}/items":
+    get:
+      tags:
+        - Itens da Planilha
+      operationId: getBuildingCostEstimationsSheetsItems
+      summary: >-
+        Retorna um array com os itens de uma planilha da versão atual do orçamento de uma obra.
+        A planilha em questão é identificada pela respectivo código da unidade construtiva (buildingUnitId).
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: buildingId
+          description: Código da obra
+          required: true
+          type: integer
+          format: int32
+        - in: path
+          name: building_unit_id
+          description: Código da unidade construtiva da obra, que identifica a planilha
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: >-
+            Deslocamento entre o começo da lista e um dado elemento. Valor
+            default é 0.
+          required: false
+          type: integer
+          default: 0
+          format: int32
+        - name: limit
+          in: query
+          description: >-
+            Quantidade máxima de resultados da pesquisa a serem retornados.
+            Valor default é 100 e o valor máximo permitido é 200.
+          required: false
+          type: integer
+          default: 100
+          maximum: 200
+          minimum: 1
+          format: int32
+      responses:
+        "200":
+          description: >-
+            Retorna um array com os itens da respectiva planilha da versão atual do orçamento da obra.
+            Se não existir nenhum, retorna um array vazio.
+          schema:
+            $ref: "#/definitions/GetResponseSheetItems"
+        "400":
+          description: Requisição mal formada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "404":
+          description: >-
+            Ocorreu um dos seguintes erros&#58;
+            <br/><br/> Obra não encontrada
+            <br/> Planilha não encontrada
+          schema:
+            $ref: "#/definitions/ApiError"
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ApiError"
+definitions:
+  GetResponseSheet:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/SheetDTO"
+  GetResponseSheetItems:
+    type: object
+    properties:
+      resultSetMetadata:
+        $ref: "#/definitions/ResultSetMetadata"
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/SheetItemsDTO"
+  ResultSetMetadata:
+    type: object
+    required:
+      - count
+      - limit
+      - offset
+    properties:
+      count:
+        type: integer
+        format: int64
+        example: 1
+        description: >-
+          Total de resultados disponíveis na base de dados como resultado da
+          pesquisa efetuada
+      offset:
+        type: integer
+        format: int32
+        description: >-
+          Deslocamento entre o começo da lista e um dado elemento. Valor default
+          é 0.
+      limit:
+        type: integer
+        format: int32
+        example: 100
+        description: >-
+          Quantidade máxima de resultados da pesquisa a serem retornados. Valor
+          default é 100 e o valor máximo permitido é 200.
+        minimum: 1
+        maximum: 200
+  SheetDTO:
+    type: object
+    properties:
+      id:
+        description: Id da unidade construtiva
+        type: integer
+        example: 1
+      description:
+        description: Descrição da unidade construtiva
+        type: string
+        example: Incorporação
+      status:
+        description: >
+          As situações da unidade construtiva são:
+            * LOCKED - Bloqueada
+            * UNLOCKED - Liberada
+        type: string
+        example: LOCKED
+  SheetItemsDTO:
+    type: object
+    properties:
+      id:
+        description: Identificador único imutável do item de orçamento
+        type: string
+      wbsCode:
+        description: >-
+          Código de referência do item de orçamento,  representando a posição do
+          mesmo na Estrutura de Decomposição do Trabalho (EDT)
+        type: string
+        example: 01.001.000.001
+      workItemId:
+        description: Código do serviço na tabela utilizada na obra.
+        type: integer
+        example: 9
+      description:
+        description: Descrição do item de orçamento
+        type: string
+        example: Alvenaria de Tijolo Furado
+      unitOfMeasure:
+        description: Unidade de medida usada para o item de orçamento
+        type: string
+        example: m2
+      quantity:
+        description: Quantidade orçada para o item de orçamento com precisão de 4 casas
+        type: number
+        example: 23.3205
+      unitPrice:
+        description: >-
+          Preço unitário do item de orçamento com precisão de 4 casas.
+          Equivalente a soma dos preços unitários de cada tipo de preço do
+          serviço
+        type: number
+        example: 9.0009
+      totalPrice:
+        description: >-
+          Preço total do item de orçamento com precisão de 2 casas. Equivalente
+          a soma dos preços totais de cada tipo de preço do serviço
+        type: number
+        example: 209.91
+      pricesByCategory:
+        type: array
+        description: >-
+          Preços do item de orçamento detalhados por tipo de insumo (por exemplo
+          material e mão de obra).
+        items:
+          $ref: "#/definitions/PriceByCategoryDTO"
+  PriceByCategoryDTO:
+    type: object
+    properties:
+      category:
+        description: Tipo de insumo correspondente aos preços totais e unitários.
+        type: string
+        enum:
+          - EQUIPMENT
+          - LABOR
+          - INCREMENTAL_COST_ITEM
+          - MATERIAL
+          - TRANSPORT_ITEM
+          - OTHER
+          - OFFICE_SUPPLY
+          - FUELS_AND_LUBRICANTS
+          - MAINTENANCE_MATERIAL
+        example: MATERIAL
+      unitPrice:
+        description: >-
+          Preço unitário para o tipo de insumo correspondente com precisão de 4
+          casas
+        type: number
+        example: 9.0009
+      totalPrice:
+        description: >-
+          Preço total para o tipo de insumo correspondente com precisão de 2
+          casas
+        type: number
+        example: 209.91
+  ApiError:
+    type: object
+    required:
+      - developerMessage
+      - status
+    properties:
+      status:
+        type: string
+        description: Status http
+      developerMessage:
+        type: string
+        description: >-
+          Mensagem de erro pertinente a ser reportada ao developer consumidor da
+          API.
+      userMessage:
+        type: array
+        description: Lista contendo mensagem de errors relavantes para o utilizador final
+        items:
+          type: string
+    description: Objeto que encapsula os atributos de erros da API

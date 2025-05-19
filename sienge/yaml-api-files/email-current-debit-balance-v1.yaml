@@ -1,0 +1,80 @@
+swagger: "2.0"
+info:
+  description: API para envio do Relatório Saldo Devedor Presente por e-mail. O relatório gerado obedece os filtros de condições de pagamento utilizadas na configuração do Portal do Cliente.
+  version: 1.0.0
+  title: Saldo Devedor Presente
+host: api.sienge.com.br
+basePath: "/{subdominio-do-cliente}/public/api/v1"
+tags:
+  - name: Saldo Devedor Presente por E-mail
+    description: API para envio de relatório de Saldo Devedor Presente
+schemes:
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+security:
+  - basicAuth: []
+paths:
+  /email-current-debit-balance:
+    post:
+      operationId: postEmailCurrentDebitBalance
+      tags:
+        - Saldo Devedor Presente por E-mail
+      summary: Envia relatório de Saldo Devedor Presente por e-mail.
+      parameters:
+        - in: body
+          name: filter
+          schema:
+            $ref: "#/definitions/EmailCurrentDebitBalanceFilter"
+      responses:
+        "201":
+          description: Relatório gerado com sucesso. O envio de e-mails pra esse relatório é assincrono, favor consultar o relatório de envio de e-mails de Contas a Receber para verificar se houve falha ao enviar.
+        "400":
+          description: Relatório não foi gerado
+        "500":
+          description: Erro interno no servidor
+          schema:
+            $ref: "#/definitions/ResponseMessage"
+definitions:
+  EmailCurrentDebitBalanceFilter:
+    type: object
+    properties:
+      customerId:
+        type: integer
+        description: Código do cliente - <b>preenchimento obrigatório</b>.
+      email:
+        type: string
+        description: E-mail do destinatário - <b>preenchimento obrigatório</b> (pode conter mais de um e-mail se for separado por ponto-e-virgula ';')
+      subject:
+        type: string
+        description: Assunto do e-mail.
+      message:
+        type: string
+        description: Texto do corpo do e-mail (pode ser usada a tag HTML '<_br_>' para quebra de linhas).
+      fileName:
+        type: string
+        description: Nome personalizado do arquivo PDF do relatório anexado ao e-mail.
+      conditionIdIn:
+        type: array
+        description: Id das condições de pagamento para incluir na consulta (Exemplo; AT, PM) | Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com as mesmas condições de pagamento informadas parâmetro .
+        items:
+          type: string
+      conditionIdNotIn:
+        type: array
+        description: Id das condições de pagamento para excluir da consulta (Exemplo; AT, PM) | Preenchendo este parâmetro serão consideradas somente as parcelas cadastradas com condições de pagamento diferentes das informadas no parâmetro. | Obs; O parâmetro ‘conditionIdIn’ tem prioridade sobre este, caso sejam preenchidos os parâmetros 'conditionIdIn' e 'conditionIdNotIn', será aplicado o filtro do parâmetro ‘conditionIdIn’ e ignorada a informação preenchida no parâmetro 'conditionIdNotIn’.
+        items:
+          type: string
+  ResponseMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        description: Status Http.
+      developerMessage:
+        type: string
+        description: Mensagem de resposta para análise do desenvolvedor.
+      clientMessage:
+        type: string
+        description: Mensagem de resposta para o usuário.
