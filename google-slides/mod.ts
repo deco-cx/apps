@@ -1,5 +1,4 @@
-import type { App, FnContext } from "@deco/deco";
-import type { Secret } from "../website/loaders/secret.ts";
+import type { FnContext } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { GoogleAuthClient, GoogleSlidesClient } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";

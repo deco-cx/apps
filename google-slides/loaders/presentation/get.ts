@@ -86,7 +86,10 @@ function extractTextContent(element: any): string {
     if (!result) {
       for (const key in element) {
         // Ignora propriedades que sabemos que não contêm conteúdo textual
-        if (["objectId", "width", "height", "transform", "type", "size", "style"].includes(key)) {
+        if (
+          ["objectId", "width", "height", "transform", "type", "size", "style"]
+            .includes(key)
+        ) {
           continue;
         }
 
@@ -111,14 +114,14 @@ const loader = async (
   ctx: AppContext,
 ): Promise<SlideContent[]> => {
   const response = await ctx.client
-  ["GET /v1/presentations/:presentationId"](
-    { presentationId: props.presentationId },
-    {
-      headers: {
-        Authorization: `Bearer ${props.token}`,
+    ["GET /v1/presentations/:presentationId"](
+      { presentationId: props.presentationId },
+      {
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
       },
-    },
-  );
+    );
 
   const data = await response.json();
 

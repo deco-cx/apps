@@ -2,46 +2,46 @@ import { AppContext } from "../../mod.ts";
 import { CLIENT_ID } from "../../utils/constant.ts";
 
 interface Props {
-    code: string;
-    returnUrl?: string;
-    redirectUri: string;
-    clientSecret: string;
+  code: string;
+  returnUrl?: string;
+  redirectUri: string;
+  clientSecret: string;
 }
 
 export default async function callback(
-    { code, returnUrl, clientSecret }: Props,
-    req: Request,
-    ctx: AppContext,
+  { code, returnUrl, clientSecret }: Props,
+  req: Request,
+  ctx: AppContext,
 ) {
-    const { authClient } = ctx;
-    const currenteCtx = await ctx.getConfiguration();
+  const { authClient } = ctx;
+  const currenteCtx = await ctx.getConfiguration();
 
-    const response = await authClient[`POST /token`]({
-        code,
-        client_id: CLIENT_ID,
-        client_secret: clientSecret,
-        redirect_uri: new URL("/oauth/callback", req.url).href,
-        grant_type: "authorization_code",
-    });
+  const response = await authClient[`POST /token`]({
+    code,
+    client_id: CLIENT_ID,
+    client_secret: clientSecret,
+    redirect_uri: new URL("/oauth/callback", req.url).href,
+    grant_type: "authorization_code",
+  });
 
-    const authResponse = await response.json();
+  const authResponse = await response.json();
 
-    await ctx.configure({
-        ...currenteCtx,
-        code,
-        access_token: authResponse.access_token,
-        refresh_token: authResponse.refresh_token,
-        expires_in: authResponse.expires_in,
-        scope: authResponse.scope,
-        token_type: authResponse.token_type,
-    });
+  await ctx.configure({
+    ...currenteCtx,
+    code,
+    access_token: authResponse.access_token,
+    refresh_token: authResponse.refresh_token,
+    expires_in: authResponse.expires_in,
+    scope: authResponse.scope,
+    token_type: authResponse.token_type,
+  });
 
-    if (returnUrl) {
-        return Response.redirect(returnUrl);
-    }
+  if (returnUrl) {
+    return Response.redirect(returnUrl);
+  }
 
-    return new Response(
-        `
+  return new Response(
+    `
       <html>
         <head>
           <title>Google Slides Authenticated</title>
@@ -65,8 +65,8 @@ export default async function callback(
         </body>
       </html>
     `,
-        {
-            headers: { "Content-Type": "text/html; charset=utf-8" },
-        },
-    );
+    {
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    },
+  );
 }

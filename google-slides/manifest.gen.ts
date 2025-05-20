@@ -2,23 +2,21 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $$$$$$$$$0 from "./actions/updateFromTemplateNames.ts";
-import * as $$$$$$$$$1 from "./actions/updateSlideTemplates.ts";
-import * as $$$0 from "./loaders/authClient.ts";
+import * as $$$$$$$$$0 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$1 from "./actions/updateFromTemplateNames.ts";
+import * as $$$$$$$$$2 from "./actions/updateSlideTemplates.ts";
+import * as $$$0 from "./loaders/oauth/start.ts";
 import * as $$$1 from "./loaders/presentation/get.ts";
-import * as $$$$$$0 from "./sections/login.tsx";
 
 const manifest = {
   "loaders": {
-    "google-slides/loaders/authClient.ts": $$$0,
+    "google-slides/loaders/oauth/start.ts": $$$0,
     "google-slides/loaders/presentation/get.ts": $$$1,
   },
-  "sections": {
-    "google-slides/sections/login.tsx": $$$$$$0,
-  },
   "actions": {
-    "google-slides/actions/updateFromTemplateNames.ts": $$$$$$$$$0,
-    "google-slides/actions/updateSlideTemplates.ts": $$$$$$$$$1,
+    "google-slides/actions/oauth/callback.ts": $$$$$$$$$0,
+    "google-slides/actions/updateFromTemplateNames.ts": $$$$$$$$$1,
+    "google-slides/actions/updateSlideTemplates.ts": $$$$$$$$$2,
   },
   "name": "google-slides",
   "baseUrl": import.meta.url,
