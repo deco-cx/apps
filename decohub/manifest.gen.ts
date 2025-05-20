@@ -33,6 +33,7 @@ import * as $$$$$$$$$$$27 from "./apps/wake.ts";
 import * as $$$$$$$$$$$28 from "./apps/wap.ts";
 import * as $$$$$$$$$$$29 from "./apps/weather.ts";
 import * as $$$$$$$$$$$30 from "./apps/workflows.ts";
+import * as $$$$$$$$$$$31 from "./apps/youtube.ts";
 
 const manifest = {
   "apps": {
@@ -67,6 +68,7 @@ const manifest = {
     "decohub/apps/wap.ts": $$$$$$$$$$$28,
     "decohub/apps/weather.ts": $$$$$$$$$$$29,
     "decohub/apps/workflows.ts": $$$$$$$$$$$30,
+    "decohub/apps/youtube.ts": $$$$$$$$$$$31,
   },
   "name": "decohub",
   "baseUrl": import.meta.url,
