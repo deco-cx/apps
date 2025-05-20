@@ -10,9 +10,11 @@ interface Props {
 // Tipo auxiliar para incluir decoded_content
 // Usando intersection ao invés de extends
 
-type RepoFileContent = Client["GET /repos/:owner/:repo/contents/:path"]["response"] & {
-  decoded_content?: string;
-};
+type RepoFileContent =
+  & Client["GET /repos/:owner/:repo/contents/:path"]["response"]
+  & {
+    decoded_content?: string;
+  };
 
 /**
  * @name GET_REPO_FILE_CONTENT
@@ -38,4 +40,4 @@ const loader = async (
   return result;
 };
 
-export default loader; 
+export default loader;

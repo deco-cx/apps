@@ -18,9 +18,9 @@ const loader = async (
   ctx: AppContext,
 ): Promise<Repository[]> => {
   const response = await ctx.client["GET /user/repos"]({
-    query: props,
+    ...props,
   });
   return await response.json();
 };
 
-export default loader; 
+export default loader;

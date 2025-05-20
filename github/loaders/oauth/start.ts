@@ -1,4 +1,8 @@
-import { CLIENT_ID, GITHUB_URL_OAUTH_AUTHORIZE, SCOPES } from "../../utils/constant.ts";
+import {
+  CLIENT_ID,
+  GITHUB_URL_OAUTH_AUTHORIZE,
+  SCOPES,
+} from "../../utils/constant.ts";
 
 interface Props {
   state: string;
@@ -14,7 +18,8 @@ export default function start(props: Props) {
     state: props.state,
   });
 
-  const authorizationUrl = `${GITHUB_URL_OAUTH_AUTHORIZE}?${authParams.toString()}`;
+  const authorizationUrl =
+    `${GITHUB_URL_OAUTH_AUTHORIZE}?${authParams.toString()}`;
 
   return Response.redirect(authorizationUrl);
 }

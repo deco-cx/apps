@@ -1,5 +1,10 @@
 import { GithubUser } from "./types.ts";
-import type { SimpleUser, Repository, GistSimple, OauthResponse } from "./types.ts";
+import type {
+  GistSimple,
+  OauthResponse,
+  Repository,
+  SimpleUser,
+} from "./types.ts";
 
 export interface Client {
   "GET /users/:username": {

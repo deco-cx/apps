@@ -15,4 +15,4 @@ const loader = async (
   return await response.json();
 };
 
-export default loader; 
+export default loader;

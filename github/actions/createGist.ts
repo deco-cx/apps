@@ -21,4 +21,4 @@ const action = async (
   return await response.json();
 };
 
-export default action; 
+export default action;

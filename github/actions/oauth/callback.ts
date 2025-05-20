@@ -1,5 +1,8 @@
 import { AppContext } from "../../mod.ts";
-import { CLIENT_ID, GITHUB_URL_OAUTH_ACCESS_TOKEN } from "../../utils/constant.ts";
+import {
+  CLIENT_ID,
+  GITHUB_URL_OAUTH_ACCESS_TOKEN,
+} from "../../utils/constant.ts";
 
 interface Props {
   code: string;
@@ -12,24 +15,24 @@ export default async function callback(
   _req: Request,
   ctx: AppContext,
 ) {
-    console.log("rest", rest);
-    const currentCtx = await ctx.getConfiguration();
-    const response = await fetch(`${GITHUB_URL_OAUTH_ACCESS_TOKEN}`, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          client_id: CLIENT_ID,
-          client_secret: "9f15d6ad56ec05ffe64f17dcfa3ea0713c1c2d69",
-          code,
-          redirect_uri: redirectUri,
-        }),
-      });
+  console.log("rest", rest);
+  const currentCtx = await ctx.getConfiguration();
+  const response = await fetch(`${GITHUB_URL_OAUTH_ACCESS_TOKEN}`, {
+    method: "POST",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: CLIENT_ID,
+      client_secret: "9f15d6ad56ec05ffe64f17dcfa3ea0713c1c2d69",
+      code,
+      redirect_uri: redirectUri,
+    }),
+  });
 
   const authResponse = await response.json();
-  
+
   await ctx.configure({
     ...currentCtx,
     access_token: authResponse.access_token,

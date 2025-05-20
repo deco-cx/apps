@@ -6,7 +6,6 @@ import { Client } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { GITHUB_URL } from "./utils/constant.ts";
 
-
 export interface Props {
   access_token?: string;
   refresh_token?: string;

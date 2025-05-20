@@ -30,7 +30,6 @@ export interface Repository {
   description?: string;
   fork: boolean;
   url: string;
-  [key: string]: any; // Para campos extras
 }
 
 export interface GistFile {

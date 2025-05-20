@@ -16,9 +16,9 @@ const loader = async (
   ctx: AppContext,
 ): Promise<GistSimple[]> => {
   const response = await ctx.client["GET /gists/public"]({
-     props,
+    ...props,
   });
   return await response.json();
 };
 
-export default loader; 
+export default loader;
