@@ -55,6 +55,7 @@ const config = {
     app("linx"),
     app("linx-impulse"),
     app("shopify"),
+    app("magento"),
     app("stability"),
     app("elevenlabs"),
     app("vidu"),
