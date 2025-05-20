@@ -32,11 +32,6 @@ export interface CreateLiveStreamParams {
    * @description Indica se o stream pode ser reutilizado para várias transmissões
    */
   isReusable?: boolean;
-
-  /**
-   * @description Token de autorização do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 export interface CreateLiveStreamResult {
@@ -62,17 +57,7 @@ export default async function action(
     resolution = "1080p",
     frameRate = "60fps",
     isReusable = true,
-    tokenYoutube,
   } = props;
-
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return {
-      success: false,
-      message: "Token de autenticação não encontrado",
-    };
-  }
 
   if (!title) {
     return {
@@ -104,7 +89,7 @@ export default async function action(
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${getAccessToken(req)}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),

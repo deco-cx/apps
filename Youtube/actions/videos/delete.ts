@@ -11,11 +11,6 @@ export interface DeleteVideoParams {
   videoId: string;
 
   /**
-   * @description Token de autorização do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Ignorar erros não fatais (opcional)
    */
   onBehalfOfContentOwner?: string;
@@ -46,15 +41,8 @@ export default async function action(
   const client = ctx.client;
   const {
     videoId,
-    tokenYoutube,
     onBehalfOfContentOwner,
   } = props;
-
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return createErrorResponse(401, "Token de autenticação não encontrado");
-  }
 
   if (!videoId) {
     return createErrorResponse(400, "ID do vídeo é obrigatório");
@@ -66,11 +54,6 @@ export default async function action(
       {
         id: videoId,
         onBehalfOfContentOwner,
-      },
-      {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-        },
       },
     );
 

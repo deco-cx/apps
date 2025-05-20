@@ -39,11 +39,6 @@ export interface VideoDetailsOptions {
   includeCaptions?: boolean;
 
   /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Ignorar cache para esta solicitação
    */
   skipCache?: boolean;
@@ -73,14 +68,6 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<VideoDetailsResponse> {
   const client = ctx.client;
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para obter detalhes do vídeo",
-    );
-  }
 
   const {
     videoId,
@@ -99,7 +86,6 @@ export default async function loader(
       part: partString,
       id: videoId,
     }, {
-      headers: { Authorization: `Bearer ${accessToken}` },
       ...STALE,
     });
 
@@ -136,7 +122,6 @@ export default async function loader(
           part: "snippet",
           videoId,
         }, {
-          headers: { Authorization: `Bearer ${accessToken}` },
           ...STALE,
         });
 
@@ -174,21 +159,17 @@ function createErrorResponse(
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: VideoDetailsOptions, req: Request) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
   const tokenExpired = req.headers.get("X-Token-Expired") === "true";
 
-  if (!accessToken || !props.videoId || props.skipCache || tokenExpired) {
+  if (!props.videoId || props.skipCache || tokenExpired) {
     return null;
   }
-
-  const tokenFragment = accessToken.slice(-8);
 
   const params = new URLSearchParams([
     ["videoId", props.videoId],
     ["parts", (props.parts || ["snippet", "statistics", "status"]).join(",")],
     ["includeCaptions", (props.includeCaptions ?? true).toString()],
     ["includePrivate", (props.includePrivate ?? false).toString()],
-    ["tokenId", tokenFragment],
   ]);
 
   params.sort();

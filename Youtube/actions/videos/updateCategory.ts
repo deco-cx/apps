@@ -48,11 +48,6 @@ export interface UpdateCategoryOptions {
    * 29 - Sem fins lucrativos/ativismo
    */
   categoryId: string;
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 /**
@@ -74,25 +69,11 @@ export default async function action(
     return createErrorResponse(400, "ID da categoria é obrigatório");
   }
 
-  // Obter o token de acesso dos cookies ou do parâmetro
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para atualizar a categoria do vídeo",
-    );
-  }
-
   try {
     // Primeiro, obter os dados atuais do vídeo para não perder informações
     const getResponse = await client["GET /videos"]({
       part: "snippet,status",
       id: props.videoId,
-    }, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
     });
 
     if (!getResponse.ok) {
@@ -127,7 +108,6 @@ export default async function action(
       { part: "snippet" },
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: requestBody,

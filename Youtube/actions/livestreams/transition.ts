@@ -17,11 +17,6 @@ export interface TransitionBroadcastParams {
    * @description Tipo de transição a ser aplicada
    */
   transitionType: BroadcastTransitionType;
-
-  /**
-   * @description Token de autorização do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 export interface TransitionBroadcastResult {
@@ -43,17 +38,7 @@ export default async function action(
   const {
     broadcastId,
     transitionType,
-    tokenYoutube,
   } = props;
-
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return {
-      success: false,
-      message: "Token de autenticação não encontrado",
-    };
-  }
 
   if (!broadcastId) {
     return {
@@ -86,7 +71,7 @@ export default async function action(
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${getAccessToken(req)}`,
         "Content-Length": "0", // Requisição sem corpo
       },
     });

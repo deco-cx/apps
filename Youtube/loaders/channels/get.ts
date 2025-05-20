@@ -120,7 +120,7 @@ export const cacheKey = (
   req: Request,
   ctx: AppContext,
 ) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
+  const accessToken = getAccessToken(req);
 
   // Verificar se há flag de token expirado
   const tokenExpired = req.headers.get("X-Token-Expired") === "true";

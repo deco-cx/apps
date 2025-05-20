@@ -29,11 +29,6 @@ export interface UpdateVideoOptions {
    * @description Novo status de privacidade do vídeo (opcional)
    */
   privacyStatus?: "public" | "private" | "unlisted";
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 export interface UpdateVideoResult {
@@ -65,25 +60,11 @@ export default async function action(
     return createErrorResponse(400, "ID do vídeo é obrigatório");
   }
 
-  // Obter o token de acesso dos cookies
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para atualizar o vídeo",
-    );
-  }
-
   try {
     // Primeiro, obter os dados atuais do vídeo para não perder informações
     const getResponse = await client["GET /videos"]({
       part: "snippet,status",
       id: props.videoId,
-    }, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
     });
 
     if (!getResponse.ok) {
@@ -129,7 +110,6 @@ export default async function action(
       { part: "snippet,status" },
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: requestBody,

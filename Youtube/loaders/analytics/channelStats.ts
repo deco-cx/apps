@@ -43,11 +43,6 @@ export interface ChannelAnalyticsOptions {
    * @description Número máximo de resultados
    */
   maxResults?: number;
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 interface AnalyticsResponse {
@@ -78,16 +73,7 @@ export default async function loader(
     sort = "day",
     filters,
     maxResults,
-    tokenYoutube,
   } = props;
-
-  // Obter o token de acesso
-  const accessToken = getAccessToken(req) || tokenYoutube;
-
-  if (!accessToken) {
-    console.error("Autenticação necessária para obter dados de analytics");
-    return null;
-  }
 
   if (!channelId) {
     console.error("ID do canal é obrigatório");
@@ -129,7 +115,7 @@ export default async function loader(
     // Fazer a requisição para a API do YouTube Analytics
     const response = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${getAccessToken(req)}`,
       },
     });
 

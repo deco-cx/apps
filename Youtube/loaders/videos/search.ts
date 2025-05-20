@@ -55,11 +55,6 @@ export interface VideoSearchOptions {
   relevanceLanguage?: string;
 
   /**
-   * @description YouTube authentication token (optional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Include private videos (when authenticated)
    */
   includePrivate?: boolean;
@@ -186,7 +181,6 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<YoutubeVideoResponse | null> {
   const client = ctx.client;
-  const accessToken = props.tokenYoutube || getAccessToken(req);
 
   const {
     q,
@@ -394,8 +388,7 @@ export const cacheKey = (props: VideoSearchOptions, req: Request) => {
     return null;
   }
 
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-  const tokenFragment = accessToken ? accessToken.slice(-8) : "";
+  const tokenFragment = "";
 
   const params = new URLSearchParams([
     ["q", props.q || ""],

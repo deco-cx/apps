@@ -49,11 +49,6 @@ export interface VideoAnalyticsOptions {
   maxResults?: number;
 
   /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Ignorar cache para esta solicitação
    */
   skipCache?: boolean;
@@ -102,19 +97,8 @@ export default async function loader(
     dimensions = "video",
     sort = "-views",
     maxResults,
-    tokenYoutube,
     skipCache = false,
   } = props;
-
-  // Obter o token de acesso
-  const accessToken = getAccessToken(req) || tokenYoutube;
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para obter dados de analytics",
-    );
-  }
 
   if (!channelId) {
     return createErrorResponse(400, "ID do canal é obrigatório");
@@ -158,7 +142,7 @@ export default async function loader(
     // Fazer a requisição para a API do YouTube Analytics
     const response = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${getAccessToken(req)}`,
       },
       ...STALE,
     });
@@ -249,10 +233,7 @@ export const cacheKey = (
   req: Request,
   _ctx: AppContext,
 ) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
-  // Não usar cache se não houver token ou se skipCache for verdadeiro
-  if (!accessToken || props.skipCache) {
+  if (props.skipCache) {
     return null;
   }
 
@@ -272,10 +253,6 @@ export const cacheKey = (
   ]);
 
   params.sort();
-
-  // Incluir fragmento do token na chave de cache
-  const tokenFragment = accessToken.slice(-8);
-  params.append("tokenId", tokenFragment);
 
   return `youtube-video-analytics-${params.toString()}`;
 };

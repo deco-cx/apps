@@ -10,11 +10,6 @@ export interface VideoCategoriesOptions {
   regionCode?: string;
 
   /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Ignorar cache para esta solicitação
    */
   skipCache?: boolean;
@@ -29,24 +24,14 @@ export default async function loader(
   req: Request,
   ctx: AppContext,
 ): Promise<YoutubeCategoryListResponse | null> {
-  const { regionCode = "BR", tokenYoutube } = props;
+  const { regionCode = "BR" } = props;
   const client = ctx.client;
-
-  const accessToken = getAccessToken(req) || tokenYoutube;
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para obter categorias de vídeos",
-    );
-  }
 
   try {
     const response = await client["GET /videoCategories"]({
       part: "snippet",
       regionCode,
     }, {
-      headers: { Authorization: `Bearer ${accessToken}` },
       ...STALE,
     });
 
@@ -104,19 +89,14 @@ function createErrorResponse(
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: VideoCategoriesOptions, req: Request) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
   const tokenExpired = req.headers.get("X-Token-Expired") === "true";
 
-  if (!accessToken || props.skipCache || tokenExpired) {
+  if (props.skipCache || tokenExpired) {
     return null;
   }
 
-  const tokenFragment = accessToken.slice(-8);
-
   const params = new URLSearchParams([
     ["regionCode", props.regionCode || "BR"],
-    ["tokenId", tokenFragment],
   ]);
 
   params.sort();

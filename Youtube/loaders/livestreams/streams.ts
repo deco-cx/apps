@@ -4,11 +4,6 @@ import type { LiveStreamListResponse } from "../../utils/types.ts";
 
 export interface ListLiveStreamsParams {
   /**
-   * @description Token de autenticação do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Filtrar por IDs específicos de streams
    */
   streamId?: string;
@@ -53,15 +48,6 @@ export default async function loader(
   } = props;
 
   //const client = ctx.client;
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return {
-      error: true,
-      message:
-        "Autenticação necessária para listar streams. O token de acesso não foi encontrado.",
-    };
-  }
 
   try {
     // Construir a URL manualmente
@@ -95,7 +81,7 @@ export default async function loader(
       url.toString(),
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${getAccessToken(req)}`,
         },
       },
     );

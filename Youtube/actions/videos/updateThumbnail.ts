@@ -20,11 +20,6 @@ export interface UpdateThumbnailOptions {
    * @description Dados base64 da imagem para o thumbnail
    */
   imageBase64?: string;
-
-  /**
-   * @description Token de acesso do YouTube
-   */
-  tokenYoutube?: string;
 }
 
 export interface ThumbnailUpdateResult {
@@ -51,7 +46,7 @@ export default async function action(
   ctx: AppContext,
 ): Promise<ThumbnailResponse> {
   const client = ctx.client;
-  const { videoId, imageData, imageBase64, tokenYoutube } = props;
+  const { videoId, imageData, imageBase64 } = props;
 
   // Validar dados
   if (!videoId) {
@@ -60,16 +55,6 @@ export default async function action(
 
   if (!imageData && !imageBase64) {
     return createErrorResponse(400, "Dados da imagem são obrigatórios");
-  }
-
-  // Obter o token de acesso dos cookies
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para atualizar o thumbnail",
-    );
   }
 
   try {
@@ -98,7 +83,7 @@ export default async function action(
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${client.accessToken}`,
           "Content-Type": "image/jpeg, image/png, image/webp",
         },
         body: imageBase64 ? imageBase64 : imageBlob!,

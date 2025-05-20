@@ -4,7 +4,6 @@ import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 export interface ResponderCommentProps {
   parentId: string;
   text: string;
-  tokenYoutube?: string;
 }
 
 /**
@@ -17,11 +16,6 @@ const action = async (
   _ctx: AppContext,
 ) => {
   const { parentId, text } = props;
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return { success: false, message: "Autenticação necessária" };
-  }
 
   if (!parentId) {
     return { success: false, message: "ID do comentário pai é obrigatório" };
@@ -37,7 +31,7 @@ const action = async (
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${getAccessToken(req)}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

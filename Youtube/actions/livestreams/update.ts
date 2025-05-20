@@ -55,11 +55,6 @@ export interface UpdateLiveBroadcastParams {
    * @description Conteúdo adequado para crianças (opcional)
    */
   madeForKids?: boolean;
-
-  /**
-   * @description Token de autorização do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 export interface UpdateLiveBroadcastResult {
@@ -89,17 +84,7 @@ export default async function action(
     enableAutoStart,
     enableAutoStop,
     madeForKids,
-    tokenYoutube,
   } = props;
-
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return {
-      success: false,
-      message: "Token de autenticação não encontrado",
-    };
-  }
 
   if (!broadcastId) {
     return {
@@ -118,7 +103,7 @@ export default async function action(
 
     const getResponse = await fetch(getUrl.toString(), {
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${getAccessToken(req)}`,
       },
     });
 
@@ -184,7 +169,7 @@ export default async function action(
     const updateResponse = await fetch(updateUrl.toString(), {
       method: "PUT",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${getAccessToken(req)}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),

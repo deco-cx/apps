@@ -22,11 +22,6 @@ export interface UpdateLiveBroadcastThumbnailParams {
    * @description Tipo MIME da imagem (e.g., 'image/jpeg', 'image/png')
    */
   mimeType?: string;
-
-  /**
-   * @description Token de autorização do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 export interface UpdateLiveBroadcastThumbnailResult {
@@ -51,17 +46,7 @@ export default async function action(
     thumbnailUrl,
     thumbnailData,
     mimeType = "image/jpeg",
-    tokenYoutube,
   } = props;
-
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return {
-      success: false,
-      message: "Token de autenticação não encontrado",
-    };
-  }
 
   if (!broadcastId) {
     return {
@@ -113,7 +98,6 @@ export default async function action(
     const uploadResponse = await fetch(url.toString(), {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
         "Content-Type": mimeType,
         "Content-Length": imageData.length.toString(),
       },

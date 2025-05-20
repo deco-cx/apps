@@ -41,8 +41,6 @@ export interface VideoListOptions {
    * @title
    */
   part?: string;
-
-  tokenYoutube?: string;
 }
 
 /**
@@ -55,10 +53,6 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<YoutubeVideoListResponse | null> {
   const { client } = ctx;
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-  if (!accessToken && !props.tokenYoutube) {
-    return null;
-  }
 
   const { videoId, maxResults = 10, pageToken, order = "relevance", q, part } =
     props;
@@ -67,7 +61,7 @@ export default async function loader(
     const videoResponse = await client["GET /videos"]({
       part: part || "snippet,statistics,status",
       id: videoId,
-    }, { headers: { Authorization: `Bearer ${accessToken}` } });
+    });
 
     return await videoResponse.json();
   }
@@ -79,7 +73,7 @@ export default async function loader(
     order,
     type: "video",
     pageToken,
-  }, { headers: { Authorization: `Bearer ${accessToken}` } });
+  });
 
   const searchData = await searchResponse.json() as YoutubeVideoResponse;
 
@@ -98,7 +92,7 @@ export default async function loader(
     const detailsResponse = await client["GET /videos"]({
       part: "snippet,statistics,status",
       id: videoIds,
-    }, { headers: { Authorization: `Bearer ${accessToken}` } });
+    });
 
     const detailsData = await detailsResponse
       .json() as YoutubeVideoListResponse;

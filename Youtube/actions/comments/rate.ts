@@ -4,7 +4,6 @@ import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 export interface LikeCommentProps {
   commentId: string;
   rating: "like" | "dislike" | "none";
-  tokenYoutube?: string;
 }
 
 /**
@@ -17,11 +16,6 @@ const action = async (
   _ctx: AppContext,
 ) => {
   const { commentId, rating } = props;
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return { success: false, message: "Autenticação necessária" };
-  }
 
   if (!commentId) {
     return { success: false, message: "ID do comentário é obrigatório" };
@@ -44,7 +38,7 @@ const action = async (
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${getAccessToken(req)}`,
         "Content-Length": "0", // importante: requisição sem corpo
       },
     });

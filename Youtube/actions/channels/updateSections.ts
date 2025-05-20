@@ -60,11 +60,6 @@ export interface UpdateChannelSectionsOptions {
    * @description IDs de seções a serem removidas (opcional)
    */
   removeSectionIds?: string[];
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 interface UpdateChannelSectionsResult {
@@ -83,7 +78,7 @@ export default async function action(
   props: UpdateChannelSectionsOptions,
   req: Request,
 ): Promise<UpdateChannelSectionsResult> {
-  const { sections, removeSectionIds, tokenYoutube } = props;
+  const { sections, removeSectionIds } = props;
 
   if (!sections || sections.length === 0) {
     console.error("Nenhuma seção fornecida");
@@ -95,7 +90,7 @@ export default async function action(
   }
 
   // Obter o token de acesso
-  const accessToken = tokenYoutube || getAccessToken(req);
+  const accessToken = getAccessToken(req);
 
   if (!accessToken) {
     console.error("Token de acesso não encontrado");

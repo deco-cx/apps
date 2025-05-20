@@ -51,11 +51,6 @@ export interface ChannelDefaultOptions {
    * @description Se a publicação automática na feed social está ativada
    */
   enableAutoShare?: boolean;
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 interface UpdateChannelDefaultsResult {
@@ -84,26 +79,12 @@ export default async function action(
     tags,
     defaultLanguage,
     enableAutoShare,
-    tokenYoutube,
   } = props;
-
-  // Obter o token de acesso
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    console.error("Token de acesso não encontrado");
-    return { success: false, message: "Autenticação necessária" };
-  }
 
   try {
     // Primeiro, obter os dados atuais do canal para não perder configurações
     const getResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=brandingSettings&mine=true`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
     );
 
     if (!getResponse.ok) {
@@ -193,7 +174,6 @@ export default async function action(
       {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),

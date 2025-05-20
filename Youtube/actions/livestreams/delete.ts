@@ -6,11 +6,6 @@ export interface DeleteLiveBroadcastParams {
    * @description ID da transmissão ao vivo a ser excluída
    */
   broadcastId: string;
-
-  /**
-   * @description Token de autorização do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 export interface DeleteLiveBroadcastResult {
@@ -30,17 +25,7 @@ export default async function action(
 ): Promise<DeleteLiveBroadcastResult> {
   const {
     broadcastId,
-    tokenYoutube,
   } = props;
-
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return {
-      success: false,
-      message: "Token de autenticação não encontrado",
-    };
-  }
 
   if (!broadcastId) {
     return {
@@ -62,7 +47,7 @@ export default async function action(
     const response = await fetch(url.toString(), {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${getAccessToken(req)}`,
       },
     });
 

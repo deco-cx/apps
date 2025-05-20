@@ -37,11 +37,6 @@ export interface VideoCaptionsOptions {
   autoLoadCaption?: boolean;
 
   /**
-   * @description YouTube access token (optional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Opção para ignorar cache em casos específicos
    */
   skipCache?: boolean;
@@ -87,21 +82,12 @@ export default async function loader(
     translationLanguage,
     preferredLanguage,
     autoLoadCaption = true,
-    tokenYoutube,
     skipCache = false,
   }: VideoCaptionsOptions,
   req: Request,
   ctx: AppContext,
 ): Promise<CaptionResponse | null> {
   const client = ctx.client;
-  const accessToken = getAccessToken(req) || tokenYoutube;
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Authentication required to get video captions",
-    );
-  }
 
   if (!videoId) {
     return createErrorResponse(400, "Video ID is required");
@@ -112,7 +98,6 @@ export default async function loader(
       part: "snippet",
       videoId,
     }, {
-      headers: { Authorization: `Bearer ${accessToken}` },
       ...STALE,
     });
 
@@ -140,11 +125,10 @@ export default async function loader(
     if (targetCaptionId) {
       await loadCaption(
         client,
-        accessToken,
+        response,
         targetCaptionId,
         format,
         translationLanguage,
-        response,
       );
     }
 
@@ -177,11 +161,10 @@ function findCaptionToLoad(
 
 async function loadCaption(
   client: any,
-  accessToken: string,
+  response: CaptionResponse,
   captionId: string,
   format: "srt" | "sbv" | "vtt",
   translationLanguage: string | undefined,
-  response: CaptionResponse,
 ): Promise<void> {
   try {
     const captionParams: Record<string, string> = { tfmt: format };
@@ -193,7 +176,6 @@ async function loadCaption(
       id: captionId,
       ...captionParams,
     }, {
-      headers: { Authorization: `Bearer ${accessToken}` },
       ...STALE,
     });
 
@@ -390,10 +372,8 @@ export const cacheKey = (
   req: Request,
   ctx: AppContext,
 ) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
-  // Não fazer cache se não houver token ou videoId
-  if (!accessToken || !props.videoId) {
+  // Não fazer cache se não houver videoId
+  if (!props.videoId) {
     return null;
   }
 

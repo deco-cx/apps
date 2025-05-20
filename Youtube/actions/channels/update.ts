@@ -40,11 +40,6 @@ export interface UpdateChannelOptions {
    * @description Tópicos relacionados ao canal (IDs de tópicos do Freebase/Wiki) (opcional)
    */
   topicCategories?: string[];
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 interface UpdateChannelResult {
@@ -71,7 +66,6 @@ export default async function action(
     country,
     defaultLanguage,
     topicCategories,
-    tokenYoutube,
   } = props;
 
   if (!channelId) {
@@ -79,23 +73,10 @@ export default async function action(
     return { success: false, message: "ID do canal é obrigatório" };
   }
 
-  // Obter o token de acesso
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    console.error("Token de acesso não encontrado");
-    return { success: false, message: "Autenticação necessária" };
-  }
-
   try {
     // Primeiro, obter os dados atuais do canal para não perder informações
     const getResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
     );
 
     if (!getResponse.ok) {
@@ -194,7 +175,6 @@ export default async function action(
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(snippetRequestBody),
@@ -222,7 +202,6 @@ export default async function action(
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(brandingRequestBody),
@@ -244,11 +223,6 @@ export default async function action(
     // 3. Buscar os dados atualizados do canal
     const updatedDataResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=snippet,brandingSettings&id=${channelId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
     );
 
     const updatedChannelData = await updatedDataResponse.json();

@@ -20,11 +20,6 @@ export interface CommentListParams {
   pageToken?: string;
 
   /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Ignorar cache para esta solicitação
    */
   skipCache?: boolean;
@@ -51,18 +46,8 @@ export default async function loader(
     parentId,
     maxResults = 20,
     pageToken,
-    tokenYoutube,
     skipCache = false,
   } = props;
-
-  const accessToken = getAccessToken(req) || tokenYoutube;
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para carregar comentários",
-    );
-  }
 
   if (!parentId) {
     return createErrorResponse(
@@ -82,7 +67,7 @@ export default async function loader(
 
     const response = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${getAccessToken(req)}`,
       },
       ...STALE,
     });
@@ -147,10 +132,7 @@ export const cacheKey = (
   req: Request,
   _ctx: AppContext,
 ) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
-  // Não usar cache se não houver token ou se skipCache for verdadeiro
-  if (!accessToken || props.skipCache) {
+  if (props.skipCache) {
     return null;
   }
 

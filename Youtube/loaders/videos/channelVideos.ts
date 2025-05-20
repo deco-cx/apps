@@ -15,11 +15,6 @@ export interface ChannelVideosOptions {
    * @description Token para buscar a próxima página
    */
   pageToken?: string;
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 /**
@@ -32,11 +27,6 @@ export default async function loader(
   ctx: AppContext,
 ): Promise<YoutubeVideoListResponse | null> {
   const { client } = ctx;
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
-  if (!accessToken) {
-    return null;
-  }
 
   const {
     maxResults = 50,
@@ -47,7 +37,7 @@ export default async function loader(
     const channelResponse = await client["GET /channels"]({
       part: "contentDetails",
       mine: true,
-    }, { headers: { Authorization: `Bearer ${accessToken}` } });
+    });
 
     const channelData = await channelResponse.json();
 
@@ -77,7 +67,7 @@ export default async function loader(
       playlistId: uploadsPlaylistId,
       maxResults,
       pageToken,
-    }, { headers: { Authorization: `Bearer ${accessToken}` } });
+    });
 
     const playlistData = await playlistResponse.json();
 

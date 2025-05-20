@@ -8,10 +8,6 @@ export interface SendCommentProps {
    * @description Define se o comentário deve ser pinado no vídeo (requer permissão de proprietário do vídeo)
    */
   pinComment?: boolean;
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 /**
@@ -24,11 +20,6 @@ const action = async (
   _ctx: AppContext,
 ) => {
   const { videoId, text, pinComment = false } = props;
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return { success: false, message: "Autenticação necessária" };
-  }
 
   if (!videoId) {
     return { success: false, message: "ID do vídeo é obrigatório" };
@@ -45,7 +36,7 @@ const action = async (
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${getAccessToken(req)}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -93,7 +84,7 @@ const action = async (
           {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${getAccessToken(req)}`,
               "Content-Length": "0", // importante: requisição sem corpo
             },
           },
@@ -129,7 +120,7 @@ const action = async (
           {
             method: "PUT",
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${getAccessToken(req)}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({

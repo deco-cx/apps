@@ -6,11 +6,6 @@ import { AppContext } from "../../mod.ts";
  */
 export interface ListLiveBroadcastsParams {
   /**
-   * @description Token de autenticação do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Filtrar por IDs específicos de transmissões
    */
   broadcastId?: string;
@@ -94,15 +89,6 @@ export default async function loader(
     includeVideoDetails = false,
   } = props;
 
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para listar transmissões ao vivo. O token de acesso não foi encontrado.",
-    );
-  }
-
   try {
     // Construir a URL manualmente
     const baseUrl = "https://youtube.googleapis.com/youtube/v3/liveBroadcasts";
@@ -175,7 +161,7 @@ export default async function loader(
       url.toString(),
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${getAccessToken(req)}`,
         },
       },
     );
@@ -286,15 +272,13 @@ function createErrorResponse(
 export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: ListLiveBroadcastsParams, req: Request) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
   // Não usar cache para consultas que exigem dados em tempo real
-  if (!accessToken || props.broadcastStatus === "active") {
+  if (!getAccessToken(req) || props.broadcastStatus === "active") {
     return null;
   }
 
   // Incluir fragmento do token na chave de cache
-  const tokenFragment = accessToken.slice(-8);
+  const tokenFragment = getAccessToken(req).slice(-8);
 
   const params = new URLSearchParams([
     ["broadcastId", props.broadcastId || ""],

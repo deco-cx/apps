@@ -25,11 +25,6 @@ export interface ThreadListParams {
   order?: "time" | "relevance";
 
   /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Ignorar cache para esta solicitação
    */
   skipCache?: boolean;
@@ -57,17 +52,8 @@ export default async function loader(
     maxResults = 20,
     pageToken,
     order = "time",
-    tokenYoutube,
     skipCache = false,
   } = props;
-  const accessToken = getAccessToken(req) || tokenYoutube;
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para carregar threads de comentários",
-    );
-  }
 
   if (!videoId) {
     return createErrorResponse(
@@ -88,7 +74,7 @@ export default async function loader(
 
     const response = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${getAccessToken(req)}`,
       },
       ...STALE,
     });
@@ -151,10 +137,8 @@ export const cacheKey = (
   req: Request,
   _ctx: AppContext,
 ) => {
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
   // Não usar cache se não houver token ou se skipCache for verdadeiro
-  if (!accessToken || props.skipCache) {
+  if (props.skipCache) {
     return null;
   }
 

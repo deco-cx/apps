@@ -6,11 +6,6 @@ export interface PinCommentProps {
    * @description ID do comentário a ser pinado
    */
   commentId: string;
-
-  /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 interface PinCommentResult {
@@ -30,11 +25,6 @@ const action = async (
   _ctx: AppContext,
 ): Promise<PinCommentResult> => {
   const { commentId } = props;
-  const accessToken = props.tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return { success: false, message: "Autenticação necessária" };
-  }
 
   if (!commentId) {
     return { success: false, message: "ID do comentário é obrigatório" };
@@ -56,7 +46,7 @@ const action = async (
       getUrl.toString(),
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${getAccessToken(req)}`,
         },
       },
     );
@@ -93,7 +83,7 @@ const action = async (
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${getAccessToken(req)}`,
           "Content-Length": "0", // importante: requisição sem corpo
         },
       },
@@ -127,7 +117,7 @@ const action = async (
       {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${getAccessToken(req)}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

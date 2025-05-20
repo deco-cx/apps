@@ -12,11 +12,6 @@ export interface BindStreamParams {
    * @description ID do stream de vídeo
    */
   streamId: string;
-
-  /**
-   * @description Token de autorização do YouTube (opcional)
-   */
-  tokenYoutube?: string;
 }
 
 export interface BindStreamResult {
@@ -38,17 +33,7 @@ export default async function action(
   const {
     broadcastId,
     streamId,
-    tokenYoutube,
   } = props;
-
-  const accessToken = tokenYoutube || getAccessToken(req);
-
-  if (!accessToken) {
-    return {
-      success: false,
-      message: "Token de autenticação não encontrado",
-    };
-  }
 
   if (!broadcastId) {
     return {
@@ -79,7 +64,7 @@ export default async function action(
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${getAccessToken(req)}`,
         "Content-Length": "0", // Requisição sem corpo
       },
     });
