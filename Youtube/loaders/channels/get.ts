@@ -23,11 +23,6 @@ export interface ChannelOptions {
   id?: string;
 
   /**
-   * @description Token de acesso do YouTube (opcional)
-   */
-  tokenYoutube?: string;
-
-  /**
    * @description Ignorar cache para esta solicitação
    */
   skipCache?: boolean;
@@ -52,18 +47,10 @@ export type ChannelResponse = ChannelResult | ChannelError;
  */
 export default async function loader(
   props: ChannelOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<ChannelResponse> {
   const client = ctx.client;
-  const accessToken = getAccessToken(req) || props.tokenYoutube;
-
-  if (!accessToken) {
-    return createErrorResponse(
-      401,
-      "Autenticação necessária para obter dados do canal",
-    );
-  }
 
   const { part = "snippet", id, mine = true } = props;
 
@@ -77,7 +64,6 @@ export default async function loader(
 
   try {
     const response = await client["GET /channels"]({ part, id, mine }, {
-      headers: { Authorization: `Bearer ${accessToken}` },
       ...STALE,
     });
 

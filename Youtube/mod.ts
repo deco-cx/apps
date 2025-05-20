@@ -1,26 +1,18 @@
 import type { AuthClient, Client } from "./utils/client.ts";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import type { FnContext } from "@deco/deco";
-import { Secret } from "../website/loaders/secret.ts";
 import { createHttpClient } from "../utils/http.ts";
 import { fetchSafe } from "../utils/fetch.ts";
+import { McpContext } from "../mcp/context.ts";
 
 export interface Props {
-  /**
-   * @title Authentication Configuration
-   * @description The configuration for the authentication on the Youtube API.
-   */
-  authenticationConfig: {
-    clientSecret: Secret;
-    clientId: string;
-    scopes: string;
-    redirectUri: string;
-    /**
-     * @title Authentication URL
-     * @description The URL to authenticate the user ex: https://accounts.google.com/o/oauth2/v2/auth
-     */
-    url: string;
-  };
+  code?: string;
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+  scope?: string;
+  token_type?: string;
+  refresh_token_expires_in?: number;
 }
 
 export interface State extends Props {
@@ -28,7 +20,7 @@ export interface State extends Props {
   authClient: ReturnType<typeof createHttpClient<AuthClient>>;
 }
 
-export type AppContext = FnContext<State, Manifest>;
+export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
  * @title Youtube
@@ -41,6 +33,7 @@ export default function App({ ...props }: Props) {
     base: "https://www.googleapis.com/youtube/v3",
     headers: new Headers({
       "Accept": "application/json",
+      "Authorization": `Bearer ${props.access_token}`,
     }),
     fetcher: fetchSafe,
   });

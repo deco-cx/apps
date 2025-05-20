@@ -16,45 +16,42 @@ import * as $$$$$$$$$10 from "./actions/livestreams/delete.ts";
 import * as $$$$$$$$$11 from "./actions/livestreams/transition.ts";
 import * as $$$$$$$$$12 from "./actions/livestreams/update.ts";
 import * as $$$$$$$$$13 from "./actions/livestreams/updateThumbnail.ts";
-import * as $$$$$$$$$14 from "./actions/videos/delete.ts";
-import * as $$$$$$$$$15 from "./actions/videos/update.ts";
-import * as $$$$$$$$$16 from "./actions/videos/updateCategory.ts";
-import * as $$$$$$$$$17 from "./actions/videos/updateThumbnail.ts";
+import * as $$$$$$$$$14 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$15 from "./actions/videos/delete.ts";
+import * as $$$$$$$$$16 from "./actions/videos/update.ts";
+import * as $$$$$$$$$17 from "./actions/videos/updateCategory.ts";
+import * as $$$$$$$$$18 from "./actions/videos/updateThumbnail.ts";
 import * as $$$0 from "./loaders/analytics/channelStats.ts";
 import * as $$$1 from "./loaders/analytics/videoStats.ts";
-import * as $$$2 from "./loaders/auth/authenticate.ts";
-import * as $$$3 from "./loaders/channels/get.ts";
-import * as $$$4 from "./loaders/comments/list.ts";
-import * as $$$5 from "./loaders/comments/threads.ts";
-import * as $$$6 from "./loaders/livestreams/list.ts";
-import * as $$$7 from "./loaders/livestreams/streams.ts";
+import * as $$$2 from "./loaders/channels/get.ts";
+import * as $$$3 from "./loaders/comments/list.ts";
+import * as $$$4 from "./loaders/comments/threads.ts";
+import * as $$$5 from "./loaders/livestreams/list.ts";
+import * as $$$6 from "./loaders/livestreams/streams.ts";
+import * as $$$7 from "./loaders/oauth/start.ts";
 import * as $$$8 from "./loaders/videos/captions.ts";
 import * as $$$9 from "./loaders/videos/categories.ts";
 import * as $$$10 from "./loaders/videos/channelVideos.ts";
 import * as $$$11 from "./loaders/videos/details.ts";
 import * as $$$12 from "./loaders/videos/list.ts";
 import * as $$$13 from "./loaders/videos/search.ts";
-import * as $$$$$$0 from "./sections/login.tsx";
 
 const manifest = {
   "loaders": {
     "Youtube/loaders/analytics/channelStats.ts": $$$0,
     "Youtube/loaders/analytics/videoStats.ts": $$$1,
-    "Youtube/loaders/auth/authenticate.ts": $$$2,
-    "Youtube/loaders/channels/get.ts": $$$3,
-    "Youtube/loaders/comments/list.ts": $$$4,
-    "Youtube/loaders/comments/threads.ts": $$$5,
-    "Youtube/loaders/livestreams/list.ts": $$$6,
-    "Youtube/loaders/livestreams/streams.ts": $$$7,
+    "Youtube/loaders/channels/get.ts": $$$2,
+    "Youtube/loaders/comments/list.ts": $$$3,
+    "Youtube/loaders/comments/threads.ts": $$$4,
+    "Youtube/loaders/livestreams/list.ts": $$$5,
+    "Youtube/loaders/livestreams/streams.ts": $$$6,
+    "Youtube/loaders/oauth/start.ts": $$$7,
     "Youtube/loaders/videos/captions.ts": $$$8,
     "Youtube/loaders/videos/categories.ts": $$$9,
     "Youtube/loaders/videos/channelVideos.ts": $$$10,
     "Youtube/loaders/videos/details.ts": $$$11,
     "Youtube/loaders/videos/list.ts": $$$12,
     "Youtube/loaders/videos/search.ts": $$$13,
-  },
-  "sections": {
-    "Youtube/sections/login.tsx": $$$$$$0,
   },
   "actions": {
     "Youtube/actions/channels/update.ts": $$$$$$$$$0,
@@ -71,10 +68,11 @@ const manifest = {
     "Youtube/actions/livestreams/transition.ts": $$$$$$$$$11,
     "Youtube/actions/livestreams/update.ts": $$$$$$$$$12,
     "Youtube/actions/livestreams/updateThumbnail.ts": $$$$$$$$$13,
-    "Youtube/actions/videos/delete.ts": $$$$$$$$$14,
-    "Youtube/actions/videos/update.ts": $$$$$$$$$15,
-    "Youtube/actions/videos/updateCategory.ts": $$$$$$$$$16,
-    "Youtube/actions/videos/updateThumbnail.ts": $$$$$$$$$17,
+    "Youtube/actions/oauth/callback.ts": $$$$$$$$$14,
+    "Youtube/actions/videos/delete.ts": $$$$$$$$$15,
+    "Youtube/actions/videos/update.ts": $$$$$$$$$16,
+    "Youtube/actions/videos/updateCategory.ts": $$$$$$$$$17,
+    "Youtube/actions/videos/updateThumbnail.ts": $$$$$$$$$18,
   },
   "name": "Youtube",
   "baseUrl": import.meta.url,
