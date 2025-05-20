@@ -27,6 +27,7 @@ const action = async (
 
   const body = {
     cartItem: {
+      item_id: itemId,
       qty: qty,
       quote_id: cartId,
       sku: sku,
