@@ -57,7 +57,7 @@ const action = async (
     // Create a template results array to track which templates were used
     const templateResults = slidesWithTemplates.map((slide) => ({
       id: slide.id,
-      names: slide.names,
+      names: Array.isArray(slide.text) ? slide.text : [],
       used: false,
     }));
 
@@ -66,7 +66,7 @@ const action = async (
     const updatedSlideIds: string[] = [];
 
     // Get the full presentation to access the elements
-    const getResponse = await ctx.clientSlides
+    const getResponse = await ctx.client
     ["GET /v1/presentations/:presentationId"](
       { presentationId: props.presentationId },
       {
@@ -103,11 +103,11 @@ const action = async (
 
                   // Check if this content has any template variables
                   for (const templateValue of props.templateValues) {
-                    const placeholder = `{{${templateValue.name}}}`;
+                    const placeholder = `{${templateValue.name}}`;
 
                     // Only replace if this template name exists in the slide's names
                     if (
-                      templateSlide.names?.includes(templateValue.name) &&
+                      templateSlide.text?.includes(templateValue.name) &&
                       content.includes(placeholder)
                     ) {
                       content = content.replace(
@@ -190,7 +190,7 @@ const action = async (
     return {
       presentationId: props.presentationId,
       updatedSlides: updatedSlideIds,
-      templateResults,
+      templateResults: templateResults,
     };
   } catch (error) {
     console.error("Error in updateFromTemplateNames:", error);

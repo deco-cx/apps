@@ -110,7 +110,7 @@ const loader = async (
   _req: Request,
   ctx: AppContext,
 ): Promise<SlideContent[]> => {
-  const response = await ctx.clientSlides
+  const response = await ctx.client
   ["GET /v1/presentations/:presentationId"](
     { presentationId: props.presentationId },
     {

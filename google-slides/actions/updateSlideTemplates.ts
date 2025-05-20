@@ -47,7 +47,7 @@ const action = async (
   ctx: AppContext,
 ): Promise<UpdateResponse> => {
   // First, get the slides with templates
-  const getResponse = await ctx.clientSlides
+  const getResponse = await ctx.client
   ["GET /v1/presentations/:presentationId"](
     { presentationId: props.presentationId },
     {
@@ -137,7 +137,7 @@ const action = async (
 
   // Only proceed if there are updates to make
   if (requests.length > 0) {
-    const updateResponse = await ctx.clientSlides
+    const updateResponse = await ctx.client
     ["POST /v1/presentations/:presentationId"](
       { presentationId: props.presentationId + ":batchUpdate" },
       {
