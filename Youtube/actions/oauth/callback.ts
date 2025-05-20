@@ -1,6 +1,6 @@
 import { AppContext } from "../../mod.ts";
 import { CLIENT_ID } from "../../utils/constant.ts";
-import { YoutubeTokenResponse } from "../../utils/types.ts";
+import { youtubeTokenResponse } from "../../utils/types.ts";
 
 interface Props {
   code: string;

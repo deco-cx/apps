@@ -566,7 +566,7 @@ export interface YoutubePlaylistItemsResponse {
   };
 }
 
-export interface YoutubeTokenResponse {
+export interface youtubeTokenResponse {
   access_token: string;
   refresh_token: string;
   scope: string;

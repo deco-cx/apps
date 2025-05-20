@@ -10,7 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
-    app("Youtube"),
+    app("youtube"),
     app("turso-db"),
     app("discohook"),
     app("tiny"),

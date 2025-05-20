@@ -1,1 +1,1 @@
-export { default } from "../../Youtube/mod.ts";
+export { default } from "../../youtube/mod.ts";

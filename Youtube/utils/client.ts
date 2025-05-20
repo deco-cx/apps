@@ -6,7 +6,7 @@ import {
   YoutubeCategoryListResponse,
   YoutubeChannelResponse,
   YoutubePlaylistItemsResponse,
-  YoutubeTokenResponse,
+  youtubeTokenResponse,
   YoutubeVideoListResponse,
   YoutubeVideoResponse,
 } from "./types.ts";
@@ -106,7 +106,7 @@ export interface Client {
 
 export interface AuthClient {
   "POST /token": {
-    response: YoutubeTokenResponse;
+    response: youtubeTokenResponse;
     searchParams: {
       code: string;
       client_id: string;

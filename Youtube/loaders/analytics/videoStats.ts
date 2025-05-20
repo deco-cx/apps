@@ -1,5 +1,5 @@
-import { AppContext } from "../../../Youtube/mod.ts";
-import { getAccessToken } from "../../../Youtube/utils/cookieAccessToken.ts";
+import { AppContext } from "../../../youtube/mod.ts";
+import { getAccessToken } from "../../../youtube/utils/cookieAccessToken.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
 /**

@@ -23,8 +23,8 @@ export interface State extends Props {
 export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
 
 /**
- * @title Youtube
- * @description Loaders, actions and authentication for the Youtube API for Deco.
+ * @title youtube
+ * @description Loaders, actions and authentication for the youtube API for Deco.
  * @category Social
  * @logo https://cdn.pixabay.com/photo/2021/09/11/18/21/youtube-6616310_1280.png
  */

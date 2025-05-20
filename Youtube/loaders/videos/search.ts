@@ -112,7 +112,7 @@ interface SearchResponseItem {
   };
 }
 
-interface YoutubeSearchResponse {
+interface youtubeSearchResponse {
   kind: string;
   etag: string;
   nextPageToken?: string;
@@ -264,7 +264,7 @@ export default async function loader(
       );
     }
 
-    const searchData = await searchResponse.json() as YoutubeSearchResponse;
+    const searchData = await searchResponse.json() as youtubeSearchResponse;
 
     if (!searchData.items || searchData.items.length === 0) {
       return {
