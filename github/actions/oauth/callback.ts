@@ -11,11 +11,10 @@ interface Props {
 }
 
 export default async function callback(
-  { code, returnUrl, redirectUri, ...rest }: Props,
+  { code, returnUrl, redirectUri }: Props,
   _req: Request,
   ctx: AppContext,
 ) {
-  console.log("rest", rest);
   const currentCtx = await ctx.getConfiguration();
   const response = await fetch(`${GITHUB_URL_OAUTH_ACCESS_TOKEN}`, {
     method: "POST",
