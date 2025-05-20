@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { LiveBroadcast } from "../../utils/types.ts";
 
 export type BroadcastTransitionType =
@@ -33,7 +32,7 @@ export interface TransitionBroadcastResult {
 export default async function action(
   props: TransitionBroadcastParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<TransitionBroadcastResult> {
   const {
     broadcastId,
@@ -71,7 +70,7 @@ export default async function action(
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${getAccessToken(req)}`,
+        "Authorization": `Bearer ${ctx.access_token}`,
         "Content-Length": "0", // Requisição sem corpo
       },
     });

@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface ResponderCommentProps {
   parentId: string;
@@ -13,7 +12,7 @@ export interface ResponderCommentProps {
 const action = async (
   props: ResponderCommentProps,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ) => {
   const { parentId, text } = props;
 
@@ -31,7 +30,7 @@ const action = async (
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${getAccessToken(req)}`,
+          Authorization: `Bearer ${ctx.access_token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface LikeCommentProps {
   commentId: string;
@@ -13,7 +12,7 @@ export interface LikeCommentProps {
 const action = async (
   props: LikeCommentProps,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ) => {
   const { commentId, rating } = props;
 
@@ -38,7 +37,7 @@ const action = async (
     const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${getAccessToken(req)}`,
+        Authorization: `Bearer ${ctx.access_token}`,
         "Content-Length": "0", // importante: requisição sem corpo
       },
     });

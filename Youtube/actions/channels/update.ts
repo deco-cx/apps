@@ -1,5 +1,3 @@
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-
 export interface UpdateChannelOptions {
   /**
    * @description ID do canal a ser atualizado

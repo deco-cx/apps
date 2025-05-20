@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface ChannelAnalyticsOptions {
   /**
@@ -115,7 +114,7 @@ export default async function loader(
     // Fazer a requisição para a API do YouTube Analytics
     const response = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${getAccessToken(req)}`,
+        Authorization: `Bearer ${_ctx.access_token}`,
       },
     });
 

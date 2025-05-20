@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { LiveStreamListResponse } from "../../utils/types.ts";
 
 export interface ListLiveStreamsParams {
@@ -38,7 +37,7 @@ export interface LiveStreamListErrorResponse {
 export default async function loader(
   props: ListLiveStreamsParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<LiveStreamListResponse | LiveStreamListErrorResponse> {
   const {
     streamId,
@@ -81,7 +80,7 @@ export default async function loader(
       url.toString(),
       {
         headers: {
-          Authorization: `Bearer ${getAccessToken(req)}`,
+          Authorization: `Bearer ${ctx.access_token}`,
         },
       },
     );

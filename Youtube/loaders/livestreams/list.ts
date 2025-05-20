@@ -1,4 +1,3 @@
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { AppContext } from "../../mod.ts";
 
 /**
@@ -161,7 +160,7 @@ export default async function loader(
       url.toString(),
       {
         headers: {
-          Authorization: `Bearer ${getAccessToken(req)}`,
+          Authorization: `Bearer ${ctx.access_token}`,
         },
       },
     );
@@ -273,12 +272,12 @@ export const cache = "stale-while-revalidate";
 
 export const cacheKey = (props: ListLiveBroadcastsParams, req: Request) => {
   // Não usar cache para consultas que exigem dados em tempo real
-  if (!getAccessToken(req) || props.broadcastStatus === "active") {
+  if (!ctx.access_token || props.broadcastStatus === "active") {
     return null;
   }
 
   // Incluir fragmento do token na chave de cache
-  const tokenFragment = getAccessToken(req).slice(-8);
+  const tokenFragment = ctx.access_token.slice(-8);
 
   const params = new URLSearchParams([
     ["broadcastId", props.broadcastId || ""],

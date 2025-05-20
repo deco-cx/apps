@@ -1,5 +1,4 @@
 import { AppContext } from "../../../youtube/mod.ts";
-import { getAccessToken } from "../../../youtube/utils/cookieAccessToken.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
 /**
@@ -85,7 +84,7 @@ export type AnalyticsResponse = AnalyticsResult | AnalyticsError;
 export default async function loader(
   props: VideoAnalyticsOptions,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<AnalyticsResponse> {
   const {
     channelId,
@@ -142,7 +141,7 @@ export default async function loader(
     // Fazer a requisição para a API do YouTube Analytics
     const response = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${getAccessToken(req)}`,
+        Authorization: `Bearer ${ctx.access_token}`,
       },
       ...STALE,
     });
@@ -231,7 +230,7 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (
   props: VideoAnalyticsOptions,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ) => {
   if (props.skipCache) {
     return null;

@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { LiveBroadcast } from "../../utils/types.ts";
 
 export interface UpdateLiveBroadcastThumbnailParams {

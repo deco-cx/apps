@@ -1,4 +1,3 @@
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { PrivacyStatus } from "../../utils/types.ts";
 
 export interface ChannelDefaultOptions {

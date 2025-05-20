@@ -1,5 +1,3 @@
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
-
 export interface ChannelSection {
   /**
    * @description Tipo da seção (uploads, singlePlaylist, recentUploads, etc.)
@@ -90,7 +88,7 @@ export default async function action(
   }
 
   // Obter o token de acesso
-  const accessToken = getAccessToken(req);
+  const accessToken = req.headers.get("Authorization");
 
   if (!accessToken) {
     console.error("Token de acesso não encontrado");
@@ -103,7 +101,7 @@ export default async function action(
       `https://www.googleapis.com/youtube/v3/channelSections?part=id,snippet,contentDetails&mine=true`,
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: accessToken,
         },
       },
     );
@@ -125,7 +123,7 @@ export default async function action(
     // Processar cada seção fornecida
     for (const section of sections) {
       // Preparar o objeto de seção para a API
-      const sectionBody: unknown = {
+      const sectionBody = {
         snippet: {
           type: section.type,
           style: section.style || "horizontalRow",
@@ -178,10 +176,10 @@ export default async function action(
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: accessToken,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(sectionBody),
+          body: JSON.stringify(sectionBody as any),
         },
       );
 
@@ -205,7 +203,7 @@ export default async function action(
           {
             method: "DELETE",
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: accessToken,
             },
           },
         );
@@ -241,7 +239,7 @@ export default async function action(
     }
 
     return result;
-  } catch (error) {
+  } catch (error: any) {
     console.error(
       "Erro ao processar a configuração das seções do canal:",
       error,

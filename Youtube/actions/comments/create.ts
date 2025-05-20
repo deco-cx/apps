@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface SendCommentProps {
   videoId: string;
@@ -17,7 +16,7 @@ export interface SendCommentProps {
 const action = async (
   props: SendCommentProps,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ) => {
   const { videoId, text, pinComment = false } = props;
 
@@ -36,7 +35,7 @@ const action = async (
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${getAccessToken(req)}`,
+          Authorization: `Bearer ${ctx.access_token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -84,7 +83,7 @@ const action = async (
           {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${getAccessToken(req)}`,
+              Authorization: `Bearer ${ctx.access_token}`,
               "Content-Length": "0", // importante: requisição sem corpo
             },
           },
@@ -120,7 +119,7 @@ const action = async (
           {
             method: "PUT",
             headers: {
-              Authorization: `Bearer ${getAccessToken(req)}`,
+              Authorization: `Bearer ${ctx.access_token}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({

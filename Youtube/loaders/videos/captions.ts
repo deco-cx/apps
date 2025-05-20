@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { YouTubeCaptionListResponse } from "../../utils/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 

@@ -1,4 +1,3 @@
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { UpdateThumbnailResponse } from "../../utils/types.ts";
 import { AppContext } from "../../mod.ts";
 

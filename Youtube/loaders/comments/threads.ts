@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { YouTubeCommentThreadListResponse } from "../../utils/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
@@ -45,7 +44,7 @@ export interface ThreadListResponse extends YouTubeCommentThreadListResponse {
 export default async function loader(
   props: ThreadListParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<ThreadListResponse | null> {
   const {
     videoId,
@@ -74,7 +73,7 @@ export default async function loader(
 
     const response = await fetch(url.toString(), {
       headers: {
-        Authorization: `Bearer ${getAccessToken(req)}`,
+        Authorization: `Bearer ${ctx.access_token}`,
       },
       ...STALE,
     });
@@ -135,7 +134,7 @@ export const cache = "stale-while-revalidate";
 export const cacheKey = (
   props: ThreadListParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ) => {
   // Não usar cache se não houver token ou se skipCache for verdadeiro
   if (props.skipCache) {

@@ -3,16 +3,6 @@ import { COOKIE_EXPIRATION_TIME } from "./constant.ts";
 import { AppContext } from "../mod.ts";
 
 /**
- * Get the access token from the cookie
- * @param req - The request object
- * @returns The access token
- */
-export function getAccessToken(req: Request) {
-  const cookies = getCookies(req.headers);
-  return cookies.youtube_access_token;
-}
-
-/**
  * Set the access token cookie
  * @param req - The request object
  * @param accessToken - The access token

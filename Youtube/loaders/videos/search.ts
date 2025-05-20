@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { VideoQuery, YoutubeVideoResponse } from "../../utils/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
@@ -227,11 +226,11 @@ export default async function loader(
     if (regionCode) searchParams.regionCode = regionCode;
     if (relevanceLanguage) searchParams.relevanceLanguage = relevanceLanguage;
     if (onlyShorts) searchParams.videoDuration = "short";
-    if (accessToken && includePrivate) searchParams.forMine = true;
+    if (ctx.access_token && includePrivate) searchParams.forMine = true;
 
-    const requestOptions = accessToken
+    const requestOptions = ctx.access_token
       ? {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${ctx.access_token}` },
         ...STALE,
       }
       : { ...STALE };
@@ -339,7 +338,7 @@ export default async function loader(
         resultsPerPage: items.length,
       },
       regionCode: searchData.regionCode,
-      isAuthenticated: !!accessToken,
+      isAuthenticated: !!ctx.access_token,
     };
   } catch (error) {
     return createErrorResponse(

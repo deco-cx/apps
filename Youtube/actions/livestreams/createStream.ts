@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import { LiveStream } from "../../utils/types.ts";
 
 export interface CreateLiveStreamParams {
@@ -48,7 +47,7 @@ export interface CreateLiveStreamResult {
 export default async function action(
   props: CreateLiveStreamParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<CreateLiveStreamResult> {
   const {
     title,
@@ -89,7 +88,7 @@ export default async function action(
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${getAccessToken(req)}`,
+        "Authorization": `Bearer ${ctx.access_token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),

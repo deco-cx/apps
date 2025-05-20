@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import {
   LiveBroadcast,
   LiveBroadcastPrivacyStatus,
@@ -66,7 +65,7 @@ export interface CreateLiveBroadcastResult {
 export default async function action(
   props: CreateLiveBroadcastParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<CreateLiveBroadcastResult> {
   const {
     title,
@@ -144,7 +143,7 @@ export default async function action(
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${getAccessToken(req)}`,
+        "Authorization": `Bearer ${ctx.access_token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),

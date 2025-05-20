@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface PinCommentProps {
   /**
@@ -22,7 +21,7 @@ interface PinCommentResult {
 const action = async (
   props: PinCommentProps,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<PinCommentResult> => {
   const { commentId } = props;
 
@@ -46,7 +45,7 @@ const action = async (
       getUrl.toString(),
       {
         headers: {
-          Authorization: `Bearer ${getAccessToken(req)}`,
+          Authorization: `Bearer ${ctx.access_token}`,
         },
       },
     );
@@ -83,7 +82,7 @@ const action = async (
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${getAccessToken(req)}`,
+          Authorization: `Bearer ${ctx.access_token}`,
           "Content-Length": "0", // importante: requisição sem corpo
         },
       },
@@ -117,7 +116,7 @@ const action = async (
       {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${getAccessToken(req)}`,
+          Authorization: `Bearer ${ctx.access_token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

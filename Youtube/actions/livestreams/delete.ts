@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 
 export interface DeleteLiveBroadcastParams {
   /**
@@ -21,7 +20,7 @@ export interface DeleteLiveBroadcastResult {
 export default async function action(
   props: DeleteLiveBroadcastParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<DeleteLiveBroadcastResult> {
   const {
     broadcastId,
@@ -47,7 +46,7 @@ export default async function action(
     const response = await fetch(url.toString(), {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${getAccessToken(req)}`,
+        "Authorization": `Bearer ${ctx.access_token}`,
       },
     });
 

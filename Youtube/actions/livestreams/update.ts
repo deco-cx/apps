@@ -1,5 +1,4 @@
 import type { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import {
   LiveBroadcast,
   LiveBroadcastPrivacyStatus,
@@ -71,7 +70,7 @@ export interface UpdateLiveBroadcastResult {
 export default async function action(
   props: UpdateLiveBroadcastParams,
   req: Request,
-  _ctx: AppContext,
+  ctx: AppContext,
 ): Promise<UpdateLiveBroadcastResult> {
   const {
     broadcastId,
@@ -103,7 +102,7 @@ export default async function action(
 
     const getResponse = await fetch(getUrl.toString(), {
       headers: {
-        "Authorization": `Bearer ${getAccessToken(req)}`,
+        "Authorization": `Bearer ${ctx.access_token}`,
       },
     });
 
@@ -169,7 +168,7 @@ export default async function action(
     const updateResponse = await fetch(updateUrl.toString(), {
       method: "PUT",
       headers: {
-        "Authorization": `Bearer ${getAccessToken(req)}`,
+        "Authorization": `Bearer ${ctx.access_token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),

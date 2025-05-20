@@ -1,5 +1,4 @@
 import { AppContext } from "../../mod.ts";
-import { getAccessToken } from "../../utils/cookieAccessToken.ts";
 import type { YoutubeChannelResponse } from "../../utils/types.ts";
 import { STALE } from "../../../utils/fetch.ts";
 
@@ -120,22 +119,20 @@ export const cacheKey = (
   req: Request,
   ctx: AppContext,
 ) => {
-  const accessToken = getAccessToken(req);
-
   // Verificar se há flag de token expirado
   const tokenExpired = req.headers.get("X-Token-Expired") === "true";
 
   // Não usar cache se não houver token, for canal do usuário autenticado, skipCache for verdadeiro
   // ou se o token estiver expirado
   if (
-    !accessToken || (props.mine === true && !props.id) || props.skipCache ||
+    !ctx.access_token || (props.mine === true && !props.id) || props.skipCache ||
     tokenExpired
   ) {
     return null;
   }
 
   // Incluir fragmento do token na chave de cache
-  const tokenFragment = accessToken.slice(-8);
+  const tokenFragment = ctx.access_token.slice(-8);
 
   const params = new URLSearchParams([
     ["id", props.id || ""],
