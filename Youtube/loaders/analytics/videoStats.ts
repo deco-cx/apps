@@ -83,7 +83,7 @@ export type AnalyticsResponse = AnalyticsResult | AnalyticsError;
  */
 export default async function loader(
   props: VideoAnalyticsOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<AnalyticsResponse> {
   const {
@@ -96,7 +96,7 @@ export default async function loader(
     dimensions = "video",
     sort = "-views",
     maxResults,
-    skipCache = false,
+    skipCache: _skipCache = false,
   } = props;
 
   if (!channelId) {
@@ -229,8 +229,8 @@ export const cache = "stale-while-revalidate";
 // Define a chave de cache com base nos parâmetros da requisição
 export const cacheKey = (
   props: VideoAnalyticsOptions,
-  req: Request,
-  ctx: AppContext,
+  _req: Request,
+  _ctx: AppContext,
 ) => {
   if (props.skipCache) {
     return null;

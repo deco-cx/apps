@@ -1,4 +1,3 @@
-import type { AppContext } from "../../mod.ts";
 import { LiveBroadcast } from "../../utils/types.ts";
 
 export interface UpdateLiveBroadcastThumbnailParams {
@@ -37,8 +36,7 @@ export interface UpdateLiveBroadcastThumbnailResult {
  */
 export default async function action(
   props: UpdateLiveBroadcastThumbnailParams,
-  req: Request,
-  _ctx: AppContext,
+  _req: Request,
 ): Promise<UpdateLiveBroadcastThumbnailResult> {
   const {
     broadcastId,

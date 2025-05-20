@@ -69,7 +69,7 @@ export interface UpdateLiveBroadcastResult {
  */
 export default async function action(
   props: UpdateLiveBroadcastParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<UpdateLiveBroadcastResult> {
   const {

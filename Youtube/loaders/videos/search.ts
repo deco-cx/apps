@@ -176,7 +176,6 @@ interface VideoDetailsWithShorts {
  */
 export default async function loader(
   props: VideoSearchOptions,
-  req: Request,
   ctx: AppContext,
 ): Promise<YoutubeVideoResponse | null> {
   const client = ctx.client;

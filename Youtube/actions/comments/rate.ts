@@ -11,7 +11,7 @@ export interface LikeCommentProps {
  */
 const action = async (
   props: LikeCommentProps,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ) => {
   const { commentId, rating } = props;

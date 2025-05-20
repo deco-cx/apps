@@ -20,7 +20,7 @@ export interface VideoCategoriesOptions {
  */
 export default async function loader(
   props: VideoCategoriesOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<YoutubeCategoryListResponse | null> {
   const { regionCode = "BR" } = props;

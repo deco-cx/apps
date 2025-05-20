@@ -1,6 +1,5 @@
 import { AppContext } from "../../mod.ts";
 import { CLIENT_ID } from "../../utils/constant.ts";
-import { youtubeTokenResponse } from "../../utils/types.ts";
 
 interface Props {
   code: string;
@@ -9,7 +8,7 @@ interface Props {
 }
 
 export default async function callback(
-  { code, returnUrl, ...rest }: Props,
+  { code, returnUrl, ..._rest }: Props,
   _req: Request,
   ctx: AppContext,
 ) {

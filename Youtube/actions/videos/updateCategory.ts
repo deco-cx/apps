@@ -55,7 +55,7 @@ export interface UpdateCategoryOptions {
  */
 export default async function action(
   props: UpdateCategoryOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<UpdateCategoryResponse> {
   const client = ctx.client;

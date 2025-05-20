@@ -15,7 +15,7 @@ export interface SendCommentProps {
  */
 const action = async (
   props: SendCommentProps,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ) => {
   const { videoId, text, pinComment = false } = props;

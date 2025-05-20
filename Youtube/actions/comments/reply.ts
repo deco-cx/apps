@@ -11,7 +11,7 @@ export interface ResponderCommentProps {
  */
 const action = async (
   props: ResponderCommentProps,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ) => {
   const { parentId, text } = props;

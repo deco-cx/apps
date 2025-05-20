@@ -50,7 +50,7 @@ export type UpdateVideoResponse = UpdateVideoResult | UpdateVideoError;
  */
 export default async function action(
   props: UpdateVideoOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<UpdateVideoResponse> {
   const client = ctx.client;

@@ -20,7 +20,7 @@ interface PinCommentResult {
  */
 const action = async (
   props: PinCommentProps,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<PinCommentResult> => {
   const { commentId } = props;

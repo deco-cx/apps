@@ -41,7 +41,7 @@ export type ThumbnailResponse = ThumbnailUpdateResult | ThumbnailUpdateError;
  */
 export default async function action(
   props: UpdateThumbnailOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<ThumbnailResponse> {
   const client = ctx.client;

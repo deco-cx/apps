@@ -64,7 +64,7 @@ interface UpdateChannelDefaultsResult {
  */
 export default async function action(
   props: ChannelDefaultOptions,
-  req: Request,
+  _req: Request,
   _ctx: unknown,
 ): Promise<UpdateChannelDefaultsResult> {
   const {

@@ -36,7 +36,7 @@ export interface LiveStreamListErrorResponse {
  */
 export default async function loader(
   props: ListLiveStreamsParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<LiveStreamListResponse | LiveStreamListErrorResponse> {
   const {

@@ -125,7 +125,8 @@ export const cacheKey = (
   // Não usar cache se não houver token, for canal do usuário autenticado, skipCache for verdadeiro
   // ou se o token estiver expirado
   if (
-    !ctx.access_token || (props.mine === true && !props.id) || props.skipCache ||
+    !ctx.access_token || (props.mine === true && !props.id) ||
+    props.skipCache ||
     tokenExpired
   ) {
     return null;

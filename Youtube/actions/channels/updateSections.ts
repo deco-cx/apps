@@ -179,7 +179,7 @@ export default async function action(
             Authorization: accessToken,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(sectionBody as any),
+          body: JSON.stringify(sectionBody as Record<string, unknown>),
         },
       );
 
@@ -239,14 +239,18 @@ export default async function action(
     }
 
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(
       "Erro ao processar a configuração das seções do canal:",
       error,
     );
+    let message = "Erro ao processar a solicitação";
+    if (error instanceof Error) {
+      message = `Erro ao processar a solicitação: ${error.message}`;
+    }
     return {
       success: false,
-      message: `Erro ao processar a solicitação: ${error.message}`,
+      message,
     };
   }
 }

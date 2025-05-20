@@ -31,7 +31,7 @@ export interface TransitionBroadcastResult {
  */
 export default async function action(
   props: TransitionBroadcastParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<TransitionBroadcastResult> {
   const {

@@ -81,9 +81,9 @@ export default async function loader(
     translationLanguage,
     preferredLanguage,
     autoLoadCaption = true,
-    skipCache = false,
+    skipCache: _skipCache = false,
   }: VideoCaptionsOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<CaptionResponse | null> {
   const client = ctx.client;
@@ -159,7 +159,7 @@ function findCaptionToLoad(
 }
 
 async function loadCaption(
-  client: any,
+  client: unknown,
   response: CaptionResponse,
   captionId: string,
   format: "srt" | "sbv" | "vtt",
@@ -191,11 +191,12 @@ async function loadCaption(
     } else {
       await handleCaptionError(captionResponse, response);
     }
-  } catch (error) {
+  } catch (_parseError) {
+    const errorText = await captionResponse.text();
     response.error = {
-      code: 500,
-      message: "Error requesting specific caption",
-      details: error instanceof Error ? error.message : String(error),
+      code: captionResponse.status,
+      message: "Failed to fetch caption text",
+      details: errorText,
     };
   }
 }
@@ -241,7 +242,7 @@ async function handleCaptionError(
         : "Failed to fetch caption text",
       details: JSON.stringify(errorData),
     };
-  } catch (parseError) {
+  } catch (_parseError) {
     const errorText = await captionResponse.text();
     response.error = {
       code: captionResponse.status,
@@ -368,8 +369,8 @@ export const cache = "stale-while-revalidate";
 // Define a chave de cache com base nos parâmetros da requisição
 export const cacheKey = (
   props: VideoCaptionsOptions,
-  req: Request,
-  ctx: AppContext,
+  _req: Request,
+  _ctx: AppContext,
 ) => {
   // Não fazer cache se não houver videoId
   if (!props.videoId) {

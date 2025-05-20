@@ -52,7 +52,7 @@ interface UpdateChannelResult {
  */
 export default async function action(
   props: UpdateChannelOptions,
-  req: Request,
+  _req: Request,
   _ctx: unknown,
 ): Promise<UpdateChannelResult> {
   const {

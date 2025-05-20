@@ -64,7 +64,7 @@ export interface CreateLiveBroadcastResult {
  */
 export default async function action(
   props: CreateLiveBroadcastParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<CreateLiveBroadcastResult> {
   const {

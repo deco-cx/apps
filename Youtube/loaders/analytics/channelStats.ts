@@ -60,8 +60,8 @@ interface AnalyticsResponse {
  */
 export default async function loader(
   props: ChannelAnalyticsOptions,
-  req: Request,
-  _ctx: AppContext,
+  _req: Request,
+  ctx: AppContext,
 ): Promise<AnalyticsResponse | null> {
   const {
     channelId,
@@ -114,7 +114,7 @@ export default async function loader(
     // Fazer a requisição para a API do YouTube Analytics
     const response = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${_ctx.access_token}`,
+        Authorization: `Bearer ${ctx.access_token}`,
       },
     });
 

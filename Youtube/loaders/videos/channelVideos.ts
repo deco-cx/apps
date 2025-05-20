@@ -1,8 +1,5 @@
 import type { AppContext } from "../../mod.ts";
-import type {
-  YoutubePlaylistItemsResponse,
-  YoutubeVideoListResponse,
-} from "../../utils/types.ts";
+import type { YoutubeVideoListResponse } from "../../utils/types.ts";
 
 export interface ChannelVideosOptions {
   /**
@@ -22,7 +19,7 @@ export interface ChannelVideosOptions {
  */
 export default async function loader(
   props: ChannelVideosOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<YoutubeVideoListResponse | null> {
   const { client } = ctx;

@@ -74,7 +74,7 @@ export type LiveBroadcastListResponse =
  */
 export default async function loader(
   props: ListLiveBroadcastsParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<LiveBroadcastListResponse> {
   const {
@@ -270,7 +270,7 @@ function createErrorResponse(
 
 export const cache = "stale-while-revalidate";
 
-export const cacheKey = (props: ListLiveBroadcastsParams, req: Request) => {
+export const cacheKey = (props: ListLiveBroadcastsParams, _req: Request) => {
   // Não usar cache para consultas que exigem dados em tempo real
   if (!ctx.access_token || props.broadcastStatus === "active") {
     return null;

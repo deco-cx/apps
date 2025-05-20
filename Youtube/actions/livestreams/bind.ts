@@ -1,4 +1,3 @@
-import type { AppContext } from "../../mod.ts";
 import { LiveBroadcast } from "../../utils/types.ts";
 
 export interface BindStreamParams {
@@ -26,8 +25,7 @@ export interface BindStreamResult {
  */
 export default async function action(
   props: BindStreamParams,
-  req: Request,
-  ctx: AppContext,
+  _req: Request,
 ): Promise<BindStreamResult> {
   const {
     broadcastId,

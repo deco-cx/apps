@@ -46,7 +46,7 @@ export interface CreateLiveStreamResult {
  */
 export default async function action(
   props: CreateLiveStreamParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<CreateLiveStreamResult> {
   const {

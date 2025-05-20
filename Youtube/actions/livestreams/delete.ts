@@ -19,7 +19,7 @@ export interface DeleteLiveBroadcastResult {
  */
 export default async function action(
   props: DeleteLiveBroadcastParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<DeleteLiveBroadcastResult> {
   const {

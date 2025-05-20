@@ -63,7 +63,7 @@ export type VideoDetailsResponse = VideoDetailsResult | VideoDetailsError;
  */
 export default async function loader(
   props: VideoDetailsOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<VideoDetailsResponse> {
   const client = ctx.client;
@@ -127,7 +127,7 @@ export default async function loader(
         if (captionsResponse.ok) {
           result.captions = await captionsResponse.json();
         }
-      } catch (error) {
+      } catch (_error) {
         // Ignora erros de legenda - não são críticos para o resultado
       }
     }

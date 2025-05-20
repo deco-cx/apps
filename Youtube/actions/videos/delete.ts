@@ -34,7 +34,7 @@ export type DeleteVideoResponse = DeleteVideoResult | DeleteVideoError;
  */
 export default async function action(
   props: DeleteVideoParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<DeleteVideoResponse> {
   const client = ctx.client;
@@ -64,7 +64,7 @@ export default async function action(
     }
 
     // Se a resposta não for 204, temos um erro
-    let errorText = await response.text();
+    const errorText = await response.text();
     let errorDetails;
 
     try {

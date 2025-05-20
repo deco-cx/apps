@@ -48,7 +48,7 @@ export interface VideoListOptions {
  */
 export default async function loader(
   props: VideoListOptions,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<YoutubeVideoListResponse | null> {
   const { client } = ctx;

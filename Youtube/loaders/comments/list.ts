@@ -38,14 +38,14 @@ export interface CommentListResponse extends YouTubeCommentThreadListResponse {
  */
 export default async function loader(
   props: CommentListParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<CommentListResponse | null> {
   const {
     parentId,
     maxResults = 20,
     pageToken,
-    skipCache = false,
+    skipCache: _skipCache = false,
   } = props;
 
   if (!parentId) {
@@ -128,8 +128,8 @@ export const cache = "stale-while-revalidate";
 // Define a chave de cache com base nos parâmetros da requisição
 export const cacheKey = (
   props: CommentListParams,
-  req: Request,
-  ctx: AppContext,
+  _req: Request,
+  _ctx: AppContext,
 ) => {
   if (props.skipCache) {
     return null;

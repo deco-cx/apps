@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "@std/http";
+import { setCookie } from "@std/http";
 import { COOKIE_EXPIRATION_TIME } from "./constant.ts";
 import { AppContext } from "../mod.ts";
 

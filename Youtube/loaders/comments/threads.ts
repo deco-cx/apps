@@ -43,7 +43,7 @@ export interface ThreadListResponse extends YouTubeCommentThreadListResponse {
  */
 export default async function loader(
   props: ThreadListParams,
-  req: Request,
+  _req: Request,
   ctx: AppContext,
 ): Promise<ThreadListResponse | null> {
   const {
@@ -51,7 +51,7 @@ export default async function loader(
     maxResults = 20,
     pageToken,
     order = "time",
-    skipCache = false,
+    skipCache: _skipCache = false,
   } = props;
 
   if (!videoId) {
@@ -133,8 +133,8 @@ export const cache = "stale-while-revalidate";
 // Define a chave de cache com base nos parâmetros da requisição
 export const cacheKey = (
   props: ThreadListParams,
-  req: Request,
-  ctx: AppContext,
+  _req: Request,
+  _ctx: AppContext,
 ) => {
   // Não usar cache se não houver token ou se skipCache for verdadeiro
   if (props.skipCache) {
