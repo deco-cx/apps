@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("github"),
     app("turso-db"),
     app("discohook"),
     app("tiny"),
