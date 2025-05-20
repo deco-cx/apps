@@ -39,6 +39,7 @@ export default async function callback(
     expires_in: authResponse.expires_in,
     scope: authResponse.scope,
     token_type: authResponse.token_type,
+    tokenObtainedAt: Math.floor(Date.now() / 1000),
   });
 
   if (returnUrl) {

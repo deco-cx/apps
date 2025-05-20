@@ -4,11 +4,13 @@
 
 import * as $$$$$$$$$0 from "./actions/createGist.ts";
 import * as $$$$$$$$$1 from "./actions/oauth/callback.ts";
+import * as $$$$$$$$$2 from "./actions/oauth/refreshToken.ts";
 import * as $$$0 from "./loaders/getAuthenticatedUser.ts";
 import * as $$$1 from "./loaders/getRepoFileContent.ts";
 import * as $$$2 from "./loaders/listAuthenticatedUserRepos.ts";
 import * as $$$3 from "./loaders/listPublicGists.ts";
 import * as $$$4 from "./loaders/oauth/start.ts";
+import * as $$$5 from "./loaders/withAutoRefresh.ts";
 
 const manifest = {
   "loaders": {
@@ -17,10 +19,12 @@ const manifest = {
     "github/loaders/listAuthenticatedUserRepos.ts": $$$2,
     "github/loaders/listPublicGists.ts": $$$3,
     "github/loaders/oauth/start.ts": $$$4,
+    "github/loaders/withAutoRefresh.ts": $$$5,
   },
   "actions": {
     "github/actions/createGist.ts": $$$$$$$$$0,
     "github/actions/oauth/callback.ts": $$$$$$$$$1,
+    "github/actions/oauth/refreshToken.ts": $$$$$$$$$2,
   },
   "name": "github",
   "baseUrl": import.meta.url,

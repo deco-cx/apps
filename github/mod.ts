@@ -1,10 +1,10 @@
 import type { App, FnContext } from "@deco/deco";
 import manifest, { Manifest } from "./manifest.gen.ts";
 import { McpContext } from "../mcp/context.ts";
-import { createHttpClient } from "../utils/http.ts";
 import { Client } from "./utils/client.ts";
 import { fetchSafe } from "../utils/fetch.ts";
 import { GITHUB_URL } from "./utils/constant.ts";
+import { createHttpClient } from "../utils/http.ts";
 
 export interface Props {
   access_token?: string;
@@ -13,10 +13,8 @@ export interface Props {
   scope?: string;
   token_type?: string;
   refresh_token_expires_in?: number;
+  tokenObtainedAt?: number;
 }
-
-// Here we define the state of the app
-// You choose what to put in the state
 
 export interface State extends Props {
   client: ReturnType<typeof createHttpClient<Client>>;
@@ -32,6 +30,14 @@ export type AppContext = FnContext<State & McpContext<Props>, Manifest>;
  */
 export default function App(props: Props): App<Manifest, State> {
   const { access_token } = props;
+
+  const updatedProps = {
+    ...props,
+    tokenObtainedAt: access_token
+      ? (props.tokenObtainedAt || Math.floor(Date.now() / 1000))
+      : undefined,
+  };
+
   const client = createHttpClient<Client>({
     base: GITHUB_URL,
     headers: new Headers({
@@ -42,7 +48,7 @@ export default function App(props: Props): App<Manifest, State> {
     fetcher: fetchSafe,
   });
 
-  const state = { ...props, client };
+  const state = { ...updatedProps, client };
   return {
     state,
     manifest,
