@@ -240,8 +240,6 @@ export default function App(props: Props): App<Manifest, State> {
   const secretKey = typeof apiKey === "string" ? apiKey : apiKey?.get() ?? "";
   const headerGql = getStoreHeader(storeId, site, storeHeader);
 
-  console.log({ baseUrl: apiConfig.baseUrl.get() });
-
   const baseUrl = apiConfig.baseUrl.get() ?? "";
 
   const clientAdmin = createHttpClient<API>({

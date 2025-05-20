@@ -68,7 +68,7 @@ const action = async (
       console.error(e);
     });
 
-    if(result?.ok) {
+    if (result?.ok) {
       return handleCartActions(dontReturnCart, {
         req,
         ctx,

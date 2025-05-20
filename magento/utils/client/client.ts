@@ -95,6 +95,42 @@ export interface API {
     };
   };
 
+  "GET /rest/:site/V1/products/": {
+    response: {
+      items: {
+        [key: string]: unknown;
+        name: string;
+        url_key: string;
+        sku: string;
+        media_gallery_entries: {
+          file: string;
+          types: string;
+          disabled: boolean;
+          label: string;
+          position: number;
+        }[];
+        custom_attributes:
+          | {
+            attribute_code: string;
+            value: string;
+          }[]
+          | {
+            [key: string | number]: {
+              attribute_code: string;
+              value: string;
+            };
+          };
+      }[];
+    };
+    searchParams: {
+      "searchCriteria[filter_groups][0][filters][0][field]": string;
+      "searchCriteria[filter_groups][0][filters][0][value]": string;
+      "searchCriteria[filter_groups][0][filters][0][condition_type]": string;
+      fields?: string;
+      "searchCriteria[pageSize]": number;
+    };
+  };
+
   /** @docs https://adobe-commerce.redoc.ly/2.4.7-admin/tag/cartsquoteIditems#operation/PostV1CartsQuoteIdItems */
   "PUT /rest/:site/V1/carts/:cartId/coupons/:couponCode": {
     response: boolean;

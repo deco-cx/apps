@@ -63,7 +63,10 @@ const handleNonCachedImages = async (
   if (!skus || skus.length === 0) {
     return [];
   }
-  const { items } = (await getCartImages(skus, ctx)).products;
+
+  const { products } = await getCartImages(skus, ctx);
+
+  const { items } = products;
 
   for (const i in items) {
     putImageInCache(items[i], url);

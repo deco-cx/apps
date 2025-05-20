@@ -8,11 +8,7 @@ import {
   ItemsWithDecoImage,
   MagentoCardPrices,
 } from "./client/types.ts";
-import {
-  ProductImagesInputs,
-  ProductWithImagesGraphQL,
-} from "./clientGraphql/types.ts";
-import { GetProductImages } from "./clientGraphql/queries.ts";
+import { ProductWithImagesGraphQL } from "./clientGraphql/types.ts";
 import { setCookie } from "@std/http/cookie";
 
 export const CART_COOKIE = "dataservices_cart_id";
@@ -149,18 +145,34 @@ export async function getCartImages(
   skus: Array<string>,
   ctx: AppContext,
 ) {
-  return await ctx.clientGraphql.query<
-    ProductWithImagesGraphQL,
-    ProductImagesInputs
-  >(
-    {
-      variables: {
-        search: `${skus.join(" ")}`,
-        pageSize: skus.length,
-      },
-      ...GetProductImages,
-    },
-  );
+  const products = await ctx.clientAdmin["GET /rest/:site/V1/products/"]({
+    site: ctx.site,
+    "searchCriteria[filter_groups][0][filters][0][field]": "sku",
+    "searchCriteria[filter_groups][0][filters][0][value]": skus.join(","),
+    "searchCriteria[filter_groups][0][filters][0][condition_type]": "in",
+    fields:
+      "items[sku,name,url_key,media_gallery_entries[file,types,disabled,label,position],custom_attributes[url_key]]",
+    "searchCriteria[pageSize]": skus.length,
+  }).then((res) => res.json());
+
+  const items = products.items.map((product) => {
+    return {
+      name: product.name,
+      sku: product.sku,
+      url_key: product.custom_attributes?.["1"].value,
+      media_gallery: product.media_gallery_entries.map((entry) => {
+        return {
+          types: entry.types,
+          disabled: entry.disabled,
+          label: entry.label,
+          position: entry.position,
+          url: `${ctx.baseUrl.get()}/media/catalog/product${entry.file}`,
+        };
+      }),
+    };
+  });
+
+  return { products: { items } };
 }
 
 export const setCartCookie = (headers: Headers, cartId: string) => {
